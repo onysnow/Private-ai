@@ -23,12 +23,13 @@ import {Table, TableBody, TableCell, TableRow} from '@/components/ui/table';
 import type {EntityFormSubmitPayload} from '../../components/entity-form';
 import {
   getInvestigationFinancialFlowsQueryKey, getInvestigationMoneyChecksQueryKey, getInvestigationGraphOptions, getInvestigationGraphQueryKey, listEntitiesOptions, listEntitiesQueryKey,
-  getAllRecordTagsOptions, getRedFlagsOptions, listInvestigationEvidenceOptions,
+  getAllRecordTagsOptions, listInvestigationEvidenceOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {createCanonicalRelationship, createEntity} from '../../lib/generated/sdk.gen';
 import type {EntityOut, GraphOut} from '../../lib/generated/types.gen';
 import {reportPayloadError} from '../../lib/report-error';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {Graph, withEnds} from './graph';
 import type {GraphEdge} from './graph';
 import {RelationshipDetail} from './relationship-detail';
@@ -78,7 +79,7 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
     return out;
   }, [recordTags]);
   // Open Red Flags per party: a marker on its dot.
-  const redFlags = useQuery({...getRedFlagsOptions({path}), enabled}).data;
+  const redFlags = useRedFlagsQuery(investigationId, enabled).query.data;
   const partyFlags = useMemo(() => {
     const out: Record<string, number> = {};
     for (const f of redFlags?.flags ?? []) if (f.status === 'open') for (const p of f.parties) out[p.id] = (out[p.id] ?? 0) + 1;

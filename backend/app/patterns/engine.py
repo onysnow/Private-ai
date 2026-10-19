@@ -136,9 +136,23 @@ def _run_spec(spec: Any, graph: Any) -> Any:
         return _Crashed(f"This rule failed on this case ({exc.__class__.__name__}); the other rules still ran.")
 
 
+def _digest(graph: Any) -> str:
+    """What the rules read, as one hash: every party and link with its properties and how sure it is, and
+    each rule's version. Unchanged since the last run means the stored flags are what a run would give."""
+    import json
+
+    body = {
+        "parties": sorted([p.id, p.name, p.schema, p.properties] for p in graph.parties.values()),
+        "links": sorted([l.id, l.schema, l.source, l.target, l.properties, l.certainty] for l in graph.links),
+        "rules": sorted([s.indicator, s.version] for s in detection.load()),
+    }
+    return hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()[:32]
+
+
 def recompute(db: Session, investigation_id: str) -> list[dict[str, str]]:
     """Runs every detection spec (catalogue/detection/) on the case and keeps the
-    flags; returns the specs that could not run, each with its reason."""
+    flags, and when they ran (Investigation.red_flag_run); returns the specs that
+    could not run, each with its reason."""
     graph = case_graph.build(db, investigation_id)
     certainty = {link.id: link.certainty for link in graph.links}
     now = utcnow_naive()
@@ -171,6 +185,9 @@ def recompute(db: Session, investigation_id: str) -> list[dict[str, str]]:
         if fp not in seen and row.gone_at is None and row.indicator_id not in crashed:
             row.gone_at = now
     _rank([r for r in existing.values() if r.gone_at is None])
+    inv = db.get(Investigation, investigation_id)
+    if inv is not None:
+        inv.red_flag_run = {"at": now.isoformat(), "digest": _digest(graph), "cannot_run": cannot}
     db.commit()
     return cannot
 
@@ -247,25 +264,32 @@ def bring_up_to_date(db: Session, investigation_id: str) -> list[dict[str, str]]
     return None
 
 
-def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[str, Any]:
+def run(db: Session, investigation_id: str) -> dict[str, Any] | None:
+    """Runs the rules now (and brings To check up to date), then lists the flags.
+    None for a reader without write access: only someone who can edit the case runs them."""
+    if bring_up_to_date(db, investigation_id) is None:
+        return None
+    return flags(db, investigation_id)
+
+
+def flags(db: Session, investigation_id: str) -> dict[str, Any]:
+    """The flags as the rules last left them. Reading never writes: it says when
+    the rules last ran and whether the records they read have changed since
+    (``stale``), and the caller runs them (``run``) when it wants them fresh."""
+    from datetime import datetime
+
     from app.models.domain import Entity
 
-    cannot: list[dict[str, str]] = []
-    if refresh:
-        refreshed = bring_up_to_date(db, investigation_id)
-        if refreshed is not None:
-            cannot = refreshed
-        else:
-            # A reader without write access sees the flags as last computed.
-            graph = case_graph.build(db, investigation_id)
-            cannot = [{"indicator_id": s.indicator, "name": _name(s.indicator), "reason": r}
-                      for s in detection.load() if isinstance(r := _run_spec(s, graph), str)]
+    inv = db.get(Investigation, investigation_id)
+    last = (inv.red_flag_run if inv else None) or {}
+    ran_at = datetime.fromisoformat(last["at"]) if last.get("at") else None
+    stale = ran_at is None or last.get("digest") != _digest(case_graph.build(db, investigation_id))
+    cannot: list[dict[str, str]] = list(last.get("cannot_run") or [])
     rows = list(db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == investigation_id)))
     party_ids = {p for r in rows for p in r.parties}
     names = {e.id: (e.caption or e.id, e.schema) for e in db.scalars(select(Entity).where(Entity.id.in_(party_ids)))} if party_ids else {}
     current = sorted((r for r in rows if r.gone_at is None), key=lambda r: (-r.weight, r.indicator_id, r.fingerprint))
     gone = sorted((r for r in rows if r.gone_at is not None), key=lambda r: r.gone_at or r.last_seen_at, reverse=True)
-    inv = db.get(Investigation, investigation_id)
     by_link = link_years(db, investigation_id)
     linked: dict[str, list[dict[str, str]]] = {}
     for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id, CheckItem.flag_id.is_not(None),
@@ -275,6 +299,8 @@ def flags(db: Session, investigation_id: str, *, refresh: bool = True) -> dict[s
         "investigation_id": investigation_id,
         "rules": [{"indicator_id": s.indicator, "version": s.version, "name": _name(s.indicator)} for s in detection.load()],
         "cannot_run": cannot,
+        "ran_at": ran_at,
+        "stale": stale,
         "flags": [serialize(db, r, names, linked, by_link) for r in current],
         "gone": [serialize(db, r, names, by_link=by_link) for r in gone],
         "investigation_type": investigation_type.current(db, inv) if inv else {"set_by": "app", "areas": [], "suggested": []},

@@ -6,17 +6,22 @@
 // the "rests on an unshown link" mark; under it the parties carrying flags. Centre: the open flag, with a picture
 // of what it rests on, the level ladder (met / not set / needs facts) and the actions. Right: "Before you call it":
 // the innocent explanations as a checklist kept on the flag, what the records can't show, and the sources.
-// Keys: J / K move, [ / ] step within a kind, A add to leads, X set aside (asks why in place).
+// Keys: J / K move, [ / ] step within a kind, A add to leads, X set aside (asks why in place). Pointing at a row
+// previews its flag in the centre without losing the one chosen. Reading the flags never runs the rules: the board
+// runs them when the records have changed since they last ran, and "Run the rules" runs them on demand. What is new
+// or no longer fires since your last visit plays back once as a short replay. Scrolling over the payments steps
+// through them (one notch, one payment), the one in focus lit and named.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 
 import {caseHref} from '../../lib/case-href';
 import {errorMessage} from '../../lib/api-client';
 import {getInvestigationFinancialFlowsOptions, getRedFlagsQueryKey, markRedFlagInnocentMutation} from '../../lib/generated/@tanstack/react-query.gen';
-import type {FlagInnocentOut, RedFlagOut} from '../../lib/generated/types.gen';
+import type {FinancialTransactionOut, FlagInnocentOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {useWheelStep} from '../case-home/wheel-step';
 import {GlossaryText} from '../glossary/glossary-text';
 import {InvestigationType, LEVEL, LEVEL_ORDER, flagsByArea, useRedFlags} from '../red-flags/red-flags-panel';
 
@@ -64,8 +69,92 @@ export function ladder(flag: RedFlagOut): Rung[] {
 
 function lastVisitKey(inv: string): string { return `pai:flags-visit:${inv}`; }
 
+/** The server sends UTC times without an offset; read them as UTC wherever the browser is. */
+export function utcTime(at: string): number { return new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(at) ? at : `${at}Z`).getTime(); }
+
+/** "just now", "4 min ago", "3 h ago", "2 days ago". */
+export function agoText(at: string, now = Date.now()): string {
+  const min = Math.max(0, Math.round((now - utcTime(at)) / 60000));
+  if (min < 1) return 'just now';
+  if (min < 60) return `${min} min ago`;
+  const h = Math.round(min / 60);
+  if (h < 48) return `${h} h ago`;
+  return `${Math.round(h / 24)} days ago`;
+}
+
+/** One change since the last visit: a flag first seen after it, or one that stopped firing after it. */
+export type Change = {kind: 'new' | 'gone'; flag: RedFlagOut; at: string};
+export function changesSince(flags: RedFlagOut[], gone: RedFlagOut[], since: string | null): Change[] {
+  if (since === null) return [];
+  const after = utcTime(since);
+  const out: Change[] = [
+    ...flags.filter(f => utcTime(f.first_seen_at) > after).map(f => ({kind: 'new' as const, flag: f, at: f.first_seen_at})),
+    ...gone.filter(f => f.gone_at && utcTime(f.gone_at) > after).map(f => ({kind: 'gone' as const, flag: f, at: f.gone_at!})),
+  ];
+  return out.sort((a, b) => utcTime(a.at) - utcTime(b.at) || a.flag.id.localeCompare(b.flag.id));
+}
+
+const REPLAY_MS = 1600;
+const REPLAY_MAX = 6;
+function calm(): boolean {
+  if (typeof window === 'undefined') return true;
+  try { return document.documentElement.dataset.motion === 'calm' || Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches); } catch { return false; }
+}
+
+/** What changed since the last visit, played back once, one change at a time (a new flag's row lights in the list).
+ * Calm motion: no timed playback; every change is listed at once and the reporter steps with the arrows. */
+function WhatChanged({changes, since, ready, onLight}: {changes: Change[]; since: string; ready: boolean; onLight: (c: Change | null) => void}): ReactElement | null {
+  // A kind that changed many times is one step with its count, as in the ranked list.
+  const steps = useMemo(() => {
+    const m = new Map<string, Change & {n: number}>();
+    for (const c of changes) {
+      const key = `${c.kind}:${c.flag.indicator_id}:${c.flag.level}`;
+      const step = m.get(key);
+      if (step) step.n += 1; else m.set(key, {...c, n: 1});
+    }
+    return [...m.values()];
+  }, [changes]);
+  const shown = steps.slice(0, REPLAY_MAX);
+  const [at, setAt] = useState(-1);
+  const [playing, setPlaying] = useState(false);
+  const played = useRef(false);
+  const still = calm();
+  useEffect(() => {
+    if (!ready || played.current || !shown.length || still) return;
+    played.current = true; setAt(0); setPlaying(true);
+  }, [ready, shown.length, still]);
+  useEffect(() => {
+    if (!playing) return;
+    const t = window.setTimeout(() => { if (at + 1 < shown.length) setAt(at + 1); else { setPlaying(false); setAt(-1); } }, REPLAY_MS);
+    return () => window.clearTimeout(t);
+  }, [playing, at, shown.length]);
+  const current = at >= 0 ? shown[at] : undefined;
+  useEffect(() => { onLight(current ?? null); }, [current]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!changes.length) return null;
+  const fresh = changes.filter(c => c.kind === 'new').length;
+  const stopped = changes.length - fresh;
+  const day = new Date(utcTime(since));
+  const line = (c: Change & {n: number}) => <><b className={`rb-change-word ch-${c.kind}`}>{c.kind === 'new' ? '✚ New' : '− No longer fires'}</b>{' '}
+    <span className="rb-id">{c.flag.indicator_id}</span> {c.flag.indicator?.name ?? c.flag.indicator_id}{c.n > 1 && <span className="rb-mono"> ×{c.n}</span>}</>;
+  return <div className={`rb-changed${current ? ' playing' : ''}`} role="group" aria-label="What changed since your last visit">
+    <span className="rb-changed-head">Since your last visit · {day.getUTCDate()} {day.toLocaleString('en-GB', {month: 'short', timeZone: 'UTC'})}:
+      {' '}{fresh > 0 && <>{fresh} new</>}{fresh > 0 && stopped > 0 && ' · '}{stopped > 0 && <>{stopped} no longer fire{stopped === 1 ? 's' : ''}</>}</span>
+    {current ? <span className="rb-changed-now" aria-live="polite"><span className="rb-mono">{at + 1} of {shown.length}</span> {line(current)}</span>
+      : still ? <ul className="rb-changed-all">{shown.map(c => <li key={`${c.kind}-${c.flag.id}`}>{line(c)}</li>)}</ul> : null}
+    <span className="rb-changed-acts">
+      {current ? <button type="button" onClick={() => { setPlaying(false); setAt(-1); }}>Stop</button>
+        : <button type="button" onClick={() => { setAt(0); setPlaying(!still); }}>Replay</button>}
+      {still && current && <><button type="button" aria-label="Previous change" onClick={() => setAt(i => Math.max(0, i - 1))}>‹</button>
+        <button type="button" aria-label="Next change" onClick={() => setAt(i => Math.min(shown.length - 1, i + 1))}>›</button></>}
+      {steps.length > shown.length && <small>+{steps.length - shown.length} more</small>}
+    </span>
+  </div>;
+}
+
 export function RedFlagsBoard({investigationId}: {investigationId: string}): ReactElement {
-  const {query, problem, actionsFor, setAreas} = useRedFlags(investigationId);
+  const {query, run, running, waiting, problem, actionsFor, setAreas} = useRedFlags(investigationId);
+  const [hover, setHover] = useState<string | null>(null);
+  const [lit, setLit] = useState<Change | null>(null);
   const [levels, setLevels] = useState<Levels>({textbook: true, strong: true, faint: true});
   const [aside, setAside] = useState(false);
   const [goneOpen, setGoneOpen] = useState(false);
@@ -84,7 +173,7 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
       return () => { try { window.localStorage.setItem(lastVisitKey(investigationId), new Date().toISOString()); } catch { /* best effort */ } };
     } catch { return undefined; }
   }, [investigationId]);
-  const isNew = (f: RedFlagOut) => since !== null && new Date(f.first_seen_at).getTime() > new Date(since).getTime();
+  const isNew = (f: RedFlagOut) => since !== null && utcTime(f.first_seen_at) > utcTime(since);
 
   const flags = useMemo(() => query.data?.flags ?? [], [query.data]);
   const live = flags.filter(f => !isAside(f));
@@ -94,6 +183,9 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
   const kinds = useMemo(() => groupFlags(shown), [shown]); // eslint-disable-line react-hooks/exhaustive-deps
   const kind = kinds.find(k => k.key === picked) ?? kinds[0];
   const flag = kind ? kind.flags[Math.min(step, kind.flags.length - 1)] : undefined;
+  // Pointing at a row previews its flag in the centre; the chosen one comes back when the pointer leaves the list.
+  const previewKind = hover && hover !== kind?.key ? kinds.find(k => k.key === hover) : undefined;
+  const openFlag = previewKind ? previewKind.flags[0] : flag;
   const filtered = !levels.textbook || !levels.strong || !levels.faint || aside || area || party || onlyNew;
   const reset = () => { setLevels({textbook: true, strong: true, faint: true}); setAside(false); setArea(''); setParty(''); setOnlyNew(false); setPicked(null); setStep(0); };
 
@@ -124,8 +216,8 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.target instanceof Element && e.target.closest('input, textarea, select')) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.key === 'j') { e.preventDefault(); move(1); }
-    else if (e.key === 'k') { e.preventDefault(); move(-1); }
+    if (e.key === 'j') { e.preventDefault(); setHover(null); move(1); }
+    else if (e.key === 'k') { e.preventDefault(); setHover(null); move(-1); }
     else if (e.key === ']' && kind) { e.preventDefault(); setStep(s => Math.min(kind.flags.length - 1, s + 1)); }
     else if (e.key === '[') { e.preventDefault(); setStep(s => Math.max(0, s - 1)); }
     else if ((e.key === 'a' || e.key === 'A') && flag && flag.status === 'open') { e.preventDefault(); void actionsFor(flag).onLead(); }
@@ -134,7 +226,7 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
 
   const rules = query.data?.rules ?? [];
   const cannot = query.data?.cannot_run ?? [];
-  const gone = query.data?.gone ?? [];
+  const gone = useMemo(() => query.data?.gone ?? [], [query.data]);
   const type = query.data?.investigation_type;
   const count = (level: string) => live.filter(f => f.level === level).length;
   const areas = [...new Map(live.filter(f => f.indicator).map(f => [f.indicator!.area, f.indicator!.area_name])).entries()];
@@ -149,12 +241,24 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
     return [...m.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).slice(0, 6);
   }, [live]); // eslint-disable-line react-hooks/exhaustive-deps
   const newCount = live.filter(isNew).length;
+  const changes = useMemo(() => changesSince(flags, gone, since), [flags, gone, since]);
+  const onLight = useCallback((c: Change | null) => setLit(c), []);
+  const litKey = lit?.kind === 'new' ? `${lit.flag.indicator_id}:${lit.flag.level}` : null;
+  const ranAt = query.data?.ran_at ?? null;
+  const runNow = () => run.mutate({path: {investigation_id: investigationId}});
 
   return <div className="rb" onKeyDown={onKey} id="red-flags">
     <header className="rb-top">
       {type && <InvestigationType kind={type} flagsByArea={flagsByArea(live)} onSet={setAreas}/>}
-      {rules.length > 0 && <p className="rb-coverage" title={rules.map(r => r.name).join('\n')}>
-        <b>{rules.length - cannot.length} of {rules.length}</b> record rules ran{cannot.length > 0 && <> · <span className="rb-warn">{cannot.length} need data</span></>}</p>}
+      <div className="rb-runline">
+        {rules.length > 0 && ranAt && <p className="rb-coverage" title={rules.map(r => r.name).join('\n')}>
+          <b>{rules.length - cannot.length} of {rules.length}</b> record rules ran{cannot.length > 0 && <> · <span className="rb-warn">{cannot.length} need data</span></>}</p>}
+        <span className="rb-run">
+          <button type="button" onClick={runNow} disabled={running || !investigationId} aria-busy={running}>{running ? 'Running the rules…' : 'Run the rules'}</button>
+          <small>{ranAt ? <>ran <time dateTime={ranAt} title={new Date(utcTime(ranAt)).toLocaleString('en-GB')}>{agoText(ranAt)}</time>{query.data?.stale && !running && ' · the records changed since'}</> : running ? 'first run' : 'not run yet'}</small>
+          {run.isError && <small role="alert" className="rb-warn">{errorMessage(run.error, 'Could not run the rules')}</small>}
+        </span>
+      </div>
       <div className="rb-filters" role="group" aria-label="Show">
         {(['textbook', 'strong', 'faint'] as const).map(l => <button key={l} type="button" aria-pressed={!aside && levels[l]} className={`rb-chip rk-${l}${!aside && levels[l] ? ' on' : ''}`}
           onClick={() => { setAside(false); setLevels(v => ({...v, [l]: !v[l]})); setPicked(null); }}><LevelMark level={l}/> {count(l)}</button>)}
@@ -168,6 +272,7 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
           title={since === null ? 'First visit to Red Flags on this computer' : undefined}>New since last visit {newCount}</button>
         <span className="rb-count-reset"><b>{shown.length} of {live.length + (aside ? flags.length - live.length : 0)}</b> flags{filtered && <> · <button type="button" onClick={reset}>Reset</button></>}</span>
       </div>
+      {since !== null && <WhatChanged changes={changes} since={since} ready={!running && !waiting} onLight={onLight}/>}
       {goneOpen && gone.length > 0 && <ul className="rb-gone" aria-label="No longer fire">{gone.map(f => <li key={f.id}><b>{f.indicator?.name ?? f.indicator_id}</b>: <GlossaryText text={f.summary}/></li>)}</ul>}
       {cannot.length > 0 && <details className="rb-fold"><summary>{cannot.length} rule{cannot.length === 1 ? '' : 's'} could not run on these records</summary>
         <ul>{cannot.map(c => <li key={c.indicator_id}><b>{c.name}</b>: {c.reason}</li>)}</ul></details>}
@@ -176,17 +281,19 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
     <div className="rb-cols">
       <div className="rb-list-col">
         <p className="rb-eyebrow">Ranked · level, then weight <span aria-hidden="true">J / K</span></p>
-        {query.isError && <p role="alert" className="rb-quiet">{errorMessage(query.error, 'Could not run the rules')}</p>}
+        {query.isError && <p role="alert" className="rb-quiet">{errorMessage(query.error, 'Could not read the Red Flags')}</p>}
         {problem && <p role="alert" className="rb-quiet">{problem}</p>}
-        <div className="rb-list" ref={listRef} role="listbox" aria-label="Red Flags, ranked" aria-activedescendant={kind ? `rb-${kind.key}` : undefined}>
-          {query.isPending && investigationId ? <div className="ch-skeleton" aria-busy="true" aria-label="Running the rules"/>
+        <div className="rb-list" ref={listRef} role="listbox" aria-label="Red Flags, ranked" aria-activedescendant={kind ? `rb-${kind.key}` : undefined}
+          onMouseLeave={() => setHover(null)}>
+          {waiting && investigationId ? <div className="ch-skeleton" aria-busy="true" aria-label="Running the rules"/>
             : !kinds.length ? <p className="rb-quiet">{filtered ? 'No flag matches these filters.' : `No pattern fires on these records. ${rules.length - cannot.length} rules ran.`}</p>
             : kinds.map((k, i) => {
               const first = k.flags[0];
               const unshownLinks = Math.max(...k.flags.map(unshown));
               const fresh = k.flags.some(isNew);
               return <button key={k.key} id={`rb-${k.key}`} type="button" role="option" aria-selected={k.key === kind?.key} data-kind={k.key}
-                className={`rb-row level-${k.level}${k.key === kind?.key ? ' on' : ''}`} onClick={() => pick(k.key)}
+                className={`rb-row level-${k.level}${k.key === kind?.key ? ' on' : ''}${k.key === previewKind?.key ? ' peek' : ''}${k.key === litKey ? ' lit' : ''}`}
+                onClick={() => { setHover(null); pick(k.key); }} onMouseEnter={() => setHover(k.key)}
                 aria-label={`Rank ${i + 1}, ${LEVEL[k.level]?.name ?? k.level}, ${k.name}${k.flags.length > 1 ? `, ${k.flags.length} found` : ''}, ${first.parties.slice(0, 2).map(p => p.name).join(' and ')}${first.parties.length > 2 ? ` and ${first.parties.length - 2} more` : ''}`}>
                 <span className="rb-rank">{i + 1}</span>
                 <span className="rb-row-body">
@@ -208,21 +315,24 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
         </section>}
       </div>
 
-      <section className={`rb-open level-${flag?.level ?? 'none'}`} aria-label="The open Red Flag" aria-live="polite">
-        {flag && kind ? <OpenFlag key={flag.id} flag={flag} kind={kind} step={step} setStep={setStep} investigationId={investigationId}
-          asking={asking} setAsking={setAsking} {...actionsFor(flag)}/> : <p className="rb-quiet">{query.isPending ? '' : 'Choose a flag to read it in full.'}</p>}
+      <section className={`rb-open level-${openFlag?.level ?? 'none'}${previewKind ? ' preview' : ''}`} aria-label={previewKind ? 'Preview of a Red Flag' : 'The open Red Flag'}
+        aria-live={previewKind ? 'off' : 'polite'}>
+        {previewKind && openFlag ? <OpenFlag key={`peek-${openFlag.id}`} flag={openFlag} kind={previewKind} step={0} setStep={() => undefined} investigationId={investigationId}
+          asking={false} setAsking={() => undefined} preview {...actionsFor(openFlag)}/>
+          : flag && kind ? <OpenFlag key={flag.id} flag={flag} kind={kind} step={step} setStep={setStep} investigationId={investigationId}
+          asking={asking} setAsking={setAsking} {...actionsFor(flag)}/> : <p className="rb-quiet">{waiting ? '' : 'Choose a flag to read it in full.'}</p>}
       </section>
 
       <aside className="rb-before" aria-label="Before you call it">
-        {flag ? <BeforeYouCallIt flag={flag} investigationId={investigationId}/> : null}
+        {flag ? <BeforeYouCallIt flag={flag} investigationId={investigationId} ranAt={ranAt}/> : null}
       </aside>
     </div>
   </div>;
 }
 
-function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking, onLead, onDismiss, onReopen}: {
+function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking, preview = false, onLead, onDismiss, onReopen}: {
   flag: RedFlagOut; kind: Kind; step: number; setStep: (f: (s: number) => number) => void; investigationId: string;
-  asking: boolean; setAsking: (v: boolean) => void;
+  asking: boolean; setAsking: (v: boolean) => void; preview?: boolean;
   onLead: () => Promise<void> | void; onDismiss: (reason: string) => Promise<void> | void; onReopen: () => Promise<void> | void;
 }): ReactElement {
   const ind = flag.indicator;
@@ -231,9 +341,10 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
   const payments = flag.links.length > 0 && (flag.facts as {family?: string})?.family === 'count_in_band';
   const moneyFlag = flag.indicator_id.startsWith('ML') || payments;
   return <>
+    {preview && <p className="rb-peek-note">Preview · click the row to open it; move off the list to go back</p>}
     <div className="rb-open-head">
       <span><LevelMark level={flag.level}/> <span className="rb-mono">{flag.indicator_id} · {ind?.area_name ?? ''} · rule v{flag.rule_version} · first seen {first.getDate()} {first.toLocaleString('en-GB', {month: 'short'})}</span></span>
-      {kind.flags.length > 1 && <span className="rb-step" role="group" aria-label="Flags of this kind">
+      {kind.flags.length > 1 && !preview && <span className="rb-step" role="group" aria-label="Flags of this kind">
         <button type="button" onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0} aria-label="Previous of this kind">‹</button>
         <span><b>{Math.min(step, kind.flags.length - 1) + 1}</b> of {kind.flags.length}</span>
         <button type="button" onClick={() => setStep(s => Math.min(kind.flags.length - 1, s + 1))} disabled={step >= kind.flags.length - 1} aria-label="Next of this kind">›</button>
@@ -284,26 +395,7 @@ function Picture({flag, investigationId}: {flag: RedFlagOut; investigationId: st
     const ids = new Set(flag.links);
     const pays = (ledger.data?.transactions ?? []).filter(t => ids.has(t.id) && t.dateTime).sort((a, b) => (a.dateTime! < b.dateTime! ? -1 : 1));
     if (!pays.length) return <p className="rb-quiet">{ledger.isPending ? 'Reading the payments…' : 'The payments it rests on have no dates to draw.'}</p>;
-    const currency = pays[0].currency; const sign = ({EUR: '€', USD: '$', GBP: '£'} as Record<string, string>)[currency] ?? '';
-    const W = 560; const H = 150; const lo = 8800; const hi = 10200;
-    const ts = pays.map(p => new Date(`${p.dateTime}T00:00:00Z`).getTime());
-    const t0 = Math.min(...ts) - 864e5 * 10; const t1 = Math.max(...ts) + 864e5 * 10;
-    const x = (t: number) => 40 + ((t - t0) / (t1 - t0)) * (W - 60);
-    const y = (a: number) => 20 + (1 - (Math.min(hi, Math.max(lo, a)) - lo) / (hi - lo)) * (H - 50);
-    return <figure className="rb-picture">
-      <figcaption><span>The payments it rests on</span><small>{pays.length} shown</small></figcaption>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${pays.length} payments between ${sign}9,000 and ${sign}10,000, by date`}>
-        <rect x={40} y={y(10000)} width={W - 60} height={y(9000) - y(10000)} className="rb-band"/>
-        <text x={44} y={y(10000) + 12} className="rb-band-label">{sign}9,000–{sign}10,000 band</text>
-        <line x1={40} x2={W - 20} y1={y(10000)} y2={y(10000)} className="rb-threshold"/>
-        <text x={W - 20} y={y(10000) - 5} textAnchor="end" className="rb-threshold-label">{sign}10,000 reporting line</text>
-        {pays.map((p, i) => <g key={p.id} className={`rb-pay c-${p.certainty}`}>
-          <circle cx={x(ts[i])} cy={y(p.amount)} r={7}/>
-          <text x={x(ts[i])} y={y(p.amount) + 4} textAnchor="middle" className="rb-pay-mark">{p.certainty === 'shown' ? '✓' : p.certainty === 'disputed' ? '✕' : '○'}</text>
-          <text x={x(ts[i]) + 11} y={y(p.amount) - 9} className="rb-pay-label">{sign}{p.amount.toLocaleString('en-GB')} · {p.dateTime!.slice(5)}</text>
-        </g>)}
-      </svg>
-    </figure>;
+    return <Payments pays={pays}/>;
   }
   const names = flag.parties.map(p => p.name);
   if (family === 'cycle') return <figure className="rb-picture rb-loop" aria-label={`A loop: ${names.join(' → ')} → ${names[0]}`}>
@@ -316,9 +408,58 @@ function Picture({flag, investigationId}: {flag: RedFlagOut; investigationId: st
   </figure>;
 }
 
+const CERTAINTY_WORD: Record<FinancialTransactionOut['certainty'], string> = {shown: '✓ Shown', not_yet_shown: '○ Not yet shown', disputed: '✕ Disputed'};
+
+/** The payments in the band, by date. Scrolling over the picture steps through them (one notch, one payment; the
+ * arrow keys do the same when it has focus); the payment in focus is ringed and named under the picture. */
+function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
+  const [focus, setFocus] = useState(0);
+  const at = Math.min(focus, pays.length - 1);
+  const wheel = useWheelStep(pays.length, at, setFocus);
+  const ref = useRef<HTMLElement>(null);
+  // The wheel moves inside the picture, never the column under it (React's own wheel listener cannot stop that).
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || pays.length < 2) return;
+    const stop = (e: globalThis.WheelEvent) => e.preventDefault();
+    el.addEventListener('wheel', stop, {passive: false});
+    return () => el.removeEventListener('wheel', stop);
+  }, [pays.length]);
+  const currency = pays[0].currency; const sign = ({EUR: '€', USD: '$', GBP: '£'} as Record<string, string>)[currency] ?? '';
+  const W = 560; const H = 150; const lo = 8800; const hi = 10200;
+  const ts = pays.map(p => new Date(`${p.dateTime}T00:00:00Z`).getTime());
+  const t0 = Math.min(...ts) - 864e5 * 10; const t1 = Math.max(...ts) + 864e5 * 10;
+  const x = (t: number) => 40 + ((t - t0) / (t1 - t0)) * (W - 60);
+  const y = (a: number) => 20 + (1 - (Math.min(hi, Math.max(lo, a)) - lo) / (hi - lo)) * (H - 50);
+  const day = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'});
+  const cur = pays[at];
+  const onKey = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); setFocus(Math.min(pays.length - 1, at + 1)); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); setFocus(Math.max(0, at - 1)); }
+  };
+  return <figure className="rb-picture rb-payments" ref={ref} tabIndex={pays.length > 1 ? 0 : undefined} onKeyDown={pays.length > 1 ? onKey : undefined}
+    aria-label={pays.length > 1 ? 'The payments it rests on: scroll over, or use the arrow keys, to step through them' : undefined} {...wheel}>
+    <figcaption><span>The payments it rests on</span><small>{pays.length > 1 ? <>scroll over to step through · <b>{at + 1}</b> of {pays.length} shown</> : `${pays.length} shown`}</small></figcaption>
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${pays.length} payments between ${sign}9,000 and ${sign}10,000, by date`}>
+      <rect x={40} y={y(10000)} width={W - 60} height={y(9000) - y(10000)} className="rb-band"/>
+      <text x={44} y={y(10000) + 12} className="rb-band-label">{sign}9,000–{sign}10,000 band</text>
+      <line x1={40} x2={W - 20} y1={y(10000)} y2={y(10000)} className="rb-threshold"/>
+      <text x={W - 20} y={y(10000) - 5} textAnchor="end" className="rb-threshold-label">{sign}10,000 reporting line</text>
+      {pays.map((p, i) => <g key={p.id} className={`rb-pay c-${p.certainty}${i === at ? ' focus' : ''}`}>
+        {i === at && <circle cx={x(ts[i])} cy={y(p.amount)} r={12} className="rb-pay-ring"/>}
+        <circle cx={x(ts[i])} cy={y(p.amount)} r={7}/>
+        <text x={x(ts[i])} y={y(p.amount) + 4} textAnchor="middle" className="rb-pay-mark">{p.certainty === 'shown' ? '✓' : p.certainty === 'disputed' ? '✕' : '○'}</text>
+        <text x={x(ts[i]) > W - 120 ? x(ts[i]) - 13 : x(ts[i]) + 13} y={y(p.amount) - 9} textAnchor={x(ts[i]) > W - 120 ? 'end' : 'start'} className="rb-pay-label">{sign}{p.amount.toLocaleString('en-GB')} · {p.dateTime!.slice(5)}</text>
+      </g>)}
+    </svg>
+    <p className="rb-pay-focus" aria-live="polite"><b>{sign}{cur.amount.toLocaleString('en-GB')}{sign ? '' : ` ${currency}`}</b> on {day(cur.dateTime!)} · {cur.from} → {cur.to}
+      {' '}<span className={`rb-pay-word c-${cur.certainty}`}>{CERTAINTY_WORD[cur.certainty]}</span>{cur.evidence ? <i> · {cur.evidence}</i> : null}</p>
+  </figure>;
+}
+
 const INNOCENT_WORD: Record<FlagInnocentOut['state'], string> = {not_looked_at: 'Not looked at', ruled_out: 'Ruled out', could_apply: 'Could apply'};
 
-function BeforeYouCallIt({flag, investigationId}: {flag: RedFlagOut; investigationId: string}): ReactElement {
+function BeforeYouCallIt({flag, investigationId, ranAt}: {flag: RedFlagOut; investigationId: string; ranAt: string | null}): ReactElement {
   const queryClient = useQueryClient();
   const mark = useMutation({...markRedFlagInnocentMutation(), onSuccess: data => queryClient.setQueryData(getRedFlagsQueryKey({path: {investigation_id: investigationId}}), data)});
   const [ruling, setRuling] = useState<string | null>(null);
@@ -361,6 +502,6 @@ function BeforeYouCallIt({flag, investigationId}: {flag: RedFlagOut; investigati
       {sources.map((s, i) => <blockquote key={i} className="rb-quote"><p>“{s.quote}”</p>
         <footer>{s.publisher}, {s.title}{s.locator ? `, ${s.locator}` : ''} {s.url && <a href={s.url} target="_blank" rel="noreferrer">↗</a>}</footer></blockquote>)}
     </section>}
-    <p className="rb-foot">A flag is a lead, not a finding. Verify before any publication.</p>
+    <p className="rb-foot">A flag is a lead, not a finding. Verify before any publication.{ranAt && <> · Rules ran {agoText(ranAt)}</>}</p>
   </>;
 }

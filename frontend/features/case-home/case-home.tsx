@@ -16,7 +16,7 @@ import {LevelChip, StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {
-  getClaimSourcesOptions, getInvestigationGraphOptions, getPartyYearsOptions, listJobsEndpointOptions, getRedFlagsOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
+  getClaimSourcesOptions, getInvestigationGraphOptions, getPartyYearsOptions, listJobsEndpointOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
   listInvestigationsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
@@ -34,6 +34,7 @@ import {MiniNetwork} from './mini-network';
 import {PagePicture} from './decision-card';
 import {HOLD_MS, useDecisions} from './use-decisions';
 import {useWheelStep} from './wheel-step';
+import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AiStrip} from '../ai/ai-strip';
 
 const CLAIM_STATUS: Record<string, ClaimStatus> = {
@@ -278,7 +279,7 @@ export function flagChain(parties: {name: string}[], loop: boolean): string {
 }
 
 function ActModule({investigationId}: {investigationId: string}): ReactElement {
-  const flagsQuery = useQuery({...getRedFlagsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  const {query: flagsQuery, waiting} = useRedFlagsQuery(investigationId);
   const flags = flagsQuery.data;
   const openFlag = useWorkbenchStore(state => state.openFlag);
   const [index, setIndex] = useState(0);
@@ -293,7 +294,7 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
   const leadsOf = (f: (typeof open)[number]) => (f.checks ?? []).filter(c => c.status === 'open').length;
   return <Module n="04" name="Act · Red Flags" extra={<Stepper index={index} count={cards.length} onStep={setIndex} label="Red Flags"/>}>
     <div className="ch-list" {...wheel}>
-      {flagsQuery.isPending ? <div className="ch-skeleton" aria-busy="true" aria-label="Looking for Red Flags"/> : flagsQuery.isError ? <p role="alert" className="ch-quiet">{errorMessage(flagsQuery.error, 'Could not look for Red Flags')} <button type="button" onClick={() => void flagsQuery.refetch()}>Retry</button></p> : open.length ? <>
+      {waiting ? <div className="ch-skeleton" aria-busy="true" aria-label="Looking for Red Flags"/> : flagsQuery.isError ? <p role="alert" className="ch-quiet">{errorMessage(flagsQuery.error, 'Could not look for Red Flags')} <button type="button" onClick={() => void flagsQuery.refetch()}>Retry</button></p> : open.length ? <>
         {cards.slice(at, at + 2).map(f => {
           const innocent = f.indicator?.innocent_explanations ?? [];
           const fresh = Boolean(visit && f.first_seen_at > visit.slice(0, 19));

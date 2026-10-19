@@ -30,6 +30,11 @@ def _link(inv: str, schema: str, a: str, b: str, **props: list[str]) -> str:
 
 
 def _flags(inv: str) -> dict:
+    """Runs the rules (POST), as the board does when the records have changed since they last ran."""
+    return ok(client.post(f"/api/investigations/{inv}/red-flags/run"))
+
+
+def _read(inv: str) -> dict:
     return ok(client.get(f"/api/investigations/{inv}/red-flags"))
 
 
@@ -203,3 +208,67 @@ def test_innocent_explanations_are_a_checklist_kept_on_the_flag_across_runs():
     assert again["innocent"][0] == {"text": first, "state": "ruled_out", "note": "No treasury shares in the filings"}
     client.post(f"/api/red-flags/{flag['id']}/innocent", json={"text": first, "state": "not_looked_at"})
     assert next(f for f in _flags(inv)["flags"] if f["indicator_id"] == "BO-001")["innocent"][0]["state"] == "not_looked_at"
+
+
+def test_reading_the_flags_never_runs_the_rules():
+    from app.models.domain import Investigation, PatternFlag
+
+    inv = _inv("Reading never writes")
+    a, b, c = _party(inv, "A Ltd"), _party(inv, "B Ltd"), _party(inv, "C Ltd")
+    for x, y in ((a, b), (b, c), (c, a)):
+        _link(inv, "Ownership", x, y)
+    before = _read(inv)
+    assert (before["flags"], before["gone"], before["ran_at"], before["stale"]) == ([], [], None, True), "never run: nothing stored yet, and it says so"
+    assert before["rules"], "the rules are listed whether or not they ran"
+    with SessionLocal() as db:
+        assert db.query(PatternFlag).filter_by(investigation_id=inv).count() == 0
+        assert db.get(Investigation, inv).red_flag_run is None
+
+    ran = _flags(inv)
+    assert ran["ran_at"] and ran["stale"] is False
+    assert any(f["indicator_id"] == "BO-001" for f in ran["flags"])
+    read = _read(inv)
+    assert read == ran, "a read gives what the run left, as it left it"
+    with SessionLocal() as db:
+        seen = {f.id: f.last_seen_at for f in db.query(PatternFlag).filter_by(investigation_id=inv)}
+    _read(inv)
+    with SessionLocal() as db:
+        assert {f.id: f.last_seen_at for f in db.query(PatternFlag).filter_by(investigation_id=inv)} == seen, "reading touches no flag"
+
+    # A new record: the read says the flags are behind it, and still shows what the rules last found.
+    _link(inv, "Payment", c, a, amount=["5000"], currency=["EUR"])
+    behind = _read(inv)
+    assert behind["stale"] is True and behind["ran_at"] == ran["ran_at"]
+    assert not any(f["indicator_id"] == "BO-033" for f in behind["flags"])
+    after = _flags(inv)
+    assert after["stale"] is False and after["ran_at"] >= ran["ran_at"]
+    assert any(f["indicator_id"] == "BO-033" for f in after["flags"])
+    # Setting a flag aside changes no record the rules read: the flags are not behind.
+    loop = next(f for f in after["flags"] if f["indicator_id"] == "BO-001")
+    assert ok(client.post(f"/api/red-flags/{loop['id']}/dismiss", json={"reason": "Known group structure"}))["stale"] is False
+    assert _read(inv)["stale"] is False
+
+
+def test_what_could_not_run_is_kept_from_the_last_run():
+    inv = _inv("Cannot run, kept")
+    _party(inv, "Lone Ltd")
+    assert _read(inv)["cannot_run"] == [], "nothing ran yet"
+    ran = _flags(inv)
+    assert ran["cannot_run"], "an almost empty case leaves rules without the records they need"
+    assert _read(inv)["cannot_run"] == ran["cannot_run"]
+
+
+def test_running_the_rules_needs_an_unknown_case_to_be_refused_and_a_reader_cannot_run_them():
+    from app.core.authorization import AuthorizationScope, authorization_scope_context
+    from app.patterns import engine
+
+    assert client.get("/api/investigations/nope/red-flags").status_code == 404
+    assert client.post("/api/investigations/nope/red-flags/run").status_code == 404
+    inv = _inv("Reader")
+    a, b, c = _party(inv, "A Ltd"), _party(inv, "B Ltd"), _party(inv, "C Ltd")
+    for x, y in ((a, b), (b, c), (c, a)):
+        _link(inv, "Ownership", x, y)
+    with SessionLocal() as db, authorization_scope_context(AuthorizationScope("reader-1", frozenset({inv}), role="viewer")):
+        assert engine.run(db, inv) is None, "only someone who can edit the case runs the rules"
+        read = engine.flags(db, inv)
+        assert (read["flags"], read["stale"]) == ([], True), "a reader still reads"

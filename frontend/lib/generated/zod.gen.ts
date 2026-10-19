@@ -8244,7 +8244,9 @@ export const zRedFlagOut = z.object({
  *
  * Every rule that ran, the flags that fire now (highest weight first),
  * and those that no longer fire; with the investigation's type, whose areas
- * are listed first.
+ * are listed first. As the rules last ran (``ran_at``, null if never):
+ * ``stale`` says the records they read have changed since, so a run
+ * (POST .../red-flags/run) would give a different answer.
  */
 export const zRedFlagsOut = z.object({
   cannot_run: z.array(zCannotRunOut),
@@ -8252,7 +8254,14 @@ export const zRedFlagsOut = z.object({
   gone: z.array(zRedFlagOut),
   investigation_id: z.string(),
   investigation_type: zInvestigationTypeOut,
+  ran_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   rules: z.array(zRuleOut),
+  stale: z.boolean().optional().default(false),
 });
 
 /**
@@ -10403,6 +10412,15 @@ export const zGetRedFlagsPath = z.object({
  * Successful Response
  */
 export const zGetRedFlagsResponse = zRedFlagsOut;
+
+export const zRunRedFlagsPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRunRedFlagsResponse = zRedFlagsOut;
 
 export const zListInvestigationRelationshipsPath = z.object({
   investigation_id: z.string(),

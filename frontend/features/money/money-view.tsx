@@ -15,10 +15,11 @@ import {LevelChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {
-  createLeadEndpointMutation, getInvestigationFinancialFlowsOptions, getInvestigationMoneyChecksOptions, getRedFlagsOptions, listLeadsQueryKey,
+  createLeadEndpointMutation, getInvestigationFinancialFlowsOptions, getInvestigationMoneyChecksOptions, listLeadsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {CurrencyMoneyChecksOut, FinancialTransactionOut, MoneyCheckOut, RedFlagOut, RoundTripOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {amountText, layout, pathOf, type Certainty, type CheckMark, type Payment} from './money-layout';
 
 const FinancialFlowSankey = dynamic(() => import('../../components/charts/financial-flow-sankey').then(m => m.FinancialFlowSankey),
@@ -59,7 +60,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   const setAsOf = useWorkbenchStore(s => s.setAsOf);
   const ledgerQ = useQuery({...getInvestigationFinancialFlowsOptions({path}), enabled});
   const checksQ = useQuery({...getInvestigationMoneyChecksOptions({path, query: asOf === null ? {} : {as_of: asOf}}), enabled});
-  const flagsQ = useQuery({...getRedFlagsOptions({path}), enabled});
+  const flagsQ = useRedFlagsQuery(investigationId, enabled).query;
   const [chosen, setChosen] = useState<string | null>(null);
   const [view, setView] = useState<Layout>('columns');
   const [traced, setTraced] = useState<string[]>([]);

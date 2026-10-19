@@ -12942,7 +12942,9 @@ export type RedFlagOut = {
  *
  * Every rule that ran, the flags that fire now (highest weight first),
  * and those that no longer fire; with the investigation's type, whose areas
- * are listed first.
+ * are listed first. As the rules last ran (``ran_at``, null if never):
+ * ``stale`` says the records they read have changed since, so a run
+ * (POST .../red-flags/run) would give a different answer.
  */
 export type RedFlagsOut = {
   /**
@@ -12963,9 +12965,17 @@ export type RedFlagsOut = {
   investigation_id: string;
   investigation_type: InvestigationTypeOut;
   /**
+   * Ran At
+   */
+  ran_at?: string | null;
+  /**
    * Rules
    */
   rules: Array<RuleOut>;
+  /**
+   * Stale
+   */
+  stale?: boolean;
 };
 
 /**
@@ -24640,6 +24650,41 @@ export type GetRedFlagsResponses = {
 
 export type GetRedFlagsResponse =
   GetRedFlagsResponses[keyof GetRedFlagsResponses];
+
+export type RunRedFlagsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/red-flags/run';
+};
+
+export type RunRedFlagsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RunRedFlagsError = RunRedFlagsErrors[keyof RunRedFlagsErrors];
+
+export type RunRedFlagsResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedFlagsOut;
+};
+
+export type RunRedFlagsResponse =
+  RunRedFlagsResponses[keyof RunRedFlagsResponses];
 
 export type ListInvestigationRelationshipsData = {
   body?: never;
