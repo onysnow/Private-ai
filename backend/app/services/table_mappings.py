@@ -54,7 +54,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.domain import Document, ExtractionCandidate, TableMapping
-from app.services.relationships import RELATIONSHIP_SCHEMAS, validate_payment_properties
+from app.services.relationships import RELATIONSHIP_SCHEMAS, payment_property_problem, validate_payment_properties
 
 TABLE_EXTENSIONS = {"csv": ",", "tsv": "\t", "xlsx": None}
 ENTITY_SCHEMAS = ["Person", "Company", "Organization", "PublicBody", "LegalEntity"]
@@ -63,6 +63,7 @@ SAMPLE_ROWS = 20         # rows shown with the columns
 PREVIEW_ROWS = 10        # rows a preview maps
 METHOD = "column_mapping"
 
+logger = logging.getLogger("journalism.table_mappings")
 _engine_log = logging.getLogger("followthemoney.mapping.entity")
 
 
@@ -150,8 +151,9 @@ def read_table(doc: Document, *, sheet: str | None = None, limit: int | None = M
 
         try:
             workbook = load_workbook(path, read_only=True, data_only=True)
-        except Exception as exc:   # openpyxl raises several kinds for a damaged file
-            raise TableError(f"The workbook could not be opened: {exc}") from None
+        except Exception:   # openpyxl raises several kinds for a damaged file; its text stays in the log
+            logger.warning("Workbook could not be opened: %s", path, exc_info=True)
+            raise TableError("The workbook could not be opened; it may be damaged or not a real .xlsx file") from None
         try:
             names = list(workbook.sheetnames)
             chosen = sheet or (names[0] if names else None)
@@ -194,10 +196,13 @@ def check_query(query: dict[str, Any], table: Table) -> QueryMapping:
             raise TableError(f"“{name}”: {schema or 'no kind'} is not a kind the Workbench keeps")
         missing = [c for c in list(entity.get("keys") or []) if c not in known]
         props = entity.get("properties") or {}
+        unknown: list[str] = []
         for prop, spec in props.items():
             missing += [c for c in _columns_of(spec) if c not in known]
             ftm_schema = model.get(schema)
             ftm_prop = ftm_schema.get(prop) if ftm_schema is not None else None
+            if ftm_schema is not None and ftm_prop is None:
+                unknown.append(str(prop))
             if ftm_prop is not None and ftm_prop.type == registry.entity:
                 if schema not in RELATIONSHIP_SCHEMAS:
                     raise TableError(f"“{name}”: {prop} points at another entity; map that as a link")
@@ -206,6 +211,9 @@ def check_query(query: dict[str, Any], table: Table) -> QueryMapping:
                     raise TableError(f"“{name}”: a {schema} link only names its {info['source_label'].lower()} and {info['target_label'].lower()}")
         if missing:
             raise TableError(f"“{name}”: no column named {', '.join(f'“{c}”' for c in sorted(set(missing)))}")
+        if unknown:
+            # The wording FollowTheMoney uses, said here so its own exception text never reaches the reply.
+            raise TableError(f"Invalid property: {unknown[0]}")
         if schema in RELATIONSHIP_SCHEMAS:
             info = RELATIONSHIP_SCHEMAS[schema]
             for end in ("source_prop", "target_prop"):
@@ -214,8 +222,10 @@ def check_query(query: dict[str, Any], table: Table) -> QueryMapping:
                     raise TableError(f"“{name}”: choose the entity that is the {info[end.replace('prop', 'label')].lower()}")
     try:
         return _engine(query, key_prefix=None)
-    except FollowTheMoneyException as exc:
-        raise TableError(str(exc)) from None
+    except FollowTheMoneyException:
+        # The checks above catch what a reporter can fix; anything FollowTheMoney still rejects goes to the log.
+        logger.warning("FollowTheMoney rejected a table mapping", exc_info=True)
+        raise TableError("FollowTheMoney cannot use this mapping; check each entity's kind and columns") from None
 
 
 def _engine(query: dict[str, Any], *, key_prefix: str | None) -> QueryMapping:
@@ -389,11 +399,11 @@ def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str
                 continue
             properties = _plain_properties(proxy)
             if schema == "Payment":
-                try:
-                    validate_payment_properties(properties)
-                except ValueError as exc:
-                    skipped.append({"row": row.number, "reason": f"“{name}”: {exc}"})
+                payment_problem = payment_property_problem(properties)
+                if payment_problem is not None:
+                    skipped.append({"row": row.number, "reason": f"“{name}”: {payment_problem}"})
                     continue
+                validate_payment_properties(properties)
             link = links.setdefault(proxy.id, {
                 "schema": schema, "caption": f"{entities[source.id]['caption']} → {entities[target.id]['caption']}",
                 "source_ftm_id": source.id, "target_ftm_id": target.id, "properties": {},
