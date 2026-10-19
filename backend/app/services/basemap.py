@@ -99,25 +99,17 @@ def tile(z: int, x: int, y: int) -> tuple[bytes, str | None] | None:
     return bytes(data), ("gzip" if compression == Compression.GZIP else None)
 
 
-
-def _read_inside(root: Path, relative: Path) -> bytes | None:
-    """A file under `root`, or None: the path is resolved first, so a name that
-    climbs out of the folder (or a link that leaves it) reads nothing."""
-    try:
-        base = root.resolve()
-        target = (base / relative).resolve()
-        if not target.is_relative_to(base):
-            return None
-        return target.read_bytes()
-    except (OSError, ValueError):
-        return None
-
 def fonts() -> list[str]:
+    return sorted(_font_dirs())
+
+
+def _font_dirs() -> dict[str, Path]:
     folder = basemap_dir() / "fonts"
     try:
-        return sorted(entry.name for entry in os.scandir(folder) if entry.is_dir())
+        with os.scandir(folder) as entries:
+            return {entry.name: Path(entry.path) for entry in entries if entry.is_dir(follow_symlinks=False)}
     except OSError:
-        return []
+        return {}
 
 
 def font(stack: str, glyph_range: str) -> bytes | None:
@@ -125,12 +117,22 @@ def font(stack: str, glyph_range: str) -> bytes | None:
     the names its style lists, comma-separated; the first one this copy has
     is served (the stacks @protomaps/basemaps names are single fonts)."""
     match = FONT_RANGE.match(glyph_range)
-    if match is None or int(match.group(1)) % 256 or int(match.group(2)) != int(match.group(1)) + 255:
+    if match is None or any(len(part) > 7 for part in match.groups()):
         return None
-    have = set(fonts())
+    start, end = (int(part) for part in match.groups())
+    if start > 0x10FFFF or end > 0x10FFFF or start % 256 or end != start + 255:
+        return None
+    have = _font_dirs()
+    root = basemap_dir().resolve()
     for name in (part.strip() for part in stack.split(",")):
-        if name in have:
-            return _read_inside(basemap_dir() / "fonts", Path(name) / f"{glyph_range}.pbf")
+        font_dir = have.get(name)
+        if font_dir is not None:
+            try:
+                path = (font_dir / f"{start}-{end}.pbf").resolve()
+                path.relative_to(root)
+                return path.read_bytes()
+            except (OSError, ValueError):
+                return None
     return None
 
 
@@ -138,8 +140,18 @@ def sprite(name: str) -> tuple[bytes, str] | None:
     """A sprite sheet (`grayscale@2x.png`) or its index (`grayscale.json`)."""
     if not SPRITE_NAME.match(name):
         return None
-    data = _read_inside(basemap_dir() / "sprites" / SPRITE_VERSION, Path(name))
-    if data is None:
+    try:
+        folder = basemap_dir() / "sprites" / SPRITE_VERSION
+        with os.scandir(folder) as entries:
+            files = {entry.name: Path(entry.path) for entry in entries if entry.is_file(follow_symlinks=False)}
+        asset = files.get(name)
+        if asset is None:
+            return None
+        root = basemap_dir().resolve()
+        path = asset.resolve()
+        path.relative_to(root)
+        data = path.read_bytes()
+    except (OSError, ValueError):
         return None
     return data, ("application/json" if name.endswith(".json") else "image/png")
 
@@ -148,8 +160,8 @@ def status() -> dict[str, Any]:
     """Whether a base map is installed, and what it covers."""
     try:
         opened = _open()
-    except BasemapUnavailable as exc:
-        return {"available": False, "reason": str(exc), "fonts": fonts()}
+    except BasemapUnavailable:
+        return {"available": False, "reason": "No base map is available.", "fonts": fonts()}
     header, metadata = opened.header, opened.metadata
     return {
         "available": True,
