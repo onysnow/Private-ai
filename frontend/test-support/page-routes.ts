@@ -306,7 +306,6 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
   const base = `/api/investigations/${id}`;
   return {
     [`GET ${base}/connector-findings`]: records.findings ?? [],
-    [`GET ${base}/watches`]: [],
     [`GET ${base}/entities`]: records.entities ?? [],
     [`GET ${base}/graph`]: records.graph ?? emptyGraph(),
     [`GET ${base}/timeline`]: timelineBody(id, records.events ?? []),
