@@ -86,7 +86,7 @@ jobs:
         if: failure()
         run: docker compose logs --no-color --timestamps postgres elasticsearch redis openaleph-setup api worker ingest analyze > openaleph-logs.txt
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: openaleph-logs
