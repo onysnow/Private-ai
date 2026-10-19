@@ -655,7 +655,7 @@ textarea.reason{width:100%;height:34px;resize:none;background:rgba(0,0,0,.3);bor
         <li><span class="qq">Q6</span> optional cloud detectors behind per-item consent, or local only? Images off by default?</li>
         <li><span class="qq">Q7</span> does the suite need a “synthetic” value; send this research to it?</li>
         <li><span class="qq">Q8</span> a confirmed fake can support claims about the fake, never about what it shows</li>
-        <li><span class="qq">Q9</span> status names (verified-origin … disputed): rename or accept</li></ul></div>
+        <li><span class="qq">§9.4</span> status names (verified-origin … disputed): rename or accept</li></ul></div>
     </div>
   </aside>
 </section>
@@ -755,7 +755,7 @@ var $$=function(s,el){return Array.prototype.slice.call((el||document).querySele
 var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function pad(n,l){n=String(n);while(n.length<(l||2))n='0'+n;return n}
-function tfmt(t){t=Math.round(t*10)/10;var m=Math.floor(t/60),s=t-m*60;return pad(m)+':'+pad(Math.floor(s))+'.'+Math.floor((s%1)*10)}
+function tfmt(t){var q=Math.round(t*10),m=Math.floor(q/600),s=Math.floor((q%600)/10);return pad(m)+':'+pad(s)+'.'+(q%10)}
 function isTyping(e){var t=e.target&&e.target.tagName;return t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||(e.target&&e.target.isContentEditable)}
 function copyText(txt,btn){
   var done=function(){var o=btn.textContent;btn.textContent='copied';setTimeout(function(){btn.textContent=o},1200)};
