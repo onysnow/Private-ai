@@ -217,9 +217,10 @@ def test_records_without_a_known_type_a_usable_id_or_both_ends_are_named(openale
         db.commit()
         records, skipped = build_corpus_records(db, inv.id)
         assert set(records) == {jane.id}
-        assert skipped == ["Odd record: FollowTheMoney has no schema 'NoSuchSchema'",
-                           "Bad id: its id cannot be a FollowTheMoney entity id",
-                           "Jane Doe — Directorship → Meridian Holdings Ltd: one end of this relationship is no longer an active record"]
+        # The records are read without an order, so PostgreSQL may list the reasons in any order.
+        assert sorted(skipped) == sorted(["Odd record: FollowTheMoney has no schema 'NoSuchSchema'",
+                                          "Bad id: its id cannot be a FollowTheMoney entity id",
+                                          "Jane Doe — Directorship → Meridian Holdings Ltd: one end of this relationship is no longer an active record"])
 
 
 def test_a_failure_that_cannot_be_logged_still_shows_on_the_line(openaleph, monkeypatch, caplog):
