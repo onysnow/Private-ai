@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.routing import APIRoute
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy import Engine
+from sqlalchemy import Engine, select
 from sqlalchemy.exc import DataError
 from sqlalchemy.orm import Session
 
@@ -43,6 +43,7 @@ from app.api.routes_checks import router as checks_router
 from app.api.routes_case_home import router as case_home_router
 from app.api.routes_suite import router as suite_router
 from app.api.routes_demo import router as demo_router
+from app.api.routes_session import router as session_router
 from app.api.routes_catalogue import router as catalogue_router
 from app.api.routes_table_mappings import router as table_mappings_router
 from app.api.routes_basemap import router as basemap_router
@@ -108,6 +109,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(case_home_router)
     app.include_router(suite_router)
     app.include_router(demo_router)
+    app.include_router(session_router)
     app.include_router(catalogue_router)
     app.include_router(table_mappings_router)
     app.include_router(basemap_router)
@@ -138,6 +140,31 @@ def _warm_catalogue() -> None:
         _catalogue()
     except Exception:  # pragma: no cover - the first request reads it instead
         logging.getLogger("journalism").warning("could not read the indicator catalogue ahead of time", exc_info=True)
+
+
+def app_lock_gate(request: Request, session_factory: Any) -> Response | None:
+    """The app lock (ADR-0016) for requests from this computer: while a passphrase is set, an API request without an
+    unlocked session gets 423 Locked. Cases locked on their own and not opened in the session are taken out of the
+    request's scope. Health, the session endpoints, the operator console and the screen itself are not gated."""
+    from app.core.authorization import AuthorizationScope
+    from app.models.investigations import Investigation
+    from app.services import app_lock
+
+    path = request.url.path
+    if not path.startswith("/api/") or path == "/api/health" or path.startswith(("/api/session", "/api/console")):
+        return None
+    with session_factory() as lock_db:
+        session = app_lock.get_session(request.headers.get(app_lock.SESSION_HEADER))
+        if not app_lock.is_open(lock_db, session):
+            return JSONResponse(status_code=423, content={
+                "detail": "The app is locked.", "locked": True, "pin": app_lock.pin_allowed(lock_db, session)})
+        cases = lock_db.execute(select(Investigation.id, Investigation.case_lock)).all()
+        closed = {i for i, lk in cases if lk} - (session.open_cases if session else set())
+        if closed:
+            request.state.authorization_scope = AuthorizationScope(
+                actor_id="local-owner", investigation_ids=frozenset(i for i, _ in cases if i not in closed), role="owner",
+                closed_investigation_ids=frozenset(closed), owner_wide=True)
+    return None
 
 
 def create_app(
@@ -254,7 +281,7 @@ def create_app(
         allow_origins=app_settings.cors_origins,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Authorization", "Content-Type"],
+        allow_headers=["Authorization", "Content-Type", "X-Workbench-Session"],
     )
     register_domain_routers(app)
 
@@ -357,6 +384,12 @@ def create_app(
                     event="browser_write_denied",
                 )
             return browser_denial
+
+        if local_request:
+            locked = app_lock_gate(request, session_factory)
+            if locked is not None:
+                locked.headers["X-Request-ID"] = request_id
+                return locked
 
         auth_token = set_current_authorization_scope(scope_for_request(request))
         try:

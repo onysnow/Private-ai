@@ -698,7 +698,7 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
 
 
 
-def record_backup(db: Session, investigation_id: str, data: bytes, manifest: dict[str, Any]) -> None:
+def record_backup(db: Session, investigation_id: str, data: bytes, manifest: dict[str, Any], *, encrypted: bool = False) -> None:
     """Keep when this case was last backed up, so Settings › Backups and Safety & data can say so (mockup KEEP_2).
     A backup that was made but not saved by the browser still counts: the app cannot see where the file went.
     Someone who may only read the case (a viewer) can still download a backup; it is not recorded, since
@@ -714,5 +714,5 @@ def record_backup(db: Session, investigation_id: str, data: bytes, manifest: dic
     if inv is None:
         return
     inv.last_backup = {"at": manifest["generated_at"], "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(),
-                       "documents_included": bool(manifest.get("documents_included"))}
+                       "documents_included": bool(manifest.get("documents_included")), "encrypted": encrypted}
     db.commit()

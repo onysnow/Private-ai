@@ -3756,7 +3756,10 @@ class AppUserOut(ResponseModel):
     token_last_used_at: Timestamp | None
     token_rotated_at: Timestamp | None
     token_revoked_at: Timestamp | None
-    token_status: Literal["active", "disabled", "revoked"]
+    token_status: Literal["active", "disabled", "revoked", "expired"]
+    # The key's last two characters, and when it stops working (null: made before keys expired).
+    token_hint: str | None = None
+    token_expires_at: Timestamp | None = None
     memberships: list[AppUserMembershipOut]
 
 
@@ -3766,6 +3769,7 @@ class AppUserCreatedOut(ResponseModel):
     display_name: str
     global_role: str
     token: str
+    token_expires_at: Timestamp | None = None
     token_notice: str
 
 
@@ -3775,7 +3779,7 @@ class AppUserUpdatedOut(ResponseModel):
     global_role: str
     disabled: bool
     disabled_at: Timestamp | None
-    token_status: Literal["active", "disabled", "revoked"]
+    token_status: Literal["active", "disabled", "revoked", "expired"]
 
 
 class AppUserTokenRotatedOut(ResponseModel):
@@ -3784,6 +3788,7 @@ class AppUserTokenRotatedOut(ResponseModel):
     token: str
     token_created_at: Timestamp
     token_rotated_at: Timestamp
+    token_expires_at: Timestamp | None = None
     token_notice: str
 
 
@@ -5437,3 +5442,57 @@ class KeyCheckOut(ResponseModel):
     detail: str
     credits: int | None = None
     at: str
+
+
+# --- your name and the app lock (ADR-0016) -------------------------------------------------------------------------
+
+class LockedCaseOut(ResponseModel):
+    id: str
+    name: str
+    set_at: str | None = None
+    open: bool
+
+
+class DiskStatusOut(ResponseModel):
+    """Whether the disk the app runs from is encrypted, as far as the app can tell without administrator rights."""
+    state: Literal["encrypted", "encrypting", "paused", "decrypting", "not_encrypted", "unknown"]
+    system: str
+    why: str = ""
+    how_to: str = ""
+    answered: bool = False   # the reporter's own answer, given where the app could not tell
+
+
+class LockStateOut(ResponseModel):
+    """The app lock as the screen needs it. While locked: only that it is locked and whether a PIN may open it."""
+    protection: Literal["none", "passphrase"]
+    locked: bool
+    pin: bool
+    session: str | None = None   # only from /session/start
+    name: str | None = None
+    idle_minutes: int | None = None
+    lock_on_hide: bool | None = None
+    lock_on_sleep: bool | None = None
+    quick_pin: bool | None = None
+    pin_set: bool | None = None
+    passphrase_set_at: Timestamp | None = None
+    recovery_set_at: Timestamp | None = None
+    backups_encrypted: bool | None = None
+    disk_answer: str | None = None
+    locked_cases: list[LockedCaseOut] | None = None
+    disk: DiskStatusOut | None = None
+
+
+class RecoveryWordsOut(ResponseModel):
+    """The 12 recovery words, shown this once: only an Argon2id hash of them is kept."""
+    words: list[str]
+
+
+class DeciderOut(ResponseModel):
+    name: str | None = None
+    decisions: int
+
+
+class DecidersOut(ResponseModel):
+    """Who decided what in a case over the last days (mockup ACCOUNT_2): name, or null for "a person"."""
+    days: int
+    people: list[DeciderOut]

@@ -6,7 +6,7 @@ investigation membership grants, connector credential storage, and
 security audit log access/retention.
 """
 import logging
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy.orm import Session
@@ -97,12 +97,16 @@ def update_app_user(user_id: str, payload: AppUserUpdate, request: Request, db: 
 
 
 @router.post("/settings/security/users/{user_id}/token/rotate", response_model=AppUserTokenRotatedOut)
-def rotate_app_user_token(user_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+def rotate_app_user_token(user_id: str, request: Request, db: Session = Depends(get_db),
+                          key_days: Annotated[int, Query(description="How long the new key works: 30 or 90 days.")] = 30) -> Any:
     _require_local_request(request)
     user = db.get(AppUser, user_id)
     if user is None:
         raise HTTPException(404, "User not found")
-    return _rotate_app_user_token(db, user)
+    try:
+        return _rotate_app_user_token(db, user, key_days)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
 
 
 @router.post("/settings/security/users/{user_id}/token/revoke", response_model=AppUserTokenRevokedOut)

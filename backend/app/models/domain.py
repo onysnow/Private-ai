@@ -111,6 +111,7 @@ from app.models.decks import (
 from app.models.identity import (
     AppUser,
     InvestigationMembership,
+    LocalProfile,
 )
 from app.models.jobs import (
     BackgroundJob,
@@ -193,6 +194,7 @@ __all__ = [
     "Deck",
     "AppUser",
     "InvestigationMembership",
+    "LocalProfile",
     "BackgroundJob",
     "OpenAlephEntityLink",
     "OpenAlephEntitySetLink",

@@ -1634,6 +1634,11 @@
             "default": "member",
             "title": "Global Role",
             "type": "string"
+          },
+          "key_days": {
+            "default": 30,
+            "title": "Key Days",
+            "type": "integer"
           }
         },
         "required": [
@@ -1660,6 +1665,19 @@
           "token": {
             "title": "Token",
             "type": "string"
+          },
+          "token_expires_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Expires At"
           },
           "token_notice": {
             "title": "Token Notice",
@@ -1739,6 +1757,30 @@
             "title": "Token Created At",
             "type": "string"
           },
+          "token_expires_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Expires At"
+          },
+          "token_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Hint"
+          },
           "token_last_used_at": {
             "anyOf": [
               {
@@ -1782,7 +1824,8 @@
             "enum": [
               "active",
               "disabled",
-              "revoked"
+              "revoked",
+              "expired"
             ],
             "title": "Token Status",
             "type": "string"
@@ -1846,6 +1889,19 @@
             "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
             "title": "Token Created At",
             "type": "string"
+          },
+          "token_expires_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Expires At"
           },
           "token_notice": {
             "title": "Token Notice",
@@ -1942,7 +1998,8 @@
             "enum": [
               "active",
               "disabled",
-              "revoked"
+              "revoked",
+              "expired"
             ],
             "title": "Token Status",
             "type": "string"
@@ -2663,6 +2720,17 @@
             "contentMediaType": "application/octet-stream",
             "title": "File",
             "type": "string"
+          },
+          "secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret"
           }
         },
         "required": [
@@ -2677,6 +2745,17 @@
             "contentMediaType": "application/octet-stream",
             "title": "File",
             "type": "string"
+          },
+          "secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret"
           }
         },
         "required": [
@@ -2691,6 +2770,17 @@
             "contentMediaType": "application/octet-stream",
             "title": "File",
             "type": "string"
+          },
+          "secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret"
           }
         },
         "required": [
@@ -3526,6 +3616,30 @@
           "open"
         ],
         "title": "CaseLeadCountsOut",
+        "type": "object"
+      },
+      "CaseLockIn": {
+        "properties": {
+          "old": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Old"
+          },
+          "passphrase": {
+            "title": "Passphrase",
+            "type": "string"
+          }
+        },
+        "required": [
+          "passphrase"
+        ],
+        "title": "CaseLockIn",
         "type": "object"
       },
       "CaseLookupsOut": {
@@ -4764,6 +4878,24 @@
           "certainty"
         ],
         "title": "ChainStepOut",
+        "type": "object"
+      },
+      "ChangePassphraseIn": {
+        "properties": {
+          "new": {
+            "title": "New",
+            "type": "string"
+          },
+          "old": {
+            "title": "Old",
+            "type": "string"
+          }
+        },
+        "required": [
+          "old",
+          "new"
+        ],
+        "title": "ChangePassphraseIn",
         "type": "object"
       },
       "ChangeSetIn": {
@@ -14281,6 +14413,52 @@
         "title": "DataTableRowOut",
         "type": "object"
       },
+      "DeciderOut": {
+        "properties": {
+          "decisions": {
+            "title": "Decisions",
+            "type": "integer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "decisions"
+        ],
+        "title": "DeciderOut",
+        "type": "object"
+      },
+      "DecidersOut": {
+        "description": "Who decided what in a case over the last days (mockup ACCOUNT_2): name, or null for \"a person\".",
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/DeciderOut"
+            },
+            "title": "People",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days",
+          "people"
+        ],
+        "title": "DecidersOut",
+        "type": "object"
+      },
       "DecisionChoiceOut": {
         "description": "One answer: the existing endpoint it posts to and the body it sends.",
         "properties": {
@@ -15511,6 +15689,65 @@
           "confirm"
         ],
         "title": "DisabledIn",
+        "type": "object"
+      },
+      "DiskAnswerIn": {
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          }
+        },
+        "title": "DiskAnswerIn",
+        "type": "object"
+      },
+      "DiskStatusOut": {
+        "description": "Whether the disk the app runs from is encrypted, as far as the app can tell without administrator rights.",
+        "properties": {
+          "answered": {
+            "default": false,
+            "title": "Answered",
+            "type": "boolean"
+          },
+          "how_to": {
+            "default": "",
+            "title": "How To",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "encrypted",
+              "encrypting",
+              "paused",
+              "decrypting",
+              "not_encrypted",
+              "unknown"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          },
+          "why": {
+            "default": "",
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "system"
+        ],
+        "title": "DiskStatusOut",
         "type": "object"
       },
       "DocumentChunkOut": {
@@ -24425,6 +24662,284 @@
         "title": "LineageSourceOut",
         "type": "object"
       },
+      "LockReasonIn": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "LockReasonIn",
+        "type": "object"
+      },
+      "LockStateOut": {
+        "description": "The app lock as the screen needs it. While locked: only that it is locked and whether a PIN may open it.",
+        "properties": {
+          "backups_encrypted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backups Encrypted"
+          },
+          "disk": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DiskStatusOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "disk_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Disk Answer"
+          },
+          "idle_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idle Minutes"
+          },
+          "lock_on_hide": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock On Hide"
+          },
+          "lock_on_sleep": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock On Sleep"
+          },
+          "locked": {
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "locked_cases": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/LockedCaseOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locked Cases"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "passphrase_set_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passphrase Set At"
+          },
+          "pin": {
+            "title": "Pin",
+            "type": "boolean"
+          },
+          "pin_set": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pin Set"
+          },
+          "protection": {
+            "enum": [
+              "none",
+              "passphrase"
+            ],
+            "title": "Protection",
+            "type": "string"
+          },
+          "quick_pin": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quick Pin"
+          },
+          "recovery_set_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recovery Set At"
+          },
+          "session": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session"
+          }
+        },
+        "required": [
+          "protection",
+          "locked",
+          "pin"
+        ],
+        "title": "LockStateOut",
+        "type": "object"
+      },
+      "LockedCaseOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "open": {
+            "title": "Open",
+            "type": "boolean"
+          },
+          "set_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Set At"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "open"
+        ],
+        "title": "LockedCaseOut",
+        "type": "object"
+      },
+      "LockingIn": {
+        "properties": {
+          "idle_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idle Minutes"
+          },
+          "lock_on_hide": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock On Hide"
+          },
+          "lock_on_sleep": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock On Sleep"
+          },
+          "quick_pin": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quick Pin"
+          }
+        },
+        "title": "LockingIn",
+        "type": "object"
+      },
       "LookupDefaultsPut": {
         "properties": {
           "defaults": {
@@ -25452,6 +25967,19 @@
           }
         },
         "title": "MultiEnrichmentRequest",
+        "type": "object"
+      },
+      "NameIn": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "NameIn",
         "type": "object"
       },
       "NoteCreate": {
@@ -27253,6 +27781,36 @@
         "title": "PeekOut",
         "type": "object"
       },
+      "PinIn": {
+        "properties": {
+          "pin": {
+            "title": "Pin",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pin"
+        ],
+        "title": "PinIn",
+        "type": "object"
+      },
+      "PinSetIn": {
+        "properties": {
+          "pin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pin"
+          }
+        },
+        "title": "PinSetIn",
+        "type": "object"
+      },
       "PlaceEventOut": {
         "description": "An event on the investigation's timeline that happened at a place:\none about the place's own record (\"place\") or about a relationship\nlinking something to it (\"link\"). `first_day` and `last_day` are the\ndays its dates as recorded can mean; `exact` is false when a date is\nknown only to the month or year.",
         "properties": {
@@ -28556,6 +29114,41 @@
           "rows"
         ],
         "title": "RecordTagsOut",
+        "type": "object"
+      },
+      "RecoverIn": {
+        "properties": {
+          "new_passphrase": {
+            "title": "New Passphrase",
+            "type": "string"
+          },
+          "words": {
+            "title": "Words",
+            "type": "string"
+          }
+        },
+        "required": [
+          "words",
+          "new_passphrase"
+        ],
+        "title": "RecoverIn",
+        "type": "object"
+      },
+      "RecoveryWordsOut": {
+        "description": "The 12 recovery words, shown this once: only an Argon2id hash of them is kept.",
+        "properties": {
+          "words": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "words"
+        ],
+        "title": "RecoveryWordsOut",
         "type": "object"
       },
       "RedFlagOut": {
@@ -31796,6 +32389,19 @@
           "schema"
         ],
         "title": "SearchPartyOut",
+        "type": "object"
+      },
+      "SecretIn": {
+        "properties": {
+          "passphrase": {
+            "title": "Passphrase",
+            "type": "string"
+          }
+        },
+        "required": [
+          "passphrase"
+        ],
+        "title": "SecretIn",
         "type": "object"
       },
       "SecurityAlertsOut": {
@@ -54292,6 +54898,68 @@
         "summary": "List Investigation Cross References"
       }
     },
+    "/api/investigations/{investigation_id}/deciders": {
+      "get": {
+        "description": "Who decided what in this case over the last days (mockup ACCOUNT_2): quote links, claim reviews by a person and\ndecided proposals, by the name kept with each; null for decisions made before names were kept (\"a person\").",
+        "operationId": "investigation_deciders",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecidersOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Investigation Deciders"
+      }
+    },
     "/api/investigations/{investigation_id}/decisions": {
       "get": {
         "operationId": "get_decisions",
@@ -59149,6 +59817,548 @@
         "summary": "Link Lead"
       }
     },
+    "/api/me": {
+      "get": {
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Me"
+      }
+    },
+    "/api/me/cases/{investigation_id}/lock": {
+      "put": {
+        "description": "Lock a case on its own, or change its passphrase (the old one is asked).",
+        "operationId": "lock_case",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaseLockIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Lock Case"
+      }
+    },
+    "/api/me/cases/{investigation_id}/unlock-for-good": {
+      "post": {
+        "operationId": "remove_case_lock",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Remove Case Lock"
+      }
+    },
+    "/api/me/disk": {
+      "put": {
+        "operationId": "disk_answer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiskAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Disk Answer"
+      }
+    },
+    "/api/me/locking": {
+      "put": {
+        "operationId": "locking",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LockingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Locking"
+      }
+    },
+    "/api/me/name": {
+      "put": {
+        "operationId": "set_name",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NameIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Set Name"
+      }
+    },
+    "/api/me/passphrase": {
+      "post": {
+        "operationId": "change_passphrase",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassphraseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Change Passphrase"
+      }
+    },
+    "/api/me/pin": {
+      "put": {
+        "operationId": "set_pin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PinSetIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Set Pin"
+      }
+    },
+    "/api/me/protection": {
+      "post": {
+        "description": "Protect with a passphrase: returns the recovery words, once. This browser stays unlocked.",
+        "operationId": "turn_on",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryWordsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Turn On"
+      }
+    },
+    "/api/me/protection/off": {
+      "post": {
+        "operationId": "turn_off",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Turn Off"
+      }
+    },
+    "/api/me/recovery-key": {
+      "post": {
+        "operationId": "new_recovery_key",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryWordsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "New Recovery Key"
+      }
+    },
     "/api/notes/{note_id}": {
       "delete": {
         "description": "Delete the note. A lead made from it stays.",
@@ -60462,6 +61672,422 @@
           }
         },
         "summary": "Search Workbench"
+      }
+    },
+    "/api/session": {
+      "get": {
+        "operationId": "session_state",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Session State"
+      }
+    },
+    "/api/session/active": {
+      "post": {
+        "description": "The screen saw you working: what the idle lock measures from (polling alone does not count).",
+        "operationId": "active",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Active"
+      }
+    },
+    "/api/session/cases/{investigation_id}/close": {
+      "post": {
+        "operationId": "close_case",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Close Case"
+      }
+    },
+    "/api/session/cases/{investigation_id}/open": {
+      "post": {
+        "operationId": "open_case",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Open Case"
+      }
+    },
+    "/api/session/lock": {
+      "post": {
+        "operationId": "lock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/LockReasonIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Lock"
+      }
+    },
+    "/api/session/recover": {
+      "post": {
+        "description": "Forgot the passphrase: the recovery words, and a new passphrase.",
+        "operationId": "recover",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoverIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Recover"
+      }
+    },
+    "/api/session/start": {
+      "post": {
+        "operationId": "start_session",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Start Session"
+      }
+    },
+    "/api/session/unlock": {
+      "post": {
+        "operationId": "unlock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Unlock"
+      }
+    },
+    "/api/session/unlock-pin": {
+      "post": {
+        "operationId": "unlock_pin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PinIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Unlock Pin"
       }
     },
     "/api/settings/connectors/{provider}/check": {
@@ -61795,6 +63421,18 @@
             "schema": {
               "title": "User Id",
               "type": "string"
+            }
+          },
+          {
+            "description": "How long the new key works: 30 or 90 days.",
+            "in": "query",
+            "name": "key_days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "description": "How long the new key works: 30 or 90 days.",
+              "title": "Key Days",
+              "type": "integer"
             }
           }
         ],

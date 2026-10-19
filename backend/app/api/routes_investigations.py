@@ -15,6 +15,7 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ai.reasoning import (
@@ -49,6 +50,7 @@ from app.schemas.api import (
     SuiteRunRequest,
 )
 from app.schemas.responses import (
+    DecidersOut,
     AiAnalysisCandidatesOut,
     AiModelFailedOut,
     AiOutputRejectedOut,
@@ -86,6 +88,7 @@ from app.schemas.responses import (
 from app.services.assistant_context import build_question_context
 from app.services.demo_seed import seed_demo_investigation
 from app.services.exports import build_investigation_export, record_backup
+from app.services.sealed_backups import seal
 from app.services.financial_flows import investigation_financial_ledger
 from app.services.run_plan import build_run_plan, get_profile as get_run_profile, save_profile as save_run_profile
 from app.services.investigations import (
@@ -493,15 +496,18 @@ def export_investigation(
         payload, manifest = build_investigation_export(db, investigation_id, include_documents=include_documents)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
-    record_backup(db, investigation_id, payload, manifest)
+    # Encrypted when a passphrase is set (ADR-0016): the file that leaves this computer is the sealed one.
+    payload, sealed = seal(db, payload)
+    record_backup(db, investigation_id, payload, manifest, encrypted=sealed)
     inv = manifest["investigation"]
     safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in inv["name"]).strip("_") or "investigation"
-    filename = f"{safe_name}.jwbackup.zip"
+    filename = f"{safe_name}.jwbackup{'.encrypted' if sealed else ''}.zip"
     return Response(
         content=payload, media_type="application/zip",
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"',
             "X-JW-Backup-Version": str(manifest["version"]),
+            "X-JW-Backup-Encrypted": "true" if sealed else "false",
         },
     )
 
@@ -713,3 +719,33 @@ def list_connector_findings(
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return _list_investigation_connector_findings(db, investigation_id, limit=limit, offset=offset)
+
+
+@router.get("/investigations/{investigation_id}/deciders", response_model=DecidersOut)
+def investigation_deciders(investigation_id: str, days: int = Query(30, ge=1, le=365), db: Session = Depends(get_db)) -> Any:
+    """Who decided what in this case over the last days (mockup ACCOUNT_2): quote links, claim reviews by a person and
+    decided proposals, by the name kept with each; null for decisions made before names were kept ("a person")."""
+    from collections import Counter
+    from datetime import timedelta
+
+    from app.core.time import utcnow_naive
+    from app.models.claims import Claim, ClaimEvidenceLink, ClaimReviewEvent
+    from app.models.documents import ExtractionCandidate
+
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    since = utcnow_naive() - timedelta(days=days)
+    names: Counter[str | None] = Counter()
+    for (name,) in db.execute(select(ClaimEvidenceLink.decided_by_name).join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
+                              .where(Claim.investigation_id == investigation_id, ClaimEvidenceLink.created_at >= since)):
+        names[name] += 1
+    for (name,) in db.execute(select(ClaimReviewEvent.decided_by_name).join(Claim, Claim.id == ClaimReviewEvent.claim_id)
+                              .where(Claim.investigation_id == investigation_id, ClaimReviewEvent.created_at >= since,
+                                     ClaimReviewEvent.reviewer_type.in_(("HUMAN", "LEGAL_COUNSEL")))):
+        names[name] += 1
+    for (name,) in db.execute(select(ExtractionCandidate.decided_by_name)
+                              .where(ExtractionCandidate.investigation_id == investigation_id, ExtractionCandidate.reviewed_at >= since,
+                                     ExtractionCandidate.review_status != "proposed")):
+        names[name] += 1
+    people = sorted(names.items(), key=lambda kv: (kv[0] is None, -kv[1], kv[0] or ""))
+    return {"days": days, "people": [{"name": n, "decisions": c} for n, c in people]}

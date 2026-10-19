@@ -43,6 +43,10 @@ from app.services.exports import (
     record_backup,
     restore_investigation_export,
 )
+from app.services.sealed_backups import is_sealed, seal
+
+SEALED_IN_CONSOLE = ("This backup is encrypted. Restore it in the app, Settings › Backups, where the passphrase or the "
+                     "recovery words can be given; the console does not ask for them.")
 from app.services.security import redact_database_url, resolve_storage_root
 from opsconsole import (
     Check,
@@ -391,9 +395,10 @@ class WorkbenchBackups:
         for path in sorted(self.backups_dir.glob("*.zip"), reverse=True):
             manifest = self._manifest_of(path)
             stat = path.stat()
-            label = manifest["investigation"]["name"] if manifest else path.stem
+            sealed = manifest is None and is_sealed(path.read_bytes())
+            label = manifest["investigation"]["name"] if manifest else f"{path.stem} (encrypted)" if sealed else path.stem
             created_at = manifest["generated_at"] if manifest else datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat()
-            out.append(BackupRecord(id=path.stem, created_at=created_at, bytes=stat.st_size, kind=self.kind, label=label, verified=manifest is not None))
+            out.append(BackupRecord(id=path.stem, created_at=created_at, bytes=stat.st_size, kind=self.kind, label=label, verified=manifest is not None or sealed))
         return out
 
     def create(self, handle: RunHandle, *, selection: str | None) -> BackupRecord:
@@ -402,13 +407,14 @@ class WorkbenchBackups:
         handle.log(f"[console] exporting investigation {selection}")
         with self.session_factory() as db:
             data, manifest = build_investigation_export(db, selection, include_documents=True)
+            data, sealed = seal(db, data)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         backup_id = f"{stamp}-{selection}"
         path = self.backups_dir / f"{backup_id}.zip"
         path.write_bytes(data)
         # Recorded only once the archive is on disk, so a failed write never reads as a fresh backup.
         with self.session_factory() as db:
-            record_backup(db, selection, data, manifest)
+            record_backup(db, selection, data, manifest, encrypted=sealed)
         handle.log(f"[console] wrote {path.name} ({len(data)} bytes)")
         return BackupRecord(id=backup_id, created_at=manifest["generated_at"], bytes=len(data), kind=self.kind, label=manifest["investigation"]["name"], verified=True)
 
@@ -420,6 +426,9 @@ class WorkbenchBackups:
 
     def restore_plan(self, backup_id: str) -> RestorePlan:
         data = self._path(backup_id).read_bytes()
+        if is_sealed(data):
+            return RestorePlan(backup_id=backup_id, summary="An encrypted backup (ADR-0016)", will_replace=[],
+                               warnings=[SEALED_IN_CONSOLE])
         with self.session_factory() as db:
             preview = preview_investigation_restore(db, data, self.document_storage_dir)
         # A restore always targets an isolated investigation graph -- any collision is a
@@ -441,6 +450,8 @@ class WorkbenchBackups:
             raise RuntimeError("Backup restore is disabled; set ENABLE_RESTORE_API=true to enable it")
         path = self._path(backup_id)
         data = path.read_bytes()
+        if is_sealed(data):
+            raise RuntimeError(SEALED_IN_CONSOLE)
         handle.log(f"[console] restoring from {path.name}")
         with self.session_factory() as db:
             result = restore_investigation_export(db, data, self.document_storage_dir)

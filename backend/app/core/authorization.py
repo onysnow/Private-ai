@@ -33,19 +33,25 @@ class AuthorizationScope:
     investigation_ids: frozenset[str] | None = None
     role: str = "owner"
     investigation_roles: tuple[tuple[str, str], ...] = ()
+    # Cases locked on their own and not opened in this session (ADR-0016). The owner of this computer then gets
+    # an allowlist of every other case (so code that lists "all cases" leaves these out) but keeps owning the
+    # app: owner_wide marks that allowlist as "everything but the closed cases", so a case created during the
+    # request, or a global setting, is still theirs.
+    closed_investigation_ids: frozenset[str] = frozenset()
+    owner_wide: bool = False
 
     @property
     def unrestricted(self) -> bool:
         return self.investigation_ids is None
 
     def allows(self, investigation_id: str | None) -> bool:
-        if not investigation_id:
+        if not investigation_id or investigation_id in self.closed_investigation_ids:
             return False
         # Written as `is None` (not `self.unrestricted`) so mypy can narrow
         # investigation_ids to frozenset[str] on the right side of `or` --
         # the two are equivalent by construction (STRUCT-0013), but going
         # through the property loses that narrowing for the type checker.
-        return self.investigation_ids is None or investigation_id in self.investigation_ids
+        return self.investigation_ids is None or self.owner_wide or investigation_id in self.investigation_ids
 
     def role_for(self, investigation_id: str) -> str:
         if self.unrestricted:
@@ -60,7 +66,7 @@ class AuthorizationScope:
 
     @property
     def is_global_admin(self) -> bool:
-        return self.unrestricted and self.role in {"owner", "admin"}
+        return (self.unrestricted or self.owner_wide) and self.role in {"owner", "admin"}
 
 
 class InvestigationAuthorizationError(PermissionError):

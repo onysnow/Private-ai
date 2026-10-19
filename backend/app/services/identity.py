@@ -22,6 +22,8 @@ def scope_for_persisted_token(db: Session, token: str, *, mark_used: bool = Fals
     user = db.scalar(select(AppUser).where(AppUser.token_digest == token_digest(token)))
     if user is None or user.disabled or user.token_revoked_at is not None:
         return None
+    if user.token_expires_at is not None and user.token_expires_at <= utcnow_naive():
+        return None   # a key lasts 30 or 90 days (ADR-0016); the owner renews it from the person's row
     if mark_used:
         user.token_last_used_at = utcnow_naive()
         db.commit()

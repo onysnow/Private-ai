@@ -417,6 +417,8 @@ class AiThoughtMarkRequest(BaseModel):
 class AppUserCreate(BaseModel):
     display_name: str
     global_role: str = "member"
+    # How long the key works: 30 or 90 days (ADR-0016).
+    key_days: int = 30
 
 
 class AppUserUpdate(BaseModel):
@@ -847,3 +849,51 @@ class PushSubscriptionIn(BaseModel):
 
 class PushSubscriptionRemove(BaseModel):
     endpoint: str = Field(min_length=8, max_length=2000)
+
+
+# --- your name and the app lock (ADR-0016) -------------------------------------------------------------------------
+
+class SecretIn(BaseModel):
+    passphrase: str
+
+
+class PinIn(BaseModel):
+    pin: str
+
+
+class RecoverIn(BaseModel):
+    words: str
+    new_passphrase: str
+
+
+class NameIn(BaseModel):
+    name: str
+
+
+class ChangePassphraseIn(BaseModel):
+    old: str
+    new: str
+
+
+class PinSetIn(BaseModel):
+    pin: str | None = None
+
+
+class LockingIn(BaseModel):
+    idle_minutes: int | None = None
+    lock_on_hide: bool | None = None
+    lock_on_sleep: bool | None = None
+    quick_pin: bool | None = None
+
+
+class DiskAnswerIn(BaseModel):
+    answer: str | None = None   # encrypted | not_encrypted | None (let the app check)
+
+
+class CaseLockIn(BaseModel):
+    passphrase: str
+    old: str | None = None
+
+
+class LockReasonIn(BaseModel):
+    reason: str | None = None   # idle | hide | sleep | button
