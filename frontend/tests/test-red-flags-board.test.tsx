@@ -88,7 +88,11 @@ describe('RedFlagsBoard', () => {
     const user = userEvent.setup();
     await user.click(within(before).getAllByRole('button', {name: 'Rule out…'})[0]);
     const input = within(before).getByRole('textbox', {name: 'What ruled out: Group cross-holdings'});
-    expect(within(before).getByRole('button', {name: 'Rule out'})).toBeDisabled();
+    // Empty: the field says what to do, and nothing is sent.
+    await user.click(within(before).getByRole('button', {name: 'Rule out'}));
+    expect(await within(before).findByText('Write what ruled it out.')).toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(api.calls('POST /api/red-flags/f2/innocent')).toHaveLength(0);
     await user.type(input, 'No cross-holdings in the filings');
     await user.click(within(before).getByRole('button', {name: 'Rule out'}));
     await waitFor(() => expect(api.calls('POST /api/red-flags/f2/innocent')).toHaveLength(1));
@@ -107,7 +111,9 @@ describe('RedFlagsBoard', () => {
     await waitFor(() => expect(api.calls('POST /api/red-flags/f2/lead')).toHaveLength(1));
     fireEvent.keyDown(board, {key: 'x'});
     expect(within(open).getByLabelText('Why set it aside?')).toBeInTheDocument();
-    expect(within(open).getByRole('button', {name: 'Set aside'})).toBeDisabled();
+    fireEvent.click(within(open).getByRole('button', {name: 'Set aside'}));
+    expect(await within(open).findByText('Write why first.')).toBeInTheDocument();
+    expect(api.calls('POST /api/red-flags/f2/dismiss')).toHaveLength(0);
     fireEvent.keyDown(board, {key: 'j'});
     expect(await within(screen.getByRole('region', {name: 'The open Red Flag'})).findByRole('link', {name: 'Show in money flows'})).toHaveAttribute('href', expect.stringContaining('/see'));
     expect(within(screen.getByRole('region', {name: 'The open Red Flag'})).getByRole('button', {name: 'Share'})).toBeDisabled();

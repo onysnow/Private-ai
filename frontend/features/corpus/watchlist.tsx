@@ -8,11 +8,14 @@
 // lead on its own.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
-import type {ChangeEvent, FormEvent, ReactElement} from 'react';
+import type {ReactElement} from 'react';
+import {z} from 'zod';
 
 import {Button} from '@/components/ui/button';
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {
   addWatchlistEntryMutation, checkWatchlistNowMutation, dismissHitMutation, getWatchlistOptions, getWatchlistQueryKey,
   listLeadsQueryKey, makeLeadFromHitMutation, removeWatchlistEntryMutation,
@@ -20,6 +23,13 @@ import {
 import type {WatchlistEntryOut, WatchlistHitOut, WatchlistOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {Snippet} from '../search/corpus-results';
+
+// What the reporter types to watch a name (backend WatchlistEntryCreate: query 1–512, note up to 2000).
+const watchSchema = z.object({
+  query: z.string().trim().min(1, 'Type a name or a search to watch.').max(512, 'Keep it under 512 characters.'),
+  note: z.string().trim().max(2000, 'Keep the reason under 2,000 characters.'),
+});
+type WatchValues = z.infer<typeof watchSchema>;
 
 const CHECK_STATE: Record<string, string> = {
   not_configured: 'OpenAleph is not set up here, so the name was not searched.',
@@ -54,8 +64,7 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
   const openDocument = useWorkbenchStore(state => state.openDocument);
   const path = {investigation_id: investigationId};
   const key = getWatchlistQueryKey({path});
-  const [query, setQuery] = useState('');
-  const [note, setNote] = useState('');
+  const form = useZodForm<WatchValues>(watchSchema, {defaultValues: {query: '', note: ''}, mode: 'onSubmit'});
   const [status, setStatus] = useState('');
   const watchlist = useQuery({...getWatchlistOptions({path}), enabled: Boolean(investigationId)});
   const add = useMutation({...addWatchlistEntryMutation()});
@@ -70,17 +79,12 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
     try { setStatus(await work()); } catch (error) { setStatus(errorMessage(error, failed)); }
   };
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const name = query.trim();
-    if (!name) return;
-    void attempt(async () => {
-      keep(await add.mutateAsync({path, body: {query: name, note: note.trim() || null}}));
-      setQuery('');
-      setNote('');
-      return `Watching “${name}”.`;
-    }, 'Could not watch the name');
-  };
+  // An empty name is refused under the field; a refused save stays in the form, under the field the server names.
+  const submit = submitWith(form, async ({query, note}) => {
+    keep(await add.mutateAsync({path, body: {query, note: note || null}}));
+    form.reset();
+    setStatus(`Watching “${query}”.`);
+  }, 'Could not watch the name');
   const checkNow = () => attempt(async () => {
     const reply = await check.mutateAsync({path});
     keep(reply);
@@ -104,13 +108,16 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
   return <div className="candidate">
     <b>Watchlist</b>
     <p className="muted">Names searched in this investigation&apos;s documents whenever OpenAleph reads a new one. Each document a name turns up in shows here once.</p>
-    <form onSubmit={submit} className="actions" aria-label="Watch a name">
-      <Input aria-label="Name or search to watch" placeholder="A name, or a search like “Jane Doe” OR Zanzibar" value={query}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}/>
-      <Input aria-label="Why it is watched" placeholder="Why (optional)" value={note}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => setNote(e.target.value)}/>
-      <Button type="submit" disabled={!query.trim() || add.isPending}>Watch</Button>
-    </form>
+    <Form {...form}><form onSubmit={submit} className="actions" aria-label="Watch a name" noValidate>
+      <FormField control={form.control} name="query" render={({field}) => <FormItemBare>
+        <FormControl><Input {...field} aria-label="Name or search to watch" placeholder="A name, or a search like “Jane Doe” OR Zanzibar"/></FormControl>
+        <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+      <FormField control={form.control} name="note" render={({field}) => <FormItemBare>
+        <FormControl><Input {...field} aria-label="Why it is watched" placeholder="Why (optional)"/></FormControl>
+        <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+      <FormRootError className="field-msg next-line"/>
+      <Button type="submit" disabled={add.isPending}>Watch</Button>
+    </form></Form>
     {watchlist.isError && <p className="muted">{errorMessage(watchlist.error, 'Could not load the watchlist')}</p>}
     {watchlist.data && entries.length === 0 && <p className="muted">No name is watched yet.</p>}
     {entries.length > 0 && <Button variant="outline" onClick={() => void checkNow()} disabled={check.isPending}>{check.isPending ? 'Checking…' : 'Check now'}</Button>}

@@ -1,8 +1,13 @@
 # React Hook Form + Zod adoption (issue #41)
 
 Status: infra landed 2026-09-24; the shared layer for bad input (`lib/forms.ts`)
-landed 2026-10-19. The hand-wired forms in `features/` are not converted yet:
-each change that shows a new message on screen waits on Ony's approval (mockups first).
+landed 2026-10-19, and the same day the 20 hand-wired forms moved onto it: the
+watchlist, before you run (question and theory, a premise, why the settings become
+the default), watch the run (why reject), marks (new tag, note, new collection),
+case home's question, story (version name, note, thesis, new section, a gate, ready
+to run), red flags (set aside on the board, the card and the drawer; what ruled an
+innocent explanation out), new-case setup and the record picker. The connections
+picker has no typed field and is left as it is.
 
 ## What's here
 
@@ -59,6 +64,30 @@ each change that shows a new message on screen waits on Ony's approval (mockups 
    field with a `.refine()` that both validates and is later split into the
    array. `entity-form.tsx` took the single-field-plus-refine route for this
    reason.
+
+## A compact form the app styles itself
+
+Most of the converted forms are a field and a button or two in a row or grid of the
+app's own CSS (`styles/`), not shadcn's stacked boxes. For those:
+
+- Wrap the field in `FormItemBare` (`components/ui/form.tsx`) instead of `FormItem`:
+  it draws no box (display: contents), so the input keeps its place in the form's
+  row or grid and its CSS still applies.
+- Give `FormMessage` and `FormRootError` the class `field-msg` (app/globals.css):
+  plain words in the status red. Add `next-line` when the form is a row or a grid of
+  columns: the message then takes a line of its own under the row, so nothing in
+  the row moves when it shows.
+- Pass `mode: 'onSubmit'` to `useZodForm`: checked on leaving the field, an empty
+  box (often one that opens focused, a reason asked in place) would say "Write why
+  first." as soon as the reporter clicks away, and the message could move Cancel
+  under the pointer. After a first submit each change is checked again, so the
+  message goes as soon as they type. A full form (new-case setup, EntityForm) keeps
+  the default, checked on leaving each field.
+- The submit button is not disabled when the field is empty (only while saving):
+  pressing it is how the reporter finds out what is missing.
+- Where a mutation's error was also shown elsewhere on the screen, the form's save
+  resets that mutation on failure (or the other message leaves it out), so the
+  failure shows once, in the form.
 
 ## Wiring a converted section into `page.tsx`
 

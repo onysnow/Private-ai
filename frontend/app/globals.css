@@ -619,3 +619,9 @@
 .tc-decide .sv-btn.on.tc-does_not { border-color: var(--flag-textbook-fill); color: var(--text); background: rgba(159,54,50,.25); }
 .tc-decide .sv-btn.on.tc-unclear { border-color: #8d692b; color: var(--text); background: rgba(141,105,43,.25); }
 .tc-count { color: var(--text-muted); white-space: nowrap; }
+
+/* What is wrong with a field, and why a save failed (lib/forms.ts, components/ui/form.tsx; issue #41): plain words in
+   the status red, under the field. In a row of a field and its buttons the message takes a line of its own under the
+   row (next-line), so nothing in the row moves when it shows. */
+.field-msg { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--status-disputed); }
+.field-msg.next-line { order: 1; flex-basis: 100%; grid-column: 1 / -1; }

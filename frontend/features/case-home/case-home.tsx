@@ -11,10 +11,13 @@ import {useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {DragEvent, ReactElement, ReactNode} from 'react';
+import {z} from 'zod';
 
 import {LevelChip, StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {
   getClaimSourcesOptions, getInvestigationGraphOptions, getPartyYearsOptions, listJobsEndpointOptions, getSinceOptions, getStandingOptions, listClaimsOptions, listDocumentsOptions,
   listInvestigationsQueryKey,
@@ -115,27 +118,30 @@ function Stepper({index, count, total, onStep, label}: {index: number; count: nu
   </span>;
 }
 
+// The question as the backend takes it (InvestigationUpdate: up to 500 characters; an empty one clears it).
+const questionSchema = z.object({question: z.string().trim().max(500, 'Keep the question under 500 characters.')});
+type QuestionValues = z.infer<typeof questionSchema>;
+
 /** The case's own question, written in place. */
 function CaseQuestion({investigation}: {investigation: InvestigationOut}): ReactElement {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(investigation.question ?? '');
-  const [problem, setProblem] = useState('');
-  useEffect(() => { setDraft(investigation.question ?? ''); }, [investigation.question]);
-  const save = async () => {
-    try {
-      await patchInvestigation({path: {investigation_id: investigation.id}, body: {question: draft}, throwOnError: true});
-      await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
-      setEditing(false); setProblem('');
-    } catch (error) { setProblem(errorMessage(error, 'Could not save the question')); }
-  };
-  if (editing) return <form className="ch-q-edit" onSubmit={e => { e.preventDefault(); void save(); }}>
+  const form = useZodForm<QuestionValues>(questionSchema, {defaultValues: {question: investigation.question ?? ''}, mode: 'onSubmit'});
+  useEffect(() => { form.reset({question: investigation.question ?? ''}); }, [investigation.question]); // eslint-disable-line react-hooks/exhaustive-deps
+  const save = submitWith(form, async ({question}) => {
+    await patchInvestigation({path: {investigation_id: investigation.id}, body: {question}, throwOnError: true});
+    await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
+    setEditing(false);
+  }, 'Could not save the question');
+  if (editing) return <Form {...form}><form className="ch-q-edit" onSubmit={save} noValidate>
     <label htmlFor="ch-q">The question</label>
-    <input id="ch-q" autoFocus value={draft} maxLength={500} onChange={e => setDraft(e.target.value)} placeholder="Who really owns the harbour land?"
-      onKeyDown={e => { if (e.key === 'Escape') setEditing(false); }}/>
+    <FormField control={form.control} name="question" render={({field}) => <FormItemBare>
+      <FormControl><input {...field} id="ch-q" autoFocus maxLength={500} placeholder="Who really owns the harbour land?"
+        onKeyDown={e => { if (e.key === 'Escape') setEditing(false); }}/></FormControl>
+      <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+    <FormRootError className="field-msg next-line"/>
     <button type="submit">Save</button>
-    {problem && <span role="alert">{problem}</span>}
-  </form>;
+  </form></Form>;
   return <div className="ch-q">
     <p className="ch-eyebrow">The question</p>
     {investigation.question

@@ -6,9 +6,12 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import {useEffect, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
+import {z} from 'zod';
 
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {StatusChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {api} from '../../lib/api-instance';
 import {
   addNoteMutation, getNotesOptions, getNotesQueryKey, getStoryQueryKey, getStoryVersionOptions, getWriteupEndpointQueryKey,
@@ -19,6 +22,12 @@ import type {CitableClaim, DocInfo} from './editor-extensions';
 
 // TipTap loads only when a version is read (as the editor itself does).
 const VersionText = dynamic(() => import('./version-text').then(m => m.VersionText), {ssr: false, loading: () => <p className="sy-quiet">Reading…</p>});
+
+// A version's name and a note on the story, as the backend takes them (WriteupVersionCreate name 1–200, NoteCreate text 1–20000).
+const versionSchema = z.object({name: z.string().trim().min(1, 'Give the version a name.').max(200, 'Keep the name under 200 characters.')});
+const noteSchema = z.object({text: z.string().trim().min(1, 'Write the note first.').max(20000, 'Keep the note under 20,000 characters.')});
+type VersionValues = z.infer<typeof versionSchema>;
+type NoteValues = z.infer<typeof noteSchema>;
 
 const STATE_CHIP = {shown: 'supported', disputed: 'disputed', unshown: 'unshown', ruled_out: 'ruled_out'} as const;
 const when = (iso: string) => new Date(iso).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
@@ -59,13 +68,13 @@ export function VersionsPane({investigationId, writeupId, onClose, onRestored}: 
   const list = useQuery({...listStoryVersionsOptions({path})});
   const [viewing, setViewing] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
-  const [name, setName] = useState('');
+  const nameForm = useZodForm<VersionValues>(versionSchema, {defaultValues: {name: ''}, mode: 'onSubmit'});
   const one = useQuery({...getStoryVersionOptions({path: {...path, version_id: viewing ?? ''}}), enabled: Boolean(viewing)});
   const refresh = () => Promise.all([
     queryClient.invalidateQueries({queryKey: listStoryVersionsQueryKey({path})}),
     queryClient.invalidateQueries({queryKey: getStoryQueryKey({path})}),
   ]);
-  const nameM = useMutation({...nameStoryVersionMutation(), onSuccess: () => { setName(''); void refresh(); }});
+  const nameM = useMutation({...nameStoryVersionMutation(), onSuccess: () => { void refresh(); }});
   const restoreM = useMutation({...restoreStoryVersionMutation(), onSuccess: data => {
     queryClient.setQueryData(getWriteupEndpointQueryKey({path: {writeup_id: writeupId}}), data);
     setAsking(false); setViewing(null);
@@ -91,12 +100,17 @@ export function VersionsPane({investigationId, writeupId, onClose, onRestored}: 
     </Pane>;
   }
   return <Pane label="Version history" title="Version history" onClose={onClose}>
-    <form className="sy-name" onSubmit={e => { e.preventDefault(); if (name.trim()) nameM.mutate({path, body: {name: name.trim()}}); }}>
+    <Form {...nameForm}><form className="sy-name" noValidate onSubmit={submitWith(nameForm, async ({name}) => {
+      await nameM.mutateAsync({path, body: {name}});
+      nameForm.reset();
+    }, 'Could not keep that version')}>
       <label htmlFor="sy-version-name">Name the text as it stands</label>
-      <span><input id="sy-version-name" value={name} maxLength={200} onChange={e => setName(e.target.value)} placeholder="e.g. Before legal read"/>
-        <button type="submit" disabled={!name.trim() || nameM.isPending}>Keep</button></span>
-    </form>
-    {nameM.isError && <p role="alert" className="sy-quiet">{errorMessage(nameM.error, 'Could not keep that version')}</p>}
+      <FormField control={nameForm.control} name="name" render={({field}) => <FormItemBare>
+        <span><FormControl><input {...field} id="sy-version-name" maxLength={200} placeholder="e.g. Before legal read"/></FormControl>
+          <button type="submit" disabled={nameM.isPending}>Keep</button></span>
+        <FormMessage className="field-msg"/></FormItemBare>}/>
+      <FormRootError className="field-msg"/>
+    </form></Form>
     {list.isError && <p role="alert" className="sy-quiet">{errorMessage(list.error, 'Could not read the versions')}</p>}
     <p className="sy-quiet">Kept on their own while you write, at most one every ten minutes; named ones stay.</p>
     <ol className="sy-versions" aria-label="Versions, newest first">
@@ -115,17 +129,24 @@ export function NotesTab({investigationId, storyId}: {investigationId: string; s
   const options = {path: {investigation_id: investigationId}, query: {record_type: 'story' as const, record_id: storyId}};
   const notes = useQuery({...getNotesOptions(options)});
   const reload = () => queryClient.invalidateQueries({queryKey: getNotesQueryKey(options)});
-  const [text, setText] = useState('');
+  const noteForm = useZodForm<NoteValues>(noteSchema, {defaultValues: {text: ''}, mode: 'onSubmit'});
   const [deleting, setDeleting] = useState<string | null>(null);
-  const addM = useMutation({...addNoteMutation(), onSuccess: () => { setText(''); void reload(); }});
+  const addM = useMutation({...addNoteMutation(), onSuccess: () => { void reload(); }});
   const removeM = useMutation({...removeNoteMutation(), onSuccess: () => { setDeleting(null); void reload(); }});
-  const problem = notes.error ?? addM.error ?? removeM.error;
+  // A note that could not be added shows in its form.
+  const problem = notes.error ?? removeM.error;
   return <div className="sy-notes">
-    <form onSubmit={e => { e.preventDefault(); if (text.trim()) addM.mutate({path: options.path, body: {text: text.trim(), record_type: 'story', record_id: storyId}}); }}>
+    <Form {...noteForm}><form noValidate onSubmit={submitWith(noteForm, async ({text}) => {
+      await addM.mutateAsync({path: options.path, body: {text, record_type: 'story', record_id: storyId}});
+      noteForm.reset();
+    }, 'Could not add the note')}>
       <label htmlFor="sy-note">A note on the story</label>
-      <textarea id="sy-note" rows={3} value={text} onChange={e => setText(e.target.value)} placeholder="What to ask, what to check, what the editor said"/>
-      <button type="submit" disabled={!text.trim() || addM.isPending}>Add note</button>
-    </form>
+      <FormField control={noteForm.control} name="text" render={({field}) => <FormItemBare>
+        <FormControl><textarea {...field} id="sy-note" rows={3} placeholder="What to ask, what to check, what the editor said"/></FormControl>
+        <FormMessage className="field-msg"/></FormItemBare>}/>
+      <FormRootError className="field-msg"/>
+      <button type="submit" disabled={addM.isPending}>Add note</button>
+    </form></Form>
     {problem && <p role="alert" className="sy-quiet">{errorMessage(problem, 'Could not change the notes')}</p>}
     <ol className="sy-note-list" aria-label="Notes on the story">
       {(notes.data?.notes ?? []).map((n: NoteOut) => <li key={n.id}>

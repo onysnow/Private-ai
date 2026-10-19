@@ -43,7 +43,7 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
   - make the designs the best possible UI/UX and visualisation.
 
 - **Settings panes (19 Oct):** Notifications (alert preferences), Outside lookups, AI and research (research automation) and Connector keys drawn in the mockup at https://claude.ai/artifact/SEucwaaP2poX283ztjtfLp, waiting on Ony. HOME_2 drew only their sidebar rows. Connector keys already save one key per source (`security-panel.tsx`); the rest has no backend yet (no notification rules table, no per-person settings store).
-- **Issue #41, the forms (19 Oct):** the shared layer is built (`lib/forms.ts`, readable 422s with `fieldErrors`, `FormRootError`; EntityForm moved onto it). Not converted: 21 hand-wired forms that ignore an empty or bad field without a word (watchlist, marks ×3, story ×6, red flags ×3, before you run ×3, watch the run, case home's question, new-case setup, record picker). Converting them shows a message under the field, as in the Connector keys board of the Settings mockup: waiting on Ony.
+- **Done 19 Oct: issue #41, the forms.** The 20 hand-wired forms are on the shared layer (`lib/forms.ts`): an empty or bad field says what to do under it and sends nothing; a refused save shows under the field or for the form, and the input stays (`docs/frontend/react-hook-form-zod.md`). The connections picker has no typed field and stays as it is.
 
 ## Asked for: demo
 - **The demo is a finished (or nearly finished) investigation.** The human-review decisions should be pre-made by Claude from what is known, so the user sees how the app works past the review step. Today 1MDB has about 15,000 items waiting.

@@ -9,8 +9,11 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
+import {z} from 'zod';
 
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {
   getAiAnalysisCandidateEndpointOptions, listAiRunEventsOptions, listAiRunEventsQueryKey, listAiRunsOptions, markAiRunThoughtMutation,
@@ -51,6 +54,9 @@ const SYSTEMS: Array<{key: string; name: string; x: number; w: number; trigger: 
   {key: 'das', name: 'DAS', x: 780, w: 80, trigger: 'if the answer had recommended an action'},
 ];
 const TAS_MODULES = 10;
+// Why the answer is rejected (the review's note; the backend sets no length).
+const rejectSchema = z.object({reason: z.string().trim().min(1, 'Write why first.')});
+type RejectValues = z.infer<typeof rejectSchema>;
 // The pipeline in reading order, for the arrow keys (research AI §4 "arrow keys move along the pipeline").
 const ORDER = ['run', 'retrieval', 'cp-02', 'cp-03', 'router', 'model', 'gate:schema', 'gate:citation', 'gate:quote', 'gate:chart', 'gate:writing',
   'tas/08', 'tas/06', 'tas/class', 'tas/corroboration', 'cp-01', 'boundary:tas→las', 'boundary:las→das', 'candidate', 'review'];
@@ -252,9 +258,9 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
   const candidateId = run?.candidate_id ?? null;
   const candidate = useQuery({...getAiAnalysisCandidateEndpointOptions({path: {candidate_id: candidateId ?? ''}}), enabled: Boolean(candidateId)});
   const [rejecting, setRejecting] = useState(false);
-  const [reason, setReason] = useState('');
+  const rejectForm = useZodForm<RejectValues>(rejectSchema, {defaultValues: {reason: ''}, mode: 'onSubmit'});
   const review = useMutation({...reviewAiAnalysisCandidateEndpointMutation(), onSuccess: () => {
-    setRejecting(false);
+    setRejecting(false); rejectForm.reset();
     void queryClient.invalidateQueries({queryKey: listAiRunEventsQueryKey({path: {investigation_id: investigationId, run_id: id ?? ''}, query: {after: 0}})});
     void candidate.refetch();
   }});
@@ -757,8 +763,16 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
           {candidateId && !reviewed && !rejecting && <>
             <button type="button" className="br-primary" onClick={() => review.mutate({path: {candidate_id: candidateId}, body: {decision: 'accept', note: null}})}>✓ Accept</button>
             <button type="button" onClick={() => setRejecting(true)}>✕ Reject with reason</button></>}
-          {rejecting && <form className="br-add" onSubmit={e => { e.preventDefault(); if (candidateId) review.mutate({path: {candidate_id: candidateId}, body: {decision: 'reject', note: reason.trim()}}); }}>
-            <input aria-label="Why reject it" value={reason} onChange={e => setReason(e.target.value)} autoFocus/><button type="submit" disabled={!reason.trim()}>Reject</button></form>}
+          {rejecting && <Form {...rejectForm}><form className="br-add" noValidate onSubmit={submitWith(rejectForm, async ({reason}) => {
+            if (!candidateId) return;
+            // The failure shows in this form, so not again in the footer.
+            try { await review.mutateAsync({path: {candidate_id: candidateId}, body: {decision: 'reject', note: reason}}); } catch (error) { review.reset(); throw error; }
+          }, 'Not saved')}>
+            <FormField control={rejectForm.control} name="reason" render={({field}) => <FormItemBare>
+              <FormControl><input {...field} aria-label="Why reject it" autoFocus/></FormControl>
+              <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+            <FormRootError className="field-msg next-line"/>
+            <button type="submit">Reject</button></form></Form>}
           {reviewed && <span className="br-ok">{words(candidate.data?.review_status)}</span>}
           {thoughtId && run?.finished && !sample && <button type="button" aria-pressed={marked === 'to_check'} disabled={mark.isPending}
             title={marked === 'to_check' ? 'On your list to check; press again to take it off' : 'Put this thought on your list to check; it is kept in the run record'}

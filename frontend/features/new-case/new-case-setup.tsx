@@ -7,9 +7,11 @@ import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useRouter} from 'next/navigation';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
+import {z} from 'zod';
 
-import {errorMessage} from '../../lib/api-client';
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {caseHref} from '../../lib/case-href';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {listAreasOptions, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {createInvestigation, setInvestigationType} from '../../lib/generated/sdk.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -21,39 +23,46 @@ export const HAVE: {key: string; label: string; line: string; href: string}[] = 
   {key: 'nothing', label: 'Nothing yet', line: 'A tip or a question to start from', href: '/'},
 ];
 
+// The case's name and question, as the backend takes them (InvestigationCreate; the name as InvestigationUpdate allows it, 1–255).
+const caseSchema = z.object({
+  name: z.string().trim().min(1, 'Give the case a name.').max(255, 'Keep the name under 255 characters.'),
+  question: z.string().trim().max(500, 'Keep the question under 500 characters.'),
+});
+type CaseValues = z.infer<typeof caseSchema>;
+
 export function NewCaseSetup({onCreated}: {onCreated?: (id: string) => void}): ReactElement {
   const router = useRouter();
   const queryClient = useQueryClient();
   const areas = useQuery(listAreasOptions()).data ?? [];
-  const [name, setName] = useState('');
-  const [question, setQuestion] = useState('');
+  const form = useZodForm<CaseValues>(caseSchema, {defaultValues: {name: '', question: ''}});
   const [kinds, setKinds] = useState<string[]>([]);
   const [filter, setFilter] = useState('');
   const [have, setHave] = useState('documents');
-  const [busy, setBusy] = useState(false);
-  const [problem, setProblem] = useState('');
+  const busy = form.formState.isSubmitting;
   const words = filter.trim().toLowerCase().split(/\s+/).filter(Boolean);
   const shown = areas.filter(a => kinds.includes(a.key) || words.every(w => `${a.name} ${a.summary}`.toLowerCase().includes(w)));
   const toggle = (key: string) => setKinds(k => (k.includes(key) ? k.filter(x => x !== key) : [...k, key]));
 
-  const start = async () => {
-    setBusy(true); setProblem('');
-    try {
-      const created = (await createInvestigation({body: {name: name.trim(), question: question.trim() || null}, throwOnError: true})).data;
-      if (kinds.length) await setInvestigationType({path: {investigation_id: created.id}, body: {areas: kinds}, throwOnError: true});
-      await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
-      useWorkbenchStore.getState().setInvestigationId(created.id);
-      onCreated?.(created.id);
-      router.push(caseHref(HAVE.find(h => h.key === have)?.href ?? '/', created.id));
-    } catch (error) { setProblem(errorMessage(error, 'Could not start the case')); } finally { setBusy(false); }
-  };
+  // A case with no name is refused under the field; a refused save stays in the form, with what was typed.
+  const start = submitWith(form, async ({name, question}) => {
+    const created = (await createInvestigation({body: {name, question: question || null}, throwOnError: true})).data;
+    if (kinds.length) await setInvestigationType({path: {investigation_id: created.id}, body: {areas: kinds}, throwOnError: true});
+    await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
+    useWorkbenchStore.getState().setInvestigationId(created.id);
+    onCreated?.(created.id);
+    router.push(caseHref(HAVE.find(h => h.key === have)?.href ?? '/', created.id));
+  }, 'Could not start the case');
 
-  return <form className="nc" aria-label="Start a case" onSubmit={e => { e.preventDefault(); if (name.trim()) void start(); }}>
+  return <Form {...form}><form className="nc" aria-label="Start a case" onSubmit={start} noValidate>
     <fieldset>
       <legend><span>1</span>The case</legend>
-      <label>Name<input value={name} onChange={e => setName(e.target.value)} placeholder="Kestrel harbour land" required maxLength={255}/></label>
-      <label>The question it answers <small>(you can write it later)</small>
-        <input value={question} onChange={e => setQuestion(e.target.value)} placeholder="Who really owns the harbour land?" maxLength={500}/></label>
+      <FormField control={form.control} name="name" render={({field}) => <FormItemBare>
+        <label>Name<FormControl><input {...field} placeholder="Kestrel harbour land" required maxLength={255}/></FormControl></label>
+        <FormMessage className="field-msg"/></FormItemBare>}/>
+      <FormField control={form.control} name="question" render={({field}) => <FormItemBare>
+        <label>The question it answers <small>(you can write it later)</small>
+          <FormControl><input {...field} placeholder="Who really owns the harbour land?" maxLength={500}/></FormControl></label>
+        <FormMessage className="field-msg"/></FormItemBare>}/>
     </fieldset>
     <fieldset>
       <legend><span>2</span>What kind of case <small>(optional: skip it and the app suggests kinds from what you bring in)</small></legend>
@@ -71,7 +80,7 @@ export function NewCaseSetup({onCreated}: {onCreated?: (id: string) => void}): R
           <input type="radio" name="nc-have" checked={have === h.key} onChange={() => setHave(h.key)}/><b>{h.label}</b><small>{h.line}</small></label>)}
       </div>
     </fieldset>
-    <button type="submit" className="nc-go" disabled={!name.trim() || busy}>{busy ? 'Starting…' : 'Start the case'}</button>
-    {problem && <p role="alert">{problem}</p>}
-  </form>;
+    <FormRootError className="field-msg"/>
+    <button type="submit" className="nc-go" disabled={busy}>{busy ? 'Starting…' : 'Start the case'}</button>
+  </form></Form>;
 }

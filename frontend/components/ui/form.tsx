@@ -99,6 +99,13 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 );
 FormItem.displayName = 'FormItem';
 
+/** A FormItem that draws no box of its own (display: contents), for a compact form the app styles itself: the field
+ * keeps its place in the form's own row or grid, and its message (className "field-msg", app/globals.css) goes under it. */
+const FormItemBare = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({className, ...props}, ref) => <FormItem ref={ref} className={cn('contents space-y-0', className)} {...props}/>
+);
+FormItemBare.displayName = 'FormItemBare';
+
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
@@ -167,4 +174,4 @@ function FormRootError({className}: {className?: string}): React.ReactElement | 
   );
 }
 
-export {useFormField, Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormRootError, FormField};
+export {useFormField, Form, FormItem, FormItemBare, FormLabel, FormControl, FormDescription, FormMessage, FormRootError, FormField};
