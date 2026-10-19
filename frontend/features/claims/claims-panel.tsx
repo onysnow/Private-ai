@@ -24,6 +24,7 @@ import {createClaimEndpoint, createClaimReview, linkClaimEvidenceEndpoint} from 
 import type {ClaimOut, ClaimReviewWorkspaceOut, EvidencePoolRow} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {WatchButton} from '../inbox/watch-button';
 
 /** The canonical relationships the page still holds, as far as this panel
  * needs them: to name a relationship that depends on the open claim. */
@@ -186,7 +187,8 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
           {!selectedClaim ? <p className="muted">Choose a claim to inspect its evidence and verification state.</p> : <>
             <h4>{selectedClaim.text}</h4>
             <p><Button variant="outline" size="sm" onClick={() => { openChain(selectedClaim.id); window.location.hash = 'chain-of-custody'; }}>
-              Chain of Custody: how this got here</Button></p>
+              Chain of Custody: how this got here</Button>{' '}
+              <WatchButton investigationId={investigationId} recordType="claim" recordId={selectedClaim.id} className="ap-btn"/></p>
             <div className="searchrow">
               <Select value={claimStatus} onValueChange={setClaimStatus}>
                 <SelectTrigger className="w-auto"><SelectValue/></SelectTrigger>

@@ -55,6 +55,17 @@ where its mockup puts it, in the sections below (§5 line styles, §6 claim card
 - [x] Gathering outcome per lead (obtained / refused / not held / no reply / unable)
 - [x] Hash + custody log for online captures; CP-02 source-protection and CP-03 publication-ethics records
 
+## 1b. Settings panes — Settings panes mockup (19 Oct, https://claude.ai/artifact/SEucwaaP2poX283ztjtfLp)
+
+HOME_2 draws the Settings sidebar only; these four panes were drawn on 19 Oct and built the same day
+(`features/settings/*-pane.tsx`; backend `app/services/preferences.py`, `notifications.py`, `watches.py`,
+`connector_activity.py`, `app/api/routes_preferences.py`; tables `app_preferences`, `fact_watches`).
+- [x] Notifications: each kind routed to Interrupt (Textbook only) / Needs you / Everything else / Off, saved as chosen, per person; last week replayed with the routes on screen; quiet while reading (held while a `data-calm-zone` screen is open: the reader, Chain of Custody, Decide); desktop notification (kind only); watches on facts (Watch on a claim card and a Red Flag page; Seen in the inbox). The inbox and the bell read `GET /investigations/{id}/inbox`; an interrupt shows once in the top band (`features/inbox/interrupt-notice.tsx`)
+- [x] Outside lookups: the "what leaves this computer" sentence built from the modes; each source with the wire (case → what is sent → host), its default for new cases (owner or admin), its mode here, key and last lookup; this case's own modes saved with a reason (Make it match the defaults); other cases that differ; sent this week (from `connector_runs`); Off refused by the server on every lookup path; Automatic looks each new party (Person, Company, Organization, LegalEntity, PublicBody) up once in a background job (`outside_lookup`)
+- [x] AI and research: the model (set on the server, with the variables); research without asking Off / Ask first (Ask first: a Needs-you row when documents arrive after a case's last run); run settings for new cases saved with a reason, used by every case that has not saved its own; cannot be turned off; cases that run differently
+- [x] Connector keys: a card per source: works / refused (401 or 403 on its last lookup) / saved / no key, goes to, unlocks, last used, cases this month; paste checked as typed (one line, no spaces); Replace, Remove with a confirm
+- [ ] Not built: "Without approval" research (needs saved questions); a key test without a query; email or phone notifications; per-case research mode
+
 ## 2. Case home — mockup HOME_1 (redesign §04.1)
 
 Today: **built 12 Oct** except Bring in's "what it proposed so far". Built earlier: question, standing strip, Next up card with three keys and undo, Bring in /

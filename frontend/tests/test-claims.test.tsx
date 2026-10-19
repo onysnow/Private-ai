@@ -44,7 +44,7 @@ function workspace(claim: ReturnType<typeof claimFixture>, overrides: Record<str
 const relationships = [{id: 'rel-1', schema: 'Directorship', source: {caption: 'Jane Doe'}, target: {caption: 'Kestrelwood Holdings'}}];
 
 async function renderPanel(routes: Record<string, unknown> = {}, onInspectRelationship = vi.fn()) {
-  const api = mockApi({[CLAIMS]: [claimFixture()], [EVIDENCE]: [poolRow], ...routes});
+  const api = mockApi({[CLAIMS]: [claimFixture()], [EVIDENCE]: [poolRow], 'GET /api/investigations/inv-1/watches': [], ...routes});
   wrap(<ClaimsPanel investigationId="inv-1" relationships={relationships} onInspectRelationship={onInspectRelationship}/>);
   await screen.findByText('The contract was approved on March 3.');
   return api;

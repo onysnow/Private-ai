@@ -84,7 +84,7 @@ function ThisCase({inv, caseName, data}: {inv: string; caseName: string; data: L
         <FormField control={form.control} name="reason" render={({field}) => <FormItem>
           <FormLabel>Why this case is different</FormLabel>
           <FormControl><input className="st-input" placeholder="Source protection: no outside traces" {...field}/></FormControl>
-          <FormMessage/>
+          <FormMessage className="field-msg"/>
         </FormItem>}/>
         <FormRootError/>
         <div className="st-acts">

@@ -5,7 +5,7 @@ import {cleanup, render, screen, within} from '@testing-library/react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import {mockApi} from '../test-support/mock-api';
-import {validSettingsStatus} from '../test-support/page-routes';
+import {settingsPaneRoutes, validSettingsStatus} from '../test-support/page-routes';
 
 vi.mock('next/navigation', () => ({useRouter: () => ({push: vi.fn()}), usePathname: () => '/settings'}));
 
@@ -15,19 +15,21 @@ async function renderSettings(ai: Record<string, unknown>) {
   mockApi({
     'GET /api/settings/status': {...validSettingsStatus, ai: {...validSettingsStatus.ai, ...ai}},
     'GET /api/investigations': [],
+    ...settingsPaneRoutes(),
+    'GET /api/settings/research': {...(settingsPaneRoutes()['GET /api/settings/research'] as object), ai_enabled: Boolean(ai.enabled)},
   });
   window.history.replaceState(null, '', '/settings#ai');
   vi.resetModules();
   const mod = await import('../app/settings/page');
   const Page = mod.default;
   render(<Page/>);
-  await screen.findByRole('heading', {name: 'Private AI'});
+  await screen.findByRole('heading', {name: 'The model'});
   // The status has arrived once the sidebar shows its value (the page reads it
   // through TanStack Query, which answers a moment after the render).
   await screen.findByRole('button', {name: /^AI and research: /});
 }
 
-describe('Settings: Private AI', () => {
+describe('Settings: AI and research', () => {
   it('names the local model and says it runs on this computer', async () => {
     await renderSettings({enabled: true, provider: 'ollama', provider_key_configured: true, endpoints_callable: true, model: 'qwen2.5:7b', runs_on_this_computer: true,
       authority_suite: {present: true, source: 'onysnow/Authority-System-Suite@b1c71e8', tas_version: '1.12', modules: {presentation_draft: {spec_file: 'PRESENTATION_DRAFT.md', available: true, vendored_tas: false}}, control_surface: {spec_file: 'x', available: true, flags: {}}}});

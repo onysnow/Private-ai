@@ -51,7 +51,8 @@ export function InterruptNotice(): ReactElement | null {
   }, [pendingKeys, data?.quiet_while_reading]);
 
   useEffect(() => {
-    if (!pendingKeys || calm) return;
+    // Checked here as well as by the timer: on the first render the timer has not looked yet.
+    if (!pendingKeys || calm || (data?.quiet_while_reading && inCalmZone())) return;
     const shown = new Set(readShown());
     const fresh = waiting.filter(r => !shown.has(r.key));
     if (!fresh.length) return;
@@ -60,7 +61,7 @@ export function InterruptNotice(): ReactElement | null {
     if (data?.desktop) tellTheComputer(fresh);
     // waiting is derived from pendingKeys
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pendingKeys, calm, data?.desktop]);
+  }, [pendingKeys, calm, data?.desktop, data?.quiet_while_reading]);
 
   if (!showing.length || !inv) return null;
   const first = showing[0];

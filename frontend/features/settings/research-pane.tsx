@@ -89,7 +89,7 @@ export function ResearchPane({model, rules}: {model: ReactNode; rules: ReactNode
             <FormField control={form.control} name="reason" render={({field}) => <FormItem>
               <FormLabel>Why new cases start this way</FormLabel>
               <FormControl><input className="st-input" placeholder="Our cases are contested: every answer must survive a search for the opposite" {...field}/></FormControl>
-              <FormMessage/>
+              <FormMessage className="field-msg"/>
             </FormItem>}/>
             <FormRootError/>
             <div className="st-acts">

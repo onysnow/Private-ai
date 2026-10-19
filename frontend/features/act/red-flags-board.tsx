@@ -28,6 +28,7 @@ import {useWheelStep} from '../case-home/wheel-step';
 import {GlossaryText} from '../glossary/glossary-text';
 import {InvestigationType, LEVEL, LEVEL_ORDER, dismissSchema, flagsByArea, useRedFlags} from '../red-flags/red-flags-panel';
 import type {DismissValues} from '../red-flags/red-flags-panel';
+import {WatchButton} from '../inbox/watch-button';
 
 type Kind = {key: string; name: string; level: string; flags: RedFlagOut[]; weight: number};
 type Levels = Record<'textbook' | 'strong' | 'faint', boolean>;
@@ -388,6 +389,7 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
             <p className="rb-quiet">Set aside: {flag.dismissed_reason}</p>
             <button type="button" onClick={() => void onReopen()}>Open it again</button>
           </> : <p className="rb-quiet">Made a lead.</p>}
+          <WatchButton investigationId={investigationId} recordType="red_flag" recordId={flag.id} className=""/>
           {moneyFlag && <Link className="rb-link-btn" href={caseHref('/see#money-flows', investigationId)}>Show in money flows</Link>}
           <button type="button" disabled title={flag.level === 'faint' ? 'Faint flags can’t headline a share card.' : 'Sharing is not built yet.'}>Share</button>
           <small>{flag.level === 'faint' ? 'Faint flags can’t headline a share card.' : 'Share cards are not built yet.'}</small>

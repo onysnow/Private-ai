@@ -64,7 +64,7 @@ function KeyCard({s, onChanged}: {s: LookupSourceOut; onChanged: () => void}): R
         <FormField control={form.control} name="credential" render={({field}) => <FormItem>
           <FormLabel>{s.key_saved ? 'Paste the new key' : 'Paste the key'}</FormLabel>
           <FormControl><input type="password" autoComplete="off" spellCheck={false} className="st-input st-mono" {...field}/></FormControl>
-          <FormMessage/>
+          <FormMessage className="field-msg"/>
         </FormItem>}/>
         <FormRootError/>
         <div className="st-acts">
