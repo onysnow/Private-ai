@@ -219,6 +219,9 @@ import type {
   ExportInvestigationData,
   ExportInvestigationErrors,
   ExportInvestigationResponses,
+  ExportOutboundLogData,
+  ExportOutboundLogErrors,
+  ExportOutboundLogResponses,
   ExportWriteupDocxData,
   ExportWriteupDocxErrors,
   ExportWriteupDocxResponses,
@@ -405,6 +408,9 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewErrors,
   GetOrphanStoragePreviewResponses,
+  GetOutboundLogData,
+  GetOutboundLogErrors,
+  GetOutboundLogResponses,
   GetOwnershipChainData,
   GetOwnershipChainErrors,
   GetOwnershipChainResponses,
@@ -423,6 +429,9 @@ import type {
   GetResearchSettingsData,
   GetResearchSettingsErrors,
   GetResearchSettingsResponses,
+  GetSafetyAndDataData,
+  GetSafetyAndDataErrors,
+  GetSafetyAndDataResponses,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesErrors,
   GetSameAnswerCandidatesResponses,
@@ -1102,6 +1111,9 @@ import {
   zExportInvestigationPath,
   zExportInvestigationQuery,
   zExportInvestigationResponse,
+  zExportOutboundLogPath,
+  zExportOutboundLogQuery,
+  zExportOutboundLogResponse,
   zExportWriteupDocxPath,
   zExportWriteupDocxResponse,
   zExternalRelationshipCandidatesPath,
@@ -1226,6 +1238,9 @@ import {
   zGetOpenalephDocumentSyncPath,
   zGetOpenalephDocumentSyncResponse,
   zGetOrphanStoragePreviewResponse,
+  zGetOutboundLogPath,
+  zGetOutboundLogQuery,
+  zGetOutboundLogResponse,
   zGetOwnershipChainPath,
   zGetOwnershipChainResponse,
   zGetPartyYearsPath,
@@ -1238,6 +1253,9 @@ import {
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
   zGetResearchSettingsResponse,
+  zGetSafetyAndDataPath,
+  zGetSafetyAndDataQuery,
+  zGetSafetyAndDataResponse,
   zGetSameAnswerCandidatesPath,
   zGetSameAnswerCandidatesResponse,
   zGetSecurityAlertsQuery,
@@ -7283,6 +7301,62 @@ export const addNote = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Outbound Log
+ *
+ * Newest first. Only requests that left this computer, unless `include_local` is true.
+ */
+export const getOutboundLog = <ThrowOnError extends boolean = false>(
+  options: Options<GetOutboundLogData, ThrowOnError>,
+): RequestResult<GetOutboundLogResponses, GetOutboundLogErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetOutboundLogResponses,
+    GetOutboundLogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetOutboundLogPath,
+          query: zGetOutboundLogQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetOutboundLogResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/outbound-log',
+    ...options,
+  });
+
+/**
+ * Export Outbound Log
+ */
+export const exportOutboundLog = <ThrowOnError extends boolean = false>(
+  options: Options<ExportOutboundLogData, ThrowOnError>,
+): RequestResult<
+  ExportOutboundLogResponses,
+  ExportOutboundLogErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ExportOutboundLogResponses,
+    ExportOutboundLogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportOutboundLogPath,
+          query: zExportOutboundLogQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportOutboundLogResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/outbound-log.csv',
+    ...options,
+  });
+
+/**
  * How Are They Connected
  *
  * Every chain of links between two parties, up to max_len links, each with how sure its weakest link is.
@@ -7633,6 +7707,35 @@ export const putCaseResearch = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Safety And Data
+ */
+export const getSafetyAndData = <ThrowOnError extends boolean = false>(
+  options: Options<GetSafetyAndDataData, ThrowOnError>,
+): RequestResult<
+  GetSafetyAndDataResponses,
+  GetSafetyAndDataErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetSafetyAndDataResponses,
+    GetSafetyAndDataErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSafetyAndDataPath,
+          query: zGetSafetyAndDataQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSafetyAndDataResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/safety-and-data',
+    ...options,
   });
 
 /**

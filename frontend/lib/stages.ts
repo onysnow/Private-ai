@@ -42,6 +42,7 @@ export const STAGES: Stage[] = [
     {label: 'AI drafts', anchor: 'ai-reasoning-panel'},
   ]},
   {key: 'keep', route: '/keep', n: 5, name: 'Keep', line: 'Take the investigation with you, or remove it.', colour: SWATCH.taupe, parts: [
+    {label: 'Safety & data', anchor: 'safety-and-data'},
     {label: 'Backup & restore', anchor: 'backup-restore'},
     {label: 'Delete', anchor: 'deletion'},
     {label: 'Access', anchor: 'access'},

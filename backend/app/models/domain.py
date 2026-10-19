@@ -81,7 +81,6 @@ from app.models.preferences import (
 )
 from app.models.platform import (
     NotificationDelivery,
-    OutboundRequest,
     PushSubscription,
     SavedQuestion,
 )
@@ -99,6 +98,10 @@ from app.models.ai import (
 from app.models.writeups import (
     Writeup,
     WriteupVersion,
+)
+from app.models.safety import (
+    BackupEvent,
+    OutboundRequest,
 )
 from app.models.stories import (
     Story,
@@ -185,6 +188,7 @@ __all__ = [
     "PushSubscription",
     "AIAnalysisCandidate",
     "AIRunEvent",
+    "BackupEvent",
     "Writeup",
     "WriteupVersion",
     "Story",

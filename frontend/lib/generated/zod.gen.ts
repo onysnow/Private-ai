@@ -5484,6 +5484,32 @@ export const zOrphanFileOut = z.object({
 });
 
 /**
+ * OutboundEntryOut
+ *
+ * One request that carried case data to an outside service, as it was sent. `local` is true for a request to a
+ * service on this computer: kept so the log is complete, and not counted as leaving.
+ */
+export const zOutboundEntryOut = z.object({
+  actor: z.string(),
+  at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  destination: z.string(),
+  detail: z.record(z.unknown()).nullable(),
+  error: z.string().nullable(),
+  id: z.string(),
+  local: z.boolean(),
+  reason: z.string(),
+  run_id: z.string().nullable(),
+  service: z.string(),
+  status: z.string(),
+  value_kind: z.string(),
+  value_sent: z.string(),
+});
+
+/**
  * OutboundLineOut
  *
  * One request that left this computer (app/services/outbound.py).
@@ -5512,6 +5538,16 @@ export const zLookupSettingsOut = z.object({
   cases: z.array(zCaseLookupsOut),
   sources: z.array(zLookupSourceOut),
   week: z.array(zOutboundLineOut),
+});
+
+/**
+ * OutboundLogOut
+ */
+export const zOutboundLogOut = z.object({
+  entries: z.array(zOutboundEntryOut),
+  period: z.string(),
+  service: z.string().nullable(),
+  total: z.number().int(),
 });
 
 /**
@@ -6752,6 +6788,190 @@ export const zRunPlanOut = z.object({
   systems: z.array(zRunPlanSystemOut),
   where: zRunPlanWhereOut,
   working_theory: z.string().nullable(),
+});
+
+/**
+ * SafetyAccessCardOut
+ */
+export const zSafetyAccessCardOut = z.object({
+  refused_24h: z.number().int(),
+});
+
+/**
+ * SafetyBackupCardOut
+ */
+export const zSafetyBackupCardOut = z.object({
+  documents: z.number().int().nullable(),
+  last: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  records: z.number().int().nullable(),
+  sha256: z.string().nullable(),
+  size_bytes: z.number().int().nullable(),
+  with_documents: z.boolean().nullable(),
+});
+
+/**
+ * SafetyBackupsStoreOut
+ */
+export const zSafetyBackupsStoreOut = z.object({
+  count: z.number().int(),
+  encrypted: z.boolean(),
+  last: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+});
+
+/**
+ * SafetyCaseRecordsOut
+ */
+export const zSafetyCaseRecordsOut = z.object({
+  claims: z.number().int(),
+  in_backups: z.boolean(),
+  records: z.number().int(),
+});
+
+/**
+ * SafetyDeleteCardOut
+ */
+export const zSafetyDeleteCardOut = z.object({
+  files: z.number().int(),
+  records: z.number().int(),
+  shared_files: z.number().int(),
+});
+
+/**
+ * SafetyDocumentsOut
+ */
+export const zSafetyDocumentsOut = z.object({
+  bytes: z.number().int(),
+  files: z.number().int(),
+  in_backups: z.boolean(),
+});
+
+/**
+ * SafetyHousekeepingCardOut
+ */
+export const zSafetyHousekeepingCardOut = z.object({
+  stray_bytes: z.number().int(),
+  stray_files: z.number().int(),
+});
+
+/**
+ * SafetyCardsOut
+ */
+export const zSafetyCardsOut = z.object({
+  access: zSafetyAccessCardOut,
+  backup: zSafetyBackupCardOut,
+  delete: zSafetyDeleteCardOut,
+  housekeeping: zSafetyHousekeepingCardOut,
+});
+
+/**
+ * SafetyInvestigationOut
+ */
+export const zSafetyInvestigationOut = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+/**
+ * SafetyKeysOut
+ */
+export const zSafetyKeysOut = z.object({
+  set: z.number().int(),
+  total: z.number().int(),
+});
+
+/**
+ * SafetyPrivateAiOut
+ */
+export const zSafetyPrivateAiOut = z.object({
+  enabled: z.boolean(),
+  model: z.string().nullable(),
+  on_this_computer: z.boolean().nullable(),
+  provider: z.string().nullable(),
+  remote_allowed: z.boolean(),
+});
+
+/**
+ * SafetySecurityLogOut
+ */
+export const zSafetySecurityLogOut = z.object({
+  bytes: z.number().int(),
+  events: z.number().int(),
+  since: z.string().nullable(),
+});
+
+/**
+ * SafetyServiceOut
+ *
+ * An outside service the case can reach. `mode` is one of off / on_click / this_computer / automatic / blocked:
+ * the app has no "ask first" switch yet (ADR-0015), so a lookup runs only when the reporter starts it (`on_click`).
+ * `counted` is false when the app does not log that service's traffic, so the screen never shows a false zero.
+ */
+export const zSafetyServiceOut = z.object({
+  counted: z.boolean(),
+  host: z.string(),
+  key: z.string(),
+  label: z.string(),
+  last: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  mode: z.string(),
+  role: z.string(),
+  sends: z.array(z.string()),
+  sent: z.number().int(),
+  why: z.string(),
+});
+
+/**
+ * SafetyStoresOut
+ */
+export const zSafetyStoresOut = z.object({
+  backups: zSafetyBackupsStoreOut,
+  case_records: zSafetyCaseRecordsOut,
+  documents: zSafetyDocumentsOut,
+  private_ai: zSafetyPrivateAiOut,
+  security_log: zSafetySecurityLogOut,
+  service_keys: zSafetyKeysOut,
+});
+
+/**
+ * SafetyTotalsOut
+ */
+export const zSafetyTotalsOut = z.object({
+  ai_calls_outside: z.number().int(),
+  documents_sent_out: z.number().int(),
+  requests_left: z.number().int(),
+  services_reached: z.number().int(),
+});
+
+/**
+ * SafetyAndDataOut
+ */
+export const zSafetyAndDataOut = z.object({
+  cards: zSafetyCardsOut,
+  investigation: zSafetyInvestigationOut,
+  not_counted: z.array(z.string()),
+  now: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  period: z.string(),
+  services: z.array(zSafetyServiceOut),
+  stores: zSafetyStoresOut,
+  totals: zSafetyTotalsOut,
 });
 
 /**
@@ -11249,6 +11469,36 @@ export const zAddNotePath = z.object({
  */
 export const zAddNoteResponse = zNoteOut;
 
+export const zGetOutboundLogPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetOutboundLogQuery = z.object({
+  period: z.enum(['today', '7d', '30d', 'all']).optional().default('7d'),
+  service: z.string().nullish(),
+  limit: z.number().int().gte(1).lte(1000).optional().default(200),
+  include_local: z.boolean().optional().default(false),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetOutboundLogResponse = zOutboundLogOut;
+
+export const zExportOutboundLogPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zExportOutboundLogQuery = z.object({
+  period: z.enum(['today', '7d', '30d', 'all']).optional().default('all'),
+  service: z.string().nullish(),
+});
+
+/**
+ * The whole outbound log as a CSV file, for a source-protection file
+ */
+export const zExportOutboundLogResponse = z.string();
+
 export const zHowAreTheyConnectedPath = z.object({
   investigation_id: z.string(),
 });
@@ -11417,6 +11667,19 @@ export const zPutCaseResearchPath = z.object({
  * Successful Response
  */
 export const zPutCaseResearchResponse = zCaseResearchOut;
+
+export const zGetSafetyAndDataPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetSafetyAndDataQuery = z.object({
+  period: z.enum(['today', '7d', '30d', 'all']).optional().default('7d'),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSafetyAndDataResponse = zSafetyAndDataOut;
 
 export const zSaveQuestionBody = zSavedQuestionCreate;
 
