@@ -32,8 +32,8 @@ def get_basemap_status() -> Any:
 def get_basemap_tile(z: int, x: int, y: int) -> Response:
     try:
         found = basemap.tile(z, x, y)
-    except basemap.BasemapUnavailable as exc:
-        raise HTTPException(503, str(exc)) from exc
+    except basemap.BasemapUnavailable:
+        raise HTTPException(503, "The base map is unavailable.")
     if found is None:
         raise HTTPException(404, "The base map has no tile there")
     data, encoding = found
