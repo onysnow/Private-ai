@@ -72,29 +72,36 @@ def relationship_schema_info(schema: str) -> dict:
 _PARTIAL_ISO_DATE = re.compile(r"^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$")
 
 
-def validate_payment_properties(props: dict[str, list[str]]) -> None:
-    """Reject Payment values the financial ledger could not read back.
-
-    Only checks what is present: a Payment without an amount, currency or date
-    is still a valid FtM record, and the ledger lists it as incomplete rather
-    than guessing the missing value.
-    """
+def payment_property_problem(props: dict[str, list[str]]) -> str | None:
+    """What makes these Payment values unreadable by the financial ledger, in
+    plain words, or None. Only checks what is present: a Payment without an
+    amount, currency or date is still a valid FtM record, and the ledger lists
+    it as incomplete rather than guessing the missing value."""
     for value in props.get("amount", []):
         try:
             number = float(str(value).replace(",", ""))
         except ValueError:
-            raise ValueError(f"Payment amount must be a number: {value!r}") from None
+            return f"Payment amount must be a number: {value!r}"
         # float() also accepts "nan", "inf" and "1e999"; the detectors cannot read
         # those back, and one such amount used to switch off Red Flags for the case.
         if not math.isfinite(number) or number < 0:
-            raise ValueError(f"Payment amount must be a finite, non-negative number: {value!r}")
+            return f"Payment amount must be a finite, non-negative number: {value!r}"
     for value in props.get("currency", []):
         if not re.fullmatch(r"[A-Za-z]{3}", str(value).strip()):
-            raise ValueError(f"Payment currency must be a 3-letter ISO 4217 code: {value!r}")
+            return f"Payment currency must be a 3-letter ISO 4217 code: {value!r}"
     for prop in ("date", "startDate", "endDate"):
         for value in props.get(prop, []):
             if not _PARTIAL_ISO_DATE.match(str(value).strip()):
-                raise ValueError(f"Payment {prop} must be YYYY, YYYY-MM or YYYY-MM-DD: {value!r}")
+                return f"Payment {prop} must be YYYY, YYYY-MM or YYYY-MM-DD: {value!r}"
+    return None
+
+
+def validate_payment_properties(props: dict[str, list[str]]) -> None:
+    """Reject Payment values the financial ledger could not read back
+    (payment_property_problem), then normalise currency and amount."""
+    problem = payment_property_problem(props)
+    if problem is not None:
+        raise ValueError(problem)
     if "currency" in props:
         props["currency"] = [str(v).strip().upper() for v in props["currency"]]
     if "amount" in props:
