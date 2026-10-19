@@ -183,8 +183,8 @@ AI_2 built 12 Oct (Act › AI runs, `features/ai/before-you-run.tsx`; backend `a
 ## 9. Knowledge and safety — mockups KNOWLEDGE_KEEP_1 (catalogue) and _2 (Safety & data) (§10)
 
 Both **missing**.
-- [ ] Catalogue map of 42 areas in six families, area card, indicator list with how-checked glyphs and counts, indicator page (ladder, could be innocent / signs side by side, checked by, sources, case), Map / Table / Cards, Practise (flip cards)
-- [ ] Glossary: every term (not the first 200), every area's definition, hover cards that are reachable, dwell, Esc
+- [x] Catalogue map of 42 areas in six families, area card, indicator list with how-checked glyphs and counts, indicator page (ladder, could be innocent / signs side by side, checked by, sources, case), Map / Table / Cards (built 19 Oct at /learn: `features/knowledge/`, `GET /api/catalogue/map`, `/indicators`; the six families are the mockup's grouping, still waiting on Ony, research Part 6 Q2). Still to do: Practise (scheduled flip cards: needs a review store, an open question for Ony); Cards is browse-only
+- [x] Glossary: every term (not the first 200), every area's definition, hover cards that are reachable, dwell, Esc (built 19 Oct: Learn › Glossary, `features/glossary/`; every area's own wording in a tab, "No definition yet" where an area has none; the wording itself stays Ony's)
 - [ ] Safety & data: what lives where (stores and services with modes and what is sent), totals with zeroes, period switch; Backup / Who can reach it / Housekeeping / Delete this case cards; Your safety panel (built last); outbound log, word for word
 - [ ] Encrypted backups (ADR); delete by typing the case name
 

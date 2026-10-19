@@ -527,10 +527,19 @@
 @layer components {
   .gt-term { color: inherit; text-decoration: underline dotted var(--accent-1); text-underline-offset: 3px; cursor: help; }
   .gt-term:hover, .gt-term:focus-visible { color: #f0d9a8; }
-  .gt-card { position: fixed; z-index: 60; width: 320px; padding: 10px 12px; background: var(--ground); border: 1px solid #8d692b; border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.45); color: var(--text-muted); font-size: 13px; line-height: 1.45; pointer-events: none; }
-  .gt-card[hidden] { display: none; }
-  .gt-card b { color: #f0d9a8; } .gt-card small { display: block; margin-top: 6px; color: #8f8478; }
+  /* One shared card (features/glossary/glossary-text.tsx): the pointer can move into it, so it takes pointer events. */
+  .gt-card { position: fixed; z-index: 90; width: max-content; max-width: min(360px, calc(100vw - 16px)); padding: 10px 12px; background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-lifted, 0 8px 24px rgba(0,0,0,.45)); color: var(--text); font: 13px/1.45 var(--font-ui);
+    animation: gt-reveal 240ms var(--ease-out, ease-out) both; }
+  .gt-card.above { animation-name: gt-reveal-above; }
+  @keyframes gt-reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @keyframes gt-reveal-above { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .gt-card b { color: var(--text); font-weight: 700; }
+  .gt-card .gt-areas { color: var(--text-muted); font: 11px var(--font-mono); }
+  .gt-card .gt-def { display: block; margin-top: 2px; color: var(--text-muted); }
+  .gt-card .gt-more { display: block; margin-top: 4px; font-size: 12px; color: var(--accent-2); }
+  .gt-card .gt-foot { display: flex; gap: 10px; justify-content: space-between; margin-top: 8px; font: 11px var(--font-mono); color: var(--text-muted); }
+  .gt-card .gt-foot a { color: var(--accent-1); margin-left: auto; }
 }
 
 /* The investigation's type on Red Flags (features/red-flags/red-flags-panel.tsx). */

@@ -3450,6 +3450,45 @@
         "title": "CaseYearOut",
         "type": "object"
       },
+      "CatalogueAreaCountsOut": {
+        "description": "How one area's indicators can be checked, how many are still pending, how many a rule computes.",
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "lookups": {
+            "title": "Lookups",
+            "type": "integer"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          },
+          "person": {
+            "title": "Person",
+            "type": "integer"
+          },
+          "records": {
+            "title": "Records",
+            "type": "integer"
+          },
+          "rules": {
+            "title": "Rules",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "records",
+          "lookups",
+          "person",
+          "pending",
+          "rules"
+        ],
+        "title": "CatalogueAreaCountsOut",
+        "type": "object"
+      },
       "CatalogueAreaOut": {
         "properties": {
           "indicators": {
@@ -3545,6 +3584,51 @@
           "source_url"
         ],
         "title": "CatalogueCaseOut",
+        "type": "object"
+      },
+      "CatalogueCrossHintCountOut": {
+        "description": "How many of one area's indicators say they \"may also point to\" another area.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "count"
+        ],
+        "title": "CatalogueCrossHintCountOut",
+        "type": "object"
+      },
+      "CatalogueIndicatorListOut": {
+        "properties": {
+          "indicators": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueIndicatorRowOut"
+            },
+            "title": "Indicators",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "indicators"
+        ],
+        "title": "CatalogueIndicatorListOut",
         "type": "object"
       },
       "CatalogueIndicatorOut": {
@@ -3694,6 +3778,91 @@
           "version"
         ],
         "title": "CatalogueIndicatorOut",
+        "type": "object"
+      },
+      "CatalogueIndicatorRowOut": {
+        "description": "One indicator in a list: enough to pick it, not the whole entry.",
+        "properties": {
+          "area": {
+            "title": "Area",
+            "type": "string"
+          },
+          "checkable": {
+            "enum": [
+              "records",
+              "lookups",
+              "person"
+            ],
+            "title": "Checkable",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "levels_set": {
+            "items": {
+              "enum": [
+                "faint",
+                "strong",
+                "textbook"
+              ],
+              "type": "string"
+            },
+            "title": "Levels Set",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "pending"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "area",
+          "checkable",
+          "status",
+          "levels_set",
+          "rule"
+        ],
+        "title": "CatalogueIndicatorRowOut",
+        "type": "object"
+      },
+      "CatalogueMapOut": {
+        "properties": {
+          "areas": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueAreaCountsOut"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "cross_hints": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueCrossHintCountOut"
+            },
+            "title": "Cross Hints",
+            "type": "array"
+          }
+        },
+        "required": [
+          "areas",
+          "cross_hints"
+        ],
+        "title": "CatalogueMapOut",
         "type": "object"
       },
       "CatalogueSourceOut": {
@@ -19987,6 +20156,30 @@
         "title": "FontPairOut",
         "type": "object"
       },
+      "GlossaryDefinitionOut": {
+        "description": "One area's own wording of a term (catalogue/glossary/<area>.yaml).",
+        "properties": {
+          "area": {
+            "title": "Area",
+            "type": "string"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "area",
+          "definition",
+          "source_url"
+        ],
+        "title": "GlossaryDefinitionOut",
+        "type": "object"
+      },
       "GlossaryHintOut": {
         "properties": {
           "areas": {
@@ -20000,11 +20193,22 @@
             "title": "Definition",
             "type": "string"
           },
+          "definitions": {
+            "title": "Definitions",
+            "type": "integer"
+          },
           "names": {
             "items": {
               "$ref": "#/components/schemas/GlossaryNameOut"
             },
             "title": "Names",
+            "type": "array"
+          },
+          "related": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Related",
             "type": "array"
           },
           "term": {
@@ -20016,6 +20220,8 @@
           "term",
           "definition",
           "areas",
+          "related",
+          "definitions",
           "names"
         ],
         "title": "GlossaryHintOut",
@@ -20080,6 +20286,13 @@
             "title": "Definition",
             "type": "string"
           },
+          "definitions": {
+            "items": {
+              "$ref": "#/components/schemas/GlossaryDefinitionOut"
+            },
+            "title": "Definitions",
+            "type": "array"
+          },
           "examples": {
             "items": {
               "type": "string"
@@ -20118,7 +20331,8 @@
           "cases",
           "related",
           "indicators",
-          "areas"
+          "areas",
+          "definitions"
         ],
         "title": "GlossaryTermOut",
         "type": "object"
@@ -36300,6 +36514,150 @@
         "summary": "Search Glossary"
       }
     },
+    "/api/catalogue/glossary/entry": {
+      "get": {
+        "description": "One term in full, found by its name (any case), with every area's own definition.",
+        "operationId": "get_glossary_entry",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "term",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Term",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlossaryTermOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Glossary Entry"
+      }
+    },
+    "/api/catalogue/indicators": {
+      "get": {
+        "description": "Indicators in catalogue order, one area or all; with words, only those whose id or name holds every one.",
+        "operationId": "list_indicators",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 200,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "area",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Z]{2}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Area"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 500,
+              "maximum": 3000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueIndicatorListOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Indicators"
+      }
+    },
     "/api/catalogue/indicators/{indicator_id}": {
       "get": {
         "description": "One indicator in full: definition, levels, sources, cases, data needed, cross-hints, innocent explanations.",
@@ -36348,6 +36706,45 @@
           }
         },
         "summary": "Get Indicator"
+      }
+    },
+    "/api/catalogue/map": {
+      "get": {
+        "description": "Per area, how its indicators can be checked; and how often one area's indicators may also point to another.",
+        "operationId": "get_catalogue_map",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueMapOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Catalogue Map"
       }
     },
     "/api/catalogue/terms": {

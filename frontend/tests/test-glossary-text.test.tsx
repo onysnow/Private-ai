@@ -1,27 +1,28 @@
 // @vitest-environment jsdom
-// Hover cards for glossary terms (features/glossary/glossary-text.tsx): a term
-// written in the app's text is marked the first time it appears, as a whole
-// word; acronyms and the app's own names only as written; pointing at it shows
-// its definition and the term opens its glossary entry.
-import {cleanup, fireEvent, render, screen} from '@testing-library/react';
+// Hover cards for glossary terms (features/glossary/glossary-text.tsx): a term written in the app's text is marked
+// the first time it appears, as a whole word; acronyms and the app's own names only as written. The card follows
+// WCAG 1.4.13: it opens after a dwell (not on a pointer passing by) or at once on focus, the pointer can move into
+// it and it stays while the pointer is on the term or the card, and Esc closes it. One card at a time.
+import {act, cleanup, fireEvent, render, screen} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {GlossaryText, buildTermIndex, findTerms} from '../features/glossary/glossary-text';
+import {CLOSE_GRACE_MS, GlossaryText, OPEN_DWELL_MS, buildTermIndex, findTerms} from '../features/glossary/glossary-text';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {mockApi} from '../test-support/mock-api';
 
+const hint = (term: string, definition: string, areas: string[], names: {text: string; exact: boolean}[], more: {related?: string[]; definitions?: number} = {}) =>
+  ({term, definition, areas, names, related: more.related ?? [], definitions: more.definitions ?? 1});
 const hints = [
-  {term: 'Beneficial owner', definition: 'The real person who owns or controls a company.', areas: ['BO'], names: [{text: 'Beneficial owner', exact: false}]},
-  {term: 'Nominee', definition: 'Someone who holds a post or shares in name for another.', areas: ['BO'], names: [{text: 'Nominee', exact: false}]},
-  {term: 'PEP (politically exposed person)', definition: 'Someone in a prominent public role.', areas: ['CO'],
-    names: [{text: 'PEP', exact: true}, {text: 'politically exposed person', exact: false}]},
-  {term: 'Strong', definition: 'The second level of a Red Flag.', areas: ['APP'], names: [{text: 'Strong', exact: true}]},
+  hint('Beneficial owner', 'The real person who owns or controls a company.', ['BO'], [{text: 'Beneficial owner', exact: false}]),
+  hint('Nominee', 'Someone who holds a post or shares in name for another.', ['BO', 'ML'], [{text: 'Nominee', exact: false}], {related: ['Beneficial owner'], definitions: 2}),
+  hint('PEP (politically exposed person)', 'Someone in a prominent public role.', ['CO'], [{text: 'PEP', exact: true}, {text: 'politically exposed person', exact: false}]),
+  hint('Strong', 'The second level of a Red Flag.', ['APP'], [{text: 'Strong', exact: true}]),
 ];
 
 beforeEach(() => connectGeneratedClient(new ApiClient('http://api.test')));
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 describe('findTerms', () => {
   const index = buildTermIndex(hints)!;
@@ -42,19 +43,65 @@ describe('findTerms', () => {
   });
 });
 
-describe('GlossaryText', () => {
-  it('shows the definition when pointed at and links to the full entry', async () => {
+describe('GlossaryText hover cards', () => {
+  const renderText = async (text: string) => {
     mockApi({'GET /api/catalogue/terms': hints});
-    render(<QueryProvider><p>Held through a <GlossaryText text="nominee director."/></p></QueryProvider>);
-    const term = await screen.findByRole('link', {name: 'nominee'});
+    render(<QueryProvider><p><GlossaryText text={text}/></p></QueryProvider>);
+    return screen.findByRole('link', {name: 'nominee'});
+  };
+
+  it('reads the definition to screen readers and links to the full entry', async () => {
+    const term = await renderText('Held through a nominee director.');
     expect(term).toHaveAttribute('href', '/glossary?q=Nominee');
-    const card = screen.getByRole('tooltip', {hidden: true});
-    expect(card).not.toBeVisible();
     expect(term).toHaveAccessibleDescription(/Someone who holds a post/);
-    fireEvent.mouseEnter(term);
-    expect(screen.getByRole('tooltip')).toHaveTextContent('Nominee Someone who holds a post or shares in name for another.');
-    fireEvent.mouseLeave(term);
     expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+
+  it('opens only after a dwell, stays while the pointer is in the card, and closes after the pointer leaves both', async () => {
+    const term = await renderText('Held through a nominee director.');
+    vi.useFakeTimers();
+    fireEvent.mouseEnter(term);
+    act(() => { vi.advanceTimersByTime(OPEN_DWELL_MS - 50); });
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    fireEvent.mouseLeave(term);
+    act(() => { vi.advanceTimersByTime(OPEN_DWELL_MS); });
+    expect(screen.queryByRole('tooltip')).toBeNull();
+
+    fireEvent.mouseEnter(term);
+    act(() => { vi.advanceTimersByTime(OPEN_DWELL_MS); });
+    const card = screen.getByRole('tooltip');
+    expect(card).toHaveTextContent('Nominee');
+    expect(card).toHaveTextContent('Someone who holds a post or shares in name for another.');
+    expect(card).toHaveTextContent('Defined in 2 areas');
+    expect(card).toHaveTextContent('Related: Beneficial owner');
+    expect(card).toHaveTextContent('↵ open · Esc');
+
+    fireEvent.mouseLeave(term);
+    fireEvent.mouseEnter(card);
+    act(() => { vi.advanceTimersByTime(CLOSE_GRACE_MS * 3); });
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
+    fireEvent.mouseLeave(card);
+    act(() => { vi.advanceTimersByTime(CLOSE_GRACE_MS + 10); });
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+
+  it('opens at once on keyboard focus and closes on Esc', async () => {
+    const term = await renderText('Held through a nominee director.');
+    act(() => term.focus());
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Nominee');
+    fireEvent.keyDown(document, {key: 'Escape'});
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
+
+  it('shows one card at a time', async () => {
+    mockApi({'GET /api/catalogue/terms': hints});
+    render(<QueryProvider><p><GlossaryText text="A nominee for the beneficial owner."/></p></QueryProvider>);
+    const nominee = await screen.findByRole('link', {name: 'nominee'});
+    const owner = screen.getByRole('link', {name: 'beneficial owner'});
+    act(() => nominee.focus());
+    act(() => owner.focus());
+    expect(screen.getAllByRole('tooltip')).toHaveLength(1);
+    expect(screen.getByRole('tooltip')).toHaveTextContent('The real person who owns or controls a company.');
   });
 
   it('is plain text when the terms cannot be loaded', async () => {

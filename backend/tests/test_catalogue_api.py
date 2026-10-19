@@ -47,3 +47,42 @@ def test_term_hints_give_the_names_a_term_is_found_by():
     assert names("AAER (Accounting and Auditing Enforcement Release)")["AAER"] is True
     assert names("Strong") == {"Strong": True}, "the app's own names match only as written"
     assert all(len(n["text"]) >= 4 or (len(n["text"]) == 3 and n["text"].isupper()) for h in hints.values() for n in h["names"])
+
+
+def test_glossary_keeps_every_areas_own_definition():
+    everything = []
+    for offset in range(0, 5000, 500):
+        everything += ok(client.get("/api/catalogue/glossary", params={"limit": 500, "offset": offset}))["terms"]
+    assert len(everything) == ok(client.get("/api/catalogue/glossary", params={"limit": 1}))["total"]
+    assert all(t["definitions"] and t["definitions"][0]["definition"] == t["definition"] for t in everything)
+    assert all({d["area"] for d in t["definitions"]} <= set(t["areas"]) for t in everything)
+    several = [t for t in everything if len(t["definitions"]) > 1]
+    assert several, "terms defined by more than one area keep each area's wording"
+    one = several[0]
+    entry = ok(client.get("/api/catalogue/glossary/entry", params={"term": one["term"].upper()}))
+    assert entry["term"] == one["term"] and entry["definitions"] == one["definitions"]
+    assert client.get("/api/catalogue/glossary/entry", params={"term": "no such term at all"}).status_code == 404
+    hints = {h["term"]: h for h in ok(client.get("/api/catalogue/terms"))}
+    assert hints[one["term"]]["definitions"] == len(one["definitions"]) and hints[one["term"]]["related"] == one["related"]
+
+
+def test_catalogue_map_counts_how_each_area_is_checked_and_its_cross_hints():
+    m = ok(client.get("/api/catalogue/map"))
+    areas = {a["key"]: a for a in m["areas"]}
+    totals = {a["key"]: a["indicators"] for a in ok(client.get("/api/catalogue/areas")) if a["key"] != "APP"}
+    assert set(areas) == set(totals)
+    assert all(a["records"] + a["lookups"] + a["person"] == totals[k] for k, a in areas.items())
+    assert areas["BO"]["rules"] >= 1, "BO has detection rules (catalogue/detection/bo.yaml)"
+    assert m["cross_hints"] and all(h["source"] != h["target"] and h["count"] > 0 and h["target"] in areas for h in m["cross_hints"])
+
+
+def test_indicator_list_by_area_and_search():
+    bo = ok(client.get("/api/catalogue/indicators", params={"area": "BO"}))
+    assert bo["total"] == len(bo["indicators"]) and all(r["area"] == "BO" for r in bo["indicators"])
+    first = bo["indicators"][0]
+    assert first["id"] == "BO-001" and first["rule"] is True and first["levels_set"] == ["textbook"], "unset levels are not 'set'"
+    everything = ok(client.get("/api/catalogue/indicators", params={"limit": 3000}))
+    assert everything["total"] == len(everything["indicators"]) == sum(a["indicators"] for a in ok(client.get("/api/catalogue/areas")))
+    found = ok(client.get("/api/catalogue/indicators", params={"q": "circular OWNERSHIP"}))["indicators"]
+    assert "BO-001" in [r["id"] for r in found]
+    assert ok(client.get("/api/catalogue/indicators", params={"q": "bo-001"}))["indicators"][0]["id"] == "BO-001"

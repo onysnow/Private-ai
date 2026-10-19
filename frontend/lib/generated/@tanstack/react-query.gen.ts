@@ -85,6 +85,7 @@ import {
   getBasemapStatus,
   getBasemapTile,
   getCaseRecord,
+  getCatalogueMap,
   getChecks,
   getClaimCustodyChain,
   getClaimReviewWorkspace,
@@ -111,6 +112,7 @@ import {
   getExtractionCandidateLineage,
   getExtractionEntityMatches,
   getExtractionOpenalephMatches,
+  getGlossaryEntry,
   getIdentifierTargets,
   getIndicator,
   getIngestionBatch,
@@ -194,6 +196,7 @@ import {
   listEntityStatements,
   listExternalRelationshipPromotions,
   listExternalRelationshipReviews,
+  listIndicators,
   listIngestionBatches,
   listInvestigationAiAnalysisCandidates,
   listInvestigationCrossReferences,
@@ -518,6 +521,9 @@ import type {
   GetCaseRecordData,
   GetCaseRecordError,
   GetCaseRecordResponse,
+  GetCatalogueMapData,
+  GetCatalogueMapError,
+  GetCatalogueMapResponse,
   GetChecksData,
   GetChecksError,
   GetChecksResponse,
@@ -596,6 +602,9 @@ import type {
   GetExtractionOpenalephMatchesData,
   GetExtractionOpenalephMatchesError,
   GetExtractionOpenalephMatchesResponse,
+  GetGlossaryEntryData,
+  GetGlossaryEntryError,
+  GetGlossaryEntryResponse,
   GetIdentifierTargetsData,
   GetIdentifierTargetsError,
   GetIdentifierTargetsResponse,
@@ -845,6 +854,9 @@ import type {
   ListExternalRelationshipReviewsData,
   ListExternalRelationshipReviewsError,
   ListExternalRelationshipReviewsResponse,
+  ListIndicatorsData,
+  ListIndicatorsError,
+  ListIndicatorsResponse,
   ListIngestionBatchesData,
   ListIngestionBatchesError,
   ListIngestionBatchesResponse,
@@ -1724,6 +1736,117 @@ export const searchGlossaryInfiniteOptions = (
   return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const getGlossaryEntryQueryKey = (
+  options: Options<GetGlossaryEntryData>,
+) => createQueryKey('getGlossaryEntry', options);
+
+/**
+ * Get Glossary Entry
+ *
+ * One term in full, found by its name (any case), with every area's own definition.
+ */
+export const getGlossaryEntryOptions = (
+  options: Options<GetGlossaryEntryData>,
+) =>
+  queryOptions<
+    GetGlossaryEntryResponse,
+    GetGlossaryEntryError,
+    GetGlossaryEntryResponse,
+    ReturnType<typeof getGlossaryEntryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getGlossaryEntry({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getGlossaryEntryQueryKey(options),
+  });
+
+export const listIndicatorsQueryKey = (options?: Options<ListIndicatorsData>) =>
+  createQueryKey('listIndicators', options);
+
+/**
+ * List Indicators
+ *
+ * Indicators in catalogue order, one area or all; with words, only those whose id or name holds every one.
+ */
+export const listIndicatorsOptions = (options?: Options<ListIndicatorsData>) =>
+  queryOptions<
+    ListIndicatorsResponse,
+    ListIndicatorsError,
+    ListIndicatorsResponse,
+    ReturnType<typeof listIndicatorsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listIndicators({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listIndicatorsQueryKey(options),
+  });
+
+export const listIndicatorsInfiniteQueryKey = (
+  options?: Options<ListIndicatorsData>,
+): QueryKey<Options<ListIndicatorsData>> =>
+  createQueryKey('listIndicators', options, true);
+
+/**
+ * List Indicators
+ *
+ * Indicators in catalogue order, one area or all; with words, only those whose id or name holds every one.
+ */
+export const listIndicatorsInfiniteOptions = (
+  options?: Options<ListIndicatorsData>,
+) => {
+  const opts = infiniteQueryOptions<
+    ListIndicatorsResponse,
+    ListIndicatorsError,
+    InfiniteData<ListIndicatorsResponse>,
+    QueryKey<Options<ListIndicatorsData>>,
+    | number
+    | Pick<
+        QueryKey<Options<ListIndicatorsData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ListIndicatorsData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  offset: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await listIndicators({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: listIndicatorsInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
 export const getIndicatorQueryKey = (options: Options<GetIndicatorData>) =>
   createQueryKey('getIndicator', options);
 
@@ -1749,6 +1872,36 @@ export const getIndicatorOptions = (options: Options<GetIndicatorData>) =>
       return data;
     },
     queryKey: getIndicatorQueryKey(options),
+  });
+
+export const getCatalogueMapQueryKey = (
+  options?: Options<GetCatalogueMapData>,
+) => createQueryKey('getCatalogueMap', options);
+
+/**
+ * Get Catalogue Map
+ *
+ * Per area, how its indicators can be checked; and how often one area's indicators may also point to another.
+ */
+export const getCatalogueMapOptions = (
+  options?: Options<GetCatalogueMapData>,
+) =>
+  queryOptions<
+    GetCatalogueMapResponse,
+    GetCatalogueMapError,
+    GetCatalogueMapResponse,
+    ReturnType<typeof getCatalogueMapQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCatalogueMap({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCatalogueMapQueryKey(options),
   });
 
 export const listTermHintsQueryKey = (options?: Options<ListTermHintsData>) =>

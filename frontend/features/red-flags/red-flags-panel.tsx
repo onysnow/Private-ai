@@ -119,7 +119,7 @@ export function FlagDetail({flag, ...actions}: {flag: RedFlagOut} & FlagActions)
   return <>
     <p className="rf-drawer-level">{LEVEL[flag.level].name} · {LEVEL[flag.level].meaning}</p>
     <h3>{flag.level === 'textbook' ? <NeonTitle text={name}/> : name}</h3>
-    <p className="sv-muted">{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}{ind && <> · <a href={`/glossary?indicator=${encodeURIComponent(ind.id)}`}>Full entry in the glossary</a></>}</p>
+    <p className="sv-muted">{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}{ind && <> · <a href={`/learn?indicator=${encodeURIComponent(ind.id)}`}>Full entry in the catalogue</a></>}</p>
     <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
     <PartyButtons parties={flag.parties}/>
     <section className="rf-sec" aria-labelledby="rf-sec-innocent">

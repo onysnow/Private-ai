@@ -51,8 +51,11 @@ def _glossary() -> list[dict[str, Any]]:
     for g in cat.glossaries:
         for t in g.terms:
             key = t.term.strip().lower()
-            row = merged.setdefault(key, {**t.model_dump(mode="json"), "areas": []})
+            row = merged.setdefault(key, {**t.model_dump(mode="json"), "areas": [], "definitions": []})
             row["areas"] = sorted(set(row["areas"]) | set(t.areas or [g.area]))
+            # Every area's own wording is kept (research Knowledge §1: "Backend must stop dropping them");
+            # `definition` stays the first one, for the places that show a single line.
+            row["definitions"].append({"area": g.area, "definition": t.definition, "source_url": t.source_url})
             for field in ("indicators", "related", "cases", "examples"):
                 row[field] = list(dict.fromkeys([*row.get(field, []), *getattr(t, field)]))
     return sorted(merged.values(), key=lambda t: t["term"].lower())
@@ -76,6 +79,44 @@ def catalogue_areas() -> list[dict[str, Any]]:
               "verified": sum(i.status.value == "verified" for i in a.indicators), "terms": terms.get(a.key, 0)} for a in cat.areas]
     return areas + [{"key": k, "name": n, "scope": s, "summary": s, "indicators": 0, "verified": 0, "terms": terms.get(k, 0)}
                     for k, (n, s) in GLOSSARY_ONLY.items() if terms.get(k)]
+
+
+# A level the catalogue has no published number for yet (catalogue/indicators/*.yaml: "To be set by Ony").
+UNSET_LEVEL = "to be set"
+
+
+@lru_cache(maxsize=1)
+def _ruled() -> frozenset[str]:
+    """Indicators a detection rule computes on the case's records (catalogue/detection/)."""
+    return frozenset(spec.indicator for spec in detection.load())
+
+
+@lru_cache(maxsize=1)
+def catalogue_map() -> dict[str, Any]:
+    """What the catalogue map draws (mockup KNOWLEDGE_KEEP_1, panel A): per area, how its indicators can be
+    checked and how many are still pending; and the "may also point to" counts between areas."""
+    cat = catalogue()
+    areas = []
+    hints: dict[tuple[str, str], int] = {}
+    for a in cat.areas:
+        n = {"records": 0, "lookups": 0, "person": 0, "pending": 0, "rules": 0}
+        for i in a.indicators:
+            n[i.checkable.value] += 1
+            n["pending"] += i.status.value == "pending"
+            n["rules"] += i.id in _ruled()
+            for h in i.cross_hints:
+                if h.target_area != a.key:
+                    hints[(a.key, h.target_area)] = hints.get((a.key, h.target_area), 0) + 1
+        areas.append({"key": a.key, **n})
+    return {"areas": areas, "cross_hints": [{"source": s, "target": t, "count": n} for (s, t), n in sorted(hints.items())]}
+
+
+@lru_cache(maxsize=1)
+def catalogue_indicator_rows() -> list[dict[str, Any]]:
+    """One short row per indicator, in catalogue order: what the indicator list and the search need."""
+    return [{"id": i.id, "name": i.name, "area": a.key, "checkable": i.checkable.value, "status": i.status.value,
+             "levels_set": [lv for lv in LEVELS if UNSET_LEVEL not in getattr(i.levels, lv).lower()], "rule": i.id in _ruled()}
+            for a in catalogue().areas for i in a.indicators]
 
 
 def _acronym(text: str) -> bool:
@@ -104,7 +145,8 @@ def catalogue_term_hints() -> list[dict[str, Any]]:
     out = []
     for t in _glossary():
         own = "APP" in t["areas"]
-        out.append({"term": t["term"], "definition": t["definition"], "areas": t["areas"],
+        out.append({"term": t["term"], "definition": t["definition"], "areas": t["areas"], "related": t["related"],
+                    "definitions": len(t["definitions"]),
                     "names": [{"text": n, "exact": own or n.isupper()} for n in _names(t["term"])]})
     return out
 

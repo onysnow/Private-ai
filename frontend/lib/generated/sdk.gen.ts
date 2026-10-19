@@ -240,6 +240,9 @@ import type {
   GetCaseRecordData,
   GetCaseRecordErrors,
   GetCaseRecordResponses,
+  GetCatalogueMapData,
+  GetCatalogueMapErrors,
+  GetCatalogueMapResponses,
   GetChecksData,
   GetChecksErrors,
   GetChecksResponses,
@@ -318,6 +321,9 @@ import type {
   GetExtractionOpenalephMatchesData,
   GetExtractionOpenalephMatchesErrors,
   GetExtractionOpenalephMatchesResponses,
+  GetGlossaryEntryData,
+  GetGlossaryEntryErrors,
+  GetGlossaryEntryResponses,
   GetIdentifierTargetsData,
   GetIdentifierTargetsErrors,
   GetIdentifierTargetsResponses,
@@ -567,6 +573,9 @@ import type {
   ListExternalRelationshipReviewsData,
   ListExternalRelationshipReviewsErrors,
   ListExternalRelationshipReviewsResponses,
+  ListIndicatorsData,
+  ListIndicatorsErrors,
+  ListIndicatorsResponses,
   ListIngestionBatchesData,
   ListIngestionBatchesErrors,
   ListIngestionBatchesResponses,
@@ -1027,6 +1036,7 @@ import {
   zGetBasemapTileResponse,
   zGetCaseRecordPath,
   zGetCaseRecordResponse,
+  zGetCatalogueMapResponse,
   zGetChecksPath,
   zGetChecksResponse,
   zGetClaimCustodyChainPath,
@@ -1081,6 +1091,8 @@ import {
   zGetExtractionEntityMatchesResponse,
   zGetExtractionOpenalephMatchesPath,
   zGetExtractionOpenalephMatchesResponse,
+  zGetGlossaryEntryQuery,
+  zGetGlossaryEntryResponse,
   zGetIdentifierTargetsPath,
   zGetIdentifierTargetsResponse,
   zGetIndicatorPath,
@@ -1268,6 +1280,8 @@ import {
   zListExternalRelationshipPromotionsResponse,
   zListExternalRelationshipReviewsPath,
   zListExternalRelationshipReviewsResponse,
+  zListIndicatorsQuery,
+  zListIndicatorsResponse,
   zListIngestionBatchesPath,
   zListIngestionBatchesResponse,
   zListInvestigationAiAnalysisCandidatesPath,
@@ -2041,6 +2055,64 @@ export const searchGlossary = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Glossary Entry
+ *
+ * One term in full, found by its name (any case), with every area's own definition.
+ */
+export const getGlossaryEntry = <ThrowOnError extends boolean = false>(
+  options: Options<GetGlossaryEntryData, ThrowOnError>,
+): RequestResult<
+  GetGlossaryEntryResponses,
+  GetGlossaryEntryErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetGlossaryEntryResponses,
+    GetGlossaryEntryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zGetGlossaryEntryQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetGlossaryEntryResponse.parseAsync(data),
+    url: '/api/catalogue/glossary/entry',
+    ...options,
+  });
+
+/**
+ * List Indicators
+ *
+ * Indicators in catalogue order, one area or all; with words, only those whose id or name holds every one.
+ */
+export const listIndicators = <ThrowOnError extends boolean = false>(
+  options?: Options<ListIndicatorsData, ThrowOnError>,
+): RequestResult<ListIndicatorsResponses, ListIndicatorsErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ListIndicatorsResponses,
+    ListIndicatorsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zListIndicatorsQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListIndicatorsResponse.parseAsync(data),
+    url: '/api/catalogue/indicators',
+    ...options,
+  });
+
+/**
  * Get Indicator
  *
  * One indicator in full: definition, levels, sources, cases, data needed, cross-hints, innocent explanations.
@@ -2064,6 +2136,37 @@ export const getIndicator = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetIndicatorResponse.parseAsync(data),
     url: '/api/catalogue/indicators/{indicator_id}',
+    ...options,
+  });
+
+/**
+ * Get Catalogue Map
+ *
+ * Per area, how its indicators can be checked; and how often one area's indicators may also point to another.
+ */
+export const getCatalogueMap = <ThrowOnError extends boolean = false>(
+  options?: Options<GetCatalogueMapData, ThrowOnError>,
+): RequestResult<
+  GetCatalogueMapResponses,
+  GetCatalogueMapErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetCatalogueMapResponses,
+    GetCatalogueMapErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCatalogueMapResponse.parseAsync(data),
+    url: '/api/catalogue/map',
     ...options,
   });
 
