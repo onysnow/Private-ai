@@ -39,6 +39,7 @@ from app.models.domain import (
 )
 from app.services.exports import (
     build_investigation_export,
+    mark_backed_up,
     preview_investigation_restore,
     restore_investigation_export,
 )
@@ -401,6 +402,7 @@ class WorkbenchBackups:
         handle.log(f"[console] exporting investigation {selection}")
         with self.session_factory() as db:
             data, manifest = build_investigation_export(db, selection, include_documents=True)
+            mark_backed_up(db, selection)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         backup_id = f"{stamp}-{selection}"
         path = self.backups_dir / f"{backup_id}.zip"

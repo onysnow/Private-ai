@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app.ai.reasoning import ai_reasoning_status
 from app.core.config import settings
 from app.core.time import utcnow_naive
-from app.models.domain import BackgroundJob, Document, Entity, PatternFlag
+from app.models.domain import BackgroundJob, Claim, Document, Entity, IngestionBatch, Investigation, PatternFlag
 from app.patterns.engine import indicator
 from app.services import preferences, watches
 from app.services.case_home import decisions
@@ -68,7 +68,9 @@ def _documents_since(db: Session, investigation_id: str, after: datetime) -> int
 def research_due(db: Session, investigation_id: str) -> dict[str, Any] | None:
     """Ask first: documents came in since this case's last AI run, so it may be worth running again. Only for a case
     that has had a run (a case that never ran is not nagged) and only while the AI is set up."""
-    if preferences.research_mode(db) != "ask" or not ai_reasoning_status(settings).get("enabled"):
+    from app.services.saved_questions import case_research_mode
+
+    if case_research_mode(db, investigation_id)[0] != "ask" or not ai_reasoning_status(settings).get("enabled"):
         return None
     last = db.scalar(select(func.max(BackgroundJob.finished_at)).where(
         BackgroundJob.investigation_id == investigation_id, BackgroundJob.kind == "ai_reasoning", BackgroundJob.status == "succeeded"))
@@ -76,6 +78,48 @@ def research_due(db: Session, investigation_id: str) -> dict[str, Any] | None:
         return None
     n = _documents_since(db, investigation_id, last)
     return {"documents": n, "last_run_at": last} if n else None
+
+
+def _import_rows(db: Session, investigation_id: str, after: datetime) -> list[dict[str, Any]]:
+    from app.services.ingestion_batches import batch_summary
+
+    out = []
+    for batch in db.scalars(select(IngestionBatch).where(IngestionBatch.investigation_id == investigation_id,
+                                                         IngestionBatch.finished_at > after)):
+        n = batch_summary(db, batch)
+        problems = f" · {n['problems']} need{'s' if n['problems'] == 1 else ''} you" if n["problems"] else ""
+        out.append(_row(f"i:{batch.id}:{batch.finished_at:%Y%m%d%H%M%S}", "import",
+                        f"{n['files']} file{'s' if n['files'] != 1 else ''} read{problems}", batch.label or "",
+                        "/bring-in#the-drop", batch.finished_at, actor="The Drop"))
+    return out
+
+
+def backup_due(db: Session, investigation_id: str, days: int, now: datetime) -> dict[str, Any] | None:
+    """The case changed since its last full backup, and that backup (or the case's start, if never) is older than
+    ``days``. Counted from the records' own times: documents, claims and parties added since."""
+    if not days:
+        return None
+    inv = db.get(Investigation, investigation_id)
+    if inv is None:
+        return None
+    since = inv.last_backup_at or inv.created_at
+    if now - since < timedelta(days=days):
+        return None
+    changed = sum(int(db.scalar(select(func.count()).select_from(model).where(model.investigation_id == investigation_id,
+                                                                             model.created_at > since)) or 0)
+                  for model in (Document, Claim, Entity))
+    if not changed:
+        return None
+    return {"since": since, "changed": changed, "never": inv.last_backup_at is None, "days": (now - since).days}
+
+
+def _source_rows(db: Session, after: datetime) -> list[dict[str, Any]]:
+    from app.services.source_freshness import recent_changes
+
+    return [_row(f"src:{c['source']}:{c['version']}", "source", f"{c['label']} updated its data",
+                 "Names already looked up there are checked again where the case allows it.", "/settings#lookups",
+                 c["at"], actor=c["label"], actor_kind="connector")
+            for c in recent_changes(db, after)]
 
 
 def inbox(db: Session, investigation_id: str, person: str, *, sees_security: bool) -> dict[str, Any]:
@@ -92,6 +136,13 @@ def inbox(db: Session, investigation_id: str, person: str, *, sees_security: boo
             rows.append(_row(f"w:{w['id']}:{w['value']}", "watch", w["label"], f"{w['baseline_words']} → {w['value_words']}",
                              "/act#red-flags" if w["record_type"] == "red_flag" else "/check#claim-verification", now,
                              actor="You watch this"))
+    rows += _import_rows(db, investigation_id, week_ago) + _source_rows(db, week_ago)
+    backup = backup_due(db, investigation_id, prefs["backup_days"], now)
+    if backup:
+        when = "never backed up" if backup["never"] else f"not backed up for {backup['days']} days"
+        rows.append(_row(f"b:{investigation_id}:{now:%Y%m%d}", "backup", f"This case was {when}",
+                         f"{backup['changed']} record{'s' if backup['changed'] != 1 else ''} added since. Backups: Keep › Backup.",
+                         "/keep#backup-restore", now))
     due = research_due(db, investigation_id)
     if due:
         n = due["documents"]

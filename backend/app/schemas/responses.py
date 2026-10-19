@@ -5179,11 +5179,28 @@ class NotificationKindOut(ResponseModel):
     route: str
 
 
+class NotificationChannelOut(ResponseModel):
+    mode: str
+    address: str | None = None
+    url: str | None = None
+
+
+class NotificationServerOut(ResponseModel):
+    """What this server can send outside the app; never its mail account or keys."""
+    email: bool
+    webpush: bool
+    webpush_key: str | None = None
+
+
 class NotificationPrefsOut(ResponseModel):
     routes: dict[str, str]
     quiet_while_reading: bool
     desktop: bool
+    backup_days: int
     kinds: list[NotificationKindOut]
+    outside: dict[str, NotificationChannelOut]
+    server: NotificationServerOut
+    push_devices: int
 
 
 class InboxRowOut(ResponseModel):
@@ -5247,6 +5264,7 @@ class LookupSourceOut(ResponseModel):
     mode: str | None = None
     last: ConnectorRunLineOut | None = None
     cases_this_month: int
+    key_check: KeyCheckOut | None = None
 
 
 class CaseLookupsOut(ResponseModel):
@@ -5257,10 +5275,24 @@ class CaseLookupsOut(ResponseModel):
     set_at: Timestamp
 
 
+class OutboundLineOut(ResponseModel):
+    """One request that left this computer (app/services/outbound.py)."""
+    id: str
+    at: Timestamp
+    kind: str
+    service: str
+    destination: str
+    sent: str
+    outcome: str
+    investigation_id: str | None = None
+    case: str
+
+
 class LookupSettingsOut(ResponseModel):
     sources: list[LookupSourceOut]
     cases: list[CaseLookupsOut]
-    week: list[ConnectorRunLineOut]
+    # Everything that left this computer in the last seven days, not only lookups.
+    week: list[OutboundLineOut]
     can_change_defaults: bool
 
 
@@ -5282,3 +5314,39 @@ class ResearchSettingsOut(ResponseModel):
     locked: list[RunPlanLockedOut]
     cases: list[RunDefaultsCaseOut]
     can_change_defaults: bool
+
+
+class SavedQuestionOut(ResponseModel):
+    id: str
+    investigation_id: str
+    module: str
+    question: str
+    working_theory: str | None = None
+    created_by: str | None = None
+    created_at: Timestamp
+    last_run_id: str | None = None
+    last_run_at: Timestamp | None = None
+
+
+class CaseResearchOut(ResponseModel):
+    investigation_id: str
+    mode: str
+    own: bool
+    reason: str | None = None
+    default: str
+    ai_enabled: bool
+    questions: list[SavedQuestionOut]
+
+
+class NotificationTestOut(ResponseModel):
+    channel: str
+    sent: bool
+
+
+class KeyCheckOut(ResponseModel):
+    """Whether a source accepts its key, learned without a search."""
+    provider: str
+    state: str
+    detail: str
+    credits: int | None = None
+    at: str

@@ -8,7 +8,8 @@
 // packet's size and whether saved outside leads come along, and the two steps a setting adds (devil's advocate,
 // exhaustive research depth). The live view (step 3) opens the same instructions and plan as a drawer at its left edge,
 // for a new run of the question; step 4 reviews the answer claim by claim (claim-review-view.tsx). Ask the case can be
-// opened from elsewhere (the command palette, the case home's AI strip) with a question already typed.
+// opened from elsewhere (the command palette, the case home's AI strip) with a question already typed. A question can be
+// saved to ask again (saved-questions.tsx), by hand or by itself after each import when the case is set to Without approval.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
@@ -22,12 +23,14 @@ import {api} from '../../lib/api-instance';
 import {describeJob, waitForJob} from '../../lib/jobs';
 import {apiTime} from '../../lib/timestamps';
 import {
-  investigationRunPlanMutation, investigationRunProfileOptions, investigationRunProfileQueryKey, saveInvestigationRunProfileMutation,
+  getCaseResearchQueryKey, investigationRunPlanMutation, investigationRunProfileOptions, investigationRunProfileQueryKey, saveInvestigationRunProfileMutation,
+  saveQuestionMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {investigationCaseSynthesis, investigationHypothesisTest} from '../../lib/generated/sdk.gen';
 import type {RunOptionsIn, RunPlanOut, RunSettingOut} from '../../lib/generated/types.gen';
 import {listAiRunsOptions, listAiRunsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {ReviewSheet} from './claim-review-view';
+import {SavedQuestions} from './saved-questions';
 import {WatchTheRun} from './watch-the-run';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -242,6 +245,10 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
 
   const changed = values && caseDefaults ? Object.keys(values).filter(k => values[k] !== caseDefaults[k]) : [];
   const rows = p?.settings ?? [];
+  // Keep the question to ask again (by hand, or after each import in a case set to Without approval).
+  const keep = useMutation({...saveQuestionMutation(), onSuccess: () => {
+    void queryClient.invalidateQueries({queryKey: getCaseResearchQueryKey({path: {investigation_id: investigationId}})});
+  }});
   const cancel = () => {
     if (caseDefaults) setValues(caseDefaults);
     setPremises(profile.data?.premises ?? []); setEcho([]); flagged.current.clear(); setMaxResults(PACKET_DEFAULT); setIncludeLeads(true); setEditing(false); setStep(1);
@@ -357,6 +364,9 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
         <small>{apiTime(r.created_at).toLocaleString(undefined, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})} · {r.events} steps{r.problems ? ` · ${r.problems} problem${r.problems === 1 ? '' : 's'}` : ''}{r.review_status ? ` · ${r.review_status}` : ''}</small>
         <button type="button" className="br-quiet" onClick={() => { setRunId(r.run_id); setStep(3); }}>Watch it again</button></li>)}
     </ul></div>}
+    <SavedQuestions investigationId={investigationId} onAsk={q => {
+      setModule(q.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setQuestion(q.question); setTheory(q.working_theory ?? '');
+    }}/>
     {earlier.isSuccess && earlier.data.runs.length === 0 && <p className="br-tray">No runs yet in this case. <button type="button" className="br-quiet"
       onClick={() => { setRunId(null); setSampleOnly(true); setStep(3); }}>Watch a sample run</button></p>}
   </section>;
@@ -433,6 +443,10 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
         <FormRootError className="field-msg next-line"/>
         <button type="submit" disabled={save.isPending}>Save</button>
       </form></Form> : <button type="button" className="br-save" onClick={() => setSaving(true)}>Save as this case’s default</button>}
+      <button type="button" className="br-save" disabled={keep.isPending || !question.trim() || (module === 'hypothesis_test' && !theory.trim())}
+        onClick={() => keep.mutate({path: {investigation_id: investigationId}, body: {module, question: question.trim(), working_theory: module === 'hypothesis_test' ? theory.trim() : null}})}>
+        {keep.isSuccess && keep.variables?.body.question === question.trim() ? 'Question saved ✓' : 'Save this question'}</button>
+      {keep.isError && <span role="alert" className="br-bad">{errorMessage(keep.error, 'Could not save the question.')}</span>}
       {!running && outcome && step === 2 && <span role="status" className={outcome.ok ? 'br-ok' : 'br-bad'}>{outcome.text}</span>}
       {running && step === 2 && <span role="status">Running in the background. The answer will wait for you in AI drafts.{runId && <> <button type="button" className="br-quiet" onClick={() => setStep(3)}>Watch it</button></>}</span>}
       <span className="br-note">AI can be wrong. Every result waits for you.</span>

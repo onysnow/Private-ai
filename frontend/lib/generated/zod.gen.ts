@@ -862,6 +862,14 @@ export const zCaseRecordOut = z.object({
 });
 
 /**
+ * CaseResearchPut
+ */
+export const zCaseResearchPut = z.object({
+  mode: z.enum(['off', 'ask', 'automatic']).nullable(),
+  reason: z.string().max(300).nullish(),
+});
+
+/**
  * CaseSinceOut
  */
 export const zCaseSinceOut = z.object({
@@ -4321,6 +4329,19 @@ export const zInvestigationUpdate = z.object({
 });
 
 /**
+ * KeyCheckOut
+ *
+ * Whether a source accepts its key, learned without a search.
+ */
+export const zKeyCheckOut = z.object({
+  at: z.string(),
+  credits: z.number().int().nullish(),
+  detail: z.string(),
+  provider: z.string(),
+  state: z.string(),
+});
+
+/**
  * LeadConvertRequest
  */
 export const zLeadConvertRequest = z.object({
@@ -4563,21 +4584,12 @@ export const zLookupSourceOut = z.object({
   default: z.string(),
   host: z.string(),
   key: z.string(),
+  key_check: zKeyCheckOut.nullish(),
   key_saved: z.boolean(),
   kind: z.string(),
   label: z.string(),
   last: zConnectorRunLineOut.nullish(),
   mode: z.string().nullish(),
-});
-
-/**
- * LookupSettingsOut
- */
-export const zLookupSettingsOut = z.object({
-  can_change_defaults: z.boolean(),
-  cases: z.array(zCaseLookupsOut),
-  sources: z.array(zLookupSourceOut),
-  week: z.array(zConnectorRunLineOut),
 });
 
 /**
@@ -4987,6 +4999,24 @@ export const zNotesOut = z.object({
 });
 
 /**
+ * NotificationChannelOut
+ */
+export const zNotificationChannelOut = z.object({
+  address: z.string().nullish(),
+  mode: z.string(),
+  url: z.string().nullish(),
+});
+
+/**
+ * NotificationChannelPut
+ */
+export const zNotificationChannelPut = z.object({
+  address: z.string().max(320).nullish(),
+  mode: z.enum(['off', 'interrupts', 'daily']),
+  url: z.string().max(1000).nullish(),
+});
+
+/**
  * NotificationKindOut
  */
 export const zNotificationKindOut = z.object({
@@ -4998,22 +5028,48 @@ export const zNotificationKindOut = z.object({
 });
 
 /**
- * NotificationPrefsOut
- */
-export const zNotificationPrefsOut = z.object({
-  desktop: z.boolean(),
-  kinds: z.array(zNotificationKindOut),
-  quiet_while_reading: z.boolean(),
-  routes: z.record(z.string()),
-});
-
-/**
  * NotificationPrefsPut
  */
 export const zNotificationPrefsPut = z.object({
+  backup_days: z
+    .union([z.literal(7), z.literal(14), z.literal(30), z.literal(0)])
+    .nullish(),
   desktop: z.boolean().optional().default(false),
   quiet_while_reading: z.boolean().optional().default(true),
   routes: z.record(z.enum(['interrupt', 'needs', 'else', 'off'])).optional(),
+});
+
+/**
+ * NotificationServerOut
+ *
+ * What this server can send outside the app; never its mail account or keys.
+ */
+export const zNotificationServerOut = z.object({
+  email: z.boolean(),
+  webpush: z.boolean(),
+  webpush_key: z.string().nullish(),
+});
+
+/**
+ * NotificationPrefsOut
+ */
+export const zNotificationPrefsOut = z.object({
+  backup_days: z.number().int(),
+  desktop: z.boolean(),
+  kinds: z.array(zNotificationKindOut),
+  outside: z.record(zNotificationChannelOut),
+  push_devices: z.number().int(),
+  quiet_while_reading: z.boolean(),
+  routes: z.record(z.string()),
+  server: zNotificationServerOut,
+});
+
+/**
+ * NotificationTestOut
+ */
+export const zNotificationTestOut = z.object({
+  channel: z.string(),
+  sent: z.boolean(),
 });
 
 /**
@@ -5334,6 +5390,37 @@ export const zOrphanFileOut = z.object({
   modified_at: z.number(),
   relative_path: z.string(),
   size_bytes: z.number().int(),
+});
+
+/**
+ * OutboundLineOut
+ *
+ * One request that left this computer (app/services/outbound.py).
+ */
+export const zOutboundLineOut = z.object({
+  at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  case: z.string(),
+  destination: z.string(),
+  id: z.string(),
+  investigation_id: z.string().nullish(),
+  kind: z.string(),
+  outcome: z.string(),
+  sent: z.string(),
+  service: z.string(),
+});
+
+/**
+ * LookupSettingsOut
+ */
+export const zLookupSettingsOut = z.object({
+  can_change_defaults: z.boolean(),
+  cases: z.array(zCaseLookupsOut),
+  sources: z.array(zLookupSourceOut),
+  week: z.array(zOutboundLineOut),
 });
 
 /**
@@ -5685,6 +5772,30 @@ export const zEntityMatchPreviewOut = z.object({
   provider_lead: zProviderLeadOut,
   schema: z.string(),
   strong_match: zEntityCandidateOut.nullable(),
+});
+
+/**
+ * PushSubscriptionKeys
+ */
+export const zPushSubscriptionKeys = z.object({
+  auth: z.string().min(1).max(255),
+  p256dh: z.string().min(1).max(255),
+});
+
+/**
+ * PushSubscriptionIn
+ */
+export const zPushSubscriptionIn = z.object({
+  endpoint: z.string().min(8).max(2000),
+  keys: zPushSubscriptionKeys,
+  label: z.string().max(255).nullish(),
+});
+
+/**
+ * PushSubscriptionRemove
+ */
+export const zPushSubscriptionRemove = z.object({
+  endpoint: z.string().min(8).max(2000),
 });
 
 /**
@@ -6074,7 +6185,7 @@ export const zReportingTaskUpdate = z.object({
  */
 export const zResearchSettingsPut = z.object({
   flags: z.record(z.unknown()).nullish(),
-  mode: z.enum(['off', 'ask']).nullish(),
+  mode: z.enum(['off', 'ask', 'automatic']).nullish(),
   options: z.record(z.unknown()).nullish(),
   reason: z.string().max(300).nullish(),
 });
@@ -6514,6 +6625,52 @@ export const zSameAnswerOut = z.object({
   caption: z.string(),
   label: z.string().nullish(),
   scope: z.enum(['drop', 'case']),
+});
+
+/**
+ * SavedQuestionCreate
+ */
+export const zSavedQuestionCreate = z.object({
+  module: z.enum(['case_synthesis', 'hypothesis_test']),
+  question: z.string().min(1).max(4000),
+  working_theory: z.string().max(2000).nullish(),
+});
+
+/**
+ * SavedQuestionOut
+ */
+export const zSavedQuestionOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  last_run_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  last_run_id: z.string().nullish(),
+  module: z.string(),
+  question: z.string(),
+  working_theory: z.string().nullish(),
+});
+
+/**
+ * CaseResearchOut
+ */
+export const zCaseResearchOut = z.object({
+  ai_enabled: z.boolean(),
+  default: z.string(),
+  investigation_id: z.string(),
+  mode: z.string(),
+  own: z.boolean(),
+  questions: z.array(zSavedQuestionOut),
+  reason: z.string().nullish(),
 });
 
 /**
@@ -11038,6 +11195,37 @@ export const zListReportingTasksQuery = z.object({
  */
 export const zListReportingTasksResponse = z.array(zReportingTaskOut);
 
+export const zGetCaseResearchPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCaseResearchResponse = zCaseResearchOut;
+
+export const zPutCaseResearchBody = zCaseResearchPut;
+
+export const zPutCaseResearchPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPutCaseResearchResponse = zCaseResearchOut;
+
+export const zSaveQuestionBody = zSavedQuestionCreate;
+
+export const zSaveQuestionPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSaveQuestionResponse = zSavedQuestionOut;
+
 export const zGetSincePath = z.object({
   investigation_id: z.string(),
 });
@@ -11654,6 +11842,24 @@ export const zUpdateReportingTaskEndpointPath = z.object({
  */
 export const zUpdateReportingTaskEndpointResponse = zReportingTaskOut;
 
+export const zDeleteSavedQuestionPath = z.object({
+  saved_question_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteSavedQuestionResponse = z.void();
+
+export const zRunSavedQuestionPath = z.object({
+  saved_question_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRunSavedQuestionResponse = zSavedQuestionOut;
+
 export const zSearchWorkbenchQuery = z.object({
   q: z.string().min(1),
   investigation_id: z.string().nullish(),
@@ -11689,6 +11895,15 @@ export const zSearchWorkbenchQuery = z.object({
  * Successful Response
  */
 export const zSearchWorkbenchResponse = zSearchOut;
+
+export const zCheckConnectorKeyPath = z.object({
+  provider: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCheckConnectorKeyResponse = zKeyCheckOut;
 
 export const zDeleteConnectorCredentialPath = z.object({
   provider: z.string(),
@@ -11742,6 +11957,40 @@ export const zPutNotificationPrefsBody = zNotificationPrefsPut;
  * Successful Response
  */
 export const zPutNotificationPrefsResponse = zNotificationPrefsOut;
+
+export const zPutNotificationChannelBody = zNotificationChannelPut;
+
+export const zPutNotificationChannelPath = z.object({
+  channel: z.enum(['email', 'phone', 'webpush']),
+});
+
+/**
+ * Successful Response
+ */
+export const zPutNotificationChannelResponse = zNotificationPrefsOut;
+
+export const zTestNotificationChannelPath = z.object({
+  channel: z.enum(['email', 'phone', 'webpush']),
+});
+
+/**
+ * Successful Response
+ */
+export const zTestNotificationChannelResponse = zNotificationTestOut;
+
+export const zAddPushSubscriptionBody = zPushSubscriptionIn;
+
+/**
+ * Successful Response
+ */
+export const zAddPushSubscriptionResponse = zNotificationPrefsOut;
+
+export const zRemovePushSubscriptionBody = zPushSubscriptionRemove;
+
+/**
+ * Successful Response
+ */
+export const zRemovePushSubscriptionResponse = zNotificationPrefsOut;
 
 /**
  * Successful Response

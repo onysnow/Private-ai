@@ -5,7 +5,7 @@ A person's notifications are theirs alone (keyed by who is asking). Defaults tha
 defaults, research, run defaults for new cases) need the workstation owner or a global admin; a case's own lookups
 need that case's admin.
 """
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
@@ -19,12 +19,16 @@ from app.core.authorization import (
 )
 from app.core.config import settings
 from app.db.session import get_db
-from app.models.domain import FactWatch, Investigation
-from app.schemas.api import CaseLookupsPut, FactWatchCreate, LookupDefaultsPut, NotificationPrefsPut, ResearchSettingsPut
-from app.schemas.responses import (
-    FactWatchOut, InboxOut, LookupSettingsOut, NotificationPrefsOut, ResearchSettingsOut,
+from app.models.domain import FactWatch, Investigation, PushSubscription, SavedQuestion
+from app.schemas.api import (
+    CaseLookupsPut, CaseResearchPut, FactWatchCreate, LookupDefaultsPut, NotificationChannelPut, NotificationPrefsPut, PushSubscriptionIn,
+    PushSubscriptionRemove, ResearchSettingsPut, SavedQuestionCreate,
 )
-from app.services import connector_activity, notifications, preferences, run_plan, watches
+from app.schemas.responses import (
+    CaseResearchOut, FactWatchOut, InboxOut, KeyCheckOut, LookupSettingsOut, NotificationPrefsOut, NotificationTestOut, ResearchSettingsOut, SavedQuestionOut,
+    upstream,
+)
+from app.services import connector_activity, delivery, notifications, outbound, preferences, run_plan, saved_questions, source_freshness, watches
 from app.services.settings import connector_credential_status
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -36,18 +40,61 @@ def _person(request: Request) -> str:
 
 # --- Notifications -----------------------------------------------------------------------------------------------
 
+def _notification_prefs(db: Session, person: str) -> dict[str, Any]:
+    return {**preferences.notification_prefs(db, person), "outside": delivery.channel_prefs(db, person),
+            "server": delivery.server_status(),
+            "push_devices": len(list(db.scalars(select(PushSubscription.id).where(PushSubscription.person == person))))}
+
+
 @router.get("/settings/notifications", response_model=NotificationPrefsOut)
 def get_notification_prefs(request: Request, db: Session = Depends(get_db)) -> Any:
-    return preferences.notification_prefs(db, _person(request))
+    return _notification_prefs(db, _person(request))
 
 
 @router.put("/settings/notifications", response_model=NotificationPrefsOut)
 def put_notification_prefs(body: NotificationPrefsPut, request: Request, db: Session = Depends(get_db)) -> Any:
     try:
-        return preferences.save_notification_prefs(db, _person(request), routes=dict(body.routes),
-                                                   quiet_while_reading=body.quiet_while_reading, desktop=body.desktop)
+        preferences.save_notification_prefs(db, _person(request), routes=dict(body.routes), backup_days=body.backup_days,
+                                            quiet_while_reading=body.quiet_while_reading, desktop=body.desktop)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+    return _notification_prefs(db, _person(request))
+
+
+@router.put("/settings/notifications/channels/{channel}", response_model=NotificationPrefsOut)
+def put_notification_channel(channel: Literal["email", "phone", "webpush"], body: NotificationChannelPut, request: Request,
+                             db: Session = Depends(get_db)) -> Any:
+    try:
+        delivery.save_channel(db, _person(request), channel, mode=body.mode, address=body.address, url=body.url)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return _notification_prefs(db, _person(request))
+
+
+@router.post("/settings/notifications/channels/{channel}/test", response_model=NotificationTestOut, responses=upstream("The channel", 502))
+def test_notification_channel(channel: Literal["email", "phone", "webpush"], request: Request, db: Session = Depends(get_db)) -> Any:
+    try:
+        sent = delivery.send_test(db, _person(request), channel)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    except Exception as exc:
+        raise HTTPException(502, f"The test did not go out: {exc}") from exc
+    return {"channel": channel, "sent": sent}
+
+
+@router.post("/settings/push-subscriptions", response_model=NotificationPrefsOut)
+def add_push_subscription(body: PushSubscriptionIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    try:
+        delivery.add_subscription(db, _person(request), body.endpoint, body.keys.model_dump(), body.label)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return _notification_prefs(db, _person(request))
+
+
+@router.post("/settings/push-subscriptions/remove", response_model=NotificationPrefsOut)
+def remove_push_subscription(body: PushSubscriptionRemove, request: Request, db: Session = Depends(get_db)) -> Any:
+    delivery.remove_subscription(db, _person(request), body.endpoint)
+    return _notification_prefs(db, _person(request))
 
 
 @router.get("/investigations/{investigation_id}/inbox", response_model=InboxOut)
@@ -111,9 +158,11 @@ def _lookup_settings(db: Session, request: Request, investigation_id: str | None
         "key": p, **{k: preferences.PROVIDER_TEXT.get(p, {}).get(k, "") for k in ("label", "kind")},
         "host": preferences.provider_host(registry.get(p)), "key_saved": _key_saved(p),
         "default": defaults[p], "mode": modes.get(p), **seen["providers"][p],
+        "key_check": ({"provider": p, **kc} if (kc := source_freshness.last_key_check(db, p)) else None),
     } for p in providers]
     cases = [c for c in preferences.cases_with_own_lookups(db, providers) if scope.allows(c["investigation_id"])]
-    return {"sources": sources, "cases": cases, "week": seen["week"], "can_change_defaults": scope.is_global_admin}
+    week = outbound.recent(db, days=7, investigation_ids=scope.investigation_ids)
+    return {"sources": sources, "cases": cases, "week": week, "can_change_defaults": scope.is_global_admin}
 
 
 @router.get("/settings/lookups", response_model=LookupSettingsOut)
@@ -198,3 +247,83 @@ def put_research_settings(body: ResearchSettingsPut, request: Request, db: Sessi
     except (ValueError, ReasoningInputError) as exc:
         raise HTTPException(400, str(exc))
     return _research_settings(db, request)
+
+
+# --- Saved questions and a case's own research mode --------------------------------------------------------------
+
+def _case_research(db: Session, investigation_id: str) -> dict[str, Any]:
+    mode, reason = saved_questions.case_research_mode(db, investigation_id)
+    own = preferences._get(db, "case", investigation_id, "research") is not None
+    return {"investigation_id": investigation_id, "mode": mode, "own": own, "reason": reason,
+            "default": preferences.research_mode(db), "ai_enabled": bool(ai_reasoning_status(settings).get("enabled")),
+            "questions": [saved_questions.serialize(q) for q in saved_questions.listing(db, investigation_id)]}
+
+
+@router.get("/investigations/{investigation_id}/research", response_model=CaseResearchOut)
+def get_case_research(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return _case_research(db, investigation_id)
+
+
+@router.put("/investigations/{investigation_id}/research", response_model=CaseResearchOut)
+def put_case_research(investigation_id: str, body: CaseResearchPut, request: Request, db: Session = Depends(get_db)) -> Any:
+    require_scope_investigation_admin(scope_for_request(request), investigation_id)
+    try:
+        saved_questions.save_case_research_mode(db, investigation_id, body.mode, body.reason)
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return _case_research(db, investigation_id)
+
+
+@router.post("/investigations/{investigation_id}/saved-questions", response_model=SavedQuestionOut)
+def save_question(investigation_id: str, body: SavedQuestionCreate, request: Request, db: Session = Depends(get_db)) -> Any:
+    try:
+        row = saved_questions.create(db, investigation_id, module=body.module, question=body.question,
+                                     working_theory=body.working_theory, created_by=_person(request))
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return saved_questions.serialize(row)
+
+
+def _saved(db: Session, saved_question_id: str) -> SavedQuestion:
+    row = db.get(SavedQuestion, saved_question_id)
+    if row is None:
+        raise HTTPException(404, "Saved question not found")
+    return row
+
+
+@router.delete("/saved-questions/{saved_question_id}", status_code=204)
+def delete_saved_question(saved_question_id: str, db: Session = Depends(get_db)) -> None:
+    db.delete(_saved(db, saved_question_id))
+    db.commit()
+
+
+@router.post("/saved-questions/{saved_question_id}/run", response_model=SavedQuestionOut)
+def run_saved_question(saved_question_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    from app.ai.reasoning import ReasoningInputError as _Refused
+
+    row = _saved(db, saved_question_id)
+    if not settings.enable_ai_features or not (settings.ai_provider or "").strip():
+        raise HTTPException(400, "No model is set up on this deployment")
+    try:
+        saved_questions.queue_run(db, row, actor_id=_person(request))
+    except _Refused as exc:
+        raise HTTPException(400, str(exc))
+    db.refresh(row)
+    return saved_questions.serialize(row)
+
+
+
+@router.post("/settings/connectors/{provider}/check", response_model=KeyCheckOut, responses=upstream("The source", 502))
+def check_connector_key(provider: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Ask the source whether it accepts its key, sending no search (Settings › Connector keys, "Check the key")."""
+    require_scope_global_admin(scope_for_request(request))
+    try:
+        return {"provider": provider, **source_freshness.check_key(db, provider)}
+    except LookupError as exc:
+        raise HTTPException(404, str(exc))

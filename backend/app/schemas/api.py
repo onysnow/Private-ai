@@ -750,6 +750,7 @@ class NotificationPrefsPut(BaseModel):
     routes: dict[str, NotificationRoute] = Field(default_factory=dict, description="Where each kind goes; kinds left out keep their route.")
     quiet_while_reading: bool = True
     desktop: bool = False
+    backup_days: Literal[7, 14, 30, 0] | None = Field(default=None, description="Mention a changed case not backed up for this many days (0: never).")
 
 
 class LookupDefaultsPut(BaseModel):
@@ -762,7 +763,7 @@ class CaseLookupsPut(BaseModel):
 
 
 class ResearchSettingsPut(BaseModel):
-    mode: Literal["off", "ask"] | None = Field(default=None, description="What the AI may start on its own.")
+    mode: Literal["off", "ask", "automatic"] | None = Field(default=None, description="What the AI may start on its own, for cases that have not chosen.")
     flags: dict[str, Any] | None = Field(default=None, description="Run defaults for new cases: the suite's flags.")
     options: dict[str, Any] | None = Field(default=None, description="Run defaults for new cases: the run options.")
     reason: str | None = Field(default=None, max_length=300, description="Needed when the run defaults change.")
@@ -771,3 +772,35 @@ class ResearchSettingsPut(BaseModel):
 class FactWatchCreate(BaseModel):
     record_type: Literal["claim", "red_flag"]
     record_id: str = Field(min_length=1, max_length=64)
+
+
+class SavedQuestionCreate(BaseModel):
+    module: Literal["case_synthesis", "hypothesis_test"]
+    question: str = Field(min_length=1, max_length=4000)
+    working_theory: str | None = Field(default=None, max_length=2000)
+
+
+class CaseResearchPut(BaseModel):
+    mode: Literal["off", "ask", "automatic"] | None = Field(description="This case's own research mode, or null to follow the default.")
+    reason: str | None = Field(default=None, max_length=300, description="One line on why, needed with a mode.")
+
+
+class NotificationChannelPut(BaseModel):
+    mode: Literal["off", "interrupts", "daily"]
+    address: str | None = Field(default=None, max_length=320, description="Email: your own address.")
+    url: str | None = Field(default=None, max_length=1000, description="Phone: your ntfy address (ntfys://host/topic).")
+
+
+class PushSubscriptionKeys(BaseModel):
+    p256dh: str = Field(min_length=1, max_length=255)
+    auth: str = Field(min_length=1, max_length=255)
+
+
+class PushSubscriptionIn(BaseModel):
+    endpoint: str = Field(min_length=8, max_length=2000)
+    keys: PushSubscriptionKeys
+    label: str | None = Field(default=None, max_length=255)
+
+
+class PushSubscriptionRemove(BaseModel):
+    endpoint: str = Field(min_length=8, max_length=2000)

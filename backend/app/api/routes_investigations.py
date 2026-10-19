@@ -44,7 +44,7 @@ from app.schemas.api import (
 )
 from app.services.assistant_context import build_question_context
 from app.services.run_plan import build_run_plan, get_profile as get_run_profile, save_profile as save_run_profile
-from app.services.exports import build_investigation_export
+from app.services.exports import build_investigation_export, mark_backed_up
 from app.services.investigations import (
     create_investigation as _create_investigation,
     lead_queue as _lead_queue,
@@ -384,6 +384,9 @@ def export_investigation(
         payload, manifest = build_investigation_export(db, investigation_id, include_documents=include_documents)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
+    # A full backup (with its documents) is what the backup reminder counts (the inbox's "backup" kind).
+    if include_documents:
+        mark_backed_up(db, investigation_id)
     inv = manifest["investigation"]
     safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in inv["name"]).strip("_") or "investigation"
     filename = f"{safe_name}.jwbackup.zip"

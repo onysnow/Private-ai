@@ -3,7 +3,8 @@
 // whether its key works (from its last lookup: accepted, or refused with a 401/403), where
 // the key goes, what it unlocks, when it was last used and by how many cases; paste a key
 // (checked as you type: one line, no spaces), replace it or remove it. A saved key is never
-// shown again. Changing a key is allowed from this computer only (the server checks).
+// shown again. Changing a key is allowed from this computer only (the server checks). Check the
+// key asks the source whether it accepts it, through an endpoint that takes no search.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
@@ -14,7 +15,7 @@ import {errorMessage} from '../../lib/api-client';
 import {apiTime} from '../../lib/timestamps';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {
-  deleteConnectorCredentialMutation, getLookupSettingsOptions, getLookupSettingsQueryKey, saveConnectorCredentialMutation, settingsStatusQueryKey,
+  checkConnectorKeyMutation, deleteConnectorCredentialMutation, getLookupSettingsOptions, getLookupSettingsQueryKey, saveConnectorCredentialMutation, settingsStatusQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {LookupSourceOut} from '../../lib/generated/types.gen';
 
@@ -29,9 +30,16 @@ export const keySchema = z.object({
 });
 type KeyIn = z.infer<typeof keySchema>;
 
-/** Works, refused, not tried yet, or no key: from the source's last lookup. */
+/** Works, refused, not tried yet, or no key: from the newer of the source's last lookup and its last key check. */
 function state(s: LookupSourceOut): {cls: string; words: string; line: string} {
   if (!s.key_saved) return {cls: 'none', words: 'no key', line: 'Without one: only what the source gives without a key, if anything.'};
+  const check = s.key_check;
+  if (check && check.state !== 'not_supported' && check.state !== 'no_key' && (!s.last || apiTime(check.at) >= apiTime(s.last.at))) {
+    const credits = check.credits != null ? ` ${check.credits.toLocaleString()} credits left.` : '';
+    if (check.state === 'works') return {cls: 'ok', words: '✓ works', line: `Checked ${when(check.at)}: the source accepts it.${credits}`};
+    if (check.state === 'refused') return {cls: 'bad', words: '! refused', line: `Checked ${when(check.at)}: the source refused this key. Lookups to it fail until the key is replaced.`};
+    return {cls: 'saved', words: 'unknown', line: `Checked ${when(check.at)}: ${check.detail}`};
+  }
   if (s.last?.status === 'refused') return {cls: 'bad', words: '! refused', line: `The source refused this key on ${when(s.last.at)}. Lookups to it fail until the key is replaced.`};
   if (s.last?.status === 'completed') return {cls: 'ok', words: '✓ works', line: `Last accepted ${when(s.last.at)}.`};
   return {cls: 'saved', words: 'saved', line: 'Not used yet: the first lookup shows whether the source accepts it.'};
@@ -41,6 +49,7 @@ function KeyCard({s, onChanged}: {s: LookupSourceOut; onChanged: () => void}): R
   const [open, setOpen] = useState(!s.key_saved);
   const [removing, setRemoving] = useState(false);
   const save = useMutation(saveConnectorCredentialMutation());
+  const check = useMutation({...checkConnectorKeyMutation(), onSuccess: onChanged});
   const remove = useMutation({...deleteConnectorCredentialMutation(), onSuccess: () => { setRemoving(false); setOpen(true); onChanged(); }});
   const form = useZodForm<KeyIn>(keySchema, {defaultValues: {credential: ''}, mode: 'onChange'});
   const onSubmit = submitWith(form, async v => {
@@ -75,12 +84,15 @@ function KeyCard({s, onChanged}: {s: LookupSourceOut; onChanged: () => void}): R
       </form>
     </Form> : <div className="st-acts">
       <button type="button" className={`ap-btn${st.cls === 'bad' ? ' p' : ''}`} onClick={() => setOpen(true)}>Replace</button>
+      <button type="button" className="ap-btn" disabled={check.isPending} title="Asks the source whether it accepts the key. No search is sent, and no name."
+        onClick={() => check.mutate({path: {provider: s.key}})}>{check.isPending ? 'Checking…' : 'Check the key'}</button>
       {removing ? <>
         <span className="st-hint">Remove the {s.label} key?</span>
         <button type="button" className="ap-btn" disabled={remove.isPending} onClick={() => remove.mutate({path: {provider: s.key}})}>Remove it</button>
         <button type="button" className="ap-btn" onClick={() => setRemoving(false)}>Keep it</button>
       </> : <button type="button" className="ap-btn" onClick={() => setRemoving(true)}>Remove</button>}
     </div>}
+    {check.isError && <p className="st-problem" role="alert">{errorMessage(check.error, 'Could not check the key.')}</p>}
     {remove.isError && <p className="st-problem" role="alert">{errorMessage(remove.error, 'Could not remove the key.')}</p>}
   </section>;
 }

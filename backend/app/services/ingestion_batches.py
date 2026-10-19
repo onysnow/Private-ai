@@ -25,6 +25,7 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.core.time import utcnow_naive
 from app.jobs.records import serialize_job
 from app.models.domain import BackgroundJob, Document, IngestionBatch, IngestionBatchItem, Investigation
 from app.services.documents import serialize_document
@@ -61,8 +62,60 @@ def record_item(db: Session, batch: IngestionBatch, *, filename: str, outcome: s
     item = IngestionBatchItem(batch_id=batch.id, position=position, filename=filename[:512], outcome=outcome,
                               document_id=document_id, error=error)
     db.add(item)
+    # A file added after the batch looked finished (the first read ended before the next upload) reopens it.
+    if outcome == "saved" and batch.finished_at is not None:
+        batch.finished_at = None
     db.commit()
     return item
+
+
+DONE = ("succeeded", "failed", "cancelled")
+
+
+def _root_of(db: Session, document_id: str) -> str:
+    seen: set[str] = set()
+    current = document_id
+    while current not in seen:
+        seen.add(current)
+        parent = db.scalar(select(Document.parent_document_id).where(Document.id == current))
+        if not parent:
+            return current
+        current = str(parent)
+    return current
+
+
+def after_read(db: Session, document_id: str) -> list[IngestionBatch]:
+    """A document's read ended: each open batch it belongs to whose every file (and every file found inside them)
+    has finished reading is marked finished, and what follows a finished import runs (saved questions, part 4 of
+    docs/project-notes/PLATFORM_NEEDS_PLAN.md). Returns the batches it finished."""
+    root = _root_of(db, document_id)
+    batches = list(db.scalars(select(IngestionBatch).join(IngestionBatchItem, IngestionBatchItem.batch_id == IngestionBatch.id)
+                              .where(IngestionBatchItem.document_id == root, IngestionBatchItem.outcome == "saved",
+                                     IngestionBatch.finished_at.is_(None)).distinct()))
+    finished: list[IngestionBatch] = []
+    for batch in batches:
+        saved = [str(d) for d in db.scalars(select(IngestionBatchItem.document_id).where(
+            IngestionBatchItem.batch_id == batch.id, IngestionBatchItem.outcome == "saved", IngestionBatchItem.document_id.is_not(None)))]
+        order = _review_order(db, batch.investigation_id, saved)
+        jobs = _latest_jobs(db, order)
+        if all(doc in jobs and jobs[doc].status in DONE for doc in saved) and all(j.status in DONE for j in jobs.values()):
+            batch.finished_at = utcnow_naive()
+            db.commit()
+            finished.append(batch)
+    for batch in finished:
+        from app.services.saved_questions import on_import_finished
+
+        on_import_finished(db, batch)
+    return finished
+
+
+def batch_summary(db: Session, batch: IngestionBatch) -> dict[str, int]:
+    """How a finished batch went: files read, files that need someone (a read that failed or was stopped)."""
+    saved = [str(d) for d in db.scalars(select(IngestionBatchItem.document_id).where(
+        IngestionBatchItem.batch_id == batch.id, IngestionBatchItem.outcome == "saved", IngestionBatchItem.document_id.is_not(None)))]
+    jobs = _latest_jobs(db, saved)
+    problems = sum(1 for doc in saved if doc in jobs and jobs[doc].status != "succeeded")
+    return {"files": len(saved), "problems": problems}
 
 
 def find_duplicate(db: Session, investigation_id: str, digest: str) -> Document | None:

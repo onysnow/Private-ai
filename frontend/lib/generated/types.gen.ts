@@ -1994,6 +1994,58 @@ export type CaseRecordOut = {
 };
 
 /**
+ * CaseResearchOut
+ */
+export type CaseResearchOut = {
+  /**
+   * Ai Enabled
+   */
+  ai_enabled: boolean;
+  /**
+   * Default
+   */
+  default: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Mode
+   */
+  mode: string;
+  /**
+   * Own
+   */
+  own: boolean;
+  /**
+   * Questions
+   */
+  questions: Array<SavedQuestionOut>;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+};
+
+/**
+ * CaseResearchPut
+ */
+export type CaseResearchPut = {
+  /**
+   * Mode
+   *
+   * This case's own research mode, or null to follow the default.
+   */
+  mode: 'off' | 'ask' | 'automatic' | null;
+  /**
+   * Reason
+   *
+   * One line on why, needed with a mode.
+   */
+  reason?: string | null;
+};
+
+/**
  * CaseSinceOut
  */
 export type CaseSinceOut = {
@@ -10623,6 +10675,34 @@ export type InvestigationUpdate = {
 };
 
 /**
+ * KeyCheckOut
+ *
+ * Whether a source accepts its key, learned without a search.
+ */
+export type KeyCheckOut = {
+  /**
+   * At
+   */
+  at: string;
+  /**
+   * Credits
+   */
+  credits?: number | null;
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * State
+   */
+  state: string;
+};
+
+/**
  * LeadClaimConversionOut
  */
 export type LeadClaimConversionOut = {
@@ -11293,7 +11373,7 @@ export type LookupSettingsOut = {
   /**
    * Week
    */
-  week: Array<ConnectorRunLineOut>;
+  week: Array<OutboundLineOut>;
 };
 
 /**
@@ -11316,6 +11396,7 @@ export type LookupSourceOut = {
    * Key
    */
   key: string;
+  key_check?: KeyCheckOut | null;
   /**
    * Key Saved
    */
@@ -12013,6 +12094,46 @@ export type NotesOut = {
 };
 
 /**
+ * NotificationChannelOut
+ */
+export type NotificationChannelOut = {
+  /**
+   * Address
+   */
+  address?: string | null;
+  /**
+   * Mode
+   */
+  mode: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
+ * NotificationChannelPut
+ */
+export type NotificationChannelPut = {
+  /**
+   * Address
+   *
+   * Email: your own address.
+   */
+  address?: string | null;
+  /**
+   * Mode
+   */
+  mode: 'off' | 'interrupts' | 'daily';
+  /**
+   * Url
+   *
+   * Phone: your ntfy address (ntfys://host/topic).
+   */
+  url?: string | null;
+};
+
+/**
  * NotificationKindOut
  */
 export type NotificationKindOut = {
@@ -12043,6 +12164,10 @@ export type NotificationKindOut = {
  */
 export type NotificationPrefsOut = {
   /**
+   * Backup Days
+   */
+  backup_days: number;
+  /**
    * Desktop
    */
   desktop: boolean;
@@ -12050,6 +12175,16 @@ export type NotificationPrefsOut = {
    * Kinds
    */
   kinds: Array<NotificationKindOut>;
+  /**
+   * Outside
+   */
+  outside: {
+    [key: string]: NotificationChannelOut;
+  };
+  /**
+   * Push Devices
+   */
+  push_devices: number;
   /**
    * Quiet While Reading
    */
@@ -12060,12 +12195,19 @@ export type NotificationPrefsOut = {
   routes: {
     [key: string]: string;
   };
+  server: NotificationServerOut;
 };
 
 /**
  * NotificationPrefsPut
  */
 export type NotificationPrefsPut = {
+  /**
+   * Backup Days
+   *
+   * Mention a changed case not backed up for this many days (0: never).
+   */
+  backup_days?: 7 | 14 | 30 | 0 | null;
   /**
    * Desktop
    */
@@ -12082,6 +12224,40 @@ export type NotificationPrefsPut = {
   routes?: {
     [key: string]: 'interrupt' | 'needs' | 'else' | 'off';
   };
+};
+
+/**
+ * NotificationServerOut
+ *
+ * What this server can send outside the app; never its mail account or keys.
+ */
+export type NotificationServerOut = {
+  /**
+   * Email
+   */
+  email: boolean;
+  /**
+   * Webpush
+   */
+  webpush: boolean;
+  /**
+   * Webpush Key
+   */
+  webpush_key?: string | null;
+};
+
+/**
+ * NotificationTestOut
+ */
+export type NotificationTestOut = {
+  /**
+   * Channel
+   */
+  channel: string;
+  /**
+   * Sent
+   */
+  sent: boolean;
 };
 
 /**
@@ -12647,6 +12823,52 @@ export type OrphanStoragePreviewOut = {
    * Unsafe Document References
    */
   unsafe_document_references: Array<UnsafeDocumentReferenceOut>;
+};
+
+/**
+ * OutboundLineOut
+ *
+ * One request that left this computer (app/services/outbound.py).
+ */
+export type OutboundLineOut = {
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * Case
+   */
+  case: string;
+  /**
+   * Destination
+   */
+  destination: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id?: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Outcome
+   */
+  outcome: string;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Service
+   */
+  service: string;
 };
 
 /**
@@ -13406,6 +13628,45 @@ export type ProviderLeadOut = {
    * Provider Resolved Entity Id
    */
   provider_resolved_entity_id: string | null;
+};
+
+/**
+ * PushSubscriptionIn
+ */
+export type PushSubscriptionIn = {
+  /**
+   * Endpoint
+   */
+  endpoint: string;
+  keys: PushSubscriptionKeys;
+  /**
+   * Label
+   */
+  label?: string | null;
+};
+
+/**
+ * PushSubscriptionKeys
+ */
+export type PushSubscriptionKeys = {
+  /**
+   * Auth
+   */
+  auth: string;
+  /**
+   * P256Dh
+   */
+  p256dh: string;
+};
+
+/**
+ * PushSubscriptionRemove
+ */
+export type PushSubscriptionRemove = {
+  /**
+   * Endpoint
+   */
+  endpoint: string;
 };
 
 /**
@@ -14506,9 +14767,9 @@ export type ResearchSettingsPut = {
   /**
    * Mode
    *
-   * What the AI may start on its own.
+   * What the AI may start on its own, for cases that have not chosen.
    */
-  mode?: 'off' | 'ask' | null;
+  mode?: 'off' | 'ask' | 'automatic' | null;
   /**
    * Options
    *
@@ -15276,6 +15537,68 @@ export type SameAnswerOut = {
    * Scope
    */
   scope: 'drop' | 'case';
+};
+
+/**
+ * SavedQuestionCreate
+ */
+export type SavedQuestionCreate = {
+  /**
+   * Module
+   */
+  module: 'case_synthesis' | 'hypothesis_test';
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
+};
+
+/**
+ * SavedQuestionOut
+ */
+export type SavedQuestionOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Last Run At
+   */
+  last_run_at?: string | null;
+  /**
+   * Last Run Id
+   */
+  last_run_id?: string | null;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
 };
 
 /**
@@ -26262,6 +26585,113 @@ export type ListReportingTasksResponses = {
 export type ListReportingTasksResponse =
   ListReportingTasksResponses[keyof ListReportingTasksResponses];
 
+export type GetCaseResearchData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/research';
+};
+
+export type GetCaseResearchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaseResearchError =
+  GetCaseResearchErrors[keyof GetCaseResearchErrors];
+
+export type GetCaseResearchResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseResearchOut;
+};
+
+export type GetCaseResearchResponse =
+  GetCaseResearchResponses[keyof GetCaseResearchResponses];
+
+export type PutCaseResearchData = {
+  body: CaseResearchPut;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/research';
+};
+
+export type PutCaseResearchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutCaseResearchError =
+  PutCaseResearchErrors[keyof PutCaseResearchErrors];
+
+export type PutCaseResearchResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseResearchOut;
+};
+
+export type PutCaseResearchResponse =
+  PutCaseResearchResponses[keyof PutCaseResearchResponses];
+
+export type SaveQuestionData = {
+  body: SavedQuestionCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/saved-questions';
+};
+
+export type SaveQuestionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SaveQuestionError = SaveQuestionErrors[keyof SaveQuestionErrors];
+
+export type SaveQuestionResponses = {
+  /**
+   * Successful Response
+   */
+  200: SavedQuestionOut;
+};
+
+export type SaveQuestionResponse =
+  SaveQuestionResponses[keyof SaveQuestionResponses];
+
 export type GetSinceData = {
   body?: never;
   path: {
@@ -28487,6 +28917,78 @@ export type UpdateReportingTaskEndpointResponses = {
 export type UpdateReportingTaskEndpointResponse =
   UpdateReportingTaskEndpointResponses[keyof UpdateReportingTaskEndpointResponses];
 
+export type DeleteSavedQuestionData = {
+  body?: never;
+  path: {
+    /**
+     * Saved Question Id
+     */
+    saved_question_id: string;
+  };
+  query?: never;
+  url: '/api/saved-questions/{saved_question_id}';
+};
+
+export type DeleteSavedQuestionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteSavedQuestionError =
+  DeleteSavedQuestionErrors[keyof DeleteSavedQuestionErrors];
+
+export type DeleteSavedQuestionResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteSavedQuestionResponse =
+  DeleteSavedQuestionResponses[keyof DeleteSavedQuestionResponses];
+
+export type RunSavedQuestionData = {
+  body?: never;
+  path: {
+    /**
+     * Saved Question Id
+     */
+    saved_question_id: string;
+  };
+  query?: never;
+  url: '/api/saved-questions/{saved_question_id}/run';
+};
+
+export type RunSavedQuestionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RunSavedQuestionError =
+  RunSavedQuestionErrors[keyof RunSavedQuestionErrors];
+
+export type RunSavedQuestionResponses = {
+  /**
+   * Successful Response
+   */
+  200: SavedQuestionOut;
+};
+
+export type RunSavedQuestionResponse =
+  RunSavedQuestionResponses[keyof RunSavedQuestionResponses];
+
 export type SearchWorkbenchData = {
   body?: never;
   path?: never;
@@ -28579,6 +29081,46 @@ export type SearchWorkbenchResponses = {
 
 export type SearchWorkbenchResponse =
   SearchWorkbenchResponses[keyof SearchWorkbenchResponses];
+
+export type CheckConnectorKeyData = {
+  body?: never;
+  path: {
+    /**
+     * Provider
+     */
+    provider: string;
+  };
+  query?: never;
+  url: '/api/settings/connectors/{provider}/check';
+};
+
+export type CheckConnectorKeyErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The source failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CheckConnectorKeyError =
+  CheckConnectorKeyErrors[keyof CheckConnectorKeyErrors];
+
+export type CheckConnectorKeyResponses = {
+  /**
+   * Successful Response
+   */
+  200: KeyCheckOut;
+};
+
+export type CheckConnectorKeyResponse =
+  CheckConnectorKeyResponses[keyof CheckConnectorKeyResponses];
 
 export type DeleteConnectorCredentialData = {
   body?: never;
@@ -28785,6 +29327,144 @@ export type PutNotificationPrefsResponses = {
 
 export type PutNotificationPrefsResponse =
   PutNotificationPrefsResponses[keyof PutNotificationPrefsResponses];
+
+export type PutNotificationChannelData = {
+  body: NotificationChannelPut;
+  path: {
+    /**
+     * Channel
+     */
+    channel: 'email' | 'phone' | 'webpush';
+  };
+  query?: never;
+  url: '/api/settings/notifications/channels/{channel}';
+};
+
+export type PutNotificationChannelErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutNotificationChannelError =
+  PutNotificationChannelErrors[keyof PutNotificationChannelErrors];
+
+export type PutNotificationChannelResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type PutNotificationChannelResponse =
+  PutNotificationChannelResponses[keyof PutNotificationChannelResponses];
+
+export type TestNotificationChannelData = {
+  body?: never;
+  path: {
+    /**
+     * Channel
+     */
+    channel: 'email' | 'phone' | 'webpush';
+  };
+  query?: never;
+  url: '/api/settings/notifications/channels/{channel}/test';
+};
+
+export type TestNotificationChannelErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The channel failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TestNotificationChannelError =
+  TestNotificationChannelErrors[keyof TestNotificationChannelErrors];
+
+export type TestNotificationChannelResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationTestOut;
+};
+
+export type TestNotificationChannelResponse =
+  TestNotificationChannelResponses[keyof TestNotificationChannelResponses];
+
+export type AddPushSubscriptionData = {
+  body: PushSubscriptionIn;
+  path?: never;
+  query?: never;
+  url: '/api/settings/push-subscriptions';
+};
+
+export type AddPushSubscriptionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddPushSubscriptionError =
+  AddPushSubscriptionErrors[keyof AddPushSubscriptionErrors];
+
+export type AddPushSubscriptionResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type AddPushSubscriptionResponse =
+  AddPushSubscriptionResponses[keyof AddPushSubscriptionResponses];
+
+export type RemovePushSubscriptionData = {
+  body: PushSubscriptionRemove;
+  path?: never;
+  query?: never;
+  url: '/api/settings/push-subscriptions/remove';
+};
+
+export type RemovePushSubscriptionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemovePushSubscriptionError =
+  RemovePushSubscriptionErrors[keyof RemovePushSubscriptionErrors];
+
+export type RemovePushSubscriptionResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type RemovePushSubscriptionResponse =
+  RemovePushSubscriptionResponses[keyof RemovePushSubscriptionResponses];
 
 export type GetResearchSettingsData = {
   body?: never;

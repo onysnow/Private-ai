@@ -222,6 +222,8 @@ _NOT_INVESTIGATION_RECORDS = {
     "indicator_id",
     # A small real demo case (routes_demo.py, app/services/demo_cases.py): one of three fixed names.
     "case_id",
+    # A way the app tells a person outside it (routes_preferences.py: email, phone, webpush): theirs, in no case.
+    "channel",
     # Records that live inside an investigation named in the same path, and are looked up through it:
     # a story section (stories.section_of), an AI run and a thought in it (routes_ai_runs._run_row, run_events),
     # a version of the story's write-up (routes_stories._version).

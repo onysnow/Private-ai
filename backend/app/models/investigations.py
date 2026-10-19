@@ -32,6 +32,8 @@ class Investigation(Base):
     # When the Red Flag rules last ran on this case: {"at", "digest" of the records they read, "cannot_run"}
     # (app/patterns/engine.py). Reading the flags never runs them; None until they first run.
     red_flag_run: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # When a backup of the case was last downloaded or made in the console (the inbox's backup reminder).
+    last_backup_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

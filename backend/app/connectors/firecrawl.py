@@ -1,6 +1,11 @@
 import httpx
 
-from app.connectors.base import Connector, ExternalFinding
+from app.connectors.base import (
+    Connector,
+    ExternalFinding,
+    KeyCheck,
+    key_check_from_status,
+)
 from app.core.config import settings
 
 
@@ -29,6 +34,23 @@ class FirecrawlConnector(Connector):
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
+
+    async def check_key(self) -> KeyCheck:
+        """GET /v2/team/credit-usage: needs the key (401 otherwise), costs no credits, says the credits left."""
+        if not self.api_key:
+            return KeyCheck("no_key", "No key saved: searches use the shared free limit.")
+        async with httpx.AsyncClient(timeout=20) as client:
+            resp = await client.get(f"{self.base_url}/v2/team/credit-usage", headers=self._headers())
+        if resp.status_code == 404:
+            return KeyCheck("works", "The source accepted the key (no credit balance on record).")
+        check = key_check_from_status(resp.status_code)
+        if check.state == "works":
+            data = (resp.json() or {}).get("data") or {}
+            remaining = data.get("remainingCredits") if isinstance(data, dict) else None
+            if isinstance(remaining, (int, float)):
+                check.credits = int(remaining)
+                check.detail = f"The source accepted the key. {int(remaining):,} credits left."
+        return check
 
     def _parse_result(self, item: dict) -> ExternalFinding:
         url = item.get("url") or ""

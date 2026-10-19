@@ -34,3 +34,7 @@ procrastinate==3.10.0
 # The self-hosted base map's tiles, read from its PMTiles file (app/services/basemap.py;
 # ADR-0005 line 18; BSD-3).
 pmtiles==3.8.1
+# Notifications outside the app (docs/project-notes/PLATFORM_NEEDS_PLAN.md, part 5): email and ntfy through
+# Apprise (BSD-2-Clause), Web Push with VAPID through pywebpush (MPL-2.0).
+apprise==2.0.1
+pywebpush==2.5.0

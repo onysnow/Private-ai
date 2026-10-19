@@ -390,3 +390,15 @@ html[data-motion='calm'] .wr-plan { animation: none; }
 .cr-detail .wr-refs li.out { border: 1px dashed var(--status-disputed); box-shadow: none; }
 .cr-keys { color: var(--text-muted); font-size: 11px; }
 .wr-drawer .cr-key { margin: 2px 0; }
+
+/* Ask the case › Saved questions (saved-questions.tsx): each with Ask it, Run now, Stop asking it; then the case's mode. */
+.br-saved { max-width: 760px; padding: 10px 14px; border-radius: 14px; background: var(--surface-1); display: grid; gap: 8px; }
+.br-saved ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.br-saved li { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, auto); gap: 0 8px; align-items: center; font-size: 13px; }
+.br-saved li span { grid-column: 1; min-width: 0; }
+.br-saved li em { color: var(--text-muted); font-style: normal; }
+.br-saved li small { grid-column: 1; grid-row: 2; color: var(--text-muted); font-size: 11.5px; }
+.br-saved li .br-quiet { grid-row: 1 / span 2; }
+.br-saved-mode { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.br-saved-mode small { flex: 1 1 260px; color: var(--text-muted); font-size: 12px; }
+@media (max-width: 560px) { .br-saved li { grid-template-columns: minmax(0, 1fr); } .br-saved li .br-quiet, .br-saved li small { grid-row: auto; grid-column: 1; justify-self: start; } }

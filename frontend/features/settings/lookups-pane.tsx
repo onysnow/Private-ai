@@ -2,7 +2,8 @@
 // Settings › Outside lookups (Settings panes mockup, board 2): one sentence, built from the
 // settings, saying what leaves this computer; each source with what it is sent and where,
 // its mode for new cases and for this case, its key and its last lookup; this case's own
-// choice (with the reason it was made), cases that differ, and every lookup this week.
+// choice (with the reason it was made), cases that differ, and everything sent outside this
+// week: lookups, AI runs, key and update checks, notices (app/services/outbound.py).
 // Off is enforced by the server (a lookup to that source is refused from any screen);
 // Automatic looks each new party up once, in the background (GET/PUT /settings/lookups).
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -28,6 +29,11 @@ const MODE_DOES: Record<Mode, string> = {
   ask: 'Looked up only when you ask, on a record or below. You see the words before they go.',
   off: 'Never asked. A lookup to it is refused, from any screen.',
 };
+// What each line of Sent this week was (app/services/outbound.py records every request that leaves the server).
+const KIND_WORDS: Record<string, string> = {
+  lookup: 'Lookup', ai: 'AI run', key_check: 'Key check', source_check: 'Source update check', mail: 'Email', push: 'Push notice', download: 'Download',
+};
+const OUTCOME_WORDS: Record<string, string> = {refused: ' · refused: the key was not accepted', failed: ' · did not answer'};
 const when = (iso: string): string => apiTime(iso).toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
 
 /** "Nothing leaves this computer except: …", from each source's mode in this case. */
@@ -147,11 +153,11 @@ export function LookupsPane({investigationId, caseName, providers}: {investigati
             </li>)}</ul>}
         </section>
         <section className="ap-pane" aria-labelledby="lk-week">
-          <div className="ap-pane-head"><h2 id="lk-week">Sent this week</h2><span>{d.week.length} lookup{d.week.length === 1 ? '' : 's'}</span></div>
+          <div className="ap-pane-head"><h2 id="lk-week">Sent this week</h2><span>{d.week.length} request{d.week.length === 1 ? '' : 's'} left this server</span></div>
           {!d.week.length ? <p className="st-hint">Nothing was sent outside this week.</p>
             : <ul className="st-list">{d.week.slice(0, 12).map(r => <li key={r.id} className="st-route">
-              <span className="st-route-what"><b className="st-mono">“{r.sent}”</b>
-                <small>{d.sources.find(s => s.key === r.provider)?.label ?? r.provider} · {r.case} · {when(r.at)}{r.status === 'refused' ? ' · refused' : r.status === 'failed' ? ' · no answer' : ` · ${r.results} found`}</small></span>
+              <span className="st-route-what"><b className={r.kind === 'lookup' ? 'st-mono' : ''}>{r.kind === 'lookup' ? `“${r.sent}”` : r.sent}</b>
+                <small>{KIND_WORDS[r.kind] ?? r.kind} · {d.sources.find(s => s.key === r.service)?.label ?? r.service} · {r.destination}{r.case ? ` · ${r.case}` : ''} · {when(r.at)}{OUTCOME_WORDS[r.outcome] ?? ''}</small></span>
             </li>)}</ul>}
         </section>
       </div>

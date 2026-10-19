@@ -197,7 +197,7 @@
 .st-input[aria-invalid='true'] { border-color: var(--status-disputed); }
 .st-mono { font-family: var(--font-mono); }
 .st-acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.st-big { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.st-big { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
 @media (max-width: 700px) { .st-big { grid-template-columns: 1fr; } }
 .st-big button { all: unset; cursor: pointer; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 14px; background: var(--surface-2); border: 1.5px solid var(--line); min-height: 44px; }
 .st-big button.on { border-color: var(--accent-1); box-shadow: 0 0 0 1px var(--accent-1); }
@@ -232,3 +232,9 @@
 @keyframes fr-alarm-rise { from { transform: translate(-50%, -12px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .fr-alarm { animation: none; } }
 html[data-motion='calm'] .fr-alarm { animation: none; }
+
+/* Settings › Notifications › Outside the app: one row per way out, its address beside its mode. */
+.st-channel { align-items: flex-start; }
+.st-channel .st-channel-input { flex: 1 1 240px; width: auto; }
+.st-channel > .st-hint, .st-channel > .st-problem { flex: 1 0 100%; margin: 0; }
+.st-channel > .st-link { margin-left: 0; }
