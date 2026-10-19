@@ -11,13 +11,14 @@ import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormRootError} from '../../components/ui/form';
 import {errorMessage} from '../../lib/api-client';
+import {apiTime} from '../../lib/timestamps';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {
   deleteConnectorCredentialMutation, getLookupSettingsOptions, getLookupSettingsQueryKey, saveConnectorCredentialMutation, settingsStatusQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {LookupSourceOut} from '../../lib/generated/types.gen';
 
-const when = (iso: string): string => new Date(iso.endsWith('Z') ? iso : `${iso}Z`).toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+const when = (iso: string): string => apiTime(iso).toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
 
 export const keySchema = z.object({
   credential: z.string()

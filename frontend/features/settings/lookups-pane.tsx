@@ -12,6 +12,7 @@ import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormRootError} from '../../components/ui/form';
 import {errorMessage} from '../../lib/api-client';
+import {apiTime} from '../../lib/timestamps';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {
   clearCaseLookupsMutation, getLookupSettingsOptions, getLookupSettingsQueryKey, putCaseLookupsMutation, putLookupDefaultsMutation,
@@ -27,7 +28,7 @@ const MODE_DOES: Record<Mode, string> = {
   ask: 'Looked up only when you ask, on a record or below. You see the words before they go.',
   off: 'Never asked. A lookup to it is refused, from any screen.',
 };
-const when = (iso: string): string => new Date(iso.endsWith('Z') ? iso : `${iso}Z`).toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+const when = (iso: string): string => apiTime(iso).toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
 
 /** "Nothing leaves this computer except: …", from each source's mode in this case. */
 export function whatLeaves(sources: LookupSourceOut[]): string {
