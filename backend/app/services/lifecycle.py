@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.db.session import Base
 from app.db.locking import lock_investigation_transaction
-from app.models.domain import Document, Investigation
+from app.models.domain import Document, Investigation, WebCapture
 from app.services.security import resolve_storage_root
 
 logger = logging.getLogger("journalism.lifecycle")
@@ -131,9 +131,16 @@ def preview_investigation_deletion(db: Session, investigation_id: str, storage_r
     shared = 0
     existing = 0
     missing = 0
-    for doc in documents:
+    # A captured web page keeps files of its own (its archive, screenshot and text copy; ADR-0016) beside the one
+    # a Document holds; they are listed here under "capture:<id>" and go with the case like any document file.
+    entries = [(doc.id, doc.storage_path) for doc in documents] + [
+        (f"capture:{cap.id}", f["path"])
+        for cap in db.scalars(select(WebCapture).where(WebCapture.investigation_id == investigation_id))
+        for f in (cap.files or []) if f.get("owned_by") == "capture"
+    ]
+    for entry_id, entry_path in entries:
         try:
-            path = _contained_existing_path(root, doc.storage_path)
+            path = _contained_existing_path(root, entry_path)
             rel = str(path.relative_to(root))
             is_shared = str(path) in all_other_paths
             exists = path.is_file()
@@ -144,15 +151,15 @@ def preview_investigation_deletion(db: Session, investigation_id: str, storage_r
             else:
                 missing += 1
             files.append({
-                "document_id": doc.id,
+                "document_id": entry_id,
                 "relative_path": rel,
                 "exists": exists,
                 "shared_with_other_investigation": is_shared,
                 "action": "preserve_shared" if is_shared else ("delete" if exists else "already_missing"),
             })
         except ValueError as exc:
-            logger.warning("Unsafe stored path for document %s: %s", doc.id, exc)
-            unsafe_paths.append({"document_id": doc.id, "storage_path": doc.storage_path, "error": UNSAFE_PATH})
+            logger.warning("Unsafe stored path for document %s: %s", entry_id, exc)
+            unsafe_paths.append({"document_id": entry_id, "storage_path": entry_path, "error": UNSAFE_PATH})
 
     return {
         "investigation_id": investigation_id,
@@ -283,6 +290,15 @@ def preview_orphan_document_files(db: Session, storage_root: str | Path) -> dict
         except ValueError as exc:
             logger.warning("Unsafe stored path for document %s: %s", document_id, exc)
             unsafe_references.append({"document_id": str(document_id), "storage_path": str(raw), "error": UNSAFE_PATH})
+    for capture_id, capture_files in db.execute(select(WebCapture.id, WebCapture.files)).all():
+        for f in capture_files or []:
+            if f.get("owned_by") != "capture":
+                continue
+            try:
+                referenced.add(str(_contained_existing_path(root, f["path"])))
+            except ValueError as exc:
+                logger.warning("Unsafe stored path for capture %s: %s", capture_id, exc)
+                unsafe_references.append({"document_id": f"capture:{capture_id}", "storage_path": str(f["path"]), "error": UNSAFE_PATH})
 
     ignored_top_level = {".delete-staging", ".restore-staging", ".upload-staging"}
     files: list[dict[str, Any]] = []

@@ -90,6 +90,7 @@ from app.models.writeups import (
     Writeup,
     WriteupVersion,
 )
+from app.models.captures import WebCapture
 from app.models.safety import (
     BackupEvent,
     OutboundRequest,
@@ -175,6 +176,7 @@ __all__ = [
     "AIRunEvent",
     "OutboundRequest",
     "BackupEvent",
+    "WebCapture",
     "Writeup",
     "WriteupVersion",
     "Story",

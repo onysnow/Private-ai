@@ -57,6 +57,17 @@ class Settings(BaseSettings):
     firecrawl_api_key: str = ""
     firecrawl_search_limit: int = 20
     document_storage_dir: str = "./data/documents"
+    # Web captures (ADR-0016): a pasted link is fetched from this computer, without cookies or a login. The
+    # address of a private network, this computer or a link-local range is refused unless allowed here.
+    capture_max_bytes: int = 25 * 1024 * 1024
+    capture_timeout_seconds: float = 20.0
+    capture_allow_private_hosts: bool = False
+    # auto = also load the page in Chromium (Playwright) for a screenshot and the page as a browser renders it,
+    # when it is installed; off = fetch the page only.
+    capture_browser: str = "auto"
+    capture_browser_timeout_seconds: float = 45.0
+    # The Chromium or Chrome program to use, when Playwright's own download is not the one installed.
+    capture_browser_path: str = ""
     connector_credentials_file: str = "./data/secrets/connectors.json"
     max_document_bytes: int = 50 * 1024 * 1024
     enable_pdf_ocr: bool = True

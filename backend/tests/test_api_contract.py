@@ -264,6 +264,34 @@ def _email_document(document_id: str) -> str:
         return email.id
 
 
+def _web_capture(investigation_id: str, document_id: str) -> str:
+    """A saved web capture as the capture service stores one (app/services/web_capture.py), written directly: the
+    test opens no network connection, so a link cannot be fetched here."""
+    import tempfile
+    from pathlib import Path
+
+    from app.db.session import SessionLocal
+    from app.models.domain import Document, WebCapture
+    from app.services.documents import sha256_bytes
+
+    text = b"Kestrel SA paid 4.2 million euros for the freehold."
+    path = Path(tempfile.mkdtemp(prefix="capture-seed-")) / "text.txt"
+    path.write_bytes(text)
+    with SessionLocal() as db:
+        doc = db.get(Document, document_id)
+        assert doc is not None
+        row = WebCapture(
+            investigation_id=investigation_id, source_id=doc.source_id, document_id=doc.id, url="https://news.example/harbour",
+            final_url="https://news.example/harbour", outcome="saved", title="Harbour parcel sold", collector={"tool": "httpx"},
+            steps=[{"key": "page", "label": "Page fetched", "state": "done", "seconds": 0.1, "detail": "200 OK"}],
+            files=[{"name": "text.txt", "role": "text", "note": "the working copy", "size": len(text), "sha256": sha256_bytes(text),
+                    "path": str(path), "owned_by": "capture"}],
+            page_sha256=doc.sha256, text_sha256=sha256_bytes(text), checks=[])
+        db.add(row)
+        db.commit()
+        return row.id
+
+
 def _cross_reference(investigation_id: str, entity_id: str) -> str:
     """An OpenAleph cross-reference as the corpus job stores one
     (app/services/cross_references.py import_cross_references); the demo
@@ -449,6 +477,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "job_id": document["job"]["id"], "finding_id": company["id"], "session_id": session["id"], "assessment_id": assessment["id"],
             "review_id": review["id"], "writeup_id": writeup["id"], "deck_id": deck["id"], "prop": "jurisdiction", "provider": "fake-a",
             "task_id": task, "cross_reference_id": _cross_reference(inv, meridian), "batch_id": batch["id"],
+            "capture_id": _web_capture(inv, document["id"]),
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
@@ -459,6 +488,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
         per_operation={
             ("GET", "/api/ai-analysis-candidates/{candidate_id}"): {"candidate_id": ai_candidate},
             ("GET", "/api/basemap/sprites/{name}"): {"name": "grayscale.json"},
+            ("GET", "/api/investigations/{investigation_id}/captures/{capture_id}/files/{name}"): {"name": "text.txt"},
             **{(method, path): {"candidate_id": ai_candidate} for method, path in (
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-deck"),
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup"),

@@ -28,7 +28,7 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, OutboundRequest,
+    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, OutboundRequest, WebCapture,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -45,7 +45,7 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, OutboundRequest,
+        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, OutboundRequest, WebCapture,
     ]
 }
 
@@ -95,6 +95,8 @@ RESTORE_ORDER = [
     "ai_run_events",
     # What left this computer, word for word (ADR-0015): part of the chain of custody, so it travels with the case.
     "outbound_requests",
+    # A captured web page (ADR-0016): its record after the document and source it points at; its files travel too.
+    "web_captures",
 ]
 
 
@@ -162,7 +164,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion, OutboundRequest,
+        Story, AIRunEvent, WriteupVersion, OutboundRequest, WebCapture,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -213,6 +215,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
         "ai_run_events": direct["ai_run_events"],
         "outbound_requests": direct["outbound_requests"],
+        "web_captures": direct["web_captures"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -375,6 +378,7 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
 
     missing_documents = []
     document_entries = []
+    capture_entries: list[dict[str, Any]] = []
     if include_documents:
         for doc in records["documents"]:
             raw_path = Path(doc.get("storage_path") or "")
@@ -385,6 +389,20 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
                 document_entries.append({"document_id": doc["id"], "archive_path": ext_name, "sha256": hashlib.sha256(raw).hexdigest()})
             else:
                 missing_documents.append({"document_id": doc["id"], "storage_path": doc.get("storage_path")})
+        # A captured web page's own files (archive, screenshot, text copy; ADR-0016), beside the document's.
+        for cap in records["web_captures"]:
+            for f in cap.get("files") or []:
+                if f.get("owned_by") != "capture":
+                    continue
+                cap_path = Path(f["path"])
+                if cap_path.is_file():
+                    raw = cap_path.read_bytes()
+                    ext_name = f"captures/{cap['id']}/{_safe_name(f['name'])}"
+                    file_payloads[ext_name] = raw
+                    capture_entries.append({"capture_id": cap["id"], "name": f["name"], "archive_path": ext_name,
+                                            "sha256": hashlib.sha256(raw).hexdigest()})
+                else:
+                    missing_documents.append({"document_id": f"capture:{cap['id']}", "storage_path": f["path"]})
 
     manifest: dict[str, Any] = {
         "format": EXPORT_FORMAT,
@@ -394,6 +412,7 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
         "record_counts": {k: len(v) for k, v in records.items()},
         "documents_included": include_documents,
         "document_files": document_entries,
+        "capture_files": capture_entries,
         "missing_document_files": missing_documents,
         "lineage_integrity": _require_lineage_integrity(records),
         "checksums": {},
@@ -536,6 +555,16 @@ def preview_investigation_restore(
                 "message": f"Document destination already exists: {dest}",
             })
 
+    for entry in manifest.get("capture_files", []):
+        dest = contained_path(storage_root, investigation_id, "captures", str(entry["capture_id"]), Path(str(entry["archive_path"])).name)
+        if dest.exists():
+            conflicts.append({
+                "kind": "document_path",
+                "table": "web_captures",
+                "id": str(entry["capture_id"]),
+                "message": f"Capture file destination already exists: {dest}",
+            })
+
     # build_investigation_export lists the files it could not include as
     # "missing_document_files"; this read "missing_documents", which no backup
     # has, so the preview always said none were missing.
@@ -627,6 +656,21 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 staged.write_bytes(raw)
                 staged_files.append((staged, dest))
                 raw_locations[doc_id] = str(dest)
+            capture_locations: dict[tuple[str, str], str] = {}
+            for entry in manifest.get("capture_files", []):
+                capture_id = entry["capture_id"]
+                filename = Path(entry["archive_path"]).name
+                dest = contained_path(document_storage_dir, investigation_id, "captures", capture_id, filename)
+                if dest.exists():
+                    raise ValueError(f"Restore destination appeared after preview: {dest}")
+                raw = zf.read(entry["archive_path"])
+                if hashlib.sha256(raw).hexdigest() != entry["sha256"]:
+                    raise ValueError(f"Capture file checksum mismatch: {capture_id}")
+                staged = contained_path(stage_root, "captures", capture_id, filename)
+                staged.parent.mkdir(parents=True, exist_ok=True)
+                staged.write_bytes(raw)
+                staged_files.append((staged, dest))
+                capture_locations[(capture_id, entry["name"])] = str(dest)
 
         restored_counts: dict[str, int] = {}
         try:
@@ -641,6 +685,12 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                     row = dict(raw_row)
                     if table == "documents" and row["id"] in raw_locations:
                         row["storage_path"] = raw_locations[row["id"]]
+                    if table == "web_captures":
+                        row["files"] = [
+                            {**f, "path": (capture_locations.get((row["id"], f["name"]), f["path"]) if f.get("owned_by") == "capture"
+                                           else raw_locations.get(str(row.get("document_id")), f["path"]))}
+                            for f in row.get("files") or []
+                        ]
                     db.add(model(**_coerce_datetimes(model, row)))
                 if rows:
                     db.flush()

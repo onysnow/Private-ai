@@ -738,3 +738,7 @@ class StoryReady(BaseModel):
 
 class WriteupVersionCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200, description='A name for the write-up as it stands ("Before legal read").')
+
+
+class CaptureCreate(BaseModel):
+    url: str = Field(max_length=4096, description="The web address to capture. Captures never log in, and refuse a private network.")

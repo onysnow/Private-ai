@@ -5310,3 +5310,74 @@ class SafetyAndDataOut(ResponseModel):
     services: list[SafetyServiceOut]
     cards: SafetyCardsOut
     not_counted: list[str]
+
+
+# --- Bring in › Links & captures (mockup INTAKE_3, ADR-0016) ---
+
+class CaptureStepOut(ResponseModel):
+    """One stage of the capture lane as it ran: done, skipped (with why) or failed, and how long it took."""
+    key: str
+    label: str
+    state: str  # done | skipped | failed
+    seconds: float
+    detail: str
+
+
+class CaptureFileOut(ResponseModel):
+    """A file kept for a capture, with its SHA-256. `role`: page | rendered | archive | screenshot | text."""
+    name: str
+    role: str
+    note: str
+    size: int
+    sha256: str
+
+
+class CaptureCheckOut(ResponseModel):
+    """One re-check of a saved capture: `state` is same | changed | gone | unreachable | not_seen. For changed and
+    gone, `capture_id` is the capture that kept what was found."""
+    at: str
+    state: str
+    capture_id: str | None = None
+
+
+class CaptureOut(ResponseModel):
+    """A web page captured from a link. `outcome`: saved | link_only | not_seen | failed. `displayed` is what the page
+    SAYS about itself (title, byline, date) and is never verified. `change` is the newest re-check's state."""
+    id: str
+    investigation_id: str
+    source_id: str | None = None
+    document_id: str | None = None
+    supersedes_id: str | None = None
+    url: str
+    final_url: str | None = None
+    outcome: str
+    reason: str | None = None
+    title: str | None = None
+    started_at: Timestamp
+    ended_at: Timestamp | None = None
+    collector: dict[str, Any]
+    request: dict[str, Any] | None = None
+    response: dict[str, Any] | None = None
+    steps: list[CaptureStepOut]
+    files: list[CaptureFileOut]
+    page_sha256: str | None = None
+    text_sha256: str | None = None
+    displayed: dict[str, Any] | None = None
+    checks: list[CaptureCheckOut]
+    change: str | None = None
+    has_screenshot: bool = False
+    created_at: Timestamp
+
+
+class CapturesOut(ResponseModel):
+    captures: list[CaptureOut]
+
+
+class CaptureResultOut(ResponseModel):
+    """What a capture or a re-check came to. `state`: new | already_in_case | same | changed | gone | unreachable |
+    not_seen. `job` follows the page's reading, like an upload's."""
+    capture: CaptureOut
+    state: str
+    already_in_case: bool
+    document_id: str | None = None
+    job: BackgroundJobOut | None = None
