@@ -4295,6 +4295,12 @@ export const zInvestigationOut = z.object({
   description: z.string().nullish(),
   id: z.string(),
   is_demo: z.boolean(),
+  last_backup_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   name: z.string(),
   question: z.string().nullish(),
   type_areas: z.array(z.string()).nullish(),

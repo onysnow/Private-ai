@@ -1876,6 +1876,8 @@ class InvestigationOut(ResponseModel):
     # This case's default AI run settings (null until the reporter saves them).
     ai_run_profile: dict | None = None
     created_at: Timestamp
+    # When the case last had a full backup (with its files); null until then. The backup reminder reads it.
+    last_backup_at: Timestamp | None = None
 
 
 class EntityOut(ResponseModel):

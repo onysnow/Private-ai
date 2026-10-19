@@ -10586,6 +10586,10 @@ export type InvestigationOut = {
    */
   is_demo: boolean;
   /**
+   * Last Backup At
+   */
+  last_backup_at?: string | null;
+  /**
    * Name
    */
   name: string;

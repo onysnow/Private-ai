@@ -225,6 +225,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "case_records": direct["case_records"],
         "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
         "ai_run_events": direct["ai_run_events"],
+        "saved_questions": direct["saved_questions"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
