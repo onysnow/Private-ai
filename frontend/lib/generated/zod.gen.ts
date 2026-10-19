@@ -147,6 +147,7 @@ export const zAiLimitsOut = z.object({
 export const zAiModuleStatusOut = z.object({
   available: z.boolean(),
   spec_file: z.string(),
+  system: z.string().nullish(),
   vendored_tas: z.boolean(),
 });
 
@@ -6129,10 +6130,23 @@ export const zRunPlanRecordOut = z.object({
  * What a run would do, before it runs (mockup AI_2).
  */
 export const zRunPlanRequest = z.object({
+  handoff_from: z.string().max(64).nullish(),
   include_external_leads: z.boolean().optional().default(true),
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   module: z
-    .enum(['case_synthesis', 'hypothesis_test'])
+    .union([
+      z.enum(['case_synthesis', 'hypothesis_test']),
+      z.enum([
+        'research_vetting',
+        'quant_framing',
+        'las_argument_check',
+        'das_framing',
+        'das_options',
+        'evidence_plan',
+        'ehs_harm_minimisation',
+        'ehs_public_interest',
+      ]),
+    ])
     .optional()
     .default('case_synthesis'),
   options: zRunOptionsIn.nullish(),
@@ -7097,6 +7111,34 @@ export const zSuiteRequirementOut = z.object({
   suite_term: z.string(),
   what: z.string(),
   why: z.string(),
+});
+
+/**
+ * SuiteRunRequest
+ *
+ * One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an
+ * answer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.
+ * `context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and
+ * access limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given
+ * by the logic check only.
+ */
+export const zSuiteRunRequest = z.object({
+  context: z.string().max(4000).nullish(),
+  handoff_from: z.string().max(64).nullish(),
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.number().int().gte(1).lte(100).optional().default(30),
+  module: z.enum([
+    'research_vetting',
+    'quant_framing',
+    'las_argument_check',
+    'das_framing',
+    'das_options',
+    'evidence_plan',
+    'ehs_harm_minimisation',
+    'ehs_public_interest',
+  ]),
+  premises: z.array(z.string()).max(10).nullish(),
+  question: z.string().min(1).max(4000),
 });
 
 /**
@@ -10118,6 +10160,17 @@ export const zSaveInvestigationRunProfilePath = z.object({
  * Successful Response
  */
 export const zSaveInvestigationRunProfileResponse = zRunProfileOut;
+
+export const zInvestigationSuiteRunBody = zSuiteRunRequest;
+
+export const zInvestigationSuiteRunPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationSuiteRunResponse = zAiReasoningRunOut;
 
 export const zListCaseRecordsPath = z.object({
   investigation_id: z.string(),

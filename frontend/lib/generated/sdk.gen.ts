@@ -477,6 +477,9 @@ import type {
   InvestigationRunProfileData,
   InvestigationRunProfileErrors,
   InvestigationRunProfileResponses,
+  InvestigationSuiteRunData,
+  InvestigationSuiteRunErrors,
+  InvestigationSuiteRunResponses,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogErrors,
   InvestigationVisualCatalogResponses,
@@ -1207,6 +1210,9 @@ import {
   zInvestigationRunPlanResponse,
   zInvestigationRunProfilePath,
   zInvestigationRunProfileResponse,
+  zInvestigationSuiteRunBody,
+  zInvestigationSuiteRunPath,
+  zInvestigationSuiteRunResponse,
   zInvestigationVisualCatalogPath,
   zInvestigationVisualCatalogResponse,
   zInvestigationVisualPreviewBody,
@@ -5810,6 +5816,45 @@ export const saveInvestigationRunProfile = <
     responseValidator: async (data) =>
       await zSaveInvestigationRunProfileResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/profile',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Investigation Suite Run
+ *
+ * A run of another system of the Authority System Suite -- RAS, QAS, LAS, DAS, EGS or EHS
+ * (app/ai/systems.py) -- through the same citation-validated pipeline as the TAS endpoints, with the same
+ * guarantee: the answer is a proposal and writes nothing else. A run may start from an answer you accepted
+ * (`handoff_from`); what crosses is decided by the suite's INTEROP rules (app/ai/interop.py) and every value held
+ * back is listed in the run record.
+ */
+export const investigationSuiteRun = <ThrowOnError extends boolean = false>(
+  options: Options<InvestigationSuiteRunData, ThrowOnError>,
+): RequestResult<
+  InvestigationSuiteRunResponses,
+  InvestigationSuiteRunErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    InvestigationSuiteRunResponses,
+    InvestigationSuiteRunErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zInvestigationSuiteRunBody,
+          path: zInvestigationSuiteRunPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationSuiteRunResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/assistant/suite-run',
     ...options,
     headers: {
       'Content-Type': 'application/json',

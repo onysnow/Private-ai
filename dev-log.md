@@ -2611,3 +2611,23 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
 - Suite coverage (same day): app/ai/suite_map.json maps 78 app values to suite terms (an agent read the suite;
   every term string was then checked present in the vendored file). Adding a value to any of the vocabularies in
   suite_map.app_vocabularies() without mapping it fails tests/test_suite_map.py; so does a stale SUITE_GAPS.md.
+
+## 2026-10-19: the suite's other six systems run in the app
+
+Ony: build out the Authority System Suite's systems. Six spec passes read RAS, QAS, LAS, DAS, EGS and EHS (router
+rows, modules, INTEROP rules, value lists, what an app run may not do); every value list was then checked present in
+the vendored text by a new drift test, and the suite defects they reported were re-read at the cited lines.
+
+- `app/ai/systems.py`: eight modules (RAS 03+04, QAS 01+03, LAS 01+02, DAS 01 and 02, EGS 01, EHS 02 and 01), each
+  with its suite files, a trimmed output contract, its value lists, and the rules the app reads mechanically
+  (rejections) or shows the person (flags). `reasoning.py` takes them through the same pipeline as TAS.
+- `app/ai/interop.py`: a run may start from an accepted answer (`handoff_from`); it reads that run's packet, gets
+  what INTEROP lets cross, and every held-back value is a BLOCK · HELD event with its rule. Rejected claims never
+  cross; corrected ones cross in the person's words.
+- DAS `upstream_tier` is written by the Workbench from the source's person-set tier ([IN-010]).
+- "Before you run" covers suite modules, shows the hand-over step and marks the systems a next run would use.
+- `docs/authority-suite/SUITE_SYSTEMS_IN_APP.md`: what runs, what does not and why, and ten suite problems for Ony.
+
+Tests: `test_suite_systems.py` (12, new), drift tests (2 new), and the AI, plan, claim-review, guard and migration
+tests pass; mypy and ruff clean. Frontend: client regenerated, tsc clean, vitest 1307 passed. No screen for
+starting a suite run: mockup first.

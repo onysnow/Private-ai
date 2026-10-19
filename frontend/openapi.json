@@ -755,6 +755,17 @@
             "title": "Spec File",
             "type": "string"
           },
+          "system": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System"
+          },
           "vendored_tas": {
             "title": "Vendored Tas",
             "type": "boolean"
@@ -28839,6 +28850,18 @@
       "RunPlanRequest": {
         "description": "What a run would do, before it runs (mockup AI_2).",
         "properties": {
+          "handoff_from": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff From"
+          },
           "include_external_leads": {
             "default": true,
             "title": "Include External Leads",
@@ -28852,13 +28875,30 @@
             "type": "integer"
           },
           "module": {
-            "default": "case_synthesis",
-            "enum": [
-              "case_synthesis",
-              "hypothesis_test"
+            "anyOf": [
+              {
+                "enum": [
+                  "case_synthesis",
+                  "hypothesis_test"
+                ],
+                "type": "string"
+              },
+              {
+                "enum": [
+                  "research_vetting",
+                  "quant_framing",
+                  "las_argument_check",
+                  "das_framing",
+                  "das_options",
+                  "evidence_plan",
+                  "ehs_harm_minimisation",
+                  "ehs_public_interest"
+                ],
+                "type": "string"
+              }
             ],
-            "title": "Module",
-            "type": "string"
+            "default": "case_synthesis",
+            "title": "Module"
           },
           "options": {
             "anyOf": [
@@ -31861,6 +31901,88 @@
           "found"
         ],
         "title": "SuiteRequirementOut",
+        "type": "object"
+      },
+      "SuiteRunRequest": {
+        "description": "One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an\nanswer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.\n`context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and\naccess limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given\nby the logic check only.",
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "handoff_from": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff From"
+          },
+          "include_external_leads": {
+            "default": true,
+            "title": "Include External Leads",
+            "type": "boolean"
+          },
+          "max_results": {
+            "default": 30,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "module": {
+            "enum": [
+              "research_vetting",
+              "quant_framing",
+              "las_argument_check",
+              "das_framing",
+              "das_options",
+              "evidence_plan",
+              "ehs_harm_minimisation",
+              "ehs_public_interest"
+            ],
+            "title": "Module",
+            "type": "string"
+          },
+          "premises": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premises"
+          },
+          "question": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "module",
+          "question"
+        ],
+        "title": "SuiteRunRequest",
         "type": "object"
       },
       "SuiteUnmappedOut": {
@@ -50674,6 +50796,102 @@
           }
         },
         "summary": "Save Investigation Run Profile"
+      }
+    },
+    "/api/investigations/{investigation_id}/assistant/suite-run": {
+      "post": {
+        "description": "A run of another system of the Authority System Suite -- RAS, QAS, LAS, DAS, EGS or EHS\n(app/ai/systems.py) -- through the same citation-validated pipeline as the TAS endpoints, with the same\nguarantee: the answer is a proposal and writes nothing else. A run may start from an answer you accepted\n(`handoff_from`); what crosses is decided by the suite's INTEROP rules (app/ai/interop.py) and every value held\nback is listed in the run record.",
+        "operationId": "investigation_suite_run",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuiteRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiOutputRejectedOut"
+                    }
+                  ],
+                  "title": "Response 422 Investigation Suite Run"
+                }
+              }
+            },
+            "description": "The input does not match the route, or the model's answer did not pass its checks"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiModelFailedOut"
+                    }
+                  ],
+                  "title": "Response 502 Investigation Suite Run"
+                }
+              }
+            },
+            "description": "The AI provider failed (the details are logged on the server), or its answer could not be used at all"
+          }
+        },
+        "summary": "Investigation Suite Run"
       }
     },
     "/api/investigations/{investigation_id}/case-records": {

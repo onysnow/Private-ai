@@ -26,7 +26,10 @@ from app.ai.reasoning import (
     normalize_control_flags,
     normalize_premises,
     normalize_run_options,
+    packet_of_run,
+    resolve_handoff,
 )
+from app.ai.systems import SUITE_MODULES
 from app.ai.run_events import instructions_in_packet
 from app.core.config import Settings
 from app.core.config import settings as default_settings
@@ -72,6 +75,17 @@ MODULE_TEXT = {
     "case_synthesis": ("Case synthesis", "TAS 08"),
     "hypothesis_test": ("Test a theory", "TAS 06"),
     "presentation_draft": ("Draft a brief", "app"),
+    **{key: (m.title, f"{m.system.upper()} {m.node.split('/', 1)[1]}") for key, m in SUITE_MODULES.items()},
+}
+
+# Which next run the router's trigger table points to from each answer (AGENTS.md rows 1-7), by the conditions
+# its output meets: a synthesis states conclusions (LAS), names gaps (EGS) and people (EHS); a theory test is
+# tested against data (QAS) and has records to seek (EGS).
+NEXT_FROM = {
+    "case_synthesis": ("las_argument_check", "evidence_plan", "ehs_harm_minimisation"),
+    "hypothesis_test": ("quant_framing", "evidence_plan"),
+    "ehs_harm_minimisation": ("ehs_public_interest",),
+    "das_framing": ("das_options",),
 }
 
 
@@ -130,6 +144,33 @@ def settings_table(profile: dict) -> list[dict]:
     return rows
 
 
+def _suite_steps(module: str, handoff: dict | None, record_count: int) -> list[dict]:
+    m = SUITE_MODULES[module]
+    title, system = MODULE_TEXT[module]
+    steps: list[dict] = []
+    if handoff is None:
+        steps.append({"key": "packet", "who": "APP", "title": "Build the packet from the case", "changed": False,
+                      "detail": "Search this investigation only. Nothing is fetched from outside."})
+    else:
+        held = ", ".join(f"{h['from']} {h['field']}" for h in handoff.get("held") or []) or "nothing"
+        steps.append({"key": "handoff", "who": "APP", "title": "Hand over your accepted answer", "system": "INTEROP",
+                      "changed": False,
+                      "detail": f"{len(handoff['records'])} record(s) cross, with the packet that answer cited. "
+                                f"Held back under INTEROP.md: {held}."
+                                + (f" Left out because you rejected them: {len(handoff['left_out'])}." if handoff.get("left_out") else "")})
+    steps.append({"key": "model", "who": "MODEL", "title": title, "system": system, "changed": False,
+                  "detail": f"{m.system_name}. Answers only from the {record_count} record{'s' if record_count != 1 else ''} "
+                            "in the packet" + (" and the hand-over." if handoff else ".")})
+    steps.append({"key": "checks", "who": "APP", "title": "Enforced checks", "changed": False,
+                  "detail": f"Shape · every citation in the packet · the {m.system.upper()} rules the app can read"})
+    steps.append({"key": "review", "who": "YOU", "title": "You decide", "changed": False,
+                  "detail": "The answer lands as a proposal. Nothing joins the case until you accept it."
+                  + (" It decides nothing for you." if m.system in ("das", "ehs") else "")})
+    for n, step in enumerate(steps, 1):
+        step["n"] = n
+    return steps
+
+
 def _steps(module: str, options: dict[str, str], include_external_leads: bool, record_count: int) -> list[dict]:
     title, system = MODULE_TEXT[module]
     steps = [{
@@ -157,17 +198,23 @@ def _steps(module: str, options: dict[str, str], include_external_leads: bool, r
     return steps
 
 
+SYSTEM_WHY = [
+    ("RAS", "published research"), ("TAS", "facts about real people, firms and documents"),
+    ("QAS", "a theory tested against data"), ("LAS", "conclusions beyond what a source says"),
+    ("DAS", "choosing between options"), ("EGS", "planning how to obtain evidence"),
+    ("EHS", "publishing what could cause harm"),
+]
+
+
 def _systems(module: str) -> list[dict]:
     """Which systems the answer will need, by the suite's trigger table (AGENTS.md: triggers are conditions on what
-    is about to be produced). Today the app runs TAS only."""
-    reaches_beyond = module in TAS_MODULES
-    rows = [
-        {"system": "TAS", "why": "facts about real people, firms and documents", "state": "runs" if module in TAS_MODULES else "not_expected"},
-        {"system": "LAS", "why": "conclusions beyond what a source says", "state": "not_in_app" if reaches_beyond else "not_expected"},
-        {"system": "QAS", "why": "a theory tested against data", "state": "not_in_app" if module == "hypothesis_test" else "not_expected"},
-        {"system": "RAS", "why": "published research", "state": "not_expected"},
-        {"system": "DAS", "why": "recommending an action", "state": "not_expected"},
-    ]
+    is about to be produced): the one this run uses, and the ones a next run from its answer would (`next_run`)."""
+    running = "tas" if module in TAS_MODULES else (SUITE_MODULES[module].system if module in SUITE_MODULES else "app")
+    nexts = {SUITE_MODULES[n].system for n in NEXT_FROM.get(module, ())}
+    rows = []
+    for name, why in SYSTEM_WHY:
+        state = "runs" if name.lower() == running else ("next_run" if name.lower() in nexts else "not_expected")
+        rows.append({"system": name, "why": why, "state": state})
     return rows
 
 
@@ -183,19 +230,26 @@ def _past_run_minutes(db: Session) -> list[float]:
 
 def build_run_plan(db: Session, investigation_id: str, *, module: str, question: str, working_theory: str | None = None,
                    max_results: int = 30, include_external_leads: bool = True, flags: dict | None = None,
-                   options: dict | None = None, premises: list[str] | None = None,
+                   options: dict | None = None, premises: list[str] | None = None, handoff_from: str | None = None,
                    settings: Settings = default_settings) -> dict:
     if module not in MODULE_FILES or module == "presentation_draft":
-        raise ReasoningInputError("the plan covers case synthesis and theory tests")
+        raise ReasoningInputError("the plan covers case synthesis, theory tests and the suite's other systems")
     if db.get(Investigation, investigation_id) is None:
         raise LookupError("Investigation not found")
+    suite = SUITE_MODULES.get(module)
+    if suite is not None and suite.needs_handoff and not handoff_from:
+        raise ReasoningInputError(f"{suite.title} starts from an accepted answer of {' or '.join(suite.takes_from)}")
+    source, handoff = resolve_handoff(db, investigation_id=investigation_id, module=module, handoff_from=handoff_from)
     resolved_flags = normalize_control_flags(flags)
     resolved_options = normalize_run_options(options)
     stated = normalize_premises(premises)
     profile = get_profile(db, investigation_id)
 
-    packet = build_question_context(db, investigation_id=investigation_id, question=question, max_results=max_results,
-                                    include_external_leads=include_external_leads)
+    if source is not None:
+        packet = packet_of_run(db, investigation_id=investigation_id, run_id=str((source.trace or {}).get("run_id")))
+    else:
+        packet = build_question_context(db, investigation_id=investigation_id, question=question, max_results=max_results,
+                                        include_external_leads=include_external_leads)
     citations = packet.get("citations", [])
     by_type: dict[str, int] = {}
     for c in citations:
@@ -205,6 +259,8 @@ def build_run_plan(db: Session, investigation_id: str, *, module: str, question:
     user_prompt = f"RETRIEVAL PACKET:\n{json.dumps(packet)}" + (f"\nWORKING THEORY TO TEST:\n{working_theory}" if working_theory else "")
     try:
         system_prompt = build_system_prompt(module, packet["reasoning_contract"], resolved_flags, resolved_options, stated)
+        if handoff is not None:
+            user_prompt = f"HANDOFF:\n{json.dumps(handoff['records'])}\n" + user_prompt
     except ReasoningInputError:
         system_prompt = ""
     words_in = len(system_prompt.split()) + len(user_prompt.split())
@@ -230,7 +286,8 @@ def build_run_plan(db: Session, investigation_id: str, *, module: str, question:
             "records": len(citations), "by_type": [{"record_type": k, "count": v} for k, v in sorted(by_type.items(), key=lambda kv: -kv[1])],
             "leads_only": leads, "first": [{"record_type": c["record_type"], "record_id": c["record_id"], "title": c.get("title") or ""} for c in citations[:6]],
         },
-        "steps": _steps(module, resolved_options, include_external_leads, len(citations)),
+        "steps": _suite_steps(module, handoff, len(citations)) if suite is not None
+        else _steps(module, resolved_options, include_external_leads, len(citations)),
         "systems": _systems(module),
         "injections": instructions_in_packet(packet),
         "where": {

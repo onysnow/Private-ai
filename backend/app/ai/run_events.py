@@ -14,6 +14,7 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.ai.systems import SuiteModule, walk
 from app.core.time import utcnow_naive
 from app.models.domain import AIRunEvent
 
@@ -146,6 +147,51 @@ def record_thoughts(rec: RunRecorder, module: str, payload: dict, known: set[tup
             chain("tas/06", "Module 06; Standard §12", str(f.get("conflict_id") or ""),
                   str((f.get("statement_a") or {}).get("statement") or "") + " / " + str((f.get("statement_b") or {}).get("statement") or ""),
                   "OPEN" if open_ else "RESOLVED", "partial" if open_ else "good", refs)
+    return tally
+
+
+def _suite_verdict(module: SuiteModule, item: dict) -> tuple[str, str]:
+    """The verdict and status one part of a suite answer shows in the run record, read from the record's own values;
+    a support system's part is never good or bad, since it judges nothing (AGENTS.md [AG-067])."""
+    if module.system == "las":
+        verdicts = [str(line.get("validity_verdict") or line.get("inferential_type") or "") for line in item.get("argument_lines") or []
+                    if isinstance(line, dict)]
+        if item.get("formal_fallacy") or "INVALID" in verdicts:
+            return "INVALID", "bad"
+        return ("VALID", "good") if verdicts and all(v == "VALID" for v in verdicts) else ("HOLDS_IF_PREMISES_TRUE", "partial")
+    if module.system == "ras":
+        return str(item.get("corroboration_verdict") or "UNKNOWN"), "good" if item.get("corroboration_verdict") == "CORROBORATED" else "partial"
+    field = {"evidence_plan": "route", "ehs_harm_minimisation": "decision", "das_options": "option_type",
+             "quant_framing": "category"}.get(module.key)
+    if module.key == "ehs_public_interest":
+        return ("NEEDED" if item.get("needed_by_public_interest") else "NOT_NEEDED"), "neutral"
+    return str(item.get(field) or "RECORDED") if field else "RECORDED", "neutral" if module.is_support else "partial"
+
+
+def record_suite_thoughts(rec: RunRecorder, module: SuiteModule, payload: dict, known: set[tuple[str, str]],
+                          parent: int | None) -> dict[str, int]:
+    """One chain per part of a suite answer that a person decides one by one (SuiteModule.items): what the model
+    says (self-reported), then the app's check of the records it cites."""
+    tally = {s: 0 for s in STATUSES}
+    if module.items is None:
+        return tally
+    list_path, id_field, text_field, ref_fields = module.items
+    for _where, item in walk(payload, list_path + "[]"):
+        thought_id = str(item.get(id_field) or "")
+        refs = _refs(*(item.get(key) for key in ref_fields))
+        verdict, status = _suite_verdict(module, item)
+        said = rec.emit("RULE", module.node, system=module.system, rule=f"{module.system.upper()} {module.title}",
+                        verdict=verdict, status=status, text=str(item.get(text_field) or "")[:2000], refs=refs,
+                        parent=parent, self_reported=True, detail={"thought": thought_id})
+        last = status
+        if refs:
+            missing = _in_packet(refs, known)
+            last = "bad" if missing else status
+            rec.emit("CHECK", "gate:citation", status="bad" if missing else "good", verdict="FAIL" if missing else "PASS",
+                     text=(f"{len(missing)} of {len(refs)} cited records are not in the packet" if missing
+                           else f"All {len(refs)} cited records are in the packet"),
+                     refs=refs, parent=said, detail={"thought": thought_id})
+        tally[last] += 1
     return tally
 
 
