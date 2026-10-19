@@ -95,6 +95,14 @@ describe('a form on the shared layer', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('investigation_id: Field required');
   });
 
+  it('says a value the form has but shows no field for (a default only) for the whole form', async () => {
+    const user = userEvent.setup();
+    render(<NameForm save={vi.fn().mockRejectedValue(http([{path: 'note', message: 'Too long'}]))}/>);
+    await user.type(screen.getByLabelText('Name'), 'Fernhill');
+    await user.click(screen.getByRole('button', {name: 'Save'}));
+    expect(await screen.findByRole('alert')).toHaveTextContent('note: Too long');
+  });
+
   it('says any other failure for the whole form, in the server\'s words or the fallback', async () => {
     const user = userEvent.setup();
     const {unmount} = render(<NameForm save={vi.fn().mockRejectedValue(new ApiHttpError('/api/x', 409, 'A party with that name exists'))}/>);
@@ -118,5 +126,14 @@ describe('EntityForm on the shared layer', () => {
     await user.click(screen.getByRole('button', {name: 'Create entity'}));
     expect(await screen.findByText('String should have at most 255 characters')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('says a refused property list, which has no message of its own, for the whole form', async () => {
+    const user = userEvent.setup();
+    render(<EntityForm onSubmit={vi.fn().mockRejectedValue(http([{path: 'properties', message: 'Input should be a valid dictionary'}]))}/>);
+    await user.type(screen.getByLabelText('Caption'), 'Fernhill Ltd');
+    await user.type(screen.getByLabelText('FollowTheMoney schema'), 'Company');
+    await user.click(screen.getByRole('button', {name: 'Create entity'}));
+    expect(await screen.findByRole('alert')).toHaveTextContent('properties: Input should be a valid dictionary');
   });
 });

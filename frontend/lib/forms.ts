@@ -18,15 +18,18 @@ export function useZodForm<T extends FieldValues>(schema: ZodType<T, ZodTypeDef,
   return useForm<T>({mode: 'onBlur', ...props, resolver: zodResolver(schema)});
 }
 
-/** Has the form a value at this dotted path (so a server error can be shown on it)? */
-function hasField<T extends FieldValues>(form: UseFormReturn<T>, path: string): path is FieldPath<T> {
+/** Is a field rendered at this dotted path (a FormField registered it), so an error set on it is seen?
+ * A value with no field of its own (a default no control shows, a list whose rows have the fields)
+ * is not: its error goes to the form's own message. */
+function isRendered<T extends FieldValues>(form: UseFormReturn<T>, path: string): path is FieldPath<T> {
   if (!path) return false;
-  let at: unknown = form.getValues();
+  // react-hook-form keeps registered fields in control._fields, each leaf carrying _f.
+  let at: unknown = (form.control as unknown as {_fields: unknown})._fields;
   for (const part of path.split('.')) {
     if (typeof at !== 'object' || at === null || !(part in at)) return false;
     at = (at as Record<string, unknown>)[part];
   }
-  return true;
+  return typeof at === 'object' && at !== null && '_f' in at;
 }
 
 /** Puts a failed save back on the form: each field the server refused on that field
@@ -38,7 +41,7 @@ export function showServerErrors<T extends FieldValues>(form: UseFormReturn<T>, 
   let placed = false;
   for (const f of error instanceof ApiHttpError ? error.fieldErrors : []) {
     const path = paths[f.path] ?? f.path;
-    if (hasField(form, path)) {
+    if (isRendered(form, path)) {
       form.setError(path, {type: 'server', message: f.message}, {shouldFocus: !placed});
       placed = true;
     } else {
