@@ -926,9 +926,8 @@ def test_investigation_replies(demo):
     db, _inv, _doc, _candidates, _accepted = demo
     rows = list_investigations(db, AuthorizationScope(actor_id="local"))
     assert rows
-    # ai_run_profile is a stored blob read through its own route (GET .../ai/run-profile), not part of the case record.
-    _same_through_model(list[r.InvestigationOut], rows, hidden=("ai_run_profile",))
-    _same_through_model(r.InvestigationOut, create_investigation(db, InvestigationCreate(name="Second case", description="with a description")), hidden=("ai_run_profile",))
+    _same_through_model(list[r.InvestigationOut], rows)
+    _same_through_model(r.InvestigationOut, create_investigation(db, InvestigationCreate(name="Second case", description="with a description")))
 
 
 def test_settings_and_security_replies(demo, tmp_path, monkeypatch):
