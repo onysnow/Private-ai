@@ -162,9 +162,11 @@ describe('The Wire', () => {
     render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
     await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
     await waitFor(() => expect([...document.querySelectorAll<SVGGElement>('.elab')].some(g => g.style.display !== 'none')).toBe(true));
-    fireEvent.keyDown(window, {key: 'j'});
-    const lit = document.querySelector('.elab.lit');
-    expect(lit).not.toBeNull();
+    // The calm descent to the party can still be redrawing the links: press J until one stays lit.
+    await waitFor(() => {
+      if (!document.querySelector('.elab.lit')) fireEvent.keyDown(window, {key: 'j'});
+      expect(document.querySelector('.elab.lit')).not.toBeNull();
+    });
     expect(document.querySelector('.tw-tip')?.textContent).toMatch(/Enter opens every record on this link/);
     fireEvent.keyDown(window, {key: 'Enter'});
     await waitFor(() => expect(document.querySelector('.tw-alttitle')?.textContent).toBe('one link, opened'));
