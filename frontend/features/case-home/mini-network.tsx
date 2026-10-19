@@ -2,9 +2,13 @@
 // "See · who is linked" on Case home: the six most-linked parties and the links
 // between them, each link drawn by how sure it is (solid shown, dashed not yet
 // shown, double disputed) and named in words beneath. Pointing at a party lights it
-// everywhere (the shared pointedParty).
+// everywhere (the shared pointedParty). The year rail's "as of" year shows the links
+// that held then (lib/as-of.ts), as the network does.
 import {useQuery} from '@tanstack/react-query';
-import type {ReactElement} from 'react';
+import {useRef} from 'react';
+import type {KeyboardEvent, ReactElement} from 'react';
+
+import {linkSpan, shownAsOf} from '../../lib/as-of';
 
 import {getInvestigationGraphOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {RelationshipOut} from '../../lib/generated/types.gen';
@@ -81,8 +85,25 @@ export function MiniNetwork({investigationId}: {investigationId: string}): React
   const graph = graphQuery.data;
   const pointed = useWorkbenchStore(state => state.pointedParty);
   const point = useWorkbenchStore(state => state.setPointedParty);
-  const nodes = graph?.nodes ?? [];
-  const edges = (graph?.edges ?? []).filter(e => e.source && e.target);
+  const asOf = useWorkbenchStore(state => state.asOf);
+  // Pointing (hover or focus) already lights a party; the click that follows keeps it lit
+  // rather than turning it off again. A second click turns it off.
+  const pointedByHover = useRef<string | null>(null);
+  const reach = (id: string) => {
+    if (pointed === id) return;
+    pointedByHover.current = id;
+    point(id);
+  };
+  const press = (id: string) => {
+    if (pointedByHover.current === id) { pointedByHover.current = null; return; }
+    pointedByHover.current = null;
+    point(pointed === id ? null : id);
+  };
+  const edges = (graph?.edges ?? []).filter(e => e.source && e.target
+    && shownAsOf(linkSpan(e.properties as Record<string, string[] | undefined>), asOf));
+  // As of a year, the parties are those with a link that held then.
+  const linked = new Set(edges.flatMap(e => [e.source!.id, e.target!.id]));
+  const nodes = (graph?.nodes ?? []).filter(n => asOf === null || linked.has(n.id));
   const degree = new Map<string, number>();
   for (const e of edges) for (const id of [e.source!.id, e.target!.id]) degree.set(id, (degree.get(id) ?? 0) + 1);
   const top = [...nodes].sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) || a.caption.localeCompare(b.caption)).slice(0, 6);
@@ -100,6 +121,7 @@ export function MiniNetwork({investigationId}: {investigationId: string}): React
   const pairs = [...byPair.values()];
   const placed: {x: number; y: number; w: number}[] = [];
   if (graphQuery.isPending && investigationId) return <div className="ch-skeleton" aria-busy="true" aria-label="Drawing who is linked"/>;
+  if (!top.length && asOf !== null && graph?.nodes.length) return <p className="ch-empty">No link had started by {asOf}. Choose another year, or the same year again for all years.</p>;
   if (!top.length) return <p className="ch-empty">No parties linked yet. Links appear here once records are linked in Check.</p>;
   return <figure className="ch-net">
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`The ${top.length} most-linked parties and ${shownEdges.length} links between them`}>
@@ -137,11 +159,17 @@ export function MiniNetwork({investigationId}: {investigationId: string}): React
       {top.map(n => {
         const p = at.get(n.id)!;
         const on = pointed === n.id;
+        const name = n.caption.length > 22 ? `${n.caption.slice(0, 21)}…` : n.caption;
+        const below = p.y > H / 2;
+        const half = Math.max(12, name.length * 3.2);
         return <g key={n.id} className={`ch-node${on ? ' on' : ''}`} transform={`translate(${p.x},${p.y})`} tabIndex={0} role="button"
           aria-label={`${n.caption}, ${degree.get(n.id) ?? 0} links`} aria-pressed={on}
-          onMouseEnter={() => point(n.id)} onFocus={() => point(n.id)} onClick={() => point(on ? null : n.id)}>
+          onMouseEnter={() => reach(n.id)} onFocus={() => reach(n.id)} onClick={() => press(n.id)}
+          onKeyDown={(event: KeyboardEvent) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); press(n.id); } }}>
+          {/* The whole party, mark and name, takes the pointer: the gap between them is not the drawing's. */}
+          <rect className="ch-node-hit" x={-half} y={below ? -11 : -25} width={half * 2} height={37}/>
           <Mark shape={shapeOf(n.schema)}/>
-          <text y={p.y > H / 2 ? 22 : -13} textAnchor="middle">{n.caption.length > 22 ? `${n.caption.slice(0, 21)}…` : n.caption}</text>
+          <text y={below ? 22 : -13} textAnchor="middle">{name}</text>
         </g>;
       })}
     </svg>
@@ -149,7 +177,7 @@ export function MiniNetwork({investigationId}: {investigationId: string}): React
       <span><i className="ch-key ch-key-supported"/>shown</span>
       <span><i className="ch-key ch-key-unshown"/>not yet shown</span>
       <span><i className="ch-key ch-key-disputed"/>disputed</span>
-      <span className="ch-net-count">{nodes.length} parties · {edges.length} links</span>
+      <span className="ch-net-count">{nodes.length} parties · {edges.length} links{asOf !== null ? ` · as of ${asOf}` : ''}</span>
     </figcaption>
   </figure>;
 }

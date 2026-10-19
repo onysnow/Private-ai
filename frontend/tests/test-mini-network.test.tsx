@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 // Case home's "See · who is linked": link years and certainty marks, party shapes.
-import {cleanup, render, screen} from '@testing-library/react';
+import {act, cleanup, fireEvent, render, screen} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
 import {MiniNetwork, linkWord, linkYear, shapeOf} from '../features/case-home/mini-network';
@@ -18,7 +18,7 @@ const edge = (id: string, s: string, t: string, properties: Record<string, strin
 }) as unknown as RelationshipOut;
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); useWorkbenchStore.setState({investigationId: 'inv-1', pointedParty: null}); });
-afterEach(() => { cleanup(); useWorkbenchStore.setState({pointedParty: null}); });
+afterEach(() => { cleanup(); useWorkbenchStore.setState({pointedParty: null, asOf: null}); });
 
 describe('MiniNetwork', () => {
   it('reads a link year from its own dates and a shape from the kind of party', () => {
@@ -48,5 +48,48 @@ describe('MiniNetwork', () => {
     expect(await screen.findByText('owns 2017 ✓')).toBeInTheDocument();
     expect(screen.getByText('owns 2019 ×')).toBeInTheDocument();
     expect(screen.getByText('3 parties · 2 links')).toBeInTheDocument();
+  });
+
+  const twoLinks = () => {
+    const node = (id: string) => ({id, ftm_id: `ftm-${id}`, caption: id, schema: 'Company', properties: {}});
+    const end = (id: string) => ({id, ftm_id: `ftm-${id}`, caption: id, schema: 'Company'});
+    const link = (id: string, s: string, t: string, properties: Record<string, string[]>) =>
+      relationshipFixture({id, properties, source: end(s), target: end(t)});
+    mockApi({'GET /api/investigations/inv-1/graph': {...emptyGraph([
+      link('l1', 'Meridian', 'Bellcastle', {startDate: ['2017']}),
+      link('l2', 'Bellcastle', 'Orrin', {startDate: ['2020-05']}),
+    ]), nodes: [node('Meridian'), node('Bellcastle'), node('Orrin')]}});
+    render(<QueryProvider><MiniNetwork investigationId="inv-1"/></QueryProvider>);
+  };
+
+  it('keeps a party lit when it is clicked after the pointer reached it, and a second click turns it off', async () => {
+    twoLinks();
+    const party = await screen.findByRole('button', {name: 'Bellcastle, 2 links'});
+    fireEvent.mouseEnter(party);
+    fireEvent.click(party);
+    expect(useWorkbenchStore.getState().pointedParty).toBe('Bellcastle');
+    expect(party).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(party);
+    expect(useWorkbenchStore.getState().pointedParty).toBeNull();
+    // From the keyboard: focus points, Enter keeps it, Enter again turns it off.
+    const other = screen.getByRole('button', {name: 'Orrin, 1 links'});
+    fireEvent.focus(other);
+    fireEvent.keyDown(other, {key: 'Enter'});
+    expect(useWorkbenchStore.getState().pointedParty).toBe('Orrin');
+    fireEvent.keyDown(other, {key: 'Enter'});
+    expect(useWorkbenchStore.getState().pointedParty).toBeNull();
+    // The whole party takes the pointer, not only its mark.
+    expect(party.querySelector('.ch-node-hit')).not.toBeNull();
+  });
+
+  it('shows the links that held as of the year chosen on the year rail', async () => {
+    twoLinks();
+    expect(await screen.findByText('3 parties · 2 links')).toBeInTheDocument();
+    act(() => useWorkbenchStore.setState({asOf: 2018}));
+    expect(screen.getByText('2 parties · 1 links · as of 2018')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /^Orrin/})).toBeNull();
+    act(() => useWorkbenchStore.setState({asOf: 2016}));
+    expect(screen.getByText(/No link had started by 2016/)).toBeInTheDocument();
+    act(() => useWorkbenchStore.setState({asOf: null}));
   });
 });

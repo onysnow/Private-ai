@@ -247,13 +247,14 @@
 .ch-link-disputed line { stroke: var(--status-disputed); }
 .ch-link.lit line { stroke-width: 3; }
 .ch-node { cursor: pointer; outline: none; }
-.ch-node :is(rect, circle, path) { fill: var(--surface-3); stroke: var(--accent-2); stroke-width: 1.5; transition: transform var(--dur-fast) var(--ease-out); }
+.ch-node-hit { fill: transparent; stroke: none; pointer-events: all; }
+.ch-node :is(rect, circle, path):not(.ch-node-hit) { fill: var(--surface-3); stroke: var(--accent-2); stroke-width: 1.5; transition: transform var(--dur-fast) var(--ease-out); }
 .ch-link-label { fill: var(--text-muted); font: 500 9.5px var(--font-ui); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; }
 .ch-link-disputed .ch-link-label { fill: var(--status-disputed); }
 .ch-net figcaption > span { display: inline-flex; align-items: center; }
 .ch-key-shape { width: 11px; height: 11px; margin-right: 4px; vertical-align: -1px; fill: var(--surface-3); stroke: var(--accent-2); stroke-width: 2; }
 .ch-node text { fill: var(--text); font: 600 10.5px var(--font-ui); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; }
-.ch-node.on :is(rect, circle, path), .ch-node:hover :is(rect, circle, path), .ch-node:focus-visible :is(rect, circle, path) { fill: var(--accent-1); stroke: var(--accent-1); transform: scale(1.25); }
+.ch-node.on :is(rect, circle, path):not(.ch-node-hit), .ch-node:hover :is(rect, circle, path):not(.ch-node-hit), .ch-node:focus-visible :is(rect, circle, path):not(.ch-node-hit) { fill: var(--accent-1); stroke: var(--accent-1); transform: scale(1.25); }
 .ch-net figcaption { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11.5px; color: var(--text-muted); }
 .ch-net-count { margin-left: auto; }
 .ch-key { display: inline-block; width: 16px; height: 0; border-top: 2px solid var(--status-supported); margin-right: 5px; vertical-align: middle; }
