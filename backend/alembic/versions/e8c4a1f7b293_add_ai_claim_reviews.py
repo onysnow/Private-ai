@@ -1,13 +1,13 @@
 """per-claim review of an AI proposal: Keep / Correct / Reject (mockup AI_1, research AI §2 "Per-claim decisions")
 
 Revision ID: e8c4a1f7b293
-Revises: d3a6b9c2e714
+Revises: e4c8a1f7b392
 """
 from alembic import op
 import sqlalchemy as sa
 
 revision = "e8c4a1f7b293"
-down_revision = "d3a6b9c2e714"
+down_revision = "e4c8a1f7b392"
 branch_labels = None
 depends_on = None
 
