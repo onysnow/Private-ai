@@ -926,8 +926,10 @@ def test_investigation_replies(demo):
     db, _inv, _doc, _candidates, _accepted = demo
     rows = list_investigations(db, AuthorizationScope(actor_id="local"))
     assert rows
-    _same_through_model(list[r.InvestigationOut], rows)
-    _same_through_model(r.InvestigationOut, create_investigation(db, InvestigationCreate(name="Second case", description="with a description")))
+    # red_flag_run is the Red Flag engine's own bookkeeping; GET .../red-flags reports it as ran_at / stale.
+    _same_through_model(list[r.InvestigationOut], rows, hidden=("red_flag_run",))
+    _same_through_model(r.InvestigationOut, create_investigation(db, InvestigationCreate(name="Second case", description="with a description")),
+                        hidden=("red_flag_run",))
 
 
 def test_settings_and_security_replies(demo, tmp_path, monkeypatch):
