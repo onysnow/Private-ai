@@ -9,7 +9,8 @@ done, in the line style of the status grammar: confirmed by a person, proposed a
 by the app, against the claim, an AI step.
 
 Nothing is invented. What the records do not hold is left out or said ("not recorded"): there is no stored OCR
-legibility, so none is shown; the uploader comes only from the intake batch. Read-only, except that it re-hashes
+legibility, so none is shown; the uploader comes only from the intake batch. The claim carries its Done checklist
+for Supported, run by the same code a claim review is held to (app/services/claim_done.py). Read-only, except that it re-hashes
 the files it shows (which writes nothing).
 """
 from __future__ import annotations
@@ -33,7 +34,7 @@ from app.models.jobs import BackgroundJob
 from app.models.patterns import PatternFlag
 from app.models.relationships import RelationshipEdge, RelationshipEvidenceAttachment
 from app.models.sources import Evidence, Source
-from app.services.claim_done import _document_of, _file_matches, _norm
+from app.services.claim_done import _document_of, _file_matches, _norm, done_checks
 from app.services.provenance import _record_extraction_lineage
 
 READ_METHOD = {"ocr": "OCR", "native_pdf": "text layer", "native_text": "text"}
@@ -229,6 +230,9 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             "sources_for": len(supports),
             "against": len(rows) - len(supports),
         },
+        # The Done checklist for Supported, from the same rules a review to Supported is held to (claim_done.py):
+        # each rule met, not met, or not checkable here, with what it waits on.
+        "done": done_checks(db, claim, target="supported"),
         "checked_at": datetime.now(timezone.utc),
     }
 

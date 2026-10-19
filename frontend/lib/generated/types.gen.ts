@@ -4902,6 +4902,7 @@ export type CustodyChainOut = {
    */
   checked_at: string;
   claim: CustodyClaimOut;
+  done: ClaimDoneOut;
   /**
    * Log
    */

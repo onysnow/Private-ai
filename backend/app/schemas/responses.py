@@ -2750,6 +2750,8 @@ class CustodyChainOut(ResponseModel):
     ai: list[CustodyAiOut]
     log: list[CustodyLogOut]
     seal: CustodySealOut
+    # The Done rules for Supported (app/services/claim_done.py), as a claim review is held to them.
+    done: ClaimDoneOut
     checked_at: Timestamp
 
 

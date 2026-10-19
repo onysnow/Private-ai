@@ -74,6 +74,13 @@ def test_each_piece_of_evidence_is_a_row_from_the_file_to_the_claim(tmp_path):
     assert "Uploaded transfer.pdf · SHA-256 recorded at intake" in whats
     assert any(w.startswith("Linked as against the claim: filed 14 Dec 2017") for w in whats)
 
+    # The claim's Done checklist for Supported: the same rules, run by the same code, a review to Supported is held to.
+    done = chain["done"]
+    assert done["target"] == "supported"
+    assert [r["key"] for r in done["rules"]] == ["supporting", "says_it", "locator", "file", "contradictions", "not_leads_only"]
+    assert all(r["state"] == "met" for r in done["rules"]) and done["met"] is True and done["left"] == 0
+    assert done == ok(client.get(f"/api/claims/{claim['id']}/review-workspace"))["done"]["supported"]
+
     # The source, where the quote stands in the passage, and what rests on the evidence.
     assert support["source"] == {"title": "Share transfer", "source_type": "document", "tier": None, "issuer": None}
     text = passage["text"]
@@ -93,6 +100,10 @@ def test_each_piece_of_evidence_is_a_row_from_the_file_to_the_claim(tmp_path):
 
     # The file changes on disk: the chain says the hash no longer matches, and the re-check says so too.
     path.write_bytes(b"changed")
-    assert ok(client.get(f"/api/claims/{claim['id']}/custody-chain"))["seal"]["hashes_intact"] is False
+    changed = ok(client.get(f"/api/claims/{claim['id']}/custody-chain"))
+    assert changed["seal"]["hashes_intact"] is False
+    file_rule = next(r for r in changed["done"]["rules"] if r["key"] == "file")
+    assert file_rule["state"] == "not_met" and file_rule["detail"] == "Changed or missing: transfer.pdf."
+    assert changed["done"]["met"] is False and changed["done"]["left"] == 1
     assert ok(client.post(f"/api/documents/{doc_id}/recheck-hash"))["matches"] is False
     assert client.get("/api/claims/no-such-claim/custody-chain").status_code == 404

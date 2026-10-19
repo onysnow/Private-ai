@@ -138,3 +138,26 @@
 .cc-tools .cc-btn { padding: 4px 9px; font-size: 11.5px; }
 .cc-dir { font-size: 11.5px; }
 .cc-seal .cc-seal-line span.ai { padding: 0; box-shadow: none; background: none; border-radius: 0; }
+
+/* The claim's Done checklist for Supported (server rules, app/services/claim_done.py): ✓ met, ✕ not met with what
+   it waits on, ○ not checkable here. */
+.cc-done { display: grid; gap: 3px; margin-top: 4px; }
+.cc-done-head { margin: 0; font: 600 9.5px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
+.cc-done-head .ok { color: var(--status-supported); } .cc-done-head .bad { color: var(--status-disputed); } .cc-done-head .unknown { color: var(--status-unshown); }
+.cc-done ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 11.5px; color: var(--text-muted); }
+.cc-done li > span { display: inline-block; width: 1.1em; }
+.cc-done li.done-met > span { color: var(--status-supported); }
+.cc-done li.done-not_met { color: var(--text); } .cc-done li.done-not_met > span { color: var(--status-disputed); }
+.cc-done li.done-unknown > span { color: var(--status-unshown); }
+.cc-done li small { display: block; padding-left: 1.1em; font-size: 10.5px; line-height: 1.3; }
+
+/* Scroll-over replay along the log: the row the replay stands on, and its card in the chain. */
+.cc-log tr.now td { background: color-mix(in srgb, var(--accent-1) 22%, transparent); }
+.cc-log tr.now td:first-child { box-shadow: inset 2px 0 0 var(--accent-1); }
+.cc-claim.lit, .cc-ai.lit { outline: 1.5px solid var(--accent-2); outline-offset: 3px; }
+
+/* Draw-in: the wires reveal from the file to the sentence when a chain opens. Values never animate; with reduced
+   motion the wires are drawn at once. */
+.cc-lines.draw { animation: cc-draw 900ms cubic-bezier(.25, .7, .25, 1) backwards; }
+@keyframes cc-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) { .cc-lines.draw { animation: none; } }

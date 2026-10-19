@@ -2075,6 +2075,7 @@ export const zCustodyChainOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
   claim: zCustodyClaimOut,
+  done: zClaimDoneOut,
   log: z.array(zCustodyLogOut),
   rows: z.array(zCustodyRowOut),
   seal: zCustodySealOut,
