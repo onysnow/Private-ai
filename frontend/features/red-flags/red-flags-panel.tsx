@@ -54,11 +54,14 @@ export function FlagActionsRow({flag, onLead, onDismiss, onReopen}: {flag: RedFl
   </>;
 }
 
+/** A flag's parties: pointing at one lights it everywhere; clicking one opens its dossier, as a party does in the network. */
 export function PartyButtons({parties, limit}: {parties: RedFlagOut['parties']; limit?: number}): ReactElement {
   const setPointed = useWorkbenchStore(state => state.setPointedParty);
+  const openDossier = useWorkbenchStore(state => state.openDossier);
   const shown = limit ? parties.slice(0, limit) : parties;
-  return <div className="rf-who">{shown.map(p => <button type="button" key={p.id} className="sv-pd rf-party"
-    onMouseEnter={() => setPointed(p.id)} onMouseLeave={() => setPointed(null)} onFocus={() => setPointed(p.id)} onBlur={() => setPointed(null)}>
+  return <div className="rf-who">{shown.map(p => <button type="button" key={p.id} className="sv-pd rf-party" title={`Open ${p.name}'s dossier`}
+    onMouseEnter={() => setPointed(p.id)} onMouseLeave={() => setPointed(null)} onFocus={() => setPointed(p.id)} onBlur={() => setPointed(null)}
+    onClick={() => openDossier(p.id)}>
     <i style={{borderColor: PARTY[partyKind(p.schema)].ring}}/>{p.name}</button>)}
     {shown.length < parties.length && <span className="sv-muted">+{parties.length - shown.length} more</span>}</div>;
 }
