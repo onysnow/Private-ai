@@ -1,13 +1,13 @@
 """a write-up's snapshots (mockup ACT_2, version "before legal read") and when a lead is chased (Now / Next / Later)
 
 Revision ID: e4c8a1f7b392
-Revises: d3a6b9c2e714
+Revises: e8b5c1f4a927
 """
 from alembic import op
 import sqlalchemy as sa
 
 revision = "e4c8a1f7b392"
-down_revision = "d3a6b9c2e714"
+down_revision = "e8b5c1f4a927"
 branch_labels = None
 depends_on = None
 
