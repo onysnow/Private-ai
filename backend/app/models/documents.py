@@ -95,6 +95,9 @@ class DocumentChunk(Base):
     page_number: Mapped[int | None] = mapped_column(nullable=True, index=True)
     ordinal: Mapped[int] = mapped_column(default=0, index=True)
     text: Mapped[str] = mapped_column(Text)
+    # How legible an OCR'd page was: Tesseract's mean word confidence, 0-100, measured after the read
+    # (app/services/legibility.py). None for a page with a text layer, or until measured.
+    ocr_legibility: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 
@@ -113,6 +116,9 @@ class ExtractionCandidate(Base):
     reviewer_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # Who decided it, as signed in when they did (app/db/decided_by.py); None before this was kept.
+    decided_by_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    decided_by_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
 
 class IngestionBatch(Base):

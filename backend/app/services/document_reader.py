@@ -32,6 +32,12 @@ def _child_read(path: str) -> tuple[list[dict], list[str]]:
     return extract_chunks(Path(path))
 
 
+def _child_measure(path: str, pages: list[int]) -> tuple[dict[int, float | None], str | None]:
+    from app.services.legibility import measure_pdf_pages
+
+    return measure_pdf_pages(path, pages, settings.pdf_ocr_language, settings.pdf_ocr_dpi)
+
+
 def _executor() -> ProcessPoolExecutor:
     global _pool
     with _lock:
@@ -56,6 +62,18 @@ def read_chunks(path: Path) -> tuple[list[dict], list[str]]:
     except BrokenProcessPool as exc:
         shutdown()  # the next read starts a fresh reader process
         raise RuntimeError("The document reader stopped unexpectedly on this file") from exc
+
+
+def measure_legibility(path: str, pages: list[int]) -> tuple[dict[int, float | None], str | None]:
+    """How legible the given scanned pages are (app/services/legibility.py), in a reader process unless disabled:
+    rendering a page holds the interpreter lock like reading one."""
+    if not settings.document_read_in_subprocess:
+        return _child_measure(path, pages)
+    try:
+        return _executor().submit(_child_measure, path, pages).result()
+    except BrokenProcessPool as exc:
+        shutdown()
+        raise RuntimeError("The document reader stopped unexpectedly while measuring legibility") from exc
 
 
 def shutdown() -> None:

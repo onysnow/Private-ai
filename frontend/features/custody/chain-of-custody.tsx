@@ -19,7 +19,7 @@ import {useWheelStep} from '../case-home/wheel-step';
 import {errorMessage} from '../../lib/api-client';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {getClaimCustodyChainOptions, listClaimsOptions, recheckHashMutation} from '../../lib/generated/@tanstack/react-query.gen';
-import type {ClaimDoneOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
+import type {ClaimDoneOut, CustodyAnchorOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -85,11 +85,37 @@ function Seal({chain}: {chain: CustodyChainOut}): ReactElement {
 }
 
 /** The quote lit in its passage. */
-function Lit({text, quote}: {text: string; quote?: string | null}): ReactElement {
-  if (!quote) return <>{text}</>;
-  const at = text.toLowerCase().indexOf(quote.toLowerCase());
-  if (at < 0) return <>{text}</>;
-  return <>{text.slice(0, at)}<mark>{text.slice(at, at + quote.length)}</mark>{text.slice(at + quote.length)}</>;
+function Lit({text, quote, span}: {text: string; quote?: string | null; span?: {start: number; end: number} | null}): ReactElement {
+  // The stored anchor's characters when there is one (ADR-0015); otherwise the words looked for, ignoring case.
+  const at = span ? span.start : quote ? text.toLowerCase().indexOf(quote.toLowerCase()) : -1;
+  const end = span ? span.end : at + (quote?.length ?? 0);
+  if (at < 0 || end > text.length) return <>{text}</>;
+  return <>{text.slice(0, at)}<mark>{text.slice(at, end)}</mark>{text.slice(end)}</>;
+}
+
+/** About 150 characters of a passage for its card, starting a little before the quote so the card shows it lit. */
+function excerpt(text: string, span: {start: number; end: number} | null): {text: string; span: {start: number; end: number} | null} {
+  const LEN = 150;
+  if (!span || span.end > text.length) return {text: text.length > LEN ? `${text.slice(0, LEN)}…` : text, span: null};
+  let from = Math.max(0, span.start - 40);
+  if (from > 0) { const space = text.indexOf(' ', from); from = space >= 0 && space < span.start ? space + 1 : from; }
+  const to = Math.max(from + LEN, Math.min(span.end, from + LEN * 2));
+  const lead = from > 0 ? '…' : '';
+  return {text: `${lead}${text.slice(from, to)}${to < text.length ? '…' : ''}`, span: {start: span.start - from + lead.length, end: Math.min(span.end, to) - from + lead.length}};
+}
+
+const spanOf = (a: CustodyAnchorOut | null | undefined) => a && a.start != null && a.end != null ? {start: a.start, end: a.end} : null;
+
+/** The server counts characters (code points); JavaScript strings count UTF-16 units, so a character outside the
+ * basic plane before or inside the quote would shift the highlight. Turn a stored span into this text's units. */
+export function unitSpan(text: string, span: {start: number; end: number} | null): {start: number; end: number} | null {
+  if (!span) return null;
+  const unit = (points: number) => {
+    let i = 0;
+    for (let n = 0; n < points && i < text.length; n += 1) i += (text.codePointAt(i) ?? 0) > 0xffff ? 2 : 1;
+    return i;
+  };
+  return {start: unit(span.start), end: unit(span.end)};
 }
 
 export function ChainOfCustody({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
@@ -287,7 +313,7 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
     </svg>
     {COLUMNS.map((c, i) => <p key={c} className="cc-col" style={{gridColumn: i + 1}}>{c.toUpperCase()}</p>)}
     {chain.rows.map((row, r) => row.cards.map(c => <CardBox key={c.id} card={c} row={r + 2} picked={picked === c.id} lit={lit === c.id} falls={downstream.has(c.id)}
-      against={row.stance === 'contradicts'} onPick={() => onPick(c.id)} onLight={onLight}/>))}
+      against={row.stance === 'contradicts'} anchor={spanOf(row.anchor)} onPick={() => onPick(c.id)} onLight={onLight}/>))}
     <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}${lit === 'claim' ? ' lit' : ''}`} data-card="claim" style={{gridColumn: 5, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
       aria-label={`The claim: ${chain.claim.text}`}>
       <StatusChip status={claimStatus}/>
@@ -318,19 +344,21 @@ function DoneList({done}: {done: ClaimDoneOut}): ReactElement {
   </div>;
 }
 
-function CardBox({card, row, picked, lit, falls, against, onPick, onLight}: {
-  card: CustodyCardOut; row: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; onPick: () => void; onLight: (id: string | null) => void;
+function CardBox({card, row, picked, lit, falls, against, anchor, onPick, onLight}: {
+  card: CustodyCardOut; row: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; anchor: {start: number; end: number} | null;
+  onPick: () => void; onLight: (id: string | null) => void;
 }): ReactElement {
+  const shown = card.kind === 'passage' && card.text ? excerpt(card.text, unitSpan(card.text, anchor)) : null;
   const head = card.kind === 'decision' ? (card.title === 'Answered' ? 'Linked against' : card.title)
-    : card.kind === 'passage' ? `Passage${card.page ? ` · p.${card.page}` : ''}` : KIND_WORD[card.kind];
+    : card.kind === 'passage' ? `Passage${card.page ? ` · p.${card.page}` : ''}${lineSpan(card, 'l.')}` : KIND_WORD[card.kind];
   return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}`}
     style={{gridColumn: COL[card.kind] + 1, gridRow: row}} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
     aria-label={`${KIND_WORD[card.kind]}: ${card.title}. ${card.checks.map(c => `${c.label} ${c.ok === true ? 'passed' : c.ok === false ? 'failed' : 'not known'}`).join(', ')}`}>
     {card.kind === 'file' && <span className="cc-thumb" aria-hidden="true"><i/><i/><i/><i/></span>}
     <span className="cc-card-top"><span className="cc-kind">{head}</span>{card.checks.map(c => <Check key={c.label} {...c}/>)}</span>
-    {card.kind === 'passage' ? (card.text ? <span className="cc-text"><Lit text={card.text.length > 150 ? `${card.text.slice(0, 150)}…` : card.text} quote={card.quote}/></span> : <b>{card.title}</b>)
+    {card.kind === 'passage' ? (shown ? <span className="cc-text"><Lit text={shown.text} quote={card.quote} span={shown.span}/></span> : <b>{card.title}</b>)
       : card.kind === 'reading' ? <b>{card.title}{card.lines[0] ? `, ${card.lines[0]}` : ''}</b>
-      : card.kind === 'decision' ? <b>{card.title === 'Answered' ? `Answer: ${card.lines[0]}` : card.title === 'Quote saved' ? 'Typed in by a person' : card.lines[0]}</b>
+      : card.kind === 'decision' ? <b>{card.title === 'Answered' ? `Answer: ${card.lines[0]}` : card.title === 'Quote saved' ? `Typed in by ${card.who ?? 'a person'}` : card.lines[0]}</b>
       : <b className={card.kind === 'file' ? 'cc-file' : undefined}>{card.title}</b>}
     {card.quote && card.kind === 'source' && <span className="cc-text">“{card.quote}”</span>}
     {card.kind === 'decision' && card.title === 'Proposed' && card.lines[1] && <small className={card.lines[1].startsWith('accepted') ? 'cc-ok' : ''}>{card.lines[1].startsWith('accepted') ? `✓ ${card.lines[1].replace(/^a/, 'A')}` : card.lines[1]}</small>}
@@ -361,8 +389,9 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
   return <aside className="cc-detail" aria-label={`Step ${n} of ${all.length}: ${KIND_WORD[card.kind]}`}>
     <p className="cc-eyebrow">Step {n} of {all.length} · {KIND_WORD[card.kind]}</p>
     <h3>{title}</h3>
-    {file && <p className="cc-mono cc-muted">{file.title}{passage?.page ? ` · page ${passage.page}` : ''}</p>}
-    {(passage?.text || card.quote) && <blockquote><Lit text={passage?.text ?? card.quote ?? ''} quote={card.quote ?? passage?.quote}/></blockquote>}
+    {file && <p className="cc-mono cc-muted">{file.title}{passage && lineSpan(passage, 'lines') ? ` ·${lineSpan(passage, 'lines')}` : passage?.page ? ` · page ${passage.page}` : ''}</p>}
+    {(passage?.text || card.quote) && <blockquote><Lit text={passage?.text ?? card.quote ?? ''} quote={card.quote ?? passage?.quote}
+      span={passage?.text ? unitSpan(passage.text, spanOf(row?.anchor)) : null}/></blockquote>}
     <dl>
       {src && item('Source', <span className="cc-checks plain">
         <Check label={SOURCE_WORD[src.source_type] ?? src.source_type} ok={true}/>
@@ -371,10 +400,10 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
       {file && item('File', <span className="cc-checks plain">{chip(hash?.ok, hash?.ok ? 'hash matches' : hash?.ok === false ? 'hash differs' : 'hash not checked')}
         {reading && reading.checks[0]?.label === 'OCR' ? <Check label="read by OCR" ok={true}/> : reading ? chip(reading.checks[0]?.ok, 'text layer') : null}</span>)}
       {passage && item('Content', <span className="cc-checks plain">{chip(says?.ok, says?.ok ? 'says it · exact' : says?.ok === false ? 'does not say it' : 'not checked')}</span>)}
-      {row?.anchor && item('Anchor', `${row.anchor.exact ? 'exact' : 'same words, different case'} quote at characters ${row.anchor.start}–${row.anchor.end} of the passage (found now, not stored)`)}
+      {row?.anchor && item('Anchor', anchorWords(row.anchor))}
       {sha && item('SHA-256', <span className="cc-mono">{sha}
         {recheck?.result !== undefined ? <> · {recheck.result ? '✓ re-checked now' : '✕ does not match the file now'}</> : <> · {hash?.ok ? '✓ re-checked when opened' : ''}</>}</span>)}
-      {decision && item('Decided', `${decision.title === 'Proposed' ? decision.lines.join(' · ') : decision.title === 'Answered' ? `Answered: ${decision.lines[0]}` : 'Typed in by a person'} · ${short(decision.when)}`)}
+      {decision && item('Decided', `${decision.title === 'Proposed' ? decision.lines.join(' · ') : decision.title === 'Answered' ? `Answered by ${decision.who ?? 'a person'}: ${decision.lines[0]}` : `Typed in by ${decision.who ?? 'a person'}`} · ${short(decision.when)}`)}
       {row && item('Rests on it', rests.length ? <span className="cc-checks">
         {(['claim', 'link'] as const).map(k => { const c = rests.filter(r => r.kind === k).length; return c ? <span key={k} className="cc-rest">{c} {k}{c === 1 ? '' : 's'}</span> : null; })}
         {rests.filter(r => r.kind === 'flag').map(f => <span key={f.id} className="cc-rest">{f.label} {f.level && <LevelMark level={f.level}/>}</span>)}</span> : 'nothing else yet')}
@@ -393,6 +422,27 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
       <button type="button" aria-pressed={breaks} onClick={onBreaks}>What if this breaks?</button>
     </div>
   </aside>;
+}
+
+/** "l.14–22" on a passage card, "lines 14–22" in the detail: the passage's lines, as read, that the quote spans. */
+function lineSpan(card: CustodyCardOut, word: string): string {
+  if (card.line_start == null) return '';
+  // Joined so the span never breaks across lines ("l.14–22", not "l.14–" then "22").
+  return ` ${word}${word.endsWith('.') ? '' : '\u00a0'}${card.line_start}${card.line_end != null && card.line_end !== card.line_start ? `\u2060–\u2060${card.line_end}` : ''}`;
+}
+
+const MATCH_WORD: Record<string, string> = {exact: 'exact quote', case: 'same words, different case', spacing: 'same words, different spacing'};
+
+/** The stored anchor as found now (ADR-0015): how the words matched, the text kept either side, the offsets, and
+ * what happened to it since it was stored. */
+function anchorWords(a: CustodyAnchorOut): string {
+  if (a.start == null || a.end == null) {
+    return a.state === 'lost' ? `the quote is no longer in the text of this passage${a.anchored_at ? ` (anchored ${short(a.anchored_at)})` : ''}` : 'the quote is not in this passage';
+  }
+  const around = a.before === a.after ? `${a.before} characters before and after` : `${a.before} characters before, ${a.after} after`;
+  const where = `${MATCH_WORD[a.match ?? 'exact'] ?? 'quote'} + ${around}, offsets ${a.start}–${a.end}${(a.occurrences ?? 1) > 1 ? ` · 1 of ${a.occurrences} places` : ''}`;
+  return a.state === 'moved' ? `${where} · moved since it was anchored (the document was read again)`
+    : a.state === 'not anchored' ? `${where} · found now: saved before anchors were kept` : where;
 }
 
 function LevelMark({level}: {level: string}): ReactElement {

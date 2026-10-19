@@ -286,11 +286,51 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             sync = sync_document_to_openaleph(db, doc.id)
         except Exception as exc:  # OpenAleph down must not undo a finished read
             db.rollback()
-            return f"Document read; sending it to OpenAleph failed: {type(exc).__name__}: {exc}"
-        if sync.status == "failed":
-            return f"Document read; sending it to OpenAleph failed: {sync.error}"
-        message = "Document read and sent to OpenAleph"
-    return message
+            message = f"Document read; sending it to OpenAleph failed: {type(exc).__name__}: {exc}"
+        else:
+            message = (f"Document read; sending it to OpenAleph failed: {sync.error}" if sync.status == "failed"
+                       else "Document read and sent to OpenAleph")
+    return _measure_legibility(db, document_id, report, message)
+
+
+def _measure_legibility(db: Session, document_id: str, report: Report, message: str) -> str:
+    """After the read, how legible each page read by OCR was (app/services/legibility.py). The document is
+    already read and in use; measuring never fails the read, and a stop asked for here stops only the measuring."""
+    from sqlalchemy import select
+
+    from app.jobs.records import JobStopped
+    from app.models.domain import Document, DocumentChunk
+    from app.services.document_reader import measure_legibility
+
+    doc = db.get(Document, document_id)
+    if doc is None or not settings.enable_pdf_ocr:
+        return message
+    scanned = [c for c in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id, DocumentChunk.locator.contains("(OCR)")))
+               if c.ocr_legibility is None]
+    pages = sorted({c.page_number or 1 for c in scanned})
+    if not pages:
+        return message
+    measured: dict[int, float | None] = {}
+    try:
+        for number, page in enumerate(pages, 1):
+            report(85 + int(14 * number / len(pages)), f"Read · measuring how legible the scan is · page {number} of {len(pages)}")
+            got, why = measure_legibility(doc.storage_path, [page])
+            if why:
+                return f"{message}; legibility not measured: {why}"
+            measured.update(got)
+    except JobStopped:
+        pass
+    except Exception as exc:
+        logger.warning("measuring legibility failed", exc_info=True, extra={"document_id": document_id})
+        return f"{message}; legibility not measured: {type(exc).__name__}"
+    finally:
+        for chunk in scanned:
+            value = measured.get(chunk.page_number or 1)
+            if value is not None:
+                chunk.ocr_legibility = value
+        db.commit()
+    done = sum(1 for v in measured.values() if v is not None)
+    return f"{message}; legibility measured on {done} of {len(pages)} scanned page{'s' if len(pages) != 1 else ''}"
 
 
 def _check_watchlist_after_read(db: Session, document_id: str, message: str | None) -> str | None:

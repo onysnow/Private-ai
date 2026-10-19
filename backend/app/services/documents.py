@@ -14,6 +14,7 @@ from app.services.pdf_ocr import extract_pdf_chunks
 from app.services.image_reader import IMAGE_EXTENSIONS, extract_image_chunks
 from app.services.container_readers import CONTAINER_EXTENSIONS, read_container
 from app.services.document_reader import read_chunks
+from app.services.anchors import anchor_document_quotes
 from app.services.entity_signals import clean_names, norm_name, read_name, read_passage, split_title
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
@@ -302,6 +303,9 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
                     once[key] = row
         doc.extraction_status = 'complete'
         doc.extraction_issues = issues or None
+        db.flush()
+        # Quotes saved from this document before it was read, or kept from an earlier reading, find their place.
+        anchor_document_quotes(db, doc)
         db.commit()
     except Exception as exc:
         # Drop any chunks/proposals added before the failure, then record why.
@@ -403,6 +407,7 @@ def serialize_extraction_lineage(db: Session, candidate: ExtractionCandidate) ->
             'accepted_record_id': candidate.accepted_record_id,
             'reviewer_note': candidate.reviewer_note, 'created_at': candidate.created_at,
             'reviewed_at': candidate.reviewed_at,
+            'decided_by_id': candidate.decided_by_id, 'decided_by_name': candidate.decided_by_name,
         },
         'document': ({
             'id': doc.id, 'investigation_id': doc.investigation_id, 'source_id': doc.source_id,

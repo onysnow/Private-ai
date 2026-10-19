@@ -85,7 +85,7 @@ from app.schemas.responses import (
 )
 from app.services.assistant_context import build_question_context
 from app.services.demo_seed import seed_demo_investigation
-from app.services.exports import build_investigation_export
+from app.services.exports import build_investigation_export, record_backup
 from app.services.financial_flows import investigation_financial_ledger
 from app.services.investigations import (
     create_investigation as _create_investigation,
@@ -492,6 +492,7 @@ def export_investigation(
         payload, manifest = build_investigation_export(db, investigation_id, include_documents=include_documents)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
+    record_backup(db, investigation_id, payload, manifest)
     inv = manifest["investigation"]
     safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in inv["name"]).strip("_") or "investigation"
     filename = f"{safe_name}.jwbackup.zip"

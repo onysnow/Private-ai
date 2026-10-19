@@ -18,6 +18,7 @@ from app.core.time import utcnow_iso
 from app.core.config import settings
 from app.db.locking import investigation_export_snapshot, lock_investigation_transaction
 from app.jobs.corpus import request_corpus_sync
+from app.services.anchors import anchor_document_quotes
 from app.services.security import contained_path, resolve_storage_root
 from app.models.domain import (
     Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, ClaimReviewEvent, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment,
@@ -630,6 +631,7 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 raw_locations[doc_id] = str(dest)
 
         restored_counts: dict[str, int] = {}
+        db.info["restoring"] = True
         try:
             for table in RESTORE_ORDER:
                 model = MODEL_BY_TABLE[table]
@@ -646,6 +648,13 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 if rows:
                     db.flush()
                 restored_counts[table] = len(rows)
+            db.info.pop("restoring", None)
+            # A backup made before quotes were anchored (ADR-0015): anchor them in the restored passages.
+            for doc_row in records.get("documents", []):
+                doc = db.get(Document, doc_row["id"])
+                if doc is not None:
+                    anchor_document_quotes(db, doc, only_missing=True)
+            db.flush()
 
             # Install documents only after every database row has flushed successfully.
             # Use exclusive creation rather than replace() so a concurrent local file can
@@ -659,6 +668,7 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
 
             db.commit()
         except Exception:
+            db.info.pop("restoring", None)
             db.rollback()
             for dest in reversed(created_files):
                 try:
@@ -680,3 +690,23 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
     request_corpus_sync(db, investigation_id)
     return {"investigation_id": investigation_id, "restored_counts": restored_counts, "manifest": manifest}
 
+
+
+def record_backup(db: Session, investigation_id: str, data: bytes, manifest: dict[str, Any]) -> None:
+    """Keep when this case was last backed up, so Settings › Backups and Safety & data can say so (mockup KEEP_2).
+    A backup that was made but not saved by the browser still counts: the app cannot see where the file went.
+    Someone who may only read the case (a viewer) can still download a backup; it is not recorded, since
+    recording it would be a change to the case they may not make."""
+    from app.core.authorization import current_authorization_scope
+    from app.models.investigations import Investigation
+
+    scope = current_authorization_scope()
+    if scope is not None and not scope.allows_write(investigation_id):
+        return
+
+    inv = db.get(Investigation, investigation_id)
+    if inv is None:
+        return
+    inv.last_backup = {"at": manifest["generated_at"], "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(),
+                       "documents_included": bool(manifest.get("documents_included"))}
+    db.commit()

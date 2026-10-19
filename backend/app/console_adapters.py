@@ -40,6 +40,7 @@ from app.models.domain import (
 from app.services.exports import (
     build_investigation_export,
     preview_investigation_restore,
+    record_backup,
     restore_investigation_export,
 )
 from app.services.security import redact_database_url, resolve_storage_root
@@ -405,6 +406,9 @@ class WorkbenchBackups:
         backup_id = f"{stamp}-{selection}"
         path = self.backups_dir / f"{backup_id}.zip"
         path.write_bytes(data)
+        # Recorded only once the archive is on disk, so a failed write never reads as a fresh backup.
+        with self.session_factory() as db:
+            record_backup(db, selection, data, manifest)
         handle.log(f"[console] wrote {path.name} ({len(data)} bytes)")
         return BackupRecord(id=backup_id, created_at=manifest["generated_at"], bytes=len(data), kind=self.kind, label=manifest["investigation"]["name"], verified=True)
 
