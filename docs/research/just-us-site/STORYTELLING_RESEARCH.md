@@ -47,7 +47,7 @@ Research before the mockups. No code, no generated images. The mockups will use 
 **The scenes and the risk with each:**
 - **Lynching:** no stock photograph should show a real person. The scene should be built from parts: a tree, rope, legs from a posed model, the ground, a police silhouette.
 - **ICE:** the same. Use posed or generic elements: a cracked windshield, flashing lights, figures in tactical gear with no faces.
-- **Epstein files:** use the real released pages. US government documents are public domain, and the black redaction bars are the point.
+- **Epstein files:** a government release does not make a page public domain. 17 U.S.C. §105 covers only work by federal employees in their official duties, such as a DOJ cover letter or an FBI form. It does not cover flight logs, emails, photographs or exhibits that were merely released with them. Before any real page is used, record who wrote it and what rights it carries. Otherwise the scene shows a stand-in page with only redaction bars, which is still the point.
 - **Trump administration:** use public-domain White House photographs. Showing the building and not the man avoids the likeness and portrait questions.
 
 ## 4. How the research changes the plan
