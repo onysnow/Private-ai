@@ -2694,3 +2694,16 @@ round:
   investigation_type.py, stories.py and routes_ai_runs.py on the backend).
 
 Tests: vitest 1341 passed (200 files), tsc and eslint clean; backend touched tests, mypy and the OpenAPI check pass.
+
+### 2026-10-19 — Decided audit items built (PR #87)
+
+Case home: continuous year rail (empty years as dimmed ticks; the strip's year count is the span); mini network
+"n linked · m in the case". Claims list: mark + word on every status, edge by shape. Bring in: sample-case link
+only when the sample has documents; reading room counts only what it shows, "n whole-passage quotes wait in
+Decide"; "Emails & phones"; identifier cards say Email address or Phone number from the value. AI: the drafts panel
+hands runs to Before you run; the lookups line says runs make no outside lookups yet; run plan
+`packet.below_tier_floor` (records below the floor, per tier, "leads only"). Settings breadcrumb names the case.
+Not built (new design or no data): standing-number popovers, empty-case first actions, Format Editorial/Desk/Story,
+Wire arrangement switch, worked-out links, source scan, Practise, sort by unlocks / H snooze, Safety & data screen.
+Presentation draft still runs straight from the drafts panel (the plan endpoint does not cover it).
+Tests: vitest 1353 passed; tsc, eslint, mypy, ruff, OpenAPI check clean; touched backend tests pass.
