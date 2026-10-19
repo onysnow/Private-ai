@@ -26,7 +26,7 @@ import type {ChangeEvent, DragEvent, FocusEvent as ReactFocusEvent, KeyboardEven
 
 import {ApiHttpError, errorMessage} from '../../lib/api-client';
 import {caseHref} from '../../lib/case-href';
-import {getDropHistoryOptions, getDropHistoryQueryKey, getDropOptions, getDropQueryKey, settingsStatusOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getDropHistoryOptions, getDropHistoryQueryKey, getDropOptions, getDropQueryKey, listDocumentsOptions, listInvestigationsOptions, settingsStatusOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {cancelJobEndpoint, createIngestionBatch, retryJobEndpoint} from '../../lib/generated/sdk.gen';
 import type {DropHistoryEntryOut, DropLaneOut, DropOut, DropProposerOut, DropStageOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
@@ -44,7 +44,7 @@ const STALLED_MARK = '⧗';
 const STALLED_WORD = 'no progress';
 const isStalled = (lane: DropLaneOut, s: DropStageOut) => s.key === 'read' && lane.stalled_minutes !== null && lane.stalled_minutes !== undefined;
 const KIND: Record<string, [string, string]> = {entity: ['name', 'names'], claim: ['claim', 'claims'], evidence: ['quote', 'quotes'],
-  relationship: ['link', 'links'], event: ['date', 'dates'], identifier: ['identifier', 'identifiers']};
+  relationship: ['link', 'links'], event: ['date', 'dates'], identifier: ['email or phone', 'emails & phones']};
 const kindWord = (k: string, n: number) => (KIND[k] ? KIND[k][n === 1 ? 0 : 1] : k);
 const KindTitle = (k: string) => { const w = kindWord(k, 2); return w.charAt(0).toUpperCase() + w.slice(1); };
 const LANGUAGES: Record<string, string> = {eng: 'English', fra: 'French', deu: 'German', spa: 'Spanish', ita: 'Italian', por: 'Portuguese', nld: 'Dutch', rus: 'Russian', ara: 'Arabic', chi_sim: 'Chinese'};
@@ -314,6 +314,16 @@ function Totals({data, tab}: {data: DropOut; tab: TabStop}): ReactElement {
   </div>;
 }
 
+/** The empty Drop's way to the sample case (research §2 "Empty"), offered only when that case has
+ * documents to bring in: the sample (POST /api/demo/seed) holds sources and evidence but no files,
+ * and a link to an empty case teaches nothing. */
+function SampleCaseLink({investigationId}: {investigationId: string}): ReactElement | null {
+  const sample = useQuery({...listInvestigationsOptions()}).data?.find(c => c.is_demo && c.id !== investigationId);
+  const files = useQuery({...listDocumentsOptions({path: {investigation_id: sample?.id ?? ''}, query: {limit: 1}}), enabled: Boolean(sample)}).data;
+  if (!sample || !files?.length) return null;
+  return <p className="dp-quiet"><Link className="dp-link" href={caseHref('/bring-in', sample.id)}>Try with the sample case</Link> (teaching case)</p>;
+}
+
 export function TheDrop({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
   const queryClient = useQueryClient();
   const [busyNow, setBusyNow] = useState(false);
@@ -535,6 +545,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   if (!data || empty) return <section className="dp dp-empty" aria-label="The Drop">
     {field}
     {empty && <p className="dp-quiet">Each file is read on this computer: nothing leaves it.</p>}
+    {empty && <SampleCaseLink investigationId={investigationId}/>}
     {query.isError && <p role="alert">{errorMessage(query.error, 'Could not see what was brought in')}</p>}
   </section>;
 

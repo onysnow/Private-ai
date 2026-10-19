@@ -14,11 +14,14 @@
 // like a decision, then saved. Pointing at a card lights its words, and pointing at marked words lights
 // their card (research §6).
 import {useQuery, useQueryClient} from '@tanstack/react-query';
+import Link from 'next/link';
+import {useRouter} from 'next/navigation';
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
+import {caseHref} from '../../lib/case-href';
 import {
   getDocumentOptions, getExtractionCandidateExplanationOptions, getExtractionEntityMatchesOptions, getIdentifierTargetsOptions, getSameAnswerCandidatesOptions, getTagsOptions,
   listDocumentCandidatesEndpointOptions, listDocumentsOptions, listInvestigationsOptions,
@@ -65,6 +68,12 @@ function spanOf(payload: Record<string, unknown>): {start: number; end: number} 
 }
 
 /** What a proposal says, in a line. */
+/** What a proposal would become; an identifier is named by its value: an address with an @ is an email, anything else a phone number. */
+export function kindWord(c: ExtractionCandidateOut): string {
+  if (c.candidate_type === 'identifier' && !proposalText(c).includes('@')) return 'Phone number';
+  return KIND_WORD[c.candidate_type] ?? c.candidate_type;
+}
+
 export function proposalText(c: ExtractionCandidateOut): string {
   const p = c.payload as Record<string, unknown>;
   return String(p.caption ?? p.text ?? p.quote ?? p.value ?? p.title ?? c.candidate_type);
@@ -302,7 +311,7 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
   const open = c.review_status === 'proposed' && !held;
   const ask = openQuestion(c, answer, Boolean(matches.data?.strong_match));
   const blocked = ask !== null || (c.candidate_type === 'entity' && matches.isPending);
-  const kind = KIND_WORD[c.candidate_type] ?? c.candidate_type;
+  const kind = kindWord(c);
   const sameId = answer.identity?.kind === 'same' ? answer.identity.entityId : null;
   const record = sameId ? matches.data?.matches.find(m => m.entity_id === sameId)?.caption ?? null : null;
   const owners = [...(targets.data?.document_entities ?? []), ...(targets.data?.other_entities ?? [])];
@@ -420,11 +429,19 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   const strongOf = (id: string) => Boolean(queryClient.getQueryData<{strong_match?: unknown}>(getExtractionEntityMatchesOptions({path: {candidate_id: id}}).queryKey)?.strong_match);
   const shownCards = filter === 'questions' ? pageCards.filter(c => c.review_status === 'proposed' && openQuestion(c, answers[c.id] ?? {}, strongOf(c.id))) : pageCards;
   const pageClips = clips.filter(cl => (cl.page ?? 0) === current);
+  // The counts are of what the margin shows: a whole-passage quote proposal has no words to mark and no card
+  // here, so it is left out of them and pointed to in Decide instead.
   const counts = useMemo(() => {
     const c = {accepted: 0, rejected: 0, waiting: 0};
-    for (const x of all) { if (x.review_status === 'accepted') c.accepted += 1; else if (x.review_status === 'rejected') c.rejected += 1; else if (x.review_status === 'proposed') c.waiting += 1; }
+    for (const x of all) {
+      if (x.candidate_type === 'evidence') continue;
+      if (x.review_status === 'accepted') c.accepted += 1; else if (x.review_status === 'rejected') c.rejected += 1; else if (x.review_status === 'proposed') c.waiting += 1;
+    }
     return c;
   }, [all]);
+  const router = useRouter();
+  const decideHref = caseHref('/decide?kind=proposal', investigationId);
+  const quotesWaiting = all.filter(x => x.candidate_type === 'evidence' && x.review_status === 'proposed').length;
   const tops0 = docs.filter(d => !d.parent_document_id);
   const index = tops0.findIndex(d => d.id === documentId);
   const ocr = pageChunks.some(ch => /\(OCR\)/i.test(ch.locator));
@@ -738,6 +755,12 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
           <button type="button" role="radio" aria-checked={filter === 'questions'} onClick={() => setFilter('questions')}>Questions only</button>
         </span>
       </header>
+      {quotesWaiting > 0 && <p className="rr-quiet rr-elsewhere"><Link href={decideHref} onClick={e => {
+        // Go first, then close: closing unmounts this link before Next would follow it.
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault(); router.push(decideHref); onClose();
+      }}>
+        {quotesWaiting} whole-passage quote{quotesWaiting === 1 ? ' waits' : 's wait'} in Decide</Link></p>}
       <div className="rr-side-list">
         {heldBatch && !shownCards.some(c => c.id === heldBatch.from) && <p className="rr-held rr-batch-held" role="status">✓ {heldBatch.ids.length} more mention{heldBatch.ids.length === 1 ? ' goes' : 's go'} to {heldBatch.record} in a moment.
           <button type="button" onClick={undoBatch}>Undo <kbd>U</kbd></button></p>}

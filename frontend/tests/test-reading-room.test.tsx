@@ -5,7 +5,7 @@ import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {ReadingRoom, acceptImpact, clipOf, proposalText, sameReason} from '../features/reading-room/reading-room';
+import {ReadingRoom, acceptImpact, clipOf, kindWord, proposalText, sameReason} from '../features/reading-room/reading-room';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -57,6 +57,13 @@ describe('reading room helpers', () => {
     expect(proposalText(name as unknown as ExtractionCandidateOut)).toBe('Fernhill Ltd');
   });
 
+  it('names an identifier by its value: email or phone number', () => {
+    const id = (value: string) => ({...name, candidate_type: 'identifier', payload: {value}}) as unknown as ExtractionCandidateOut;
+    expect(kindWord(id('ana@harbour.example'))).toBe('Email address');
+    expect(kindWord(id('+44 20 7946 0000'))).toBe('Phone number');
+    expect(kindWord(name as unknown as ExtractionCandidateOut)).toBe('Name');
+  });
+
   it('says why a record may be the same, and what accepting adds', () => {
     expect(sameReason('Harbour Nominees Ltd', 'Harbour Nominees Limited', 'the same name')).toBe('Same name: “Ltd” and “Limited” read as one');
     expect(sameReason('Kestrel SA', 'Kestrel SA', 'the same name')).toBe('Same name, word for word');
@@ -93,6 +100,25 @@ describe('ReadingRoom', () => {
     fireEvent.keyDown(window, {key: 'Escape'});
     await waitFor(() => expect(api.calls('POST /api/extraction-candidates/x1/review')).toHaveLength(1));
     expect(api.lastBody('POST /api/extraction-candidates/x1/review')).toEqual({decision: 'accept', entity_schema: 'Company'});
+  });
+
+  it('counts only what the margin shows, and points whole-passage quotes to Decide', async () => {
+    const quote = (id: string, status: string) => ({...name, id, candidate_type: 'evidence', review_status: status,
+      payload: {quote: TEXT, rationale: {rule: 'sentence_assertion'}}});
+    routes({'GET /api/documents/d1/candidates': [name, quote('q1', 'proposed'), quote('q2', 'proposed'), quote('q3', 'accepted')]});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    await within(room).findByRole('article', {name: 'Name: Fernhill Ltd'});
+    expect(room.querySelector('.rr-foot')).toHaveTextContent('0 accepted · 0 rejected · 1 waiting');
+    expect(within(room).getByRole('link', {name: '2 whole-passage quotes wait in Decide'})).toHaveAttribute('href', '/decide?kind=proposal&inv=inv-1');
+  });
+
+  it('leaves out the pointer to Decide when no whole-passage quote waits', async () => {
+    routes();
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    await within(room).findByRole('article', {name: 'Name: Fernhill Ltd'});
+    expect(within(room).queryByRole('link', {name: /whole-passage/})).not.toBeInTheDocument();
   });
 
   it('waits for the answer to its question before a name can be accepted', async () => {

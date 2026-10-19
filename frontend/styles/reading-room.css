@@ -65,6 +65,10 @@
 .rr-side-head [role=radio] { all: unset; cursor: pointer; padding: 3px 9px; border-radius: 99px; font-size: 11.5px; color: var(--text-muted); border: 1px solid transparent; }
 .rr-side-head [role=radio][aria-checked=true] { border-color: var(--line); color: var(--text); background: var(--surface-2); }
 .rr-side-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 10px; padding: 2px 4px 30px 2px; }
+.rr-elsewhere { margin: 0; }
+.rr-elsewhere a { color: var(--accent-2); text-underline-offset: 2px; }
+.rr-elsewhere a:hover { color: var(--text); }
+.rr-elsewhere a:focus-visible { outline: 2px solid var(--accent-1); border-radius: 3px; }
 .rr-clip { padding: 12px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
 .rr-clip .rr-eyebrow { display: flex; align-items: center; gap: 8px; }
 .rr-clip .rr-eyebrow .st { margin-left: auto; }

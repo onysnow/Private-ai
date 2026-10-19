@@ -112,6 +112,29 @@ describe('The Drop', () => {
     expect(screen.getByRole('button', {name: 'a folder'})).toBeInTheDocument();
   });
 
+  it('offers the sample case on an empty Drop only when the sample has documents to bring in', async () => {
+    const empty = {...drop, lanes: [], totals: {...drop.totals, files: 0}, ready_for_you: {}};
+    const sample = {id: 'demo-1', name: 'Demo Investigation', description: null, question: null, is_demo: true, type_areas: null, ai_run_profile: null, created_at: '2026-10-12T00:00:00'};
+    const file = {id: 'f1', investigation_id: 'demo-1', source_id: 's1', filename: 'note.txt', title: 'note', mime_type: 'text/plain', sha256: 'ab'.repeat(32),
+      extraction_status: 'complete', extraction_error: null, extraction_issues: [], created_at: '2026-10-12T00:00:00', chunk_count: 1, candidate_counts: {}, parent_document_id: null};
+    const api = mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': empty, 'GET /api/investigations': [sample], 'GET /api/investigations/demo-1/documents': []});
+    const first = render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    await screen.findByText(/nothing leaves it/);
+    await waitFor(() => expect(api.calls('GET /api/investigations/demo-1/documents')).toHaveLength(1));
+    expect(screen.queryByRole('link', {name: 'Try with the sample case'})).not.toBeInTheDocument();
+    first.unmount();
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': empty, 'GET /api/investigations': [sample], 'GET /api/investigations/demo-1/documents': [file]});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByRole('link', {name: 'Try with the sample case'})).toHaveAttribute('href', '/bring-in?inv=demo-1');
+  });
+
+  it('names the identifier proposals as the mockup does: Emails & phones', async () => {
+    mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': {...drop, ready_for_you: {identifier: 3}}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const ready = await screen.findByRole('region', {name: 'Ready for you'});
+    expect(within(ready).getByRole('link', {name: '3 emails & phones proposed'})).toHaveTextContent('Emails & phones');
+  });
+
   it('reads a failed file again, and sends a second copy to the first', async () => {
     const failed = lane('d4', 'locked.pdf', ['done', 'done', 'stopped', 'stopped', 'skipped', 'waiting', 'waiting'], {retry_job_id: 'j4', note: 'Password-protected'});
     const copy = lane('d5', 'minutes (copy).pdf', ['done', 'done', 'done', 'done', 'skipped', 'done', 'done'], {same_as: 'd1', note: 'Already in the case: same fingerprint'});
