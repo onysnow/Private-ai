@@ -40,6 +40,8 @@ PAYLOAD = {
                 "warrant": "direct quote", "confidence": "HIGH", "confidence_term": "VERY_LIKELY", "confidence_basis": "x", "limitations": []}],
     "investigative_gaps": [],
 }
+# A reporter's claim-by-claim decision (app/ai/reasoning.py review_ai_claim) travels with the candidate.
+CLAIM_REVIEWS = {"CLM-0001": {"decision": "correct", "text": "Ada North signed on 3 May.", "reason": None, "reviewed_at": "2026-10-19T08:00:00Z"}}
 
 
 def _memory_factory():
@@ -58,6 +60,7 @@ def _seed_candidates(db: Session, investigation_id: str, *, prefix: str) -> tupl
         request={"question": "What did Ada North sign?", "working_theory": None, "max_results": 30, "include_external_leads": True},
         payload=PAYLOAD, checked_citation_ids=[{"record_type": "evidence", "record_id": f"{prefix}-ev"}],
         review_status="accepted", reviewer_note="Reporter verified the cited filing.", created_at=utcnow_naive(), reviewed_at=utcnow_naive(),
+        claim_reviews=CLAIM_REVIEWS,
     )
     rejected = AIAnalysisCandidate(
         id=f"{prefix}-rejected", investigation_id=investigation_id, module="hypothesis_test",
@@ -105,6 +108,7 @@ def test_ai_candidates_round_trip_through_portable_backup(tmp_path: Path):
     assert exported[accepted_id]["reviewer_note"] == "Reporter verified the cited filing."
     assert exported[accepted_id]["reviewed_at"] is not None
     assert exported[rejected_id]["review_status"] == "rejected"
+    assert exported[accepted_id]["claim_reviews"] == CLAIM_REVIEWS and exported[rejected_id]["claim_reviews"] is None
 
     engine = create_engine(f"sqlite:///{tmp_path / 'restored.db'}", connect_args={"check_same_thread": False})
     Base.metadata.create_all(engine)
@@ -118,6 +122,7 @@ def test_ai_candidates_round_trip_through_portable_backup(tmp_path: Path):
         assert row.checked_citation_ids == [{"record_type": "evidence", "record_id": "b-ev"}]
         assert row.request["question"] == "What did Ada North sign?"
         assert row.reviewed_at is not None
+        assert row.claim_reviews == CLAIM_REVIEWS
         assert db.get(AIAnalysisCandidate, rejected_id).reviewer_note == "Auto-rejected: invented citation"
 
 

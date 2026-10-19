@@ -28,6 +28,7 @@
 .dp-card dl div { display: flex; justify-content: space-between; gap: 10px; }
 .dp-card dt { color: var(--text-muted); }
 .dp-card dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.dp-proposers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .dp-local { margin: 8px 0 0; color: var(--text-muted); font-size: 11.5px; }
 .dp-eyebrow { margin: 0; font: 500 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
 .dp-quiet { color: var(--text-muted); font-size: 12.5px; margin: 4px 0 0; }

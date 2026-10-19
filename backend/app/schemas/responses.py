@@ -3524,6 +3524,15 @@ class CitationDetailOut(ResponseModel):
     missing: bool
 
 
+class AiClaimReviewOut(ResponseModel):
+    """Your decision on one claim or hypothesis of an answer. `text` is your corrected wording (the model's stays
+    in the payload); `reason` says why, and is always there for a rejection."""
+    decision: str  # keep | correct | reject
+    text: str | None
+    reason: str | None
+    reviewed_at: str
+
+
 class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
     """One proposal in full. `payload` is the model's output in its module's
     own schema (app/ai/reasoning.py OUTPUT_SCHEMAS), or the raw text of a run
@@ -3534,6 +3543,8 @@ class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
     payload: dict[str, Any]
     checked_citation_ids: list[RecordRefOut]
     trace: dict[str, Any] | None
+    # Your decisions claim by claim, by claim or hypothesis id (app/ai/reasoning.py review_ai_claim); {} when none.
+    claim_reviews: dict[str, AiClaimReviewOut]
     citation_details: list[CitationDetailOut] | None = Field(default=None, exclude_if=_absent_when_none)
     deck_preview: list[DeckSlideOut] | None = Field(default=None, exclude_if=_absent_when_none)
     # A presentation draft's "how we know" line (app/services/presentation.py how_we_know).
@@ -4895,6 +4906,13 @@ class DropStageNameOut(ResponseModel):
     label: str
 
 
+class DropProposerOut(ResponseModel):
+    rule: str
+    accepted: int
+    rejected: int
+    waiting: int
+
+
 class DropReceiptOut(ResponseModel):
     fingerprint: str
     pages: int | None = None
@@ -4905,6 +4923,9 @@ class DropReceiptOut(ResponseModel):
     watchlist_hits: int
     flags_fed: list[str]
     files_inside: int
+    # What each proposer's proposals came to, by the rule that proposed them (payload.rationale.rule, "" when
+    # none is recorded). An accept corrected first is counted as accepted: corrections are not recorded apart.
+    by_proposer: list[DropProposerOut] = Field(default_factory=list)
 
 
 class DropLaneOut(ResponseModel):

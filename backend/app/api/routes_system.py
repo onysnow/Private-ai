@@ -30,6 +30,7 @@ from app.schemas.responses import (
 )
 from app.schemas.api import (
     AIAnalysisCandidateReviewRequest,
+    AiClaimReviewRequest,
     EvidenceCreate,
     PromoteToDeckRequest,
     PromoteToWriteupRequest,
@@ -37,7 +38,7 @@ from app.schemas.api import (
     TimelineEventCreate,
     TimelineEventGradeUpdate,
 )
-from app.ai.reasoning import review_ai_analysis_candidate, serialize_ai_analysis_candidate
+from app.ai.reasoning import review_ai_analysis_candidate, review_ai_claim, serialize_ai_analysis_candidate
 from app.services.decks import serialize_deck
 from app.services.evidence import create_evidence
 from app.services.openaleph import probe_openaleph
@@ -196,6 +197,21 @@ def review_ai_analysis_candidate_endpoint(candidate_id: str, body: AIAnalysisCan
         return review_ai_analysis_candidate(db, row, decision=body.decision, note=body.note)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+
+
+@router.post("/ai-analysis-candidates/{candidate_id}/claim-review", response_model=AiAnalysisCandidateOut)
+def review_ai_claim_endpoint(candidate_id: str, body: AiClaimReviewRequest, db: Session = Depends(get_db)) -> Any:
+    """Keep, correct or reject one claim (or hypothesis) of a proposed answer; replies with the whole proposal."""
+    row = db.get(AIAnalysisCandidate, candidate_id)
+    if row is None:
+        raise HTTPException(404, "AI analysis candidate not found")
+    try:
+        review_ai_claim(db, row, claim_id=body.claim_id, decision=body.decision, text=body.text, reason=body.reason)
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    return serialize_ai_analysis_candidate(row)
 
 
 @router.post("/ai-analysis-candidates/{candidate_id}/promote-to-writeup", response_model=WriteupOut)

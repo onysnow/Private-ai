@@ -89,6 +89,32 @@ export const zAiAnalysisCandidatesOut = z.object({
 });
 
 /**
+ * AiClaimReviewOut
+ *
+ * Your decision on one claim or hypothesis of an answer. `text` is your corrected wording (the model's stays
+ * in the payload); `reason` says why, and is always there for a rejection.
+ */
+export const zAiClaimReviewOut = z.object({
+  decision: z.string(),
+  reason: z.string().nullable(),
+  reviewed_at: z.string(),
+  text: z.string().nullable(),
+});
+
+/**
+ * AiClaimReviewRequest
+ *
+ * Your decision on one claim (or hypothesis) of a proposed AI answer (research AI §2 "Per-claim decisions").
+ * `text` is your corrected wording (correct only); `reason` is required to reject. "clear" takes a decision back.
+ */
+export const zAiClaimReviewRequest = z.object({
+  claim_id: z.string().min(1).max(64),
+  decision: z.enum(['keep', 'correct', 'reject', 'clear']),
+  reason: z.string().max(300).nullish(),
+  text: z.string().max(2000).nullish(),
+});
+
+/**
  * AiControlFlagOut
  */
 export const zAiControlFlagOut = z.object({
@@ -2688,9 +2714,20 @@ export const zDropHistoryOut = z.object({
 });
 
 /**
+ * DropProposerOut
+ */
+export const zDropProposerOut = z.object({
+  accepted: z.number().int(),
+  rejected: z.number().int(),
+  rule: z.string(),
+  waiting: z.number().int(),
+});
+
+/**
  * DropReceiptOut
  */
 export const zDropReceiptOut = z.object({
+  by_proposer: z.array(zDropProposerOut).optional(),
   files_inside: z.number().int(),
   fingerprint: z.string(),
   flags_fed: z.array(z.string()),
@@ -8427,6 +8464,7 @@ export const zAiAnalysisCandidateOut = z.object({
   checked_citation_count: z.number().int(),
   checked_citation_ids: z.array(zRecordRefOut),
   citation_details: z.array(zCitationDetailOut).nullish(),
+  claim_reviews: z.record(zAiClaimReviewOut),
   confidence: z.number(),
   created_at: z
     .string()
@@ -8888,6 +8926,17 @@ export const zGetAiAnalysisCandidateEndpointPath = z.object({
  * Successful Response
  */
 export const zGetAiAnalysisCandidateEndpointResponse = zAiAnalysisCandidateOut;
+
+export const zReviewAiClaimEndpointBody = zAiClaimReviewRequest;
+
+export const zReviewAiClaimEndpointPath = z.object({
+  candidate_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zReviewAiClaimEndpointResponse = zAiAnalysisCandidateOut;
 
 export const zPromoteAiAnalysisCandidateToDeckEndpointBody =
   zPromoteToDeckRequest;

@@ -193,7 +193,7 @@ describe('restyling a chart in a presentation draft', () => {
     created_at: '2026-10-01T09:00:00', reviewed_at: '2026-10-01T09:05:00', checked_citation_count: 0, rejection_reason: null,
   };
   const detail = {
-    ...summary, payload, checked_citation_ids: [], citation_details: [], trace: null,
+    ...summary, payload, checked_citation_ids: [], claim_reviews: {}, citation_details: [], trace: null,
     deck_preview: [
       {kind: 'title', heading: payload.title, bullets: [payload.goal_restated], evidence: [], notes: '', visual: null},
       {kind: 'content', heading: 'Who received the money', bullets: payload.sections[0].key_points, evidence: [], notes: payload.sections[0].body, visual},

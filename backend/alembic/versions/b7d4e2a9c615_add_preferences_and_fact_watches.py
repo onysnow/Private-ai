@@ -1,13 +1,13 @@
 """settings kept on the server (Notifications, Outside lookups, AI and research) and watches on a claim or a Red Flag
 
 Revision ID: b7d4e2a9c615
-Revises: e4c8a1f7b392
+Revises: e8c4a1f7b293
 """
 from alembic import op
 import sqlalchemy as sa
 
 revision = "b7d4e2a9c615"
-down_revision = "e4c8a1f7b392"
+down_revision = "e8c4a1f7b293"
 branch_labels = None
 depends_on = None
 

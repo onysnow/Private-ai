@@ -14,6 +14,7 @@ import {caseHref} from '../../lib/case-href';
 import {getInboxOptions, getInboxQueryKey, seeWatchMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {InboxOut, InboxRowOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 
 const SNOOZE_KEY = 'pai:snoozed';
 const DAY_MS = 86_400_000;
@@ -42,6 +43,9 @@ export function useSnoozed(): [Record<string, number>, (id: string, ms: number) 
 export function useInbox(enabled = true): {data: InboxOut | undefined; isPending: boolean} {
   const inv = useWorkbenchStore(state => state.investigationId);
   const q = useQuery({...getInboxOptions({path: {investigation_id: inv}}), enabled: Boolean(inv) && enabled, refetchInterval: 60_000});
+  // The inbox reads the stored flags and To check items; when the records have changed since the rules last ran,
+  // this runs them once (and the run refreshes the inbox).
+  useRedFlagsQuery(inv, Boolean(inv) && enabled);
   return {data: q.data, isPending: q.isPending};
 }
 

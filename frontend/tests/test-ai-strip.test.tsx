@@ -54,6 +54,20 @@ describe('AiStrip', () => {
     expect(push).toHaveBeenCalledWith('/act?inv=inv-1#ai-runs');
   });
 
+  it('asks the case from the case home: the question opens step 1 of Ask the case', async () => {
+    mockApi({
+      'GET /api/capabilities': caps(true),
+      'GET /api/investigations/inv-1/ai-runs': {runs: []},
+      'GET /api/investigations/inv-1/ai-analysis-candidates': {candidates: []},
+    });
+    render(<QueryProvider><AiStrip investigationId="inv-1"/></QueryProvider>);
+    const field = await screen.findByRole('textbox', {name: 'Ask the case a question'});
+    const user = userEvent.setup();
+    await user.type(field, 'Who controlled Fernhill Ltd?{Enter}');
+    expect(useWorkbenchStore.getState().askCase?.question).toBe('Who controlled Fernhill Ltd?');
+    expect(push).toHaveBeenCalledWith('/act?inv=inv-1#ai-runs');
+  });
+
   it('draws the miniature pipeline while a run is live', async () => {
     const live = {...RUN, status: 'running', finished: false, problems: 2};
     mockApi({
@@ -67,5 +81,6 @@ describe('AiStrip', () => {
     expect(await screen.findByRole('button', {name: 'AI run live: TAS routed, the model is writing, 2 problems. Open it'})).toBeInTheDocument();
     expect(document.querySelectorAll('.ai-strip circle.on')).toHaveLength(1);
     expect(document.querySelector('.ai-strip circle.ring.writing')).not.toBeNull();
+    expect(screen.queryByRole('textbox', {name: 'Ask the case a question'})).toBeNull();
   });
 });

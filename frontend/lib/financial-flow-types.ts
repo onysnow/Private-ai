@@ -149,3 +149,54 @@ export function findFlowCycle(links: Pick<FinancialFlowSankeyLink, 'source' | 't
   }
   return null;
 }
+
+/** The two ends of the "others (n)" band: not parties, so no party's name can match them. */
+export const OTHERS_IN = '\u0000others:in';
+export const OTHERS_OUT = '\u0000others:out';
+
+export type FoldedFlows = {
+  /** What is drawn: the largest flows, and the rest as one "others (n)" link when any were folded. */
+  aggregation: FinancialFlowAggregation;
+  /** How many flows (payer to payee) there are in all. */
+  flows: number;
+  folded: {flows: number; transactions: number; amount: number} | null;
+  /** Each party's exact total (the larger of what came in and what went out, over every flow), as its label shows it. */
+  totals: Map<string, number>;
+};
+
+/**
+ * Draws only the `top` largest flows and folds the rest into one link, "others (n)", from a node of its own
+ * to another (the money view's Columns layout does the same: features/money/money-layout.ts TOP_FLOWS).
+ * Each party's total still counts every flow. With `top` unset, or no more flows than `top`, nothing folds.
+ */
+export function foldFlows(aggregation: FinancialFlowAggregation, top?: number): FoldedFlows {
+  const totalIn = new Map<string, number>();
+  const totalOut = new Map<string, number>();
+  for (const link of aggregation.links) {
+    totalOut.set(link.source, (totalOut.get(link.source) ?? 0) + link.value);
+    totalIn.set(link.target, (totalIn.get(link.target) ?? 0) + link.value);
+  }
+  const totals = new Map(aggregation.nodes.map(n => [n.name, Math.max(totalIn.get(n.name) ?? 0, totalOut.get(n.name) ?? 0)]));
+  const flows = aggregation.links.length;
+  if (top === undefined || flows <= top) return {aggregation, flows, folded: null, totals};
+  const key = (l: FinancialFlowSankeyLink) => `${l.source}\u0000${l.target}`;
+  const ranked = [...aggregation.links].sort((a, b) => b.value - a.value || key(a).localeCompare(key(b)));
+  const kept = ranked.slice(0, top);
+  const rest = ranked.slice(top);
+  const amount = rest.reduce((s, l) => s + l.value, 0);
+  const transactionIds = rest.flatMap(l => l.transactionIds);
+  const names = new Set(kept.flatMap(l => [l.source, l.target]));
+  totals.set(OTHERS_IN, amount);
+  totals.set(OTHERS_OUT, amount);
+  return {
+    aggregation: {
+      ...aggregation,
+      nodes: [...aggregation.nodes.filter(n => names.has(n.name)), {name: OTHERS_IN}, {name: OTHERS_OUT}],
+      links: [...kept, {source: OTHERS_IN, target: OTHERS_OUT, value: amount, transactionIds,
+        flowType: rest.some(l => l.flowType === 'inferred') ? 'inferred' : 'direct'}],
+    },
+    flows,
+    folded: {flows: rest.length, transactions: transactionIds.length, amount},
+    totals,
+  };
+}

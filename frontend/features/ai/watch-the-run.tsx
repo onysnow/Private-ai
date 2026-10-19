@@ -8,7 +8,7 @@
 // travelling lights; the log (L) carries the same steps in order and is the screen-reader view.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import type {KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
+import type {KeyboardEvent as ReactKeyboardEvent, ReactElement, ReactNode} from 'react';
 import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
@@ -21,10 +21,13 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {AiRunEventOut} from '../../lib/generated/types.gen';
 import {currentAppearance, onAppearanceChange} from '../../lib/theme';
+import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {RunBloom} from '../effects/run-bloom';
 import type {Flight} from '../effects/run-bloom';
 import {webglAvailable} from '../effects/webgl';
+import {decisionWords, reviewItems} from './claim-review';
+import {ClaimDecision, ClaimText, UnderlineKey} from './claim-review-view';
 import {SAMPLE_EVENTS, SAMPLE_RUN} from './run-sample';
 import {useRunStream} from './run-stream';
 import {thoughtTallies} from './run-tally';
@@ -79,7 +82,7 @@ const isProblem = (e: Ev) => e.status === 'bad' || (e.status === 'partial' && !e
 const OTHER_MODULE = /^(ras|qas|las|das)\/./;
 const nodeOf = (e: Ev) => (AT[e.node] || OTHER_MODULE.test(e.node) ? e.node : e.node === 'cp-02' || e.node === 'cp-03' ? e.node : e.node.startsWith('gate:') ? 'gate:citation' : e.system === 'tas' ? 'tas/class' : 'run');
 const words = (v: string | null | undefined) => (v ? (v.charAt(0) + v.slice(1).toLowerCase()).replace(/_/g, ' ') : '');
-const utc = (iso: string) => Date.parse(iso.endsWith('Z') ? iso : `${iso}Z`);
+const utc = (iso: string) => apiTime(iso).getTime();
 const stamp = (iso: string) => new Date(utc(iso)).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false}).replace(',', '');
 const clock = (ms: number) => new Date(ms).toLocaleTimeString('en-GB', {hour12: false});
 const who = (e: Ev) => (e.node === 'review' ? 'you' : e.self_reported ? 'model says' : e.system === 'app' ? 'app · enforced' : e.system);
@@ -121,10 +124,16 @@ function calmNow(): boolean {
   return document.documentElement.dataset.motion === 'calm' || Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 }
 
-export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample: startSample = false}: {
+export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onReview, onPlan, planDrawer, sample: startSample = false}: {
   investigationId: string; runId: string | null; onBack?: () => void; sample?: boolean;
   /** Run again with new instructions: back to the plan with this run's question (research AI §5 "Run again"). */
   onRunAgain?: (r: {question: string; module: string; theory: string | null; from?: {run_id: string; step: number}}) => void;
+  /** Step 4 of Ask the case: review this run's answer claim by claim. */
+  onReview?: (candidateId: string) => void;
+  /** Open (or close) the instructions and plan as a drawer inside this view (research AI §6), for this run's question. */
+  onPlan?: (r: {question: string; module: string; theory: string | null}) => void;
+  /** The instructions and plan drawer, drawn at the left edge while open. */
+  planDrawer?: ReactNode;
 }): ReactElement {
   const queryClient = useQueryClient();
   const caseName = useWorkbenchStore(s => s.investigationName);
@@ -396,6 +405,11 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
     ? ((candidate.data!.payload as {claims: Array<Record<string, unknown>>}).claims.find(c => c.claim_id === thoughtId))
     : undefined;
   const reviewed = candidate.data && candidate.data.review_status !== 'proposed';
+  // The answer's claims as a person decides them one by one; the thought in focus, when it is one of them.
+  const items = sample ? [] : reviewItems(candidate.data);
+  const item = thoughtId ? items.find(i => i.id === thoughtId) : undefined;
+  const waitingClaims = items.filter(i => !i.decision).length;
+  const afterDecision = () => { void queryClient.invalidateQueries({queryKey: listAiRunEventsQueryKey({path: {investigation_id: investigationId, run_id: realId ?? ''}, query: {after: 0}})}); };
   const tasOn = events.some(e => e.kind === 'ROUTE' && e.system === 'tas');
   const routed = new Set(events.filter(e => e.kind === 'ROUTE').map(e => e.system)).size;
   const loadNode = events.find(e => e.kind === 'LOAD')?.node ?? 'tas/08';
@@ -606,11 +620,16 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
       <button type="button" className={`wr-pill${problems.length ? ' bad' : ''}`} onClick={nextProblem} disabled={!problems.length}>{problems.length} problem{problems.length === 1 ? '' : 's'} <kbd>N</kbd></button>
       <button type="button" className="wr-pill" aria-pressed={calm} onClick={() => setCalm(c => !c)}>Calm</button>
       <button type="button" className="wr-pill" aria-pressed={log} onClick={() => setLog(l => !l)}>Log <kbd>L</kbd></button>
-      {onBack && <button type="button" className="wr-pill" onClick={onBack}>{sample && !realId ? 'Ask the case' : 'Back to the plan'}</button>}
+      {onPlan && run && !sample && <button type="button" className="wr-pill" aria-pressed={Boolean(planDrawer)}
+        onClick={() => onPlan({question: run.question, module: run.module, theory: run.working_theory ?? null})}>Instructions &amp; plan</button>}
+      {onReview && candidateId && items.length > 0 && <button type="button" className={`wr-pill${waitingClaims && !reviewed ? ' ai' : ''}`} onClick={() => onReview(candidateId)}>
+        Review{reviewed ? ` · ${words(candidate.data?.review_status)}` : waitingClaims ? ` · ${waitingClaims} wait` : ' · all decided'}</button>}
+      {onBack &&<button type="button" className="wr-pill" onClick={onBack}>{sample && !realId ? 'Ask the case' : 'Back to the plan'}</button>}
     </header>
     {q.isError && <p role="alert" className="br-bad">{errorMessage(q.error, 'Could not read the run')}</p>}
 
-    <div className={`wr-body${focus !== null ? ' drawer-open' : ''}`}>
+    <div className={`wr-body${focus !== null ? ' drawer-open' : ''}${planDrawer ? ' plan-open' : ''}`}>
+      {planDrawer && <aside className="wr-plan" aria-label="Instructions and plan" role="region">{planDrawer}</aside>}
       {log ? <ol className="wr-log" aria-label="The run, step by step" aria-live="polite">
         {visible.filter(e => full || e.kind !== 'SETTING').map(e => <li key={e.n} className={`${e.status}${lit.has(e.n) ? ' lit' : ''}`}>
           <button type="button" onClick={() => setFocus(e.n)}><span className="wr-ln">#{e.n}</span><svg width="16" height="16" aria-hidden="true"><Mark status={e.status} self={e.self_reported} x={8} y={8} r={5}/></svg>
@@ -744,8 +763,10 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
                 <b className={e.status}>{verdictOf(e)}</b></button></li>)}
               {!steps.length && <li className="wr-none">No step matches “{stepSearch}”.</li>}</ol>
             {stepsView === 'timeline' && chain.length > 0 && <p className="wr-stepaxis"><span>{clock(chainT0)}</span><span>{Math.max(0, Math.round((chainT1 - chainT0) / 1000))} s</span><span>{clock(chainT1)}</span></p>}</section>
-          <section aria-label="Output"><h4><b>3</b> Output <small>{refsOf.length ? 'from a passage · model’s words' : 'model’s words'}</small></h4>
-            <p className="wr-q">{(claim?.claim as string | undefined) ?? (thought ?? focused).text}</p>
+          <section aria-label="Output"><h4><b>3</b> Output <small>{item ? (item.grounded.length ? 'from a passage · model’s words' : 'model’s words · no passage says it') : refsOf.length ? 'from a passage · model’s words' : 'model’s words'}</small></h4>
+            <p className="wr-q">{item ? <ClaimText item={item} reviewStatus={candidate.data?.review_status}/> : (claim?.claim as string | undefined) ?? (thought ?? focused).text}</p>
+            {item && <UnderlineKey/>}
+            {item && candidate.data && run?.finished && <ClaimDecision candidate={candidate.data} item={item} onSaved={afterDecision} compact/>}
             {candidateId && candidate.isLoading ? <div className="wr-skeleton" aria-label="Loading the answer"><i/><i/><i/></div>
               : <dl className="br-facts">
               {claim && <><dt>Class</dt><dd>{words(String(claim.classification ?? ''))} <span className="br-chip ai">model says</span></dd>
@@ -755,7 +776,8 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
                 {weakest ? <> {capOf ? 'capped by' : 'weakest:'} step #{weakest.n}: {weakest.text}</> : ' every step held'}</dd></>}
               <dt>Removed</dt><dd>{removed ? removed.text : 'nothing removed'}</dd></dl>}</section>
           <section aria-label="Ledger"><h4><b>4</b> Ledger</h4><p className="wr-chips">
-            {thoughtId && <span className="br-chip">{thoughtId} {marked === 'to_check' ? 'to check · you' : marked === 'reject' ? 'rejected · you' : marked === 'keep' ? 'kept · you' : 'proposed'}</span>}
+            {thoughtId && <span className="br-chip">{thoughtId} {item?.decision ? decisionWords(item.decision) : marked === 'to_check' ? 'to check · you' : marked === 'reject' ? 'rejected · you' : marked === 'keep' ? 'kept · you' : 'proposed'}</span>}
+            {thoughtId && item?.decision && marked === 'to_check' && <span className="br-chip">to check · you</span>}
             {candidateId && <span className="br-chip">AIC {candidateId.slice(0, 8)} {reviewed ? words(candidate.data?.review_status) : 'sent for you'}</span>}
             <span className="br-chip">Judgement ledger · no outcome yet</span></p></section>
         </div>
@@ -783,7 +805,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, sample:
             onClick={() => onRunAgain({question: run.question, module: run.module, theory: run.working_theory ?? null, from: focused ? {run_id: run.run_id, step: focused.n} : undefined})}>Run again from this step…</button>}
           {review.isError && <span role="alert" className="br-bad">{errorMessage(review.error, 'Not saved')}</span>}
           {mark.isError && <span role="alert" className="br-bad">{errorMessage(mark.error, 'Not saved')}</span>}
-          <small>Accept and reject apply to the whole answer; To check marks this thought only.</small>
+          <small>Accept and reject apply to the whole answer; {item ? 'Keep, Correct and Reject above decide this claim; ' : ''}To check marks this thought only.</small>
         </footer>
       </aside>}
     </div>

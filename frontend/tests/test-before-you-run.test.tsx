@@ -110,7 +110,7 @@ describe('BeforeYouRun', () => {
       'GET /api/investigations/inv-1/ai-runs': {runs: [RUN]},
       'GET /api/ai-analysis-candidates/cand-1': {id: 'cand-1', investigation_id: 'inv-1', module: 'case_synthesis', review_status: 'proposed', confidence: 0.5,
         created_at: '2026-10-12T10:01:00Z', payload: {}, rejection_reason: null, request: {}, reviewed_at: null, reviewer_note: null, trace: null,
-        accepted_record_id: null, accepted_record_type: null, checked_citation_count: 0, checked_citation_ids: []},
+        accepted_record_id: null, accepted_record_type: null, checked_citation_count: 0, checked_citation_ids: [], claim_reviews: {}},
     });
     render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
     const user = userEvent.setup();
@@ -121,6 +121,51 @@ describe('BeforeYouRun', () => {
     await user.click(go);
     await waitFor(() => expect(api.lastBody(`POST ${BASE}/case-synthesis`)).toMatchObject({question: RUN.question, packet_from: {run_id: 'job-1', step: 2}}));
     window.history.replaceState(null, '', '/');
+  });
+
+  it('edits what the plan is made of: the packet, the outside leads and the steps a setting adds', async () => {
+    const withDevil = {...PLAN, steps: [...PLAN.steps.slice(0, 2), {key: 'devils_advocate', n: 3, who: 'MODEL', title: 'Devil’s advocate on the lead theory', detail: 'x', changed: true, system: 'TAS'}, ...PLAN.steps.slice(2)]};
+    const api = mockApi({
+      [`GET ${BASE}/profile`]: PLAN.profile,
+      [`POST ${BASE}/plan`]: ({body}: {body: unknown}) => ((body as {options: Record<string, string>}).options.devils_advocate === 'ON' ? withDevil : PLAN),
+      [`POST ${BASE}/case-synthesis`]: {candidate_id: 'cand-1', job, review_status: 'proposed', payload: {}},
+      'GET /api/investigations/inv-1/ai-runs/job-1/events': {run: RUN, events: []},
+    });
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
+    await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
+    const plan = await screen.findByRole('region', {name: 'The plan'});
+    await within(plan).findByText('3 records go in');
+    await user.click(within(plan).getByRole('button', {name: 'Edit plan'}));
+
+    // The packet's size and the outside leads go to the plan, and are echoed as changes.
+    const size = within(plan).getByRole('spinbutton', {name: 'Records in the packet, at most'});
+    await user.clear(size);
+    await user.type(size, '50{Enter}');
+    await user.click(within(plan).getByRole('checkbox', {name: /Bring outside leads saved in the case/}));
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/plan`)).toMatchObject({max_results: 50, include_external_leads: false}));
+    const where = screen.getByRole('region', {name: 'Where it runs, what it costs'});
+    expect(within(where).getByText(/packet up to 30 → 50 records/)).toBeInTheDocument();
+    expect(within(where).getByText(/outside leads in the packet on → off/)).toBeInTheDocument();
+
+    // Fixed steps always run; a step a setting adds can be added and removed here.
+    expect(within(plan).getAllByTitle('This step always runs')).toHaveLength(4);
+    await user.click(within(plan).getByRole('button', {name: '+ Devil’s advocate'}));
+    expect(screen.getByRole('switch', {name: 'Devil’s advocate, on, changed from off'})).toBeInTheDocument();
+    await user.click(await within(plan).findByRole('button', {name: 'Remove the step: Devil’s advocate on the lead theory'}));
+    expect(screen.getByRole('switch', {name: /^Devil’s advocate, off/})).toBeInTheDocument();
+    expect(within(plan).getByRole('button', {name: '+ Research depth · Exhaustive'})).toBeInTheDocument();
+
+    // The question can be changed here too, and the run carries all of it.
+    const q = within(plan).getByRole('textbox', {name: 'The question'});
+    await user.clear(q);
+    await user.type(q, 'Who owned Fernhill Ltd in 2018?');
+    await user.click(within(plan).getByRole('button', {name: 'Done'}));
+    expect(within(plan).getByText('Who owned Fernhill Ltd in 2018?')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: /Run and watch/}));
+    await waitFor(() => expect(api.lastBody(`POST ${BASE}/case-synthesis`)).toMatchObject({
+      question: 'Who owned Fernhill Ltd in 2018?', max_results: 50, include_external_leads: false, options: {devils_advocate: 'OFF'}}));
   });
 
   it('runs on Ctrl+Enter only while its tab shows, and never from a field elsewhere', async () => {
