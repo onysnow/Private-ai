@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from app.db.session import Base, SessionLocal, engine
 from app.main import app
 from app.models.domain import ConnectorFinding, DocumentChunk, ExtractionCandidate, Statement, TimelineEvent
+from tests.claim_helpers import post_claim
 
 
 def test_investigation_search_returns_typed_provenance_and_claim_evidence_links():
@@ -30,7 +31,7 @@ def test_investigation_search_returns_typed_provenance_and_claim_evidence_links(
         'locator': 'p. 42',
         'notes': 'Primary filing excerpt'
     }).json()
-    claim = client.post('/api/claims', json={
+    claim = post_claim(client, {
         'investigation_id': inv['id'], 'text': 'Acme Holdings requested regulatory approval.',
         'status': 'supported', 'confidence': 0.8
     }).json()
@@ -70,12 +71,12 @@ def test_claim_evidence_guards_cross_investigation_and_stance():
     inv2 = client.post('/api/investigations', json={'name': 'Evidence two'}).json()
     source = client.post('/api/sources', json={'investigation_id': inv1['id'], 'title': 'Source'}).json()
     evidence = client.post('/api/evidence', json={'source_id': source['id'], 'quote': 'Relevant fact'}).json()
-    claim = client.post('/api/claims', json={'investigation_id': inv2['id'], 'text': 'Different investigation claim'}).json()
+    claim = post_claim(client, {'investigation_id': inv2['id'], 'text': 'Different investigation claim'}).json()
 
     cross = client.post(f"/api/claims/{claim['id']}/evidence", json={'evidence_id': evidence['id'], 'stance': 'supports'})
     assert cross.status_code == 400
 
-    claim_same = client.post('/api/claims', json={'investigation_id': inv1['id'], 'text': 'Same investigation claim'}).json()
+    claim_same = post_claim(client, {'investigation_id': inv1['id'], 'text': 'Same investigation claim'}).json()
     bad = client.post(f"/api/claims/{claim_same['id']}/evidence", json={'evidence_id': evidence['id'], 'stance': 'proves'})
     assert bad.status_code == 400
 
@@ -96,7 +97,7 @@ def test_search_results_expose_direct_provenance_trace_targets_across_reporting_
     evidence = client.post('/api/evidence', json={
         'source_id': source['id'], 'quote': 'Morgan Vale joined the board.', 'locator': 'page 2',
     }).json()
-    claim = client.post('/api/claims', json={
+    claim = post_claim(client, {
         'investigation_id': inv['id'], 'text': 'Morgan Vale joined the board.', 'status': 'supported', 'confidence': 0.8,
     }).json()
     assert client.post(f"/api/claims/{claim['id']}/evidence", json={'evidence_id': evidence['id'], 'stance': 'supports'}).status_code == 200
@@ -204,7 +205,7 @@ def test_prefiltered_record_types_still_match_via_own_fields_not_a_parents(): # 
     })
 
     # Claim and reporting task: self-contained, match via their own text.
-    client.post('/api/claims', json={'investigation_id': inv, 'text': f'{token} entity confirmed as owner.'})
+    post_claim(client, {'investigation_id': inv, 'text': f'{token} entity confirmed as owner.'})
     client.post('/api/reporting-tasks', json={'investigation_id': inv, 'title': f'Verify {token} filing'})
 
     with SessionLocal() as db:
@@ -319,7 +320,7 @@ def test_search_finds_names_with_accented_capitals_and_folded_letters():
     for caption in ('Émile Zola', 'Øresund Holdings', 'Karl Strauß'):
         assert client.post('/api/entities', json={'investigation_id': inv['id'], 'schema': 'LegalEntity', 'caption': caption,
                                                   'properties': {'name': [caption]}}).status_code == 200
-    claim = client.post('/api/claims', json={'investigation_id': inv['id'], 'text': 'Émile Zola signed the Øresund lease.',
+    claim = post_claim(client, {'investigation_id': inv['id'], 'text': 'Émile Zola signed the Øresund lease.',
                                              'status': 'unverified', 'confidence': 0.5})
     assert claim.status_code == 200, claim.text
     for query, expected in (('Émile', 'Émile Zola'), ('øresund', 'Øresund Holdings'), ('STRAUSS', 'Karl Strauß')):

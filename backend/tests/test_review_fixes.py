@@ -482,3 +482,32 @@ def test_read_mode_is_enforced_by_sqlite_not_only_by_the_keyword_screen(tmp_path
         conn.commit()
     with engine.connect() as conn:
         assert [r[0] for r in conn.execute(_text("select v from t order by id"))] == ["a", "c"]
+
+
+# --- E-03: a claim cannot be created already Supported or Confirmed ----------
+
+def test_a_claim_cannot_be_created_as_supported_or_confirmed():
+    from tests.claim_helpers import post_claim
+    from tests.test_saved_charts import _deck_and_writeup
+    c = TestClient(app)
+    inv, _d, _w = _deck_and_writeup()
+
+    def claim_count() -> int:
+        from sqlalchemy import func, select as _select
+        from app.models.domain import Claim
+        with SessionLocal() as db:
+            return db.scalar(_select(func.count()).select_from(Claim).where(Claim.investigation_id == inv)) or 0
+
+    before = claim_count()
+    for status in ("supported", "confirmed"):
+        refused = c.post("/api/claims", json={"investigation_id": inv, "text": "Shell Co paid the minister", "status": status})
+        assert refused.status_code == 400 and "reviewing it" in refused.json()["detail"], refused.text
+    assert claim_count() == before  # nothing was written by the refused calls
+    # The review path still gets a claim there, and keeps the reason on an event.
+    claim = post_claim(c, {"investigation_id": inv, "text": "Shell Co paid the minister", "status": "supported", "confidence": 0.6}).json()
+    assert claim["status"] == "supported"
+    workspace = c.get(f"/api/claims/{claim['id']}/review-workspace").json()
+    assert [e["to_status"] for e in workspace["review_history"]] == ["supported"]
+    # The other statuses a reporter may start a claim at are unchanged.
+    for status in ("lead", "unverified", "disputed", "rejected"):
+        assert c.post("/api/claims", json={"investigation_id": inv, "text": f"A {status} claim", "status": status}).status_code == 200

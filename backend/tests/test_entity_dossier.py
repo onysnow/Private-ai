@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 
 from app.db.session import Base, engine
 from app.main import app
+from tests.claim_helpers import post_claim
 
 
 def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
@@ -28,13 +29,13 @@ def test_entity_dossier_assembles_canonical_evidence_relationships_and_leads():
     evidence = client.post('/api/evidence', json={
         'source_id': source['id'], 'quote': 'Acme Holdings filed the application.', 'locator': 'p. 4'
     }).json()
-    claim = client.post('/api/claims', json={
+    claim = post_claim(client, {
         'investigation_id': inv['id'], 'text': 'Acme Holdings sought commission approval.', 'status': 'supported', 'confidence': .8
     }).json()
     client.post(f"/api/claims/{claim['id']}/evidence", json={
         'evidence_id': evidence['id'], 'stance': 'supports'
     })
-    client.post('/api/claims', json={
+    post_claim(client, {
         'investigation_id': inv['id'], 'text': 'Unrelated company claim.'
     })
     client.post('/api/leads', json={
@@ -79,7 +80,7 @@ def test_entity_dossier_uses_explicit_graph_context_without_text_name_matches():
     evidence = client.post('/api/evidence', json={
         'source_id': source['id'], 'quote': 'The director resigned on March 4.', 'locator': 'p. 9'
     }).json()
-    claim = client.post('/api/claims', json={
+    claim = post_claim(client, {
         'investigation_id': inv['id'], 'text': 'The resignation occurred before the acquisition.',
         'status': 'disputed', 'confidence': .55
     }).json()

@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests.claim_helpers import post_claim
 
 client = TestClient(app)
 
@@ -20,7 +21,7 @@ def test_timeline_normalizes_ftm_source_and_reporter_events():
         "investigation_id": inv["id"], "title": "State filing", "url": "https://example.test/filing",
         "metadata_json": {"filing_date": "2025-03-14", "date_verified": True},
     }).json()
-    claim = client.post("/api/claims", json={
+    claim = post_claim(client, {
         "investigation_id": inv["id"], "text": "Jane joined the board in spring 2024", "status": "supported", "confidence": .7,
     }).json()
     manual = client.post("/api/timeline-events", json={
@@ -106,7 +107,7 @@ def test_reporter_timeline_event_exposes_claim_evidence_source_context_without_c
     evidence = client.post("/api/evidence", json={
         "source_id": source["id"], "quote": "The board appointed Jane effective April 1.", "locator": "p. 7",
     }).json()
-    claim = client.post("/api/claims", json={
+    claim = post_claim(client, {
         "investigation_id": inv["id"], "text": "Jane joined the board on April 1", "status": "disputed", "confidence": .45,
     }).json()
     link = client.post(f"/api/claims/{claim['id']}/evidence", json={
