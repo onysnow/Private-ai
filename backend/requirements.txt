@@ -38,3 +38,8 @@ pmtiles==3.8.1
 # Apprise (BSD-2-Clause), Web Push with VAPID through pywebpush (MPL-2.0).
 apprise==2.0.1
 pywebpush==2.5.0
+# The app lock and encrypted backups (ADR-0016): Argon2id hashes of the passphrase, PIN and recovery words (MIT);
+# age encryption through the Rust rage (MIT); BIP-39 recovery words, Trezor's reference implementation (MIT).
+argon2-cffi==25.1.0
+pyrage==1.4.0
+mnemonic==0.21

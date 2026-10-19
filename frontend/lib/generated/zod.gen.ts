@@ -406,6 +406,7 @@ export const zApiAccessStatusOut = z.object({
 export const zAppUserCreate = z.object({
   display_name: z.string(),
   global_role: z.string().optional().default('member'),
+  key_days: z.number().int().optional().default(30),
 });
 
 /**
@@ -418,6 +419,12 @@ export const zAppUserCreatedOut = z.object({
   global_role: z.string(),
   id: z.string(),
   token: z.string(),
+  token_expires_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   token_notice: z.string(),
 });
 
@@ -451,6 +458,13 @@ export const zAppUserOut = z.object({
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+  token_expires_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  token_hint: z.string().nullish(),
   token_last_used_at: z
     .string()
     .regex(
@@ -469,7 +483,7 @@ export const zAppUserOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     )
     .nullable(),
-  token_status: z.enum(['active', 'disabled', 'revoked']),
+  token_status: z.enum(['active', 'disabled', 'revoked', 'expired']),
 });
 
 /**
@@ -498,6 +512,12 @@ export const zAppUserTokenRotatedOut = z.object({
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+  token_expires_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   token_notice: z.string(),
   token_rotated_at: z
     .string()
@@ -529,7 +549,7 @@ export const zAppUserUpdatedOut = z.object({
   display_name: z.string(),
   global_role: z.string(),
   id: z.string(),
-  token_status: z.enum(['active', 'disabled', 'revoked']),
+  token_status: z.enum(['active', 'disabled', 'revoked', 'expired']),
 });
 
 /**
@@ -646,6 +666,7 @@ export const zBasemapStatusOut = z.object({
  */
 export const zBodyInspectBackup = z.object({
   file: z.string(),
+  secret: z.string().nullish(),
 });
 
 /**
@@ -653,6 +674,7 @@ export const zBodyInspectBackup = z.object({
  */
 export const zBodyPreviewBackupRestore = z.object({
   file: z.string(),
+  secret: z.string().nullish(),
 });
 
 /**
@@ -660,6 +682,7 @@ export const zBodyPreviewBackupRestore = z.object({
  */
 export const zBodyRestoreBackup = z.object({
   file: z.string(),
+  secret: z.string().nullish(),
 });
 
 /**
@@ -842,6 +865,14 @@ export const zCaseFlagCountsOut = z.object({
  */
 export const zCaseLeadCountsOut = z.object({
   open: z.number().int(),
+});
+
+/**
+ * CaseLockIn
+ */
+export const zCaseLockIn = z.object({
+  old: z.string().nullish(),
+  passphrase: z.string(),
 });
 
 /**
@@ -1127,6 +1158,14 @@ export const zChainOut = z.object({
   links: z.array(zChainStepOut),
   parties: z.array(zChainPartyOut),
   weakest: z.enum(['supported', 'unsupported', 'contested']),
+});
+
+/**
+ * ChangePassphraseIn
+ */
+export const zChangePassphraseIn = z.object({
+  new: z.string(),
+  old: z.string(),
 });
 
 /**
@@ -2304,6 +2343,24 @@ export const zCustodyChainOut = z.object({
 });
 
 /**
+ * DeciderOut
+ */
+export const zDeciderOut = z.object({
+  decisions: z.number().int(),
+  name: z.string().nullish(),
+});
+
+/**
+ * DecidersOut
+ *
+ * Who decided what in a case over the last days (mockup ACCOUNT_2): name, or null for "a person".
+ */
+export const zDecidersOut = z.object({
+  days: z.number().int(),
+  people: z.array(zDeciderOut),
+});
+
+/**
  * DecisionChoiceOut
  *
  * One answer: the existing endpoint it posts to and the body it sends.
@@ -2605,6 +2662,33 @@ export const zDemoCaseOut = z.object({
 export const zDemoSeedOut = z.object({
   created: z.boolean(),
   investigation_id: z.string(),
+});
+
+/**
+ * DiskAnswerIn
+ */
+export const zDiskAnswerIn = z.object({
+  answer: z.string().nullish(),
+});
+
+/**
+ * DiskStatusOut
+ *
+ * Whether the disk the app runs from is encrypted, as far as the app can tell without administrator rights.
+ */
+export const zDiskStatusOut = z.object({
+  answered: z.boolean().optional().default(false),
+  how_to: z.string().optional().default(''),
+  state: z.enum([
+    'encrypted',
+    'encrypting',
+    'paused',
+    'decrypting',
+    'not_encrypted',
+    'unknown',
+  ]),
+  system: z.string(),
+  why: z.string().optional().default(''),
 });
 
 /**
@@ -4661,6 +4745,69 @@ export const zExtractionLineageLookupOut = z.object({
 });
 
 /**
+ * LockReasonIn
+ */
+export const zLockReasonIn = z.object({
+  reason: z.string().nullish(),
+});
+
+/**
+ * LockedCaseOut
+ */
+export const zLockedCaseOut = z.object({
+  id: z.string(),
+  name: z.string(),
+  open: z.boolean(),
+  set_at: z.string().nullish(),
+});
+
+/**
+ * LockStateOut
+ *
+ * The app lock as the screen needs it. While locked: only that it is locked and whether a PIN may open it.
+ */
+export const zLockStateOut = z.object({
+  backups_encrypted: z.boolean().nullish(),
+  disk: zDiskStatusOut.nullish(),
+  disk_answer: z.string().nullish(),
+  idle_minutes: z.number().int().nullish(),
+  known: z.boolean().optional().default(false),
+  lock_on_hide: z.boolean().nullish(),
+  lock_on_sleep: z.boolean().nullish(),
+  locked: z.boolean(),
+  locked_cases: z.array(zLockedCaseOut).nullish(),
+  name: z.string().nullish(),
+  passphrase_set_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  pin: z.boolean(),
+  pin_set: z.boolean().nullish(),
+  protection: z.enum(['none', 'passphrase']),
+  quick_pin: z.boolean().nullish(),
+  recovery_set_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  session: z.string().nullish(),
+  unsigned_decisions: z.number().int().nullish(),
+});
+
+/**
+ * LockingIn
+ */
+export const zLockingIn = z.object({
+  idle_minutes: z.number().int().nullish(),
+  lock_on_hide: z.boolean().nullish(),
+  lock_on_sleep: z.boolean().nullish(),
+  quick_pin: z.boolean().nullish(),
+});
+
+/**
  * LookupDefaultsPut
  */
 export const zLookupDefaultsPut = z.object({
@@ -5011,6 +5158,13 @@ export const zMoneyCheckOut = z.object({
  */
 export const zMultiEnrichmentRequest = z.object({
   providers: z.array(z.string()).optional(),
+});
+
+/**
+ * NameIn
+ */
+export const zNameIn = z.object({
+  name: z.string(),
 });
 
 /**
@@ -5680,6 +5834,20 @@ export const zPeekOut = z.object({
 });
 
 /**
+ * PinIn
+ */
+export const zPinIn = z.object({
+  pin: z.string(),
+});
+
+/**
+ * PinSetIn
+ */
+export const zPinSetIn = z.object({
+  pin: z.string().nullish(),
+});
+
+/**
  * PlaceEventOut
  *
  * An event on the investigation's timeline that happened at a place:
@@ -6091,6 +6259,23 @@ export const zRecordTagRowOut = z.object({
 export const zRecordTagsOut = z.object({
   investigation_id: z.string(),
   rows: z.array(zRecordTagRowOut),
+});
+
+/**
+ * RecoverIn
+ */
+export const zRecoverIn = z.object({
+  new_passphrase: z.string(),
+  words: z.string(),
+});
+
+/**
+ * RecoveryWordsOut
+ *
+ * The 12 recovery words, shown this once: only an Argon2id hash of them is kept.
+ */
+export const zRecoveryWordsOut = z.object({
+  words: z.array(z.string()),
 });
 
 /**
@@ -7070,6 +7255,13 @@ export const zSearchPartyOut = z.object({
   id: z.string(),
   name: z.string(),
   schema: z.string(),
+});
+
+/**
+ * SecretIn
+ */
+export const zSecretIn = z.object({
+  passphrase: z.string(),
 });
 
 /**
@@ -11157,6 +11349,19 @@ export const zListInvestigationCrossReferencesQuery = z.object({
 export const zListInvestigationCrossReferencesResponse =
   z.array(zCrossReferenceOut);
 
+export const zInvestigationDecidersPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zInvestigationDecidersQuery = z.object({
+  days: z.number().int().gte(1).lte(365).optional().default(30),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationDecidersResponse = zDecidersOut;
+
 export const zGetDecisionsPath = z.object({
   investigation_id: z.string(),
 });
@@ -12133,6 +12338,89 @@ export const zLinkLeadPath = z.object({
  */
 export const zLinkLeadResponse = zLeadLinkOut;
 
+/**
+ * Successful Response
+ */
+export const zMeResponse = zLockStateOut;
+
+export const zLockCaseBody = zCaseLockIn;
+
+export const zLockCasePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zLockCaseResponse = zLockStateOut;
+
+export const zRemoveCaseLockBody = zSecretIn;
+
+export const zRemoveCaseLockPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRemoveCaseLockResponse = zLockStateOut;
+
+export const zDiskAnswerBody = zDiskAnswerIn;
+
+/**
+ * Successful Response
+ */
+export const zDiskAnswerResponse = zLockStateOut;
+
+export const zLockingBody = zLockingIn;
+
+/**
+ * Successful Response
+ */
+export const zLockingResponse = zLockStateOut;
+
+export const zSetNameBody = zNameIn;
+
+/**
+ * Successful Response
+ */
+export const zSetNameResponse = zLockStateOut;
+
+export const zChangePassphraseBody = zChangePassphraseIn;
+
+/**
+ * Successful Response
+ */
+export const zChangePassphraseResponse = zLockStateOut;
+
+export const zSetPinBody = zPinSetIn;
+
+/**
+ * Successful Response
+ */
+export const zSetPinResponse = zLockStateOut;
+
+export const zTurnOnBody = zSecretIn;
+
+/**
+ * Successful Response
+ */
+export const zTurnOnResponse = zRecoveryWordsOut;
+
+export const zTurnOffBody = zSecretIn;
+
+/**
+ * Successful Response
+ */
+export const zTurnOffResponse = zLockStateOut;
+
+export const zNewRecoveryKeyBody = zSecretIn;
+
+/**
+ * Successful Response
+ */
+export const zNewRecoveryKeyResponse = zRecoveryWordsOut;
+
 export const zRemoveNotePath = z.object({
   note_id: z.string(),
 });
@@ -12362,6 +12650,72 @@ export const zSearchWorkbenchQuery = z.object({
  */
 export const zSearchWorkbenchResponse = zSearchOut;
 
+/**
+ * Successful Response
+ */
+export const zSessionStateResponse = zLockStateOut;
+
+/**
+ * Successful Response
+ */
+export const zActiveResponse = z.void();
+
+export const zCloseCasePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCloseCaseResponse = zLockStateOut;
+
+export const zOpenCaseBody = zSecretIn;
+
+export const zOpenCasePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zOpenCaseResponse = zLockStateOut;
+
+/**
+ * Body
+ */
+export const zLockBody = zLockReasonIn.nullable();
+
+/**
+ * Successful Response
+ */
+export const zLockResponse = zLockStateOut;
+
+export const zRecoverBody = zRecoverIn;
+
+/**
+ * Successful Response
+ */
+export const zRecoverResponse = zLockStateOut;
+
+/**
+ * Successful Response
+ */
+export const zStartSessionResponse = zLockStateOut;
+
+export const zUnlockBody = zSecretIn;
+
+/**
+ * Successful Response
+ */
+export const zUnlockResponse = zLockStateOut;
+
+export const zUnlockPinBody = zPinIn;
+
+/**
+ * Successful Response
+ */
+export const zUnlockPinResponse = zLockStateOut;
+
 export const zCheckConnectorKeyPath = z.object({
   provider: z.string(),
 });
@@ -12574,6 +12928,10 @@ export const zRevokeAppUserTokenResponse = zAppUserTokenRevokedOut;
 
 export const zRotateAppUserTokenPath = z.object({
   user_id: z.string(),
+});
+
+export const zRotateAppUserTokenQuery = z.object({
+  key_days: z.number().int().optional().default(30),
 });
 
 /**

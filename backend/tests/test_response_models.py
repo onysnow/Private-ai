@@ -927,9 +927,10 @@ def test_investigation_replies(demo):
     rows = list_investigations(db, AuthorizationScope(actor_id="local"))
     assert rows
     # red_flag_run is the Red Flag engine's own bookkeeping; GET .../red-flags reports it as ran_at / stale.
-    _same_through_model(list[r.InvestigationOut], rows, hidden=("red_flag_run",))
+    # case_lock holds the Argon2id hash of a locked case's passphrase (ADR-0016): never sent.
+    _same_through_model(list[r.InvestigationOut], rows, hidden=("red_flag_run", "case_lock"))
     _same_through_model(r.InvestigationOut, create_investigation(db, InvestigationCreate(name="Second case", description="with a description")),
-                        hidden=("red_flag_run",))
+                        hidden=("red_flag_run", "case_lock"))
 
 
 def test_settings_and_security_replies(demo, tmp_path, monkeypatch):

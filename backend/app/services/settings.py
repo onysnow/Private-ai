@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import secrets
+from datetime import timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -110,6 +111,32 @@ def security_alerts(*, window_hours: float = 24.0, max_examples: int = 10) -> di
     )
 
 
+KEY_DAYS = (30, 90)
+
+
+def _token_status(user: AppUser) -> str:
+    if user.token_revoked_at is not None:
+        return "revoked"
+    if user.disabled:
+        return "disabled"
+    if user.token_expires_at is not None and user.token_expires_at <= utcnow_naive():
+        return "expired"
+    return "active"
+
+
+def _new_key(user: AppUser, days: int) -> str:
+    """A key for one person (ADR-0016): it lasts 30 or 90 days; only its digest and last two characters are kept."""
+    if days not in KEY_DAYS:
+        raise ValueError("A key lasts 30 or 90 days")
+    token = secrets.token_urlsafe(32)
+    now = utcnow_naive()
+    user.token_digest = token_digest(token)
+    user.token_hint = token[-2:]
+    user.token_created_at = now
+    user.token_expires_at = now + timedelta(days=days)
+    return token
+
+
 def list_app_users(db: Session) -> list[dict]:
     users = db.scalars(select(AppUser).order_by(AppUser.display_name, AppUser.id)).all()
     memberships = db.scalars(select(InvestigationMembership)).all()
@@ -129,7 +156,9 @@ def list_app_users(db: Session) -> list[dict]:
         "token_last_used_at": user.token_last_used_at,
         "token_rotated_at": user.token_rotated_at,
         "token_revoked_at": user.token_revoked_at,
-        "token_status": "revoked" if user.token_revoked_at is not None else ("disabled" if user.disabled else "active"),
+        "token_status": _token_status(user),
+        "token_hint": user.token_hint,
+        "token_expires_at": user.token_expires_at,
         "memberships": sorted(by_user.get(user.id, []), key=lambda row: row["investigation_id"]),
     } for user in users]
 
@@ -140,12 +169,8 @@ def create_app_user(db: Session, payload: AppUserCreate) -> dict:
     display_name = payload.display_name.strip()
     if not display_name:
         raise ValueError("display_name is required")
-    token = secrets.token_urlsafe(32)
-    user = AppUser(
-        display_name=display_name,
-        global_role=payload.global_role,
-        token_digest=token_digest(token),
-    )
+    user = AppUser(display_name=display_name, global_role=payload.global_role)
+    token = _new_key(user, payload.key_days)
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -154,6 +179,7 @@ def create_app_user(db: Session, payload: AppUserCreate) -> dict:
         "display_name": user.display_name,
         "global_role": user.global_role,
         "token": token,
+        "token_expires_at": user.token_expires_at,
         "token_notice": "Store this token now; only its SHA-256 digest is retained.",
     }
 
@@ -179,15 +205,13 @@ def update_app_user(db: Session, user: AppUser, payload: AppUserUpdate) -> dict:
         "global_role": user.global_role,
         "disabled": user.disabled,
         "disabled_at": user.disabled_at,
-        "token_status": "revoked" if user.token_revoked_at is not None else ("disabled" if user.disabled else "active"),
+        "token_status": _token_status(user),
     }
 
 
-def rotate_app_user_token(db: Session, user: AppUser) -> dict:
-    token = secrets.token_urlsafe(32)
-    now = utcnow_naive()
-    user.token_digest = token_digest(token)
-    user.token_created_at = now
+def rotate_app_user_token(db: Session, user: AppUser, days: int = 30) -> dict:
+    token = _new_key(user, days)
+    now = user.token_created_at
     user.token_rotated_at = now
     user.token_revoked_at = None
     user.token_last_used_at = None
@@ -197,6 +221,7 @@ def rotate_app_user_token(db: Session, user: AppUser) -> dict:
         "token": token,
         "token_created_at": now,
         "token_rotated_at": now,
+        "token_expires_at": user.token_expires_at,
         "token_notice": "Store this replacement token now; only its SHA-256 digest is retained.",
     }
 

@@ -369,6 +369,7 @@ export function settingsPaneRoutes(): Routes {
     'GET /api/settings/lookups': {sources: [], cases: [], week: [], can_change_defaults: true},
     'GET /api/settings/research': {mode: 'ask', ai_enabled: false, model: null, settings: [], defaults_reason: null, defaults_saved_at: null,
       locked: [], cases: [], can_change_defaults: true},
+    'GET /api/settings/security/users': [],
   };
 }
 

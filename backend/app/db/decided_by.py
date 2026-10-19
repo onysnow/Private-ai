@@ -18,8 +18,12 @@ def _actor(db: Session) -> tuple[str, str | None] | None:
     scope = current_authorization_scope()
     if scope is None:
         return None
-    from app.models.identity import AppUser
+    from app.models.identity import AppUser, LocalProfile
 
+    if scope.actor_id == "local-owner":
+        # The owner of this computer signs with the name they gave (ADR-0016); none given yet: "a person".
+        owner = db.get(LocalProfile, 1)
+        return scope.actor_id, (owner.display_name if owner is not None else None)
     user = db.get(AppUser, scope.actor_id)
     return scope.actor_id, (user.display_name if user is not None else None)
 

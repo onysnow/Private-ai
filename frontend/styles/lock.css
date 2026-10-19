@@ -1,0 +1,97 @@
+/* Your name, the app lock, Locking, People and access (ADR-0016, mockups ACCOUNT_1-4). */
+.lk-eyebrow { margin: 0; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.lk-mono { font-family: var(--font-mono); }
+.lk-muted { color: var(--text-muted); font-size: 12.5px; }
+.lk-panel { padding: 18px 20px; border-radius: 14px; background: var(--surface-1); border: 1px solid var(--line); }
+.lk-err { color: var(--flag-textbook-edge, #d9705f); font-size: 12.5px; margin: 6px 0 0; }
+.lk-input { box-sizing: border-box; width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: 14px var(--font-ui); }
+.lk-input:focus-visible { outline: 2px solid var(--accent-1); }
+
+/* The lock screen: nothing about the case behind it. */
+.lk-cover { position: fixed; inset: 0; z-index: 400; display: grid; place-items: center; background: radial-gradient(520px 300px at 50% 32%, color-mix(in srgb, var(--accent-1) 14%, var(--ground)), var(--ground)); }
+.lk-card { width: min(380px, 90vw); text-align: center; display: grid; gap: 12px; justify-items: center; }
+.lk-sym { width: 58px; height: 58px; border-radius: 50%; border: 1.5px solid var(--accent-1); display: grid; place-items: center; color: var(--accent-1); font-size: 20px; }
+.lk-card h1 { margin: 0; font: 300 30px var(--font-display); color: var(--text); }
+.lk-dots { display: flex; gap: 10px; justify-content: center; }
+.lk-dots i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--text-muted); }
+.lk-dots i.f { background: var(--accent-1); border-color: var(--accent-1); }
+.lk-link { all: unset; cursor: pointer; color: var(--accent-1); font-size: 12.5px; }
+.lk-link:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+.lk-form { display: grid; gap: 8px; width: 100%; }
+.lk-words { width: 100%; min-height: 80px; resize: vertical; }
+
+/* First open (ACCOUNT_1) and the passphrase (ACCOUNT_3). */
+.lk-first { position: fixed; inset: 0; z-index: 350; overflow: auto; background: radial-gradient(1200px 600px at 70% -10%, color-mix(in srgb, var(--accent-1) 10%, var(--ground)) 0, transparent 60%), var(--ground); color: var(--text); }
+.lk-first-in { box-sizing: border-box; max-width: 1360px; margin: 0 auto; padding: 22px 40px 100px; }
+.lk-top { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); }
+.lk-top b { color: var(--text); font-weight: 500; }
+.lk-chip { display: inline-flex; align-items: center; gap: 6px; font: 500 11px var(--font-mono); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; color: var(--text-muted); }
+.lk-chip.ok { color: var(--accent-2); }
+.lk-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 28px; margin-top: 18px; }
+@media (max-width: 1000px) { .lk-wrap { grid-template-columns: 1fr; } .lk-first-in { padding: 18px 18px 120px; } }
+.lk-first h1 { margin: 8px 0; font: 300 44px/1.05 var(--font-display); }
+.lk-lede { color: var(--text-muted); font-size: 15px; max-width: 580px; margin: 0; }
+.lk-name { margin-top: 20px; }
+.lk-field { display: flex; align-items: flex-end; gap: 14px; border-bottom: 2px solid var(--accent-1); padding-bottom: 8px; margin-top: 10px; }
+.lk-field input { all: unset; flex: 1; font: 400 34px/1.1 var(--font-display); color: var(--text); min-width: 0; }
+.lk-field input::placeholder { color: color-mix(in srgb, var(--text-muted) 55%, transparent); }
+.lk-initials { width: 46px; height: 46px; border-radius: 50%; border: 1.5px dashed var(--line); display: grid; place-items: center; font: 500 14px var(--font-mono); color: var(--text-muted); flex: none; }
+.lk-initials.on { border: 1.5px solid var(--accent-1); color: var(--accent-1); }
+.lk-reads { display: grid; gap: 8px; margin-top: 16px; }
+.lk-read { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: center; padding: 9px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; font-size: 13px; }
+.lk-read .lk-where { font: 500 10.5px var(--font-mono); color: var(--text-muted); letter-spacing: .06em; text-transform: uppercase; }
+.lk-slot { color: var(--text-muted); border: 1px dashed var(--line); border-radius: 5px; padding: 0 6px; font-style: italic; }
+.lk-signed { color: var(--accent-1); font-weight: 600; }
+.lk-before { margin-top: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+.lk-count { font: 300 34px/1 var(--font-display); }
+.lk-opt { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 20px 1fr; gap: 12px; width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; margin-top: 10px; background: var(--surface-2); }
+.lk-opt:focus-visible { outline: 2px solid var(--accent-1); }
+.lk-opt.on { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 9%, var(--surface-2)); }
+.lk-radio { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--text-muted); margin-top: 3px; box-sizing: border-box; }
+.lk-opt.on .lk-radio { border-color: var(--accent-1); background: var(--accent-1); box-shadow: inset 0 0 0 3.5px var(--surface-2); }
+.lk-opt b { font-size: 14.5px; }
+.lk-pp { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; margin-top: 8px; font-size: 12.5px; color: var(--text-muted); }
+.lk-pp .y::before { content: '✓ '; color: var(--accent-2); } .lk-pp .n::before { content: '✕ '; color: var(--flag-textbook-edge, #d9705f); }
+.lk-tag { font: 500 10.5px var(--font-mono); border: 1px solid var(--accent-1); color: var(--accent-1); border-radius: 999px; padding: 1px 8px; margin-left: 8px; vertical-align: 2px; }
+.lk-disk { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px 14px; border-radius: 11px; border: 1px solid var(--line); background: var(--surface-2); font-size: 13px; }
+.lk-disk .lk-shape { font-size: 16px; line-height: 1; }
+.lk-disk.ok .lk-shape { color: var(--accent-2); } .lk-disk.no .lk-shape { color: var(--flag-textbook-edge, #d9705f); }
+.lk-foot { position: fixed; left: 0; right: 0; bottom: 0; z-index: 360; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 40px; border-top: 1px solid var(--line); background: color-mix(in srgb, var(--ground) 92%, transparent); font-size: 12.5px; color: var(--text-muted); }
+.lk-meter { display: flex; gap: 4px; margin: 10px 0 6px; } .lk-meter i { flex: 1; height: 6px; border-radius: 3px; background: var(--surface-3); } .lk-meter i.f { background: var(--accent-2); }
+.lk-wordgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; counter-reset: w; }
+.lk-wordgrid span { font: 500 15px var(--font-mono); color: var(--accent-1); background: var(--ground); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.lk-wordgrid span::before { counter-increment: w; content: counter(w) '  '; color: var(--text-muted); font-size: 11px; }
+.lk-warn { margin-top: 14px; padding: 10px 12px; border-left: 3px solid var(--flag-textbook-edge, #d9705f); background: var(--surface-2); border-radius: 6px; font-size: 12.5px; }
+.lk-list { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; font-size: 13px; }
+.lk-list li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; }
+
+/* Settings › Your safety › Locking and People and access (ACCOUNT_4, ACCOUNT_2). */
+.lk-settings { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .lk-settings { grid-template-columns: 1fr; } }
+.lk-status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.lk-status .lk-big { font: 300 22px var(--font-display); }
+.lk-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 0; border-top: 1px solid var(--line); }
+.lk-row:first-of-type { border-top: 0; }
+.lk-row small { display: block; color: var(--text-muted); font-size: 12.5px; }
+.lk-case { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); margin-top: 8px; }
+.lk-case .lk-icon { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; border: 1px solid var(--line); }
+.lk-case .lk-icon.on { border-color: var(--accent-1); color: var(--accent-1); }
+.lk-preview { overflow: hidden; padding: 0; }
+.lk-preview .lk-mini { height: 280px; display: grid; place-items: center; text-align: center; background: radial-gradient(400px 220px at 50% 30%, color-mix(in srgb, var(--accent-1) 12%, var(--ground)), var(--ground)); border-bottom: 1px solid var(--line); }
+.lk-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13.5px; }
+.lk-table th { text-align: left; font: 500 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); padding: 0 10px 8px; border-bottom: 1px solid var(--line); }
+.lk-table td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.lk-table td small { display: block; color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+.lk-who { display: flex; gap: 10px; align-items: center; }
+.lk-av { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 500 12px var(--font-mono); border: 1.5px solid var(--line); color: var(--text-muted); flex: none; }
+.lk-av.me { border-color: var(--accent-1); color: var(--accent-1); }
+.lk-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.lk-bars { display: grid; gap: 8px; margin-top: 10px; }
+.lk-bar { display: grid; grid-template-columns: 110px 1fr 44px; gap: 10px; align-items: center; font-size: 13px; }
+.lk-track { height: 8px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+.lk-track i { display: block; height: 100%; background: color-mix(in srgb, var(--accent-1) 55%, var(--surface-3)); }
+.lk-track i.me { background: var(--accent-1); }
+.lk-roles { display: grid; gap: 8px; margin-top: 8px; }
+.lk-keybox { margin-top: 14px; padding: 12px; border: 1px dashed var(--accent-1); border-radius: 10px; background: var(--ground); }
+.lk-keybox code { font: 500 14px var(--font-mono); color: var(--accent-1); word-break: break-all; }
+.lk-banner { display: flex; gap: 10px; align-items: center; margin-top: 14px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); font-size: 13px; color: var(--text-muted); }

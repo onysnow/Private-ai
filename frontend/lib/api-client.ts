@@ -66,8 +66,13 @@ async function parseError(response:Response,endpoint:string):Promise<ApiHttpErro
   return new ApiHttpError(endpoint,response.status,detail,structured,fields);
 }
 
+/** Said on window when the server answers 423 Locked (the app lock, ADR-0016): the lock gate shows the lock screen. */
+export const LOCKED_EVENT='pai:locked';
+
 export class ApiClient {
   private authToken='';
+  /** This browser's app-lock session (lib/app-lock.ts), sent with every request as X-Workbench-Session. */
+  private sessionKey='';
 
   constructor(public baseUrl:string){}
 
@@ -78,17 +83,20 @@ export class ApiClient {
   setAuthToken(token:string):void{this.authToken=token.trim()}
   clearAuthToken():void{this.authToken=''}
   hasAuthToken():boolean{return Boolean(this.authToken)}
+  setSessionKey(key:string):void{this.sessionKey=key.trim()}
 
   private async request(endpoint:string,options:RequestOptions={}):Promise<Response>{
     const path=normalizeEndpoint(endpoint);
     const headers=new Headers(options.headers||{});
     if(this.authToken&&!headers.has('authorization'))headers.set('authorization',`Bearer ${this.authToken}`);
+    if(this.sessionKey&&!headers.has('x-workbench-session'))headers.set('x-workbench-session',this.sessionKey);
     let body:BodyInit|undefined=options.rawBody;
     if(options.body!==undefined){
       headers.set('content-type','application/json');
       body=JSON.stringify(options.body);
     }
     const response=await fetch(`${this.baseUrl}${path}`,{...options,headers,body});
+    if(response.status===423&&typeof window!=='undefined')window.dispatchEvent(new Event(LOCKED_EVENT));
     if(!response.ok)throw await parseError(response,path);
     return response;
   }

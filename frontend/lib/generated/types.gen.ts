@@ -973,6 +973,10 @@ export type AppUserCreate = {
    * Global Role
    */
   global_role?: string;
+  /**
+   * Key Days
+   */
+  key_days?: number;
 };
 
 /**
@@ -997,6 +1001,10 @@ export type AppUserCreatedOut = {
    * Token
    */
   token: string;
+  /**
+   * Token Expires At
+   */
+  token_expires_at?: string | null;
   /**
    * Token Notice
    */
@@ -1054,6 +1062,14 @@ export type AppUserOut = {
    */
   token_created_at: string;
   /**
+   * Token Expires At
+   */
+  token_expires_at?: string | null;
+  /**
+   * Token Hint
+   */
+  token_hint?: string | null;
+  /**
    * Token Last Used At
    */
   token_last_used_at: string | null;
@@ -1068,7 +1084,7 @@ export type AppUserOut = {
   /**
    * Token Status
    */
-  token_status: 'active' | 'disabled' | 'revoked';
+  token_status: 'active' | 'disabled' | 'revoked' | 'expired';
 };
 
 /**
@@ -1111,6 +1127,10 @@ export type AppUserTokenRotatedOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   token_created_at: string;
+  /**
+   * Token Expires At
+   */
+  token_expires_at?: string | null;
   /**
    * Token Notice
    */
@@ -1168,7 +1188,7 @@ export type AppUserUpdatedOut = {
   /**
    * Token Status
    */
-  token_status: 'active' | 'disabled' | 'revoked';
+  token_status: 'active' | 'disabled' | 'revoked' | 'expired';
 };
 
 /**
@@ -1530,6 +1550,10 @@ export type BodyInspectBackup = {
    * File
    */
   file: Blob | File;
+  /**
+   * Secret
+   */
+  secret?: string | null;
 };
 
 /**
@@ -1540,6 +1564,10 @@ export type BodyPreviewBackupRestore = {
    * File
    */
   file: Blob | File;
+  /**
+   * Secret
+   */
+  secret?: string | null;
 };
 
 /**
@@ -1550,6 +1578,10 @@ export type BodyRestoreBackup = {
    * File
    */
   file: Blob | File;
+  /**
+   * Secret
+   */
+  secret?: string | null;
 };
 
 /**
@@ -2045,6 +2077,20 @@ export type CaseLeadCountsOut = {
    * Open
    */
   open: number;
+};
+
+/**
+ * CaseLockIn
+ */
+export type CaseLockIn = {
+  /**
+   * Old
+   */
+  old?: string | null;
+  /**
+   * Passphrase
+   */
+  passphrase: string;
 };
 
 /**
@@ -2803,6 +2849,20 @@ export type ChainStepOut = {
    * To
    */
   to: string;
+};
+
+/**
+ * ChangePassphraseIn
+ */
+export type ChangePassphraseIn = {
+  /**
+   * New
+   */
+  new: string;
+  /**
+   * Old
+   */
+  old: string;
 };
 
 /**
@@ -5819,6 +5879,36 @@ export type DataTableRowOut = {
 };
 
 /**
+ * DeciderOut
+ */
+export type DeciderOut = {
+  /**
+   * Decisions
+   */
+  decisions: number;
+  /**
+   * Name
+   */
+  name?: string | null;
+};
+
+/**
+ * DecidersOut
+ *
+ * Who decided what in a case over the last days (mockup ACCOUNT_2): name, or null for "a person".
+ */
+export type DecidersOut = {
+  /**
+   * Days
+   */
+  days: number;
+  /**
+   * People
+   */
+  people: Array<DeciderOut>;
+};
+
+/**
  * DecisionChoiceOut
  *
  * One answer: the existing endpoint it posts to and the body it sends.
@@ -6550,6 +6640,50 @@ export type DemoSeedOut = {
    * Investigation Id
    */
   investigation_id: string;
+};
+
+/**
+ * DiskAnswerIn
+ */
+export type DiskAnswerIn = {
+  /**
+   * Answer
+   */
+  answer?: string | null;
+};
+
+/**
+ * DiskStatusOut
+ *
+ * Whether the disk the app runs from is encrypted, as far as the app can tell without administrator rights.
+ */
+export type DiskStatusOut = {
+  /**
+   * Answered
+   */
+  answered?: boolean;
+  /**
+   * How To
+   */
+  how_to?: string;
+  /**
+   * State
+   */
+  state:
+    | 'encrypted'
+    | 'encrypting'
+    | 'paused'
+    | 'decrypting'
+    | 'not_encrypted'
+    | 'unknown';
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Why
+   */
+  why?: string;
 };
 
 /**
@@ -11661,6 +11795,137 @@ export type LineageSourceOut = {
 };
 
 /**
+ * LockReasonIn
+ */
+export type LockReasonIn = {
+  /**
+   * Reason
+   */
+  reason?: string | null;
+};
+
+/**
+ * LockStateOut
+ *
+ * The app lock as the screen needs it. While locked: only that it is locked and whether a PIN may open it.
+ */
+export type LockStateOut = {
+  /**
+   * Backups Encrypted
+   */
+  backups_encrypted?: boolean | null;
+  disk?: DiskStatusOut | null;
+  /**
+   * Disk Answer
+   */
+  disk_answer?: string | null;
+  /**
+   * Idle Minutes
+   */
+  idle_minutes?: number | null;
+  /**
+   * Known
+   */
+  known?: boolean;
+  /**
+   * Lock On Hide
+   */
+  lock_on_hide?: boolean | null;
+  /**
+   * Lock On Sleep
+   */
+  lock_on_sleep?: boolean | null;
+  /**
+   * Locked
+   */
+  locked: boolean;
+  /**
+   * Locked Cases
+   */
+  locked_cases?: Array<LockedCaseOut> | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+  /**
+   * Passphrase Set At
+   */
+  passphrase_set_at?: string | null;
+  /**
+   * Pin
+   */
+  pin: boolean;
+  /**
+   * Pin Set
+   */
+  pin_set?: boolean | null;
+  /**
+   * Protection
+   */
+  protection: 'none' | 'passphrase';
+  /**
+   * Quick Pin
+   */
+  quick_pin?: boolean | null;
+  /**
+   * Recovery Set At
+   */
+  recovery_set_at?: string | null;
+  /**
+   * Session
+   */
+  session?: string | null;
+  /**
+   * Unsigned Decisions
+   */
+  unsigned_decisions?: number | null;
+};
+
+/**
+ * LockedCaseOut
+ */
+export type LockedCaseOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Open
+   */
+  open: boolean;
+  /**
+   * Set At
+   */
+  set_at?: string | null;
+};
+
+/**
+ * LockingIn
+ */
+export type LockingIn = {
+  /**
+   * Idle Minutes
+   */
+  idle_minutes?: number | null;
+  /**
+   * Lock On Hide
+   */
+  lock_on_hide?: boolean | null;
+  /**
+   * Lock On Sleep
+   */
+  lock_on_sleep?: boolean | null;
+  /**
+   * Quick Pin
+   */
+  quick_pin?: boolean | null;
+};
+
+/**
  * LookupDefaultsPut
  */
 export type LookupDefaultsPut = {
@@ -12289,6 +12554,16 @@ export type MultiEnrichmentRequest = {
    * Providers
    */
   providers?: Array<string>;
+};
+
+/**
+ * NameIn
+ */
+export type NameIn = {
+  /**
+   * Name
+   */
+  name: string;
 };
 
 /**
@@ -13541,6 +13816,26 @@ export type PeekOut = {
 };
 
 /**
+ * PinIn
+ */
+export type PinIn = {
+  /**
+   * Pin
+   */
+  pin: string;
+};
+
+/**
+ * PinSetIn
+ */
+export type PinSetIn = {
+  /**
+   * Pin
+   */
+  pin?: string | null;
+};
+
+/**
  * PlaceEventOut
  *
  * An event on the investigation's timeline that happened at a place:
@@ -14351,6 +14646,32 @@ export type RecordTagsOut = {
    * Rows
    */
   rows: Array<RecordTagRowOut>;
+};
+
+/**
+ * RecoverIn
+ */
+export type RecoverIn = {
+  /**
+   * New Passphrase
+   */
+  new_passphrase: string;
+  /**
+   * Words
+   */
+  words: string;
+};
+
+/**
+ * RecoveryWordsOut
+ *
+ * The 12 recovery words, shown this once: only an Argon2id hash of them is kept.
+ */
+export type RecoveryWordsOut = {
+  /**
+   * Words
+   */
+  words: Array<string>;
 };
 
 /**
@@ -16538,6 +16859,16 @@ export type SearchPartyOut = {
    * Schema
    */
   schema: string;
+};
+
+/**
+ * SecretIn
+ */
+export type SecretIn = {
+  /**
+   * Passphrase
+   */
+  passphrase: string;
 };
 
 /**
@@ -26116,6 +26447,47 @@ export type ListInvestigationCrossReferencesResponses = {
 export type ListInvestigationCrossReferencesResponse =
   ListInvestigationCrossReferencesResponses[keyof ListInvestigationCrossReferencesResponses];
 
+export type InvestigationDecidersData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Days
+     */
+    days?: number;
+  };
+  url: '/api/investigations/{investigation_id}/deciders';
+};
+
+export type InvestigationDecidersErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationDecidersError =
+  InvestigationDecidersErrors[keyof InvestigationDecidersErrors];
+
+export type InvestigationDecidersResponses = {
+  /**
+   * Successful Response
+   */
+  200: DecidersOut;
+};
+
+export type InvestigationDecidersResponse =
+  InvestigationDecidersResponses[keyof InvestigationDecidersResponses];
+
 export type GetDecisionsData = {
   body?: never;
   path: {
@@ -29289,6 +29661,341 @@ export type LinkLeadResponses = {
 
 export type LinkLeadResponse = LinkLeadResponses[keyof LinkLeadResponses];
 
+export type MeData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/me';
+};
+
+export type MeErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MeError = MeErrors[keyof MeErrors];
+
+export type MeResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type MeResponse = MeResponses[keyof MeResponses];
+
+export type LockCaseData = {
+  body: CaseLockIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/me/cases/{investigation_id}/lock';
+};
+
+export type LockCaseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type LockCaseError = LockCaseErrors[keyof LockCaseErrors];
+
+export type LockCaseResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type LockCaseResponse = LockCaseResponses[keyof LockCaseResponses];
+
+export type RemoveCaseLockData = {
+  body: SecretIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/me/cases/{investigation_id}/unlock-for-good';
+};
+
+export type RemoveCaseLockErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemoveCaseLockError =
+  RemoveCaseLockErrors[keyof RemoveCaseLockErrors];
+
+export type RemoveCaseLockResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type RemoveCaseLockResponse =
+  RemoveCaseLockResponses[keyof RemoveCaseLockResponses];
+
+export type DiskAnswerData = {
+  body: DiskAnswerIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/disk';
+};
+
+export type DiskAnswerErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DiskAnswerError = DiskAnswerErrors[keyof DiskAnswerErrors];
+
+export type DiskAnswerResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type DiskAnswerResponse = DiskAnswerResponses[keyof DiskAnswerResponses];
+
+export type LockingData = {
+  body: LockingIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/locking';
+};
+
+export type LockingErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type LockingError = LockingErrors[keyof LockingErrors];
+
+export type LockingResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type LockingResponse = LockingResponses[keyof LockingResponses];
+
+export type SetNameData = {
+  body: NameIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/name';
+};
+
+export type SetNameErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SetNameError = SetNameErrors[keyof SetNameErrors];
+
+export type SetNameResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type SetNameResponse = SetNameResponses[keyof SetNameResponses];
+
+export type ChangePassphraseData = {
+  body: ChangePassphraseIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/passphrase';
+};
+
+export type ChangePassphraseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ChangePassphraseError =
+  ChangePassphraseErrors[keyof ChangePassphraseErrors];
+
+export type ChangePassphraseResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type ChangePassphraseResponse =
+  ChangePassphraseResponses[keyof ChangePassphraseResponses];
+
+export type SetPinData = {
+  body: PinSetIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/pin';
+};
+
+export type SetPinErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SetPinError = SetPinErrors[keyof SetPinErrors];
+
+export type SetPinResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type SetPinResponse = SetPinResponses[keyof SetPinResponses];
+
+export type TurnOnData = {
+  body: SecretIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/protection';
+};
+
+export type TurnOnErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TurnOnError = TurnOnErrors[keyof TurnOnErrors];
+
+export type TurnOnResponses = {
+  /**
+   * Successful Response
+   */
+  200: RecoveryWordsOut;
+};
+
+export type TurnOnResponse = TurnOnResponses[keyof TurnOnResponses];
+
+export type TurnOffData = {
+  body: SecretIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/protection/off';
+};
+
+export type TurnOffErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TurnOffError = TurnOffErrors[keyof TurnOffErrors];
+
+export type TurnOffResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type TurnOffResponse = TurnOffResponses[keyof TurnOffResponses];
+
+export type NewRecoveryKeyData = {
+  body: SecretIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/recovery-key';
+};
+
+export type NewRecoveryKeyErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type NewRecoveryKeyError =
+  NewRecoveryKeyErrors[keyof NewRecoveryKeyErrors];
+
+export type NewRecoveryKeyResponses = {
+  /**
+   * Successful Response
+   */
+  200: RecoveryWordsOut;
+};
+
+export type NewRecoveryKeyResponse =
+  NewRecoveryKeyResponses[keyof NewRecoveryKeyResponses];
+
 export type RemoveNoteData = {
   body?: never;
   path: {
@@ -30123,6 +30830,282 @@ export type SearchWorkbenchResponses = {
 
 export type SearchWorkbenchResponse =
   SearchWorkbenchResponses[keyof SearchWorkbenchResponses];
+
+export type SessionStateData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/session';
+};
+
+export type SessionStateErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SessionStateError = SessionStateErrors[keyof SessionStateErrors];
+
+export type SessionStateResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type SessionStateResponse =
+  SessionStateResponses[keyof SessionStateResponses];
+
+export type ActiveData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/session/active';
+};
+
+export type ActiveErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ActiveError = ActiveErrors[keyof ActiveErrors];
+
+export type ActiveResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type ActiveResponse = ActiveResponses[keyof ActiveResponses];
+
+export type CloseCaseData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/session/cases/{investigation_id}/close';
+};
+
+export type CloseCaseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CloseCaseError = CloseCaseErrors[keyof CloseCaseErrors];
+
+export type CloseCaseResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type CloseCaseResponse = CloseCaseResponses[keyof CloseCaseResponses];
+
+export type OpenCaseData = {
+  body: SecretIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/session/cases/{investigation_id}/open';
+};
+
+export type OpenCaseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type OpenCaseError = OpenCaseErrors[keyof OpenCaseErrors];
+
+export type OpenCaseResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type OpenCaseResponse = OpenCaseResponses[keyof OpenCaseResponses];
+
+export type LockData = {
+  /**
+   * Body
+   */
+  body?: LockReasonIn | null;
+  path?: never;
+  query?: never;
+  url: '/api/session/lock';
+};
+
+export type LockErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type LockError = LockErrors[keyof LockErrors];
+
+export type LockResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type LockResponse = LockResponses[keyof LockResponses];
+
+export type RecoverData = {
+  body: RecoverIn;
+  path?: never;
+  query?: never;
+  url: '/api/session/recover';
+};
+
+export type RecoverErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecoverError = RecoverErrors[keyof RecoverErrors];
+
+export type RecoverResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type RecoverResponse = RecoverResponses[keyof RecoverResponses];
+
+export type StartSessionData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/session/start';
+};
+
+export type StartSessionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type StartSessionError = StartSessionErrors[keyof StartSessionErrors];
+
+export type StartSessionResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type StartSessionResponse =
+  StartSessionResponses[keyof StartSessionResponses];
+
+export type UnlockData = {
+  body: SecretIn;
+  path?: never;
+  query?: never;
+  url: '/api/session/unlock';
+};
+
+export type UnlockErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UnlockError = UnlockErrors[keyof UnlockErrors];
+
+export type UnlockResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type UnlockResponse = UnlockResponses[keyof UnlockResponses];
+
+export type UnlockPinData = {
+  body: PinIn;
+  path?: never;
+  query?: never;
+  url: '/api/session/unlock-pin';
+};
+
+export type UnlockPinErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UnlockPinError = UnlockPinErrors[keyof UnlockPinErrors];
+
+export type UnlockPinResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type UnlockPinResponse = UnlockPinResponses[keyof UnlockPinResponses];
 
 export type CheckConnectorKeyData = {
   body?: never;
@@ -30985,7 +31968,14 @@ export type RotateAppUserTokenData = {
      */
     user_id: string;
   };
-  query?: never;
+  query?: {
+    /**
+     * Key Days
+     *
+     * How long the new key works: 30 or 90 days.
+     */
+    key_days?: number;
+  };
   url: '/api/settings/security/users/{user_id}/token/rotate';
 };
 

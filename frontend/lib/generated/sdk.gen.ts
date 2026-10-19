@@ -12,6 +12,9 @@ import {
 } from './client';
 import { client } from './client.gen';
 import type {
+  ActiveData,
+  ActiveErrors,
+  ActiveResponses,
   AddChartToDeckEndpointData,
   AddChartToDeckEndpointErrors,
   AddChartToDeckEndpointResponses,
@@ -60,6 +63,9 @@ import type {
   CapabilitiesData,
   CapabilitiesErrors,
   CapabilitiesResponses,
+  ChangePassphraseData,
+  ChangePassphraseErrors,
+  ChangePassphraseResponses,
   CheckConnectorKeyData,
   CheckConnectorKeyErrors,
   CheckConnectorKeyResponses,
@@ -69,6 +75,9 @@ import type {
   ClearCaseLookupsData,
   ClearCaseLookupsErrors,
   ClearCaseLookupsResponses,
+  CloseCaseData,
+  CloseCaseErrors,
+  CloseCaseResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
@@ -165,6 +174,9 @@ import type {
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointErrors,
   DeleteWriteupEndpointResponses,
+  DiskAnswerData,
+  DiskAnswerErrors,
+  DiskAnswerResponses,
   DismissHitData,
   DismissHitErrors,
   DismissHitResponses,
@@ -504,6 +516,9 @@ import type {
   InvestigationCaseSynthesisData,
   InvestigationCaseSynthesisErrors,
   InvestigationCaseSynthesisResponses,
+  InvestigationDecidersData,
+  InvestigationDecidersErrors,
+  InvestigationDecidersResponses,
   InvestigationDeletionPreviewData,
   InvestigationDeletionPreviewErrors,
   InvestigationDeletionPreviewResponses,
@@ -687,6 +702,15 @@ import type {
   LoadDemoCaseData,
   LoadDemoCaseErrors,
   LoadDemoCaseResponses,
+  LockCaseData,
+  LockCaseErrors,
+  LockCaseResponses,
+  LockData,
+  LockErrors,
+  LockingData,
+  LockingErrors,
+  LockingResponses,
+  LockResponses,
   MakeLeadFromHitData,
   MakeLeadFromHitErrors,
   MakeLeadFromHitResponses,
@@ -705,12 +729,21 @@ import type {
   MarkStoryReadyData,
   MarkStoryReadyErrors,
   MarkStoryReadyResponses,
+  MeData,
+  MeErrors,
+  MeResponses,
   NameStoryVersionData,
   NameStoryVersionErrors,
   NameStoryVersionResponses,
+  NewRecoveryKeyData,
+  NewRecoveryKeyErrors,
+  NewRecoveryKeyResponses,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusErrors,
   OpenalephIntegrationStatusResponses,
+  OpenCaseData,
+  OpenCaseErrors,
+  OpenCaseResponses,
   PatchClaimSuiteData,
   PatchClaimSuiteErrors,
   PatchClaimSuiteResponses,
@@ -783,12 +816,18 @@ import type {
   RecordStoryGateData,
   RecordStoryGateErrors,
   RecordStoryGateResponses,
+  RecoverData,
+  RecoverErrors,
+  RecoverResponses,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewErrors,
   RefreshOpenalephDocumentReviewResponses,
   RelationshipSchemasData,
   RelationshipSchemasErrors,
   RelationshipSchemasResponses,
+  RemoveCaseLockData,
+  RemoveCaseLockErrors,
+  RemoveCaseLockResponses,
   RemoveCollectionData,
   RemoveCollectionErrors,
   RemoveCollectionItemData,
@@ -888,15 +927,27 @@ import type {
   SendCorpusEntitySetData,
   SendCorpusEntitySetErrors,
   SendCorpusEntitySetResponses,
+  SessionStateData,
+  SessionStateErrors,
+  SessionStateResponses,
   SetInvestigationTypeData,
   SetInvestigationTypeErrors,
   SetInvestigationTypeResponses,
+  SetNameData,
+  SetNameErrors,
+  SetNameResponses,
+  SetPinData,
+  SetPinErrors,
+  SetPinResponses,
   SetStoryThesisData,
   SetStoryThesisErrors,
   SetStoryThesisResponses,
   SettingsStatusData,
   SettingsStatusErrors,
   SettingsStatusResponses,
+  StartSessionData,
+  StartSessionErrors,
+  StartSessionResponses,
   StartStoryWriteupData,
   StartStoryWriteupErrors,
   StartStoryWriteupResponses,
@@ -912,6 +963,18 @@ import type {
   TestNotificationChannelData,
   TestNotificationChannelErrors,
   TestNotificationChannelResponses,
+  TurnOffData,
+  TurnOffErrors,
+  TurnOffResponses,
+  TurnOnData,
+  TurnOnErrors,
+  TurnOnResponses,
+  UnlockData,
+  UnlockErrors,
+  UnlockPinData,
+  UnlockPinErrors,
+  UnlockPinResponses,
+  UnlockResponses,
   UntagARecordData,
   UntagARecordErrors,
   UntagARecordResponses,
@@ -944,6 +1007,7 @@ import type {
   UploadDocumentResponses,
 } from './types.gen';
 import {
+  zActiveResponse,
   zAddChartToDeckEndpointBody,
   zAddChartToDeckEndpointPath,
   zAddChartToDeckEndpointResponse,
@@ -987,12 +1051,16 @@ import {
   zCanonicalEntityResolutionPath,
   zCanonicalEntityResolutionResponse,
   zCapabilitiesResponse,
+  zChangePassphraseBody,
+  zChangePassphraseResponse,
   zCheckConnectorKeyPath,
   zCheckConnectorKeyResponse,
   zCheckWatchlistNowPath,
   zCheckWatchlistNowResponse,
   zClearCaseLookupsPath,
   zClearCaseLookupsResponse,
+  zCloseCasePath,
+  zCloseCaseResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -1067,6 +1135,8 @@ import {
   zDeleteWatchResponse,
   zDeleteWriteupEndpointPath,
   zDeleteWriteupEndpointResponse,
+  zDiskAnswerBody,
+  zDiskAnswerResponse,
   zDismissHitPath,
   zDismissHitResponse,
   zDismissRedFlagBody,
@@ -1307,6 +1377,9 @@ import {
   zInvestigationCaseSynthesisBody,
   zInvestigationCaseSynthesisPath,
   zInvestigationCaseSynthesisResponse,
+  zInvestigationDecidersPath,
+  zInvestigationDecidersQuery,
+  zInvestigationDecidersResponse,
   zInvestigationDeletionPreviewPath,
   zInvestigationDeletionPreviewResponse,
   zInvestigationHypothesisTestBody,
@@ -1451,6 +1524,13 @@ import {
   zLoad1MdbResponse,
   zLoadDemoCasePath,
   zLoadDemoCaseResponse,
+  zLockBody,
+  zLockCaseBody,
+  zLockCasePath,
+  zLockCaseResponse,
+  zLockingBody,
+  zLockingResponse,
+  zLockResponse,
   zMakeLeadFromHitPath,
   zMakeLeadFromHitResponse,
   zMakeLeadFromNotePath,
@@ -1466,10 +1546,16 @@ import {
   zMarkStoryReadyBody,
   zMarkStoryReadyPath,
   zMarkStoryReadyResponse,
+  zMeResponse,
   zNameStoryVersionBody,
   zNameStoryVersionPath,
   zNameStoryVersionResponse,
+  zNewRecoveryKeyBody,
+  zNewRecoveryKeyResponse,
   zOpenalephIntegrationStatusResponse,
+  zOpenCaseBody,
+  zOpenCasePath,
+  zOpenCaseResponse,
   zPatchClaimSuiteBody,
   zPatchClaimSuitePath,
   zPatchClaimSuiteResponse,
@@ -1533,9 +1619,14 @@ import {
   zRecordStoryGateBody,
   zRecordStoryGatePath,
   zRecordStoryGateResponse,
+  zRecoverBody,
+  zRecoverResponse,
   zRefreshOpenalephDocumentReviewPath,
   zRefreshOpenalephDocumentReviewResponse,
   zRelationshipSchemasResponse,
+  zRemoveCaseLockBody,
+  zRemoveCaseLockPath,
+  zRemoveCaseLockResponse,
   zRemoveCollectionItemPath,
   zRemoveCollectionItemQuery,
   zRemoveCollectionItemResponse,
@@ -1586,6 +1677,7 @@ import {
   zRevokeAppUserTokenPath,
   zRevokeAppUserTokenResponse,
   zRotateAppUserTokenPath,
+  zRotateAppUserTokenQuery,
   zRotateAppUserTokenResponse,
   zRunRedFlagsPath,
   zRunRedFlagsResponse,
@@ -1616,13 +1708,19 @@ import {
   zSendCorpusEntitySetBody,
   zSendCorpusEntitySetPath,
   zSendCorpusEntitySetResponse,
+  zSessionStateResponse,
   zSetInvestigationTypeBody,
   zSetInvestigationTypePath,
   zSetInvestigationTypeResponse,
+  zSetNameBody,
+  zSetNameResponse,
+  zSetPinBody,
+  zSetPinResponse,
   zSetStoryThesisBody,
   zSetStoryThesisPath,
   zSetStoryThesisResponse,
   zSettingsStatusResponse,
+  zStartSessionResponse,
   zStartStoryWriteupPath,
   zStartStoryWriteupResponse,
   zSyncCorpusNowPath,
@@ -1634,6 +1732,14 @@ import {
   zTagARecordResponse,
   zTestNotificationChannelPath,
   zTestNotificationChannelResponse,
+  zTurnOffBody,
+  zTurnOffResponse,
+  zTurnOnBody,
+  zTurnOnResponse,
+  zUnlockBody,
+  zUnlockPinBody,
+  zUnlockPinResponse,
+  zUnlockResponse,
   zUntagARecordPath,
   zUntagARecordQuery,
   zUntagARecordResponse,
@@ -6680,6 +6786,38 @@ export const listInvestigationCrossReferences = <
   });
 
 /**
+ * Investigation Deciders
+ *
+ * Who decided what in this case over the last days (mockup ACCOUNT_2): quote links, claim reviews by a person and
+ * decided proposals, by the name kept with each; null for decisions made before names were kept ("a person").
+ */
+export const investigationDeciders = <ThrowOnError extends boolean = false>(
+  options: Options<InvestigationDecidersData, ThrowOnError>,
+): RequestResult<
+  InvestigationDecidersResponses,
+  InvestigationDecidersErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    InvestigationDecidersResponses,
+    InvestigationDecidersErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zInvestigationDecidersPath,
+          query: zInvestigationDecidersQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationDecidersResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/deciders',
+    ...options,
+  });
+
+/**
  * Get Decisions
  */
 export const getDecisions = <ThrowOnError extends boolean = false>(
@@ -9006,6 +9144,308 @@ export const linkLead = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Me
+ */
+export const me = <ThrowOnError extends boolean = false>(
+  options?: Options<MeData, ThrowOnError>,
+): RequestResult<MeResponses, MeErrors, ThrowOnError> =>
+  (options?.client ?? client).get<MeResponses, MeErrors, ThrowOnError>({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zMeResponse.parseAsync(data),
+    url: '/api/me',
+    ...options,
+  });
+
+/**
+ * Lock Case
+ *
+ * Lock a case on its own, or change its passphrase (the old one is asked).
+ */
+export const lockCase = <ThrowOnError extends boolean = false>(
+  options: Options<LockCaseData, ThrowOnError>,
+): RequestResult<LockCaseResponses, LockCaseErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    LockCaseResponses,
+    LockCaseErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zLockCaseBody,
+          path: zLockCasePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zLockCaseResponse.parseAsync(data),
+    url: '/api/me/cases/{investigation_id}/lock',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Remove Case Lock
+ */
+export const removeCaseLock = <ThrowOnError extends boolean = false>(
+  options: Options<RemoveCaseLockData, ThrowOnError>,
+): RequestResult<RemoveCaseLockResponses, RemoveCaseLockErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RemoveCaseLockResponses,
+    RemoveCaseLockErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zRemoveCaseLockBody,
+          path: zRemoveCaseLockPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRemoveCaseLockResponse.parseAsync(data),
+    url: '/api/me/cases/{investigation_id}/unlock-for-good',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Disk Answer
+ */
+export const diskAnswer = <ThrowOnError extends boolean = false>(
+  options: Options<DiskAnswerData, ThrowOnError>,
+): RequestResult<DiskAnswerResponses, DiskAnswerErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    DiskAnswerResponses,
+    DiskAnswerErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDiskAnswerBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDiskAnswerResponse.parseAsync(data),
+    url: '/api/me/disk',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Locking
+ */
+export const locking = <ThrowOnError extends boolean = false>(
+  options: Options<LockingData, ThrowOnError>,
+): RequestResult<LockingResponses, LockingErrors, ThrowOnError> =>
+  (options.client ?? client).put<LockingResponses, LockingErrors, ThrowOnError>(
+    {
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: zLockingBody,
+            path: z.never().optional(),
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseValidator: async (data) =>
+        await zLockingResponse.parseAsync(data),
+      url: '/api/me/locking',
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    },
+  );
+
+/**
+ * Set Name
+ */
+export const setName = <ThrowOnError extends boolean = false>(
+  options: Options<SetNameData, ThrowOnError>,
+): RequestResult<SetNameResponses, SetNameErrors, ThrowOnError> =>
+  (options.client ?? client).put<SetNameResponses, SetNameErrors, ThrowOnError>(
+    {
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: zSetNameBody,
+            path: z.never().optional(),
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseValidator: async (data) =>
+        await zSetNameResponse.parseAsync(data),
+      url: '/api/me/name',
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    },
+  );
+
+/**
+ * Change Passphrase
+ */
+export const changePassphrase = <ThrowOnError extends boolean = false>(
+  options: Options<ChangePassphraseData, ThrowOnError>,
+): RequestResult<
+  ChangePassphraseResponses,
+  ChangePassphraseErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ChangePassphraseResponses,
+    ChangePassphraseErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zChangePassphraseBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zChangePassphraseResponse.parseAsync(data),
+    url: '/api/me/passphrase',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Set Pin
+ */
+export const setPin = <ThrowOnError extends boolean = false>(
+  options: Options<SetPinData, ThrowOnError>,
+): RequestResult<SetPinResponses, SetPinErrors, ThrowOnError> =>
+  (options.client ?? client).put<SetPinResponses, SetPinErrors, ThrowOnError>({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSetPinBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zSetPinResponse.parseAsync(data),
+    url: '/api/me/pin',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Turn On
+ *
+ * Protect with a passphrase: returns the recovery words, once. This browser stays unlocked.
+ */
+export const turnOn = <ThrowOnError extends boolean = false>(
+  options: Options<TurnOnData, ThrowOnError>,
+): RequestResult<TurnOnResponses, TurnOnErrors, ThrowOnError> =>
+  (options.client ?? client).post<TurnOnResponses, TurnOnErrors, ThrowOnError>({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zTurnOnBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zTurnOnResponse.parseAsync(data),
+    url: '/api/me/protection',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Turn Off
+ */
+export const turnOff = <ThrowOnError extends boolean = false>(
+  options: Options<TurnOffData, ThrowOnError>,
+): RequestResult<TurnOffResponses, TurnOffErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    TurnOffResponses,
+    TurnOffErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zTurnOffBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zTurnOffResponse.parseAsync(data),
+    url: '/api/me/protection/off',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * New Recovery Key
+ */
+export const newRecoveryKey = <ThrowOnError extends boolean = false>(
+  options: Options<NewRecoveryKeyData, ThrowOnError>,
+): RequestResult<NewRecoveryKeyResponses, NewRecoveryKeyErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    NewRecoveryKeyResponses,
+    NewRecoveryKeyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zNewRecoveryKeyBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zNewRecoveryKeyResponse.parseAsync(data),
+    url: '/api/me/recovery-key',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Remove Note
  *
  * Delete the note. A lead made from it stays.
@@ -9690,6 +10130,240 @@ export const searchWorkbench = <ThrowOnError extends boolean = false>(
       await zSearchWorkbenchResponse.parseAsync(data),
     url: '/api/search',
     ...options,
+  });
+
+/**
+ * Session State
+ */
+export const sessionState = <ThrowOnError extends boolean = false>(
+  options?: Options<SessionStateData, ThrowOnError>,
+): RequestResult<SessionStateResponses, SessionStateErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    SessionStateResponses,
+    SessionStateErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSessionStateResponse.parseAsync(data),
+    url: '/api/session',
+    ...options,
+  });
+
+/**
+ * Active
+ *
+ * The screen saw you working: what the idle lock measures from (polling alone does not count).
+ */
+export const active = <ThrowOnError extends boolean = false>(
+  options?: Options<ActiveData, ThrowOnError>,
+): RequestResult<ActiveResponses, ActiveErrors, ThrowOnError> =>
+  (options?.client ?? client).post<ActiveResponses, ActiveErrors, ThrowOnError>(
+    {
+      requestValidator: async (data) =>
+        await z
+          .object({
+            body: z.never().optional(),
+            path: z.never().optional(),
+            query: z.never().optional(),
+          })
+          .parseAsync(data),
+      responseValidator: async (data) => await zActiveResponse.parseAsync(data),
+      url: '/api/session/active',
+      ...options,
+    },
+  );
+
+/**
+ * Close Case
+ */
+export const closeCase = <ThrowOnError extends boolean = false>(
+  options: Options<CloseCaseData, ThrowOnError>,
+): RequestResult<CloseCaseResponses, CloseCaseErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CloseCaseResponses,
+    CloseCaseErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCloseCasePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCloseCaseResponse.parseAsync(data),
+    url: '/api/session/cases/{investigation_id}/close',
+    ...options,
+  });
+
+/**
+ * Open Case
+ */
+export const openCase = <ThrowOnError extends boolean = false>(
+  options: Options<OpenCaseData, ThrowOnError>,
+): RequestResult<OpenCaseResponses, OpenCaseErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    OpenCaseResponses,
+    OpenCaseErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zOpenCaseBody,
+          path: zOpenCasePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zOpenCaseResponse.parseAsync(data),
+    url: '/api/session/cases/{investigation_id}/open',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Lock
+ */
+export const lock = <ThrowOnError extends boolean = false>(
+  options?: Options<LockData, ThrowOnError>,
+): RequestResult<LockResponses, LockErrors, ThrowOnError> =>
+  (options?.client ?? client).post<LockResponses, LockErrors, ThrowOnError>({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zLockBody.optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zLockResponse.parseAsync(data),
+    url: '/api/session/lock',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Recover
+ *
+ * Forgot the passphrase: the recovery words, and a new passphrase.
+ */
+export const recover = <ThrowOnError extends boolean = false>(
+  options: Options<RecoverData, ThrowOnError>,
+): RequestResult<RecoverResponses, RecoverErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RecoverResponses,
+    RecoverErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zRecoverBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zRecoverResponse.parseAsync(data),
+    url: '/api/session/recover',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Start Session
+ */
+export const startSession = <ThrowOnError extends boolean = false>(
+  options?: Options<StartSessionData, ThrowOnError>,
+): RequestResult<StartSessionResponses, StartSessionErrors, ThrowOnError> =>
+  (options?.client ?? client).post<
+    StartSessionResponses,
+    StartSessionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zStartSessionResponse.parseAsync(data),
+    url: '/api/session/start',
+    ...options,
+  });
+
+/**
+ * Unlock
+ */
+export const unlock = <ThrowOnError extends boolean = false>(
+  options: Options<UnlockData, ThrowOnError>,
+): RequestResult<UnlockResponses, UnlockErrors, ThrowOnError> =>
+  (options.client ?? client).post<UnlockResponses, UnlockErrors, ThrowOnError>({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUnlockBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zUnlockResponse.parseAsync(data),
+    url: '/api/session/unlock',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Unlock Pin
+ */
+export const unlockPin = <ThrowOnError extends boolean = false>(
+  options: Options<UnlockPinData, ThrowOnError>,
+): RequestResult<UnlockPinResponses, UnlockPinErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    UnlockPinResponses,
+    UnlockPinErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUnlockPinBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUnlockPinResponse.parseAsync(data),
+    url: '/api/session/unlock-pin',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -10454,7 +11128,7 @@ export const rotateAppUserToken = <ThrowOnError extends boolean = false>(
         .object({
           body: z.never().optional(),
           path: zRotateAppUserTokenPath,
-          query: z.never().optional(),
+          query: zRotateAppUserTokenQuery.optional(),
         })
         .parseAsync(data),
     responseValidator: async (data) =>

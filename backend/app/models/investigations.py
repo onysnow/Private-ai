@@ -34,6 +34,9 @@ class Investigation(Base):
     red_flag_run: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     # The last backup made of this case: {"at", "bytes", "sha256", "documents_included"} (mockup KEEP_2).
     last_backup: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # A case locked on its own (ADR-0016, mockup ACCOUNT_4): {"hash": Argon2id of its passphrase, "set_at"}. Until
+    # it is unlocked in a session it is outside that session's authorization scope.
+    case_lock: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

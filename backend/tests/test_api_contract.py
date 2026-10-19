@@ -102,7 +102,10 @@ SETTINGS = hypothesis.settings(
 # listens (its media type is declared; tests/test_opsconsole_package.py reads
 # it), and a migration upgrade would rewrite the schema of the database every
 # other test shares (its reply is the run status every other run start shows).
-NOT_CALLED = {("GET", "/api/console/events"), ("POST", "/api/console/schema/migrations/upgrade")}
+NOT_CALLED = {("GET", "/api/console/events"), ("POST", "/api/console/schema/migrations/upgrade"),
+              # These change who may call everything after them: a passphrase locks the API (423), a case lock
+              # takes the seeded case out of scope (404). tests/test_app_lock.py covers them (ADR-0016).
+              ("POST", "/api/me/protection"), ("PUT", "/api/me/cases/{investigation_id}/lock")}
 
 
 def _no_network(*_args: Any, **_kwargs: Any) -> Any:

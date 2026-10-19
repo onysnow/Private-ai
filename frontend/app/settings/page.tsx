@@ -13,13 +13,18 @@ import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 import {AppearancePanel, lookName, useAppearance} from '../../features/appearance/appearance-panel';
 import {KeptLine, SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
-import {HIDE_SCREEN_EVENT, NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
+import {NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
 import {SecurityPanel} from '../../features/security/security-panel';
 import {KeysPane} from '../../features/settings/keys-pane';
 import {LookupsPane} from '../../features/settings/lookups-pane';
 import {NotificationsPane} from '../../features/settings/notifications-pane';
 import {ResearchPane} from '../../features/settings/research-pane';
 import {BackupPanel, lastBackupOf} from '../../features/backups/backup-panel';
+import {LockingPane} from '../../features/lock/locking-pane';
+import {NamePane} from '../../features/lock/name-pane';
+import {PeoplePane} from '../../features/lock/people-pane';
+import {useLockStore} from '../../lib/app-lock';
+import {listAppUsersOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {agoText} from '../../features/act/red-flags-board';
 import {LevelChip, LEVEL_WORDS} from '../../components/status';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -218,13 +223,19 @@ function Settings(): ReactElement {
   const lookupValue = !looks ? '' : lookupModes.length === 1 ? ({automatic: 'automatic', ask: 'ask', off: 'off'} as Record<string, string>)[lookupModes[0]] ?? '' : 'mixed';
   const researchValue = !research ? '' : !research.ai_enabled ? 'no model' : research.mode === 'ask' ? 'ask first' : 'off';
   const lastBackup = lastBackupOf(cases.find(c => c.id === inv)?.last_backup);
+  const lockState = useLockStore(s => s.state);
+  const appUsers = useQuery({...listAppUsersOptions(), enabled: Boolean(status)}).data;
+  const peopleHere = (appUsers ?? []).filter(u => !u.disabled && (u.global_role === 'admin' || u.memberships.some(m => m.investigation_id === inv))).length;
   const settingRows: SettingRow[] = [
+    {group: 'You', id: 'name', stored: 'the server on this computer, and in backups', leaves: 'nothing', label: 'Your name', value: lockState ? (lockState.name ? 'set' : 'not set') : '',
+      words: 'sign signature byline decided by who', note: 'Your name goes on your decisions: what you accept, link, reject or set as Supported.'},
     {group: 'You', id: 'appearance', stored: 'this browser on this device', leaves: 'nothing', label: 'Appearance', value: theme, words: 'theme colour color dark effects motion format fonts',
       note: 'Appearance is yours alone: it is saved on this device and never changes what a teammate sees.'},
     {group: 'You', id: 'notifications', stored: 'the server on this computer, for you alone; snoozes in this browser', leaves: 'nothing', label: 'Notifications', value: notes ? (notes.desktop ? 'in app + desktop' : 'in app') : '', words: 'inbox bell snooze alerts interrupt watch desktop',
       note: 'Notifications are yours alone: a teammate keeps their own routes.'},
     {group: 'You', id: 'keyboard', stored: 'this browser on this device', leaves: 'nothing', label: 'Keyboard', value: keysOn ? 'on' : 'off', words: 'keys shortcuts single-key'},
-    {group: 'You', id: 'safety', stored: 'nothing is stored', leaves: 'nothing', label: 'Your safety', value: '', words: 'hide screen cover'},
+    {group: 'You', id: 'safety', stored: 'the server on this computer: only fingerprints of the passphrase and PIN, never the secrets', leaves: 'nothing', label: 'Your safety', value: lockState ? (lockState.protection === 'passphrase' ? 'passphrase' : 'nothing to unlock') : '',
+      words: 'hide screen cover lock locking passphrase pin idle recovery words encrypt disk bitlocker case lock'},
     {group: 'Cases', id: 'new-case', stored: 'the server on this computer', leaves: 'nothing', label: 'New-case setup', value: '', words: 'start create'},
     {group: 'Cases', id: 'lookups', stored: 'the server on this computer; a case can differ', leaves: 'a party’s name, to that source only, as each source’s mode says', label: 'Outside lookups', value: lookupValue, words: 'connectors aleph opensanctions firecrawl search outside automatic',
       note: 'Each lookup leaves a trace on that site: the name you asked about, from this computer’s address.'},
@@ -234,6 +245,8 @@ function Settings(): ReactElement {
     {group: 'Cases', id: 'demo', stored: 'the server on this computer; hiding is per browser', leaves: 'loading a real case fetches its public pages from their publishers', label: 'Demo case', value: demoInv ? (hideDemo ? 'hidden' : 'shown') : 'none', words: 'sample seed delete 1mdb'},
     {group: 'This computer', id: 'access', stored: 'the token is held in this browser’s memory only', leaves: 'nothing', label: 'Access and token', value: state === 'local' ? 'local' : state === 'authenticated' ? 'token' : state === 'needs_token' ? 'token needed'
       : state === 'remote_disabled' ? 'remote off' : state === 'error' ? 'not reached' : '', words: 'api bearer'},
+    {group: 'This computer', id: 'people', stored: 'the server on this computer; of each key only a fingerprint and its last two characters', leaves: 'nothing',
+      label: 'People and access', value: appUsers ? String(peopleHere + 1) : '', words: 'users reporters viewers admin roles keys team who decided'},
     {group: 'This computer', id: 'keys', stored: 'the server on this computer, never shown again', leaves: 'a key goes only to its own service, with each request you make', label: 'Connector keys', value: status ? `${connectors.filter(c => c.configured).length} of ${connectors.length}` : '', words: 'credentials secret'},
     {group: 'This computer', id: 'backups', stored: 'the file you save, wherever you put it', leaves: 'nothing', label: 'Backups',
       value: lastBackup ? agoText(lastBackup.at) : inv ? 'none yet' : '', words: 'restore archive last backup'},
@@ -270,10 +283,10 @@ function Settings(): ReactElement {
         <input type="checkbox" role="switch" checked={keysOn} onChange={e => { setSingleKeys(e.target.checked); setKeysOn(e.target.checked); }}/><i aria-hidden="true"/></label>
       <p className="mt-3 text-sm text-muted-foreground">Keys with ⌘ or Ctrl always work: ⌘K search and commands, ⌘O switch case, ⌘⇧H hide the screen.</p>
     </div>,
-    safety: <div className={card}>
-      <p className="text-sm">Hide screen covers everything at once with a plain page, for when someone walks up. ⌘⇧H from anywhere, or the button on Case home; your place is kept until you ask for it back.</p>
-      <button type="button" className="ap-btn mt-4" onClick={() => window.dispatchEvent(new Event(HIDE_SCREEN_EVENT))}>Hide the screen now</button>
-    </div>,
+    name: <NamePane/>,
+    safety: <LockingPane/>,
+    people: inv ? <PeoplePane investigationId={inv} caseName={caseName} networkOn={status ? status.access.mode !== 'local_only' : false}
+      onAccess={() => go('access')}/> : <p className="text-sm text-muted-foreground">Open or start a case to see who can reach it.</p>,
     'new-case': <div className={card}>
       <p className="text-sm">A new case starts with its name and the question it answers, what kind of case it is, and what you have so far. The same setup opens from the case switcher (⌘O).</p>
       <button type="button" className="ap-btn p mt-4" onClick={() => window.dispatchEvent(new Event(NEW_CASE_EVENT))}>Start a new case</button>
