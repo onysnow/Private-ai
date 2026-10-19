@@ -4,7 +4,7 @@
 // Three tall answers, each a shape, a word and a key; No offers reason chips.
 import {useQuery} from '@tanstack/react-query';
 import Link from 'next/link';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {AiTag, LevelChip} from '../../components/status';
@@ -42,11 +42,24 @@ export function RowCells({rows, compact = false}: {rows: NonNullable<NonNullable
 export function PartyChips({parties}: {parties: DecisionItemOut['parties']}): ReactElement | null {
   const pointed = useWorkbenchStore(state => state.pointedParty);
   const point = useWorkbenchStore(state => state.setPointedParty);
+  // Pointing (hover or focus) already lights a party; the click that follows keeps it lit
+  // rather than turning it off again. A second click turns it off (as the Home mini-network does).
+  const pointedByHover = useRef<string | null>(null);
+  const reach = (id: string) => {
+    if (pointed === id) return;
+    pointedByHover.current = id;
+    point(id);
+  };
+  const press = (id: string) => {
+    if (pointedByHover.current === id) { pointedByHover.current = null; return; }
+    pointedByHover.current = null;
+    point(pointed === id ? null : id);
+  };
   if (!parties.length) return null;
   return <ul className="ch-parties" aria-label="Parties">
     {parties.map(p => <li key={p.id}>
-      <button type="button" className={`ch-party${pointed === p.id ? ' on' : ''}`} onMouseEnter={() => point(p.id)}
-        onFocus={() => point(p.id)} onClick={() => point(pointed === p.id ? null : p.id)} aria-pressed={pointed === p.id}>
+      <button type="button" className={`ch-party${pointed === p.id ? ' on' : ''}`} onMouseEnter={() => reach(p.id)}
+        onFocus={() => reach(p.id)} onClick={() => press(p.id)} aria-pressed={pointed === p.id}>
         <span aria-hidden="true" className="ch-party-kind">{(p.schema || 'T')[0]}</span>{p.name}
       </button>
     </li>)}
