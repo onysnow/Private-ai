@@ -99,6 +99,19 @@ def tile(z: int, x: int, y: int) -> tuple[bytes, str | None] | None:
     return bytes(data), ("gzip" if compression == Compression.GZIP else None)
 
 
+
+def _read_inside(root: Path, relative: Path) -> bytes | None:
+    """A file under `root`, or None: the path is resolved first, so a name that
+    climbs out of the folder (or a link that leaves it) reads nothing."""
+    try:
+        base = root.resolve()
+        target = (base / relative).resolve()
+        if not target.is_relative_to(base):
+            return None
+        return target.read_bytes()
+    except (OSError, ValueError):
+        return None
+
 def fonts() -> list[str]:
     folder = basemap_dir() / "fonts"
     try:
@@ -117,10 +130,7 @@ def font(stack: str, glyph_range: str) -> bytes | None:
     have = set(fonts())
     for name in (part.strip() for part in stack.split(",")):
         if name in have:
-            try:
-                return (basemap_dir() / "fonts" / name / f"{glyph_range}.pbf").read_bytes()
-            except OSError:
-                return None
+            return _read_inside(basemap_dir() / "fonts", Path(name) / f"{glyph_range}.pbf")
     return None
 
 
@@ -128,9 +138,8 @@ def sprite(name: str) -> tuple[bytes, str] | None:
     """A sprite sheet (`grayscale@2x.png`) or its index (`grayscale.json`)."""
     if not SPRITE_NAME.match(name):
         return None
-    try:
-        data = (basemap_dir() / "sprites" / SPRITE_VERSION / name).read_bytes()
-    except OSError:
+    data = _read_inside(basemap_dir() / "sprites" / SPRITE_VERSION, Path(name))
+    if data is None:
         return None
     return data, ("application/json" if name.endswith(".json") else "image/png")
 

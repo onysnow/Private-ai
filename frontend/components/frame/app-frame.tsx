@@ -50,7 +50,7 @@ function markLearned(): void { try { window.localStorage.setItem(LEARNED_KEY, '1
 /** Where you last were in each case, so opening it again goes back there. */
 const CASE_PLACE_KEY = 'pai:case-places';
 function readCasePlaces(): Record<string, Place> {
-  try { const v = JSON.parse(window.localStorage.getItem(CASE_PLACE_KEY) ?? '{}') as Record<string, Place>; return v && typeof v === 'object' ? v : {}; }
+  try { const v = JSON.parse(window.localStorage.getItem(CASE_PLACE_KEY) ?? '{}') as Record<string, Place>; return v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).filter(([, p]) => p && isAppPath(p.href))) : {}; }
   catch { return {}; }
 }
 function rememberCasePlace(inv: string, place: Place): void {
@@ -59,8 +59,10 @@ function rememberCasePlace(inv: string, place: Place): void {
 
 /** The last five places, newest first: a place is its address and the trail's words for it. */
 type Place = {href: string; label: string};
+/** An address kept in the browser's storage is followed only when it is a path in this app (not `//host`, not `javascript:`). */
+const isAppPath = (href: unknown): href is string => typeof href === 'string' && /^\/(?![/\\])\S*$/.test(href);
 function readPlaces(): Place[] {
-  try { const v = JSON.parse(window.localStorage.getItem(TRAIL_KEY) ?? '[]') as Place[]; return Array.isArray(v) ? v.filter(p => p && typeof p.href === 'string').slice(0, 5) : []; }
+  try { const v = JSON.parse(window.localStorage.getItem(TRAIL_KEY) ?? '[]') as Place[]; return Array.isArray(v) ? v.filter(p => p && isAppPath(p.href) && typeof p.label === 'string').slice(0, 5) : []; }
   catch { return []; }
 }
 function rememberPlace(place: Place): Place[] {
