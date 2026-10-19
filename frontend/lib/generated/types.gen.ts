@@ -169,6 +169,10 @@ export type AiAnalysisCandidateOut = {
    */
   module: string;
   /**
+   * Next Runs
+   */
+  next_runs?: Array<AiNextRunOut>;
+  /**
    * Payload
    */
   payload: {
@@ -333,6 +337,10 @@ export type AiAuthoritySuiteOut = {
    */
   source: string | null;
   /**
+   * Systems
+   */
+  systems?: Array<AiSuiteSystemOut>;
+  /**
    * Tas Version
    */
   tas_version: string | null;
@@ -423,6 +431,20 @@ export type AiControlSurfaceOut = {
 };
 
 /**
+ * AiFinalAuditOut
+ */
+export type AiFinalAuditOut = {
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Node
+   */
+  node: string;
+};
+
+/**
  * AiLimitsOut
  */
 export type AiLimitsOut = {
@@ -467,9 +489,41 @@ export type AiModuleStatusOut = {
    */
   spec_file: string;
   /**
+   * System
+   */
+  system?: string | null;
+  /**
    * Vendored Tas
    */
   vendored_tas: boolean;
+};
+
+/**
+ * AiNextRunOut
+ *
+ * A next run the suite service routes an answer to, by what the answer contains.
+ */
+export type AiNextRunOut = {
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Row
+   */
+  row: number | null;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Why
+   */
+  why: string;
 };
 
 /**
@@ -701,6 +755,10 @@ export type AiRunOut = {
    */
   finished_at: string | null;
   /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
    * Message
    */
   message: string | null;
@@ -720,6 +778,7 @@ export type AiRunOut = {
    * Review Status
    */
   review_status: string | null;
+  route: AiRunRouteOut;
   /**
    * Run Id
    */
@@ -753,6 +812,36 @@ export type AiRunRefOut = {
 };
 
 /**
+ * AiRunRouteOut
+ *
+ * How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+ * not know (a run recorded under a name since removed); "app" for the app-local draft.
+ */
+export type AiRunRouteOut = {
+  final_audit: AiFinalAuditOut | null;
+  /**
+   * Modules In System
+   */
+  modules_in_system: number;
+  /**
+   * Node
+   */
+  node: string | null;
+  /**
+   * Row
+   */
+  row: number | null;
+  /**
+   * System
+   */
+  system: string | null;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * AiRunsOut
  */
 export type AiRunsOut = {
@@ -760,6 +849,74 @@ export type AiRunsOut = {
    * Runs
    */
   runs: Array<AiRunOut>;
+};
+
+/**
+ * AiSuiteModuleOut
+ */
+export type AiSuiteModuleOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Node
+   */
+  node: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * AiSuiteSystemOut
+ *
+ * One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+ * CHANGELOG numbers them, `latest_change` its newest entry.
+ */
+export type AiSuiteSystemOut = {
+  final_audit: AiFinalAuditOut | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Latest Change
+   */
+  latest_change: string | null;
+  /**
+   * Module Count
+   */
+  module_count: number;
+  /**
+   * Modules
+   */
+  modules: Array<AiSuiteModuleOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Present
+   */
+  present: boolean;
+  /**
+   * Row
+   */
+  row: number;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Version
+   */
+  version: string | null;
 };
 
 /**
@@ -1012,6 +1169,80 @@ export type AppUserUpdatedOut = {
    * Token Status
    */
   token_status: 'active' | 'disabled' | 'revoked';
+};
+
+/**
+ * AssistantRunRequest
+ *
+ * Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+ * test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+ * uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+ * (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+ * check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+ * then holds the goal).
+ */
+export type AssistantRunRequest = {
+  /**
+   * Changes
+   */
+  changes?: Array<RunChangeIn> | null;
+  /**
+   * Context
+   */
+  context?: string | null;
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module:
+    | 'case_synthesis'
+    | 'hypothesis_test'
+    | 'presentation_draft'
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
+  options?: RunOptionsIn | null;
+  packet_from?: PacketFromIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Record Refs
+   */
+  record_refs?: Array<RecordRef> | null;
+  /**
+   * Severity Floor
+   */
+  severity_floor?: 'ALL' | 'MATERIAL' | 'BLOCKING' | null;
+  /**
+   * Source Tier Floor
+   */
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
 };
 
 /**
@@ -14951,6 +15182,10 @@ export type RunPlanRecordOut = {
  */
 export type RunPlanRequest = {
   /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
    * Include External Leads
    */
   include_external_leads?: boolean;
@@ -14961,7 +15196,17 @@ export type RunPlanRequest = {
   /**
    * Module
    */
-  module?: 'case_synthesis' | 'hypothesis_test';
+  module?:
+    | 'case_synthesis'
+    | 'hypothesis_test'
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
   options?: RunOptionsIn | null;
   /**
    * Premises
@@ -16768,6 +17013,54 @@ export type SuiteRequirementOut = {
    * Why
    */
   why: string;
+};
+
+/**
+ * SuiteRunRequest
+ *
+ * One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an
+ * answer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.
+ * `context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and
+ * access limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given
+ * by the logic check only.
+ */
+export type SuiteRunRequest = {
+  /**
+   * Context
+   */
+  context?: string | null;
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module:
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
 };
 
 /**
@@ -24066,6 +24359,102 @@ export type SaveInvestigationRunProfileResponses = {
 
 export type SaveInvestigationRunProfileResponse =
   SaveInvestigationRunProfileResponses[keyof SaveInvestigationRunProfileResponses];
+
+export type InvestigationAssistantRunData = {
+  body: AssistantRunRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/run';
+};
+
+export type InvestigationAssistantRunErrors = {
+  /**
+   * Response 422 Investigation Assistant Run
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
+   */
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Assistant Run
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationAssistantRunError =
+  InvestigationAssistantRunErrors[keyof InvestigationAssistantRunErrors];
+
+export type InvestigationAssistantRunResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
+};
+
+export type InvestigationAssistantRunResponse =
+  InvestigationAssistantRunResponses[keyof InvestigationAssistantRunResponses];
+
+export type InvestigationSuiteRunData = {
+  body: SuiteRunRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/suite-run';
+};
+
+export type InvestigationSuiteRunErrors = {
+  /**
+   * Response 422 Investigation Suite Run
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
+   */
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Suite Run
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationSuiteRunError =
+  InvestigationSuiteRunErrors[keyof InvestigationSuiteRunErrors];
+
+export type InvestigationSuiteRunResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
+};
+
+export type InvestigationSuiteRunResponse =
+  InvestigationSuiteRunResponses[keyof InvestigationSuiteRunResponses];
 
 export type ListCaseRecordsData = {
   body?: never;

@@ -249,6 +249,14 @@
             "title": "Module",
             "type": "string"
           },
+          "next_runs": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AiNextRunOut"
+            },
+            "title": "Next Runs",
+            "type": "array"
+          },
           "payload": {
             "additionalProperties": true,
             "title": "Payload",
@@ -541,6 +549,14 @@
             ],
             "title": "Source"
           },
+          "systems": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AiSuiteSystemOut"
+            },
+            "title": "Systems",
+            "type": "array"
+          },
           "tas_version": {
             "anyOf": [
               {
@@ -704,6 +720,24 @@
         "title": "AiControlSurfaceOut",
         "type": "object"
       },
+      "AiFinalAuditOut": {
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "node": {
+            "title": "Node",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node",
+          "file"
+        ],
+        "title": "AiFinalAuditOut",
+        "type": "object"
+      },
       "AiLimitsOut": {
         "properties": {
           "max_concurrent_runs": {
@@ -755,6 +789,17 @@
             "title": "Spec File",
             "type": "string"
           },
+          "system": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System"
+          },
           "vendored_tas": {
             "title": "Vendored Tas",
             "type": "boolean"
@@ -766,6 +811,47 @@
           "vendored_tas"
         ],
         "title": "AiModuleStatusOut",
+        "type": "object"
+      },
+      "AiNextRunOut": {
+        "description": "A next run the suite service routes an answer to, by what the answer contains.",
+        "properties": {
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "row": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "module",
+          "system",
+          "row",
+          "title",
+          "why"
+        ],
+        "title": "AiNextRunOut",
         "type": "object"
       },
       "AiOutputRejectedOut": {
@@ -1157,6 +1243,17 @@
             ],
             "title": "Finished At"
           },
+          "handoff_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff From"
+          },
           "message": {
             "anyOf": [
               {
@@ -1190,6 +1287,9 @@
               }
             ],
             "title": "Review Status"
+          },
+          "route": {
+            "$ref": "#/components/schemas/AiRunRouteOut"
           },
           "run_id": {
             "title": "Run Id",
@@ -1239,7 +1339,8 @@
           "events",
           "problems",
           "message",
-          "error"
+          "error",
+          "route"
         ],
         "title": "AiRunOut",
         "type": "object"
@@ -1262,6 +1363,72 @@
         "title": "AiRunRefOut",
         "type": "object"
       },
+      "AiRunRouteOut": {
+        "description": "How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does\nnot know (a run recorded under a name since removed); \"app\" for the app-local draft.",
+        "properties": {
+          "final_audit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiFinalAuditOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "modules_in_system": {
+            "title": "Modules In System",
+            "type": "integer"
+          },
+          "node": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node"
+          },
+          "row": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row"
+          },
+          "system": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "row",
+          "node",
+          "title",
+          "modules_in_system",
+          "final_audit"
+        ],
+        "title": "AiRunRouteOut",
+        "type": "object"
+      },
       "AiRunsOut": {
         "properties": {
           "runs": {
@@ -1276,6 +1443,116 @@
           "runs"
         ],
         "title": "AiRunsOut",
+        "type": "object"
+      },
+      "AiSuiteModuleOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "module": {
+            "title": "Module",
+            "type": "string"
+          },
+          "node": {
+            "title": "Node",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "module",
+          "title",
+          "node",
+          "available"
+        ],
+        "title": "AiSuiteModuleOut",
+        "type": "object"
+      },
+      "AiSuiteSystemOut": {
+        "description": "One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its\nCHANGELOG numbers them, `latest_change` its newest entry.",
+        "properties": {
+          "final_audit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiFinalAuditOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "latest_change": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Change"
+          },
+          "module_count": {
+            "title": "Module Count",
+            "type": "integer"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/AiSuiteModuleOut"
+            },
+            "title": "Modules",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "present": {
+            "title": "Present",
+            "type": "boolean"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "system",
+          "name",
+          "kind",
+          "row",
+          "version",
+          "latest_change",
+          "present",
+          "module_count",
+          "final_audit",
+          "modules"
+        ],
+        "title": "AiSuiteSystemOut",
         "type": "object"
       },
       "AiThoughtMarkRequest": {
@@ -1694,6 +1971,195 @@
           "confirm"
         ],
         "title": "ApplyIn",
+        "type": "object"
+      },
+      "AssistantRunRequest": {
+        "description": "Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory\ntest, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it\nuses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings\n(`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic\ncheck), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`\nthen holds the goal).",
+        "properties": {
+          "changes": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RunChangeIn"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changes"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "handoff_from": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff From"
+          },
+          "include_external_leads": {
+            "default": true,
+            "title": "Include External Leads",
+            "type": "boolean"
+          },
+          "max_results": {
+            "default": 30,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "module": {
+            "anyOf": [
+              {
+                "enum": [
+                  "case_synthesis",
+                  "hypothesis_test",
+                  "presentation_draft"
+                ],
+                "type": "string"
+              },
+              {
+                "enum": [
+                  "research_vetting",
+                  "quant_framing",
+                  "las_argument_check",
+                  "das_framing",
+                  "das_options",
+                  "evidence_plan",
+                  "ehs_harm_minimisation",
+                  "ehs_public_interest"
+                ],
+                "type": "string"
+              }
+            ],
+            "title": "Module"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunOptionsIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "packet_from": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PacketFromIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "premises": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premises"
+          },
+          "question": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          },
+          "record_refs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RecordRef"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Record Refs"
+          },
+          "severity_floor": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ALL",
+                  "MATERIAL",
+                  "BLOCKING"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity Floor"
+          },
+          "source_tier_floor": {
+            "anyOf": [
+              {
+                "enum": [
+                  "A",
+                  "B",
+                  "C",
+                  "D"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Tier Floor"
+          },
+          "working_theory": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working Theory"
+          }
+        },
+        "required": [
+          "module",
+          "question"
+        ],
+        "title": "AssistantRunRequest",
         "type": "object"
       },
       "BackgroundJobOut": {
@@ -29602,6 +30068,18 @@
       "RunPlanRequest": {
         "description": "What a run would do, before it runs (mockup AI_2).",
         "properties": {
+          "handoff_from": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff From"
+          },
           "include_external_leads": {
             "default": true,
             "title": "Include External Leads",
@@ -29615,13 +30093,30 @@
             "type": "integer"
           },
           "module": {
-            "default": "case_synthesis",
-            "enum": [
-              "case_synthesis",
-              "hypothesis_test"
+            "anyOf": [
+              {
+                "enum": [
+                  "case_synthesis",
+                  "hypothesis_test"
+                ],
+                "type": "string"
+              },
+              {
+                "enum": [
+                  "research_vetting",
+                  "quant_framing",
+                  "las_argument_check",
+                  "das_framing",
+                  "das_options",
+                  "evidence_plan",
+                  "ehs_harm_minimisation",
+                  "ehs_public_interest"
+                ],
+                "type": "string"
+              }
             ],
-            "title": "Module",
-            "type": "string"
+            "default": "case_synthesis",
+            "title": "Module"
           },
           "options": {
             "anyOf": [
@@ -32624,6 +33119,88 @@
           "found"
         ],
         "title": "SuiteRequirementOut",
+        "type": "object"
+      },
+      "SuiteRunRequest": {
+        "description": "One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an\nanswer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.\n`context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and\naccess limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given\nby the logic check only.",
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "handoff_from": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff From"
+          },
+          "include_external_leads": {
+            "default": true,
+            "title": "Include External Leads",
+            "type": "boolean"
+          },
+          "max_results": {
+            "default": 30,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "module": {
+            "enum": [
+              "research_vetting",
+              "quant_framing",
+              "las_argument_check",
+              "das_framing",
+              "das_options",
+              "evidence_plan",
+              "ehs_harm_minimisation",
+              "ehs_public_interest"
+            ],
+            "title": "Module",
+            "type": "string"
+          },
+          "premises": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Premises"
+          },
+          "question": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "module",
+          "question"
+        ],
+        "title": "SuiteRunRequest",
         "type": "object"
       },
       "SuiteUnmappedOut": {
@@ -51437,6 +52014,198 @@
           }
         },
         "summary": "Save Investigation Run Profile"
+      }
+    },
+    "/api/investigations/{investigation_id}/assistant/run": {
+      "post": {
+        "description": "Any AI run, through the one route the suite service gives its module (app/ai/suite.py): TAS, the other six\nsystems, or the app-local draft. The per-module endpoints below are this same route with the module fixed.\nEvery answer is a proposal and writes nothing else.",
+        "operationId": "investigation_assistant_run",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistantRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiOutputRejectedOut"
+                    }
+                  ],
+                  "title": "Response 422 Investigation Assistant Run"
+                }
+              }
+            },
+            "description": "The input does not match the route, or the model's answer did not pass its checks"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiModelFailedOut"
+                    }
+                  ],
+                  "title": "Response 502 Investigation Assistant Run"
+                }
+              }
+            },
+            "description": "The AI provider failed (the details are logged on the server), or its answer could not be used at all"
+          }
+        },
+        "summary": "Investigation Assistant Run"
+      }
+    },
+    "/api/investigations/{investigation_id}/assistant/suite-run": {
+      "post": {
+        "description": "A run of another system of the Authority System Suite -- RAS, QAS, LAS, DAS, EGS or EHS\n(app/ai/systems.py) -- through the same citation-validated pipeline as the TAS endpoints, with the same\nguarantee: the answer is a proposal and writes nothing else. A run may start from an answer you accepted\n(`handoff_from`); what crosses is decided by the suite's INTEROP rules (app/ai/interop.py) and every value held\nback is listed in the run record.",
+        "operationId": "investigation_suite_run",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuiteRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiOutputRejectedOut"
+                    }
+                  ],
+                  "title": "Response 422 Investigation Suite Run"
+                }
+              }
+            },
+            "description": "The input does not match the route, or the model's answer did not pass its checks"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiModelFailedOut"
+                    }
+                  ],
+                  "title": "Response 502 Investigation Suite Run"
+                }
+              }
+            },
+            "description": "The AI provider failed (the details are logged on the server), or its answer could not be used at all"
+          }
+        },
+        "summary": "Investigation Suite Run"
       }
     },
     "/api/investigations/{investigation_id}/case-records": {

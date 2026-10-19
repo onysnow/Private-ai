@@ -2948,6 +2948,8 @@ class AiModuleStatusOut(ResponseModel):
     spec_file: str
     available: bool
     vendored_tas: bool
+    # The suite system the module belongs to (tas, ras, qas, las, das, egs, ehs); null for an app-local module.
+    system: str | None = None
 
 
 class AiControlFlagOut(ResponseModel):
@@ -2961,12 +2963,49 @@ class AiControlSurfaceOut(ResponseModel):
     flags: dict[str, AiControlFlagOut]
 
 
+class AiFinalAuditOut(ResponseModel):
+    node: str  # e.g. tas/10
+    file: str
+
+
+class AiSuiteModuleOut(ResponseModel):
+    module: str
+    title: str
+    node: str
+    available: bool
+
+
+class AiSuiteSystemOut(ResponseModel):
+    """One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+    CHANGELOG numbers them, `latest_change` its newest entry."""
+    system: str
+    name: str
+    kind: str  # authority | support
+    row: int
+    version: str | None
+    latest_change: str | None
+    present: bool
+    module_count: int
+    final_audit: AiFinalAuditOut | None
+    modules: list[AiSuiteModuleOut]
+
+
+class AiNextRunOut(ResponseModel):
+    """A next run the suite service routes an answer to, by what the answer contains."""
+    module: str
+    system: str
+    row: int | None
+    title: str
+    why: str
+
+
 class AiAuthoritySuiteOut(ResponseModel):
     """The vendored Authority System Suite: where it came from and the TAS version the prompts use."""
     present: bool
     source: str | None
     tas_version: str | None
     modules: dict[str, AiModuleStatusOut]
+    systems: list[AiSuiteSystemOut] = []
     control_surface: AiControlSurfaceOut
 
 
@@ -3491,7 +3530,7 @@ class AiAnalysisCandidateSummaryOut(ResponseModel):
     for a human rejection, or null when not rejected."""
     id: str
     investigation_id: str
-    module: str  # case_synthesis | hypothesis_test | presentation_draft
+    module: str  # case_synthesis | hypothesis_test | presentation_draft | a suite module (app/ai/systems.py)
     request: dict[str, Any]
     review_status: str  # proposed | accepted | rejected
     confidence: float
@@ -3545,6 +3584,8 @@ class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
     trace: dict[str, Any] | None
     # Your decisions claim by claim, by claim or hypothesis id (app/ai/reasoning.py review_ai_claim); {} when none.
     claim_reviews: dict[str, AiClaimReviewOut]
+    # Where this answer goes next by what it contains (app/ai/suite.py next_runs); [] for a rejected answer.
+    next_runs: list[AiNextRunOut] = []
     citation_details: list[CitationDetailOut] | None = Field(default=None, exclude_if=_absent_when_none)
     deck_preview: list[DeckSlideOut] | None = Field(default=None, exclude_if=_absent_when_none)
     # A presentation draft's "how we know" line (app/services/presentation.py how_we_know).
@@ -5142,6 +5183,17 @@ class AiRunEventOut(ResponseModel):
     detail: dict[str, Any] | None
 
 
+class AiRunRouteOut(ResponseModel):
+    """How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+    not know (a run recorded under a name since removed); "app" for the app-local draft."""
+    system: str | None
+    row: int | None
+    node: str | None
+    title: str
+    modules_in_system: int
+    final_audit: AiFinalAuditOut | None
+
+
 class AiRunOut(ResponseModel):
     run_id: str
     status: str
@@ -5158,6 +5210,8 @@ class AiRunOut(ResponseModel):
     problems: int
     message: str | None
     error: str | None
+    route: AiRunRouteOut
+    handoff_from: str | None = None
 
 
 class AiRunsOut(ResponseModel):

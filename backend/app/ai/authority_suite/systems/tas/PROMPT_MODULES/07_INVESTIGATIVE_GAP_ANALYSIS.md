@@ -24,7 +24,7 @@ RULES
 3. Name the likely record custodian and lawful access route.
 4. Do not recommend compulsory process unless the user has that authority.
 5. Do not recommend impersonation, pretexting, credential misuse, unauthorized access, or evasion of access controls. An AI assistant does not recommend deceptive methods; whether to use one is the journalist's and their editor's decision, under their own code.
-6. Distinguish a record believed to exist from one known to exist.
+6. Distinguish a record believed to exist from one known to exist, and mark each acquisition in the plan KNOWN TO EXIST or BELIEVED TO EXIST with the reason: known where an input shows the record or the holder's own entry or statement of it; believed where it is only inferred or reported by a source.
 
 OUTPUT
 | GAP ID | Unresolved question | Why material | Current evidence | Needed record/testimony | Likely custodian | Lawful access route | Priority | What it could confirm/refute | Dependency |

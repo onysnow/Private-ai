@@ -2611,3 +2611,67 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
 - Suite coverage (same day): app/ai/suite_map.json maps 78 app values to suite terms (an agent read the suite;
   every term string was then checked present in the vendored file). Adding a value to any of the vocabularies in
   suite_map.app_vocabularies() without mapping it fails tests/test_suite_map.py; so does a stale SUITE_GAPS.md.
+
+## 2026-10-19: the suite's other six systems run in the app
+
+Ony: build out the Authority System Suite's systems. Six spec passes read RAS, QAS, LAS, DAS, EGS and EHS (router
+rows, modules, INTEROP rules, value lists, what an app run may not do); every value list was then checked present in
+the vendored text by a new drift test, and the suite defects they reported were re-read at the cited lines.
+
+- `app/ai/systems.py`: eight modules (RAS 03+04, QAS 01+03, LAS 01+02, DAS 01 and 02, EGS 01, EHS 02 and 01), each
+  with its suite files, a trimmed output contract, its value lists, and the rules the app reads mechanically
+  (rejections) or shows the person (flags). `reasoning.py` takes them through the same pipeline as TAS.
+- `app/ai/interop.py`: a run may start from an accepted answer (`handoff_from`); it reads that run's packet, gets
+  what INTEROP lets cross, and every held-back value is a BLOCK · HELD event with its rule. Rejected claims never
+  cross; corrected ones cross in the person's words.
+- DAS `upstream_tier` is written by the Workbench from the source's person-set tier ([IN-010]).
+- "Before you run" covers suite modules, shows the hand-over step and marks the systems a next run would use.
+- `docs/authority-suite/SUITE_SYSTEMS_IN_APP.md`: what runs, what does not and why, and ten suite problems for Ony.
+
+Tests: `test_suite_systems.py` (12, new), drift tests (2 new), and the AI, plan, claim-review, guard and migration
+tests pass; mypy and ruff clean. Frontend: client regenerated, tsc clean, vitest 1307 passed. No screen for
+starting a suite run: mockup first.
+
+## 2026-10-19 (cont.): the suite at its newest version, behind one service
+
+Ony: use the most recent version of the suite, and have one service handle all of it and route everything.
+
+- Vendored copy b1c71e8 → d2b2186 (the suite's `main`, 51 commits; 21 files in `systems/`, root documents
+  unchanged). The old copy was first checked byte for byte against b1c71e8. Upstream changes the app sends as
+  prompts: TAS 08 rules 8, 9 and new 11; QAS 01; DAS 01; EHS 01. `SUITE_GAPS.md` regenerated (it names the commit).
+  New suite conflict for Ony: TAS 08 rule 8 now says one source is never corroboration, Standard §4.3 still lets
+  one Tier A source carry it (SUITE_SYSTEMS_IN_APP.md item 11).
+- `app/ai/suite.py`: the one front door. Every module's route (system, trigger-table row, files), each system's
+  version, and `next_runs` (an answer routed onward by what it contains). reasoning.py's MODULE_FILES, titles,
+  nodes and run-record ROUTE/LOAD steps, the plan, and the settings status all read from it; the two code paths
+  for routing a TAS run and a suite run are now one.
+- `POST .../assistant/run` runs any module; the per-module endpoints are that route with the module fixed.
+  Candidates carry `next_runs`; settings status carries `authority_suite.systems`.
+
+Tests: `test_suite_service.py` (5, new: routes against AGENTS.md's table, the pipeline reading from the service,
+status, the one endpoint and its refusals, next runs) plus the suite, AI, guard and migration tests pass; mypy and
+ruff clean; vitest 1307 passed, tsc clean.
+
+## 2026-10-19 (cont.): the run map draws every system's run; the stopped and rejected states read right
+
+Ony sent two screenshots of Watch the run (a stopped case synthesis; a candidate with a green check beside "Your
+review: rejected") and asked that every system be hooked up properly and that this screen work. Reproduced locally
+with a stand-in model (all eight suite modules plus TAS, both chains, a stopped run, a rejected run), screenshotted
+each, fixed, screenshotted again.
+
+Backend: a run the checks stopped saved its answer as rejected but its job has no result, so the run summary said
+"none saved"; it now finds the answer through the run record's "Saved as" step. The summary's review status is the
+answer's as it stands now (it was frozen at run time). Each run carries its route from the suite service (system,
+row, node, module count, final audit). A DAS evidence row citing no source now says why it has no upstream tier.
+
+Run map: columns and the Support pills light from the run's route ("not in this run" replaces "not triggered · not
+in the app yet"); EGS and EHS are real nodes; a system's module chip, gate and thoughts sit on its own node, with the
+wires to it; a hand-over lights the Boundaries band ("Hand-over · n held") instead of a Controls badge; the router
+reads "of 7"; "+ n modules" comes from the system's real count (TAS has 13); the final-audit ledger names the run's
+system's audit; lanes appear for the systems a run used. The candidate's mark follows its review (✕ once rejected),
+and Your review says "you rejected it" or, dimmed, "stopped by the checks". A stopped run shows its real reason, not
+"Stopped with an error".
+
+Tests: test_suite_service.py (6), watch-the-run (23, 2 new); vitest 1309 passed, tsc and eslint clean; backend
+touched tests, mypy, ruff and the OpenAPI check pass. Not changed: the map's small size and overlapping axis labels
+at phone width, which were there before.

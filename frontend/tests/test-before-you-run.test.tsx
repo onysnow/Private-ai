@@ -19,7 +19,7 @@ const job = {id: 'job-1', kind: 'ai_reasoning', investigation_id: 'inv-1', subje
 
 const RUN = {run_id: 'job-1', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who controlled Fernhill Ltd?', working_theory: null,
   created_at: '2026-10-12T10:00:00Z', started_at: '2026-10-12T10:00:00Z', finished_at: '2026-10-12T10:01:00Z', candidate_id: 'cand-1', review_status: 'proposed',
-  events: 0, problems: 0, message: null, error: null};
+  events: 0, problems: 0, message: null, error: null, route: {system: 'tas', row: 2, node: 'tas/08', title: 'Case synthesis', modules_in_system: 13, final_audit: {node: 'tas/10', file: '10_FINAL_ACCURACY_AUDIT.md'}}};
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => cleanup());

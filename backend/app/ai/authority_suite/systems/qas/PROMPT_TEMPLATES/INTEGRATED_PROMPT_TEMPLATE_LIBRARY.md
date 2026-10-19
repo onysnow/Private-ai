@@ -111,7 +111,7 @@ STATUS FROM EARLIER WORK
 
 If no QFRM record exists, run Module 01 first. Then apply
 CORE/DATA_SOURCE_AND_QUALITY_POLICY.md to the dataset through Module 02
-rule 12. Do not compute any result from the dataset in this template.
+rule 12. Do not compute any result from the dataset in this template. If the request also asks for the result, decline that part, say it belongs to the full pipeline (T01), and give no share, rate or count.
 
 OUTPUT
 The QDAT assurance block; the reliance level with its reasons; each limit to

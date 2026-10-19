@@ -23,6 +23,7 @@ from typing import Any, Callable
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.ai.systems import SUITE_MODULES
 from app.models.domain import (
     AIAnalysisCandidate, CheckItem, Claim, ClaimReviewEvent, ConnectorFinding, CrossReferenceProposal, Document,
     DocumentChunk, Entity, Evidence, ExtractionCandidate, Investigation, Lead, PatternFlag, RelationshipEdge, Source,
@@ -524,7 +525,8 @@ def _outside(db: Session, inv: str) -> list[dict[str, Any]]:
 def _ai(db: Session, inv: str) -> list[dict[str, Any]]:
     rows = list(db.scalars(select(AIAnalysisCandidate).where(AIAnalysisCandidate.investigation_id == inv,
                                                              AIAnalysisCandidate.review_status == "proposed")))
-    label = {"case_synthesis": "Case synthesis", "hypothesis_test": "Hypothesis test", "presentation_draft": "Presentation draft"}
+    label = {"case_synthesis": "Case synthesis", "hypothesis_test": "Hypothesis test", "presentation_draft": "Presentation draft",
+             **{key: m.title for key, m in SUITE_MODULES.items()}}
     out = []
     for r in rows:
         q = str((r.request or {}).get("question") or "")

@@ -37,7 +37,10 @@ import type {TraceHandler} from './presentation/draft-preview';
 // evidence chip in a presentation draft's preview).
 type Props={api:ApiClient,investigationId:string,status:AiReasoningStatus|null|undefined,onTraceRecord?:TraceHandler};
 
-const MODULE_LABEL:Record<AiModuleName,string>={case_synthesis:'Case synthesis (TAS module 08)',hypothesis_test:'Hypothesis & contradiction test (TAS module 06)',presentation_draft:'Presentation draft (brief/deck from picked evidence)'};
+const MODULE_LABEL:Record<AiModuleName,string>={case_synthesis:'Case synthesis (TAS module 08)',hypothesis_test:'Hypothesis & contradiction test (TAS module 06)',presentation_draft:'Presentation draft (brief/deck from picked evidence)',
+  research_vetting:'Research vetting (RAS modules 03 and 04)',quant_framing:'Rival explanations (QAS modules 01 and 03)',las_argument_check:'Logic check (LAS modules 01 and 02)',
+  das_framing:'Decision framing (DAS module 01)',das_options:'Options and evidence (DAS module 02)',evidence_plan:'Evidence plan (EGS module 01)',
+  ehs_harm_minimisation:'Harm assessment (EHS module 02)',ehs_public_interest:'Public interest (EHS module 01)'};
 const moduleLabel=(m:string):string=>(m in MODULE_LABEL?MODULE_LABEL[m as AiModuleName]:m);
 
 // presentation_draft is app-local (backend/app/ai/presentation_modules), not

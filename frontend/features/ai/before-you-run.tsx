@@ -63,7 +63,7 @@ const FLAGS = new Set(['severity_floor', 'source_tier_floor']);
 const GROUPS = ['How strict', 'Extra passes', 'What you see', 'Doing things on its own'];
 const SWITCHES = new Set(['devils_advocate', 'show_reasoning_chain']);
 const clock = () => new Date().toTimeString().slice(0, 8);
-const STATE_WORDS: Record<string, string> = {runs: 'runs', not_in_app: 'would apply · not in the app yet', not_expected: 'not expected'};
+const STATE_WORDS: Record<string, string> = {runs: 'runs', next_run: 'would apply · a next run from this answer, once you accept it', not_in_app: 'would apply · not in the app yet', not_expected: 'not expected'};
 // The plan's steps a setting adds (run_plan.py _steps): the setting's key, and its value with and without the step.
 const OPTIONAL_STEPS: Array<{key: string; on: string; off: string}> = [{key: 'devils_advocate', on: 'ON', off: 'OFF'}, {key: 'research_depth', on: 'EXHAUSTIVE', off: 'NORMAL'}];
 const PACKET_DEFAULT = 30;
@@ -324,8 +324,8 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       {optional.filter(o => values[o.key] !== o.on).map(o => <button key={o.key} type="button" className="br-quiet" onClick={() => change(o.key, o.on)}>
         + {o.row!.label}{o.key === 'research_depth' ? ` · ${o.row!.allowed.find(a => a.value === o.on)?.label ?? o.on}` : ''}</button>)}</p>}
     {p && <div className="br-systems"><p className="br-eyebrow">Likely to run · decided by what the answer will contain</p>
-      <p>{p.systems.map(s => <span key={s.system} className={`br-sysrow ${s.state}`} title={STATE_WORDS[s.state]}><b>{s.system}</b> · {s.state === 'not_expected' ? 'not expected' : s.why}{s.state === 'not_in_app' ? ' · not in the app yet' : ''}</span>)}</p>
-      <small>You cannot switch a system off: it runs when the answer would need it. Today only TAS runs inside the app.</small></div>}
+      <p>{p.systems.map(s => <span key={s.system} className={`br-sysrow ${s.state}`} title={STATE_WORDS[s.state]}><b>{s.system}</b> · {s.state === 'not_expected' ? 'not expected' : s.why}{s.state === 'not_in_app' ? ' · not in the app yet' : ''}{s.state === 'next_run' ? ' · next run, from this answer' : ''}</span>)}</p>
+      <small>You cannot switch a system off: it runs when the answer would need it. A next run starts from this answer once you accept it.</small></div>}
     {p?.injections.map(i => <p key={i.record_id} className="br-inject" role="note"><b>Ignored an instruction inside the evidence.</b> {i.title || i.record_type} reads “{i.quote}”.
       Material can never change a setting; it is quoted as evidence and logged.</p>)}
   </div>;

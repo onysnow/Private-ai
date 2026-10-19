@@ -164,6 +164,7 @@ import {
   importOpenalephDocumentEntities,
   importOpenalephDocumentEvidence,
   inspectBackup,
+  investigationAssistantRun,
   investigationCaseSynthesis,
   investigationDeletionPreview,
   investigationHypothesisTest,
@@ -171,6 +172,7 @@ import {
   investigationQuestionContext,
   investigationRunPlan,
   investigationRunProfile,
+  investigationSuiteRun,
   investigationVisualCatalog,
   investigationVisualPreview,
   investigationVisualRestyle,
@@ -772,6 +774,9 @@ import type {
   InspectBackupData,
   InspectBackupError,
   InspectBackupResponse,
+  InvestigationAssistantRunData,
+  InvestigationAssistantRunError,
+  InvestigationAssistantRunResponse,
   InvestigationCaseSynthesisData,
   InvestigationCaseSynthesisError,
   InvestigationCaseSynthesisResponse,
@@ -793,6 +798,9 @@ import type {
   InvestigationRunProfileData,
   InvestigationRunProfileError,
   InvestigationRunProfileResponse,
+  InvestigationSuiteRunData,
+  InvestigationSuiteRunError,
+  InvestigationSuiteRunResponse,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogError,
   InvestigationVisualCatalogResponse,
@@ -5417,6 +5425,70 @@ export const saveInvestigationRunProfileMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await saveInvestigationRunProfile({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Investigation Assistant Run
+ *
+ * Any AI run, through the one route the suite service gives its module (app/ai/suite.py): TAS, the other six
+ * systems, or the app-local draft. The per-module endpoints below are this same route with the module fixed.
+ * Every answer is a proposal and writes nothing else.
+ */
+export const investigationAssistantRunMutation = (
+  options?: Partial<Options<InvestigationAssistantRunData>>,
+): UseMutationOptions<
+  InvestigationAssistantRunResponse,
+  InvestigationAssistantRunError,
+  Options<InvestigationAssistantRunData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    InvestigationAssistantRunResponse,
+    InvestigationAssistantRunError,
+    Options<InvestigationAssistantRunData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await investigationAssistantRun({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Investigation Suite Run
+ *
+ * A run of another system of the Authority System Suite -- RAS, QAS, LAS, DAS, EGS or EHS
+ * (app/ai/systems.py) -- through the same citation-validated pipeline as the TAS endpoints, with the same
+ * guarantee: the answer is a proposal and writes nothing else. A run may start from an answer you accepted
+ * (`handoff_from`); what crosses is decided by the suite's INTEROP rules (app/ai/interop.py) and every value held
+ * back is listed in the run record.
+ */
+export const investigationSuiteRunMutation = (
+  options?: Partial<Options<InvestigationSuiteRunData>>,
+): UseMutationOptions<
+  InvestigationSuiteRunResponse,
+  InvestigationSuiteRunError,
+  Options<InvestigationSuiteRunData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    InvestigationSuiteRunResponse,
+    InvestigationSuiteRunError,
+    Options<InvestigationSuiteRunData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await investigationSuiteRun({
         ...options,
         ...fnOptions,
         throwOnError: true,

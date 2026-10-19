@@ -26,7 +26,9 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 const COLUMNS = ['Files', 'Reading', 'Passage', 'Decision', 'The claim'] as const;
 const COL: Record<CustodyCardOut['kind'], number> = {file: 0, source: 0, reading: 1, passage: 2, decision: 3};
 const SOURCE_WORD: Record<string, string> = {public_record: 'Public record', document: 'Document', web: 'Web page', interview: 'Interview', social: 'Social post', other: 'Other'};
-const AI_MODULE: Record<string, string> = {case_synthesis: 'Case synthesis', hypothesis_test: 'Theory test', presentation_draft: 'Presentation'};
+const AI_MODULE: Record<string, string> = {case_synthesis: 'Case synthesis', hypothesis_test: 'Theory test', presentation_draft: 'Presentation',
+  research_vetting: 'Research vetting', quant_framing: 'Rival explanations', las_argument_check: 'Logic check', das_framing: 'Decision framing',
+  das_options: 'Options and evidence', evidence_plan: 'Evidence plan', ehs_harm_minimisation: 'Harm assessment', ehs_public_interest: 'Public interest'};
 const KIND_WORD: Record<CustodyCardOut['kind'], string> = {file: 'File', source: 'Source', reading: 'Reading', passage: 'Passage', decision: 'Decision'};
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 /** The cards' and the log's short form, as the mockup writes it: "2 Oct 09:14". */

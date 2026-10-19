@@ -132,6 +132,14 @@ export const zAiControlSurfaceOut = z.object({
 });
 
 /**
+ * AiFinalAuditOut
+ */
+export const zAiFinalAuditOut = z.object({
+  file: z.string(),
+  node: z.string(),
+});
+
+/**
  * AiLimitsOut
  */
 export const zAiLimitsOut = z.object({
@@ -147,20 +155,21 @@ export const zAiLimitsOut = z.object({
 export const zAiModuleStatusOut = z.object({
   available: z.boolean(),
   spec_file: z.string(),
+  system: z.string().nullish(),
   vendored_tas: z.boolean(),
 });
 
 /**
- * AiAuthoritySuiteOut
+ * AiNextRunOut
  *
- * The vendored Authority System Suite: where it came from and the TAS version the prompts use.
+ * A next run the suite service routes an answer to, by what the answer contains.
  */
-export const zAiAuthoritySuiteOut = z.object({
-  control_surface: zAiControlSurfaceOut,
-  modules: z.record(zAiModuleStatusOut),
-  present: z.boolean(),
-  source: z.string().nullable(),
-  tas_version: z.string().nullable(),
+export const zAiNextRunOut = z.object({
+  module: z.string(),
+  row: z.number().int().nullable(),
+  system: z.string(),
+  title: z.string(),
+  why: z.string(),
 });
 
 /**
@@ -207,61 +216,6 @@ export const zAiModelFailedOut = z.object({
 });
 
 /**
- * AiReasoningStatusOut
- *
- * Whether the AI reasoning endpoints can be called, and what they would
- * run on. Never carries key material. Every key is always sent (null when
- * unknown), so the nullable ones have no default: the generated type then
- * matches the AI panel's own status type (lib/api-types.ts).
- */
-export const zAiReasoningStatusOut = z.object({
-  authority_suite: zAiAuthoritySuiteOut,
-  enabled: z.boolean(),
-  endpoints_callable: z.boolean(),
-  limits: zAiLimitsOut,
-  model: z.string().nullable(),
-  provider: z.string().nullable(),
-  provider_key_configured: z.boolean(),
-  remote_endpoint_allowed: z.boolean(),
-  runs_on_this_computer: z.boolean().nullable(),
-});
-
-/**
- * AiRunOut
- */
-export const zAiRunOut = z.object({
-  candidate_id: z.string().nullable(),
-  created_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  error: z.string().nullable(),
-  events: z.number().int(),
-  finished: z.boolean(),
-  finished_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullable(),
-  message: z.string().nullable(),
-  module: z.string(),
-  problems: z.number().int(),
-  question: z.string(),
-  review_status: z.string().nullable(),
-  run_id: z.string(),
-  started_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullable(),
-  status: z.string(),
-  working_theory: z.string().nullable(),
-});
-
-/**
  * AiRunRefOut
  */
 export const zAiRunRefOut = z.object({
@@ -296,6 +250,58 @@ export const zAiRunEventOut = z.object({
 });
 
 /**
+ * AiRunRouteOut
+ *
+ * How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+ * not know (a run recorded under a name since removed); "app" for the app-local draft.
+ */
+export const zAiRunRouteOut = z.object({
+  final_audit: zAiFinalAuditOut.nullable(),
+  modules_in_system: z.number().int(),
+  node: z.string().nullable(),
+  row: z.number().int().nullable(),
+  system: z.string().nullable(),
+  title: z.string(),
+});
+
+/**
+ * AiRunOut
+ */
+export const zAiRunOut = z.object({
+  candidate_id: z.string().nullable(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  error: z.string().nullable(),
+  events: z.number().int(),
+  finished: z.boolean(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  handoff_from: z.string().nullish(),
+  message: z.string().nullable(),
+  module: z.string(),
+  problems: z.number().int(),
+  question: z.string(),
+  review_status: z.string().nullable(),
+  route: zAiRunRouteOut,
+  run_id: z.string(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  status: z.string(),
+  working_theory: z.string().nullable(),
+});
+
+/**
  * AiRunEventsOut
  */
 export const zAiRunEventsOut = z.object({
@@ -308,6 +314,69 @@ export const zAiRunEventsOut = z.object({
  */
 export const zAiRunsOut = z.object({
   runs: z.array(zAiRunOut),
+});
+
+/**
+ * AiSuiteModuleOut
+ */
+export const zAiSuiteModuleOut = z.object({
+  available: z.boolean(),
+  module: z.string(),
+  node: z.string(),
+  title: z.string(),
+});
+
+/**
+ * AiSuiteSystemOut
+ *
+ * One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+ * CHANGELOG numbers them, `latest_change` its newest entry.
+ */
+export const zAiSuiteSystemOut = z.object({
+  final_audit: zAiFinalAuditOut.nullable(),
+  kind: z.string(),
+  latest_change: z.string().nullable(),
+  module_count: z.number().int(),
+  modules: z.array(zAiSuiteModuleOut),
+  name: z.string(),
+  present: z.boolean(),
+  row: z.number().int(),
+  system: z.string(),
+  version: z.string().nullable(),
+});
+
+/**
+ * AiAuthoritySuiteOut
+ *
+ * The vendored Authority System Suite: where it came from and the TAS version the prompts use.
+ */
+export const zAiAuthoritySuiteOut = z.object({
+  control_surface: zAiControlSurfaceOut,
+  modules: z.record(zAiModuleStatusOut),
+  present: z.boolean(),
+  source: z.string().nullable(),
+  systems: z.array(zAiSuiteSystemOut).optional().default([]),
+  tas_version: z.string().nullable(),
+});
+
+/**
+ * AiReasoningStatusOut
+ *
+ * Whether the AI reasoning endpoints can be called, and what they would
+ * run on. Never carries key material. Every key is always sent (null when
+ * unknown), so the nullable ones have no default: the generated type then
+ * matches the AI panel's own status type (lib/api-types.ts).
+ */
+export const zAiReasoningStatusOut = z.object({
+  authority_suite: zAiAuthoritySuiteOut,
+  enabled: z.boolean(),
+  endpoints_callable: z.boolean(),
+  limits: zAiLimitsOut,
+  model: z.string().nullable(),
+  provider: z.string().nullable(),
+  provider_key_configured: z.boolean(),
+  remote_endpoint_allowed: z.boolean(),
+  runs_on_this_computer: z.boolean().nullable(),
 });
 
 /**
@@ -6251,6 +6320,45 @@ export const zRunOptionsIn = z.object({
 });
 
 /**
+ * AssistantRunRequest
+ *
+ * Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+ * test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+ * uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+ * (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+ * check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+ * then holds the goal).
+ */
+export const zAssistantRunRequest = z.object({
+  changes: z.array(zRunChangeIn).max(50).nullish(),
+  context: z.string().max(4000).nullish(),
+  handoff_from: z.string().max(64).nullish(),
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.number().int().gte(1).lte(100).optional().default(30),
+  module: z.union([
+    z.enum(['case_synthesis', 'hypothesis_test', 'presentation_draft']),
+    z.enum([
+      'research_vetting',
+      'quant_framing',
+      'las_argument_check',
+      'das_framing',
+      'das_options',
+      'evidence_plan',
+      'ehs_harm_minimisation',
+      'ehs_public_interest',
+    ]),
+  ]),
+  options: zRunOptionsIn.nullish(),
+  packet_from: zPacketFromIn.nullish(),
+  premises: z.array(z.string()).max(10).nullish(),
+  question: z.string().min(1).max(4000),
+  record_refs: z.array(zRecordRef).max(200).nullish(),
+  severity_floor: z.enum(['ALL', 'MATERIAL', 'BLOCKING']).nullish(),
+  source_tier_floor: z.enum(['A', 'B', 'C', 'D']).nullish(),
+  working_theory: z.string().max(2000).nullish(),
+});
+
+/**
  * CaseSynthesisRequest
  */
 export const zCaseSynthesisRequest = z.object({
@@ -6322,10 +6430,23 @@ export const zRunPlanRecordOut = z.object({
  * What a run would do, before it runs (mockup AI_2).
  */
 export const zRunPlanRequest = z.object({
+  handoff_from: z.string().max(64).nullish(),
   include_external_leads: z.boolean().optional().default(true),
   max_results: z.number().int().gte(1).lte(100).optional().default(30),
   module: z
-    .enum(['case_synthesis', 'hypothesis_test'])
+    .union([
+      z.enum(['case_synthesis', 'hypothesis_test']),
+      z.enum([
+        'research_vetting',
+        'quant_framing',
+        'las_argument_check',
+        'das_framing',
+        'das_options',
+        'evidence_plan',
+        'ehs_harm_minimisation',
+        'ehs_public_interest',
+      ]),
+    ])
     .optional()
     .default('case_synthesis'),
   options: zRunOptionsIn.nullish(),
@@ -7310,6 +7431,34 @@ export const zSuiteRequirementOut = z.object({
   suite_term: z.string(),
   what: z.string(),
   why: z.string(),
+});
+
+/**
+ * SuiteRunRequest
+ *
+ * One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an
+ * answer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.
+ * `context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and
+ * access limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given
+ * by the logic check only.
+ */
+export const zSuiteRunRequest = z.object({
+  context: z.string().max(4000).nullish(),
+  handoff_from: z.string().max(64).nullish(),
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.number().int().gte(1).lte(100).optional().default(30),
+  module: z.enum([
+    'research_vetting',
+    'quant_framing',
+    'las_argument_check',
+    'das_framing',
+    'das_options',
+    'evidence_plan',
+    'ehs_harm_minimisation',
+    'ehs_public_interest',
+  ]),
+  premises: z.array(z.string()).max(10).nullish(),
+  question: z.string().min(1).max(4000),
 });
 
 /**
@@ -8476,6 +8625,7 @@ export const zAiAnalysisCandidateOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   module: z.string(),
+  next_runs: z.array(zAiNextRunOut).optional().default([]),
   payload: z.record(z.unknown()),
   rejection_reason: z.string().nullable(),
   request: z.record(z.unknown()),
@@ -10331,6 +10481,28 @@ export const zSaveInvestigationRunProfilePath = z.object({
  * Successful Response
  */
 export const zSaveInvestigationRunProfileResponse = zRunProfileOut;
+
+export const zInvestigationAssistantRunBody = zAssistantRunRequest;
+
+export const zInvestigationAssistantRunPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationAssistantRunResponse = zAiReasoningRunOut;
+
+export const zInvestigationSuiteRunBody = zSuiteRunRequest;
+
+export const zInvestigationSuiteRunPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationSuiteRunResponse = zAiReasoningRunOut;
 
 export const zListCaseRecordsPath = z.object({
   investigation_id: z.string(),

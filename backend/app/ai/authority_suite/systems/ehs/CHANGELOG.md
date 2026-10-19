@@ -2,6 +2,10 @@
 
 *Ethics and Harm System (EHS)*
 
+## 2026-10-12 — DIR-0049: a retrospective record does not satisfy CP-03 (T-0376)
+
+`PROMPT_MODULES/01_PUBLIC_INTEREST_AND_PROPORTIONALITY.md` rule 3 now says a retrospective record does not satisfy CP-03 (Module 04 rule 2) and that the record says so wherever it is delivered. Before, the consequence lived only in Module 04, which a task writing the record after publication does not run, so gate case H01 could not be passed by following Module 01 (RUN-0023, T-0376). The maintainer's approval: DIR-0049.
+
 ## 2026-10-10 — DIR-0046: named a support system
 
 - README.md: EHS is named a support system (status line; a lead-in under "Where EHS's job ends"): it serves the authority systems and issues no authority judgement; it lays out and records the ethics weighing and decides nothing. The maintainer's choice, DIR-0046; no rule changed.
