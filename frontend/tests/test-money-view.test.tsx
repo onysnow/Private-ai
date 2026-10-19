@@ -192,8 +192,10 @@ describe('MoneyView', () => {
     wrap(<MoneyView investigationId="inv-1"/>);
     await userEvent.setup().click(await screen.findByRole('radio', {name: 'Flow'}));
     await screen.findByTestId('sankey-stub');
-    const props = sankeySpy.mock.calls.at(-1)?.[0] as {transactions: Array<{id: string}>};
+    const props = sankeySpy.mock.calls.at(-1)?.[0] as {transactions: Array<{id: string}>; fold?: {top: number; all: boolean}};
     expect(props.transactions.map(t => t.id)).toEqual(['p1', 'p2', 'p3', 'p4', 'p5']);
+    // A very large ledger folds to the 20 largest flows in the Flow layout too, as in Columns.
+    expect(props.fold).toMatchObject({top: 20, all: false});
     cleanup();
     mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {...LEDGER, transactions: [], incomplete: []}});
     wrap(<MoneyView investigationId="inv-1"/>);

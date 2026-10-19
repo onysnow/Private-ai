@@ -262,7 +262,8 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
             {allFlows && picture.flows > TOP_FLOWS && <span className="mn-fold">All {picture.flows} flows are drawn. <button type="button" className="mn-link" onClick={() => { setAllFlows(false); setPointed(null); }}>Fold to the {TOP_FLOWS} largest</button></span>}
           </figcaption>
         </figure>}
-        {view === 'flow' && <div className="mn-figure"><FinancialFlowSankey height={360} transactions={txs.map(t => ({
+        {view === 'flow' && <div className="mn-figure"><FinancialFlowSankey height={360}
+          fold={{top: TOP_FLOWS, all: allFlows, onAll: all => { setAllFlows(all); if (!all) setPointed(null); }}} transactions={txs.map(t => ({
           id: t.id, dateTime: t.dateTime || '', from: t.from, to: t.to, amount: t.amount, currency: t.currency,
           statedPurpose: t.statedPurpose || undefined, evidence: t.evidence || undefined, status: t.status || undefined, flowType: t.flowType,
         }))}/></div>}

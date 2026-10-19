@@ -140,4 +140,50 @@ describe('FinancialFlowSankey', () => {
     expect(tooltip.renderMode).toBe('richText');
     expect(tooltip.formatter({dataType: 'edge', name: `${evil} > B`, value: 10, data: {flowType: 'direct'}})).not.toContain('<br');
   });
+
+  // The Money view's Flow layout folds a very large ledger as its Columns layout does (money-layout.ts TOP_FLOWS).
+  describe('folded to the largest flows', () => {
+    // 25 flows: "Hub" pays P1..P25 amounts 100..2500, and P1 pays Hub-2 once more so a small party has two flows.
+    const many = [
+      ...Array.from({length: 25}, (_, i) => txn({id: `t${i + 1}`, from: 'Hub', to: `P${i + 1}`, amount: (i + 1) * 100, currency: 'USD'})),
+      txn({id: 't26', from: 'P1', to: 'Sink', amount: 50, currency: 'USD'}),
+    ];
+    const last = () => chartSpy.mock.calls[chartSpy.mock.calls.length - 1][0];
+
+    it('draws every flow when nothing asks it to fold', () => {
+      render(<FinancialFlowSankey transactions={many}/>);
+      expect(last().option.series[0].links).toHaveLength(26);
+      expect(screen.queryByTestId('sankey-fold')).not.toBeInTheDocument();
+    });
+
+    it('draws the 20 largest and one "others (n)" band, the totals exact, and opens and folds on request', () => {
+      let all = false;
+      const onAll = vi.fn((next: boolean) => { all = next; });
+      const {rerender} = render(<FinancialFlowSankey transactions={many} fold={{top: 20, all, onAll}}/>);
+      const series = last().option.series[0];
+      expect(series.links).toHaveLength(21);
+      const others = series.links.find((l: {source: string}) => !series.data.some((n: {name: string}) => n.name === l.source && !n.name.startsWith('\u0000')));
+      // The six smallest flows fold: Hub→P1..P5 (100..500) and P1→Sink (50).
+      expect(others.value).toBe(1550);
+      const label = series.label.formatter;
+      expect(label({name: others.source, value: others.value})).toBe('others (6)\n{amount|USD 1,550}');
+      // Hub's label counts every payment it made, not only the drawn ones.
+      expect(label({name: 'Hub', value: 1})).toBe(`Hub\n{amount|USD ${(25 * 26 / 2 * 100).toLocaleString('en-GB')}}`);
+      expect(series.data.map((n: {name: string}) => n.name)).not.toContain('P1');
+      expect(screen.getByTestId('sankey-fold')).toHaveTextContent('The 20 largest of 26 flows are drawn; others (6) holds the other 6 payments, USD 1,550. Totals count every payment.');
+      expect(last().option.tooltip.formatter({dataType: 'edge', name: 'x', value: 1550, data: {source: others.source}})).toBe('others (6)\nUSD 1,550 in 6 payments');
+      fireEvent.click(screen.getByRole('button', {name: 'Show all 26 flows'}));
+      expect(onAll).toHaveBeenCalledWith(true);
+      rerender(<FinancialFlowSankey transactions={many} fold={{top: 20, all, onAll}}/>);
+      expect(last().option.series[0].links).toHaveLength(26);
+      fireEvent.click(screen.getByRole('button', {name: 'Fold to the 20 largest'}));
+      expect(onAll).toHaveBeenLastCalledWith(false);
+    });
+
+    it('does not fold a ledger of 20 flows or fewer', () => {
+      render(<FinancialFlowSankey transactions={many.slice(0, 20)} fold={{top: 20, all: false, onAll: vi.fn()}}/>);
+      expect(last().option.series[0].links).toHaveLength(20);
+      expect(screen.queryByTestId('sankey-fold')).not.toBeInTheDocument();
+    });
+  });
 });
