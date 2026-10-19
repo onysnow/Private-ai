@@ -4128,6 +4128,7 @@ export const zLeadRowOut = z.object({
     ),
   detail: z.string().nullish(),
   gathering_outcome: z.string().nullish(),
+  horizon: z.enum(['now', 'next', 'later']).nullish(),
   id: z.string(),
   investigation_id: z.string(),
   provider: z.string().nullish(),

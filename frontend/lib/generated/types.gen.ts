@@ -10272,6 +10272,10 @@ export type LeadRowOut = {
    */
   gathering_outcome?: string | null;
   /**
+   * Horizon
+   */
+  horizon?: 'now' | 'next' | 'later' | null;
+  /**
    * Id
    */
   id: string;

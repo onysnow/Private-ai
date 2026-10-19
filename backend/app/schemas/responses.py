@@ -2465,6 +2465,7 @@ class LeadRowOut(ResponseModel):
     provider_record_id: str | None = None
     status: str
     gathering_outcome: str | None = None
+    horizon: Literal["now", "next", "later"] | None = None  # when to chase it; None = in the inbox
     created_at: Timestamp
 
 

@@ -22012,6 +22012,22 @@
             ],
             "title": "Gathering Outcome"
           },
+          "horizon": {
+            "anyOf": [
+              {
+                "enum": [
+                  "now",
+                  "next",
+                  "later"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon"
+          },
           "id": {
             "title": "Id",
             "type": "string"
