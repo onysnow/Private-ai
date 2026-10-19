@@ -174,7 +174,7 @@ From the Berkeley Protocol on Digital Open Source Investigations (cited from mem
 | Authenticity / AI-generation | None | New `AuthenticityAssessment` (see §7.4) |
 | Claim review / fact-check | None | Export vocabulary only (schema.org `ClaimReview`) |
 
-Draft YAML for all six schemata is in Appendix A. **It has not been loaded into an FtM `Model`**; syntax is modelled on the stock files and is untested.
+Draft YAML for all six schemata is in Appendix A. **It has not been loaded into an FtM `Model`**; syntax is modelled on the stock files and is untested. A review of the first draft caught two errors against FtM 3.8.4, now corrected: `edge.source`/`edge.target` take plain property names (a mapping raises `TypeError: unhashable type: 'dict'` when the model is generated), and required fields go in a schema-level `required:` list (a `required: true` inside a property is ignored, so validation would accept records missing their endpoints). Load the YAML into a real FtM `Model` before relying on it.
 
 ### 6.3 How custom schemata work, and the limits
 
@@ -209,13 +209,14 @@ Draft YAML for all six schemata is in Appendix A. **It has not been loaded into 
 ### 7.2 Design: a four-layer triage
 
 1. **Provenance**: C2PA validation, signer and trust-list result, IPTC source type, known watermarks where access exists.
-2. **Source and outlet reputation**: domain against content-farm lists, domain age, ownership, byline history, first-seen date, earliest copy by reverse image search.
+2. **Source and outlet reputation**: domain against content-farm lists, domain age, ownership, byline history, first-seen date, earliest copy by reverse image search (an external send, see §7.3).
 3. **Detectors as hints**: optional per modality; results stored; never used to gate.
 4. **A person decides, with reasons**: what was checked, what was not.
 
 ### 7.3 Hard rules
 
-- A detector score **never** auto-rejects or auto-approves; it only raises a review flag, and can only lower a grade pending review, never raise one.
+- A detector score **never** auto-rejects or auto-approves; it only raises a separate, non-blocking review flag. Nothing blocks claim support until a person records a decision (§7.4). A detector result can never raise a grade.
+- **External reverse searches are disclosure, not a local check.** Opening a TinEye, Google Lens or Yandex link in a browser means "nothing is submitted automatically", but a URL or query in the link is still sent to the provider, and an upload discloses the image itself. Treat each as a third-party send: explicit per-item consent, blocked by default on source-protected material, and logged. Prefer searching from a public URL of the item rather than uploading the original; for sensitive items use only local similarity checks against the case's own files.
 - Every check stores method, tool, model and version, score and scale, threshold, date and time, hash of the input, and whether it ran locally or in the cloud. History is append-only; any status can be disputed.
 - **Local by default.** Sending a source's media to a cloud detector discloses it to a third party. Cloud detectors (Hive, Reality Defender, Sensity, SynthID Detector, InVID beta tools, GPTZero, Pangram) only with explicit per-item opt-in, never on source-protected material, and each send logged.
 - **Propagation**: a claim citing an item marked likely-synthetic or confirmed-synthetic cannot be marked supported through it; it needs other support or shows "supported only by a synthetic source". Derivatives (crops, transcripts, quotes, summaries) inherit the flag from their parent; clearing one needs a human reason.
@@ -223,12 +224,14 @@ Draft YAML for all six schemata is in Appendix A. **It has not been loaded into 
 
 ### 7.4 Proposed status values (for Ony to rename or accept)
 
+Signature validation and origin are two separate facts. A valid C2PA signature only says the manifest is intact and who signed it; a validly signed manifest can also say "AI-generated". So the system records the validation result (valid / invalid / absent / untrusted signer) and the assertions it contains as *findings*, and never turns them into a status by itself. Detectors and domain checks work the same way: they raise a non-blocking review flag. Only a person's recorded decision sets `verified-origin`, `likely-synthetic` or `confirmed-synthetic`, and only those decisions affect claim support (§7.3).
+
 | Status | Meaning | Set by |
 |---|---|---|
-| verified-origin | Valid signed provenance, or independent human verification of capture/author | System (valid signed C2PA) or a person |
+| verified-origin | A person has reviewed the provenance assertions and the signer's trust (or independently verified capture/author) and recorded reasons | A person only |
 | unverified | Default; nothing either way | System |
-| likely-synthetic | Weighty indicators (signed AI-source assertion, detector agreement, content-farm domain) but not confirmed | System flag; a person confirms |
-| confirmed-synthetic | Signed AI manifest, generator admission, or human forensic finding | A person with reasons, or a valid AI-source manifest |
+| likely-synthetic | A person has judged the indicators (signed AI-source assertion, detector agreement, content-farm domain) weighty but not conclusive, and recorded why | A person only. The system raises a separate, non-blocking review flag |
+| confirmed-synthetic | Signed AI-source manifest, generator admission, or forensic finding, reviewed by a person | A person with reasons |
 | disputed | Evidence conflicts | A person |
 
 Mapping to the suite's source tiers (the research agent did not read the suite; the app's `source_tier` runs **A–F**, not A–D as that agent assumed): proposal only. verified-origin with signed capture plus corroboration → top tiers; unverified → mid tier with a caveat, never sole support; likely-synthetic or disputed → lead only; confirmed-synthetic → excluded from support but allowed as the subject of reporting. **Which tier each lands in is the suite's call**, and the missing "synthetic" value in `AUTHENTICITY_STATUSES` is a suite change for Ony.
@@ -249,7 +252,7 @@ This follows the repo's rule: mockups first, Ony approves, then build. Each step
 
 **Phase 3: Following.** Monitors (outlet feeds, sitemaps, YouTube channel feeds, Bluesky, Mastodon, Telegram public channels), a schedule, change detection with version history, duplicate clustering, an "at-risk, capture first" queue, and a source-health screen. Closed platforms: Zeeschuimer import and manual capture, no bulk crawling. Egress policy per monitor.
 
-**Phase 4: Authenticity layer.** `authenticity_check` log; C2PA validation locally; outlet/domain reputation check; reverse-search links (open in browser, nothing sent); optional detectors behind opt-in; the propagation rule on claims; the `role` field; review UI that demands reasons. Needs the suite decision on statuses.
+**Phase 4: Authenticity layer.** `authenticity_check` log; C2PA validation locally; outlet/domain reputation check; reverse-search helpers behind explicit consent (see below); optional detectors behind opt-in; the propagation rule on claims; the `role` field; review UI that demands reasons. Needs the suite decision on statuses.
 
 **Phase 5: FtM mirror.** Load the six schemata into OpenAleph (after testing the YAML), mirror outlets, bylines, accounts, posts, captures and assessments so they can be searched and cross-referenced; side tables stay in the app.
 
@@ -331,11 +334,12 @@ Outlet:
 Byline:
   extends: [Interval]
   edge:
-    source: {property: journalist}
-    target: {property: article}
+    source: journalist
+    target: article
+  required: [journalist, article]
   properties:
-    journalist: {type: entity, range: Person, required: true}
-    article:    {type: entity, range: Article, required: true}
+    journalist: {type: entity, range: Person}
+    article:    {type: entity, range: Article}
     role:       {type: string}            # author|photographer|editor
     position:   {type: number}
 
@@ -357,8 +361,9 @@ Capture:
 
 TranscriptSegment:      # undecided: entity vs side table for long media
   extends: [Thing]
+  required: [media]
   properties:
-    media:      {type: entity, range: Document, required: true, reverse: {name: segments}}
+    media:      {type: entity, range: Document, reverse: {name: segments}}
     startMs:    {type: number}
     endMs:      {type: number}
     speaker:    {type: string}
@@ -369,9 +374,10 @@ TranscriptSegment:      # undecided: entity vs side table for long media
 
 MediaDerivative:
   extends: [Interval]
+  required: [source, derivative]
   properties:
-    source:     {type: entity, range: Document, required: true}
-    derivative: {type: entity, range: Document, required: true}
+    source:     {type: entity, range: Document}
+    derivative: {type: entity, range: Document}
     kind:       {type: string}            # frame|thumbnail|audio|translation|ocr
     tool:       {type: string}
     toolVersion: {type: string}
@@ -379,8 +385,9 @@ MediaDerivative:
 
 AuthenticityAssessment:
   extends: [Thing]
+  required: [subject]
   properties:
-    subject:           {type: entity, range: Document, required: true}
+    subject:           {type: entity, range: Document}
     method:            {type: string}     # classifier|C2PA|forensic|human
     model:             {type: string}
     modelVersion:      {type: string}
