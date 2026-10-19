@@ -10,10 +10,12 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
-from app.models.domain import Investigation
-from app.schemas.api import StoryClaimPlace, StoryGateSet, StoryReady, StorySectionCreate, StorySectionUpdate, StoryThesisSet
-from app.schemas.responses import StoryOut
+from app.models.domain import Investigation, WriteupVersion
+from app.schemas.api import StoryClaimPlace, StoryGateSet, StoryReady, StorySectionCreate, StorySectionUpdate, StoryThesisSet, WriteupVersionCreate
+from app.schemas.responses import StoryOut, WriteupOut, WriteupVersionDetailOut, WriteupVersionOut, WriteupVersionsOut
 from app.services import stories
+from app.services import writeup_versions as versions
+from app.services.writeups import serialize_writeup
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -106,3 +108,56 @@ def start_story_writeup(investigation_id: str, db: Session = Depends(get_db)) ->
     _case(db, investigation_id)
     stories.ensure_writeup(db, investigation_id)
     return stories.story_tree(db, investigation_id)
+
+
+# --- the write-up's version history (app/services/writeup_versions.py) ------------------------------------------
+
+def _writeup(db: Session, investigation_id: str) -> Any:
+    _case(db, investigation_id)
+    writeup = stories.story_writeup(db, investigation_id)
+    if writeup is None:
+        raise HTTPException(404, "The story has no write-up yet")
+    return writeup
+
+
+def _version(db: Session, investigation_id: str, version_id: str) -> tuple[Any, Any]:
+    writeup = _writeup(db, investigation_id)
+    version = db.get(WriteupVersion, version_id)
+    if version is None or version.writeup_id != writeup.id:
+        raise HTTPException(404, "Version not found")
+    return writeup, version
+
+
+@router.get("/investigations/{investigation_id}/story/versions", response_model=WriteupVersionsOut)
+def list_story_versions(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """The write-up's versions, newest first: named ones, automatic ones and those kept before a restore."""
+    _case(db, investigation_id)
+    writeup = stories.story_writeup(db, investigation_id)
+    if writeup is None:
+        return {"writeup_id": None, "versions": []}
+    return {"writeup_id": writeup.id, "versions": [versions.serialize_version(v) for v in versions.list_versions(db, writeup)]}
+
+
+@router.post("/investigations/{investigation_id}/story/versions", response_model=WriteupVersionOut)
+def name_story_version(investigation_id: str, body: WriteupVersionCreate, db: Session = Depends(get_db)) -> Any:
+    """Keep the write-up as it stands under a name ("Before legal read")."""
+    writeup = _writeup(db, investigation_id)
+    try:
+        return versions.serialize_version(versions.name_version(db, writeup, body.name))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+
+@router.get("/investigations/{investigation_id}/story/versions/{version_id}", response_model=WriteupVersionDetailOut)
+def get_story_version(investigation_id: str, version_id: str, db: Session = Depends(get_db)) -> Any:
+    """One version with its text, to read (never to edit)."""
+    _writeup_row, version = _version(db, investigation_id, version_id)
+    return versions.serialize_version(version, include_content=True)
+
+
+@router.post("/investigations/{investigation_id}/story/versions/{version_id}/restore", response_model=WriteupOut)
+def restore_story_version(investigation_id: str, version_id: str, db: Session = Depends(get_db)) -> Any:
+    """Put this version's text back. The text it replaces is kept first, as a version of its own."""
+    writeup, version = _version(db, investigation_id, version_id)
+    versions.restore_version(db, writeup, version)
+    return serialize_writeup(writeup)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from app.schemas.api import LeadConvertRequest, LeadCreate, LeadLinkCreate, ReportingTaskCreate, ReportingTaskUpdate
 
@@ -14,6 +14,10 @@ from app.models.domain import (
 LEAD_STATUSES = {"unreviewed", "active", "blocked", "resolved", "rejected"}
 PRIORITIES = {"low", "normal", "high", "urgent"}
 TASK_STATUSES = {"todo", "in_progress", "blocked", "done", "cancelled"}
+HORIZONS = ("now", "next", "later")
+# Now holds at most this many open leads (research Act §6: a WIP limit, shown as "4 / 5").
+NOW_CAP = 5
+DONE_STATUSES = {"resolved", "rejected"}
 
 
 def get_profile(db: Session, lead_id: str, create: bool = False) -> LeadProfile | None:
@@ -347,6 +351,7 @@ def serialize_lead(db: Session, lead: Lead) -> dict:
         "kind": "connector" if lead.provider else "question",
         "status": lead.status,
         "gathering_outcome": lead.gathering_outcome,
+        "horizon": lead.horizon,
         "priority": profile.priority if profile else "normal",
         "owner": profile.owner if profile else None,
         "next_action": profile.next_action if profile else None,
@@ -408,6 +413,7 @@ def list_leads_serialized(db: Session, leads: list[Lead]) -> list[dict]:
             "kind": "connector" if lead.provider else "question",
             "status": lead.status,
             "gathering_outcome": lead.gathering_outcome,
+            "horizon": lead.horizon,
             "priority": profile.priority if profile else "normal",
             "owner": profile.owner if profile else None,
             "next_action": profile.next_action if profile else None,
@@ -699,6 +705,16 @@ def update_lead(db: Session, row: Lead, data: dict) -> Lead:
         if data["gathering_outcome"] is not None and data["gathering_outcome"] not in GATHERING_OUTCOMES:
             raise ValueError(f"gathering_outcome must be one of: {', '.join(GATHERING_OUTCOMES)}")
         row.gathering_outcome = data["gathering_outcome"]
+    if "horizon" in data:
+        horizon = data["horizon"]
+        if horizon is not None and horizon not in HORIZONS:
+            raise ValueError(f"horizon must be one of: {', '.join(HORIZONS)}")
+        if horizon == "now" and row.horizon != "now":
+            in_now = db.scalar(select(func.count()).select_from(Lead).where(
+                Lead.investigation_id == row.investigation_id, Lead.horizon == "now", Lead.status.not_in(DONE_STATUSES), Lead.id != row.id)) or 0
+            if in_now >= NOW_CAP:
+                raise ValueError(f"Now already holds {NOW_CAP} leads: move one to Next or finish it first")
+        row.horizon = horizon
     profile = get_profile(db, row.id, create=True)
     old_status = row.status
     for field in ("title", "detail", "status"):

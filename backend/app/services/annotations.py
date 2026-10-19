@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
 from app.models.domain import (
     Claim, Collection, CollectionItem, ConnectorFinding, Document, Entity, Evidence, Lead, Note, RecordTag,
-    RelationshipEdge, ReportingTask, Source, Tag, TimelineEvent,
+    RelationshipEdge, ReportingTask, Source, Story, Tag, TimelineEvent,
 )
 
 # The eight tag swatches (docs/discovery/README.md, Colour roles): deepBlue,
@@ -62,6 +62,8 @@ RECORD_KINDS: dict[str, RecordKind] = {
     "lead": RecordKind(Lead, lambda db, r: r.title),
     "task": RecordKind(ReportingTask, lambda db, r: r.title),
     "finding": RecordKind(ConnectorFinding, lambda db, r: r.caption or r.provider_record_id),
+    # The story's own notes (Act › Story, the Notes tab beside Cited).
+    "story": RecordKind(Story, lambda db, r: _short(r.thesis) or "The story"),
 }
 
 

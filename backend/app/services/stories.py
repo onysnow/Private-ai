@@ -111,7 +111,8 @@ def story_tree(db: Session, investigation_id: str) -> dict[str, Any]:
                     if ev is None:
                         continue
                     src = db.get(Source, ev.source_id) if ev.source_id else None
-                    evidence.append({"id": ev.id, "stance": link.stance, "label": (src.title if src else "Typed in"), "locator": ev.locator})
+                    evidence.append({"id": ev.id, "stance": link.stance, "label": (src.title if src else "Typed in"), "locator": ev.locator,
+                                     "quote": ev.quote})
                 supporting = sum(1 for e in evidence if e["stance"] == "supports")
                 if state == "shown" and supporting == 1:
                     single.append(claim.id)
@@ -173,7 +174,15 @@ def story_tree(db: Session, investigation_id: str) -> dict[str, Any]:
         "ready": {"by": story.ready_by, "at": story.ready_at} if story and story.ready_at else None,
         "can_ready": all(g["state"] == "passed" for g in gates),
         "unplaced": unplaced,
+        "version": _named(db, writeup),
     }
+
+
+def _named(db: Session, writeup: Writeup | None) -> dict[str, Any] | None:
+    from app.services.writeup_versions import latest_named, serialize_version
+
+    row = latest_named(db, writeup) if writeup is not None else None
+    return serialize_version(row) if row is not None else None
 
 
 def set_thesis(db: Session, investigation_id: str, thesis: str) -> None:
@@ -271,3 +280,9 @@ def ensure_writeup(db: Session, investigation_id: str) -> None:
     row = create_writeup(db, investigation_id=investigation_id, title=story.thesis or "The story")
     story.writeup_id = row.id
     db.commit()
+
+
+def story_writeup(db: Session, investigation_id: str) -> Writeup | None:
+    """The write-up this case's story is told in, if started."""
+    story = story_of(db, investigation_id)
+    return db.get(Writeup, story.writeup_id) if story is not None and story.writeup_id else None

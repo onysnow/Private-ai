@@ -134,3 +134,26 @@ def test_a_null_for_a_required_field_leaves_it_and_a_null_for_an_optional_one_cl
     assert patched.status_code == 200, patched.text
     body = patched.json()
     assert (body["title"], body["status"], body["priority"], body["owner"]) == ("Request the minutes", task["status"], task["priority"], None)
+
+
+def test_a_lead_is_placed_now_next_or_later_and_now_holds_at_most_five():
+    inv = make_investigation("Horizons")
+    ids = [client.post("/api/leads", json={"investigation_id": inv["id"], "title": f"Lead {i}"}).json()["id"] for i in range(7)]
+    first = client.get(f"/api/leads/{ids[0]}").json()
+    assert first["horizon"] is None  # in the inbox until a person places it
+    for lead_id in ids[:5]:
+        placed = client.patch(f"/api/leads/{lead_id}", json={"horizon": "now"})
+        assert placed.status_code == 200 and placed.json()["horizon"] == "now"
+    refused = client.patch(f"/api/leads/{ids[5]}", json={"horizon": "now"})
+    assert refused.status_code == 400 and "Now already holds 5" in refused.json()["detail"]
+    assert client.patch(f"/api/leads/{ids[5]}", json={"horizon": "sometime"}).status_code == 422
+    # A finished lead no longer counts against Now; moving one already in Now is not refused.
+    assert client.patch(f"/api/leads/{ids[0]}", json={"status": "resolved"}).status_code == 200
+    assert client.patch(f"/api/leads/{ids[5]}", json={"horizon": "now"}).status_code == 200
+    assert client.patch(f"/api/leads/{ids[1]}", json={"horizon": "now", "priority": "high"}).status_code == 200
+    assert client.patch(f"/api/leads/{ids[6]}", json={"horizon": "later"}).json()["horizon"] == "later"
+    # A null puts it back in the inbox; leaving it out keeps it where it is.
+    assert client.patch(f"/api/leads/{ids[6]}", json={"owner": "AJ"}).json()["horizon"] == "later"
+    assert client.patch(f"/api/leads/{ids[6]}", json={"horizon": None}).json()["horizon"] is None
+    queue = client.get(f"/api/investigations/{inv['id']}/leads/queue?unresolved_only=false").json()
+    assert sorted(item["horizon"] or "inbox" for item in queue["items"]) == ["inbox"] + ["now"] * 6

@@ -140,6 +140,7 @@ import {
   getSince,
   getStanding,
   getStory,
+  getStoryVersion,
   getSuiteCoverage,
   getTaggedRecords,
   getTags,
@@ -206,6 +207,7 @@ import {
   listReportingTasks,
   listSourceEvidenceEndpoint,
   listSources,
+  listStoryVersions,
   listTermHints,
   listWriteupsEndpoint,
   load1Mdb,
@@ -216,6 +218,7 @@ import {
   markAiRunThought,
   markRedFlagInnocent,
   markStoryReady,
+  nameStoryVersion,
   openalephIntegrationStatus,
   type Options,
   patchClaimSuite,
@@ -248,6 +251,7 @@ import {
   reopenRedFlag,
   resolveFinding,
   restoreBackup,
+  restoreStoryVersion,
   retryJobEndpoint,
   reviewAiAnalysisCandidateEndpoint,
   reviewExternalRelationship,
@@ -677,6 +681,9 @@ import type {
   GetStoryData,
   GetStoryError,
   GetStoryResponse,
+  GetStoryVersionData,
+  GetStoryVersionError,
+  GetStoryVersionResponse,
   GetSuiteCoverageData,
   GetSuiteCoverageError,
   GetSuiteCoverageResponse,
@@ -875,6 +882,9 @@ import type {
   ListSourcesData,
   ListSourcesError,
   ListSourcesResponse,
+  ListStoryVersionsData,
+  ListStoryVersionsError,
+  ListStoryVersionsResponse,
   ListTermHintsData,
   ListTermHintsError,
   ListTermHintsResponse,
@@ -905,6 +915,9 @@ import type {
   MarkStoryReadyData,
   MarkStoryReadyError,
   MarkStoryReadyResponse,
+  NameStoryVersionData,
+  NameStoryVersionError,
+  NameStoryVersionResponse,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
@@ -997,6 +1010,9 @@ import type {
   RestoreBackupData,
   RestoreBackupError,
   RestoreBackupResponse,
+  RestoreStoryVersionData,
+  RestoreStoryVersionError,
+  RestoreStoryVersionResponse,
   RetryJobEndpointData,
   RetryJobEndpointError,
   RetryJobEndpointResponse,
@@ -7547,6 +7563,122 @@ export const removeStoryClaimMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await removeStoryClaim({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listStoryVersionsQueryKey = (
+  options: Options<ListStoryVersionsData>,
+) => createQueryKey('listStoryVersions', options);
+
+/**
+ * List Story Versions
+ *
+ * The write-up's versions, newest first: named ones, automatic ones and those kept before a restore.
+ */
+export const listStoryVersionsOptions = (
+  options: Options<ListStoryVersionsData>,
+) =>
+  queryOptions<
+    ListStoryVersionsResponse,
+    ListStoryVersionsError,
+    ListStoryVersionsResponse,
+    ReturnType<typeof listStoryVersionsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listStoryVersions({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listStoryVersionsQueryKey(options),
+  });
+
+/**
+ * Name Story Version
+ *
+ * Keep the write-up as it stands under a name ("Before legal read").
+ */
+export const nameStoryVersionMutation = (
+  options?: Partial<Options<NameStoryVersionData>>,
+): UseMutationOptions<
+  NameStoryVersionResponse,
+  NameStoryVersionError,
+  Options<NameStoryVersionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    NameStoryVersionResponse,
+    NameStoryVersionError,
+    Options<NameStoryVersionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await nameStoryVersion({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getStoryVersionQueryKey = (
+  options: Options<GetStoryVersionData>,
+) => createQueryKey('getStoryVersion', options);
+
+/**
+ * Get Story Version
+ *
+ * One version with its text, to read (never to edit).
+ */
+export const getStoryVersionOptions = (options: Options<GetStoryVersionData>) =>
+  queryOptions<
+    GetStoryVersionResponse,
+    GetStoryVersionError,
+    GetStoryVersionResponse,
+    ReturnType<typeof getStoryVersionQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getStoryVersion({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getStoryVersionQueryKey(options),
+  });
+
+/**
+ * Restore Story Version
+ *
+ * Put this version's text back. The text it replaces is kept first, as a version of its own.
+ */
+export const restoreStoryVersionMutation = (
+  options?: Partial<Options<RestoreStoryVersionData>>,
+): UseMutationOptions<
+  RestoreStoryVersionResponse,
+  RestoreStoryVersionError,
+  Options<RestoreStoryVersionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RestoreStoryVersionResponse,
+    RestoreStoryVersionError,
+    Options<RestoreStoryVersionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await restoreStoryVersion({
         ...options,
         ...fnOptions,
         throwOnError: true,
