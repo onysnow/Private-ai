@@ -16,6 +16,8 @@ from app.models.domain import Document, Investigation
 from app.services.security import resolve_storage_root
 
 logger = logging.getLogger("journalism.lifecycle")
+# Shown for a stored path outside document storage; the reason is logged, not sent.
+UNSAFE_PATH = "The stored path is outside the document storage folder"
 
 
 def _openaleph_collection(db: Session, investigation_id: str) -> dict[str, str] | None:
@@ -149,7 +151,8 @@ def preview_investigation_deletion(db: Session, investigation_id: str, storage_r
                 "action": "preserve_shared" if is_shared else ("delete" if exists else "already_missing"),
             })
         except ValueError as exc:
-            unsafe_paths.append({"document_id": doc.id, "storage_path": doc.storage_path, "error": str(exc)})
+            logger.warning("Unsafe stored path for document %s: %s", doc.id, exc)
+            unsafe_paths.append({"document_id": doc.id, "storage_path": doc.storage_path, "error": UNSAFE_PATH})
 
     return {
         "investigation_id": investigation_id,
@@ -278,7 +281,8 @@ def preview_orphan_document_files(db: Session, storage_root: str | Path) -> dict
         try:
             referenced.add(str(_contained_existing_path(root, raw)))
         except ValueError as exc:
-            unsafe_references.append({"document_id": str(document_id), "storage_path": str(raw), "error": str(exc)})
+            logger.warning("Unsafe stored path for document %s: %s", document_id, exc)
+            unsafe_references.append({"document_id": str(document_id), "storage_path": str(raw), "error": UNSAFE_PATH})
 
     ignored_top_level = {".delete-staging", ".restore-staging", ".upload-staging"}
     files: list[dict[str, Any]] = []
