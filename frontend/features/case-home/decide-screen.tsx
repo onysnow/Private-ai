@@ -14,7 +14,7 @@ import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
 import {DecisionCard, Excerpt, PartyChips, RowCells, pageOf} from './decision-card';
-import {HOLD_MS, KIND_LABEL, useDecisions} from './use-decisions';
+import {HOLD_MS, KIND_LABEL, acceptsInBulk, undoBlocked, useDecisions} from './use-decisions';
 import type {DecisionKind, DecisionOrder} from './use-decisions';
 
 const KIND_ICON: Record<DecisionKind, string> = {to_check: '?', missing: '∅', proposal: '◇', match: '⇄', outside: '◎', ai: 'AI', watchlist: '◉'};
@@ -25,6 +25,12 @@ function age(iso: string): string {
   if (minutes < 60) return `${minutes} min`;
   if (minutes < 60 * 24) return `${Math.round(minutes / 60)} h`;
   return `${Math.round(minutes / 1440)} d`;
+}
+
+/** The words for a list that would not load: the browser's "Failed to fetch" means the server did not answer. */
+export function loadError(error: unknown): string {
+  const message = errorMessage(error, '');
+  return !message || /failed to fetch|networkerror|load failed/i.test(message) ? 'The server did not answer.' : message;
 }
 
 const typing = (target: EventTarget | null): boolean => {
@@ -63,7 +69,11 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
   </section>;
 }
 
-export function DecideScreen({investigationId, investigationName, active = true}: {investigationId: string; investigationName: string; active?: boolean}): ReactElement {
+export function DecideScreen({investigationId, investigationName, active = true, unreachable = null}: {
+  investigationId: string; investigationName: string; active?: boolean;
+  /** The case frame could not reach the server (no case is known yet): shown as this screen's error state. */
+  unreachable?: {error: unknown; retry: () => void} | null;
+}): ReactElement {
   const [kind, setKind] = useState<DecisionKind | undefined>(undefined);
   const [order, setOrder] = useState<DecisionOrder>('source');
   useEffect(() => {
@@ -102,19 +112,31 @@ export function DecideScreen({investigationId, investigationName, active = true}
   }, [active, all, move]);
 
   const groups = useMemo(() => {
-    const out: {key: string; group: string; label: string; items: DecisionItemOut[]}[] = [];
+    const out: {key: string; group: DecisionItemOut['group']; label: string; items: DecisionItemOut[]}[] = [];
     for (const i of items) {
       const last = out[out.length - 1];
-      if (order === 'source' && last && last.group === i.group.key) last.items.push(i);
-      else out.push({key: `${i.group.key}:${out.length}`, group: i.group.key, label: order === 'source' ? i.group.label : '', items: [i]});
+      if (order === 'source' && last && last.group.key === i.group.key) last.items.push(i);
+      else out.push({key: `${i.group.key}:${out.length}`, group: i.group, label: order === 'source' ? i.group.label : '', items: [i]});
     }
     return out;
   }, [items, order]);
 
+  // "Accept all n high" (CHECK_1, very large state): same-shaped proposals from one source, confirmed by count first.
+  const [bulk, setBulk] = useState<string | null>(null);
+  useEffect(() => { setBulk(null); }, [order, kind, investigationId]);
+  const acceptGroup = (chosen: DecisionItemOut[]) => {
+    if (item && chosen.some(c => c.id === item.id)) setSelected(items.find(i => !chosen.includes(i))?.id ?? null);
+    all.acceptAll(chosen);
+    setBulk(null);
+  };
+
   const loading = all.query.isPending && Boolean(investigationId);
+  const failure = items.length ? null
+    : unreachable ?? (all.query.isError ? {error: all.query.error, retry: () => { void all.query.refetch(); }} : null);
   const session = {yes: 0, no: 0, unsure: 0};
   for (const d of all.decided) session[d.choice.key] += 1;
   const failed = all.decided.find(d => d.state === 'failed');
+  const batch = all.held?.batch ? all.decided.filter(d => d.batch === all.held?.batch && d.state === 'held') : [];
   const kinds = Object.keys(KIND_LABEL) as DecisionKind[];
 
   return <div className="dc" aria-label="Decide">
@@ -122,7 +144,7 @@ export function DecideScreen({investigationId, investigationName, active = true}
       <h1>To decide</h1>
       <p className="ch-quiet">{investigationName ? `${investigationName} · ` : ''}only you can decide these</p>
       <div className="dc-chips" role="group" aria-label="Show">
-        <button type="button" className={!kind ? 'on' : ''} aria-pressed={!kind} onClick={() => setKind(undefined)}>All {loading ? '…' : total}</button>
+        <button type="button" className={!kind ? 'on' : ''} aria-pressed={!kind} onClick={() => setKind(undefined)}>All {loading || failure ? '…' : total}</button>
         {kinds.filter(k => all.counts[k]).map(k => <button key={k} type="button" className={kind === k ? 'on' : ''} aria-pressed={kind === k}
           onClick={() => setKind(kind === k ? undefined : k)}>{KIND_LABEL[k]} {all.counts[k]}</button>)}
       </div>
@@ -136,9 +158,23 @@ export function DecideScreen({investigationId, investigationName, active = true}
       {(all.query.data?.total ?? 0) > (all.query.data?.items.length ?? 0) && <p className="ch-quiet">Showing the first {all.query.data?.items.length} of {all.query.data?.total}; each one you decide makes room for the next.</p>}
       <div className="dc-list">
         {loading && <p className="dc-loading" aria-busy="true">Gathering what waits for you…</p>}
-        {all.query.isError && <p role="alert">{errorMessage(all.query.error, 'Could not load what waits for you')}</p>}
-        {groups.map(g => <div key={g.key} className="dc-group">
-          {g.label && <p className="dc-group-name">{g.label}<span>{g.items.length} left</span></p>}
+        {all.query.isError && items.length > 0 && <p className="dc-stale" role="alert">Could not refresh: {loadError(all.query.error)} <button type="button" onClick={() => { void all.query.refetch(); }}>Retry</button></p>}
+        {groups.map(g => {
+          const high = g.label ? g.items.filter(acceptsInBulk) : [];
+          return <div key={g.key} className="dc-group">
+          {g.label && <div className="dc-group-head">
+            <p className="dc-group-name"><span className="dc-group-label">{g.label}</span><span>{g.items.length} left</span></p>
+            {(g.group.pages ?? 0) > 0 && <p className="dc-pages" title="Pages of this document with something to decide, and how many have nothing left">
+              <span className="dc-pages-bar" aria-hidden="true">{Array.from({length: Math.min(g.group.pages ?? 0, 24)}, (_, n) => <i key={n} className={n < (g.group.pages_read ?? 0) ? 'read' : ''}/>)}</span>
+              pages read: {g.group.pages_read ?? 0} of {g.group.pages}</p>}
+            {high.length >= 2 && bulk !== g.key && <button type="button" className="dc-bulk" onClick={() => setBulk(g.key)}>✓ Accept all {high.length} high</button>}
+          </div>}
+          {bulk === g.key && <div className="dc-bulk-confirm" role="group" aria-label={`Accept all ${high.length} high`}>
+            <p>Accept all <b>{high.length}</b> proposals rated high in {g.label}? Each waits {HOLD_MS / 1000} s, and Undo takes back all {high.length}.</p>
+            <ol>{high.map(i => <li key={i.id}>{i.question}</li>)}</ol>
+            <div><button type="button" className="dc-bulk-go" onClick={() => acceptGroup(high)}>Accept {high.length}</button>
+              <button type="button" onClick={() => setBulk(null)}>Cancel</button></div>
+          </div>}
           <ul>{g.items.map(i => <li key={i.id}>
             <button type="button" className={`dc-row${item?.id === i.id ? ' on' : ''}`} aria-current={item?.id === i.id ? 'true' : undefined} onClick={() => setSelected(i.id)}>
               <span className={`dc-kind dc-kind-${i.kind}`} aria-hidden="true" title={KIND_LABEL[i.kind]}>{KIND_ICON[i.kind]}</span>
@@ -146,7 +182,8 @@ export function DecideScreen({investigationId, investigationName, active = true}
                 <small>{i.actor_kind === 'ai' ? 'AI draft' : i.actor} · {KIND_LABEL[i.kind].toLowerCase()} · {age(i.created_at)}{i.level ? ' · ' : ''}{i.level && <LevelChip level={i.level}/>}</small></span>
             </button>
           </li>)}</ul>
-        </div>)}
+        </div>;
+        })}
       </div>
     </aside>
 
@@ -158,7 +195,13 @@ export function DecideScreen({investigationId, investigationName, active = true}
         {item.choices.length === 0 && <Link className="dc-elsewhere" href={caseHref(item.open.href, investigationId)}>{item.open.label} ↗</Link>}
       </section>
     </> : <section className="dc-empty">
-      {loading ? <div className="ch-skeleton dc-skeleton" aria-busy="true" aria-label="Gathering what waits for you"/> : <>
+      {/* A list that did not load says so alone: "Nothing waits for you" would claim the queue is empty. */}
+      {failure ? <div className="dc-failed" role="alert">
+          <h2><span aria-hidden="true">✕ </span>Could not load what waits for you.</h2>
+          <p>{loadError(failure.error)} Nothing was lost; your decisions are kept on the server.</p>
+          <button type="button" onClick={failure.retry} disabled={all.query.isFetching}>{all.query.isFetching ? 'Trying again…' : 'Retry'}</button>
+        </div>
+        : loading ? <div className="ch-skeleton dc-skeleton" aria-busy="true" aria-label="Gathering what waits for you"/> : <>
         <h2>Nothing waits for you{kind ? ` in ${KIND_LABEL[kind]}` : ''}.</h2>
         <p>{all.decided.length ? `${all.decided.length} decided in this session.` : 'New proposals, checks and missing values arrive here as the case grows.'}</p>
         <Link href={caseHref('/bring-in#document-ingestion', investigationId)}>Drop documents</Link>
@@ -168,11 +211,19 @@ export function DecideScreen({investigationId, investigationName, active = true}
     <footer className="dc-bar">
       <span><b>{items.length ? index + 1 : 0}</b> of {items.length}</span>
       <span className="dc-session" aria-label="This session">✓ {session.yes} · ✕ {session.no} · ○ {session.unsure}</span>
-      <span className="dc-last" aria-label="Last 10">LAST 10 {all.decided.slice(0, 10).map(d => <i key={d.item.id} className={`dc-last-${d.choice.key} dc-${d.state}`}
-        title={`${d.item.question} — ${d.choice.label}`}>{SHAPE[d.choice.key]}</i>)}</span>
+      <span className="dc-last" role="group" aria-label="Last 10">LAST 10 {all.decided.slice(0, 10).map(d => {
+        // Each of the last ten answers can be taken back where that is possible; the others say why not.
+        const blocked = undoBlocked(d);
+        const words = `${d.choice.label}: ${d.item.question}`;
+        return <button key={d.item.id} type="button" className={`dc-last-${d.choice.key} dc-${d.state}`} aria-disabled={blocked ? 'true' : undefined}
+          aria-label={blocked ? `${words} — ${blocked}` : `Undo ${words}`} title={blocked ? `${words}\n${blocked}` : `${words}\nClick to undo`}
+          onClick={() => { if (!blocked && all.undo(d.item.id)) setSelected(d.item.id); }}>{SHAPE[d.choice.key]}</button>;
+      })}</span>
       <span className="dc-keys" aria-hidden="true"><kbd>J</kbd><kbd>K</kbd> move <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> decide <kbd>Z</kbd> undo</span>
       <span className="dc-toast" aria-live="polite">
         {failed ? <>Could not save “{failed.choice.label}”: {failed.error}. Your choice is kept. <button type="button" onClick={() => all.retry(failed.item.id)}>Retry</button> <button type="button" onClick={() => all.undo(failed.item.id)}>Drop it</button></>
+          : all.undoError ? all.undoError
+          : batch.length ? <><b>✓ Accepted {batch.length}</b> · {batch[0].item.group.label} <button type="button" onClick={() => all.undoBatch(batch[0].batch!)}>Undo all {batch.length} <kbd>Z</kbd></button></>
           : all.held ? <><b>{SHAPE[all.held.choice.key]} {all.held.choice.label}</b> · {all.held.item.question.slice(0, 60)} <button type="button" onClick={() => all.undo()}>Undo <kbd>Z</kbd></button></>
           : `Each answer waits ${HOLD_MS / 1000} s, so you can undo it.`}
       </span>

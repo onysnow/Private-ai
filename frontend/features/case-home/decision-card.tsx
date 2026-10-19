@@ -87,6 +87,20 @@ function PageThumb({documentId, page, passage}: {documentId: string; page: numbe
   </figure>;
 }
 
+/** "What happens" (CHECK_1): what each answer does, as the server words it from the endpoint the answer posts
+ *  to, then what holds whichever way you answer. */
+export function WhatHappens({item}: {item: DecisionItemOut}): ReactElement | null {
+  const answers = item.choices.filter(c => c.happens);
+  if (!answers.length && !item.consequences.length) return null;
+  return <div className="ch-happens" aria-label="What happens">
+    <p className="ch-eyebrow">What happens</p>
+    {answers.length > 0 && <dl>{answers.map(c => <div key={c.key} className={`ch-happens-${c.key}`}>
+      <dt><span aria-hidden="true">{MARK[c.key]}</span> {c.label}</dt><dd>{c.happens}</dd>
+    </div>)}</dl>}
+    {item.consequences.length > 0 && <ul>{item.consequences.map(c => <li key={c}>{c}</li>)}</ul>}
+  </div>;
+}
+
 export function DecisionCard({item, position, total, keys, active, onDecide, showWhatHappens = true}: {
   item: DecisionItemOut; position: number; total: number; keys: 'home' | 'decide'; active: boolean;
   onDecide: (choice: DecisionChoiceOut, note: string) => void; showWhatHappens?: boolean;
@@ -122,10 +136,7 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
   </>;
   const extras = <>
     {item.known && item.known.length > 0 && <ul className="ch-known" aria-label="Already in the case">{item.known.map(k => <li key={k}>{k}</li>)}</ul>}
-    {showWhatHappens && item.consequences.length > 0 && <div className="ch-happens">
-      <p className="ch-eyebrow">If you answer</p>
-      <ul>{item.consequences.map(c => <li key={c}>{c}</li>)}</ul>
-    </div>}
+    {showWhatHappens && <WhatHappens item={item}/>}
   </>;
   return <article className={`ch-card ch-kind-${item.kind}`} aria-label={`${item.question} (${position} of ${total})`} data-testid="decision-card">
     <p className="ch-why">

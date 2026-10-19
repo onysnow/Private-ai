@@ -222,7 +222,7 @@ def test_a_table_row_card_names_the_rows_facts_shows_its_cells_and_what_the_case
     assert link["known"] == ["Already in the case: £5,000,000 from Meridian Holdings Ltd to Bellcastle Trading Group, no date"]
     name = next(i for i in items if "Bellcastle" in i["question"] and i is not link and i["evidence"]["rows"])
     assert name["question"] == "Is “Bellcastle Trading Group” in row 2 the record Bellcastle Trading Group?"
-    assert name["consequences"][0] == "Same: these rows are added to Bellcastle Trading Group; no new record."
+    assert name["choices"][0]["happens"] == "These rows are added to Bellcastle Trading Group; no new record."
     assert name["evidence"]["rows"][0]["number"] == 2 and name["known"] == []
 
 
@@ -295,3 +295,58 @@ def test_a_page_is_drawn_with_its_passage_marked(tmp_path, monkeypatch):
     assert fitz.Pixmap(reply.content).width == 200
     assert client.get(f"/api/documents/{doc_id}/page-image", params={"highlight": "not on the page"}).headers["x-passage-found"] == "0"
     assert client.get(f"/api/documents/{doc_id}/page-image", params={"page": 3}).status_code == 404
+
+
+def _doc_with_pages(inv: str, pages: dict[int, list[tuple[str, float]]]) -> tuple[str, dict[int, list[str]]]:
+    """A document whose pages each carry claim proposals (text, confidence); returns its id and the proposal ids per page."""
+    ids: dict[int, list[str]] = {}
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Filing", source_type="document")
+        db.add(src); db.flush()
+        doc = Document(investigation_id=inv, source_id=src.id, filename="filing.pdf", sha256="2" * 64, storage_path="/dev/null", extraction_status="complete")
+        db.add(doc); db.flush()
+        for number, proposals in pages.items():
+            chunk = DocumentChunk(document_id=doc.id, locator=f"p. {number}", page_number=number, ordinal=number, text=f"Page {number} text.")
+            db.add(chunk); db.flush()
+            for text, confidence in proposals:
+                row = ExtractionCandidate(investigation_id=inv, document_id=doc.id, chunk_id=chunk.id, candidate_type="claim",
+                                          payload={"text": text}, confidence=confidence)
+                db.add(row); db.flush()
+                ids.setdefault(number, []).append(row.id)
+        db.commit()
+        return doc.id, ids
+
+
+def test_a_document_group_counts_the_pages_read_and_each_answer_says_what_it_does():
+    inv = _inv("Pages read")
+    doc, ids = _doc_with_pages(inv, {1: [("Kestrel SA paid in 2020", 0.9)], 2: [("The parcel was sold", 0.6), ("A second sale", 0.9)],
+                                     3: [("The board met", 0.3)]})
+    items = [i for i in ok(client.get(f"/api/investigations/{inv}/decisions", params={"order": "source"}))["items"] if i["group"]["key"] == f"doc:{doc}"]
+    assert {i["group"]["pages"] for i in items} == {3} and {i["group"]["pages_read"] for i in items} == {0}
+    assert sorted(i["confidence_band"] for i in items) == ["high", "high", "low", "medium"]
+    first = next(i for i in items if i["id"] == ids[1][0])
+    yes, no = first["choices"]
+    assert yes["happens"].startswith("Creates the claim as Not yet shown") and no["happens"] == "Marked rejected, with your reason; no claim is made."
+    # The reason chosen under No is stored with the rejection.
+    ok(client.post(no["path"], json={**no["body"], "note": "Misread"}))
+    with SessionLocal() as db:
+        assert db.get(ExtractionCandidate, ids[1][0]).reviewer_note == "Misread"
+    # Page 1 has nothing left; page 2 still has one of its two.
+    ok(client.post(f"/api/extraction-candidates/{ids[2][0]}/review", json={"decision": "reject"}))
+    items = [i for i in ok(client.get(f"/api/investigations/{inv}/decisions"))["items"] if i["group"]["key"] == f"doc:{doc}"]
+    assert {(i["group"]["pages"], i["group"]["pages_read"]) for i in items} == {(3, 1)}
+
+
+def test_a_table_document_gets_no_page_count():
+    from app.services.case_home import _page_of
+    assert _page_of("p4") == 4 and _page_of("page 12 (OCR)") == 12 and _page_of("row 2") is None and _page_of(None) is None
+    inv = _inv("No pages")
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Ledger", source_type="document")
+        db.add(src); db.flush()
+        doc = Document(investigation_id=inv, source_id=src.id, filename="ledger.csv", sha256="3" * 64, storage_path="/dev/null", extraction_status="complete")
+        db.add(doc); db.flush()
+        db.add(ExtractionCandidate(investigation_id=inv, document_id=doc.id, candidate_type="claim", payload={"text": "A row", "locator": "row 2"}, confidence=0.9))
+        db.commit()
+    item = ok(client.get(f"/api/investigations/{inv}/decisions"))["items"][0]
+    assert item["group"]["pages"] is None and item["group"]["pages_read"] is None

@@ -64,6 +64,7 @@ import {ApiPayloadError} from '../../lib/api-validate';
 import {filterHiddenDemo} from '../../lib/demo-preference';
 import {
   connectorsOptions, getInvestigationGraphOptions, listInvestigationEvidenceOptions, listInvestigationsOptions, listInvestigationsQueryKey, listSourcesOptions,
+  settingsStatusQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {InvestigationOut} from '../../lib/generated/types.gen';
 import {caseHref} from '../../lib/case-href';
@@ -203,7 +204,13 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
   const clearProvenance = useWorkbenchStore(state => state.clearProvenance);
   const accessLabel = access.state === 'authenticated' ? 'API: session active' : access.state === 'local' ? 'API: local access' : access.state === 'needs_token' ? 'API: token needed'
     : access.state === 'remote_disabled' ? 'API: remote disabled' : access.state === 'error' ? 'API: connection error' : 'API: checking…';
-  const accessProblem = access.state === 'needs_token' || access.state === 'error';
+  // Decide shows a server that does not answer as its own error state, alone, with a retry (BACKLOG P1:
+  // "Failed to fetch" beside "Nothing waits for you"); a token that is needed still shows the access panel.
+  const decideUnreachable = view === 'decide' && (access.state === 'error' || (investigationsQuery.isError && !inv))
+    ? {error: access.state === 'error' ? new Error(access.message) : investigationsQuery.error,
+       retry: () => { void queryClient.refetchQueries({queryKey: settingsStatusQueryKey()}); void investigationsQuery.refetch(); }}
+    : null;
+  const accessProblem = access.state === 'needs_token' || (access.state === 'error' && !decideUnreachable);
 
   const stage = (key: StageKey, children: ReactNode) => mounted(key) && <div className={view === 'all' ? undefined : 'cv-stage'} hidden={!shown(key)} data-view={key}>
     {view !== 'all' && <StageHeader stageKey={key} investigationName={investigationName}/>}
@@ -222,7 +229,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         loading={!rows && !investigationsQuery.isError} active={view === 'home'}/></PanelErrorBoundary>
     </div>}
     {view !== 'all' && mounted('decide') && <div hidden={!shown('decide')} className="cv-home-wrap">
-      <PanelErrorBoundary name="Decide"><DecideScreen investigationId={inv} investigationName={investigationName} active={view === 'decide'}/></PanelErrorBoundary>
+      <PanelErrorBoundary name="Decide"><DecideScreen investigationId={inv} investigationName={investigationName} active={view === 'decide'} unreachable={decideUnreachable}/></PanelErrorBoundary>
     </div>}
 
     {view === 'all' ? <>

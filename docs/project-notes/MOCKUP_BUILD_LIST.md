@@ -137,9 +137,9 @@ Timeline and Places: **no mockup in the 16 screens** — the canvas frames 4–1
 ## 6. Check — mockups CHECK_1 (Decide) and CHECK_2 (Chain of Custody) (§06)
 
 CHECK_1 Decide: **partial** (queue, evidence pane, card, keys, undo built).
-- [ ] Queue filters work past the first 200 (backlog P1); grouped by source with "pages read"
-- [ ] "What happens" preview per kind; reason chips under No; Last 10 strip; bulk "Accept all 38 high"
-- [ ] Sort by what it unlocks; "Open the document" opens the reader, not Search
+- [x] Queue filters work past the first 200 (backlog P1); grouped by source with "pages read" (19 Oct: each document group shows "pages read: n of m", the pages carrying a proposal or a passage to check and how many have nothing left, counted on the server from the items themselves; a spreadsheet's rows get no count)
+- [x] "What happens" preview per kind; reason chips under No; Last 10 strip; bulk "Accept all 38 high" (19 Oct: each answer says what it does, worded from the endpoint it posts to; chips only where the endpoint stores the note, so a watchlist dismiss answers at once; Last 10 entries undo while held, a saved To check item or missing value goes back to open, the rest say why not; "Accept all n high" per source for high proposals whose Yes asks no question, confirmed by count with the list, one Undo all; the Decide error state stands alone with Retry)
+- [ ] Sort by what it unlocks (19 Oct: not built; no stored data says which answer completes a claim's Done rules or raises a Red Flag: To check answers leave flag levels unchanged, an accepted claim starts Not yet shown, and whether a new link would raise a flag needs a dry run of the pattern engine); "Open the document" opens the reader, not Search (done, see CHECK_2 below)
 CHECK_2 Chain of Custody (12 Oct: Check › Chain of Custody, `features/custody`; backend `GET /claims/{id}/custody-chain`, `POST /documents/{id}/recheck-hash`):
 - [x] Whole-screen chain: Files → Reading → Passage → Decision → The claim as wired cards with check glyphs (✓ hash re-checked on load, ✓ says it, OCR / text layer), one row per piece of evidence, against rows in red; AI drafts that quote the claim as plum cards
 - [x] Wire styles (confirmed / proposed / worked out / against / AI) with the action word on each line

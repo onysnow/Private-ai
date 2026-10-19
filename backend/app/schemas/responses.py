@@ -4533,6 +4533,7 @@ class DecisionChoiceOut(ResponseModel):
     method: Literal["POST"]
     path: str
     body: dict[str, Any]
+    happens: str | None = None  # what posting this answer does (the card's "What happens")
 
 
 class DecisionRowOut(ResponseModel):
@@ -4560,6 +4561,9 @@ class DecisionPartyOut(ResponseModel):
 class DecisionGroupOut(ResponseModel):
     key: str
     label: str
+    # A document's pages that carry something to decide, and how many have nothing left ("pages read: 3 of 9").
+    pages: int | None = None
+    pages_read: int | None = None
 
 
 class DecisionLinkOut(ResponseModel):
@@ -4588,6 +4592,7 @@ class DecisionItemOut(ResponseModel):
     choices: list[DecisionChoiceOut]
     open: DecisionLinkOut
     known: list[str] = []
+    confidence_band: Literal["high", "medium", "low"] | None = None  # a document proposal's confidence, as a word
 
 
 class CaseDecisionsOut(ResponseModel):

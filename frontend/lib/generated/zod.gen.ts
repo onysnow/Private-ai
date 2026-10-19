@@ -2087,6 +2087,7 @@ export const zCustodyChainOut = z.object({
  */
 export const zDecisionChoiceOut = z.object({
   body: z.record(z.unknown()),
+  happens: z.string().nullish(),
   key: z.enum(['yes', 'no', 'unsure']),
   label: z.string(),
   method: z.literal('POST'),
@@ -2099,6 +2100,8 @@ export const zDecisionChoiceOut = z.object({
 export const zDecisionGroupOut = z.object({
   key: z.string(),
   label: z.string(),
+  pages: z.number().int().nullish(),
+  pages_read: z.number().int().nullish(),
 });
 
 /**
@@ -2151,6 +2154,7 @@ export const zDecisionItemOut = z.object({
   actor: z.string(),
   actor_kind: z.enum(['person', 'app', 'ai', 'connector']),
   choices: z.array(zDecisionChoiceOut),
+  confidence_band: z.enum(['low', 'medium', 'high']).nullish(),
   consequences: z.array(z.string()),
   created_at: z
     .string()

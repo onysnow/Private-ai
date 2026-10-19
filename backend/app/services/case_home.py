@@ -15,6 +15,7 @@ Nothing here writes."""
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from datetime import datetime
 from typing import Any, Callable
@@ -124,8 +125,9 @@ def decision_counts(db: Session, inv: str) -> dict[str, int]:
     return {k: v for k, v in counts.items() if v}
 
 
-def _choice(key: str, label: str, path: str, body: dict[str, Any]) -> dict[str, Any]:
-    return {"key": key, "label": label, "method": "POST", "path": path, "body": body}
+def _choice(key: str, label: str, path: str, body: dict[str, Any], happens: str | None = None) -> dict[str, Any]:
+    """One answer. ``happens`` is what posting it does, read from the endpoint it posts to (the card's "What happens")."""
+    return {"key": key, "label": label, "method": "POST", "path": path, "body": body, "happens": happens}
 
 
 def _names(db: Session, ids: set[str]) -> dict[str, tuple[str, str]]:
@@ -186,8 +188,9 @@ def _check_items(db: Session, inv: str) -> list[dict[str, Any]]:
             "proposal": f"{indicator}: {'a passage that may show it' if r.kind == 'passage' else r.excerpt or '' if money else 'a part the records cannot show'}",
             "consequences": [f"Your answer is kept on the Red Flag {indicator} as what a person found; the flag's level comes from the records and does not change."
                              if flag else "Your answer is kept with this item."],
-            "choices": [_choice("yes", "Shows it", path, {"status": "shows"}), _choice("no", "Does not", path, {"status": "does_not"}),
-                        _choice("unsure", "Unclear", path, {"status": "unclear"})],
+            "choices": [_choice("yes", "Shows it", path, {"status": "shows"}, "Recorded as shown, with your note; it leaves the list."),
+                        _choice("no", "Does not", path, {"status": "does_not"}, "Recorded as not shown, with your reason; it leaves the list."),
+                        _choice("unsure", "Unclear", path, {"status": "unclear"}, "Recorded as unclear; it leaves the list and can be opened again in To check.")],
             "open": {"href": "/check#to-check", "label": "Open To check"},
         })
     return out
@@ -213,8 +216,9 @@ def _missing(db: Session, inv: str) -> list[dict[str, Any]]:
             "group": {"key": f"missing:{r.indicator_id}", "label": rule_name(r.indicator_id)}, "evidence": None,
             "parties": _parties(list(r.parties), names), "proposal": f"{rule_name(r.indicator_id)} · {r.excerpt}",
             "consequences": [f"While it is missing: {r.blocks}", "Filling in the value removes this by itself."],
-            "choices": [_choice("yes", "Chase it", path, {"status": "chasing"}), _choice("no", "Can't be known", path, {"status": "unknowable"}),
-                        _choice("unsure", "Doesn't apply", path, {"status": "not_needed"})],
+            "choices": [_choice("yes", "Chase it", path, {"status": "chasing"}, "Opens a lead to find it, linked to the record it is missing from."),
+                        _choice("no", "Can't be known", path, {"status": "unknowable"}, "Recorded as unknowable, with your reason; it leaves the list."),
+                        _choice("unsure", "Doesn't apply", path, {"status": "not_needed"}, "Recorded as not needed here; it leaves the list.")],
             "open": {"href": MISSING_OPEN.get(r.record_type or "", "/check"), "label": "Fill it in"},
         })
     return out
@@ -362,6 +366,10 @@ def _known_payments(db: Session, inv: str, page: list[dict[str, Any]]) -> None:
             item["known"].append(f"and {len(found) - 3} more payments between them")
 
 
+# What saying No to a document proposal does (documents.review_candidate): the row is kept, marked rejected, with the note.
+REJECTED = "Marked rejected, with your reason; {}."
+
+
 def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> None:
     """A name proposal asks "add it?", or "same as this record?" when the case has a record of that name."""
     row: ExtractionCandidate = item["_entity_row"]
@@ -374,16 +382,18 @@ def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> Non
     if strong:
         other = strong.get("caption") or strong.get("entity_id")
         item["question"] = f"Is “{caption}” {where} the record {other}?"
-        item["consequences"] = [f"Same: {source} {'are' if numbers else 'is'} added to {other}; no new record.",
-                                f"Different: “{caption}” becomes a new {schema}, kept apart from {other}."]
+        item["consequences"] = []
         base = {"decision": "accept", "entity_schema": schema, "matched_entity_id": strong.get("entity_id")}
-        item["choices"] = [_choice("yes", "Same record", path, {**base, "entity_identity_decision": "same"}),
-                           _choice("no", "A different one", path, {**base, "entity_identity_decision": "different"})]
+        item["choices"] = [_choice("yes", "Same record", path, {**base, "entity_identity_decision": "same"},
+                                   f"{source.capitalize()} {'are' if numbers else 'is'} added to {other}; no new record."),
+                           _choice("no", "A different one", path, {**base, "entity_identity_decision": "different"},
+                                   f"“{caption}” becomes a new {schema}, kept apart from {other}.")]
     else:
         item["question"] = f"Add “{caption}” as a {schema}?"
-        item["consequences"] = [f"Creates the record {caption} ({schema}) with {source} as its source."]
-        item["choices"] = [_choice("yes", "Add it", path, {"decision": "accept", "entity_schema": schema}),
-                           _choice("no", "Not a name", path, {"decision": "reject"})]
+        item["consequences"] = []
+        item["choices"] = [_choice("yes", "Add it", path, {"decision": "accept", "entity_schema": schema},
+                                   f"Creates the record {caption} ({schema}) with {source} as its source."),
+                           _choice("no", "Not a name", path, {"decision": "reject"}, REJECTED.format("no record is made"))]
 
 
 def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
@@ -413,6 +423,7 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
         item: dict[str, Any] = {
             "kind": "proposal", "id": r.id, "actor": "Name-finder" if r.candidate_type in ("entity", "identifier") else "Document reader",
             "actor_kind": "app", "created_at": r.created_at, "rank": PROPOSAL_RANK.get(r.candidate_type, 30), "level": None,
+            "confidence_band": band,
             "reason": f"Proposed from {docs.get(r.document_id, 'a document')}{mentioned(p)} · confidence {band} ({r.confidence:.2f})",
             "group": {"key": f"doc:{r.document_id}", "label": docs.get(r.document_id, r.document_id)},
             "evidence": {"document_id": r.document_id, "filename": docs.get(r.document_id, r.document_id),
@@ -437,12 +448,16 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
             item["choices"] = []
         elif r.candidate_type == "claim":
             item["question"] = f"Keep this as a claim to check: “{caption[:180]}”?"
-            item["consequences"] = ["Creates the claim as Not yet shown, with this passage linked as supporting evidence."]
-            item["choices"] = [_choice("yes", "Keep it", path, {"decision": "accept"}), _choice("no", "Not a claim", path, {"decision": "reject"})]
+            item["consequences"] = []
+            item["choices"] = [_choice("yes", "Keep it", path, {"decision": "accept"},
+                                       "Creates the claim as Not yet shown, with this passage linked as supporting evidence."),
+                               _choice("no", "Not a claim", path, {"decision": "reject"}, REJECTED.format("no claim is made"))]
         elif r.candidate_type == "evidence":
             item["question"] = "Keep this passage as evidence?"
-            item["consequences"] = ["Saves the exact words and where they are as evidence of this document's source."]
-            item["choices"] = [_choice("yes", "Keep it", path, {"decision": "accept"}), _choice("no", "Not useful", path, {"decision": "reject"})]
+            item["consequences"] = []
+            item["choices"] = [_choice("yes", "Keep it", path, {"decision": "accept"},
+                                       "Saves the exact words and where they are as evidence of this document's source."),
+                               _choice("no", "Not useful", path, {"decision": "reject"}, REJECTED.format("nothing is saved"))]
         elif numbers:
             schema = str(p.get("schema") or "")
             source = ends.get(str(p.get("source_candidate_id"))) or caption.partition(" → ")[0]
@@ -451,15 +466,18 @@ def _proposals(db: Session, inv: str) -> list[dict[str, Any]]:
             props: dict[str, Any] = raw_props if isinstance(raw_props, dict) else {}
             phrase = _rows_phrase(numbers)
             item["question"] = f"Do{'es' if len(numbers) == 1 else ''} {phrase} show {_link_facts(schema, source, target, props)}?"
-            item["consequences"] = [f"Adds the link between the two records with {'this row' if len(numbers) == 1 else 'these rows'} as evidence."]
-            item["choices"] = [_choice("yes", "Link them", path, {"decision": "accept"}), _choice("no", "No", path, {"decision": "reject"})]
+            item["consequences"] = []
+            item["choices"] = [_choice("yes", "Link them", path, {"decision": "accept"},
+                                       f"Adds the link between the two records with {'this row' if len(numbers) == 1 else 'these rows'} as evidence."),
+                               _choice("no", "No", path, {"decision": "reject"}, REJECTED.format("no link is added"))]
             if schema == "Payment" and source and target:
                 item["_payment_ends"] = (source, target)
         else:
             label = str(p.get("label") or p.get("schema") or "link")
             item["question"] = f"Does this passage show the {label.lower()} {caption}?".replace("  ", " ")
-            item["consequences"] = ["Adds the link between the two records with this passage as evidence."]
-            item["choices"] = [_choice("yes", "Link them", path, {"decision": "accept"}), _choice("no", "No", path, {"decision": "reject"})]
+            item["consequences"] = []
+            item["choices"] = [_choice("yes", "Link them", path, {"decision": "accept"}, "Adds the link between the two records with this passage as evidence."),
+                               _choice("no", "No", path, {"decision": "reject"}, REJECTED.format("no link is added"))]
         out.append(item)
     return out
 
@@ -481,9 +499,10 @@ def _matches(db: Session, inv: str) -> list[dict[str, Any]]:
             "group": {"key": f"match:{where}", "label": where}, "evidence": None,
             "parties": _parties([r.entity_id] + ([r.other_entity_id] if r.other_entity_id else []), names),
             "proposal": f"{ours} ↔ {r.match_caption} ({r.match_schema})",
-            "consequences": ["Same: the two are recorded as one entity across collections; nothing is merged here."],
-            "choices": [_choice("yes", "Same", path, {"decision": "same"}), _choice("no", "Different", path, {"decision": "different"}),
-                        _choice("unsure", "Not sure", path, {"decision": "unsure"})],
+            "consequences": ["Each answer is kept as history (the latest stands) and sent to OpenAleph as your judgement."],
+            "choices": [_choice("yes", "Same", path, {"decision": "same"}, "The two are recorded as one entity across collections; nothing is merged here."),
+                        _choice("no", "Different", path, {"decision": "different"}, "Recorded as different entities, with your reason."),
+                        _choice("unsure", "Not sure", path, {"decision": "unsure"}, "Recorded as not sure; it leaves the list.")],
             "open": {"href": "/bring-in#corpus", "label": "Open in OpenAleph corpus"},
         })
     return out
@@ -517,8 +536,9 @@ def _ai(db: Session, inv: str) -> list[dict[str, Any]]:
             "reason": f"AI draft · {r.created_at:%d %b %H:%M}" + (f" · asked: {q[:80]}" if q else ""),
             "group": {"key": "ai", "label": "AI drafts"}, "evidence": None, "parties": [],
             "proposal": f"{label.get(r.module, r.module)}" + (f" · {claims} claims" if claims else ""),
-            "consequences": ["Marks the draft as analysis a person checked. It never creates or changes a record."],
-            "choices": [_choice("yes", "Accept", path, {"decision": "accept"}), _choice("no", "Reject", path, {"decision": "reject"})],
+            "consequences": ["Either way it never creates or changes a record; your answer is written into the run record."],
+            "choices": [_choice("yes", "Accept", path, {"decision": "accept"}, "Marks the draft as analysis a person checked."),
+                        _choice("no", "Reject", path, {"decision": "reject"}, "Marks the draft rejected, with your reason.")],
             "open": {"href": "/act#ai-reasoning-panel", "label": "Read the whole draft"},
         })
     return out
@@ -540,12 +560,58 @@ def _watchlist(db: Session, inv: str) -> list[dict[str, Any]]:
             "evidence": {"document_id": hit.document_id, "filename": hit.title, "locator": f"page {hit.page_number}" if hit.page_number else None,
                          "excerpt": excerpt, "terms": [query]},
             "parties": [], "proposal": hit.title,
-            "consequences": ["Add to leads: opens a lead pointing at this page."],
-            "choices": [_choice("yes", "Add to leads", f"/api/watchlist-hits/{hit.id}/lead", {}),
-                        _choice("no", "Dismiss", f"/api/watchlist-hits/{hit.id}/dismiss", {})],
+            "consequences": [],
+            "choices": [_choice("yes", "Add to leads", f"/api/watchlist-hits/{hit.id}/lead", {}, "Opens a lead pointing at this page."),
+                        _choice("no", "Dismiss", f"/api/watchlist-hits/{hit.id}/dismiss", {}, "Dismissed; it leaves the list. A hit keeps no reason.")],
             "open": {"href": "/bring-in#corpus", "label": "Open Watchlist"},
         })
     return out
+
+
+_PAGE = re.compile(r"\bp(?:age|p)?\.?\s*(\d+)", re.IGNORECASE)
+
+
+def _page_of(locator: str | None) -> int | None:
+    """The page a locator names: "p4", "p. 4", "page 12 (OCR)", "pp. 3–4"."""
+    m = _PAGE.search(locator or "")
+    return int(m.group(1)) if m else None
+
+
+def _pages_read(db: Session, page: list[dict[str, Any]]) -> None:
+    """Decide by source (FEATURE_CHECK §3.1, "pages read: 3 of 9"): for each
+    document shown, the pages that carry a proposal or a passage to check, and
+    how many of them have nothing left to decide. Read from the proposals and
+    To check items themselves, decided or not; a document whose items name no
+    page (a spreadsheet's rows) gets no count."""
+    docs = {i["group"]["key"][4:] for i in page if i["group"]["key"].startswith("doc:")}
+    if not docs:
+        return
+    pending: dict[str, set[int]] = {}
+    seen: dict[str, set[int]] = {}
+
+    def note(doc: str | None, number: int | None, waiting: bool) -> None:
+        if doc is None or number is None:
+            return
+        seen.setdefault(doc, set()).add(number)
+        if waiting:
+            pending.setdefault(doc, set()).add(number)
+
+    rows = db.execute(select(ExtractionCandidate.document_id, ExtractionCandidate.review_status, ExtractionCandidate.payload,
+                             DocumentChunk.page_number, DocumentChunk.locator)
+                      .outerjoin(DocumentChunk, DocumentChunk.id == ExtractionCandidate.chunk_id)
+                      .where(ExtractionCandidate.document_id.in_(docs)))
+    for doc, status, payload, number, locator in rows:
+        if number is None:
+            number = _page_of(locator or (payload.get("locator") if isinstance(payload, dict) else None))
+        note(doc, number, status == "proposed")
+    for doc, status, locator in db.execute(select(CheckItem.document_id, CheckItem.status, CheckItem.locator)
+                                           .where(CheckItem.document_id.in_(docs), CheckItem.gone_at.is_(None))):
+        note(doc, _page_of(locator), status == "open")
+    for item in page:
+        key = item["group"]["key"]
+        doc = key[4:] if key.startswith("doc:") else ""
+        if doc in seen:
+            item["group"] = {**item["group"], "pages": len(seen[doc]), "pages_read": len(seen[doc] - pending.get(doc, set()))}
 
 
 def decisions(db: Session, investigation_id: str, *, kind: str | None = None, order: str = "consequence",
@@ -574,6 +640,7 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
                     strong = None
                 _entity_question(item, strong)
     _known_payments(db, investigation_id, page)
+    _pages_read(db, page)
     for item in page:
         item.pop("_entity_row", None)
         item.pop("_payment_ends", None)

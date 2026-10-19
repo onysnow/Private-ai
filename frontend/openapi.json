@@ -13110,6 +13110,17 @@
             "title": "Body",
             "type": "object"
           },
+          "happens": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Happens"
+          },
           "key": {
             "enum": [
               "yes",
@@ -13220,6 +13231,28 @@
           "label": {
             "title": "Label",
             "type": "string"
+          },
+          "pages": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages"
+          },
+          "pages_read": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Read"
           }
         },
         "required": [
@@ -13252,6 +13285,22 @@
             },
             "title": "Choices",
             "type": "array"
+          },
+          "confidence_band": {
+            "anyOf": [
+              {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Band"
           },
           "consequences": {
             "items": {
