@@ -116,7 +116,8 @@ describe('ReadingRoom', () => {
     const clip = await screen.findByRole('region', {name: 'Evidence clip'});
     expect(within(clip).getByText('bought on behalf', {selector: 'mark'})).toBeInTheDocument();
     expect(within(clip).getByText(/the words are in the stored text/)).toBeInTheDocument();
-    expect(api.lastBody('POST /api/evidence')).toEqual({source_id: 'src-1', quote: 'bought on behalf', locator: 'page 4', document_id: 'd1'});
+    // document_id is for pictures only: the backend answers 400 to it on a text document.
+    expect(api.lastBody('POST /api/evidence')).toEqual({source_id: 'src-1', quote: 'bought on behalf', locator: 'page 4'});
   });
 
   it('finds words in the document and closes with Escape', async () => {
