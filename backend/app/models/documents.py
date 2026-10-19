@@ -132,6 +132,8 @@ class IngestionBatch(Base):
     label: Mapped[str] = mapped_column(String(512))
     created_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+    # When the last file of the batch finished reading (succeeded, failed or stopped): the inbox's "import finished".
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
 class IngestionBatchItem(Base):

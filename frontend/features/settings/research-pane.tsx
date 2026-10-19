@@ -18,6 +18,7 @@ import type {RunSettingOut} from '../../lib/generated/types.gen';
 const MODES = [
   {id: 'off', label: 'Off', text: 'The AI runs only when you press Run in Act › AI runs.'},
   {id: 'ask', label: 'Ask first', text: 'When documents arrive after a case’s last run, Needs you asks whether to run it again. Nothing runs until you say so.'},
+  {id: 'automatic', label: 'Without approval', text: 'When an import finishes, the case’s saved questions run again by themselves, under the case’s run settings. A case with no saved question runs nothing.'},
 ] as const;
 
 const FLAG_KEYS = new Set(['source_tier_floor', 'severity_floor']);
@@ -64,8 +65,8 @@ export function ResearchPane({model, rules}: {model: ReactNode; rules: ReactNode
           disabled={!d.can_change_defaults || save.isPending} onClick={() => d.mode !== m.id && save.mutate({body: {mode: m.id}})}>
           <b>{m.label}</b><small>{m.text}</small></button>)}
       </div>
-      {!d.ai_enabled && <p className="st-hint">No model is set up, so nothing is asked either way.</p>}
-      <p className="st-hint">Whatever is chosen, every result is a proposal: nothing joins the case until you accept it in Decide.</p>
+      {!d.ai_enabled && <p className="st-hint">No model is set up, so nothing is asked or run either way.</p>}
+      <p className="st-hint">Whatever is chosen, every result is a proposal: nothing joins the case until you accept it in Decide. A question is saved from Before you run, and a case can choose differently there.</p>
     </section>
 
     <div className="ap-two">

@@ -154,6 +154,7 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
     unknown = [name for name in providers if registry.get(name) is None]
     if unknown:
         raise ValueError(f"Unknown connectors: {', '.join(unknown)}")
+    from app.services.connectors import log_lookup, party_sent
     from app.services.preferences import lookup_modes, provider_label
 
     off = [p for p, mode in lookup_modes(db, entity.investigation_id, providers).items() if mode == "off"]
@@ -187,10 +188,15 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
         session_run.run_id = run.id
         db.commit()
         try:
-            findings = await connector.enrich({
-                "id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption,
-                "properties": entity.properties or {},
-            })
+            try:
+                findings = await connector.enrich({
+                    "id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption,
+                    "properties": entity.properties or {},
+                })
+            except Exception as exc:
+                log_lookup(db, provider, entity.investigation_id, party_sent(entity), exc)
+                raise
+            log_lookup(db, provider, entity.investigation_id, party_sent(entity))
             rows = persist_connector_findings(db, run, entity.investigation_id, provider, findings)
             for finding_row in rows:
                 link = db.scalar(select(EnrichmentSessionFinding).where(

@@ -14,7 +14,7 @@ from typing import Any
 from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 
-from app.core.time import utcnow_iso
+from app.core.time import utcnow_iso, utcnow_naive
 from app.core.config import settings
 from app.db.locking import investigation_export_snapshot, lock_investigation_transaction
 from app.jobs.corpus import request_corpus_sync
@@ -29,10 +29,12 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference,
+    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
+
+
 EXPORT_VERSION = 1
 
 MODEL_BY_TABLE = {
@@ -46,7 +48,7 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference,
+        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion,
     ]
 }
 
@@ -97,6 +99,9 @@ RESTORE_ORDER = [
     "stories", "story_sections", "story_claims",
     # Each AI run's steps as they happened (ADR-0012): the run record travels with the case.
     "ai_run_events",
+    # Questions kept to be asked again (Before you run › Save this question); the run they last started is a job on
+    # the server that made the backup, so only its id travels.
+    "saved_questions",
 ]
 
 
@@ -164,7 +169,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion, Preference,
+        Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -215,6 +220,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "case_records": direct["case_records"],
         "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
         "ai_run_events": direct["ai_run_events"],
+        "saved_questions": direct["saved_questions"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

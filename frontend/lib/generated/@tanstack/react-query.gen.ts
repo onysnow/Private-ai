@@ -14,6 +14,7 @@ import {
   addCollection,
   addCollectionItem,
   addNote,
+  addPushSubscription,
   addStorySection,
   addTag,
   addWatchlistEntry,
@@ -24,6 +25,7 @@ import {
   cancelJobEndpoint,
   canonicalEntityResolution,
   capabilities,
+  checkConnectorKey,
   checkWatchlistNow,
   clearCaseLookups,
   connectors,
@@ -54,6 +56,7 @@ import {
   deleteConnectorCredential,
   deleteDeckEndpoint,
   deleteInvestigationMembership,
+  deleteSavedQuestion,
   deleteStorySection,
   deleteWatch,
   deleteWriteupEndpoint,
@@ -88,6 +91,7 @@ import {
   getBasemapStatus,
   getBasemapTile,
   getCaseRecord,
+  getCaseResearch,
   getCatalogueMap,
   getChecks,
   getClaimCustodyChain,
@@ -252,8 +256,10 @@ import {
   promoteStatementAssessment,
   pruneSecurityAudit,
   putCaseLookups,
+  putCaseResearch,
   putInvestigationMembership,
   putLookupDefaults,
+  putNotificationChannel,
   putNotificationPrefs,
   putResearchSettings,
   recheckHash,
@@ -264,6 +270,7 @@ import {
   removeCollectionItem,
   removeInvestigation,
   removeNote,
+  removePushSubscription,
   removeStoryClaim,
   removeTag,
   removeWatchlistEntry,
@@ -281,9 +288,11 @@ import {
   revokeAppUserToken,
   rotateAppUserToken,
   runRedFlags,
+  runSavedQuestion,
   runTableMapping,
   saveConnectorCredential,
   saveInvestigationRunProfile,
+  saveQuestion,
   searchGlossary,
   searchInvestigationCorpus,
   searchWorkbench,
@@ -297,6 +306,7 @@ import {
   syncCorpusNow,
   syncOpenalephDocument,
   tagARecord,
+  testNotificationChannel,
   untagARecord,
   updateAppUser,
   updateClaimEndpoint,
@@ -324,6 +334,9 @@ import type {
   AddNoteData,
   AddNoteError,
   AddNoteResponse,
+  AddPushSubscriptionData,
+  AddPushSubscriptionError,
+  AddPushSubscriptionResponse,
   AddStorySectionData,
   AddStorySectionError,
   AddStorySectionResponse,
@@ -354,6 +367,9 @@ import type {
   CapabilitiesData,
   CapabilitiesError,
   CapabilitiesResponse,
+  CheckConnectorKeyData,
+  CheckConnectorKeyError,
+  CheckConnectorKeyResponse,
   CheckWatchlistNowData,
   CheckWatchlistNowError,
   CheckWatchlistNowResponse,
@@ -444,6 +460,9 @@ import type {
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipError,
   DeleteInvestigationMembershipResponse,
+  DeleteSavedQuestionData,
+  DeleteSavedQuestionError,
+  DeleteSavedQuestionResponse,
   DeleteStorySectionData,
   DeleteStorySectionError,
   DeleteStorySectionResponse,
@@ -546,6 +565,9 @@ import type {
   GetCaseRecordData,
   GetCaseRecordError,
   GetCaseRecordResponse,
+  GetCaseResearchData,
+  GetCaseResearchError,
+  GetCaseResearchResponse,
   GetCatalogueMapData,
   GetCatalogueMapError,
   GetCatalogueMapResponse,
@@ -1034,12 +1056,18 @@ import type {
   PutCaseLookupsData,
   PutCaseLookupsError,
   PutCaseLookupsResponse,
+  PutCaseResearchData,
+  PutCaseResearchError,
+  PutCaseResearchResponse,
   PutInvestigationMembershipData,
   PutInvestigationMembershipError,
   PutInvestigationMembershipResponse,
   PutLookupDefaultsData,
   PutLookupDefaultsError,
   PutLookupDefaultsResponse,
+  PutNotificationChannelData,
+  PutNotificationChannelError,
+  PutNotificationChannelResponse,
   PutNotificationPrefsData,
   PutNotificationPrefsError,
   PutNotificationPrefsResponse,
@@ -1070,6 +1098,9 @@ import type {
   RemoveNoteData,
   RemoveNoteError,
   RemoveNoteResponse,
+  RemovePushSubscriptionData,
+  RemovePushSubscriptionError,
+  RemovePushSubscriptionResponse,
   RemoveStoryClaimData,
   RemoveStoryClaimError,
   RemoveStoryClaimResponse,
@@ -1121,6 +1152,9 @@ import type {
   RunRedFlagsData,
   RunRedFlagsError,
   RunRedFlagsResponse,
+  RunSavedQuestionData,
+  RunSavedQuestionError,
+  RunSavedQuestionResponse,
   RunTableMappingData,
   RunTableMappingError,
   RunTableMappingResponse,
@@ -1130,6 +1164,9 @@ import type {
   SaveInvestigationRunProfileData,
   SaveInvestigationRunProfileError,
   SaveInvestigationRunProfileResponse,
+  SaveQuestionData,
+  SaveQuestionError,
+  SaveQuestionResponse,
   SearchGlossaryData,
   SearchGlossaryError,
   SearchGlossaryResponse,
@@ -1169,6 +1206,9 @@ import type {
   TagARecordData,
   TagARecordError,
   TagARecordResponse,
+  TestNotificationChannelData,
+  TestNotificationChannelError,
+  TestNotificationChannelResponse,
   UntagARecordData,
   UntagARecordError,
   UntagARecordResponse,
@@ -7604,6 +7644,86 @@ export const listReportingTasksInfiniteOptions = (
   return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const getCaseResearchQueryKey = (
+  options: Options<GetCaseResearchData>,
+) => createQueryKey('getCaseResearch', options);
+
+/**
+ * Get Case Research
+ */
+export const getCaseResearchOptions = (options: Options<GetCaseResearchData>) =>
+  queryOptions<
+    GetCaseResearchResponse,
+    GetCaseResearchError,
+    GetCaseResearchResponse,
+    ReturnType<typeof getCaseResearchQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaseResearch({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaseResearchQueryKey(options),
+  });
+
+/**
+ * Put Case Research
+ */
+export const putCaseResearchMutation = (
+  options?: Partial<Options<PutCaseResearchData>>,
+): UseMutationOptions<
+  PutCaseResearchResponse,
+  PutCaseResearchError,
+  Options<PutCaseResearchData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutCaseResearchResponse,
+    PutCaseResearchError,
+    Options<PutCaseResearchData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putCaseResearch({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Save Question
+ */
+export const saveQuestionMutation = (
+  options?: Partial<Options<SaveQuestionData>>,
+): UseMutationOptions<
+  SaveQuestionResponse,
+  SaveQuestionError,
+  Options<SaveQuestionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SaveQuestionResponse,
+    SaveQuestionError,
+    Options<SaveQuestionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await saveQuestion({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getSinceQueryKey = (options: Options<GetSinceData>) =>
   createQueryKey('getSince', options);
 
@@ -9426,6 +9546,60 @@ export const updateReportingTaskEndpointMutation = (
   return mutationOptions;
 };
 
+/**
+ * Delete Saved Question
+ */
+export const deleteSavedQuestionMutation = (
+  options?: Partial<Options<DeleteSavedQuestionData>>,
+): UseMutationOptions<
+  DeleteSavedQuestionResponse,
+  DeleteSavedQuestionError,
+  Options<DeleteSavedQuestionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteSavedQuestionResponse,
+    DeleteSavedQuestionError,
+    Options<DeleteSavedQuestionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteSavedQuestion({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Run Saved Question
+ */
+export const runSavedQuestionMutation = (
+  options?: Partial<Options<RunSavedQuestionData>>,
+): UseMutationOptions<
+  RunSavedQuestionResponse,
+  RunSavedQuestionError,
+  Options<RunSavedQuestionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RunSavedQuestionResponse,
+    RunSavedQuestionError,
+    Options<RunSavedQuestionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await runSavedQuestion({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const searchWorkbenchQueryKey = (
   options: Options<SearchWorkbenchData>,
 ) => createQueryKey('searchWorkbench', options);
@@ -9454,6 +9628,35 @@ export const searchWorkbenchOptions = (options: Options<SearchWorkbenchData>) =>
     },
     queryKey: searchWorkbenchQueryKey(options),
   });
+
+/**
+ * Check Connector Key
+ *
+ * Ask the source whether it accepts its key, sending no search (Settings › Connector keys, "Check the key").
+ */
+export const checkConnectorKeyMutation = (
+  options?: Partial<Options<CheckConnectorKeyData>>,
+): UseMutationOptions<
+  CheckConnectorKeyResponse,
+  CheckConnectorKeyError,
+  Options<CheckConnectorKeyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CheckConnectorKeyResponse,
+    CheckConnectorKeyError,
+    Options<CheckConnectorKeyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await checkConnectorKey({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Delete Connector Credential
@@ -9609,6 +9812,114 @@ export const putNotificationPrefsMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await putNotificationPrefs({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Put Notification Channel
+ */
+export const putNotificationChannelMutation = (
+  options?: Partial<Options<PutNotificationChannelData>>,
+): UseMutationOptions<
+  PutNotificationChannelResponse,
+  PutNotificationChannelError,
+  Options<PutNotificationChannelData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutNotificationChannelResponse,
+    PutNotificationChannelError,
+    Options<PutNotificationChannelData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putNotificationChannel({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Test Notification Channel
+ */
+export const testNotificationChannelMutation = (
+  options?: Partial<Options<TestNotificationChannelData>>,
+): UseMutationOptions<
+  TestNotificationChannelResponse,
+  TestNotificationChannelError,
+  Options<TestNotificationChannelData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    TestNotificationChannelResponse,
+    TestNotificationChannelError,
+    Options<TestNotificationChannelData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await testNotificationChannel({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add Push Subscription
+ */
+export const addPushSubscriptionMutation = (
+  options?: Partial<Options<AddPushSubscriptionData>>,
+): UseMutationOptions<
+  AddPushSubscriptionResponse,
+  AddPushSubscriptionError,
+  Options<AddPushSubscriptionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddPushSubscriptionResponse,
+    AddPushSubscriptionError,
+    Options<AddPushSubscriptionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addPushSubscription({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Remove Push Subscription
+ */
+export const removePushSubscriptionMutation = (
+  options?: Partial<Options<RemovePushSubscriptionData>>,
+): UseMutationOptions<
+  RemovePushSubscriptionResponse,
+  RemovePushSubscriptionError,
+  Options<RemovePushSubscriptionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RemovePushSubscriptionResponse,
+    RemovePushSubscriptionError,
+    Options<RemovePushSubscriptionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await removePushSubscription({
         ...options,
         ...fnOptions,
         throwOnError: true,

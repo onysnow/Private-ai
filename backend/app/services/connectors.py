@@ -95,6 +95,22 @@ def require_lookup_allowed(db: Session, investigation_id: str, provider: str) ->
                                  "Change it in Settings › Outside lookups.")
 
 
+def log_lookup(db: Session, provider: str, investigation_id: str | None, sent: str, exc: Exception | None = None) -> None:
+    """One line in the log of what leaves this computer (app/services/outbound.py) for a lookup to ``provider``."""
+    from app.services.outbound import record_outbound
+    from app.services.preferences import provider_host
+
+    text = str(exc or "")
+    outcome = "sent" if exc is None else ("refused" if any(c in text for c in ("401", "403", "Unauthorized", "Forbidden")) else "failed")
+    record_outbound(db, kind="lookup", service=provider, destination=provider_host(registry.get(provider)) or provider,
+                    sent=sent, investigation_id=investigation_id, outcome=outcome, detail=text or None)
+
+
+def party_sent(entity: Entity) -> str:
+    """What a party lookup sends, in words: its name, and its other details when there are any."""
+    return f"“{entity.caption}”" + (" and its details on record" if entity.properties else "")
+
+
 def entity_query_label(entity: Entity) -> str:
     """How a run made for a party is recorded (ConnectorRun.query), so a later run can find it."""
     return f"entity:{entity.ftm_id or entity.id}"
@@ -125,6 +141,14 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
     run_id = run.id
     try:
         findings = await connector.search(body.query)
+    except Exception as exc:
+        log_lookup(db, provider, body.investigation_id, f"“{body.query}”", exc)
+        _fail_run(db, run_id, exc)
+        raise HTTPException(
+            502, f"{provider} connector failed. Details were logged server-side (connector run {run_id})."
+        ) from exc
+    log_lookup(db, provider, body.investigation_id, f"“{body.query}”")
+    try:
         return persist_connector_findings(db, run, body.investigation_id, provider, findings)
     except Exception as exc:
         _fail_run(db, run_id, exc)
@@ -153,6 +177,14 @@ async def enrich_entity(provider: str, entity: Entity, db: Session) -> Any:
             "caption": entity.caption,
             "properties": entity.properties or {},
         })
+    except Exception as exc:
+        log_lookup(db, provider, entity.investigation_id, party_sent(entity), exc)
+        _fail_run(db, run_id, exc)
+        raise HTTPException(
+            502, f"{provider} enrichment failed. Details were logged server-side (connector run {run_id})."
+        ) from exc
+    log_lookup(db, provider, entity.investigation_id, party_sent(entity))
+    try:
         return persist_connector_findings(db, run, entity.investigation_id, provider, findings)
     except Exception as exc:
         _fail_run(db, run_id, exc)

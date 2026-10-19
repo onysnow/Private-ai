@@ -830,6 +830,24 @@ def _chart_retry_feedback(db: Session, investigation_id: str, module: str, raw_t
     return retry_feedback(report), report
 
 
+def _record_model_call(db: Session, investigation_id: str, settings: Settings, chars: int) -> None:
+    """A model call that leaves this computer goes in the log of what leaves it (app/services/outbound.py); one
+    answered on this computer does not."""
+    from app.services.outbound import record_outbound
+
+    provider = (settings.ai_provider or "").strip().lower()
+    if provider == "ollama":
+        # An Ollama "cloud" model is answered on Ollama's servers even through a local Ollama.
+        cloud = (settings.ollama_model or "").split(":")[-1].endswith("cloud")
+        if is_local_endpoint(settings.ollama_base_url) and not cloud:
+            return
+        destination = "ollama.com" if cloud else settings.ollama_base_url
+    else:
+        destination = {"anthropic": "api.anthropic.com", "openai": "api.openai.com"}.get(provider, provider)
+    record_outbound(db, kind="ai", service=provider or "ai", destination=destination, investigation_id=investigation_id,
+                    sent=f"{chars:,} characters: the instructions, the question and the records chosen from the case")
+
+
 def run_reasoning_module(db: Session, *, investigation_id: str, run_id: str | None = None, **kwargs: Any) -> AIAnalysisCandidate:
     """Run one reasoning module (see _run_reasoning_module) and keep its run record: with a run id (the job it was
     queued as) every step is appended to ai_run_events as it happens (ADR-0012, mockup AI_1)."""
@@ -1071,6 +1089,7 @@ def _run_reasoning_module(
         model_start = rec.emit("CHECK", "model", status="neutral", parent=retrieved, verdict="STARTED",
                                text=f"Model call: {(settings.ai_provider or '').strip()} {getattr(client, 'model', '') or ''}".strip())
         started_at = utcnow_naive()
+        _record_model_call(db, investigation_id, settings, len(system_prompt) + len(user_prompt))
         response = coerce_response(client.generate(system_prompt, user_prompt, **generate_kwargs))
         seconds = round((utcnow_naive() - started_at).total_seconds(), 1)
         model_end = rec.emit("CHECK", "model", status="bad" if response.truncated else "good", parent=model_start,
@@ -1094,6 +1113,7 @@ def _run_reasoning_module(
                 chart_retries.append({"attempt": attempt, "removed": (retry_report or {}).get("removed", []), "feedback": feedback})
                 model_end = rec.emit("CHECK", "gate:chart", status="partial", parent=model_end, verdict="RETRY",
                                      text=f"A chart failed the chart check; sent back to the model (attempt {attempt})")
+                _record_model_call(db, investigation_id, settings, len(system_prompt) + len(user_prompt) + len(feedback))
                 response = coerce_response(client.generate(system_prompt, f"{user_prompt}\n\n{feedback}", **generate_kwargs))
 
     request = {

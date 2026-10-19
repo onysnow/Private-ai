@@ -33,11 +33,17 @@ NOTIFICATION_KINDS: list[dict[str, Any]] = [
     {"key": "outside", "label": "Outside findings", "default": "needs", "can_interrupt": False},
     {"key": "ai", "label": "AI draft ready", "default": "needs", "can_interrupt": False},
     {"key": "research", "label": "New documents since the last AI run", "default": "needs", "can_interrupt": False},
+    {"key": "import", "label": "An import finished reading", "default": "needs", "can_interrupt": False},
     {"key": "flag_faint", "label": "Faint Red Flag", "default": "else", "can_interrupt": False},
     {"key": "documents", "label": "Documents added", "default": "else", "can_interrupt": False},
+    {"key": "backup", "label": "A case not backed up for a while", "default": "else", "can_interrupt": False},
+    {"key": "source", "label": "An outside source updated its data", "default": "else", "can_interrupt": False},
     {"key": "security", "label": "Requests the server refused", "default": "else", "can_interrupt": False},
 ]
 KIND_BY_KEY = {k["key"]: k for k in NOTIFICATION_KINDS}
+# After how many days without a backup a changed case is mentioned (0: never).
+BACKUP_DAYS = (7, 14, 30, 0)
+DEFAULT_BACKUP_DAYS = 14
 
 
 def _get(db: Session, scope: str, subject: str, key: str) -> Preference | None:
@@ -68,24 +74,30 @@ def notification_prefs(db: Session, person: str) -> dict[str, Any]:
     chosen: dict[str, Any] = raw if isinstance(raw, dict) else {}
     routes = {k["key"]: chosen[k["key"]] if _route_allowed(k["key"], str(chosen.get(k["key"]))) else k["default"]
               for k in NOTIFICATION_KINDS}
+    backup_days = stored.get("backup_days", DEFAULT_BACKUP_DAYS)
     return {
         "routes": routes,
         "quiet_while_reading": bool(stored.get("quiet_while_reading", True)),
         "desktop": bool(stored.get("desktop", False)),
+        "backup_days": backup_days if backup_days in BACKUP_DAYS else DEFAULT_BACKUP_DAYS,
         "kinds": [{**k, "route": routes[k["key"]]} for k in NOTIFICATION_KINDS],
     }
 
 
 def save_notification_prefs(db: Session, person: str, *, routes: dict[str, str], quiet_while_reading: bool,
-                            desktop: bool) -> dict[str, Any]:
+                            desktop: bool, backup_days: int | None = None) -> dict[str, Any]:
     for kind, route in routes.items():
         if kind not in KIND_BY_KEY:
             raise ValueError(f"No kind of notification is called {kind!r}")
         if not _route_allowed(kind, route):
             raise ValueError(f"{KIND_BY_KEY[kind]['label']} cannot go to {route!r}")
-    current = notification_prefs(db, person)["routes"]
+    if backup_days is not None and backup_days not in BACKUP_DAYS:
+        raise ValueError(f"The backup reminder can be {', '.join(str(d) for d in BACKUP_DAYS if d)} days, or never (0)")
+    current = notification_prefs(db, person)
+    stored = (row.value if (row := _get(db, "person", person, "notifications")) else {}) or {}
     _put(db, "person", person, "notifications",
-         {"routes": {**current, **routes}, "quiet_while_reading": quiet_while_reading, "desktop": desktop})
+         {**stored, "routes": {**current["routes"], **routes}, "quiet_while_reading": quiet_while_reading, "desktop": desktop,
+          "backup_days": current["backup_days"] if backup_days is None else backup_days})
     return notification_prefs(db, person)
 
 
@@ -181,7 +193,8 @@ def cases_with_own_lookups(db: Session, providers: list[str]) -> list[dict[str, 
 
 # --- AI and research (server) ------------------------------------------------------------------------------------
 
-RESEARCH_MODES = ("off", "ask")
+# automatic: "Without approval": the case's saved questions run when an import finishes (app/services/saved_questions.py).
+RESEARCH_MODES = ("off", "ask", "automatic")
 DEFAULT_RESEARCH_MODE = "ask"
 
 

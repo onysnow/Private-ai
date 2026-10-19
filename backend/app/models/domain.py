@@ -79,6 +79,12 @@ from app.models.preferences import (
     FactWatch,
     Preference,
 )
+from app.models.platform import (
+    NotificationDelivery,
+    OutboundRequest,
+    PushSubscription,
+    SavedQuestion,
+)
 from app.models.annotations import (
     Collection,
     CollectionItem,
@@ -173,6 +179,10 @@ __all__ = [
     "CheckItem",
     "Preference",
     "FactWatch",
+    "OutboundRequest",
+    "SavedQuestion",
+    "NotificationDelivery",
+    "PushSubscription",
     "AIAnalysisCandidate",
     "AIRunEvent",
     "Writeup",
