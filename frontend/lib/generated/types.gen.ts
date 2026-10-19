@@ -5204,6 +5204,10 @@ export type DecisionChoiceOut = {
     [key: string]: unknown;
   };
   /**
+   * Happens
+   */
+  happens?: string | null;
+  /**
    * Key
    */
   key: 'yes' | 'no' | 'unsure';
@@ -5263,6 +5267,14 @@ export type DecisionGroupOut = {
    * Label
    */
   label: string;
+  /**
+   * Pages
+   */
+  pages?: number | null;
+  /**
+   * Pages Read
+   */
+  pages_read?: number | null;
 };
 
 /**
@@ -5285,6 +5297,10 @@ export type DecisionItemOut = {
    * Choices
    */
   choices: Array<DecisionChoiceOut>;
+  /**
+   * Confidence Band
+   */
+  confidence_band?: 'low' | 'medium' | 'high' | null;
   /**
    * Consequences
    */

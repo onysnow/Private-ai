@@ -371,8 +371,9 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
       : <div className="ch-clear"><p>Nothing waits for you.</p><Link href={caseHref('/bring-in#document-ingestion', inv)}>Drop documents</Link></div>}
     <footer className="ch-next-foot">
       <span className="ch-dots" aria-hidden="true">{items.slice(0, 9).map((d, i) => <i key={d.id} className={i === index ? 'on' : ''}/>)}</span>
-      <span aria-live="polite" title={item?.consequences.join(' ')}>{held ? <>Saved in a moment: <b>{held.choice.label}</b>. <button type="button" className="ch-undo" onClick={() => undo()}>Undo <kbd>Z</kbd></button></>
+      <span aria-live="polite" title={item ? [...item.choices.map(c => (c.happens ? `${c.label}: ${c.happens}` : '')), ...item.consequences].filter(Boolean).join(' ') : undefined}>{held ? <>Saved in a moment: <b>{held.choice.label}</b>. <button type="button" className="ch-undo" onClick={() => undo()}>Undo <kbd>Z</kbd></button></>
         : item?.consequences.length ? `${item.consequences.join(' ').replace(/\.$/, '')}; Undo for ${HOLD_MS / 1000} s.`
+        : item?.choices[0]?.happens ? `${item.choices[0].label}: ${item.choices[0].happens.replace(/\.$/, '')}; Undo for ${HOLD_MS / 1000} s.`
         : `${total} to decide in this case. Your answer waits ${HOLD_MS / 1000} s before it is sent, so you can undo it.`}</span>
       <Link href={caseHref('/decide', inv)}>Open Decide <span aria-hidden="true">↗</span></Link>
     </footer>

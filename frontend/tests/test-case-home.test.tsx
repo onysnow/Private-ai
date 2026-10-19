@@ -59,6 +59,22 @@ const missingItem = {
   open: {href: '/see#relationship-graph', label: 'Fill it in'},
 };
 
+/** A claim proposal from page 2 of filing.pdf, whose document has 1 of 3 pages read. */
+function proposal(id: string, band: 'high' | 'medium' | 'low', question: string) {
+  const path = `/api/extraction-candidates/${id}/review`;
+  return {
+    kind: 'proposal', id, question, proposal: 'Claim: the parcel', actor: 'Document reader', actor_kind: 'app', created_at: '2026-10-09T10:00:00', rank: 60,
+    reason: `Proposed from filing.pdf · confidence ${band}`, level: null, confidence_band: band,
+    group: {key: 'doc:d2', label: 'filing.pdf', pages: 3, pages_read: 1},
+    evidence: {document_id: 'd2', filename: 'filing.pdf', locator: 'p. 2', excerpt: 'The parcel was sold.', terms: [], rows: []}, parties: [], consequences: [], known: [],
+    choices: [
+      {key: 'yes', label: 'Keep it', method: 'POST', path, body: {decision: 'accept'}, happens: 'Creates the claim as Not yet shown, with this passage linked as supporting evidence.'},
+      {key: 'no', label: 'Not a claim', method: 'POST', path, body: {decision: 'reject'}, happens: 'Marked rejected, with your reason; no claim is made.'},
+    ],
+    open: {href: '/review?document=d2', label: 'Open in Review'},
+  };
+}
+
 function routes(extra: Record<string, unknown> = {}) {
   return mockApi({
     'GET /api/investigations/inv-1/standing': standing,
@@ -191,6 +207,121 @@ describe('Decide', () => {
     fireEvent.click(screen.getByRole('button', {name: 'Not public'}));
     act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
     await waitFor(() => expect(api.lastBody('POST /api/checks/mv-1/decide')).toEqual({status: 'unknowable', note: 'Not public'}));
+  });
+
+  it('groups by source with the pages read, and says what each answer does', async () => {
+    routes({'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {proposal: 2}, total: 2, offset: 0,
+      items: [proposal('p1', 'high', 'Keep this as a claim to check: “The parcel was sold”?'), proposal('p2', 'low', 'Keep this as a claim to check: “The board met”?')]}});
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    const queue = await screen.findByRole('complementary', {name: 'To decide'});
+    expect(await within(queue).findByText('filing.pdf')).toBeInTheDocument();
+    expect(within(queue).getByText(/pages read: 1 of 3/)).toBeInTheDocument();
+    const happens = await screen.findByLabelText('What happens');
+    expect(within(happens).getByText('Creates the claim as Not yet shown, with this passage linked as supporting evidence.')).toBeInTheDocument();
+    expect(within(happens).getByText('Marked rejected, with your reason; no claim is made.')).toBeInTheDocument();
+    expect(within(happens).getByText(/Not a claim/)).toBeInTheDocument();
+    // One high proposal is not a batch: no bulk button.
+    expect(within(queue).queryByRole('button', {name: /Accept all/})).toBeNull();
+  });
+
+  it('accepts all high proposals of a source after a confirmation naming the count, with one undo', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    const named = {...proposal('p4', 'high', 'Is “Fernhill Ltd” in this passage the record Fernhill Ltd?'),
+      choices: [{key: 'yes', label: 'Same record', method: 'POST', path: '/api/extraction-candidates/p4/review', body: {decision: 'accept', entity_identity_decision: 'same', matched_entity_id: 'e1'}, happens: null}]};
+    const api = routes({
+      'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {proposal: 4}, total: 4, offset: 0,
+        items: [proposal('p1', 'high', 'Keep A?'), proposal('p2', 'high', 'Keep B?'), proposal('p3', 'medium', 'Keep C?'), named]},
+      'POST /api/extraction-candidates/p1/review': {candidate: {}, record: null}, 'POST /api/extraction-candidates/p2/review': {candidate: {}, record: null},
+    });
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    const queue = await screen.findByRole('complementary', {name: 'To decide'});
+    // The name that asks same-or-new and the medium one are left out.
+    fireEvent.click(await within(queue).findByRole('button', {name: '✓ Accept all 2 high'}));
+    const confirm = within(queue).getByRole('group', {name: 'Accept all 2 high'});
+    expect(within(confirm).getByText(/proposals rated high in filing\.pdf/)).toBeInTheDocument();
+    expect(within(confirm).getAllByRole('listitem').map(li => li.textContent)).toEqual(['Keep A?', 'Keep B?']);
+    fireEvent.click(within(confirm).getByRole('button', {name: 'Accept 2'}));
+    expect(await screen.findByText('✓ Accepted 2')).toBeInTheDocument();
+    expect(within(queue).queryByText('Keep A?')).toBeNull();
+    fireEvent.click(screen.getByRole('button', {name: /Undo all 2/}));
+    expect(await within(queue).findByText('Keep A?')).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
+    expect(api.calls('POST /api/extraction-candidates/p1/review')).toHaveLength(0);
+    fireEvent.click(within(queue).getByRole('button', {name: '✓ Accept all 2 high'}));
+    fireEvent.click(within(queue).getByRole('button', {name: 'Accept 2'}));
+    act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
+    await waitFor(() => expect(api.calls('POST /api/extraction-candidates/p2/review')).toHaveLength(1));
+    expect(api.lastBody('POST /api/extraction-candidates/p1/review')).toEqual({decision: 'accept'});
+    expect(api.calls('POST /api/extraction-candidates/p4/review')).toHaveLength(0);
+  });
+
+  it('keeps the last ten answers, undoing a held one, reopening a saved check, and saying why a saved proposal cannot', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    const api = routes({
+      'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {to_check: 1, proposal: 1}, total: 2, offset: 0, items: [checkItem, proposal('p1', 'high', 'Keep A?')]},
+      'POST /api/checks/chk-1/decide': {investigation_id: 'inv-1', items: [], gone: [], missing: []},
+      'POST /api/extraction-candidates/p1/review': {candidate: {}, record: null},
+    });
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    await screen.findByRole('heading', {name: checkItem.question});
+    fireEvent.keyDown(window, {key: '1'});
+    const strip = screen.getByRole('group', {name: 'Last 10'});
+    fireEvent.click(within(strip).getByRole('button', {name: `Undo Shows it: ${checkItem.question}`}));
+    expect(await screen.findByRole('heading', {name: checkItem.question})).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: '1'});
+    fireEvent.keyDown(window, {key: '1'});
+    act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
+    await waitFor(() => expect(api.calls('POST /api/checks/chk-1/decide')).toHaveLength(1));
+    await waitFor(() => expect(api.calls('POST /api/extraction-candidates/p1/review')).toHaveLength(1));
+    const saved = await within(strip).findByRole('button', {name: 'Keep it: Keep A? — Saved. Proposals cannot be taken back once sent.'});
+    expect(saved).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(saved);
+    fireEvent.click(await within(strip).findByRole('button', {name: `Undo Shows it: ${checkItem.question}`}));
+    await waitFor(() => expect(api.lastBody('POST /api/checks/chk-1/decide')).toEqual({status: 'open'}));
+    expect(api.calls('POST /api/extraction-candidates/p1/review')).toHaveLength(1);
+  });
+
+  it('answers No on a watchlist hit at once: its dismiss keeps no reason, so no chips are offered', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    const hit = {...checkItem, kind: 'watchlist', id: 'wh-1', level: null, question: 'Is this mention of Fernhill worth a lead?',
+      choices: [{key: 'yes', label: 'Add to leads', method: 'POST', path: '/api/watchlist-hits/wh-1/lead', body: {}, happens: 'Opens a lead pointing at this page.'},
+                {key: 'no', label: 'Dismiss', method: 'POST', path: '/api/watchlist-hits/wh-1/dismiss', body: {}, happens: 'Dismissed; it leaves the list. A hit keeps no reason.'}]};
+    const api = routes({'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {watchlist: 1}, total: 1, offset: 0, items: [hit]},
+      'POST /api/watchlist-hits/wh-1/dismiss': {investigation_id: 'inv-1', entries: [], new_hits: 0}});
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    fireEvent.click(await screen.findByRole('button', {name: /Dismiss/}));
+    expect(screen.queryByRole('group', {name: 'Why not'})).toBeNull();
+    act(() => { vi.advanceTimersByTime(HOLD_MS + 100); });
+    await waitFor(() => expect(api.lastBody('POST /api/watchlist-hits/wh-1/dismiss')).toEqual({}));
+  });
+
+  it('shows a list that would not load as an error alone, with a retry', async () => {
+    let fail = true;
+    const api = routes({'GET /api/investigations/inv-1/decisions': () => {
+      if (fail) throw new TypeError('Failed to fetch');
+      return {investigation_id: 'inv-1', counts: {to_check: 1}, total: 1, offset: 0, items: [checkItem]};
+    }});
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    const alert = await screen.findByRole('alert');
+    expect(within(alert).getByText('Could not load what waits for you.')).toBeInTheDocument();
+    expect(within(alert).getByText(/The server did not answer\./)).toBeInTheDocument();
+    expect(screen.queryByText(/Nothing waits for you/)).toBeNull();
+    expect(screen.queryByText(/Failed to fetch/)).toBeNull();
+    fail = false;
+    fireEvent.click(within(alert).getByRole('button', {name: 'Retry'}));
+    expect(await screen.findByRole('heading', {name: checkItem.question})).toBeInTheDocument();
+    expect(api.calls('GET /api/investigations/inv-1/decisions').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shows a server the case frame could not reach as the same error state, retried by the frame', async () => {
+    routes();
+    const retry = vi.fn();
+    wrap(<DecideScreen investigationId="" investigationName="" unreachable={{error: new Error('Failed to fetch'), retry}}/>);
+    const alert = screen.getByRole('alert');
+    expect(within(alert).getByText(/The server did not answer\./)).toBeInTheDocument();
+    expect(screen.queryByText(/Nothing waits for you/)).toBeNull();
+    fireEvent.click(within(alert).getByRole('button', {name: 'Retry'}));
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 });
 
