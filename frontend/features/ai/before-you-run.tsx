@@ -7,8 +7,11 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
+import {z} from 'zod';
 
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {api} from '../../lib/api-instance';
 import {describeJob, waitForJob} from '../../lib/jobs';
@@ -22,6 +25,22 @@ import {WatchTheRun} from './watch-the-run';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 type Module = 'case_synthesis' | 'hypothesis_test';
+// The three boxes, as the backend takes them: the question and the theory (RunPlanRequest question 1–4000,
+// working_theory up to 2000, needed to test a theory), a premise (up to 10 of them) and why the settings become this
+// case's default (RunProfileIn reason 1–300).
+const askSchema = z.object({
+  module: z.enum(['case_synthesis', 'hypothesis_test']),
+  question: z.string().trim().min(1, 'Write your question first.').max(4000, 'Keep the question under 4,000 characters.'),
+  theory: z.string().trim().max(2000, 'Keep the theory under 2,000 characters.'),
+}).superRefine((v, ctx) => {
+  if (v.module === 'hypothesis_test' && !v.theory) ctx.addIssue({code: z.ZodIssueCode.custom, path: ['theory'], message: 'Write the theory to test.'});
+});
+const premiseSchema = z.object({premise: z.string().trim().min(1, 'Write what to take as given.')});
+const reasonSchema = z.object({reason: z.string().trim().min(1, 'Write why first.').max(300, 'Keep it under 300 characters.')});
+type AskValues = z.infer<typeof askSchema>;
+type PremiseValues = z.infer<typeof premiseSchema>;
+type ReasonValues = z.infer<typeof reasonSchema>;
+const MAX_PREMISES = 10;
 type Values = Record<string, string>;
 type Echo = {at: string; kind: 'SETTING' | 'FLAG'; text: string};
 type Step = 1 | 2 | 3 | 4;
@@ -72,16 +91,17 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   const queryClient = useQueryClient();
   const profile = useQuery({...investigationRunProfileOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const [step, setStep] = useState<Step>(1);
-  const [module, setModule] = useState<Module>('case_synthesis');
-  const [question, setQuestion] = useState('');
-  const [theory, setTheory] = useState('');
+  // The question, the theory and what to run are the Ask form's; the plan reads them as they are typed.
+  const askForm = useZodForm<AskValues>(askSchema, {defaultValues: {module: 'case_synthesis', question: '', theory: ''}, mode: 'onSubmit'});
+  const [module, question, theory] = askForm.watch(['module', 'question', 'theory']);
+  const setModule = (m: Module) => askForm.setValue('module', m);
   const [values, setValues] = useState<Values | null>(null);
   const [premises, setPremises] = useState<string[]>([]);
-  const [premise, setPremise] = useState('');
+  const premiseForm = useZodForm<PremiseValues>(premiseSchema, {defaultValues: {premise: ''}, mode: 'onSubmit'});
   const [echo, setEcho] = useState<Echo[]>([]);
   const [hover, setHover] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [reason, setReason] = useState('');
+  const reasonForm = useZodForm<ReasonValues>(reasonSchema, {defaultValues: {reason: ''}, mode: 'onSubmit'});
   const [runId, setRunId] = useState<string | null>(null);
   const [sampleOnly, setSampleOnly] = useState(false);
   // Run again from a step of an earlier run (AI_1's drawer): the same packet, the instructions set here.
@@ -131,20 +151,23 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     setEcho(e => [...e, {at: clock(), kind: 'SETTING', text: `${key} ${values[key].toLowerCase()} → ${next.toLowerCase()}`}]);
     setValues({...values, [key]: next});
   };
-  const addPremise = () => {
-    const text = premise.trim();
-    if (!text || premises.includes(text) || premises.length >= 10) return;
+  const addPremise = submitWith(premiseForm, async ({premise: text}) => {
+    if (premises.includes(text)) { premiseForm.setError('premise', {message: 'That is already taken as given.'}); return; }
+    if (premises.length >= MAX_PREMISES) { premiseForm.setError('premise', {message: 'Ten at most: take one off first.'}); return; }
     setPremises([...premises, text]);
-    setPremise('');
+    premiseForm.reset();
     setEcho(e => [...e, {at: clock(), kind: 'SETTING', text: 'premise + USER_STIPULATED'}]);
-  };
+  }, 'Could not add it');
 
   const save = useMutation({...saveInvestigationRunProfileMutation(), onSuccess: data => {
     queryClient.setQueryData(investigationRunProfileQueryKey({path: {investigation_id: investigationId}}), data);
-    setSaving(false); setReason('');
+    setSaving(false); reasonForm.reset();
   }});
-  const saveDefault = () => body && save.mutate({path: {investigation_id: investigationId}, body: {
-    severity_floor: body.severity_floor, source_tier_floor: body.source_tier_floor, options: body.options, premises, reason: reason.trim()}});
+  const saveDefault = submitWith(reasonForm, async ({reason}) => {
+    if (!body) return;
+    await save.mutateAsync({path: {investigation_id: investigationId}, body: {
+      severity_floor: body.severity_floor, source_tier_floor: body.source_tier_floor, options: body.options, premises, reason}});
+  }, 'Not saved');
 
   const [running, setRunning] = useState(false);
   const run = async (watch: boolean) => {
@@ -197,16 +220,21 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
 
   if (step === 1) return <section className="br" aria-label="AI runs">
     <header className="br-head"><h2>Ask the case</h2>{stepper}</header>
-    <form className="br-ask" onSubmit={e => { e.preventDefault(); if (question.trim() && (module === 'case_synthesis' || theory.trim())) setStep(2); }}>
+    <Form {...askForm}><form className="br-ask" noValidate onSubmit={submitWith(askForm, async () => { setStep(2); }, 'Could not go on')}>
       <span className="br-seg" role="radiogroup" aria-label="What to run">
         {([['case_synthesis', 'Case synthesis'], ['hypothesis_test', 'Test a theory']] as const).map(([m, l]) =>
           <button key={m} type="button" role="radio" aria-checked={module === m} className={module === m ? 'on' : ''} onClick={() => setModule(m)}>{l}</button>)}
       </span>
-      <label>Your question<textarea rows={3} value={question} onChange={e => setQuestion(e.target.value)} className="br-question"
-        placeholder="Who controlled Fernhill Ltd between 2016 and 2023, and how was the harbour land moved?"/></label>
-      {module === 'hypothesis_test' && <label>The theory to test<textarea rows={2} value={theory} onChange={e => setTheory(e.target.value)}/></label>}
-      <button type="submit" className="br-primary" disabled={!question.trim() || (module === 'hypothesis_test' && !theory.trim())}>Next: instructions and plan</button>
-    </form>
+      <FormField control={askForm.control} name="question" render={({field}) => <FormItemBare>
+        <label>Your question<FormControl><textarea {...field} rows={3} className="br-question"
+          placeholder="Who controlled Fernhill Ltd between 2016 and 2023, and how was the harbour land moved?"/></FormControl></label>
+        <FormMessage className="field-msg"/></FormItemBare>}/>
+      {module === 'hypothesis_test' && <FormField control={askForm.control} name="theory" render={({field}) => <FormItemBare>
+        <label>The theory to test<FormControl><textarea {...field} rows={2}/></FormControl></label>
+        <FormMessage className="field-msg"/></FormItemBare>}/>}
+      <FormRootError className="field-msg"/>
+      <button type="submit" className="br-primary">Next: instructions and plan</button>
+    </form></Form>
     {(earlier.data?.runs.length ?? 0) > 0 && <div className="br-earlier"><p className="br-eyebrow">Earlier runs</p><ul>
       {earlier.data!.runs.slice(0, 6).map(r => <li key={r.run_id}><span>{r.question}</span>
         <small>{new Date(r.created_at.endsWith('Z') ? r.created_at : `${r.created_at}Z`).toLocaleString(undefined, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})} · {r.events} steps{r.problems ? ` · ${r.problems} problem${r.problems === 1 ? '' : 's'}` : ''}{r.review_status ? ` · ${r.review_status}` : ''}</small>
@@ -221,7 +249,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     {!runId && running && <p role="status">Sending the run…</p>}
     {(runId || sampleOnly) && <WatchTheRun investigationId={investigationId} runId={runId} sample={sampleOnly && !runId}
       onBack={() => { setSampleOnly(false); setStep(runId ? 2 : 1); }}
-      onRunAgain={r => { setSampleOnly(false); setPacketFrom(r.from ?? null); setQuestion(r.question); setModule(r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setTheory(r.theory ?? ''); setStep(2); }}/>}
+      onRunAgain={r => { setSampleOnly(false); setPacketFrom(r.from ?? null); askForm.reset({question: r.question, module: r.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis', theory: r.theory ?? ''}); setStep(2); }}/>}
   </section>;
 
   return <section className="br" aria-label="AI runs" ref={planRef}>
@@ -239,10 +267,13 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
         <fieldset className="br-group"><legend>Take as given</legend>
           <ul className="br-premises">{premises.map(x => <li key={x}><q>{x}</q><span className="br-chip">You said</span>
             <button type="button" aria-label={`Stop taking as given: ${x}`} onClick={() => setPremises(premises.filter(y => y !== x))}>×</button></li>)}</ul>
-          <form className="br-add" onSubmit={e => { e.preventDefault(); addPremise(); }}>
-            <input aria-label="Something to take as given" value={premise} onChange={e => setPremise(e.target.value)} placeholder="Printed on the result as you said it. Not evidence."/>
-            <button type="submit" disabled={!premise.trim()}>Add</button>
-          </form>
+          <Form {...premiseForm}><form className="br-add" noValidate onSubmit={addPremise}>
+            <FormField control={premiseForm.control} name="premise" render={({field}) => <FormItemBare>
+              <FormControl><input {...field} aria-label="Something to take as given" placeholder="Printed on the result as you said it. Not evidence."/></FormControl>
+              <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+            <FormRootError className="field-msg next-line"/>
+            <button type="submit">Add</button>
+          </form></Form>
         </fieldset>
         <fieldset className="br-group br-planned"><legend>Overlays</legend><span>Legal · Journalism · Values (labour)</span><span className="br-chip">Planned</span></fieldset>
       </div>
@@ -295,11 +326,13 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     <footer className="br-foot">
       <button type="button" className="br-primary" onClick={() => void run(true)} disabled={!p?.where.callable || running}>Run and watch <kbd>⌘↵</kbd></button>
       <button type="button" onClick={() => void run(false)} disabled={!p?.where.callable || running}>Run in the background</button>
-      {saving ? <form className="br-add br-why" onSubmit={e => { e.preventDefault(); saveDefault(); }}>
-        <input aria-label="Why this case runs with these settings" value={reason} onChange={e => setReason(e.target.value)} placeholder="Why, in one line (kept with the profile)" autoFocus/>
-        <button type="submit" disabled={!reason.trim() || save.isPending}>Save</button>
-      </form> : <button type="button" className="br-save" onClick={() => setSaving(true)}>Save as this case’s default</button>}
-      {save.isError && <span role="alert" className="br-bad">{errorMessage(save.error, 'Not saved')}</span>}
+      {saving ? <Form {...reasonForm}><form className="br-add br-why" noValidate onSubmit={saveDefault}>
+        <FormField control={reasonForm.control} name="reason" render={({field}) => <FormItemBare>
+          <FormControl><input {...field} aria-label="Why this case runs with these settings" placeholder="Why, in one line (kept with the profile)" autoFocus/></FormControl>
+          <FormMessage className="field-msg next-line"/></FormItemBare>}/>
+        <FormRootError className="field-msg next-line"/>
+        <button type="submit" disabled={save.isPending}>Save</button>
+      </form></Form> : <button type="button" className="br-save" onClick={() => setSaving(true)}>Save as this case’s default</button>}
       {!running && outcome && step === 2 && <span role="status" className={outcome.ok ? 'br-ok' : 'br-bad'}>{outcome.text}</span>}
       {running && step === 2 && <span role="status">Running in the background. The answer will wait for you in AI drafts.{runId && <> <button type="button" className="br-quiet" onClick={() => setStep(3)}>Watch it</button></>}</span>}
       <span className="br-note">AI can be wrong. Every result waits for you.</span>

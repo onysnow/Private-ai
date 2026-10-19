@@ -77,7 +77,10 @@ describe('BeforeYouRun', () => {
     await user.type(await screen.findByLabelText('Your question'), 'Who?');
     await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
     await user.click(await screen.findByRole('button', {name: 'Save as this case’s default'}));
-    expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+    await user.click(screen.getByRole('button', {name: 'Save'}));
+    expect(await screen.findByText('Write why first.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Why this case runs with these settings')).toHaveAttribute('aria-invalid', 'true');
+    expect(api.calls(`PUT ${BASE}/profile`)).toHaveLength(0);
     await user.type(screen.getByLabelText('Why this case runs with these settings'), 'Named people');
     await user.click(screen.getByRole('button', {name: 'Save'}));
     await waitFor(() => expect(api.lastBody(`PUT ${BASE}/profile`)).toMatchObject({reason: 'Named people', source_tier_floor: 'D', premises: []}));
