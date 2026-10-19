@@ -759,6 +759,9 @@ import type {
   ReviewAiAnalysisCandidateEndpointData,
   ReviewAiAnalysisCandidateEndpointErrors,
   ReviewAiAnalysisCandidateEndpointResponses,
+  ReviewAiClaimEndpointData,
+  ReviewAiClaimEndpointErrors,
+  ReviewAiClaimEndpointResponses,
   ReviewExternalRelationshipData,
   ReviewExternalRelationshipErrors,
   ReviewExternalRelationshipResponses,
@@ -1426,6 +1429,9 @@ import {
   zReviewAiAnalysisCandidateEndpointBody,
   zReviewAiAnalysisCandidateEndpointPath,
   zReviewAiAnalysisCandidateEndpointResponse,
+  zReviewAiClaimEndpointBody,
+  zReviewAiClaimEndpointPath,
+  zReviewAiClaimEndpointResponse,
   zReviewExternalRelationshipBody,
   zReviewExternalRelationshipPath,
   zReviewExternalRelationshipResponse,
@@ -1558,6 +1564,41 @@ export const getAiAnalysisCandidateEndpoint = <
       await zGetAiAnalysisCandidateEndpointResponse.parseAsync(data),
     url: '/api/ai-analysis-candidates/{candidate_id}',
     ...options,
+  });
+
+/**
+ * Review Ai Claim Endpoint
+ *
+ * Keep, correct or reject one claim (or hypothesis) of a proposed answer; replies with the whole proposal.
+ */
+export const reviewAiClaimEndpoint = <ThrowOnError extends boolean = false>(
+  options: Options<ReviewAiClaimEndpointData, ThrowOnError>,
+): RequestResult<
+  ReviewAiClaimEndpointResponses,
+  ReviewAiClaimEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    ReviewAiClaimEndpointResponses,
+    ReviewAiClaimEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zReviewAiClaimEndpointBody,
+          path: zReviewAiClaimEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zReviewAiClaimEndpointResponse.parseAsync(data),
+    url: '/api/ai-analysis-candidates/{candidate_id}/claim-review',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

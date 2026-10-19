@@ -47,9 +47,11 @@ function record(claims: number) {
   return out;
 }
 const CAND = {id: 'cand-1', investigation_id: 'inv-1', module: 'case_synthesis', review_status: 'proposed', confidence: 0.5, created_at: '2026-10-10T14:03:12Z', payload: {claims: [
-  {claim_id: 'CLM-0001', claim: 'Kestrel SA controlled Fernhill Ltd.', classification: 'SOURCE_STATEMENT', confidence_term: 'LIKELY', confidence: 'MEDIUM'}]},
+  {claim_id: 'CLM-0001', claim: 'Kestrel SA controlled Fernhill Ltd.', classification: 'SOURCE_STATEMENT', confidence_term: 'LIKELY', confidence: 'MEDIUM',
+    supporting_evidence: [{record_type: 'document', record_id: 'doc-41-register'}]},
+  {claim_id: 'CLM-0002', claim: 'Harbour Nominees acted for Kestrel SA.', classification: 'INFERENCE', confidence_term: 'ROUGHLY_EVEN', confidence: 'LOW', supporting_evidence: []}]},
   rejection_reason: null, request: {}, reviewed_at: null, reviewer_note: null, trace: null, accepted_record_id: null, accepted_record_type: null,
-  checked_citation_count: 0, checked_citation_ids: []};
+  checked_citation_count: 1, checked_citation_ids: [{record_type: 'document', record_id: 'doc-41-register'}], claim_reviews: {}};
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => cleanup());
@@ -100,7 +102,7 @@ describe('WatchTheRun', () => {
     expect(within(drawer).getByText('model says')).toBeInTheDocument();
     expect(within(drawer).getByText(/model: likely/)).toBeInTheDocument();
     expect(within(drawer).queryByText(/capped/)).toBeNull();
-    expect(within(drawer).getByText(/Accept and reject apply to the whole answer; To check marks this thought only/)).toBeInTheDocument();
+    expect(within(drawer).getByText(/Accept and reject apply to the whole answer; Keep, Correct and Reject above decide this claim; To check marks this thought only/)).toBeInTheDocument();
     await user.click(within(drawer).getByRole('button', {name: 'Close the trace'}));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -257,6 +259,75 @@ describe('WatchTheRun, your marks and other runs', () => {
     await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
     await user.click(screen.getByRole('button', {name: 'Run again from this step…'}));
     expect(again).toHaveBeenCalledWith({question: RUN.question, module: 'case_synthesis', theory: null, from: {run_id: 'run-1', step: expect.any(Number)}});
+  });
+});
+
+describe('WatchTheRun, deciding one claim', () => {
+  it('underlines a grounded claim, and Keep, Correct and Reject decide that claim only', async () => {
+    const kept = {...CAND, claim_reviews: {'CLM-0001': {decision: 'keep', text: null, reason: null, reviewed_at: '2026-10-10T15:00:00Z'}}};
+    const api = open(2, {'POST /api/ai-analysis-candidates/cand-1/claim-review': kept});
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
+    const drawer = screen.getByRole('dialog');
+    const words = await within(drawer).findByText('Kestrel SA controlled Fernhill Ltd.', {selector: '.cr-text'});
+    expect(words).toHaveClass('grounded', 'ai');
+    expect(words.getAttribute('title')).toMatch(/Rests on document:doc-41-r, in the packet/);
+    expect(within(drawer).getByLabelText('Key for the claim underlines')).toBeInTheDocument();
+
+    await user.click(within(drawer).getByRole('button', {name: '✓ Keep'}));
+    await waitFor(() => expect(api.lastBody('POST /api/ai-analysis-candidates/cand-1/claim-review')).toEqual({claim_id: 'CLM-0001', decision: 'keep', text: null, reason: null}));
+    // Kept by a person: no longer plum, and the ledger says so.
+    await waitFor(() => expect(within(drawer).getByText('Kestrel SA controlled Fernhill Ltd.', {selector: '.cr-text'})).not.toHaveClass('ai'));
+    expect(within(drawer).getByText('CLM-0001 kept · you')).toBeInTheDocument();
+    expect(within(drawer).getByRole('button', {name: 'Undo'})).toBeInTheDocument();
+  });
+
+  it('a correction needs new words and a rejection needs a reason', async () => {
+    const api = open(2, {'POST /api/ai-analysis-candidates/cand-1/claim-review': CAND});
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
+    const drawer = screen.getByRole('dialog');
+    await user.click(await within(drawer).findByRole('button', {name: '◆ Correct'}));
+    const save = within(drawer).getByRole('button', {name: 'Save correction'});
+    expect(save).toBeDisabled();
+    await user.clear(within(drawer).getByRole('textbox', {name: /How it should read/}));
+    await user.type(within(drawer).getByRole('textbox', {name: /How it should read/}), 'Kestrel SA held 62% of Fernhill Ltd.');
+    await user.click(save);
+    await waitFor(() => expect(api.lastBody('POST /api/ai-analysis-candidates/cand-1/claim-review')).toEqual({
+      claim_id: 'CLM-0001', decision: 'correct', text: 'Kestrel SA held 62% of Fernhill Ltd.', reason: null}));
+
+    await user.click(within(drawer).getByRole('button', {name: '✕ Reject'}));
+    expect(within(drawer).getByRole('button', {name: 'Reject the claim'})).toBeDisabled();
+    await user.click(within(drawer).getByRole('button', {name: 'overstated'}));
+    await user.click(within(drawer).getByRole('button', {name: 'Reject the claim'}));
+    await waitFor(() => expect(api.lastBody('POST /api/ai-analysis-candidates/cand-1/claim-review')).toEqual({
+      claim_id: 'CLM-0001', decision: 'reject', text: null, reason: 'overstated'}));
+  });
+
+  it('shows the model’s words struck beside a correction, and nothing to decide once the answer is reviewed', async () => {
+    const corrected = {...CAND, review_status: 'accepted', claim_reviews: {'CLM-0001': {decision: 'correct', text: 'Kestrel SA held 62%.', reason: null, reviewed_at: '2026-10-10T15:00:00Z'}}};
+    open(2, {'GET /api/ai-analysis-candidates/cand-1': corrected});
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /^Corroboration/}));
+    const drawer = screen.getByRole('dialog');
+    expect(await within(drawer).findByText('Kestrel SA held 62%.')).toHaveClass('mine');
+    expect(within(drawer).getByText('Kestrel SA controlled Fernhill Ltd.').tagName).toBe('S');
+    expect(within(drawer).queryByRole('button', {name: '✓ Keep'})).toBeNull();
+    expect(within(drawer).getByText(/corrected · you/, {selector: '.cr-decide'})).toBeInTheDocument();
+  });
+
+  it('opens the review step and the instructions drawer from its header', async () => {
+    const events = record(2);
+    mockApi({[`GET ${EV}`]: {run: {...RUN, events: events.length}, events}, 'GET /api/ai-analysis-candidates/cand-1': CAND});
+    const review = vi.fn();
+    const plan = vi.fn();
+    render(<QueryProvider><WatchTheRun investigationId="inv-1" runId="run-1" onReview={review} onPlan={plan} planDrawer={<p>The plan panel</p>}/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: 'Review · 2 wait'}));
+    expect(review).toHaveBeenCalledWith('cand-1');
+    expect(screen.getByRole('region', {name: 'Instructions and plan'})).toHaveTextContent('The plan panel');
+    await user.click(screen.getByRole('button', {name: 'Instructions & plan'}));
+    expect(plan).toHaveBeenCalledWith({question: RUN.question, module: 'case_synthesis', theory: null});
   });
 });
 
