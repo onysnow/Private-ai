@@ -66,6 +66,7 @@ def test_fonts_and_sprites_come_only_from_the_base_map_folder(folder):
     assert client.get("/api/basemap/fonts/Arial Unicode MS,Noto Sans Regular/0-255.pbf").content == b"glyphs 0-255"
     assert client.get("/api/basemap/fonts/Noto Sans Regular/256-511.pbf").status_code == 404     # not in this copy
     assert client.get("/api/basemap/fonts/Noto Sans Regular/1-255.pbf").status_code == 404       # not a glyph range
+    assert basemap.font("Noto Sans Regular", "9" * 5000) is None
     assert basemap.font("..", "secret") is None and basemap.font("../..", "0-255") is None
     sheet = client.get("/api/basemap/sprites/grayscale@2x.png")
     assert sheet.status_code == 200 and sheet.headers["content-type"] == "image/png"

@@ -246,6 +246,6 @@ def get_orphan_storage_preview(request: Request, db: Session = Depends(get_db)) 
     _require_local_request(request)
     try:
         return _preview_orphan_document_files(db, settings.document_storage_dir)
-    except Exception as exc:
+    except Exception:
         logger.exception("Orphan storage preview failed")
-        raise HTTPException(500, "Orphan storage preview failed; details are in the server log.") from exc
+        raise HTTPException(500, "Orphan storage preview failed; details are in the server log.") from None

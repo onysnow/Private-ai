@@ -100,11 +100,16 @@ def tile(z: int, x: int, y: int) -> tuple[bytes, str | None] | None:
 
 
 def fonts() -> list[str]:
+    return sorted(_font_dirs())
+
+
+def _font_dirs() -> dict[str, Path]:
     folder = basemap_dir() / "fonts"
     try:
-        return sorted(entry.name for entry in os.scandir(folder) if entry.is_dir())
+        with os.scandir(folder) as entries:
+            return {entry.name: Path(entry.path) for entry in entries if entry.is_dir(follow_symlinks=False)}
     except OSError:
-        return []
+        return {}
 
 
 def font(stack: str, glyph_range: str) -> bytes | None:
@@ -112,14 +117,18 @@ def font(stack: str, glyph_range: str) -> bytes | None:
     the names its style lists, comma-separated; the first one this copy has
     is served (the stacks @protomaps/basemaps names are single fonts)."""
     match = FONT_RANGE.match(glyph_range)
-    if match is None or int(match.group(1)) % 256 or int(match.group(2)) != int(match.group(1)) + 255:
+    if match is None or any(len(part) > 7 for part in match.groups()):
         return None
-    have = set(fonts())
+    start, end = (int(part) for part in match.groups())
+    if start > 0x10FFFF or end > 0x10FFFF or start % 256 or end != start + 255:
+        return None
+    have = _font_dirs()
     root = basemap_dir().resolve()
     for name in (part.strip() for part in stack.split(",")):
-        if name in have:
+        font_dir = have.get(name)
+        if font_dir is not None:
             try:
-                path = (root / "fonts" / name / f"{glyph_range}.pbf").resolve()
+                path = (font_dir / f"{start}-{end}.pbf").resolve()
                 path.relative_to(root)
                 return path.read_bytes()
             except (OSError, ValueError):
@@ -132,8 +141,14 @@ def sprite(name: str) -> tuple[bytes, str] | None:
     if not SPRITE_NAME.match(name):
         return None
     try:
+        folder = basemap_dir() / "sprites" / SPRITE_VERSION
+        with os.scandir(folder) as entries:
+            files = {entry.name: Path(entry.path) for entry in entries if entry.is_file(follow_symlinks=False)}
+        asset = files.get(name)
+        if asset is None:
+            return None
         root = basemap_dir().resolve()
-        path = (root / "sprites" / SPRITE_VERSION / name).resolve()
+        path = asset.resolve()
         path.relative_to(root)
         data = path.read_bytes()
     except (OSError, ValueError):

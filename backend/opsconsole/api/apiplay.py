@@ -106,6 +106,7 @@ def router(ctx: ConsoleContext) -> APIRouter:
             transport = httpx.ASGITransport(app=request.app)
             async with httpx.AsyncClient(transport=transport, base_url="http://workbench.invalid",
                                          timeout=body.timeout_seconds, follow_redirects=False) as client:
+                # lgtm[py/full-ssrf] ASGITransport dispatches only to request.app in-process.
                 response = await client.request(body.method, body.path, params=body.query, headers=headers,
                                                 json=body.body if body.body is not None and not isinstance(body.body, str) else None,
                                                 content=body.body.encode() if isinstance(body.body, str) else None)
