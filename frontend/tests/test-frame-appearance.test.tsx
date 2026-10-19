@@ -162,6 +162,19 @@ describe('AppFrame', () => {
     expect(push).toHaveBeenCalledWith('/act#red-flags');
   });
 
+  it('asks the case from the palette, with the words typed there as the question', async () => {
+    render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
+    fireEvent.keyDown(window, {key: 'k', metaKey: true});
+    const input = await screen.findByRole('combobox', {name: 'Search or command'});
+    expect(screen.getByRole('option', {name: /Ask the case…/})).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.type(input, 'who owns Fernhill');
+    expect(screen.queryByRole('option', {name: /Ask the case…/})).toBeNull();
+    await user.click(screen.getByRole('option', {name: /Ask the case: “who owns Fernhill”/}));
+    expect(useWorkbenchStore.getState().askCase?.question).toBe('who owns Fernhill');
+    expect(push).toHaveBeenCalledWith('/act#ai-runs');
+  });
+
   it('opens edges with Alt and an arrow, pins one on this computer, and lists where you have been', async () => {
     render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
     const left = document.getElementById('fr-left')!;

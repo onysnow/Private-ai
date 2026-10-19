@@ -259,6 +259,7 @@ import {
   restoreStoryVersion,
   retryJobEndpoint,
   reviewAiAnalysisCandidateEndpoint,
+  reviewAiClaimEndpoint,
   reviewExternalRelationship,
   reviewExtractionCandidate,
   reviewFinding,
@@ -1039,6 +1040,9 @@ import type {
   ReviewAiAnalysisCandidateEndpointData,
   ReviewAiAnalysisCandidateEndpointError,
   ReviewAiAnalysisCandidateEndpointResponse,
+  ReviewAiClaimEndpointData,
+  ReviewAiClaimEndpointError,
+  ReviewAiClaimEndpointResponse,
   ReviewExternalRelationshipData,
   ReviewExternalRelationshipError,
   ReviewExternalRelationshipResponse,
@@ -1204,6 +1208,35 @@ export const getAiAnalysisCandidateEndpointOptions = (
     },
     queryKey: getAiAnalysisCandidateEndpointQueryKey(options),
   });
+
+/**
+ * Review Ai Claim Endpoint
+ *
+ * Keep, correct or reject one claim (or hypothesis) of a proposed answer; replies with the whole proposal.
+ */
+export const reviewAiClaimEndpointMutation = (
+  options?: Partial<Options<ReviewAiClaimEndpointData>>,
+): UseMutationOptions<
+  ReviewAiClaimEndpointResponse,
+  ReviewAiClaimEndpointError,
+  Options<ReviewAiClaimEndpointData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ReviewAiClaimEndpointResponse,
+    ReviewAiClaimEndpointError,
+    Options<ReviewAiClaimEndpointData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await reviewAiClaimEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Promote Ai Analysis Candidate To Deck Endpoint

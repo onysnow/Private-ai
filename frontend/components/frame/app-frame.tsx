@@ -180,8 +180,11 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
 
   const caseHref = useCaseHref();
   const go = useCallback((href: string) => { onOpenChange(false); router.push(caseHref(href)); }, [onOpenChange, router, caseHref]);
+  // "Ask the case" in four steps (research AI §1): Ask, Instructions & plan, Watch, Review, in Act › AI runs.
+  const openAskCase = useWorkbenchStore(s => s.openAskCase);
+  const ask = useCallback((question: string) => { openAskCase(question); go('/act#ai-runs'); }, [openAskCase, go]);
   const commands = useMemo<Command[]>(() => {
-    const list: Command[] = [];
+    const list: Command[] = [{id: 'ask-case', group: 'AI', label: 'Ask the case…', hint: 'Ask · plan · watch · review', run: () => ask('')}];
     PAGES.forEach(p => list.push({id: `page-${p.href}`, group: 'Go to', label: p.label, hint: p.hint, run: () => go(p.href)}));
     STAGES.forEach(s => s.parts.forEach(part => list.push({id: `part-${part.anchor}`, group: 'Go to', label: `${s.name} › ${part.label}`, run: () => go(hrefOfAnchor(part.anchor))})));
     STAGES.forEach(s => list.push({id: `stage-${s.key}`, group: 'Go to', label: s.name, hint: s.line, run: () => go(s.route)}));
@@ -190,7 +193,7 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
     list.push({id: 'calm', group: 'Appearance', label: currentAppearance().motion === 'calm' ? 'Turn calm motion off' : 'Turn calm motion on', run: () => { keepAppearance({motion: currentAppearance().motion === 'calm' ? 'normal' : 'calm'}); onOpenChange(false); }});
     list.push({id: 'console', group: 'Go to', label: 'Backend console', run: () => { onOpenChange(false); window.location.href = '/console/'; }});
     return list;
-  }, [go, onOpenChange]);
+  }, [go, onOpenChange, ask]);
 
   const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   const shown = commands.filter(c => words.every(w => `${c.group} ${c.label} ${c.hint ?? ''}`.toLowerCase().includes(w)));
@@ -198,7 +201,8 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
     ? [{id: 'search', group: 'Search', label: `Search the case for “${q.trim()}”`, hint: 'Names, documents, claims, dates', run: () => {
         onOpenChange(false);
         if (handOffSearch(q.trim()) === 'navigate' || !/^\/bring-in\/?$/.test(pathname ?? '')) router.push(caseHref('/bring-in#investigation-search'));
-      }}, ...shown]
+      }}, {id: 'ask-typed', group: 'AI', label: `Ask the case: “${q.trim()}”`, hint: 'Opens Ask with this question; nothing runs yet', run: () => ask(q.trim())},
+      ...shown.filter(c => c.id !== 'ask-case')]
     : shown;
   const groups = Array.from(new Set(items.map(i => i.group)));
   const pick = (i: number) => items[i]?.run();
