@@ -147,9 +147,10 @@ def _case_synthesis_to_ehs(payload: dict, reviews: dict, held: dict[str, dict]) 
     subjects = []
     for r in payload.get("right_of_reply_needed") or []:
         if isinstance(r, dict) and r.get("subject"):
+            # Only the name and the claims that survived your review cross: TAS's own summary of what would be said
+            # was written before your review and could carry a claim you rejected or corrected.
             subjects.append({"kind": "subject", "subject": r["subject"],
-                             "claim_ids": [cid for cid in r.get("claim_ids") or [] if cid in kept],
-                             "what_will_be_said": r.get("what_will_be_said")})
+                             "claim_ids": [cid for cid in r.get("claim_ids") or [] if cid in kept]})
     records = subjects + [{"kind": "claim", "claim_id": c["claim_id"], "claim": c["claim"],
                            "supporting_evidence": c.get("supporting_evidence") or []} for c in claims]
     return {"records": records, "left_out": left_out, "ids": sorted(kept),

@@ -245,9 +245,34 @@ def _handoff_ids(handoff: dict | None) -> set[str]:
 
 # --- LAS ------------------------------------------------------------------------------------------------------------
 
+def _las_structure(payload: dict) -> list[str]:
+    """The nested parts of a logic check the light shape check does not reach: every argument line an object with
+    its fields, every premise reference an id string. A malformed one is rejected, never skipped or crashed on."""
+    errors: list[str] = []
+    for a, arg in enumerate(payload.get("arguments") or []):
+        if not isinstance(arg, dict):
+            continue
+        for key in ("explicit_premises", "unstated_premises", "reviews", "equivocation_affecting_inference"):
+            if any(not isinstance(x, str) for x in arg.get(key) or []):
+                errors.append(f"arguments[{a}].{key} must hold strings only")
+        for i, line in enumerate(arg.get("argument_lines") or []):
+            where = f"arguments[{a}].argument_lines[{i}]"
+            if not isinstance(line, dict):
+                errors.append(f"{where} must be an object")
+                continue
+            for req, typ in (("premises", list), ("inferential_type", str), ("confidence_term", str)):
+                if not isinstance(line.get(req), typ):
+                    errors.append(f"{where}.{req} must be a {typ.__name__}")
+            if any(not isinstance(x, str) for x in line.get("premises") or [] if isinstance(line.get("premises"), list)):
+                errors.append(f"{where}.premises must hold PREM- id strings only")
+    return errors
+
+
 def _check_las(payload: dict, ctx: dict) -> Check:
     handoff = ctx.get("handoff")
-    errors: list[str] = []
+    errors: list[str] = _las_structure(payload)
+    if errors:
+        return Check(errors, [])
     flags: list[str] = []
     premise_ids = _ids(payload, "premises[]", "premise_id")
     errors += _pattern(premise_ids, "PREM", "premise_id")
@@ -839,10 +864,21 @@ def _check_ras(payload: dict, ctx: dict) -> Check:
             for s in claim.get(key) or []:
                 if isinstance(s, dict) and s.get("source_id") not in source_ids:
                     errors.append(f"{where}.{key} names {s.get('source_id')!r}, which is not one of the sources")
-        counted = [s for s in support if s.get("source_id") not in unverified]
-        if claim.get("corroboration_verdict") == "CORROBORATED" and len({s.get("source_id") for s in counted}) < 2:
-            errors.append(f"{where} is CORROBORATED on fewer than two sources that count (an unverified-provenance "
-                          "source never counts)")
+        counted = {s.get("source_id") for s in support if s.get("source_id") not in unverified}
+        if claim.get("corroboration_verdict") == "CORROBORATED" and len(counted) < 2:
+            # Module 04 rule 7: the one exception is a Tier 1 review pooling two or more independent studies at the
+            # claim's scope, with its basis recorded as "pooled: N independent studies". Whether the pooled studies
+            # are independent and scope-matched is for a person to check.
+            single = next(iter(counted), None)
+            tier1 = single is not None and any(s.get("source_id") == single and s.get("tier") == 1 for s in support)
+            if tier1 and str(claim.get("corroboration_basis") or "").lower().startswith("pooled"):
+                flags.append(f"{claim.get('claim_id')}: CORROBORATED on one Tier 1 review under Module 04 rule 7 "
+                             f"({claim.get('corroboration_basis')}); check that its pooled studies are independent "
+                             "and match the claim's scope")
+            else:
+                errors.append(f"{where} is CORROBORATED on fewer than two sources that count (an unverified-provenance "
+                              "source never counts), and is not a Tier 1 review whose basis says it pools independent "
+                              "studies (Module 04 rule 7)")
     for key in _keys_anywhere(payload, ("certainty_of_evidence", "degree_of_consensus")):
         errors.append(f"{key}: only a full Module 09 calibration assigns it, and this run is Modules 03 and 04")
     return Check(errors, flags)
@@ -888,7 +924,8 @@ RAS_VETTING = SuiteModule(
             "supporting_sources": [_RAS_SOURCE_REF],
             "contradicting_sources": [_RAS_SOURCE_REF],
             "corroboration_verdict": "|".join(RAS_CORROBORATION),
-            "corroboration_basis": "string",
+            "corroboration_basis": "string - for a Tier 1 review pooling independent studies (Module 04 rule 7): "
+                                   "'pooled: N independent studies (per the review)'",
             "replication_status": "|".join(RAS_REPLICATION),
             "extrapolation_flag": "boolean",
             "warrant": "string",
@@ -937,7 +974,13 @@ def run_checks(key: str, payload: dict, *, handoff: dict | None = None, packet_t
                premises: list[str] | None = None) -> Check:
     module = SUITE_MODULES[key]
     ctx = {"handoff": handoff, "packet_text": packet_text, "premises": premises or []}
-    return module.check(payload, ctx) if module.check else Check()
+    if module.check is None:
+        return Check()
+    try:
+        return module.check(payload, ctx)
+    except (TypeError, AttributeError, ValueError) as exc:
+        # A value of the wrong kind somewhere the checks read: the answer is malformed, and is rejected as such.
+        return Check([f"the answer could not be read by the {module.system.upper()} checks: {type(exc).__name__}: {exc}"], [])
 
 
 def framing_text(key: str, module_texts: list[str], premises: list[str]) -> str:

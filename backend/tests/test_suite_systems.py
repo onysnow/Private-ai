@@ -409,3 +409,58 @@ def test_a_suite_answer_is_reviewed_part_by_part(client, monkeypatch):
     kept = client.post(f"/api/ai-analysis-candidates/{pid}/claim-review", json={"claim_id": "GPLN-0001", "decision": "keep"})
     assert kept.status_code == 200, kept.text
     assert client.post(f"/api/ai-analysis-candidates/{pid}/claim-review", json={"claim_id": "GPLN-0404", "decision": "keep"}).status_code == 404
+
+
+def test_a_rejected_allegation_never_reaches_the_ethics_run_through_the_reply_summary(client, monkeypatch):
+    case = _case(client)
+    cid = _accepted_synthesis(client, monkeypatch, case, review={"claim_id": "CLM-0001", "decision": "reject", "reason": "Not shown."})
+    model = _Model(_harm(case))
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: model)
+    assert _suite_run(client, case, "ehs_harm_minimisation", handoff_from=cid).status_code == 200
+    handed = model.user_prompts[0].split("RETRIEVAL PACKET", 1)[0]
+    assert '"subject": "Ada North"' in handed and "She approved it." not in handed and '"claim_ids": []' in handed
+
+
+def test_malformed_logic_lines_are_rejected_not_skipped_or_crashed_on(client, monkeypatch):
+    case = _case(client)
+    good = _logic_check(case)
+    for lines in ([42], [{**good["arguments"][0]["argument_lines"][0], "premises": [{}]}]):
+        answer = {**good, "arguments": [{**good["arguments"][0], "reviews": [], "argument_lines": lines}]}
+        monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, b=answer, **k: _Model(b))
+        refused = _suite_run(client, case, "las_argument_check")
+        assert refused.status_code == 422, refused.text
+
+
+def test_a_weak_argument_is_never_recorded_as_holding(client, monkeypatch):
+    case = _case(client)
+    answer = _logic_check(case)
+    answer["arguments"][0]["reviews"] = []
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _Model(answer))
+    run = _suite_run(client, case, "las_argument_check")
+    assert run.status_code == 200, run.text
+    run_id = client.get(f"/api/ai-analysis-candidates/{run.json()['candidate_id']}").json()["trace"]["run_id"]
+    with SessionLocal() as db:
+        said = [e for e in db.query(AIRunEvent).filter(AIRunEvent.run_id == run_id).all() if e.self_reported]
+    assert [(e.verdict, e.status) for e in said] == [("ABDUCTIVE", "partial")]
+
+
+def test_one_tier_1_review_pooling_studies_may_be_corroborated_and_is_flagged_for_a_person(client, monkeypatch):
+    case = _case(client)
+    source = {"source_id": "RSRC-0001", "record": _ref(case), "citation": "A review", "tier": 1, "claim_specific_tier_exceptions": [],
+              "venue_legitimacy_flag": "STANDARD", "provenance_flag": "VERIFIED", "source_level": "SECONDARY", "study_design": "REVIEW",
+              "sample_size": None, "funding_coi_status": "NOT_CHECKED", "funding_conflicts_of_interest": None, "disclosed_limitations": [],
+              "quality_flag": "CLEAN", "currency_status": "UNABLE_TO_VERIFY", "retrieved_at": None, "access_status": "FULL_TEXT"}
+    claim = {"claim_id": "RCLM-0001", "claim_text": "Boards minute approvals", "supporting_sources": [
+        {"source_id": "RSRC-0001", "tier": 1, "pinpoint_location": "Table 2", "evidence": [_ref(case)]}], "contradicting_sources": [],
+             "corroboration_verdict": "CORROBORATED", "corroboration_basis": "pooled: 4 independent studies (per the review)",
+             "replication_status": "INDEPENDENTLY_REPLICATED", "extrapolation_flag": False, "warrant": "stated"}
+    answer = {"scope_and_limitations": "Partial", "not_research_sources": [], "sources": [source], "claims": [claim]}
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _Model(answer))
+    run = _suite_run(client, case, "research_vetting")
+    assert run.status_code == 200, run.text
+    flags = client.get(f"/api/ai-analysis-candidates/{run.json()['candidate_id']}").json()["trace"]["suite_checks"]["flags"]
+    assert any("Module 04 rule 7" in f for f in flags)
+    for broken in ({**answer, "sources": [{**source, "tier": 3}], "claims": [{**claim, "supporting_sources": [{**claim["supporting_sources"][0], "tier": 3}]}]},
+                   {**answer, "claims": [{**claim, "corroboration_basis": "one strong review"}]}):
+        monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, b=broken, **k: _Model(b))
+        assert _suite_run(client, case, "research_vetting").status_code == 422
