@@ -228,6 +228,16 @@ function Settings(): ReactElement {
   // The breadcrumb names the section you are in (mockup HOME_2: case › Settings › Appearance).
   useEffect(() => { setTrailTail([{label: 'Settings', href: '/settings'}, {label: row.label}]); }, [row.label]);
   useEffect(() => () => setTrailTail([]), []);
+  // ...and the case it was opened from, which this page does not load itself: its name from the case list.
+  const caseId = useWorkbenchStore(state => state.investigationId);
+  useEffect(() => {
+    const inv = new URLSearchParams(window.location.search).get('inv') || caseId;
+    const open = investigationsQuery.data?.find(i => i.id === inv);
+    if (!open) return;
+    const store = useWorkbenchStore.getState();
+    if (store.investigationId !== open.id) store.setInvestigationId(open.id);
+    store.setInvestigationName(open.name);
+  }, [caseId, investigationsQuery.data]);
   const providersQuery = useQuery({...connectorsOptions(), enabled: Boolean(status) && ['lookups', 'keys', 'log'].includes(section)});
   const providers = providersQuery.data?.providers ?? Object.keys(status?.connectors ?? {});
   const card = 'rounded-xl border border-border bg-card p-5';
