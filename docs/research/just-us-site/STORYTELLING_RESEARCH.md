@@ -18,17 +18,21 @@ Research before the mockups. No code, no generated images. The mockups will use 
 | [EJI + Google, "Lynching in America" (2017)](https://newsone.com/3719162/bryan-stevensons-eji-launches-lynching-site-with-google) | Map down to county level, audio stories and a short documentary, all about families. EJI's site has won a [Webby](https://eji.org/news/eji-webby-award/). *Current status unconfirmed.* | The tree scene: tone and dignity |
 | [Al Jazeera "Know their names"](https://janataweekly.org/al-jazeera-the-tv-channel-that-saves-the-honor-of-modern-journalism/) | Names and faces of the journalists killed in Gaza. *The original page was not found.* | Gaza: people, not numbers |
 
-### Scroll as a film (the camera, the scene changes)
-| Reference | What to take from it |
+### Whole websites that are one scroll story (the model for Just-Us)
+The site itself is the story: the homepage is the scroll, from the first screen to the call to action. These are not stories embedded inside an article.
+
+| Website | What to take from it |
 |---|---|
-| [SBS "The Boat" (2015)](https://www.commarts.com/project/23899/the-boat) | The closest match in spirit. A scrolling graphic novel. Text sways at an angle during the storm, the screen shakes, there's sound design and an optional auto-scroll. 222 illustrations, 59 animated sequences ([SBS](https://www.sbs.com.au/movies/article/2015/04/27/sound-and-vision-boat)). Its weather and parallax are the model for the opening rain. |
-| [NFB "Bear 71" (2012)](https://opendoclab.mit.edu/bear-71) | Linear narration over imagery you explore, about 20 minutes long. When the story ends you can wander the map. |
-| [IVRESS by Utsubo](https://www.utsubo.com/blog/immersive-storytelling-websites-guide) | Its scenes are joined by continuous camera and material changes, with no hard cuts. This is the model for "the floor becomes the scene wipe". |
-| [Noomo's site](https://www.webgpu.com/tag/interactive-storytelling/) | Each story is a room in a lit hallway, driven by scroll. |
-| [Codrops, "A scroll-driven 3D world with something to say" (Apr 2026)](https://tympanus.net/codrops/?p=114641) | A recent write-up of a site meant to feel like a place you arrive in. It took 3 to 4 months. The author admits ordinary page layouts usually have better UX. |
-| [scroll-world (GitHub)](https://github.com/sw7rvy/scroll-world) | One camera shot with no cuts, through four story beats, with a simpler fallback for phones. |
+| [Why Zero](https://winners.kyoorius.com/winners/2026/kda/16247-why-zero/) (Zero University; Awwwards Site of the Day, 7 Sep 2026) | The closest match. A whole site that argues a system is broken (education) and that this product replaces it. You draw a zero to open it, then one continuous WebGL scroll shows a dream shattering, money burning and degree certificates shredded, ending on the product. It runs as one scroll timeline in Three.js and GSAP, under 10 MB, at 60 fps on budget phones. Same structure as Just-Us: the failure, scene by scene, then the answer. |
+| [The Power of Storytelling](https://www.awwwards.com/sites/the-power-of-storytelling) (Noomo; Awwwards Site of the Day, 8 Jun 2026) | The agency's own site: each client story is a room in a lit hallway, and scroll moves you through them. It has a 3D scroll section and a fly-through. This is the model for the camera moving from the window to the room. |
+| [Lando Norris](https://www.awwwards.com/sites/lando-norris) (OFF+BRAND; Awwwards Site of the Year 2025) | The current top of the field for cinematic scroll sequences on a personal site, scored 8.18/10. Look at how it paces its big moments and keeps the site usable around them. |
+| Cartier Watches & Wonders ([Utsubo's list](https://www.utsubo.com/blog/best-threejs-websites-2026)) | Six 3D alcoves you scroll through, one scene per product, like rooms in a museum. This is the model for one scene per injustice. |
+| IVRESS, "Spin a Tale" ([Utsubo](https://www.utsubo.com/blog/immersive-storytelling-websites-guide); Awwwards Site of the Day 28 Jun 2026, FWA of the Month) | Its scenes are joined by continuous camera and material changes, with no hard cuts. This is the model for "the floor becomes the scene wipe". *Its awards and its link are unconfirmed.* |
+| [Codrops, "A scroll-driven 3D world with something to say" (Apr 2026)](https://tympanus.net/codrops/?p=114641) | How someone built a whole site meant to feel like a place you arrive in, in 3 to 4 months. The author admits ordinary page layouts usually have better UX. |
 | [Apple's product pages](https://www.setproduct.com/blog/how-to-3d-animate-scroll) | Scroll scrubs pre-rendered frames drawn on a canvas, not video. Video seeking lags scroll by 50 to 150 ms. WebP frames are far smaller than PNG ([GSAP forum](https://gsap.com/community/forums/topic/25188-airpods-image-sequence-animation-using-scrollTrigger/)). This is the technique if a scene is filmed or rendered rather than layered. |
-| Roundups: [scrollytelling.ai, 27 examples (2026)](https://scrollytelling.ai/examples/), [Maglr](https://www.maglr.com/blog/best-scrollytelling-examples) | Places to browse. |
+| Where to browse more: [Awwwards Storytelling](https://www.awwwards.com/inspiration_search/Storytelling/), [Awwwards Scrolling](https://www.awwwards.com/websites/scrolling/), [Awwwards 3D](https://www.awwwards.com/websites/3d/), [scrollytelling.ai, 27 examples](https://scrollytelling.ai/examples/) | Galleries of whole sites. |
+
+A whole interactive manifesto costs far more than one animated section ([Metabole](https://metabole.studio/en/blog/scrollytelling)). Why Zero is the proof that it can still be light enough for budget phones.
 
 ## 2. What the research says to do on phones
 - **Keep the scroll on mobile when the transitions carry meaning.** Don't stack the content on phones. This is the Pudding's advice ([Responsive scrollytelling](https://pudding.cool/process/responsive-scrollytelling/), excerpt only), and the window → blinds → room → floor transitions are the meaning here.
