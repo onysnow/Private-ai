@@ -350,7 +350,7 @@ function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
         const on = lit.has(t.id);
         return <tr key={t.id} className={`${on ? 'lit' : ''}${flagged.has(t.id) ? ' flagged' : ''}${traced.has(t.id) ? ' traced' : ''}`} onMouseEnter={() => onLight(t.id, from + i)}
           aria-current={on ? 'true' : undefined}>
-          <td>{day(t.dateTime ?? null)}</td><td>{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>{day(t.dateTime ?? null)}{t.dateEnd ? ` to ${day(t.dateEnd)}` : ''}</td><td>{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
           <td><span className={`mn-sure mn-sure-${t.certainty}`}><span aria-hidden="true">{c.mark}</span> {c.word}</span></td>
           <td>{t.locator ?? <span className="mn-muted">none attached</span>}</td>
           {full && <td>{t.statedPurpose ?? <span className="mn-muted">none stated</span>}</td>}
