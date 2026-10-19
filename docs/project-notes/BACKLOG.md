@@ -19,7 +19,7 @@ Wherever a card appears (decision, dashboard widget, flag, timeline row, to-chec
 Cards that fail this today: "Keep this passage as evidence?" with no preview, four identical "business reason for the payments" checks, flags with no amounts or dates, and timeline rows with raw ids.
 
 ## Asked for: mockups first
-- **Login and account (19 Oct).** So decisions on this computer carry your name ("Accepted by Ony") rather than "a person": the app stores who decided from the signed-in account (built 19 Oct), but the local owner has no account. Mockups drawn 19 Oct, waiting for Ony: `docs/design/mockups/proposed/ACCOUNT_1-sign-your-work.png`, `ACCOUNT_2-people-and-access.png`.
+- **Login and account (19 Oct).** So decisions on this computer carry your name ("Accepted by Ony") rather than "a person": the app stores who decided from the signed-in account (built 19 Oct), but the local owner has no account. Mockups ACCOUNT_1–4 approved 19 Oct (`docs/design/mockups/`); tools researched in `docs/research/accounts-and-locking-tools.md`, waiting on Ony's choice before the ADR.
 - **Bring in › Documents (ingestion page).** Redesign the queue and most of the page:
   - show progress, "stuck" and errors per file;
   - drop the wall of nine OpenAleph buttons on every row;
