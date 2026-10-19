@@ -16,7 +16,8 @@ import {KeptLine, SettingsNav, SettingsSearch, useSection, type SettingRow} from
 import {HIDE_SCREEN_EVENT, NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
 import {SecurityPanel} from '../../features/security/security-panel';
-import {BackupPanel} from '../../features/backups/backup-panel';
+import {BackupPanel, lastBackupOf} from '../../features/backups/backup-panel';
+import {agoText} from '../../features/act/red-flags-board';
 import {LevelChip, LEVEL_WORDS} from '../../components/status';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {setSingleKeys, singleKeysOn} from '../../lib/shortcuts';
@@ -204,6 +205,7 @@ function Settings(): ReactElement {
   const connectors = Object.values(status?.connectors ?? {});
   const theme = look.trying ? lookName(look.trying, look.tryingOwn) : lookName(look.kept.theme, look.kept.custom);
   const inv = useWorkbenchStore(state => state.investigationId) || cases[0]?.id || '';
+  const lastBackup = lastBackupOf(cases.find(c => c.id === inv)?.last_backup);
   const settingRows: SettingRow[] = [
     {group: 'You', id: 'appearance', stored: 'this browser on this device', leaves: 'nothing', label: 'Appearance', value: theme, words: 'theme colour color dark effects motion format fonts',
       note: 'Appearance is yours alone: it is saved on this device and never changes what a teammate sees.'},
@@ -218,7 +220,8 @@ function Settings(): ReactElement {
     {group: 'This computer', id: 'access', stored: 'the token is held in this browser’s memory only', leaves: 'nothing', label: 'Access and token', value: state === 'local' ? 'local' : state === 'authenticated' ? 'token' : state === 'needs_token' ? 'token needed'
       : state === 'remote_disabled' ? 'remote off' : state === 'error' ? 'not reached' : '', words: 'api bearer'},
     {group: 'This computer', id: 'keys', stored: 'the server on this computer, never shown again', leaves: 'a key goes only to its own service, with each request you make', label: 'Connector keys', value: status ? `${connectors.filter(c => c.configured).length} of ${connectors.length}` : '', words: 'credentials secret'},
-    {group: 'This computer', id: 'backups', stored: 'the file you save, wherever you put it', leaves: 'nothing', label: 'Backups', value: '', words: 'restore archive'},
+    {group: 'This computer', id: 'backups', stored: 'the file you save, wherever you put it', leaves: 'nothing', label: 'Backups',
+      value: lastBackup ? agoText(lastBackup.at) : inv ? 'none yet' : '', words: 'restore archive last backup'},
     {group: 'This computer', id: 'log', stored: 'the server on this computer', leaves: 'nothing', label: 'Security log', value: status?.security.needs_attention ? 'look' : '', words: 'audit denials'},
     {group: 'This computer', id: 'console', label: 'Operator console', value: '', href: '/console/', words: 'backend'},
   ];

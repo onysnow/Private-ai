@@ -1206,6 +1206,8 @@ export const zClaimEvidenceLinkOut = z.object({
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+  decided_by_id: z.string().nullish(),
+  decided_by_name: z.string().nullish(),
   evidence_id: z.string(),
   id: z.string(),
   note: z.string().nullish(),
@@ -1249,6 +1251,8 @@ export const zClaimReviewEventOut = z.object({
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+  decided_by_id: z.string().nullish(),
+  decided_by_name: z.string().nullish(),
   from_agreement_grade: z.string().nullish(),
   from_confidence: z.number(),
   from_evidence_grade: z.string().nullish(),
@@ -1998,12 +2002,23 @@ export const zCustodyAiOut = z.object({
 /**
  * CustodyAnchorOut
  *
- * Where the quote stands in the passage, found now (character offsets in the passage text).
+ * Where the quote stands in the passage (ADR-0015): the stored anchor found again, or, for a quote saved before
+ * anchors were kept, found now. Offsets are characters in the passage text; null when the quote is not found.
  */
 export const zCustodyAnchorOut = z.object({
-  end: z.number().int(),
-  exact: z.boolean(),
-  start: z.number().int(),
+  after: z.number().int().nullish(),
+  anchored_at: z.string().nullish(),
+  before: z.number().int().nullish(),
+  chunk_id: z.string().nullish(),
+  end: z.number().int().nullish(),
+  exact: z.boolean().nullish(),
+  line_end: z.number().int().nullish(),
+  line_start: z.number().int().nullish(),
+  match: z.enum(['exact', 'case', 'spacing']).nullish(),
+  occurrences: z.number().int().nullish(),
+  start: z.number().int().nullish(),
+  state: z.enum(['held', 'moved', 'lost', 'not anchored']),
+  stored: z.boolean(),
 });
 
 /**
@@ -2095,6 +2110,9 @@ export const zCustodyCardOut = z.object({
   document_id: z.string().nullish(),
   id: z.string(),
   kind: z.enum(['file', 'source', 'reading', 'passage', 'decision']),
+  legibility: z.number().nullish(),
+  line_end: z.number().int().nullish(),
+  line_start: z.number().int().nullish(),
   lines: z.array(z.string()),
   page: z.number().int().nullish(),
   quote: z.string().nullish(),
@@ -3134,6 +3152,7 @@ export const zEvidenceCreate = z.object({
  * EvidenceOut
  */
 export const zEvidenceOut = z.object({
+  anchor: z.record(z.unknown()).nullish(),
   authenticity_status: z.string().nullish(),
   captured_on: z.string().nullish(),
   created_on: z.string().nullish(),
@@ -4140,6 +4159,7 @@ export const zInvestigationOut = z.object({
   description: z.string().nullish(),
   id: z.string(),
   is_demo: z.boolean(),
+  last_backup: z.record(z.unknown()).nullish(),
   name: z.string(),
   question: z.string().nullish(),
   type_areas: z.array(z.string()).nullish(),
@@ -4307,6 +4327,8 @@ export const zLineageCandidateOut = z.object({
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
+  decided_by_id: z.string().nullish(),
+  decided_by_name: z.string().nullish(),
   document_id: z.string(),
   id: z.string(),
   investigation_id: z.string(),

@@ -2995,6 +2995,14 @@ export type ClaimEvidenceLinkOut = {
    */
   created_at: string;
   /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
+  /**
    * Evidence Id
    */
   evidence_id: string;
@@ -3131,6 +3139,14 @@ export type ClaimReviewEventOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
+  /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
   /**
    * From Agreement Grade
    */
@@ -4933,21 +4949,62 @@ export type CustodyAiOut = {
 /**
  * CustodyAnchorOut
  *
- * Where the quote stands in the passage, found now (character offsets in the passage text).
+ * Where the quote stands in the passage (ADR-0015): the stored anchor found again, or, for a quote saved before
+ * anchors were kept, found now. Offsets are characters in the passage text; null when the quote is not found.
  */
 export type CustodyAnchorOut = {
   /**
+   * After
+   */
+  after?: number | null;
+  /**
+   * Anchored At
+   */
+  anchored_at?: string | null;
+  /**
+   * Before
+   */
+  before?: number | null;
+  /**
+   * Chunk Id
+   */
+  chunk_id?: string | null;
+  /**
    * End
    */
-  end: number;
+  end?: number | null;
   /**
    * Exact
    */
-  exact: boolean;
+  exact?: boolean | null;
+  /**
+   * Line End
+   */
+  line_end?: number | null;
+  /**
+   * Line Start
+   */
+  line_start?: number | null;
+  /**
+   * Match
+   */
+  match?: 'exact' | 'case' | 'spacing' | null;
+  /**
+   * Occurrences
+   */
+  occurrences?: number | null;
   /**
    * Start
    */
-  start: number;
+  start?: number | null;
+  /**
+   * State
+   */
+  state: 'held' | 'moved' | 'lost' | 'not anchored';
+  /**
+   * Stored
+   */
+  stored: boolean;
 };
 
 /**
@@ -4976,6 +5033,18 @@ export type CustodyCardOut = {
    * Kind
    */
   kind: 'file' | 'source' | 'reading' | 'passage' | 'decision';
+  /**
+   * Legibility
+   */
+  legibility?: number | null;
+  /**
+   * Line End
+   */
+  line_end?: number | null;
+  /**
+   * Line Start
+   */
+  line_start?: number | null;
   /**
    * Lines
    */
@@ -7982,6 +8051,12 @@ export type EvidenceCreate = {
  */
 export type EvidenceOut = {
   /**
+   * Anchor
+   */
+  anchor?: {
+    [key: string]: unknown;
+  } | null;
+  /**
    * Authenticity Status
    */
   authenticity_status?: string | null;
@@ -10204,6 +10279,12 @@ export type InvestigationOut = {
    */
   is_demo: boolean;
   /**
+   * Last Backup
+   */
+  last_backup?: {
+    [key: string]: unknown;
+  } | null;
+  /**
    * Name
    */
   name: string;
@@ -10745,6 +10826,14 @@ export type LineageCandidateOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
+  /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
   /**
    * Document Id
    */

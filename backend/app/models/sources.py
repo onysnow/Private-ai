@@ -50,3 +50,6 @@ class Evidence(Base):
     published_on: Mapped[str | None] = mapped_column(String(10), nullable=True)
     retrieved_on: Mapped[str | None] = mapped_column(String(10), nullable=True)
     limitations: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # Where the quote stands in its document's text, kept so it can be found again (ADR-0015,
+    # app/services/anchor_text.py): passage, offsets, 32 characters either side, match, lines.
+    anchor: Mapped[dict | None] = mapped_column(JSON, nullable=True)

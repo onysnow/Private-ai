@@ -82,6 +82,9 @@ class EvidenceOut(ResponseModel):
     published_on: str | None = None
     retrieved_on: str | None = None
     limitations: list[str] | None = None
+    # Where the quote stands in its document's text, as stored (ADR-0015): passage, offsets, the text either side,
+    # how the words matched, the lines it spans; null for a quote with no document or not found in it.
+    anchor: dict[str, Any] | None = None
 
 
 class EvidencePoolRow(ResponseModel):
@@ -694,6 +697,9 @@ class LineageCandidateOut(ResponseModel):
     reviewer_note: str | None = None
     created_at: Timestamp
     reviewed_at: Timestamp | None = None
+    # Who decided it, as signed in then; null before this was kept or with no account.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
 
 
 class LineageDocumentOut(ResponseModel):
@@ -1672,6 +1678,9 @@ class ClaimEvidenceLinkOut(ResponseModel):
     evidence_id: str
     stance: str  # supports | contradicts | context
     note: str | None = None
+    # Who decided it, as signed in then; null before this was kept, or outside a request.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
     created_at: Timestamp
 
 
@@ -1711,6 +1720,9 @@ class ClaimReviewEventOut(ResponseModel):
     unmet_rules: list[str] | None = None
     reviewer_type: str = "HUMAN"
     suite_changes: dict[str, list[Any]] | None = None
+    # Who decided it, as signed in then; null before this was kept, or outside a request.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
     created_at: Timestamp
 
 
@@ -1875,6 +1887,8 @@ class InvestigationOut(ResponseModel):
     type_areas: list[str] | None = None
     # This case's default AI run settings (null until the reporter saves them).
     ai_run_profile: dict | None = None
+    # The last backup made of this case: {"at", "bytes", "sha256", "documents_included"}; null until one is made.
+    last_backup: dict | None = None
     created_at: Timestamp
 
 
@@ -2683,6 +2697,11 @@ class CustodyCardOut(ResponseModel):
     text: str | None = None
     quote: str | None = None
     page: int | None = None
+    # A passage: the lines of the page, as read, that the quote spans.
+    line_start: int | None = None
+    line_end: int | None = None
+    # A reading by OCR: how legible the page was (Tesseract's mean word confidence, 0-100); null until measured.
+    legibility: float | None = None
 
 
 class CustodySourceOut(ResponseModel):
@@ -2694,10 +2713,24 @@ class CustodySourceOut(ResponseModel):
 
 
 class CustodyAnchorOut(ResponseModel):
-    """Where the quote stands in the passage, found now (character offsets in the passage text)."""
-    start: int
-    end: int
-    exact: bool
+    """Where the quote stands in the passage (ADR-0015): the stored anchor found again, or, for a quote saved before
+    anchors were kept, found now. Offsets are characters in the passage text; null when the quote is not found."""
+    start: int | None = None
+    end: int | None = None
+    exact: bool | None = None
+    match: Literal["exact", "case", "spacing"] | None = None
+    # Characters of the text before and after the quote kept with the anchor (up to 32 each).
+    before: int | None = None
+    after: int | None = None
+    line_start: int | None = None
+    line_end: int | None = None
+    occurrences: int | None = None
+    # held: the stored place still holds the quote; moved: found elsewhere; lost: no longer in the text;
+    # not anchored: nothing stored, looked for now.
+    state: Literal["held", "moved", "lost", "not anchored"]
+    stored: bool
+    anchored_at: str | None = None
+    chunk_id: str | None = None
 
 
 class CustodyRestingOut(ResponseModel):

@@ -48,6 +48,9 @@ class ClaimEvidenceLink(Base):
     evidence_id: Mapped[str] = mapped_column(ForeignKey("evidence.id"), index=True)
     stance: Mapped[str] = mapped_column(String(32), index=True)  # supports/contradicts/context
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Who linked it, as signed in when they did (app/db/decided_by.py); None before this was kept.
+    decided_by_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    decided_by_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 
@@ -72,6 +75,9 @@ class ClaimReviewEvent(Base):
     # Who reviewed (the suite's reviewer_type): a person, legal counsel, an AI-assisted
     # step or the app itself. A review from the API is a person's unless it says otherwise.
     reviewer_type: Mapped[str] = mapped_column(String(16), default="HUMAN")
+    # Which person, as signed in when they reviewed (app/db/decided_by.py); None before this was kept.
+    decided_by_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    decided_by_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     # Suite fields a review changed: {field: [from, to]}.
     suite_changes: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

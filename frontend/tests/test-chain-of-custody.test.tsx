@@ -24,14 +24,15 @@ const CHAIN = {
   claim: {id: 'c1', text: 'Harbour Nominees Ltd held 40% of Fernhill Ltd from March 2018', status: 'supported', confidence: 0.8},
   rows: [
     {evidence_id: 'e1', stance: 'supports', source: {title: 'Stock transfer form J30', source_type: 'document', tier: 'A', issuer: null},
-      anchor: {start: 27, end: 79, exact: true}, rests_on: [{kind: 'claim', id: 'c1', label: 'Harbour Nominees Ltd held 40%', level: null},
+      anchor: {start: 27, end: 79, exact: true, match: 'exact', before: 27, after: 32, line_start: 14, line_end: 22, occurrences: 1,
+        state: 'held', stored: true, anchored_at: '2026-10-03T11:02:00', chunk_id: 'k3'}, rests_on: [{kind: 'claim', id: 'c1', label: 'Harbour Nominees Ltd held 40%', level: null},
         {kind: 'flag', id: 'f1', label: 'Red Flag BO-031', level: 'strong'}], cards: [
       card('file:e1', 'file', 'Fernhill_share_transfer_2018.pdf', {who: 'Ony', actor: 'person', checks: [{label: 'hash', ok: true}], document_id: 'd1', sha256: SHA,
         lines: ['uploaded by Ony · 02 Oct 09:14'], wire: {style: 'worked_out', words: 'read by the app'}}),
-      card('read:e1', 'reading', 'Page 3 of 4', {who: 'App reader', lines: ['read by OCR', 'app reader'], checks: [{label: 'OCR', ok: true}], wire: {style: 'worked_out', words: 'p.3'}}),
+      card('read:e1', 'reading', 'Page 3 of 4', {who: 'App reader', lines: ['read by OCR · 96% legible'], legibility: 96.2, checks: [{label: 'OCR', ok: true}], wire: {style: 'worked_out', words: 'p.3'}}),
       card('passage:e1', 'passage', 'Passage · page 3 (OCR)', {text: 'to the person named below: Harbour Nominees Limited, being forty per cent (40%) of the issued share capital',
-        quote: 'Harbour Nominees Limited, being forty per cent (40%)', page: 3, checks: [{label: 'says it', ok: true}], wire: {style: 'proposed', words: 'proposed'}}),
-      card('decision:e1', 'decision', 'Proposed', {who: 'a person', actor: 'person', lines: ['Name-finder · entity · 0.78', 'accepted by a person'],
+        quote: 'Harbour Nominees Limited, being forty per cent (40%)', page: 3, line_start: 14, line_end: 22, checks: [{label: 'says it', ok: true}], wire: {style: 'proposed', words: 'proposed'}}),
+      card('decision:e1', 'decision', 'Proposed', {who: 'Ony', actor: 'person', lines: ['Name-finder · entity · 0.78', 'accepted by Ony'],
         checks: [{label: 'accepted', ok: true}], wire: {style: 'confirmed', words: 'supports'}}),
     ]},
     {evidence_id: 'e2', stance: 'contradicts', cards: [
@@ -92,7 +93,15 @@ describe('Chain of Custody', () => {
     expect(detail.querySelector('mark')).toHaveTextContent('Harbour Nominees Limited, being forty per cent (40%)');
     expect(within(detail).getByText(/a3f9 07c2 … 5d1e/)).toBeInTheDocument();
     expect(detail).toHaveTextContent('Stock transfer form J30, page 3');
-    expect(detail).toHaveTextContent('exact quote at characters 27–79 of the passage');
+    // Stored, not found again each time (ADR-0015): the lines, the text kept either side, the offsets.
+    expect(detail).toHaveTextContent('Fernhill_share_transfer_2018.pdf · lines 14\u2060–\u206022');
+    expect(detail).toHaveTextContent('exact quote + 27 characters before, 32 after, offsets 27–79');
+    expect(detail).toHaveTextContent('Name-finder · entity · 0.78 · accepted by Ony');
+    expect(screen.getByRole('button', {name: /^Passage: Passage · page 3/})).toHaveTextContent('Passage · p.3 l.14\u2060–\u206022');
+    // The card shows the words around the stored anchor, lit (offsets 27–79 of the passage).
+    expect(screen.getByRole('button', {name: /^Passage: Passage · page 3/}).querySelector('mark')).toHaveTextContent('Harbour Nominees Limited, being forty per cent (40%)');
+    expect(screen.getByRole('button', {name: /^Reading: Page 3 of 4/})).toHaveTextContent('Page 3 of 4, read by OCR · 96% legible');
+    expect(screen.getByRole('button', {name: /^Decision: Proposed/})).toHaveTextContent('✓ Accepted by Ony');
     expect(within(detail).getByText(/Red Flag BO-031/)).toBeInTheDocument();
     // The AI step leads to its run.
     await userEvent.setup().click(screen.getByRole('button', {name: 'Watch the run →'}));
@@ -116,7 +125,7 @@ describe('Chain of Custody', () => {
     expect(screen.getByRole('list', {name: 'The chain as a list'})).toHaveTextContent('Ony: Uploaded Fernhill_share_transfer_2018.pdf');
     fireEvent.keyDown(window, {key: 'l'});
     await user.click(screen.getByRole('button', {name: /^Source: Companies House CS01/}));
-    expect(screen.getByRole('complementary', {name: 'Step 1 of 2: Source'})).toHaveTextContent('Answered: filed 14 Dec 2017, before the transfer');
+    expect(screen.getByRole('complementary', {name: 'Step 1 of 2: Source'})).toHaveTextContent('Answered by a person: filed 14 Dec 2017, before the transfer');
   });
 
   it('replays the log as the wheel turns over it, lighting each step\'s card and wires', async () => {
