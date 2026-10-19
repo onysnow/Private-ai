@@ -3,36 +3,57 @@
 // specimen cards (each drawn in its own theme) and the effects; on the right the open
 // case's real Case home, split between the theme you use and the one you point at, its
 // four facts, and the formats. Pointing at a card previews it there; choosing a card tries
-// it on the whole app for this session, and the bar at the top keeps it or goes back.
-import type {ReactElement} from 'react';
+// it on the whole app for this session, and the bar at the top keeps it or goes back. "+ Make your own" opens the
+// theme maker (theme-maker.tsx); your own themes then sit among the cards and are tried and kept the same way.
+import type {CSSProperties, ReactElement} from 'react';
 import {useEffect, useState} from 'react';
 
 import {STATUS_WORDS, LEVEL_WORDS} from '../../components/status';
 import {clearHeroPhoto, loadHeroPhoto, onHeroPhotoChange, saveHeroPhoto, type HeroPhoto} from '../../lib/hero-photo';
 import {webglAvailable} from '../effects/webgl';
-import {ThemeCompare} from './theme-compare';
+import {ThemeCompare, type Look} from './theme-compare';
+import {draftFrom, draftOf, ThemeMaker, type ThemeDraft} from './theme-maker';
+import {checkPalette, ratioText} from '../../lib/contrast';
+import {customTheme, customThemes, deleteCustomTheme, MAX_CUSTOM_THEMES, onCustomThemesChange, paletteVars, type CustomTheme} from '../../lib/custom-theme';
 import {
-  currentAppearance, DEFAULT_APPEARANCE, FORMATS, keepAppearance, keptAppearance, onAppearanceChange, THEMES, tryingTheme, tryTheme,
+  currentAppearance, DEFAULT_APPEARANCE, FORMATS, keepAppearance, keptAppearance, onAppearanceChange, THEMES, tryingCustom, tryingTheme, tryTheme,
   type Appearance, type Effects, type Format, type NamedEffect, type ThemeId,
 } from '../../lib/theme';
 
+type AppearanceState = {now: Appearance; kept: Appearance; trying: ThemeId | null; tryingOwn: string | null};
+
 /** The appearance on screen now, kept up to date when it changes anywhere. */
-export function useAppearance(): {now: Appearance; kept: Appearance; trying: ThemeId | null} {
+export function useAppearance(): AppearanceState {
   // The first render matches the server's (stored choices are read after mounting), so hydration never disagrees.
-  const [state, setState] = useState<{now: Appearance; kept: Appearance; trying: ThemeId | null}>({now: DEFAULT_APPEARANCE, kept: DEFAULT_APPEARANCE, trying: null});
+  const [state, setState] = useState<AppearanceState>({now: DEFAULT_APPEARANCE, kept: DEFAULT_APPEARANCE, trying: null, tryingOwn: null});
   useEffect(() => {
-    const read = () => setState({now: currentAppearance(), kept: keptAppearance(), trying: tryingTheme()});
+    const read = () => setState({now: currentAppearance(), kept: keptAppearance(), trying: tryingTheme(), tryingOwn: tryingCustom()});
     read();
-    return onAppearanceChange(read);
+    const offA = onAppearanceChange(read);
+    const offC = onCustomThemesChange(read);
+    return () => { offA(); offC(); };
   }, []);
   return state;
 }
 
+/** Your own themes, kept up to date when one is saved or deleted. */
+function useCustomThemes(): CustomTheme[] {
+  const [list, setList] = useState<CustomTheme[]>([]);
+  useEffect(() => {
+    const read = () => setList(customThemes());
+    read();
+    return onCustomThemesChange(read);
+  }, []);
+  return list;
+}
+
 const themeName = (id: ThemeId): string => THEMES.find(t => t.id === id)?.name ?? id;
+/** A theme's name, or the name of your own theme when there is one. */
+export const lookName = (theme: ThemeId, own: string | null): string => customTheme(own)?.name ?? themeName(theme);
 
 /** The bar at the top of every screen while a theme is on trial: Keep it, or go back (Esc). */
 export function TryingBar(): ReactElement | null {
-  const {trying, kept} = useAppearance();
+  const {trying, tryingOwn, kept} = useAppearance();
   useEffect(() => {
     if (!trying) return undefined;
     const onKey = (e: KeyboardEvent) => {
@@ -43,12 +64,12 @@ export function TryingBar(): ReactElement | null {
     return () => window.removeEventListener('keydown', onKey);
   }, [trying]);
   if (!trying) return null;
-  const name = themeName(trying);
+  const name = lookName(trying, tryingOwn);
   return <div className="ap-trying" role="status">
     <i className="ap-trying-dot" aria-hidden="true"/>
     <span>Trying <b>{name}</b> · nothing is saved until you keep it</span>
-    <button type="button" className="ap-btn p" onClick={() => keepAppearance({theme: trying})}>Keep {name}</button>
-    <button type="button" className="ap-btn" onClick={() => tryTheme(null)}>Go back to {themeName(kept.theme)} <kbd>Esc</kbd></button>
+    <button type="button" className="ap-btn p" onClick={() => keepAppearance({theme: trying, custom: tryingOwn})}>Keep {name}</button>
+    <button type="button" className="ap-btn" onClick={() => tryTheme(null)}>Go back to {lookName(kept.theme, kept.custom)} <kbd>Esc</kbd></button>
   </div>;
 }
 
@@ -57,7 +78,7 @@ const EFFECTS: {id: Effects; name: string}[] = [{id: 'full', name: 'Full'}, {id:
 /** The named effects, from the OnySnow Studios effect system (vendor/onysnow-effects, ADR-0009). */
 const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeId[]}[] = [
   {id: 'bokeh', name: 'Bokeh lights on the board', line: 'CSS only · drifts 23–34 s', themes: ['rain-noir']},
-  {id: 'rain', name: 'Rain on the case-home pane', line: 'WaterDrops · one pane only · stops if calm', themes: ['rain-noir']},
+  {id: 'rain', name: 'Rain on the case-home pane', line: 'WaterDrops · one pane only · a still “after the rain” frame if calm', themes: ['rain-noir']},
   {id: 'grain', name: 'Film grain', line: 'Never on documents', themes: ['rain-noir', 'archive']},
   {id: 'iris', name: 'Iris when a feature opens', line: '8-blade shutter · fades if calm', themes: ['rain-noir']},
   {id: 'shutter', name: 'Shutter corners on save', line: 'Brackets only, no flash', themes: ['rain-noir']},
@@ -118,12 +139,48 @@ function RainPhoto(): ReactElement {
   </div>;
 }
 
+/** A card in the gallery: one of the five themes, or one of your own drawn as its base theme in its own colours. */
+type ThemeOption = {key: string; theme: ThemeId; own: CustomTheme | null; name: string; mood: string; swatches: string[]; lowest: string};
+
+function optionsOf(own: CustomTheme[]): ThemeOption[] {
+  return [
+    ...THEMES.map(t => ({key: t.id, theme: t.id, own: null, name: t.name, mood: t.mood, swatches: t.swatches.slice(1), lowest: t.lowestContrast})),
+    ...own.map(o => ({key: `own:${o.id}`, theme: o.base, own: o, name: o.name, mood: `Your own, from ${themeName(o.base)}. Kept in this browser.`,
+      swatches: (['surface-1', 'surface-2', 'surface-3', 'text', 'accent-1', 'accent-2'] as const).map(k => o.colours[k]),
+      lowest: ratioText(checkPalette(o.colours).lowest.ratio)})),
+  ];
+}
+
+const ownStyle = (o: CustomTheme | null): CSSProperties | undefined => (o ? paletteVars(o.colours) as CSSProperties : undefined);
+
 export function AppearancePanel(): ReactElement {
-  const {now, kept, trying} = useAppearance();
-  const [pointed, setPointed] = useState<ThemeId | null>(null);
-  const looking: ThemeId = pointed ?? trying ?? kept.theme;
-  const info = THEMES.find(t => t.id === looking)!;
-  const lookingWord = trying === looking ? 'trying' : looking === kept.theme ? 'now' : 'pointed at';
+  const {now, kept, trying, tryingOwn} = useAppearance();
+  const own = useCustomThemes();
+  const options = optionsOf(own);
+  const keyOf = (theme: ThemeId, custom: string | null) => (custom ? `own:${custom}` : theme);
+  const [pointed, setPointed] = useState<string | null>(null);
+  const [draft, setDraft] = useState<ThemeDraft | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const nowKey = keyOf(now.theme, now.custom);
+  const keptKey = keyOf(kept.theme, kept.custom);
+  const tryingKey = trying ? keyOf(trying, tryingOwn) : null;
+  const lookingKey = pointed ?? tryingKey ?? keptKey;
+  const looking = options.find(o => o.key === lookingKey) ?? options.find(o => o.key === keptKey) ?? options[0];
+  const keptOption = options.find(o => o.key === keptKey) ?? options[0];
+  const lookingWord = draft ? 'making' : tryingKey === looking.key ? 'trying' : looking.key === keptKey ? 'now' : 'pointed at';
+  const lookOf = (o: ThemeOption): Look => ({theme: o.theme, colours: o.own?.colours ?? null, name: o.name});
+  const after: Look = draft ? {theme: draft.base, colours: draft.colours, name: draft.name.trim() || 'Your theme'} : lookOf(looking);
+  const afterCheck = draft ? checkPalette(draft.colours) : looking.own ? checkPalette(looking.own.colours) : null;
+  const lowest = afterCheck ? ratioText(afterCheck.lowest.ratio) : looking.lowest;
+  const passes = afterCheck ? afterCheck.failing.length === 0 : Number.parseFloat(looking.lowest) >= 4.5;
+  const info = THEMES.find(t => t.id === after.theme)!;
+  const remove = (o: CustomTheme) => {
+    deleteCustomTheme(o.id);
+    setDeleting(null);
+    // Kept or on trial: back to the theme it started from (the kept choice falls back by itself once it is gone).
+    if (tryingOwn === o.id) tryTheme(null);
+    else keepAppearance({});
+  };
   // Read after mounting, so the first render matches the server's.
   const [webgl, setWebgl] = useState(true);
   useEffect(() => setWebgl(webglAvailable()), []);
@@ -138,33 +195,52 @@ export function AppearancePanel(): ReactElement {
             if (at < 0) return;
             const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
             if (step) { e.preventDefault(); cards[(at + step + cards.length) % cards.length].focus(); return; }
-            if ((e.key === 'k' || e.key === 'K') && !e.metaKey && !e.ctrlKey) { e.preventDefault(); keepAppearance({theme: THEMES[at].id}); }
+            if ((e.key === 'k' || e.key === 'K') && !e.metaKey && !e.ctrlKey) { e.preventDefault(); keepAppearance({theme: options[at].theme, custom: options[at].own?.id ?? null}); }
           }}>
-          {THEMES.map(t => {
-            const current = kept.theme === t.id;
-            return <button key={t.id} type="button" data-theme={t.id} role="radio" aria-checked={now.theme === t.id}
-              tabIndex={now.theme === t.id ? 0 : -1}
-              className={`ap-card${now.theme === t.id ? ' on' : ''}${trying === t.id ? ' trying' : ''}`}
-              aria-label={`${t.name} theme${current ? ', in use' : ''}${trying === t.id ? ', trying' : ''}`}
-              onMouseEnter={() => setPointed(t.id)} onFocus={() => setPointed(t.id)} onBlur={() => setPointed(null)}
-              onClick={() => tryTheme(current ? null : t.id)}>
-              <span className="ap-card-head"><b>{t.name}</b>{current && <span className="ap-tag">Current</span>}{trying === t.id && <span className="ap-tag try">Trying</span>}</span>
+          {options.map(t => {
+            const current = keptKey === t.key;
+            const card = <button key={t.key} type="button" data-theme={t.theme} role="radio" aria-checked={nowKey === t.key} style={ownStyle(t.own)}
+              tabIndex={nowKey === t.key ? 0 : -1}
+              className={`ap-card${nowKey === t.key ? ' on' : ''}${tryingKey === t.key ? ' trying' : ''}`}
+              aria-label={`${t.name} theme${t.own ? ' (your own)' : ''}${current ? ', in use' : ''}${tryingKey === t.key ? ', trying' : ''}`}
+              onMouseEnter={() => setPointed(t.key)} onFocus={() => setPointed(t.key)} onBlur={() => setPointed(null)}
+              onClick={() => tryTheme(current ? null : t.theme, current ? null : t.own?.id ?? null)}>
+              <span className="ap-card-head"><b>{t.name}</b>{current && <span className="ap-tag">Current</span>}{tryingKey === t.key && <span className="ap-tag try">Trying</span>}</span>
               <span className="ap-mood">{t.mood}</span>
-              <span className="ap-sw" aria-hidden="true">{t.swatches.slice(1).map(c => <i key={c} style={{background: c}}/>)}</span>
+              <span className="ap-sw" aria-hidden="true">{t.swatches.map((c, i) => <i key={`${c}${i}`} style={{background: c}}/>)}</span>
               <span className="ap-type" aria-hidden="true"><span className="ap-type-h">Header</span><span className="ap-type-b">Body copy</span><span className="ap-type-m">€29,400</span></span>
               <span className="ap-marks" aria-hidden="true">
                 {(['supported', 'disputed', 'unshown', 'ruled_out'] as const).map(s => <i key={s} className={`st-${s}`} title={STATUS_WORDS[s].word}>{STATUS_WORDS[s].mark}</i>)}
                 {(['faint', 'strong', 'textbook'] as const).map(l => <i key={l} className={`lv-${l}`} title={LEVEL_WORDS[l].word}>{LEVEL_WORDS[l].bars}</i>)}
               </span>
-              <span className="ap-meta">Lowest pair {t.lowestContrast} · {contrastGrade(t.lowestContrast)}</span>
+              <span className="ap-meta">Lowest pair {t.lowest} · {contrastGrade(t.lowest)}</span>
             </button>;
+            if (!t.own) return card;
+            const o = t.own;
+            return <div key={t.key} className="ap-own-cell">
+              {card}
+              <span className="ap-own-acts">
+                {deleting === o.id
+                  ? <><span>Delete {o.name}?</span><button type="button" onClick={() => remove(o)}>Delete</button><button type="button" onClick={() => setDeleting(null)}>Keep it</button></>
+                  : <><button type="button" onClick={() => { setDeleting(null); setDraft(draftOf(o)); }}>Edit</button><button type="button" onClick={() => setDeleting(o.id)}>Delete…</button></>}
+              </span>
+            </div>;
           })}
-          <div className="ap-card ap-own" aria-disabled="true">
+          <button type="button" className="ap-card ap-own" aria-expanded={draft !== null && !draft.id} disabled={own.length >= MAX_CUSTOM_THEMES && !draft}
+            onClick={() => setDraft(draft && !draft.id ? null : draftFrom(keptOption.theme))}>
             <b>+ Make your own</b>
             <span className="ap-mood">Start from any theme and change colours. Each colour is checked for contrast before it can be saved.</span>
-            <span className="ap-meta">Not built yet</span>
-          </div>
+            {own.length >= MAX_CUSTOM_THEMES && <span className="ap-meta">This browser keeps {MAX_CUSTOM_THEMES}; delete one first</span>}
+          </button>
         </div>
+        {draft && <ThemeMaker draft={draft} onDraft={setDraft} onCancel={() => setDraft(null)}
+          onSaved={t => {
+            const editing = Boolean(draft.id);
+            setDraft(null);
+            // A new one goes on trial at once; an edited one already in use is drawn again in its new colours.
+            if (!editing) tryTheme(t.base, t.id);
+            else keepAppearance({});
+          }}/>}
 
         <header className="ap-pane-head"><h2>Effects</h2><span>only on the board behind panels, never over text</span></header>
         <div className="ap-seg" role="radiogroup" aria-label="Effects">
@@ -184,15 +260,15 @@ export function AppearancePanel(): ReactElement {
           })}
         </div>
         {webgl && now.theme === 'rain-noir' && now.effects !== 'off' && !now.off.includes('rain') && <RainPhoto/>}
-        <Switch on={now.motion === 'calm'} label="Calm motion" line="Slides become fades and moving effects stand still. Your computer’s reduce-motion setting does the same."
+        <Switch on={now.motion === 'calm'} label="Calm motion" line="Slides become fades, moving effects stand still and the rain shows a still “after the rain” frame. Your computer’s reduce-motion setting does the same."
           onChange={on => keepAppearance({motion: on ? 'calm' : 'normal'})}/>
       </div>
 
       <div className="ap-pane">
-        <ThemeCompare before={kept.theme} after={looking} afterWord={lookingWord}/>
+        <ThemeCompare before={lookOf(keptOption)} after={after} afterWord={lookingWord}/>
         <p className="ap-note">Drag the divider, or use ← → while it is focused. The preview is your real case, not a sample.</p>
-        <dl className="ap-facts" aria-label={`${info.name} in four facts`}>
-          <div><dt>{Number.parseFloat(info.lowestContrast) >= 4.5 ? '✓ Passes every check' : 'Fails a contrast check'}</dt><dd>Lowest text pair {info.lowestContrast} · {contrastGrade(info.lowestContrast)}</dd></div>
+        <dl className="ap-facts" aria-label={`${after.name ?? info.name} in four facts`}>
+          <div><dt>{passes ? '✓ Passes every check' : '✕ Fails a contrast check'}</dt><dd>Lowest text pair {lowest} · {contrastGrade(lowest)}</dd></div>
           <div><dt>Calm zones untouched</dt><dd>{info.calm}</dd></div>
           <div><dt>Fonts on this computer</dt><dd>{info.fonts}</dd></div>
           <div><dt>Cost on this laptop</dt><dd>{info.cost}</dd></div>

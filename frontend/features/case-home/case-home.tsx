@@ -29,6 +29,7 @@ import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
 import {NewCaseSetup} from '../new-case/new-case-setup';
 import {DecisionCard} from './decision-card';
+import {FrostPanel, FrostStill} from '../effects/frost-panel';
 import {RainPane} from '../effects/rain-pane';
 import {MiniNetwork} from './mini-network';
 import {PagePicture} from './decision-card';
@@ -93,14 +94,14 @@ function Module({n, name, href, extra, children, className = '', label, openLabe
   n: string; name: string; href?: string; extra?: ReactNode; children: ReactNode; className?: string; label?: string; openLabel?: string;
 }): ReactElement {
   const inv = useWorkbenchStore(state => state.investigationId);
-  return <section className={`ch-mod ${className}`} aria-label={label ?? name}>
+  return <FrostPanel className={`ch-mod ${className}`} label={label ?? name}>
     <header className="ch-mod-head">
       <h2><span className="ch-n">{n}</span>{name}</h2>
       {extra}
       {href && <Link className="ch-open" href={caseHref(href, inv)}>{openLabel} <span aria-hidden="true">↗</span></Link>}
     </header>
     {children}
-  </section>;
+  </FrostPanel>;
 }
 
 function Stepper({index, count, total, onStep, label}: {index: number; count: number; total?: number; onStep: (i: number) => void; label: string}): ReactElement | null {
@@ -470,7 +471,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
 }): ReactElement {
   const id = investigation?.id ?? '';
   if (!investigation) return loading ? <div className="ch-home ch-loading" aria-busy="true"><div className="ch-skeleton"/></div> : <div className="ch-home"><FirstCase onSwitch={onSwitch}/></div>;
-  return <div className="ch-home" data-testid="case-home">
+  return <FrostStill.Provider value={preview}><div className="ch-home" data-testid="case-home">
     <RainPane as="header" className="ch-top" still={preview}>
       <div className="ch-name">
         <h1>{investigation.name}</h1>
@@ -489,5 +490,5 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
         <Module n="03" name="See · who is linked" href="/see#the-wire" openLabel="Open network"><MiniNetwork investigationId={id}/></Module></div>
     </div>
     <footer className="ch-bottom"><YearRail investigationId={id}/><PointingAt investigationId={id}/></footer>
-  </div>;
+  </div></FrostStill.Provider>;
 }

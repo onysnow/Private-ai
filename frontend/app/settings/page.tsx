@@ -11,7 +11,7 @@ import type {InvestigationDeletionPreview, SettingsStatusOut} from '../../lib/ge
 import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
 import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
-import {AppearancePanel, useAppearance} from '../../features/appearance/appearance-panel';
+import {AppearancePanel, lookName, useAppearance} from '../../features/appearance/appearance-panel';
 import {KeptLine, SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
 import {HIDE_SCREEN_EVENT, NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
@@ -20,7 +20,6 @@ import {BackupPanel} from '../../features/backups/backup-panel';
 import {LevelChip, LEVEL_WORDS} from '../../components/status';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {setSingleKeys, singleKeysOn} from '../../lib/shortcuts';
-import {THEMES} from '../../lib/theme';
 import {SuiteCoverage} from '../../features/suite-coverage/suite-coverage';
 import {DemoCasesLoader} from '../../features/demo/demo-cases-loader';
 import {OneMdbLoader} from '../../features/demo/one-mdb-loader';
@@ -203,7 +202,7 @@ function Settings(): ReactElement {
   useEffect(() => { setKeysOn(singleKeysOn()); }, []);
   const cases = investigationsQuery.data ?? [];
   const connectors = Object.values(status?.connectors ?? {});
-  const theme = THEMES.find(t => t.id === (look.trying ?? look.kept.theme))?.name ?? look.kept.theme;
+  const theme = look.trying ? lookName(look.trying, look.tryingOwn) : lookName(look.kept.theme, look.kept.custom);
   const inv = useWorkbenchStore(state => state.investigationId) || cases[0]?.id || '';
   const settingRows: SettingRow[] = [
     {group: 'You', id: 'appearance', stored: 'this browser on this device', leaves: 'nothing', label: 'Appearance', value: theme, words: 'theme colour color dark effects motion format fonts',

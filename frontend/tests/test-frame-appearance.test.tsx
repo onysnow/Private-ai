@@ -42,7 +42,7 @@ describe('theme storage', () => {
 
   it('ignores unknown or unready values', () => {
     window.localStorage.setItem('pai:appearance', JSON.stringify({theme: 'neon-pink', format: 'desk', effects: 'loud'}));
-    expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon']});
+    expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], custom: null});
   });
 });
 
