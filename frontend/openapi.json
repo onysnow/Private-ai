@@ -24725,6 +24725,11 @@
             ],
             "title": "Idle Minutes"
           },
+          "known": {
+            "default": false,
+            "title": "Known",
+            "type": "boolean"
+          },
           "lock_on_hide": {
             "anyOf": [
               {
@@ -24846,6 +24851,17 @@
               }
             ],
             "title": "Session"
+          },
+          "unsigned_decisions": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unsigned Decisions"
           }
         },
         "required": [

@@ -74,6 +74,14 @@ def test_a_passphrase_locks_the_api_until_it_is_given():
     locked = client.get("/api/investigations", headers=h(other["session"]))
     assert locked.status_code == 423 and locked.json()["locked"] is True
     assert client.get("/api/investigations").status_code == 423
+    # The screen at :3000 must see the 423 itself (not a network error), and its preflight is never locked.
+    web = {"Origin": "http://localhost:3000"}
+    seen = client.get("/api/investigations", headers=web)
+    assert seen.status_code == 423 and seen.headers["access-control-allow-origin"] == "http://localhost:3000"
+    preflight = client.options("/api/settings/status", headers={**web, "Access-Control-Request-Method": "GET",
+                                                                "Access-Control-Request-Headers": "x-workbench-session"})
+    assert preflight.status_code == 200
+    assert client.get("/api/investigations", headers={"Origin": "https://elsewhere.example"}).headers.get("access-control-allow-origin") is None
     assert client.get("/api/health").status_code == 200
     assert client.post("/api/session/unlock", json={"passphrase": "wrong"}, headers=h(other["session"])).status_code == 400
     assert client.post("/api/session/unlock", json={"passphrase": PASS}, headers=h(other["session"])).json()["locked"] is False
@@ -215,10 +223,12 @@ def test_who_decided_what_counts_by_name_with_a_person_last():
         client.post(f"/api/claims/{claim['id']}/evidence", json={"evidence_id": ev["id"], "stance": "supports"}, headers=h(token))
 
     link()   # no name yet: "a person"
+    assert client.get("/api/me", headers=h(token)).json()["unsigned_decisions"] >= 1
     client.put("/api/me/name", json={"name": "Ony"}, headers=h(token))
     link()
     link()
     counted = client.get(f"/api/investigations/{inv}/deciders", headers=h(token)).json()
+    assert client.get("/api/me", headers=h(token)).json()["unsigned_decisions"] is None   # asked only before a name
     assert counted == {"days": 30, "people": [{"name": "Ony", "decisions": 2}, {"name": None, "decisions": 1}]}
 
 

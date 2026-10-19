@@ -43,6 +43,13 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   - one demo loads at a time, and a failed load is cleaned up;
   - a flag summary no longer ends twice after "S.A.".
 
+- **Your name and the app lock (19 Oct, ADR-0016, mockups ACCOUNT_1–4):** first open asks your
+  name, which goes on your decisions; "Protect with a passphrase" locks the app (idle, Hide
+  screen, sleep; quick PIN), seals every backup, and lets a case have its own passphrase;
+  People and access gives a person a key that expires. Branch `claude/accounts-and-locking`.
+  Disk encryption is left to Windows (BitLocker / Device encryption); the app only reports it,
+  and the BitLocker reading is untested on a real Windows machine.
+
 ## Waiting on Ony
 - **See ("The Wire"):** the prototype is at https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3,
   with its source in `docs/design/see-the-wire/` and the design in `SEE_THE_WIRE_PROTOTYPE.md`.

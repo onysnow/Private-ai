@@ -47,7 +47,7 @@ def _disk(db: Session) -> dict[str, Any]:
 
 
 def _state(db: Session, lock_session: app_lock.LockSession | None, token: str | None = None) -> dict[str, Any]:
-    state = app_lock.summary(db, lock_session)
+    state = {**app_lock.summary(db, lock_session), "known": lock_session is not None}
     if not state["locked"]:
         state["disk"] = _disk(db)
     return {**state, "session": token} if token else state

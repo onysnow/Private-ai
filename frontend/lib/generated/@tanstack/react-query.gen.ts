@@ -9,6 +9,7 @@ import {
 
 import { client } from '../client.gen';
 import {
+  active,
   addChartToDeckEndpoint,
   addChartToWriteupEndpoint,
   addCollection,
@@ -25,9 +26,11 @@ import {
   cancelJobEndpoint,
   canonicalEntityResolution,
   capabilities,
+  changePassphrase,
   checkConnectorKey,
   checkWatchlistNow,
   clearCaseLookups,
+  closeCase,
   connectors,
   connectorSearch,
   convertLeadEndpoint,
@@ -60,6 +63,7 @@ import {
   deleteStorySection,
   deleteWatch,
   deleteWriteupEndpoint,
+  diskAnswer,
   dismissHit,
   dismissRedFlag,
   editCollection,
@@ -170,6 +174,7 @@ import {
   inspectBackup,
   investigationAssistantRun,
   investigationCaseSynthesis,
+  investigationDeciders,
   investigationDeletionPreview,
   investigationHypothesisTest,
   investigationPresentationDraft,
@@ -231,14 +236,20 @@ import {
   listWriteupsEndpoint,
   load1Mdb,
   loadDemoCase,
+  lock,
+  lockCase,
+  locking,
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
   markAiRunThought,
   markRedFlagInnocent,
   markStoryReady,
+  me,
   nameStoryVersion,
+  newRecoveryKey,
   openalephIntegrationStatus,
+  openCase,
   type Options,
   patchClaimSuite,
   patchEvidenceSuite,
@@ -264,8 +275,10 @@ import {
   putResearchSettings,
   recheckHash,
   recordStoryGate,
+  recover,
   refreshOpenalephDocumentReview,
   relationshipSchemas,
+  removeCaseLock,
   removeCollection,
   removeCollectionItem,
   removeInvestigation,
@@ -299,14 +312,22 @@ import {
   seedDemo,
   seeWatch,
   sendCorpusEntitySet,
+  sessionState,
   setInvestigationType,
+  setName,
+  setPin,
   setStoryThesis,
   settingsStatus,
+  startSession,
   startStoryWriteup,
   syncCorpusNow,
   syncOpenalephDocument,
   tagARecord,
   testNotificationChannel,
+  turnOff,
+  turnOn,
+  unlock,
+  unlockPin,
   untagARecord,
   updateAppUser,
   updateClaimEndpoint,
@@ -319,6 +340,9 @@ import {
   uploadDocument,
 } from '../sdk.gen';
 import type {
+  ActiveData,
+  ActiveError,
+  ActiveResponse,
   AddChartToDeckEndpointData,
   AddChartToDeckEndpointError,
   AddChartToDeckEndpointResponse,
@@ -367,6 +391,9 @@ import type {
   CapabilitiesData,
   CapabilitiesError,
   CapabilitiesResponse,
+  ChangePassphraseData,
+  ChangePassphraseError,
+  ChangePassphraseResponse,
   CheckConnectorKeyData,
   CheckConnectorKeyError,
   CheckConnectorKeyResponse,
@@ -376,6 +403,9 @@ import type {
   ClearCaseLookupsData,
   ClearCaseLookupsError,
   ClearCaseLookupsResponse,
+  CloseCaseData,
+  CloseCaseError,
+  CloseCaseResponse,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchError,
@@ -472,6 +502,9 @@ import type {
   DeleteWriteupEndpointData,
   DeleteWriteupEndpointError,
   DeleteWriteupEndpointResponse,
+  DiskAnswerData,
+  DiskAnswerError,
+  DiskAnswerResponse,
   DismissHitData,
   DismissHitError,
   DismissHitResponse,
@@ -802,6 +835,9 @@ import type {
   InvestigationCaseSynthesisData,
   InvestigationCaseSynthesisError,
   InvestigationCaseSynthesisResponse,
+  InvestigationDecidersData,
+  InvestigationDecidersError,
+  InvestigationDecidersResponse,
   InvestigationDeletionPreviewData,
   InvestigationDeletionPreviewError,
   InvestigationDeletionPreviewResponse,
@@ -985,6 +1021,15 @@ import type {
   LoadDemoCaseData,
   LoadDemoCaseError,
   LoadDemoCaseResponse,
+  LockCaseData,
+  LockCaseError,
+  LockCaseResponse,
+  LockData,
+  LockError,
+  LockingData,
+  LockingError,
+  LockingResponse,
+  LockResponse,
   MakeLeadFromHitData,
   MakeLeadFromHitError,
   MakeLeadFromHitResponse,
@@ -1003,12 +1048,21 @@ import type {
   MarkStoryReadyData,
   MarkStoryReadyError,
   MarkStoryReadyResponse,
+  MeData,
+  MeError,
+  MeResponse,
   NameStoryVersionData,
   NameStoryVersionError,
   NameStoryVersionResponse,
+  NewRecoveryKeyData,
+  NewRecoveryKeyError,
+  NewRecoveryKeyResponse,
   OpenalephIntegrationStatusData,
   OpenalephIntegrationStatusError,
   OpenalephIntegrationStatusResponse,
+  OpenCaseData,
+  OpenCaseError,
+  OpenCaseResponse,
   PatchClaimSuiteData,
   PatchClaimSuiteError,
   PatchClaimSuiteResponse,
@@ -1080,12 +1134,18 @@ import type {
   RecordStoryGateData,
   RecordStoryGateError,
   RecordStoryGateResponse,
+  RecoverData,
+  RecoverError,
+  RecoverResponse,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewError,
   RefreshOpenalephDocumentReviewResponse,
   RelationshipSchemasData,
   RelationshipSchemasError,
   RelationshipSchemasResponse,
+  RemoveCaseLockData,
+  RemoveCaseLockError,
+  RemoveCaseLockResponse,
   RemoveCollectionData,
   RemoveCollectionError,
   RemoveCollectionItemData,
@@ -1185,15 +1245,27 @@ import type {
   SendCorpusEntitySetData,
   SendCorpusEntitySetError,
   SendCorpusEntitySetResponse,
+  SessionStateData,
+  SessionStateError,
+  SessionStateResponse,
   SetInvestigationTypeData,
   SetInvestigationTypeError,
   SetInvestigationTypeResponse,
+  SetNameData,
+  SetNameError,
+  SetNameResponse,
+  SetPinData,
+  SetPinError,
+  SetPinResponse,
   SetStoryThesisData,
   SetStoryThesisError,
   SetStoryThesisResponse,
   SettingsStatusData,
   SettingsStatusError,
   SettingsStatusResponse,
+  StartSessionData,
+  StartSessionError,
+  StartSessionResponse,
   StartStoryWriteupData,
   StartStoryWriteupError,
   StartStoryWriteupResponse,
@@ -1209,6 +1281,18 @@ import type {
   TestNotificationChannelData,
   TestNotificationChannelError,
   TestNotificationChannelResponse,
+  TurnOffData,
+  TurnOffError,
+  TurnOffResponse,
+  TurnOnData,
+  TurnOnError,
+  TurnOnResponse,
+  UnlockData,
+  UnlockError,
+  UnlockPinData,
+  UnlockPinError,
+  UnlockPinResponse,
+  UnlockResponse,
   UntagARecordData,
   UntagARecordError,
   UntagARecordResponse,
@@ -6350,6 +6434,37 @@ export const listInvestigationCrossReferencesOptions = (
     queryKey: listInvestigationCrossReferencesQueryKey(options),
   });
 
+export const investigationDecidersQueryKey = (
+  options: Options<InvestigationDecidersData>,
+) => createQueryKey('investigationDeciders', options);
+
+/**
+ * Investigation Deciders
+ *
+ * Who decided what in this case over the last days (mockup ACCOUNT_2): quote links, claim reviews by a person and
+ * decided proposals, by the name kept with each; null for decisions made before names were kept ("a person").
+ */
+export const investigationDecidersOptions = (
+  options: Options<InvestigationDecidersData>,
+) =>
+  queryOptions<
+    InvestigationDecidersResponse,
+    InvestigationDecidersError,
+    InvestigationDecidersResponse,
+    ReturnType<typeof investigationDecidersQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await investigationDeciders({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: investigationDecidersQueryKey(options),
+  });
+
 export const getDecisionsQueryKey = (options: Options<GetDecisionsData>) =>
   createQueryKey('getDecisions', options);
 
@@ -9015,6 +9130,280 @@ export const linkLeadMutation = (
   return mutationOptions;
 };
 
+export const meQueryKey = (options?: Options<MeData>) =>
+  createQueryKey('me', options);
+
+/**
+ * Me
+ */
+export const meOptions = (options?: Options<MeData>) =>
+  queryOptions<MeResponse, MeError, MeResponse, ReturnType<typeof meQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await me({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: meQueryKey(options),
+  });
+
+/**
+ * Lock Case
+ *
+ * Lock a case on its own, or change its passphrase (the old one is asked).
+ */
+export const lockCaseMutation = (
+  options?: Partial<Options<LockCaseData>>,
+): UseMutationOptions<
+  LockCaseResponse,
+  LockCaseError,
+  Options<LockCaseData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LockCaseResponse,
+    LockCaseError,
+    Options<LockCaseData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await lockCase({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Remove Case Lock
+ */
+export const removeCaseLockMutation = (
+  options?: Partial<Options<RemoveCaseLockData>>,
+): UseMutationOptions<
+  RemoveCaseLockResponse,
+  RemoveCaseLockError,
+  Options<RemoveCaseLockData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RemoveCaseLockResponse,
+    RemoveCaseLockError,
+    Options<RemoveCaseLockData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await removeCaseLock({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Disk Answer
+ */
+export const diskAnswerMutation = (
+  options?: Partial<Options<DiskAnswerData>>,
+): UseMutationOptions<
+  DiskAnswerResponse,
+  DiskAnswerError,
+  Options<DiskAnswerData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DiskAnswerResponse,
+    DiskAnswerError,
+    Options<DiskAnswerData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await diskAnswer({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Locking
+ */
+export const lockingMutation = (
+  options?: Partial<Options<LockingData>>,
+): UseMutationOptions<LockingResponse, LockingError, Options<LockingData>> => {
+  const mutationOptions: UseMutationOptions<
+    LockingResponse,
+    LockingError,
+    Options<LockingData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await locking({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Set Name
+ */
+export const setNameMutation = (
+  options?: Partial<Options<SetNameData>>,
+): UseMutationOptions<SetNameResponse, SetNameError, Options<SetNameData>> => {
+  const mutationOptions: UseMutationOptions<
+    SetNameResponse,
+    SetNameError,
+    Options<SetNameData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await setName({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Change Passphrase
+ */
+export const changePassphraseMutation = (
+  options?: Partial<Options<ChangePassphraseData>>,
+): UseMutationOptions<
+  ChangePassphraseResponse,
+  ChangePassphraseError,
+  Options<ChangePassphraseData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ChangePassphraseResponse,
+    ChangePassphraseError,
+    Options<ChangePassphraseData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await changePassphrase({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Set Pin
+ */
+export const setPinMutation = (
+  options?: Partial<Options<SetPinData>>,
+): UseMutationOptions<SetPinResponse, SetPinError, Options<SetPinData>> => {
+  const mutationOptions: UseMutationOptions<
+    SetPinResponse,
+    SetPinError,
+    Options<SetPinData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await setPin({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Turn On
+ *
+ * Protect with a passphrase: returns the recovery words, once. This browser stays unlocked.
+ */
+export const turnOnMutation = (
+  options?: Partial<Options<TurnOnData>>,
+): UseMutationOptions<TurnOnResponse, TurnOnError, Options<TurnOnData>> => {
+  const mutationOptions: UseMutationOptions<
+    TurnOnResponse,
+    TurnOnError,
+    Options<TurnOnData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await turnOn({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Turn Off
+ */
+export const turnOffMutation = (
+  options?: Partial<Options<TurnOffData>>,
+): UseMutationOptions<TurnOffResponse, TurnOffError, Options<TurnOffData>> => {
+  const mutationOptions: UseMutationOptions<
+    TurnOffResponse,
+    TurnOffError,
+    Options<TurnOffData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await turnOff({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * New Recovery Key
+ */
+export const newRecoveryKeyMutation = (
+  options?: Partial<Options<NewRecoveryKeyData>>,
+): UseMutationOptions<
+  NewRecoveryKeyResponse,
+  NewRecoveryKeyError,
+  Options<NewRecoveryKeyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    NewRecoveryKeyResponse,
+    NewRecoveryKeyError,
+    Options<NewRecoveryKeyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await newRecoveryKey({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 /**
  * Remove Note
  *
@@ -9628,6 +10017,235 @@ export const searchWorkbenchOptions = (options: Options<SearchWorkbenchData>) =>
     },
     queryKey: searchWorkbenchQueryKey(options),
   });
+
+export const sessionStateQueryKey = (options?: Options<SessionStateData>) =>
+  createQueryKey('sessionState', options);
+
+/**
+ * Session State
+ */
+export const sessionStateOptions = (options?: Options<SessionStateData>) =>
+  queryOptions<
+    SessionStateResponse,
+    SessionStateError,
+    SessionStateResponse,
+    ReturnType<typeof sessionStateQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await sessionState({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: sessionStateQueryKey(options),
+  });
+
+/**
+ * Active
+ *
+ * The screen saw you working: what the idle lock measures from (polling alone does not count).
+ */
+export const activeMutation = (
+  options?: Partial<Options<ActiveData>>,
+): UseMutationOptions<ActiveResponse, ActiveError, Options<ActiveData>> => {
+  const mutationOptions: UseMutationOptions<
+    ActiveResponse,
+    ActiveError,
+    Options<ActiveData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await active({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Close Case
+ */
+export const closeCaseMutation = (
+  options?: Partial<Options<CloseCaseData>>,
+): UseMutationOptions<
+  CloseCaseResponse,
+  CloseCaseError,
+  Options<CloseCaseData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CloseCaseResponse,
+    CloseCaseError,
+    Options<CloseCaseData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await closeCase({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Open Case
+ */
+export const openCaseMutation = (
+  options?: Partial<Options<OpenCaseData>>,
+): UseMutationOptions<
+  OpenCaseResponse,
+  OpenCaseError,
+  Options<OpenCaseData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    OpenCaseResponse,
+    OpenCaseError,
+    Options<OpenCaseData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await openCase({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Lock
+ */
+export const lockMutation = (
+  options?: Partial<Options<LockData>>,
+): UseMutationOptions<LockResponse, LockError, Options<LockData>> => {
+  const mutationOptions: UseMutationOptions<
+    LockResponse,
+    LockError,
+    Options<LockData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await lock({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Recover
+ *
+ * Forgot the passphrase: the recovery words, and a new passphrase.
+ */
+export const recoverMutation = (
+  options?: Partial<Options<RecoverData>>,
+): UseMutationOptions<RecoverResponse, RecoverError, Options<RecoverData>> => {
+  const mutationOptions: UseMutationOptions<
+    RecoverResponse,
+    RecoverError,
+    Options<RecoverData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await recover({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Start Session
+ */
+export const startSessionMutation = (
+  options?: Partial<Options<StartSessionData>>,
+): UseMutationOptions<
+  StartSessionResponse,
+  StartSessionError,
+  Options<StartSessionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    StartSessionResponse,
+    StartSessionError,
+    Options<StartSessionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await startSession({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Unlock
+ */
+export const unlockMutation = (
+  options?: Partial<Options<UnlockData>>,
+): UseMutationOptions<UnlockResponse, UnlockError, Options<UnlockData>> => {
+  const mutationOptions: UseMutationOptions<
+    UnlockResponse,
+    UnlockError,
+    Options<UnlockData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unlock({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Unlock Pin
+ */
+export const unlockPinMutation = (
+  options?: Partial<Options<UnlockPinData>>,
+): UseMutationOptions<
+  UnlockPinResponse,
+  UnlockPinError,
+  Options<UnlockPinData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UnlockPinResponse,
+    UnlockPinError,
+    Options<UnlockPinData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unlockPin({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * Check Connector Key

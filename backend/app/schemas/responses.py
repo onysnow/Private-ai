@@ -5467,6 +5467,7 @@ class LockStateOut(ResponseModel):
     protection: Literal["none", "passphrase"]
     locked: bool
     pin: bool
+    known: bool = False          # the server knows this browser's session (a restart forgets them all)
     session: str | None = None   # only from /session/start
     name: str | None = None
     idle_minutes: int | None = None
@@ -5479,6 +5480,7 @@ class LockStateOut(ResponseModel):
     backups_encrypted: bool | None = None
     disk_answer: str | None = None
     locked_cases: list[LockedCaseOut] | None = None
+    unsigned_decisions: int | None = None   # only while no name is given: decisions saved before names were kept
     disk: DiskStatusOut | None = None
 
 

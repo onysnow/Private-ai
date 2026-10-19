@@ -371,6 +371,22 @@ def close_case(session: LockSession, investigation_id: str) -> None:
     session.open_cases.discard(investigation_id)
 
 
+def unsigned_decisions(db: Session) -> int:
+    """Decisions saved before names were kept: they stay "a person" (first open says how many, ACCOUNT_1)."""
+    from sqlalchemy import func
+
+    from app.models.claims import ClaimEvidenceLink, ClaimReviewEvent
+    from app.models.documents import ExtractionCandidate
+
+    human = func.upper(func.coalesce(ClaimReviewEvent.reviewer_type, "HUMAN")).in_(("HUMAN", "LEGAL_COUNSEL"))
+    counts = (select(func.count()).select_from(ClaimEvidenceLink).where(ClaimEvidenceLink.decided_by_name.is_(None)),
+              select(func.count()).select_from(ClaimReviewEvent).where(ClaimReviewEvent.decided_by_name.is_(None), human),
+              select(func.count()).select_from(ExtractionCandidate).where(
+                  ExtractionCandidate.decided_by_name.is_(None), ExtractionCandidate.review_status.is_not(None),
+                  ExtractionCandidate.review_status != "proposed"))
+    return sum(int(db.execute(q).scalar_one()) for q in counts)
+
+
 def summary(db: Session, session: LockSession | None) -> dict[str, Any]:
     """What the screens need. While locked, only that it is locked and how to open it: no name, no cases."""
     row = profile(db)
@@ -386,5 +402,6 @@ def summary(db: Session, session: LockSession | None) -> dict[str, Any]:
             "passphrase_set_at": row.passphrase_set_at, "recovery_set_at": row.recovery_set_at,
             "backups_encrypted": bool(row.backup_recipient and row.protection == "passphrase"),
             "disk_answer": row.disk_answer,
+            "unsigned_decisions": None if row.display_name else unsigned_decisions(db),
             "locked_cases": [{"id": i, "name": n, "set_at": (lk or {}).get("set_at"),
                               "open": bool(session and i in session.open_cases)} for i, n, lk in cases]}

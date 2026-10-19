@@ -151,7 +151,9 @@ def app_lock_gate(request: Request, session_factory: Any) -> Response | None:
     from app.services import app_lock
 
     path = request.url.path
-    if not path.startswith("/api/") or path == "/api/health" or path.startswith(("/api/session", "/api/console")):
+    # A browser's CORS preflight carries no session key; the request it clears is gated.
+    if request.method == "OPTIONS" or not path.startswith("/api/") or path == "/api/health" \
+            or path.startswith(("/api/session", "/api/console")):
         return None
     with session_factory() as lock_db:
         session = app_lock.get_session(request.headers.get(app_lock.SESSION_HEADER))
@@ -389,6 +391,12 @@ def create_app(
             locked = app_lock_gate(request, session_factory)
             if locked is not None:
                 locked.headers["X-Request-ID"] = request_id
+                # Answered before the CORS middleware runs: without these the screen sees a network error, not 423.
+                origin = request.headers.get("origin")
+                if origin in app_settings.cors_origins:
+                    locked.headers["Access-Control-Allow-Origin"] = origin
+                    locked.headers["Access-Control-Allow-Credentials"] = "true"
+                    locked.headers["Vary"] = "Origin"
                 return locked
 
         auth_token = set_current_authorization_scope(scope_for_request(request))
