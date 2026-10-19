@@ -1,0 +1,67 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="account.css"><style>
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 40px}
+.crumb{font-size:13px;color:var(--muted)} .crumb b{color:var(--text);font-weight:500}
+.wrap{display:grid;grid-template-columns:1fr 1.05fr;gap:28px;padding:0 40px}
+h1{font:300 44px/1.05 'Source Serif 4 Variable';margin:8px 0 8px}
+.lede{color:var(--muted);font-size:15px;max-width:580px}
+.namebox{margin-top:20px;padding:20px 22px}
+.field{display:flex;align-items:flex-end;gap:16px;border-bottom:2px solid var(--amber);padding-bottom:8px;margin-top:10px}
+.ph{font:400 34px/1 'Source Serif 4 Variable';color:#5d4f40}
+.caret{width:2px;height:36px;background:var(--amber)}
+.initials{margin-left:auto;width:46px;height:46px;border-radius:50%;border:1.5px dashed #5d4f40;display:grid;place-items:center;font:500 14px 'IBM Plex Mono';color:#5d4f40}
+.reads{margin-top:16px;display:grid;gap:8px}
+.read{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center;padding:9px 12px;background:var(--p2);border:1px solid var(--line);border-radius:10px;font-size:13px}
+.read .where{font:500 10.5px 'IBM Plex Mono';color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.slot{color:#7d6a52;border:1px dashed #5d4f40;border-radius:5px;padding:0 6px;font-style:italic}
+.logrow{font:12.5px 'IBM Plex Mono';color:var(--muted)} .logrow b{color:var(--text);font-weight:500}
+.before{margin-top:14px;padding:14px 18px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.count{font:300 34px/1 'Source Serif 4 Variable'}
+.right{padding-top:4px}
+.prot{padding:18px 20px}
+.opt{display:grid;grid-template-columns:20px 1fr;gap:12px;padding:13px 14px;border:1px solid var(--line);border-radius:11px;margin-top:10px;background:var(--p2)}
+.opt.on{border-color:var(--amber);background:#2a2014}
+.radio{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--muted);margin-top:3px}
+.opt.on .radio{border-color:var(--amber);box-shadow:inset 0 0 0 3.5px #2a2014;background:var(--amber)}
+.opt b{font-weight:600;font-size:14.5px}
+.pp{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.pp span:before{margin-right:6px}
+.pp .y:before{content:'✓';color:var(--ok)} .pp .n:before{content:'✕';color:var(--bad)}
+.tag{font:500 10.5px 'IBM Plex Mono';border:1px solid #6b4e22;color:var(--amber);border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:2px}
+.extra{margin-top:12px;font-size:12.5px;color:var(--muted)}
+.foot{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:14px 40px;border-top:1px solid var(--line);background:rgba(18,15,12,.88)}
+</style></head><body>
+<div class="top"><div class="crumb">Journalism Workbench · <b>This computer</b> · first open after the update</div><span class="chip">⌂ Nothing leaves this computer</span></div>
+<div class="wrap">
+ <div>
+  <p class="eyebrow">Who is working here</p>
+  <h1>Sign your work</h1>
+  <p class="lede">From now on the app writes your name on every decision you make: what you accept, link, reject or set as Supported. Editors and lawyers read it in the Chain of Custody and the custody log.</p>
+  <div class="panel namebox">
+   <p class="eyebrow">Your name, as it goes on your work</p>
+   <div class="field"><span class="caret"></span><span class="ph">The name on your byline</span><span class="initials">··</span></div>
+   <div class="reads">
+    <p class="eyebrow" style="margin-top:4px">How it will read · fills in as you type</p>
+    <div class="read"><span class="where">Custody log</span><span class="logrow">3 Oct 11:02 · <span class="slot">your name</span> · <b>Accepted the proposal</b></span></div>
+    <div class="read"><span class="where">Decision card</span><span><span style="color:var(--ok)">✓</span> Accepted by <span class="slot">your name</span> · 3 Oct 11:02</span></div>
+    <div class="read"><span class="where">For a lawyer</span><span class="logrow">decided_by: <span class="slot">your name</span> (owner) · human</span></div>
+   </div>
+  </div>
+  <div class="panel before">
+   <span class="count">214</span>
+   <span class="note">decisions made before today stay as they are: <span class="mono" style="color:var(--text)">a person · before 19 Oct, when names weren't kept yet</span>. Nobody's name is put on them afterwards.</span>
+  </div>
+ </div>
+ <div class="right">
+  <div class="panel prot">
+   <p class="eyebrow">Protect what's on this computer · choose one</p>
+   <div class="opt on"><span class="radio"></span><div><b>Nothing to unlock</b>
+    <div class="pp"><span class="y">Opens straight away</span><span class="n">Anyone at this computer acts as you</span><span class="y">Nothing to forget</span><span class="n">Files readable if the laptop is taken</span></div></div></div>
+   <div class="opt"><span class="radio"></span><div><b>Encrypt with a passphrase</b><span class="tag">for cases with sources</span>
+    <div class="pp"><span class="y">Database and documents unreadable without it</span><span class="n">Lose it and the recovery key: the data is gone</span><span class="y">Locks when you walk away</span><span class="n">Asked every time the app starts</span></div>
+    <p class="extra">Next: set the passphrase and print a recovery key, once.</p></div></div>
+   <p class="extra" style="margin-top:14px">Either way, later in Settings › Your safety: lock one case with its own passphrase, lock when idle, a quick PIN to reopen.</p>
+  </div>
+ </div>
+</div>
+<div class="foot"><span class="note">Your name is stored in this computer's database and travels in backups. You can change it; past decisions keep the name they were signed with.</span><span style="display:flex;gap:12px;align-items:center"><span class="note">Type your name to continue</span><button class="btn primary" disabled>Continue <span class="key" style="border-color:#7a5520;color:#1b1208">⏎</span></button></span></div>
+</body></html>
