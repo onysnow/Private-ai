@@ -1,0 +1,31 @@
+/* The claims list on Check › Claims (features/claims/claims-panel.tsx). Each row carries the status grammar
+   (docs/handoff/02_RULES.md): a shape and a word in its chip, and the same shape on its left edge: shown solid,
+   not yet shown dashed, disputed red with a double edge, ruled out dotted. Never colour alone. */
+.finding.cl-row { display: flex; flex-direction: column; align-items: stretch; gap: 6px; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast), border-color var(--dur-fast); }
+.cl-row > .st { align-self: flex-start; display: inline-flex; gap: 5px; align-items: center; font: 600 11.5px/1.2 var(--font-ui); padding: 3px 8px; }
+.cl-row > small { margin-top: 0; }
+.finding.cl-row:hover, .finding.cl-row:focus-visible { transform: translateX(3px); background: var(--surface-2); }
+.finding.cl-row:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+.finding.cl-row[aria-current='true'] { background: var(--surface-2); border-top-color: var(--accent-1); border-right-color: var(--accent-1); border-bottom-color: var(--accent-1); }
+.finding.cl-supported { border-left: 4px solid var(--status-supported); }
+.finding.cl-unshown { border-left: 4px dashed var(--status-unshown); }
+.finding.cl-disputed { border-left: 6px double var(--status-disputed); }
+.finding.cl-ruled_out { border-left: 4px dotted var(--text-muted); }
+.cl-row > .st-disputed, .cl-head .st-disputed { border-style: double; border-width: 3px; }
+.cl-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cl-head .st { display: inline-flex; gap: 5px; align-items: center; font: 600 11.5px/1.2 var(--font-ui); padding: 3px 8px; }
+.cl-mark { display: inline-block; margin-right: 3px; }
+.cl-mark-supported { color: var(--status-supported); }
+.cl-mark-disputed { color: var(--status-disputed); }
+.cl-mark-unshown { color: var(--status-unshown); }
+.cl-mark-ruled_out { color: var(--text-muted); }
+
+/* Calm and reduced motion: no slide on hover, the colour change only, at once. */
+html[data-motion='calm'] .finding.cl-row { transition: none; }
+html[data-motion='calm'] .finding.cl-row:hover, html[data-motion='calm'] .finding.cl-row:focus-visible { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .finding.cl-row { transition: none; }
+  .finding.cl-row:hover, .finding.cl-row:focus-visible { transform: none; }
+}
+.cl-head h4 { margin: 0; }

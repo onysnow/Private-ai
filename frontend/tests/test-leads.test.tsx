@@ -151,7 +151,8 @@ describe('LeadsPanel', () => {
       expect(api.calls('GET /api/investigations/inv-1/claims')).toHaveLength(2);
     });
     expect(api.lastBody('POST /api/leads/lead-1/convert')).toEqual({kind: 'claim'});
-    await screen.findByText('lead · 0% confidence');
+    await screen.findByText('0% confidence');
+    expect(screen.getByText('0% confidence').closest('button')).toHaveClass('cl-unshown');
     expect(api.unmatched()).toEqual([]);
   });
 
