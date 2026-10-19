@@ -9,7 +9,7 @@ from app.models.domain import Document, DocumentChunk, DocumentCorpusSync, Extra
 from app.services.ftm import make_ftm_entity
 from app.services.identifier_proposals import accept_identifier
 from app.services.security import contained_path, resolve_storage_root
-from app.services.resolution import BASIS_SAME, candidate_entities
+from app.services.resolution import BASIS_SAME, candidate_entities, entity_names
 from app.services.pdf_ocr import extract_pdf_chunks
 from app.services.image_reader import IMAGE_EXTENSIONS, extract_image_chunks
 from app.services.container_readers import CONTAINER_EXTENSIONS, read_container
@@ -260,9 +260,13 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
         raise ValueError('Document has already been read')
     doc.extraction_status = 'extracting'
     doc.extraction_error = None
-    # The investigation's records by name: a name it already holds is proposed as that record's kind.
-    existing = {norm_name(row.caption): (row.id, row.schema) for row in db.scalars(select(Entity).where(
-        Entity.investigation_id == doc.investigation_id, Entity.merged_into_entity_id.is_(None)))}
+    # The investigation's records by name (caption, other names and aliases): a name it already
+    # holds is proposed as that record's kind. A caption wins over another record's alias.
+    held = db.scalars(select(Entity).where(Entity.investigation_id == doc.investigation_id, Entity.merged_into_entity_id.is_(None))).all()
+    existing: dict[str, tuple[str, str]] = {norm_name(record.caption): (record.id, record.schema) for record in held}
+    for record in held:
+        for name in entity_names(record)[1:]:
+            existing.setdefault(norm_name(name), (record.id, record.schema))
     try:
         chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
         # One proposal per name (and per claim sentence) in a document, with every place it is
