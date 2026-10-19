@@ -2044,6 +2044,38 @@ export type CaseYearOut = {
 };
 
 /**
+ * CatalogueAreaCountsOut
+ *
+ * How one area's indicators can be checked, how many are still pending, how many a rule computes.
+ */
+export type CatalogueAreaCountsOut = {
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Lookups
+   */
+  lookups: number;
+  /**
+   * Pending
+   */
+  pending: number;
+  /**
+   * Person
+   */
+  person: number;
+  /**
+   * Records
+   */
+  records: number;
+  /**
+   * Rules
+   */
+  rules: number;
+};
+
+/**
  * CatalogueAreaOut
  */
 export type CatalogueAreaOut = {
@@ -2113,6 +2145,40 @@ export type CatalogueCaseOut = {
    * Year
    */
   year: string;
+};
+
+/**
+ * CatalogueCrossHintCountOut
+ *
+ * How many of one area's indicators say they "may also point to" another area.
+ */
+export type CatalogueCrossHintCountOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Source
+   */
+  source: string;
+  /**
+   * Target
+   */
+  target: string;
+};
+
+/**
+ * CatalogueIndicatorListOut
+ */
+export type CatalogueIndicatorListOut = {
+  /**
+   * Indicators
+   */
+  indicators: Array<CatalogueIndicatorRowOut>;
+  /**
+   * Total
+   */
+  total: number;
 };
 
 /**
@@ -2196,6 +2262,56 @@ export type CatalogueIndicatorOut = {
    * Version
    */
   version: number;
+};
+
+/**
+ * CatalogueIndicatorRowOut
+ *
+ * One indicator in a list: enough to pick it, not the whole entry.
+ */
+export type CatalogueIndicatorRowOut = {
+  /**
+   * Area
+   */
+  area: string;
+  /**
+   * Checkable
+   */
+  checkable: 'records' | 'lookups' | 'person';
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Levels Set
+   */
+  levels_set: Array<'faint' | 'strong' | 'textbook'>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Rule
+   */
+  rule: boolean;
+  /**
+   * Status
+   */
+  status: 'verified' | 'pending';
+};
+
+/**
+ * CatalogueMapOut
+ */
+export type CatalogueMapOut = {
+  /**
+   * Areas
+   */
+  areas: Array<CatalogueAreaCountsOut>;
+  /**
+   * Cross Hints
+   */
+  cross_hints: Array<CatalogueCrossHintCountOut>;
 };
 
 /**
@@ -9163,6 +9279,26 @@ export type FontPairOut = {
 };
 
 /**
+ * GlossaryDefinitionOut
+ *
+ * One area's own wording of a term (catalogue/glossary/<area>.yaml).
+ */
+export type GlossaryDefinitionOut = {
+  /**
+   * Area
+   */
+  area: string;
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Source Url
+   */
+  source_url: string;
+};
+
+/**
  * GlossaryHintOut
  */
 export type GlossaryHintOut = {
@@ -9175,9 +9311,17 @@ export type GlossaryHintOut = {
    */
   definition: string;
   /**
+   * Definitions
+   */
+  definitions: number;
+  /**
    * Names
    */
   names: Array<GlossaryNameOut>;
+  /**
+   * Related
+   */
+  related: Array<string>;
   /**
    * Term
    */
@@ -9228,6 +9372,10 @@ export type GlossaryTermOut = {
    * Definition
    */
   definition: string;
+  /**
+   * Definitions
+   */
+  definitions: Array<GlossaryDefinitionOut>;
   /**
    * Examples
    */
@@ -18843,6 +18991,90 @@ export type SearchGlossaryResponses = {
 export type SearchGlossaryResponse =
   SearchGlossaryResponses[keyof SearchGlossaryResponses];
 
+export type GetGlossaryEntryData = {
+  body?: never;
+  path?: never;
+  query: {
+    /**
+     * Term
+     */
+    term: string;
+  };
+  url: '/api/catalogue/glossary/entry';
+};
+
+export type GetGlossaryEntryErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetGlossaryEntryError =
+  GetGlossaryEntryErrors[keyof GetGlossaryEntryErrors];
+
+export type GetGlossaryEntryResponses = {
+  /**
+   * Successful Response
+   */
+  200: GlossaryTermOut;
+};
+
+export type GetGlossaryEntryResponse =
+  GetGlossaryEntryResponses[keyof GetGlossaryEntryResponses];
+
+export type ListIndicatorsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Q
+     */
+    q?: string;
+    /**
+     * Area
+     */
+    area?: string | null;
+    /**
+     * Limit
+     */
+    limit?: number;
+    /**
+     * Offset
+     */
+    offset?: number;
+  };
+  url: '/api/catalogue/indicators';
+};
+
+export type ListIndicatorsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListIndicatorsError =
+  ListIndicatorsErrors[keyof ListIndicatorsErrors];
+
+export type ListIndicatorsResponses = {
+  /**
+   * Successful Response
+   */
+  200: CatalogueIndicatorListOut;
+};
+
+export type ListIndicatorsResponse =
+  ListIndicatorsResponses[keyof ListIndicatorsResponses];
+
 export type GetIndicatorData = {
   body?: never;
   path: {
@@ -18877,6 +19109,37 @@ export type GetIndicatorResponses = {
 
 export type GetIndicatorResponse =
   GetIndicatorResponses[keyof GetIndicatorResponses];
+
+export type GetCatalogueMapData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/catalogue/map';
+};
+
+export type GetCatalogueMapErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCatalogueMapError =
+  GetCatalogueMapErrors[keyof GetCatalogueMapErrors];
+
+export type GetCatalogueMapResponses = {
+  /**
+   * Successful Response
+   */
+  200: CatalogueMapOut;
+};
+
+export type GetCatalogueMapResponse =
+  GetCatalogueMapResponses[keyof GetCatalogueMapResponses];
 
 export type ListTermHintsData = {
   body?: never;

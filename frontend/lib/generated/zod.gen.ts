@@ -876,6 +876,20 @@ export const zCaseStandingOut = z.object({
 });
 
 /**
+ * CatalogueAreaCountsOut
+ *
+ * How one area's indicators can be checked, how many are still pending, how many a rule computes.
+ */
+export const zCatalogueAreaCountsOut = z.object({
+  key: z.string(),
+  lookups: z.number().int(),
+  pending: z.number().int(),
+  person: z.number().int(),
+  records: z.number().int(),
+  rules: z.number().int(),
+});
+
+/**
  * CatalogueAreaOut
  */
 export const zCatalogueAreaOut = z.object({
@@ -900,6 +914,48 @@ export const zCatalogueCaseOut = z.object({
   source_url: z.string(),
   what_happened: z.string(),
   year: z.string(),
+});
+
+/**
+ * CatalogueCrossHintCountOut
+ *
+ * How many of one area's indicators say they "may also point to" another area.
+ */
+export const zCatalogueCrossHintCountOut = z.object({
+  count: z.number().int(),
+  source: z.string(),
+  target: z.string(),
+});
+
+/**
+ * CatalogueIndicatorRowOut
+ *
+ * One indicator in a list: enough to pick it, not the whole entry.
+ */
+export const zCatalogueIndicatorRowOut = z.object({
+  area: z.string(),
+  checkable: z.enum(['records', 'lookups', 'person']),
+  id: z.string(),
+  levels_set: z.array(z.enum(['faint', 'strong', 'textbook'])),
+  name: z.string(),
+  rule: z.boolean(),
+  status: z.enum(['verified', 'pending']),
+});
+
+/**
+ * CatalogueIndicatorListOut
+ */
+export const zCatalogueIndicatorListOut = z.object({
+  indicators: z.array(zCatalogueIndicatorRowOut),
+  total: z.number().int(),
+});
+
+/**
+ * CatalogueMapOut
+ */
+export const zCatalogueMapOut = z.object({
+  areas: z.array(zCatalogueAreaCountsOut),
+  cross_hints: z.array(zCatalogueCrossHintCountOut),
 });
 
 /**
@@ -3673,6 +3729,17 @@ export const zFontPairOut = z.object({
 });
 
 /**
+ * GlossaryDefinitionOut
+ *
+ * One area's own wording of a term (catalogue/glossary/<area>.yaml).
+ */
+export const zGlossaryDefinitionOut = z.object({
+  area: z.string(),
+  definition: z.string(),
+  source_url: z.string(),
+});
+
+/**
  * GlossaryNameOut
  */
 export const zGlossaryNameOut = z.object({
@@ -3686,7 +3753,9 @@ export const zGlossaryNameOut = z.object({
 export const zGlossaryHintOut = z.object({
   areas: z.array(z.string()),
   definition: z.string(),
+  definitions: z.number().int(),
   names: z.array(zGlossaryNameOut),
+  related: z.array(z.string()),
   term: z.string(),
 });
 
@@ -3697,6 +3766,7 @@ export const zGlossaryTermOut = z.object({
   areas: z.array(z.string()),
   cases: z.array(z.string()),
   definition: z.string(),
+  definitions: z.array(zGlossaryDefinitionOut),
   examples: z.array(z.string()),
   indicators: z.array(z.string()),
   related: z.array(z.string()),
@@ -8745,6 +8815,30 @@ export const zSearchGlossaryQuery = z.object({
  */
 export const zSearchGlossaryResponse = zGlossaryPageOut;
 
+export const zGetGlossaryEntryQuery = z.object({
+  term: z.string().min(1).max(200),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetGlossaryEntryResponse = zGlossaryTermOut;
+
+export const zListIndicatorsQuery = z.object({
+  q: z.string().max(200).optional().default(''),
+  area: z
+    .string()
+    .regex(/^[A-Z]{2}$/)
+    .nullish(),
+  limit: z.number().int().gte(1).lte(3000).optional().default(500),
+  offset: z.number().int().gte(0).optional().default(0),
+});
+
+/**
+ * Successful Response
+ */
+export const zListIndicatorsResponse = zCatalogueIndicatorListOut;
+
 export const zGetIndicatorPath = z.object({
   indicator_id: z.string(),
 });
@@ -8753,6 +8847,11 @@ export const zGetIndicatorPath = z.object({
  * Successful Response
  */
 export const zGetIndicatorResponse = zCatalogueIndicatorOut;
+
+/**
+ * Successful Response
+ */
+export const zGetCatalogueMapResponse = zCatalogueMapOut;
 
 /**
  * Response List Term Hints

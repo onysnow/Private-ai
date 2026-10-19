@@ -19,6 +19,8 @@ import {BoardEffects} from '../../features/effects/board-effects';
 import {STAGES, hrefOfAnchor} from '../../lib/stages';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {handOffSearch} from '../../lib/search-handoff';
+import {TRAIL_TAIL_EVENT, currentTrailTail} from '../../lib/trail';
+import type {TrailTail} from '../../lib/trail';
 import {applyAppearance, currentAppearance, keepAppearance, THEMES, tryTheme} from '../../lib/theme';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {listInvestigationsOptions} from '../../lib/generated/@tanstack/react-query.gen';
@@ -75,18 +77,19 @@ const EDGE_PX = 6;
 const PAGES: {label: string; href: string; hint: string}[] = [
   {label: 'Case home', href: '/', hint: 'Where the case stands and what needs you'},
   {label: 'Decide', href: '/decide', hint: 'Everything only you can decide, one at a time'},
-  {label: 'Glossary', href: '/glossary', hint: 'Terms and Red Flag indicators'},
+  {label: 'Learn', href: '/learn', hint: 'The Red Flags catalogue and the glossary'},
   {label: 'Settings', href: '/settings', hint: 'Appearance, access, demo case'},
   {label: 'About', href: '/about', hint: 'What this app is'},
 ];
 
-const PAGE_NAMES: Record<string, string> = {'/': 'Case home', '/decide': 'Decide', '/glossary': 'Glossary', '/settings': 'Settings', '/about': 'About', '/review': 'Review', '/review/batch': 'Batch review'};
+const PAGE_NAMES: Record<string, string> = {'/': 'Case home', '/decide': 'Decide', '/learn': 'Learn', '/glossary': 'Glossary', '/settings': 'Settings', '/about': 'About', '/review': 'Review', '/review/batch': 'Batch review'};
 
 /** A link inside the case keeps the open case (?inv=) so a reload or a shared link opens it again. */
 function useCaseHref(): (href: string) => string {
   const inv = useWorkbenchStore(state => state.investigationId);
   return useCallback((href: string) => {
-    if (!inv || !(href === '/' || href.startsWith('/#') || href.startsWith('/decide') || STAGES.some(s => href.startsWith(s.route)))) return href;
+    if (!inv || !(href === '/' || href.startsWith('/#') || href.startsWith('/decide') || href.startsWith('/learn') || href.startsWith('/glossary')
+      || STAGES.some(s => href.startsWith(s.route)))) return href;
     const [path, hash] = href.split('#');
     return `${path}${path.includes('?') ? '&' : '?'}inv=${encodeURIComponent(inv)}${hash ? `#${hash}` : ''}`;
   }, [inv]);
@@ -109,6 +112,14 @@ function useTrail(): {label: string; href?: string}[] {
     window.addEventListener('hashchange', read);
     return () => window.removeEventListener('hashchange', read);
   }, [pathname]);
+  // A screen outside the stages (Learn) names its own places after the page (lib/trail.ts).
+  const [tail, setTail] = useState<TrailTail>([]);
+  useEffect(() => {
+    setTail(currentTrailTail());
+    const read = (e: Event) => setTail((e as CustomEvent<TrailTail>).detail ?? []);
+    window.addEventListener(TRAIL_TAIL_EVENT, read);
+    return () => window.removeEventListener(TRAIL_TAIL_EVENT, read);
+  }, [pathname]);
   const stage = STAGES.find(s => s.route === pathname);
   const inCase = pathname === '/' || pathname === '/decide' || Boolean(stage);
   const trail: {label: string; href?: string}[] = [];
@@ -122,6 +133,9 @@ function useTrail(): {label: string; href?: string}[] {
     trail.push({label: 'Check', href: '/check'}, {label: 'Decide'});
   } else if (pathname === '/') {
     trail.push({label: 'Home'});
+  } else if (tail.length && (pathname === '/learn' || pathname === '/glossary')) {
+    if (caseName) trail.push({label: caseName, href: '/'});
+    trail.push(...tail);
   } else {
     trail.push({label: PAGE_NAMES[pathname] ?? pathname.split('/').filter(Boolean).map(s => s[0].toUpperCase() + s.slice(1)).join(' › '), href: pathname});
   }

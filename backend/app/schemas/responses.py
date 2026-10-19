@@ -4398,6 +4398,13 @@ class CatalogueAreaOut(ResponseModel):
     terms: int
 
 
+class GlossaryDefinitionOut(ResponseModel):
+    """One area's own wording of a term (catalogue/glossary/<area>.yaml)."""
+    area: str
+    definition: str
+    source_url: str
+
+
 class GlossaryTermOut(ResponseModel):
     term: str
     definition: str
@@ -4407,6 +4414,7 @@ class GlossaryTermOut(ResponseModel):
     related: list[str]
     indicators: list[str]
     areas: list[str]
+    definitions: list[GlossaryDefinitionOut]
 
 
 class GlossaryNameOut(ResponseModel):
@@ -4418,7 +4426,47 @@ class GlossaryHintOut(ResponseModel):
     term: str
     definition: str
     areas: list[str]
+    related: list[str]
+    definitions: int  # how many areas word it themselves ("Defined in 3 areas")
     names: list[GlossaryNameOut]
+
+
+class CatalogueAreaCountsOut(ResponseModel):
+    """How one area's indicators can be checked, how many are still pending, how many a rule computes."""
+    key: str
+    records: int
+    lookups: int
+    person: int
+    pending: int
+    rules: int
+
+
+class CatalogueCrossHintCountOut(ResponseModel):
+    """How many of one area's indicators say they "may also point to" another area."""
+    source: str
+    target: str
+    count: int
+
+
+class CatalogueMapOut(ResponseModel):
+    areas: list[CatalogueAreaCountsOut]
+    cross_hints: list[CatalogueCrossHintCountOut]
+
+
+class CatalogueIndicatorRowOut(ResponseModel):
+    """One indicator in a list: enough to pick it, not the whole entry."""
+    id: str
+    name: str
+    area: str
+    checkable: Literal["records", "lookups", "person"]
+    status: Literal["verified", "pending"]
+    levels_set: list[Literal["faint", "strong", "textbook"]]
+    rule: bool  # a detection rule computes it on the case's records
+
+
+class CatalogueIndicatorListOut(ResponseModel):
+    total: int
+    indicators: list[CatalogueIndicatorRowOut]
 
 
 class GlossaryPageOut(ResponseModel):
