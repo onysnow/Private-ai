@@ -101,7 +101,9 @@ def test_openaleph_sync_failure_is_persisted(tmp_path, monkeypatch):
         )
         row = sync_document_to_openaleph(db, doc.id, client_factory=lambda: client)
         assert row.status == "failed"
-        assert "OpenAleph unavailable" in (row.error or "")
+        # The upstream text stays in the server log; the reporter gets a plain line.
+        assert row.error == "OpenAleph did not accept the file; the server log has the reason"
+        assert "OpenAleph unavailable" not in row.error
         assert db.get(type(doc), doc.id) is not None
 
 
