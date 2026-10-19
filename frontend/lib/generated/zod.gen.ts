@@ -132,6 +132,14 @@ export const zAiControlSurfaceOut = z.object({
 });
 
 /**
+ * AiFinalAuditOut
+ */
+export const zAiFinalAuditOut = z.object({
+  file: z.string(),
+  node: z.string(),
+});
+
+/**
  * AiLimitsOut
  */
 export const zAiLimitsOut = z.object({
@@ -208,41 +216,6 @@ export const zAiModelFailedOut = z.object({
 });
 
 /**
- * AiRunOut
- */
-export const zAiRunOut = z.object({
-  candidate_id: z.string().nullable(),
-  created_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  error: z.string().nullable(),
-  events: z.number().int(),
-  finished: z.boolean(),
-  finished_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullable(),
-  message: z.string().nullable(),
-  module: z.string(),
-  problems: z.number().int(),
-  question: z.string(),
-  review_status: z.string().nullable(),
-  run_id: z.string(),
-  started_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullable(),
-  status: z.string(),
-  working_theory: z.string().nullable(),
-});
-
-/**
  * AiRunRefOut
  */
 export const zAiRunRefOut = z.object({
@@ -277,6 +250,58 @@ export const zAiRunEventOut = z.object({
 });
 
 /**
+ * AiRunRouteOut
+ *
+ * How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+ * not know (a run recorded under a name since removed); "app" for the app-local draft.
+ */
+export const zAiRunRouteOut = z.object({
+  final_audit: zAiFinalAuditOut.nullable(),
+  modules_in_system: z.number().int(),
+  node: z.string().nullable(),
+  row: z.number().int().nullable(),
+  system: z.string().nullable(),
+  title: z.string(),
+});
+
+/**
+ * AiRunOut
+ */
+export const zAiRunOut = z.object({
+  candidate_id: z.string().nullable(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  error: z.string().nullable(),
+  events: z.number().int(),
+  finished: z.boolean(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  handoff_from: z.string().nullish(),
+  message: z.string().nullable(),
+  module: z.string(),
+  problems: z.number().int(),
+  question: z.string(),
+  review_status: z.string().nullable(),
+  route: zAiRunRouteOut,
+  run_id: z.string(),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullable(),
+  status: z.string(),
+  working_theory: z.string().nullable(),
+});
+
+/**
  * AiRunEventsOut
  */
 export const zAiRunEventsOut = z.object({
@@ -308,8 +333,10 @@ export const zAiSuiteModuleOut = z.object({
  * CHANGELOG numbers them, `latest_change` its newest entry.
  */
 export const zAiSuiteSystemOut = z.object({
+  final_audit: zAiFinalAuditOut.nullable(),
   kind: z.string(),
   latest_change: z.string().nullable(),
+  module_count: z.number().int(),
   modules: z.array(zAiSuiteModuleOut),
   name: z.string(),
   present: z.boolean(),

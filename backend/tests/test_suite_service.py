@@ -136,3 +136,29 @@ def test_next_runs_follow_what_the_answer_contains():
     for key, nexts in suite.POSSIBLE_NEXT.items():
         for n in nexts:
             assert key in suite.ROUTES[n].takes_from, (key, n)
+
+
+def test_a_run_names_the_answer_it_saved_its_current_review_and_its_route(monkeypatch):
+    """A run the checks stopped still saved its answer (as rejected); the summary finds it through the run record, and
+    a run's review status is the answer's as it stands now, not as it was when the run ended."""
+    client = TestClient(app)
+    case = _case(client)
+    run = f"/api/investigations/{case['inv']}/assistant/run"
+    stopped = _synthesis({"record_type": "evidence", "record_id": "not-in-the-packet"})
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _Model(stopped))
+    assert client.post(run, json={"module": "case_synthesis", "question": "Ada North approved the transfer"}).status_code == 422
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _Model(_synthesis(case["ref"])))
+    ok = client.post(run, json={"module": "case_synthesis", "question": "Ada North approved the transfer"}).json()
+    client.post(f"/api/ai-analysis-candidates/{ok['candidate_id']}/review", json={"decision": "reject", "note": "No."})
+
+    runs = client.get(f"/api/investigations/{case['inv']}/ai-runs").json()["runs"]
+    by_status = {r["status"]: r for r in runs}
+    assert by_status["failed"]["candidate_id"], "the stopped run's rejected answer is named, not 'none saved'"
+    assert by_status["failed"]["review_status"] == "rejected"
+    assert by_status["succeeded"]["candidate_id"] == ok["candidate_id"]
+    assert by_status["succeeded"]["review_status"] == "rejected", "the review as it stands now"
+    route = by_status["succeeded"]["route"]
+    assert route["system"] == "tas" and route["row"] == 2 and route["node"] == "tas/08"
+    assert route["modules_in_system"] == suite.module_count("tas") and route["final_audit"]["node"] == "tas/10"
+    for system, name in suite.FINAL_AUDIT.items():
+        assert (suite.SYSTEMS_ROOT / system / "PROMPT_MODULES" / name).is_file(), system

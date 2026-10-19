@@ -81,6 +81,13 @@ ROUTES: dict[str, Route] = {
                                 (APP_MODULES_ROOT / "PRESENTATION_DRAFT.md",)),
 }
 
+# Each system's final audit, which runs in a fresh context and never in the run it audits (every system's catalog).
+FINAL_AUDIT = {
+    "tas": "10_FINAL_ACCURACY_AUDIT.md", "ras": "10_FINAL_RESEARCH_AUDIT.md", "qas": "07_FINAL_QUANTITATIVE_AUDIT.md",
+    "las": "10_FINAL_LOGIC_AUDIT.md", "das": "10_FINAL_DECISION_AUDIT.md",
+    "egs": "05_GATHERING_LOG_AND_FINAL_GATHERING_CHECK.md", "ehs": "04_FINAL_ETHICS_CHECK.md",
+}
+
 # The systems in the suite's own order: the five authority systems in pipeline order, then the two support systems.
 SYSTEM_ORDER = ("ras", "tas", "qas", "las", "das", "egs", "ehs")
 
@@ -173,6 +180,27 @@ def vendored_commit() -> str | None:
     return first[0].strip() or None if first else None
 
 
+def module_count(system: str) -> int:
+    """How many prompt modules the system has in the vendored copy."""
+    folder = SYSTEMS_ROOT / system / "PROMPT_MODULES"
+    return len(list(folder.glob("[0-9][0-9]_*.md"))) if folder.is_dir() else 0
+
+
+def final_audit(system: str) -> dict[str, str] | None:
+    name = FINAL_AUDIT.get(system)
+    return {"node": f"{system}/{name[:2]}", "file": name} if name else None
+
+
+def run_route(module: str) -> dict[str, Any]:
+    """What a run's record needs to draw its route: the system, its row, the module's node and title, how many of the
+    system's modules it leaves unrun, and the system's final audit, which never runs inside it."""
+    r = ROUTES.get(module)
+    if r is None:
+        return {"system": None, "row": None, "node": None, "title": module, "modules_in_system": 0, "final_audit": None}
+    return {"system": r.system, "row": r.row, "node": r.node, "title": r.title,
+            "modules_in_system": module_count(r.system) if r.row else 0, "final_audit": final_audit(r.system)}
+
+
 def systems_status() -> list[dict[str, Any]]:
     """Every system of the suite with its row, kind, version and the modules the app runs from it."""
     rows = []
@@ -181,6 +209,7 @@ def systems_status() -> list[dict[str, Any]]:
         modules = [r for r in ROUTES.values() if r.system == system]
         rows.append({
             "system": system, "name": name, "kind": kind, "row": row, **_version_of(system),
+            "module_count": module_count(system), "final_audit": final_audit(system),
             "present": (SYSTEMS_ROOT / system).is_dir(),
             "modules": [{"module": r.module, "title": r.title, "node": r.node,
                          "available": all(p.exists() for p in r.files)} for r in modules],

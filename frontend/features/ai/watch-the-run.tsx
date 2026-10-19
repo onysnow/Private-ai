@@ -40,41 +40,72 @@ const AT: Record<string, Pt> = {
   'tas/08': {x: 495, y: 122}, 'tas/06': {x: 495, y: 122}, 'app/draft': {x: 290, y: 60}, 'tas/class': {x: 495, y: 158}, 'tas/corroboration': {x: 495, y: 194},
   'boundary:tas→las': {x: 640, y: 322}, 'boundary:las→das': {x: 735, y: 200},
   'cp-01': {x: 495, y: 290}, 'cp-02': {x: 32, y: 318}, 'cp-03': {x: 80, y: 318}, candidate: {x: 905, y: 110}, review: {x: 905, y: 300},
+  // The support systems sit in the Support band; a hand-over crosses the Boundaries band (INTEROP.md).
+  egs: {x: 440, y: 379}, ehs: {x: 560, y: 379}, interop: {x: 262, y: 28},
 };
 const HALF: Record<string, Pt> = {
   run: {x: 50, y: 22}, retrieval: {x: 50, y: 14}, router: {x: 21, y: 21}, model: {x: 26, y: 26}, 'gate:schema': {x: 18, y: 16}, 'gate:citation': {x: 18, y: 16},
   'gate:quote': {x: 18, y: 8}, 'gate:chart': {x: 18, y: 8}, 'gate:writing': {x: 18, y: 8}, 'tas/08': {x: 40, y: 11}, 'tas/06': {x: 40, y: 11}, 'tas/class': {x: 40, y: 11},
   'tas/corroboration': {x: 40, y: 11}, 'cp-01': {x: 14, y: 16}, 'cp-02': {x: 14, y: 16}, 'cp-03': {x: 14, y: 16}, 'boundary:tas→las': {x: 30, y: 9}, 'boundary:las→das': {x: 4, y: 120}, candidate: {x: 50, y: 20}, review: {x: 22, y: 22}, 'app/draft': {x: 40, y: 11},
+  egs: {x: 44, y: 12}, ehs: {x: 44, y: 12}, interop: {x: 50, y: 14},
 };
+// The five authority systems as columns, in the suite's pipeline order; the two support systems are pills in the
+// Support band (SUPPORT). Every system runs in the app as its own run (backend app/ai/suite.py); a column lights when
+// this run is routed to it or its record holds a step of it.
 const SYSTEMS: Array<{key: string; name: string; x: number; w: number; trigger: string}> = [
-  {key: 'ras', name: 'RAS', x: 390, w: 80, trigger: 'if the answer had relied on published research'},
-  {key: 'tas', name: 'TAS', x: 495, w: 100, trigger: 'the answer states facts about real people, firms and documents'},
-  {key: 'qas', name: 'QAS', x: 600, w: 80, trigger: 'if the answer had computed or compared numbers'},
-  {key: 'las', name: 'LAS', x: 690, w: 80, trigger: 'if the answer had drawn a conclusion beyond a source'},
-  {key: 'das', name: 'DAS', x: 780, w: 80, trigger: 'if the answer had recommended an action'},
+  {key: 'ras', name: 'RAS', x: 390, w: 80, trigger: 'when the answer relies on published research'},
+  {key: 'tas', name: 'TAS', x: 495, w: 100, trigger: 'when the answer states facts about real people, firms and documents'},
+  {key: 'qas', name: 'QAS', x: 600, w: 80, trigger: 'when the answer tests a theory against data'},
+  {key: 'las', name: 'LAS', x: 690, w: 80, trigger: 'when the answer draws a conclusion beyond a source'},
+  {key: 'das', name: 'DAS', x: 780, w: 80, trigger: 'when the answer structures a choice between options'},
 ];
-const TAS_MODULES = 10;
+const SUPPORT: Array<{key: 'egs' | 'ehs'; name: string; word: string; trigger: string}> = [
+  {key: 'egs', name: 'EGS', word: 'gathering', trigger: 'when the answer plans how to obtain evidence'},
+  {key: 'ehs', name: 'EHS', word: 'ethics', trigger: 'when the answer prepares material for publication that could cause harm'},
+];
+const SYSTEM_COUNT = SYSTEMS.length + SUPPORT.length;
 // The pipeline in reading order, for the arrow keys (research AI §4 "arrow keys move along the pipeline").
 const ORDER = ['run', 'retrieval', 'cp-02', 'cp-03', 'router', 'model', 'gate:schema', 'gate:citation', 'gate:quote', 'gate:chart', 'gate:writing',
-  'tas/08', 'tas/06', 'tas/class', 'tas/corroboration', 'cp-01', 'boundary:tas→las', 'boundary:las→das', 'candidate', 'review'];
+  'tas/08', 'tas/06', 'tas/class', 'tas/corroboration', 'cp-01', 'boundary:tas→las', 'boundary:las→das', 'egs', 'ehs', 'candidate', 'review'];
 const NOTES_KEY = 'pai:watch-run-notes';
-const LANES: Array<{key: string; label: string; match: (e: Ev) => boolean}> = [
-  {key: 'router', label: 'Router', match: e => e.kind === 'ROUTE' || e.kind === 'LOAD' || e.node === 'controls'},
+// A system's own steps: its module, its rules, its gate. The router's ROUTE and LOAD steps stay on the router lane.
+const ofSystem = (sys: string) => (e: Ev) => e.system === sys && e.kind !== 'ROUTE' && e.kind !== 'LOAD' && !e.node.startsWith('boundary:');
+const LANES: Array<{key: string; label: string; system?: boolean; match: (e: Ev) => boolean}> = [
+  {key: 'router', label: 'Router', match: e => e.kind === 'ROUTE' || e.kind === 'LOAD' || e.node === 'controls' || e.node === 'interop'},
   {key: 'model', label: 'Model', match: e => e.node === 'model'},
-  {key: 'checks', label: 'Checks', match: e => e.node.startsWith('gate:') || e.node === 'retrieval'},
-  {key: 'tas', label: 'TAS', match: e => e.system === 'tas' && e.kind !== 'ROUTE' && e.kind !== 'LOAD' && !e.node.startsWith('boundary:')},
-  {key: 'las', label: 'LAS', match: e => (e.system === 'las' && e.kind !== 'ROUTE') || e.node === 'boundary:tas→las'},
-  {key: 'das', label: 'DAS', match: e => (e.system === 'das' && e.kind !== 'ROUTE') || e.node === 'boundary:las→das'},
+  {key: 'checks', label: 'Checks', match: e => (e.node.startsWith('gate:') && e.system === 'app') || e.node === 'retrieval'
+    || ['gate:schema', 'gate:citation', 'gate:quote', 'gate:chart', 'gate:writing'].includes(e.node)},
+  {key: 'ras', label: 'RAS', system: true, match: ofSystem('ras')},
+  {key: 'tas', label: 'TAS', system: true, match: ofSystem('tas')},
+  {key: 'qas', label: 'QAS', system: true, match: ofSystem('qas')},
+  {key: 'las', label: 'LAS', system: true, match: e => ofSystem('las')(e) || e.node === 'boundary:tas→las'},
+  {key: 'das', label: 'DAS', system: true, match: e => ofSystem('das')(e) || e.node === 'boundary:las→das'},
+  {key: 'egs', label: 'EGS', system: true, match: ofSystem('egs')},
+  {key: 'ehs', label: 'EHS', system: true, match: ofSystem('ehs')},
   {key: 'write', label: 'Write', match: e => e.kind === 'WRITE' || e.kind === 'TURN'},
   {key: 'you', label: 'You', match: e => e.node === 'review'},
 ];
+// System lanes always drawn, dimmed when empty; the others only when the run holds a step of them.
+const STANDING_LANES = new Set(['tas', 'las', 'das']);
 const WORD: Record<Status, string> = {good: 'verified', partial: 'in between', bad: 'stopped', neutral: 'a finding'};
 const STREAM_OVER = 12;
 const isProblem = (e: Ev) => e.status === 'bad' || (e.status === 'partial' && !e.self_reported);
-// A module of a system the app does not run yet (RAS, QAS, LAS, DAS): drawn as a chip in that system's column when a
-// record holds one. B4 (the TAS → LAS crosswalk) and B6 (precedence before DAS) are boundaries (INTEROP §3, §8).
+// A module of RAS, QAS, LAS or DAS is drawn as a chip in that system's column when a record holds one; a module of EGS
+// or EHS lights that system's pill in the Support band. B4 (the TAS → LAS crosswalk) and B6 (precedence before DAS)
+// are boundaries (INTEROP §3, §8); a hand-over between runs crosses the Boundaries band ('interop').
 const OTHER_MODULE = /^(ras|qas|las|das)\/./;
-const nodeOf = (e: Ev) => (AT[e.node] || OTHER_MODULE.test(e.node) ? e.node : e.node === 'cp-02' || e.node === 'cp-03' ? e.node : e.node.startsWith('gate:') ? 'gate:citation' : e.system === 'tas' ? 'tas/class' : 'run');
+const SUPPORT_MODULE = /^(egs|ehs)\/./;
+/** Where a step sits on the map. A system's own gate (gate:las, …) sits on the module that run is routed to. */
+const nodeFor = (routeNode: string | null | undefined) => (e: Ev): string => {
+  if (AT[e.node] || OTHER_MODULE.test(e.node)) return e.node;
+  if (SUPPORT_MODULE.test(e.node)) return e.node.slice(0, 3);
+  if (/^gate:(ras|qas|las|das|egs|ehs)$/.test(e.node)) {
+    const sys = e.node.slice(5);
+    if (routeNode && routeNode.startsWith(`${sys}/`)) return SUPPORT_MODULE.test(routeNode) ? sys : routeNode;
+  }
+  if (e.node === 'cp-02' || e.node === 'cp-03') return e.node;
+  return e.node.startsWith('gate:') ? 'gate:citation' : e.system === 'tas' ? 'tas/class' : 'run';
+};
 const words = (v: string | null | undefined) => (v ? (v.charAt(0) + v.slice(1).toLowerCase()).replace(/_/g, ' ') : '');
 const utc = (iso: string) => apiTime(iso).getTime();
 const stamp = (iso: string) => new Date(utc(iso)).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false}).replace(',', '');
@@ -143,6 +174,9 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
     refetchInterval: query => (query.state.data?.run.finished ? false : streaming.current ? 5000 : 1000),
   });
   const run = sample ? SAMPLE_RUN : q.data?.run;
+  // How the suite service routed this run (backend app/ai/suite.py): its system, module node and final audit.
+  const route = run?.route;
+  const nodeOf = useMemo(() => nodeFor(route?.node), [route?.node]);
   const events = useMemo(() => (sample ? SAMPLE_EVENTS : q.data?.events ?? []), [sample, q.data]);
   // Compare two runs of the same question: the parts whose verdict changed glow, the rest stay dim (research AI §4).
   const [compareId, setCompareId] = useState<string | null>(null);
@@ -221,7 +255,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
       t[k].last = e;
     }
     return t;
-  }, [visible]);
+  }, [visible, nodeOf]);
 
   // A thought: the chain from the run's start to this step, and every step that follows from it.
   const chain = useMemo(() => {
@@ -394,19 +428,33 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
   };
   const settingsIn = events.filter(e => e.kind === 'SETTING' && e.rule !== 'echo' && e.rule !== 'premise');
   const overrides = events.filter(e => e.kind === 'SETTING' && e.rule !== 'echo' && / \(default /.test(e.text)).length;
-  const umbrellaFlags = events.filter(e => e.system === 'umbrella' && e.kind !== 'SETTING' && (e.status === 'partial' || e.status === 'bad')).length;
+  const umbrellaFlags = events.filter(e => e.system === 'umbrella' && e.kind !== 'SETTING' && e.node !== 'interop' && (e.status === 'partial' || e.status === 'bad')).length;
+  // A hand-over from an accepted answer: what crossed, and what INTEROP held back (one BLOCK · HELD per field).
+  const handedOver = events.filter(e => e.node === 'interop');
+  const held = handedOver.filter(e => e.verdict === 'HELD').length;
   const claim = thought && Array.isArray((candidate.data?.payload as {claims?: unknown[]} | undefined)?.claims)
     ? ((candidate.data!.payload as {claims: Array<Record<string, unknown>>}).claims.find(c => c.claim_id === thoughtId))
     : undefined;
   const reviewed = candidate.data && candidate.data.review_status !== 'proposed';
+  // An answer the app's checks rejected was never yours to review; one you rejected was.
+  const stoppedByChecks = candidate.data?.review_status === 'rejected' && candidate.data.rejection_reason !== 'reviewer';
+  const answerState = !candidate.data ? null : candidate.data.review_status === 'proposed' ? 'waits for you'
+    : stoppedByChecks ? 'stopped by the checks' : candidate.data.review_status === 'accepted' ? 'you accepted it' : 'you rejected it';
   // The answer's claims as a person decides them one by one; the thought in focus, when it is one of them.
   const items = sample ? [] : reviewItems(candidate.data);
   const item = thoughtId ? items.find(i => i.id === thoughtId) : undefined;
   const waitingClaims = items.filter(i => !i.decision).length;
   const afterDecision = () => { void queryClient.invalidateQueries({queryKey: listAiRunEventsQueryKey({path: {investigation_id: investigationId, run_id: realId ?? ''}, query: {after: 0}})}); };
   const tasOn = events.some(e => e.kind === 'ROUTE' && e.system === 'tas');
-  const routed = new Set(events.filter(e => e.kind === 'ROUTE').map(e => e.system)).size;
+  const routed = new Set(events.filter(e => e.kind === 'ROUTE' && e.system !== 'app').map(e => e.system)).size;
   const loadNode = events.find(e => e.kind === 'LOAD')?.node ?? 'tas/08';
+  // The module node this run's answer comes from: TAS's chip, another system's chip or pill, or the app's draft.
+  const routeSys = route?.system ?? (tasOn ? 'tas' : null);
+  const moduleNode = tasOn ? loadNode : routeSys && routeSys !== 'app' ? (SUPPORT_MODULE.test(route?.node ?? '') ? routeSys : route?.node ?? 'app/draft') : 'app/draft';
+  const thoughtNode = tasOn ? 'tas/class' : moduleNode;
+  // The modules of the routed system this run did not run (LAS 01+02 runs two of ten).
+  const modulesRun = (route?.node ?? '').split('/')[1]?.split('+').length ?? 1;
+  const notRunHere = Math.max(0, (route?.modules_in_system ?? 0) - modulesRun);
   const packet = events.find(e => e.node === 'retrieval');
   const local = /ollama/i.test(events.find(e => e.node === 'model')?.text ?? '');
   const gateUsed = (g: string) => events.some(e => e.node === g);
@@ -431,15 +479,21 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
     return `M${sx} ${from.y} C${mx} ${from.y} ${mx} ${to.y} ${tx} ${to.y}`;
   };
   const WIRES: Array<[string, string]> = [['run', 'router'], ['retrieval', 'model'], ['router', 'model'], ['model', 'gate:schema'], ['gate:schema', 'gate:citation'],
-    ['router', tasOn ? loadNode : 'app/draft'], ['gate:citation', 'tas/class'], ['tas/class', 'tas/corroboration'], ['tas/class', 'candidate'], ['candidate', 'review']];
+    ['router', moduleNode], ['gate:citation', thoughtNode], ...(tasOn ? [['tas/class', 'tas/corroboration'] as [string, string]] : []),
+    [thoughtNode, 'candidate'], ['candidate', 'review'], ...(handedOver.length ? [['interop', 'router'] as [string, string]] : [])]
+    .filter(([a, b]) => P[a] && P[b]) as Array<[string, string]>;
 
-  const node = (k: string, label: string, shape: 'diamond' | 'circle' | 'double' | 'hex' | 'person' | 'qtile' | 'chip' | 'mini' | 'cand', sub?: string[], opts: {dim?: boolean; icon?: string; hint?: string} = {}) => {
+  const node = (k: string, label: string, shape: 'diamond' | 'circle' | 'double' | 'hex' | 'person' | 'qtile' | 'chip' | 'mini' | 'cand' | 'pill', sub?: string[], opts: {dim?: boolean; icon?: string; hint?: string; status?: Status} = {}) => {
     const p = P[k];
     const t = tally[k];
+    // The mark a node shows: its last step's verdict, or the state given (the answer as it stands after your review).
+    const markStatus = opts.status ?? t?.last?.status;
     const dim = opts.dim ?? false;
     const name = `${label}${opts.hint ? ` (${opts.hint})` : ''}${t ? `, ${(['good', 'partial', 'bad', 'neutral'] as Status[]).filter(s => t[s]).map(s => `${t[s]} ${WORD[s]}`).join(', ')}` : ''}${dim ? ', not run in the app' : ''}`;
     const onLit = chain.some(e => nodeOf(e) === k);
-    const small = shape === 'chip' || shape === 'mini';
+    const small = shape === 'chip' || shape === 'mini' || shape === 'pill';
+    // A pill is as wide as its words (about 5.6 units a letter at this size), never narrower than the band's pills.
+    const pillHalf = Math.max(44, label.length * 2.8 + 14);
     const labelY = shape === 'circle' ? 44 : shape === 'hex' ? 30 : shape === 'person' ? 36 : shape === 'cand' ? -3 : shape === 'double' ? 30 : 32;
     const comparing = Boolean(compareId && other.data);
     return <g key={k} className={`wr-node ${shape}${dim ? ' dim' : ''}${onLit ? ' lit' : ''}${(focus !== null && !onLit) || (comparing && !changed.has(k)) ? ' faded' : ''}${comparing && changed.has(k) ? ' changed' : ''}${k === 'model' && writing ? ' writing' : ''}`}
@@ -456,11 +510,12 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
       {shape === 'cand' && <rect x={-50} y={-20} width={100} height={40} rx={6}/>}
       {shape === 'chip' && <rect x={-40} y={-11} width={80} height={22} rx={5}/>}
       {shape === 'mini' && <rect x={-18} y={-8} width={36} height={16} rx={4}/>}
+      {shape === 'pill' && <rect x={-pillHalf} y={-12} width={pillHalf * 2} height={24} rx={12}/>}
       {shape === 'qtile' ? <><text y={-9} className="wr-label left" x={-44}>{label}</text>{(sub ?? []).map((l, i) => <text key={i} x={-44} y={4 + i * 11} className="wr-sub left">{l}</text>)}</>
-        : small ? <text y={shape === 'mini' ? 3 : 4} className={shape === 'mini' ? 'wr-sub' : 'wr-label chip'}>{label}</text>
+        : small ? <text y={shape === 'mini' ? 3 : 4} className={shape === 'mini' || (shape === 'pill' && dim) ? 'wr-sub' : 'wr-label chip'}>{label}</text>
         : <><text y={labelY} className="wr-label">{label}</text>{(sub ?? []).map((l, i) => <text key={i} y={labelY + 12 + i * 11} className="wr-sub">{l}</text>)}</>}
-      {t?.last && shape !== 'mini' && <Mark status={t.last.status} self={t.last.self_reported} x={shape === 'qtile' || shape === 'cand' ? 48 : small ? 38 : 18} y={shape === 'qtile' ? -20 : shape === 'cand' ? -18 : small ? -9 : -16} r={5.5}/>}
-      {t && t.bad > 0 && <text className="wr-stopmark" x={shape === 'qtile' || shape === 'cand' ? -58 : small ? -48 : shape === 'person' || shape === 'circle' ? -38 : -24}
+      {markStatus && shape !== 'mini' && <Mark status={markStatus} self={!opts.status && t?.last?.self_reported} x={shape === 'qtile' || shape === 'cand' ? 48 : shape === 'pill' ? pillHalf - 2 : small ? 38 : 18} y={shape === 'qtile' ? -20 : shape === 'cand' ? -18 : small ? -9 : -16} r={5.5}/>}
+      {(opts.status === 'bad' || (!opts.status && t && t.bad > 0)) && <text className="wr-stopmark" x={shape === 'qtile' || shape === 'cand' ? -58 : small ? -48 : shape === 'person' || shape === 'circle' ? -38 : -24}
         y={shape === 'qtile' || shape === 'cand' || small ? 4 : shape === 'person' || shape === 'circle' ? 4 : -10} aria-hidden="true">⊘</text>}
       {!calm && last && last.status === 'bad' && nodeOf(last) === k && <g key={`spark${last.n}`} className="wr-sparks" aria-hidden="true">
         {[[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([dx, dy], i) => <path key={i} d={`M${dx * 10} ${dy * 10} l${dx * 7} ${dy * 7}`}>
@@ -599,11 +654,11 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
 
   return <section className="wr" aria-label="Watch the run" ref={rootRef}>
     <header className="wr-head">
-      <h2><span>{caseName || 'Case'}</span> · Act · AI runs · <b>{(words(run?.module) || 'Run').replace(/^./, c => c.toUpperCase())}</b> · {run ? stamp(run.created_at) : ''}</h2>
+      <h2><span>{caseName || 'Case'}</span> · Act · AI runs · <b>{route?.title ?? (words(run?.module) || 'Run').replace(/^./, c => c.toUpperCase())}{route?.system && route.system !== 'app' ? ` · ${route.system.toUpperCase()}` : ''}</b> · {run ? stamp(run.created_at) : ''}</h2>
       {sample ? <span className="wr-pill">sample — not a real run</span>
         : stream.mode === 'reconnecting' ? <span className="wr-pill live" role="status">reconnecting · catching up from event {stream.from}</span>
         : liveRun ? <span className="wr-pill live">● LIVE · {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}{catchUp > 1 ? ` · ${catchUp}× to catch up` : ''}</span>
-        : run?.status === 'failed' ? <span className="wr-pill bad" title={run.message ?? undefined}>Stopped · {stamp(run.created_at)}</span>
+        : run?.status === 'failed' ? <span className="wr-pill bad" title={run.error ?? run.message ?? undefined}>Stopped · {stamp(run.created_at)}</span>
         : <span className="wr-pill">{replay ? 'Replay of run' : 'Run record'} · {run ? stamp(run.created_at) : ''}</span>}
       {sameQuestion.length > 0 && <select className="wr-pill wr-compare" aria-label="Compare with another run of this question" value={compareId ?? ''}
         onChange={e => setCompareId(e.target.value || null)}>
@@ -633,7 +688,8 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
         {run?.finished && events.length === 0 && <p className="wr-old" role="status">This run was made before steps were recorded. Showing what was stored: question, packet, reply.</p>}
         <svg ref={svgRef} viewBox={`${zoom.cx - 500 / zoom.k} ${zoom.cy - 210 / zoom.k} ${1000 / zoom.k} ${420 / zoom.k}`} role="group" aria-label="The run as a map: input, router and model, app checks, the suite's systems, output" preserveAspectRatio="xMidYMid meet">
           <g className="wr-band"><rect x={200} y={8} width={600} height={40} rx={20}/>
-            <text x={262} y={32} textAnchor="middle" className="dimtext"><title>Boundaries between the suite’s systems: not in the app yet</title>Boundaries</text>
+            {handedOver.length ? node('interop', `Hand-over${held ? ` · ${held} held` : ''}`, 'pill', undefined, {hint: 'INTEROP boundaries'})
+              : <text x={262} y={32} textAnchor="middle" className="dimtext"><title>Boundaries between the suite’s systems: a run that starts from an accepted answer crosses one (INTEROP.md)</title>Boundaries</text>}
             <g className="wr-controls" transform="translate(500 28)" role="button" tabIndex={0} aria-label={`Controls, ${overrides} override${overrides === 1 ? '' : 's'}`}
               onClick={() => { const c = events.find(e => e.kind === 'SETTING'); if (c) setFocus(c.n); }}>
               <rect x={-76} y={-14} width={152} height={28} rx={14}/><text y={4}>Controls · {overrides} override{overrides === 1 ? '' : 's'}</text>
@@ -642,13 +698,14 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
           {[['Input', 70], ['Router', 185], ['App checks', 290]].map(([h, x]) => <text key={h} className="wr-col" x={x as number} y={72}>{String(h).toUpperCase()}</text>)}
           <text className="wr-col" x={905} y={72}>OUTPUT</text>
           {SYSTEMS.map(s => {
-            const on = s.key === 'tas' ? tasOn : events.some(e => e.system === s.key || (e.kind === 'ROUTE' && e.system === s.key));
-            return <g key={s.key} className={`wr-sys${on ? '' : ' dim'}`}><title>{on ? `${s.name}: ${s.trigger}` : `${s.name} not triggered: ${s.trigger}${s.key === 'tas' ? '' : ' · not in the app yet'}`}</title>
+            const on = s.key === 'tas' ? tasOn : routeSys === s.key || events.some(e => e.system === s.key && e.kind !== 'SETTING');
+            const runsHere = routeSys === s.key;
+            return <g key={s.key} className={`wr-sys${on ? '' : ' dim'}`}><title>{on ? `${s.name}: ${s.trigger}` : `${s.name} not in this run: it runs ${s.trigger}, as its own run`}</title>
               <rect x={s.x - s.w / 2} y={82} width={s.w} height={262} rx={10}/>
               <text x={s.x} y={100} className="wr-label">{s.name}</text>
-              {!on && <text x={s.x} y={116} className="wr-sub">not triggered</text>}
-              {on && s.key === 'tas' && <text x={s.x} y={232} className="wr-sub">+ {TAS_MODULES - 1} modules</text>}
-              {on && s.key === 'tas' && <text x={s.x} y={243} className="wr-sub tiny">not run here</text>}
+              {!on && <text x={s.x} y={116} className="wr-sub">not in this run</text>}
+              {runsHere && notRunHere > 0 && <text x={s.x} y={232} className="wr-sub">+ {notRunHere} modules</text>}
+              {runsHere && notRunHere > 0 && <text x={s.x} y={243} className="wr-sub tiny">not run here</text>}
               {on && (otherModules[s.key]?.length ?? 0) > 5 && <text x={s.x} y={132 + 5 * 34 + 4} className="wr-sub">+ {otherModules[s.key].length - 5} modules</text>}</g>;
           })}
           <g className="wr-wires">
@@ -686,7 +743,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
               <text x={-44} y={4} className="wr-sub left">{`${r.record_type}:${r.record_id.slice(0, 7)}`}</text></g>)}
             {(packet?.refs.length ?? 0) > 3 && <text y={72} className="wr-sub">+ {(packet?.refs.length ?? 0) - 3} records</text>}
             {tally.retrieval?.last && <Mark status={tally.retrieval.last.status} x={46} y={-9} r={5}/>}</g>
-          {node('router', 'Router', 'diamond', [`${routed} of 5 routed`])}
+          {node('router', 'Router', 'diamond', [routeSys === 'app' ? 'app module' : `${routed} of ${SYSTEM_COUNT} routed`])}
           {node('model', 'Model call', 'circle', writing ? [`writing · ${writingFor}s`, 'nothing is shown while it writes'] : modelEnd ? [`${(modelEnd.detail as {seconds?: number} | null)?.seconds ?? ''} s · ${local ? 'on this computer' : 'sent out'}`] : [local ? 'on this computer' : 'not run yet', 'nothing is shown while it writes'])}
           {node('gate:schema', 'Shape', 'double', [events.some(e => e.node === 'gate:schema' && e.status === 'good') ? 'pass' : ''], {icon: '{ }'})}
           {node('gate:citation', 'Citations', 'double', [`${events.filter(e => e.node === 'gate:citation' && e.status === 'good').length} of ${events.filter(e => e.node === 'gate:citation' && e.kind === 'CHECK').length}`], {icon: '99'})}
@@ -697,14 +754,22 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
           {Object.values(otherModules).flatMap(mods => mods.slice(0, 5)).map(m => node(m, moduleLabel(m), 'chip'))}
           {boundaries}
           {node('cp-01', 'CP-01', 'hex', ['right of reply'], {dim: !events.some(e => e.node === 'cp-01')})}
-          {node('candidate', 'Candidate', 'cand', [candidateId ? `AIC ${candidateId.slice(0, 8)}` : 'none saved'])}
+          {node('candidate', 'Candidate', 'cand', [candidateId ? `AIC ${candidateId.slice(0, 8)}` : 'none saved'],
+            {status: candidate.data?.review_status === 'rejected' ? 'bad' : candidate.data?.review_status === 'accepted' ? 'good' : undefined})}
           <g className="wr-tally" transform="translate(914 150)">
             {(['good', 'partial', 'bad', 'neutral'] as Status[]).map((s, i) => <g key={s} transform={`translate(0 ${i * 16})`}><Mark status={s} x={6} y={0} r={4.5}/><text x={18} y={4}>{counts[s]} {WORD[s]}</text></g>)}
           </g>
-          {node('review', 'Your review', 'person', [reviewed ? words(candidate.data?.review_status) : 'waits for you'])}
+          {node('review', 'Your review', 'person', [answerState ?? (candidateId ? 'waits for you' : 'nothing to review')], {dim: stoppedByChecks})}
           <g className="wr-band support"><rect x={330} y={362} width={340} height={34} rx={17}/>
             <text x={366} y={383} className="dimtext" textAnchor="middle">Support</text>
-            {[['EGS', 'gathering', 440], ['EHS', 'ethics', 560]].map(([a, b, x]) => <g key={a as string} className="wr-sys dim" transform={`translate(${x} 379)`}><title>{a} {b}: not triggered, not in the app yet</title><rect x={-44} y={-12} width={88} height={24} rx={12}/><text y={4} className="wr-sub">{a} {b}</text></g>)}</g>
+            {SUPPORT.map(sp => {
+              const on = routeSys === sp.key || events.some(e => e.system === sp.key && e.kind !== 'SETTING');
+              // Named as the column chips are (LAS 01+02): the system and the module it ran; the module's title on hover.
+              const ran = routeSys === sp.key && route?.node ? route.node.split('/')[1] : null;
+              const label = ran ? `${sp.name} ${ran}` : `${sp.name} ${sp.word}`;
+              return node(sp.key, label, 'pill', undefined, {dim: !on, hint: !on ? `not in this run: it runs ${sp.trigger}, as its own run`
+                : ran ? `${route?.title}, ${sp.trigger}` : sp.trigger});
+            })}</g>
           {node('cp-02', 'CP-02', 'hex', undefined, {dim: !events.some(e => e.node === 'cp-02'), hint: 'source protection'})}
           {node('cp-03', 'CP-03', 'hex', undefined, {dim: !events.some(e => e.node === 'cp-03'), hint: 'publication approval'})}
           {lights}
@@ -724,7 +789,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
             {compareId && other.data ? <><b>Compared with the run of {stamp(other.data.run.created_at)} · {changes.length ? `${changes.length} part${changes.length === 1 ? '' : 's'} changed` : 'nothing changed'}</b>
               <small>{changes.map(c => `${c.k.replace(/^gate:|^tas\//, '')}: ${c.before ? WORD[c.before] : 'not reached'} → ${c.after ? WORD[c.after] : 'not reached'}`).join(' · ') || 'Every part ended with the same verdict.'}</small></>
               : thought ? <><b>{thoughtId} · {thought.text}</b><small>Everything else dims to about a third. Esc clears.</small></>
-              : run?.status === 'failed' ? <><b className="wr-bad">Stopped</b><small>{(run.message ?? run.error ?? 'The run stopped').replace(/[.\s]*$/, '.')} Press N for the step that stopped it.</small></>
+              : run?.status === 'failed' ? <><b className="wr-bad">Stopped</b><small>{(run.error ?? run.message ?? 'The run stopped').replace(/[.\s]*$/, '.')} Press N for the step that stopped it.</small></>
               : <><b>None chosen</b><small>Click a light, a chip or a tally to follow one thought from input to output.</small></>}</p>
           <ul className="wr-legend" aria-label="Key">
             {(['good', 'partial', 'bad', 'neutral'] as Status[]).map(s => <li key={s}><svg width="14" height="14" aria-hidden="true"><Mark status={s} x={7} y={7} r={5}/></svg>{WORD[s]}</li>)}
@@ -810,7 +875,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
       <div className="wr-lanes" aria-label="The run, one lane per part" ref={lanesRef}>
         <p className="br-eyebrow">The run, one lane per part{win.to - win.from < 1 && <button type="button" className="wr-lanefit" onClick={() => setWin({from: 0, to: 1})}>whole run</button>}</p>
         <div className="wr-axis" aria-hidden="true"><span/>{tickLabels.map(t => <i key={t.f} style={{left: `${t.f * 100}%`}}>{t.text}</i>)}</div>
-        {LANES.map(l => <div key={l.key} className={`wr-lane${l.key === 'las' || l.key === 'das' ? ' dim' : ''}`}><span>{l.label}</span><div>
+        {LANES.filter(l => !l.system || STANDING_LANES.has(l.key) || events.some(l.match)).map(l => <div key={l.key} className={`wr-lane${l.system && !events.some(l.match) ? ' dim' : ''}`}><span>{l.label}</span><div>
           {l.key === 'model' && modelStart && (() => {
             const a = Math.max(0, xIn(xOf(modelStart))), b = Math.min(100, xIn(modelEnd ? xOf(modelEnd) : 100));
             return b > a ? <i className="wr-bar" style={{left: `${a}%`, width: `${Math.max(0.5, b - a)}%`}}/> : null;
@@ -824,7 +889,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
         <p className="br-eyebrow">Ledgers</p>
         <div><b>Run record</b><small>append-only, hashed</small><em>{events.length}</em></div>
         <div><b>Judgement ledger</b><small>outcomes come later</small><em>0</em></div>
-        <div><b>Final audit</b><small>tas/{TAS_MODULES} not run here</small><em>—</em></div>
+        <div><b>Final audit</b><small>{route?.final_audit ? `${route.final_audit.node} runs apart, never inside the run` : 'none for an app module'}</small><em>—</em></div>
       </div>
     </footer>
   </section>;
