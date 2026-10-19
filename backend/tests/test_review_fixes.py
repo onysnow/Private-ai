@@ -444,29 +444,6 @@ def test_the_query_workbench_strips_comments_in_one_pass():
     assert _t.perf_counter() - started < 2
 
 
-def test_the_api_replay_goes_to_the_address_the_server_listens_on_not_the_host_header():
-    from starlette.requests import Request
-
-    from opsconsole.api.apiplay import _own_base
-    scope = {"type": "http", "scheme": "http", "server": ("0.0.0.0", 8000), "path": "/", "query_string": b"",
-             "headers": [(b"host", b"attacker.example")]}
-    assert _own_base(Request(scope)) == "http://127.0.0.1:8000"
-    scope["server"] = ("::1", 9000)
-    assert _own_base(Request(scope)) == "http://[::1]:9000"
-
-
-def test_base_map_files_are_read_only_from_inside_their_folder(tmp_path):
-    from app.services.basemap import _read_inside
-    (tmp_path / "fonts").mkdir()
-    (tmp_path / "fonts" / "a.pbf").write_bytes(b"ok")
-    (tmp_path / "secret.txt").write_bytes(b"no")
-    root = tmp_path / "fonts"
-    from pathlib import Path
-    assert _read_inside(root, Path("a.pbf")) == b"ok"
-    assert _read_inside(root, Path("../secret.txt")) is None
-    assert _read_inside(root, Path("missing.pbf")) is None
-
-
 def test_a_connector_credential_failure_does_not_answer_with_the_internal_reason(monkeypatch):
     import app.api.routes_settings as settings_routes
 

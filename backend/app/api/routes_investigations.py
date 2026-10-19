@@ -11,6 +11,7 @@ This is the last of the 8 groups in REMEDIATION_PROMPT.md's Stage E
 plan (STRUCT-0002/0008); once this landed, app/api/routes.py itself
 was deleted and main.py no longer imports it.
 """
+import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
@@ -78,6 +79,7 @@ from app.services.relationships import (
 from app.services.timeline import investigation_timeline
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
+logger = logging.getLogger(__name__)
 
 # A reasoning run that is queued answers 202 with the job to follow (Foundation Fixes fix 4);
 # one whose answer fails its checks is refused (422) with what the check found, and
@@ -420,6 +422,9 @@ def investigation_deletion_preview(investigation_id: str, db: Session = Depends(
         return preview_investigation_deletion(db, investigation_id, settings.document_storage_dir)
     except ValueError as exc:
         raise HTTPException(404 if str(exc) == "Investigation not found" else 400, str(exc))
+    except Exception as exc:
+        logger.exception("Investigation deletion preview failed")
+        raise HTTPException(500, "Deletion preview failed; details are in the server log.") from exc
 
 
 @router.delete("/investigations/{investigation_id}", response_model=InvestigationDeletionResult)
