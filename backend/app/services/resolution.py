@@ -75,8 +75,22 @@ def candidate_entities(db: Session, investigation_id: str, caption: str, schema:
         basis = (BASIS_SAME if same_words or (similarity or 0) >= SAME_NAME
                  else BASIS_SIMILAR if (similarity or 0) >= SIMILAR_NAME else BASIS_WORDS)
         scored.append({"entity_id": row.id, "caption": row.caption, "schema": row.schema, "score": round(score, 4),
-                       "name_similarity": None if similarity is None else round(similarity, 4), "basis": basis})
+                       "name_similarity": None if similarity is None else round(similarity, 4), "basis": basis,
+                       # How much the record already holds, for the "already in the case" card (reading room).
+                       "facts": sum(len(v) for v in (row.properties or {}).values() if isinstance(v, list))})
     return sorted(scored, key=lambda x: x["score"], reverse=True)[:10]
+
+
+def same_name(a: str, b: str) -> bool:
+    """Whether two names read as the same name (the strong tier above): the same words, or FollowTheMoney's
+    comparison at SAME_NAME or more, compared as legal entities so a guessed kind does not keep them apart."""
+    if not a.strip() or not b.strip():
+        return False
+    if set(_norm(a).split()) == set(_norm(b).split()):
+        return True
+    schema = model.get("LegalEntity")
+    assert schema is not None
+    return (compare_names(schema, _proxy(schema, a), _proxy(schema, b)) or 0.0) >= SAME_NAME
 
 
 FOUND_BY_NAME = "name_overlap"

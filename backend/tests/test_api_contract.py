@@ -472,6 +472,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
                 ("POST", "/api/documents/{document_id}/table-mappings"))},
             **{(method, path): {"candidate_id": proposal} for method, path in (
                 ("GET", "/api/extraction-candidates/{candidate_id}/entity-matches"),
+                ("GET", "/api/extraction-candidates/{candidate_id}/same-answer"),
                 ("GET", "/api/extraction-candidates/{candidate_id}/openaleph-matches"),
                 ("GET", "/api/extraction-candidates/{candidate_id}/explanation"),
                 ("GET", "/api/extraction-candidates/{candidate_id}/lineage"),

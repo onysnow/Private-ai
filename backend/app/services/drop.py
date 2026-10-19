@@ -5,21 +5,33 @@ Received → Checked → Read → Split into passages → Files inside → Names
 Ready for you. A stage is done, active, waiting (on an earlier stage), stopped (it
 failed, with why), needs_you (proposals wait for a person) or skipped (a file with
 nothing inside). An archive or e-mail is one lane; the files found in it are counted
-in its "Files inside" stage. Each lane also carries its read receipt."""
+in its "Files inside" stage. Each lane also carries its read receipt.
+
+A read that has not moved for STALL_AFTER says so in words ("No progress for 6 min",
+research §3): a running read whose job has not reported since, or a read still queued
+while nothing else in the case is being read (the queue is not moving).
+
+history() is the History tab: every drop (an ingestion batch) with what it produced,
+and the files brought in one at a time grouped by the day they came."""
 
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from datetime import datetime, timedelta
 from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models.domain import BackgroundJob, CheckItem, Document, DocumentChunk, ExtractionCandidate, PatternFlag, WatchlistEntry, WatchlistHit
+from app.core.time import utcnow_naive
+from app.models.domain import (
+    BackgroundJob, CheckItem, Document, DocumentChunk, ExtractionCandidate, IngestionBatch, IngestionBatchItem, PatternFlag, WatchlistEntry, WatchlistHit,
+)
 
 STAGES = [("received", "Received"), ("checked", "Checked"), ("read", "Read"), ("passages", "Split into passages"),
           ("inside", "Files inside"), ("names", "Names & facts"), ("ready", "Ready for you")]
 UNREAD = {"pending", "queued"}
+STALL_AFTER = timedelta(minutes=6)
 
 
 def _stage(key: str, state: str, detail: str = "") -> dict[str, str]:
@@ -48,7 +60,18 @@ def _seconds(job: BackgroundJob | None) -> int | None:
     return max(0, round((job.finished_at - job.started_at).total_seconds()))
 
 
-def drop(db: Session, investigation_id: str) -> dict[str, Any]:
+def _quiet_for(since: datetime | None, now: datetime) -> int | None:
+    """Whole minutes without a change, once that is STALL_AFTER or more."""
+    if since is None or now - since < STALL_AFTER:
+        return None
+    return int((now - since).total_seconds() // 60)
+
+
+def quiet_words(minutes: int) -> str:
+    return f"No progress for {minutes} min" if minutes < 120 else f"No progress for {minutes // 60} h"
+
+
+def drop(db: Session, investigation_id: str, *, now: datetime | None = None) -> dict[str, Any]:
     docs = list(db.scalars(select(Document).where(Document.investigation_id == investigation_id).order_by(Document.created_at)))
     ids = [d.id for d in docs]
     chunks: dict[str, list[tuple[str, int | None]]] = defaultdict(list)
@@ -91,6 +114,17 @@ def drop(db: Session, investigation_id: str) -> dict[str, Any]:
     for d in docs:
         first_of.setdefault(d.sha256, d.id)
     queued = [d.id for d in docs if d.extraction_status in UNREAD]
+    now = now or utcnow_naive()
+    anyone_reading = any(d.extraction_status == "extracting" for d in docs)
+
+    def stalled(d: Document, job: BackgroundJob | None) -> int | None:
+        if job is None:
+            return None
+        if d.extraction_status == "extracting" and job.status == "running":
+            return _quiet_for(job.updated_at or job.started_at, now)
+        if d.extraction_status in UNREAD and job.status == "queued" and not anyone_reading:
+            return _quiet_for(job.created_at, now)
+        return None
 
     def lane(d: Document) -> dict[str, Any]:
         job = jobs.get(d.id)
@@ -99,10 +133,13 @@ def drop(db: Session, investigation_id: str) -> dict[str, Any]:
         read_done = status == "complete"
         original = first_of.get(d.sha256)
         same = original if original and original != d.id else None
+        quiet = stalled(d, job)
         stages = [_stage("received", "done", d.created_at.strftime("%d %b %H:%M") if d.created_at else ""),
                   _stage("checked", "done", "= same" if same else _kind_of(d))]
         if status == "failed":
             stages.append(_stage("read", "stopped", d.extraction_error or "Could not be read"))
+        elif quiet is not None:
+            stages.append(_stage("read", "active" if status == "extracting" else "waiting", quiet_words(quiet)))
         elif status == "extracting":
             stages.append(_stage("read", "active", (job.message if job and job.status == "running" and job.message else "Reading")))
         elif status in UNREAD:
@@ -136,6 +173,8 @@ def drop(db: Session, investigation_id: str) -> dict[str, Any]:
             note = "Already in the case: same fingerprint"
         elif status == "failed":
             note = d.extraction_error or "Could not be read"
+        elif quiet is not None:
+            note = quiet_words(quiet) + (" · it may have stopped" if status == "extracting" else " · nothing is being read")
         elif status == "extracting":
             note = (job.message if job and job.message else "Reading")
         elif status in UNREAD:
@@ -151,8 +190,8 @@ def drop(db: Session, investigation_id: str) -> dict[str, Any]:
             "job_id": job.id if job is not None and job.status in {"queued", "running"} else None,
             "retry_job_id": job.id if job is not None and job.status == "failed" else None,
             "problem": status == "failed" or any(s["state"] == "stopped" for s in stages),
-            "in_progress": any(s["state"] in {"active", "waiting"} for s in stages),
-            "issues": issues, "waiting": left, "seconds": seconds,
+            "in_progress": status != "failed" and any(s["state"] in {"active", "waiting"} for s in stages),
+            "issues": issues, "waiting": left, "seconds": seconds, "stalled_minutes": quiet,
             "children": [lane(k) for k in kids],
             "receipt": {
                 "fingerprint": d.sha256, "pages": len(pages) or None, "how_read": _how_read([loc for loc, _ in own_chunks]) or None,
@@ -184,3 +223,101 @@ def drop(db: Session, investigation_id: str) -> dict[str, Any]:
         "ready_unsure": unsure,
         "watchlist": {"hits": sum(hits.values()), "names": sorted(hit_names)},
     }
+
+
+def changes(seen: dict[str, str], snapshot: dict[str, Any], dump: Any) -> list[tuple[str, Any]]:
+    """What the per-file event stream sends for one look at The Drop (ADR-0014): one `lane` event for
+    each file whose lane changed since ``seen`` (its files inside travel with it), `gone` for a file no
+    longer there, then one `summary` (everything but the lanes, with their order) when anything
+    changed. ``seen`` maps each file to its lane as last sent and is updated in place; ``dump`` turns a
+    value into the JSON text compared and sent."""
+    out: list[tuple[str, Any]] = []
+    order = [lane["document_id"] for lane in snapshot["lanes"]]
+    for lane in snapshot["lanes"]:
+        text = dump(lane)
+        if seen.get(lane["document_id"]) != text:
+            seen[lane["document_id"]] = text
+            out.append(("lane", lane))
+    for doc_id in [k for k in seen if not k.startswith("#") and k not in order]:
+        del seen[doc_id]
+        out.append(("gone", {"document_id": doc_id}))
+    summary = {**{k: v for k, v in snapshot.items() if k != "lanes"}, "order": order}
+    text = dump(summary)
+    if out or seen.get("#summary") != text:
+        seen["#summary"] = text
+        out.append(("summary", summary))
+    return out
+
+
+def history(db: Session, investigation_id: str) -> dict[str, Any]:
+    """Every drop, newest first, with what it produced (the History tab).
+
+    A drop is an ingestion batch: what happened to each file sent (saved, already in the case, refused)
+    and, from the saved files and the files found inside them, how many were read, how many could not
+    be, the passages made and the proposals found, accepted and still waiting. Files that came in
+    without a batch (one at a time, or before The Drop made one per drop) are grouped by the day
+    they came, so nothing brought in is missing from the history."""
+    docs = list(db.scalars(select(Document).where(Document.investigation_id == investigation_id)))
+    by_id = {d.id: d for d in docs}
+    children: dict[str, list[str]] = defaultdict(list)
+    for d in docs:
+        if d.parent_document_id:
+            children[d.parent_document_id].append(d.id)
+    passages: Counter[str] = Counter()
+    found: dict[str, Counter[str]] = defaultdict(Counter)
+    accepted: Counter[str] = Counter()
+    waiting: Counter[str] = Counter()
+    if docs:
+        for doc_id, n in db.execute(select(DocumentChunk.document_id, func.count()).where(DocumentChunk.document_id.in_(list(by_id)))
+                                    .group_by(DocumentChunk.document_id)):
+            passages[doc_id] = int(n)
+        for doc_id, kind, status in db.execute(select(ExtractionCandidate.document_id, ExtractionCandidate.candidate_type,
+                                                      ExtractionCandidate.review_status).where(ExtractionCandidate.document_id.in_(list(by_id)))):
+            found[doc_id][kind] += 1
+            accepted[doc_id] += status == "accepted"
+            waiting[doc_id] += status == "proposed"
+
+    def family(doc_id: str) -> list[str]:
+        out = [doc_id]
+        for kid in children.get(doc_id, []):
+            out.extend(family(kid))
+        return out
+
+    def produced(top: list[str]) -> dict[str, Any]:
+        every = [x for t in top for x in family(t)]
+        kinds: Counter[str] = Counter()
+        for x in every:
+            kinds.update(found[x])
+        return {"read": sum(by_id[x].extraction_status == "complete" for x in every),
+                "problems": sum(by_id[x].extraction_status == "failed" for x in every),
+                "in_progress": sum(by_id[x].extraction_status in UNREAD | {"extracting"} for x in every),
+                "files_inside": len(every) - len(top), "passages": sum(passages[x] for x in every), "proposals": dict(kinds),
+                "accepted": sum(accepted[x] for x in every), "waiting": sum(waiting[x] for x in every)}
+
+    entries: list[dict[str, Any]] = []
+    in_a_batch: set[str] = set()
+    batches = list(db.scalars(select(IngestionBatch).where(IngestionBatch.investigation_id == investigation_id)))
+    items: dict[str, list[IngestionBatchItem]] = defaultdict(list)
+    if batches:
+        for item in db.scalars(select(IngestionBatchItem).where(IngestionBatchItem.batch_id.in_([b.id for b in batches]))
+                               .order_by(IngestionBatchItem.position)):
+            items[item.batch_id].append(item)
+    for b in batches:
+        mine = items.get(b.id, [])
+        saved = [str(i.document_id) for i in mine if i.outcome == "saved" and i.document_id in by_id]
+        in_a_batch.update(saved)
+        entries.append({"id": b.id, "batch_id": b.id, "label": b.label, "created_at": b.created_at, "document_ids": saved, "one_at_a_time": False,
+                        "files": len(saved), "duplicates": sum(i.outcome == "duplicate" for i in mine),
+                        "refused": sum(i.outcome == "refused" for i in mine), **produced(saved)})
+    days: dict[str, list[Document]] = defaultdict(list)
+    for d in docs:
+        if not d.parent_document_id and d.id not in in_a_batch:
+            days[d.created_at.strftime("%Y-%m-%d")].append(d)
+    for day, group in days.items():
+        group.sort(key=lambda d: d.created_at)
+        top = [d.id for d in group]
+        entries.append({"id": f"day:{day}", "batch_id": None, "label": group[0].filename + (f" and {len(group) - 1} more" if len(group) > 1 else ""),
+                        "created_at": group[0].created_at, "document_ids": top, "one_at_a_time": True,
+                        "files": len(top), "duplicates": 0, "refused": 0, **produced(top)})
+    entries.sort(key=lambda e: e["created_at"], reverse=True)
+    return {"investigation_id": investigation_id, "drops": entries}

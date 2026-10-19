@@ -299,6 +299,9 @@ import type {
   GetDocumentTranslationResponses,
   GetDropData,
   GetDropErrors,
+  GetDropHistoryData,
+  GetDropHistoryErrors,
+  GetDropHistoryResponses,
   GetDropResponses,
   GetEntityDossierData,
   GetEntityDossierErrors,
@@ -381,6 +384,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsErrors,
   GetRedFlagsResponses,
+  GetSameAnswerCandidatesData,
+  GetSameAnswerCandidatesErrors,
+  GetSameAnswerCandidatesResponses,
   GetSecurityAlertsData,
   GetSecurityAlertsErrors,
   GetSecurityAlertsResponses,
@@ -1061,6 +1067,8 @@ import {
   zGetDocumentTableResponse,
   zGetDocumentTranslationPath,
   zGetDocumentTranslationResponse,
+  zGetDropHistoryPath,
+  zGetDropHistoryResponse,
   zGetDropPath,
   zGetDropResponse,
   zGetEntityDossierPath,
@@ -1120,6 +1128,8 @@ import {
   zGetRecordProvenanceTraceResponse,
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
+  zGetSameAnswerCandidatesPath,
+  zGetSameAnswerCandidatesResponse,
   zGetSecurityAlertsQuery,
   zGetSecurityAlertsResponse,
   zGetSecurityAuditQuery,
@@ -5032,6 +5042,38 @@ export const reviewExtractionCandidate = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Same Answer Candidates
+ *
+ * The other waiting proposals of the same name in this proposal's drop (else the case), so one answer can
+ * be offered to all of them (reading room, "Answer once, apply to the batch").
+ */
+export const getSameAnswerCandidates = <ThrowOnError extends boolean = false>(
+  options: Options<GetSameAnswerCandidatesData, ThrowOnError>,
+): RequestResult<
+  GetSameAnswerCandidatesResponses,
+  GetSameAnswerCandidatesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetSameAnswerCandidatesResponses,
+    GetSameAnswerCandidatesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSameAnswerCandidatesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSameAnswerCandidatesResponse.parseAsync(data),
+    url: '/api/extraction-candidates/{candidate_id}/same-answer',
+    ...options,
+  });
+
+/**
  * Health
  */
 export const health = <ThrowOnError extends boolean = false>(
@@ -6402,6 +6444,33 @@ export const getDrop = <ThrowOnError extends boolean = false>(
       ...options,
     },
   );
+
+/**
+ * Get Drop History
+ *
+ * The Drop's History tab: every drop, newest first, with what each produced.
+ */
+export const getDropHistory = <ThrowOnError extends boolean = false>(
+  options: Options<GetDropHistoryData, ThrowOnError>,
+): RequestResult<GetDropHistoryResponses, GetDropHistoryErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetDropHistoryResponses,
+    GetDropHistoryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDropHistoryPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDropHistoryResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/drop/history',
+    ...options,
+  });
 
 /**
  * List Entities

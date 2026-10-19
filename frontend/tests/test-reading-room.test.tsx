@@ -5,7 +5,7 @@ import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {ReadingRoom, clipOf, proposalText} from '../features/reading-room/reading-room';
+import {ReadingRoom, acceptImpact, clipOf, proposalText, sameReason} from '../features/reading-room/reading-room';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -55,6 +55,20 @@ describe('reading room helpers', () => {
     expect(clip.checked).toBe(true);
     expect(clipOf({text: TEXT, locator: 'p'}, 0, 3, 'XYZ', 'f').checked).toBe(false);
     expect(proposalText(name as unknown as ExtractionCandidateOut)).toBe('Fernhill Ltd');
+  });
+
+  it('says why a record may be the same, and what accepting adds', () => {
+    expect(sameReason('Harbour Nominees Ltd', 'Harbour Nominees Limited', 'the same name')).toBe('Same name: “Ltd” and “Limited” read as one');
+    expect(sameReason('Kestrel SA', 'Kestrel SA', 'the same name')).toBe('Same name, word for word');
+    expect(sameReason('Kestrel', 'Kestrel Holdings', 'a similar name')).toBe('A similar name');
+    const c = name as unknown as ExtractionCandidateOut;
+    expect(acceptImpact(c, {}, {locator: 'p.4 ¶1', mentions: 1})).toEqual(['Adds “Fernhill Ltd” as a new record: Company', 'Traced to p.4 ¶1']);
+    expect(acceptImpact(c, {identity: {kind: 'same', entityId: 'e1'}}, {locator: 'p.4 ¶1', mentions: 3, record: 'Fernhill Limited'})[0])
+      .toBe('Adds the 3 places this document names it to Fernhill Limited; no new record');
+    expect(acceptImpact(c, {schema: 'Person', identity: {kind: 'new'}}, {locator: 'p.4 ¶1', mentions: 1, strong: 'Fernhill Limited'}))
+      .toEqual(['Adds “Fernhill Ltd” as a new record: Person', 'Traced to p.4 ¶1', 'Kept apart from Fernhill Limited: you said it is a different one']);
+    const claim = {...c, candidate_type: 'claim', payload: {text: 'The board agreed.'}} as ExtractionCandidateOut;
+    expect(acceptImpact(claim, {}, {locator: 'p.3 ¶3', mentions: 0})).toEqual(['Adds the claim to test, Not yet shown', 'Keeps these words, p.3 ¶3, as its supporting evidence']);
   });
 });
 
@@ -118,6 +132,64 @@ describe('ReadingRoom', () => {
     expect(within(clip).getByText(/the words are in the stored text/)).toBeInTheDocument();
     // document_id is for pictures only: the backend answers 400 to it on a text document.
     expect(api.lastBody('POST /api/evidence')).toEqual({source_id: 'src-1', quote: 'bought on behalf', locator: 'page 4'});
+  });
+
+  it('shows what accepting changes on the Accept button', async () => {
+    routes();
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const card = await screen.findByRole('article', {name: 'Name: Fernhill Ltd'});
+    const accept = within(card).getByRole('button', {name: /^Accept/});
+    expect(accept).toHaveAccessibleDescription(/What changes if you accept.*Adds “Fernhill Ltd” as a new record: Company.*Traced to p\.4 ¶1/);
+    expect(within(card).getByRole('tooltip')).toHaveTextContent('Nothing else in the case changes.');
+  });
+
+  const match = {entity_id: 'e1', caption: 'Fernhill Limited', schema: 'Company', score: 0.95, name_similarity: 0.95, basis: 'same_name', facts: 14};
+  const sameRoutes = (extra = {}) => routes({
+    'GET /api/extraction-candidates/x1/entity-matches': {candidate_id: 'x1', caption: 'Fernhill Ltd', schema: 'Company', matches: [match], strong_match: match,
+      provider_lead: {provider: null, provider_entity_id: null, provider_resolved_entity_id: null}, identity_rule: 'same name'},
+    'GET /api/extraction-candidates/x1/same-answer': {candidate_id: 'x1', caption: 'Fernhill Ltd', scope: 'drop', label: 'minutes.pdf and 2 more', candidates: [
+      {candidate_id: 'y1', caption: 'Fernhill Limited', document_id: 'd2', filename: 'letter.eml', locator: 'body ¶2'},
+      {candidate_id: 'y2', caption: 'FERNHILL LTD', document_id: 'd3', filename: 'ledger.xlsx', locator: null}]},
+    'POST /api/extraction-candidates/y1/review': {candidate: {...name, id: 'y1', review_status: 'accepted'}, record: null},
+    'POST /api/extraction-candidates/y2/review': {candidate: {...name, id: 'y2', review_status: 'accepted'}, record: null},
+    ...extra,
+  });
+
+  it('shows the record already in the case, and offers the same answer to the other mentions in the drop', async () => {
+    const api = sameRoutes();
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const card = await screen.findByRole('article', {name: 'Name: Fernhill Ltd'});
+    const known = await within(card).findByLabelText('Already in the case: Fernhill Limited');
+    expect(known).toHaveTextContent('Company · 14 facts in the case');
+    expect(known).toHaveTextContent('✓ Same name: “Ltd” and “Limited” read as one');
+    expect(within(card).getByRole('button', {name: /^Accept/})).toBeDisabled();
+    await userEvent.setup().click(card);
+    fireEvent.keyDown(window, {key: '1'});
+    expect(within(card).getByRole('button', {name: /^Accept/})).toHaveAccessibleDescription(/Adds p\.4 ¶1 to Fernhill Limited; no new record/);
+    const offer = await within(card).findByRole('group', {name: 'Same answer for the others'});
+    expect(offer).toHaveTextContent('Same answer for 2 more mentions in this drop? Fernhill Ltd = Fernhill Limited');
+    expect(offer).toHaveTextContent('“Fernhill Limited” · letter.eml, body ¶2');
+    await userEvent.setup().click(within(offer).getByRole('button', {name: 'Apply to these 2'}));
+    expect(screen.getByText(/2 more mentions go to Fernhill Limited in a moment/)).toBeInTheDocument();
+    expect(api.calls('POST /api/extraction-candidates/y1/review')).toHaveLength(0);  // held 6 s, like every decision
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(api.calls('POST /api/extraction-candidates/y2/review')).toHaveLength(1));
+    expect(api.lastBody('POST /api/extraction-candidates/y1/review')).toEqual({decision: 'accept', entity_schema: 'Company', entity_identity_decision: 'same', matched_entity_id: 'e1'});
+  });
+
+  it('takes the same answer back with U', async () => {
+    const api = sameRoutes();
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const card = await screen.findByRole('article', {name: 'Name: Fernhill Ltd'});
+    await within(card).findByLabelText('Already in the case: Fernhill Limited');
+    await userEvent.setup().click(card);
+    fireEvent.keyDown(window, {key: '1'});
+    const offer = await within(card).findByRole('group', {name: 'Same answer for the others'});
+    await userEvent.setup().click(within(offer).getByRole('button', {name: 'Apply to these 2'}));
+    fireEvent.keyDown(window, {key: 'u'});
+    expect(await screen.findByText('Undone: the 2 other mentions still wait.')).toBeInTheDocument();
+    fireEvent.keyDown(window, {key: 'Escape'});
+    expect(api.calls('POST /api/extraction-candidates/y1/review')).toHaveLength(0);
   });
 
   it('finds words in the document and closes with Escape', async () => {

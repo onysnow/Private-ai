@@ -18,7 +18,7 @@ import type {ReactElement, ReactNode} from 'react';
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
 import {
-  getDocumentOptions, getExtractionCandidateExplanationOptions, getExtractionEntityMatchesOptions, getIdentifierTargetsOptions, getTagsOptions,
+  getDocumentOptions, getExtractionCandidateExplanationOptions, getExtractionEntityMatchesOptions, getIdentifierTargetsOptions, getSameAnswerCandidatesOptions, getTagsOptions,
   listDocumentCandidatesEndpointOptions, listDocumentsOptions, listInvestigationsOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {
@@ -40,6 +40,8 @@ type Picked = {chunk: DocumentChunkOut; start: number; end: number; quote: strin
 export type Clip = {quote: string; before: string; after: string; fingerprint: string; anchor: string; checked: boolean; page: number | null; evidenceId: string};
 type Answer = {schema?: string; identity?: IdentityChoice; owner?: string};
 type Held = {c: ExtractionCandidateOut; decision: 'accept' | 'reject'; body: Record<string, unknown>; until: number};
+/** The same answer applied to other mentions of a name, held 6 s like one decision. */
+type BatchHeld = {ids: string[]; record: string; body: Record<string, unknown>; until: number};
 
 const CLIP_CONTEXT = 32;
 const HOLD_MS = 6000;
@@ -83,6 +85,42 @@ export function openQuestion(c: ExtractionCandidateOut, a: Answer, strongMatch: 
   if (c.candidate_type === 'entity' && strongMatch && !a.identity) return 'identity';
   if (c.candidate_type === 'identifier' && !a.owner) return 'owner';
   return null;
+}
+
+const wordsOf = (s: string) => s.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+
+/** Why a record may be what the name names, in words (research §8: "Same name: 'Ltd' and 'Limited' read as one"). */
+export function sameReason(caption: string, other: string, why: string): string {
+  const a = wordsOf(caption), b = wordsOf(other);
+  const lower = (xs: string[]) => new Set(xs.map(x => x.toLowerCase()));
+  const onlyA = a.filter(w => !lower(b).has(w.toLowerCase())), onlyB = b.filter(w => !lower(a).has(w.toLowerCase()));
+  if (why.startsWith('the same name')) {
+    if (!onlyA.length && !onlyB.length) return 'Same name, word for word';
+    if (onlyA.length && onlyB.length && onlyA.length <= 2 && onlyB.length <= 2) return `Same name: “${onlyA.join(' ')}” and “${onlyB.join(' ')}” read as one`;
+  }
+  return why.charAt(0).toUpperCase() + why.slice(1);
+}
+
+type ImpactContext = {locator: string; mentions: number; record?: string | null; strong?: string | null; owner?: string | null};
+
+/** What accepting a proposal adds to the case, before it is accepted (research §6 "What changes if I accept"). Read
+ * from the answers on the card and what review_candidate does with each kind (app/services/documents.py). */
+export function acceptImpact(c: ExtractionCandidateOut, a: Answer, ctx: ImpactContext): string[] {
+  const caption = proposalText(c);
+  const where = ctx.mentions > 1 ? `the ${ctx.mentions} places this document names it` : ctx.locator;
+  switch (c.candidate_type) {
+    case 'entity': {
+      const schema = a.schema ?? String((c.payload as {suggested_schema?: unknown}).suggested_schema ?? 'LegalEntity');
+      if (a.identity?.kind === 'same' && ctx.record) return [`Adds ${where} to ${ctx.record}; no new record`, 'The name is kept as it is written here, traced to these words'];
+      return [`Adds “${caption}” as a new record: ${SCHEMA_WORD[schema] ?? schema}`, `Traced to ${where}`,
+        ...(ctx.strong ? [`Kept apart from ${ctx.strong}: you said it is a different one`] : [])];
+    }
+    case 'claim': return ['Adds the claim to test, Not yet shown', `Keeps these words, ${ctx.locator}, as its supporting evidence`];
+    case 'evidence': return [`Keeps the exact words, ${ctx.locator}, as evidence from this document`];
+    case 'identifier': return [ctx.owner ? `Adds ${caption} to ${ctx.owner}` : `Adds ${caption} to the record you choose`, `Traced to ${ctx.locator}`];
+    case 'relationship': return ['Adds the link between the two records', `With ${ctx.locator} as its evidence`];
+    default: return [`Adds it to the case with ${ctx.locator} as its source`];
+  }
 }
 
 /** The words kept as evidence, with their surroundings, checked against the stored text. */
@@ -172,11 +210,17 @@ function Question({c, answer, setAnswer, active, onAcceptFirst}: {c: ExtractionC
     if (!body) choices.push(...qChoices);
     body = <>{body}<div className="rr-q" role="group" aria-label="Is this already in the case?">
       <p>Is this already in the case?{strong ? '' : ' (optional)'}</p>
-      {options.map((o, i) => <div key={o.entityId} className="rr-match">
-        <span><b>{o.caption}</b><small>{o.schema} · {o.why}</small></span>
+      {options.map((o, i) => {
+        const facts = matches.data?.matches.find(m => m.entity_id === o.entityId)?.facts;
+        const reason = sameReason(caption, o.caption, o.why);
+        return <div key={o.entityId} className="rr-match">
+        <span className="rr-known" aria-label={`Already in the case: ${o.caption}`}><b>{o.caption}</b>
+          <small>{SCHEMA_WORD[o.schema] ?? o.schema}{typeof facts === 'number' ? ` · ${facts} fact${facts === 1 ? '' : 's'} in the case` : ''}</small>
+          <small className={o.why.startsWith('the same name') ? 'rr-agree' : 'rr-near'}><span aria-hidden="true">{o.why.startsWith('the same name') ? '✓ ' : '≈ '}</span>{reason}</small></span>
         <button type="button" aria-pressed={answer.identity?.kind === 'same' && answer.identity.entityId === o.entityId}
           onClick={() => setAnswer({...answer, identity: {kind: 'same', entityId: o.entityId}})}>Same as this {!body || answer.schema ? <kbd>{i + 1}</kbd> : null}</button>
-      </div>)}
+      </div>;
+      })}
       <button type="button" className="rr-new" aria-pressed={answer.identity?.kind === 'new'} onClick={() => setAnswer({...answer, identity: {kind: 'new'}})}>
         A new record <kbd>{options.length + 1}</kbd></button>
     </div></>;
@@ -212,19 +256,51 @@ function Question({c, answer, setAnswer, active, onAcceptFirst}: {c: ExtractionC
   return body;
 }
 
-function Card({c, focus, locator, held, answer, setAnswer, onFocus, onDecide, onUndo, onAcceptFirst}: {
+/** Answer once, apply to the batch (research §8): once this name is said to be a record already in the case, the
+ * other waiting mentions of the same name in its drop are offered the same answer, listed; nothing is applied
+ * until you say so, and then it waits 6 s with Undo like any decision. */
+function SameAnswer({c, record, recordId, schema, onApply}: {c: ExtractionCandidateOut; record: string; recordId: string; schema: string;
+  onApply: (b: BatchHeld) => void}): ReactElement | null {
+  const same = useQuery({...getSameAnswerCandidatesOptions({path: {candidate_id: c.id}})});
+  const [dismissed, setDismissed] = useState(false);
+  const list = same.data?.candidates ?? [];
+  if (dismissed || !list.length) return null;
+  const where = same.data?.scope === 'drop' ? 'in this drop' : 'in this case';
+  return <div className="rr-batch" role="group" aria-label="Same answer for the others">
+    <p>Same answer for {list.length} more mention{list.length === 1 ? '' : 's'} {where}? <b>{proposalText(c)}</b> = <b>{record}</b></p>
+    <ul>{list.slice(0, 6).map(x => <li key={x.candidate_id}>“{x.caption}” · {x.filename}{x.locator ? `, ${x.locator}` : ''}</li>)}
+      {list.length > 6 && <li>and {list.length - 6} more</li>}</ul>
+    <div className="rr-batch-acts">
+      <button type="button" onClick={e => { e.stopPropagation(); setDismissed(true);
+        onApply({ids: list.map(x => x.candidate_id), record, body: {decision: 'accept', entity_schema: schema, entity_identity_decision: 'same', matched_entity_id: recordId}, until: Date.now() + HOLD_MS}); }}>
+        Apply to these {list.length}</button>
+      <button type="button" onClick={e => { e.stopPropagation(); setDismissed(true); }}>No, one at a time</button>
+    </div>
+  </div>;
+}
+
+function Card({c, focus, locator, held, answer, setAnswer, onFocus, onDecide, onUndo, onAcceptFirst, onApplyBatch}: {
   c: ExtractionCandidateOut; focus: boolean; locator: string; held: Held | null; answer: Answer; setAnswer: (a: Answer) => void; onFocus: () => void;
   onDecide: (decision: 'accept' | 'reject', caption?: string) => void; onUndo: () => void;
   onAcceptFirst: (candidateId: string, caption: string, schema: string) => Promise<string>;
+  onApplyBatch: (b: BatchHeld) => void;
 }): ReactElement {
   const [why, setWhy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [caption, setCaption] = useState(proposalText(c));
   const matches = useQuery({...getExtractionEntityMatchesOptions({path: {candidate_id: c.id}}), enabled: c.candidate_type === 'entity' && c.review_status === 'proposed'});
+  const targets = useQuery({...getIdentifierTargetsOptions({path: {candidate_id: c.id}}), enabled: c.candidate_type === 'identifier' && c.review_status === 'proposed'});
   const open = c.review_status === 'proposed' && !held;
   const ask = openQuestion(c, answer, Boolean(matches.data?.strong_match));
   const blocked = ask !== null || (c.candidate_type === 'entity' && matches.isPending);
   const kind = KIND_WORD[c.candidate_type] ?? c.candidate_type;
+  const sameId = answer.identity?.kind === 'same' ? answer.identity.entityId : null;
+  const record = sameId ? matches.data?.matches.find(m => m.entity_id === sameId)?.caption ?? null : null;
+  const owners = [...(targets.data?.document_entities ?? []), ...(targets.data?.other_entities ?? [])];
+  const impact = acceptImpact(c, answer, {locator, mentions: ((c.payload as {mentions?: unknown[]}).mentions ?? []).length, record,
+    strong: answer.identity?.kind === 'new' ? matches.data?.strong_match?.caption ?? null : null,
+    owner: owners.find(o => o.entity_id === answer.owner)?.caption ?? null});
+  const impactId = `rr-impact-${c.id}`;
   return <article id={`rr-card-${c.id}`} className={`rr-card rr-${c.candidate_type}${focus ? ' on' : ''}${open ? '' : ' done'}`}
     aria-label={`${kind}: ${proposalText(c)}`} onClick={onFocus}>
     <header>
@@ -240,13 +316,19 @@ function Card({c, focus, locator, held, answer, setAnswer, onFocus, onDecide, on
       : open ? <>
         <Question c={c} answer={answer} setAnswer={setAnswer} active={focus} onAcceptFirst={onAcceptFirst}/>
         <div className="rr-answers" role="group" aria-label="Your answer">
-          <button type="button" className="p" disabled={blocked} onClick={e => { e.stopPropagation(); onDecide('accept', editing ? caption : undefined); }}
-            aria-keyshortcuts={focus ? 'A' : undefined}>Accept <kbd>A</kbd></button>
+          <span className="rr-accept-wrap">
+            <button type="button" className="p" disabled={blocked} onClick={e => { e.stopPropagation(); onDecide('accept', editing ? caption : undefined); }}
+              aria-keyshortcuts={focus ? 'A' : undefined} aria-describedby={impactId}>Accept <kbd>A</kbd></button>
+            <span id={impactId} role="tooltip" className="rr-impact"><b>What changes if you accept</b>
+              {impact.map(line => <span key={line}>{line}</span>)}<span className="rr-quiet">Nothing else in the case changes.</span></span>
+          </span>
           <button type="button" onClick={e => { e.stopPropagation(); onDecide('reject'); }} aria-keyshortcuts={focus ? 'R' : undefined}>Reject <kbd>R</kbd></button>
           {c.candidate_type === 'entity' && <button type="button" onClick={e => { e.stopPropagation(); setEditing(v => !v); }} aria-pressed={editing}>Edit</button>}
           {blocked && ask && <small className="rr-why-not">{ask === 'owner' ? 'Say whose it is first' : 'Answer the question first'}</small>}
           <button type="button" className="rr-why-btn" onClick={e => { e.stopPropagation(); setWhy(w => !w); }} aria-expanded={why}>Why? ›</button>
         </div>
+        {sameId && record && <SameAnswer c={c} record={record} recordId={sameId} onApply={onApplyBatch}
+          schema={answer.schema ?? String((c.payload as {suggested_schema?: unknown}).suggested_schema ?? 'LegalEntity')}/>}
       </> : null}
     {why && <Why candidateId={c.id}/>}
   </article>;
@@ -383,6 +465,30 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   // Closing the room sends a decision still held.
   useEffect(() => () => { if (heldRef.current) void sendRef.current(heldRef.current); }, []);
 
+  // The same answer for other mentions of a name: held like one decision, then sent one by one.
+  const [heldBatch, setHeldBatch] = useState<BatchHeld | null>(null);
+  const heldBatchRef = useRef<BatchHeld | null>(null);
+  const sendBatch = useCallback(async (b: BatchHeld) => {
+    let done = 0;
+    const failed: string[] = [];
+    for (const id of b.ids) {
+      try { await reviewExtractionCandidate({path: {candidate_id: id}, body: b.body as never, throwOnError: true}); done += 1; }
+      catch (error) { failed.push(errorMessage(error, 'not saved')); }
+    }
+    setStatus(`✓ ${done} more mention${done === 1 ? '' : 's'} added to ${b.record}.${failed.length ? ` ${failed.length} not saved: ${failed[0]}` : ''}`);
+    await queryClient.invalidateQueries();
+  }, [queryClient]);
+  const sendBatchRef = useRef(sendBatch);
+  sendBatchRef.current = sendBatch;
+  useEffect(() => {
+    heldBatchRef.current = heldBatch;
+    if (!heldBatch) return undefined;
+    const timer = window.setTimeout(() => { setHeldBatch(null); heldBatchRef.current = null; void sendBatch(heldBatch); }, Math.max(0, heldBatch.until - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [heldBatch, sendBatch]);
+  useEffect(() => () => { if (heldBatchRef.current) void sendBatchRef.current(heldBatchRef.current); }, []);
+  const undoBatch = () => { if (heldBatchRef.current) setStatus(`Undone: the ${heldBatchRef.current.ids.length} other mentions still wait.`); setHeldBatch(null); heldBatchRef.current = null; };
+
   const decide = useCallback((c: ExtractionCandidateOut, decision: 'accept' | 'reject', caption?: string) => {
     if (heldRef.current && heldRef.current.c.id !== c.id) void send(heldRef.current);
     const p = c.payload as Record<string, unknown>;
@@ -489,6 +595,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
       }
       if (k === 'j') { e.preventDefault(); move(1); return; }
       if (k === 'k') { e.preventDefault(); move(-1); return; }
+      if (k === 'u' && heldBatchRef.current) { e.preventDefault(); undoBatch(); return; }
       if (k === 'u' && heldRef.current) { e.preventDefault(); undo(); return; }
       const card = cards.find(c => c.id === focus);
       if (!card || card.review_status !== 'proposed' || held?.c.id === card.id) return;
@@ -578,6 +685,8 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         </span>
       </header>
       <div className="rr-side-list">
+        {heldBatch && <p className="rr-held rr-batch-held" role="status">✓ {heldBatch.ids.length} more mention{heldBatch.ids.length === 1 ? '' : 's'} go to {heldBatch.record} in a moment.
+          <button type="button" onClick={undoBatch}>Undo <kbd>U</kbd></button></p>}
         {pageClips.map(cl => <section key={cl.evidenceId || cl.anchor} className="rr-clip" aria-label="Evidence clip">
           <p className="rr-eyebrow">Evidence clip <span className="rr-quiet">saved just now</span>
             <span className="st st-unshown"><span aria-hidden="true">○</span>Not yet shown</span></p>
@@ -590,7 +699,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         </section>)}
         {shownCards.map(c => <Card key={c.id} c={c} focus={focus === c.id} locator={locatorOf(c)} held={held?.c.id === c.id ? held : null}
           answer={answers[c.id] ?? {}} setAnswer={a => setAnswers(prev => ({...prev, [c.id]: a}))} onFocus={() => setFocus(c.id)}
-          onDecide={(d, caption) => decide(c, d, caption)} onUndo={undo} onAcceptFirst={acceptFirst}/>)}
+          onDecide={(d, caption) => decide(c, d, caption)} onUndo={undo} onAcceptFirst={acceptFirst} onApplyBatch={b => { setHeldBatch(b); heldBatchRef.current = b; }}/>)}
         {!shownCards.length && !pageClips.length && <p className="rr-quiet">{filter === 'questions' ? 'No question waits on this page.'
           : pageCards.length ? '' : `Nothing waits on this ${paged ? 'page' : 'text'}.`}{counts.waiting && !pageCards.some(c => c.review_status === 'proposed') ? ' Others wait elsewhere: J moves to the next.' : ''}</p>}
       </div>

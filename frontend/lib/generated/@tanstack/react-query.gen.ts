@@ -105,6 +105,7 @@ import {
   getDocumentTable,
   getDocumentTranslation,
   getDrop,
+  getDropHistory,
   getEntityDossier,
   getExtractionCandidateExplanation,
   getExtractionCandidateLineage,
@@ -132,6 +133,7 @@ import {
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
+  getSameAnswerCandidates,
   getSecurityAlerts,
   getSecurityAudit,
   getSecurityAuditRetentionPreview,
@@ -575,6 +577,9 @@ import type {
   GetDocumentTranslationResponse,
   GetDropData,
   GetDropError,
+  GetDropHistoryData,
+  GetDropHistoryError,
+  GetDropHistoryResponse,
   GetDropResponse,
   GetEntityDossierData,
   GetEntityDossierError,
@@ -657,6 +662,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsError,
   GetRedFlagsResponse,
+  GetSameAnswerCandidatesData,
+  GetSameAnswerCandidatesError,
+  GetSameAnswerCandidatesResponse,
   GetSecurityAlertsData,
   GetSecurityAlertsError,
   GetSecurityAlertsResponse,
@@ -4514,6 +4522,37 @@ export const reviewExtractionCandidateMutation = (
   return mutationOptions;
 };
 
+export const getSameAnswerCandidatesQueryKey = (
+  options: Options<GetSameAnswerCandidatesData>,
+) => createQueryKey('getSameAnswerCandidates', options);
+
+/**
+ * Get Same Answer Candidates
+ *
+ * The other waiting proposals of the same name in this proposal's drop (else the case), so one answer can
+ * be offered to all of them (reading room, "Answer once, apply to the batch").
+ */
+export const getSameAnswerCandidatesOptions = (
+  options: Options<GetSameAnswerCandidatesData>,
+) =>
+  queryOptions<
+    GetSameAnswerCandidatesResponse,
+    GetSameAnswerCandidatesError,
+    GetSameAnswerCandidatesResponse,
+    ReturnType<typeof getSameAnswerCandidatesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSameAnswerCandidates({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSameAnswerCandidatesQueryKey(options),
+  });
+
 export const healthQueryKey = (options?: Options<HealthData>) =>
   createQueryKey('health', options);
 
@@ -6195,6 +6234,33 @@ export const getDropOptions = (options: Options<GetDropData>) =>
       return data;
     },
     queryKey: getDropQueryKey(options),
+  });
+
+export const getDropHistoryQueryKey = (options: Options<GetDropHistoryData>) =>
+  createQueryKey('getDropHistory', options);
+
+/**
+ * Get Drop History
+ *
+ * The Drop's History tab: every drop, newest first, with what each produced.
+ */
+export const getDropHistoryOptions = (options: Options<GetDropHistoryData>) =>
+  queryOptions<
+    GetDropHistoryResponse,
+    GetDropHistoryError,
+    GetDropHistoryResponse,
+    ReturnType<typeof getDropHistoryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDropHistory({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDropHistoryQueryKey(options),
   });
 
 export const listEntitiesQueryKey = (options: Options<ListEntitiesData>) =>
