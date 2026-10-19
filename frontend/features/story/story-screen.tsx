@@ -11,9 +11,12 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
+import {z} from 'zod';
 
+import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {StatusChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
+import {submitWith, useZodForm} from '../../lib/forms';
 import {
   addStorySectionMutation, getNotesOptions, getStoryOptions, getStoryQueryKey, markStoryReadyMutation, placeStoryClaimMutation, recordStoryGateMutation,
   removeStoryClaimMutation, setStoryThesisMutation, startStoryWriteupMutation,
@@ -27,6 +30,22 @@ const WriteupEditor = dynamic(() => import('./writeup-editor').then(m => m.Write
 /** The drag type a claim of the tree carries (editor-extensions.ts CLAIM_DRAG; repeated so TipTap loads only with the editor). */
 const CLAIM_DRAG = 'application/x-story-claim';
 type Pane = {kind: 'passage'; claimId: string} | {kind: 'versions'} | null;
+
+// What the boxes of this screen take, as the backend does (StoryThesisSet thesis up to 2000, StorySectionCreate title
+// 1–512, StoryGateSet who up to 255 and a day, StoryReady by 1–255).
+type Gate = 'right_of_reply' | 'legal_read';
+const thesisSchema = z.object({thesis: z.string().trim().min(1, 'Write the sentence first.').max(2000, 'Keep it under 2,000 characters.')});
+const sectionSchema = z.object({title: z.string().trim().min(1, 'Write what the section will say.').max(512, 'Keep it under 512 characters.')});
+const gateSchema = (gate: Gate) => z.object({
+  who: z.string().trim().min(1, gate === 'right_of_reply' ? 'Write who it was sent to.' : 'Write who read it.').max(255, 'Keep it under 255 characters.'),
+  on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Pick the day.'),
+});
+const readySchema = z.object({by: z.string().trim().min(1, 'Write who decided.').max(255, 'Keep it under 255 characters.')});
+type ThesisValues = z.infer<typeof thesisSchema>;
+type SectionValues = z.infer<typeof sectionSchema>;
+type GateValues = z.infer<ReturnType<typeof gateSchema>>;
+type ReadyValues = z.infer<typeof readySchema>;
+const NEXT_LINE = 'field-msg next-line';
 
 const STATE_CHIP = {shown: 'supported', disputed: 'disputed', unshown: 'unshown', ruled_out: 'ruled_out'} as const;
 const GATE_MARK: Record<StoryGateOut['state'], string> = {passed: '✓', open: '○', warning: '!', pending: '○'};
@@ -68,13 +87,14 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   const [tab, setTab] = useState<'write' | 'cited' | 'notes'>('write');
   const [doc, setDoc] = useState<DocInfo | null>(null);
   const cited = doc?.cited ?? [];
-  const [thesis, setThesis] = useState('');
-  const [newSection, setNewSection] = useState('');
+  const thesisForm = useZodForm<ThesisValues>(thesisSchema, {defaultValues: {thesis: ''}, mode: 'onSubmit'});
+  const sectionForm = useZodForm<SectionValues>(sectionSchema, {defaultValues: {title: ''}, mode: 'onSubmit'});
   const [lit, setLit] = useState<string | null>(null);
   const [pane, setPane] = useState<Pane>(null);
   const [exporting, setExporting] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
-  const problem = [thesisM, sectionM, placeM, removeM, gateM, readyM, writeM].find(m => m.isError)?.error;
+  // The thesis, a new section, a gate and "Ready to run" show a failed save in their own forms.
+  const problem = [placeM, removeM, gateM, writeM].find(m => m.isError)?.error;
   const notes = useQuery({...getNotesOptions({path, query: {record_type: 'story', record_id: story?.id ?? ''}}), enabled: Boolean(story?.id)});
 
   // Claims of the story, numbered in the tree's order: the numbers on the citation chips.
@@ -115,17 +135,33 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
         <header className="sy-left-head"><p className="sy-eyebrow">What the story needs <small>thesis → sections → claims → evidence · a branch is as strong as its weakest claim</small></p>
           <button type="button" className="sy-btn" aria-pressed={outline} onClick={() => setOutline(v => !v)}><kbd>L</kbd> list view</button></header>
         {story.critical.length > 0 && <p className="sy-critical"><b>Critical path</b> Blocked by: {story.critical.map(x => x.text).join(' · ')} <small>({story.critical[0].section})</small></p>}
-        {!story.thesis ? <form className="sy-thesis-form" onSubmit={e => { e.preventDefault(); if (thesis.trim()) thesisM.mutate({path, body: {thesis: thesis.trim()}}); }}>
+        {!story.thesis ? <Form {...thesisForm}><form className="sy-thesis-form" noValidate onSubmit={submitWith(thesisForm, async ({thesis}) => {
+          await thesisM.mutateAsync({path, body: {thesis}});
+        }, 'Could not set the thesis')}>
           <label htmlFor="sy-thesis">Write the one sentence this story says</label>
-          <input id="sy-thesis" value={thesis} onChange={e => setThesis(e.target.value)} placeholder="e.g. Kestrel SA ended up with the harbour land through companies that hid who owned them"/>
-          <button type="submit" disabled={!thesis.trim()}>Set the thesis</button>
-        </form> : outline ? <Outline story={story}/> : <Tree story={story} lit={lit} setLit={setLit} byId={byId} canDrag={Boolean(story.writeup_id)}
+          <FormField control={thesisForm.control} name="thesis" render={({field}) => <FormItemBare>
+            <FormControl><input {...field} id="sy-thesis" placeholder="e.g. Kestrel SA ended up with the harbour land through companies that hid who owned them"/></FormControl>
+            <FormMessage className="field-msg"/></FormItemBare>}/>
+          <FormRootError className="field-msg"/>
+          <button type="submit">Set the thesis</button>
+        </form></Form> : outline ? <Outline story={story}/> : <Tree story={story} lit={lit} setLit={setLit} byId={byId} canDrag={Boolean(story.writeup_id)}
           onRemove={(section, claim) => removeM.mutate({path: {...path, section_id: section, claim_id: claim}})}
           onPlace={(section, claim) => placeM.mutate({path: {...path, section_id: section}, body: {claim_id: claim}})}/>}
-        {story.thesis && <form className="sy-add" onSubmit={e => { e.preventDefault(); if (newSection.trim()) { sectionM.mutate({path, body: {title: newSection.trim()}}); setNewSection(''); } }}>
-          <input aria-label="A new section" value={newSection} onChange={e => setNewSection(e.target.value)} placeholder="+ A section: what the story will say next"/>
-          <button type="submit" disabled={!newSection.trim()}>Add section</button></form>}
-        <Gates story={story} onGate={(gate, who, on) => gateM.mutate({path, body: {gate, who, on}})} onReady={by => readyM.mutate({path, body: {by}})}/>
+        {story.thesis && <Form {...sectionForm}><form className="sy-add" noValidate onSubmit={submitWith(sectionForm, async ({title}) => {
+          await sectionM.mutateAsync({path, body: {title}});
+          sectionForm.reset();
+        }, 'Could not add the section')}>
+          <FormField control={sectionForm.control} name="title" render={({field}) => <FormItemBare>
+            <FormControl><input {...field} aria-label="A new section" placeholder="+ A section: what the story will say next"/></FormControl>
+            <FormMessage className={NEXT_LINE}/></FormItemBare>}/>
+          <FormRootError className={NEXT_LINE}/>
+          <button type="submit">Add section</button></form></Form>}
+        <Gates story={story} onClear={gate => gateM.mutate({path, body: {gate, who: null, on: null}})}
+          onGate={async (gate, who, on) => {
+            // The failure shows in the gate's form, so not again over the screen.
+            try { await gateM.mutateAsync({path, body: {gate, who, on}}); } catch (error) { gateM.reset(); throw error; }
+          }}
+          onReady={async by => { await readyM.mutateAsync({path, body: {by}}); }}/>
         {/* What opens beside the text lies over the tree's edge, next to the write-up, so the text never moves. */}
         {pane && <div className="sy-pane-slot">
           {pane.kind === 'passage' && <PassagePane claim={byId.get(pane.claimId)} onClose={() => setPane(null)}/>}
@@ -259,33 +295,49 @@ function Outline({story}: {story: StoryOut}): ReactElement {
   </ol>;
 }
 
-function Gates({story, onGate, onReady}: {story: StoryOut; onGate: (gate: 'right_of_reply' | 'legal_read', who: string | null, on: string | null) => void;
-  onReady: (by: string) => void}): ReactElement {
-  const [editing, setEditing] = useState<'right_of_reply' | 'legal_read' | null>(null);
-  const [who, setWho] = useState('');
-  const [on, setOn] = useState('');
-  const [by, setBy] = useState('');
+/** Who the reply went to, or who read it for the lawyer, and on which day: asked in place, under the gate. */
+function GateForm({gate, onGate, onClose}: {gate: Gate; onGate: (gate: Gate, who: string, on: string) => Promise<void>; onClose: () => void}): ReactElement {
+  const form = useZodForm<GateValues>(gateSchema(gate), {defaultValues: {who: '', on: ''}, mode: 'onSubmit'});
+  const label = gate === 'right_of_reply' ? 'Sent to' : 'Read by';
+  return <Form {...form}><form className="gate-form" noValidate onSubmit={submitWith(form, async ({who, on}) => {
+    await onGate(gate, who, on);
+    onClose();
+  }, 'Could not record it')}>
+    <FormField control={form.control} name="who" render={({field}) => <FormItemBare>
+      <FormControl><input {...field} aria-label={label} placeholder={label}/></FormControl>
+      <FormMessage className={NEXT_LINE}/></FormItemBare>}/>
+    <FormField control={form.control} name="on" render={({field}) => <FormItemBare>
+      <FormControl><input {...field} type="date" aria-label="On"/></FormControl>
+      <FormMessage className={NEXT_LINE}/></FormItemBare>}/>
+    <FormRootError className={NEXT_LINE}/>
+    <button type="submit">Record</button><button type="button" onClick={onClose}>Cancel</button>
+  </form></Form>;
+}
+
+function Gates({story, onGate, onClear, onReady}: {story: StoryOut; onGate: (gate: Gate, who: string, on: string) => Promise<void>;
+  onClear: (gate: Gate) => void; onReady: (by: string) => Promise<void>}): ReactElement {
+  const [editing, setEditing] = useState<Gate | null>(null);
+  const ready = useZodForm<ReadyValues>(readySchema, {defaultValues: {by: ''}, mode: 'onSubmit'});
   return <section className="sy-gates" aria-label="Gates">
     <p className="sy-eyebrow">Gates · {story.gates_passed} of {story.gates.length} passed</p>
     <ul>{story.gates.map(g => <li key={g.key} className={`gate g-${g.state}`}>
       <span className="gate-mark" aria-hidden="true">{GATE_MARK[g.state]}</span>
       <span><b>{g.label}</b><small>{g.detail}</small>
         {(g.key === 'right_of_reply' || g.key === 'legal_read') && (editing === g.key
-          ? <form className="gate-form" onSubmit={e => { e.preventDefault(); if (who.trim() && on) { onGate(g.key as 'right_of_reply', who.trim(), on); setEditing(null); } }}>
-            <input aria-label={g.key === 'right_of_reply' ? 'Sent to' : 'Read by'} placeholder={g.key === 'right_of_reply' ? 'Sent to' : 'Read by'} value={who} onChange={e => setWho(e.target.value)}/>
-            <input type="date" aria-label="On" value={on} onChange={e => setOn(e.target.value)}/>
-            <button type="submit" disabled={!who.trim() || !on}>Record</button><button type="button" onClick={() => setEditing(null)}>Cancel</button>
-          </form> : <span className="gate-acts">
-            <button type="button" onClick={() => { setEditing(g.key as 'right_of_reply'); setWho(''); setOn(''); }}>{g.state === 'passed' ? 'Change' : 'Record'}</button>
-            {g.state === 'passed' && <button type="button" onClick={() => onGate(g.key as 'right_of_reply', null, null)}>Clear</button>}
+          ? <GateForm gate={g.key as Gate} onGate={onGate} onClose={() => setEditing(null)}/> : <span className="gate-acts">
+            <button type="button" onClick={() => setEditing(g.key as Gate)}>{g.state === 'passed' ? 'Change' : 'Record'}</button>
+            {g.state === 'passed' && <button type="button" onClick={() => onClear(g.key as Gate)}>Clear</button>}
           </span>)}
       </span>
     </li>)}</ul>
     {story.ready ? <p className="sy-ok">Ready to run · decided by {story.ready.by} on {new Date(story.ready.at).toLocaleDateString('en-GB')}</p>
-      : <form className="gate-form" onSubmit={e => { e.preventDefault(); if (by.trim()) onReady(by.trim()); }}>
-        <input aria-label="Decided by" placeholder="Decided by" value={by} onChange={e => setBy(e.target.value)} disabled={!story.can_ready}/>
-        <button type="submit" disabled={!story.can_ready || !by.trim()}>Ready to run</button>
+      : <Form {...ready}><form className="gate-form" noValidate onSubmit={submitWith(ready, async ({by}) => { await onReady(by); }, 'Could not record it')}>
+        <FormField control={ready.control} name="by" render={({field}) => <FormItemBare>
+          <FormControl><input {...field} aria-label="Decided by" placeholder="Decided by" disabled={!story.can_ready}/></FormControl>
+          <FormMessage className={NEXT_LINE}/></FormItemBare>}/>
+        <FormRootError className={NEXT_LINE}/>
+        <button type="submit" disabled={!story.can_ready}>Ready to run</button>
         {!story.can_ready && <small>Only when every gate has passed.</small>}
-      </form>}
+      </form></Form>}
   </section>;
 }
