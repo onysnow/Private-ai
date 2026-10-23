@@ -20,7 +20,17 @@ client = TestClient(app)
 
 class Sanctions(Connector):
     async def search(self, query: str):
-        return [ExternalFinding(provider="opensanctions", record_id="os-1", caption="M. Ross", schema="Person", properties={}, url="https://x.example/1", raw={})]
+        return [
+            ExternalFinding(
+                provider="opensanctions",
+                record_id="os-1",
+                caption="M. Ross",
+                schema="Person",
+                properties={},
+                url="https://x.example/1",
+                raw={},
+            )
+        ]
 
     def enrich_sent(self, entity: dict) -> str:
         return "M. Ross · 14 Quay Street"
@@ -47,18 +57,44 @@ def _inv(name: str) -> str:
 
 def test_a_search_and_a_lookup_are_logged_word_for_word_and_a_failure_says_so():
     inv = _inv("Safety log")
-    client.post("/api/connectors/opensanctions/search", json={"investigation_id": inv, "query": "Harbour Nominees Ltd"})
-    entity = ok(client.post("/api/entities", json={"investigation_id": inv, "schema": "Person", "caption": "M. Ross", "properties": {"name": ["M. Ross"]}}))
+    client.post(
+        "/api/connectors/opensanctions/search",
+        json={"investigation_id": inv, "query": "Harbour Nominees Ltd"},
+    )
+    entity = ok(
+        client.post(
+            "/api/entities",
+            json={
+                "investigation_id": inv,
+                "schema": "Person",
+                "caption": "M. Ross",
+                "properties": {"name": ["M. Ross"]},
+            },
+        )
+    )
     ok(client.post(f"/api/entities/{entity['id']}/enrich/opensanctions"))
-    assert client.post("/api/connectors/firecrawl/search", json={"investigation_id": inv, "query": "Kestrel SA"}).status_code == 502
+    assert (
+        client.post(
+            "/api/connectors/firecrawl/search",
+            json={"investigation_id": inv, "query": "Kestrel SA"},
+        ).status_code
+        == 502
+    )
 
-    page = ok(client.get(f"/api/investigations/{inv}/safety-data", params={"period": "all"}))
+    page = ok(
+        client.get(f"/api/investigations/{inv}/safety-data", params={"period": "all"})
+    )
     sent = {(r["service"], r["value"], r["outcome"]) for r in page["outbound"]}
     assert ("opensanctions", "Harbour Nominees Ltd", "sent") in sent
     assert ("opensanctions", "M. Ross · 14 Quay Street", "sent") in sent
     assert ("firecrawl", "Kestrel SA", "failed") in sent
-    assert page["totals"]["requests_left"] == 3 and page["totals"]["services_reached"] == 2
-    assert page["totals"]["documents_sent_out"] == 0 and page["totals"]["ai_calls_outside"] == 0
+    assert (
+        page["totals"]["requests_left"] == 3 and page["totals"]["services_reached"] == 2
+    )
+    assert (
+        page["totals"]["documents_sent_out"] == 0
+        and page["totals"]["ai_calls_outside"] == 0
+    )
     assert "3 items to 2 services" in page["exposure"]
 
 
@@ -66,35 +102,106 @@ def test_the_period_and_the_case_limit_what_is_counted():
     inv, other = _inv("Period"), _inv("Another case")
     with SessionLocal() as db:
         old = utcnow_naive() - timedelta(days=40)
-        db.add(OutboundRequest(investigation_id=inv, at=old, service="opensanctions", kind="search text", value="old name"))
-        db.add(OutboundRequest(investigation_id=inv, service="opensanctions", kind="search text", value="new name"))
-        db.add(OutboundRequest(investigation_id=other, service="aleph", kind="search text", value="not this case"))
-        db.add(OutboundRequest(investigation_id=inv, service="ai:ollama", kind="case text", value="3 records", leaves_computer=False))
+        db.add(
+            OutboundRequest(
+                investigation_id=inv,
+                at=old,
+                service="opensanctions",
+                kind="search text",
+                value="old name",
+            )
+        )
+        db.add(
+            OutboundRequest(
+                investigation_id=inv,
+                service="opensanctions",
+                kind="search text",
+                value="new name",
+            )
+        )
+        db.add(
+            OutboundRequest(
+                investigation_id=other,
+                service="aleph",
+                kind="search text",
+                value="not this case",
+            )
+        )
+        db.add(
+            OutboundRequest(
+                investigation_id=inv,
+                service="ai:ollama",
+                kind="case text",
+                value="3 records",
+                leaves_computer=False,
+            )
+        )
         db.commit()
-    week = ok(client.get(f"/api/investigations/{inv}/safety-data", params={"period": "7d"}))
+    week = ok(
+        client.get(f"/api/investigations/{inv}/safety-data", params={"period": "7d"})
+    )
     assert [r["value"] for r in week["outbound"]] == ["3 records", "new name"]
-    assert week["totals"]["requests_left"] == 1, "a model on this computer is not a request that left"
-    assert ok(client.get(f"/api/investigations/{inv}/safety-data", params={"period": "all"}))["totals"]["requests_left"] == 2
-    assert ok(client.get(f"/api/investigations/{other}/safety-data"))["outbound"][0]["value"] == "not this case"
+    assert (
+        week["totals"]["requests_left"] == 1
+    ), "a model on this computer is not a request that left"
+    assert (
+        ok(
+            client.get(
+                f"/api/investigations/{inv}/safety-data", params={"period": "all"}
+            )
+        )["totals"]["requests_left"]
+        == 2
+    )
+    assert (
+        ok(client.get(f"/api/investigations/{other}/safety-data"))["outbound"][0][
+            "value"
+        ]
+        == "not this case"
+    )
 
 
 def test_the_stores_and_services_come_from_the_case_and_nothing_is_invented():
     inv = _inv("Stores")
-    ok(client.post("/api/entities", json={"investigation_id": inv, "schema": "Company", "caption": "Acme", "properties": {"name": ["Acme"]}}))
+    ok(
+        client.post(
+            "/api/entities",
+            json={
+                "investigation_id": inv,
+                "schema": "Company",
+                "caption": "Acme",
+                "properties": {"name": ["Acme"]},
+            },
+        )
+    )
     page = ok(client.get(f"/api/investigations/{inv}/safety-data"))
     stores = {s["id"]: s for s in page["stores"]}
     assert set(stores) == {"records", "documents", "backups", "keys", "log", "ai"}
     assert stores["records"]["count"] >= 1 and stores["documents"]["count"] == 0
-    assert stores["backups"]["warning"] and page["backup"]["last_backup_at"] is None and page["backup"]["encrypted"] is False
-    assert {s["id"] for s in page["services"]} >= {"aleph", "opensanctions", "firecrawl", "openaleph", "ai"}
+    assert (
+        stores["backups"]["warning"]
+        and page["backup"]["last_backup_at"] is None
+        and page["backup"]["encrypted"] is False
+    )
+    assert {s["id"] for s in page["services"]} >= {
+        "aleph",
+        "opensanctions",
+        "firecrawl",
+        "openaleph",
+        "ai",
+    }
     assert client.get("/api/investigations/nope/safety-data").status_code == 404
 
 
 def test_the_log_travels_with_a_backup():
     inv = _inv("Backup carries the log")
-    client.post("/api/connectors/opensanctions/search", json={"investigation_id": inv, "query": "Quay Holdings"})
+    client.post(
+        "/api/connectors/opensanctions/search",
+        json={"investigation_id": inv, "query": "Quay Holdings"},
+    )
     with SessionLocal() as db:
-        payload, _manifest = build_investigation_export(db, inv, include_documents=False)
+        payload, _manifest = build_investigation_export(
+            db, inv, include_documents=False
+        )
     _manifest, records = inspect_export(payload)
     assert [r["value"] for r in records["outbound_requests"]] == ["Quay Holdings"]
 
@@ -102,7 +209,9 @@ def test_the_log_travels_with_a_backup():
 class _FakeModel:
     model = "fake-1"
 
-    def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096) -> str:
+    def generate(
+        self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096
+    ) -> str:
         return "not json"
 
 
@@ -117,16 +226,38 @@ def _ask_the_ai(monkeypatch, provider: str, model: str = "") -> str:
     monkeypatch.setattr(reasoning, "get_llm_client", lambda *a, **k: _FakeModel())
     governor.reset()
     inv = _inv(f"AI {provider}")
-    client.post(f"/api/investigations/{inv}/assistant/case-synthesis", json={"question": "Who signed?"})
+    client.post(
+        f"/api/investigations/{inv}/assistant/case-synthesis",
+        json={"question": "Who signed?"},
+    )
     return inv
 
 
-def test_a_model_call_is_logged_and_only_an_outside_model_counts_as_leaving(monkeypatch):
-    outside = ok(client.get(f"/api/investigations/{_ask_the_ai(monkeypatch, 'anthropic')}/safety-data"))
-    assert outside["totals"]["ai_calls_outside"] == 1 and outside["totals"]["requests_left"] == 1
+def test_a_model_call_is_logged_and_only_an_outside_model_counts_as_leaving(
+    monkeypatch,
+):
+    outside = ok(
+        client.get(
+            f"/api/investigations/{_ask_the_ai(monkeypatch, 'anthropic')}/safety-data"
+        )
+    )
+    assert (
+        outside["totals"]["ai_calls_outside"] == 1
+        and outside["totals"]["requests_left"] == 1
+    )
     row = outside["outbound"][0]
-    assert row["service"] == "ai:anthropic" and row["leaves_computer"] is True and "characters" in row["value"]
+    assert (
+        row["service"] == "ai:anthropic"
+        and row["leaves_computer"] is True
+        and "characters" in row["value"]
+    )
 
-    here = ok(client.get(f"/api/investigations/{_ask_the_ai(monkeypatch, 'ollama', 'llama3')}/safety-data"))
-    assert here["totals"]["ai_calls_outside"] == 0 and here["totals"]["requests_left"] == 0
+    here = ok(
+        client.get(
+            f"/api/investigations/{_ask_the_ai(monkeypatch, 'ollama', 'llama3')}/safety-data"
+        )
+    )
+    assert (
+        here["totals"]["ai_calls_outside"] == 0 and here["totals"]["requests_left"] == 0
+    )
     assert here["outbound"][0]["leaves_computer"] is False

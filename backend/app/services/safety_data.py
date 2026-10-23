@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Literal
 
@@ -36,7 +36,7 @@ SERVICE_ABOUT = {
 }
 
 
-def period_start(period: Period):
+def period_start(period: Period) -> datetime | None:
     now = utcnow_naive()
     if period == "today":
         return now.replace(hour=0, minute=0, second=0, microsecond=0)
