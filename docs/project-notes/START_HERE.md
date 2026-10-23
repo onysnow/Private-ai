@@ -59,6 +59,8 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   its community/donation/paid-model links). Ony's call: the Workbench is not a competing product,
   so studying and porting from them is fine.
 
+- **UI simplification research (23 Oct):** `docs/research/ui-simplification/UI_SIMPLIFICATION_RESEARCH.pdf` (source `.md`, figures in `fig/`), with five animated sketches in `concept-lab.html` (also at https://claude.ai/artifact/5vCdnmgCH5saNn21grE628). Proposes three detail levels (Less / Usual / Everything) over a floor that never folds, and folding, depth and selection patterns. No app code changed. Its 11 open questions are in §8 of the report.
+
 ## Still open from the demos
 - Video and audio files are read only through OpenAleph. (Email, .mbox, .zip and .xlsx are now read by the
   Workbench's own reader too: `app/services/container_readers.py`.)
