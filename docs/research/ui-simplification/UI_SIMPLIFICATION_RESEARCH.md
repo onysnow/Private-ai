@@ -355,7 +355,7 @@ Pictures for A–E are in the Concept Lab frames below.
 
 <figure><img src="fig/lab-C.jpg"><figcaption><b>Concept Lab C, a 15,284-item queue at three altitudes (top to bottom).</b> Six counted groups; groups with three rows each; the records of one group. The line "Found · showing · why" never leaves. All counts in the lab are invented.</figcaption></figure>
 
-<figure><img src="fig/lab-D.jpg"><figcaption><b>Concept Lab D, Red Flags at Less, Usual, Everything (top to bottom).</b> The outlined parts are the floor. The right column counts what you can press and says what is folded. (The counts 9 / 16 / 24 are illustrative.)</figcaption></figure>
+<figure><img src="fig/lab-D.jpg"><figcaption><b>Concept Lab D, Red Flags at Less, Usual, Everything (top to bottom).</b> The outlined parts are the floor. The right column counts what you can press and says what is folded. (The counts 11 / 16 / 24 are illustrative.)</figcaption></figure>
 
 <figure><img src="fig/lab-E.jpg"><figcaption><b>Concept Lab E, actions follow the selection (top to bottom).</b> Nothing selected: rows are lines. One selected: three single-file actions. Three selected: actions that work on a set, including Compare.</figcaption></figure>
 

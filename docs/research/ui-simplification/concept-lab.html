@@ -81,8 +81,8 @@ section.demo p.why{margin:0 0 8px;color:var(--muted);max-width:75ch}
 .lv{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;height:100%}
 .flag{background:var(--s2);border:1.5px solid rgb(111 138 163/.6);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
 .flag .floor{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px;padding:3px 6px;margin:0 -2px}
-.hide{transition:max-height var(--slow) var(--ease),opacity var(--std) var(--ease),margin var(--std);overflow:hidden;max-height:60px;opacity:1}
-.lv[data-l="guided"] .hide.l2,.lv[data-l="guided"] .hide.l3,.lv[data-l="standard"] .hide.l3{max-height:0;opacity:0;margin:0;padding:0}
+button.hide{max-width:300px}.hide{transition:max-height var(--slow) var(--ease),opacity var(--std) var(--ease),margin var(--std);overflow:hidden;max-height:60px;opacity:1}
+.lv[data-l="guided"] .hide.l2,.lv[data-l="guided"] .hide.l3,.lv[data-l="standard"] .hide.l3{max-height:0;opacity:0;margin:0;padding:0;border-width:0;min-height:0;visibility:hidden}
 .rail{background:var(--s2);border:1.5px solid rgb(111 138 163/.6);border-radius:10px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:6px}
 .meter{font:600 12px var(--mono);color:var(--muted)}
 .meter b{font-size:20px;color:var(--accent)}
@@ -117,6 +117,7 @@ section.demo p.why{margin:0 0 8px;color:var(--muted);max-width:75ch}
 .trail button{padding:0 6px;min-height:22px;font:inherit;border-radius:6px}
 .mode{margin-left:auto;display:flex;gap:6px;align-items:center}
 .wcount{font:600 12px var(--mono);color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.pan.pulse{animation:none;border-color:var(--bad)}.spane{animation:none}}
 </style>
 <div class="wrap">
 <h1>Simplification Concept Lab</h1>
@@ -165,8 +166,8 @@ const root=document.documentElement;
 $('#calm').onclick=e=>{const on=e.target.getAttribute('aria-pressed')!=='true';e.target.setAttribute('aria-pressed',on);on?root.setAttribute('data-calm',''):root.removeAttribute('data-calm')};
 /* A */
 const secs=[
- {n:'Claims',k:'1',sum:'21 confirmed · 9 disputed · 4 unverified',rows:[['Kestrel SA paid 681,000 USD to Tanore Finance','confirmed'],['Director left before the transfer','disputed'],['Second account held by same person','unverified']]},
- {n:'To check',k:'2',sum:'14 waiting · 3 need a source',rows:[['Is "T. Finance" the same as Tanore Finance?','shows'],['Address on page 4 matches registry?','unclear'],['Date of the transfer: two candidates','unclear']]},
+ {n:'Claims',k:'1',sum:'21 confirmed · 9 disputed · 4 unverified',rows:[['Kestrel SA paid 681,000 USD to Larkspur Finance','confirmed'],['Director left before the transfer','disputed'],['Second account held by same person','unverified']]},
+ {n:'To check',k:'2',sum:'14 waiting · 3 need a source',rows:[['Is "L. Finance" the same as Larkspur Finance?','shows'],['Address on page 4 matches registry?','unclear'],['Date of the transfer: two candidates','unclear']]},
  {n:'Connector findings',k:'3',sum:'7 from outside lookups · 2 new',rows:[['Sanctions list: partial name match','new'],['Registry: shell company, 2013','new'],['Corpus: 3 documents mention it','seen']]},
  {n:'Chain of custody',k:'4',sum:'104 files · all hashes match',rows:[['Gate_cam_export.dav · locked 7f31…c0aa','ok'],['Email 0412 · 2 passages used','ok'],['Payments.csv · 84 rows read','ok']]}];
 const acc=$('#acc');let aOn=0;
@@ -177,22 +178,28 @@ function evA(){secs[3].sum='1 file failed its hash check · 103 match';const p=$
 drawA();setA(0);
 $$('[data-a]').forEach(b=>b.onclick=()=>{b.dataset.a==='e'?evA():setA(+b.dataset.a)});
 /* B */
-const rec=`<div class="rec" id="r1" tabindex="0"><span class="d">12 Nov 2013</span><span><b>Tanore Finance → Kestrel SA</b> · wire</span><span class="chip">USD 681,000</span><span class="chip ok">supported</span><div class="more"><dl><dt>Who</dt><dd>Tanore Finance Ltd (BVI) → Kestrel SA (Luxembourg)</dd><dt>How sure</dt><dd>2 sources · bank record and a court filing · likely</dd><dt>When</dt><dd>12 Nov 2013 (bank date). Court filing says 14 Nov: disputed by 2 days</dd><dt>From</dt><dd>Payments.csv row 41 · Judgment p.18 §3</dd></dl></div></div>`;
+const rec=`<div class="rec" id="r1" tabindex="0"><span class="d">12 Nov 2013</span><span><b>Larkspur Finance → Kestrel SA</b> · wire</span><span class="chip">USD 681,000</span><span class="chip ok">supported</span><div class="more"><dl><dt>Who</dt><dd>Larkspur Finance Ltd (BVI) → Kestrel SA (Luxembourg)</dd><dt>How sure</dt><dd>2 sources · bank record and a court filing · likely</dd><dt>When</dt><dd>12 Nov 2013 (bank date). Court filing says 14 Nov: disputed by 2 days</dd><dt>From</dt><dd>Payments.csv row 41 · Judgment p.18 §3</dd></dl></div></div>`;
 const other=['03 Dec 2013|Kestrel SA → Aldane Holdings|USD 120,000|unverified','19 Jan 2014|Aldane Holdings → R. Voss|USD 90,000|disputed'].map(x=>{const[a,b,c,d]=x.split('|');return`<div class="rec"><span class="d">${a}</span><span><b>${b}</b> · wire</span><span class="chip">${c}</span><span class="chip ${d==='disputed'?'bad':''}">${d}</span></div>`}).join('');
 $('#ladder').innerHTML=rec+other;
-$('#peek').innerHTML=`<div class="cap">Peek · nothing opens</div><div style="margin:4px 0"><b>USD 681,000</b> from Tanore Finance Ltd to Kestrel SA, 12 Nov 2013.</div><div style="color:var(--muted)">2 sources · likely · dates differ by 2 days</div><div style="margin-top:6px"><span class="chip ok">supported</span> <span class="chip">Payments.csv r41</span></div>`;
-$('#room').innerHTML=`<div style="display:flex;gap:10px;align-items:center"><b style="font-size:17px">Payment · Tanore Finance → Kestrel SA</b><span class="chip ok">supported</span><span style="flex:1"></span><button id="roomx">Esc · back to the list</button></div><div class="cols"><div class="col"><div class="cap">The record</div><p>USD 681,000 · wire · 12 Nov 2013<br>Purpose: "consulting"</p></div><div class="col"><div class="cap">Where it comes from</div><p>Payments.csv row 41<br>Judgment p.18 §3 (quote)<br>Original page image</p></div><div class="col"><div class="cap">What's against it</div><p>Court filing gives 14 Nov.<br>Disputed by 2 days; not by amount.</p></div></div>`;
+$('#peek').innerHTML=`<div class="cap">Peek · nothing opens</div><div style="margin:4px 0"><b>USD 681,000</b> from Larkspur Finance Ltd to Kestrel SA, 12 Nov 2013.</div><div style="color:var(--muted)">2 sources · likely · dates differ by 2 days</div><div style="margin-top:6px"><span class="chip ok">supported</span> <span class="chip">Payments.csv r41</span></div>`;
+$('#room').innerHTML=`<div style="display:flex;gap:10px;align-items:center"><b style="font-size:17px">Payment · Larkspur Finance → Kestrel SA</b><span class="chip ok">supported</span><span style="flex:1"></span><button id="roomx">Esc · back to the list</button></div><div class="cols"><div class="col"><div class="cap">The record</div><p>USD 681,000 · wire · 12 Nov 2013<br>Purpose: "consulting"</p></div><div class="col"><div class="cap">Where it comes from</div><p>Payments.csv row 41<br>Judgment p.18 §3 (quote)<br>Original page image</p></div><div class="col"><div class="cap">What's against it</div><p>Court filing gives 14 Nov.<br>Disputed by 2 days; not by amount.</p></div></div>`;
 const noteB=['<b>Depth 1.</b> Date, parties, amount, status: all five questions answered in one line.','<b>Depth 2.</b> Hovering or focusing gives a peek: a sentence, the certainty, and where it is from. It closes on its own; nothing is mounted.','<b>Depth 3.</b> A click opens the card in place; the list around it stays, pushed down, so you keep your position.','<b>Depth 4.</b> Enter opens the whole room (a container transform: the card grows into it). Esc grows it back into the same row.'];
 function setB(i){const r=$('#r1');r.classList.toggle('open',i===2);r.classList.toggle('focus',i>=1);$('#peek').classList.toggle('show',i===1);$('#room').classList.toggle('show',i===3);$('#noteB').innerHTML=noteB[i];$$('[data-b]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.b===i))}
-$$('[data-b]').forEach(b=>b.onclick=()=>setB(+b.dataset.b));$('#roomx').onclick=()=>setB(2);
+$$('[data-b]').forEach(b=>b.onclick=()=>setB(+b.dataset.b));const r1=$('#r1');
+r1.addEventListener('click',()=>{const open=r1.classList.contains('open');setB(open?0:2)});
+r1.addEventListener('focus',()=>{if(!r1.classList.contains('open')&&!$('#room').classList.contains('show'))setB(1)});
+r1.addEventListener('blur',()=>{if($('#peek').classList.contains('show'))setB(0)});
+r1.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();setB(3);$('#roomx').focus()}else if(e.key===' '){e.preventDefault();setB(r1.classList.contains('open')?0:2)}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#room').classList.contains('show')){setB(2);r1.focus()}});
+$('#roomx').onclick=()=>{setB(2);r1.focus()};
 $('#r1').onmouseenter=()=>{if(!$('#r1').classList.contains('open'))setB(1)};$('#r1').onmouseleave=()=>{if($('#peek').classList.contains('show'))setB(0)};
 setB(0);
 /* C */
-const groups=[['Names it found',6120,['“Kestrel S.A.” → Kestrel SA','“T. Finance” → ?','“R. Voss” → person']],['Possible links',3880,['Voss — Aldane (director?)','Aldane — Kestrel (owner?)','Tanore — Kestrel (payment)']],['Facts to confirm',2410,['Dates: 2 candidates','Amounts: currency missing','Address ≠ registry']],['Quotes for claims',1760,['p.18 “transferred on…”','p.4 “beneficial owner…”','p.9 “no explanation…”']],['Duplicates',820,['Email 0412 = 0412 (copy)','Judgment p.3 twice','CSV read twice']],['Other',294,['Page numbers','Letterheads','Boilerplate']]];
+const groups=[['Names it found',6120,['“Kestrel S.A.” → Kestrel SA','“L. Finance” → ?','“R. Voss” → person']],['Possible links',3880,['Voss — Aldane (director?)','Aldane — Kestrel (owner?)','Larkspur — Kestrel (payment)']],['Facts to confirm',2410,['Dates: 2 candidates','Amounts: currency missing','Address ≠ registry']],['Quotes for claims',1760,['p.18 “transferred on…”','p.4 “beneficial owner…”','p.9 “no explanation…”']],['Duplicates',820,['Email 0412 = 0412 (copy)','Judgment p.3 twice','CSV read twice']],['Other',294,['Page numbers','Letterheads','Boilerplate']]];
 const total=groups.reduce((a,g)=>a+g[1],0);
 $('#zoom').innerHTML=`<div class="count"><span>Found <b id="cf">${total.toLocaleString()}</b></span><span>· showing <b id="cs">6 groups</b></span><span id="cw">· grouped because 15,284 is more than anyone can read; <u>change</u></span></div><div class="gtabs" id="gtabs"></div><div class="recs" id="recs"></div><div class="tiles" id="tiles">${groups.map(g=>`<div class="tile"><span class="nm">${g[0]}</span> <b>${g[1].toLocaleString()}</b><div class="rows">${g[2].map(r=>`<div>${r}</div>`).join('')}</div></div>`).join('')}</div>`;
 $('#gtabs').innerHTML='<span class="chip acc">Names it found 6,120</span><span class="chip">Possible links 3,880</span><span class="chip">Facts to confirm 2,410</span><span class="chip">Quotes 1,760</span><span class="chip">+2 more</span>';
-$('#recs').innerHTML=[['“Kestrel S.A.”','Company','Judgment p.18','likely same as Kestrel SA'],['“T. Finance”','unknown kind','Email 0412','needs a decision'],['“R. Voss”','Person','Payments.csv r57','new name'],['“Okafor”','Person','Interview 41:08','heard, not read']].map(r=>`<div class="rrow"><b>${r[0]}</b><span style="color:var(--muted)">${r[1]}</span><span>${r[2]}</span><span class="chip">${r[3]}</span></div>`).join('');
+$('#recs').innerHTML=[['“Kestrel S.A.”','Company','Judgment p.18','likely same as Kestrel SA'],['“L. Finance”','unknown kind','Email 0412','needs a decision'],['“R. Voss”','Person','Payments.csv r57','new name'],['“Okafor”','Person','Interview 41:08','heard, not read']].map(r=>`<div class="rrow"><b>${r[0]}</b><span style="color:var(--muted)">${r[1]}</span><span>${r[2]}</span><span class="chip">${r[3]}</span></div>`).join('');
 const noteC={1:'<b>Whole queue.</b> Six groups, six numbers. The biggest is the biggest tile. This is the overview.',2:'<b>Groups open.</b> Each group shows three of its rows. The counter says how many groups, and the rest are one scroll away.',3:'<b>Records.</b> One group at a time becomes a list of the actual records, four on screen, with the same who/what/how much/when/where.'};
 function setC(z){$('#zoom').dataset.z=z;$('#cs').textContent=z===1?'6 groups':z===2?'6 groups, 3 rows each':'4 of 6,120 names (Names it found)';$('#cw').innerHTML=z===3?'· stopped at 4 because that is what fits; <u>show next 4</u>':'· grouped because 15,284 is more than anyone can read; <u>change</u>';$('#noteC').innerHTML=noteC[z];$$('[data-c]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.c===z))}
 $$('[data-c]').forEach(b=>b.onclick=()=>setC(+b.dataset.c));setC(1);
@@ -200,17 +207,19 @@ $$('[data-c]').forEach(b=>b.onclick=()=>setC(+b.dataset.c));setC(1);
 $('#lv').innerHTML=`<div class="flag"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="font-size:16px">Round-trip payments · BO-033</b><span class="floor"><span class="chip bad">Strong</span></span></div>
 <div class="floor" style="font-size:13px">An indicator, not a finding. It rests on 2 links that are not yet shown.</div>
 <div class="floor" style="font-size:13px"><div class="cap">Before you call it</div>☐ Related companies paying each other for real services?  ☐ A loan and repayment?  ☐ Group treasury arrangement?</div>
-<div class="hide l2" style="font-size:13px"><div class="cap">Picture it rests on</div>Tanore → Kestrel → Aldane → Tanore · 3 payments · 14 months</div>
-<div class="hide l2 tb"><button>Set aside…</button><button>Add to leads</button><button>Show in money flows</button></div>
+<div class="hide l2" style="font-size:13px"><div class="cap">Picture it rests on</div>Larkspur → Kestrel → Aldane → Larkspur · 3 payments · 14 months</div>
+<div class="tb"><button>Set aside…</button><button>Add to leads</button><button class="hide l2">Show in money flows</button></div>
 <div class="hide l3" style="font-size:12.5px;color:var(--muted)"><div class="cap">How it was computed</div>Rule v3 · detector: cycle · weight parts 0.4 / 0.35 / 0.25 · first seen 3 Oct · 31 payments grouped</div>
 <div class="hide l3 tb"><button>Rule history</button><button>Weights</button><button>Compare versions</button><button>Export record</button></div></div>
 <div class="rail"><div class="meter">Things you can press here <b id="mc">9</b></div><div class="hid" id="hid"></div><div class="cap" style="margin-top:4px">Always on, every level</div><div style="font-size:12.5px;color:var(--muted)">Level · "indicator, not a finding" · innocent explanations · where it comes from (one click) · counts that say found / shown</div></div>`;
-const lvInfo={guided:{c:9,h:'Folded: picture, three actions, how it was computed (4 more items). <u>Show</u>',n:'<b>Less.</b> What a first-time journalist needs to decide this flag. The outlined parts cannot be folded at any level.'},standard:{c:16,h:'Folded: how it was computed (4 more items). <u>Show</u>',n:'<b>Usual.</b> The default for a person who has done this before.'},full:{c:24,h:'Nothing folded.',n:'<b>Everything.</b> Rule version, weights, detector. The audit view.'}};
+const lvInfo={guided:{c:11,h:'Folded: the picture it rests on, one action, how it was computed (6 more items). <u>Show</u>',n:'<b>Less.</b> What a first-time journalist needs to decide this flag: the two decision actions stay. The outlined parts cannot be folded at any level.'},standard:{c:16,h:'Folded: how it was computed (5 more items). <u>Show</u>',n:'<b>Usual.</b> The default for a person who has done this before.'},full:{c:24,h:'Nothing folded.',n:'<b>Everything.</b> Rule version, weights, detector. The audit view.'}};
 function setD(l){$('#lv').dataset.l=l;const i=lvInfo[l];$('#mc').textContent=i.c;$('#hid').innerHTML=i.h;$('#noteD').innerHTML=i.n;$$('[data-d]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===l))}
-$$('[data-d]').forEach(b=>b.onclick=()=>setD(b.dataset.d));setD('standard');
+$$('[data-d]').forEach(b=>b.onclick=()=>{endTrial();setD(b.dataset.d)});setD('standard');
 $('#toastD').innerHTML=`<b>That's a lot on screen.</b> Want a calmer view of this case?<div class="act"><button id="tryL">Try it</button><button id="notNow">Not now</button><button id="never">Don't ask again</button></div><div style="font-size:12px;color:var(--muted);margin-top:4px">Try shows it for 20 seconds with Keep / Undo. Nothing changes unless you keep it.</div>`;
 $('#nudge').onclick=()=>$('#toastD').classList.add('show');
-$('#tryL').onclick=()=>{setD('guided');$('#toastD').classList.remove('show');$('#noteD').innerHTML='<b>Trying "Less" for 20 s.</b> <button id="keep">Keep</button> <button id="undo">Undo</button>';$('#keep').onclick=()=>setD('guided');$('#undo').onclick=()=>setD('standard')};
+let prevL='standard',trialT=null;
+function endTrial(){clearTimeout(trialT);trialT=null}
+$('#tryL').onclick=()=>{prevL=$('#lv').dataset.l;setD('guided');$('#toastD').classList.remove('show');$('#noteD').innerHTML='<b>Trying "Less" for 20 s.</b> <button id="keep">Keep</button> <button id="undo">Undo</button>';endTrial();trialT=setTimeout(()=>{setD(prevL);$('#noteD').innerHTML='<b>Trial ended.</b> Back to what you had.'},20000);$('#keep').onclick=()=>{endTrial();setD('guided')};$('#undo').onclick=()=>{endTrial();setD(prevL)}};
 $('#notNow').onclick=$('#never').onclick=()=>$('#toastD').classList.remove('show');
 /* E */
 const files=[['Harbour_walkthrough_0412.mp4','video · 6:12 · Arabic','read'],['Interview_Okafor_0412.m4a','audio · 41:08','read'],['Gate_cam_export.dav','video · CCTV · 7:40','1 problem'],['IMG_2231.jpg','photo · 4000×2500','read'],['Judgment_p1-34.pdf','scanned · 34 pages','read']];
@@ -226,7 +235,7 @@ $$('[data-e]').forEach(b=>b.onclick=()=>{sel=new Set(+b.dataset.e===0?[]:+b.data
 window.lab={setA,evA,setB,setC,setD,setE:n=>{sel=new Set(n===0?[]:n===1?[2]:[0,2,3]);drawE()}};
 
 /* F */
-const ents={c:{k:'Claim',t:'Kestrel SA paid 681,000 USD to Tanore Finance',b:'Supported · 2 sources · likely',links:['s','f']},s:{k:'Source',t:'Court judgment p.18 §3',b:'Tier B · authentic · quote at lines 12–14',links:['f']},f:{k:'File',t:'Payments.csv',b:'Locked 7f31…c0aa · 84 rows read · hash matches',links:[]},g:{k:'Flag',t:'Round-trip payments BO-033',b:'Strong · indicator, not a finding',links:['c']}};
+const ents={c:{k:'Claim',t:'Kestrel SA paid 681,000 USD to Larkspur Finance',b:'Supported · 2 sources · likely',links:['s','f']},s:{k:'Source',t:'Court judgment p.18 §3',b:'Tier B · authentic · quote at lines 12–14',links:['f']},f:{k:'File',t:'Payments.csv',b:'Locked 7f31…c0aa · 84 rows read · hash matches',links:[]},g:{k:'Flag',t:'Round-trip payments BO-033',b:'Strong · indicator, not a finding',links:['c']}};
 let fmode='stack',fopen=[],ftrail=[];
 $('#slist').innerHTML=Object.entries(ents).map(([id,e])=>`<button class="sitem" data-id="${id}"><span class="k">${e.k}</span><span>${e.t}</span><span class="chip">${e.b.split(' · ')[0]}</span></button>`).join('');
 function paneHtml(id,one){const e=ents[id];return `<div class="spane ${one?'one':''}">${one?`<div class="trail">${ftrail.map((t,i)=>`<button data-trail="${i}">${ents[t].k}</button>${i<ftrail.length-1?'›':''}`).join('')}</div>`:''}<div class="cap">${e.k}</div><h4>${e.t}</h4><div style="color:var(--muted)">${e.b}</div>${e.links.map(l=>`<button data-link="${l}">Open ${ents[l].k.toLowerCase()}: ${ents[l].t.slice(0,22)}…</button>`).join('')}</div>`}
