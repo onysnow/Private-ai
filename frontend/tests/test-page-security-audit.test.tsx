@@ -133,7 +133,7 @@ describe('Home security audit metadata', () => {
     await screen.findByText('Loaded 1 of 150 security event(s).');
 
     expect(
-      screen.getByText((_, node) => node?.textContent === '2026-09-23T00:00:00Z · GET /api/entities · 200 · auth_success · local', {
+      screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · this computer · opened a page of the app · ✓ allowed$/.test(node?.textContent ?? ''), {
         selector: 'small',
       }),
     ).toBeInTheDocument();
@@ -172,12 +172,12 @@ describe('Home security audit metadata', () => {
 
     await screen.findByText('Showing 2 of 150 matching event(s).');
     expect(
-      screen.getByText((_, node) => node?.textContent === '2026-09-23T00:00:00Z · GET /api/entities · 200 · auth_success · local', {
+      screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · this computer · opened a page of the app · ✓ allowed$/.test(node?.textContent ?? ''), {
         selector: 'small',
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText((_, node) => node?.textContent === '2026-09-23T00:00:00Z · GET /api/entities · 200 · auth_rate_limited · remote', {
+      screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · another device.* · opened a page of the app · ✕ refused$/.test(node?.textContent ?? ''), {
         selector: 'small',
       }),
     ).toBeInTheDocument();
