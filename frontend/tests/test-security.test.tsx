@@ -142,14 +142,14 @@ describe('SecurityPanel', () => {
     await userEvent.setup().click(screen.getByRole('button', {name: 'Load recent security events'}));
 
     await screen.findByText('Loaded 1 of 150 security event(s).');
-    expect(screen.getByText((_, node) => node?.textContent === '2026-09-23T00:00:00Z · GET /api/entities · 200 · auth_success · local', {selector: 'small'})).toBeInTheDocument();
+    expect(screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · this computer · opened a page of the app · ✓ allowed$/.test(node?.textContent ?? ''), {selector: 'small'})).toBeInTheDocument();
     expect(screen.getByText((_, node) => node?.textContent === '150 valid event(s) · 140 local · 10 remote · 0 malformed retained', {selector: 'small'})).toBeInTheDocument();
     expect(screen.getByText('Methods: GET 100 · POST 50')).toBeInTheDocument();
     expect(screen.getByText('Showing 1 of 150 matching event(s).')).toBeInTheDocument();
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Load 100 older events'}));
     await screen.findByText('Showing 2 of 150 matching event(s).');
-    expect(screen.getByText((_, node) => node?.textContent === '2026-09-23T00:00:00Z · GET /api/entities · 200 · auth_rate_limited · remote', {selector: 'small'})).toBeInTheDocument();
+    expect(screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · another device.* · opened a page of the app · ✕ refused$/.test(node?.textContent ?? ''), {selector: 'small'})).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Load 100 older events'})).not.toBeInTheDocument();
     expect(api.calls(AUDIT).map(page)).toEqual([{limit: '100', offset: '0'}, {limit: '100', offset: '100'}]);
     expect(api.calls(SUMMARY)).toHaveLength(1);
