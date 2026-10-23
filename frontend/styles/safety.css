@@ -1,0 +1,85 @@
+/* Safety & data (mockup KNOWLEDGE_KEEP_2; features/safety/safety-screen.tsx). The page never scrolls: the log scrolls
+   inside itself. Status keeps a shape and a word (OFF / ON REQUEST / LOCAL, ✕ blocked, ▲ warning); the alarm colour is
+   not used here. Calm and exact: no decorative motion. */
+.sd { height: 100%; box-sizing: border-box; padding: 4px 28px 18px; display: flex; flex-direction: column; gap: 12px; color: var(--text); font-family: var(--font-ui); overflow: hidden; }
+.sd-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; }
+.sd-title { margin: 0; font: 300 28px/1.15 var(--font-display); }
+.sd-title em { font-style: normal; color: var(--accent-1); }
+.sd-sub, .sd-quiet, .sd-foot { margin: 4px 0 0; font-size: 12.5px; color: var(--text-muted); }
+.sd-chip { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); font: 600 11.5px var(--font-mono); color: var(--text-muted); }
+.sd-chip-out { color: var(--accent-1); border-color: var(--accent-1); }
+.sd-error { color: var(--text); font-size: 13px; }
+.sd-link { all: unset; cursor: pointer; margin-left: 10px; color: var(--accent-2); }
+.sd-link:focus-visible, .sd-box:focus-visible, .sd-store:focus-visible, .sd-btn:focus-visible, .sd-rows:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+.sd-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 62fr) minmax(0, 38fr); grid-template-rows: minmax(0, 1fr) auto; gap: 14px; }
+.sd-panel { min-height: 0; box-sizing: border-box; padding: 16px 18px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
+.sd-map { display: flex; flex-direction: column; gap: 8px; overflow: auto; }
+.sd-log { display: flex; flex-direction: column; gap: 8px; }
+.sd-eyebrow { margin: 0; font: 600 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
+.sd-h3 { margin: 0; font: 700 17px var(--font-display); }
+
+.sd-totals { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+.sd-tiles { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.sd-tiles > div { padding: 8px 12px; border-radius: 10px; background: var(--surface-2); min-width: 92px; }
+.sd-tiles dd { margin: 0; font: 600 26px/1 var(--font-mono); }
+.sd-tiles dt { order: 2; margin-top: 4px; font-size: 11px; color: var(--text-muted); }
+.sd-tiles > div { display: flex; flex-direction: column; }
+.sd-switch { display: inline-flex; align-self: flex-start; padding: 3px; border-radius: 10px; background: var(--surface-2); }
+.sd-switch button { all: unset; cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.sd-switch button.on { background: var(--surface-3); color: var(--text); }
+.sd-switch button:focus-visible { outline: 2px solid var(--accent-2); }
+
+.sd-diagram { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 250px); gap: 0 8px; align-items: stretch; }
+.sd-computer { padding: 10px 12px 12px; border: 1.5px solid var(--accent-1); border-radius: 14px; display: grid; gap: 10px; }
+.sd-computer .sd-eyebrow { color: var(--accent-1); }
+.sd-stores { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sd-store { display: grid; gap: 1px; align-content: start; padding: 7px 10px; border-radius: 10px; background: var(--surface-2); font-size: 12.5px; }
+.sd-store strong { font-size: 13.5px; }
+.sd-mark { color: var(--accent-1); }
+.sd-where { font-size: 11px; line-height: 1.25; color: var(--text-muted); }
+.sd-warn { font-size: 11.5px; color: var(--accent-1); }
+.sd-services { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; align-content: space-between; }
+.sd-service { position: relative; display: grid; grid-template-columns: minmax(90px, 1fr) 124px; align-items: center; }
+.sd-line { position: relative; border-top: 2px solid var(--accent-2); margin-right: 0; height: 0; }
+.sd-line i { position: absolute; bottom: 4px; right: 4px; font: 10.5px var(--font-mono); font-style: normal; color: var(--accent-2); white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.sd-off .sd-line, .sd-local .sd-line { border-top: 2px dotted var(--line); }
+.sd-off .sd-line i, .sd-local .sd-line i { color: var(--text-muted); }
+.sd-box { all: unset; cursor: pointer; box-sizing: border-box; display: grid; gap: 2px; padding: 6px 9px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); font-size: 11.5px; color: var(--text-muted); }
+.sd-box strong { font-size: 13px; color: var(--text); }
+.sd-service.picked .sd-box { border-color: var(--accent-2); background: var(--surface-3); }
+.sd-state { justify-self: start; margin-top: 2px; padding: 1px 7px; border: 1px solid currentColor; border-radius: 999px; font: 600 9.5px var(--font-mono); letter-spacing: .06em; }
+.sd-on_request .sd-state { color: var(--accent-2); }
+.sd-foot { margin-top: 0; }
+.sd-twin { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.sd-logbar { display: flex; align-items: center; gap: 10px; }
+.sd-logbar select { padding: 5px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: 12px var(--font-ui); }
+.sd-count { margin-right: auto; font: 11.5px var(--font-mono); color: var(--text-muted); }
+.sd-rows { flex: 1 1 auto; min-height: 0; overflow: auto; margin: 0; padding: 0; list-style: none; display: grid; align-content: start; gap: 0; }
+.sd-rows li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 1px 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 12.5px; }
+.sd-rows li.inside { opacity: .7; }
+.sd-time { font: 11.5px var(--font-mono); color: var(--text-muted); grid-row: span 3; }
+.sd-svc { font-weight: 600; }
+.sd-value { font: 12.5px var(--font-mono); color: var(--accent-2); quotes: '“' '”'; word-break: break-word; }
+.sd-why { font-size: 11.5px; color: var(--text-muted); }
+
+.sd-cards { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.sd-card { box-sizing: border-box; padding: 12px 14px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); display: grid; gap: 4px; align-content: start; font-size: 12.5px; }
+.sd-card h3 { margin: 0; font: 700 15px var(--font-display); }
+.sd-card p { margin: 0; color: var(--text-muted); }
+.sd-card .sd-warn { color: var(--accent-1); }
+.sd-card .sd-eyebrow { margin-bottom: 2px; }
+.sd-danger { border: 1px solid var(--status-disputed); }
+.sd-btn { all: unset; cursor: pointer; justify-self: start; margin-top: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--line); font-size: 12.5px; font-weight: 600; color: var(--text); }
+.sd-btn.primary { background: var(--accent-1); border-color: var(--accent-1); color: var(--ground); }
+.sd-btn.danger { border-color: var(--status-disputed); color: var(--status-disputed); }
+.sd-btn:disabled { opacity: .5; cursor: not-allowed; }
+.sd[data-checking] .sd-tiles dd, .sd[data-checking] .sd-count { opacity: .6; }
+@media (max-width: 1100px) { .sd { height: 100%; overflow: auto; } .sd-grid { grid-template-columns: 1fr; } .sd-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sd-diagram { grid-template-columns: 1fr; gap: 10px; } }
+
+.sd-box > span:not(.sd-state) { display: none; }
+.sd-service:hover .sd-box > span:not(.sd-state), .sd-box:focus-visible > span:not(.sd-state) { display: block; }
+.sd-services { align-content: start; }
+.sd-map { overflow: hidden; }
+@media (max-width: 1100px) { .sd-map { overflow: visible; } .sd-rows { max-height: 60vh; } }

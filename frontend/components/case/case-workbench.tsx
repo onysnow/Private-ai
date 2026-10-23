@@ -33,6 +33,7 @@ import {TheWire} from '../../features/the-wire/the-wire';
 import {MoneyView} from '../../features/money/money-view';
 import {ChainOfCustody} from '../../features/custody/chain-of-custody';
 import {StoryScreen} from '../../features/story/story-screen';
+import {SafetyScreen} from '../../features/safety/safety-screen';
 import {TheDrop} from '../../features/the-drop/the-drop';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
@@ -305,6 +306,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},
       ])}
       {screen('keep', [
+        {anchor: 'safety-data', label: 'Safety & data', fill: true, render: () => <PanelErrorBoundary name="Safety & data"><SafetyScreen investigationId={inv} caseName={investigationName} active={view === 'keep'}/></PanelErrorBoundary>},
         {anchor: 'backup-restore', label: 'Backup & restore', render: () => <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>},
         {anchor: 'deletion', label: 'Delete', render: () => <PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary>},
         ...(access.settingsStatus ? [{anchor: 'access', label: 'Access', render: () => <PanelErrorBoundary name="Local security/settings status">

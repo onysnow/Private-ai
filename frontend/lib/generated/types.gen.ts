@@ -12255,6 +12255,58 @@ export type OrphanStoragePreviewOut = {
 };
 
 /**
+ * OutboundRequestOut
+ */
+export type OutboundRequestOut = {
+  /**
+   * Actor
+   */
+  actor: 'you' | 'automatic';
+  /**
+   * At
+   */
+  at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Leaves Computer
+   */
+  leaves_computer: boolean;
+  /**
+   * Outcome
+   */
+  outcome: 'sent' | 'failed' | 'blocked';
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Service
+   */
+  service: string;
+  /**
+   * Service Name
+   */
+  service_name: string;
+  /**
+   * Source
+   */
+  source?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
  * OwnershipChainLinkOut
  *
  * An Ownership or Directorship link as the records state it.
@@ -14724,6 +14776,202 @@ export type RunSettingValueOut = {
    * Value
    */
   value: string;
+};
+
+/**
+ * SafetyAccessOut
+ */
+export type SafetyAccessOut = {
+  /**
+   * Log Readable
+   */
+  log_readable: boolean;
+  /**
+   * Mode
+   */
+  mode: 'local_only' | 'remote';
+  /**
+   * Refused 24H
+   */
+  refused_24h: number;
+};
+
+/**
+ * SafetyBackupOut
+ */
+export type SafetyBackupOut = {
+  /**
+   * Encrypted
+   */
+  encrypted: boolean;
+  /**
+   * Last Backup At
+   */
+  last_backup_at?: string | null;
+  /**
+   * Restore Enabled
+   */
+  restore_enabled: boolean;
+};
+
+/**
+ * SafetyDataOut
+ *
+ * Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015).
+ */
+export type SafetyDataOut = {
+  access: SafetyAccessOut;
+  backup: SafetyBackupOut;
+  /**
+   * Exposure
+   */
+  exposure: string;
+  housekeeping: SafetyHousekeepingOut;
+  /**
+   * Outbound
+   */
+  outbound: Array<OutboundRequestOut>;
+  /**
+   * Outbound Total
+   */
+  outbound_total: number;
+  /**
+   * Period
+   */
+  period: 'today' | '7d' | '30d' | 'all';
+  /**
+   * Services
+   */
+  services: Array<SafetyServiceOut>;
+  /**
+   * Stores
+   */
+  stores: Array<SafetyStoreOut>;
+  totals: SafetyTotalsOut;
+};
+
+/**
+ * SafetyHousekeepingOut
+ */
+export type SafetyHousekeepingOut = {
+  /**
+   * Stray Bytes
+   */
+  stray_bytes?: number | null;
+  /**
+   * Stray Files
+   */
+  stray_files?: number | null;
+};
+
+/**
+ * SafetyServiceOut
+ *
+ * A service the case can reach, with what has been sent to it in the period.
+ */
+export type SafetyServiceOut = {
+  /**
+   * About
+   */
+  about: string;
+  /**
+   * Blocked Note
+   */
+  blocked_note?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Sends
+   */
+  sends: Array<string>;
+  /**
+   * Sent Count
+   */
+  sent_count: number;
+  /**
+   * State
+   */
+  state: 'off' | 'on_request' | 'local';
+  /**
+   * State Note
+   */
+  state_note: string;
+  /**
+   * Where
+   */
+  where: 'inside' | 'outside';
+};
+
+/**
+ * SafetyStoreOut
+ *
+ * One place on this computer where the case lives (mockup KEEP_2's six stores).
+ */
+export type SafetyStoreOut = {
+  /**
+   * Bytes
+   */
+  bytes?: number | null;
+  /**
+   * Count
+   */
+  count?: number | null;
+  /**
+   * Count Note
+   */
+  count_note?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * In Backups
+   */
+  in_backups?: boolean | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Oldest
+   */
+  oldest?: string | null;
+  /**
+   * Warning
+   */
+  warning?: string | null;
+  /**
+   * Where
+   */
+  where: string;
+};
+
+/**
+ * SafetyTotalsOut
+ */
+export type SafetyTotalsOut = {
+  /**
+   * Ai Calls Outside
+   */
+  ai_calls_outside: number;
+  /**
+   * Documents Sent Out
+   */
+  documents_sent_out: number;
+  /**
+   * Requests Left
+   */
+  requests_left: number;
+  /**
+   * Services Reached
+   */
+  services_reached: number;
 };
 
 /**
@@ -25658,6 +25906,46 @@ export type ListReportingTasksResponses = {
 
 export type ListReportingTasksResponse =
   ListReportingTasksResponses[keyof ListReportingTasksResponses];
+
+export type GetSafetyDataData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Period
+     */
+    period?: 'today' | '7d' | '30d' | 'all';
+  };
+  url: '/api/investigations/{investigation_id}/safety-data';
+};
+
+export type GetSafetyDataErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSafetyDataError = GetSafetyDataErrors[keyof GetSafetyDataErrors];
+
+export type GetSafetyDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: SafetyDataOut;
+};
+
+export type GetSafetyDataResponse =
+  GetSafetyDataResponses[keyof GetSafetyDataResponses];
 
 export type GetSinceData = {
   body?: never;

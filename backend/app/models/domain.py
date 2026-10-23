@@ -86,6 +86,7 @@ from app.models.ai import (
     AIAnalysisCandidate,
     AIRunEvent,
 )
+from app.models.outbound import OutboundRequest
 from app.models.writeups import (
     Writeup,
     WriteupVersion,
@@ -169,6 +170,7 @@ __all__ = [
     "CheckItem",
     "AIAnalysisCandidate",
     "AIRunEvent",
+    "OutboundRequest",
     "Writeup",
     "WriteupVersion",
     "Story",

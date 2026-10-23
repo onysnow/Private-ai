@@ -390,6 +390,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsErrors,
   GetRedFlagsResponses,
+  GetSafetyDataData,
+  GetSafetyDataErrors,
+  GetSafetyDataResponses,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesErrors,
   GetSameAnswerCandidatesResponses,
@@ -1143,6 +1146,9 @@ import {
   zGetRecordProvenanceTraceResponse,
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
+  zGetSafetyDataPath,
+  zGetSafetyDataQuery,
+  zGetSafetyDataResponse,
   zGetSameAnswerCandidatesPath,
   zGetSameAnswerCandidatesResponse,
   zGetSecurityAlertsQuery,
@@ -7282,6 +7288,33 @@ export const listReportingTasks = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListReportingTasksResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/reporting-tasks',
+    ...options,
+  });
+
+/**
+ * Get Safety Data
+ *
+ * Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015).
+ */
+export const getSafetyData = <ThrowOnError extends boolean = false>(
+  options: Options<GetSafetyDataData, ThrowOnError>,
+): RequestResult<GetSafetyDataResponses, GetSafetyDataErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetSafetyDataResponses,
+    GetSafetyDataErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSafetyDataPath,
+          query: zGetSafetyDataQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSafetyDataResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/safety-data',
     ...options,
   });
 

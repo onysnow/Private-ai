@@ -5165,6 +5165,23 @@ export const zOrphanFileOut = z.object({
 });
 
 /**
+ * OutboundRequestOut
+ */
+export const zOutboundRequestOut = z.object({
+  actor: z.enum(['you', 'automatic']),
+  at: z.string(),
+  id: z.string(),
+  kind: z.string(),
+  leaves_computer: z.boolean(),
+  outcome: z.enum(['sent', 'failed', 'blocked']),
+  reason: z.string(),
+  service: z.string(),
+  service_name: z.string(),
+  source: z.record(z.unknown()).nullish(),
+  value: z.string(),
+});
+
+/**
  * OwnershipChainLinkOut
  *
  * An Ownership or Directorship link as the records state it.
@@ -6276,6 +6293,94 @@ export const zRunPlanOut = z.object({
   systems: z.array(zRunPlanSystemOut),
   where: zRunPlanWhereOut,
   working_theory: z.string().nullable(),
+});
+
+/**
+ * SafetyAccessOut
+ */
+export const zSafetyAccessOut = z.object({
+  log_readable: z.boolean(),
+  mode: z.enum(['local_only', 'remote']),
+  refused_24h: z.number().int(),
+});
+
+/**
+ * SafetyBackupOut
+ */
+export const zSafetyBackupOut = z.object({
+  encrypted: z.boolean(),
+  last_backup_at: z.string().nullish(),
+  restore_enabled: z.boolean(),
+});
+
+/**
+ * SafetyHousekeepingOut
+ */
+export const zSafetyHousekeepingOut = z.object({
+  stray_bytes: z.number().int().nullish(),
+  stray_files: z.number().int().nullish(),
+});
+
+/**
+ * SafetyServiceOut
+ *
+ * A service the case can reach, with what has been sent to it in the period.
+ */
+export const zSafetyServiceOut = z.object({
+  about: z.string(),
+  blocked_note: z.string().nullish(),
+  id: z.string(),
+  name: z.string(),
+  sends: z.array(z.string()),
+  sent_count: z.number().int(),
+  state: z.enum(['off', 'on_request', 'local']),
+  state_note: z.string(),
+  where: z.enum(['inside', 'outside']),
+});
+
+/**
+ * SafetyStoreOut
+ *
+ * One place on this computer where the case lives (mockup KEEP_2's six stores).
+ */
+export const zSafetyStoreOut = z.object({
+  bytes: z.number().int().nullish(),
+  count: z.number().int().nullish(),
+  count_note: z.string().nullish(),
+  id: z.string(),
+  in_backups: z.boolean().nullish(),
+  name: z.string(),
+  oldest: z.string().nullish(),
+  warning: z.string().nullish(),
+  where: z.string(),
+});
+
+/**
+ * SafetyTotalsOut
+ */
+export const zSafetyTotalsOut = z.object({
+  ai_calls_outside: z.number().int(),
+  documents_sent_out: z.number().int(),
+  requests_left: z.number().int(),
+  services_reached: z.number().int(),
+});
+
+/**
+ * SafetyDataOut
+ *
+ * Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015).
+ */
+export const zSafetyDataOut = z.object({
+  access: zSafetyAccessOut,
+  backup: zSafetyBackupOut,
+  exposure: z.string(),
+  housekeeping: zSafetyHousekeepingOut,
+  outbound: z.array(zOutboundRequestOut),
+  outbound_total: z.number().int(),
+  period: z.enum(['today', '7d', '30d', 'all']),
+  services: z.array(zSafetyServiceOut),
+  stores: z.array(zSafetyStoreOut),
+  totals: zSafetyTotalsOut,
 });
 
 /**
@@ -10795,6 +10900,19 @@ export const zListReportingTasksQuery = z.object({
  * Successful Response
  */
 export const zListReportingTasksResponse = z.array(zReportingTaskOut);
+
+export const zGetSafetyDataPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zGetSafetyDataQuery = z.object({
+  period: z.enum(['today', '7d', '30d', 'all']).optional().default('7d'),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSafetyDataResponse = zSafetyDataOut;
 
 export const zGetSincePath = z.object({
   investigation_id: z.string(),

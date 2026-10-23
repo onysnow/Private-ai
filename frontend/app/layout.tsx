@@ -13,6 +13,7 @@ import '../styles/act.css';
 import '../styles/story.css';
 import '../styles/before-run.css';
 import '../styles/drop.css';
+import '../styles/safety.css';
 import '../styles/reading-room.css';
 import '../styles/learn.css';
 // Deck font pairings (SIL OFL, served by the app itself -- see

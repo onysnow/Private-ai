@@ -5167,3 +5167,81 @@ class AiRunsOut(ResponseModel):
 class AiRunEventsOut(ResponseModel):
     run: AiRunOut
     events: list[AiRunEventOut]
+
+
+class SafetyTotalsOut(ResponseModel):
+    requests_left: int
+    services_reached: int
+    documents_sent_out: int
+    ai_calls_outside: int
+
+
+class SafetyStoreOut(ResponseModel):
+    """One place on this computer where the case lives (mockup KEEP_2's six stores)."""
+    id: str
+    name: str
+    count: int | None = None
+    count_note: str | None = None
+    bytes: int | None = None
+    oldest: str | None = None
+    where: str
+    in_backups: bool | None = None
+    warning: str | None = None
+
+
+class SafetyServiceOut(ResponseModel):
+    """A service the case can reach, with what has been sent to it in the period."""
+    id: str
+    name: str
+    about: str
+    state: Literal["off", "on_request", "local"]
+    state_note: str
+    sent_count: int
+    sends: list[str]
+    where: Literal["inside", "outside"]
+    blocked_note: str | None = None
+
+
+class SafetyBackupOut(ResponseModel):
+    last_backup_at: str | None = None
+    encrypted: bool
+    restore_enabled: bool
+
+
+class SafetyAccessOut(ResponseModel):
+    mode: Literal["local_only", "remote"]
+    refused_24h: int
+    log_readable: bool
+
+
+class SafetyHousekeepingOut(ResponseModel):
+    stray_files: int | None = None
+    stray_bytes: int | None = None
+
+
+class OutboundRequestOut(ResponseModel):
+    id: str
+    at: str
+    service: str
+    service_name: str
+    kind: str
+    value: str
+    reason: str
+    actor: Literal["you", "automatic"]
+    leaves_computer: bool
+    outcome: Literal["sent", "failed", "blocked"]
+    source: dict[str, Any] | None = None
+
+
+class SafetyDataOut(ResponseModel):
+    """Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015)."""
+    period: Literal["today", "7d", "30d", "all"]
+    totals: SafetyTotalsOut
+    exposure: str
+    stores: list[SafetyStoreOut]
+    services: list[SafetyServiceOut]
+    backup: SafetyBackupOut
+    access: SafetyAccessOut
+    housekeeping: SafetyHousekeepingOut
+    outbound: list[OutboundRequestOut]
+    outbound_total: int
