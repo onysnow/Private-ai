@@ -13,6 +13,17 @@ class ExternalFinding:
     raw: dict = field(default_factory=dict)
 
 
+def entity_sent_value(caption: str | None, properties: dict | None) -> str:
+    """What an enrichment sends about an entity, as one line: its name and the values of the properties sent with it."""
+    parts = [str(caption)] if caption else []
+    for values in (properties or {}).values():
+        for value in (values if isinstance(values, list) else [values]):
+            text = str(value).strip()
+            if text and text not in parts:
+                parts.append(text)
+    return " · ".join(parts)
+
+
 class Connector(ABC):
     @abstractmethod
     async def search(self, query: str) -> list[ExternalFinding]: ...
@@ -48,6 +59,10 @@ class Connector(ABC):
         if caption and caption not in terms:
             terms.insert(0, caption)
         return " ".join(terms[:6])
+
+    def enrich_sent(self, entity: dict) -> str:
+        """The words enrich() sends to the service for this entity, for the outbound log (ADR-0015)."""
+        return self.entity_query(entity)
 
     async def enrich(self, entity: dict) -> list[ExternalFinding]:
         query = self.entity_query(entity)

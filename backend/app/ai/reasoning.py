@@ -33,6 +33,7 @@ from app.ai.governor import governor
 from app.ai.run_events import RunRecorder, instructions_in_packet, record_thoughts, run_events
 from app.ai.quote_check import check_presentation_quotes, prompt_record_texts
 from app.ai.writing_check import check_presentation_writing
+from app.services.outbound import record_model_call
 from app.ai.llm_client import LLMConfigurationError, coerce_response, get_llm_client, is_local_endpoint
 from app.core.authorization import current_authorization_scope, ensure_scope_can_mutate_ids
 from app.core.config import Settings, settings as default_settings
@@ -955,6 +956,9 @@ def _run_reasoning_module(
         model_start = rec.emit("CHECK", "model", status="neutral", parent=retrieved, verdict="STARTED",
                                text=f"Model call: {(settings.ai_provider or '').strip()} {getattr(client, 'model', '') or ''}".strip())
         started_at = utcnow_naive()
+        record_model_call(db, investigation_id, provider=(settings.ai_provider or "").strip().lower(), model=getattr(client, "model", "") or "",
+                          module_title=MODULE_TITLES.get(module, module), records=len(packet.get("citations", [])), prompt_chars=len(system_prompt) + len(user_prompt),
+                          leaves_computer=ai_reasoning_status(settings).get("runs_on_this_computer") is not True, run_id=rec.run_id)
         response = coerce_response(client.generate(system_prompt, user_prompt, **generate_kwargs))
         seconds = round((utcnow_naive() - started_at).total_seconds(), 1)
         model_end = rec.emit("CHECK", "model", status="bad" if response.truncated else "good", parent=model_start,
@@ -978,6 +982,10 @@ def _run_reasoning_module(
                 chart_retries.append({"attempt": attempt, "removed": (retry_report or {}).get("removed", []), "feedback": feedback})
                 model_end = rec.emit("CHECK", "gate:chart", status="partial", parent=model_end, verdict="RETRY",
                                      text=f"A chart failed the chart check; sent back to the model (attempt {attempt})")
+                record_model_call(db, investigation_id, provider=(settings.ai_provider or "").strip().lower(), model=getattr(client, "model", "") or "",
+                                  module_title=f"{MODULE_TITLES.get(module, module)} (sent back after a chart check)", records=len(packet.get("citations", [])),
+                                  prompt_chars=len(system_prompt) + len(user_prompt) + len(feedback),
+                                  leaves_computer=ai_reasoning_status(settings).get("runs_on_this_computer") is not True, run_id=rec.run_id)
                 response = coerce_response(client.generate(system_prompt, f"{user_prompt}\n\n{feedback}", **generate_kwargs))
 
     request = {

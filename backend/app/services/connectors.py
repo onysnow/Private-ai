@@ -30,6 +30,7 @@ from app.models.domain import (
     ConnectorFinding, ConnectorRun, Entity, Investigation, Lead, LeadProfile, LeadWorkflowEvent,
 )
 from app.schemas.api import ConnectorSearchRequest
+from app.services.outbound import enrich_sent_text, mark_outbound_failed, record_outbound
 
 
 def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id: str, provider: str, findings: Sequence[ExternalFinding]) -> list[ConnectorFinding]:
@@ -91,11 +92,14 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
     run = ConnectorRun(investigation_id=body.investigation_id, provider=provider, query=body.query)
     db.add(run); db.commit(); db.refresh(run)
     run_id = run.id
+    sent_id = record_outbound(db, body.investigation_id, service=provider, kind="search text", value=body.query,
+                              reason="A search you ran", actor="you", source={"connector_run_id": run_id})
     try:
         findings = await connector.search(body.query)
         return persist_connector_findings(db, run, body.investigation_id, provider, findings)
     except Exception as exc:
         _fail_run(db, run_id, exc)
+        mark_outbound_failed(db, sent_id)
         # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
         # echoed into the client-facing response (STRUCT-0028).
         raise HTTPException(
@@ -113,16 +117,16 @@ async def enrich_entity(provider: str, entity: Entity, db: Session) -> Any:
     )
     db.add(run); db.commit(); db.refresh(run)
     run_id = run.id
+    payload = {"id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption, "properties": entity.properties or {}}
+    sent_id = record_outbound(db, entity.investigation_id, service=provider, kind="details of a record",
+                              value=enrich_sent_text(connector, payload), reason=f"Look up {entity.caption}",
+                              actor="you", source={"connector_run_id": run_id, "entity_id": entity.id})
     try:
-        findings = await connector.enrich({
-            "id": entity.ftm_id,
-            "schema": entity.schema,
-            "caption": entity.caption,
-            "properties": entity.properties or {},
-        })
+        findings = await connector.enrich(payload)
         return persist_connector_findings(db, run, entity.investigation_id, provider, findings)
     except Exception as exc:
         _fail_run(db, run_id, exc)
+        mark_outbound_failed(db, sent_id)
         # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
         # echoed into the client-facing response (STRUCT-0028).
         raise HTTPException(

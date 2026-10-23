@@ -135,6 +135,7 @@ import {
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
+  getSafetyData,
   getSameAnswerCandidates,
   getSecurityAlerts,
   getSecurityAudit,
@@ -672,6 +673,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsError,
   GetRedFlagsResponse,
+  GetSafetyDataData,
+  GetSafetyDataError,
+  GetSafetyDataResponse,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesError,
   GetSameAnswerCandidatesResponse,
@@ -7400,6 +7404,33 @@ export const listReportingTasksInfiniteOptions = (
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const getSafetyDataQueryKey = (options: Options<GetSafetyDataData>) =>
+  createQueryKey('getSafetyData', options);
+
+/**
+ * Get Safety Data
+ *
+ * Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015).
+ */
+export const getSafetyDataOptions = (options: Options<GetSafetyDataData>) =>
+  queryOptions<
+    GetSafetyDataResponse,
+    GetSafetyDataError,
+    GetSafetyDataResponse,
+    ReturnType<typeof getSafetyDataQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSafetyData({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSafetyDataQueryKey(options),
+  });
 
 export const getSinceQueryKey = (options: Options<GetSinceData>) =>
   createQueryKey('getSince', options);

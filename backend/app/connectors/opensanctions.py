@@ -1,6 +1,6 @@
 import httpx
 
-from app.connectors.base import Connector, ExternalFinding
+from app.connectors.base import Connector, ExternalFinding, entity_sent_value
 from app.core.config import settings
 
 
@@ -68,6 +68,10 @@ class OpenSanctionsConnector(Connector):
             if not isinstance(items, list):
                 return []
             return [self._parse_result(item) for item in items]
+
+    def enrich_sent(self, entity: dict) -> str:
+        # Query-by-example sends every property of the record, not one search line.
+        return entity_sent_value(None, entity.get("properties"))
 
     async def enrich(self, entity: dict) -> list[ExternalFinding]:
         """Match a canonical FtM entity using OpenSanctions query-by-example."""

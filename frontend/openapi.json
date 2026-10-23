@@ -25194,6 +25194,85 @@
         "title": "OrphanStoragePreviewOut",
         "type": "object"
       },
+      "OutboundRequestOut": {
+        "properties": {
+          "actor": {
+            "enum": [
+              "you",
+              "automatic"
+            ],
+            "title": "Actor",
+            "type": "string"
+          },
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "leaves_computer": {
+            "title": "Leaves Computer",
+            "type": "boolean"
+          },
+          "outcome": {
+            "enum": [
+              "sent",
+              "failed",
+              "blocked"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "service_name": {
+            "title": "Service Name",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "service",
+          "service_name",
+          "kind",
+          "value",
+          "reason",
+          "actor",
+          "leaves_computer",
+          "outcome"
+        ],
+        "title": "OutboundRequestOut",
+        "type": "object"
+      },
       "OwnershipChainLinkOut": {
         "description": "An Ownership or Directorship link as the records state it.",
         "properties": {
@@ -29337,6 +29416,350 @@
           "label"
         ],
         "title": "RunSettingValueOut",
+        "type": "object"
+      },
+      "SafetyAccessOut": {
+        "properties": {
+          "log_readable": {
+            "title": "Log Readable",
+            "type": "boolean"
+          },
+          "mode": {
+            "enum": [
+              "local_only",
+              "remote"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "refused_24h": {
+            "title": "Refused 24H",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mode",
+          "refused_24h",
+          "log_readable"
+        ],
+        "title": "SafetyAccessOut",
+        "type": "object"
+      },
+      "SafetyBackupOut": {
+        "properties": {
+          "encrypted": {
+            "title": "Encrypted",
+            "type": "boolean"
+          },
+          "last_backup_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Backup At"
+          },
+          "restore_enabled": {
+            "title": "Restore Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "encrypted",
+          "restore_enabled"
+        ],
+        "title": "SafetyBackupOut",
+        "type": "object"
+      },
+      "SafetyDataOut": {
+        "description": "Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015).",
+        "properties": {
+          "access": {
+            "$ref": "#/components/schemas/SafetyAccessOut"
+          },
+          "backup": {
+            "$ref": "#/components/schemas/SafetyBackupOut"
+          },
+          "exposure": {
+            "title": "Exposure",
+            "type": "string"
+          },
+          "housekeeping": {
+            "$ref": "#/components/schemas/SafetyHousekeepingOut"
+          },
+          "outbound": {
+            "items": {
+              "$ref": "#/components/schemas/OutboundRequestOut"
+            },
+            "title": "Outbound",
+            "type": "array"
+          },
+          "outbound_total": {
+            "title": "Outbound Total",
+            "type": "integer"
+          },
+          "period": {
+            "enum": [
+              "today",
+              "7d",
+              "30d",
+              "all"
+            ],
+            "title": "Period",
+            "type": "string"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyServiceOut"
+            },
+            "title": "Services",
+            "type": "array"
+          },
+          "stores": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyStoreOut"
+            },
+            "title": "Stores",
+            "type": "array"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/SafetyTotalsOut"
+          }
+        },
+        "required": [
+          "period",
+          "totals",
+          "exposure",
+          "stores",
+          "services",
+          "backup",
+          "access",
+          "housekeeping",
+          "outbound",
+          "outbound_total"
+        ],
+        "title": "SafetyDataOut",
+        "type": "object"
+      },
+      "SafetyHousekeepingOut": {
+        "properties": {
+          "stray_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stray Bytes"
+          },
+          "stray_files": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stray Files"
+          }
+        },
+        "title": "SafetyHousekeepingOut",
+        "type": "object"
+      },
+      "SafetyServiceOut": {
+        "description": "A service the case can reach, with what has been sent to it in the period.",
+        "properties": {
+          "about": {
+            "title": "About",
+            "type": "string"
+          },
+          "blocked_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocked Note"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sends": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sends",
+            "type": "array"
+          },
+          "sent_count": {
+            "title": "Sent Count",
+            "type": "integer"
+          },
+          "state": {
+            "enum": [
+              "off",
+              "on_request",
+              "local"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "state_note": {
+            "title": "State Note",
+            "type": "string"
+          },
+          "where": {
+            "enum": [
+              "inside",
+              "outside"
+            ],
+            "title": "Where",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "about",
+          "state",
+          "state_note",
+          "sent_count",
+          "sends",
+          "where"
+        ],
+        "title": "SafetyServiceOut",
+        "type": "object"
+      },
+      "SafetyStoreOut": {
+        "description": "One place on this computer where the case lives (mockup KEEP_2's six stores).",
+        "properties": {
+          "bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bytes"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "count_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count Note"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "in_backups": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In Backups"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "oldest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warning"
+          },
+          "where": {
+            "title": "Where",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "where"
+        ],
+        "title": "SafetyStoreOut",
+        "type": "object"
+      },
+      "SafetyTotalsOut": {
+        "properties": {
+          "ai_calls_outside": {
+            "title": "Ai Calls Outside",
+            "type": "integer"
+          },
+          "documents_sent_out": {
+            "title": "Documents Sent Out",
+            "type": "integer"
+          },
+          "requests_left": {
+            "title": "Requests Left",
+            "type": "integer"
+          },
+          "services_reached": {
+            "title": "Services Reached",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "requests_left",
+          "services_reached",
+          "documents_sent_out",
+          "ai_calls_outside"
+        ],
+        "title": "SafetyTotalsOut",
         "type": "object"
       },
       "SameAnswerCandidateOut": {
@@ -54027,6 +54450,72 @@
           }
         },
         "summary": "List Reporting Tasks"
+      }
+    },
+    "/api/investigations/{investigation_id}/safety-data": {
+      "get": {
+        "description": "Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015).",
+        "operationId": "get_safety_data",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "default": "7d",
+              "enum": [
+                "today",
+                "7d",
+                "30d",
+                "all"
+              ],
+              "title": "Period",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafetyDataOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Safety Data"
       }
     },
     "/api/investigations/{investigation_id}/since": {
