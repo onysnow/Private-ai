@@ -261,3 +261,52 @@ def test_a_model_call_is_logged_and_only_an_outside_model_counts_as_leaving(
         here["totals"]["ai_calls_outside"] == 0 and here["totals"]["requests_left"] == 0
     )
     assert here["outbound"][0]["leaves_computer"] is False
+
+
+def test_the_last_backup_and_refusals_are_read_from_the_security_log(
+    tmp_path, monkeypatch
+):
+    import json
+    from datetime import datetime, timezone
+
+    from app.core.config import settings
+
+    inv = _inv("From the log")
+    now = datetime.now(timezone.utc)
+    lines = [
+        {
+            "timestamp": (now - timedelta(days=3)).isoformat(),
+            "event": "api_request",
+            "method": "GET",
+            "status_code": 200,
+            "path": f"/api/investigations/{inv}/export",
+        },
+        {
+            "timestamp": (now - timedelta(hours=2)).isoformat(),
+            "event": "access_denied",
+            "method": "GET",
+            "status_code": 403,
+            "path": "/api/x",
+        },
+        {
+            "timestamp": (now - timedelta(days=9)).isoformat(),
+            "event": "access_denied",
+            "method": "GET",
+            "status_code": 403,
+            "path": "/api/x",
+        },
+    ]
+    log = tmp_path / "security.jsonl"
+    log.write_text(
+        "\n".join(
+            json.dumps(
+                {"request_id": str(i), "client_host": "", "local_request": True, **line}
+            )
+            for i, line in enumerate(lines)
+        )
+    )
+    monkeypatch.setattr(settings, "audit_log_file", str(log))
+    page = ok(client.get(f"/api/investigations/{inv}/safety-data"))
+    assert page["backup"]["last_backup_at"] is not None
+    assert page["access"]["refused_24h"] == 1
+    assert next(s for s in page["stores"] if s["id"] == "log")["count"] == 3

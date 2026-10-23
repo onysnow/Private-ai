@@ -75,6 +75,7 @@ def _audit_facts(investigation_id: str) -> dict[str, Any]:
                 stamp = parse_audit_timestamp(record.get("timestamp"))
                 if stamp is None:
                     continue
+                stamp = stamp.replace(tzinfo=None)  # the log writes UTC with an offset; the rest of the app compares naive UTC
                 facts["events"] += 1
                 if facts["oldest"] is None or stamp < facts["oldest"]:
                     facts["oldest"] = stamp
