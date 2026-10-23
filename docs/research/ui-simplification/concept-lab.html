@@ -1,0 +1,252 @@
+<title>Simplification Concept Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{color-scheme:dark;--ground:#14263A;--s1:#1E3448;--s2:#26425A;--s3:#2E4D67;--text:#F5ECDA;--muted:#C6BBA5;--line:#6F8AA3;--accent:#E8A95B;--accent2:#7FB7E0;--ok:#9CC5A1;--bad:#F39882;--ai:#B7A6E0;--unshown:#CBC3B2;
+--ui:'IBM Plex Sans','Inter',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+--quick:120ms;--std:220ms;--slow:380ms;--ease:cubic-bezier(.2,.7,.2,1)}
+:root[data-calm]{--quick:0ms;--std:0ms;--slow:0ms}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--text);font:14px/1.45 var(--ui)}
+@media (prefers-reduced-motion:reduce){:root{--quick:0ms;--std:0ms;--slow:0ms}}
+.wrap{max-width:1040px;margin:0 auto;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:24px;margin:0 0 4px}
+.lede{color:var(--muted);max-width:70ch;margin:0 0 14px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 18px;color:var(--muted);font-size:13px}
+button{font:inherit;color:var(--text);background:var(--s2);border:1.5px solid var(--line);border-radius:8px;padding:5px 12px;min-height:30px;cursor:pointer}
+button:hover{border-color:var(--accent2)}button[aria-pressed=true]{background:var(--accent);color:#1a1208;border-color:var(--accent);font-weight:600}
+button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+section.demo{margin:0 0 30px}
+section.demo h2{font-size:17px;margin:0 0 2px}
+section.demo p.why{margin:0 0 8px;color:var(--muted);max-width:75ch}
+.ctl{display:flex;gap:6px;align-items:center;margin:0 0 8px;flex-wrap:wrap}
+.ctl .lbl{font:600 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.stage{position:relative;background:var(--s1);border:1.5px solid rgb(111 138 163/.55);border-radius:14px;padding:14px;height:430px;overflow:hidden}
+.cap{font:600 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.note{margin-top:8px;font-size:12.5px;color:var(--muted);min-height:20px}
+.note b{color:var(--text)}
+.chip{display:inline-flex;align-items:center;gap:5px;font:500 12px var(--mono);border:1.5px solid var(--line);border-radius:999px;padding:0 8px;min-height:22px;white-space:nowrap}
+.chip.ok{color:var(--ok);border-color:var(--ok)}.chip.bad{color:var(--bad);border-color:var(--bad)}.chip.acc{color:var(--accent);border-color:var(--accent)}.chip.ai{color:var(--ai);border-style:dashed;border-color:var(--ai)}
+/* A: spine accordion */
+.acc{display:flex;flex-direction:column;gap:8px;height:100%}
+.pan{background:var(--s2);border:1.5px solid rgb(111 138 163/.6);border-radius:10px;overflow:hidden;flex:0 0 46px;display:flex;flex-direction:column;transition:flex-basis var(--slow) var(--ease),border-color var(--std)}
+.pan.on{flex:1 1 auto;border-color:var(--accent)}
+.pan header{display:flex;align-items:center;gap:10px;padding:0 12px;min-height:44px;flex:none;cursor:pointer}
+.pan header b{font-size:14px}.pan header .sum{color:var(--muted);font-size:13px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pan .key{font:600 11px var(--mono);border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--muted)}
+.pan .body{padding:2px 12px 10px;opacity:0;transition:opacity var(--std) var(--ease);overflow:hidden}
+.pan.on .body{opacity:1;transition-delay:var(--quick)}
+.pan .row{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:6px 0;border-top:1px solid rgb(111 138 163/.3);font-size:13px;align-items:center}
+.pan.pulse{animation:pulse 1.1s var(--ease) 2}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgb(243 152 130/.7)}100%{box-shadow:0 0 0 12px rgb(243 152 130/0)}}
+:root[data-calm] .pan.pulse{animation:none;border-color:var(--bad)}
+.toast{position:absolute;right:14px;bottom:14px;background:var(--s3);border:1.5px solid var(--accent);border-radius:10px;padding:8px 12px;max-width:340px;font-size:13px;transform:translateY(20px);opacity:0;pointer-events:none;transition:all var(--std) var(--ease)}
+.toast.show{transform:none;opacity:1;pointer-events:auto}
+.toast .act{display:flex;gap:6px;margin-top:6px}
+/* B: record ladder */
+.ladder{display:grid;grid-template-columns:1fr;gap:10px;height:100%;position:relative;align-content:start}
+.rec{background:var(--s2);border:1.5px solid rgb(111 138 163/.6);border-radius:10px;padding:8px 12px;display:grid;grid-template-columns:90px 1fr auto auto;gap:12px;align-items:center;font-size:13px;transition:all var(--std) var(--ease)}
+.rec .d{font:500 12px var(--mono);color:var(--muted)}
+.rec.focus{border-color:var(--accent)}
+.rec .more{grid-column:1/-1;max-height:0;opacity:0;overflow:hidden;transition:max-height var(--slow) var(--ease),opacity var(--std) var(--ease);font-size:13px}
+.rec.open .more{max-height:170px;opacity:1;margin-top:6px}
+.rec.open{background:var(--s3)}
+.more dl{display:grid;grid-template-columns:110px 1fr;gap:3px 12px;margin:0}
+.more dt{color:var(--muted)}.more dd{margin:0}
+.peek{position:absolute;left:130px;top:62px;width:340px;background:var(--s3);border:1.5px solid var(--accent2);border-radius:10px;padding:10px 12px;font-size:13px;box-shadow:0 12px 30px rgb(0 0 0/.45);opacity:0;transform:translateY(6px) scale(.98);transition:all var(--std) var(--ease);pointer-events:none;z-index:5}
+.peek.show{opacity:1;transform:none}
+.room{position:absolute;inset:0;background:var(--ground);border-radius:12px;padding:14px;opacity:0;pointer-events:none;transform:scale(.96);transition:all var(--slow) var(--ease);z-index:8}
+.room.show{opacity:1;pointer-events:auto;transform:none}
+.room .cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+.room .col{background:var(--s1);border:1.5px solid rgb(111 138 163/.55);border-radius:10px;padding:10px;font-size:13px;min-height:200px}
+/* C: semantic zoom */
+.zoom{height:100%;display:flex;flex-direction:column;gap:10px}
+.count{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+.count b{color:var(--text);font:600 14px var(--mono)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:1;align-content:start}
+.tile{background:var(--s2);border:1.5px solid rgb(111 138 163/.6);border-radius:10px;padding:10px 12px;transition:all var(--slow) var(--ease);overflow:hidden}
+.tile b{font:600 22px var(--mono);display:block}
+.tile .nm{font-size:13px}
+.tile .rows{max-height:0;opacity:0;overflow:hidden;transition:max-height var(--slow) var(--ease),opacity var(--std);font-size:12.5px}
+.zoom[data-z="2"] .tile .rows{max-height:110px;opacity:1;margin-top:6px}
+.zoom[data-z="2"] .tile b{font-size:15px;display:inline}
+.zoom[data-z="3"] .tiles{display:none}
+.recs{display:none;flex-direction:column;gap:6px}
+.zoom[data-z="3"] .recs{display:flex}
+.recs .rrow{display:grid;grid-template-columns:200px 120px 1fr auto;gap:12px;align-items:center;background:var(--s2);border:1.5px solid rgb(111 138 163/.5);border-radius:9px;padding:7px 12px;font-size:13px}
+.gtabs{display:flex;gap:6px;flex-wrap:wrap}
+.tile .rows div{padding:2px 0;border-top:1px solid rgb(111 138 163/.25)}
+.alt{display:flex;gap:4px;align-items:center}
+/* D: detail levels */
+.lv{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;height:100%}
+.flag{background:var(--s2);border:1.5px solid rgb(111 138 163/.6);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+.flag .floor{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px;padding:3px 6px;margin:0 -2px}
+button.hide{max-width:300px}.hide{transition:max-height var(--slow) var(--ease),opacity var(--std) var(--ease),margin var(--std);overflow:hidden;max-height:60px;opacity:1}
+.lv[data-l="guided"] .hide.l2,.lv[data-l="guided"] .hide.l3,.lv[data-l="standard"] .hide.l3{max-height:0;opacity:0;margin:0;padding:0;border-width:0;min-height:0;visibility:hidden}
+.rail{background:var(--s2);border:1.5px solid rgb(111 138 163/.6);border-radius:10px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:6px}
+.meter{font:600 12px var(--mono);color:var(--muted)}
+.meter b{font-size:20px;color:var(--accent)}
+.hid{font-size:12.5px;color:var(--muted);border:1.5px dashed var(--line);border-radius:8px;padding:5px 9px}
+.tb{display:flex;gap:6px;flex-wrap:wrap}
+/* E: context bar */
+.lib{display:flex;flex-direction:column;gap:6px;height:100%;position:relative}
+.lrow{display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;background:var(--s2);border:1.5px solid rgb(111 138 163/.5);border-radius:9px;padding:6px 10px;font-size:13px;cursor:pointer;transition:all var(--quick)}
+.lrow:hover{border-color:var(--accent2)}.lrow.sel{border-color:var(--accent);background:var(--s3)}
+.lrow .cb{width:16px;height:16px;border:1.5px solid var(--line);border-radius:4px;display:grid;place-items:center;font-size:11px}
+.lrow.sel .cb{background:var(--accent);border-color:var(--accent);color:#1a1208}
+.lrow .rb{display:flex;gap:4px;opacity:0;transition:opacity var(--quick)}
+.lrow:hover .rb,.lrow:focus-within .rb{opacity:1}
+.cbar{position:absolute;left:50%;bottom:6px;transform:translate(-50%,70px);opacity:0;background:var(--s3);border:1.5px solid var(--accent);border-radius:12px;padding:7px 10px;display:flex;gap:6px;align-items:center;box-shadow:0 12px 30px rgb(0 0 0/.5);transition:all var(--std) var(--ease)}
+.cbar.show{transform:translate(-50%,0);opacity:1}
+.cbar .n{font:600 12px var(--mono);color:var(--accent);margin-right:6px;white-space:nowrap}.cbar button{white-space:nowrap}
+@media (max-width:640px){.rec{grid-template-columns:1fr auto;}.rec .d{grid-column:1/-1}.lv{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}.recs .rrow{grid-template-columns:1fr auto}.recs .rrow span:nth-child(2),.recs .rrow span:nth-child(3){display:none}.room .cols{grid-template-columns:1fr}.stage{height:auto;min-height:430px}.peek{left:12px;right:12px;width:auto}.lrow{grid-template-columns:22px 1fr auto}.lrow .rb{display:none}.cbar{flex-wrap:wrap;width:calc(100% - 16px);justify-content:center}h1{font-size:21px}}
+
+/* F: one inspector slot */
+.slotwrap{display:flex;gap:10px;height:100%}
+.slist{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px;transition:flex-basis var(--std)}
+.sitem{display:grid;grid-template-columns:90px 1fr auto;gap:10px;align-items:center;background:var(--s2);border:1.5px solid rgb(111 138 163/.5);border-radius:9px;padding:7px 10px;font-size:13px;cursor:pointer;text-align:left;color:var(--text);min-height:36px}
+.sitem:hover{border-color:var(--accent2)}.sitem.cur{border-color:var(--accent);background:var(--s3)}
+.sitem .k{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.spanes{display:flex;gap:6px;flex:0 0 auto}
+.spane{width:250px;background:var(--s3);border:1.5px solid var(--accent2);border-radius:10px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:6px;overflow:hidden;animation:slidein var(--std) var(--ease)}
+@keyframes slidein{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+:root[data-calm] .spane{animation:none}
+.spane.one{width:340px;border-color:var(--accent)}
+.spane h4{margin:0;font-size:14px}
+.trail{display:flex;gap:4px;flex-wrap:wrap;font:500 11px var(--mono);color:var(--muted)}
+.trail button{padding:0 6px;min-height:22px;font:inherit;border-radius:6px}
+.mode{margin-left:auto;display:flex;gap:6px;align-items:center}
+.wcount{font:600 12px var(--mono);color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.pan.pulse{animation:none;border-color:var(--bad)}.spane{animation:none}}
+</style>
+<div class="wrap">
+<h1>Simplification Concept Lab</h1>
+<p class="lede">Six ways to show less at once without losing anything. These are pictures to react to, not the app: Kestrel case data is fictional. Each one is set up so its animation tells you what changed, and each has a still-frame fallback.</p>
+<div class="bar"><span class="cap">Motion</span><button id="calm" aria-pressed="false">Calm motion</button><span>Turns every animation here into an instant change, as the Workbench's own Calm motion does.</span></div>
+
+<section class="demo" id="A"><h2>A. The part you're on opens, the rest fold to a spine</h2>
+<p class="why">Check has four sections. Only the one you're in is open; the others shrink to one line that still carries their count and state. An event can pulse a spine but never steals the screen.</p>
+<div class="ctl"><span class="lbl">Try</span><button data-a="0">Claims</button><button data-a="1">To check</button><button data-a="2">Connector findings</button><button data-a="3">Chain of custody</button><button data-a="e">⚡ A file fails its hash check</button></div>
+<div class="stage" id="stA"><div class="acc" id="acc"></div></div>
+<div class="note" id="noteA"></div></section>
+
+<section class="demo" id="B"><h2>B. One record, four depths</h2>
+<p class="why">Every card keeps who, what, how much, when and where from at its shallowest depth. Hover peeks; a click opens it in place; Enter opens the full room. Nothing is a new window until you ask for the whole thing.</p>
+<div class="ctl"><span class="lbl">Depth</span><button data-b="0">1 · Line</button><button data-b="1">2 · Peek (hover)</button><button data-b="2">3 · Opened in place</button><button data-b="3">4 · The room</button></div>
+<div class="stage" id="stB"><div class="ladder" id="ladder"></div><div class="peek" id="peek"></div><div class="room" id="room"></div></div>
+<div class="note" id="noteB"></div></section>
+
+<section class="demo" id="C"><h2>C. Zoom changes what a list is, not just how big it is</h2>
+<p class="why">Fifteen thousand proposals can't be a list. At the top it is six counted groups; one zoom in, the groups show their rows; one more, it is the records. All counts in this lab are invented for the picture. The line "found · shown · why" is always on screen.</p>
+<div class="ctl"><span class="lbl">Altitude</span><button data-c="1">Whole queue</button><button data-c="2">Groups open</button><button data-c="3">Records</button></div>
+<div class="stage" id="stC"><div class="zoom" id="zoom" data-z="1"></div></div>
+<div class="note" id="noteC"></div></section>
+
+<section class="demo" id="D"><h2>D. One switch for how much you see, with a floor it cannot go below</h2>
+<p class="why">The Red Flags screen at three levels. The outlined parts are the ethical floor: level, "indicator, not a finding", innocent explanations. They are there at every level. What folds away says how many things it holds and offers them back. The nudge is an offer only.</p>
+<div class="ctl"><span class="lbl">Show me</span><button data-d="guided">Less</button><button data-d="standard" aria-pressed="true">Usual</button><button data-d="full">Everything</button><button id="nudge">⚡ Simulate "opened 4 panels in a minute"</button></div>
+<div class="stage" id="stD"><div class="lv" id="lv" data-l="standard"></div><div class="toast" id="toastD"></div></div>
+<div class="note" id="noteD"></div></section>
+
+<section class="demo" id="E"><h2>E. Buttons arrive when something is selected</h2>
+<p class="why">The Library has about forty-four fixed buttons today. Here a row shows its two likely actions on hover; selecting rows raises one bar with only the actions that make sense for that selection, then it leaves.</p>
+<div class="ctl"><span class="lbl">Try</span><button data-e="0">Nothing selected</button><button data-e="1">Select one</button><button data-e="2">Select three</button></div>
+<div class="stage" id="stE"><div class="lib" id="lib"></div><div class="cbar" id="cbar"></div></div>
+<div class="note" id="noteE"></div></section>
+
+<section class="demo" id="F"><h2>F. One inspector slot instead of a stack of windows</h2>
+<p class="why">Today a click can open a drawer on top of a drawer on top of a panel. Here every "open this" goes to one slot at the right. A link inside it moves along a trail; Back returns. Switch the mode to compare.</p>
+<div class="ctl"><span class="lbl">Mode</span><button data-f="stack" aria-pressed="true">Today: each click adds a window</button><button data-f="slot">Proposed: one slot with a trail</button><button id="fclear">Clear</button><span class="wcount" id="fcount"></span></div>
+<div class="stage" id="stF"><div class="slotwrap"><div class="slist" id="slist"></div><div class="spanes" id="spanes"></div></div></div>
+<div class="note" id="noteF"></div></section>
+</div>
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+$('#calm').onclick=e=>{const on=e.target.getAttribute('aria-pressed')!=='true';e.target.setAttribute('aria-pressed',on);on?root.setAttribute('data-calm',''):root.removeAttribute('data-calm')};
+/* A */
+const secs=[
+ {n:'Claims',k:'1',sum:'21 confirmed · 9 disputed · 4 unverified',rows:[['Kestrel SA paid 681,000 USD to Larkspur Finance','confirmed'],['Director left before the transfer','disputed'],['Second account held by same person','unverified']]},
+ {n:'To check',k:'2',sum:'14 waiting · 3 need a source',rows:[['Is "L. Finance" the same as Larkspur Finance?','shows'],['Address on page 4 matches registry?','unclear'],['Date of the transfer: two candidates','unclear']]},
+ {n:'Connector findings',k:'3',sum:'7 from outside lookups · 2 new',rows:[['Sanctions list: partial name match','new'],['Registry: shell company, 2013','new'],['Corpus: 3 documents mention it','seen']]},
+ {n:'Chain of custody',k:'4',sum:'104 files · all hashes match',rows:[['Gate_cam_export.dav · locked 7f31…c0aa','ok'],['Email 0412 · 2 passages used','ok'],['Payments.csv · 84 rows read','ok']]}];
+const acc=$('#acc');let aOn=0;
+function drawA(){acc.innerHTML=secs.map((s,i)=>`<div class="pan ${i===aOn?'on':''}" data-i="${i}"><header><b>${s.n}</b><span class="sum">${s.sum}</span><span class="key">${s.k}</span></header><div class="body">${s.rows.map(r=>`<div class="row"><span>${r[0]}</span><span class="chip ${r[1]==='confirmed'||r[1]==='ok'||r[1]==='shows'?'ok':r[1]==='disputed'?'bad':r[1]==='new'?'acc':''}">${r[1]}</span><button>Open</button></div>`).join('')}</div></div>`).join('');
+ $$('.pan header',acc).forEach(h=>h.onclick=()=>setA(+h.parentElement.dataset.i))}
+function setA(i){aOn=i;$$('.pan',acc).forEach((p,j)=>p.classList.toggle('on',j===i));$('#noteA').innerHTML=`<b>${secs[i].n}</b> is open. The other three are one line each and still show their numbers. Keys 1–4 or a pause over a spine do the same.`}
+function evA(){secs[3].sum='1 file failed its hash check · 103 match';const p=$$('.pan',acc)[3];p.querySelector('.sum').textContent=secs[3].sum;p.querySelector('.sum').style.color='var(--bad)';p.classList.remove('pulse');void p.offsetWidth;p.classList.add('pulse');$('#noteA').innerHTML=`<b>Event, not a takeover.</b> The Chain of custody spine pulses twice and changes its own line. Your section stays open; nothing is hidden or reordered.`}
+drawA();setA(0);
+$$('[data-a]').forEach(b=>b.onclick=()=>{b.dataset.a==='e'?evA():setA(+b.dataset.a)});
+/* B */
+const rec=`<div class="rec" id="r1" tabindex="0"><span class="d">12 Nov 2013</span><span><b>Larkspur Finance → Kestrel SA</b> · wire</span><span class="chip">USD 681,000</span><span class="chip ok">supported</span><div class="more"><dl><dt>Who</dt><dd>Larkspur Finance Ltd (BVI) → Kestrel SA (Luxembourg)</dd><dt>How sure</dt><dd>2 sources · bank record and a court filing · likely</dd><dt>When</dt><dd>12 Nov 2013 (bank date). Court filing says 14 Nov: disputed by 2 days</dd><dt>From</dt><dd>Payments.csv row 41 · Judgment p.18 §3</dd></dl></div></div>`;
+const other=['03 Dec 2013|Kestrel SA → Aldane Holdings|USD 120,000|unverified','19 Jan 2014|Aldane Holdings → R. Voss|USD 90,000|disputed'].map(x=>{const[a,b,c,d]=x.split('|');return`<div class="rec"><span class="d">${a}</span><span><b>${b}</b> · wire</span><span class="chip">${c}</span><span class="chip ${d==='disputed'?'bad':''}">${d}</span></div>`}).join('');
+$('#ladder').innerHTML=rec+other;
+$('#peek').innerHTML=`<div class="cap">Peek · nothing opens</div><div style="margin:4px 0"><b>USD 681,000</b> from Larkspur Finance Ltd to Kestrel SA, 12 Nov 2013.</div><div style="color:var(--muted)">2 sources · likely · dates differ by 2 days</div><div style="margin-top:6px"><span class="chip ok">supported</span> <span class="chip">Payments.csv r41</span></div>`;
+$('#room').innerHTML=`<div style="display:flex;gap:10px;align-items:center"><b style="font-size:17px">Payment · Larkspur Finance → Kestrel SA</b><span class="chip ok">supported</span><span style="flex:1"></span><button id="roomx">Esc · back to the list</button></div><div class="cols"><div class="col"><div class="cap">The record</div><p>USD 681,000 · wire · 12 Nov 2013<br>Purpose: "consulting"</p></div><div class="col"><div class="cap">Where it comes from</div><p>Payments.csv row 41<br>Judgment p.18 §3 (quote)<br>Original page image</p></div><div class="col"><div class="cap">What's against it</div><p>Court filing gives 14 Nov.<br>Disputed by 2 days; not by amount.</p></div></div>`;
+const noteB=['<b>Depth 1.</b> Date, parties, amount, status: all five questions answered in one line.','<b>Depth 2.</b> Hovering or focusing gives a peek: a sentence, the certainty, and where it is from. It closes on its own; nothing is mounted.','<b>Depth 3.</b> A click opens the card in place; the list around it stays, pushed down, so you keep your position.','<b>Depth 4.</b> Enter opens the whole room (a container transform: the card grows into it). Esc grows it back into the same row.'];
+function setB(i){const r=$('#r1');r.classList.toggle('open',i===2);r.classList.toggle('focus',i>=1);$('#peek').classList.toggle('show',i===1);$('#room').classList.toggle('show',i===3);$('#noteB').innerHTML=noteB[i];$$('[data-b]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.b===i))}
+$$('[data-b]').forEach(b=>b.onclick=()=>setB(+b.dataset.b));const r1=$('#r1');
+r1.addEventListener('click',()=>{const open=r1.classList.contains('open');setB(open?0:2)});
+r1.addEventListener('focus',()=>{if(!r1.classList.contains('open')&&!$('#room').classList.contains('show'))setB(1)});
+r1.addEventListener('blur',()=>{if($('#peek').classList.contains('show'))setB(0)});
+r1.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();setB(3);$('#roomx').focus()}else if(e.key===' '){e.preventDefault();setB(r1.classList.contains('open')?0:2)}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#room').classList.contains('show')){setB(2);r1.focus()}});
+$('#roomx').onclick=()=>{setB(2);r1.focus()};
+$('#r1').onmouseenter=()=>{if(!$('#r1').classList.contains('open'))setB(1)};$('#r1').onmouseleave=()=>{if($('#peek').classList.contains('show'))setB(0)};
+setB(0);
+/* C */
+const groups=[['Names it found',6120,['“Kestrel S.A.” → Kestrel SA','“L. Finance” → ?','“R. Voss” → person']],['Possible links',3880,['Voss — Aldane (director?)','Aldane — Kestrel (owner?)','Larkspur — Kestrel (payment)']],['Facts to confirm',2410,['Dates: 2 candidates','Amounts: currency missing','Address ≠ registry']],['Quotes for claims',1760,['p.18 “transferred on…”','p.4 “beneficial owner…”','p.9 “no explanation…”']],['Duplicates',820,['Email 0412 = 0412 (copy)','Judgment p.3 twice','CSV read twice']],['Other',294,['Page numbers','Letterheads','Boilerplate']]];
+const total=groups.reduce((a,g)=>a+g[1],0);
+$('#zoom').innerHTML=`<div class="count"><span>Found <b id="cf">${total.toLocaleString()}</b></span><span>· showing <b id="cs">6 groups</b></span><span id="cw">· grouped because 15,284 is more than anyone can read; <u>change</u></span></div><div class="gtabs" id="gtabs"></div><div class="recs" id="recs"></div><div class="tiles" id="tiles">${groups.map(g=>`<div class="tile"><span class="nm">${g[0]}</span> <b>${g[1].toLocaleString()}</b><div class="rows">${g[2].map(r=>`<div>${r}</div>`).join('')}</div></div>`).join('')}</div>`;
+$('#gtabs').innerHTML='<span class="chip acc">Names it found 6,120</span><span class="chip">Possible links 3,880</span><span class="chip">Facts to confirm 2,410</span><span class="chip">Quotes 1,760</span><span class="chip">+2 more</span>';
+$('#recs').innerHTML=[['“Kestrel S.A.”','Company','Judgment p.18','likely same as Kestrel SA'],['“L. Finance”','unknown kind','Email 0412','needs a decision'],['“R. Voss”','Person','Payments.csv r57','new name'],['“Okafor”','Person','Interview 41:08','heard, not read']].map(r=>`<div class="rrow"><b>${r[0]}</b><span style="color:var(--muted)">${r[1]}</span><span>${r[2]}</span><span class="chip">${r[3]}</span></div>`).join('');
+const noteC={1:'<b>Whole queue.</b> Six groups, six numbers. The biggest is the biggest tile. This is the overview.',2:'<b>Groups open.</b> Each group shows three of its rows. The counter says how many groups, and the rest are one scroll away.',3:'<b>Records.</b> One group at a time becomes a list of the actual records, four on screen, with the same who/what/how much/when/where.'};
+function setC(z){$('#zoom').dataset.z=z;$('#cs').textContent=z===1?'6 groups':z===2?'6 groups, 3 rows each':'4 of 6,120 names (Names it found)';$('#cw').innerHTML=z===3?'· stopped at 4 because that is what fits; <u>show next 4</u>':'· grouped because 15,284 is more than anyone can read; <u>change</u>';$('#noteC').innerHTML=noteC[z];$$('[data-c]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.c===z))}
+$$('[data-c]').forEach(b=>b.onclick=()=>setC(+b.dataset.c));setC(1);
+/* D */
+$('#lv').innerHTML=`<div class="flag"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="font-size:16px">Round-trip payments · BO-033</b><span class="floor"><span class="chip bad">Strong</span></span></div>
+<div class="floor" style="font-size:13px">An indicator, not a finding. It rests on 2 links that are not yet shown.</div>
+<div class="floor" style="font-size:13px"><div class="cap">Before you call it</div>☐ Related companies paying each other for real services?  ☐ A loan and repayment?  ☐ Group treasury arrangement?</div>
+<div class="hide l2" style="font-size:13px"><div class="cap">Picture it rests on</div>Larkspur → Kestrel → Aldane → Larkspur · 3 payments · 14 months</div>
+<div class="tb"><button>Set aside…</button><button>Add to leads</button><button class="hide l2">Show in money flows</button></div>
+<div class="hide l3" style="font-size:12.5px;color:var(--muted)"><div class="cap">How it was computed</div>Rule v3 · detector: cycle · weight parts 0.4 / 0.35 / 0.25 · first seen 3 Oct · 31 payments grouped</div>
+<div class="hide l3 tb"><button>Rule history</button><button>Weights</button><button>Compare versions</button><button>Export record</button></div></div>
+<div class="rail"><div class="meter">Things you can press here <b id="mc">9</b></div><div class="hid" id="hid"></div><div class="cap" style="margin-top:4px">Always on, every level</div><div style="font-size:12.5px;color:var(--muted)">Level · "indicator, not a finding" · innocent explanations · where it comes from (one click) · counts that say found / shown</div></div>`;
+const lvInfo={guided:{c:11,h:'Folded: the picture it rests on, one action, how it was computed (6 more items). <u>Show</u>',n:'<b>Less.</b> What a first-time journalist needs to decide this flag: the two decision actions stay. The outlined parts cannot be folded at any level.'},standard:{c:16,h:'Folded: how it was computed (5 more items). <u>Show</u>',n:'<b>Usual.</b> The default for a person who has done this before.'},full:{c:24,h:'Nothing folded.',n:'<b>Everything.</b> Rule version, weights, detector. The audit view.'}};
+function setD(l){$('#lv').dataset.l=l;const i=lvInfo[l];$('#mc').textContent=i.c;$('#hid').innerHTML=i.h;$('#noteD').innerHTML=i.n;$$('[data-d]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===l))}
+$$('[data-d]').forEach(b=>b.onclick=()=>{endTrial();setD(b.dataset.d)});setD('standard');
+$('#toastD').innerHTML=`<b>That's a lot on screen.</b> Want a calmer view of this case?<div class="act"><button id="tryL">Try it</button><button id="notNow">Not now</button><button id="never">Don't ask again</button></div><div style="font-size:12px;color:var(--muted);margin-top:4px">Try shows it for 20 seconds with Keep / Undo. Nothing changes unless you keep it.</div>`;
+$('#nudge').onclick=()=>$('#toastD').classList.add('show');
+let prevL='standard',trialT=null;
+function endTrial(){clearTimeout(trialT);trialT=null}
+$('#tryL').onclick=()=>{prevL=$('#lv').dataset.l;setD('guided');$('#toastD').classList.remove('show');$('#noteD').innerHTML='<b>Trying "Less" for 20 s.</b> <button id="keep">Keep</button> <button id="undo">Undo</button>';endTrial();trialT=setTimeout(()=>{setD(prevL);$('#noteD').innerHTML='<b>Trial ended.</b> Back to what you had.'},20000);$('#keep').onclick=()=>{endTrial();setD('guided')};$('#undo').onclick=()=>{endTrial();setD(prevL)}};
+$('#notNow').onclick=$('#never').onclick=()=>$('#toastD').classList.remove('show');
+/* E */
+const files=[['Harbour_walkthrough_0412.mp4','video · 6:12 · Arabic','read'],['Interview_Okafor_0412.m4a','audio · 41:08','read'],['Gate_cam_export.dav','video · CCTV · 7:40','1 problem'],['IMG_2231.jpg','photo · 4000×2500','read'],['Judgment_p1-34.pdf','scanned · 34 pages','read']];
+let sel=new Set();
+$('#lib').innerHTML=files.map((f,i)=>`<div class="lrow" data-i="${i}" tabindex="0"><span class="cb"></span><span><b>${f[0]}</b> <span style="color:var(--muted)">${f[1]}</span></span><span class="chip ${f[2]==='read'?'ok':'bad'}">${f[2]}</span><span class="rb"><button>Open</button><button>Mark</button></span></div>`).join('');
+function drawE(){$$('.lrow').forEach(r=>{const on=sel.has(+r.dataset.i);r.classList.toggle('sel',on);r.querySelector('.cb').textContent=on?'✓':''});const n=sel.size,bar=$('#cbar');bar.classList.toggle('show',n>0);
+ bar.innerHTML=n?`<span class="n">${n} selected</span>${n===1?'<button>Open</button><button>Add to a claim</button><button>See chain of custody</button>':'<button>Tag all</button><button>Compare</button><button>Add to collection</button>'}<button>Clear</button>`:'';
+ $('#noteE').innerHTML=n===0?'<b>Resting state.</b> Rows are lines. Open and Mark appear when you point at one.':n===1?'<b>One selected.</b> Three actions that make sense for a single file.':'<b>Several selected.</b> The bar swaps to actions that work on a set: Compare appears only now.';
+ $$('[data-e]').forEach(b=>b.setAttribute('aria-pressed',false))}
+$$('.lrow').forEach(r=>r.onclick=()=>{const i=+r.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);drawE()});
+$$('[data-e]').forEach(b=>b.onclick=()=>{sel=new Set(+b.dataset.e===0?[]:+b.dataset.e===1?[2]:[0,2,3]);drawE()});drawE();
+/* capture hook */
+window.lab={setA,evA,setB,setC,setD,setE:n=>{sel=new Set(n===0?[]:n===1?[2]:[0,2,3]);drawE()}};
+
+/* F */
+const ents={c:{k:'Claim',t:'Kestrel SA paid 681,000 USD to Larkspur Finance',b:'Supported · 2 sources · likely',links:['s','f']},s:{k:'Source',t:'Court judgment p.18 §3',b:'Tier B · authentic · quote at lines 12–14',links:['f']},f:{k:'File',t:'Payments.csv',b:'Locked 7f31…c0aa · 84 rows read · hash matches',links:[]},g:{k:'Flag',t:'Round-trip payments BO-033',b:'Strong · indicator, not a finding',links:['c']}};
+let fmode='stack',fopen=[],ftrail=[];
+$('#slist').innerHTML=Object.entries(ents).map(([id,e])=>`<button class="sitem" data-id="${id}"><span class="k">${e.k}</span><span>${e.t}</span><span class="chip">${e.b.split(' · ')[0]}</span></button>`).join('');
+function paneHtml(id,one){const e=ents[id];return `<div class="spane ${one?'one':''}">${one?`<div class="trail">${ftrail.map((t,i)=>`<button data-trail="${i}">${ents[t].k}</button>${i<ftrail.length-1?'›':''}`).join('')}</div>`:''}<div class="cap">${e.k}</div><h4>${e.t}</h4><div style="color:var(--muted)">${e.b}</div>${e.links.map(l=>`<button data-link="${l}">Open ${ents[l].k.toLowerCase()}: ${ents[l].t.slice(0,22)}…</button>`).join('')}</div>`}
+function drawF(){const box=$('#spanes');
+ if(fmode==='stack'){box.innerHTML=fopen.map(id=>paneHtml(id,false)).join('');$('#fcount').textContent=fopen.length?fopen.length+' windows open':'';$('#noteF').innerHTML=fopen.length>2?`<b>${fopen.length} windows, and the list has shrunk to a sliver.</b> Which one is current? Where did you start?`:'<b>Today.</b> Each click or link adds a window; they pile up beside the list.';}
+ else{const id=ftrail[ftrail.length-1];box.innerHTML=id?paneHtml(id,true):'';$('#fcount').textContent=id?'1 window':'';$('#noteF').innerHTML=id?'<b>One slot.</b> The trail shows where you came from; Back or Esc goes one step back, a second Esc closes. A new list click replaces the slot.':'<b>Proposed.</b> Click a row: it opens in the single slot at the right.'}
+ $$('.sitem').forEach(b=>b.classList.toggle('cur',fmode==='slot'?ftrail[ftrail.length-1]===b.dataset.id:fopen.includes(b.dataset.id)));
+ $$('[data-link]',box).forEach(b=>b.onclick=()=>openF(b.dataset.link,true));$$('[data-trail]',box).forEach(b=>b.onclick=()=>{ftrail=ftrail.slice(0,+b.dataset.trail+1);drawF()})}
+function openF(id,fromInside){if(fmode==='stack'){if(!fopen.includes(id))fopen.push(id);fopen=fopen.slice(-4)}else{fromInside?ftrail.push(id):ftrail=[id]}drawF()}
+$$('.sitem').forEach(b=>b.onclick=()=>openF(b.dataset.id,false));
+$$('[data-f]').forEach(b=>b.onclick=()=>{fmode=b.dataset.f;fopen=[];ftrail=[];$$('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawF()});
+$('#fclear').onclick=()=>{fopen=[];ftrail=[];drawF()};drawF();
+window.lab.setF=(m,seq)=>{fmode=m;fopen=[];ftrail=[];$$('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f===m));seq.forEach((id,i)=>openF(id,m==='slot'&&i>0));};
+</script>
