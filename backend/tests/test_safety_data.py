@@ -310,3 +310,126 @@ def test_the_last_backup_and_refusals_are_read_from_the_security_log(
     assert page["backup"]["last_backup_at"] is not None
     assert page["access"]["refused_24h"] == 1
     assert next(s for s in page["stores"] if s["id"] == "log")["count"] == 3
+
+
+class _NeedsKey(Connector):
+    requires_key = True
+    configured = False
+
+    async def search(self, query: str):
+        raise RuntimeError("no key")
+
+
+def test_a_search_the_app_stops_for_want_of_a_key_is_blocked_not_counted_as_sent():
+    registry.register("opensanctions", _NeedsKey())
+    try:
+        inv = _inv("No key")
+        assert (
+            client.post(
+                "/api/connectors/opensanctions/search",
+                json={"investigation_id": inv, "query": "Quay"},
+            ).status_code
+            == 502
+        )
+        page = ok(
+            client.get(
+                f"/api/investigations/{inv}/safety-data", params={"period": "all"}
+            )
+        )
+        assert [(r["outcome"], r["value"]) for r in page["outbound"]] == [
+            ("blocked", "Quay")
+        ]
+        assert (
+            page["totals"]["requests_left"] == 0
+            and page["totals"]["services_reached"] == 0
+        )
+        state = {s["id"]: s for s in page["services"]}
+        assert (
+            state["opensanctions"]["state"] == "off"
+        ), "a key-requiring service without a key can send nothing"
+        assert (
+            state["firecrawl"]["state"] == "on_request"
+        ), "a service that works without a key is not off for want of one"
+    finally:
+        registry.register("opensanctions", Sanctions())
+
+
+def test_a_failed_model_call_is_marked_failed_and_history_does_not_depend_on_the_current_setting(
+    monkeypatch,
+):
+    import app.ai.reasoning as reasoning
+    from app.core.config import settings
+
+    class Down(_FakeModel):
+        def generate(self, *a, **k):
+            raise RuntimeError("timeout")
+
+    inv = _ask_the_ai(monkeypatch, "anthropic")
+    monkeypatch.setattr(reasoning, "get_llm_client", lambda *a, **k: Down())
+    from app.ai.governor import governor
+
+    governor.reset()
+    client.post(
+        f"/api/investigations/{inv}/assistant/case-synthesis",
+        json={"question": "Again?"},
+    )
+    monkeypatch.setattr(settings, "ai_provider", "ollama")
+    monkeypatch.setattr(settings, "ollama_model", "llama3")
+    page = ok(client.get(f"/api/investigations/{inv}/safety-data"))
+    assert sorted(r["outcome"] for r in page["outbound"]) == ["failed", "sent"]
+    ai = next(s for s in page["services"] if s["id"] == "ai")
+    assert ai["sent_count"] == 2 and ai["sends"] == [
+        "case text"
+    ], "outside calls stay on the screen after switching to a local model"
+
+
+def test_every_logged_row_is_returned_and_the_prompt_text_is_not_cut():
+    inv = _inv("Many")
+    long = "x" * 6000
+    with SessionLocal() as db:
+        for i in range(520):
+            db.add(
+                OutboundRequest(
+                    investigation_id=inv,
+                    service="aleph",
+                    kind="search text",
+                    value=long if i == 0 else f"n{i}",
+                )
+            )
+        db.commit()
+    page = ok(
+        client.get(f"/api/investigations/{inv}/safety-data", params={"period": "all"})
+    )
+    assert len(page["outbound"]) == page["outbound_total"] == 520
+    assert any(len(r["value"]) == 6000 for r in page["outbound"])
+
+
+def test_persisted_users_make_the_case_reachable_beyond_this_computer():
+    import uuid
+
+    from app.models.domain import AppUser
+
+    inv = _inv("Users")
+    assert (
+        ok(client.get(f"/api/investigations/{inv}/safety-data"))["access"]["mode"]
+        == "local_only"
+    )
+    with SessionLocal() as db:
+        db.add(
+            AppUser(
+                display_name="Reporter",
+                global_role="member",
+                token_digest=uuid.uuid4().hex * 2,
+            )
+        )
+        db.commit()
+    try:
+        assert (
+            ok(client.get(f"/api/investigations/{inv}/safety-data"))["access"]["mode"]
+            == "remote"
+        )
+    finally:
+        with SessionLocal() as db:
+            for u in db.query(AppUser).filter_by(display_name="Reporter"):
+                db.delete(u)
+            db.commit()

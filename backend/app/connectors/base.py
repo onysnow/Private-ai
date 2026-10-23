@@ -25,6 +25,9 @@ def entity_sent_value(caption: str | None, properties: dict | None) -> str:
 
 
 class Connector(ABC):
+    # True when the service refuses (or the connector will not send) a request without a key; then nothing leaves until one is stored.
+    requires_key: bool = False
+
     @abstractmethod
     async def search(self, query: str) -> list[ExternalFinding]: ...
 

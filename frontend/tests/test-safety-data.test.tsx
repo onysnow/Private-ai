@@ -51,6 +51,11 @@ describe('the helpers', () => {
     expect([ago(null, now), ago('2026-10-23T01:00:00Z', now), ago('2026-10-22T01:00:00Z', now), ago('2026-10-20T01:00:00Z', now)]).toEqual(['never', 'today', 'yesterday', '3 days ago']);
     expect([bytesInWords(900), bytesInWords(4_100_000), bytesInWords(1_400_000_000)]).toEqual(['900 B', '4.1 MB', '1.4 GB']);
   });
+  it('keeps a formula-looking value as text in the CSV', () => {
+    const csv = logCsv([row('a', 'opensanctions', '=HYPERLINK("http://x")') as never, row('b', 'opensanctions', '-2+3') as never]);
+    expect(csv).toContain(`"'=HYPERLINK(""http://x"")"`);
+    expect(csv).toContain(`"'-2+3"`);
+  });
   it('writes the log as CSV with quotes doubled', () => {
     const csv = logCsv([row('a', 'opensanctions', 'say "hi"') as never]);
     expect(csv.split('\n')[0]).toContain('"value sent"');
@@ -91,6 +96,16 @@ describe('Safety & data', () => {
     expect(api.lastUrl('GET /api/investigations/inv-1/safety-data').searchParams.get('period')).toBe('30d');
     fireEvent.click(screen.getByRole('button', {name: /Firecrawl: OFF/}));
     expect(await screen.findByText('Nothing has been sent to that service in this period.')).toBeTruthy();
+  });
+
+  it('keeps what a service was sent in the period even when its key has since been removed', async () => {
+    show({services: PAGE().services.map(x => (x.id === 'firecrawl' ? {...x, sent_count: 4, sends: ['search text']} : x))});
+    expect(await screen.findByRole('button', {name: /Firecrawl: OFF\. search text · 4/})).toBeTruthy();
+  });
+
+  it('does not say nothing left when the period has no logged requests, only that none are logged', async () => {
+    show({totals: {requests_left: 0, services_reached: 0, documents_sent_out: 0, ai_calls_outside: 0}, outbound: [], outbound_total: 0});
+    expect(await screen.findByText('◉ no requests logged in this period')).toBeTruthy();
   });
 
   it('points the cards at the tabs that do the work', async () => {

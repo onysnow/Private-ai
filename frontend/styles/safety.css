@@ -76,9 +76,10 @@
 .sd-btn.danger { border-color: var(--status-disputed); color: var(--status-disputed); }
 .sd-btn:disabled { opacity: .5; cursor: not-allowed; }
 .sd[data-checking] .sd-tiles dd, .sd[data-checking] .sd-count { opacity: .6; }
-@media (max-width: 1100px) { .sd { height: auto; overflow: visible; } .sd-grid { grid-template-columns: 1fr; } .sd-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sd-diagram { grid-template-columns: 1fr; gap: 10px; } }
+@media (max-width: 1100px) { .sd { height: 100%; overflow: auto; } .sd-grid { grid-template-columns: 1fr; } .sd-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sd-diagram { grid-template-columns: 1fr; gap: 10px; } }
 
 .sd-box > span:not(.sd-state) { display: none; }
 .sd-service:hover .sd-box > span:not(.sd-state), .sd-box:focus-visible > span:not(.sd-state) { display: block; }
 .sd-services { align-content: start; }
 .sd-map { overflow: hidden; }
+@media (max-width: 1100px) { .sd-map { overflow: visible; } .sd-rows { max-height: 60vh; } }

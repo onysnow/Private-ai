@@ -5,6 +5,7 @@ from app.core.config import settings
 
 
 class OpenSanctionsConnector(Connector):
+    requires_key = True
     """OpenSanctions FtM search and query-by-example enrichment adapter."""
 
     def __init__(self, api_key: str | None = None):

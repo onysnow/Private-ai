@@ -15,12 +15,12 @@ from sqlalchemy.orm import Session
 
 from app.ai.llm_client import is_local_endpoint
 from app.ai.reasoning import ai_reasoning_status
-from app.connectors.registry import CONNECTOR_SPECS
+from app.connectors.registry import CONNECTOR_SPECS, registry
 from app.core.audit_log import parse_audit_timestamp
 from app.core.config import settings
 from app.core.time import utcnow_naive
 from app.models.domain import (
-    Claim, Document, DocumentCorpusSync, Entity, Evidence, Investigation, OutboundRequest, RelationshipEdge, Source,
+    AppUser, Claim, Document, DocumentCorpusSync, Entity, Evidence, Investigation, OutboundRequest, RelationshipEdge, Source,
 )
 from app.services.lifecycle import preview_orphan_document_files
 from app.services.security import resolve_storage_root
@@ -93,10 +93,13 @@ def _services(db: Session, investigation_id: str, counts: dict[str, dict[str, An
     out: list[dict[str, Any]] = []
     for provider in CONNECTOR_SPECS:
         has_key = bool(connector_credential_status(provider)["configured"])
+        needs_key = bool(getattr(registry.get(provider), "requires_key", False))
         c = counts.get(provider, {"n": 0, "kinds": []})
         out.append({
             "id": provider, "name": SERVICE_NAMES.get(provider, provider.capitalize()), "about": SERVICE_ABOUT.get(provider, ""),
-            "state": "on_request" if has_key else "off", "state_note": "Only when you press it" if has_key else "No key stored: nothing can be sent",
+            "state": "off" if needs_key and not has_key else "on_request",
+            "state_note": "No key stored: nothing can be sent" if needs_key and not has_key
+            else ("Only when you press it" if has_key else "Works without a key: only when you press it"),
             "sent_count": c["n"], "sends": c["kinds"], "where": "outside",
         })
     local = is_local_endpoint(settings.openaleph_base_url)
@@ -115,12 +118,18 @@ def _services(db: Session, investigation_id: str, counts: dict[str, dict[str, An
         state, note = "local", "A model on this computer"
     else:
         state, note = "on_request", "Only when you run it"
-    ai_counts = counts.get(f"ai:{provider}", {"n": 0, "kinds": []}) if provider else {"n": 0, "kinds": []}
+    # What went to any outside model in the period, whatever the settings are now.
+    ai_counts: dict[str, Any] = {"n": 0, "kinds": []}
+    for service, c in counts.items():
+        if service.startswith("ai"):
+            ai_counts["n"] += c["n"]
+            ai_counts["kinds"] += [k for k in c["kinds"] if k not in ai_counts["kinds"]]
     out.append({
         "id": "ai", "name": "Outside AI" if not runs_here else "Private AI", "about": f"{provider} {ai['model'] or ''}".strip() or "No model chosen",
-        "state": state, "state_note": note, "sent_count": 0 if runs_here else ai_counts["n"], "sends": [] if runs_here else ai_counts["kinds"],
+        "state": state, "state_note": note, "sent_count": ai_counts["n"], "sends": ai_counts["kinds"],
         "where": "inside" if runs_here else "outside",
-        "blocked_note": None if runs_here or provider in ("anthropic", "openai") or not provider else "Outside models are not allowed on this server",
+        "blocked_note": None if runs_here or provider in ("anthropic", "openai") or not provider or settings.ai_allow_remote_endpoint
+        else "Outside models are not allowed on this server",
     })
     return out
 
@@ -145,6 +154,7 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
     paths = [row for row in db.scalars(select(Document.storage_path).where(Document.investigation_id == investigation_id)) if row]
     doc_bytes = sum(_file_bytes(p, root) for p in paths)
     audit = _audit_facts(investigation_id)
+    persisted_users = int(db.scalar(select(func.count()).select_from(AppUser).where(AppUser.disabled == False)) or 0)  # noqa: E712
 
     stmt = select(OutboundRequest).where(OutboundRequest.investigation_id == investigation_id)
     if since is not None:
@@ -160,7 +170,8 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
     services = _services(db, investigation_id, per_service)
 
     remote_openaleph = settings.openaleph_enabled and not is_local_endpoint(settings.openaleph_base_url)
-    docs_out = count(DocumentCorpusSync, DocumentCorpusSync.status == "synced") if remote_openaleph else 0
+    synced = (DocumentCorpusSync.status == "synced") if since is None else ((DocumentCorpusSync.status == "synced") & (DocumentCorpusSync.synced_at >= since))
+    docs_out = count(DocumentCorpusSync, synced) if remote_openaleph else 0
     ai_out = sum(1 for r in left if r.service.startswith("ai"))
     reached = sorted({r.service for r in left})
 
@@ -175,7 +186,9 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
     words = sum(1 for r in left if not r.service.startswith("ai"))
     exposure = (f"This case has sent {words} {'item' if words == 1 else 'items'} to {len(names)} {'service' if len(names) == 1 else 'services'}"
                 f" ({', '.join(names)}) and {ai_out} {'request' if ai_out == 1 else 'requests'} to an outside AI." if left
-                else "Nothing from this case has left this computer in this period.")
+                else "No request from this case is logged as leaving this computer in this period. Calls made before the log began, and traffic to OpenAleph, are not in it.")
+    if docs_out:
+        exposure += f" {docs_out} {'document was' if docs_out == 1 else 'documents were'} also synced to OpenAleph at {settings.openaleph_base_url}."
 
     return {
         "period": period,
@@ -198,11 +211,11 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
         "services": services,
         "backup": {"last_backup_at": audit["last_backup_at"].isoformat() if audit["last_backup_at"] else None, "encrypted": False,
                    "restore_enabled": bool(settings.enable_restore_api)},
-        "access": {"mode": "remote" if (settings.api_auth_token.strip()) else "local_only", "refused_24h": audit["refused_24h"],
+        "access": {"mode": "remote" if (settings.api_auth_token.strip() or persisted_users) else "local_only", "refused_24h": audit["refused_24h"],
                    "log_readable": audit["readable"]},
         "housekeeping": {"stray_files": orphan_files, "stray_bytes": orphan_bytes},
         "outbound": [{"id": r.id, "at": r.at.isoformat(), "service": r.service, "service_name": SERVICE_NAMES.get(r.service, r.service),
                       "kind": r.kind, "value": r.value, "reason": r.reason, "actor": r.actor, "leaves_computer": r.leaves_computer,
-                      "outcome": r.outcome, "source": r.source} for r in rows[:500]],
+                      "outcome": r.outcome, "source": r.source} for r in rows],
         "outbound_total": len(rows),
     }

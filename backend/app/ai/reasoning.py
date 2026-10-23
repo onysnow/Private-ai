@@ -33,7 +33,7 @@ from app.ai.governor import governor
 from app.ai.run_events import RunRecorder, instructions_in_packet, record_thoughts, run_events
 from app.ai.quote_check import check_presentation_quotes, prompt_record_texts
 from app.ai.writing_check import check_presentation_writing
-from app.services.outbound import record_model_call
+from app.services.outbound import mark_outbound_failed, record_model_call
 from app.ai.llm_client import LLMConfigurationError, coerce_response, get_llm_client, is_local_endpoint
 from app.core.authorization import current_authorization_scope, ensure_scope_can_mutate_ids
 from app.core.config import Settings, settings as default_settings
@@ -808,6 +808,18 @@ def _chart_retry_feedback(db: Session, investigation_id: str, module: str, raw_t
     return retry_feedback(report), report
 
 
+def _model_leaves_computer(client: Any) -> bool:
+    """Whether this call's prompt goes off this computer. An Ollama adapter says where the model really runs (/api/show: a
+    cloud model behind a local address still leaves); a model that cannot say is judged by the settings, and a failure to ask counts as leaving."""
+    describe = getattr(client, "describe_model", None)
+    if callable(describe):
+        try:
+            return describe().get("local") is not True
+        except Exception:
+            return True
+    return ai_reasoning_status(default_settings).get("runs_on_this_computer") is not True
+
+
 def run_reasoning_module(db: Session, *, investigation_id: str, run_id: str | None = None, **kwargs: Any) -> AIAnalysisCandidate:
     """Run one reasoning module (see _run_reasoning_module) and keep its run record: with a run id (the job it was
     queued as) every step is appended to ai_run_events as it happens (ADR-0012, mockup AI_1)."""
@@ -956,10 +968,14 @@ def _run_reasoning_module(
         model_start = rec.emit("CHECK", "model", status="neutral", parent=retrieved, verdict="STARTED",
                                text=f"Model call: {(settings.ai_provider or '').strip()} {getattr(client, 'model', '') or ''}".strip())
         started_at = utcnow_naive()
-        record_model_call(db, investigation_id, provider=(settings.ai_provider or "").strip().lower(), model=getattr(client, "model", "") or "",
-                          module_title=MODULE_TITLES.get(module, module), records=len(packet.get("citations", [])), prompt_chars=len(system_prompt) + len(user_prompt),
-                          leaves_computer=ai_reasoning_status(settings).get("runs_on_this_computer") is not True, run_id=rec.run_id)
-        response = coerce_response(client.generate(system_prompt, user_prompt, **generate_kwargs))
+        sent_id = record_model_call(db, investigation_id, provider=(settings.ai_provider or "").strip().lower(), model=getattr(client, "model", "") or "",
+                                    module_title=MODULE_TITLES.get(module, module), records=len(packet.get("citations", [])),
+                                    prompt_chars=len(system_prompt) + len(user_prompt), leaves_computer=_model_leaves_computer(client), run_id=rec.run_id)
+        try:
+            response = coerce_response(client.generate(system_prompt, user_prompt, **generate_kwargs))
+        except Exception:
+            mark_outbound_failed(db, sent_id)
+            raise
         seconds = round((utcnow_naive() - started_at).total_seconds(), 1)
         model_end = rec.emit("CHECK", "model", status="bad" if response.truncated else "good", parent=model_start,
                              verdict="TRUNCATED" if response.truncated else "ANSWERED",
@@ -982,11 +998,14 @@ def _run_reasoning_module(
                 chart_retries.append({"attempt": attempt, "removed": (retry_report or {}).get("removed", []), "feedback": feedback})
                 model_end = rec.emit("CHECK", "gate:chart", status="partial", parent=model_end, verdict="RETRY",
                                      text=f"A chart failed the chart check; sent back to the model (attempt {attempt})")
-                record_model_call(db, investigation_id, provider=(settings.ai_provider or "").strip().lower(), model=getattr(client, "model", "") or "",
-                                  module_title=f"{MODULE_TITLES.get(module, module)} (sent back after a chart check)", records=len(packet.get("citations", [])),
-                                  prompt_chars=len(system_prompt) + len(user_prompt) + len(feedback),
-                                  leaves_computer=ai_reasoning_status(settings).get("runs_on_this_computer") is not True, run_id=rec.run_id)
-                response = coerce_response(client.generate(system_prompt, f"{user_prompt}\n\n{feedback}", **generate_kwargs))
+                retry_id = record_model_call(db, investigation_id, provider=(settings.ai_provider or "").strip().lower(), model=getattr(client, "model", "") or "",
+                                             module_title=f"{MODULE_TITLES.get(module, module)} (sent back after a chart check)", records=len(packet.get("citations", [])),
+                                             prompt_chars=len(system_prompt) + len(user_prompt) + len(feedback), leaves_computer=_model_leaves_computer(client), run_id=rec.run_id)
+                try:
+                    response = coerce_response(client.generate(system_prompt, f"{user_prompt}\n\n{feedback}", **generate_kwargs))
+                except Exception:
+                    mark_outbound_failed(db, retry_id)
+                    raise
 
     request = {
         "question": question,

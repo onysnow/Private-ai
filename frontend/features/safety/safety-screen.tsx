@@ -33,7 +33,8 @@ export function ago(iso: string | null | undefined, now = new Date()): string {
 
 /** The log as a comma-separated table for a source-protection file (research §14: "Export log"). */
 export function logCsv(rows: OutboundRequestOut[]): string {
-  const cell = (v: string) => `"${v.replace(/"/g, '""')}"`;
+  // A cell that starts with = + - @ (or a tab or return) would be run as a formula by a spreadsheet: a ' first keeps it as text.
+  const cell = (v: string) => `"${(/^[=+\-@\t\r]/.test(v) ? `'${v}` : v).replace(/"/g, '""')}"`;
   const head = ['time', 'service', 'kind of value', 'value sent', 'why', 'who started it', 'left this computer', 'result'];
   return [head, ...rows.map(r => [r.at, r.service_name, r.kind, r.value, r.reason, r.actor === 'you' ? 'you' : 'automatic', r.leaves_computer ? 'yes' : 'no', r.outcome])]
     .map(line => line.map(cell).join(',')).join('\n');
@@ -73,7 +74,7 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
         <h2 className="sd-title">What lives on <em>this computer</em>, and what leaves it</h2>
         <p className="sd-sub">{caseName ? `${caseName} · ` : ''}{data.exposure}{stale}</p>
       </div>
-      <span className={`sd-chip${nothingLeft ? '' : ' sd-chip-out'}`}>{nothingLeft ? '◉ nothing has left this computer' : `↗ ${t.requests_left} left in this period`}</span>
+      <span className={`sd-chip${nothingLeft ? '' : ' sd-chip-out'}`}>{nothingLeft ? '◉ no requests logged in this period' : `↗ ${t.requests_left} left in this period`}</span>
     </header>
 
     <div className="sd-grid">
@@ -105,9 +106,9 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
           </div>
           <ul className="sd-services" aria-label="Services this case can reach">
             {data.services.map(s => {
-              const line = s.where === 'inside' ? '' : s.state === 'off' ? 'nothing sent' : s.sent_count ? `${s.sends.join(', ')} · ${s.sent_count}` : 'never used';
+              const line = s.sent_count ? `${s.sends.join(', ')} · ${s.sent_count}` : s.where === 'inside' ? '' : s.state === 'off' ? 'nothing sent' : 'never used';
               return <li key={s.id} className={`sd-service sd-${s.state}${only === s.id ? ' picked' : ''}`}>
-                <span className="sd-line" aria-hidden="true">{s.blocked_note ? <i>✕ blocked</i> : <i>{line}</i>}</span>
+                <span className="sd-line" aria-hidden="true">{s.blocked_note && !s.sent_count ? <i>✕ blocked</i> : <i>{line}</i>}</span>
                 <button type="button" className="sd-box" aria-pressed={only === s.id}
                   onClick={() => setOnly(only === s.id ? null : s.id)}
                   aria-label={`${s.name}: ${STATE[s.state]}. ${line || s.state_note}. ${s.sent_count ? 'Show its requests in the log.' : ''}`}>
@@ -135,7 +136,7 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
         <div className="sd-logbar">
           <select aria-label="Service" value={only ?? ''} onChange={e => setOnly(e.target.value || null)}>
             <option value="">All services</option>
-            {data.services.filter(s => s.where === 'outside').map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            {data.services.filter(s => s.where === 'outside' || s.sent_count > 0).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
           <span className="sd-count">{rows.length} of {data.outbound_total}</span>
           <button type="button" className="sd-btn" disabled={!rows.length} onClick={() => {
