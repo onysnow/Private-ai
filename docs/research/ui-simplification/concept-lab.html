@@ -100,10 +100,27 @@ section.demo p.why{margin:0 0 8px;color:var(--muted);max-width:75ch}
 .cbar.show{transform:translate(-50%,0);opacity:1}
 .cbar .n{font:600 12px var(--mono);color:var(--accent);margin-right:6px;white-space:nowrap}.cbar button{white-space:nowrap}
 @media (max-width:640px){.rec{grid-template-columns:1fr auto;}.rec .d{grid-column:1/-1}.lv{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}.recs .rrow{grid-template-columns:1fr auto}.recs .rrow span:nth-child(2),.recs .rrow span:nth-child(3){display:none}.room .cols{grid-template-columns:1fr}.stage{height:auto;min-height:430px}.peek{left:12px;right:12px;width:auto}.lrow{grid-template-columns:22px 1fr auto}.lrow .rb{display:none}.cbar{flex-wrap:wrap;width:calc(100% - 16px);justify-content:center}h1{font-size:21px}}
+
+/* F: one inspector slot */
+.slotwrap{display:flex;gap:10px;height:100%}
+.slist{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px;transition:flex-basis var(--std)}
+.sitem{display:grid;grid-template-columns:90px 1fr auto;gap:10px;align-items:center;background:var(--s2);border:1.5px solid rgb(111 138 163/.5);border-radius:9px;padding:7px 10px;font-size:13px;cursor:pointer;text-align:left;color:var(--text);min-height:36px}
+.sitem:hover{border-color:var(--accent2)}.sitem.cur{border-color:var(--accent);background:var(--s3)}
+.sitem .k{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.spanes{display:flex;gap:6px;flex:0 0 auto}
+.spane{width:250px;background:var(--s3);border:1.5px solid var(--accent2);border-radius:10px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:6px;overflow:hidden;animation:slidein var(--std) var(--ease)}
+@keyframes slidein{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+:root[data-calm] .spane{animation:none}
+.spane.one{width:340px;border-color:var(--accent)}
+.spane h4{margin:0;font-size:14px}
+.trail{display:flex;gap:4px;flex-wrap:wrap;font:500 11px var(--mono);color:var(--muted)}
+.trail button{padding:0 6px;min-height:22px;font:inherit;border-radius:6px}
+.mode{margin-left:auto;display:flex;gap:6px;align-items:center}
+.wcount{font:600 12px var(--mono);color:var(--accent)}
 </style>
 <div class="wrap">
 <h1>Simplification Concept Lab</h1>
-<p class="lede">Five ways to show less at once without losing anything. These are pictures to react to, not the app: Kestrel case data is fictional. Each one is set up so its animation tells you what changed, and each has a still-frame fallback.</p>
+<p class="lede">Six ways to show less at once without losing anything. These are pictures to react to, not the app: Kestrel case data is fictional. Each one is set up so its animation tells you what changed, and each has a still-frame fallback.</p>
 <div class="bar"><span class="cap">Motion</span><button id="calm" aria-pressed="false">Calm motion</button><span>Turns every animation here into an instant change, as the Workbench's own Calm motion does.</span></div>
 
 <section class="demo" id="A"><h2>A. The part you're on opens, the rest fold to a spine</h2>
@@ -135,6 +152,12 @@ section.demo p.why{margin:0 0 8px;color:var(--muted);max-width:75ch}
 <div class="ctl"><span class="lbl">Try</span><button data-e="0">Nothing selected</button><button data-e="1">Select one</button><button data-e="2">Select three</button></div>
 <div class="stage" id="stE"><div class="lib" id="lib"></div><div class="cbar" id="cbar"></div></div>
 <div class="note" id="noteE"></div></section>
+
+<section class="demo" id="F"><h2>F. One inspector slot instead of a stack of windows</h2>
+<p class="why">Today a click can open a drawer on top of a drawer on top of a panel. Here every "open this" goes to one slot at the right. A link inside it moves along a trail; Back returns. Switch the mode to compare.</p>
+<div class="ctl"><span class="lbl">Mode</span><button data-f="stack" aria-pressed="true">Today: each click adds a window</button><button data-f="slot">Proposed: one slot with a trail</button><button id="fclear">Clear</button><span class="wcount" id="fcount"></span></div>
+<div class="stage" id="stF"><div class="slotwrap"><div class="slist" id="slist"></div><div class="spanes" id="spanes"></div></div></div>
+<div class="note" id="noteF"></div></section>
 </div>
 <script>
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -201,4 +224,20 @@ $$('.lrow').forEach(r=>r.onclick=()=>{const i=+r.dataset.i;sel.has(i)?sel.delete
 $$('[data-e]').forEach(b=>b.onclick=()=>{sel=new Set(+b.dataset.e===0?[]:+b.dataset.e===1?[2]:[0,2,3]);drawE()});drawE();
 /* capture hook */
 window.lab={setA,evA,setB,setC,setD,setE:n=>{sel=new Set(n===0?[]:n===1?[2]:[0,2,3]);drawE()}};
+
+/* F */
+const ents={c:{k:'Claim',t:'Kestrel SA paid 681,000 USD to Tanore Finance',b:'Supported · 2 sources · likely',links:['s','f']},s:{k:'Source',t:'Court judgment p.18 §3',b:'Tier B · authentic · quote at lines 12–14',links:['f']},f:{k:'File',t:'Payments.csv',b:'Locked 7f31…c0aa · 84 rows read · hash matches',links:[]},g:{k:'Flag',t:'Round-trip payments BO-033',b:'Strong · indicator, not a finding',links:['c']}};
+let fmode='stack',fopen=[],ftrail=[];
+$('#slist').innerHTML=Object.entries(ents).map(([id,e])=>`<button class="sitem" data-id="${id}"><span class="k">${e.k}</span><span>${e.t}</span><span class="chip">${e.b.split(' · ')[0]}</span></button>`).join('');
+function paneHtml(id,one){const e=ents[id];return `<div class="spane ${one?'one':''}">${one?`<div class="trail">${ftrail.map((t,i)=>`<button data-trail="${i}">${ents[t].k}</button>${i<ftrail.length-1?'›':''}`).join('')}</div>`:''}<div class="cap">${e.k}</div><h4>${e.t}</h4><div style="color:var(--muted)">${e.b}</div>${e.links.map(l=>`<button data-link="${l}">Open ${ents[l].k.toLowerCase()}: ${ents[l].t.slice(0,22)}…</button>`).join('')}</div>`}
+function drawF(){const box=$('#spanes');
+ if(fmode==='stack'){box.innerHTML=fopen.map(id=>paneHtml(id,false)).join('');$('#fcount').textContent=fopen.length?fopen.length+' windows open':'';$('#noteF').innerHTML=fopen.length>2?`<b>${fopen.length} windows, and the list has shrunk to a sliver.</b> Which one is current? Where did you start?`:'<b>Today.</b> Each click or link adds a window; they pile up beside the list.';}
+ else{const id=ftrail[ftrail.length-1];box.innerHTML=id?paneHtml(id,true):'';$('#fcount').textContent=id?'1 window':'';$('#noteF').innerHTML=id?'<b>One slot.</b> The trail shows where you came from; Back or Esc goes one step back, a second Esc closes. A new list click replaces the slot.':'<b>Proposed.</b> Click a row: it opens in the single slot at the right.'}
+ $$('.sitem').forEach(b=>b.classList.toggle('cur',fmode==='slot'?ftrail[ftrail.length-1]===b.dataset.id:fopen.includes(b.dataset.id)));
+ $$('[data-link]',box).forEach(b=>b.onclick=()=>openF(b.dataset.link,true));$$('[data-trail]',box).forEach(b=>b.onclick=()=>{ftrail=ftrail.slice(0,+b.dataset.trail+1);drawF()})}
+function openF(id,fromInside){if(fmode==='stack'){if(!fopen.includes(id))fopen.push(id);fopen=fopen.slice(-4)}else{fromInside?ftrail.push(id):ftrail=[id]}drawF()}
+$$('.sitem').forEach(b=>b.onclick=()=>openF(b.dataset.id,false));
+$$('[data-f]').forEach(b=>b.onclick=()=>{fmode=b.dataset.f;fopen=[];ftrail=[];$$('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawF()});
+$('#fclear').onclick=()=>{fopen=[];ftrail=[];drawF()};drawF();
+window.lab.setF=(m,seq)=>{fmode=m;fopen=[];ftrail=[];$$('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f===m));seq.forEach((id,i)=>openF(id,m==='slot'&&i>0));};
 </script>

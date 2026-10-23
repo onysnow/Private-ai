@@ -1,6 +1,8 @@
 # Simplifying the Workbench: showing less without hiding anything
 
-<p class="meta">Research for discussion · 23 Oct 2026 · branch <code>claude/site-simplification-ui-research-xiwlzs</code> · no app code was changed. Companion file: <code>concept-lab.html</code> (five animated sketches, referred to below as the Concept Lab).</p>
+<p class="meta">Research for discussion · 23 Oct 2026 · branch <code>claude/site-simplification-ui-research-xiwlzs</code> · no app code was changed. Companion file: <code>concept-lab.html</code> (six animated sketches, referred to below as the Concept Lab).</p>
+
+<p class="meta"><b>Update, same day (revision 2).</b> Added at your request: a look at North Star (nstarlive.com) in §5.7, the Awwwards data-visualization list in §5.8, and a section on fewer windows and layout in §7.5. The Wire is approved and is left out of every proposal; where it appears it is the model, not a target.</p>
 
 ## 0. The short version
 
@@ -12,11 +14,12 @@
 | What can be nested? | Rule versions and weights, entity-resolution audit, connector and OpenAleph internals, the 2,946-indicator catalogue beyond what the app actually computes (7 rules), per-run AI operating instructions, themes and effects, tokens and security logs. | §3, §7.2 |
 | How much at once? | Research gives no fixed number. Choice time grows with the log of the number of options (Hick), and people hold about four chunks (Cowan), not seven. So the useful move is grouping into few labelled groups at each level, not trimming a long flat list. | §4 |
 | How do we stop the overwhelm? | Four moves, used together: (1) fold what you are not on into a one-line **spine** that keeps its count and state; (2) give every record **four depths** (line, peek, opened in place, the room); (3) raise **actions only when something is selected**; (4) make long lists **zoomable** (groups, then rows, then records). | §7.4, Concept Lab |
+| How do we get rid of so many windows at once? | About 15 kinds of overlay become **four** (one inspector slot, a room, the command bar, a confirm), and the rule is **one thing open at a time**: a click replaces what is in the slot, a link inside it moves along a trail. Every screen then fits one of five layouts. | §7.5, Concept Lab F |
 | A complexity setting? For beginners? | Yes: one switch, three plain-word levels (**Less / Usual / Everything**), with a floor that cannot be turned off. Not a "Beginner/Expert" label. Folded things always say how many they hold. | §7.2 |
 | How would people know to turn it on? | Five ways, none silent: a question when the first case opens, a switch that is always in the top edge, a command in ⌘K, an **offer** (never an automatic change) when a screen is crowded, and "N folded · show" lines where something is hidden. | §7.3 |
 | Animation and event triggers? | Yes, with three rules from your own design notes and from what failed elsewhere: motion explains a change; an event may add attention but never hides or moves what you are on; values never animate (highlight a changed number, do not count it up). | §7.5 |
 
-**What I looked at.** The whole app (15 routes, 39 feature folders, 69 data tables, 284 endpoints), the Authority System Suite doctrine, your mockups and the Media Suite board. Then 40 screenshots of other products and design guidance, read as pictures, and a dozen research papers and guidelines (some only as abstracts, §9 says which).
+**What I looked at.** The whole app (15 routes, 39 feature folders, 69 data tables, 284 endpoints), the Authority System Suite doctrine, your mockups and the Media Suite board. Then about 50 screenshots and video frames of other products and design guidance, read as pictures, and a dozen research papers and guidelines (some only as abstracts, §9 says which).
 
 **The one finding that shaped everything.** The overload is mostly not the number of features. It comes from the same navigation shown in four places, from older screens that are still stacked forms (Library, Relationships, Claims, Connectors), and from screens that ask for every decision at the shallowest layer. Your newer screens (Case home, Decide, Red Flags, Money, Story) already follow the right pattern; the work is to carry that pattern to the rest and add one setting on top.
 
@@ -41,7 +44,7 @@ Screen counts below are static counts of controls in the code (buttons, inputs, 
 <div class="b"><span>Act › Red Flags</span><i style="width:62%"></i><em>50–80</em></div>
 <div class="b"><span>Case home</span><i style="width:58%"></i><em>55–75</em></div>
 <div class="b"><span>Act › Story</span><i style="width:58%"></i><em>45–75</em></div>
-<div class="b"><span>See › The Wire</span><i style="width:54%"></i><em>40–70</em></div>
+<div class="b"><span>See › The Wire (approved)</span><i style="width:54%"></i><em>40–70</em></div>
 <div class="b"><span>Act › AI runs / Watch</span><i style="width:54%"></i><em>40–70</em></div>
 <div class="b"><span>Bring in › The Drop</span><i style="width:46%"></i><em>35–60</em></div>
 <div class="b"><span>Check › Claims</span><i style="width:42%"></i><em>35–55</em></div>
@@ -89,6 +92,7 @@ The top of the list is not what you would guess from the mockups. The four heavi
 7. **Many kinds of overlay.** About 15 kinds of dialog, drawer, sheet and takeover: four Radix dialogs, two `role="dialog"` takeovers, four different drawers (plan, one-thought, Wire, custody), a sheet and a pending-conflict dialog. Only two places use the shared Tabs component; every other tab set is hand-built, so behaviour will differ (my inference from the code).
 8. **No setting and no tour.** There is no Simple/Advanced, density or beginner switch, no tutorial, and "Practise" is a disabled button. The edge-hiding frame is the only built-in complexity device, and it hides navigation, not content.
 9. **The Media Suite board overwhelms for a different reason.** It is a board of boards: 9 top tabs, then 9 numbered chips in the first tab alone, then a numbered-notes switch, a theme switch, a Full/Calm switch, a search bar and a "Safe review" pill, before the product screen starts. In headless Chromium at 1440×900 I counted 58 buttons, tabs and links rendered on first load (some below the fold). The screen inside (the Shelf) is dense by design: 7 steps per file, three columns, a problems filter and a run button.
+10. **Windows pile up because every kind of detail opens its own container.** Counting regions (a bordered area with its own heading or controls) in the images: Case home mockup 11, Red Flags mockup 7, the Media Suite Shelf 7 or more. On top of that, a click on a claim, a source, a file or a flag can each open a different drawer, so a user can hold three or four windows beside a list that has shrunk to a sliver (Concept Lab F reproduces this). The cause is that nothing says "one at a time".
 
 <figure><img src="fig/media-suite.jpg"><figcaption><b>Our own Media Suite board, first view.</b> The scaffolding (tabs, chips, switches) competes with the screen it is presenting. The Shelf inside already uses good moves (dots instead of words for steps, "Problems first", counts in a side column), but it shows all seven steps for every file at once.</figcaption></figure>
 
@@ -132,7 +136,7 @@ I read each of these as an abstract, an excerpt or the page itself; §9 gives th
 <tr><td><b>Hick's law</b> (as summarised across several UX sources; the law is Hick and Hyman, 1950s)</td><td>Decision time rises with the logarithm of the number of options: each added option costs less than the last. The sources agree no fixed cut-off (such as "7 items") follows from it.</td><td>Trimming a flat list from 40 to 35 buys almost nothing. Grouping into a few named groups does. Design for few groups per level.</td></tr>
 <tr><td><b>Cowan 2001</b>, "The magical number 4"</td><td>Working-memory capacity is about three to five chunks, not Miller's seven; Miller himself stressed chunking.</td><td>Aim at about four things competing for attention in any one region of the screen, each a chunk with a name.</td></tr>
 <tr><td><b>Nielsen Norman Group</b>, Progressive Disclosure</td><td>Putting something on the first screen signals that it matters. Get the primary/secondary split right: what users need often goes first, the primary list must not be long, and the step to the second level must be obvious. Research does not support the worry that a limited first view harms understanding.</td><td>The first level is a promise about importance. The way down must always be visible (a labelled spine, a "N more" line), not hidden behind hover only.</td></tr>
-<tr><td><b>Shneiderman 1996</b>, "The Eyes Have It"</td><td>Overview first, zoom and filter, then details on demand; plus relate, history, extract.</td><td>The Wire already has altitude. The same shape is missing from Decide, Library, Claims and Timeline.</td></tr>
+<tr><td><b>Shneiderman 1996</b>, "The Eyes Have It"</td><td>Overview first, zoom and filter, then details on demand; plus relate, history, extract.</td><td>The Wire already has altitude and is the model. The same shape is missing from Decide, Library, Claims and Timeline.</td></tr>
 <tr><td><b>Shneiderman 2002/03</b>, multi-layer interface design</td><td>Start users on a small feature set (layer 1) and let them climb. Examples worked through: a word processor with 8 layers, a map with 3.</td><td>The case for levels, and for few of them. The three levels here are Shneiderman layers with the floor added.</td></tr>
 <tr><td><b>Carroll &amp; Carrithers 1984</b>, "Training wheels" (Human Factors; CACM)</td><td>A word processor with error-prone and non-essential functions disabled taught new users faster; a control group spent almost a quarter of their time recovering from errors the blocked functions would have caused. A 1986 follow-up found trainees later did better on advanced tasks on the full system.</td><td>Hiding features can speed learning, and does not hurt later. It supports a "Less" level, and says the level should be a state people leave, not a place they live.</td></tr>
 <tr><td><b>Findlater &amp; McGrenere, CHI 2004</b>, static vs adaptive vs adaptable menus (27 participants)</td><td>People preferred menus they customised over menus the system adapted for them; adaptive menus were no faster, and automatic reshuffling can hurt spatial memory. Office 2000's personalised menus are the cited industry case.</td><td>The user sets the level. The app may offer; it may not silently reshape. This is the main reason for the "offer, never impose" rule in §7.3.</td></tr>
@@ -219,6 +223,37 @@ Your Library and Relationships panels sit nearer Photopea; the redesigned Case h
 
 - **Take:** this is the same logic as your floor. When something must not be skipped, make it a deliberate one-time step and then keep a quiet permanent reminder. Your "indicator, not a finding" line and the Strong/Textbook safety notice follow that pattern.
 
+### 5.7 North Star (nstarlive.com)
+
+North Star is a research platform for journalists, law enforcement and the public. Its home page lists nine "sectors" (camera globe, username research, crypto tracing, NetScan, Hawk for photo location, Skywave for radio, Linkscope, Catalogue for public registries, Watchtower) plus Cases, a link board. It is the closest product I found to ours in kind: many tools, lots of records, an investigative audience.
+
+**What I could see, and what I could not.** I looked at the public home page and its 54-second preview video (I took a frame every three seconds). I did not log in, so I have not seen the working panel at normal size; the video is stylised, with the screens tilted in 3D, so frames show structure, not exact density. I read the page's copy for what the tools do.
+
+<figure><img src="fig/nstar-hero.jpg"><figcaption><b>North Star home.</b> Eleven items in the header, one globe, four counted tiles (250,000+ cameras, Billions of data records, 45+ live feeds, 180M images).</figcaption></figure>
+
+<figure><img src="fig/nstar-sectors.jpg"><figcaption><b>The nine sectors as a list.</b> One line each with a chevron; each opens to about five named capabilities with a one-line explanation.</figcaption></figure>
+
+<figure><img src="fig/nstar-video.jpg"><figcaption><b>Frames from the preview video.</b> (1) "Choose your sector": one card per tool, one is entered at a time. (2) A camera opens in a single side panel. (3) and (4) a search result opens one inspector, closed with ESC; the same slot shows a domain record and a network record. (5) the wallet graph with a transaction timeline beneath it. (6) a small floating "Flow filters" card.</figcaption></figure>
+
+What it does that bears on layout and overload:
+
+- **A launcher, then one tool full screen.** Nine tools are never on screen together. "Choose your sector" is the only place they sit side by side.
+- **One inspector, closed with Esc.** Every kind of result (camera, domain, network, wallet) opens in the same right-hand slot. This is the pattern Concept Lab F proposes.
+- **Time as a drag window.** On the wallet graph you drag a window across the timeline; flows outside it fade and every panel recomputes. (The Wire already has an as-of rail, so this confirms the approach.)
+- **Small floating cards for filters** instead of a filter bar or a dialog.
+- **Expand by double-click, with a count.** Nodes expand to their next hop; the inspector shows "Counterparties (55)".
+- **Copy that matches your doctrine.** The page says Catalogue is "honest about what it cannot reach", so "nothing found is never confused with never looked"; that Hawk "tells you when it cannot tell", with "rejected", "insufficient texture" and "no reference imagery" kept as three different answers; that each subdomain "carries the sources that found it, so one confirmed twice reads differently from one merely guessed"; that smart case expansion marks "a finding the model cannot stand up … rather than quietly dropping it" and draws weak leads "and leaves them alone rather than chasing them". Those are your floor items 1, 9, 10 and 11 in a competitor's words.
+
+What to take: the launcher idea for the stage level (one stage at a time, already close to ours), the single inspector, the floating filter card, and the copy habit of naming the kind of "no". What to avoid: an 11-item header (ours shows stages and pages; the edges already hide them). What I cannot say: how North Star behaves at real data volumes, or whether its inspector stacks when you click from one result to another.
+
+### 5.8 The Awwwards data-visualization list
+
+I could not open `awwwards.com/websites/data-visualization/`: both the headless browser and `curl` were reset by the site, and the web archive copy would not load either. So I have not seen the list page or its ranking. From a search of that category I got these names with 2026 Site of the Day tags: Cerebrium (10 Sep 2026), Shift 5 (2 Mar), Vibrant Wellness (20 Feb), Farm Minerals (19 Feb) and Nfinite (7 Feb). The names and dates come from search snippets, so I did not confirm them on the list itself. I then opened each company's own site.
+
+<figure><img src="fig/awwwards-sites.jpg"><figcaption><b>Home pages of five sites from that category, plus North Star's Cases section (bottom right) for comparison.</b> Left to right, top to bottom: Cerebrium, Shift5, Vibrant Wellness (cookie banner covers it), Farm Minerals, Nfinite, North Star Cases.</figcaption></figure>
+
+These are brand and marketing sites. They show how to make data feel designed (a large type treatment, one number per card, a status index), not how to run a dense working tool, so they matter more for the website (SITE_1) and for how big numbers are set than for the stage screens. Two details are useful: Shift5's numbered "System Status" index set as plain monospaced lines, and Nfinite's floating mini-cards that show one number and a state word (a bar at 94%, tags such as Update, Missing, Add), which is the same idea as a spine carrying a count and a state. Awwwards pages are often mostly about motion and layout craft, so the list is worth another pass if you point me to the sites you liked; I would rather study those than guess.
+
 ## 6. Where we stand against these
 
 | Pattern | Seen at | In the Workbench today | Gap |
@@ -231,6 +266,8 @@ Your Library and Relationships panels sit nearer Photopea; the redesigned Case h
 | First-run offer | Datashare | Edge hint chips on first use | No tour or role question |
 | Not-skippable disclosure | ICIJ | Gates, "indicator, not a finding", type-to-confirm | Already strong |
 | Task list for readiness | GOV.UK | Story gates (5) | Gates live inside Story only |
+| One inspector, closed with Esc | North Star | Four kinds of drawer, a sheet and dialogs | Nothing says "one at a time" |
+| Launcher, then one tool | North Star, Resolve pages | Stages (close) | Stage pages still hold several panels |
 | Try before keep | (Appearance bar) | **Try, Keep, Compare in Appearance** | Reuse for detail levels |
 
 The Appearance "Try / Keep / Compare" bar is the most useful thing already built for this study: it is exactly the safe way to offer a detail level.
@@ -261,7 +298,7 @@ Name candidates: **Less / Usual / Everything.** Not "Beginner / Expert": I found
 <tr><td>Sources</td><td>Tier as a word (reliable / unclear)</td><td>Tier A–F</td><td>+ authenticity, restatement, four dates</td></tr>
 <tr><td>Red Flags</td><td>Flag, floor items, add to leads, set aside</td><td>+ picture it rests on, show in money</td><td>+ rule version, weight parts, detector, history</td></tr>
 <tr><td>Money</td><td>Columns or flow, "traced so far"</td><td>+ ledger, currency tabs</td><td>+ integrity checks, all rows</td></tr>
-<tr><td>The Wire</td><td>Around one party, top altitude</td><td>+ whole case, follow the money</td><td>+ path box, arrangements, as-of rail</td></tr>
+<tr><td>The Wire</td><td colspan="3">Unchanged. Approved as is, at every level.</td></tr>
 <tr><td>Outside lookups, OpenAleph</td><td>One search; findings arrive in Decide with provenance</td><td>Findings list</td><td>Enrichment sessions, xref, entity sets, corpus sync</td></tr>
 <tr><td>Entity resolution</td><td>Merge candidates in Decide</td><td>+ conflicts</td><td>+ audit, post-merge reconciliation</td></tr>
 <tr><td>AI runs</td><td>Ask, what leaves the computer, review</td><td>+ the plan</td><td>+ operating instructions, tier floor, devil's advocate</td></tr>
@@ -308,6 +345,8 @@ Pictures for A–E are in the Concept Lab frames below.
 | I | **Learn tells the truth.** Default filter "what the app checks" (7 rules); the rest labelled reference and checklist. | Learn | Filter chip | No finding hidden; it names what is not computed |
 | J | **Settings opens one group at a time** (it already has three: You, Cases, This computer) and starts at search. | Settings | Group opens in place; search highlights | n/a |
 | K | **Overlay rules.** Four kinds only: peek (hover), one side drawer at a time with a trail, a full room (Reading room, Custody), a dialog only for irreversible actions. | All | Opening a second drawer replaces the first with a slide, not a stack | n/a |
+| M | **One inspector slot.** Every "open this" (claim, source, file, flag, record) goes to one slot at the right; links inside it move along a trail; a new list click replaces it. | Library, Claims, Sources, Connectors, Red Flags, Leads | Slot content slides in (220 ms); Back or Esc goes one step back, a second Esc closes | Provenance one click away stays; slot never covers the list |
+| N | **Five layouts.** Board, list + slot, canvas + strip, room, index + pane (§7.5). | All screens except The Wire | Screens keep their layout when you move around; only the slot and the spines change | n/a |
 | L | **Keys on demand.** Show a key hint after the same mouse action three times; one `?` that lists the keys of the screen you are on. | All | Hint chip fades in once; "don't show again" | n/a |
 
 <figure><img src="fig/lab-A.jpg"><figcaption><b>Concept Lab A, four frames.</b> Claims open (top left). To check open, Claims folded to a spine that keeps its numbers (top right). Chain of custody open (bottom left). A file fails its hash check: the Chain of custody spine changes its own line to red and pulses twice while the reader stays where they were (bottom right).</figcaption></figure>
@@ -320,7 +359,48 @@ Pictures for A–E are in the Concept Lab frames below.
 
 <figure><img src="fig/lab-E.jpg"><figcaption><b>Concept Lab E, actions follow the selection (top to bottom).</b> Nothing selected: rows are lines. One selected: three single-file actions. Three selected: actions that work on a set, including Compare.</figcaption></figure>
 
-### 7.5 Animation and event triggers: a vocabulary
+### 7.5 Fewer windows at once
+
+You asked to get rid of the different windows so there are not so many at once. Two changes do most of it: a rule, and a short list of layouts.
+
+**The rule: one thing open at a time.** Three slots only:
+
+1. **Work**: the screen you are on.
+2. **Inspector**: one slot at the right. Anything you open from the work area lands here and replaces what was there. A link inside it moves along a trail (Claim › Source › File); Back or Esc goes one step back, a second Esc closes. It never stacks.
+3. **Transient**: a toast, an offer or a peek. It disappears on its own or when answered.
+
+Plus the **edges** (navigation and tools), which already hide. A room (Reading room, Chain of custody) takes over the whole screen and returns to the row you left.
+
+<figure><img src="fig/lab-F.jpg"><figcaption><b>Concept Lab F.</b> Top: how it works today in effect. Four clicks add four windows and the list shrinks to a sliver at the left. Bottom: the same clicks with one slot; the trail (Flag › Claim › Source) shows the way back.</figcaption></figure>
+
+**About 15 kinds of overlay become four.**
+
+<table>
+<tr><th>Today</th><th>Becomes</th></tr>
+<tr><td>Plan drawer, "One thought" drawer, The Wire's drawer, Chain-of-Custody drawer, old Red Flags detail drawer, Export sheet, the dossier's pending-conflict dialog</td><td><b>Inspector</b>: one slot. (The Wire's own drawer stays as built; it is approved.)</td></tr>
+<tr><td>Reading room, Chain of Custody full screen, Watch the run</td><td><b>Room</b>: full screen, Esc returns to the same row</td></tr>
+<tr><td>Command palette, Case switcher, New case, Shortcuts help, Inbox</td><td><b>Command bar</b>: one surface at the top. ⌘K searches and goes; ⌘O and New case are modes of it; `?` shows the keys of the screen you are on; the Inbox is a mode, not a window.</td></tr>
+<tr><td>Delete, overwrite, prune, restore, send</td><td><b>Confirm</b>: the only true dialog, typed confirmation as today</td></tr>
+</table>
+
+**Five layouts cover the screens.** (The Wire keeps its own.)
+
+<figure><img src="fig/layouts.jpg"><figcaption><b>Library today and proposed, and the five layouts.</b> Library today is schematic (from control counts and the BACKLOG). In the proposal the forms move into the slot and actions follow the selection. The five layouts: Board, List + slot, Canvas + strip, Room, Index + pane.</figcaption></figure>
+
+<table>
+<tr><th>Screen</th><th>Layout</th><th>What stops being a window</th></tr>
+<tr><td>Case home</td><td>Board</td><td>Nothing opens on top; modules open into the slot</td></tr>
+<tr><td>Library, Sources &amp; evidence, Claims, Connectors, Red Flags, Leads, Decide</td><td>List + slot</td><td>Bulk import, Stage relationship, Add relationship and similar forms become slot content; per-row buttons become hover and selection actions</td></tr>
+<tr><td>Money, Places, Timeline</td><td>Canvas + strip</td><td>Filters become floating cards on the strip, as in North Star</td></tr>
+<tr><td>Reading room, Chain of custody, Watch the run, AI plan</td><td>Room</td><td>The plan drawer and "one thought" drawer become slot content inside the room</td></tr>
+<tr><td>Settings, Learn, Keep</td><td>Index + pane</td><td>Settings opens one group at a time; Learn's three views become one pane with a switch</td></tr>
+</table>
+
+**Relationships versus The Wire.** The older Relationships panel (graph plus add-party and add-relationship forms) overlaps with The Wire, which you like and want kept as is. I have not touched either. The question is only whether the old panel's add forms and grid view should move into the Wire's own slot, so there is one place for links; see §8.
+
+**Rules that keep it honest.** The slot never covers the list row it came from; the floor items (status, level, provenance) are in the slot's header, not under a fold; opening from a keyboard (Enter) and closing (Esc) behave like a click; the inspector remembers its last width.
+
+### 7.6 Animation and event triggers: a vocabulary
 
 | Trigger | Response | Duration and curve | Reduced-motion fallback |
 |---|---|---|---|
@@ -337,14 +417,15 @@ Pictures for A–E are in the Concept Lab frames below.
 
 **Limits.** One automatic motion at a time. No motion longer than 450 ms. Nothing moves the thing you are reading. Every motion has a still frame (the Concept Lab's "Calm motion" button shows each one). Staged animation helped in Heer and Robertson's experiments but sometimes lengthened response time in a later study, so the lab keeps durations short.
 
-### 7.6 Order of work
+### 7.7 Order of work
 
 My estimate of size, not a measurement.
 
 | Step | What | Size | Why this order |
 |---|---|---|---|
-| 1 | **Overlay rules (K), one navigation (H), keys on demand (L)** | S–M | Removes repetition without a new setting |
-| 2 | **Actions on selection (E)** for Library and Relationships | M | The two heaviest screens; matches the redesign already pending |
+| 1 | **One inspector slot (M) and the four overlay kinds (K)** | M | Directly removes the stack of windows; no new setting needed |
+| 1b | **One navigation (H), keys on demand (L)** | S | Removes repetition |
+| 2 | **List + slot layout (N) with actions on selection (E)** for Library, Claims, Sources, Connectors | M | The heaviest older panels; uses the slot from step 1 |
 | 3 | **Spine and open part (A)** on stage pages; the shared "folded" component | M | Gives every later fold its count line |
 | 4 | **Four depths (B)** for claims and payments | M | Peek and in-place open reuse step 3 |
 | 5 | **Detail levels (D)** plus the first-case question and the top-edge switch | M–L | Needs the tier tags from steps 3–4 |
@@ -364,7 +445,12 @@ My estimate of size, not a measurement.
 8. **Library.** May "Bulk import" and "Stage relationship from a reviewed claim" leave the Library for The Drop and the claim screen?
 9. **Folded counts everywhere.** Is it right to show "N folded · show" on every fold, even where it adds a line?
 10. **Learn default.** Should Learn open filtered to the 7 indicators the app computes, with the rest marked reference?
-11. **First.** Which screens come first: the two heaviest (Library, Relationships) or the ones people see first (Case home, Decide)?
+11. **First.** Which screens come first: the older heavy panels (Library, Claims, Connectors) or the ones people see first (Case home, Decide)?
+12. **One slot.** Is "one inspector at a time, with a trail" the right rule? Is it acceptable that clicking another row replaces what is open, with Back available?
+13. **Relationships and The Wire.** May the old Relationships panel's add forms and grid view move into the Wire's own slot, leaving the Wire itself as it is?
+14. **Command bar.** May Case switcher, New case, Inbox and the shortcut list become modes of one command surface?
+15. **Awwwards.** Which sites on that list do you like? I could not open the list from here, so send me the names or links and I will study those.
+16. **North Star.** Do you have a login to its working panel? I only saw the public site and its promo video.
 
 ## 9. What I checked, and what I did not
 
@@ -382,6 +468,8 @@ My estimate of size, not a measurement.
 - **Material container-transform duration (450 ms)** is from a third-party page.
 - **Bloomberg, Notion's help page and Palantir's product screens** were unavailable (blocked or no useful picture). Apple's Assistive Access, Photoshop's Task Bar, DaVinci Resolve and VS Code were read as text and a page picture, not in use.
 - **Figma UI3.** I read Figma's post and forum threads; forum comments are anecdotal.
+- **North Star.** I saw the public home page and the 54-second preview video (a frame every three seconds). I did not log in. The video is stylised, so frames show structure, not real density, and I do not know how the working panel behaves with real data.
+- **Awwwards.** I could not open the data-visualization list (connection reset by the site; the archive copy also failed). The five names come from a search listing. I opened their own home pages; I did not confirm them against the list.
 - **Search tooling.** The Firecrawl credits ran out partway, so later searches used the built-in web search, which returns summaries, not full pages.
 - **Your own users.** Nothing here comes from watching someone use the Workbench. Whether people at your target level would choose "Less" correctly, or notice an offer, is untested; the Concept Lab is the cheapest way to find out.
 - **Whether the Learn screen tells people that only 7 of 2,946 indicators are computed:** not confirmed.
@@ -389,6 +477,8 @@ My estimate of size, not a measurement.
 ## 10. Sources
 
 Looked at as pages (screenshot): Cambridge Intelligence, "Graph visualization: fixing data hairballs" · GOV.UK Design System: Complete multiple tasks, Details, Accordion · OpenSanctions entity page · ICIJ Offshore Leaks Database · ICIJ Datashare demo · Gephi Lite · Linear docs, Display options · Figma blog, "Inside the redesigned Figma" · Microsoft Support, "Use the Simplified Ribbon" · Photopea · tldraw · Grafana play · GitHub pull request page · Wikipedia, 1MDB · OpenStreetMap · Material Design 3 transitions · Apple HIG, Disclosure controls and Motion · Apple Assistive Access guide · Adobe Photoshop help, Contextual Task Bar · Blackmagic DaVinci Resolve.
+
+Added in revision 2: nstarlive.com home page and preview video · Awwwards data-visualization category (names from search results only) · Cerebrium, Shift5, Vibrant Wellness, Farm Minerals and Nfinite home pages.
 
 Research (abstract or summary level unless noted):
 
