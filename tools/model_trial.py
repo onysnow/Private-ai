@@ -1,4 +1,5 @@
-"""Ask TAS Modules 06 and 08 real questions with a real local model, and record what the app accepts.
+"""Ask TAS Modules 06 and 08, and one module of every suite system, real questions with a real local model,
+and record what the app accepts.
 
     TZ=UTC python tools/model_trial.py --model qwen2.5:3b --out docs/project-notes/MODEL_TRIAL.md
 
@@ -11,7 +12,7 @@ Testing (Module 06) each question through the app's own endpoints, with
 Ollama as the provider, and records for each run: whether the answer was
 staged for review or refused, the app's reason when refused (an invented
 citation, a quote not in the source, a schema the answer broke), how many
-claims or hypotheses it gave and how many citations the app checked, and how
+claims, hypotheses or records it gave and how many citations the app checked, and how
 long it took.
 
 Needs Ollama answering at --ollama-url with the model pulled. Runs the
@@ -50,6 +51,20 @@ WORKING_THEORIES = {
     QUESTIONS["hypothesis_test"][1]: "One person controlled every account the deposits went into.",
 }
 ROUTES = {"case_synthesis": "case-synthesis", "hypothesis_test": "hypothesis-test"}
+# One module of each Authority System Suite system (ADR-0015), asked about the same case.
+SUITE_QUESTIONS = {
+    "suite:ras.01": "Frame a research question on how banks and regulators detect cash structuring.",
+    "suite:tas.01": "Extract the evidence about who made the cash deposits and when.",
+    "suite:qas.01": "Frame the question of whether the deposits were kept under the $10,000 reporting threshold.",
+    "suite:las.01": "Reconstruct the argument that the deposits were structured to avoid the reporting requirement.",
+    "suite:das.01": "Frame the decision: publish the structuring finding now, or wait for the account holder's reply?",
+    "suite:egs.01": "Plan how to obtain the bank's records of these deposits.",
+    "suite:ehs.01": "Is naming the account holder in the public interest, and is it proportionate?",
+}
+for key, question in SUITE_QUESTIONS.items():
+    QUESTIONS[key] = [question]
+    system, number = key.removeprefix("suite:").split(".")
+    ROUTES[key] = f"suite/{system}/{number}"
 
 
 def main() -> int:
@@ -57,7 +72,9 @@ def main() -> int:
     parser.add_argument("--model", required=True)
     parser.add_argument("--ollama-url", default="http://127.0.0.1:11434")
     parser.add_argument("--case", default="us-v-anise-structuring")
-    parser.add_argument("--repeat", type=int, default=2, help="runs per question")
+    parser.add_argument("--repeat", type=int, default=1, help="runs per question")
+    parser.add_argument("--max-results", type=int, default=10, help="records the packet holds")
+    parser.add_argument("--only", nargs="*", help="modules to run (default: all)")
     parser.add_argument("--timeout", type=float, default=900, help="seconds the app waits for the model")
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
@@ -86,11 +103,13 @@ def main() -> int:
 
     rows = []
     for module, questions in QUESTIONS.items():
+        if args.only and module not in args.only:
+            continue
         for question in questions:
             for attempt in range(1, args.repeat + 1):
                 governor.reset()
                 started = time.monotonic()
-                body_in = {"question": question}
+                body_in = {"question": question, "max_results": args.max_results}
                 if module == "hypothesis_test":
                     body_in["working_theory"] = WORKING_THEORIES[question]
                 reply = client.post(f"/api/investigations/{inv}/assistant/{ROUTES[module]}", json=body_in)
@@ -100,22 +119,23 @@ def main() -> int:
                 detail = body.get("detail")
                 reason = (detail if isinstance(detail, str) else (detail or {}).get("message") if isinstance(detail, dict)
                           else "; ".join(str(e.get("msg")) for e in detail) if isinstance(detail, list) else None)
-                items = payload.get("claims") or payload.get("hypotheses") or []
+                items = payload.get("claims") or payload.get("hypothesis_matrix") or payload.get("records") or []
                 rows.append({
                     "module": module, "question": question, "attempt": attempt, "http": reply.status_code, "seconds": seconds,
                     "outcome": body.get("review_status") or "refused",
                     "reason": (reason or (body.get("job") or {}).get("error") or "")[:220],
                     "items": len(items),
                     "citations": sum(len(i.get("supporting_evidence") or []) + len(i.get("contradicting_evidence") or [])
-                                     for i in items if isinstance(i, dict)),
+                                     + len(i.get("cites") or []) for i in items if isinstance(i, dict)),
                 })
                 print(rows[-1], flush=True)
 
     staged = sum(1 for r in rows if r["outcome"] == "proposed")
     lines = [
-        "# A real local model on TAS Modules 06 and 08\n",
+        "# A real local model on TAS Modules 06 and 08 and one module of each suite system\n",
         f"Generated by `tools/model_trial.py` on {time.strftime('%Y-%m-%d')}: `{args.model}` through Ollama, on the "
-        f"`{args.case}` demo case, {args.repeat} run(s) per question, CPU only. Staged means the answer passed every "
+        f"`{args.case}` demo case, {args.repeat} run(s) per question, {args.max_results} records per packet, CPU only. "
+        "Staged means the answer passed every "
         "check the app makes (its schema, the evidence it may cite, quotes found in their source) and waits for a "
         "reporter's review; refused means the app turned it away, with its reason.\n",
         f"**{staged} of {len(rows)} answers staged.**\n",

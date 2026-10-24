@@ -51,6 +51,11 @@ class LLMProviderError(RuntimeError):
     """
 
 
+class LLMContextError(LLMProviderError):
+    """The request does not fit the model's context window. Ollama would otherwise drop the start of the prompt
+    (the instructions) without saying so; the reporter can narrow the question or ask for fewer records."""
+
+
 @dataclass(frozen=True)
 class LLMResponse:
     text: str
@@ -264,7 +269,8 @@ class OllamaLLMClient(LLMClient):
         remote_host = info.get("remote_host") if isinstance(info, dict) else None
         local = not remote_host and not self._model.endswith("-cloud") and not self._model.split(":")[-1].endswith("cloud")
         return {"model": self._model, "local": local, "remote_host": remote_host, "base_url": self._base_url,
-                "details": info.get("details") if isinstance(info, dict) else None}
+                "details": info.get("details") if isinstance(info, dict) else None,
+                "model_info": info.get("model_info") if isinstance(info, dict) else None}
 
     def generate(self, system_prompt: str, user_prompt: str, *, max_tokens: int = 4096,
                  json_schema: dict[str, Any] | None = None) -> LLMResponse:
@@ -276,11 +282,20 @@ class OllamaLLMClient(LLMClient):
                 f"ollama model {self._model!r} runs on Ollama's cloud ({described['remote_host'] or 'cloud model'}), "
                 "not on this computer; set ai_allow_remote_endpoint to send evidence there"
             )
+        # Ollama's context defaults to 4096 tokens and it drops the start of a longer prompt, the instructions
+        # first, without an error. The window is sized to this request instead, within what the model holds.
+        num_ctx = context_tokens_needed(system_prompt, user_prompt, max_tokens)
+        model_max = model_context_length(described.get("model_info"))
+        if model_max and num_ctx > model_max:
+            raise LLMContextError(
+                f"the request needs about {num_ctx} tokens and {self._model} holds {model_max}; "
+                "narrow the question or ask for fewer records"
+            )
         body: dict[str, Any] = {
             "model": self._model,
             "stream": False,
             "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
-            "options": {"num_predict": max_tokens},
+            "options": {"num_predict": max_tokens, "num_ctx": num_ctx},
             # Hold the model to the module's JSON shape; the reasoning layer's
             # own parser and validators still check whatever comes back.
             "format": json_schema or "json",
@@ -292,7 +307,31 @@ class OllamaLLMClient(LLMClient):
             raise LLMProviderError(f"ollama request failed: {exc.__class__.__name__}: {exc}") from exc
         if response.status_code >= 400:
             raise LLMProviderError(f"ollama request failed: HTTP {response.status_code}: {response.text[:300]}")
-        return parse_ollama_response(response.json(), fallback_model=self._model, allow_remote=self._allow_remote)
+        data = response.json()
+        # A prompt that still filled the window was cut (Ollama keeps num_ctx - num_predict tokens of it).
+        evaluated = data.get("prompt_eval_count") if isinstance(data, dict) else None
+        if isinstance(evaluated, int) and evaluated >= num_ctx - max_tokens - 8:
+            raise LLMContextError(f"ollama kept {evaluated} tokens of the prompt, the whole window; the rest was dropped")
+        return parse_ollama_response(data, fallback_model=self._model, allow_remote=self._allow_remote)
+
+
+CHARS_PER_TOKEN = 3          # under English's ~4: JSON and ids tokenize densely; too big a window costs only memory
+MIN_CONTEXT = 4096
+
+
+def context_tokens_needed(system_prompt: str, user_prompt: str, max_tokens: int) -> int:
+    """The context window a request needs: its prompt, estimated generously, plus the answer, in 1024-token steps."""
+    needed = (len(system_prompt) + len(user_prompt)) // CHARS_PER_TOKEN + max_tokens + 256
+    return max(MIN_CONTEXT, -(-needed // 1024) * 1024)
+
+
+def model_context_length(model_info: Any) -> int | None:
+    """The model's own window from /api/show (`qwen2.context_length`: 32768), or None if it does not say."""
+    if isinstance(model_info, dict):
+        for key, value in model_info.items():
+            if key.endswith(".context_length") and isinstance(value, int) and value > 0:
+                return value
+    return None
 
 
 def parse_ollama_response(payload: Any, *, fallback_model: str, allow_remote: bool = False) -> LLMResponse:

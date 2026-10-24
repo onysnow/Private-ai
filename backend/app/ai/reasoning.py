@@ -1215,12 +1215,14 @@ def describe_reasoning_failure(exc: Exception) -> tuple[int, Any, dict[str, str]
     reasoning endpoints have always given -- or None for an unexpected error.
     A run that executes as a background job keeps this in the job's result."""
     from app.ai.governor import ReasoningThrottled
-    from app.ai.llm_client import LLMProviderError
+    from app.ai.llm_client import LLMContextError, LLMProviderError
 
     if isinstance(exc, ReasoningInputError):
         return 400, str(exc), None
     if isinstance(exc, ReasoningThrottled):
         return 429, str(exc), {"Retry-After": str(exc.retry_after_seconds)}
+    if isinstance(exc, LLMContextError):
+        return 400, f"The request is too long for the model: {exc}", None
     if isinstance(exc, LLMProviderError):
         # STRUCT-0028: no raw vendor error text in the response; the exception
         # message is what the server log/audit gets.
