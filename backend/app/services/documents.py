@@ -498,6 +498,10 @@ def preview_entity_candidate_matches(db: Session, candidate: ExtractionCandidate
     }
 
 def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: str, note: str|None=None, entity_schema: str|None=None, caption: str|None=None, claim_status: str='lead', confidence: float|None=None, matched_entity_id: str|None=None, entity_identity_decision: str|None=None, target_entity_id: str|None=None) -> dict:
+    # Two people deciding at once: the second waits here for the first and then
+    # sees its decision, instead of a status read before either wrote.
+    lock_investigation_transaction(db, candidate.investigation_id)
+    db.refresh(candidate)
     if candidate.review_status != 'proposed':
         raise ValueError('Candidate has already been reviewed')
     if decision not in {'accept','reject'}: raise ValueError('Decision must be accept or reject')
