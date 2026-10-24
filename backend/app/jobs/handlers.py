@@ -42,7 +42,7 @@ def _record_openaleph_details(db: Session, document_id: str, read: OpenAlephText
 
 
 def _add_and_read_children(db: Session, document_id: str, *, collection_id: str, container_id: str,
-                           report: Report, runner: str) -> tuple[str, dict[str, int]]:
+                           report: Report, runner: str, parent_job_id: str | None = None) -> tuple[str, dict[str, int]]:
     """Make each file inside an archive or email a document under it, and
     read each one as a job of its own, so a child that fails can be retried
     from its row (app/services/openaleph_children.py). Returns a sentence
@@ -65,8 +65,11 @@ def _add_and_read_children(db: Session, document_id: str, *, collection_id: str,
     unread = 0
     for number, child_id in enumerate(result.added, 1):
         report(None, f"Reading the files inside: {number} of {len(result.added)}")
+        # Run here, not by the queue: the archive's job is what keeps it alive
+        # (app/jobs/recovery.py fails it once that job has finished).
         child_job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=parent.investigation_id,
-                               subject_type="document", subject_id=child_id, runner=runner)
+                               subject_type="document", subject_id=child_id, runner=runner,
+                               payload={"parent_job_id": parent_job_id} if parent_job_id else None)
         if execute_job(factory, child_job.id, HANDLERS) != "succeeded":
             unread += 1
     db.expire_all()
@@ -91,7 +94,8 @@ def _add_and_read_children(db: Session, document_id: str, *, collection_id: str,
     return "; ".join(parts) or "no files inside", counts
 
 
-def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, report: Report, runner: str = "inline") -> str:
+def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, report: Report, runner: str = "inline",
+                           job_id: str | None = None) -> str:
     """Wait for OpenAleph's name-finding, make the document's chunks and
     proposals from OpenAleph's text, and stage the names it found. An
     archive's or an email's files become documents under it.
@@ -107,7 +111,8 @@ def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, r
 
     if is_container(read.schema):
         children, _counts = _add_and_read_children(db, document_id, collection_id=read.collection_id,
-                                                   container_id=read.provider_document_id, report=report, runner=runner)
+                                                   container_id=read.provider_document_id, report=report, runner=runner,
+                                                   parent_job_id=job_id)
         message = f"{message}; {children}"
     return message
 
@@ -253,7 +258,7 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             if local_text and stored is not None:
                 read = _with_local_text(read, stored.storage_path)
                 local_text = bool(read.chunks)
-            message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner)
+            message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner, job_id=job.id)
             if local_text and message:
                 message = f"{message}; OpenAleph found no text, so the text is the Workbench's own reading"
             return _check_watchlist_after_read(db, document_id, message)
@@ -374,7 +379,8 @@ def children_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     if not is_container(str((sync.response_json or {}).get("schema") or "")):
         raise JobFailed("Only an archive or an email has files inside", {"reason": "not_a_container"})
     message, counts = _add_and_read_children(db, doc.id, collection_id=sync.collection_id,
-                                             container_id=str(sync.provider_record_id), report=report, runner=job.runner)
+                                             container_id=str(sync.provider_record_id), report=report, runner=job.runner,
+                                             parent_job_id=job.id)
     return {"message": message[0].upper() + message[1:], "result": counts}
 
 

@@ -322,25 +322,50 @@ def test_a_batch_stopped_twice_ends_with_every_document_accounted_for_and_nothin
 def test_procrastinate_rows_the_queue_never_held_are_failed_once_they_stop_moving(storage):
     inv = _investigation()
     with SessionLocal() as db:
-        never_queued = create_job(db, kind="extract_document", investigation_id=inv, runner="procrastinate")
-        lost_child = create_job(db, kind="extract_document", investigation_id=inv, runner="procrastinate")
-        queued = create_job(db, kind="extract_document", investigation_id=inv, runner="procrastinate")
-        fresh = create_job(db, kind="extract_document", investigation_id=inv, runner="procrastinate")
-        old = utcnow_naive() - timedelta(hours=2)
+        def job(**payload):
+            return create_job(db, kind="extract_document", investigation_id=inv, runner="procrastinate", payload=payload).id
+
+        never_queued, queued, fresh, legacy_child = job(), job(), job(), job()
+        archive_done, archive_busy = job(), job()
+        orphan_child, busy_child = job(parent_job_id=archive_done), job(parent_job_id=archive_busy)
         table = BackgroundJob.__table__
-        db.execute(table.update().where(table.c.id == lost_child.id).values(status="running"))
-        db.execute(table.update().where(table.c.id == queued.id).values(queue_job_id=41))
-        db.execute(table.update().where(table.c.id.in_([never_queued.id, lost_child.id, queued.id])).values(updated_at=old))
+        db.execute(table.update().where(table.c.id.in_([legacy_child, orphan_child, busy_child])).values(status="running"))
+        db.execute(table.update().where(table.c.id == archive_done).values(status="succeeded"))
+        db.execute(table.update().where(table.c.id.in_([archive_done, archive_busy, queued])).values(queue_job_id=41))
+        db.execute(table.update().where(table.c.id == archive_busy).values(status="running"))
+        old = utcnow_naive() - timedelta(hours=2)
+        db.execute(table.update().where(table.c.id.in_([never_queued, queued, legacy_child, busy_child])).values(updated_at=old))
         db.commit()
 
-        assert recovery.jobs_the_queue_does_not_hold(db, older_than=timedelta(hours=1)) == 2
+        # never_queued and legacy_child by age; orphan_child because its archive's job finished.
+        assert recovery.jobs_the_queue_does_not_hold(db, older_than=timedelta(hours=1)) == 3
+        db.commit()
         db.expire_all()
-        assert db.get(BackgroundJob, never_queued.id).error == recovery.NEVER_QUEUED_ERROR
-        assert db.get(BackgroundJob, lost_child.id).error == recovery.LOST_ERROR
-        assert db.get(BackgroundJob, queued.id).status == "queued"     # Procrastinate holds it
-        assert db.get(BackgroundJob, fresh.id).status == "queued"      # may be being handed over now
+        assert db.get(BackgroundJob, never_queued).error == recovery.NEVER_QUEUED_ERROR
+        assert db.get(BackgroundJob, legacy_child).error == recovery.LOST_ERROR
+        assert db.get(BackgroundJob, orphan_child).error == recovery.LOST_ERROR   # however recently it moved
+        assert db.get(BackgroundJob, busy_child).status == "running"   # its archive's job is alive, however long
+        assert db.get(BackgroundJob, queued).status == "queued"     # Procrastinate holds it
+        assert db.get(BackgroundJob, fresh).status == "queued"      # may be being handed over now
     # A failed row is never claimed if the queue does run it after all.
-    assert execute_job(SessionLocal, never_queued.id, HANDLERS, resume_running=True) == "failed"
+    assert execute_job(SessionLocal, never_queued, HANDLERS, resume_running=True) == "failed"
+
+
+def test_a_retry_stopped_before_it_reached_the_queue_is_not_mistaken_for_one_the_queue_holds(storage):
+    inv = _investigation()
+    with SessionLocal() as db:
+        job = create_job(db, kind="extract_document", investigation_id=inv, runner="procrastinate")
+        table = BackgroundJob.__table__
+        db.execute(table.update().where(table.c.id == job.id).values(status="failed", queue_job_id=41))
+        db.commit()
+        requeue_for_retry(db, db.get(BackgroundJob, job.id))   # ...then the app stopped before submit()
+        assert db.get(BackgroundJob, job.id).queue_job_id is None
+        db.execute(table.update().where(table.c.id == job.id).values(updated_at=utcnow_naive() - timedelta(hours=2)))
+        db.commit()
+        assert recovery.jobs_the_queue_does_not_hold(db, older_than=timedelta(hours=1)) == 1
+        db.commit()
+        db.expire_all()
+        assert db.get(BackgroundJob, job.id).error == recovery.NEVER_QUEUED_ERROR
 
 
 def test_only_old_staged_files_are_removed(storage):

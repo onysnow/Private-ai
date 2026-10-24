@@ -20,14 +20,17 @@ chunks, proposals or OpenAleph documents.
 | Reading the text (OCR, proposals) | nothing; the read is one transaction | marks the job interrupted (existing); the retry reads it once | `..._the_retry_reads_it_once` |
 | OpenAleph took the file, the Workbench never recorded it | sync row `syncing` with no OpenAleph id | the next send uses the same `foreign_id`, so OpenAleph updates the same document; no second copy | `..._makes_no_second_copy` |
 | Procrastinate: job row saved, never handed to the queue | a job `queued` for ever | **new:** the stalled-job check fails it after an hour unmoved | `..._fails_what_a_stopped_process_left_outside_the_queue` |
-| Procrastinate: a file inside an archive being read by the archive's worker | a job `running` the queue does not know about | **new:** the same check fails it after an hour unmoved | `..._once_they_stop_moving` |
+| Procrastinate: a file inside an archive being read by the archive's worker | a job `running` the queue does not know about | **new:** failed once the archive's own job has finished (its id is in the child job's payload), however long the read takes | `..._once_they_stop_moving` |
+| Procrastinate: a retry saved, not yet handed to the queue | a job `queued` still carrying the last attempt's queue id | **new:** a retry clears the old queue id, so the check above finds it | `test_a_retry_stopped_before_it_reached_the_queue_...` |
 | A batch, stopped twice | a mix of the above | each document read exactly once after the retries | `test_a_batch_stopped_twice_...` |
 
 The OpenAleph row relies on OpenAleph 5.3.1's `Document.save` (`aleph/model/document.py`), which
 looks a document up by collection and `foreign_id` before making one. Checked in its source on
 24 Oct 2026; the test models that, it does not run OpenAleph.
 
-The waits on Procrastinate are there because another API process may be between saving a row and
+On PostgreSQL one sweep runs at a time (a transaction advisory lock; a second process skips its
+turn), and every write repeats the test that selected the row, so a job made or retried meanwhile is
+left as it is. The waits on Procrastinate are there because another API process may be between saving a row and
 queueing it: documents count as left behind after 10 minutes, jobs and staged files after an hour
 (longer than the 15-minute OpenAleph read timeout). The in-process runner (SQLite) has no other
 process, so it recovers everything at start-up.

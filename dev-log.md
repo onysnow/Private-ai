@@ -2626,3 +2626,6 @@ mid-ingestion leaves behind. Details and the remaining gaps: docs/project-notes/
   same way without the change).
 - Checked in OpenAleph 5.3.1's source: an upload with a `foreign_id` the collection holds updates
   that document, so re-sending after a lost reply makes no second copy.
+- Review round (Copilot, PR #102): the sweep takes a PostgreSQL advisory lock and re-checks each
+  row in its UPDATE; `requeue_for_retry` clears the old `queue_job_id`; a job for a file inside an
+  archive records `parent_job_id` and is failed only once that job has finished.
