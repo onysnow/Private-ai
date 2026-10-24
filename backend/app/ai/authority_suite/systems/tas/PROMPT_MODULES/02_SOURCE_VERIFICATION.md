@@ -28,7 +28,7 @@ VERIFICATION RULES
 4. Separate source existence, document authenticity, and substantive truth.
 5. Do not mark a claim verified if the source supports only part of it.
 6. Record conflicting sources and date/version differences.
-7. “No result found” must include search scope, systems, queries, date, and limitations. It is not “false” or “does not exist.”
+7. “No result found” is labelled NEGATIVE SEARCH RESULT (`CORE/INVESTIGATIVE_PROMPT_ENGINEERING_STANDARD.md` §4.8) and carries the retrieval log of `CORE/SOURCE_AUTHORITY_AND_RETRIEVAL_POLICY.md` §4, whether the search was run here or supplied: search scope, systems, queries, date, and limitations. It is not “false” or “does not exist.”
 8. Check that every hyperlink reaches the intended document or record, not a homepage, search page, or wrong edition.
 9. Before treating a claim as supported by multiple sources, confirm the sources are independent. A forward, requote, republication, or other duplicate copy of the same underlying statement (see `restates_evidence_id` in the evidence record) counts as one source, not one per copy, regardless of how many times it appears in the corpus.
 10. Do not mark a claim verified because a source discusses the same topic. Confirm the cited passage supports the exact proposition as stated, including its scope, specificity, time period, and any conditions or qualifiers — a general policy, target, or typical practice does not establish what happened in a specific instance.

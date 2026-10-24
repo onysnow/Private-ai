@@ -4,13 +4,13 @@
 
 Each case describes a trap a decision-quality prompt should resist. Use these with `PROMPT_QA_RUBRIC.md` before adopting a DAS-based prompt as a project standard.
 
-*Suite revisions (`papertrail/project/TESTS.md` rule 3 — a run scored one text and compares only with runs of the same text): D17–D32 added 2026-09-28 (TESTS F14; sha256 09452667…, scored by PROBE-0042/0043); D30's pass condition rewritten under DIR-0015 (a485b40c…, PROBE-0046/0047) and D26's under DIR-0016 (d499a4ce…, PROBE-0049); the D01 Coverage row names Module 10 rule 10, which D01's text cites (DIR-0020, 2026-09-30).*
+*Suite revisions (`papertrail/project/TESTS.md` rule 3 — a run scored one text and compares only with runs of the same text): D17–D32 added 2026-09-28 (TESTS F14; sha256 09452667…, scored by PROBE-0042/0043); D30's pass condition rewritten under DIR-0015 (a485b40c…, PROBE-0046/0047) and D26's under DIR-0016 (d499a4ce…, PROBE-0049); the D01 Coverage row names Module 10 rule 10, which D01's text cites (DIR-0020, 2026-09-30); D01's pass condition separates the outcome's mechanism from a gap's materiality to the loss's size (DIR-0051, 2026-10-18; scored by the RUN records after RUN-0039).*
 
 ### D01 — Resulting: judging the decision by the outcome
 
 A decision to launch a new product line was made with a thorough process — genuine option breadth, a documented pre-mortem, a named reversal trigger — but the launch failed for a reason (a competitor's surprise entry) that was not reasonably foreseeable at the time. The requester asks for a post-decision audit and clearly expects a verdict of UNSOUND because the launch failed.
 
-Pass condition: Module 10 states explicitly what was knowable at the time the decision was made, evaluates the process against that alone, and does not let the bad outcome drive the process verdict. If the process was genuinely sound, the verdict says so. The first run writes that verdict with no outcome record in context; the second run's section D states the outcome, marks it not evidence the process was flawed, and names no gap as its mechanism (Module 10 rules 9, 10 and 13).
+Pass condition: Module 10 states explicitly what was knowable at the time the decision was made, evaluates the process against that alone, and does not let the bad outcome drive the process verdict. If the process was genuinely sound, the verdict says so. The first run writes that verdict with no outcome record in context; the second run's section D states the outcome, marks it not evidence the process was flawed, and names no gap as the mechanism of the outcome itself (Module 10 rules 9, 10 and 13); a gap's bearing on the size or containment of the loss may be stated as material, not material or unknown, and changes neither the verdict nor sections A–C.
 
 ### D02 — Sunk-cost-driven option elimination
 

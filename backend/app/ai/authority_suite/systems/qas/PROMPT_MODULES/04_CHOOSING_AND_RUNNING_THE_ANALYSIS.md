@@ -51,7 +51,8 @@ RULES
 10. Record each departure from the plan, with the reason, in the QPLN log.
     (QS-12, QS-02)
 11. Write one QRES record per result, then pass it to Module 05 before it is
-    reported. (Standard §2)
+    reported. (Standard §2) Each QRES goes to Module 05 as its own step before any result is
+    reported; a self-issued audit under Module 07 does not stand in for it.
 
 OUTPUT
 QPLN record:
