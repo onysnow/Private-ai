@@ -2611,3 +2611,18 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
 - Suite coverage (same day): app/ai/suite_map.json maps 78 app values to suite terms (an agent read the suite;
   every term string was then checked present in the vendored file). Adding a value to any of the vocabularies in
   suite_map.app_vocabularies() without mapping it fails tests/test_suite_map.py; so does a stale SUITE_GAPS.md.
+
+## 2026-10-24: crash recovery (audit of 23 Oct, §7)
+
+Ony asked to start on the 23 Oct research docs in Drive. Started with their P1 §7: what a stop
+mid-ingestion leaves behind. Details and the remaining gaps: docs/project-notes/CRASH_RECOVERY.md.
+- New `app/jobs/recovery.py`, run by `JobRunner` at start-up (and every minute on Procrastinate,
+  with the stalled-job check): a document saved without its reading job gets a failed job to retry;
+  a Procrastinate job row the queue never held is failed after an hour unmoved; files left in
+  `.upload-staging` are removed.
+- Tests: `tests/test_crash_recovery.py` (9; passes on SQLite and PostgreSQL 16; 3 fail without the
+  runner change) and one Procrastinate test. Of the 51 test files that start the app with stored
+  documents, all pass except two that need Tesseract, which this container lacks (they fail the
+  same way without the change).
+- Checked in OpenAleph 5.3.1's source: an upload with a `foreign_id` the collection holds updates
+  that document, so re-sending after a lost reply makes no second copy.
