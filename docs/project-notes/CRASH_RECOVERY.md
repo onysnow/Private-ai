@@ -79,3 +79,12 @@ Run on 24 Oct 2026, 40 documents (`--documents 40 --kills 5`): **pass**.
   audit's P2 question about running the workers inside the API process; this is one measurement
   on a cloud container, not on the target workstation.
 
+### A database outage (audit test 5)
+
+`--db-down`/`--db-up` stop PostgreSQL while reads run and start it again, without restarting the
+API. Run on 24 Oct 2026, 20 documents, PostgreSQL stopped with `pg_ctl stop -m immediate` (as a
+crash stops it) for 20 seconds: **pass**. The API process stayed up and answered as soon as the
+database was back; the read the outage cut off was handed back by Procrastinate and succeeded at
+its second attempt; all 20 documents read once, nothing duplicated. (One upload was also killed in
+that run and its document recovered through the 10-minute sweep, as above.)
+

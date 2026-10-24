@@ -41,8 +41,13 @@ QUESTIONS = {
     ],
     "hypothesis_test": [
         "Were the deposits structured to avoid the reporting threshold, or is there an innocent explanation?",
-        "Test the hypothesis that a single person controlled every account in this case.",
+        "Did a single person control every account in this case?",
     ],
+}
+# Module 06 tests a stated working theory against the record (HypothesisTestRequest.working_theory).
+WORKING_THEORIES = {
+    QUESTIONS["hypothesis_test"][0]: "The cash deposits were split to stay under the $10,000 reporting threshold.",
+    QUESTIONS["hypothesis_test"][1]: "One person controlled every account the deposits went into.",
 }
 ROUTES = {"case_synthesis": "case-synthesis", "hypothesis_test": "hypothesis-test"}
 
@@ -85,12 +90,16 @@ def main() -> int:
             for attempt in range(1, args.repeat + 1):
                 governor.reset()
                 started = time.monotonic()
-                reply = client.post(f"/api/investigations/{inv}/assistant/{ROUTES[module]}", json={"question": question})
+                body_in = {"question": question}
+                if module == "hypothesis_test":
+                    body_in["working_theory"] = WORKING_THEORIES[question]
+                reply = client.post(f"/api/investigations/{inv}/assistant/{ROUTES[module]}", json=body_in)
                 seconds = round(time.monotonic() - started)
                 body = reply.json()
                 payload = body.get("payload") or {}
                 detail = body.get("detail")
-                reason = detail if isinstance(detail, str) else (detail or {}).get("message") if isinstance(detail, dict) else None
+                reason = (detail if isinstance(detail, str) else (detail or {}).get("message") if isinstance(detail, dict)
+                          else "; ".join(str(e.get("msg")) for e in detail) if isinstance(detail, list) else None)
                 items = payload.get("claims") or payload.get("hypotheses") or []
                 rows.append({
                     "module": module, "question": question, "attempt": attempt, "http": reply.status_code, "seconds": seconds,
