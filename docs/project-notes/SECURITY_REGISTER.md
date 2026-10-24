@@ -10,7 +10,7 @@ nothing here is a penetration test or a review of a live deployment.
 |---|---|---|---|---|
 | Pillow (backend) | 12.3.0 | 37 known vulnerabilities, fixed in 13.0.0 | **fixed**: 13.0.0. OCR, picture, deck, export and PDF tests pass on it (with Tesseract installed) | `pip-audit -r backend/requirements.txt`: none left |
 | next (frontend) | 15.5.27 | critical: remote code execution through the image optimiser with SVG files (GHSA-2464-fhr4-w9xw); denial of service with Server Actions (GHSA-p3m5-59mp-jv5r) | **fixed**: 15.5.28. Typecheck, 1307 tests and build pass | `npm audit --omit=dev` |
-| zod (frontend) | 3.25.76 | high: memory exhaustion validating oversized constrained collections (GHSA-mrhx-c7xc-m3w5); fixed only in zod 4.6.6 | **open**: zod 4 is a breaking change. Zod is used by the generated API client (`lib/generated/zod.gen.ts`, about 3,500 schema calls), which checks the app's own API replies in the browser, so the input it validates comes from the reporter's own backend. Moving needs the client generator set up for zod 4 and the client regenerated | `npm audit --omit=dev` |
+| zod (frontend) | 3.25.76 | high: memory exhaustion validating oversized constrained collections (GHSA-mrhx-c7xc-m3w5); fixed only in zod 4.6.6 | **fixed** on 24 Oct (Ony's call): zod 4.6.7, `@hookform/resolvers` 5.9.2 (resolvers 3 supports zod 3 only), the API client regenerated with the zod plugin's `compatibilityVersion: 4`, and the entity form typed with its input and output shapes. Typecheck, lint, 1307 tests and build pass | `npm audit --omit=dev`: none left |
 
 Dev-only packages were not scanned (`--omit=dev`). `eslint-config-next` stays at 15.5.26; it is a
 lint config, not part of the running app.

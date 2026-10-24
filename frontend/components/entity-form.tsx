@@ -19,6 +19,7 @@ import {
   entityFormSchema,
   entityFormValuesToProperties,
   propertiesToEntityFormEntries,
+  type EntityFormInput,
   type EntityFormValues,
 } from '@/lib/entity-schema';
 import {Button} from '@/components/ui/button';
@@ -53,7 +54,7 @@ function entityToDefaults(entity: CanonicalEntity | null | undefined): EntityFor
 
 export function EntityForm({entity, onSubmit, onCancel}: EntityFormProps): React.ReactElement {
   const isEdit = Boolean(entity);
-  const form = useForm<EntityFormValues>({
+  const form = useForm<EntityFormInput, unknown, EntityFormValues>({
     resolver: zodResolver(entityFormSchema),
     defaultValues: entityToDefaults(entity),
     mode: 'onBlur',
