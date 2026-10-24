@@ -164,6 +164,7 @@ import {
   investigationQuestionContext,
   investigationRunPlan,
   investigationRunProfile,
+  investigationSuiteModule,
   investigationVisualCatalog,
   investigationVisualPreview,
   investigationVisualRestyle,
@@ -279,6 +280,7 @@ import {
   setStoryThesis,
   settingsStatus,
   startStoryWriteup,
+  suiteCatalogListing,
   syncCorpusNow,
   syncOpenalephDocument,
   tagARecord,
@@ -759,6 +761,9 @@ import type {
   InvestigationRunProfileData,
   InvestigationRunProfileError,
   InvestigationRunProfileResponse,
+  InvestigationSuiteModuleData,
+  InvestigationSuiteModuleError,
+  InvestigationSuiteModuleResponse,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogError,
   InvestigationVisualCatalogResponse,
@@ -1100,6 +1105,9 @@ import type {
   StartStoryWriteupData,
   StartStoryWriteupError,
   StartStoryWriteupResponse,
+  SuiteCatalogListingData,
+  SuiteCatalogListingError,
+  SuiteCatalogListingResponse,
   SyncCorpusNowData,
   SyncCorpusNowError,
   SyncCorpusNowResponse,
@@ -5365,6 +5373,38 @@ export const saveInvestigationRunProfileMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await saveInvestigationRunProfile({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Investigation Suite Module
+ *
+ * Any module of any Authority System Suite system (ADR-0015): /assistant/suite/las/01 runs LAS Module 01.
+ * The prompt and the records it answers in are read from the vendored suite (GET /api/suite/catalog lists them);
+ * the answer is checked against those records' schemas and the packet's citations, and lands as a proposal for
+ * review like every other run. `prior_run_ids` are earlier runs of this case whose answers the module reads.
+ */
+export const investigationSuiteModuleMutation = (
+  options?: Partial<Options<InvestigationSuiteModuleData>>,
+): UseMutationOptions<
+  InvestigationSuiteModuleResponse,
+  InvestigationSuiteModuleError,
+  Options<InvestigationSuiteModuleData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    InvestigationSuiteModuleResponse,
+    InvestigationSuiteModuleError,
+    Options<InvestigationSuiteModuleData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await investigationSuiteModule({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -9832,6 +9872,37 @@ export const promoteStatementAssessmentMutation = (
   };
   return mutationOptions;
 };
+
+export const suiteCatalogListingQueryKey = (
+  options?: Options<SuiteCatalogListingData>,
+) => createQueryKey('suiteCatalogListing', options);
+
+/**
+ * Suite Catalog Listing
+ *
+ * Every system, module and record of the vendored suite (ADR-0015): what
+ * /investigations/{id}/assistant/suite/{system}/{number} can run, read from the suite's own files.
+ */
+export const suiteCatalogListingOptions = (
+  options?: Options<SuiteCatalogListingData>,
+) =>
+  queryOptions<
+    SuiteCatalogListingResponse,
+    SuiteCatalogListingError,
+    SuiteCatalogListingResponse,
+    ReturnType<typeof suiteCatalogListingQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await suiteCatalogListing({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: suiteCatalogListingQueryKey(options),
+  });
 
 export const getMappingSchemasQueryKey = (
   options?: Options<GetMappingSchemasData>,

@@ -57,7 +57,7 @@
 .br-systems small { color: var(--text-muted); font-size: 11.5px; }
 .br-sysrow { padding: 2px 7px; border-radius: 5px; font: 11px var(--font-mono); box-shadow: inset 0 0 0 1px var(--line); }
 .br-sysrow.runs { color: var(--status-supported); box-shadow: inset 0 0 0 1px currentColor; }
-.br-sysrow.not_in_app { color: var(--text); box-shadow: inset 0 0 0 1px var(--line); border-style: dashed; outline: 1px dashed var(--line); outline-offset: -1px; }
+.br-sysrow.not_in_app, .br-sysrow.next { color: var(--text); box-shadow: inset 0 0 0 1px var(--line); border-style: dashed; outline: 1px dashed var(--line); outline-offset: -1px; }
 .br-sysrow.not_expected { color: var(--text-muted); opacity: .7; }
 .br-inject { margin: 0; padding: 8px 10px; border-radius: 8px; font-size: 12.5px; box-shadow: inset 0 0 0 1px var(--status-disputed); background: color-mix(in srgb, var(--status-disputed) 10%, transparent); }
 .br-inject b { color: var(--status-disputed); }

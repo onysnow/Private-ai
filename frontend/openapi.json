@@ -31634,6 +31634,35 @@
         "title": "StyleWarningOut",
         "type": "object"
       },
+      "SuiteCatalogOut": {
+        "description": "Every system, module and record of the vendored suite, as the app runs them.",
+        "properties": {
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteSystemOut"
+            },
+            "title": "Systems",
+            "type": "array"
+          }
+        },
+        "required": [
+          "source",
+          "systems"
+        ],
+        "title": "SuiteCatalogOut",
+        "type": "object"
+      },
       "SuiteCoverageCountsOut": {
         "properties": {
           "app_lacks": {
@@ -31812,6 +31841,150 @@
         "title": "SuiteMappingOut",
         "type": "object"
       },
+      "SuiteModuleOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "use_when": {
+            "title": "Use When",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "number",
+          "title",
+          "use_when",
+          "path"
+        ],
+        "title": "SuiteModuleOut",
+        "type": "object"
+      },
+      "SuiteModuleRequest": {
+        "description": "A run of one suite module (ADR-0015).",
+        "properties": {
+          "include_external_leads": {
+            "default": true,
+            "title": "Include External Leads",
+            "type": "boolean"
+          },
+          "max_results": {
+            "default": 30,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "prior_run_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prior Run Ids"
+          },
+          "question": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          },
+          "working_theory": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working Theory"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "SuiteModuleRequest",
+        "type": "object"
+      },
+      "SuiteRecordOut": {
+        "properties": {
+          "closed": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Closed",
+            "type": "object"
+          },
+          "fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "id_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id Field"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "prefix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefix"
+          }
+        },
+        "required": [
+          "kind",
+          "prefix",
+          "id_field",
+          "fields",
+          "closed"
+        ],
+        "title": "SuiteRecordOut",
+        "type": "object"
+      },
       "SuiteRequirementOut": {
         "properties": {
           "file": {
@@ -31861,6 +32034,64 @@
           "found"
         ],
         "title": "SuiteRequirementOut",
+        "type": "object"
+      },
+      "SuiteSystemOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteModuleOut"
+            },
+            "title": "Modules",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteRecordOut"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "trigger_row": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trigger Row"
+          },
+          "when": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "When"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "trigger_row",
+          "when",
+          "modules",
+          "records"
+        ],
+        "title": "SuiteSystemOut",
         "type": "object"
       },
       "SuiteUnmappedOut": {
@@ -50676,6 +50907,120 @@
         "summary": "Save Investigation Run Profile"
       }
     },
+    "/api/investigations/{investigation_id}/assistant/suite/{system}/{number}": {
+      "post": {
+        "description": "Any module of any Authority System Suite system (ADR-0015): /assistant/suite/las/01 runs LAS Module 01.\nThe prompt and the records it answers in are read from the vendored suite (GET /api/suite/catalog lists them);\nthe answer is checked against those records' schemas and the packet's citations, and lands as a proposal for\nreview like every other run. `prior_run_ids` are earlier runs of this case whose answers the module reads.",
+        "operationId": "investigation_suite_module",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "system",
+            "required": true,
+            "schema": {
+              "title": "System",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "title": "Number",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuiteModuleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReasoningRunOut"
+                }
+              }
+            },
+            "description": "Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiOutputRejectedOut"
+                    }
+                  ],
+                  "title": "Response 422 Investigation Suite Module"
+                }
+              }
+            },
+            "description": "The input does not match the route, or the model's answer did not pass its checks"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AiModelFailedOut"
+                    }
+                  ],
+                  "title": "Response 502 Investigation Suite Module"
+                }
+              }
+            },
+            "description": "The AI provider failed (the details are logged on the server), or its answer could not be used at all"
+          }
+        },
+        "summary": "Investigation Suite Module"
+      }
+    },
     "/api/investigations/{investigation_id}/case-records": {
       "get": {
         "operationId": "list_case_records",
@@ -58753,6 +59098,45 @@
           }
         },
         "summary": "Promote Statement Assessment"
+      }
+    },
+    "/api/suite/catalog": {
+      "get": {
+        "description": "Every system, module and record of the vendored suite (ADR-0015): what\n/investigations/{id}/assistant/suite/{system}/{number} can run, read from the suite's own files.",
+        "operationId": "suite_catalog_listing",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuiteCatalogOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Suite Catalog Listing"
       }
     },
     "/api/table-mapping/schemas": {

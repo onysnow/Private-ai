@@ -16141,6 +16141,22 @@ export type StyleWarningOut = {
 };
 
 /**
+ * SuiteCatalogOut
+ *
+ * Every system, module and record of the vendored suite, as the app runs them.
+ */
+export type SuiteCatalogOut = {
+  /**
+   * Source
+   */
+  source: string | null;
+  /**
+   * Systems
+   */
+  systems: Array<SuiteSystemOut>;
+};
+
+/**
  * SuiteCoverageCountsOut
  */
 export type SuiteCoverageCountsOut = {
@@ -16244,6 +16260,88 @@ export type SuiteMappingOut = {
 };
 
 /**
+ * SuiteModuleOut
+ */
+export type SuiteModuleOut = {
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Number
+   */
+  number: string;
+  /**
+   * Path
+   */
+  path: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Use When
+   */
+  use_when: string;
+};
+
+/**
+ * SuiteModuleRequest
+ *
+ * A run of one suite module (ADR-0015).
+ */
+export type SuiteModuleRequest = {
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Prior Run Ids
+   */
+  prior_run_ids?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
+};
+
+/**
+ * SuiteRecordOut
+ */
+export type SuiteRecordOut = {
+  /**
+   * Closed
+   */
+  closed: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Fields
+   */
+  fields: Array<string>;
+  /**
+   * Id Field
+   */
+  id_field: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Prefix
+   */
+  prefix: string | null;
+};
+
+/**
  * SuiteRequirementOut
  */
 export type SuiteRequirementOut = {
@@ -16271,6 +16369,36 @@ export type SuiteRequirementOut = {
    * Why
    */
   why: string;
+};
+
+/**
+ * SuiteSystemOut
+ */
+export type SuiteSystemOut = {
+  /**
+   * Code
+   */
+  code: string;
+  /**
+   * Modules
+   */
+  modules: Array<SuiteModuleOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Records
+   */
+  records: Array<SuiteRecordOut>;
+  /**
+   * Trigger Row
+   */
+  trigger_row: number | null;
+  /**
+   * When
+   */
+  when: string | null;
 };
 
 /**
@@ -23570,6 +23698,62 @@ export type SaveInvestigationRunProfileResponses = {
 export type SaveInvestigationRunProfileResponse =
   SaveInvestigationRunProfileResponses[keyof SaveInvestigationRunProfileResponses];
 
+export type InvestigationSuiteModuleData = {
+  body: SuiteModuleRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * System
+     */
+    system: string;
+    /**
+     * Number
+     */
+    number: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/suite/{system}/{number}';
+};
+
+export type InvestigationSuiteModuleErrors = {
+  /**
+   * Response 422 Investigation Suite Module
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
+   */
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Suite Module
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationSuiteModuleError =
+  InvestigationSuiteModuleErrors[keyof InvestigationSuiteModuleErrors];
+
+export type InvestigationSuiteModuleResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
+};
+
+export type InvestigationSuiteModuleResponse =
+  InvestigationSuiteModuleResponses[keyof InvestigationSuiteModuleResponses];
+
 export type ListCaseRecordsData = {
   body?: never;
   path: {
@@ -28657,6 +28841,37 @@ export type PromoteStatementAssessmentResponses = {
 
 export type PromoteStatementAssessmentResponse =
   PromoteStatementAssessmentResponses[keyof PromoteStatementAssessmentResponses];
+
+export type SuiteCatalogListingData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/suite/catalog';
+};
+
+export type SuiteCatalogListingErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SuiteCatalogListingError =
+  SuiteCatalogListingErrors[keyof SuiteCatalogListingErrors];
+
+export type SuiteCatalogListingResponses = {
+  /**
+   * Successful Response
+   */
+  200: SuiteCatalogOut;
+};
+
+export type SuiteCatalogListingResponse =
+  SuiteCatalogListingResponses[keyof SuiteCatalogListingResponses];
 
 export type GetMappingSchemasData = {
   body?: never;

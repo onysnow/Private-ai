@@ -222,6 +222,9 @@ _NOT_INVESTIGATION_RECORDS = {
     "indicator_id",
     # A small real demo case (routes_demo.py, app/services/demo_cases.py): one of three fixed names.
     "case_id",
+    # A suite system and module number (routes_investigations.investigation_suite_module, ADR-0015): the same for
+    # every investigation, which the path names.
+    "system", "number",
     # Records that live inside an investigation named in the same path, and are looked up through it:
     # a story section (stories.section_of), an AI run and a thought in it (routes_ai_runs._run_row, run_events),
     # a version of the story's write-up (routes_stories._version).

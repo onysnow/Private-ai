@@ -477,6 +477,9 @@ import type {
   InvestigationRunProfileData,
   InvestigationRunProfileErrors,
   InvestigationRunProfileResponses,
+  InvestigationSuiteModuleData,
+  InvestigationSuiteModuleErrors,
+  InvestigationSuiteModuleResponses,
   InvestigationVisualCatalogData,
   InvestigationVisualCatalogErrors,
   InvestigationVisualCatalogResponses,
@@ -819,6 +822,9 @@ import type {
   StartStoryWriteupData,
   StartStoryWriteupErrors,
   StartStoryWriteupResponses,
+  SuiteCatalogListingData,
+  SuiteCatalogListingErrors,
+  SuiteCatalogListingResponses,
   SyncCorpusNowData,
   SyncCorpusNowErrors,
   SyncCorpusNowResponses,
@@ -1207,6 +1213,9 @@ import {
   zInvestigationRunPlanResponse,
   zInvestigationRunProfilePath,
   zInvestigationRunProfileResponse,
+  zInvestigationSuiteModuleBody,
+  zInvestigationSuiteModulePath,
+  zInvestigationSuiteModuleResponse,
   zInvestigationVisualCatalogPath,
   zInvestigationVisualCatalogResponse,
   zInvestigationVisualPreviewBody,
@@ -1479,6 +1488,7 @@ import {
   zSettingsStatusResponse,
   zStartStoryWriteupPath,
   zStartStoryWriteupResponse,
+  zSuiteCatalogListingResponse,
   zSyncCorpusNowPath,
   zSyncCorpusNowResponse,
   zSyncOpenalephDocumentPath,
@@ -5818,6 +5828,44 @@ export const saveInvestigationRunProfile = <
   });
 
 /**
+ * Investigation Suite Module
+ *
+ * Any module of any Authority System Suite system (ADR-0015): /assistant/suite/las/01 runs LAS Module 01.
+ * The prompt and the records it answers in are read from the vendored suite (GET /api/suite/catalog lists them);
+ * the answer is checked against those records' schemas and the packet's citations, and lands as a proposal for
+ * review like every other run. `prior_run_ids` are earlier runs of this case whose answers the module reads.
+ */
+export const investigationSuiteModule = <ThrowOnError extends boolean = false>(
+  options: Options<InvestigationSuiteModuleData, ThrowOnError>,
+): RequestResult<
+  InvestigationSuiteModuleResponses,
+  InvestigationSuiteModuleErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    InvestigationSuiteModuleResponses,
+    InvestigationSuiteModuleErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zInvestigationSuiteModuleBody,
+          path: zInvestigationSuiteModulePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zInvestigationSuiteModuleResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/assistant/suite/{system}/{number}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * List Case Records
  */
 export const listCaseRecords = <ThrowOnError extends boolean = false>(
@@ -9743,6 +9791,38 @@ export const promoteStatementAssessment = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Suite Catalog Listing
+ *
+ * Every system, module and record of the vendored suite (ADR-0015): what
+ * /investigations/{id}/assistant/suite/{system}/{number} can run, read from the suite's own files.
+ */
+export const suiteCatalogListing = <ThrowOnError extends boolean = false>(
+  options?: Options<SuiteCatalogListingData, ThrowOnError>,
+): RequestResult<
+  SuiteCatalogListingResponses,
+  SuiteCatalogListingErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    SuiteCatalogListingResponses,
+    SuiteCatalogListingErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSuiteCatalogListingResponse.parseAsync(data),
+    url: '/api/suite/catalog',
+    ...options,
   });
 
 /**

@@ -44,7 +44,7 @@ const FLAGS = new Set(['severity_floor', 'source_tier_floor']);
 const GROUPS = ['How strict', 'Extra passes', 'What you see', 'Doing things on its own'];
 const SWITCHES = new Set(['devils_advocate', 'show_reasoning_chain']);
 const clock = () => new Date().toTimeString().slice(0, 8);
-const STATE_WORDS: Record<string, string> = {runs: 'runs', not_in_app: 'would apply · not in the app yet', not_expected: 'not expected'};
+const STATE_WORDS: Record<string, string> = {runs: 'runs', next: 'runs next, when the answer calls for it', not_in_app: 'would apply · not in the app yet', not_expected: 'not expected'};
 // The plan's steps a setting adds (run_plan.py _steps): the setting's key, and its value with and without the step.
 const OPTIONAL_STEPS: Array<{key: string; on: string; off: string}> = [{key: 'devils_advocate', on: 'ON', off: 'OFF'}, {key: 'research_depth', on: 'EXHAUSTIVE', off: 'NORMAL'}];
 const PACKET_DEFAULT = 30;

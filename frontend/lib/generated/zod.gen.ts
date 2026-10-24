@@ -7091,6 +7091,41 @@ export const zSuiteMappingOut = z.object({
 });
 
 /**
+ * SuiteModuleOut
+ */
+export const zSuiteModuleOut = z.object({
+  key: z.string(),
+  number: z.string(),
+  path: z.string(),
+  title: z.string(),
+  use_when: z.string(),
+});
+
+/**
+ * SuiteModuleRequest
+ *
+ * A run of one suite module (ADR-0015).
+ */
+export const zSuiteModuleRequest = z.object({
+  include_external_leads: z.boolean().optional().default(true),
+  max_results: z.int().gte(1).lte(100).optional().default(30),
+  prior_run_ids: z.array(z.string()).max(5).nullish(),
+  question: z.string().min(1).max(4000),
+  working_theory: z.string().max(2000).nullish(),
+});
+
+/**
+ * SuiteRecordOut
+ */
+export const zSuiteRecordOut = z.object({
+  closed: z.record(z.string(), z.array(z.string())),
+  fields: z.array(z.string()),
+  id_field: z.string().nullable(),
+  kind: z.string(),
+  prefix: z.string().nullable(),
+});
+
+/**
  * SuiteRequirementOut
  */
 export const zSuiteRequirementOut = z.object({
@@ -7100,6 +7135,28 @@ export const zSuiteRequirementOut = z.object({
   suite_term: z.string(),
   what: z.string(),
   why: z.string(),
+});
+
+/**
+ * SuiteSystemOut
+ */
+export const zSuiteSystemOut = z.object({
+  code: z.string(),
+  modules: z.array(zSuiteModuleOut),
+  name: z.string(),
+  records: z.array(zSuiteRecordOut),
+  trigger_row: z.int().nullable(),
+  when: z.string().nullable(),
+});
+
+/**
+ * SuiteCatalogOut
+ *
+ * Every system, module and record of the vendored suite, as the app runs them.
+ */
+export const zSuiteCatalogOut = z.object({
+  source: z.string().nullable(),
+  systems: z.array(zSuiteSystemOut),
 });
 
 /**
@@ -10134,6 +10191,19 @@ export const zSaveInvestigationRunProfilePath = z.object({
  */
 export const zSaveInvestigationRunProfileResponse = zRunProfileOut;
 
+export const zInvestigationSuiteModuleBody = zSuiteModuleRequest;
+
+export const zInvestigationSuiteModulePath = z.object({
+  investigation_id: z.string(),
+  system: z.string(),
+  number: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zInvestigationSuiteModuleResponse = zAiReasoningRunOut;
+
 export const zListCaseRecordsPath = z.object({
   investigation_id: z.string(),
 });
@@ -11633,6 +11703,11 @@ export const zPromoteStatementAssessmentPath = z.object({
  * Successful Response
  */
 export const zPromoteStatementAssessmentResponse = zStatementPromotionOut;
+
+/**
+ * Successful Response
+ */
+export const zSuiteCatalogListingResponse = zSuiteCatalogOut;
 
 /**
  * Successful Response
