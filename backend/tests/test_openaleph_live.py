@@ -284,7 +284,14 @@ def test_the_corpus_is_searched_with_highlights_and_similar_documents_are_found(
     minutes = _upload(live, inv, "minutes.pdf", _pdf(
         "Board minutes of Kestrelwood Holdings Limited.",
         "Page two: Jonathan Whitaker approved the Zanzibar transfer to Meridian Holdings Ltd."), "application/pdf")
-    other = _upload(live, inv, "note.txt", b"Meridian Holdings Ltd paid Angela Merkel and Jane Doe again.", "text/plain")
+    # The note repeats what it shares with the memo, so more_like_this has terms to go on (the same fixture as
+    # PR #82 / #93, where this test kept passing).
+    other = _upload(
+        live, inv, "note.txt",
+        b"Meridian Holdings Ltd records show Jane Doe paid Angela Merkel. "
+        b"Meridian Holdings Ltd records show Jane Doe paid Angela Merkel.",
+        "text/plain",
+    )
 
     found = client.get(f"/api/investigations/{inv}/corpus/search", params={"q": "Zanzibar"}).json()
     assert found["state"] == "ok", found
