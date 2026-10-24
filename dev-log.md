@@ -2645,3 +2645,14 @@ Ony: "there's more to do, so continue". All on PR #102.
   EPIT and CAPT records now have a test.
 - `docs/project-notes/SECURITY_REGISTER.md`: Pillow 13.0.0 and Next.js 15.5.28 fix the known
   vulnerabilities; zod (needs zod 4) and the unpinned Elasticsearch and Redis images are open.
+
+## 2026-10-24 (evening): real crash drill, live OpenAleph, extraction comparison
+
+Ony: "keep developing". Docker runs in the cloud container, so the OpenAleph 5.3.1 stack ran here.
+- `tools/crash_drill.py`: SIGKILLs the API (uvicorn, PostgreSQL, Procrastinate) mid-upload and five
+  times mid-read; 40 scanned PDFs, all read once, nothing duplicated or left over (CRASH_RECOVERY.md).
+- The live OpenAleph tests (9) pass against the real stack with this branch.
+- `tools/extraction_parity.py` → EXTRACTION_PARITY.md: text matches; locators, archive handling and
+  damaged files differ. It found the pattern name-finder missing accented names and running
+  "Ltd." into the next sentence; both fixed (`NAME_RE`, `clean_names`), with a test.
+- FOOTPRINT.md: OpenAleph's side idles at 6.4 GiB, 12.7 GB of images, 5½ min cold start.
