@@ -924,6 +924,11 @@ def _run_reasoning_module(
                 db, investigation_id=investigation_id, question=question,
                 max_results=max_results, include_external_leads=include_external_leads,
             )
+        # The packet is the model's text and the run record's: plain JSON values only
+        # (a reviewed relationship's advisory carries datetimes; docs/project-notes/MODEL_TRIAL.md).
+        from fastapi.encoders import jsonable_encoder
+
+        packet = jsonable_encoder(packet)
         if module in QUOTE_CHECKED_MODULES:
             # The full quotable text of every cited record: the model quotes
             # from it and the quote check searches it (app/ai/quote_check.py).
