@@ -140,6 +140,9 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=24)
     parser.add_argument("--timeout", type=float, default=1800, help="seconds to wait for every document to finish")
     parser.add_argument("--out", type=Path, help="write the result as JSON here")
+    parser.add_argument("--db-down", help="shell command that stops the database, run once while reads run (audit test 5)")
+    parser.add_argument("--db-up", help="shell command that starts it again")
+    parser.add_argument("--db-down-seconds", type=float, default=20)
     args = parser.parse_args()
     name = args.database_url.rsplit("/", 1)[-1].split("?")[0].lower()
     if not args.database_url.startswith("postgresql") or not any(t in name for t in DISPOSABLE):
@@ -206,6 +209,33 @@ def main() -> int:
         time.sleep(random.uniform(0.5, 3))
         server.start()
 
+    # The database stops while reads run, and starts again; the API is not restarted,
+    # so this shows whether its queue worker and connections come back on their own.
+    outage: dict = {}
+    if args.db_down and args.db_up:
+        deadline = time.monotonic() + 300
+        while time.monotonic() < deadline and not client.get(
+                f"{base}/jobs", params={"investigation_id": inv, "status": "running"}).json():
+            time.sleep(0.5)
+        time.sleep(random.uniform(0.2, 2.0))
+        before = len(sampler.samples), sampler.failures
+        subprocess.run(args.db_down, shell=True, check=True)
+        outage["stopped_at"] = time.strftime("%H:%M:%S")
+        time.sleep(args.db_down_seconds)
+        subprocess.run(args.db_up, shell=True, check=True)
+        outage["started_at"] = time.strftime("%H:%M:%S")
+        back = time.monotonic()
+        while time.monotonic() - back < 120:
+            try:
+                if client.get(f"{base}/jobs", params={"investigation_id": inv, "limit": 1}).status_code == 200:
+                    break
+            except httpx.HTTPError:
+                pass
+            time.sleep(0.5)
+        outage["api_answering_again_after_s"] = round(time.monotonic() - back, 1)
+        outage["health_failures_during"] = sampler.failures - before[1]
+        outage["api_process_survived"] = server.proc is not None and server.proc.poll() is None
+
     # Retry what failed, as a reporter would, until every document is finished.
     started, retries = time.monotonic(), 0
     while time.monotonic() - started < args.timeout:
@@ -264,7 +294,7 @@ def main() -> int:
         "documents_with_more_than_one_reading_job": sum(1 for c in jobs_per_doc.values() if c > 1),
         "failed": [(f, err) for _id, f, status, err in docs if status != "complete"],
         "staging_left": staging, "files_without_a_row": sorted(on_disk - {str(Path(p).resolve()) for p in stored_paths}),
-        "reading_jobs": attempts, "queue_jobs": queue,
+        "reading_jobs": attempts, "queue_jobs": queue, "database_outage": outage,
         "kills": kills, "server_starts": server.starts, "retries_by_the_reporter": retries,
         "seconds_to_finish_after_last_kill": round(time.monotonic() - started),
         "health_ms": {"samples": len(sampler.samples), "failed_while_down": sampler.failures,
