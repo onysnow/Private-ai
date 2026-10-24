@@ -76,7 +76,7 @@
     "html-to-image": "^1.11.13",
     "lucide-react": "^1.48.0",
     "maplibre-gl": "^6.11.2",
-    "next": "15.5.27",
+    "next": "15.5.28",
     "react": "19.3.0",
     "react-compare-slider": "4.0.0",
     "react-dom": "19.3.0",
