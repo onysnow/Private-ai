@@ -30,8 +30,8 @@ lint config, not part of the running app.
 |---|---|---|
 | OpenAleph API, worker, ingest-file, ftm-analyze, UI | `${OPENALEPH_TAG:-5.3.1}` | pinned; the weekly **OpenAleph live CI** (`.github/workflows/openaleph-live-ci.yml`) runs the Workbench against these real services, so an OpenAleph upgrade is tested before it is used |
 | ftm-translate | `5.3.0-argos` | pinned |
-| Elasticsearch | `ghcr.io/openaleph/elasticsearch:latest` | **not pinned**: on 24 Oct `latest` was the same image as the moving tag `9` (digest `sha256:89586922…`), so a `docker compose pull` can bring a new Elasticsearch 9.x minor without any change in the repo. The existing search index lives in its volume |
-| Redis | `redis:alpine` | **not pinned**: any Redis version |
+| Elasticsearch | `ghcr.io/openaleph/elasticsearch:9@sha256:89586922…` | **pinned** on 24 Oct (Ony's call) by digest to the image `latest` pointed at (Elasticsearch 9.5.5; the repository publishes no 9.5.5 tag). Before, `latest` followed the moving tag `9`, so a `docker compose pull` could bring a new 9.x minor with no change in the repo |
+| Redis | `redis:8.10.2-alpine` | **pinned** on 24 Oct to the version `redis:alpine` was (same digest) |
 | PostgreSQL | `postgres:16-alpine`, `postgres:17-alpine` | major version pinned |
 
 Upgrade and rollback steps for the Workbench itself are in `DEPLOYMENT.md` §4–5.

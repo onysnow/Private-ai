@@ -43,7 +43,10 @@ services:
       retries: 20
 
   elasticsearch:
-    image: ghcr.io/openaleph/elasticsearch:latest
+    # Elasticsearch 9.5.5 as OpenAleph builds it, pinned by digest (the repository
+    # publishes no 9.5.5 tag; `latest` and `9` move). Change it on purpose, after
+    # the OpenAleph live CI passes on the new one (docs/project-notes/SECURITY_REGISTER.md).
+    image: ghcr.io/openaleph/elasticsearch:9@sha256:8958692228b516761250f96969e43e1af17d137e36920b4aead5e84fa1f6bda3
     environment:
       discovery.type: single-node
       xpack.security.enabled: "false"
@@ -58,7 +61,7 @@ services:
       start_period: 60s
 
   redis:
-    image: redis:alpine
+    image: redis:8.10.2-alpine
     command: ["redis-server", "--save", "3600", "10"]
     volumes:
       - openaleph-redis-data:/data
