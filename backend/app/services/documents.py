@@ -22,7 +22,10 @@ from app.jobs.corpus import request_corpus_sync
 # Pictures are documents too (app/services/image_reader.py): kept as pictures, their text read by OCR.
 # Emails, mailboxes, .zip archives and spreadsheets are read by app/services/container_readers.py.
 SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'} | set(IMAGE_EXTENSIONS) | set(CONTAINER_EXTENSIONS)
-NAME_RE = re.compile(r"\b([A-Z][A-Za-z'’.-]+(?:\s+(?:[A-Z][A-Za-z'’.-]+|of|the|and|&)){1,5})\b")
+# Capitals and letters of the Latin alphabet, accented ones too (Société Générale, Müller & Söhne).
+_NAME_UPPER = "A-ZÀ-ÖØ-Þ"
+_NAME_LETTER = "A-Za-zÀ-ÖØ-öø-ÿĀ-ž"
+NAME_RE = re.compile(rf"\b([{_NAME_UPPER}][{_NAME_LETTER}'’.-]+(?:\s+(?:[{_NAME_UPPER}][{_NAME_LETTER}'’.-]+|of|the|and|&)){{1,5}})\b")
 ORG_SUFFIX = re.compile(r"\b(Inc\.?|LLC|Ltd\.?|Corporation|Corp\.?|Company|Co\.?|Department|Commission|Authority|University|Foundation|Association|Committee|Council|Bank)\b", re.I)
 SENTENCE_SPLIT_RE = re.compile(r'(?<=[.!?])\s+')
 CLAIM_TRIGGER_RE = re.compile(r'\b(is|are|was|were|has|have|had|will|did|does|announced|reported|paid|owns|served|worked|received|filed|approved|voted)\b', re.I)
@@ -498,6 +501,10 @@ def preview_entity_candidate_matches(db: Session, candidate: ExtractionCandidate
     }
 
 def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: str, note: str|None=None, entity_schema: str|None=None, caption: str|None=None, claim_status: str='lead', confidence: float|None=None, matched_entity_id: str|None=None, entity_identity_decision: str|None=None, target_entity_id: str|None=None) -> dict:
+    # Two people deciding at once: the second waits here for the first and then
+    # sees its decision, instead of a status read before either wrote.
+    lock_investigation_transaction(db, candidate.investigation_id)
+    db.refresh(candidate)
     if candidate.review_status != 'proposed':
         raise ValueError('Candidate has already been reviewed')
     if decision not in {'accept','reject'}: raise ValueError('Decision must be accept or reject')

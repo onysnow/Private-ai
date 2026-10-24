@@ -2611,3 +2611,48 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
 - Suite coverage (same day): app/ai/suite_map.json maps 78 app values to suite terms (an agent read the suite;
   every term string was then checked present in the vendored file). Adding a value to any of the vocabularies in
   suite_map.app_vocabularies() without mapping it fails tests/test_suite_map.py; so does a stale SUITE_GAPS.md.
+
+## 2026-10-24: crash recovery (audit of 23 Oct, §7)
+
+Ony asked to start on the 23 Oct research docs in Drive. Started with their P1 §7: what a stop
+mid-ingestion leaves behind. Details and the remaining gaps: docs/project-notes/CRASH_RECOVERY.md.
+- New `app/jobs/recovery.py`, run by `JobRunner` at start-up (and every minute on Procrastinate,
+  with the stalled-job check): a document saved without its reading job gets a failed job to retry;
+  a Procrastinate job row the queue never held is failed after an hour unmoved; files left in
+  `.upload-staging` are removed.
+- Tests: `tests/test_crash_recovery.py` (9; passes on SQLite and PostgreSQL 16; 3 fail without the
+  runner change) and one Procrastinate test. Of the 51 test files that start the app with stored
+  documents, all pass except two that need Tesseract, which this container lacks (they fail the
+  same way without the change).
+- Checked in OpenAleph 5.3.1's source: an upload with a `foreign_id` the collection holds updates
+  that document, so re-sending after a lost reply makes no second copy.
+- Review round (Copilot, PR #102): the sweep takes a PostgreSQL advisory lock and re-checks each
+  row in its UPDATE; `requeue_for_retry` clears the old `queue_job_id`; a job for a file inside an
+  archive records `parent_job_id` and is failed only once that job has finished.
+
+## 2026-10-24 (later): the rest of the 23 Oct audit's items
+
+Ony: "there's more to do, so continue". All on PR #102.
+- A retried read whose text was already saved finishes the steps after it (OpenAleph's names, the
+  OpenAleph upload) instead of failing on "already read" (`app/jobs/handlers.py`).
+- Two people deciding one proposal or reviewing one claim at once: both used to go through on
+  PostgreSQL (a proposal accepted then rejected; a review event with a stale "from"). Both now lock
+  and re-read first; `tests/test_concurrent_reviews.py` failed before and passes after.
+- `tools/dependency_report.py` and its output `docs/project-notes/DEPENDENCY_REPORT.md`: no import
+  cycles at load time; `core.config` and `core.authorization` import `services.security`, a
+  dependency-free helper that sits in the wrong layer; no route module writes rows itself.
+- `docs/authority-suite/SUITE_COVERAGE.md`: the app runs TAS Modules 06 and 08 only; HYP, CFLT, ESRC,
+  EPIT and CAPT records now have a test.
+- `docs/project-notes/SECURITY_REGISTER.md`: Pillow 13.0.0 and Next.js 15.5.28 fix the known
+  vulnerabilities; zod (needs zod 4) and the unpinned Elasticsearch and Redis images are open.
+
+## 2026-10-24 (evening): real crash drill, live OpenAleph, extraction comparison
+
+Ony: "keep developing". Docker runs in the cloud container, so the OpenAleph 5.3.1 stack ran here.
+- `tools/crash_drill.py`: SIGKILLs the API (uvicorn, PostgreSQL, Procrastinate) mid-upload and five
+  times mid-read; 40 scanned PDFs, all read once, nothing duplicated or left over (CRASH_RECOVERY.md).
+- The live OpenAleph tests (9) pass against the real stack with this branch.
+- `tools/extraction_parity.py` → EXTRACTION_PARITY.md: text matches; locators, archive handling and
+  damaged files differ. It found the pattern name-finder missing accented names and running
+  "Ltd." into the next sentence; both fixed (`NAME_RE`, `clean_names`), with a test.
+- FOOTPRINT.md: OpenAleph's side idles at 6.4 GiB, 12.7 GB of images, 5½ min cold start.

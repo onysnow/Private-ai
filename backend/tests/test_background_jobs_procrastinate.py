@@ -147,3 +147,84 @@ def test_ai_run_is_queued_and_its_result_is_on_the_job(client, monkeypatch):
     candidate = client.get(f"/api/ai-analysis-candidates/{job['result']['candidate_id']}").json()
     assert candidate["review_status"] == "proposed"
     governor.reset()
+
+
+def test_the_watchdog_fails_what_a_stopped_process_left_outside_the_queue(client, tmp_path):
+    """The app stopped between saving a document and making its job, and
+    between making a job and handing it to the queue (app/jobs/recovery.py).
+    Once neither has moved for a while, the stalled-job check gives each a
+    failed job the reporter can retry; it never touches what is in the queue."""
+    from datetime import timedelta
+
+    from sqlalchemy.orm import Session
+
+    from app.core.time import utcnow_naive
+    from app.jobs import recovery
+    from app.jobs.records import create_job
+    from app.models.domain import BackgroundJob, Document
+    from app.services.documents import store_document
+
+    inv = client.post("/api/investigations", json={"name": "Stopped mid-upload"}).json()["id"]
+    engine = create_engine(POSTGRES_URL)
+    try:
+        with Session(engine) as db:
+            unread = store_document(db, investigation_id=inv, title="Memo", filename="memo.txt", mime_type="text/plain",
+                                    data=b"Acme Holdings Inc. announced a program.\n", storage_dir=tmp_path / "docs").id
+            never_queued = create_job(db, kind="probe", investigation_id=inv, runner="procrastinate").id
+            fresh = create_job(db, kind="probe", investigation_id=inv, runner="procrastinate").id
+            old = utcnow_naive() - timedelta(hours=2)
+            db.execute(Document.__table__.update().where(Document.id == unread).values(created_at=old))
+            db.execute(BackgroundJob.__table__.update().where(BackgroundJob.id == never_queued).values(updated_at=old))
+            db.commit()
+
+        client.portal.call(client.app.state.jobs._retry_stalled)
+
+        with Session(engine) as db:
+            doc = db.get(Document, unread)
+            assert doc.extraction_status == "failed" and doc.extraction_error == recovery.UNREAD_DOCUMENT
+            [reading] = db.query(BackgroundJob).filter(BackgroundJob.subject_id == unread).all()
+            assert reading.status == "failed" and reading.runner == "procrastinate"
+            assert db.get(BackgroundJob, never_queued).error == recovery.NEVER_QUEUED_ERROR
+            assert db.get(BackgroundJob, fresh).status == "queued"
+            reading_id = reading.id
+
+        assert client.post(f"/api/jobs/{reading_id}/retry").status_code == 200
+        job = _wait_for(client, reading_id)
+        assert job["status"] == "succeeded", job
+        assert client.get(f"/api/documents/{unread}").json()["extraction_status"] == "complete"
+    finally:
+        engine.dispose()
+
+
+def test_only_one_recovery_sweep_runs_at_a_time(client, tmp_path):
+    """Two API processes sweeping at once would each give an unread document
+    a job; the second waits its turn instead (app/jobs/recovery.py)."""
+    from datetime import timedelta
+
+    from sqlalchemy.orm import Session
+
+    from app.core.time import utcnow_naive
+    from app.jobs import recovery
+    from app.models.domain import BackgroundJob, Document
+    from app.services.documents import store_document
+
+    inv = client.post("/api/investigations", json={"name": "Two sweeps"}).json()["id"]
+    engine = create_engine(POSTGRES_URL)
+    try:
+        with Session(engine) as db:
+            unread = store_document(db, investigation_id=inv, title="Memo", filename="memo.txt", mime_type="text/plain",
+                                    data=b"Acme Holdings Inc. announced a program.\n", storage_dir=tmp_path / "docs").id
+            db.execute(Document.__table__.update().where(Document.id == unread)
+                       .values(created_at=utcnow_naive() - timedelta(hours=2)))
+            db.commit()
+        sweep = dict(runner="procrastinate", storage_root=None, documents_older_than=timedelta(minutes=10),
+                     jobs_older_than=timedelta(hours=1), staged_older_than=timedelta(hours=1))
+        with Session(engine) as first, Session(engine) as second:
+            first.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": recovery.RECOVERY_LOCK_KEY})
+            assert recovery.recover(second, **sweep).documents == 0   # the first holds the sweep
+            first.rollback()
+            assert recovery.recover(second, **sweep).documents == 1
+            assert recovery.recover(second, **sweep).documents == 0   # done once, never again
+            assert second.query(BackgroundJob).filter(BackgroundJob.subject_id == unread).count() == 1
+    finally:
+        engine.dispose()
