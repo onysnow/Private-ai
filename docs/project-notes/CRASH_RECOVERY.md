@@ -48,10 +48,34 @@ process, so it recovers everything at start-up.
 
 ## Not done yet
 
-- **No real process kill.** The tests stop the work with an exception the app does not catch,
-  which leaves the same database state as a kill. A kill of the container (`docker kill` during a
-  large import) has not been run.
-- **No 50,000-document run** and no measurement on the target hardware. The batch test uses 12
-  documents.
+- **No 50,000-document run** and no measurement on the target hardware. The drill below used 40
+  documents on a 4-CPU cloud container; the batch test uses 12.
+- **No `docker kill` of the product's own containers.** The drill kills the API process group
+  (uvicorn and its reader processes), which is what a container kill does to it, but outside Docker.
 - **Worker termination, database disconnection and a queue backlog** on Procrastinate (audit test 5)
   are covered only for the rows above, not as a load test.
+
+## The crash drill (a real SIGKILL)
+
+`tools/crash_drill.py` runs the API with uvicorn on PostgreSQL 16 with the Procrastinate queue, as
+the Docker product does, uploads scanned PDFs (three pages each, so every read needs OCR), and
+kills the whole process group with SIGKILL: once while an upload request is in flight, and five
+times while reads are running. It restarts the API after each kill, retries what failed as a
+reporter would, and then checks the database and the storage folder.
+
+Run on 24 Oct 2026, 40 documents (`--documents 40 --kills 5`): **pass**.
+
+- All 40 files are one document each and all 40 are read, each with its three pages. No page
+  twice, no name proposed twice, one reading job per document, nothing left in
+  `.upload-staging`, no stored file without its row.
+- 38 reads succeeded at the first attempt; the 2 the kills stopped were handed back by
+  Procrastinate's stalled-job check and succeeded at the third attempt.
+- The upload kill landed between saving the document and making its job. That document waited
+  `queued` until the recovery sweep's 10 minutes passed, then had a failed job with "The app
+  stopped before this was read", and one retry read it. (The first run of the drill stopped
+  before the 10 minutes and reported it as unread; the drill now waits for every document.)
+- `GET /api/health`, sampled every half second while the API was up: median 5 ms, 95th percentile
+  88 ms, slowest 3.6 s. The slow answers come while the API's own two workers OCR. That is the
+  audit's P2 question about running the workers inside the API process; this is one measurement
+  on a cloud container, not on the target workstation.
+
