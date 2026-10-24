@@ -22,6 +22,8 @@ chunks, proposals or OpenAleph documents.
 | Procrastinate: job row saved, never handed to the queue | a job `queued` for ever | **new:** the stalled-job check fails it after an hour unmoved | `..._fails_what_a_stopped_process_left_outside_the_queue` |
 | Procrastinate: a file inside an archive being read by the archive's worker | a job `running` the queue does not know about | **new:** failed once the archive's own job has finished (its id is in the child job's payload), however long the read takes | `..._once_they_stop_moving` |
 | Procrastinate: a retry saved, not yet handed to the queue | a job `queued` still carrying the last attempt's queue id | **new:** a retry clears the old queue id, so the check above finds it | `test_a_retry_stopped_before_it_reached_the_queue_...` |
+| Reading: text saved, OpenAleph's names not staged yet | a read document without its names | **new:** the retry keeps the saved text and stages the names (skipping any already proposed) | `..._stages_openalephs_names_once` |
+| Reading: read locally, not yet sent to OpenAleph | a read document OpenAleph does not hold | **new:** the retry keeps the saved text and sends it | `..._the_retry_sends_it` |
 | A batch, stopped twice | a mix of the above | each document read exactly once after the retries | `test_a_batch_stopped_twice_...` |
 
 The OpenAleph row relies on OpenAleph 5.3.1's `Document.save` (`aleph/model/document.py`), which
@@ -38,19 +40,14 @@ process, so it recovers everything at start-up.
 ## Exact guarantees
 
 - Jobs run **at least once** when retried: a retry can run a handler again. What makes the effects
-  happen once is in the handlers: a document with chunks is never read again ("Document has already
-  been read"), OpenAleph's names are not proposed twice (`import_analysis_proposals` skips values
+  happen once is in the handlers: a document with chunks is never read again (a retry finishes the
+  steps after the read; a new reading job for it fails with "Document has already been read"), OpenAleph's names are not proposed twice (`import_analysis_proposals` skips values
   already proposed), and OpenAleph matches on `foreign_id`.
 - Recovery never deletes reporter data: it only adds failed jobs, marks documents failed, and
   removes staged copies that no row references.
 
 ## Not done yet
 
-- **A retry after the text was saved fails.** If the app stops after a document's chunks are
-  committed but before the next step (staging OpenAleph's names, or sending a locally read file to
-  OpenAleph), retrying the read job fails with "Document has already been read". The step can be
-  finished by hand ("Find names again"; the OpenAleph sync button), but the retry itself does not
-  resume.
 - **No real process kill.** The tests stop the work with an exception the app does not catch,
   which leaves the same database state as a kill. A kill of the container (`docker kill` during a
   large import) has not been run.

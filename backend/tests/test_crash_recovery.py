@@ -207,6 +207,81 @@ def test_stopped_mid_read_keeps_nothing_half_read_and_the_retry_reads_it_once(tm
     assert _counts(document_id) == first
 
 
+def _retry(job_id: str) -> str:
+    """POST /api/jobs/{id}/retry, as the in-process runner does it."""
+    with SessionLocal() as db:
+        requeue_for_retry(db, db.get(BackgroundJob, job_id))
+    return execute_job(SessionLocal, job_id, HANDLERS)
+
+
+@pytest.fixture()
+def openaleph(monkeypatch):
+    from openaleph_fake import FakeOpenAleph
+
+    fake = FakeOpenAleph().install(monkeypatch)
+    monkeypatch.setattr(settings, "openaleph_read_poll_seconds", 0.01)
+    monkeypatch.setattr(settings, "openaleph_analysis_timeout_seconds", 5)
+    return fake
+
+
+def test_stopped_after_the_text_was_saved_the_retry_stages_openalephs_names_once(tmp_path, storage, openaleph, monkeypatch):
+    from openaleph_fake import entity
+
+    import app.services.openaleph_analysis as analysis
+
+    monkeypatch.setattr(settings, "document_reader", "openaleph")
+    inv = _investigation()
+    document_id = _store(inv, storage, data=b"Jane Doe signed for Meridian Holdings Ltd.\n")
+    openaleph.entities["1.upload"] = entity("1.upload", bodyText="Jane Doe signed for Meridian Holdings Ltd.",
+                                            peopleMentioned=["jane doe"], detectedLanguage="eng")
+    with SessionLocal() as db:
+        job = create_job(db, kind="extract_document", investigation_id=inv, subject_type="document", subject_id=document_id)
+    real = analysis.import_analysis_proposals
+    _killed_at(monkeypatch, "app.services.openaleph_analysis", "import_analysis_proposals")
+    with pytest.raises(KeyboardInterrupt):
+        execute_job(SessionLocal, job.id, HANDLERS)
+    monkeypatch.setattr(analysis, "import_analysis_proposals", real)
+    saved = _counts(document_id)
+    assert saved[0] == 1   # the text was committed before the stop
+
+    with _start(tmp_path):
+        pass   # marks the job interrupted
+    assert _retry(job.id) == "succeeded"
+    assert _counts(document_id)[0] == saved[0]   # not read again
+    with SessionLocal() as db:
+        names = [c.payload["caption"] for c in db.scalars(select(ExtractionCandidate).where(
+            ExtractionCandidate.document_id == document_id, ExtractionCandidate.candidate_type == "entity"))]
+    assert names.count("Jane Doe") == 1
+    assert len(openaleph.uploads) == 1   # OpenAleph already had it
+
+
+def test_stopped_before_a_locally_read_file_reached_openaleph_the_retry_sends_it(tmp_path, storage, openaleph, monkeypatch):
+    import app.services.openaleph_corpus as corpus
+
+    monkeypatch.setattr(settings, "document_reader", "local")
+    monkeypatch.setattr(settings, "openaleph_auto_sync_documents", True)
+    inv = _investigation()
+    document_id = _store(inv, storage)
+    with SessionLocal() as db:
+        job = create_job(db, kind="extract_document", investigation_id=inv, subject_type="document", subject_id=document_id)
+    real = corpus.sync_document_to_openaleph
+    _killed_at(monkeypatch, "app.services.openaleph_corpus", "sync_document_to_openaleph")
+    with pytest.raises(KeyboardInterrupt):
+        execute_job(SessionLocal, job.id, HANDLERS)
+    monkeypatch.setattr(corpus, "sync_document_to_openaleph", real)
+    saved = _counts(document_id)
+
+    with _start(tmp_path):
+        pass
+    assert _retry(job.id) == "succeeded"
+    with SessionLocal() as db:
+        row = db.get(BackgroundJob, job.id)
+        assert row.message == "Document read and sent to OpenAleph"
+        sync = db.scalar(select(DocumentCorpusSync).where(DocumentCorpusSync.document_id == document_id))
+        assert sync.status == "synced"
+    assert _counts(document_id) == saved and len(openaleph.uploads) == 1
+
+
 # 3. Stopped after OpenAleph took the file, before the Workbench recorded it --
 
 class UpsertingOpenAleph:
