@@ -2629,3 +2629,19 @@ mid-ingestion leaves behind. Details and the remaining gaps: docs/project-notes/
 - Review round (Copilot, PR #102): the sweep takes a PostgreSQL advisory lock and re-checks each
   row in its UPDATE; `requeue_for_retry` clears the old `queue_job_id`; a job for a file inside an
   archive records `parent_job_id` and is failed only once that job has finished.
+
+## 2026-10-24 (later): the rest of the 23 Oct audit's items
+
+Ony: "there's more to do, so continue". All on PR #102.
+- A retried read whose text was already saved finishes the steps after it (OpenAleph's names, the
+  OpenAleph upload) instead of failing on "already read" (`app/jobs/handlers.py`).
+- Two people deciding one proposal or reviewing one claim at once: both used to go through on
+  PostgreSQL (a proposal accepted then rejected; a review event with a stale "from"). Both now lock
+  and re-read first; `tests/test_concurrent_reviews.py` failed before and passes after.
+- `tools/dependency_report.py` and its output `docs/project-notes/DEPENDENCY_REPORT.md`: no import
+  cycles at load time; `core.config` and `core.authorization` import `services.security`, a
+  dependency-free helper that sits in the wrong layer; no route module writes rows itself.
+- `docs/authority-suite/SUITE_COVERAGE.md`: the app runs TAS Modules 06 and 08 only; HYP, CFLT, ESRC,
+  EPIT and CAPT records now have a test.
+- `docs/project-notes/SECURITY_REGISTER.md`: Pillow 13.0.0 and Next.js 15.5.28 fix the known
+  vulnerabilities; zod (needs zod 4) and the unpinned Elasticsearch and Redis images are open.
