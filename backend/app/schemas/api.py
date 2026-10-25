@@ -459,15 +459,6 @@ class RecordRef(BaseModel):
     record_id: str
 
 
-class SuiteModuleRequest(BaseModel):
-    """A run of one suite module (ADR-0015)."""
-    question: str = Field(min_length=1, max_length=4000)
-    working_theory: str | None = Field(default=None, max_length=2000)
-    max_results: int = Field(default=30, ge=1, le=100)
-    include_external_leads: bool = True
-    prior_run_ids: list[str] | None = Field(default=None, max_length=5)
-
-
 class PresentationDraftRequest(BaseModel):
     goal: str = Field(min_length=1, max_length=4000)
     record_refs: list[RecordRef] = Field(min_length=1, max_length=200)

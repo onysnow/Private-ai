@@ -16,7 +16,7 @@ import re
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 SUITE_ROOT = Path(__file__).resolve().parent / "authority_suite"
 SYSTEMS = ("ras", "tas", "qas", "las", "das", "egs", "ehs")   # AGENTS.md's order: the pipeline, then support
@@ -166,7 +166,7 @@ def non_negotiables() -> str:
     return re.sub(r"\n\s*\[PROSE-BY-NATURE:.*?\]", "", section, flags=re.S).strip()
 
 
-def _walk_strings(node: Any, key: str | None = None) -> Iterator[tuple[str, str]]:
+def _walk_strings(node: Any, key: str | None = None):
     if isinstance(node, dict):
         for k, v in node.items():
             yield from _walk_strings(v, k)

@@ -452,7 +452,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "user_id": user["id"], "aid": activity, "bid": backup["id"], "kind": "investigation_export", "qid": saved["id"],
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
-            "indicator_id": "BO-001", "system": "las", "number": "01", "case_id": "deripaska-en-rusal", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
+            "indicator_id": "BO-001", "case_id": "deripaska-en-rusal", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
             "check_id": _check_item(client), "case_record_id": case_record["id"], "thought_id": "CLM-0001",
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },

@@ -67,7 +67,7 @@ export const PLAN = {
   {
    "system": "LAS",
    "why": "conclusions beyond what a source says",
-   "state": "next"
+   "state": "not_in_app"
   },
   {
    "system": "QAS",

@@ -5167,37 +5167,3 @@ class AiRunsOut(ResponseModel):
 class AiRunEventsOut(ResponseModel):
     run: AiRunOut
     events: list[AiRunEventOut]
-
-
-# --- The Authority System Suite catalog (ADR-0015) -------------------------------------
-
-
-class SuiteModuleOut(ResponseModel):
-    key: str              # suite:las.01, the module the run endpoint takes
-    number: str
-    title: str
-    use_when: str
-    path: str             # within the vendored suite
-
-
-class SuiteRecordOut(ResponseModel):
-    kind: str
-    prefix: str | None
-    id_field: str | None
-    fields: list[str]
-    closed: dict[str, list[str]]
-
-
-class SuiteSystemOut(ResponseModel):
-    code: str
-    name: str
-    trigger_row: int | None
-    when: str | None      # AGENTS.md's trigger for this system
-    modules: list[SuiteModuleOut]
-    records: list[SuiteRecordOut]
-
-
-class SuiteCatalogOut(ResponseModel):
-    """Every system, module and record of the vendored suite, as the app runs them."""
-    source: str | None
-    systems: list[SuiteSystemOut]

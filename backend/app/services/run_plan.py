@@ -159,13 +159,12 @@ def _steps(module: str, options: dict[str, str], include_external_leads: bool, r
 
 def _systems(module: str) -> list[dict]:
     """Which systems the answer will need, by the suite's trigger table (AGENTS.md: triggers are conditions on what
-    is about to be produced). TAS runs now; a system the answer trips is handed off after it ("next"): the run names
-    it with the module to run, and every suite module runs in the app (app/ai/suite_router.py, ADR-0015)."""
+    is about to be produced). Today the app runs TAS only."""
     reaches_beyond = module in TAS_MODULES
     rows = [
         {"system": "TAS", "why": "facts about real people, firms and documents", "state": "runs" if module in TAS_MODULES else "not_expected"},
-        {"system": "LAS", "why": "conclusions beyond what a source says", "state": "next" if reaches_beyond else "not_expected"},
-        {"system": "QAS", "why": "a theory tested against data", "state": "next" if module == "hypothesis_test" else "not_expected"},
+        {"system": "LAS", "why": "conclusions beyond what a source says", "state": "not_in_app" if reaches_beyond else "not_expected"},
+        {"system": "QAS", "why": "a theory tested against data", "state": "not_in_app" if module == "hypothesis_test" else "not_expected"},
         {"system": "RAS", "why": "published research", "state": "not_expected"},
         {"system": "DAS", "why": "recommending an action", "state": "not_expected"},
     ]

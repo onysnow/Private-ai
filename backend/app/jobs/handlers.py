@@ -424,8 +424,7 @@ def ai_reasoning_job(db: Session, job: BackgroundJob, report: Report) -> dict:
             working_theory=request.get("working_theory"), max_results=request.get("max_results", 30),
             include_external_leads=request.get("include_external_leads", True), control_flags=request.get("control_flags"),
             record_refs=request.get("record_refs"), run_options=request.get("run_options"), premises=request.get("premises"),
-            changes=request.get("changes"), packet_from=request.get("packet_from"), prior_run_ids=request.get("prior_run_ids"),
-            actor_id=request.get("actor_id"), run_id=job.id,
+            changes=request.get("changes"), packet_from=request.get("packet_from"), actor_id=request.get("actor_id"), run_id=job.id,
         )
     except Exception as exc:
         described = describe_reasoning_failure(exc)

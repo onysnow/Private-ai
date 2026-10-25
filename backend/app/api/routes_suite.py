@@ -13,30 +13,11 @@ from app.db.session import get_db
 from app.models.domain import CaseRecord, Claim, Evidence, Investigation, RelationshipEdge, Source
 from app.schemas.api import (CaseRecordAmend, CaseRecordCreate, ClaimSuiteFields, EvidenceSuiteFields, RelationshipSuiteFields,
                              SourceSuiteFields)
-from app.schemas.responses import CaseRecordOut, ClaimOut, EvidenceOut, SourceOut, SuiteCatalogOut
+from app.schemas.responses import CaseRecordOut, ClaimOut, EvidenceOut, SourceOut
 from app.services import case_records, suite_fields
 from app.services.relationships import serialize_relationship
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
-
-
-@router.get("/suite/catalog", response_model=SuiteCatalogOut)
-def suite_catalog_listing() -> Any:
-    """Every system, module and record of the vendored suite (ADR-0015): what
-    /investigations/{id}/assistant/suite/{system}/{number} can run, read from the suite's own files."""
-    from app.ai import suite_catalog
-    from app.ai.reasoning import _vendored_suite_commit
-    from app.ai.suite_router import trigger_rows
-
-    rows = trigger_rows()
-    return {"source": _vendored_suite_commit(), "systems": [{
-        "code": s.code, "name": s.name,
-        "trigger_row": rows[s.code].number if s.code in rows else None, "when": rows[s.code].when if s.code in rows else None,
-        "modules": [{"key": m.key, "number": m.number, "title": m.title, "use_when": m.use_when,
-                     "path": str(m.path.relative_to(suite_catalog.SUITE_ROOT))} for m in s.modules],
-        "records": [{"kind": r.kind, "prefix": r.prefix, "id_field": r.id_field, "fields": list(r.example),
-                     "closed": {k: list(v) for k, v in r.closed.items()}} for r in s.records],
-    } for s in suite_catalog.systems()]}
 
 
 def _get(db: Session, model: Any, row_id: str, name: str) -> Any:

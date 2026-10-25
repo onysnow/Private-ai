@@ -2656,19 +2656,3 @@ Ony: "keep developing". Docker runs in the cloud container, so the OpenAleph 5.3
   damaged files differ. It found the pattern name-finder missing accented names and running
   "Ltd." into the next sentence; both fixed (`NAME_RE`, `clean_names`), with a test.
 - FOOTPRINT.md: OpenAleph's side idles at 6.4 GiB, 12.7 GB of images, 5½ min cold start.
-
-## 2026-10-24 (night): every Authority System Suite system runs (ADR-0015)
-
-Ony: "prioritize making sure the entire Authority suite system is hooked up properly and working".
-- `app/ai/suite_catalog.py` reads each system's name, modules (use-when, prompt) and records (example,
-  id prefix, closed values) from the vendored copy; `tests/test_suite_catalog.py`.
-- `app/ai/suite_modules.py` + `app/ai/reasoning.py`: any module runs as `suite:<system>.<NN>` through
-  `POST /api/investigations/{id}/assistant/suite/{system}/{number}`, with the same packet, run record,
-  citation check and review gate as Modules 06 and 08. Each record in the answer is checked against its
-  own schema. `prior_run_ids` quotes earlier runs' answers and keeps their records citable.
-- `app/ai/suite_router.py`: a run's answer names the systems it trips by AGENTS.md's trigger table
-  (TAS inference → LAS 01, transaction → QAS 01, hypothesis → QAS 03, gap → EGS 01, right of reply →
-  EGS 03 and EHS 01, …), kept in the trace and the run record. The run plan shows LAS and QAS as
-  "next" instead of "not in the app yet" (same look on screen, new words in the tooltip).
-- `GET /api/suite/catalog` lists every system, module and record. `tests/test_suite_runs.py` (16):
-  a module of each of the seven systems end to end with a fake model, and all 60 prompts built.
