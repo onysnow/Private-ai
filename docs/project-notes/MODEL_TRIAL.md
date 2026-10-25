@@ -5,20 +5,26 @@ case, 10 records per packet, CPU only (4 cores, no GPU). Staged means the answer
 (its schema, the evidence it may cite, the suite's rules for that run) and waits for a reporter's review; refused
 means the app turned it away, with its reason.
 
-**9 of 11 runs staged. Every module but two staged an answer; those two were refused for real mistakes the checks
-are there to catch.**
+**8 of the 13 runs staged.** Every TAS question staged in its last run, and so did the LAS, DAS and EHS modules.
+RAS research vetting and QAS quant framing never staged: each was refused for a real mistake the checks are there to
+catch (and RAS once ran out of time). The first run (9 runs) went before a fix to the app's own context check; the
+second run (4 runs) repeated the theory tests and the two refused modules after it.
 
-| Module | Question | Outcome | Items | Citations | Seconds | App's reason |
-|---|---|---|---:|---:|---:|---|
-| case_synthesis (TAS 08) | What does the record establish about who made the cash deposits, and what is still unproven? | staged | 3 | 9 | 1440* | |
-| case_synthesis (TAS 08) | Which claims in this case are corroborated, and by which evidence? | staged | 1 | 1 | 340 | |
-| hypothesis_test (TAS 06) | Were the deposits structured to avoid the reporting threshold, or is there an innocent explanation? | staged | 1 | 16 | 520 | |
-| hypothesis_test (TAS 06) | Did a single person control every account in this case? | staged | 1 | 12 | 419 | |
-| research_vetting (RAS 03+04) | How do banks and regulators detect cash deposits structured to stay under the threshold? | refused | 0 | 0 | 856 | cited the case itself (`case:d8dfe052…`), which is not a record in the packet |
-| quant_framing (QAS 01+03) | Were the deposits kept under the $10,000 reporting threshold more often than chance would give? | refused (twice) | 0 | 0 | 521, 567 | said the data was not viewed before framing; it was in the packet (Module 01 rule 9) |
-| las_argument_check (LAS 01+02) | Does it follow from the record that the deposits were structured to avoid the reporting requirement? | staged | 3 | 2 | 364 | |
-| das_framing (DAS 01) | Should the story name the account holder now, or wait for their reply? | staged | 12 | 10 | 451 | |
-| ehs_harm_minimisation (EHS 02) | What harm could naming the account holder cause, and to whom? | staged | 1 | 6 | 353 | |
+| Run | Module | Question | Outcome | Items | Citations | Seconds | App's reason |
+|---|---|---|---|---:|---:|---:|---|
+| 1 | case_synthesis (TAS 08) | What does the record establish about who made the cash deposits, and what is still unproven? | staged | 3 | 9 | 1440* | |
+| 1 | case_synthesis (TAS 08) | Which claims in this case are corroborated, and by which evidence? | staged | 1 | 1 | 340 | |
+| 1 | hypothesis_test (TAS 06) | Were the deposits structured to avoid the reporting threshold, or is there an innocent explanation? | staged | 1 | 23 | 609 | |
+| 1 | hypothesis_test (TAS 06) | Did a single person control every account in this case? | refused (the app's error) | 0 | 0 | 348 | "ollama kept 10503 tokens of the prompt, the whole window": wrong; the prompt fitted an 18,432-token window and nothing was cut |
+| 1 | research_vetting (RAS 03+04) | How do banks and regulators detect cash deposits structured to stay under the threshold? | refused | 0 | 0 | 1801 | the 1,800-second limit the trial set ran out |
+| 1 | quant_framing (QAS 01+03) | Were the deposits kept under the $10,000 reporting threshold more often than chance would give? | refused | 0 | 0 | 521 | said the data was not viewed before framing; it was in the packet (Module 01 rule 9) |
+| 1 | las_argument_check (LAS 01+02) | Does it follow from the record that the deposits were structured to avoid the reporting requirement? | staged | 3 | 2 | 364 | |
+| 1 | das_framing (DAS 01) | Should the story name the account holder now, or wait for their reply? | staged | 12 | 10 | 451 | |
+| 1 | ehs_harm_minimisation (EHS 02) | What harm could naming the account holder cause, and to whom? | staged | 1 | 6 | 353 | |
+| 2 | hypothesis_test (TAS 06) | Were the deposits structured to avoid the reporting threshold, or is there an innocent explanation? | staged | 1 | 16 | 520 | |
+| 2 | hypothesis_test (TAS 06) | Did a single person control every account in this case? | staged | 1 | 12 | 419 | |
+| 2 | research_vetting (RAS 03+04) | How do banks and regulators detect cash deposits structured to stay under the threshold? | refused | 0 | 0 | 856 | cited the case itself (`case:d8dfe052…`), which is not a record in the packet |
+| 2 | quant_framing (QAS 01+03) | Were the deposits kept under the $10,000 reporting threshold more often than chance would give? | refused | 0 | 0 | 567 | the same as run 1 (Module 01 rule 9) |
 
 \* The first run shared the CPU with a local OpenAleph stack.
 
@@ -30,7 +36,7 @@ are there to catch.**
   and refuses one the model cannot hold before any evidence is sent.
 - **A refusal of the app's own making.** The first version of that fix refused a theory test whose 10,503-token
   prompt fitted an 18,432-token window; Ollama's log shows nothing was cut. The check now refuses only a prompt that
-  filled the whole window; run again, that theory test staged (the row above).
+  filled the whole window; run again, that theory test staged (run 2).
 
 ## Not measured
 
