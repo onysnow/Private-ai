@@ -1,4 +1,4 @@
-"""The Authority System Suite read from the vendored copy (app/ai/suite_catalog.py, ADR-0015).
+"""The Authority System Suite read from the vendored copy (app/ai/suite_catalog.py, ADR-0017).
 
 Every system, module and record the app runs comes from the suite's own files,
 so these fail when an update to the vendored copy stops parsing, rather than a

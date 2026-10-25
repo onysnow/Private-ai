@@ -2720,3 +2720,11 @@ and Your review says "you rejected it" or, dimmed, "stopped by the checks". A st
 Tests: test_suite_service.py (6), watch-the-run (23, 2 new); vitest 1309 passed, tsc and eslint clean; backend
 touched tests, mypy, ruff and the OpenAPI check pass. Not changed: the map's small size and overlapping axis labels
 at phone width, which were there before.
+
+## 2026-10-25: the two suite branches combined (ADR-0017)
+
+PR #102 had hooked all seven systems in generically (60 modules, one contract) without finding PR #87, which
+already ran eight modules of the other six with the suite's limits and INTEROP's boundaries. Ony: combine, #87 as
+base. The generic runner is reverted and #87's four suite commits are on this branch (its screen and feature
+commits are not). Kept from #102: `suite_catalog.py`, a drift test that holds #87's copied value lists to the
+suite's whole lists, `GET /api/suite/catalog`, and the Ollama context-window fix.

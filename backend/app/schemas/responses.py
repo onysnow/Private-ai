@@ -5221,3 +5221,38 @@ class AiRunsOut(ResponseModel):
 class AiRunEventsOut(ResponseModel):
     run: AiRunOut
     events: list[AiRunEventOut]
+
+
+# --- The Authority System Suite catalog (app/ai/suite.py catalog) ------------------------
+
+
+class SuiteCatalogModuleOut(ResponseModel):
+    number: str
+    title: str
+    use_when: str
+    path: str                 # within the vendored suite
+    runs_in: list[str]        # the app runs that use it; empty when none does
+    final_audit: bool         # runs in a fresh context, never in the run it audits
+
+
+class SuiteCatalogRecordOut(ResponseModel):
+    kind: str
+    prefix: str | None
+    id_field: str | None
+    fields: list[str]
+    closed: dict[str, list[str]]
+
+
+class SuiteCatalogSystemOut(ResponseModel):
+    code: str
+    name: str
+    row: int                  # AGENTS.md trigger table
+    kind: str                 # authority or support
+    modules: list[SuiteCatalogModuleOut]
+    records: list[SuiteCatalogRecordOut]
+
+
+class SuiteCatalogOut(ResponseModel):
+    """Every system, module and record of the vendored suite, and which app runs use each module."""
+    source: str | None
+    systems: list[SuiteCatalogSystemOut]

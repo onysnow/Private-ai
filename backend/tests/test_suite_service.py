@@ -162,3 +162,21 @@ def test_a_run_names_the_answer_it_saved_its_current_review_and_its_route(monkey
     assert route["modules_in_system"] == suite.module_count("tas") and route["final_audit"]["node"] == "tas/10"
     for system, name in suite.FINAL_AUDIT.items():
         assert (suite.SYSTEMS_ROOT / system / "PROMPT_MODULES" / name).is_file(), system
+
+
+def test_the_catalog_lists_every_module_and_which_runs_use_it():
+    from fastapi.testclient import TestClient
+
+    from app.ai import suite_catalog
+    from app.main import app
+
+    body = TestClient(app).get("/api/suite/catalog").json()
+    assert [s["code"] for s in body["systems"]] == list(suite_catalog.SYSTEMS)
+    modules = {(s["code"], m["number"]): m for s in body["systems"] for m in s["modules"]}
+    assert len(modules) == sum(len(s.modules) for s in suite_catalog.systems())
+    assert modules[("tas", "08")]["runs_in"] == ["case_synthesis"]
+    assert modules[("ehs", "03")]["runs_in"] == []                      # source protection is not run (SUITE_SYSTEMS_IN_APP.md)
+    assert modules[("las", "10")]["final_audit"] and modules[("las", "10")]["runs_in"] == []
+    used = {k for m in modules.values() for k in m["runs_in"]}
+    from app.ai.suite import ROUTES
+    assert used == {k for k, r in ROUTES.items() if r.system != "app"}  # every suite run's files are in the catalog

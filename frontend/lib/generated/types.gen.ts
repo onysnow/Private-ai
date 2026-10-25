@@ -16386,6 +16386,110 @@ export type StyleWarningOut = {
 };
 
 /**
+ * SuiteCatalogModuleOut
+ */
+export type SuiteCatalogModuleOut = {
+  /**
+   * Final Audit
+   */
+  final_audit: boolean;
+  /**
+   * Number
+   */
+  number: string;
+  /**
+   * Path
+   */
+  path: string;
+  /**
+   * Runs In
+   */
+  runs_in: Array<string>;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Use When
+   */
+  use_when: string;
+};
+
+/**
+ * SuiteCatalogOut
+ *
+ * Every system, module and record of the vendored suite, and which app runs use each module.
+ */
+export type SuiteCatalogOut = {
+  /**
+   * Source
+   */
+  source: string | null;
+  /**
+   * Systems
+   */
+  systems: Array<SuiteCatalogSystemOut>;
+};
+
+/**
+ * SuiteCatalogRecordOut
+ */
+export type SuiteCatalogRecordOut = {
+  /**
+   * Closed
+   */
+  closed: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Fields
+   */
+  fields: Array<string>;
+  /**
+   * Id Field
+   */
+  id_field: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Prefix
+   */
+  prefix: string | null;
+};
+
+/**
+ * SuiteCatalogSystemOut
+ */
+export type SuiteCatalogSystemOut = {
+  /**
+   * Code
+   */
+  code: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Modules
+   */
+  modules: Array<SuiteCatalogModuleOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Records
+   */
+  records: Array<SuiteCatalogRecordOut>;
+  /**
+   * Row
+   */
+  row: number;
+};
+
+/**
  * SuiteCoverageCountsOut
  */
 export type SuiteCoverageCountsOut = {
@@ -29046,6 +29150,37 @@ export type PromoteStatementAssessmentResponses = {
 
 export type PromoteStatementAssessmentResponse =
   PromoteStatementAssessmentResponses[keyof PromoteStatementAssessmentResponses];
+
+export type GetSuiteCatalogData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/suite/catalog';
+};
+
+export type GetSuiteCatalogErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSuiteCatalogError =
+  GetSuiteCatalogErrors[keyof GetSuiteCatalogErrors];
+
+export type GetSuiteCatalogResponses = {
+  /**
+   * Successful Response
+   */
+  200: SuiteCatalogOut;
+};
+
+export type GetSuiteCatalogResponse =
+  GetSuiteCatalogResponses[keyof GetSuiteCatalogResponses];
 
 export type GetMappingSchemasData = {
   body?: never;

@@ -145,6 +145,7 @@ import {
   getStanding,
   getStory,
   getStoryVersion,
+  getSuiteCatalog,
   getSuiteCoverage,
   getTaggedRecords,
   getTags,
@@ -704,6 +705,9 @@ import type {
   GetStoryVersionData,
   GetStoryVersionError,
   GetStoryVersionResponse,
+  GetSuiteCatalogData,
+  GetSuiteCatalogError,
+  GetSuiteCatalogResponse,
   GetSuiteCoverageData,
   GetSuiteCoverageError,
   GetSuiteCoverageResponse,
@@ -9904,6 +9908,37 @@ export const promoteStatementAssessmentMutation = (
   };
   return mutationOptions;
 };
+
+export const getSuiteCatalogQueryKey = (
+  options?: Options<GetSuiteCatalogData>,
+) => createQueryKey('getSuiteCatalog', options);
+
+/**
+ * Get Suite Catalog
+ *
+ * Every system, module and record of the vendored Authority System Suite, read from its own files, with the
+ * app runs that use each module (none, for a module the app leaves out).
+ */
+export const getSuiteCatalogOptions = (
+  options?: Options<GetSuiteCatalogData>,
+) =>
+  queryOptions<
+    GetSuiteCatalogResponse,
+    GetSuiteCatalogError,
+    GetSuiteCatalogResponse,
+    ReturnType<typeof getSuiteCatalogQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSuiteCatalog({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSuiteCatalogQueryKey(options),
+  });
 
 export const getMappingSchemasQueryKey = (
   options?: Options<GetMappingSchemasData>,

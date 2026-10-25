@@ -6,9 +6,10 @@ code on 24 Oct 2026 against the vendored suite (`backend/app/ai/authority_suite/
 `SUITE_GAPS.md` next to this file is the word-by-word comparison of the app's values with the
 suite's; this file is about what runs.
 
-**Short answer: the app runs one system, TAS, through two of its modules. It records some EHS and
-EGS records and checks them against the suite's lists. It does nothing with RAS, QAS, LAS or DAS
-except name them as hand-offs it cannot make.**
+**Short answer (updated 25 Oct 2026): this table is the state before PR #87's suite runs joined this
+branch.** The app now runs eight modules of the other six systems as well as TAS Modules 06 and 08; what runs, what
+crosses between runs and what is left out are in `SUITE_SYSTEMS_IN_APP.md`, and `GET /api/suite/catalog` lists every
+module with the runs that use it (ADR-0017). The table is kept as the audit's record.
 
 | | TAS Topic | EHS Ethics & Harm | EGS Evidence Gathering | LAS Logic | QAS Quantitative | RAS Research | DAS Decision |
 |---|---|---|---|---|---|---|---|

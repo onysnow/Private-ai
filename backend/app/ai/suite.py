@@ -215,3 +215,26 @@ def systems_status() -> list[dict[str, Any]]:
                          "available": all(p.exists() for p in r.files)} for r in modules],
         })
     return rows
+
+
+def catalog() -> dict[str, Any]:
+    """Every module and record of the vendored suite, read from its own files (app/ai/suite_catalog.py), with the
+    app runs that use each module. A module no run uses is listed too, and a final audit says it never runs in the
+    run it audits: what the app leaves out is shown, not hidden."""
+    from app.ai import suite_catalog
+
+    rows = []
+    for system in suite_catalog.systems():
+        audit = FINAL_AUDIT.get(system.code)
+        rows.append({
+            "code": system.code, "name": system.name, "row": SYSTEM_NAMES[system.code][2], "kind": SYSTEM_NAMES[system.code][1],
+            "modules": [{
+                "number": m.number, "title": m.title, "use_when": m.use_when,
+                "path": str(m.path.relative_to(SUITE_ROOT)),
+                "runs_in": sorted(r.module for r in ROUTES.values() if m.path in r.files),
+                "final_audit": audit is not None and m.path.name == audit,
+            } for m in system.modules],
+            "records": [{"kind": r.kind, "prefix": r.prefix, "id_field": r.id_field, "fields": list(r.example),
+                         "closed": {k: list(v) for k, v in r.closed.items()}} for r in system.records],
+        })
+    return {"source": vendored_commit(), "systems": rows}

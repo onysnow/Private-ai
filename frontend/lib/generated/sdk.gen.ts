@@ -420,6 +420,9 @@ import type {
   GetStoryVersionData,
   GetStoryVersionErrors,
   GetStoryVersionResponses,
+  GetSuiteCatalogData,
+  GetSuiteCatalogErrors,
+  GetSuiteCatalogResponses,
   GetSuiteCoverageData,
   GetSuiteCoverageErrors,
   GetSuiteCoverageResponses,
@@ -1170,6 +1173,7 @@ import {
   zGetStoryResponse,
   zGetStoryVersionPath,
   zGetStoryVersionResponse,
+  zGetSuiteCatalogResponse,
   zGetSuiteCoverageResponse,
   zGetTaggedRecordsPath,
   zGetTaggedRecordsResponse,
@@ -9831,6 +9835,38 @@ export const promoteStatementAssessment = <
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Suite Catalog
+ *
+ * Every system, module and record of the vendored Authority System Suite, read from its own files, with the
+ * app runs that use each module (none, for a module the app leaves out).
+ */
+export const getSuiteCatalog = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSuiteCatalogData, ThrowOnError>,
+): RequestResult<
+  GetSuiteCatalogResponses,
+  GetSuiteCatalogErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetSuiteCatalogResponses,
+    GetSuiteCatalogErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSuiteCatalogResponse.parseAsync(data),
+    url: '/api/suite/catalog',
+    ...options,
   });
 
 /**
