@@ -308,20 +308,23 @@ class OllamaLLMClient(LLMClient):
         if response.status_code >= 400:
             raise LLMProviderError(f"ollama request failed: HTTP {response.status_code}: {response.text[:300]}")
         data = response.json()
-        # A prompt that still filled the window was cut (Ollama keeps num_ctx - num_predict tokens of it).
+        # A prompt that still filled the whole window was cut. (A 10,503-token prompt in an 18,432-token window was
+        # read whole, with no "truncating input prompt" in Ollama's log: the window, not window minus answer, is the limit.)
         evaluated = data.get("prompt_eval_count") if isinstance(data, dict) else None
-        if isinstance(evaluated, int) and evaluated >= num_ctx - max_tokens - 8:
+        if isinstance(evaluated, int) and evaluated >= num_ctx - 8:
             raise LLMContextError(f"ollama kept {evaluated} tokens of the prompt, the whole window; the rest was dropped")
         return parse_ollama_response(data, fallback_model=self._model, allow_remote=self._allow_remote)
 
 
-CHARS_PER_TOKEN = 3          # under English's ~4: JSON and ids tokenize densely; too big a window costs only memory
+# Measured on the reasoning prompts with qwen2.5: about 2.9 characters a token (JSON and ids tokenize densely).
+# Estimated low on purpose: too big a window costs only memory.
+CHARS_PER_TOKEN = 2.5
 MIN_CONTEXT = 4096
 
 
 def context_tokens_needed(system_prompt: str, user_prompt: str, max_tokens: int) -> int:
     """The context window a request needs: its prompt, estimated generously, plus the answer, in 1024-token steps."""
-    needed = (len(system_prompt) + len(user_prompt)) // CHARS_PER_TOKEN + max_tokens + 256
+    needed = int((len(system_prompt) + len(user_prompt)) / CHARS_PER_TOKEN) + max_tokens + 256
     return max(MIN_CONTEXT, -(-needed // 1024) * 1024)
 
 

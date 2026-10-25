@@ -85,10 +85,16 @@ def test_the_context_window_is_sized_to_the_request():
 
 def test_a_prompt_that_still_filled_the_window_is_refused():
     chat = {"model": "llama3.2", "message": {"role": "assistant", "content": "{}"}, "done": True, "done_reason": "stop",
-            "prompt_eval_count": 4096 - 64}
+            "prompt_eval_count": 4096}
     client = OllamaLLMClient("http://127.0.0.1:11434", "llama3.2", transport=_ollama(chat=chat))
     with pytest.raises(LLMContextError, match="dropped"):
         client.generate("system", "user", max_tokens=64)
+
+    # A prompt that fit, however little room it left the answer, is not refused (Ollama read 10,503 tokens of an
+    # 18,432-token window whole).
+    chat["prompt_eval_count"] = 4096 - 64 - 100
+    client = OllamaLLMClient("http://127.0.0.1:11434", "llama3.2", transport=_ollama(chat=chat))
+    assert client.generate("system", "user", max_tokens=64).text == "{}"
 
 
 @pytest.mark.parametrize("model, show", [
