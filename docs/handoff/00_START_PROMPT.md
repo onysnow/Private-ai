@@ -27,7 +27,7 @@ Next up, in order:
 Rules that bite:
 - **Mockups first.** Ony approves a mockup before the app changes. The Wire (SEE_1) still needs a new mockup.
 - **Commands for Ony:** one line, starting with `cd /d C:\Users\Wigi\Documents\Private-ai &&`.
-- **The Authority System Suite is beta.** If a problem's cause is inside `backend/app/ai/authority_suite`, report it
+- **The Authority System Suite is beta.** If a problem's cause is inside the suite (bundled in the `authority-suite-sdk` package), report it
   to Ony; do not work around it.
 - **Writing:** lead with the answer. Say what was checked and what wasn't. Make no unrequested recommendations.
 

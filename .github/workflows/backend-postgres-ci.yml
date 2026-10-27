@@ -39,8 +39,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # The Authority System Suite is vendored in backend/app/ai/authority_suite,
-      # so nothing beyond the checkout is fetched (it was a private submodule).
+      # The Authority System Suite comes from the authority-suite-sdk package in
+      # backend/requirements.txt (private repository; pip needs git credentials that
+      # can read onysnow/authority-suite-sdk).
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"

@@ -2611,3 +2611,19 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
 - Suite coverage (same day): app/ai/suite_map.json maps 78 app values to suite terms (an agent read the suite;
   every term string was then checked present in the vendored file). Adding a value to any of the vocabularies in
   suite_map.app_vocabularies() without mapping it fails tests/test_suite_map.py; so does a stale SUITE_GAPS.md.
+
+## 2026-10-27: the Authority Suite SDK replaces the vendored suite copy
+
+- `backend/app/ai/authority_suite/` (the plain copy at b1c71e8) is gone. `authority-suite-sdk` is pinned in
+  `backend/requirements.txt` and imported only in `app/ai/authority_sdk.py`; everything the app reads from the suite
+  (module prompts, the control surface, the TAS version, the commit, the likelihood terms) goes through it.
+- `MODULE_FILES` now holds a suite path (a string) for TAS modules and a `Path` for the app-local one.
+  `SUITE_ROOT`, `TAS_ROOT`, `_vendored_suite_commit` and `_vendored_tas_version` are removed.
+- The status block keeps its keys (`authority_suite.present/source/tas_version/modules/control_surface`, `vendored_tas`),
+  so the API contract and the front end are unchanged. `source` now reads `...@d2b2186`.
+- The suite the app runs on moves from b1c71e8 to the SDK's d2b2186. Files the app reads that changed: TAS Module 08
+  (new rule 11, rules 9 and item 11 reworded), TAS Module 02 rule 7, and TAS CHANGELOG. Module 06, CONTROL_SURFACE,
+  OUTPUT_SCHEMAS (TAS, EHS, EGS) and the Standard are identical. TAS version is still 1.12. The meanings in
+  `suite_map.json` were read against b1c71e8; the tests confirm each term is still present in d2b2186, not that its
+  meaning is unchanged.
+- Installing the backend needs git (added to the Dockerfile) and credentials that can read the private SDK repository.

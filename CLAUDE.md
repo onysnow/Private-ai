@@ -17,7 +17,7 @@ Read docs/project-notes/START_HERE.md first: it says where the work stands. The 
 - **UI:** innovative, using the fact it's digital, not copies of other tools.
 - **Approval mode is auto:** proceed without stopping on routine steps.
 - **Don't create new problems while fixing things.**
-- **The Authority System Suite is in beta** (`backend/app/ai/authority_suite`). When a problem's cause is in the suite
+- **The Authority System Suite is in beta** (bundled in `authority-suite-sdk`, which `backend/app/ai/authority_sdk.py` imports; this repo keeps no copy). When a problem's cause is in the suite
   itself (its rules, prompts, systems or outputs) rather than in this app, don't work around it in the app: tell Ony
   what it is and where, so he can fix it in the suite.
 

@@ -14,16 +14,16 @@ from app.db.session import Base, SessionLocal, engine
 from app.main import app
 from app.core.config import settings
 import app.ai.reasoning as reasoning_module
+from app.ai import authority_sdk
 from app.ai.governor import governor
 from app.ai.llm_client import LLMProviderError, LLMResponse
 
 
-# The vendored TAS spec is a private submodule; CI without TAS_REPO_TOKEN runs
-# without it (see .github/workflows/backend-postgres-ci.yml). Tests that actually
-# build a prompt from it skip there, mirroring tests/test_tas_submodule_drift.py;
-# gating/queue/settings tests that never read a spec file still run.
-_SUITE_PRESENT = (reasoning_module.TAS_ROOT / "PROMPT_MODULES").exists()
-requires_suite = pytest.mark.skipif(not _SUITE_PRESENT, reason="vendored Authority System Suite missing")
+# The Authority System Suite comes from the Authority Suite SDK, which the backend
+# requires, so it is always present; the marker stays on the tests that build a prompt
+# from it so a broken SDK install skips them visibly instead of erroring.
+_SUITE_PRESENT = authority_sdk.suite_has(reasoning_module.MODULE_FILES["case_synthesis"])  # type: ignore[arg-type]
+requires_suite = pytest.mark.skipif(not _SUITE_PRESENT, reason="Authority System Suite missing from the SDK")
 
 
 class _FakeLLMClient:
@@ -297,7 +297,7 @@ def test_settings_status_reports_ai_reasoning_state_without_secrets():
         assert "sk-ant" not in r.text, "settings status must never leak key material"
         if ai["authority_suite"]["present"]:
             assert ai["endpoints_callable"] is True
-            assert ai["authority_suite"]["tas_version"] == "1.12", "TAS version is read from the vendored CHANGELOG's first version heading"
+            assert ai["authority_suite"]["tas_version"] == "1.12", "TAS version is read from the suite's CHANGELOG first version heading"
             assert ai["authority_suite"]["source"].startswith("onysnow/Authority-System-Suite@")
     finally:
         settings.anthropic_api_key = original_key
@@ -312,7 +312,7 @@ def test_missing_suite_file_is_a_clean_400_not_a_500(monkeypatch):
     client = TestClient(app)
     seeded = _seeded_investigation(client)
     monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: _FakeLLMClient("{}"))
-    monkeypatch.setitem(reasoning_module.MODULE_FILES, "case_synthesis", reasoning_module.TAS_ROOT / "PROMPT_MODULES" / "99_DOES_NOT_EXIST.md")
+    monkeypatch.setitem(reasoning_module.MODULE_FILES, "case_synthesis", "systems/tas/PROMPT_MODULES/99_DOES_NOT_EXIST.md")
     r = client.post(
         f"/api/investigations/{seeded['investigation']['id']}/assistant/case-synthesis",
         json={"question": "What did Ada North sign?"},

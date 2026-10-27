@@ -2,12 +2,12 @@
 Contradiction Testing (Module 06) as real, LLM-backed endpoints.
 
 This module owns exactly the glue between `build_question_context()`'s
-retrieval packet, the vendored TAS module prompts, an `LLMClient`, and
+retrieval packet, the TAS module prompts (from the Authority Suite SDK), an `LLMClient`, and
 strict citation validation. It deliberately knows nothing about HTTP —
 `app/api/routes.py` stays a thin wrapper (see STRUCTURE_AUDIT.md
 STRUCT-0002 for why routes.py should not keep absorbing logic).
 
-Non-negotiable, matching issue #36 and this repo's TAS vendoring:
+Non-negotiable, matching issue #36 and this repo's use of TAS:
 model output is never trusted directly. Every evidence reference it
 makes is checked against the retrieval packet's own `citations` list
 before the result is even considered for the review queue, and the
@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import json
 import re
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +28,9 @@ from sqlalchemy.orm import Session
 from app.ai.chart_check import (
     CHART_VISUAL_TYPE, MAX_CHART_RETRIES, check_presentation_charts, retry_feedback, visual_catalog_for_prompt,
 )
-from app.ai.authority_sdk import confidence_terms
+from app.ai.authority_sdk import (
+    SuiteFileMissing, confidence_terms, suite_has, suite_source, suite_text, tas_present, tas_version,
+)
 from app.ai.governor import governor
 from app.ai.run_events import RunRecorder, instructions_in_packet, record_thoughts, run_events
 from app.ai.quote_check import check_presentation_quotes, prompt_record_texts
@@ -48,15 +49,13 @@ from app.visuals.spec import DRAWN_KINDS, QUESTIONS, spec_errors
 CHART_SCHEMA_QUESTIONS = "|".join(q.id for q in QUESTIONS.values() if any(k in DRAWN_KINDS for k in q.kinds))
 CHART_SCHEMA_KINDS = "|".join(dict.fromkeys(k.value for q in QUESTIONS.values() for k in q.kinds if k in DRAWN_KINDS))
 
-# The Authority System Suite (onysnow/Authority-System-Suite), vendored as a
-# plain copy at the commit in authority_suite/VENDORED_FROM. It replaced the
-# old tas_spec submodule, which held the Topic Authority System alone. The
-# prompts are built from TAS, the suite's investigative system; the other
-# systems (RAS, QAS, LAS, DAS, EGS, EHS) are kept so the hand-offs TAS names
-# in INTEROP.md resolve. See authority_suite/README_VENDORING.md to update it.
-SUITE_ROOT = Path(__file__).resolve().parent / "authority_suite"
-TAS_ROOT = SUITE_ROOT / "systems" / "tas"
-# App-local reasoning module content -- not part of the vendored suite,
+# The Authority System Suite (onysnow/Authority-System-Suite) comes from the
+# Authority Suite SDK, which bundles it at one commit (app/ai/authority_sdk.py;
+# the pin is in requirements.txt). The repo keeps no copy. The prompts are built
+# from TAS, the suite's investigative system. A suite file is named by its path
+# from the suite root, as a string; an app-local file is a Path.
+TAS_MODULES_DIR = "systems/tas/PROMPT_MODULES"
+# App-local reasoning module content -- not part of the suite,
 # not numbered or governed by TAS's CONTROL_SURFACE. See PRESENTATION_DRAFT.md
 # for why this is kept separate rather than added to TAS: it serves a
 # workflow (evidence + goal -> brief/deck) that TAS itself doesn't define,
@@ -65,22 +64,21 @@ TAS_ROOT = SUITE_ROOT / "systems" / "tas"
 APP_MODULES_ROOT = Path(__file__).resolve().parent / "presentation_modules"
 
 # STRUCT-0025: tests/test_authority_suite_drift.py verifies every path below
-# still resolves inside the vendored suite. If you update the vendored copy
+# still resolves in the suite the SDK bundles. If you move the SDK pin
 # (or wire up a new TAS module here), run that test locally first -- an upstream rename/restructure should fail there, not silently at
-# request time with a FileNotFoundError. That drift test only covers
+# request time with a missing file. That drift test only covers
 # TAS_MODULES below; an app-local module's file moving is caught the plain
 # way, by _read() raising when the path doesn't exist.
-MODULE_FILES = {
-    "case_synthesis": TAS_ROOT / "PROMPT_MODULES" / "08_CASE_SYNTHESIS.md",
-    "hypothesis_test": TAS_ROOT / "PROMPT_MODULES" / "06_HYPOTHESIS_AND_CONTRADICTION_TESTING.md",
+MODULE_FILES: dict[str, str | Path] = {
+    "case_synthesis": f"{TAS_MODULES_DIR}/08_CASE_SYNTHESIS.md",
+    "hypothesis_test": f"{TAS_MODULES_DIR}/06_HYPOTHESIS_AND_CONTRADICTION_TESTING.md",
     "presentation_draft": APP_MODULES_ROOT / "PRESENTATION_DRAFT.md",
 }
 
-# Which modules are vendored TAS content (the suite copy) vs. this app's
-# own prompt content. Drives build_system_prompt()'s framing text and
-# CONTROL_SURFACE flag availability, and ai_reasoning_status()'s TAS-relative
-# path reporting -- a module outside the suite was never meant to resolve
-# relative to SUITE_ROOT.
+# Which modules are TAS content (the suite) vs. this app's own prompt
+# content. Drives build_system_prompt()'s framing text and
+# CONTROL_SURFACE flag availability, and ai_reasoning_status()'s path
+# reporting -- a module outside the suite is not read from the suite.
 TAS_MODULES = {"case_synthesis", "hypothesis_test"}
 
 # The JSON contract each module's model call must return. Kept separate from
@@ -292,7 +290,7 @@ def _validate_presentation_visuals(payload: dict) -> list[str]:
 # non-negotiable evidence rule. The prompt block in build_system_prompt() says so
 # to the model in as many words, and the citation/schema validators run
 # identically whatever the flags are.
-CONTROL_SURFACE_FILE = TAS_ROOT / "CORE" / "CONTROL_SURFACE.md"
+CONTROL_SURFACE_FILE = "systems/tas/CORE/CONTROL_SURFACE.md"
 CONTROL_SURFACE_FLAGS: dict[str, dict] = {
     "severity_floor": {"default": "ALL", "allowed": ("ALL", "MATERIAL", "BLOCKING")},
     "source_tier_floor": {"default": "D", "allowed": ("A", "B", "C", "D")},
@@ -577,24 +575,34 @@ def _validate_suite_values(module: str, payload: dict) -> list[str]:
     return errors
 
 
-def _read(path: Path) -> str:
-    """Read one module's prompt file. A missing file for a vendored TAS
-    module (see TAS_MODULES) means the vendored suite copy is incomplete,
-    or was restructured upstream -- STRUCT-0025 drift test. A missing
-    file for an app-local module means it was moved or deleted outside
+def _module_available(source: str | Path) -> bool:
+    return suite_has(source) if isinstance(source, str) else source.exists()
+
+
+def _module_file_name(source: str | Path) -> str:
+    return source.rsplit("/", 1)[-1] if isinstance(source, str) else source.name
+
+
+def _read(source: str | Path) -> str:
+    """Read one module's prompt file. A missing file for a TAS module
+    (see TAS_MODULES, named by a suite path) means the suite the SDK bundles
+    was restructured upstream -- STRUCT-0025 drift test. A missing
+    file for an app-local module (a Path) means it was moved or deleted outside
     the suite entirely. Either way, surface a 400-class input error
     with the path named, not a 500 from deep inside the request."""
-    try:
-        return path.read_text(encoding="utf-8")
-    except FileNotFoundError as exc:
-        if path.is_relative_to(SUITE_ROOT):
-            rel = path.relative_to(SUITE_ROOT)
+    if isinstance(source, str):
+        try:
+            return suite_text(source)
+        except SuiteFileMissing as exc:
             raise ReasoningInputError(
-                f"vendored Authority System Suite file {str(rel)!r} is missing -- backend/app/ai/authority_suite is "
-                "incomplete or no longer matches app/ai/reasoning.py MODULE_FILES"
+                f"Authority System Suite file {source!r} is missing from the suite the Authority Suite SDK bundles -- the "
+                "SDK pin in requirements.txt no longer matches app/ai/reasoning.py MODULE_FILES"
             ) from exc
+    try:
+        return source.read_text(encoding="utf-8")
+    except FileNotFoundError as exc:
         raise ReasoningInputError(
-            f"module prompt file {str(path)!r} is missing -- it no longer matches app/ai/reasoning.py MODULE_FILES"
+            f"module prompt file {str(source)!r} is missing -- it no longer matches app/ai/reasoning.py MODULE_FILES"
         ) from exc
 
 
@@ -608,7 +616,7 @@ def build_system_prompt(module: str, reasoning_contract: dict, control_flags: di
 
     A TAS module (see TAS_MODULES) gets the suite's own framing language and its
     CONTROL_SURFACE flags block; an app-local module (presentation_draft)
-    gets neither -- it isn't part of the vendored suite and CONTROL_SURFACE
+    gets neither -- it isn't part of the suite and CONTROL_SURFACE
     is a TAS CORE concept with no runtime meaning outside it. Both still
     get the same non-negotiable evidence-authority rules and output
     contract below -- that part of this function's job doesn't change.
@@ -903,8 +911,8 @@ def _run_reasoning_module(
                      rule="AGENTS.md trigger table row 2" if is_tas else None,
                      text="TAS: the answer states facts about real people, firms and documents" if is_tas
                      else "App module: a draft from the records you picked")
-    rec.emit("LOAD", MODULE_NODES.get(module, module), system="tas" if is_tas else "app", status="good" if MODULE_FILES[module].exists() else "bad",
-             parent=route, rule="AG-050", text=f"Loaded {MODULE_FILES[module].name}")
+    rec.emit("LOAD", MODULE_NODES.get(module, module), system="tas" if is_tas else "app", status="good" if _module_available(MODULE_FILES[module]) else "bad",
+             parent=route, rule="AG-050", text=f"Loaded {_module_file_name(MODULE_FILES[module])}")
 
     with governor.acquire(actor_id or _actor_id(), settings):
         try:
@@ -1325,35 +1333,10 @@ def list_ai_analysis_candidates(
     return [serialize_ai_analysis_candidate(row, include_payload=False) for row in rows]
 
 
-@lru_cache(maxsize=1)
-def _vendored_tas_version() -> str | None:
-    """The first '## <major>.<minor>' heading in TAS's CHANGELOG, e.g. '1.12'.
-    Dated directive entries ('## 2026-10-10 — DIR-0044 ...') above it are
-    skipped. None when the vendored copy is missing."""
-    changelog = TAS_ROOT / "CHANGELOG.md"
-    if not changelog.exists():
-        return None
-    for line in changelog.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"## (\d+\.\d+(?:\.\d+)?)\b", line)
-        if m:
-            return m.group(1)
-    return None
-
-
-@lru_cache(maxsize=1)
-def _vendored_suite_commit() -> str | None:
-    """'onysnow/Authority-System-Suite@b1c71e8', from authority_suite/VENDORED_FROM."""
-    marker = SUITE_ROOT / "VENDORED_FROM"
-    if not marker.exists():
-        return None
-    first = marker.read_text(encoding="utf-8").splitlines()[:1]
-    return first[0].strip() or None if first else None
-
-
 def ai_reasoning_status(settings: Settings = default_settings) -> dict:
     """What the settings panel shows about the AI layer: whether the
     endpoints are callable, which provider adapter is selected, and whether
-    the vendored Authority System Suite the prompts are built from is present.
+    the Authority System Suite the prompts are built from (bundled in the Authority Suite SDK) is present.
     Never reveals key material -- only whether a key is configured.
     """
     provider = (settings.ai_provider or "").strip()
@@ -1372,8 +1355,8 @@ def ai_reasoning_status(settings: Settings = default_settings) -> dict:
         on_this_computer = False if provider in ("anthropic", "openai") else None
     modules = {
         name: {
-            "spec_file": str(path.relative_to(SUITE_ROOT) if path.is_relative_to(SUITE_ROOT) else path.relative_to(APP_MODULES_ROOT.parent)),
-            "available": path.exists(),
+            "spec_file": path if isinstance(path, str) else str(path.relative_to(APP_MODULES_ROOT.parent)),
+            "available": _module_available(path),
             "vendored_tas": name in TAS_MODULES,
         }
         for name, path in MODULE_FILES.items()
@@ -1393,13 +1376,13 @@ def ai_reasoning_status(settings: Settings = default_settings) -> dict:
             "max_output_tokens": settings.ai_max_output_tokens,
         },
         "authority_suite": {
-            "present": TAS_ROOT.exists() and (TAS_ROOT / "PROMPT_MODULES").exists(),
-            "source": _vendored_suite_commit(),
-            "tas_version": _vendored_tas_version(),
+            "present": tas_present(),
+            "source": suite_source(),
+            "tas_version": tas_version(),
             "modules": modules,
             "control_surface": {
-                "spec_file": str(CONTROL_SURFACE_FILE.relative_to(SUITE_ROOT)),
-                "available": CONTROL_SURFACE_FILE.exists(),
+                "spec_file": CONTROL_SURFACE_FILE,
+                "available": suite_has(CONTROL_SURFACE_FILE),
                 "flags": {name: {"default": spec["default"], "allowed": list(spec["allowed"])} for name, spec in CONTROL_SURFACE_FLAGS.items()},
             },
         },

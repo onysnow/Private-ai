@@ -33,10 +33,24 @@ def test_confidence_terms_come_from_the_sdk():
     assert len(r.CONFIDENCE_TERMS) == 7
 
 
-def test_sdk_agrees_with_the_vendored_copy_on_the_terms_the_app_uses():
-    schemas = (r.TAS_ROOT / "EVALUATION" / "OUTPUT_SCHEMAS.md").read_text(encoding="utf-8")
-    term = re.search(r'"confidence_term": "([A-Z_|]+)"', schemas)
-    assert term and tuple(term.group(1).split("|")) == authority_sdk.confidence_terms()
+def test_the_repo_keeps_no_copy_of_the_suite():
+    assert not (BACKEND / "app" / "ai" / "authority_suite").exists()
+    assert not list(BACKEND.rglob("VENDORED_FROM")), "the suite comes from the SDK; no copy of it lives under backend/"
+
+
+def test_status_reports_the_suite_the_sdk_bundles():
+    suite = r.ai_reasoning_status()["authority_suite"]
+    assert suite["present"] is True
+    assert suite["source"] == authority_sdk.suite_source()
+    assert suite["tas_version"] == authority_sdk.tas_version()
+    assert suite["control_surface"]["available"] is True
+    assert all(m["available"] for m in suite["modules"].values())
+
+
+def test_prompts_carry_the_sdk_suites_module_text():
+    for module in r.TAS_MODULES:
+        text = authority_sdk.suite_text(r.MODULE_FILES[module])
+        assert text.strip() in r.build_system_prompt(module, {}), module
 
 
 def test_validate_record_reports_issues_as_text():

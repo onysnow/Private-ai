@@ -98,9 +98,10 @@ starts skip it unless the OpenAleph version changes.
 
 Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`). The AI
 prompts are built from the [Authority System Suite](https://github.com/onysnow/Authority-System-Suite),
-copied into `backend/app/ai/authority_suite/` at the commit named in its
-`VENDORED_FROM` file (code Apache-2.0, documents CC BY 4.0). There are no
-submodules; a plain clone is complete.
+which comes from the [Authority Suite SDK](https://github.com/onysnow/authority-suite-sdk) the backend
+installs (pinned to one commit in `backend/requirements.txt`; the SDK bundles the suite at its own commit,
+code Apache-2.0, documents CC BY 4.0). This repo keeps no copy of the suite. The SDK repository is private,
+so installing the backend needs git and a token that can read it.
 
 ### Developer mode (no Docker)
 

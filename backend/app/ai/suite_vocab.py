@@ -1,10 +1,11 @@
 """The Authority System Suite's closed lists the app now records (the app-side suite
 gaps, docs/authority-suite/SUITE_GAPS.md; Ony, 12 Oct 2026: close them before step 4).
 
-Each list is copied from the vendored suite (backend/app/ai/authority_suite), and
-VOCAB_SOURCES names the file that defines it and a line of that file the values must
-appear on. tests/test_suite_vocab.py reads those files, so a suite update that changes
-a list fails the test instead of drifting silently."""
+Each list is copied from the suite (bundled in the Authority Suite SDK; paths are from
+the suite root), except the confidence terms, which are read from the SDK. VOCAB_SOURCES
+names the file that defines each list and a line of that file the values must appear on.
+tests/test_suite_records.py reads those files through the SDK, so a pin change that
+changes a list fails the test instead of drifting silently."""
 
 from __future__ import annotations
 
