@@ -28,6 +28,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Let pip read the private authority-suite-sdk repository
+        uses: ./.github/actions/authority-sdk-access
+        with:
+          deploy-key: ${{ secrets.AUTHORITY_SDK_DEPLOY_KEY }}
+
       - name: Install backend + lint/type-check dependencies
         run: |
           python -m pip install --upgrade pip

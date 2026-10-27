@@ -40,14 +40,19 @@ jobs:
       - uses: actions/checkout@v7
 
       # The Authority System Suite comes from the authority-suite-sdk package in
-      # backend/requirements.txt (private repository; pip needs git credentials that
-      # can read onysnow/authority-suite-sdk).
+      # backend/requirements.txt (private repository; the "Let pip read" step below
+      # gives git the read-only deploy key, secret AUTHORITY_SDK_DEPLOY_KEY).
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Install OCR runtime
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
+
+      - name: Let pip read the private authority-suite-sdk repository
+        uses: ./.github/actions/authority-sdk-access
+        with:
+          deploy-key: ${{ secrets.AUTHORITY_SDK_DEPLOY_KEY }}
 
       - name: Install backend dependencies
         # STRUCT-0026: requirements.txt is now production-only (no pytest/

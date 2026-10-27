@@ -13,6 +13,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
+      # The backend image installs the private authority-suite-sdk, so the build
+      # gets the read-only deploy key as a Docker build secret (docker-compose.yml).
+      - name: Let the image build read the private authority-suite-sdk repository
+        uses: ./.github/actions/authority-sdk-access
+        with:
+          deploy-key: ${{ secrets.AUTHORITY_SDK_DEPLOY_KEY }}
+
       # One image (ADR-0004): its first stage builds the workbench screen,
       # its second runs the API that serves it.
       - name: Build the workbench image (API + screen)

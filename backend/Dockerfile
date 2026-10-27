@@ -22,13 +22,24 @@ FROM python:3.12-slim
 # PyMuPDF's integrated OCR requires Tesseract language data. Keep the location
 # explicit rather than relying on runtime autodiscovery.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends git build-essential pkg-config libicu-dev tesseract-ocr tesseract-ocr-eng \
+    && apt-get install -y --no-install-recommends git openssh-client build-essential pkg-config libicu-dev tesseract-ocr tesseract-ocr-eng \
     && rm -rf /var/lib/apt/lists/*
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
 
 WORKDIR /app
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
+# requirements.txt installs the private authority-suite-sdk. When the build is given the
+# read-only deploy key (secret authority_sdk_deploy_key, from docker-compose.yml), git
+# reads that repository over SSH for this one command; the key is never copied into a layer.
+# An empty secret means no key: git then asks over HTTPS, which works only if that repository is public.
+RUN --mount=type=secret,id=authority_sdk_deploy_key \
+    if [ -s /run/secrets/authority_sdk_deploy_key ]; then \
+      export GIT_SSH_COMMAND="ssh -i /run/secrets/authority_sdk_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/tmp/known_hosts" \
+             GIT_CONFIG_COUNT=1 \
+             GIT_CONFIG_KEY_0="url.git@github.com:onysnow/authority-suite-sdk.insteadOf" \
+             GIT_CONFIG_VALUE_0="https://github.com/onysnow/authority-suite-sdk"; \
+    fi \
+    && pip install --no-cache-dir -r requirements.txt \
     && python -c "import fitz, pathlib; p=pathlib.Path(fitz.get_tessdata()); assert (p/'eng.traineddata').is_file(), f'English tessdata missing: {p}'"
 COPY backend/ .
 

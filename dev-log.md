@@ -2627,3 +2627,9 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
   `suite_map.json` were read against b1c71e8; the tests confirm each term is still present in d2b2186, not that its
   meaning is unchanged.
 - Installing the backend needs git (added to the Dockerfile) and credentials that can read the private SDK repository.
+- Access to the private SDK repository (same day): a read-only deploy key on `onysnow/authority-suite-sdk`. CI jobs that
+  install the backend use the composite action `.github/actions/authority-sdk-access` with the Actions secret
+  `AUTHORITY_SDK_DEPLOY_KEY`. The Docker build gets the key as a BuildKit secret (`authority_sdk_deploy_key`, never copied
+  into a layer; `git` and `openssh-client` are installed in the image). The compose files read it from the file named in
+  `AUTHORITY_SDK_DEPLOY_KEY_FILE` and fall back to the empty `.no-authority-sdk-key`, so compose commands never fail on a
+  missing key; the image build does, until a key is given, because the SDK repository is private.
