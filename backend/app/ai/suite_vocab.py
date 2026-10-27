@@ -8,6 +8,8 @@ a list fails the test instead of drifting silently."""
 
 from __future__ import annotations
 
+from app.ai.authority_sdk import confidence_terms
+
 TAS_SCHEMAS = "systems/tas/EVALUATION/OUTPUT_SCHEMAS.md"
 TAS_STANDARD = "systems/tas/CORE/INVESTIGATIVE_PROMPT_ENGINEERING_STANDARD.md"
 
@@ -18,7 +20,7 @@ AUTHENTICITY_STATUSES = ("VERIFIED", "PROVISIONAL", "DISPUTED", "UNKNOWN")
 # Claim record.
 CLASSIFICATIONS = ("SOURCE_STATEMENT", "CORROBORATED_FACT", "ALLEGATION", "INFERENCE", "HYPOTHESIS", "UNKNOWN",
                    "NEGATIVE_SEARCH_RESULT", "UNRESOLVED_CONFLICT")
-CONFIDENCE_TERMS = ("ALMOST_CERTAIN", "VERY_LIKELY", "LIKELY", "ROUGHLY_EVEN_CHANCE", "UNLIKELY", "VERY_UNLIKELY", "ALMOST_NO_CHANCE")
+CONFIDENCE_TERMS = confidence_terms()  # from the Authority Suite SDK, not a copy
 CONFIDENCE_LEVELS = ("LOW", "MEDIUM", "HIGH")
 # Module 02's verdicts; PARTIALLY VERIFIED needs wording that does not exceed the evidence.
 VERIFICATION_VERDICTS = ("VERIFIED", "PARTIALLY VERIFIED", "ATTRIBUTED BUT UNCORROBORATED", "UNRESOLVED",

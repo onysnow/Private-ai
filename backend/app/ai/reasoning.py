@@ -29,6 +29,7 @@ from sqlalchemy.orm import Session
 from app.ai.chart_check import (
     CHART_VISUAL_TYPE, MAX_CHART_RETRIES, check_presentation_charts, retry_feedback, visual_catalog_for_prompt,
 )
+from app.ai.authority_sdk import confidence_terms
 from app.ai.governor import governor
 from app.ai.run_events import RunRecorder, instructions_in_packet, record_thoughts, run_events
 from app.ai.quote_check import check_presentation_quotes, prompt_record_texts
@@ -96,9 +97,8 @@ QUOTE_RULE = ("string - copied word for word from that record's text in the pack
 CLASSIFICATIONS = ("SOURCE_STATEMENT", "CORROBORATED_FACT", "ALLEGATION", "INFERENCE", "HYPOTHESIS", "UNKNOWN",
                    "NEGATIVE_SEARCH_RESULT", "UNRESOLVED_CONFLICT")
 CONFIDENCE_LEVELS = ("LOW", "MEDIUM", "HIGH")
-# CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md: seven likelihood terms.
-CONFIDENCE_TERMS = ("ALMOST_CERTAIN", "VERY_LIKELY", "LIKELY", "ROUGHLY_EVEN_CHANCE", "UNLIKELY", "VERY_UNLIKELY",
-                    "ALMOST_NO_CHANCE")
+# CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md: seven likelihood terms, read from the Authority Suite SDK.
+CONFIDENCE_TERMS = confidence_terms()
 HYPOTHESIS_KINDS = ("WORKING_THEORY", "INNOCENT_EXPLANATION", "ALTERNATIVE_ATTRIBUTION", "DATA_QUALITY", "OTHER")
 # Spelled as Module 06 spells them, with spaces.
 CONFLICT_TYPES = ("DIRECT CONTRADICTION", "TEMPORAL CHANGE", "DEFINITIONAL MISMATCH", "SCOPE DIFFERENCE", "AMBIGUOUS",

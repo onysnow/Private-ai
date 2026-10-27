@@ -34,3 +34,8 @@ procrastinate==3.10.0
 # The self-hosted base map's tiles, read from its PMTiles file (app/services/basemap.py;
 # ADR-0005 line 18; BSD-3).
 pmtiles==3.8.1
+# The Authority System Suite SDK (app/ai/authority_sdk.py): imported as a package, not
+# copied in. Pinned to one commit of onysnow/authority-suite-sdk (private; Apache-2.0
+# code, CC BY 4.0 bundled suite documents; no dependencies of its own). Installing it
+# needs git, and a token that can read that repository.
+authority-suite-sdk @ git+https://github.com/onysnow/authority-suite-sdk@8b0bf4d88a7ec0a41b3de89cb9ae2c486af5347d
