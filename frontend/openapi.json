@@ -61442,6 +61442,67 @@
         "summary": "List Investigation Evidence"
       }
     },
+    "/api/investigations/{investigation_id}/evidence-pack.zip": {
+      "get": {
+        "description": "The story's evidence pack (app/services/evidence_pack.py), made on this computer. Stamped \"Export as draft\"\nwhile a check before an outward export is open; X-Pack-Draft, X-Pack-Exhibits and X-Pack-Gaps say so.",
+        "operationId": "export_evidence_pack",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The evidence pack: the write-up, its exhibits with fingerprints, custody, readiness, gaps"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No story write-up to pack"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Export Evidence Pack"
+      }
+    },
     "/api/investigations/{investigation_id}/export": {
       "get": {
         "operationId": "export_investigation",

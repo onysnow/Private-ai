@@ -12662,6 +12662,15 @@ export const zListInvestigationEvidenceQuery = z.object({
  */
 export const zListInvestigationEvidenceResponse = z.array(zEvidencePoolRow);
 
+export const zExportEvidencePackPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * The evidence pack: the write-up, its exhibits with fingerprints, custody, readiness, gaps
+ */
+export const zExportEvidencePackResponse = z.string();
+
 export const zExportInvestigationPath = z.object({
   investigation_id: z.string(),
 });

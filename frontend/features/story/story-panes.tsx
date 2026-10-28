@@ -204,6 +204,18 @@ export function ExportSheet({story, doc, onClose, onExportDocx}: {
       setStatus('Backup downloaded.');
     } catch (error) { setStatus(errorMessage(error, 'The backup did not download')); }
   };
+  const allOk = checks.every(c => c.ok);
+  const [packing, setPacking] = useState(false);
+  const pack = async () => {
+    setPacking(true);
+    setStatus('Making the evidence pack on this computer…');
+    try {
+      await save(await api.blob(`/api/investigations/${story.investigation_id}/evidence-pack.zip`),
+        `evidence-pack-${story.investigation_id.slice(0, 8)}${allOk ? '' : '-DRAFT'}.zip`);
+      setStatus(allOk ? 'Evidence pack downloaded.' : 'Evidence pack downloaded, stamped as a draft.');
+    } catch (error) { setStatus(errorMessage(error, 'The evidence pack did not download')); }
+    setPacking(false);
+  };
   const docx = async () => {
     try { await onExportDocx(); setStatus('Write-up downloaded.'); } catch (error) { setStatus(errorMessage(error, 'The write-up did not download')); }
   };
@@ -216,8 +228,10 @@ export function ExportSheet({story, doc, onClose, onExportDocx}: {
           {docxReason && <small className="sy-why">○ {docxReason}</small>}</li>
         <li className="off"><b>Write-up for reading <small>PDF</small></b><span>The paper version of the current theme.</span>
           <button type="button" disabled>Export as PDF</button><small className="sy-why">○ Not built yet</small></li>
-        <li className="off"><b>Evidence pack <small>.zip</small></b><span>The write-up, an exhibits list from its citations, each cited passage with its file’s fingerprint, and the readiness record.</span>
-          <button type="button" disabled>Export the pack</button><small className="sy-why">○ Not built yet</small></li>
+        <li><b>Evidence pack <small>.zip</small></b><span>The write-up, an exhibits list from its citations, each cited passage with its file’s fingerprint, and the readiness record.</span>
+          <button type="button" disabled={!story.writeup_id || packing} onClick={() => void pack()}>{packing ? 'Making the pack…' : allOk ? 'Export the pack' : 'Export as draft'}</button>
+          {!story.writeup_id ? <small className="sy-why">○ Start the write-up first</small>
+            : !allOk && <small className="sy-why">○ Checks below are open: every page is stamped “Export as draft”</small>}</li>
         <li><b>Backup <small>.jwbackup.zip</small></b><span>The whole case, for restoring on this or another computer; not for sharing.</span>
           <button type="button" onClick={() => void backup()}>Download the backup</button></li>
       </ul>

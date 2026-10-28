@@ -267,6 +267,9 @@ import type {
   ExportDeckPptxData,
   ExportDeckPptxErrors,
   ExportDeckPptxResponses,
+  ExportEvidencePackData,
+  ExportEvidencePackErrors,
+  ExportEvidencePackResponses,
   ExportInvestigationData,
   ExportInvestigationErrors,
   ExportInvestigationResponses,
@@ -1326,6 +1329,8 @@ import {
   zExpandEntityInCorpusResponse,
   zExportDeckPptxPath,
   zExportDeckPptxResponse,
+  zExportEvidencePackPath,
+  zExportEvidencePackResponse,
   zExportInvestigationPath,
   zExportInvestigationQuery,
   zExportInvestigationResponse,
@@ -8085,6 +8090,38 @@ export const listInvestigationEvidence = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListInvestigationEvidenceResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/evidence',
+    ...options,
+  });
+
+/**
+ * Export Evidence Pack
+ *
+ * The story's evidence pack (app/services/evidence_pack.py), made on this computer. Stamped "Export as draft"
+ * while a check before an outward export is open; X-Pack-Draft, X-Pack-Exhibits and X-Pack-Gaps say so.
+ */
+export const exportEvidencePack = <ThrowOnError extends boolean = false>(
+  options: Options<ExportEvidencePackData, ThrowOnError>,
+): RequestResult<
+  ExportEvidencePackResponses,
+  ExportEvidencePackErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ExportEvidencePackResponses,
+    ExportEvidencePackErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportEvidencePackPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportEvidencePackResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/evidence-pack.zip',
     ...options,
   });
 

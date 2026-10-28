@@ -29886,6 +29886,46 @@ export type ListInvestigationEvidenceResponses = {
 export type ListInvestigationEvidenceResponse =
   ListInvestigationEvidenceResponses[keyof ListInvestigationEvidenceResponses];
 
+export type ExportEvidencePackData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/evidence-pack.zip';
+};
+
+export type ExportEvidencePackErrors = {
+  /**
+   * No story write-up to pack
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExportEvidencePackError =
+  ExportEvidencePackErrors[keyof ExportEvidencePackErrors];
+
+export type ExportEvidencePackResponses = {
+  /**
+   * The evidence pack: the write-up, its exhibits with fingerprints, custody, readiness, gaps
+   */
+  200: Blob | File;
+};
+
+export type ExportEvidencePackResponse =
+  ExportEvidencePackResponses[keyof ExportEvidencePackResponses];
+
 export type ExportInvestigationData = {
   body?: never;
   path: {

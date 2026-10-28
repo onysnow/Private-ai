@@ -94,6 +94,7 @@ import {
   examineAgain,
   expandEntityInCorpus,
   exportDeckPptx,
+  exportEvidencePack,
   exportInvestigation,
   exportWriteupDocx,
   externalRelationshipCandidates,
@@ -637,6 +638,9 @@ import type {
   ExportDeckPptxData,
   ExportDeckPptxError,
   ExportDeckPptxResponse,
+  ExportEvidencePackData,
+  ExportEvidencePackError,
+  ExportEvidencePackResponse,
   ExportInvestigationData,
   ExportInvestigationError,
   ExportInvestigationResponse,
@@ -7867,6 +7871,37 @@ export const listInvestigationEvidenceInfiniteOptions = (
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const exportEvidencePackQueryKey = (
+  options: Options<ExportEvidencePackData>,
+) => createQueryKey('exportEvidencePack', options);
+
+/**
+ * Export Evidence Pack
+ *
+ * The story's evidence pack (app/services/evidence_pack.py), made on this computer. Stamped "Export as draft"
+ * while a check before an outward export is open; X-Pack-Draft, X-Pack-Exhibits and X-Pack-Gaps say so.
+ */
+export const exportEvidencePackOptions = (
+  options: Options<ExportEvidencePackData>,
+) =>
+  queryOptions<
+    ExportEvidencePackResponse,
+    ExportEvidencePackError,
+    ExportEvidencePackResponse,
+    ReturnType<typeof exportEvidencePackQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await exportEvidencePack({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: exportEvidencePackQueryKey(options),
+  });
 
 export const exportInvestigationQueryKey = (
   options: Options<ExportInvestigationData>,

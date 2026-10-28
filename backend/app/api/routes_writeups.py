@@ -115,3 +115,22 @@ def add_chart_to_writeup_endpoint(writeup_id: str, body: ChartToSave, db: Sessio
     except ChartRefused as exc:
         raise _refused(exc)
     return serialize_writeup(row)
+
+
+@router.get("/investigations/{investigation_id}/evidence-pack.zip", response_class=Response, responses={
+    **file_response("application/zip", "The evidence pack: the write-up, its exhibits with fingerprints, custody, readiness, gaps"),
+    404: {"model": ErrorOut, "description": "No story write-up to pack"}})
+def export_evidence_pack(investigation_id: str, db: Session = Depends(get_db)) -> Response:
+    """The story's evidence pack (app/services/evidence_pack.py), made on this computer. Stamped "Export as draft"
+    while a check before an outward export is open; X-Pack-Draft, X-Pack-Exhibits and X-Pack-Gaps say so."""
+    from app.services.evidence_pack import NoStory, build_pack
+
+    try:
+        data, summary = build_pack(db, investigation_id)
+    except NoStory as exc:
+        raise HTTPException(404, str(exc)) from exc
+    name = f"evidence-pack-{investigation_id[:8]}{'-DRAFT' if summary['draft'] else ''}.zip"
+    return Response(content=data, media_type="application/zip", headers={
+        "Content-Disposition": f'attachment; filename="{name}"', "X-Pack-Draft": "1" if summary["draft"] else "0",
+        "X-Pack-Exhibits": str(summary["exhibits"]), "X-Pack-Gaps": str(summary["gaps"]),
+        "Access-Control-Expose-Headers": "Content-Disposition, X-Pack-Draft, X-Pack-Exhibits, X-Pack-Gaps"})
