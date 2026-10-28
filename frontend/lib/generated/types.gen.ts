@@ -20042,6 +20042,28 @@ export type WireFlagsOut = {
 };
 
 /**
+ * WireLinkFlagOut
+ */
+export type WireLinkFlagOut = {
+  /**
+   * Flag Id
+   */
+  flag_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Level
+   */
+  level: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * WireLinkOut
  */
 export type WireLinkOut = {
@@ -20089,6 +20111,69 @@ export type WireLinkOut = {
    * T
    */
   t: string;
+};
+
+/**
+ * WireLinkSourceOut
+ */
+export type WireLinkSourceOut = {
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Locator
+   */
+  locator: string;
+  /**
+   * Page
+   */
+  page: number | null;
+  /**
+   * Quote
+   */
+  quote: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string | null;
+  /**
+   * Source Title
+   */
+  source_title: string;
+  /**
+   * Stance
+   */
+  stance: string | null;
+};
+
+/**
+ * WireLinkSourcesOut
+ *
+ * One link's evidence for The Wire's link panel (SEE_1): each quote with the page it stands on, and the open
+ * Red Flags resting on the link.
+ */
+export type WireLinkSourcesOut = {
+  /**
+   * Evidence
+   */
+  evidence: Array<WireLinkSourceOut>;
+  /**
+   * Flags
+   */
+  flags: Array<WireLinkFlagOut>;
+  /**
+   * Relationship Id
+   */
+  relationship_id: string;
 };
 
 /**
@@ -23077,6 +23162,10 @@ export type GetDocumentPageImageData = {
      * Highlight
      */
     highlight?: string;
+    /**
+     * Crop
+     */
+    crop?: boolean;
   };
   url: '/api/documents/{document_id}/page-image';
 };
@@ -30409,6 +30498,42 @@ export type CreateLeadFromRelationshipContextResponses = {
 
 export type CreateLeadFromRelationshipContextResponse =
   CreateLeadFromRelationshipContextResponses[keyof CreateLeadFromRelationshipContextResponses];
+
+export type GetRelationshipSourcesData = {
+  body?: never;
+  path: {
+    /**
+     * Relationship Id
+     */
+    relationship_id: string;
+  };
+  query?: never;
+  url: '/api/relationships/{relationship_id}/sources';
+};
+
+export type GetRelationshipSourcesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetRelationshipSourcesError =
+  GetRelationshipSourcesErrors[keyof GetRelationshipSourcesErrors];
+
+export type GetRelationshipSourcesResponses = {
+  /**
+   * Successful Response
+   */
+  200: WireLinkSourcesOut;
+};
+
+export type GetRelationshipSourcesResponse =
+  GetRelationshipSourcesResponses[keyof GetRelationshipSourcesResponses];
 
 export type PatchRelationshipSuiteData = {
   body: RelationshipSuiteFields;

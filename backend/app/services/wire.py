@@ -13,7 +13,11 @@ What the screen needs, read from the reviewed records and nothing else:
 - the dated events, for the time strip.
 
 Nothing here writes. Parties merged into another record are left out, and so is
-a link that loses an end that way."""
+a link that loses an end that way.
+
+`link_sources` is SEE_1's link panel: for one link, each piece of evidence on it with
+the page its quote stands on (so the screen can draw the scan with the words lit), the
+latest review of it, and the open Red Flags that rest on the link."""
 
 from __future__ import annotations
 
@@ -27,7 +31,16 @@ from followthemoney import model
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.models.documents import DocumentChunk
 from app.models.domain import Entity, PatternFlag, TimelineEvent
+from app.models.relationships import (
+    RelationshipEdge,
+    RelationshipEvidenceAttachment,
+    RelationshipEvidenceReviewEvent,
+)
+from app.models.sources import Evidence, Source
+from app.services.claim_done import _document_of
+from app.services.custody_chain import _anchor, _passage
 from app.services.relationships import investigation_relationships
 
 KIND = {"Person": "person", "Company": "company", "Organization": "org", "PublicBody": "org", "Vessel": "vehicle", "Vehicle": "vehicle",
@@ -166,3 +179,33 @@ def wire(db: Session, investigation_id: str) -> dict[str, Any]:
                                    .order_by(TimelineEvent.date_start))
               if ev.date_start and ev.date_start[:4].isdigit()]
     return {"investigation_id": investigation_id, "entities": out_entities, "links": links, "events": events}
+
+
+def link_sources(db: Session, edge: RelationshipEdge) -> dict[str, Any]:
+    """One link's evidence for SEE_1's link panel, oldest attachment first. The page is where the quote's anchor is
+    now (ADR-0015), else the first passage that says it; a quote with no document or no page has none."""
+    rows = []
+    for att in db.scalars(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.relationship_edge_id == edge.id)
+                          .order_by(RelationshipEvidenceAttachment.created_at)):
+        ev = db.get(Evidence, att.evidence_id)
+        if ev is None:
+            continue
+        source = db.get(Source, ev.source_id) if ev.source_id else None
+        doc = _document_of(db, ev, source)
+        page = None
+        if doc is not None and ev.quote:
+            _, chunk_id = _anchor(db, ev, doc)
+            chunk = db.get(DocumentChunk, chunk_id) if chunk_id else _passage(db, doc, ev.quote, None)
+            page = chunk.page_number if chunk else None
+        review = db.scalar(select(RelationshipEvidenceReviewEvent).where(RelationshipEvidenceReviewEvent.relationship_edge_id == edge.id,
+                                                                         RelationshipEvidenceReviewEvent.evidence_id == ev.id)
+                           .order_by(RelationshipEvidenceReviewEvent.created_at.desc()))
+        rows.append({"evidence_id": ev.id, "quote": ev.quote or "", "locator": ev.locator or "",
+                     "source_title": source.title if source else "", "document_id": doc.id if doc else None,
+                     "filename": doc.filename if doc else "", "page": page,
+                     "stance": review.stance if review else None, "reviewed_at": review.created_at if review else None})
+    flags = [{"flag_id": f.id, "id": f.indicator_id, "level": f.level, "text": str((f.facts or {}).get("summary") or "")}
+             for f in db.scalars(select(PatternFlag).where(PatternFlag.investigation_id == edge.investigation_id, PatternFlag.status == "open",
+                                                           PatternFlag.gone_at.is_(None)).order_by(PatternFlag.weight.desc()))
+             if edge.id in (f.links or [])]
+    return {"relationship_id": edge.id, "evidence": rows, "flags": flags}

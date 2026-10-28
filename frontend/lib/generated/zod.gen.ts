@@ -9429,6 +9429,43 @@ export const zWireEntityOut = z.object({
 });
 
 /**
+ * WireLinkFlagOut
+ */
+export const zWireLinkFlagOut = z.object({
+  flag_id: z.string(),
+  id: z.string(),
+  level: z.string(),
+  text: z.string(),
+});
+
+/**
+ * WireLinkSourceOut
+ */
+export const zWireLinkSourceOut = z.object({
+  document_id: z.string().nullable(),
+  evidence_id: z.string(),
+  filename: z.string(),
+  locator: z.string(),
+  page: z.int().nullable(),
+  quote: z.string(),
+  reviewed_at: z.iso.datetime({ offset: true, local: true }).nullable(),
+  source_title: z.string(),
+  stance: z.string().nullable(),
+});
+
+/**
+ * WireLinkSourcesOut
+ *
+ * One link's evidence for The Wire's link panel (SEE_1): each quote with the page it stands on, and the open
+ * Red Flags resting on the link.
+ */
+export const zWireLinkSourcesOut = z.object({
+  evidence: z.array(zWireLinkSourceOut),
+  flags: z.array(zWireLinkFlagOut),
+  relationship_id: z.string(),
+});
+
+/**
  * WireQuoteOut
  */
 export const zWireQuoteOut = z.object({
@@ -10346,6 +10383,7 @@ export const zGetDocumentPageImageQuery = z.object({
   page: z.int().gte(1).optional().default(1),
   width: z.int().gte(120).lte(1600).optional().default(360),
   highlight: z.string().max(2000).optional().default(''),
+  crop: z.boolean().optional().default(false),
 });
 
 /**
@@ -12488,6 +12526,15 @@ export const zCreateLeadFromRelationshipContextPath = z.object({
  * Successful Response
  */
 export const zCreateLeadFromRelationshipContextResponse = zLeadOut;
+
+export const zGetRelationshipSourcesPath = z.object({
+  relationship_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetRelationshipSourcesResponse = zWireLinkSourcesOut;
 
 export const zPatchRelationshipSuiteBody = zRelationshipSuiteFields;
 

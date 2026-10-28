@@ -74,10 +74,11 @@ export function pageOf(locator?: string | null): number | null {
 
 /** The page the passage is on, drawn with the passage marked (backend
  *  GET /api/documents/{id}/page-image); "View full page" opens the reader there. */
-/** A page of a PDF drawn by the API (GET /api/documents/{id}/page-image), the passage marked when given. */
-export function PagePicture({documentId, page, passage = '', width = 320, alt}: {documentId: string; page: number; passage?: string; width?: number; alt: string}): ReactElement | null {
-  const query = new URLSearchParams({page: String(page), width: String(width), highlight: passage.slice(0, 1500)});
-  const image = useQuery({queryKey: ['page-image', documentId, page, passage, width], queryFn: () => api.blob(`/api/documents/${documentId}/page-image?${query}`),
+/** A page of a PDF drawn by the API (GET /api/documents/{id}/page-image), the passage marked when given; with
+ * `crop`, only the band of the page around the passage. */
+export function PagePicture({documentId, page, passage = '', width = 320, crop = false, alt}: {documentId: string; page: number; passage?: string; width?: number; crop?: boolean; alt: string}): ReactElement | null {
+  const query = new URLSearchParams({page: String(page), width: String(width), highlight: passage.slice(0, 1500), ...(crop ? {crop: 'true'} : {})});
+  const image = useQuery({queryKey: ['page-image', documentId, page, passage, width, crop], queryFn: () => api.blob(`/api/documents/${documentId}/page-image?${query}`),
     staleTime: Infinity, retry: false});
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {

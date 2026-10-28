@@ -1,11 +1,16 @@
 """The Wire (app/services/wire.py): every party placed on one map, accounts drawn
-on their holder, links with their family, amount and quotes, and dated events."""
+on their holder, links with their family, amount and quotes, and dated events; and
+one link's sources for the link panel (SEE_1), each with the page its quote is on."""
 
 from __future__ import annotations
 
+import hashlib
+
 from fastapi.testclient import TestClient
 
+from app.db.session import SessionLocal
 from app.main import app
+from app.models.domain import Document, DocumentChunk, PatternFlag, Source
 
 client = TestClient(app)
 
@@ -96,3 +101,49 @@ def test_reading_the_wire_never_runs_the_rules_and_shows_what_the_last_run_left(
         read = get_wire(inv, db)
     assert {e["id"] for e in read["entities"] if e["flags"]} == flagged, "a reader reads the stored flags"
     assert stored(inv) == ran
+
+
+def test_a_links_sources_give_each_quote_its_page_its_review_and_the_flags_resting_on_the_link(tmp_path):
+    inv = ok(client.post("/api/investigations", json={"name": "Link panel"}))["id"]
+    harbour = _party(inv, "Harbour Nominees Ltd")
+    kestrel = _party(inv, "Kestrel SA")
+    link = _link(inv, "Directorship", harbour, kestrel, startDate=["2017-07-03"])
+    body = b"Change of directors"
+    path = tmp_path / "register.pdf"
+    path.write_bytes(body)
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Register filing", source_type="document")
+        db.add(src)
+        db.flush()
+        doc = Document(investigation_id=inv, source_id=src.id, filename="register.pdf", sha256=hashlib.sha256(body).hexdigest(),
+                       storage_path=str(path), extraction_status="complete")
+        db.add(doc)
+        db.flush()
+        db.add(DocumentChunk(document_id=doc.id, locator="page 1", page_number=1, ordinal=0, text="Luxembourg business register"))
+        db.add(DocumentChunk(document_id=doc.id, locator="page 2", page_number=2, ordinal=1,
+                             text="Harbour Nominees Ltd appointed director, 3 July 2017"))
+        typed = Source(investigation_id=inv, title="Board minutes (typed)", source_type="web", url="https://example.test/minutes")
+        db.add(typed)
+        db.flush()
+        db.add(PatternFlag(investigation_id=inv, indicator_id="ML-023", fingerprint="f", level="textbook", parties=[harbour, kestrel],
+                           links=[link], facts={"summary": "Circular ownership"}))
+        db.add(PatternFlag(investigation_id=inv, indicator_id="BO-031", fingerprint="g", level="faint", parties=[kestrel], links=["other"]))
+        db.commit()
+        src_id, typed_id, doc_id = src.id, typed.id, doc.id
+    filed = ok(client.post("/api/evidence", json={"source_id": src_id, "quote": "appointed director, 3 July 2017", "locator": "p.2"}))
+    minutes = ok(client.post("/api/evidence", json={"source_id": typed_id, "quote": "signed for Harbour Nominees", "locator": "p.2 ¶3"}))
+    for ev in (filed, minutes):
+        ok(client.post(f"/api/relationships/{link}/evidence", json={"evidence_id": ev["id"]}))
+    ok(client.post(f"/api/relationships/{link}/evidence/{filed['id']}/reviews", json={"stance": "supports", "rationale": "the filing says it"}))
+
+    out = ok(client.get(f"/api/relationships/{link}/sources"))
+    assert out["relationship_id"] == link
+    first, second = out["evidence"]
+    assert (first["evidence_id"], first["document_id"], first["filename"], first["page"]) == (filed["id"], doc_id, "register.pdf", 2)
+    assert first["source_title"] == "Register filing" and first["stance"] == "supports" and first["reviewed_at"]
+    # Typed in by hand: no file, so no page to draw, and not reviewed yet.
+    assert (second["document_id"], second["page"], second["stance"]) == (None, None, None)
+    assert second["quote"] == "signed for Harbour Nominees" and second["locator"] == "p.2 ¶3"
+    # Only the open flag that rests on this link.
+    assert out["flags"] == [{"flag_id": out["flags"][0]["flag_id"], "id": "ML-023", "level": "textbook", "text": "Circular ownership"}]
+    assert client.get("/api/relationships/nope/sources").status_code == 404

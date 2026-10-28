@@ -13,7 +13,8 @@ from app.models.domain import Investigation, RelationshipEdge
 from app.schemas.api import (
     RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest,
 )
-from app.schemas.responses import ConnectionsOut, LeadOut, RelationshipEvidenceReviewsOut, RelationshipOut
+from app.schemas.responses import ConnectionsOut, LeadOut, RelationshipEvidenceReviewsOut, RelationshipOut, WireLinkSourcesOut
+from app.services import wire
 from app.services.leads import create_relationship_context_lead, serialize_lead
 from app.services.relationships import (
     attach_relationship_evidence, create_relationship, relationship_evidence_review_history,
@@ -56,6 +57,16 @@ def list_relationship_evidence_reviews(relationship_id: str, db: Session = Depen
     if edge is None:
         raise HTTPException(404, "Relationship not found")
     return {"relationship_id": edge.id, "reviews": relationship_evidence_review_history(db, edge)}
+
+
+@router.get("/relationships/{relationship_id}/sources", response_model=WireLinkSourcesOut)
+def get_relationship_sources(relationship_id: str, db: Session = Depends(get_db)) -> Any:
+    """The Wire's link panel (SEE_1): each piece of evidence on the link with the page its quote stands on, its
+    latest review, and the open Red Flags resting on the link. Reads only."""
+    edge = db.get(RelationshipEdge, relationship_id)
+    if edge is None:
+        raise HTTPException(404, "Relationship not found")
+    return wire.link_sources(db, edge)
 
 
 @router.post("/relationships/{relationship_id}/evidence/{evidence_id}/reviews", response_model=RelationshipOut)

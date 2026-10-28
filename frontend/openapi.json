@@ -38515,6 +38515,34 @@
         "title": "WireFlagsOut",
         "type": "object"
       },
+      "WireLinkFlagOut": {
+        "properties": {
+          "flag_id": {
+            "title": "Flag Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "flag_id",
+          "id",
+          "level",
+          "text"
+        ],
+        "title": "WireLinkFlagOut",
+        "type": "object"
+      },
       "WireLinkOut": {
         "properties": {
           "amount": {
@@ -38592,6 +38620,118 @@
           "ev"
         ],
         "title": "WireLinkOut",
+        "type": "object"
+      },
+      "WireLinkSourceOut": {
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "locator": {
+            "title": "Locator",
+            "type": "string"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "source_title": {
+            "title": "Source Title",
+            "type": "string"
+          },
+          "stance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stance"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "quote",
+          "locator",
+          "source_title",
+          "document_id",
+          "filename",
+          "page",
+          "stance",
+          "reviewed_at"
+        ],
+        "title": "WireLinkSourceOut",
+        "type": "object"
+      },
+      "WireLinkSourcesOut": {
+        "description": "One link's evidence for The Wire's link panel (SEE_1): each quote with the page it stands on, and the open\nRed Flags resting on the link.",
+        "properties": {
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/WireLinkSourceOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/WireLinkFlagOut"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "relationship_id": {
+            "title": "Relationship Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "relationship_id",
+          "evidence",
+          "flags"
+        ],
+        "title": "WireLinkSourcesOut",
         "type": "object"
       },
       "WireOut": {
@@ -50370,7 +50510,7 @@
     },
     "/api/documents/{document_id}/page-image": {
       "get": {
-        "description": "A page of a PDF as PNG, with the passage's words highlighted where they are\nfound (X-Passage-Found says whether they were), for Next up's page beside the question.",
+        "description": "A page of a PDF as PNG, with the passage's words highlighted where they are\nfound (X-Passage-Found says whether they were), for Next up's page beside the question.\nWith `crop`, only the band of the page around the words is drawn.",
         "operationId": "get_document_page_image",
         "parameters": [
           {
@@ -50414,6 +50554,16 @@
               "maxLength": 2000,
               "title": "Highlight",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "crop",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Crop",
+              "type": "boolean"
             }
           }
         ],
@@ -61900,6 +62050,56 @@
           }
         },
         "summary": "Create Lead From Relationship Context"
+      }
+    },
+    "/api/relationships/{relationship_id}/sources": {
+      "get": {
+        "description": "The Wire's link panel (SEE_1): each piece of evidence on the link with the page its quote stands on, its\nlatest review, and the open Red Flags resting on the link. Reads only.",
+        "operationId": "get_relationship_sources",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relationship_id",
+            "required": true,
+            "schema": {
+              "title": "Relationship Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WireLinkSourcesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Relationship Sources"
       }
     },
     "/api/relationships/{relationship_id}/suite": {

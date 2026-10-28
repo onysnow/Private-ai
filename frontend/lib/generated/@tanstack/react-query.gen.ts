@@ -149,6 +149,7 @@ import {
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
+  getRelationshipSources,
   getResearchSettings,
   getSafetyData,
   getSameAnswerCandidates,
@@ -762,6 +763,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsError,
   GetRedFlagsResponse,
+  GetRelationshipSourcesData,
+  GetRelationshipSourcesError,
+  GetRelationshipSourcesResponse,
   GetResearchSettingsData,
   GetResearchSettingsError,
   GetResearchSettingsResponse,
@@ -3575,6 +3579,7 @@ export const getDocumentPageImageQueryKey = (
  *
  * A page of a PDF as PNG, with the passage's words highlighted where they are
  * found (X-Passage-Found says whether they were), for Next up's page beside the question.
+ * With `crop`, only the band of the page around the words is drawn.
  */
 export const getDocumentPageImageOptions = (
   options: Options<GetDocumentPageImageData>,
@@ -3607,6 +3612,7 @@ export const getDocumentPageImageInfiniteQueryKey = (
  *
  * A page of a PDF as PNG, with the passage's words highlighted where they are
  * found (X-Passage-Found says whether they were), for Next up's page beside the question.
+ * With `crop`, only the band of the page around the words is drawn.
  */
 export const getDocumentPageImageInfiniteOptions = (
   options: Options<GetDocumentPageImageData>,
@@ -9888,6 +9894,37 @@ export const createLeadFromRelationshipContextMutation = (
   };
   return mutationOptions;
 };
+
+export const getRelationshipSourcesQueryKey = (
+  options: Options<GetRelationshipSourcesData>,
+) => createQueryKey('getRelationshipSources', options);
+
+/**
+ * Get Relationship Sources
+ *
+ * The Wire's link panel (SEE_1): each piece of evidence on the link with the page its quote stands on, its
+ * latest review, and the open Red Flags resting on the link. Reads only.
+ */
+export const getRelationshipSourcesOptions = (
+  options: Options<GetRelationshipSourcesData>,
+) =>
+  queryOptions<
+    GetRelationshipSourcesResponse,
+    GetRelationshipSourcesError,
+    GetRelationshipSourcesResponse,
+    ReturnType<typeof getRelationshipSourcesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getRelationshipSources({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getRelationshipSourcesQueryKey(options),
+  });
 
 /**
  * Patch Relationship Suite
