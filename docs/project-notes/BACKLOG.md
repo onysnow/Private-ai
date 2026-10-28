@@ -54,6 +54,9 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
 - **Run everything through OpenAleph once and ship the results with the demo,** so a download doesn't re-read everything. This needs a running OpenAleph, so do it on Ony's PC, or in a session with OpenAleph up, and package what OpenAleph produced.
 - **Ony asked how "follow the money" works with OpenAleph and whether the system is efficient.** This is not yet checked end to end; OpenAleph was not running in the cloud session.
 
+## Asked for: testing
+- **Proofs alongside tests (25 Oct).** Tests check the inputs someone thought to try; a proof is a machine-checked argument that a property holds for every input. Add proofs to the ways the app is checked. Not yet decided: which parts of the app to prove, what each proof must show (its specification), and which proof tool to use.
+
 ## Asked for: navigation
 - **Clicking a party anywhere jumps to Bring in** (the dossier lives in Connectors; `case-workbench.tsx` `STAGE_OF_REQUEST.dossier = 'collect'`). Proposed: open the dossier as a side panel over the current screen. Ony has not answered this yet.
 
