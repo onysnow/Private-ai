@@ -11,10 +11,19 @@ from app.ai import authority_sdk, suite_vocab
 BACKEND = Path(__file__).resolve().parents[1]
 
 
+def _installed(path: Path) -> bool:
+    """Inside an installed environment (backend/.venv's site-packages counts), not repo source."""
+    return "site-packages" in path.parts
+
+
+def _in_repo_source(name: str) -> list[Path]:
+    return [p for p in BACKEND.rglob(name) if not _installed(p)]
+
+
 def test_sdk_is_imported_from_site_packages_not_the_repo():
     sdk_dir = Path(authority_suite_sdk.__file__).resolve().parent
-    assert BACKEND not in sdk_dir.parents, f"authority_suite_sdk resolves inside this repo: {sdk_dir}"
-    assert not list(BACKEND.rglob("authority_suite_sdk")), "SDK source must not be copied under backend/"
+    assert _installed(sdk_dir) or BACKEND not in sdk_dir.parents, f"authority_suite_sdk resolves inside this repo: {sdk_dir}"
+    assert not _in_repo_source("authority_suite_sdk"), "SDK source must not be copied under backend/"
 
 
 def test_requirements_pin_the_sdk_to_one_commit():
@@ -35,7 +44,7 @@ def test_confidence_terms_come_from_the_sdk():
 
 def test_the_repo_keeps_no_copy_of_the_suite():
     assert not (BACKEND / "app" / "ai" / "authority_suite").exists()
-    assert not list(BACKEND.rglob("VENDORED_FROM")), "the suite comes from the SDK; no copy of it lives under backend/"
+    assert not _in_repo_source("VENDORED_FROM"), "the suite comes from the SDK; no copy of it lives under backend/"
 
 
 def test_status_reports_the_suite_the_sdk_bundles():

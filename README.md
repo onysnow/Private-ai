@@ -104,6 +104,9 @@ code Apache-2.0, documents CC BY 4.0). This repo keeps no copy of the suite. The
 so installing the backend needs git and read access to it. Developer mode uses your own git login. CI and the
 Docker image use a read-only deploy key on the SDK repository: the Actions secret `AUTHORITY_SDK_DEPLOY_KEY`
 in CI, and for a local Docker build the path of the key file in `AUTHORITY_SDK_DEPLOY_KEY_FILE` (in `.env`).
+Keep that file outside this repository folder (for example in your `.ssh` folder): the image copies `backend/`,
+so a key kept there would end up inside it. Compose's bake builder will not read a build secret from outside the
+repository, so also set `COMPOSE_BAKE=false` in `.env`.
 
 ### Developer mode (no Docker)
 
