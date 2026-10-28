@@ -9,6 +9,11 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    # Compose's bake builder refuses a build secret read from outside the repository
+    # (the deploy key in ~/.ssh) unless granted --allow=fs.read; the plain builder
+    # passes it as docker-compose.yml says.
+    env:
+      COMPOSE_BAKE: "false"
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
