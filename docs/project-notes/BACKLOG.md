@@ -29,13 +29,13 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
   - stop stretching full-width text: use the width for different components side by side.
 - **Watchlist hits.** The bright yellow per-word highlights are unacceptable. Same full-width reading problem.
 - **Bring in › Sources & evidence.** It is only a capture form. Add a way to look through all 182 sources and 930 pieces of evidence and display them there.
-- **See › Timeline.** Impossible to read; redesign:
+- **See › Timeline.** Impossible to read; redesign (28 Oct: mockups TIME_1 and TIME_2 drawn, `docs/design/time-and-place-mockups/`, waiting for approval):
   - the axis starts in 1952 and crushes 2009–15;
   - labels overlap;
   - rows show raw property names ("incorporationDate") and `source:<uuid>` origins;
   - dates are shown twice;
   - ranges show invented days.
-- **See › Places.** The base map must come with the app automatically, not as a separate install step. Places need dated events (the timeline strip is empty) and precision (city vs exact).
+- **See › Places.** (28 Oct: mockup PLACE_1 drawn, waiting for approval.) The base map must come with the app automatically, not as a separate install step. Places need dated events (the timeline strip is empty) and precision (city vs exact).
 - ~~**See › Money.** The nav link and the "$6.87B" tile go to `#money-flows`, but See has no money view.~~ Fixed 12 Oct: See › Money (mockup SEE_2) is at `#money-flows`.
 - **Media suite.** Keep developing the mockups (research: `docs/research/media-suite/`). Then:
   - study the ArtCraft apps installed on Ony's PC and identify which parts of which apps cover each media type the Workbench handles;
