@@ -433,3 +433,22 @@ def test_persisted_users_make_the_case_reachable_beyond_this_computer():
             for u in db.query(AppUser).filter_by(display_name="Reporter"):
                 db.delete(u)
             db.commit()
+
+
+def test_a_sealed_backup_shows_as_encrypted():
+    """The last backup's own event says whether it was sealed (ADR-0016); the card and the Backups store follow it."""
+    from app.models.domain import BackupEvent
+
+    inv = _inv("Sealed backups")
+    with SessionLocal() as db:
+        db.add(BackupEvent(investigation_id=inv, size_bytes=10, sha256="0" * 64, encrypted=False, at=utcnow_naive() - timedelta(days=1)))
+        db.commit()
+    data = client.get(f"/api/investigations/{inv}/safety-data").json()
+    assert data["backup"]["encrypted"] is False
+    assert next(s for s in data["stores"] if s["id"] == "backups")["warning"] == "Not encrypted: keep it safe"
+    with SessionLocal() as db:
+        db.add(BackupEvent(investigation_id=inv, size_bytes=10, sha256="1" * 64, encrypted=True))
+        db.commit()
+    data = client.get(f"/api/investigations/{inv}/safety-data").json()
+    assert data["backup"]["encrypted"] is True
+    assert next(s for s in data["stores"] if s["id"] == "backups").get("warning") is None

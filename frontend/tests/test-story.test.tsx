@@ -42,6 +42,24 @@ describe('sentences', () => {
     ]);
     expect(s.map(x => [x.from, x.cited])).toEqual([[1, true], [42, false]]);
   });
+  it('ends a sentence at a label after a capitalised word ("Schedule A."), so its missing source shows', () => {
+    const s = sentencesOf([
+      {kind: 'text', text: 'The filing was Schedule A. The owners were listed ', pos: 1},
+      {kind: 'cite', recordId: 'c1', pos: 51},
+    ]);
+    expect(s.map(x => [x.from, x.cited])).toEqual([[1, false], [28, true]]);
+    const initials = sentencesOf([{kind: 'text', text: 'The bank paid J. R. Weber and later M. Ross ', pos: 1}, {kind: 'cite', recordId: 'c2', pos: 45}]);
+    expect(initials.map(x => x.cited)).toEqual([true]);
+  });
+  it('reads a title split by formatting as one word ("Dr" in bold, then ". Reed")', () => {
+    const s = sentencesOf([
+      {kind: 'text', text: 'Dr', pos: 1},
+      {kind: 'text', text: '. Reed was paid ', pos: 3},
+      {kind: 'cite', recordId: 'c3', pos: 19},
+      {kind: 'text', text: '.', pos: 20},
+    ]);
+    expect(s.map(x => x.cited)).toEqual([true]);
+  });
 });
 
 const claim = (id: string, text: string, state: string, evidence: unknown[] = []) => ({id, text, status: state === 'shown' ? 'supported' : state === 'disputed' ? 'disputed' : 'unverified',

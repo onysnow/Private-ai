@@ -20,7 +20,7 @@ from app.core.audit_log import parse_audit_timestamp
 from app.core.config import settings
 from app.core.time import utcnow_naive
 from app.models.domain import (
-    AppUser, Claim, Document, DocumentCorpusSync, Entity, Evidence, Investigation, OutboundRequest, RelationshipEdge, Source,
+    AppUser, BackupEvent, Claim, Document, DocumentCorpusSync, Entity, Evidence, Investigation, OutboundRequest, RelationshipEdge, Source,
 )
 from app.services.lifecycle import preview_orphan_document_files
 from app.services.security import resolve_storage_root
@@ -181,6 +181,11 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
     except Exception:
         orphan_files, orphan_bytes = None, None
 
+    # Whether the last backup made from this case was sealed with the passphrase (ADR-0016), as its backup event says.
+    last_backup = db.scalar(select(BackupEvent).where(BackupEvent.investigation_id == investigation_id)
+                            .order_by(BackupEvent.at.desc(), BackupEvent.id.desc()).limit(1))
+    encrypted = bool(last_backup is not None and last_backup.encrypted)
+
     ai = ai_reasoning_status(settings)
     names = [SERVICE_NAMES.get(s, s) for s in reached if not s.startswith("ai")]
     words = sum(1 for r in left if not r.service.startswith("ai"))
@@ -200,7 +205,7 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
             {"id": "documents", "name": "Documents & pictures", "count": len(paths), "bytes": doc_bytes,
              "where": "Kept as received, checksummed", "in_backups": True},
             {"id": "backups", "name": "Backups", "count": 1 if audit["last_backup_at"] else 0, "where": "Wherever you saved the file",
-             "in_backups": None, "warning": "Not encrypted: keep it safe"},
+             "in_backups": None, "warning": None if encrypted else "Not encrypted: keep it safe"},
             {"id": "keys", "name": "Service keys", "count": sum(1 for p in CONNECTOR_SPECS if connector_credential_status(p)["configured"]),
              "count_note": f"of {len(CONNECTOR_SPECS)} set", "where": "Stored here, never shown again", "in_backups": False},
             {"id": "log", "name": "Security log", "count": audit["events"], "oldest": audit["oldest"].isoformat() if audit["oldest"] else None,
@@ -209,7 +214,7 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
              ("Outside AI: " + (ai["provider"] or "off"))) if ai["enabled"] else "Off", "in_backups": None},
         ],
         "services": services,
-        "backup": {"last_backup_at": audit["last_backup_at"].isoformat() if audit["last_backup_at"] else None, "encrypted": False,
+        "backup": {"last_backup_at": audit["last_backup_at"].isoformat() if audit["last_backup_at"] else None, "encrypted": encrypted,
                    "restore_enabled": bool(settings.enable_restore_api)},
         "access": {"mode": "remote" if (settings.api_auth_token.strip() or persisted_users) else "local_only", "refused_24h": audit["refused_24h"],
                    "log_readable": audit["readable"]},

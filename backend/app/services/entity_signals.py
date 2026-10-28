@@ -187,7 +187,7 @@ def clean_names(raw: str) -> list[tuple[str, int, int]]:
             parts[-1][-1] = (word.rstrip(".!?;:"), at)
             parts.append([])
         # A legal form ends the name ("Meridian Holdings Ltd. Payments went..."), unless
-        # another legal form follows it ("Samsung Co. Ltd.").
+        # another legal form follows it ("Kestrel Bay Co. Ltd.").
         elif (word.endswith(".") and CORPORATE_SUFFIX.fullmatch(word) and i + 1 < len(words)
               and not CORPORATE_SUFFIX.fullmatch(words[i + 1][0])):
             parts.append([])

@@ -87,6 +87,6 @@ def test_names_with_accents_are_found_and_a_legal_form_ends_a_name():
         chunk = SimpleNamespace(text=text, locator="line 1", id="c1")
         return [p["caption"] for kind, p, _ in _candidate_payloads(chunk) if kind == "entity"]
 
-    assert names("Société Générale versa 12 000 € à Müller & Söhne GmbH.") == ["Société Générale", "Müller & Söhne GmbH"]
+    assert names("Société Vérandine versa 12 000 € à Brühlmark & Söhne GmbH.") == ["Société Vérandine", "Brühlmark & Söhne GmbH"]
     assert names("Meridian Holdings Ltd. Payments went to Bellcastle Trading.") == ["Meridian Holdings Ltd", "Bellcastle Trading"]
-    assert names("Samsung Co. Ltd. signed.") == ["Samsung Co. Ltd"]
+    assert names("Kestrel Bay Co. Ltd. signed.") == ["Kestrel Bay Co. Ltd"]

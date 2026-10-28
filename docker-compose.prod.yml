@@ -292,6 +292,10 @@ services:
       AUDIT_LOG_FILE: /app/data/audit/security.jsonl
       API_AUTH_FAILURE_STATE_FILE: /app/data/audit/auth-failures.json
       CONNECTOR_CREDENTIALS_FILE: /app/data/secrets/connectors.json
+      # Notifications outside the app (.env.example): off while empty; the Web Push key pair is kept with the other secrets.
+      NOTIFY_MAIL_URL: ${NOTIFY_MAIL_URL:-}
+      NOTIFY_PUSH_SUBJECT: ${NOTIFY_PUSH_SUBJECT:-}
+      NOTIFY_SECRETS_FILE: /app/data/secrets/notifications.json
       ENABLE_RESTORE_API: ${ENABLE_RESTORE_API:-false}
       ENABLE_AI_FEATURES: ${ENABLE_AI_FEATURES:-false}
       AI_PROVIDER: ${AI_PROVIDER:-}

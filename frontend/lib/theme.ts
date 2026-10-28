@@ -120,10 +120,16 @@ function watchBattery(): void {
   const get = (navigator as {getBattery?: () => Promise<BatteryLike>}).getBattery;
   if (!get) return;
   get.call(navigator).then(battery => {
-    const read = () => { const was = onBattery; onBattery = !battery.charging; if (was !== onBattery) applyAppearance(); };
+    const read = () => { const was = onBattery; onBattery = !battery.charging; if (was !== onBattery) changed(); };
     read();
     battery.addEventListener('chargingchange', read);
   }).catch(() => undefined);
+}
+
+/** The appearance as it runs now: kept Full effects run as Light on battery. Effects read this, not the kept choice. */
+export function effectiveAppearance(): Appearance {
+  const a = currentAppearance();
+  return a.effects === 'full' && onBattery ? {...a, effects: 'light'} : a;
 }
 
 export function applyAppearance(a: Appearance = currentAppearance()): void {

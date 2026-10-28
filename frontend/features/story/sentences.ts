@@ -8,20 +8,32 @@ export type Sentence = {from: number; to: number; cited: boolean; claims: string
 
 const WORD = /\w/;
 const END = /[.!?](?=\s|$)/g;
-// Not an end: a full stop after an initial ("M. Ross") or a short title or abbreviation ("Dr.", "e.g."), as the
-// server reads it (app/services/stories.py _END).
-const NOT_END = /(?:^|[^\w])(?:[A-Z]|Mr|Mrs|Ms|Dr|St|No|e\.g|i\.e)$/;
-const notAnEnd = (text: string, at: number) => text[at] === '.' && NOT_END.test(text.slice(Math.max(0, at - 4), at));
+// Not an end: a full stop after a short title or abbreviation ("Dr.", "e.g.") or an initial ("M. Ross"), as the
+// server reads it (app/services/stories.py _END and _ends_with_initial). A capital letter is an initial only at the
+// start of a sentence, after another initial or after a word that is not capitalised ("paid M. Ross"); after a
+// capitalised word it is a label that can end a sentence ("Schedule A."), so a missing source is never hidden.
+const TITLE = /(?:^|[^\w])(?:Mr|Mrs|Ms|Dr|St|No|e\.g|i\.e)$/;
+const LETTER = /(?:^|\s)(\S*)\s+[A-Z]$|^[A-Z]$/;
+const notAnEnd = (before: string) => {
+  if (TITLE.test(before.slice(-4))) return true;
+  const m = LETTER.exec(before.slice(-40));
+  if (!m) return false;
+  const word = m[1] ?? '';
+  return !word || !/^[A-Z]/.test(word) || /^[A-Z]\.$/.test(word);
+};
 
 /** The sentences in a run of text and citation pieces, each with its document range. */
 export function sentencesOf(pieces: Piece[]): Sentence[] {
   const out: Sentence[] = [];
   let open: Sentence | null = null;
   let openHasWords = false;
+  // The open sentence's text so far, across pieces: a title or initial split by formatting ("**Dr**. Reed") is read whole.
+  let openText = '';
   const close = () => {
     if (open && openHasWords) out.push(open);
     open = null;
     openHasWords = false;
+    openText = '';
   };
   for (const piece of pieces) {
     if (piece.kind === 'cite') {
@@ -36,7 +48,7 @@ export function sentencesOf(pieces: Piece[]): Sentence[] {
     END.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = END.exec(text))) {
-      if (notAnEnd(text, m.index)) continue;
+      if (text[m.index] === '.' && notAnEnd(openText + text.slice(start, m.index))) continue;
       const end = m.index + 1;
       const chunk = text.slice(start, end);
       if (!open) open = {from: piece.pos + start, to: piece.pos + end, cited: false, claims: []};
@@ -49,6 +61,7 @@ export function sentencesOf(pieces: Piece[]): Sentence[] {
     }
     if (start < text.length) {
       const rest = text.slice(start);
+      openText += rest;
       if (!open) open = {from: piece.pos + start, to: piece.pos + text.length, cited: false, claims: []};
       open.to = piece.pos + text.length;
       if (WORD.test(rest)) openHasWords = true;

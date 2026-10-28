@@ -37,9 +37,33 @@ def story_of(db: Session, investigation_id: str, create: bool = False) -> Story 
     return story
 
 
-# A sentence ends at . ! or ? and a space, but not after an initial ("M. Ross") or a short title or abbreviation
-# ("Dr.", "e.g."): those stay inside their sentence. frontend/features/story/sentences.ts reads sentences the same way.
-_END = re.compile(r"(?<=[.!?])(?<!\b[A-Z]\.)(?<!\bMr\.)(?<!\bMrs\.)(?<!\bMs\.)(?<!\bDr\.)(?<!\bSt\.)(?<!\bNo\.)(?<!\be\.g\.)(?<!\bi\.e\.)\s+")
+# A sentence ends at . ! or ? and a space, but not after a short title or abbreviation ("Dr.", "e.g.") or an initial
+# ("M. Ross"): those stay inside their sentence. A capital letter is read as an initial only at the start of a sentence,
+# after another initial or after a word that is not capitalised ("paid M. Ross"); after a capitalised word it is a
+# label that can end a sentence ("Schedule A."), so a missing source is never hidden. frontend/features/story/sentences.ts
+# reads sentences the same way.
+_END = re.compile(r"(?<=[.!?])(?<!\bMr\.)(?<!\bMrs\.)(?<!\bMs\.)(?<!\bDr\.)(?<!\bSt\.)(?<!\bNo\.)(?<!\be\.g\.)(?<!\bi\.e\.)\s+")
+_LETTER = re.compile(r"[A-Z]\.")
+
+
+def _ends_with_initial(text: str) -> bool:
+    words = text.split()
+    if not words or not _LETTER.fullmatch(words[-1]):
+        return False
+    before = words[-2] if len(words) > 1 else ""
+    return not before or not before[:1].isupper() or bool(_LETTER.fullmatch(before))
+
+
+def _split_sentences(text: str) -> list[str]:
+    """``text`` cut at each sentence end; the last part is the sentence still open."""
+    parts = _END.split(text)
+    out = [parts[0]]
+    for part in parts[1:]:
+        if _ends_with_initial(out[-1]):
+            out[-1] = f"{out[-1]} {part}"
+        else:
+            out.append(part)
+    return out
 _WORDS = re.compile(r"\w")
 
 
@@ -66,7 +90,7 @@ def sentences_without_source(content: dict | None) -> tuple[int, int]:
                 elif sentences:
                     sentences[-1] = True
                 continue
-            parts = _END.split(open_text + text)
+            parts = _split_sentences(open_text + text)
             for done in parts[:-1]:
                 # Punctuation straight after a citation ("… Nominees [3].") ends that sentence, not a new one.
                 if done.strip() and not (sentences and not _WORDS.search(done)):

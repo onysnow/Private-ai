@@ -23,7 +23,7 @@ from app.jobs.corpus import request_corpus_sync
 # Pictures are documents too (app/services/image_reader.py): kept as pictures, their text read by OCR.
 # Emails, mailboxes, .zip archives and spreadsheets are read by app/services/container_readers.py.
 SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'} | set(IMAGE_EXTENSIONS) | set(CONTAINER_EXTENSIONS)
-# Capitals and letters of the Latin alphabet, accented ones too (Société Générale, Müller & Söhne).
+# Capitals and letters of the Latin alphabet, accented ones too (Société Vérandine, Brühlmark & Söhne).
 _NAME_UPPER = "A-ZÀ-ÖØ-Þ"
 _NAME_LETTER = "A-Za-zÀ-ÖØ-öø-ÿĀ-ž"
 NAME_RE = re.compile(rf"\b([{_NAME_UPPER}][{_NAME_LETTER}'’.-]+(?:\s+(?:[{_NAME_UPPER}][{_NAME_LETTER}'’.-]+|of|the|and|&)){{1,5}})\b")

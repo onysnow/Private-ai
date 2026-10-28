@@ -182,6 +182,9 @@ def test_with_a_passphrase_backups_are_encrypted_and_open_anywhere_with_either_s
     assert b"Sealed" not in sealed.content and ".encrypted.zip" in sealed.headers["content-disposition"]
     with SessionLocal() as db:
         assert db.get(Investigation, inv).last_backup["encrypted"] is True
+        from app.models.domain import BackupEvent
+        events = db.query(BackupEvent).filter_by(investigation_id=inv).order_by(BackupEvent.at).all()
+        assert [e.encrypted for e in events] == [False, True], "each backup event keeps whether its file was sealed"
     assert open_sealed(sealed.content, PASS) == open_sealed(sealed.content, " ".join(words))
     files = {"file": ("b.zip", sealed.content, "application/zip")}
     no_secret = client.post("/api/backups/preview", files=files, headers=h(token))

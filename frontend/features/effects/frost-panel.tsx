@@ -13,7 +13,7 @@ import type {ElementType, ReactElement, ReactNode} from 'react';
 import {Glass} from '@fx/components/site/Glass';
 import {DEFAULT_MATERIAL, MATERIAL_ATTR} from '@fx/effects/materials/presets';
 
-import {currentAppearance, onAppearanceChange} from '../../lib/theme';
+import {effectiveAppearance, onAppearanceChange} from '../../lib/theme';
 
 /** How many board panels may be glass at once (with the rain pane, GlassLight draws at most this plus one). */
 export const FROST_LIMIT = 4;
@@ -29,7 +29,7 @@ export const frostedPanels = (): number => held;
 /** Whether the board's panels are frosted now: Rain Noir with Effects Full. */
 export function frostOn(): boolean {
   if (typeof window === 'undefined') return false;
-  const a = currentAppearance();
+  const a = effectiveAppearance();
   return a.theme === 'rain-noir' && a.effects === 'full';
 }
 
