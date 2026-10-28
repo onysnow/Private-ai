@@ -3,6 +3,7 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.time import utcnow_naive
 from app.models.domain import Document, Evidence, Source
 from app.services.image_reader import NotAPicture, stored_picture
 from app.services.security import resolve_storage_root
@@ -22,7 +23,19 @@ def _require_picture(db: Session, source_id: str, document_id: str) -> None:
         raise ValueError("The picture's stored file is not available") from exc
 
 
-def create_evidence(db: Session, payload: dict) -> Evidence:
+def _recording_of(db: Session, source_id: str) -> Document | None:
+    """The recording a source is the source of, when it is one (ADR-0020)."""
+    from sqlalchemy import select
+
+    from app.services.transcription import is_media
+
+    for document in db.scalars(select(Document).where(Document.source_id == source_id)):
+        if is_media(document.filename):
+            return document
+    return None
+
+
+def create_evidence(db: Session, payload: dict, actor: str | None = None) -> Evidence:
     """Create an Evidence row from a request payload already known to
     reference a valid Source (the caller checks that; this function
     doesn't touch the database except to persist the new row).
@@ -45,6 +58,11 @@ def create_evidence(db: Session, payload: dict) -> Evidence:
         raise ValueError(f"{payload['captured_on']!r} is not a date (YYYY, YYYY-MM or YYYY-MM-DD)")
     if payload.get("document_id"):
         _require_picture(db, payload["source_id"], payload["document_id"])
+    heard = bool(payload.pop("heard", False))
+    if payload.get("quote") and _recording_of(db, payload["source_id"]) is not None:
+        if not heard:
+            raise ValueError("Listen to this part of the recording before saving it as evidence: machines can invent words")
+        payload["heard_by"], payload["heard_at"] = actor or "you", utcnow_naive()
     row = Evidence(**payload)
     db.add(row)
     db.commit()

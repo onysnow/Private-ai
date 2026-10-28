@@ -31,11 +31,13 @@ import {
   checkWatchlistNow,
   clearCaseLookups,
   closeCase,
+  collectCaptureMedia,
   connectors,
   connectorSearch,
   convertLeadEndpoint,
   createAppUser,
   createCanonicalRelationship,
+  createCapture,
   createCaseRecord,
   createClaimEndpoint,
   createClaimReview,
@@ -94,6 +96,9 @@ import {
   getBasemapSprite,
   getBasemapStatus,
   getBasemapTile,
+  getCapture,
+  getCaptureFile,
+  getCaptures,
   getCaseRecord,
   getCaseResearch,
   getCatalogueMap,
@@ -112,9 +117,11 @@ import {
   getDocument,
   getDocumentEmail,
   getDocumentFormats,
+  getDocumentMedia,
   getDocumentPageImage,
   getDocumentPicture,
   getDocumentTable,
+  getDocumentTranscript,
   getDocumentTranslation,
   getDrop,
   getDropHistory,
@@ -409,6 +416,9 @@ import type {
   CloseCaseData,
   CloseCaseError,
   CloseCaseResponse,
+  CollectCaptureMediaData,
+  CollectCaptureMediaError,
+  CollectCaptureMediaResponse,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchError,
@@ -424,6 +434,9 @@ import type {
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipError,
   CreateCanonicalRelationshipResponse,
+  CreateCaptureData,
+  CreateCaptureError,
+  CreateCaptureResponse,
   CreateCaseRecordData,
   CreateCaseRecordError,
   CreateCaseRecordResponse,
@@ -598,6 +611,14 @@ import type {
   GetBasemapTileData,
   GetBasemapTileError,
   GetBasemapTileResponse,
+  GetCaptureData,
+  GetCaptureError,
+  GetCaptureFileData,
+  GetCaptureFileError,
+  GetCaptureResponse,
+  GetCapturesData,
+  GetCapturesError,
+  GetCapturesResponse,
   GetCaseRecordData,
   GetCaseRecordError,
   GetCaseRecordResponse,
@@ -651,6 +672,9 @@ import type {
   GetDocumentFormatsData,
   GetDocumentFormatsError,
   GetDocumentFormatsResponse,
+  GetDocumentMediaData,
+  GetDocumentMediaError,
+  GetDocumentMediaResponse,
   GetDocumentPageImageData,
   GetDocumentPageImageError,
   GetDocumentPageImageResponse,
@@ -661,6 +685,9 @@ import type {
   GetDocumentTableData,
   GetDocumentTableError,
   GetDocumentTableResponse,
+  GetDocumentTranscriptData,
+  GetDocumentTranscriptError,
+  GetDocumentTranscriptResponse,
   GetDocumentTranslationData,
   GetDocumentTranslationError,
   GetDocumentTranslationResponse,
@@ -1770,6 +1797,89 @@ export const capabilitiesOptions = (options?: Options<CapabilitiesData>) =>
     },
     queryKey: capabilitiesQueryKey(options),
   });
+
+export const getCaptureQueryKey = (options: Options<GetCaptureData>) =>
+  createQueryKey('getCapture', options);
+
+/**
+ * Get Capture
+ */
+export const getCaptureOptions = (options: Options<GetCaptureData>) =>
+  queryOptions<
+    GetCaptureResponse,
+    GetCaptureError,
+    GetCaptureResponse,
+    ReturnType<typeof getCaptureQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCapture({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaptureQueryKey(options),
+  });
+
+export const getCaptureFileQueryKey = (options: Options<GetCaptureFileData>) =>
+  createQueryKey('getCaptureFile', options);
+
+/**
+ * Get Capture File
+ *
+ * One kept file, downloaded as it was hashed (its SHA-256 is on the capture), never shown inline: a kept page is
+ * the site's own code and does not run inside the app.
+ */
+export const getCaptureFileOptions = (options: Options<GetCaptureFileData>) =>
+  queryOptions<
+    unknown,
+    GetCaptureFileError,
+    unknown,
+    ReturnType<typeof getCaptureFileQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaptureFile({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaptureFileQueryKey(options),
+  });
+
+/**
+ * Collect Capture Media
+ *
+ * Collect the one video or audio item on a captured page, logged out (app/services/media_links.py), keep it
+ * with the capture and transcribe it. Answers at once; the capture's `media` follows the job.
+ */
+export const collectCaptureMediaMutation = (
+  options?: Partial<Options<CollectCaptureMediaData>>,
+): UseMutationOptions<
+  CollectCaptureMediaResponse,
+  CollectCaptureMediaError,
+  Options<CollectCaptureMediaData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CollectCaptureMediaResponse,
+    CollectCaptureMediaError,
+    Options<CollectCaptureMediaData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await collectCaptureMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getCaseRecordQueryKey = (options: Options<GetCaseRecordData>) =>
   createQueryKey('getCaseRecord', options);
@@ -3506,6 +3616,36 @@ export const getDocumentEmailOptions = (
     queryKey: getDocumentEmailQueryKey(options),
   });
 
+export const getDocumentMediaQueryKey = (
+  options: Options<GetDocumentMediaData>,
+) => createQueryKey('getDocumentMedia', options);
+
+/**
+ * Get Document Media
+ *
+ * The original recording, for the player: the stored bytes, never re-encoded.
+ */
+export const getDocumentMediaOptions = (
+  options: Options<GetDocumentMediaData>,
+) =>
+  queryOptions<
+    GetDocumentMediaResponse,
+    GetDocumentMediaError,
+    GetDocumentMediaResponse,
+    ReturnType<typeof getDocumentMediaQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentMedia({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentMediaQueryKey(options),
+  });
+
 /**
  * Analyze Openaleph Document
  *
@@ -3869,6 +4009,36 @@ export const previewTableMappingMutation = (
   };
   return mutationOptions;
 };
+
+export const getDocumentTranscriptQueryKey = (
+  options: Options<GetDocumentTranscriptData>,
+) => createQueryKey('getDocumentTranscript', options);
+
+/**
+ * Get Document Transcript
+ *
+ * The transcript made on this computer: each segment with its words, and the parts with no speech.
+ */
+export const getDocumentTranscriptOptions = (
+  options: Options<GetDocumentTranscriptData>,
+) =>
+  queryOptions<
+    GetDocumentTranscriptResponse,
+    GetDocumentTranscriptError,
+    GetDocumentTranscriptResponse,
+    ReturnType<typeof getDocumentTranscriptQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentTranscript({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentTranscriptQueryKey(options),
+  });
 
 export const getDocumentTranslationQueryKey = (
   options: Options<GetDocumentTranslationData>,
@@ -5627,6 +5797,63 @@ export const investigationSuiteRunMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await investigationSuiteRun({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getCapturesQueryKey = (options: Options<GetCapturesData>) =>
+  createQueryKey('getCaptures', options);
+
+/**
+ * Get Captures
+ *
+ * The case's captures, newest first.
+ */
+export const getCapturesOptions = (options: Options<GetCapturesData>) =>
+  queryOptions<
+    GetCapturesResponse,
+    GetCapturesError,
+    GetCapturesResponse,
+    ReturnType<typeof getCapturesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaptures({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCapturesQueryKey(options),
+  });
+
+/**
+ * Create Capture
+ *
+ * Capture the page at `url`: one visit, no cookies, every file kept with its SHA-256, and the page's text as a
+ * case document. Answers at once with the queued capture; follow `job` (GET /api/jobs/{id}) or the capture itself.
+ */
+export const createCaptureMutation = (
+  options?: Partial<Options<CreateCaptureData>>,
+): UseMutationOptions<
+  CreateCaptureResponse,
+  CreateCaptureError,
+  Options<CreateCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateCaptureResponse,
+    CreateCaptureError,
+    Options<CreateCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createCapture({
         ...options,
         ...fnOptions,
         throwOnError: true,

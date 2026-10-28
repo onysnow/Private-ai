@@ -26,6 +26,16 @@ vl-convert-python==1.9.0.post1
 alembic==1.20.0
 PyMuPDF==1.28.2
 Pillow==13.0.0
+# Web capture (ADR-0018): a real browser visits a pasted link (Playwright, Apache-2.0; its Chromium is installed by
+# `playwright install chromium`), and the visit is kept as WARC 1.1 (warcio, Apache-2.0).
+playwright==1.64.1
+warcio==1.8.1
+# Audio and video transcribed on this computer (ADR-0020): faster-whisper (MIT) on CTranslate2 (MIT); PyAV (BSD-3)
+# decodes with the FFmpeg its wheels carry. av is pinned: 19 removed an argument faster-whisper 1.2.1 passes.
+faster-whisper==1.2.1
+# The video or audio on a captured page (ADR-0020, Phase 2c): yt-dlp (Unlicense), one item, logged out.
+yt-dlp==2026.8.19
+av==17.0.0
 openaleph-client==1.1.4
 # Background job queue on PostgreSQL (ADR-0004). Its schema is vendored in
 # alembic/sql/; upgrading this pin needs a migration that runs procrastinate's

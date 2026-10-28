@@ -53,3 +53,7 @@ class Evidence(Base):
     # Where the quote stands in its document's text, kept so it can be found again (ADR-0015,
     # app/services/anchor_text.py): passage, offsets, 32 characters either side, match, lines.
     anchor: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # A quote from a recording (ADR-0020): who heard the part themselves before it was saved, and when. Machines can
+    # invent words, so a recording's quote is saved only once a person has listened to it.
+    heard_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    heard_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

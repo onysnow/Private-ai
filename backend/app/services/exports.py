@@ -20,6 +20,7 @@ from app.db.locking import investigation_export_snapshot, lock_investigation_tra
 from app.jobs.corpus import request_corpus_sync
 from app.services.anchors import anchor_document_quotes
 from app.services.security import contained_path, resolve_storage_root
+from app.services.web_capture import capture_dir
 from app.models.domain import (
     Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, ClaimReviewEvent, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment,
     Lead, LeadProfile, LeadLink, LeadWorkflowEvent, ReportingTask, ReportingTaskWorkflowEvent, TimelineEvent,
@@ -29,7 +30,8 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
+    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
+    DocumentMedia, TranscriptSegment,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -48,7 +50,8 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
+        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
+        DocumentMedia, TranscriptSegment,
     ]
 }
 
@@ -68,6 +71,8 @@ RESTORE_ORDER = [
     "lead_links", "relationship_evidence_attachments", "relationship_evidence_review_events",
     "external_relationship_reviews", "external_relationship_promotions",
     "document_chunks", "extraction_candidates",
+    # A recording's file facts and its transcript segments (ADR-0020); a segment points at its passage.
+    "document_media", "transcript_segments",
     # Bulk imports and what happened to each file; an item points at its document.
     "ingestion_batches", "ingestion_batch_items",
     # Spreadsheet column mappings; the proposals they made are extraction candidates.
@@ -104,6 +109,9 @@ RESTORE_ORDER = [
     "saved_questions",
     # What left this computer, word for word (ADR-0015): part of the chain of custody, so it travels with the case.
     "outbound_requests",
+    # Web pages captured from links (ADR-0018): after the documents, sources and CAPT records they point at. Their
+    # files travel as capture_files in the manifest.
+    "captures",
 ]
 
 
@@ -171,7 +179,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
+        Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture, DocumentMedia, TranscriptSegment,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -224,6 +232,8 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "ai_run_events": direct["ai_run_events"],
         "saved_questions": direct["saved_questions"],
         "outbound_requests": direct["outbound_requests"],
+        "captures": direct["captures"],
+        "document_media": direct["document_media"], "transcript_segments": direct["transcript_segments"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -397,6 +407,21 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
             else:
                 missing_documents.append({"document_id": doc["id"], "storage_path": doc.get("storage_path")})
 
+    capture_entries = []
+    missing_captures = []
+    if include_documents:
+        for capture in records.get("captures", []):
+            for kept in capture.get("files") or []:
+                kept_path = capture_dir(settings.document_storage_dir, capture["investigation_id"], capture["id"]) / _safe_name(kept["name"])
+                if kept_path.is_file():
+                    raw = kept_path.read_bytes()
+                    archive_path = f"captures/{capture['id']}/{_safe_name(kept['name'])}"
+                    file_payloads[archive_path] = raw
+                    capture_entries.append({"capture_id": capture["id"], "name": kept["name"], "archive_path": archive_path,
+                                            "sha256": hashlib.sha256(raw).hexdigest()})
+                else:
+                    missing_captures.append({"capture_id": capture["id"], "name": kept["name"]})
+
     manifest: dict[str, Any] = {
         "format": EXPORT_FORMAT,
         "version": EXPORT_VERSION,
@@ -406,6 +431,8 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
         "documents_included": include_documents,
         "document_files": document_entries,
         "missing_document_files": missing_documents,
+        "capture_files": capture_entries,
+        "missing_capture_files": missing_captures,
         "lineage_integrity": _require_lineage_integrity(records),
         "checksums": {},
     }
@@ -547,11 +574,24 @@ def preview_investigation_restore(
                 "message": f"Document destination already exists: {dest}",
             })
 
+    for entry, problem in _capture_file_entries(manifest, records):
+        if problem:
+            conflicts.append({"kind": "capture_file", "table": "captures", "id": str(entry.get("capture_id")), "message": problem})
+            continue
+        dest = capture_dir(storage_root, investigation_id, str(entry["capture_id"])) / str(entry["name"])
+        if dest.exists():
+            conflicts.append({"kind": "capture_file", "table": "captures", "id": str(entry["capture_id"]),
+                              "message": f"Capture file destination already exists: {dest}"})
+
     # build_investigation_export lists the files it could not include as
     # "missing_document_files"; this read "missing_documents", which no backup
     # has, so the preview always said none were missing.
     missing_documents = list(manifest.get("missing_document_files", []))
     warnings: list[str] = []
+    missing_captures = list(manifest.get("missing_capture_files", []))
+    if missing_captures:
+        warnings.append(f"Backup is missing {len(missing_captures)} web capture file(s) that were unavailable when exported; "
+                        "those captures are restored without them.")
     if missing_documents:
         warnings.append(
             f"Backup references {len(missing_documents)} document file(s) that were unavailable when exported; metadata/extracted text can still be restored."
@@ -569,11 +609,31 @@ def preview_investigation_restore(
         "lineage_integrity": manifest.get("lineage_integrity"),
         "document_file_count": len(manifest.get("document_files", [])),
         "missing_document_count": len(missing_documents),
+        "capture_file_count": len(manifest.get("capture_files", [])),
         "warnings": warnings,
         "conflicts": conflicts,
         "can_restore": len(conflicts) == 0,
         "restore_api_enabled": settings.enable_restore_api,
     }
+
+def _capture_file_entries(manifest: dict[str, Any], records: dict[str, list[dict[str, Any]]]) -> list[tuple[dict[str, Any], str | None]]:
+    """The manifest's capture files, each with why it cannot be restored (None when it can). A backup is untrusted:
+    a file must belong to a capture in this backup, be one that capture lists, and have a plain name."""
+    listed = {row.get("id"): {f.get("name"): f.get("sha256") for f in row.get("files") or []} for row in records.get("captures", [])}
+    out: list[tuple[dict[str, Any], str | None]] = []
+    for entry in manifest.get("capture_files", []):
+        name = str(entry.get("name") or "")
+        if entry.get("capture_id") not in listed or name not in listed[entry.get("capture_id")]:
+            out.append((entry, "Capture file is not one of this backup's captures"))
+        elif name != _safe_name(name) or name in (".", ".."):
+            out.append((entry, f"Capture file name is not allowed: {name!r}"))
+        elif entry.get("sha256") != listed[entry.get("capture_id")][name]:
+            # The capture's record keeps each file's hash from when it was kept: bytes that differ are not that file.
+            out.append((entry, f"Capture file {name} does not match the SHA-256 its capture recorded"))
+        else:
+            out.append((entry, None))
+    return out
+
 
 def _coerce_datetimes(model: type[Any], row: dict[str, Any]) -> dict[str, Any]:
     result = dict(row)
@@ -638,6 +698,18 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 staged.write_bytes(raw)
                 staged_files.append((staged, dest))
                 raw_locations[doc_id] = str(dest)
+            for entry, _problem in _capture_file_entries(manifest, records):
+                capture_id, name = str(entry["capture_id"]), str(entry["name"])
+                dest = capture_dir(document_storage_dir, investigation_id, capture_id) / name
+                if dest.exists():
+                    raise ValueError(f"Restore destination appeared after preview: {dest}")
+                raw = zf.read(str(entry["archive_path"]))
+                if hashlib.sha256(raw).hexdigest() != entry["sha256"]:
+                    raise ValueError(f"Capture file checksum mismatch: {capture_id}/{name}")
+                staged = contained_path(stage_root, "captures", capture_id, name)
+                staged.parent.mkdir(parents=True, exist_ok=True)
+                staged.write_bytes(raw)
+                staged_files.append((staged, dest))
 
         restored_counts: dict[str, int] = {}
         db.info["restoring"] = True
@@ -686,7 +758,7 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                     pass
             # Clean empty per-document/investigation directories created by this attempt.
             for _, dest in reversed(staged_files):
-                for directory in (dest.parent, dest.parent.parent):
+                for directory in (dest.parent, dest.parent.parent, dest.parent.parent.parent):
                     try:
                         directory.rmdir()
                     except OSError:

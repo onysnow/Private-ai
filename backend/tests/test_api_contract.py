@@ -108,6 +108,33 @@ NOT_CALLED = {("GET", "/api/console/events"), ("POST", "/api/console/schema/migr
               ("POST", "/api/me/protection"), ("PUT", "/api/me/cases/{investigation_id}/lock")}
 
 
+def _capture_visit(url: str, har_path: Path, **_: Any) -> Any:
+    from datetime import datetime, timezone
+
+    from PIL import Image
+
+    from app.services.web_capture import Visit
+
+    picture = io.BytesIO()
+    Image.new("RGB", (40, 20), (255, 255, 255)).save(picture, format="PNG")
+    har = b'{"log": {"entries": []}}'
+    har_path.write_bytes(har)
+    return Visit(final_url=url, response_status=200, received=b"<p>Meridian paid Bellcastle</p>",
+                 rendered="<html><body><main><p>Meridian paid Bellcastle</p></main></body></html>", screenshot=picture.getvalue(),
+                 har=har, displayed={"title": "Meridian"}, captured_at=datetime.now(timezone.utc), tool="stand-in")
+
+
+def _transcribe(path: Path, progress: Callable[[float, str], None]) -> Any:
+    from app.services.transcription import Segment, Transcript
+
+    progress(1.0, "")
+    return Transcript(kind="audio", duration=19.0, streams=[{"type": "audio", "codec": "mp3"}], outline=[0.2, 1.0], outline_step=9.5,
+                      segments=[Segment(0.0, 2.8, "speech", "Meridian paid Bellcastle.", [{"w": "Meridian", "s": 0.0, "e": 0.6, "p": 0.4}]),
+                                Segment(2.8, 9.0, "no_speech")],
+                      about={"tool": "stand-in", "model": "stand-in", "language": "en", "language_probability": 1.0,
+                             "ran_at": "2026-10-28T10:00:00", "seconds": 0.0, "where": "this computer"})
+
+
 def _no_network(*_args: Any, **_kwargs: Any) -> Any:
     raise OSError("the contract test never opens a network connection")
 
@@ -178,6 +205,7 @@ def _wait(app: FastAPI, run_id: str, timeout: float = 60.0) -> None:
 def contract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[schemathesis.BaseSchema, Seeded]]:
     import app.ai.reasoning as reasoning
     from app.ai.governor import governor
+    from app.services import transcription, web_capture
     from app.connectors.registry import registry
     from app.core.config import Settings, settings
     from app.main import create_app
@@ -206,6 +234,10 @@ def contract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[
     answer = httpx.MockTransport(lambda request: httpx.Response(200, json={"ok": True}))
     setattr(standin, "Client", lambda **kw: httpx.Client(transport=answer, **kw))
     monkeypatch.setattr(apiplay, "httpx", standin)
+    # A web capture's visit, without a browser: the page it "saw" (app/services/web_capture.py).
+    monkeypatch.setattr(web_capture, "visit", _capture_visit)
+    # A recording's transcript, without the model (app/services/transcription.py).
+    monkeypatch.setattr(transcription, "transcribe", _transcribe)
     for target, name in ((socket.socket, "connect"), (socket.socket, "connect_ex"), (socket, "getaddrinfo")):
         monkeypatch.setattr(target, name, _no_network)
 
@@ -448,6 +480,11 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     fact_watch = ok(client.post("/api/watches", json={"record_type": "claim", "record_id": claim["id"]}))
     # A saved question the case can run again (app/services/saved_questions.py).
     saved_question = ok(client.post(f"/api/investigations/{inv}/saved-questions", json={"module": "case_synthesis", "question": "Who paid Meridian?"}))
+    # A page captured from a link (app/services/web_capture.py), by a stand-in for the browser's visit.
+    capture = ok(client.post(f"/api/investigations/{inv}/captures", json={"url": "https://example.org/meridian"}))
+    # A recording, transcribed by a stand-in for the model (app/services/transcription.py).
+    recording = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Board call"}, files={
+        "file": ("board-call.mp3", (Path(__file__).parent / "fixtures" / "media" / "harbour-talk.mp3").read_bytes(), "audio/mpeg")}))
 
     return Seeded(
         ids={
@@ -462,12 +499,13 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
             "indicator_id": "BO-001", "case_id": "deripaska-en-rusal", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
-            "check_id": _check_item(client), "case_record_id": case_record["id"], "thought_id": "CLM-0001",
+            "check_id": _check_item(client), "case_record_id": case_record["id"], "thought_id": "CLM-0001", "capture_id": capture["id"],
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={
             ("GET", "/api/ai-analysis-candidates/{candidate_id}"): {"candidate_id": ai_candidate},
             ("GET", "/api/basemap/sprites/{name}"): {"name": "grayscale.json"},
+            ("GET", "/api/captures/{capture_id}/files/{name}"): {"name": "page.html"},
             **{(method, path): {"candidate_id": ai_candidate} for method, path in (
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-deck"),
                 ("POST", "/api/ai-analysis-candidates/{candidate_id}/promote-to-writeup"),
@@ -476,6 +514,8 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
             ("GET", "/api/documents/{document_id}/email"): {"document_id": email},
             ("GET", "/api/documents/{document_id}/picture"): {"document_id": picture["id"]},
+            ("GET", "/api/documents/{document_id}/media"): {"document_id": recording["id"]},
+            ("GET", "/api/documents/{document_id}/transcript"): {"document_id": recording["id"]},
             ("GET", "/api/documents/{document_id}/page-image"): {"document_id": minutes["id"]},
             **{(method, path): {"document_id": ledger["id"]} for method, path in (
                 ("GET", "/api/documents/{document_id}/table"),

@@ -26,8 +26,8 @@ import type {ChangeEvent, DragEvent, FocusEvent as ReactFocusEvent, KeyboardEven
 
 import {ApiHttpError, errorMessage} from '../../lib/api-client';
 import {caseHref} from '../../lib/case-href';
-import {getDropHistoryOptions, getDropHistoryQueryKey, getDropOptions, getDropQueryKey, listDocumentsOptions, listInvestigationsOptions, settingsStatusOptions} from '../../lib/generated/@tanstack/react-query.gen';
-import {cancelJobEndpoint, createIngestionBatch, retryJobEndpoint} from '../../lib/generated/sdk.gen';
+import {getCapturesQueryKey, getDropHistoryOptions, getDropHistoryQueryKey, getDropOptions, getDropQueryKey, listDocumentsOptions, listInvestigationsOptions, settingsStatusOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {cancelJobEndpoint, createCapture, createIngestionBatch, retryJobEndpoint} from '../../lib/generated/sdk.gen';
 import type {DropHistoryEntryOut, DropLaneOut, DropOut, DropProposerOut, DropStageOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {apiTime} from '../../lib/timestamps';
@@ -36,6 +36,7 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {PagePicture} from '../case-home/decision-card';
 import {batchLabel, upload} from '../documents/documents-panel';
 import {useDropStream} from './drop-stream';
+import {CaptureLinkField, Captures, isWebAddress, sameLink, useCaptures} from './captures';
 
 const MARK: Record<DropStageOut['state'], string> = {done: '✓', active: '◐', waiting: '·', stopped: '✕', needs_you: '!', skipped: '–'};
 const WORD: Record<DropStageOut['state'], string> = {done: 'done', active: 'working', waiting: 'waiting', stopped: 'stopped', needs_you: 'needs you', skipped: 'not needed'};
@@ -342,7 +343,16 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   }, [reading, investigationId, queryClient]);
   const settings = useQuery({...settingsStatusOptions()}).data;
   const data = query.data;
-  const [tab, setTab] = useState<'line' | 'history'>('line');
+  const [tab, setTab] = useState<'line' | 'links' | 'history'>('line');
+  const captures = useCaptures(investigationId).data ?? [];
+  // A capture that finishes adds its page to the case as a document: the line and the Library count follow.
+  const capturing = captures.filter(c => c.status === 'queued' || c.status === 'capturing').length;
+  const wasCapturing = useRef(capturing);
+  useEffect(() => {
+    if (capturing < wasCapturing.current) void queryClient.invalidateQueries({queryKey: getDropQueryKey({path: {investigation_id: investigationId}})});
+    wasCapturing.current = capturing;
+  }, [capturing, investigationId, queryClient]);
+  const [pickedCapture, setPickedCapture] = useState<string | null>(null);
   const [shown, setShown] = useState<{label: string; ids: string[]} | null>(null);
   const [duplicates, setDuplicates] = useState<Duplicate[]>([]);
   const batchRef = useRef<string | undefined>(undefined);
@@ -401,7 +411,8 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   }, [lanes, lane]);
 
   useEffect(() => {
-    if (!active) return undefined;
+    // The line's keys are the line's: the Links tab has its own buttons.
+    if (!active || tab === 'links') return undefined;
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey || typing(e.target) || !singleKeysOn()) return;
       const k = e.key.toLowerCase();
@@ -413,7 +424,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [active, move, lane, openDocument]);
+  }, [active, move, lane, openDocument, tab]);
 
   // The grid's one tab stop: the cell last focused, else the first file's name.
   const gridRef = useRef<HTMLDivElement>(null);
@@ -500,7 +511,27 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   const onPaste = (text: string) => {
     const clean = text.trim();
     if (!clean) return;
+    // A link is captured, not saved as text (ADR-0018): its page is kept as it was, with proof.
+    if (isWebAddress(clean)) { void captureLink(clean); return; }
     void send([new File([clean], `Pasted text ${new Date().toISOString().slice(0, 16).replace('T', ' ')}.txt`, {type: 'text/plain'})]);
+  };
+  const captureLink = async (url: string) => {
+    const earlier = captures.find(c => c.outcome === 'saved' && sameLink(c.url) === sameLink(url));
+    if (earlier) {
+      setPickedCapture(earlier.id);
+      setTab('links');
+      setStatus('That page is already in the case: here is the capture made earlier. Capture it again from Paste a link.');
+      return;
+    }
+    setStatus('Capturing the link…');
+    try {
+      const made = (await createCapture({path: {investigation_id: investigationId}, body: {url}, throwOnError: true})).data;
+      setPickedCapture(made.id);
+      setTab('links');
+      setStatus('');
+      await Promise.all([queryClient.invalidateQueries({queryKey: getCapturesQueryKey({path: {investigation_id: investigationId}})}),
+        queryClient.invalidateQueries({queryKey: dropKey})]);
+    } catch (error) { setStatus(errorMessage(error, 'Could not capture that link')); }
   };
   const choose = (e: ChangeEvent<HTMLInputElement>) => { void send(Array.from(e.target.files ?? [])); e.target.value = ''; };
   const actions: Actions = {
@@ -523,17 +554,21 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   const language = ocr ? ocr.pdf_ocr_language.split('+').map(c => LANGUAGES[c] ?? c).join(' + ') : '';
   const byOpenAleph = settings?.document_extraction.entity_extraction_owner === 'openaleph_ftm_analyze';
 
+  // The file pickers sit in the drop field; the Links tab, which has no field, keeps its own pair.
+  const pickers = <>
+    <input ref={files} type="file" multiple hidden onChange={choose}/>
+    {/* @ts-expect-error webkitdirectory is a browser attribute React does not type */}
+    <input ref={folder} type="file" multiple hidden webkitdirectory="" onChange={choose}/>
+  </>;
   const field = <div className={`dp-field${over ? ' over' : ''}`} onDragOver={e => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={onDrop}
     onPaste={e => { const text = e.clipboardData.getData('text'); if (text && !e.clipboardData.files.length) { e.preventDefault(); onPaste(text); } }} tabIndex={0}
     onKeyDown={e => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.stopPropagation(); files.current?.click(); } }}
     aria-label="Drop files here, or paste text. Enter chooses files">
     <span className="dp-arrow" aria-hidden="true">↓</span>
-    <p><b>Drop files, a folder, or paste text</b></p>
+    <p><b>Drop files, a folder, or paste text or a link</b></p>
     <p className="dp-quiet">or press <kbd>O</kbd> to <button type="button" className="dp-link" onClick={() => files.current?.click()}>choose files</button>
       {' · '}<button type="button" className="dp-link" onClick={() => folder.current?.click()}>a folder</button></p>
-    <input ref={files} type="file" multiple hidden onChange={choose}/>
-    {/* @ts-expect-error webkitdirectory is a browser attribute React does not type */}
-    <input ref={folder} type="file" multiple hidden webkitdirectory="" onChange={choose}/>
+    {pickers}
     {status && <p role="status" className="dp-status">{status}</p>}
   </div>;
 
@@ -542,9 +577,10 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
     <p className="dp-quiet">Looking at what was brought in…</p>
   </section>;
 
-  if (!data || empty) return <section className="dp dp-empty" aria-label="The Drop">
+  if (!data || (empty && !captures.length && tab !== 'links')) return <section className="dp dp-empty" aria-label="The Drop">
     {field}
-    {empty && <p className="dp-quiet">Each file is read on this computer: nothing leaves it.</p>}
+    {empty && <CaptureLinkField investigationId={investigationId} captures={captures} onCaptured={id => { setPickedCapture(id); setTab('links'); }}/>}
+    {empty && <p className="dp-quiet">Each file is read on this computer: nothing leaves it. A link is visited once, from this computer.</p>}
     {empty && <SampleCaseLink investigationId={investigationId}/>}
     {query.isError && <p role="alert">{errorMessage(query.error, 'Could not see what was brought in')}</p>}
   </section>;
@@ -552,12 +588,14 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   return <section className="dp" aria-label="The Drop">
     <nav className="dp-tabs" aria-label="The Drop">
       <button type="button" className={tab === 'line' ? 'on' : ''} aria-current={tab === 'line' ? 'page' : undefined} onClick={() => setTab('line')}>Digestion line</button>
+      <button type="button" className={tab === 'links' ? 'on' : ''} aria-current={tab === 'links' ? 'page' : undefined} onClick={() => setTab('links')}>Links &amp; captures <small>{captures.length}</small></button>
       <Link href={caseHref('/bring-in#document-ingestion', investigationId)}>Library <small>{every.length}</small></Link>
       <button type="button" className={tab === 'history' ? 'on' : ''} aria-current={tab === 'history' ? 'page' : undefined} onClick={() => setTab('history')}>History</button>
       {t!.unread > 0 && <span className="dp-live"><i aria-hidden="true"/>Reading · {t!.unread} file{t!.unread === 1 ? '' : 's'}
         {stream === 'reconnecting' ? <small> · reconnecting</small> : stream === 'polling' ? <small> · checking every 2 s</small> : null}</span>}
     </nav>
 
+    {tab === 'links' ? <>{pickers}<Captures investigationId={investigationId} picked={pickedCapture} onPick={id => { setPickedCapture(id); setStatus(''); }} onAddFile={() => files.current?.click()} notice={status}/></> : <>
     <div className="dp-left">
       {field}
       {duplicates.length > 0 && <section className="dp-card dp-dupes" aria-label="Already in the case">
@@ -645,6 +683,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
         aria-label={l.filename} onClick={() => setPicked(l.document_id)}><Thumb lane={l} width={44}/></button></li>)}</ol>
       <span className="dp-count">{at + 1} / {strip.length}</span>
     </nav>
+    </>}
     {query.isError && <p role="alert">{errorMessage(query.error, 'Could not see what was brought in')}</p>}
   </section>;
 }

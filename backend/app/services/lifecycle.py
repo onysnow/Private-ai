@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.db.session import Base
 from app.db.locking import lock_investigation_transaction
 from app.models.domain import Document, Investigation
-from app.services.security import resolve_storage_root
+from app.services.security import contained_path, resolve_storage_root
 
 logger = logging.getLogger("journalism.lifecycle")
 # Shown for a stored path outside document storage; the reason is logged, not sent.
@@ -167,6 +167,9 @@ def preview_investigation_deletion(db: Session, investigation_id: str, storage_r
             "unsafe": len(unsafe_paths),
         },
         "unsafe_paths": unsafe_paths,
+        # Web captures' files (ADR-0018) live in the case's own folder and go with it.
+        "capture_file_count": sum(1 for p in (root / investigation_id / "captures").rglob("*") if p.is_file())
+        if (root / investigation_id / "captures").is_dir() else 0,
         "can_delete": not unsafe_paths,
         # The reporter types the case's name to delete it (research §10, KEEP_2); the API also takes the ID.
         "requires_confirmation": (inv.name or "").strip() or investigation_id,
@@ -218,6 +221,17 @@ def delete_investigation(db: Session, investigation_id: str, storage_root: str |
             staged_path.parent.mkdir(parents=True, exist_ok=True)
             original.replace(staged_path)
             staged.append((original, staged_path))
+
+        captures = contained_path(root, investigation_id, "captures")
+        if captures.is_dir():
+            staged_captures = trash_root / investigation_id / "captures"
+            staged_captures.parent.mkdir(parents=True, exist_ok=True)
+            captures.replace(staged_captures)
+            staged.append((captures, staged_captures))
+            try:
+                captures.parent.rmdir()
+            except OSError:
+                pass
 
         rows = _collect_investigation_rows(db, investigation_id)
         deleted_counts: dict[str, int] = {}

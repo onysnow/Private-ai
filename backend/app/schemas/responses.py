@@ -85,6 +85,8 @@ class EvidenceOut(ResponseModel):
     # Where the quote stands in its document's text, as stored (ADR-0015): passage, offsets, the text either side,
     # how the words matched, the lines it spans; null for a quote with no document or not found in it.
     anchor: dict[str, Any] | None = None
+    heard_by: str | None = None        # a recording's quote: who heard the part before it was saved
+    heard_at: Timestamp | None = None
 
 
 class EvidencePoolRow(ResponseModel):
@@ -137,6 +139,8 @@ class InvestigationDeletionPreview(ResponseModel):
     document_files: list[DeletionDocumentFile]
     document_file_summary: DeletionFileSummary
     unsafe_paths: list[DeletionUnsafePath]
+    # Files kept by web captures (ADR-0018), deleted with the case.
+    capture_file_count: int = 0
     can_delete: bool
     requires_confirmation: str
     openaleph_collection: DeletionCollectionOut | None
@@ -1635,6 +1639,7 @@ class BackupPreviewOut(ResponseModel):
     lineage_integrity: LineageIntegrityOut | None = None
     document_file_count: int
     missing_document_count: int
+    capture_file_count: int = 0
     warnings: list[str]
     conflicts: list[RestoreConflictOut]
     can_restore: bool
@@ -5004,6 +5009,118 @@ class CaseRecordOut(ResponseModel):
     created_by: str | None = None
     created_at: Timestamp
     updated_at: Timestamp
+
+
+# --- Recordings (app/services/transcription.py, ADR-0020) -----------------------------------------------------------
+
+class TranscriptWordOut(ResponseModel):
+    """One word: its text, start and end in seconds, and the model's probability for it."""
+    w: str
+    s: float
+    e: float
+    p: float
+
+
+class TranscriptSegmentOut(ResponseModel):
+    """A stretch of the recording: speech (its passage is `chunk_id`), or no speech, never quoted."""
+    id: str
+    chunk_id: str | None = None
+    ordinal: int
+    start: float
+    end: float
+    kind: Literal["speech", "no_speech"]
+    text: str
+    words: list[TranscriptWordOut]
+    speaker: str | None = None
+
+
+class TranscriptOut(ResponseModel):
+    """A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
+    (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
+    the machine was unsure of."""
+    document_id: str
+    kind: Literal["audio", "video"]
+    duration: float
+    streams: list[dict[str, Any]]
+    outline: list[float]
+    outline_step: float
+    transcript: dict[str, Any]
+    unsure_below: float
+    segments: list[TranscriptSegmentOut]
+
+
+# --- Web capture (app/services/web_capture.py, ADR-0018) ------------------------------------------------------------
+
+class CaptureFileOut(ResponseModel):
+    """One file a capture kept, with its SHA-256."""
+    name: str
+    role: str
+    bytes: int
+    sha256: str
+
+
+class CaptureDisplayedOut(ResponseModel):
+    """What the page displayed about itself, as displayed and not verified."""
+    title: str | None = None
+    author: str | None = None
+    published: str | None = None
+
+
+class CaptureStageOut(ResponseModel):
+    """One box of the capture lane."""
+    key: Literal["checked", "fetched", "source", "screenshot", "archive", "fingerprint", "text"]
+    label: str
+    state: Literal["done", "waiting", "stopped", "skipped"]
+    seconds: float | None = None
+
+
+class CaptureMessageOut(ResponseModel):
+    """A request line or status line with a few of its headers ([name, value] pairs)."""
+    method: str | None = None
+    target: str | None = None
+    status: str | None = None
+    headers: list[list[str]]
+
+
+class CaptureExchangeOut(ResponseModel):
+    """What was sent for the page itself and what came back, as served and not verified."""
+    request: CaptureMessageOut | None = None
+    response: CaptureMessageOut | None = None
+
+
+class CaptureOut(ResponseModel):
+    """A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
+    not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why)."""
+    id: str
+    investigation_id: str
+    url: str
+    final_url: str | None = None
+    status: Literal["queued", "capturing", "finished", "failed"]
+    outcome: Literal["saved", "not_seen", "link_only"] | None = None
+    suite_outcome: Literal["OBTAINED", "UNABLE_TO_OBTAIN"] | None = None
+    reason: str | None = None
+    http_status: int | None = None
+    collector: str | None = None
+    tool: str | None = None
+    requested_at: Timestamp
+    started_at: Timestamp | None = None
+    finished_at: Timestamp | None = None
+    captured_at: Timestamp | None = None
+    files: list[CaptureFileOut]
+    displayed: CaptureDisplayedOut
+    robots_disallowed: bool | None = None
+    stages: list[CaptureStageOut]
+    exchange: CaptureExchangeOut
+    source_id: str | None = None
+    document_id: str | None = None
+    case_record_id: str | None = None
+    job_id: str | None = None
+    content_verified: str
+    # The video or audio on the page, once the reporter asked for it: status, platform, item_id, account, title,
+    # uploaded, duration, webpage_url, live_status, tool, route; and the recording it became.
+    media: dict[str, Any]
+    media_document_id: str | None = None
+    job: BackgroundJobOut | None = None
 
 
 # --- The Drop (app/services/drop.py) ---------------------------------------------------------

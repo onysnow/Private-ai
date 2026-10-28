@@ -50,6 +50,7 @@ from app.services.openaleph_corpus import (
 )
 from app.services.image_reader import NotAPicture, stored_picture
 from app.services.security import resolve_storage_root
+from app.services.transcription import is_media
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 logger = logging.getLogger("journalism.jobs")
@@ -325,7 +326,8 @@ async def upload_document(
     except UnsupportedFormat as exc:
         raise refused(415, str(exc))
     try:
-        data = await read_upload_limited(file, settings.max_document_bytes)
+        # A recording may be larger than a document (ADR-0020).
+        data = await read_upload_limited(file, settings.max_media_bytes if is_media(file.filename) else settings.max_document_bytes)
     except HTTPException as exc:
         raise refused(exc.status_code, str(exc.detail))
     if not data:

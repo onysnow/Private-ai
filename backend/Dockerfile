@@ -41,7 +41,15 @@ RUN --mount=type=secret,id=authority_sdk_deploy_key \
     fi \
     && pip install --no-cache-dir -r requirements.txt \
     && python -c "import fitz, pathlib; p=pathlib.Path(fitz.get_tessdata()); assert (p/'eng.traineddata').is_file(), f'English tessdata missing: {p}'"
+# The browser web capture drives (ADR-0018), with the system libraries it needs, outside /app for the same reason as
+# the workbench below.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright-browsers
+RUN python -m playwright install --with-deps --only-shell chromium && rm -rf /var/lib/apt/lists/*
 COPY backend/ .
+# The transcription model (ADR-0020), fetched once here so a read never downloads it; outside /app like the browser.
+ARG TRANSCRIPTION_MODEL=small
+ENV TRANSCRIPTION_MODEL=${TRANSCRIPTION_MODEL} TRANSCRIPTION_MODEL_DIR=/opt/whisper-models
+RUN python -m app.services.transcription fetch
 
 # Outside /app, so the development compose file's ./backend:/app bind mount
 # doesn't hide it.

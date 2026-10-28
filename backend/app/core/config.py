@@ -67,6 +67,20 @@ class Settings(BaseSettings):
     # Where the Web Push signing key is kept (made on first use, readable by this server's user only).
     notify_secrets_file: str = "./data/secrets/notifications.json"
     max_document_bytes: int = 50 * 1024 * 1024
+    # Web capture (ADR-0018): the Chromium headless shell that Playwright drives. Empty: the one
+    # `playwright install --only-shell chromium` put in place. Point it at a headless shell, not a full Chromium: the
+    # full browser calls Google in the background whatever it is told. A page that takes longer than the timeout to load
+    # is kept as it stands then.
+    capture_browser_path: str = ""
+    capture_timeout_seconds: float = 45.0
+    # What one capture may bring back, the page and everything it loads, before the rest is cut off.
+    capture_max_megabytes: int = 100
+    # Audio and video (ADR-0020): the largest recording an upload takes, and the Whisper model that transcribes it on
+    # this computer (fetched once at setup into the folder below; a read never downloads it). Language: empty detects it.
+    max_media_bytes: int = 500 * 1024 * 1024
+    transcription_model: str = "small"
+    transcription_model_dir: str = "./data/models"
+    transcription_language: str = ""
     enable_pdf_ocr: bool = True
     pdf_ocr_language: str = "eng"
     pdf_ocr_dpi: int = 200

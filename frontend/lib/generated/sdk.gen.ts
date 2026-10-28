@@ -78,6 +78,9 @@ import type {
   CloseCaseData,
   CloseCaseErrors,
   CloseCaseResponses,
+  CollectCaptureMediaData,
+  CollectCaptureMediaErrors,
+  CollectCaptureMediaResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
@@ -93,6 +96,9 @@ import type {
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipErrors,
   CreateCanonicalRelationshipResponses,
+  CreateCaptureData,
+  CreateCaptureErrors,
+  CreateCaptureResponses,
   CreateCaseRecordData,
   CreateCaseRecordErrors,
   CreateCaseRecordResponses,
@@ -267,6 +273,15 @@ import type {
   GetBasemapTileData,
   GetBasemapTileErrors,
   GetBasemapTileResponses,
+  GetCaptureData,
+  GetCaptureErrors,
+  GetCaptureFileData,
+  GetCaptureFileErrors,
+  GetCaptureFileResponses,
+  GetCaptureResponses,
+  GetCapturesData,
+  GetCapturesErrors,
+  GetCapturesResponses,
   GetCaseRecordData,
   GetCaseRecordErrors,
   GetCaseRecordResponses,
@@ -320,6 +335,9 @@ import type {
   GetDocumentFormatsData,
   GetDocumentFormatsErrors,
   GetDocumentFormatsResponses,
+  GetDocumentMediaData,
+  GetDocumentMediaErrors,
+  GetDocumentMediaResponses,
   GetDocumentPageImageData,
   GetDocumentPageImageErrors,
   GetDocumentPageImageResponses,
@@ -330,6 +348,9 @@ import type {
   GetDocumentTableData,
   GetDocumentTableErrors,
   GetDocumentTableResponses,
+  GetDocumentTranscriptData,
+  GetDocumentTranscriptErrors,
+  GetDocumentTranscriptResponses,
   GetDocumentTranslationData,
   GetDocumentTranslationErrors,
   GetDocumentTranslationResponses,
@@ -1061,6 +1082,8 @@ import {
   zClearCaseLookupsResponse,
   zCloseCasePath,
   zCloseCaseResponse,
+  zCollectCaptureMediaPath,
+  zCollectCaptureMediaResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -1072,6 +1095,9 @@ import {
   zCreateAppUserResponse,
   zCreateCanonicalRelationshipBody,
   zCreateCanonicalRelationshipResponse,
+  zCreateCaptureBody,
+  zCreateCapturePath,
+  zCreateCaptureResponse,
   zCreateCaseRecordBody,
   zCreateCaseRecordPath,
   zCreateCaseRecordResponse,
@@ -1203,6 +1229,11 @@ import {
   zGetBasemapStatusResponse,
   zGetBasemapTilePath,
   zGetBasemapTileResponse,
+  zGetCaptureFilePath,
+  zGetCapturePath,
+  zGetCaptureResponse,
+  zGetCapturesPath,
+  zGetCapturesResponse,
   zGetCaseRecordPath,
   zGetCaseRecordResponse,
   zGetCaseResearchPath,
@@ -1236,6 +1267,8 @@ import {
   zGetDocumentEmailPath,
   zGetDocumentEmailResponse,
   zGetDocumentFormatsResponse,
+  zGetDocumentMediaPath,
+  zGetDocumentMediaResponse,
   zGetDocumentPageImagePath,
   zGetDocumentPageImageQuery,
   zGetDocumentPageImageResponse,
@@ -1246,6 +1279,8 @@ import {
   zGetDocumentTablePath,
   zGetDocumentTableQuery,
   zGetDocumentTableResponse,
+  zGetDocumentTranscriptPath,
+  zGetDocumentTranscriptResponse,
   zGetDocumentTranslationPath,
   zGetDocumentTranslationResponse,
   zGetDropHistoryPath,
@@ -2231,6 +2266,89 @@ export const capabilities = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCapabilitiesResponse.parseAsync(data),
     url: '/api/capabilities',
+    ...options,
+  });
+
+/**
+ * Get Capture
+ */
+export const getCapture = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaptureData, ThrowOnError>,
+): RequestResult<GetCaptureResponses, GetCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCaptureResponses,
+    GetCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCaptureResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}',
+    ...options,
+  });
+
+/**
+ * Get Capture File
+ *
+ * One kept file, downloaded as it was hashed (its SHA-256 is on the capture), never shown inline: a kept page is
+ * the site's own code and does not run inside the app.
+ */
+export const getCaptureFile = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaptureFileData, ThrowOnError>,
+): RequestResult<GetCaptureFileResponses, GetCaptureFileErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCaptureFileResponses,
+    GetCaptureFileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCaptureFilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/captures/{capture_id}/files/{name}',
+    ...options,
+  });
+
+/**
+ * Collect Capture Media
+ *
+ * Collect the one video or audio item on a captured page, logged out (app/services/media_links.py), keep it
+ * with the capture and transcribe it. Answers at once; the capture's `media` follows the job.
+ */
+export const collectCaptureMedia = <ThrowOnError extends boolean = false>(
+  options: Options<CollectCaptureMediaData, ThrowOnError>,
+): RequestResult<
+  CollectCaptureMediaResponses,
+  CollectCaptureMediaErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CollectCaptureMediaResponses,
+    CollectCaptureMediaErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCollectCaptureMediaPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCollectCaptureMediaResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/media',
     ...options,
   });
 
@@ -3967,6 +4085,37 @@ export const getDocumentEmail = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Document Media
+ *
+ * The original recording, for the player: the stored bytes, never re-encoded.
+ */
+export const getDocumentMedia = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentMediaData, ThrowOnError>,
+): RequestResult<
+  GetDocumentMediaResponses,
+  GetDocumentMediaErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentMediaResponses,
+    GetDocumentMediaErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentMediaPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentMediaResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/media',
+    ...options,
+  });
+
+/**
  * Analyze Openaleph Document
  *
  * "Find names again": OpenAleph analyses the document again
@@ -4291,6 +4440,37 @@ export const previewTableMapping = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Document Transcript
+ *
+ * The transcript made on this computer: each segment with its words, and the parts with no speech.
+ */
+export const getDocumentTranscript = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentTranscriptData, ThrowOnError>,
+): RequestResult<
+  GetDocumentTranscriptResponses,
+  GetDocumentTranscriptErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentTranscriptResponses,
+    GetDocumentTranscriptErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentTranscriptPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentTranscriptResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/transcript',
+    ...options,
   });
 
 /**
@@ -6138,6 +6318,65 @@ export const investigationSuiteRun = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zInvestigationSuiteRunResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/suite-run',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Captures
+ *
+ * The case's captures, newest first.
+ */
+export const getCaptures = <ThrowOnError extends boolean = false>(
+  options: Options<GetCapturesData, ThrowOnError>,
+): RequestResult<GetCapturesResponses, GetCapturesErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCapturesResponses,
+    GetCapturesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCapturesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCapturesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures',
+    ...options,
+  });
+
+/**
+ * Create Capture
+ *
+ * Capture the page at `url`: one visit, no cookies, every file kept with its SHA-256, and the page's text as a
+ * case document. Answers at once with the queued capture; follow `job` (GET /api/jobs/{id}) or the capture itself.
+ */
+export const createCapture = <ThrowOnError extends boolean = false>(
+  options: Options<CreateCaptureData, ThrowOnError>,
+): RequestResult<CreateCaptureResponses, CreateCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CreateCaptureResponses,
+    CreateCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateCaptureBody,
+          path: zCreateCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateCaptureResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures',
     ...options,
     headers: {
       'Content-Type': 'application/json',
