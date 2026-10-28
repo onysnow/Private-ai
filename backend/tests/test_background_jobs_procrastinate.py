@@ -48,7 +48,7 @@ def test_upload_answers_at_once_and_the_worker_reads_the_document(client, monkey
     real = documents.extract_chunks
 
     def slow(path):
-        time.sleep(2)
+        time.sleep(5)
         return real(path)
 
     monkeypatch.setattr(documents, "extract_chunks", slow)
@@ -59,7 +59,8 @@ def test_upload_answers_at_once_and_the_worker_reads_the_document(client, monkey
     upload_seconds = time.monotonic() - started
     assert response.status_code == 202, response.text
     body = response.json()
-    assert upload_seconds < 1.5, f"upload took {upload_seconds:.2f}s; it should not wait for the read"
+    # Well under the 5 s read, with room for a slow CI machine.
+    assert upload_seconds < 3, f"upload took {upload_seconds:.2f}s; it should not wait for the read"
     assert body["extraction_status"] == "queued" and body["chunk_count"] == 0
     assert body["job"]["runner"] == "procrastinate" and body["job"]["finished"] is False
 
