@@ -38,6 +38,8 @@ per-item consent and are blocked for source-protected items. "Content verified: 
 local by default, with what leaves the computer stated.
 
 ## Questions Ony must answer (research §12, numbered as there)
+Answered 28 Oct 2026 (Ony asked for judgement calls): see `docs/research/source-intake/DECISIONS.md`.
+
 1. Follow: open sources only, or also bulk logged-out collection from closed platforms? (FOLLOW_1 assumes open sources only plus link capture.)
 2. Third-party archives (Wayback-type) as an optional second witness, or never? (INTAKE_3 shows it as an off switch.)
 3. A neutral / Tor / VPN route per monitor or capture? (FOLLOW_1 and INTAKE_3 show "Direct" and "Neutral route".)
