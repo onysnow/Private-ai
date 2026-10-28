@@ -37,6 +37,7 @@ function capture(over: Partial<CaptureOut> = {}): CaptureOut {
     exchange: {request: {method: 'GET', target: '/2019/03/harbour-parcel', headers: [['accept-language', 'en-GB'], ['cookie', '(none)']]},
       response: {status: 'HTTP/1.1 200 OK', headers: [['content-type', 'text/html; charset=utf-8'], ['etag', '"7c1e-5a0"']]}},
     source_id: 's1', document_id: 'd1', case_record_id: 'r1', job_id: 'j1', content_verified: 'not done by this system', job: null,
+    media: {}, media_document_id: null,
     ...over,
   };
 }
@@ -165,6 +166,38 @@ describe('Links & captures', () => {
     const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': () => { calls += 1; return calls === 1 ? [reading] : [capture()]; }});
     render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
     await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/captures').length).toBeGreaterThan(1), {timeout: 4000});
+  });
+
+  it('collects the audio on a captured page and opens it in Listen & read', async () => {
+    let listed = [capture()];
+    const collected = capture({media: {status: 'collected', title: 'Fernhill Notes ep. 41', platform: 'HTML5MediaEmbed', account: 'Fernhill Notes',
+      duration: 19, route: 'yt-dlp, logged out, no cookies, through this computer’s own connection'}, media_document_id: 'rec-1',
+      files: [...capture().files, {name: 'media.mp3', role: 'the video or audio as served', bytes: 76_257, sha256: 'd'.repeat(64)},
+        {name: 'media.info.json', role: 'what yt-dlp read about it', bytes: 2_000, sha256: 'e'.repeat(64)}]});
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': () => listed,
+      'POST /api/captures/c1/media': () => { listed = [collected]; return collected; }});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const panel = await screen.findByRole('region', {name: 'Video or audio on this page'});
+    expect(panel).toHaveTextContent('One item, logged out, with no cookies.');
+    await user.click(within(panel).getByRole('button', {name: 'Collect the video or audio'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/media')).toHaveLength(1));
+    expect(await within(panel).findByText('Fernhill Notes ep. 41')).toBeInTheDocument();
+    expect(panel).toHaveTextContent('HTML5MediaEmbed · Fernhill Notes · 0:19');
+    expect(panel).toHaveTextContent('kept with this capture as media.mp3 and media.info.json');
+    await user.click(within(panel).getByRole('button', {name: 'Listen & read'}));
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'rec-1'});
+  });
+
+  it('says why the media on a page could not be collected, and offers to try again', async () => {
+    mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture({media: {status: 'failed', reason: 'No video or audio was found on this page'}})]});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const panel = await screen.findByRole('region', {name: 'Video or audio on this page'});
+    expect(panel).toHaveTextContent('Not collected. No video or audio was found on this page');
+    expect(within(panel).getByRole('button', {name: 'Try again'})).toBeInTheDocument();
   });
 
   it('shows a capture still running as a working lane, without a receipt', async () => {

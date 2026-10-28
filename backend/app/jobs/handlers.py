@@ -551,8 +551,32 @@ def web_capture_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     return run_capture(db, str(job.subject_id), report, read_document=read)
 
 
+CAPTURE_MEDIA = "capture_media"
+
+
+def capture_media_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Collect the video or audio on a captured page (app/services/media_links.py), then transcribe it in a reading
+    job of its own."""
+    from sqlalchemy import Engine
+
+    from app.db.session import build_session_factory
+    from app.jobs.records import create_job, execute_job
+    from app.services.media_links import collect_media
+
+    bind = db.get_bind()
+    factory = build_session_factory(bind if isinstance(bind, Engine) else bind.engine)
+
+    def read(document_id: str) -> None:
+        read_job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=job.investigation_id, subject_type="document",
+                              subject_id=document_id, runner=job.runner, payload={"parent_job_id": job.id})
+        execute_job(factory, read_job.id, HANDLERS)
+
+    return collect_media(db, str(job.subject_id), report, read_document=read)
+
+
 HANDLERS: dict[str, Handler] = {
     WEB_CAPTURE: web_capture_job,
+    CAPTURE_MEDIA: capture_media_job,
     OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,
     ANALYZE_DOCUMENT: analyze_document_job,

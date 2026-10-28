@@ -38,6 +38,8 @@ def upgrade():
         sa.Column("document_id", sa.String(), sa.ForeignKey("documents.id"), nullable=True),
         sa.Column("case_record_id", sa.String(), sa.ForeignKey("case_records.id"), nullable=True),
         sa.Column("job_id", sa.String(), nullable=True),
+        sa.Column("media", sa.JSON(), nullable=False),
+        sa.Column("media_document_id", sa.String(), sa.ForeignKey("documents.id"), nullable=True),
     )
     op.create_index("ix_captures_investigation_id", "captures", ["investigation_id"])
     op.create_index("ix_captures_source_id", "captures", ["source_id"])

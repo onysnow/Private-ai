@@ -924,6 +924,8 @@ export const zCaptureOut = z.object({
   investigation_id: z.string(),
   job: zBackgroundJobOut.nullish(),
   job_id: z.string().nullish(),
+  media: z.record(z.string(), z.unknown()),
+  media_document_id: z.string().nullish(),
   outcome: z.enum(['saved', 'not_seen', 'link_only']).nullish(),
   reason: z.string().nullish(),
   requested_at: z
@@ -9987,6 +9989,15 @@ export const zGetCaptureFilePath = z.object({
   name: z.string(),
 });
 
+export const zCollectCaptureMediaPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Already collected, or the collection finished before the reply (developer mode)
+ */
+export const zCollectCaptureMediaResponse = zCaptureOut;
+
 export const zGetCaseRecordPath = z.object({
   case_record_id: z.string(),
 });
@@ -11337,7 +11348,7 @@ export const zCreateCapturePath = z.object({
 });
 
 /**
- * Successful Response
+ * The capture finished before the reply (developer mode runs jobs inline)
  */
 export const zCreateCaptureResponse = zCaptureOut;
 

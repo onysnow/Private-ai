@@ -3726,6 +3726,22 @@
             ],
             "title": "Job Id"
           },
+          "media": {
+            "additionalProperties": true,
+            "title": "Media",
+            "type": "object"
+          },
+          "media_document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Document Id"
+          },
           "outcome": {
             "anyOf": [
               {
@@ -3852,7 +3868,8 @@
           "displayed",
           "stages",
           "exchange",
-          "content_verified"
+          "content_verified",
+          "media"
         ],
         "title": "CaptureOut",
         "type": "object"
@@ -40939,6 +40956,86 @@
         "summary": "Get Capture File"
       }
     },
+    "/api/captures/{capture_id}/media": {
+      "post": {
+        "description": "Collect the one video or audio item on a captured page, logged out (app/services/media_links.py), keep it\nwith the capture and transcribe it. Answers at once; the capture's `media` follows the job.",
+        "operationId": "collect_capture_media",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Already collected, or the collection finished before the reply (developer mode)"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The capture is not finished, or its media is already being collected"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Collect Capture Media"
+      }
+    },
     "/api/case-records/{case_record_id}": {
       "get": {
         "operationId": "get_case_record",
@@ -55494,6 +55591,16 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "The capture finished before the reply (developer mode runs jobs inline)"
+          },
           "202": {
             "content": {
               "application/json": {

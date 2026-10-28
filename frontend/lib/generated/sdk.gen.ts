@@ -78,6 +78,9 @@ import type {
   CloseCaseData,
   CloseCaseErrors,
   CloseCaseResponses,
+  CollectCaptureMediaData,
+  CollectCaptureMediaErrors,
+  CollectCaptureMediaResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
@@ -1079,6 +1082,8 @@ import {
   zClearCaseLookupsResponse,
   zCloseCasePath,
   zCloseCaseResponse,
+  zCollectCaptureMediaPath,
+  zCollectCaptureMediaResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -2312,6 +2317,38 @@ export const getCaptureFile = <ThrowOnError extends boolean = false>(
         })
         .parseAsync(data),
     url: '/api/captures/{capture_id}/files/{name}',
+    ...options,
+  });
+
+/**
+ * Collect Capture Media
+ *
+ * Collect the one video or audio item on a captured page, logged out (app/services/media_links.py), keep it
+ * with the capture and transcribe it. Answers at once; the capture's `media` follows the job.
+ */
+export const collectCaptureMedia = <ThrowOnError extends boolean = false>(
+  options: Options<CollectCaptureMediaData, ThrowOnError>,
+): RequestResult<
+  CollectCaptureMediaResponses,
+  CollectCaptureMediaErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CollectCaptureMediaResponses,
+    CollectCaptureMediaErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCollectCaptureMediaPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCollectCaptureMediaResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/media',
     ...options,
   });
 

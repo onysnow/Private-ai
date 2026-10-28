@@ -13,7 +13,7 @@ import type {FormEvent, ReactElement} from 'react';
 import {api} from '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
 import {getCapturesOptions, getCapturesQueryKey, getDropQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
-import {createCapture} from '../../lib/generated/sdk.gen';
+import {collectCaptureMedia, createCapture} from '../../lib/generated/sdk.gen';
 import type {CaptureOut, CaptureStageOut, GetCapturesError} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -143,6 +143,42 @@ function Lane({capture}: {capture: CaptureOut}): ReactElement {
   </section>;
 }
 
+type MediaFacts = {status?: string; reason?: string; platform?: string; account?: string; title?: string; duration?: number;
+  uploaded?: string; route?: string};
+
+/** The video or audio on a captured page (backend app/services/media_links.py): one item, collected logged out,
+ *  kept with the capture and transcribed like any recording. */
+function MediaPanel({capture, investigationId}: {capture: CaptureOut; investigationId: string}): ReactElement {
+  const queryClient = useQueryClient();
+  const openDocument = useWorkbenchStore(state => state.openDocument);
+  const [error, setError] = useState('');
+  const media = capture.media as MediaFacts;
+  const collect = async () => {
+    setError('');
+    try {
+      await collectCaptureMedia({path: {capture_id: capture.id}, throwOnError: true});
+      await Promise.all([queryClient.invalidateQueries({queryKey: getCapturesQueryKey({path: {investigation_id: investigationId}})}),
+        queryClient.invalidateQueries({queryKey: getDropQueryKey({path: {investigation_id: investigationId}})})]);
+    } catch (e) { setError(errorMessage(e, 'Could not collect the video or audio')); }
+  };
+  const length = media.duration ? ` · ${Math.floor(media.duration / 60)}:${String(Math.round(media.duration % 60)).padStart(2, '0')}` : '';
+  return <section className="cp-panel" aria-label="Video or audio on this page">
+    <p className="cp-cap">Video or audio on this page</p>
+    {media.status === 'collected' ? <>
+      <p><b>{media.title}</b></p>
+      <p className="cp-note">{[media.platform, media.account].filter(Boolean).join(' · ')}{length}{media.uploaded ? ` · uploaded ${media.uploaded}` : ''}</p>
+      <p className="cp-note">Collected {media.route}; kept with this capture as {capture.files.filter(f => f.name.startsWith('media.')).map(f => f.name).join(' and ')}, and transcribed on this computer.</p>
+      {capture.media_document_id && <div className="cp-acts"><button type="button" className="p" onClick={() => openDocument(capture.media_document_id!)}>Listen &amp; read</button></div>}
+    </> : media.status === 'collecting' ? <p className="cp-note" role="status">Looking for the video or audio, then collecting it, logged out…</p>
+      : <>
+        {media.status === 'failed' && <p className="cp-note"><b>Not collected.</b> {media.reason}</p>}
+        <p className="cp-note">One item, logged out, with no cookies. The page’s site sees one more visit from this computer, written in the outbound log first.</p>
+        <div className="cp-acts"><button type="button" onClick={() => void collect()}>{media.status === 'failed' ? 'Try again' : 'Collect the video or audio'}</button></div>
+      </>}
+    {error && <p role="alert" className="cp-err">{error}</p>}
+  </section>;
+}
+
 function Receipt({capture}: {capture: CaptureOut}): ReactElement {
   const openDocument = useWorkbenchStore(state => state.openDocument);
   const [copied, setCopied] = useState(false);
@@ -230,7 +266,8 @@ export function CaptureLinkField({investigationId, captures, onCaptured}: {inves
 export function useCaptures(investigationId: string): UseQueryResult<CaptureOut[], GetCapturesError> {
   return useQuery({...getCapturesOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId),
     // A finished capture may still be reading its page (its job is not done): keep following until both are.
-    refetchInterval: q => (q.state.data?.some(c => running(c) || (c.job ? !c.job.finished : false)) ? 1500 : false)});
+    refetchInterval: q => (q.state.data?.some(c => running(c) || (c.job ? !c.job.finished : false) || (c.media as MediaFacts).status === 'collecting')
+      ? 1500 : false)});
 }
 
 /** The tab's three columns, set in The Drop's own grid. */
@@ -270,7 +307,8 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
           <span className={`cp-chip big ${state.tone}`}>{state.word}</span></header>
         <Lane capture={chosen}/>
         {running(chosen) ? <p className="cp-note" role="status">Visiting the page once, from this computer, in a fresh browser with no stored cookies. The receipt appears when it is kept.</p>
-          : chosen.outcome === 'saved' ? <Receipt capture={chosen}/> : <Outcome capture={chosen} onAddFile={onAddFile}/>}
+          : chosen.outcome === 'saved' ? <><Receipt capture={chosen}/><MediaPanel capture={chosen} investigationId={investigationId}/></>
+          : <Outcome capture={chosen} onAddFile={onAddFile}/>}
       </> : <div className="cp-none"><h2>Capture a web page</h2>
         <p className="dp-quiet">A pasted link becomes a source: the page as it was, when, and proof it has not changed since.</p></div>}
       {query.isError && <p role="alert">{errorMessage(query.error, 'Could not list the captures')}</p>}

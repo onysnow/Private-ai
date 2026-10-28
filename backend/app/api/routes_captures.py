@@ -11,7 +11,7 @@ from app.api.dependencies import authorize_request_resource
 from app.api.routes_documents import _submit_or_record_failure
 from app.core.authorization import scope_for_request
 from app.db.session import get_db
-from app.jobs.handlers import WEB_CAPTURE
+from app.jobs.handlers import CAPTURE_MEDIA, WEB_CAPTURE
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Capture
@@ -33,10 +33,15 @@ def _out(db: Session, row: Capture) -> dict[str, Any]:
     if row.status != "finished" and job is not None and job.status in ("failed", "cancelled"):
         out["status"] = "failed"
         out["reason"] = job.error or job.message or "The capture stopped before it finished"
+    # Likewise a collection of the page's media whose job ended without finishing it.
+    media_job = db.get(BackgroundJob, out["media"].get("job_id")) if out["media"].get("job_id") else None
+    if out["media"].get("status") == "collecting" and media_job is not None and media_job.status in ("failed", "cancelled"):
+        out["media"] = {**out["media"], "status": "failed", "reason": media_job.error or media_job.message or "The collection stopped"}
     return out
 
 
 @router.post("/investigations/{investigation_id}/captures", response_model=CaptureOut, status_code=202, responses={
+    200: {"model": CaptureOut, "description": "The capture finished before the reply (developer mode runs jobs inline)"},
     404: {"model": ErrorOut, "description": "No such investigation"},
     422: {"model": ValidationErrorOut | ErrorOut,
           "description": "The input does not match the route, or the address is not one this computer will visit (not http or https, or a private address)"},
@@ -62,6 +67,39 @@ async def create_capture(investigation_id: str, body: CaptureCreate, request: Re
     if out["job"] is not None and out["job"]["finished"]:
         response.status_code = 200
     return out
+
+
+@router.post("/captures/{capture_id}/media", response_model=CaptureOut, status_code=202, responses={
+    200: {"model": CaptureOut, "description": "Already collected, or the collection finished before the reply (developer mode)"},
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "The capture is not finished, or its media is already being collected"},
+})
+async def collect_capture_media(capture_id: str, request: Request, response: Response, db: Session = Depends(get_db)) -> Any:
+    """Collect the one video or audio item on a captured page, logged out (app/services/media_links.py), keep it
+    with the capture and transcribe it. Answers at once; the capture's `media` follows the job."""
+    row = db.get(Capture, capture_id)
+    if row is None:
+        raise HTTPException(404, "Capture not found")
+    if row.status != "finished":
+        raise HTTPException(409, "The page is still being captured")
+    if (row.media or {}).get("status") == "collecting":
+        raise HTTPException(409, "The media on this page is already being collected")
+    if (row.media or {}).get("status") == "collected":
+        response.status_code = 200  # one item per page: what was collected stays as it was hashed
+        return _out(db, row)
+    job = create_job(db, kind=CAPTURE_MEDIA, investigation_id=row.investigation_id, subject_type="capture", subject_id=row.id,
+                     runner=job_runner(request).mode, message="Waiting to look for the video or audio")
+    row.media = {**(row.media or {}), "status": "collecting", "job_id": job.id}
+    db.commit()
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    row = db.get(Capture, capture_id) or row
+    done = db.get(BackgroundJob, job.id)
+    if done is not None and done.status in ("failed", "cancelled") and (row.media or {}).get("status") == "collecting":
+        row.media = {**row.media, "status": "failed", "reason": done.error or done.message or "The collection stopped"}
+        db.commit()
+    if done is not None and done.finished_at is not None:
+        response.status_code = 200
+    return _out(db, row)
 
 
 @router.get("/investigations/{investigation_id}/captures", response_model=list[CaptureOut])

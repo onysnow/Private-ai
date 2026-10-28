@@ -163,6 +163,7 @@ PAGE = b"""<!doctype html><html><head><title>Harbour deal</title><meta name="aut
 <meta property="article:published_time" content="2026-10-01"></head>
 <body><main><h1>Harbour deal</h1><p>Kestrel SA bought the harbour land in March 2019.</p>
 <img src="/pic.png"><img src="http://10.0.0.1/tracker.png"></main></body></html>"""
+RECORDING = Path(__file__).parent / "fixtures" / "media" / "harbour-talk.mp3"
 PNG = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
 
 
@@ -171,7 +172,10 @@ class _Site(BaseHTTPRequestHandler):
         routes = {"/story": (200, "text/html", PAGE), "/pic.png": (200, "image/png", PNG),
                   "/robots.txt": (200, "text/plain", b"User-agent: *\nDisallow: /story\n"),
                   "/members": (403, "text/html", b"<p>Log in to read</p>"), "/gone": (404, "text/html", b"<p>Not here</p>"),
-                  "/heavy": (200, "text/html", b"<html><body><p>Heavy page</p><script>fetch('/big.bin')</script></body></html>")}
+                  "/heavy": (200, "text/html", b"<html><body><p>Heavy page</p><script>fetch('/big.bin')</script></body></html>"),
+                  "/episode": (200, "text/html", b"<html><head><title>Fernhill Notes ep. 41</title></head><body><h1>Episode 41</h1>"
+                                                 b"<audio controls src='/ep41.mp3'></audio></body></html>"),
+                  "/ep41.mp3": (200, "audio/mpeg", RECORDING.read_bytes())}
         if self.path == "/cookie":  # a site that sets a cookie on its way to the page
             self.send_response(302)
             self.send_header("Set-Cookie", "sid=abc; Path=/")
@@ -401,3 +405,52 @@ def test_restore_preview_warns_when_capture_files_were_missing(site):
         delete_investigation(db, inv, settings.document_storage_dir, confirmation=inv)
         preview = preview_investigation_restore(db, data, Path(settings.document_storage_dir))
     assert any("missing 1 web capture file" in w for w in preview["warnings"])
+
+
+
+def _stand_in_transcriber(monkeypatch):
+    from app.services import transcription
+
+    def fake(path, progress):
+        progress(1.0, "")
+        return transcription.Transcript(kind="audio", duration=19.0, streams=[{"type": "audio", "codec": "mp3"}], outline=[1.0],
+                                        outline_step=19.0, about={"tool": "stand-in", "model": "stand-in", "language": "en",
+                                                                  "language_probability": 1.0, "ran_at": "2026-10-28T10:00:00",
+                                                                  "seconds": 0.0, "where": "this computer"},
+                                        segments=[transcription.Segment(0.0, 2.8, "speech", "Last week we spoke about the harbour land.")])
+    monkeypatch.setattr(transcription, "transcribe", fake)
+
+
+def test_the_audio_on_a_captured_page_is_collected_kept_and_transcribed(site, monkeypatch):
+    _stand_in_transcriber(monkeypatch)
+    inv, cap = _capture(site, "/episode", "Episode")
+    r = client.post(f"/api/captures/{cap['id']}/media")
+    assert r.status_code == 200, r.text
+    got = r.json()
+    media = got["media"]
+    assert media["status"] == "collected" and media["item_id"] and media["title"]
+    assert media["route"].startswith("yt-dlp, logged out") and media["tool"].startswith("yt-dlp ")
+    kept = {f["name"]: f for f in got["files"]}
+    assert kept["media.mp3"]["sha256"] == hashlib.sha256(RECORDING.read_bytes()).hexdigest()
+    assert client.get(f"/api/captures/{cap['id']}/files/media.mp3").content == RECORDING.read_bytes()
+    info = client.get(f"/api/captures/{cap['id']}/files/media.info.json")
+    assert hashlib.sha256(info.content).hexdigest() == kept["media.info.json"]["sha256"]
+    with SessionLocal() as db:
+        recording = db.get(Document, got["media_document_id"])
+        assert recording.parent_document_id == cap["document_id"] and recording.extraction_status == "complete"
+        assert recording.sha256 == kept["media.mp3"]["sha256"]
+        source = db.get(Source, recording.source_id)
+        assert source.source_type == "web" and source.metadata_json["media"]["route"] == media["route"]
+        services = db.scalars(select(OutboundRequest.service).where(OutboundRequest.investigation_id == inv)).all()
+        assert sorted(services) == ["media download", "web capture"]
+    assert client.get(f"/api/documents/{got['media_document_id']}/transcript").json()["segments"][0]["kind"] == "speech"
+    again = client.post(f"/api/captures/{cap['id']}/media")
+    assert again.status_code == 200 and again.json()["media_document_id"] == got["media_document_id"]
+
+
+def test_a_page_with_no_audio_or_video_says_so(site, monkeypatch):
+    _, cap = _capture(site, "/story", "No media")
+    got = client.post(f"/api/captures/{cap['id']}/media").json()
+    assert got["media"]["status"] == "failed"
+    assert got["media"]["reason"] == "No video or audio was found on this page"
+    assert got["media_document_id"] is None and not any(f["name"].startswith("media.") for f in got["files"])

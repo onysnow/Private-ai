@@ -581,7 +581,7 @@ def request_capture(db: Session, investigation_id: str, url: str, *, collector: 
     if db.get(Investigation, investigation_id) is None:
         raise LookupError("Investigation not found")
     row = Capture(investigation_id=investigation_id, url=url, status="queued", collector=collector or "you", files=[],
-                  displayed={}, stages=_stages({}), exchange={})
+                  displayed={}, stages=_stages({}), exchange={}, media={})
     db.add(row)
     db.commit()
     db.refresh(row)
@@ -772,6 +772,7 @@ def serialize_capture(row: Capture) -> dict[str, Any]:
         "stages": row.stages or [], "exchange": row.exchange or {},
         "source_id": row.source_id, "document_id": row.document_id, "case_record_id": row.case_record_id,
         "job_id": row.job_id, "content_verified": "not done by this system",
+        "media": row.media or {}, "media_document_id": row.media_document_id,
     }
 
 

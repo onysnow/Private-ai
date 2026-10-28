@@ -48,3 +48,8 @@ class Capture(Base):
     document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
     case_record_id: Mapped[str | None] = mapped_column(ForeignKey("case_records.id"), nullable=True)
     job_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    # The video or audio on the page, when the reporter collected it (app/services/media_links.py): status (collecting,
+    # collected, failed with a reason), platform, its id there, the account, title, upload date, duration, the route it
+    # took and the tool; the recording it became is media_document_id.
+    media: Mapped[dict] = mapped_column(JSON, default=dict)
+    media_document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True)

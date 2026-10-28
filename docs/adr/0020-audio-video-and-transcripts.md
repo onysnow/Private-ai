@@ -36,6 +36,13 @@ anything derived from it is marked derived. The suite's EGS rules on capture and
 - **Unsure words.** A word with probability under 0.5 is marked "machine unsure" wherever the transcript is shown.
 - **Heard before quoted.** Evidence from a recording is saved only after the reporter marks the part as heard; who and
   when is kept with the quote (Phase 2b, the Listen & read view).
+- **Media from links (Phase 2c).** On a captured page the reporter can collect its video or audio: yt-dlp (Unlicense,
+  2026.8.19), one item (no playlists), logged out, no cookie file, every connection through the capture's guard proxy
+  (public addresses only, within `MAX_MEDIA_BYTES`), single-file formats only so no FFmpeg is needed. The file and
+  yt-dlp's `info.json` are kept with the capture, each with its SHA-256, and written to the outbound log first; the file
+  becomes a recording under the page's document and is transcribed. Each item records its platform, its id there, the
+  account, the title, upload date, duration, live status, the tool and the route ("yt-dlp, logged out"). A second
+  request on the same page returns what was collected; a new visit is a new capture.
 - **Speakers are not named by the machine here.** Speaker lanes need a diarization model (pyannote) whose weights sit
   behind a Hugging Face login: left for later, with "Name this voice" in the reporter's hands.
 
@@ -47,5 +54,7 @@ anything derived from it is marked derived. The suite's EGS rules on capture and
   passages), with progress per segment and Stop honoured between segments.
 - Media files are not sent to OpenAleph for reading (ingest-file does not transcribe); a reader of the case sees the
   same transcript whichever reader is configured.
-- Not in this step: media from links (yt-dlp, Phase 2c), the Listen & read view (Phase 2b), derived files kept on disk
+- A site that offers only separate picture and sound streams (much of YouTube at its higher qualities) is collected at
+  the best single-file quality it offers, or refused with that reason; joining streams needs FFmpeg, not installed.
+- Not yet: a per-platform "works today" check (extractors break when sites change), derived files kept on disk
   (a cleaned copy, a clip of a pinned quote), a publisher's transcript and Compare, speaker diarization.

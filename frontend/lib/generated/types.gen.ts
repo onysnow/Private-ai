@@ -2096,6 +2096,16 @@ export type CaptureOut = {
    */
   job_id?: string | null;
   /**
+   * Media
+   */
+  media: {
+    [key: string]: unknown;
+  };
+  /**
+   * Media Document Id
+   */
+  media_document_id?: string | null;
+  /**
    * Outcome
    */
   outcome?: 'saved' | 'not_seen' | 'link_only' | null;
@@ -21449,6 +21459,54 @@ export type GetCaptureFileResponses = {
   200: unknown;
 };
 
+export type CollectCaptureMediaData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/media';
+};
+
+export type CollectCaptureMediaErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The capture is not finished, or its media is already being collected
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CollectCaptureMediaError =
+  CollectCaptureMediaErrors[keyof CollectCaptureMediaErrors];
+
+export type CollectCaptureMediaResponses = {
+  /**
+   * Already collected, or the collection finished before the reply (developer mode)
+   */
+  200: CaptureOut;
+  /**
+   * Successful Response
+   */
+  202: CaptureOut;
+};
+
+export type CollectCaptureMediaResponse =
+  CollectCaptureMediaResponses[keyof CollectCaptureMediaResponses];
+
 export type GetCaseRecordData = {
   body?: never;
   path: {
@@ -26289,6 +26347,10 @@ export type CreateCaptureErrors = {
 export type CreateCaptureError = CreateCaptureErrors[keyof CreateCaptureErrors];
 
 export type CreateCaptureResponses = {
+  /**
+   * The capture finished before the reply (developer mode runs jobs inline)
+   */
+  200: CaptureOut;
   /**
    * Successful Response
    */

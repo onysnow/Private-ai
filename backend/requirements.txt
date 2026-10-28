@@ -33,6 +33,8 @@ warcio==1.8.1
 # Audio and video transcribed on this computer (ADR-0020): faster-whisper (MIT) on CTranslate2 (MIT); PyAV (BSD-3)
 # decodes with the FFmpeg its wheels carry. av is pinned: 19 removed an argument faster-whisper 1.2.1 passes.
 faster-whisper==1.2.1
+# The video or audio on a captured page (ADR-0020, Phase 2c): yt-dlp (Unlicense), one item, logged out.
+yt-dlp==2026.8.19
 av==17.0.0
 openaleph-client==1.1.4
 # Background job queue on PostgreSQL (ADR-0004). Its schema is vendored in

@@ -5116,6 +5116,10 @@ class CaptureOut(ResponseModel):
     case_record_id: str | None = None
     job_id: str | None = None
     content_verified: str
+    # The video or audio on the page, once the reporter asked for it: status, platform, item_id, account, title,
+    # uploaded, duration, webpage_url, live_status, tool, route; and the recording it became.
+    media: dict[str, Any]
+    media_document_id: str | None = None
     job: BackgroundJobOut | None = None
 
 

@@ -31,6 +31,7 @@ import {
   checkWatchlistNow,
   clearCaseLookups,
   closeCase,
+  collectCaptureMedia,
   connectors,
   connectorSearch,
   convertLeadEndpoint,
@@ -415,6 +416,9 @@ import type {
   CloseCaseData,
   CloseCaseError,
   CloseCaseResponse,
+  CollectCaptureMediaData,
+  CollectCaptureMediaError,
+  CollectCaptureMediaResponse,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchError,
@@ -1846,6 +1850,36 @@ export const getCaptureFileOptions = (options: Options<GetCaptureFileData>) =>
     },
     queryKey: getCaptureFileQueryKey(options),
   });
+
+/**
+ * Collect Capture Media
+ *
+ * Collect the one video or audio item on a captured page, logged out (app/services/media_links.py), keep it
+ * with the capture and transcribe it. Answers at once; the capture's `media` follows the job.
+ */
+export const collectCaptureMediaMutation = (
+  options?: Partial<Options<CollectCaptureMediaData>>,
+): UseMutationOptions<
+  CollectCaptureMediaResponse,
+  CollectCaptureMediaError,
+  Options<CollectCaptureMediaData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CollectCaptureMediaResponse,
+    CollectCaptureMediaError,
+    Options<CollectCaptureMediaData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await collectCaptureMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getCaseRecordQueryKey = (options: Options<GetCaseRecordData>) =>
   createQueryKey('getCaseRecord', options);
