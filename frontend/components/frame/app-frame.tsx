@@ -35,6 +35,8 @@ export const SWITCH_CASE_EVENT = 'pai:switch-case';
 export const OPEN_PALETTE_EVENT = 'pai:open-palette';
 export const OPEN_INBOX_EVENT = 'pai:open-inbox';
 export const HIDE_SCREEN_EVENT = 'pai:hide-screen';
+/** Every way of hiding the screen goes through the event, so the app lock's "lock on Hide screen" hears each one. */
+export const hideScreen = (): void => { window.dispatchEvent(new Event(HIDE_SCREEN_EVENT)); };
 export const NEW_CASE_EVENT = 'pai:new-case';
 
 const DWELL_MS = 250;
@@ -257,7 +259,7 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
 }
 
 function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open: boolean) => void}): ReactElement {
-  const rows: [string, string][] = [['⌘K / Ctrl K', 'Search the case, or go anywhere'], ['⌘O / Ctrl O', 'Switch case'], ['⌘⇧H / Ctrl Shift H', 'Hide the screen'], ['[', 'Open or close the steps (left edge)'], [']', 'Open or close the tools (top edge)'],
+  const rows: [string, string][] = [['⌘K / Ctrl K', 'Search the case, or go anywhere'], ['⌘O / Ctrl O', 'Switch case'], ['⌘⇧H / Ctrl Shift H or ⇧Esc', 'Hide the screen'], ['[', 'Open or close the steps (left edge)'], [']', 'Open or close the tools (top edge)'],
     ['Alt →  /  Alt ←', 'Open or close the steps'], ['Alt ↓  /  Alt ↑', 'Open or close the tools'], ['G then H', 'Go to the case home'],
     ['1 – 4', 'Case home: go to a module'], ['J / K', 'Case home and Decide: step through the list'], ['Enter', 'Case home: open the focused module whole-screen'],
     ['S / D / U', 'Case home: answer Next up (shows it, does not, unclear)'], ['1 / 2 / 3', 'Decide: answer the card'], ['Z', 'Undo the last answer'],
@@ -376,7 +378,9 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPalette(p => !p); }
       else if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'o') { e.preventDefault(); setCases(c => !c); }
-      else if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'h') { e.preventDefault(); setHidden(true); }
+      else if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'h') { e.preventDefault(); hideScreen(); }
+      // Shift+Esc hides too (KEEP_2): one hand, no reach for the modifier keys.
+      else if (e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && e.key === 'Escape') { e.preventDefault(); hideScreen(); }
       else if (e.key === '?' && !typing(e.target) && singleKeysOn()) { e.preventDefault(); setHelp(true); }
       // G then H, within a second: the case home (research §04.2's go-to keys).
       else if (!e.metaKey && !e.ctrlKey && !e.altKey && !typing(e.target) && singleKeysOn()) {
@@ -439,7 +443,7 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
       <Bell onOpen={() => { setTop(false); setInbox(true); }}/>
       <Link href="/settings" className="fr-tool" aria-label="Settings" title="Settings"><span aria-hidden="true">⚙</span></Link>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setHelp(true); }}>Keys <kbd>?</kbd></button>
-      <button type="button" className="fr-tool" onClick={() => { setTop(false); setHidden(true); }} title="Cover the screen at once (⌘⇧H)">Hide screen</button>
+      <button type="button" className="fr-tool" onClick={() => { setTop(false); hideScreen(); }} title="Cover the screen at once (⌘⇧H or ⇧Esc)">Hide screen</button>
       <button type="button" className={`fr-tool fr-pin${pins.top ? ' on' : ''}`} aria-pressed={pins.top} onClick={() => pin('top')}
         title={pins.top ? 'Let it hide again' : 'Keep it open on this computer'}>{pins.top ? 'Pinned' : 'Pin'}</button>
     </div>

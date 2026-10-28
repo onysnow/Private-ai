@@ -16232,6 +16232,10 @@ export type SafetyAccessOut = {
  */
 export type SafetyBackupOut = {
   /**
+   * Bytes
+   */
+  bytes?: number | null;
+  /**
    * Encrypted
    */
   encrypted: boolean;
@@ -16243,6 +16247,10 @@ export type SafetyBackupOut = {
    * Restore Enabled
    */
   restore_enabled: boolean;
+  /**
+   * Sha256
+   */
+  sha256?: string | null;
 };
 
 /**
@@ -16328,7 +16336,7 @@ export type SafetyServiceOut = {
   /**
    * State
    */
-  state: 'off' | 'on_request' | 'local';
+  state: 'off' | 'ask_first' | 'automatic' | 'on_request' | 'local';
   /**
    * State Note
    */

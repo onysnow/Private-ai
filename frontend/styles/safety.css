@@ -49,7 +49,25 @@
 .sd-box strong { font-size: 13px; color: var(--text); }
 .sd-service.picked .sd-box { border-color: var(--accent-2); background: var(--surface-3); }
 .sd-state { justify-self: start; margin-top: 2px; padding: 1px 7px; border: 1px solid currentColor; border-radius: 999px; font: 600 9.5px var(--font-mono); letter-spacing: .06em; }
-.sd-on_request .sd-state { color: var(--accent-2); }
+.sd-on_request .sd-state, .sd-ask_first .sd-state { color: var(--accent-2); }
+/* Automatic sends on its own: the chip is filled, so it reads apart from Ask first by shape as well as word. */
+.sd-automatic .sd-state { color: var(--ground); background: var(--accent-2); border-color: var(--accent-2); }
+/* A request left since the last look: the line pulses once. Calm or reduced motion: it is marked, without moving. */
+.sd-pulse .sd-line { animation: sd-pulse 1.6s ease-out 1; }
+.sd-pulse .sd-line i { color: var(--accent-1); }
+@keyframes sd-pulse { 0% { border-top-color: var(--accent-1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-1) 60%, transparent); } 100% { box-shadow: 0 0 0 6px transparent; } }
+@media (prefers-reduced-motion: reduce) { .sd-pulse .sd-line { animation: none; border-top-color: var(--accent-1); } }
+html[data-motion='calm'] .sd-pulse .sd-line { animation: none; border-top-color: var(--accent-1); }
+/* The card on a line (a pause to open, stays while pointed at, Esc closes). */
+.sd-card-hover { position: absolute; right: 0; top: calc(100% + 4px); z-index: 5; width: 260px; box-sizing: border-box; padding: 10px 12px; border-radius: 10px;
+  background: var(--surface-3); border: 1px solid var(--line); box-shadow: var(--shadow-panel); font-size: 12px; display: grid; gap: 6px; }
+.sd-card-hover p { margin: 0; color: var(--text-muted); }
+.sd-card-hover ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.sd-card-hover q { font-family: var(--font-mono); color: var(--accent-2); quotes: '“' '”'; word-break: break-word; }
+.sd-card-hover li span:last-child { color: var(--text-muted); }
+.sd-hide { margin-top: 0; align-self: center; }
+.sd-kept { font: 12px var(--font-mono); color: var(--text) !important; }
+.sd-btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .sd-foot { margin-top: 0; }
 .sd-twin { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 

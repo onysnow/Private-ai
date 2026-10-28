@@ -1,7 +1,8 @@
 """Safety & data (mockup KNOWLEDGE_KEEP_2, ADR-0015): what lives on this computer for a case, what can reach outside, and
 what has left, read from the case's own rows, the outbound log and the local security log. Nothing here is a claim the
-app cannot back: a thing it does not record (a backup's size, a service's "ask first" switch) is left out or said
-not to be recorded."""
+app cannot back: a thing it does not record is left out or said not to be recorded. An outside source's mode is this
+case's outside-lookups setting (Automatic, Ask first, Off; app/services/preferences.py); the last backup's size and
+checksum are the ones kept when it was made (`investigations.last_backup`)."""
 from __future__ import annotations
 
 import json
@@ -23,6 +24,7 @@ from app.models.domain import (
     AppUser, BackupEvent, Claim, Document, DocumentCorpusSync, Entity, Evidence, Investigation, OutboundRequest, RelationshipEdge, Source,
 )
 from app.services.lifecycle import preview_orphan_document_files
+from app.services.preferences import lookup_modes
 from app.services.security import resolve_storage_root
 from app.services.settings import connector_credential_status
 
@@ -89,18 +91,28 @@ def _audit_facts(investigation_id: str) -> dict[str, Any]:
     return facts
 
 
+# A source's outside-lookups mode for the case, as the Safety & data line says it.
+MODE_STATE = {"automatic": ("automatic", "Looks each new party up once, on its own"),
+              "ask": ("ask_first", "Only when you press it"),
+              "off": ("off", "Switched off for this case")}
+
+
 def _services(db: Session, investigation_id: str, counts: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
+    modes = lookup_modes(db, investigation_id, list(CONNECTOR_SPECS))
     for provider in CONNECTOR_SPECS:
         has_key = bool(connector_credential_status(provider)["configured"])
         needs_key = bool(getattr(registry.get(provider), "requires_key", False))
         c = counts.get(provider, {"n": 0, "kinds": []})
+        if needs_key and not has_key:
+            state, note = "off", "No key stored: nothing can be sent"
+        else:
+            state, note = MODE_STATE[modes[provider]]
+            if not needs_key and state != "off":
+                note = f"Works without a key: {note[0].lower()}{note[1:]}"
         out.append({
             "id": provider, "name": SERVICE_NAMES.get(provider, provider.capitalize()), "about": SERVICE_ABOUT.get(provider, ""),
-            "state": "off" if needs_key and not has_key else "on_request",
-            "state_note": "No key stored: nothing can be sent" if needs_key and not has_key
-            else ("Only when you press it" if has_key else "Works without a key: only when you press it"),
-            "sent_count": c["n"], "sends": c["kinds"], "where": "outside",
+            "state": state, "state_note": note, "sent_count": c["n"], "sends": c["kinds"], "where": "outside",
         })
     local = is_local_endpoint(settings.openaleph_base_url)
     out.append({
@@ -185,6 +197,10 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
     last_backup = db.scalar(select(BackupEvent).where(BackupEvent.investigation_id == investigation_id)
                             .order_by(BackupEvent.at.desc(), BackupEvent.id.desc()).limit(1))
     encrypted = bool(last_backup is not None and last_backup.encrypted)
+    # The last backup as kept when it was made (size and checksum); a backup downloaded before that was kept is known
+    # only from the security log, by its time.
+    kept = inv.last_backup if isinstance(inv.last_backup, dict) else {}
+    kept_at = str(kept["at"]) if kept.get("at") else None
 
     ai = ai_reasoning_status(settings)
     names = [SERVICE_NAMES.get(s, s) for s in reached if not s.startswith("ai")]
@@ -204,7 +220,7 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
              "where": "Database on this machine", "in_backups": True},
             {"id": "documents", "name": "Documents & pictures", "count": len(paths), "bytes": doc_bytes,
              "where": "Kept as received, checksummed", "in_backups": True},
-            {"id": "backups", "name": "Backups", "count": 1 if audit["last_backup_at"] else 0, "where": "Wherever you saved the file",
+            {"id": "backups", "name": "Backups", "count": 1 if (kept_at or audit["last_backup_at"]) else 0, "where": "Wherever you saved the file",
              "in_backups": None, "warning": None if encrypted else "Not encrypted: keep it safe"},
             {"id": "keys", "name": "Service keys", "count": sum(1 for p in CONNECTOR_SPECS if connector_credential_status(p)["configured"]),
              "count_note": f"of {len(CONNECTOR_SPECS)} set", "where": "Stored here, never shown again", "in_backups": False},
@@ -214,8 +230,8 @@ def safety_data(db: Session, investigation_id: str, period: Period = "7d") -> di
              ("Outside AI: " + (ai["provider"] or "off"))) if ai["enabled"] else "Off", "in_backups": None},
         ],
         "services": services,
-        "backup": {"last_backup_at": audit["last_backup_at"].isoformat() if audit["last_backup_at"] else None, "encrypted": encrypted,
-                   "restore_enabled": bool(settings.enable_restore_api)},
+        "backup": {"last_backup_at": kept_at or (audit["last_backup_at"].isoformat() if audit["last_backup_at"] else None), "encrypted": encrypted,
+                   "restore_enabled": bool(settings.enable_restore_api), "bytes": kept.get("bytes"), "sha256": kept.get("sha256")},
         "access": {"mode": "remote" if (settings.api_auth_token.strip() or persisted_users) else "local_only", "refused_24h": audit["refused_24h"],
                    "log_readable": audit["readable"]},
         "housekeeping": {"stray_files": orphan_files, "stray_bytes": orphan_bytes},

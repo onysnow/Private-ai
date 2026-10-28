@@ -348,7 +348,7 @@ def test_a_search_the_app_stops_for_want_of_a_key_is_blocked_not_counted_as_sent
             state["opensanctions"]["state"] == "off"
         ), "a key-requiring service without a key can send nothing"
         assert (
-            state["firecrawl"]["state"] == "on_request"
+            state["firecrawl"]["state"] == "ask_first"
         ), "a service that works without a key is not off for want of one"
     finally:
         registry.register("opensanctions", Sanctions())
@@ -452,3 +452,23 @@ def test_a_sealed_backup_shows_as_encrypted():
     data = client.get(f"/api/investigations/{inv}/safety-data").json()
     assert data["backup"]["encrypted"] is True
     assert next(s for s in data["stores"] if s["id"] == "backups").get("warning") is None
+
+
+def test_each_outside_source_says_this_cases_lookup_mode_and_the_backup_card_has_its_kept_size_and_checksum():
+    import hashlib
+
+    inv = _inv("Modes and backup")
+    ok(client.put(f"/api/investigations/{inv}/lookups",
+                  json={"modes": {"firecrawl": "automatic", "aleph": "off"}, "reason": "a public-records case"}))
+    page = ok(client.get(f"/api/investigations/{inv}/safety-data"))
+    state = {s["id"]: (s["state"], s["state_note"]) for s in page["services"]}
+    assert state["firecrawl"] == ("automatic", "Works without a key: looks each new party up once, on its own")
+    assert state["aleph"][0] == "off"
+    # Nothing kept yet: no size or checksum is shown.
+    assert page["backup"]["bytes"] is None and page["backup"]["sha256"] is None
+
+    reply = client.get(f"/api/investigations/{inv}/export")
+    assert reply.status_code == 200, reply.text
+    backup = ok(client.get(f"/api/investigations/{inv}/safety-data"))["backup"]
+    assert backup["last_backup_at"] and backup["bytes"] == len(reply.content)
+    assert backup["sha256"] == hashlib.sha256(reply.content).hexdigest()

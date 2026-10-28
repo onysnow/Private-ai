@@ -6974,9 +6974,11 @@ export const zSafetyAccessOut = z.object({
  * SafetyBackupOut
  */
 export const zSafetyBackupOut = z.object({
+  bytes: z.int().nullish(),
   encrypted: z.boolean(),
   last_backup_at: z.string().nullish(),
   restore_enabled: z.boolean(),
+  sha256: z.string().nullish(),
 });
 
 /**
@@ -6999,7 +7001,7 @@ export const zSafetyServiceOut = z.object({
   name: z.string(),
   sends: z.array(z.string()),
   sent_count: z.int(),
-  state: z.enum(['off', 'on_request', 'local']),
+  state: z.enum(['off', 'ask_first', 'automatic', 'on_request', 'local']),
   state_note: z.string(),
   where: z.enum(['inside', 'outside']),
 });
