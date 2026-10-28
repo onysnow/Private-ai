@@ -106,6 +106,7 @@ import {
   getBasemapTile,
   getCapture,
   getCaptureFile,
+  getCaptureQuotes,
   getCaptures,
   getCaseRecord,
   getCaseResearch,
@@ -303,6 +304,7 @@ import {
   recordRemoval,
   recordStoryGate,
   recover,
+  refindCaptureQuotes,
   refreshOpenalephDocumentReview,
   relationshipSchemas,
   removeCaseLock,
@@ -660,6 +662,9 @@ import type {
   GetCaptureError,
   GetCaptureFileData,
   GetCaptureFileError,
+  GetCaptureQuotesData,
+  GetCaptureQuotesError,
+  GetCaptureQuotesResponse,
   GetCaptureResponse,
   GetCapturesData,
   GetCapturesError,
@@ -1248,6 +1253,9 @@ import type {
   RecoverData,
   RecoverError,
   RecoverResponse,
+  RefindCaptureQuotesData,
+  RefindCaptureQuotesError,
+  RefindCaptureQuotesResponse,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewError,
   RefreshOpenalephDocumentReviewResponse,
@@ -2072,6 +2080,66 @@ export const collectCaptureMediaMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await collectCaptureMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getCaptureQuotesQueryKey = (
+  options: Options<GetCaptureQuotesData>,
+) => createQueryKey('getCaptureQuotes', options);
+
+/**
+ * Get Capture Quotes
+ *
+ * The quotes pinned from this captured page, each found again in the saved copy and (once the page
+ * was checked again) on the live page.
+ */
+export const getCaptureQuotesOptions = (
+  options: Options<GetCaptureQuotesData>,
+) =>
+  queryOptions<
+    GetCaptureQuotesResponse,
+    GetCaptureQuotesError,
+    GetCaptureQuotesResponse,
+    ReturnType<typeof getCaptureQuotesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaptureQuotes({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaptureQuotesQueryKey(options),
+  });
+
+/**
+ * Refind Capture Quotes
+ *
+ * Read the saved copy's quotes again: each is found again in the page's passages and its place kept.
+ */
+export const refindCaptureQuotesMutation = (
+  options?: Partial<Options<RefindCaptureQuotesData>>,
+): UseMutationOptions<
+  RefindCaptureQuotesResponse,
+  RefindCaptureQuotesError,
+  Options<RefindCaptureQuotesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RefindCaptureQuotesResponse,
+    RefindCaptureQuotesError,
+    Options<RefindCaptureQuotesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await refindCaptureQuotes({
         ...options,
         ...fnOptions,
         throwOnError: true,

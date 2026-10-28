@@ -5200,6 +5200,36 @@ class CaptureFollowOut(ResponseModel):
     marked_changed: dict[str, Any] | None = None
 
 
+class CaptureQuoteSavedOut(ResponseModel):
+    """Where the quote stands in the saved copy now: held (same place), moved (found elsewhere)."""
+    state: Literal["held", "moved", "not anchored"]
+    match: str | None = None
+    occurrences: int
+    prefix: str
+    suffix: str
+    place: str
+
+
+class CaptureQuoteLiveOut(ResponseModel):
+    checked: bool
+    found: bool
+    version: int
+    same_as_saved: bool
+    match: str | None = None
+
+
+class CaptureQuoteOut(ResponseModel):
+    """A quote pinned from a captured page, found again (INTAKE_3): in the saved copy (`saved`, None when it cannot be
+    found there) and, once the page was checked again, on the live page (`live`). `unanchored`: in the tray."""
+    evidence_id: str
+    quote: str
+    characters: int
+    saved: CaptureQuoteSavedOut | None = None
+    live: CaptureQuoteLiveOut | None = None
+    captured_version: int
+    unanchored: bool
+
+
 class CaptureOut(ResponseModel):
     """A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
     not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why)."""

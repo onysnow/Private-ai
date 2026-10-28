@@ -157,3 +157,57 @@ def test_a_scheduled_check_runs_only_when_due(site):
         assert following.check_due(db, now=utcnow_naive() + timedelta(days=1, minutes=10)) == 1
     follow = client.get(f"/api/captures/{cid}").json()["follow"]
     assert follow["state"] == "same" and follow["next_check_at"] is not None
+
+
+def _read_capture(inv: str, url: str, html: str) -> str:
+    """A saved capture whose page was read as a document, as a finished capture's is: its source is "web"."""
+    from pathlib import Path
+
+    from tests.document_helpers import ingest_document
+
+    cid = _saved_capture(inv, url, html)
+    with SessionLocal() as db:
+        doc = ingest_document(db, investigation_id=inv, title="About Fernhill Ltd", filename="fernhill-about.html",
+                              mime_type="text/html", data=html.encode(), storage_dir=Path(settings.document_storage_dir))
+        source = db.get(Source, doc.source_id)
+        source.source_type, source.url = "web", url
+        row = db.get(Capture, cid)
+        row.document_id, row.source_id = doc.id, doc.source_id
+        db.commit()
+    return cid
+
+
+def test_a_quote_from_a_captured_page_is_anchored_and_finds_itself_again(site):
+    inv = _case()
+    cid = _read_capture(inv, site.base + "/about", site.page)
+    source_id = client.get(f"/api/captures/{cid}").json()["source_id"]
+    quote = "Fernhill Ltd is owned by Harbour Nominees Ltd (40%) and Kestrel SA (60%)."
+    r = client.post("/api/evidence", json={"source_id": source_id, "quote": quote})
+    assert r.status_code in (200, 201), r.text
+    with SessionLocal() as db:
+        from app.models.domain import Evidence
+        assert db.get(Evidence, r.json()["id"]).anchor is not None  # a web page's quote is anchored like a document's
+    first = client.get(f"/api/captures/{cid}/quotes").json()
+    assert len(first) == 1 and first[0]["characters"] == len(quote) and first[0]["unanchored"] is False
+    saved = first[0]["saved"]
+    assert saved["state"] == "held" and saved["match"] == "exact" and saved["occurrences"] == 1
+    assert saved["place"].startswith("characters ") and first[0]["live"] is None
+    # The live page changes: the quote is not on it any more, but still found in the saved copy (version 1).
+    site.page = site.page.replace("Harbour Nominees Ltd (40%) and Kestrel SA (60%)", "a privately held company")
+    client.post(f"/api/captures/{cid}/recheck")
+    after = client.get(f"/api/captures/{cid}/quotes").json()[0]
+    assert after["live"] == {"checked": True, "found": False, "version": 2, "same_as_saved": False, "match": None}
+    assert after["saved"]["state"] == "held" and after["unanchored"] is True and after["captured_version"] == 1
+    again = client.post(f"/api/captures/{cid}/quotes/refind").json()[0]
+    assert again["saved"]["state"] == "held"
+
+
+def test_a_capture_with_no_page_has_no_quotes(site):
+    inv = _case()
+    with SessionLocal() as db:
+        row = Capture(investigation_id=inv, url=site.base + "/gone", status="finished", outcome="link_only")
+        db.add(row)
+        db.commit()
+        cid = row.id
+    assert client.get(f"/api/captures/{cid}/quotes").json() == []
+    assert client.post(f"/api/captures/{cid}/quotes/refind").json() == []

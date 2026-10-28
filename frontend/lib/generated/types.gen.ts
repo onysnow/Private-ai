@@ -2271,6 +2271,95 @@ export type CaptureOut = {
 };
 
 /**
+ * CaptureQuoteLiveOut
+ */
+export type CaptureQuoteLiveOut = {
+  /**
+   * Checked
+   */
+  checked: boolean;
+  /**
+   * Found
+   */
+  found: boolean;
+  /**
+   * Match
+   */
+  match?: string | null;
+  /**
+   * Same As Saved
+   */
+  same_as_saved: boolean;
+  /**
+   * Version
+   */
+  version: number;
+};
+
+/**
+ * CaptureQuoteOut
+ *
+ * A quote pinned from a captured page, found again (INTAKE_3): in the saved copy (`saved`, None when it cannot be
+ * found there) and, once the page was checked again, on the live page (`live`). `unanchored`: in the tray.
+ */
+export type CaptureQuoteOut = {
+  /**
+   * Captured Version
+   */
+  captured_version: number;
+  /**
+   * Characters
+   */
+  characters: number;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  live?: CaptureQuoteLiveOut | null;
+  /**
+   * Quote
+   */
+  quote: string;
+  saved?: CaptureQuoteSavedOut | null;
+  /**
+   * Unanchored
+   */
+  unanchored: boolean;
+};
+
+/**
+ * CaptureQuoteSavedOut
+ *
+ * Where the quote stands in the saved copy now: held (same place), moved (found elsewhere).
+ */
+export type CaptureQuoteSavedOut = {
+  /**
+   * Match
+   */
+  match?: string | null;
+  /**
+   * Occurrences
+   */
+  occurrences: number;
+  /**
+   * Place
+   */
+  place: string;
+  /**
+   * Prefix
+   */
+  prefix: string;
+  /**
+   * State
+   */
+  state: 'held' | 'moved' | 'not anchored';
+  /**
+   * Suffix
+   */
+  suffix: string;
+};
+
+/**
  * CaptureStageOut
  *
  * One box of the capture lane.
@@ -22542,6 +22631,90 @@ export type CollectCaptureMediaResponses = {
 
 export type CollectCaptureMediaResponse =
   CollectCaptureMediaResponses[keyof CollectCaptureMediaResponses];
+
+export type GetCaptureQuotesData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/quotes';
+};
+
+export type GetCaptureQuotesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaptureQuotesError =
+  GetCaptureQuotesErrors[keyof GetCaptureQuotesErrors];
+
+export type GetCaptureQuotesResponses = {
+  /**
+   * Response Get Capture Quotes
+   *
+   * Successful Response
+   */
+  200: Array<CaptureQuoteOut>;
+};
+
+export type GetCaptureQuotesResponse =
+  GetCaptureQuotesResponses[keyof GetCaptureQuotesResponses];
+
+export type RefindCaptureQuotesData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/quotes/refind';
+};
+
+export type RefindCaptureQuotesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RefindCaptureQuotesError =
+  RefindCaptureQuotesErrors[keyof RefindCaptureQuotesErrors];
+
+export type RefindCaptureQuotesResponses = {
+  /**
+   * Response Refind Capture Quotes
+   *
+   * Successful Response
+   */
+  200: Array<CaptureQuoteOut>;
+};
+
+export type RefindCaptureQuotesResponse =
+  RefindCaptureQuotesResponses[keyof RefindCaptureQuotesResponses];
 
 export type RecheckCaptureData = {
   body?: never;

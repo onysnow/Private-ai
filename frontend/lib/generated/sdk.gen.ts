@@ -302,6 +302,9 @@ import type {
   GetCaptureFileData,
   GetCaptureFileErrors,
   GetCaptureFileResponses,
+  GetCaptureQuotesData,
+  GetCaptureQuotesErrors,
+  GetCaptureQuotesResponses,
   GetCaptureResponses,
   GetCapturesData,
   GetCapturesErrors,
@@ -891,6 +894,9 @@ import type {
   RecoverData,
   RecoverErrors,
   RecoverResponses,
+  RefindCaptureQuotesData,
+  RefindCaptureQuotesErrors,
+  RefindCaptureQuotesResponses,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewErrors,
   RefreshOpenalephDocumentReviewResponses,
@@ -1313,6 +1319,8 @@ import {
   zGetBasemapTileResponse,
   zGetCaptureFilePath,
   zGetCapturePath,
+  zGetCaptureQuotesPath,
+  zGetCaptureQuotesResponse,
   zGetCaptureResponse,
   zGetCapturesPath,
   zGetCapturesResponse,
@@ -1754,6 +1762,8 @@ import {
   zRecordStoryGateResponse,
   zRecoverBody,
   zRecoverResponse,
+  zRefindCaptureQuotesPath,
+  zRefindCaptureQuotesResponse,
   zRefreshOpenalephDocumentReviewPath,
   zRefreshOpenalephDocumentReviewResponse,
   zRelationshipSchemasResponse,
@@ -2581,6 +2591,69 @@ export const collectCaptureMedia = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCollectCaptureMediaResponse.parseAsync(data),
     url: '/api/captures/{capture_id}/media',
+    ...options,
+  });
+
+/**
+ * Get Capture Quotes
+ *
+ * The quotes pinned from this captured page, each found again in the saved copy and (once the page
+ * was checked again) on the live page.
+ */
+export const getCaptureQuotes = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaptureQuotesData, ThrowOnError>,
+): RequestResult<
+  GetCaptureQuotesResponses,
+  GetCaptureQuotesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetCaptureQuotesResponses,
+    GetCaptureQuotesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCaptureQuotesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCaptureQuotesResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/quotes',
+    ...options,
+  });
+
+/**
+ * Refind Capture Quotes
+ *
+ * Read the saved copy's quotes again: each is found again in the page's passages and its place kept.
+ */
+export const refindCaptureQuotes = <ThrowOnError extends boolean = false>(
+  options: Options<RefindCaptureQuotesData, ThrowOnError>,
+): RequestResult<
+  RefindCaptureQuotesResponses,
+  RefindCaptureQuotesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    RefindCaptureQuotesResponses,
+    RefindCaptureQuotesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRefindCaptureQuotesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRefindCaptureQuotesResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/quotes/refind',
     ...options,
   });
 

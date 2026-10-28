@@ -15,9 +15,9 @@ import type {FormEvent, ReactElement} from 'react';
 
 import {api} from '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
-import {getCapturesOptions, getCapturesQueryKey, getDropQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
-import {captureLatest, collectCaptureMedia, createCapture, followCapture, markCaptureChanged, recheckCapture, updateCapture} from '../../lib/generated/sdk.gen';
-import type {CaptureFollowOut, CaptureOut, CaptureStageOut, GetCapturesError} from '../../lib/generated/types.gen';
+import {getCaptureQuotesOptions, getCaptureQuotesQueryKey, getCapturesOptions, getCapturesQueryKey, getDropQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {captureLatest, collectCaptureMedia, createCapture, followCapture, markCaptureChanged, recheckCapture, refindCaptureQuotes, updateCapture} from '../../lib/generated/sdk.gen';
+import type {CaptureFollowOut, CaptureOut, CaptureQuoteOut, CaptureStageOut, GetCapturesError} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -294,6 +294,57 @@ function WhatChanged({capture, follow, investigationId, onPick}: {capture: Captu
   </section>;
 }
 
+/** Where a quote stands, in words (INTAKE_3): found again in the saved copy, and on the live page once it was checked. */
+export function quoteStanding(q: CaptureQuoteOut): {tone: 'ok' | 'amber' | 'bad'; text: string} {
+  const saved = q.saved;
+  const how = saved ? `${saved.match === 'exact' ? 'exact match' : saved.match === 'case' ? 'same words, other capitals' : 'same words, other spacing'}, ${saved.occurrences === 1 ? '1 of 1' : `1 of ${saved.occurrences}`}` : '';
+  if (!saved) return {tone: 'bad', text: 'Not found again in the saved copy. It stays in the tray, tied to the capture it was taken from.'};
+  if (q.live && !q.live.found) return {tone: 'amber', text: `Not on the live page. Still found in version ${q.captured_version}, the saved copy: ${how}.`};
+  if (q.live?.found && !q.live.same_as_saved) return {tone: 'ok', text: `Found again in the saved copy (${how}) and on the live page, version ${q.live.version}.`};
+  return {tone: 'ok', text: `Found again in the saved copy: ${how}.`};
+}
+
+function PinQuote({capture}: {capture: CaptureOut}): ReactElement {
+  const queryClient = useQueryClient();
+  const openDocument = useWorkbenchStore(state => state.openDocument);
+  const key = getCaptureQuotesQueryKey({path: {capture_id: capture.id}});
+  const found = useQuery({...getCaptureQuotesOptions({path: {capture_id: capture.id}}), enabled: capture.outcome === 'saved'});
+  const [showTray, setShowTray] = useState(false);
+  const [error, setError] = useState('');
+  const all = found.data ?? [];
+  const tray = all.filter(q => q.unanchored);
+  const shown = all.find(q => !q.unanchored) ?? all[0];
+  const reread = async () => {
+    setError('');
+    try { queryClient.setQueryData(key, (await refindCaptureQuotes({path: {capture_id: capture.id}, throwOnError: true})).data); }
+    catch (e) { setError(errorMessage(e, 'Could not read the page again')); }
+  };
+  return <section className="cp-card" aria-label="Pin a quote">
+    <p className="dp-eyebrow cp-row">Pin a quote <span>finds itself again</span></p>
+    {!shown ? <p className="dp-quiet">{capture.outcome === 'saved' ? 'Nothing pinned from this page yet. Choose words in the reading room: a quote keeps the words either side, so it finds itself again after every re-read.' : 'Nothing to pin. A quote needs a capture of the page first.'}</p>
+      : <>
+        <p className="cp-quote">{shown.saved?.prefix ? <span className="cp-ctx">…{shown.saved.prefix}</span> : null}<mark>{shown.quote}</mark>{shown.saved?.suffix ? <span className="cp-ctx">{shown.saved.suffix}…</span> : null}</p>
+        <dl className="cp-kv">
+          <dt>Exact</dt><dd>{shown.characters} characters</dd>
+          {shown.saved && <><dt>Around</dt><dd>{shown.saved.prefix.length} before · {shown.saved.suffix.length} after</dd>
+            <dt>Place</dt><dd>{shown.saved.place}</dd></>}
+        </dl>
+        {(() => { const s = quoteStanding(shown); return <p className={`cp-standing ${s.tone}`}><span className={`cp-glyph ${s.tone}`} aria-hidden="true">{s.tone === 'ok' ? '✓' : '!'}</span>{s.text}</p>; })()}
+      </>}
+    {capture.outcome === 'saved' && <div className="cp-acts" style={{marginLeft: 0}}>
+      <button type="button" onClick={() => void reread()}>Re-read the page</button>
+      {capture.document_id && <button type="button" onClick={() => openDocument(capture.document_id!)}>Pin a quote in the reading room</button>}
+      <small className="dp-quiet">Runs after every re-read.</small></div>}
+    {tray.length > 0 && <div className="cp-tray">
+      <p><span className="cp-chip amber">Unanchored · {tray.length}</span> A quote it cannot find again goes to a tray, never lost.</p>
+      <p className="dp-quiet">{tray.length} quote{tray.length === 1 ? '' : 's'} from {captureTitle(capture)} {tray.length === 1 ? 'no longer matches' : 'no longer match'} {tray.some(q => q.saved) ? 'the live page' : 'the saved copy'}.
+        <button type="button" className="cp-linkbtn" aria-expanded={showTray} onClick={() => setShowTray(s => !s)}>{showTray ? 'Hide' : 'Show'}</button></p>
+      {showTray && <ul className="cp-traylist">{tray.map(q => <li key={q.evidence_id}>“{q.quote}” <small>{quoteStanding(q).text}</small></li>)}</ul>}
+    </div>}
+    {error && <p role="alert" className="cp-err">{error}</p>}
+  </section>;
+}
+
 const AGAIN: [CaptureFollowOut['every'], string][] = [['never', 'Never'], ['weekly', 'Weekly'], ['daily', 'Daily']];
 
 function CheckAgain({capture, investigationId}: {capture: CaptureOut; investigationId: string}): ReactElement {
@@ -442,6 +493,7 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
     </div>
 
     <div className="dp-right">
+      {chosen && !running(chosen) && <PinQuote capture={chosen}/>}
       <section className="cp-card" aria-label="Capture before use">
         <p className="dp-eyebrow">Capture before use</p>
         {chosen?.outcome === 'saved' ? <>

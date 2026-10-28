@@ -891,6 +891,47 @@ export const zCaptureExchangeOut = z.object({
 });
 
 /**
+ * CaptureQuoteLiveOut
+ */
+export const zCaptureQuoteLiveOut = z.object({
+  checked: z.boolean(),
+  found: z.boolean(),
+  match: z.string().nullish(),
+  same_as_saved: z.boolean(),
+  version: z.int(),
+});
+
+/**
+ * CaptureQuoteSavedOut
+ *
+ * Where the quote stands in the saved copy now: held (same place), moved (found elsewhere).
+ */
+export const zCaptureQuoteSavedOut = z.object({
+  match: z.string().nullish(),
+  occurrences: z.int(),
+  place: z.string(),
+  prefix: z.string(),
+  state: z.enum(['held', 'moved', 'not anchored']),
+  suffix: z.string(),
+});
+
+/**
+ * CaptureQuoteOut
+ *
+ * A quote pinned from a captured page, found again (INTAKE_3): in the saved copy (`saved`, None when it cannot be
+ * found there) and, once the page was checked again, on the live page (`live`). `unanchored`: in the tray.
+ */
+export const zCaptureQuoteOut = z.object({
+  captured_version: z.int(),
+  characters: z.int(),
+  evidence_id: z.string(),
+  live: zCaptureQuoteLiveOut.nullish(),
+  quote: z.string(),
+  saved: zCaptureQuoteSavedOut.nullish(),
+  unanchored: z.boolean(),
+});
+
+/**
  * CaptureStageOut
  *
  * One box of the capture lane.
@@ -10471,6 +10512,28 @@ export const zCollectCaptureMediaPath = z.object({
  * Already collected, or the collection finished before the reply (developer mode)
  */
 export const zCollectCaptureMediaResponse = zCaptureOut;
+
+export const zGetCaptureQuotesPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Response Get Capture Quotes
+ *
+ * Successful Response
+ */
+export const zGetCaptureQuotesResponse = z.array(zCaptureQuoteOut);
+
+export const zRefindCaptureQuotesPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Response Refind Capture Quotes
+ *
+ * Successful Response
+ */
+export const zRefindCaptureQuotesResponse = z.array(zCaptureQuoteOut);
 
 export const zRecheckCapturePath = z.object({
   capture_id: z.string(),

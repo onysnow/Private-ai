@@ -291,3 +291,42 @@ describe('Checking a captured page again (INTAKE_3)', () => {
     expect(within(outcome).getByRole('button', {name: /Look for a copy elsewhere/})).toBeDisabled();
   });
 });
+
+describe('Pin a quote · finds itself again (INTAKE_3)', () => {
+  const quote = {evidence_id: 'e1', quote: 'Kestrel SA paid €4.2 million for the freehold', characters: 45, captured_version: 1, unanchored: false, live: null,
+    saved: {state: 'held', match: 'exact', occurrences: 1, prefix: '…seen by the Courier. ', suffix: ', the harbour authority confirmed', place: 'characters 1,204–1,249 of the page text'}} as const;
+
+  it('shows a quote found again in the saved copy, and a quote not on the live page in the tray', async () => {
+    const gone = {...quote, evidence_id: 'e2', quote: 'owned by Harbour Nominees Ltd (40%) and Kestrel SA (60%)', unanchored: true,
+      live: {checked: true, found: false, version: 2, same_as_saved: false, match: null}};
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture()], 'GET /api/captures/c1/files/screenshot.png': {status: 200, body: 'png'},
+      'GET /api/captures/c1/quotes': [quote, gone], 'POST /api/captures/c1/quotes/refind': [quote]});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const pin = await screen.findByRole('region', {name: 'Pin a quote'});
+    expect(await within(pin).findByText(quote.quote)).toBeInTheDocument();
+    expect(pin).toHaveTextContent('45 characters');
+    expect(pin).toHaveTextContent('22 before · 33 after');
+    expect(pin).toHaveTextContent('characters 1,204–1,249 of the page text');
+    expect(pin).toHaveTextContent('Found again in the saved copy: exact match, 1 of 1.');
+    expect(within(pin).getByText('Unanchored · 1')).toBeInTheDocument();
+    await user.click(within(pin).getByRole('button', {name: 'Show'}));
+    expect(pin).toHaveTextContent('Not on the live page. Still found in version 1, the saved copy: exact match, 1 of 1.');
+    await user.click(within(pin).getByRole('button', {name: 'Re-read the page'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/quotes/refind')).toHaveLength(1));
+    await waitFor(() => expect(within(pin).queryByText('Unanchored · 1')).toBeNull());
+  });
+
+  it('says what to do when nothing is pinned yet', async () => {
+    mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture()], 'GET /api/captures/c1/files/screenshot.png': {status: 200, body: 'png'},
+      'GET /api/captures/c1/quotes': []});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const pin = await screen.findByRole('region', {name: 'Pin a quote'});
+    expect(await within(pin).findByText(/Nothing pinned from this page yet/)).toBeInTheDocument();
+    await user.click(within(pin).getByRole('button', {name: 'Pin a quote in the reading room'}));
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1'});
+  });
+});

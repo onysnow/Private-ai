@@ -16,8 +16,8 @@ from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Capture
 from app.schemas.api import CaptureCreate, CaptureFollowIn, CaptureUpdate
-from app.schemas.responses import CaptureOut, ErrorOut, ValidationErrorOut
-from app.services import capture_follow
+from app.schemas.responses import CaptureOut, CaptureQuoteOut, ErrorOut, ValidationErrorOut
+from app.services import capture_follow, capture_quotes
 from app.services.web_capture import CaptureRefused, capture_file, list_captures, request_capture, serialize_capture
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -215,3 +215,18 @@ def get_capture_file(capture_id: str, name: str, db: Session = Depends(get_db)) 
     return FileResponse(path, media_type=MEDIA_TYPES.get(suffix, "application/octet-stream"), filename=entry["name"],
                         content_disposition_type="inline" if suffix == ".png" else "attachment",
                         headers={"X-Content-SHA256": entry["sha256"], "X-Content-Type-Options": "nosniff"})
+
+
+@router.get("/captures/{capture_id}/quotes", response_model=list[CaptureQuoteOut], responses={404: {"model": ErrorOut}})
+def get_capture_quotes(capture_id: str, db: Session = Depends(get_db)) -> Any:
+    """The quotes pinned from this captured page, each found again in the saved copy and (once the page
+    was checked again) on the live page."""
+    return capture_quotes.quotes(db, _capture_or_404(db, capture_id))
+
+
+@router.post("/captures/{capture_id}/quotes/refind", response_model=list[CaptureQuoteOut], responses={404: {"model": ErrorOut}})
+def refind_capture_quotes(capture_id: str, db: Session = Depends(get_db)) -> Any:
+    """Read the saved copy's quotes again: each is found again in the page's passages and its place kept."""
+    row = _capture_or_404(db, capture_id)
+    capture_quotes.refind(db, row)
+    return capture_quotes.quotes(db, row)

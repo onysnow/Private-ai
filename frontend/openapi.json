@@ -4106,6 +4106,149 @@
         "title": "CaptureOut",
         "type": "object"
       },
+      "CaptureQuoteLiveOut": {
+        "properties": {
+          "checked": {
+            "title": "Checked",
+            "type": "boolean"
+          },
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "match": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match"
+          },
+          "same_as_saved": {
+            "title": "Same As Saved",
+            "type": "boolean"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "checked",
+          "found",
+          "version",
+          "same_as_saved"
+        ],
+        "title": "CaptureQuoteLiveOut",
+        "type": "object"
+      },
+      "CaptureQuoteOut": {
+        "description": "A quote pinned from a captured page, found again (INTAKE_3): in the saved copy (`saved`, None when it cannot be\nfound there) and, once the page was checked again, on the live page (`live`). `unanchored`: in the tray.",
+        "properties": {
+          "captured_version": {
+            "title": "Captured Version",
+            "type": "integer"
+          },
+          "characters": {
+            "title": "Characters",
+            "type": "integer"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "live": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureQuoteLiveOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "saved": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureQuoteSavedOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unanchored": {
+            "title": "Unanchored",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "quote",
+          "characters",
+          "captured_version",
+          "unanchored"
+        ],
+        "title": "CaptureQuoteOut",
+        "type": "object"
+      },
+      "CaptureQuoteSavedOut": {
+        "description": "Where the quote stands in the saved copy now: held (same place), moved (found elsewhere).",
+        "properties": {
+          "match": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match"
+          },
+          "occurrences": {
+            "title": "Occurrences",
+            "type": "integer"
+          },
+          "place": {
+            "title": "Place",
+            "type": "string"
+          },
+          "prefix": {
+            "title": "Prefix",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "held",
+              "moved",
+              "not anchored"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "suffix": {
+            "title": "Suffix",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "occurrences",
+          "prefix",
+          "suffix",
+          "place"
+        ],
+        "title": "CaptureQuoteSavedOut",
+        "type": "object"
+      },
       "CaptureStageOut": {
         "description": "One box of the capture lane.",
         "properties": {
@@ -42813,6 +42956,134 @@
           }
         },
         "summary": "Collect Capture Media"
+      }
+    },
+    "/api/captures/{capture_id}/quotes": {
+      "get": {
+        "description": "The quotes pinned from this captured page, each found again in the saved copy and (once the page\nwas checked again) on the live page.",
+        "operationId": "get_capture_quotes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaptureQuoteOut"
+                  },
+                  "title": "Response Get Capture Quotes",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Capture Quotes"
+      }
+    },
+    "/api/captures/{capture_id}/quotes/refind": {
+      "post": {
+        "description": "Read the saved copy's quotes again: each is found again in the page's passages and its place kept.",
+        "operationId": "refind_capture_quotes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaptureQuoteOut"
+                  },
+                  "title": "Response Refind Capture Quotes",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Refind Capture Quotes"
       }
     },
     "/api/captures/{capture_id}/recheck": {
