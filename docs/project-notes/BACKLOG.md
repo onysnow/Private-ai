@@ -41,6 +41,7 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
   - study the ArtCraft apps installed on Ony's PC and identify which parts of which apps cover each media type the Workbench handles;
     28 Oct: the code of all 22 craft repos is mapped to the build items in `docs/research/media-suite/CRAFT_REPOS.md`;
     28 Oct: built and tried; what works is in the Workbench's native module (ADR-0021). Each use still needs its screen (mockup first): a photo's claims and the edit trail; redact, clean, blur, sync and clip from the reading view; PDF signing and PDF/A;
+    28 Oct: mockups MEDIA_1–3 drawn for these (`docs/design/media-mockups/`), waiting for approval;
   - define what a journalist needs to do with each media type (features, tools, goals);
   - plan the features;
   - add complementary features for this use;

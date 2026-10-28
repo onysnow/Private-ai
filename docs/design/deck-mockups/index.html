@@ -162,6 +162,17 @@ body.shownotes .screen.on .notes{display:block}
 .notes li{margin-bottom:2px}
 .notes li b{color:var(--text);font-weight:600}
 .notes .qq{font-family:var(--f-mono);color:var(--teal);font-size:10.5px}
+.listbox{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;min-width:0}
+.opt:hover{border-color:var(--line2)}
+.opt[aria-selected="true"]{border-color:rgba(221,146,49,.75);background:linear-gradient(0deg,var(--amber-d),var(--amber-d)),var(--card);box-shadow:0 0 0 1px rgba(221,146,49,.2)}
+.opt .t{font:600 12.5px/1.25 var(--f-ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opt .s{font:400 10.5px var(--f-mono);color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opts{display:flex;flex-direction:column;gap:5px}
+.opts .opt{padding:6px 9px;align-items:flex-start}
+.opts .opt .t{white-space:normal}
+.opt[aria-selected="true"] .rdot{border-color:var(--amber);background:radial-gradient(var(--amber) 0 3px,transparent 4px)}
+
 /* ---------- Decks (DECK_1 editor, DECK_2 present) ---------- */
 /* Slides use the app's default deck theme, Dark Academia (slide-canvas.tsx DEFAULT_THEME). */
 :root{--s-night:#141B1F;--s-nline:#2B3439;--s-parch:#ECE3D2;--s-pmute:#B5A88F;--s-brass:#B98D34;--s-brassd:#8A6420;--s-ox:#672C1A;--s-paper:#F7F2E8;--s-panel:#EDE4D3;--s-rule:#D9CDB6;--s-ink:#1F1B16;--s-taupe:#6B5B44}
