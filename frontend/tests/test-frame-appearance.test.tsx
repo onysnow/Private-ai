@@ -7,7 +7,7 @@ import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {AppFrame} from '../components/frame/app-frame';
+import {AppFrame, HIDE_SCREEN_EVENT} from '../components/frame/app-frame';
 import {LevelChip, StatusChip} from '../components/status';
 import {AppearancePanel, TryingBar} from '../features/appearance/appearance-panel';
 import {currentAppearance, keepAppearance, keptAppearance, tryTheme} from '../lib/theme';
@@ -266,10 +266,18 @@ describe('AppFrame', () => {
     expect(useWorkbenchStore.getState().investigationId).toBe('inv-2');
     act(() => useWorkbenchStore.getState().setInvestigationId(''));
 
+    // Each way of hiding goes through the hide event, which the app lock listens to ("lock on Hide screen").
+    const heard = vi.fn();
+    window.addEventListener(HIDE_SCREEN_EVENT, heard);
     fireEvent.keyDown(window, {key: 'h', ctrlKey: true, shiftKey: true});
     const cover = screen.getByRole('dialog', {name: 'Screen hidden'});
     await user.click(within(cover).getByRole('button', {name: 'Show the screen'}));
     expect(screen.queryByRole('dialog', {name: 'Screen hidden'})).not.toBeInTheDocument();
+    // Shift+Esc hides too.
+    fireEvent.keyDown(window, {key: 'Escape', shiftKey: true});
+    expect(screen.getByRole('dialog', {name: 'Screen hidden'})).toBeInTheDocument();
+    expect(heard).toHaveBeenCalledTimes(2);
+    window.removeEventListener(HIDE_SCREEN_EVENT, heard);
   });
 });
 

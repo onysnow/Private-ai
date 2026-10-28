@@ -4,7 +4,7 @@
 import {useState} from 'react';
 import type {FormEvent, ReactElement, ReactNode} from 'react';
 
-import {HIDE_SCREEN_EVENT} from '../../components/frame/app-frame';
+import {hideScreen} from '../../components/frame/app-frame';
 import {errorMessage} from '../../lib/api-client';
 import {lockNow, useLockStore} from '../../lib/app-lock';
 import type {LockStateOut} from '../../lib/generated/types.gen';
@@ -195,7 +195,7 @@ export function LockingPane(): ReactElement {
       <div className="lk-panel">
         <p className="text-sm">Hide screen covers everything at once with a plain page, for when someone walks up. ⌘⇧H from anywhere, or the button on Case home;
           your place is kept until you ask for it back.{on && state.lock_on_hide ? ' The app locks behind it.' : ''}</p>
-        <button type="button" className="ap-btn mt-4" onClick={() => window.dispatchEvent(new Event(HIDE_SCREEN_EVENT))}>Hide the screen now</button>
+        <button type="button" className="ap-btn mt-4" onClick={hideScreen}>Hide the screen now</button>
       </div>
     </div>
 

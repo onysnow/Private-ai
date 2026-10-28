@@ -5534,7 +5534,8 @@ class SafetyServiceOut(ResponseModel):
     id: str
     name: str
     about: str
-    state: Literal["off", "on_request", "local"]
+    # off · ask_first (only when you press it) · automatic (each new party looked up once) · on_request · local
+    state: Literal["off", "ask_first", "automatic", "on_request", "local"]
     state_note: str
     sent_count: int
     sends: list[str]
@@ -5546,6 +5547,9 @@ class SafetyBackupOut(ResponseModel):
     last_backup_at: str | None = None
     encrypted: bool
     restore_enabled: bool
+    # Kept when the backup was made; absent for one known only from the security log.
+    bytes: int | None = None
+    sha256: str | None = None
 
 
 class SafetyAccessOut(ResponseModel):

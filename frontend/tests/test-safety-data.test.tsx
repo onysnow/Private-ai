@@ -1,9 +1,13 @@
 // @vitest-environment jsdom
 // Keep › Safety & data (mockup KNOWLEDGE_KEEP_2): the totals with zeroes stated, the six places and the services with
-// their state in a word, the log word for word with its filters and CSV, the cards that point at the other tabs.
-import {cleanup, fireEvent, render, screen, within} from '@testing-library/react';
+// their state in a word, the log word for word with its filters and CSV, the cards that point at the other tabs; the card
+// on a line after a pause, a pulse when a request left since the last look, the backup's kept size and checksum, and
+// Hide screen on the page.
+import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import type {ReactElement} from 'react';
-import {afterEach, beforeEach, describe, expect, it} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {HIDE_SCREEN_EVENT} from '../components/frame/app-frame';
 
 import {ago, bytesInWords, logCsv, SafetyScreen} from '../features/safety/safety-screen';
 import {ApiClient} from '../lib/api-client';
@@ -122,5 +126,55 @@ describe('Safety & data', () => {
     mockApi({'GET /api/investigations/inv-1/safety-data': {status: 500, body: {detail: 'broken'}}});
     wrap(<SafetyScreen investigationId="inv-1"/>);
     expect(await screen.findByRole('alert')).toBeTruthy();
+  });
+
+  it('says each outside source\'s mode for this case in a word: Ask first, Automatic, Off', async () => {
+    show({services: PAGE().services.map(x => (x.id === 'opensanctions' ? {...x, state: 'automatic', state_note: 'Looks each new party up once, on its own'}
+      : x.id === 'firecrawl' ? {...x, state: 'ask_first', state_note: 'Only when you press it'} : x))});
+    expect(await screen.findByRole('button', {name: /OpenSanctions: AUTOMATIC/})).toBeTruthy();
+    expect(screen.getByRole('button', {name: /Firecrawl: ASK FIRST/})).toBeTruthy();
+  });
+
+  it('opens a card on a line after a pause, with its last requests, and Esc closes it', async () => {
+    show();
+    const box = await screen.findByRole('button', {name: /OpenSanctions: ON REQUEST/});
+    fireEvent.pointerEnter(box.closest('li')!);
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    const card = await screen.findByRole('tooltip');
+    expect(card.textContent).toContain('Harbour Nominees Ltd');
+    expect(box).toHaveAttribute('aria-describedby', card.id);
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(screen.queryByRole('tooltip')).toBeNull());
+  });
+
+  it('pulses a line once when a request left since the last look', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    try {
+      let sent = 2;
+      mockApi({'GET /api/investigations/inv-1/safety-data': () => PAGE({services: PAGE().services.map(x => (x.id === 'opensanctions' ? {...x, sent_count: sent} : x))})});
+      wrap(<SafetyScreen investigationId="inv-1"/>);
+      const box = await screen.findByRole('button', {name: /OpenSanctions: ON REQUEST/});
+      expect(box.closest('li')).not.toHaveClass('sd-pulse');
+      sent = 3;
+      await act(async () => { await vi.advanceTimersByTimeAsync(20_000); });
+      await waitFor(() => expect(box.closest('li')).toHaveClass('sd-pulse'));
+      await act(async () => { await vi.advanceTimersByTimeAsync(1700); });
+      expect(box.closest('li')).not.toHaveClass('sd-pulse');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('gives the last backup\'s kept size and checksum, offers Restore when it is on, and hides the screen', async () => {
+    show({backup: {last_backup_at: '2026-10-25T10:00:00', encrypted: true, restore_enabled: true, bytes: 1_400_000_000, sha256: 'ab'.repeat(32)}});
+    const kept = await screen.findByText('1.4 GB · ✓ checksum kept');
+    expect(kept).toHaveAttribute('title', `SHA-256 ${'ab'.repeat(32)}`);
+    fireEvent.click(screen.getByRole('button', {name: 'Restore…'}));
+    expect(window.location.hash).toBe('#backup-restore');
+    const heard = vi.fn();
+    window.addEventListener(HIDE_SCREEN_EVENT, heard);
+    fireEvent.click(screen.getByRole('button', {name: '◐ Hide screen'}));
+    expect(heard).toHaveBeenCalledTimes(1);
+    window.removeEventListener(HIDE_SCREEN_EVENT, heard);
   });
 });

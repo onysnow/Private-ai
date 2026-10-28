@@ -32029,6 +32029,17 @@
       },
       "SafetyBackupOut": {
         "properties": {
+          "bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bytes"
+          },
           "encrypted": {
             "title": "Encrypted",
             "type": "boolean"
@@ -32047,6 +32058,17 @@
           "restore_enabled": {
             "title": "Restore Enabled",
             "type": "boolean"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256"
           }
         },
         "required": [
@@ -32194,6 +32216,8 @@
           "state": {
             "enum": [
               "off",
+              "ask_first",
+              "automatic",
               "on_request",
               "local"
             ],
