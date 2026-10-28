@@ -112,12 +112,12 @@ describe('Settings: demo mode', () => {
     expect(window.localStorage.getItem('pai:hide-demo-investigations')).toBeNull();
   });
 
-  it('previews the deletion, then deletes only after the exact id is typed', async () => {
+  it('previews the deletion, then deletes only after the case\'s name is typed', async () => {
     let deleted = false;
     const preview = {
       investigation_id: 'inv-demo', investigation_name: 'Demo Investigation', record_counts: {entities: 9, claims: 3}, record_total: 12,
       document_files: [], document_file_summary: {delete: 2, preserve_shared: 0, already_missing: 0, unsafe: 0}, unsafe_paths: [],
-      can_delete: true, requires_confirmation: 'inv-demo', openaleph_collection: null,
+      can_delete: true, requires_confirmation: 'Demo Investigation', openaleph_collection: null,
     };
     const api = await renderSettings({
       [STATUS]: validSettingsStatus,
@@ -132,16 +132,16 @@ describe('Settings: demo mode', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', {name: 'Preview deletion'}));
 
-    await screen.findByText('Preview ready. Type the exact investigation ID to enable deletion.');
-    expect(screen.getByText(/This will remove 12 record\(s\)/)).toHaveTextContent('This will remove 12 record(s) and 2 document file(s). Type inv-demo to confirm.');
+    await screen.findByText('Preview ready. Type the case’s name to enable deletion.');
+    expect(screen.getByText(/This will remove 12 record\(s\)/)).toHaveTextContent('This will remove 12 record(s) and 2 document file(s). Type Demo Investigation to confirm.');
     const remove = screen.getByRole('button', {name: 'Delete permanently'});
     expect(remove).toBeDisabled();
-    await user.type(screen.getByPlaceholderText('Investigation ID'), 'inv-demo');
+    await user.type(screen.getByPlaceholderText('The case’s name'), 'Demo Investigation');
     await user.click(remove);
 
     await screen.findByText('Deleted 12 record(s) and 2 document file(s).');
     await screen.findByText('No demo investigation yet.');
-    expect(api.lastUrl('DELETE /api/investigations/inv-demo').searchParams.get('confirmation')).toBe('inv-demo');
+    expect(api.lastUrl('DELETE /api/investigations/inv-demo').searchParams.get('confirmation')).toBe('Demo Investigation');
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -152,13 +152,13 @@ describe('Settings: demo mode', () => {
       'GET /api/investigations/inv-demo/deletion-preview': {
         investigation_id: 'inv-demo', investigation_name: 'Demo Investigation', record_counts: {}, record_total: 0, document_files: [],
         document_file_summary: {delete: 0, preserve_shared: 0, already_missing: 0, unsafe: 1},
-        unsafe_paths: [{document_id: 'doc-1', storage_path: '../outside', error: 'outside storage'}], can_delete: false, requires_confirmation: 'inv-demo', openaleph_collection: null,
+        unsafe_paths: [{document_id: 'doc-1', storage_path: '../outside', error: 'outside storage'}], can_delete: false, requires_confirmation: 'Demo Investigation', openaleph_collection: null,
       },
     });
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', {name: 'Preview deletion'}));
     await screen.findByText('Deletion is blocked by an unsafe document path.');
-    await user.type(screen.getByPlaceholderText('Investigation ID'), 'inv-demo');
+    await user.type(screen.getByPlaceholderText('The case’s name'), 'Demo Investigation');
     expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeDisabled();
     await user.click(screen.getByRole('button', {name: 'Cancel'}));
     expect(screen.getByRole('button', {name: 'Preview deletion'})).toBeInTheDocument();

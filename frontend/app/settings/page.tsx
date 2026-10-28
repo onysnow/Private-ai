@@ -33,6 +33,7 @@ import {setTrailTail} from '../../lib/trail';
 import {SuiteCoverage} from '../../features/suite-coverage/suite-coverage';
 import {DemoCasesLoader} from '../../features/demo/demo-cases-loader';
 import {OneMdbLoader} from '../../features/demo/one-mdb-loader';
+import {confirmsDeletion} from '../../features/deletion/deletion-panel';
 
 // Phase 1 scope: the bearer-token API access card only, reusing the shared
 // `api` singleton (lib/api-instance.ts) so a token entered here is the same
@@ -161,7 +162,7 @@ function Settings(): ReactElement {
     try {
       const value = await previewMutation.mutateAsync(demoInv.id);
       setDemoDeletePreview(value);
-      setDemoStatus(value.can_delete ? 'Preview ready. Type the exact investigation ID to enable deletion.' : 'Deletion is blocked by an unsafe document path.');
+      setDemoStatus(value.can_delete ? 'Preview ready. Type the case’s name to enable deletion.' : 'Deletion is blocked by an unsafe document path.');
     } catch (error) {
       setDemoDeletePreview(null);
       setDemoStatus(errorMessage(error, 'Deletion preview failed'));
@@ -169,10 +170,10 @@ function Settings(): ReactElement {
   };
 
   const deleteDemo = async () => {
-    if (!demoDeletePreview || demoDeleteConfirmation !== demoDeletePreview.requires_confirmation) return;
+    if (!demoDeletePreview || !confirmsDeletion(demoDeleteConfirmation, demoDeletePreview)) return;
     setDemoStatus('Deleting demo investigation…');
     try {
-      const result = await deleteMutation.mutateAsync({id: demoDeletePreview.investigation_id, confirmation: demoDeleteConfirmation});
+      const result = await deleteMutation.mutateAsync({id: demoDeletePreview.investigation_id, confirmation: demoDeleteConfirmation.trim()});
       setDemoDeletePreview(null);
       setDemoDeleteConfirmation('');
       setDemoStatus(`Deleted ${result.deleted_record_total} record(s) and ${result.document_files_deleted} document file(s).`);
@@ -400,13 +401,15 @@ function Settings(): ReactElement {
                   <input
                     value={demoDeleteConfirmation}
                     onChange={e => setDemoDeleteConfirmation(e.target.value)}
-                    placeholder="Investigation ID"
+                    placeholder="The case’s name"
+                    aria-label="Type the case’s name to delete it"
+                    autoComplete="off"
                     className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
                   />
                   <button
                     type="button"
                     onClick={() => void deleteDemo()}
-                    disabled={!demoDeletePreview.can_delete || demoDeleteConfirmation !== demoDeletePreview.requires_confirmation}
+                    disabled={!demoDeletePreview.can_delete || !confirmsDeletion(demoDeleteConfirmation, demoDeletePreview)}
                     className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground disabled:opacity-50"
                   >
                     Delete permanently

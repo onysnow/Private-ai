@@ -193,3 +193,18 @@ def test_no_casefile_no_openaleph_call(tmp_path, openaleph_on):
     client = _Client()
     result = delete_investigation(db, inv_id, tmp_path, confirmation=inv_id, openaleph_client_factory=lambda: client)
     assert result['openaleph_collection'] is None and client.deleted == []
+
+
+def test_the_case_is_deleted_by_typing_its_name_exactly(tmp_path):
+    engine, db = _db()
+    inv_id, path = _seed(db, tmp_path, name='Kestrel SA')
+    assert preview_investigation_deletion(db, inv_id, tmp_path)['requires_confirmation'] == 'Kestrel SA'
+    # Close is not enough: another case, another casing, part of the name.
+    for typed in ('kestrel sa', 'Kestrel', 'Kestrel  SA', ''):
+        with pytest.raises(ValueError, match="case's name"):
+            delete_investigation(db, inv_id, tmp_path, confirmation=typed)
+    assert db.get(Investigation, inv_id) is not None and path.exists()
+    # Spaces at either end, as a paste brings, are not part of the name.
+    result = delete_investigation(db, inv_id, tmp_path, confirmation=' Kestrel SA ')
+    assert result['deleted'] is True and db.get(Investigation, inv_id) is None
+    db.close(); engine.dispose()

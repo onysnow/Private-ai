@@ -31,7 +31,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 const preview = {
   investigation_id: 'inv-1', investigation_name: 'Kestrelwood', record_counts: {investigations: 1, sources: 2}, record_total: 3,
   document_files: [], document_file_summary: {delete: 1, preserve_shared: 0, already_missing: 0, unsafe: 0},
-  unsafe_paths: [], can_delete: true, requires_confirmation: 'inv-1', openaleph_collection: null,
+  unsafe_paths: [], can_delete: true, requires_confirmation: 'Kestrelwood', openaleph_collection: null,
 };
 
 describe('generated client wiring', () => {
@@ -56,7 +56,7 @@ describe('generated client wiring', () => {
 });
 
 describe('DeletionPanel', () => {
-  it('previews, requires the exact ID, deletes, and hands the result to the page', async () => {
+  it('previews, asks for the case\'s name exactly, deletes, and hands the result to the page', async () => {
     const user = userEvent.setup();
     const onDeleted = vi.fn();
     const fetchMock = vi.fn()
@@ -67,16 +67,21 @@ describe('DeletionPanel', () => {
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={onDeleted}/>);
 
     await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
-    await screen.findByText('Preview ready. Type the exact investigation ID to enable deletion.');
+    await screen.findByText('Preview ready. Type the case’s name to enable deletion.');
     expect(screen.getByText(/3 record\(s\) · 1 owned file\(s\) to delete/)).toBeInTheDocument();
     const remove = screen.getByRole('button', {name: 'Permanently delete investigation'});
     expect(remove).toBeDisabled();
-    await user.type(screen.getByPlaceholderText('Exact investigation ID'), 'inv-1');
+    const name = screen.getByRole('textbox', {name: 'Type the case’s name to delete it'});
+    // Close is not the name: another casing keeps it shut.
+    await user.type(name, 'kestrelwood');
+    expect(remove).toBeDisabled();
+    await user.clear(name);
+    await user.type(name, 'Kestrelwood ');
     await user.click(remove);
 
     await screen.findByText('Deleted 3 record(s) and 1 owned document file(s); preserved 0 shared file(s).');
     expect(onDeleted).toHaveBeenCalledWith(expect.objectContaining({deleted_record_total: 3}));
-    expect(url(fetchMock.mock.calls[1])).toBe('http://api.test/api/investigations/inv-1?confirmation=inv-1');
+    expect(url(fetchMock.mock.calls[1])).toBe('http://api.test/api/investigations/inv-1?confirmation=Kestrelwood');
     expect(init(fetchMock.mock.calls[1]).method).toBe('DELETE');
   });
 
@@ -91,7 +96,7 @@ describe('DeletionPanel', () => {
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()}/>);
     await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
     expect(await screen.findByText('OpenAleph casefile “Kestrelwood” is deleted too.')).toBeInTheDocument();
-    await user.type(screen.getByPlaceholderText('Exact investigation ID'), 'inv-1');
+    await user.type(screen.getByPlaceholderText('The case’s name'), 'Kestrelwood');
     await user.click(screen.getByRole('button', {name: 'Permanently delete investigation'}));
     expect(await screen.findByText(/Casefile “Kestrelwood” is still in OpenAleph: OpenAleph could not be reached/)).toBeInTheDocument();
     expect(casefileOutcome({...casefile, deleted: true, detail: null})).toBe(' OpenAleph is deleting casefile “Kestrelwood”.');
