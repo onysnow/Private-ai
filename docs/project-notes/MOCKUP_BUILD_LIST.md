@@ -161,6 +161,7 @@ SEE_2 "Where did the money go" (12 Oct: See › Money, `features/money`, loads w
 - [x] Top 20 flows plus "others (n)" for very large ledgers (19 Oct, Columns: the 20 largest payer-to-payee flows, the rest in one "others (n)" band that opens out on a click, "Fold to the 20 largest" back; labels and Traced so far count every payment; a crowded column packs its parties. The Flow (Sankey) layout is the shared chart and still draws every flow)
 Timeline and Places: **no mockup in the 16 screens** — the canvas frames 4–13 exist; per Ony's rule, mockups first (backlog items: unreadable axis, raw property names, invented days; base map shipped with the app; dated place events and precision).
 **28 Oct: mockups drawn, waiting for Ony's approval:** TIME_1 Timeline · Lanes, TIME_2 Timeline · Stack in depth, PLACE_1 Places (`docs/design/time-and-place-mockups/`, seven open questions in its README). Nothing is built until he approves.
+Deck editor (research §9; it had only ever been designed in words): **28 Oct: mockups DECK_1 Deck editor and DECK_2 Present drawn, waiting for Ony's approval** (`docs/design/deck-mockups/`, five open questions in its README).
 
 ## 6. Check — mockups CHECK_1 (Decide) and CHECK_2 (Chain of Custody) (§06)
 
