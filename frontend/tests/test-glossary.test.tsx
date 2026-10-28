@@ -135,4 +135,18 @@ describe('Glossary', () => {
     expect(await screen.findByRole('heading', {level: 2, name: hints[1].term})).toBeInTheDocument();
     expect(window.location.search).toContain(`term=${hints[1].term}`);
   });
+
+  it('goes from the search box to the terms with ↓, and Enter there opens the first term', async () => {
+    mockApi(routes);
+    render(<GlossaryPage/>);
+    const user = userEvent.setup();
+    await screen.findByText(/of 250 terms/);
+    await user.type(screen.getByLabelText('Search the glossary'), 'nominee');
+    await waitFor(() => expect(screen.getByText(/of 250 terms/).textContent).toMatch(/^1 of/));
+    await user.keyboard('{ArrowDown}');
+    expect(document.activeElement).toBe(screen.getByRole('listbox', {name: 'Terms'}));
+    screen.getByLabelText('Search the glossary').focus();
+    await user.keyboard('{Enter}');
+    expect(await screen.findByRole('heading', {level: 2, name: 'Nominee'})).toBeInTheDocument();
+  });
 });

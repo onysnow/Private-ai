@@ -42,7 +42,7 @@ def _record_openaleph_details(db: Session, document_id: str, read: OpenAlephText
 
 
 def _add_and_read_children(db: Session, document_id: str, *, collection_id: str, container_id: str,
-                           report: Report, runner: str) -> tuple[str, dict[str, int]]:
+                           report: Report, runner: str, parent_job_id: str | None = None) -> tuple[str, dict[str, int]]:
     """Make each file inside an archive or email a document under it, and
     read each one as a job of its own, so a child that fails can be retried
     from its row (app/services/openaleph_children.py). Returns a sentence
@@ -65,8 +65,11 @@ def _add_and_read_children(db: Session, document_id: str, *, collection_id: str,
     unread = 0
     for number, child_id in enumerate(result.added, 1):
         report(None, f"Reading the files inside: {number} of {len(result.added)}")
+        # Run here, not by the queue: the archive's job is what keeps it alive
+        # (app/jobs/recovery.py fails it once that job has finished).
         child_job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=parent.investigation_id,
-                               subject_type="document", subject_id=child_id, runner=runner)
+                               subject_type="document", subject_id=child_id, runner=runner,
+                               payload={"parent_job_id": parent_job_id} if parent_job_id else None)
         if execute_job(factory, child_job.id, HANDLERS) != "succeeded":
             unread += 1
     db.expire_all()
@@ -91,7 +94,8 @@ def _add_and_read_children(db: Session, document_id: str, *, collection_id: str,
     return "; ".join(parts) or "no files inside", counts
 
 
-def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, report: Report, runner: str = "inline") -> str:
+def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, report: Report, runner: str = "inline",
+                           job_id: str | None = None, resuming: bool = False) -> str:
     """Wait for OpenAleph's name-finding, make the document's chunks and
     proposals from OpenAleph's text, and stage the names it found. An
     archive's or an email's files become documents under it.
@@ -99,7 +103,7 @@ def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, r
     The Workbench's own pattern name-finder runs only when OpenAleph gave no
     analysis (ADR-0004, decision 5; ADR-0006).
     """
-    message = _read_openaleph_text(db, document_id, read, report)
+    message = _read_openaleph_text(db, document_id, read, report, resuming=resuming)
     if message is None:
         return "The document was deleted before it was read"
     _record_openaleph_details(db, document_id, read)
@@ -107,14 +111,18 @@ def _finish_openaleph_read(db: Session, document_id: str, read: OpenAlephText, r
 
     if is_container(read.schema):
         children, _counts = _add_and_read_children(db, document_id, collection_id=read.collection_id,
-                                                   container_id=read.provider_document_id, report=report, runner=runner)
+                                                   container_id=read.provider_document_id, report=report, runner=runner,
+                                                   parent_job_id=job_id)
         message = f"{message}; {children}"
     return message
 
 
-def _read_openaleph_text(db: Session, document_id: str, read: OpenAlephText, report: Report) -> str | None:
+def _read_openaleph_text(db: Session, document_id: str, read: OpenAlephText, report: Report,
+                         *, resuming: bool = False) -> str | None:
     """The document's chunks and proposals from OpenAleph's text and names;
-    the job's message, or None when the document was deleted meanwhile."""
+    the job's message, or None when the document was deleted meanwhile.
+    ``resuming`` keeps the chunks an interrupted attempt already saved and
+    only stages OpenAleph's names (which skips any already proposed)."""
     from app.services.documents import extract_document
     from app.services.openaleph_analysis import describe_import, find_names, import_analysis_proposals
 
@@ -122,7 +130,12 @@ def _read_openaleph_text(db: Session, document_id: str, read: OpenAlephText, rep
     report(85, "Making proposals from OpenAleph's text")
     issue = analysis.issue() if read.chunks else None
     issues = [*read.issues, issue] if issue else list(read.issues)
-    doc = extract_document(db, document_id, text=(read.chunks, issues), find_names=not analysis.analysed)
+    if resuming:
+        from app.models.domain import Document
+
+        doc = db.get(Document, document_id)
+    else:
+        doc = extract_document(db, document_id, text=(read.chunks, issues), find_names=not analysis.analysed)
     if doc is None:
         return None
     if doc.extraction_status == "failed":
@@ -234,6 +247,10 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
     document_id = job.subject_id
     if not document_id:
         raise ValueError("Job has no document")
+    # A retry of a read that stopped after its text was saved finishes the steps after it
+    # instead of failing on "already read" (docs/project-notes/CRASH_RECOVERY.md). A new
+    # reading job for a read document still fails: only a retry resumes.
+    resuming = job.attempts > 1 and _already_read(db, document_id)
 
     fallback_reason: str | None = None
     if reading_with_openaleph():
@@ -253,9 +270,12 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             if local_text and stored is not None:
                 read = _with_local_text(read, stored.storage_path)
                 local_text = bool(read.chunks)
-            message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner)
+            message = _finish_openaleph_read(db, document_id, read, report, runner=job.runner, job_id=job.id,
+                                             resuming=resuming)
             if local_text and message:
                 message = f"{message}; OpenAleph found no text, so the text is the Workbench's own reading"
+            # OpenAleph may have read a scan by OCR too: its pages are measured the same way.
+            message = _measure_legibility(db, document_id, report, message or "Document read")
             return _check_watchlist_after_read(db, document_id, message)
 
     report(5, "Reading the document")
@@ -270,7 +290,7 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
 
     token = PAGE_PROGRESS.set(page_read)
     try:
-        doc = extract_document(db, document_id)
+        doc = db.get(Document, document_id) if resuming else extract_document(db, document_id)
     finally:
         PAGE_PROGRESS.reset(token)
     if doc is None:
@@ -286,11 +306,67 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             sync = sync_document_to_openaleph(db, doc.id)
         except Exception as exc:  # OpenAleph down must not undo a finished read
             db.rollback()
-            return f"Document read; sending it to OpenAleph failed: {type(exc).__name__}: {exc}"
-        if sync.status == "failed":
-            return f"Document read; sending it to OpenAleph failed: {sync.error}"
-        message = "Document read and sent to OpenAleph"
-    return message
+            message = f"Document read; sending it to OpenAleph failed: {type(exc).__name__}: {exc}"
+        else:
+            message = (f"Document read; sending it to OpenAleph failed: {sync.error}" if sync.status == "failed"
+                       else "Document read and sent to OpenAleph")
+    return _measure_legibility(db, document_id, report, message)
+
+
+def _measure_legibility(db: Session, document_id: str, report: Report, message: str) -> str:
+    """After the read, how legible each scanned page was (app/services/legibility.py): pages the Workbench read by
+    OCR, and pages with no text layer of their own, whichever reader read them (OpenAleph does not say which pages
+    it read by OCR). The document is already read and in use; measuring never fails the read, and a stop asked
+    for here stops only the measuring."""
+    from sqlalchemy import select
+
+    from app.jobs.records import JobStopped
+    from app.models.domain import Document, DocumentChunk
+    from app.services.document_reader import measure_legibility, scanned_pages
+
+    doc = db.get(Document, document_id)
+    if doc is None or not settings.enable_pdf_ocr:
+        return message
+    chunks = [c for c in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == doc.id)) if c.ocr_legibility is None]
+    try:
+        no_text_layer = set(scanned_pages(doc.storage_path))
+    except Exception:  # a file the page check cannot open: only what the reader marked as OCR is measured
+        no_text_layer = set()
+    scanned = [c for c in chunks if "(OCR)" in (c.locator or "") or (c.page_number or 1) in no_text_layer]
+    pages = sorted({c.page_number or 1 for c in scanned})
+    if not pages:
+        return message
+    measured: dict[int, float | None] = {}
+    try:
+        for number, page in enumerate(pages, 1):
+            report(85 + int(14 * number / len(pages)), f"Read · measuring how legible the scan is · page {number} of {len(pages)}")
+            got, why = measure_legibility(doc.storage_path, [page])
+            if why:
+                return f"{message}; legibility not measured: {why}"
+            measured.update(got)
+    except JobStopped:
+        pass
+    except Exception as exc:
+        logger.warning("measuring legibility failed", exc_info=True, extra={"document_id": document_id})
+        return f"{message}; legibility not measured: {type(exc).__name__}"
+    finally:
+        for chunk in scanned:
+            value = measured.get(chunk.page_number or 1)
+            if value is not None:
+                chunk.ocr_legibility = value
+        db.commit()
+    done = sum(1 for v in measured.values() if v is not None)
+    return f"{message}; legibility measured on {done} of {len(pages)} scanned page{'s' if len(pages) != 1 else ''}"
+
+
+def _already_read(db: Session, document_id: str) -> bool:
+    from sqlalchemy import select
+
+    from app.models.domain import Document, DocumentChunk
+
+    doc = db.get(Document, document_id)
+    return (doc is not None and doc.extraction_status == "complete"
+            and db.scalar(select(DocumentChunk.id).where(DocumentChunk.document_id == document_id).limit(1)) is not None)
 
 
 def _check_watchlist_after_read(db: Session, document_id: str, message: str | None) -> str | None:
@@ -374,7 +450,8 @@ def children_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     if not is_container(str((sync.response_json or {}).get("schema") or "")):
         raise JobFailed("Only an archive or an email has files inside", {"reason": "not_a_container"})
     message, counts = _add_and_read_children(db, doc.id, collection_id=sync.collection_id,
-                                             container_id=str(sync.provider_record_id), report=report, runner=job.runner)
+                                             container_id=str(sync.provider_record_id), report=report, runner=job.runner,
+                                             parent_job_id=job.id)
     return {"message": message[0].upper() + message[1:], "result": counts}
 
 
@@ -395,7 +472,8 @@ def ai_reasoning_job(db: Session, job: BackgroundJob, report: Report) -> dict:
             working_theory=request.get("working_theory"), max_results=request.get("max_results", 30),
             include_external_leads=request.get("include_external_leads", True), control_flags=request.get("control_flags"),
             record_refs=request.get("record_refs"), run_options=request.get("run_options"), premises=request.get("premises"),
-            changes=request.get("changes"), packet_from=request.get("packet_from"), actor_id=request.get("actor_id"), run_id=job.id,
+            changes=request.get("changes"), packet_from=request.get("packet_from"), handoff_from=request.get("handoff_from"),
+            context=request.get("context"), actor_id=request.get("actor_id"), run_id=job.id,
         )
     except Exception as exc:
         described = describe_reasoning_failure(exc)
@@ -410,7 +488,40 @@ def ai_reasoning_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     }
 
 
+OUTSIDE_LOOKUP = "outside_lookup"
+
+
+def outside_lookup_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Settings › Outside lookups set to Automatic: look a newly accepted party up in each such source that has not
+    yet. A source that fails is noted and the others still run; the findings wait in Decide like any lookup's."""
+    import asyncio
+
+    from fastapi import HTTPException
+
+    from app.models.domain import Entity
+    from app.services.connectors import automatic_lookups_due, enrich_entity
+    from app.services.preferences import lookup_mode, provider_label
+
+    entity = db.get(Entity, str(job.subject_id))
+    if entity is None:
+        return {"message": "The party is no longer in the case"}
+    found, failed = 0, []
+    # A re-check after a source updated its data (app/services/source_freshness.py) names its sources; while the
+    # case still allows Automatic for them.
+    recheck = [p for p in (job.payload or {}).get("recheck") or [] if lookup_mode(db, entity.investigation_id, p) == "automatic"]
+    due = recheck or automatic_lookups_due(db, entity)
+    for n, provider in enumerate(due):
+        report(int(100 * n / max(1, len(due))), f"Looking {entity.caption} up in {provider_label(provider)}")
+        try:
+            found += len(asyncio.run(enrich_entity(provider, entity, db, automatic=True)))
+        except HTTPException:
+            failed.append(provider_label(provider))
+    message = f"{found} finding{'s' if found != 1 else ''} for {entity.caption}" + (f"; {', '.join(failed)} did not answer" if failed else "")
+    return {"message": message, "result": {"findings": found, "failed": failed}}
+
+
 HANDLERS: dict[str, Handler] = {
+    OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,
     ANALYZE_DOCUMENT: analyze_document_job,
     FIND_CHILDREN: children_job,

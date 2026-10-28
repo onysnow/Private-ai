@@ -13,8 +13,11 @@ import '../styles/act.css';
 import '../styles/story.css';
 import '../styles/before-run.css';
 import '../styles/drop.css';
+import '../styles/safety.css';
 import '../styles/reading-room.css';
 import '../styles/learn.css';
+import '../styles/lock.css';
+import '../styles/safety.css';
 // Deck font pairings (SIL OFL, served by the app itself -- see
 // backend/app/services/presentation_style.py FONT_PAIRS). Only @font-face
 // rules load here; a font file downloads the first time a slide uses it.

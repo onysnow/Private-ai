@@ -1,16 +1,18 @@
 'use client';
-// The inbox behind the bell (mockup HOME_2, "Notifications inbox"): what needs you
-// (the decisions only a person can make, most consequential first) apart from
-// everything else that happened this week. Any row can be snoozed on this computer
-// for a day or a week; a snoozed row comes back by itself.
-import {useQuery} from '@tanstack/react-query';
+// The inbox behind the bell (mockup HOME_2, "Notifications inbox"): each row where the
+// person sent its kind in Settings › Notifications (GET …/inbox applies the routes):
+// Needs you apart from Everything else; a kind set to Off is not shown. Any row can be
+// snoozed on this computer for a day or a week; a snoozed row comes back by itself. A
+// watched fact that changed is marked seen here.
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {AiTag, LevelChip} from '../../components/status';
 import {caseHref} from '../../lib/case-href';
-import {getDecisionsOptions, getSinceOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getInboxOptions, getInboxQueryKey, seeWatchMutation} from '../../lib/generated/@tanstack/react-query.gen';
+import type {InboxOut, InboxRowOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 
@@ -26,31 +28,44 @@ function readSnoozed(): Record<string, number> {
 }
 
 /** Rows snoozed on this computer, and a way to snooze one more. */
+const SNOOZE_EVENT = 'pai:snoozed';
+
+/** Snoozes on this computer, shared by every place that reads them (the inbox, the bell, the interrupt notice):
+ * a snooze in one is seen by the others at once, and by other tabs through the storage event. */
 export function useSnoozed(): [Record<string, number>, (id: string, ms: number) => void] {
   const [snoozed, setSnoozed] = useState<Record<string, number>>({});
-  useEffect(() => { setSnoozed(readSnoozed()); }, []);
+  useEffect(() => {
+    const read = () => setSnoozed(readSnoozed());
+    read();
+    const onStorage = (e: StorageEvent) => { if (e.key === SNOOZE_KEY) read(); };
+    window.addEventListener(SNOOZE_EVENT, read);
+    window.addEventListener('storage', onStorage);
+    return () => { window.removeEventListener(SNOOZE_EVENT, read); window.removeEventListener('storage', onStorage); };
+  }, []);
   const snooze = useCallback((id: string, ms: number) => {
     const next = {...readSnoozed(), [id]: Date.now() + ms};
     try { window.localStorage.setItem(SNOOZE_KEY, JSON.stringify(next)); } catch { /* private window */ }
     setSnoozed(next);
+    window.dispatchEvent(new Event(SNOOZE_EVENT));
   }, []);
   return [snoozed, snooze];
 }
 
-/** A week ago, to the day, so the question stays the same all day. */
-function weekAgo(): string {
-  const d = new Date(Date.now() - 7 * DAY_MS);
-  return `${d.toISOString().slice(0, 10)}T00:00:00`;
+/** The open case's inbox, checked again every minute so the bell and the top band keep up. */
+export function useInbox(enabled = true): {data: InboxOut | undefined; isPending: boolean} {
+  const inv = useWorkbenchStore(state => state.investigationId);
+  const q = useQuery({...getInboxOptions({path: {investigation_id: inv}}), enabled: Boolean(inv) && enabled, refetchInterval: 60_000});
+  // The inbox reads the stored flags and To check items; when the records have changed since the rules last ran,
+  // this runs them once (and the run refreshes the inbox).
+  useRedFlagsQuery(inv, Boolean(inv) && enabled);
+  return {data: q.data, isPending: q.isPending};
 }
 
 /** How many need you, leaving out what is snoozed here. */
 export function useNeedsYouCount(): number {
-  const inv = useWorkbenchStore(state => state.investigationId);
   const [snoozed] = useSnoozed();
-  const data = useQuery({...getDecisionsOptions({path: {investigation_id: inv}, query: {limit: 200}}), enabled: Boolean(inv)}).data;
-  // The decisions are read as the rules last left them; when the records have changed since, this runs them once.
-  useRedFlagsQuery(inv, Boolean(inv));
-  return data ? Math.max(0, data.total - data.items.filter(i => snoozed[`d:${i.kind}:${i.id}`]).length) : 0;
+  const {data} = useInbox();
+  return data ? data.needs.filter(r => !snoozed[r.key]).length : 0;
 }
 
 function Snooze({onSnooze}: {onSnooze: (ms: number) => void}): ReactElement {
@@ -60,13 +75,30 @@ function Snooze({onSnooze}: {onSnooze: (ms: number) => void}): ReactElement {
   </span>;
 }
 
+function Row({r, inv, onClose, onSnooze}: {r: InboxRowOut; inv: string; onClose: () => void; onSnooze: (ms: number) => void}): ReactElement {
+  const queryClient = useQueryClient();
+  const seen = useMutation({...seeWatchMutation(),
+    onSuccess: () => queryClient.invalidateQueries({queryKey: getInboxQueryKey({path: {investigation_id: inv}})})});
+  const watchId = r.kind === 'watch' ? r.key.split(':')[1] : null;
+  return <li>
+    <Link href={caseHref(r.href, inv)} onClick={onClose} className="ib-row">
+      <span className="ib-why">{r.actor_kind === 'ai' ? <AiTag/> : r.actor ? <small>{r.actor}</small> : null}
+        {r.level && <LevelChip level={r.level as 'faint' | 'strong' | 'textbook'}/>}</span>
+      <b>{r.title}</b>
+      {r.reason && r.reason !== r.actor && <small className="ib-reason">{r.reason}</small>}
+    </Link>
+    <span className="ib-acts">
+      {watchId && <button type="button" className="ib-seen" disabled={seen.isPending}
+        onClick={() => seen.mutate({path: {fact_watch_id: watchId}})}>Seen</button>}
+      <Snooze onSnooze={onSnooze}/>
+    </span>
+  </li>;
+}
+
 export function Inbox({open, onClose}: {open: boolean; onClose: () => void}): ReactElement | null {
   const inv = useWorkbenchStore(state => state.investigationId);
   const [snoozed, snooze] = useSnoozed();
-  const after = useMemo(weekAgo, []);
-  const decisions = useQuery({...getDecisionsOptions({path: {investigation_id: inv}, query: {limit: 200}}), enabled: Boolean(inv && open)});
-  useRedFlagsQuery(inv, Boolean(inv && open));
-  const since = useQuery({...getSinceOptions({path: {investigation_id: inv}, query: {after}}), enabled: Boolean(inv && open)});
+  const {data, isPending} = useInbox(open);
   const [tab, setTab] = useState<'needs' | 'else'>('needs');
   useEffect(() => {
     if (!open) return undefined;
@@ -75,38 +107,27 @@ export function Inbox({open, onClose}: {open: boolean; onClose: () => void}): Re
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
   if (!open) return null;
-  const needs = (decisions.data?.items ?? []).filter(i => !snoozed[`d:${i.kind}:${i.id}`]);
-  const changes = (since.data?.changes ?? []).filter(c => !snoozed[`c:${c.key}:${c.count}`]);
+  const needs = (data?.needs ?? []).filter(r => !snoozed[r.key]);
+  const rest = (data?.else ?? []).filter(r => !snoozed[r.key]);
   const hidden = Object.keys(snoozed).length;
+  const list = tab === 'needs' ? needs : rest;
   return <section className="ib" role="dialog" aria-label="Inbox">
     <header>
       <div role="tablist" aria-label="Inbox">
         <button type="button" role="tab" aria-selected={tab === 'needs'} onClick={() => setTab('needs')}>Needs you <b>{needs.length}</b></button>
-        <button type="button" role="tab" aria-selected={tab === 'else'} onClick={() => setTab('else')}>Everything else <b>{changes.length}</b></button>
+        <button type="button" role="tab" aria-selected={tab === 'else'} onClick={() => setTab('else')}>Everything else <b>{rest.length}</b></button>
       </div>
       <button type="button" className="ib-x" aria-label="Close the inbox" onClick={onClose}>×</button>
     </header>
     {!inv ? <p className="ib-quiet">Open a case to see what waits in it.</p>
-      : tab === 'needs' ? <ul className="ib-list" role="tabpanel" aria-label="Needs you">
-        {decisions.isPending ? <li className="ib-quiet">Looking…</li> : !needs.length ? <li className="ib-quiet">Nothing needs you.</li>
-          : needs.slice(0, 30).map(i => <li key={`${i.kind}:${i.id}`}>
-            <Link href={caseHref(`/decide?kind=${i.kind}`, inv)} onClick={onClose} className="ib-row">
-              <span className="ib-why">{i.actor_kind === 'ai' ? <AiTag/> : <small>{i.actor}</small>}{i.level && <LevelChip level={i.level}/>}</span>
-              <b>{i.question}</b>
-            </Link>
-            <Snooze onSnooze={ms => snooze(`d:${i.kind}:${i.id}`, ms)}/>
-          </li>)}
-      </ul>
-      : <ul className="ib-list" role="tabpanel" aria-label="Everything else">
-        {since.isPending ? <li className="ib-quiet">Looking…</li> : !changes.length ? <li className="ib-quiet">Nothing else this week.</li>
-          : changes.map(c => <li key={c.key}>
-            <Link href={caseHref(c.href, inv)} onClick={onClose} className="ib-row">
-              <span className="ib-why">{c.actor_kind === 'ai' ? <AiTag/> : null}<small>this week</small></span>
-              <b>{c.count} {c.label}</b>
-            </Link>
-            <Snooze onSnooze={ms => snooze(`c:${c.key}:${c.count}`, ms)}/>
-          </li>)}
+      : <ul className="ib-list" role="tabpanel" aria-label={tab === 'needs' ? 'Needs you' : 'Everything else'}>
+        {isPending ? <li className="ib-quiet">Looking…</li>
+          : !list.length ? <li className="ib-quiet">{tab === 'needs' ? 'Nothing needs you.' : 'Nothing else this week.'}</li>
+          : list.slice(0, 40).map(r => <Row key={r.key} r={r} inv={inv} onClose={onClose} onSnooze={ms => snooze(r.key, ms)}/>)}
       </ul>}
-    {hidden > 0 && <footer className="ib-quiet">{hidden} snoozed on this computer; each comes back by itself.</footer>}
+    <footer className="ib-quiet">
+      {hidden > 0 && <span>{hidden} snoozed on this computer; each comes back by itself. </span>}
+      <Link href="/settings#notifications" onClick={onClose}>Choose what goes where</Link>
+    </footer>
   </section>;
 }

@@ -25,7 +25,7 @@ These come from `CLAUDE.md` plus what he has said in conversation. They all stil
   own data when the demo data can't show a state.
 
 ## Authority System Suite (beta)
-`backend/app/ai/authority_suite` is vendored and in beta. When a problem's cause is inside the suite (its rules,
+The suite comes from the `authority-suite-sdk` package (see `backend/app/ai/authority_sdk.py`) and is in beta. When a problem's cause is inside the suite (its rules,
 prompts, systems or outputs), **tell Ony what it is and where**, and don't work around it in the app.
 
 ## Effects

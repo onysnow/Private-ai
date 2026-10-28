@@ -3,11 +3,11 @@
 // always there; the left edge opens on its handle or the [ key (not while typing); ⌘K opens the command palette,
 // which offers a search of the case and every place; a theme can be tried for the session, then kept or dropped;
 // status chips always carry a word.
-import {act, cleanup, fireEvent, render, screen, within} from '@testing-library/react';
+import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {AppFrame} from '../components/frame/app-frame';
+import {AppFrame, HIDE_SCREEN_EVENT} from '../components/frame/app-frame';
 import {LevelChip, StatusChip} from '../components/status';
 import {AppearancePanel, TryingBar} from '../features/appearance/appearance-panel';
 import {currentAppearance, keepAppearance, keptAppearance, tryTheme} from '../lib/theme';
@@ -52,7 +52,7 @@ describe('Settings › Appearance', () => {
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/><TryingBar/></QueryProvider>);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('radio', {name: 'Rain Noir theme'}));
+    await user.click(screen.getByRole('radio', {name: /^Rain Noir theme/}));
     const bar = screen.getByRole('status');
     expect(bar).toHaveTextContent('Trying Rain Noir · nothing is saved until you keep it');
     expect(within(bar).getByRole('button', {name: /Go back to Case Night/})).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe('Settings › Appearance', () => {
     const user = userEvent.setup();
     screen.getByRole('radio', {name: /Case Night theme/}).focus();
     await user.keyboard('{ArrowRight}');
-    expect(screen.getByRole('radio', {name: 'Rain Noir theme'})).toHaveFocus();
+    expect(screen.getByRole('radio', {name: /^Rain Noir theme/})).toHaveFocus();
     expect(screen.getByText('Lowest text pair 5.90:1 · AA').closest('dl')).toHaveAttribute('aria-label', 'Rain Noir in four facts');
     await user.keyboard('k');
     expect(keptAppearance().theme).toBe('rain-noir');
@@ -79,7 +79,7 @@ describe('Settings › Appearance', () => {
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/><TryingBar/></QueryProvider>);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('radio', {name: 'Archive theme'}));
+    await user.click(screen.getByRole('radio', {name: /^Archive theme/}));
     expect(screen.getByRole('status')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('status')).toBeNull();
@@ -102,11 +102,37 @@ describe('Settings › Appearance', () => {
     expect(screen.getByRole('radio', {name: /Desk/})).toBeDisabled();
   });
 
+  it('names each card with its lowest contrast and whether it has effects', () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': []});
+    render(<QueryProvider><AppearancePanel/></QueryProvider>);
+    expect(screen.getByRole('radio', {name: 'Rain Noir theme, lowest contrast 5.90:1, has effects'})).toBeInTheDocument();
+    expect(screen.getByRole('radio', {name: 'Forest Ledger theme, lowest contrast 4.84:1'})).toBeInTheDocument();
+  });
+
+  it('crossfades a theme change where the browser can, 700 ms into Rain Noir', async () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    mockApi({'GET /api/investigations': []});
+    const seen: (string | undefined)[] = [];
+    const start = vi.fn((update: () => void) => { seen.push(document.documentElement.dataset.themeFade); update(); return {finished: Promise.resolve()}; });
+    Object.defineProperty(document, 'startViewTransition', {value: start, configurable: true});
+    try {
+      render(<QueryProvider><AppearancePanel/></QueryProvider>);
+      await userEvent.setup().click(screen.getByRole('radio', {name: /^Rain Noir theme/}));
+      expect(start).toHaveBeenCalledTimes(1);
+      expect(seen).toEqual(['slow']);
+      expect(document.documentElement.dataset.theme).toBe('rain-noir');
+      await waitFor(() => expect(document.documentElement.dataset.themeFade).toBeUndefined());
+    } finally {
+      delete (document as {startViewTransition?: unknown}).startViewTransition;
+    }
+  });
+
   it('shows the four facts of the theme pointed at', async () => {
     connectGeneratedClient(new ApiClient('http://api.test'));
     mockApi({'GET /api/investigations': []});
     render(<QueryProvider><AppearancePanel/></QueryProvider>);
-    await userEvent.setup().hover(screen.getByRole('radio', {name: 'Indigo Clarity theme'}));
+    await userEvent.setup().hover(screen.getByRole('radio', {name: /^Indigo Clarity theme/}));
     const facts = screen.getByText('Lowest text pair 6.39:1 · AA').closest('dl')!;
     expect(facts).toHaveAttribute('aria-label', 'Indigo Clarity in four facts');
     expect(within(facts).getByText('Inclusive Sans · Lexend · Plex Mono')).toBeInTheDocument();
@@ -240,10 +266,18 @@ describe('AppFrame', () => {
     expect(useWorkbenchStore.getState().investigationId).toBe('inv-2');
     act(() => useWorkbenchStore.getState().setInvestigationId(''));
 
+    // Each way of hiding goes through the hide event, which the app lock listens to ("lock on Hide screen").
+    const heard = vi.fn();
+    window.addEventListener(HIDE_SCREEN_EVENT, heard);
     fireEvent.keyDown(window, {key: 'h', ctrlKey: true, shiftKey: true});
     const cover = screen.getByRole('dialog', {name: 'Screen hidden'});
     await user.click(within(cover).getByRole('button', {name: 'Show the screen'}));
     expect(screen.queryByRole('dialog', {name: 'Screen hidden'})).not.toBeInTheDocument();
+    // Shift+Esc hides too.
+    fireEvent.keyDown(window, {key: 'Escape', shiftKey: true});
+    expect(screen.getByRole('dialog', {name: 'Screen hidden'})).toBeInTheDocument();
+    expect(heard).toHaveBeenCalledTimes(2);
+    window.removeEventListener(HIDE_SCREEN_EVENT, heard);
   });
 });
 

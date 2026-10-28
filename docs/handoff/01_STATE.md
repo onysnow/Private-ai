@@ -77,13 +77,9 @@ Not built:
 
 ## Not started
 
-- **SEE_1 / The Wire redesign:** needs a new mockup for Ony to approve first.
+- **SEE_1 / The Wire:** the prototype artifact is the approved design (Ony, 28 Oct); SEE_1's link panel and arrangement switch, and the prototype's touch and phone layout, built 28 Oct.
 - **§9 Knowledge catalogue** (KNOWLEDGE-catalogue.png).
-- **§9 KEEP Safety & data** (KEEP-safety-and-data.png):
-  - planned approach: a data map built from ConnectorRun (outbound lookups, word for word), counts and sizes,
-    backups, keys and the security log;
-  - lookups mode is hard-coded to "ask";
-  - the last backup time is not recorded anywhere (it needs a backup event).
+- **§9 KEEP Safety & data** (KEEP-safety-and-data.png): first slice built 19 Oct (see `MOCKUP_BUILD_LIST.md` §9 and ADR-0015). Still to do there: Your safety panel, plain-language security events, delete or keep stray files, the Off / Ask first / Automatic switch, OpenAleph traffic in the log, encrypted backups.
 - **§10 Website (SITE_1/2):** waits on Ony's name, licence and photos.
 - **Timeline and Places:** there is no mockup yet.
 

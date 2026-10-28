@@ -18,6 +18,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import Engine
@@ -27,15 +28,20 @@ from starlette.concurrency import run_in_threadpool
 from app.db.session import build_session_factory
 from app.jobs import corpus as corpus_jobs
 from app.jobs.handlers import HANDLERS
+from app.jobs import recovery
 from app.jobs.queue_schema import QUEUE_SCHEMA, ensure_queue_schema
 from app.jobs.records import Handler, execute_job, mark_interrupted
+from app.jobs.schedule import TICK_SECONDS, scheduler_tick
 from app.models.jobs import BackgroundJob
 
 logger = logging.getLogger("journalism.jobs")
 
 QUEUE_NAME = "workbench"
 TASK_NAME = "workbench.run_background_job"
+TICK_TASK_NAME = "workbench.scheduler_tick"
 RUNNERS = ("auto", "inline", "procrastinate")
+RECOVER_DOCUMENTS_AFTER = timedelta(minutes=10)
+RECOVER_JOBS_AFTER = timedelta(hours=1)
 
 
 def resolve_runner(configured: str, engine: Engine) -> str:
@@ -72,6 +78,7 @@ class JobRunner:
         self._task: Any = None          # the procrastinate Task that runs a job
         self._worker: asyncio.Task[None] | None = None
         self._watchdog: asyncio.Task[None] | None = None
+        self._ticker: asyncio.Task[None] | None = None
         self._corpus_queue: corpus_jobs.CorpusQueue | None = None
         if mode == "procrastinate":
             self._build_queue()
@@ -92,6 +99,13 @@ class JobRunner:
             execute_job(runner.session_factory, job_id, runner.handlers, resume_running=True)
 
         self._task = run_background_job
+
+        # The heartbeat of the app's own timed work (app/jobs/schedule.py): each minute is deferred once,
+        # whichever worker defers it (Procrastinate's periodic defers are unique per task and minute).
+        @self.queue.periodic(cron="* * * * *", periodic_id="workbench-tick")
+        @self.queue.task(name=TICK_TASK_NAME, queue=QUEUE_NAME, retry=False)
+        def run_scheduler_tick(timestamp: int) -> None:
+            scheduler_tick(runner.session_factory)
         # The corpus jobs (ADR-0006, Wave B) share this queue and its worker.
         corpus_jobs.register_tasks(self.queue, self.session_factory, self.engine, queue_name=QUEUE_NAME)
 
@@ -102,6 +116,12 @@ class JobRunner:
                 count = mark_interrupted(db, runner="inline")
             if count:
                 logger.info("marked %d interrupted job(s) as failed", count)
+            # Nothing else runs this process's jobs, so whatever is unfinished now
+            # was left by the process that stopped.
+            self._recover(documents_older_than=timedelta(0), jobs_older_than=timedelta(0),
+                          staged_older_than=timedelta(0))
+            # No worker in this mode: the app's timed work runs from a loop here instead (app/jobs/schedule.py).
+            self._ticker = asyncio.create_task(self._tick_forever())
             return
         if await run_in_threadpool(ensure_queue_schema, self.engine):
             logger.info("created the job queue schema")
@@ -122,12 +142,12 @@ class JobRunner:
         from app.services import document_reader
 
         document_reader.shutdown()
-        for task in (self._watchdog, self._worker):
+        for task in (self._watchdog, self._worker, self._ticker):
             if task is not None:
                 task.cancel()
                 with contextlib.suppress(asyncio.CancelledError, Exception):
                     await task
-        self._watchdog = self._worker = None
+        self._watchdog = self._worker = self._ticker = None
         if self._corpus_queue is not None:
             corpus_jobs.unregister_queue(self.engine, self._corpus_queue)
             with contextlib.suppress(Exception):
@@ -136,6 +156,20 @@ class JobRunner:
         if self.queue is not None:
             with contextlib.suppress(Exception):
                 await self.queue.close_async()
+
+    def _recover(self, *, documents_older_than: timedelta, jobs_older_than: timedelta,
+                 staged_older_than: timedelta) -> None:
+        """Give what a stopped process left half-done a final state (recovery.py)."""
+        from app.core.config import settings
+        from app.services.security import resolve_storage_root
+
+        try:
+            with self.session_factory() as db:
+                recovery.recover(db, runner=self.mode, storage_root=resolve_storage_root(settings.document_storage_dir),
+                                 documents_older_than=documents_older_than, jobs_older_than=jobs_older_than,
+                                 staged_older_than=staged_older_than)
+        except Exception:
+            logger.warning("could not look for work a stopped process left unfinished", exc_info=True)
 
     async def _retry_stalled(self) -> None:
         """Hand back jobs whose worker stopped heartbeating (a crash or a
@@ -165,6 +199,19 @@ class JobRunner:
                 logger.info("closed stalled job %s: a newer one with its queueing lock is waiting", job.id)
             except Exception:
                 logger.warning("could not retry stalled job %s", job.id, exc_info=True)
+        # Another API process may be between saving a row and queueing its job,
+        # so only what has not moved for a while counts as left behind; a job
+        # waits longer than the longest OpenAleph read can take.
+        await run_in_threadpool(self._recover, documents_older_than=RECOVER_DOCUMENTS_AFTER,
+                                jobs_older_than=RECOVER_JOBS_AFTER, staged_older_than=RECOVER_JOBS_AFTER)
+
+    async def _tick_forever(self) -> None:
+        while True:
+            await asyncio.sleep(TICK_SECONDS)
+            try:
+                await run_in_threadpool(scheduler_tick, self.session_factory)
+            except Exception:
+                logger.warning("the scheduler tick failed", exc_info=True)
 
     async def _watch_stalled(self) -> None:
         while True:

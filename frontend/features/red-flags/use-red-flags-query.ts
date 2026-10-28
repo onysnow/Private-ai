@@ -11,7 +11,7 @@ import type {QueryClient, UseMutationResult, UseQueryResult} from '@tanstack/rea
 import {useEffect} from 'react';
 
 import {
-  getChecksQueryKey, getDecisionsQueryKey, getRedFlagsOptions, getRedFlagsQueryKey, getStandingQueryKey, getWireQueryKey, runRedFlagsMutation,
+  getChecksQueryKey, getDecisionsQueryKey, getInboxQueryKey, getRedFlagsOptions, getRedFlagsQueryKey, getStandingQueryKey, getWireQueryKey, runRedFlagsMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {Options} from '../../lib/generated/sdk.gen';
 import type {GetRedFlagsError, RedFlagsOut, RunRedFlagsData, RunRedFlagsError} from '../../lib/generated/types.gen';
@@ -47,9 +47,9 @@ export function useRedFlagsQuery(investigationId: string, enabled = true): RedFl
       if (data.stale) triedFor(queryClient).add(runKey(investigationId, data.ran_at));
       queryClient.setQueryData(getRedFlagsQueryKey({path}), data);
       // Everything else that reads the stored flags and To check items: Case home's standing counts, To check,
-      // Decide (every kind and order) and the Wire. A first read still on its way may hold what was there before
+      // Decide (every kind and order), the Wire and the inbox. A first read still on its way may hold what was there before
       // the run, so it is dropped and read again.
-      for (const queryKey of [getStandingQueryKey({path}), getChecksQueryKey({path}), getDecisionsQueryKey({path}), getWireQueryKey({path})]) {
+      for (const queryKey of [getStandingQueryKey({path}), getChecksQueryKey({path}), getDecisionsQueryKey({path}), getWireQueryKey({path}), getInboxQueryKey({path})]) {
         void queryClient.cancelQueries({queryKey}).then(() => queryClient.invalidateQueries({queryKey}));
       }
     },

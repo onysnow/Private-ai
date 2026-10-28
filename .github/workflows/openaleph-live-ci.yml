@@ -70,6 +70,11 @@ jobs:
       - name: Install OCR runtime
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
 
+      - name: Let pip read the private authority-suite-sdk repository
+        uses: ./.github/actions/authority-sdk-access
+        with:
+          deploy-key: ${{ secrets.AUTHORITY_SDK_DEPLOY_KEY }}
+
       - name: Install backend dependencies
         working-directory: backend
         run: python -m pip install --upgrade pip && python -m pip install -r requirements-test.txt
@@ -86,7 +91,7 @@ jobs:
         if: failure()
         run: docker compose logs --no-color --timestamps postgres elasticsearch redis openaleph-setup api worker ingest analyze > openaleph-logs.txt
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: openaleph-logs

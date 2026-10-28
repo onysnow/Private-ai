@@ -13,6 +13,7 @@ from app.models.domain import (
     RelationshipEdge, Source, Statement, StatementPromotion,
 )
 from app.schemas.api import EntityCreate, EntityUpdate, PropertyConflictDecisionRequest
+from app.services.outbound import destination_of, enrich_sent_text, mark_outbound_failed, record_outbound, send_outcome
 from app.services.connectors import persist_connector_findings
 from app.services.consolidation import get_enrichment_session_detail
 from app.services.ftm import make_ftm_entity
@@ -154,6 +155,12 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
     unknown = [name for name in providers if registry.get(name) is None]
     if unknown:
         raise ValueError(f"Unknown connectors: {', '.join(unknown)}")
+    from app.services.preferences import lookup_modes, provider_label
+
+    off = [p for p, mode in lookup_modes(db, entity.investigation_id, providers).items() if mode == "off"]
+    if off:
+        raise ValueError(f"Outside lookups to {', '.join(provider_label(p) for p in off)} are off for this case. "
+                         "Change it in Settings › Outside lookups.")
 
     session = EnrichmentSession(
         investigation_id=entity.investigation_id, entity_id=entity.id, providers=providers, status="running",
@@ -180,11 +187,12 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
         db.refresh(run)
         session_run.run_id = run.id
         db.commit()
+        payload = {"id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption, "properties": entity.properties or {}}
+        sent_id = record_outbound(db, entity.investigation_id, service=provider, kind="details of a record",
+                                  value=enrich_sent_text(connector, payload), reason=f"Look up {entity.caption}", actor="you", outcome=send_outcome(connector),
+                                  source={"connector_run_id": run.id, "entity_id": entity.id, "destination": destination_of(connector)})
         try:
-            findings = await connector.enrich({
-                "id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption,
-                "properties": entity.properties or {},
-            })
+            findings = await connector.enrich(payload)
             rows = persist_connector_findings(db, run, entity.investigation_id, provider, findings)
             for finding_row in rows:
                 link = db.scalar(select(EnrichmentSessionFinding).where(
@@ -200,6 +208,7 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
             total_results += len(rows)
         except Exception as exc:
             failures += 1
+            mark_outbound_failed(db, sent_id)
             run.status = "failed"; run.error = str(exc); run.finished_at = utcnow_naive()
             session_run.status = "failed"; session_run.error = str(exc); session_run.finished_at = utcnow_naive()
         db.commit()

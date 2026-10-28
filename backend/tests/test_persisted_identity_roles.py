@@ -242,7 +242,9 @@ def test_every_model_resolves_to_its_investigation_for_the_write_guard():
         "IngestionBatchItem", "LeadLink", "LeadProfile", "LeadWorkflowEvent", "RelationshipEvidenceAttachment",
         "RelationshipEvidenceReviewEvent", "Statement", "StoryClaim", "StorySection",
     }
-    not_case_owned = {"AppUser", "Investigation"}
+    # A person's notices sent outside the app and the browsers they signed up: theirs, in no case.
+    # The owner of this computer's name and lock (ADR-0016): the computer's, in no case.
+    not_case_owned = {"AppUser", "Investigation", "LocalProfile", "NotificationDelivery", "PushSubscription"}
     missing = sorted(m.class_.__name__ for m in Inv.registry.mappers
                      if "investigation_id" not in {c.key for c in m.columns}
                      and m.class_.__name__ not in resolved_through_parent | not_case_owned)

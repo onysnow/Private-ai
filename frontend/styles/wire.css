@@ -2,18 +2,19 @@
    on the right says how high you are, the time strip docks at the bottom, the drawer
    slides in from the right. Chrome reads the theme's role tokens (themes.css); the kinds
    and link families keep the prototype's colours, each named in the key. */
-.tw { position: relative; height: 100%; min-height: 560px; overflow: hidden; border-radius: 16px; background: var(--ground); color: var(--text); font: 14px/1.45 var(--font-ui); }
+.tw { container: tw / inline-size; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; position: relative; height: 100%; min-height: 560px; overflow: hidden; border-radius: 16px; background: var(--ground); color: var(--text); font: 14px/1.45 var(--font-ui); }
 .tw::before { content: ''; position: absolute; inset: 0; pointer-events: none;
   background-image: linear-gradient(color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px);
   background-size: 48px 48px; }
 .tw button, .tw input, .tw select { font: inherit; color: inherit; }
-.tw button { cursor: pointer; }
+.tw button { cursor: pointer; touch-action: manipulation; }
 .tw :focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
 .tw-state { display: grid; place-content: center; gap: 10px; text-align: center; color: var(--text-muted); }
 .tw-state button { justify-self: center; border: 1px solid var(--line); background: var(--surface-1); border-radius: 8px; padding: 6px 12px; }
 
 .tw-map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; transition: opacity .5s; }
 .tw-map.drag { cursor: grabbing; }
+.tw-map { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .tw-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
 .tw-glass { background: color-mix(in srgb, var(--surface-1) 86%, transparent); backdrop-filter: blur(10px); border: 1px solid color-mix(in srgb, var(--line) 35%, transparent);
@@ -21,8 +22,21 @@
 .tw-head { position: absolute; left: 16px; top: 14px; max-width: min(560px, calc(100% - 32px)); padding: 10px 16px; z-index: 5; }
 .tw-head h2 { margin: 0; font: 600 26px/1.1 var(--font-display); letter-spacing: -.01em; }
 .tw-head h2 i { font-weight: 400; color: var(--accent-1); }
+.tw-arrange { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 0; padding: 3px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--line) 35%, transparent); width: fit-content; }
+.tw-arrange button { height: 28px; padding: 0 10px; border-radius: 7px; border: 1px solid transparent; background: none; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.tw-arrange button:hover { color: var(--text); }
+.tw-arrange button[aria-pressed='true'] { border-color: var(--accent-1); color: var(--text); background: color-mix(in srgb, var(--accent-1) 14%, transparent); }
+.tw-chosen { margin: 4px 0 0; font: 12px var(--font-ui); color: var(--text-muted); }
+.tw-chosen:empty { display: none; }
 .tw-rule { margin: 6px 0 0; color: var(--text-muted); font-size: 13px; max-width: 62ch; }
 .tw-rule b { color: var(--text); font-weight: 500; }
+.tw-active { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.tw-active:empty { display: none; }
+.tw-active .cap { font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-right: 2px; }
+.tw-active .chip { display: inline-flex; align-items: center; gap: 2px; padding: 2px 4px 2px 10px; border-radius: 999px; border: 1px solid var(--accent-1); color: var(--accent-1); font: 500 12px var(--font-mono); }
+.tw-active .chip button { border: 0; background: none; padding: 0 5px; border-radius: 999px; color: inherit; }
+.tw-active .chip button:hover { background: color-mix(in srgb, var(--accent-1) 18%, transparent); }
+.tw-active .clear { border: 0; background: none; padding: 2px 4px; font-size: 12px; color: var(--accent-1); text-decoration: underline; text-underline-offset: 3px; }
 
 .tw-tools { position: absolute; right: 16px; top: 14px; display: flex; gap: 8px; align-items: center; z-index: 6; flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 620px); }
 .tw-tool { height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--line) 45%, transparent); background: color-mix(in srgb, var(--surface-1) 86%, transparent);
@@ -54,16 +68,24 @@
 .tw-bnext { margin-top: 4px; border: 1px solid color-mix(in srgb, var(--line) 45%, transparent); border-radius: 8px; background: none; padding: 6px 8px; font-size: 12px; text-align: left; }
 .tw-bnext:hover { border-color: var(--accent-1); }
 
-.tw-time { position: absolute; left: 232px; right: 128px; bottom: 12px; height: 92px; z-index: 5; padding: 8px 14px 8px 12px; display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: stretch; }
+.tw-time { position: absolute; left: 232px; right: 128px; bottom: 12px; height: 108px; z-index: 5; padding: 8px 14px 6px 12px; display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr auto; gap: 0 12px; align-items: stretch; }
+.tw-time .tw-play { grid-row: 1 / 3; }
+.tw-counts { grid-column: 2; margin: 2px 0 0; font: 11.5px var(--font-ui); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tw-play { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--accent-1); background: none; color: var(--accent-1); align-self: center; display: grid; place-items: center; }
 .tw-play:hover { background: color-mix(in srgb, var(--accent-1) 12%, transparent); }
-.tw-tsvg { width: 100%; height: 74px; display: block; overflow: visible; align-self: center; }
+.tw-tsvg { width: 100%; height: 74px; display: block; overflow: visible; align-self: center; touch-action: none; }
 .tw-tsvg .tcap { font: 500 10px var(--font-mono); letter-spacing: .1em; fill: var(--text-muted); text-transform: uppercase; }
 .tw-tsvg .tcap.win { fill: var(--accent-1); }
 .tw-tsvg .shade { fill: color-mix(in srgb, var(--ground) 65%, transparent); }
 .tw-tsvg .handle { cursor: ew-resize; }
 
-.tw-key { position: absolute; left: 16px; bottom: 12px; width: 204px; z-index: 5; padding: 10px 12px; font-size: 11.5px; color: var(--text-muted); }
+/* The key: "How sure" always on (SEE_1); kinds and colours one click away, opening upward. */
+.tw-key { position: absolute; left: 16px; bottom: 12px; width: 204px; z-index: 6; padding: 10px 12px; font-size: 11.5px; color: var(--text-muted); }
+.tw-key .cap { font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text); display: flex; justify-content: space-between; }
+.tw-key .cap span { color: var(--text-muted); }
+.tw-key-sure .row b { font: 600 12px var(--font-mono); color: var(--text); width: 10px; text-align: center; margin-left: -2px; }
+.tw-key-sure .core { stroke: var(--surface-1); }
+.tw-key-more { margin-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 35%, transparent); padding-top: 6px; }
 .tw-key summary { cursor: pointer; font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; list-style: none; }
 .tw-key summary::-webkit-details-marker { display: none; }
 .tw-key .row { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
@@ -86,6 +108,27 @@
 .tw-drawer .acts button { border: 1px solid color-mix(in srgb, var(--line) 50%, transparent); background: none; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; }
 .tw-drawer .acts button:hover { border-color: var(--accent-1); }
 .tw-drawer .acts button.pri { background: var(--accent-1); color: var(--ground); border-color: var(--accent-1); }
+/* The link panel (SEE_1), opened with "One link": the drawer's frame, the record in focus. */
+/* With the panel open the line of dates keeps to the left of it, so no tag hides behind the panel. */
+.tw:has(.tw-linkpanel) .tw-wire { right: 520px; }
+.tw-linkpanel h2 span { color: var(--text); }
+.tw-linkpanel h2 i { font-style: normal; font-weight: 400; color: var(--accent-2); }
+.tw-lp-status { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 12.5px var(--font-ui) !important; color: var(--text-muted); }
+.tw-lp-status .sure { display: inline-flex; gap: 5px; align-items: center; padding: 2px 8px; border-radius: 999px; border: 1.5px solid var(--status-supported); color: var(--status-supported);
+  font: 600 10.5px var(--font-ui); letter-spacing: .08em; text-transform: uppercase; }
+.tw-lp-status .sure.s-unshown { border-style: dashed; border-color: var(--status-unshown); color: var(--status-unshown); }
+.tw-lp-status .sure.s-disputed { border: 3px double var(--status-disputed); color: var(--status-disputed); }
+.tw-lp-status .sure.s-worked { border-style: dotted; border-color: var(--accent-2); color: var(--accent-2); }
+.tw-lp-step { display: flex; align-items: center; gap: 8px; margin: 8px 0; font: 12px var(--font-mono); color: var(--text-muted); }
+.tw-lp-step button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--line) 50%, transparent); background: none; }
+.tw-lp-scan { margin: 10px 0 0; }
+.tw-lp-scan img { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--line) 40%, transparent); }
+.tw-lp-scan figcaption { margin-top: 4px; font: 500 10.5px var(--font-mono); color: var(--text-muted); }
+.tw-lp-noscan { font: 12.5px var(--font-ui) !important; color: var(--text-muted); }
+.tw-lp-sources { list-style: none; padding: 0 !important; margin: 10px 0 0 !important; font-size: 12.5px; }
+.tw-lp-sources li { padding: 6px 0; border-top: 1px solid color-mix(in srgb, var(--line) 25%, transparent); }
+.tw-lp-sources .tw-lp-stance { color: var(--text-muted); }
+.tw-lp-sources q { display: block; margin-top: 3px; font: italic 13px/1.45 var(--font-read); color: var(--text); }
 .tw .flagchip { display: inline-flex; align-items: center; gap: 6px; font: 600 10.5px var(--font-mono); letter-spacing: .08em; padding: 2px 7px; border-radius: 5px; text-transform: uppercase; }
 .tw .flagchip.textbook { background: var(--flag-textbook-fill); color: #ffe9e4; border: 1px solid var(--flag-textbook-edge); }
 .tw .flagchip.strong { border: 1px solid var(--flag-strong); color: var(--flag-strong); }
@@ -98,6 +141,12 @@
 .tw-wire .end small { display: block; font: 500 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px; }
 .tw-wire .tag { position: absolute; width: 210px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--surface-1) 95%, transparent);
   border: 1px solid color-mix(in srgb, var(--line) 40%, transparent); font: italic 12.5px/1.45 var(--font-read); box-shadow: 0 10px 24px rgb(5 12 22 / .4); }
+.tw-wire .tag .sure { display: inline-flex; gap: 4px; align-items: center; margin-bottom: 4px; padding: 0 6px; border-radius: 4px; font: 600 10px var(--font-mono); font-style: normal;
+  letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--line); color: var(--text); }
+.tw-wire .tag .sure i { font-style: normal; }
+.tw-wire .tag .sure.s-unshown { border-style: dashed; }
+.tw-wire .tag .sure.s-disputed { border: 3px double #FF8070; color: #FFB4A8; }
+.tw-wire .tag .sure.s-worked { border-style: dotted; }
 .tw-wire .tag b { display: block; font: 600 12.5px var(--font-ui); font-style: normal; color: var(--accent-1); }
 .tw-wire .tag .q { display: block; margin-top: 4px; color: var(--text-muted); font-variant-ligatures: none; }
 .tw-wire .tag cite { display: block; font: 500 10.5px var(--font-mono); font-style: normal; color: var(--text-muted); margin-top: 4px; }
@@ -132,7 +181,23 @@
 .tw .pulse { fill: none; stroke-linecap: round; stroke-dasharray: 1 26; animation: tw-flow 1.8s linear infinite; pointer-events: none; }
 .tw .hit { fill: none; stroke: transparent; stroke-width: 14; cursor: pointer; }
 @keyframes tw-flow { from { stroke-dashoffset: 27; } to { stroke-dashoffset: 0; } }
-.tw .halo { animation: tw-halo 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.tw .halo { transform-box: fill-box; transform-origin: center; opacity: .85; pointer-events: none; }
+.tw .halo.textbook { animation: tw-halo 2.4s ease-in-out infinite; }
+/* The link's sentence on its line; the pill's edge follows the line style, the glyph leads. */
+.tw .strand-core { fill: none; stroke: var(--ground); stroke-linecap: round; pointer-events: none; }
+.tw .strand.s-worked { stroke-linecap: round; }
+.tw .elab { cursor: pointer; }
+.tw .elab rect { fill: color-mix(in srgb, var(--surface-1) 94%, transparent); stroke: color-mix(in srgb, var(--text-muted) 70%, transparent); stroke-width: 1; }
+.tw .elab text { font: 500 11px var(--font-mono); fill: var(--text); }
+.tw .elab .glyph { font-weight: 700; fill: var(--accent-1); }
+.tw .elab.s-unshown rect { stroke-dasharray: 4 3; }
+.tw .elab.s-disputed rect { stroke: #FF8070; stroke-width: 1.2; }
+.tw .elab.s-disputed rect.inner { fill: none; }
+.tw .elab.s-disputed .glyph { fill: #FF8070; }
+.tw .elab.s-worked rect { stroke-dasharray: 1 3; stroke-linecap: round; }
+.tw .elab:hover rect, .tw .elab.lit rect { stroke: var(--accent-1); }
+.tw .elab.lit rect:first-of-type { stroke-width: 2; }
+.tw g.lit .strand { stroke-width: 4px; }
 @keyframes tw-halo { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .15; transform: scale(1.35); } }
 .tw .more { cursor: pointer; }
 .tw .more rect { fill: var(--surface-1); stroke: var(--line); stroke-dasharray: 3 3; }
@@ -143,13 +208,51 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tw .pulse { display: none; }
-  .tw .halo { animation: none; }
+  .tw .halo, .tw .halo.textbook { animation: none; }
   .tw-drawer, .tw-needle, .tw-map, .tw-wire { transition: none; }
 }
-@media (max-width: 900px) {
-  .tw-trail, .tw-key, .tw-alt { display: none; }
+/* Touch (the prototype's 21 Oct pass): fatter hit areas where the pointer is a finger. */
+@media (pointer: coarse) {
+  .tw .hit { stroke-width: 34; }
+  .tw-tool { height: 44px; }
+  .tw-drawer .x { width: 44px; height: 44px; right: 6px; top: 6px; }
+  .tw-drawer .acts button { padding: 11px 14px; }
+  .tw-pathbox select { height: 44px; }
+}
+/* Narrow, measured on the Wire itself (it sits inside the case's panel, so the window width says little): the
+   altimeter becomes a bar with Back, the three altitudes and Next; the tools scroll sideways; the drawer is a
+   bottom sheet. */
+.tw-mob { display: none; }
+@container tw (max-width: 900px) {
+  .tw-trail, .tw-key { display: none; }
   .tw-time { left: 12px; right: 12px; }
-  .tw-tools { max-width: calc(100% - 24px); top: auto; bottom: 116px; right: 12px; }
-  .tw-wire { left: 12px; right: 12px; }
-  .tw-drawer { right: 12px; }
+  .tw-head { left: 12px; top: 12px; right: 12px; max-width: none; }
+  .tw-tools { max-width: none; top: auto; bottom: 124px; left: 12px; right: 12px; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+  .tw-tools::-webkit-scrollbar { display: none; }
+  .tw-tools > * { flex: none; }
+  .tw-search { width: 170px; font-size: 16px; }
+  .tw-arrange { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; scrollbar-width: none; }
+  .tw-arrange::-webkit-scrollbar { display: none; }
+  .tw-arrange button { flex: none; height: 36px; }
+  .tw-alt { top: auto; bottom: 176px; left: 12px; right: 12px; transform: none; width: auto; padding: 6px; flex-direction: row; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .tw-alt::-webkit-scrollbar { display: none; }
+  .tw-alt .cap, .tw-alt .rail, .tw-needle, .tw-zoom { display: none; }
+  .tw-alt .track { height: auto; width: auto; display: flex; gap: 6px; flex: none; }
+  .tw-alt .stop { position: static; flex-direction: row; align-items: center; gap: 7px; height: 44px; padding: 0 12px; border: 1px solid color-mix(in srgb, var(--line) 40%, transparent);
+    border-radius: 10px; white-space: nowrap; font-size: 12.5px; color: var(--text); }
+  .tw-alt .stop[aria-current='true'] { border-color: var(--accent-1); }
+  .tw-mob { display: inline-flex; align-items: center; flex: none; height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--line) 40%, transparent);
+    background: none; white-space: nowrap; font-size: 12.5px; }
+  .tw-wire, .tw:has(.tw-linkpanel) .tw-wire { left: 12px; right: 12px; top: 150px; bottom: 242px; }
+  .tw-drawer { left: 12px; right: 12px; width: auto; top: auto; bottom: 12px; max-height: 55%; transform: translateY(40px); z-index: 9; padding-top: 22px; }
+  .tw-drawer::before { content: ''; position: absolute; left: 50%; top: 7px; width: 38px; height: 4px; margin-left: -19px; border-radius: 2px; background: color-mix(in srgb, var(--text) 28%, transparent); }
+  .tw-pathbox { left: 12px; right: 12px; top: auto; bottom: 178px; transform: none; z-index: 8; }
+  .tw-pathbox select { max-width: none; flex: 1; min-width: 120px; }
+}
+@container tw (max-width: 560px) {
+  .tw-wire .end { width: 108px; padding: 8px 9px; font-size: 12px; }
+  .tw-wire .tag { width: 170px; }
+  .tw-head h2 { font-size: 22px; }
+  .tw-rule { font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tw-chosen { display: none; }
 }

@@ -35,8 +35,13 @@ def review_claim(db: Session, claim: Claim, *, status: str, confidence: float, r
     grade the claim has). Supported and Confirmed are held to the Done rules
     (app/services/claim_done.py); with a rule not met, a written reason is
     required and kept on the event."""
+    from app.db.locking import lock_investigation_transaction
     from app.services.claim_done import require_done
 
+    # A review made at the same moment commits first; this one starts from what
+    # it left, so each event's "from" is the status it really changed.
+    lock_investigation_transaction(db, claim.investigation_id)
+    db.refresh(claim)
     rationale = rationale.strip()
     if not rationale:
         raise ValueError("Reporter rationale is required for a claim review")

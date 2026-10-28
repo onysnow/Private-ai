@@ -18,12 +18,11 @@ from app.ai.governor import governor
 from app.ai.llm_client import LLMProviderError, LLMResponse
 
 
-# The vendored TAS spec is a private submodule; CI without TAS_REPO_TOKEN runs
-# without it (see .github/workflows/backend-postgres-ci.yml). Tests that actually
-# build a prompt from it skip there, mirroring tests/test_tas_submodule_drift.py;
-# gating/queue/settings tests that never read a spec file still run.
-_SUITE_PRESENT = (reasoning_module.TAS_ROOT / "PROMPT_MODULES").exists()
-requires_suite = pytest.mark.skipif(not _SUITE_PRESENT, reason="vendored Authority System Suite missing")
+# The Authority System Suite comes from the Authority Suite SDK, which the backend
+# requires, so it is always present; the marker stays on the tests that build a prompt
+# from it so a broken SDK install skips them visibly instead of erroring.
+_SUITE_PRESENT = reasoning_module.MODULE_FILES["case_synthesis"].exists()
+requires_suite = pytest.mark.skipif(not _SUITE_PRESENT, reason="Authority System Suite missing from the SDK")
 
 
 class _FakeLLMClient:
@@ -283,7 +282,8 @@ def test_settings_status_reports_ai_reasoning_state_without_secrets():
     assert ai["enabled"] is False
     assert ai["provider"] is None
     assert ai["endpoints_callable"] is False
-    assert set(ai["authority_suite"]["modules"]) == {"case_synthesis", "hypothesis_test", "presentation_draft"}
+    assert set(ai["authority_suite"]["modules"]) == {"case_synthesis", "hypothesis_test", "presentation_draft",
+                                                     *reasoning_module.SUITE_MODULES}
     assert "spec_file" in ai["authority_suite"]["modules"]["case_synthesis"]
 
     settings.enable_ai_features = True
@@ -297,7 +297,7 @@ def test_settings_status_reports_ai_reasoning_state_without_secrets():
         assert "sk-ant" not in r.text, "settings status must never leak key material"
         if ai["authority_suite"]["present"]:
             assert ai["endpoints_callable"] is True
-            assert ai["authority_suite"]["tas_version"] == "1.12", "TAS version is read from the vendored CHANGELOG's first version heading"
+            assert ai["authority_suite"]["tas_version"] == "1.12", "TAS version is read from the suite's CHANGELOG first version heading"
             assert ai["authority_suite"]["source"].startswith("onysnow/Authority-System-Suite@")
     finally:
         settings.anthropic_api_key = original_key
@@ -534,3 +534,48 @@ def test_prompt_names_the_suite_and_its_tier_rules():
     assert "Authority System Suite" in prompt and "source_tier_floor = D" in prompt
     assert "Tier C never counts" in prompt and "UNRESOLVED_CONFLICT" in prompt and "CFLT-" not in prompt
     assert "ALMOST_NO_CHANCE" in prompt and "right_of_reply_needed" in prompt
+
+
+@requires_suite
+def test_a_packet_holding_a_reviewed_relationship_reaches_the_model(monkeypatch):
+    """Found running a real local model (docs/project-notes/MODEL_TRIAL.md): a
+    relationship whose evidence had been reviewed put its review's datetime in
+    the packet, and the run answered 500 (datetime is not JSON serializable)
+    before the model was asked."""
+    settings.enable_ai_features = True
+    settings.ai_provider = "anthropic"
+    client = TestClient(app)
+    seeded = _seeded_investigation(client)
+    inv, evidence_id = seeded["investigation"]["id"], seeded["evidence"]["id"]
+    person = client.post("/api/entities", json={"investigation_id": inv, "schema": "Person", "caption": "Ada North",
+                                                 "properties": {"name": ["Ada North"]}}).json()
+    company = client.post("/api/entities", json={"investigation_id": inv, "schema": "Company", "caption": "Ada North Holdings",
+                                                  "properties": {"name": ["Ada North Holdings"]}}).json()
+    edge = client.post("/api/relationships", json={"investigation_id": inv, "schema": "UnknownLink",
+                                                   "source_entity_id": person["id"], "target_entity_id": company["id"]})
+    assert edge.status_code == 200, edge.text
+    edge_id = edge.json()["id"]
+    assert client.post(f"/api/relationships/{edge_id}/evidence", json={"evidence_id": evidence_id}).status_code == 200
+    reviewed = client.post(f"/api/relationships/{edge_id}/evidence/{evidence_id}/reviews",
+                           json={"stance": "supports", "rationale": "The filing names both."})
+    assert reviewed.status_code == 200, reviewed.text
+
+    seen: dict = {}
+
+    class Recording(_FakeLLMClient):
+        def generate(self, system_prompt, user_prompt, **kwargs):
+            seen["prompt"] = user_prompt
+            return super().generate(system_prompt, user_prompt, **kwargs)
+
+    answer = json.dumps({
+        "executive_summary": "Ada North is linked to Ada North Holdings, per one filing.",
+        "claims": [{"claim_id": "CLM-0001", "claim": "Ada North signed the agreement.", "classification": "SOURCE_STATEMENT",
+                    "supporting_evidence": [{"record_type": "evidence", "record_id": evidence_id}], "contradicting_evidence": [],
+                    "warrant": "The filing quotes the signature.", "confidence": "MEDIUM", "confidence_term": "LIKELY",
+                    "confidence_basis": "one primary source", "limitations": []}],
+        "investigative_gaps": [],
+    })
+    monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: Recording(answer))
+    r = client.post(f"/api/investigations/{inv}/assistant/case-synthesis", json={"question": "What links Ada North to Ada North Holdings?"})
+    assert r.status_code == 200, r.text
+    assert "relationship_evidence_review" in seen["prompt"]   # the reviewed link was in what the model read

@@ -1,6 +1,6 @@
 # Start here (12 Oct 2026)
 
-**The work plan is `MOCKUP_BUILD_LIST.md`** (Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct (PR #58 into timeline-wip): table-row Decide cards, The Wire, the app-side suite gaps (data and API), Case home to HOME_1, the frame and Settings to HOME_2, the whole OnySnow Studios effect system brought in with the rain pane on the case title band (ADR-0009; frosted Glass panels still to do), The Drop and the reading room (INTAKE_1/2; History tab, per-file stream, web links and "already in the case" on reading-room cards still to do). Then SEE_2 Money, CHECK_2 Chain of Custody, ACT_1 Red Flags, ACT_2 Story, and AI_2 Before you run (Act › AI runs: the run settings in plain words, the plan, what leaves the computer, this case's default with a reason). SEE_1 waits on a Wire mockup Ony approves. Next: AI_1 Watch the run (needs the run-events table and stream, with an ADR), then §9 Knowledge and Safety & data.
+**The work plan is `MOCKUP_BUILD_LIST.md`** (Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct (PR #58 into timeline-wip): table-row Decide cards, The Wire, the app-side suite gaps (data and API), Case home to HOME_1, the frame and Settings to HOME_2, the whole OnySnow Studios effect system brought in with the rain pane on the case title band (ADR-0009; frosted Glass panels still to do), The Drop and the reading room (INTAKE_1/2; History tab, per-file stream, web links and "already in the case" on reading-room cards still to do). Then SEE_2 Money, CHECK_2 Chain of Custody, ACT_1 Red Flags, ACT_2 Story, and AI_2 Before you run (Act › AI runs: the run settings in plain words, the plan, what leaves the computer, this case's default with a reason). SEE_1 waits on a Wire mockup Ony approves. AI_1 and the Knowledge catalogue and glossary are built. 23 Oct: Safety & data (KEEP_2) built with the outbound log (ADR-0015); its remaining parts are in MOCKUP_BUILD_LIST §9. Next: the "Your safety" panel, encrypted backups, then the website (§10, waits on Ony).
 
 This is where the Workbench redesign stands, for a new session picking it up. The branch is
 `timeline-wip`.
@@ -43,6 +43,13 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   - one demo loads at a time, and a failed load is cleaned up;
   - a flag summary no longer ends twice after "S.A.".
 
+- **Your name and the app lock (19 Oct, ADR-0016, mockups ACCOUNT_1–4):** first open asks your
+  name, which goes on your decisions; "Protect with a passphrase" locks the app (idle, Hide
+  screen, sleep; quick PIN), seals every backup, and lets a case have its own passphrase;
+  People and access gives a person a key that expires. Branch `claude/accounts-and-locking`.
+  Disk encryption is left to Windows (BitLocker / Device encryption); the app only reports it,
+  and the BitLocker reading is untested on a real Windows machine.
+
 ## Waiting on Ony
 - **See ("The Wire"):** the prototype is at https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3,
   with its source in `docs/design/see-the-wire/` and the design in `SEE_THE_WIRE_PROTOTYPE.md`.
@@ -58,6 +65,8 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   "ArtCraft License (WIP)" (fair source: no selling it, no competing product, a fork can't strip
   its community/donation/paid-model links). Ony's call: the Workbench is not a competing product,
   so studying and porting from them is fine.
+
+- **UI simplification research (23 Oct):** `docs/research/ui-simplification/UI_SIMPLIFICATION_RESEARCH.pdf` (source `.md`, figures in `fig/`), with six animated sketches in `concept-lab.html` (also at https://claude.ai/artifact/5vCdnmgCH5saNn21grE628). Proposes three detail levels (Less / Usual / Everything) over a floor that never folds, and folding, depth and selection patterns. No app code changed. Revision 2 adds North Star (§5.7), the Awwwards list (§5.8) and fewer windows and layout (§7.5); The Wire is left as is. Its 16 open questions are in §8.
 
 ## Still open from the demos
 - Video and audio files are read only through OpenAleph. (Email, .mbox, .zip and .xlsx are now read by the

@@ -109,10 +109,35 @@ export function currentAppearance(): Appearance {
 /** The variables a theme of your own sets on <html> (here or in the first-paint script), taken off at every change. */
 const OWN_VARS = Object.keys(paletteVars(BASE_PALETTES['case-night']));
 
+// On battery, kept Full effects run as Light (research §04.11: "Light is chosen automatically on battery"); the kept
+// choice is unchanged and Full comes back when the computer is charging. Browsers without the Battery API keep Full.
+let onBattery = false;
+let watchingBattery = false;
+type BatteryLike = {charging: boolean; addEventListener: (name: string, fn: () => void) => void};
+function watchBattery(): void {
+  if (watchingBattery || typeof navigator === 'undefined') return;
+  watchingBattery = true;
+  const get = (navigator as {getBattery?: () => Promise<BatteryLike>}).getBattery;
+  if (!get) return;
+  get.call(navigator).then(battery => {
+    const read = () => { const was = onBattery; onBattery = !battery.charging; if (was !== onBattery) changed(); };
+    read();
+    battery.addEventListener('chargingchange', read);
+  }).catch(() => undefined);
+}
+
+/** The appearance as it runs now: kept Full effects run as Light on battery. Effects read this, not the kept choice. */
+export function effectiveAppearance(): Appearance {
+  const a = currentAppearance();
+  return a.effects === 'full' && onBattery ? {...a, effects: 'light'} : a;
+}
+
 export function applyAppearance(a: Appearance = currentAppearance()): void {
   const html = document.documentElement;
+  watchBattery();
   html.dataset.theme = a.theme;
-  html.dataset.effects = a.effects;
+  html.dataset.effects = a.effects === 'full' && onBattery ? 'light' : a.effects;
+  if (a.effects === 'full' && onBattery) html.dataset.effectsAuto = 'battery'; else delete html.dataset.effectsAuto;
   html.dataset.motion = a.motion;
   html.dataset.format = a.format;
   html.dataset.fxOff = a.off.join(' ');

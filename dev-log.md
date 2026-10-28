@@ -2611,3 +2611,172 @@ See docs/design/README.md §3 for what was built. Notes for the next session:
 - Suite coverage (same day): app/ai/suite_map.json maps 78 app values to suite terms (an agent read the suite;
   every term string was then checked present in the vendored file). Adding a value to any of the vocabularies in
   suite_map.app_vocabularies() without mapping it fails tests/test_suite_map.py; so does a stale SUITE_GAPS.md.
+
+## 2026-10-24: crash recovery (audit of 23 Oct, §7)
+
+Ony asked to start on the 23 Oct research docs in Drive. Started with their P1 §7: what a stop
+mid-ingestion leaves behind. Details and the remaining gaps: docs/project-notes/CRASH_RECOVERY.md.
+- New `app/jobs/recovery.py`, run by `JobRunner` at start-up (and every minute on Procrastinate,
+  with the stalled-job check): a document saved without its reading job gets a failed job to retry;
+  a Procrastinate job row the queue never held is failed after an hour unmoved; files left in
+  `.upload-staging` are removed.
+- Tests: `tests/test_crash_recovery.py` (9; passes on SQLite and PostgreSQL 16; 3 fail without the
+  runner change) and one Procrastinate test. Of the 51 test files that start the app with stored
+  documents, all pass except two that need Tesseract, which this container lacks (they fail the
+  same way without the change).
+- Checked in OpenAleph 5.3.1's source: an upload with a `foreign_id` the collection holds updates
+  that document, so re-sending after a lost reply makes no second copy.
+- Review round (Copilot, PR #102): the sweep takes a PostgreSQL advisory lock and re-checks each
+  row in its UPDATE; `requeue_for_retry` clears the old `queue_job_id`; a job for a file inside an
+  archive records `parent_job_id` and is failed only once that job has finished.
+
+## 2026-10-24 (later): the rest of the 23 Oct audit's items
+
+Ony: "there's more to do, so continue". All on PR #102.
+- A retried read whose text was already saved finishes the steps after it (OpenAleph's names, the
+  OpenAleph upload) instead of failing on "already read" (`app/jobs/handlers.py`).
+- Two people deciding one proposal or reviewing one claim at once: both used to go through on
+  PostgreSQL (a proposal accepted then rejected; a review event with a stale "from"). Both now lock
+  and re-read first; `tests/test_concurrent_reviews.py` failed before and passes after.
+- `tools/dependency_report.py` and its output `docs/project-notes/DEPENDENCY_REPORT.md`: no import
+  cycles at load time; `core.config` and `core.authorization` import `services.security`, a
+  dependency-free helper that sits in the wrong layer; no route module writes rows itself.
+- `docs/authority-suite/SUITE_COVERAGE.md`: the app runs TAS Modules 06 and 08 only; HYP, CFLT, ESRC,
+  EPIT and CAPT records now have a test.
+- `docs/project-notes/SECURITY_REGISTER.md`: Pillow 13.0.0 and Next.js 15.5.28 fix the known
+  vulnerabilities; zod (needs zod 4) and the unpinned Elasticsearch and Redis images are open.
+
+## 2026-10-24 (evening): real crash drill, live OpenAleph, extraction comparison
+
+Ony: "keep developing". Docker runs in the cloud container, so the OpenAleph 5.3.1 stack ran here.
+- `tools/crash_drill.py`: SIGKILLs the API (uvicorn, PostgreSQL, Procrastinate) mid-upload and five
+  times mid-read; 40 scanned PDFs, all read once, nothing duplicated or left over (CRASH_RECOVERY.md).
+- The live OpenAleph tests (9) pass against the real stack with this branch.
+- `tools/extraction_parity.py` → EXTRACTION_PARITY.md: text matches; locators, archive handling and
+  damaged files differ. It found the pattern name-finder missing accented names and running
+  "Ltd." into the next sentence; both fixed (`NAME_RE`, `clean_names`), with a test.
+- FOOTPRINT.md: OpenAleph's side idles at 6.4 GiB, 12.7 GB of images, 5½ min cold start.
+
+## 2026-10-19: the suite's other six systems run in the app
+
+Ony: build out the Authority System Suite's systems. Six spec passes read RAS, QAS, LAS, DAS, EGS and EHS (router
+rows, modules, INTEROP rules, value lists, what an app run may not do); every value list was then checked present in
+the vendored text by a new drift test, and the suite defects they reported were re-read at the cited lines.
+
+- `app/ai/systems.py`: eight modules (RAS 03+04, QAS 01+03, LAS 01+02, DAS 01 and 02, EGS 01, EHS 02 and 01), each
+  with its suite files, a trimmed output contract, its value lists, and the rules the app reads mechanically
+  (rejections) or shows the person (flags). `reasoning.py` takes them through the same pipeline as TAS.
+- `app/ai/interop.py`: a run may start from an accepted answer (`handoff_from`); it reads that run's packet, gets
+  what INTEROP lets cross, and every held-back value is a BLOCK · HELD event with its rule. Rejected claims never
+  cross; corrected ones cross in the person's words.
+- DAS `upstream_tier` is written by the Workbench from the source's person-set tier ([IN-010]).
+- "Before you run" covers suite modules, shows the hand-over step and marks the systems a next run would use.
+- `docs/authority-suite/SUITE_SYSTEMS_IN_APP.md`: what runs, what does not and why, and ten suite problems for Ony.
+
+Tests: `test_suite_systems.py` (12, new), drift tests (2 new), and the AI, plan, claim-review, guard and migration
+tests pass; mypy and ruff clean. Frontend: client regenerated, tsc clean, vitest 1307 passed. No screen for
+starting a suite run: mockup first.
+
+## 2026-10-19 (cont.): the suite at its newest version, behind one service
+
+Ony: use the most recent version of the suite, and have one service handle all of it and route everything.
+
+- Vendored copy b1c71e8 → d2b2186 (the suite's `main`, 51 commits; 21 files in `systems/`, root documents
+  unchanged). The old copy was first checked byte for byte against b1c71e8. Upstream changes the app sends as
+  prompts: TAS 08 rules 8, 9 and new 11; QAS 01; DAS 01; EHS 01. `SUITE_GAPS.md` regenerated (it names the commit).
+  New suite conflict for Ony: TAS 08 rule 8 now says one source is never corroboration, Standard §4.3 still lets
+  one Tier A source carry it (SUITE_SYSTEMS_IN_APP.md item 11).
+- `app/ai/suite.py`: the one front door. Every module's route (system, trigger-table row, files), each system's
+  version, and `next_runs` (an answer routed onward by what it contains). reasoning.py's MODULE_FILES, titles,
+  nodes and run-record ROUTE/LOAD steps, the plan, and the settings status all read from it; the two code paths
+  for routing a TAS run and a suite run are now one.
+- `POST .../assistant/run` runs any module; the per-module endpoints are that route with the module fixed.
+  Candidates carry `next_runs`; settings status carries `authority_suite.systems`.
+
+Tests: `test_suite_service.py` (5, new: routes against AGENTS.md's table, the pipeline reading from the service,
+status, the one endpoint and its refusals, next runs) plus the suite, AI, guard and migration tests pass; mypy and
+ruff clean; vitest 1307 passed, tsc clean.
+
+## 2026-10-19 (cont.): the run map draws every system's run; the stopped and rejected states read right
+
+Ony sent two screenshots of Watch the run (a stopped case synthesis; a candidate with a green check beside "Your
+review: rejected") and asked that every system be hooked up properly and that this screen work. Reproduced locally
+with a stand-in model (all eight suite modules plus TAS, both chains, a stopped run, a rejected run), screenshotted
+each, fixed, screenshotted again.
+
+Backend: a run the checks stopped saved its answer as rejected but its job has no result, so the run summary said
+"none saved"; it now finds the answer through the run record's "Saved as" step. The summary's review status is the
+answer's as it stands now (it was frozen at run time). Each run carries its route from the suite service (system,
+row, node, module count, final audit). A DAS evidence row citing no source now says why it has no upstream tier.
+
+Run map: columns and the Support pills light from the run's route ("not in this run" replaces "not triggered · not
+in the app yet"); EGS and EHS are real nodes; a system's module chip, gate and thoughts sit on its own node, with the
+wires to it; a hand-over lights the Boundaries band ("Hand-over · n held") instead of a Controls badge; the router
+reads "of 7"; "+ n modules" comes from the system's real count (TAS has 13); the final-audit ledger names the run's
+system's audit; lanes appear for the systems a run used. The candidate's mark follows its review (✕ once rejected),
+and Your review says "you rejected it" or, dimmed, "stopped by the checks". A stopped run shows its real reason, not
+"Stopped with an error".
+
+Tests: test_suite_service.py (6), watch-the-run (23, 2 new); vitest 1309 passed, tsc and eslint clean; backend
+touched tests, mypy, ruff and the OpenAPI check pass. Not changed: the map's small size and overlapping axis labels
+at phone width, which were there before.
+
+### 2026-10-19 — Screen audit: every page checked against its mockup (PR #87)
+
+Six screen audits (Home and Decide, Bring in, Check, See, Act, AI and Learn) compared each page with its mockup for
+layout, hover, focus, keyboard, entrance and persistent motion (Calm and reduced motion), and data. Fixed in this
+round:
+- Case home: AI questions name the suite system ("Accept the RAS answer…"); evidence questions name the document and
+  page; "Not sure?" opens the run claim by claim (/act?run=…&review=…). The No key opens the reasons first, as a
+  click does; the answer buttons hold one row; the undo hold is 10 s.
+- Chain of Custody: a proposal from an outside service is counted under "outside services", not as the app's.
+- Frame: the shortcuts sheet lists every key the screens use (G then H, 1–4, J/K, Enter, S/D/U, 1/2/3, Z); G then H
+  goes to Case home; the frame hints fade after 6 s; Settings sits in the breadcrumb.
+- Appearance: Full effects run as Light on battery until the computer charges (said under Full).
+- Stage pages: the header is one row ("step n of 5", name, line, tabs), so Money fits 1440×900.
+- Plus the per-screen fixes the audits made in the Drop, Reading room, Wire, Money, Red Flags, Story, Leads, Before
+  you run, Watch the run, claim review, Learn and glossary (drop.py, financial_flows.py, patterns engine,
+  investigation_type.py, stories.py and routes_ai_runs.py on the backend).
+
+Tests: vitest 1341 passed (200 files), tsc and eslint clean; backend touched tests, mypy and the OpenAPI check pass.
+
+### 2026-10-19 — Decided audit items built (PR #87)
+
+Case home: continuous year rail (empty years as dimmed ticks; the strip's year count is the span); mini network
+"n linked · m in the case". Claims list: mark + word on every status, edge by shape. Bring in: sample-case link
+only when the sample has documents; reading room counts only what it shows, "n whole-passage quotes wait in
+Decide"; "Emails & phones"; identifier cards say Email address or Phone number from the value. AI: the drafts panel
+hands runs to Before you run; the lookups line says runs make no outside lookups yet; run plan
+`packet.below_tier_floor` (records below the floor, per tier, "leads only"). Settings breadcrumb names the case.
+Not built (new design or no data): standing-number popovers, empty-case first actions, Format Editorial/Desk/Story,
+Wire arrangement switch, worked-out links, source scan, Practise, sort by unlocks / H snooze, Safety & data screen.
+Presentation draft still runs straight from the drafts panel (the plan endpoint does not cover it).
+Tests: vitest 1353 passed; tsc, eslint, mypy, ruff, OpenAPI check clean; touched backend tests pass.
+## 2026-10-25: the two suite branches combined (ADR-0017)
+
+PR #102 had hooked all seven systems in generically (60 modules, one contract) without finding PR #87, which
+already ran eight modules of the other six with the suite's limits and INTEROP's boundaries. Ony: combine, #87 as
+base. The generic runner is reverted and #87's four suite commits are on this branch (its screen and feature
+commits are not). Kept from #102: `suite_catalog.py`, a drift test that holds #87's copied value lists to the
+suite's whole lists, `GET /api/suite/catalog`, and the Ollama context-window fix.
+## 2026-10-27: the Authority Suite SDK replaces the vendored suite copy
+
+- `backend/app/ai/authority_suite/` (the plain copy at b1c71e8) is gone. `authority-suite-sdk` is pinned in
+  `backend/requirements.txt` and imported only in `app/ai/authority_sdk.py`; everything the app reads from the suite
+  (module prompts, the control surface, the TAS version, the commit, the likelihood terms) goes through it.
+- `MODULE_FILES` now holds a suite path (a string) for TAS modules and a `Path` for the app-local one.
+  `SUITE_ROOT`, `TAS_ROOT`, `_vendored_suite_commit` and `_vendored_tas_version` are removed.
+- The status block keeps its keys (`authority_suite.present/source/tas_version/modules/control_surface`, `vendored_tas`),
+  so the API contract and the front end are unchanged. `source` now reads `...@d2b2186`.
+- The suite the app runs on moves from b1c71e8 to the SDK's d2b2186. Files the app reads that changed: TAS Module 08
+  (new rule 11, rules 9 and item 11 reworded), TAS Module 02 rule 7, and TAS CHANGELOG. Module 06, CONTROL_SURFACE,
+  OUTPUT_SCHEMAS (TAS, EHS, EGS) and the Standard are identical. TAS version is still 1.12. The meanings in
+  `suite_map.json` were read against b1c71e8; the tests confirm each term is still present in d2b2186, not that its
+  meaning is unchanged.
+- Installing the backend needs git (added to the Dockerfile) and credentials that can read the private SDK repository.
+- Access to the private SDK repository (same day): a read-only deploy key on `onysnow/authority-suite-sdk`. CI jobs that
+  install the backend use the composite action `.github/actions/authority-sdk-access` with the Actions secret
+  `AUTHORITY_SDK_DEPLOY_KEY`. The Docker build gets the key as a BuildKit secret (`authority_sdk_deploy_key`, never copied
+  into a layer; `git` and `openssh-client` are installed in the image). The compose files read it from the file named in
+  `AUTHORITY_SDK_DEPLOY_KEY_FILE` and fall back to the empty `.no-authority-sdk-key`, so compose commands never fail on a
+  missing key; the image build does, until a key is given, because the SDK repository is private.

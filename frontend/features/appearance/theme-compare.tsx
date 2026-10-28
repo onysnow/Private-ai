@@ -6,7 +6,7 @@
 // theme with its colours set on the copy (lib/custom-theme), as the app sets them on the whole page.
 import {useQuery} from '@tanstack/react-query';
 import {ReactCompareSlider} from 'react-compare-slider';
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import type {CSSProperties, ReactElement} from 'react';
 
 import {CaseHome} from '../case-home/case-home';
@@ -44,6 +44,20 @@ export function ThemeCompare({before, after, afterWord = 'trying'}: {before: Loo
   const investigation = cases.find(c => c.id === inv) ?? cases[0] ?? null;
   const [box, scale] = useScale();
   const name = (look: Look) => look.name ?? THEMES.find(t => t.id === look.theme)?.name ?? look.theme;
+  // The divider is a slider named for what it splits, its value said as "50% Rain Noir" (research §04.11); the
+  // library's own handle only says how to move it.
+  const figure = useRef<HTMLElement | null>(null);
+  const at = useRef(50);
+  const beforeName = name(before);
+  const afterName = name(after);
+  // Written straight onto the handle as it moves: a re-render here would draw both copies of the Case home again.
+  const label = useCallback(() => {
+    const handle = figure.current?.querySelector<HTMLElement>('[role="slider"]');
+    if (!handle) return;
+    handle.setAttribute('aria-label', `Divider between ${beforeName} and ${afterName}`);
+    handle.setAttribute('aria-valuetext', `${Math.round(100 - at.current)}% ${afterName}`);
+  }, [beforeName, afterName]);
+  useEffect(label);
   if (!investigation) return <p className="ap-live-none">Open or start a case to see its Case home here in each theme.</p>;
   const shot = (look: Look) => <div className="ap-live" data-theme={look.theme} inert aria-hidden="true"
     style={look.colours ? paletteVars(look.colours) as CSSProperties : undefined}>
@@ -51,10 +65,10 @@ export function ThemeCompare({before, after, afterWord = 'trying'}: {before: Loo
       <CaseHome investigation={investigation} investigations={cases} onSwitch={() => undefined} loading={false} active={false} preview/>
     </div>
   </div>;
-  return <figure className="ap-compare">
+  return <figure className="ap-compare" ref={figure}>
     <figcaption className="ap-pane-head"><h2>Your case, live</h2><span>{investigation.name} · Case home</span></figcaption>
     <div ref={box} className="ap-compare-box" style={{aspectRatio: `${SCREEN_W} / ${SCREEN_H}`}}>
-      <ReactCompareSlider itemOne={shot(before)} itemTwo={shot(after)} defaultPosition={50}
+      <ReactCompareSlider itemOne={shot(before)} itemTwo={shot(after)} defaultPosition={50} onPositionChange={position => { at.current = position; label(); }}
         aria-label={`Divider between ${name(before)} and ${name(after)}`}/>
       <span className="ap-corner ap-corner-l" aria-hidden="true">{name(before)} · now</span>
       <span className="ap-corner ap-corner-r" aria-hidden="true">{name(after)} · {afterWord}</span>

@@ -26,6 +26,21 @@ def test_a_sentence_without_a_citation_is_counted_and_a_citation_after_the_full_
     assert sentences_without_source(None) == (0, 0)
 
 
+def test_an_initial_or_a_title_does_not_end_a_sentence():
+    cite = {"type": "citation", "attrs": {"recordType": "claim", "recordId": "c1", "label": "1"}}
+    doc = {"type": "doc", "content": [{"type": "paragraph", "content": [
+        {"type": "text", "text": "M. Ross, a director named by Dr. Weber, was paid "}, cite, {"type": "text", "text": ". The money went on, e.g. to Kestrel SA."}]}]}
+    assert sentences_without_source(doc) == (2, 1)
+
+
+def test_a_capital_after_a_capitalised_word_can_end_a_sentence():
+    """"Schedule A." is a label, not an initial: the uncited sentence it ends is counted, not hidden by the next one's source."""
+    cite = {"type": "citation", "attrs": {"recordType": "claim", "recordId": "c1", "label": "1"}}
+    para = lambda text: {"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": text}, cite]}]}
+    assert sentences_without_source(para("The filing was Schedule A. The owners were listed ")) == (2, 1)
+    assert sentences_without_source(para("The bank paid J. R. Weber and later M. Ross ")) == (1, 0)
+
+
 def test_the_tree_is_as_strong_as_its_weakest_claim_and_ready_waits_for_every_gate():
     inv = ok(client.post("/api/investigations", json={"name": "Harbour"}))["id"]
     empty = ok(client.get(f"/api/investigations/{inv}/story"))

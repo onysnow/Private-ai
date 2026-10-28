@@ -359,6 +359,20 @@ export type PageRoutesOptions = InvestigationRecords & {
 };
 
 /** Every route the page requests from mount through opening an investigation. */
+/** What Settings reads for its sidebar values and the Notifications, Outside lookups and AI and research panes, as a fresh install answers. */
+export function settingsPaneRoutes(): Routes {
+  return {
+    'GET /api/settings/notifications': {routes: {flag_textbook: 'interrupt'}, quiet_while_reading: true, desktop: false, backup_days: 14,
+      outside: {email: {mode: 'off', address: ''}, phone: {mode: 'off', url: ''}, webpush: {mode: 'off'}},
+      server: {email: false, webpush: false, webpush_key: null}, push_devices: 0,
+      kinds: [{key: 'flag_textbook', label: 'Textbook Red Flag', default: 'interrupt', can_interrupt: true, route: 'interrupt'}]},
+    'GET /api/settings/lookups': {sources: [], cases: [], week: [], can_change_defaults: true},
+    'GET /api/settings/research': {mode: 'ask', ai_enabled: false, model: null, settings: [], defaults_reason: null, defaults_saved_at: null,
+      locked: [], cases: [], can_change_defaults: true},
+    'GET /api/settings/security/users': [],
+  };
+}
+
 export function pageRoutes(options: PageRoutesOptions = {}): Routes {
   const {settings = validSettingsStatus, investigations = [], providers = ['aleph'], ...records} = options;
   const routes: Routes = {
@@ -367,6 +381,7 @@ export function pageRoutes(options: PageRoutesOptions = {}): Routes {
     'GET /api/document-formats': documentFormatsBody(),
     'GET /api/connectors': {providers, status: Object.fromEntries(providers.map(p => [p, {configured: true}]))},
     'GET /api/basemap': basemapStatusBody(),
+    ...settingsPaneRoutes(),
   };
   for (const investigation of investigations) Object.assign(routes, investigationRoutes(investigation.id, records));
   return routes;

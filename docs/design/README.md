@@ -24,7 +24,7 @@ This file tracks what has been built from them, in the PDF's build order.
 
 ## 2. The Authority System Suite (built)
 The old `tas_spec` submodule is replaced by a vendored copy of the Authority System Suite
-(`backend/app/ai/authority_suite`, see its `README_VENDORING.md`); the AI's output contract follows the suite's records.
+(bundled in the `authority-suite-sdk` package, read through `backend/app/ai/authority_sdk.py`); the AI's output contract follows the suite's records.
 
 ## 3. Case home, Decide, Done rules, missing values (built)
 - **Addresses** (`frontend/app/(case)/`): Case home `/`, the stages `/bring-in`, `/check`, `/see`, `/act`, `/keep`,

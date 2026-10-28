@@ -52,7 +52,10 @@ services:
       retries: 20
 
   elasticsearch:
-    image: ghcr.io/openaleph/elasticsearch:latest
+    # Elasticsearch 9.5.5 as OpenAleph builds it, pinned by digest (the repository
+    # publishes no 9.5.5 tag; `latest` and `9` move). Change it on purpose, after
+    # the OpenAleph live CI passes on the new one (docs/project-notes/SECURITY_REGISTER.md).
+    image: ghcr.io/openaleph/elasticsearch:9@sha256:8958692228b516761250f96969e43e1af17d137e36920b4aead5e84fa1f6bda3
     restart: unless-stopped
     environment:
       discovery.type: single-node
@@ -68,7 +71,7 @@ services:
       start_period: 60s
 
   redis:
-    image: redis:alpine
+    image: redis:8.10.2-alpine
     restart: unless-stopped
     command: ["redis-server", "--save", "3600", "10"]
     volumes:
@@ -275,6 +278,8 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+      secrets:
+        - authority_sdk_deploy_key
     image: journalism-workbench-backend:${WORKBENCH_TAG:-latest}
     restart: unless-stopped
     environment:
@@ -287,6 +292,10 @@ services:
       AUDIT_LOG_FILE: /app/data/audit/security.jsonl
       API_AUTH_FAILURE_STATE_FILE: /app/data/audit/auth-failures.json
       CONNECTOR_CREDENTIALS_FILE: /app/data/secrets/connectors.json
+      # Notifications outside the app (.env.example): off while empty; the Web Push key pair is kept with the other secrets.
+      NOTIFY_MAIL_URL: ${NOTIFY_MAIL_URL:-}
+      NOTIFY_PUSH_SUBJECT: ${NOTIFY_PUSH_SUBJECT:-}
+      NOTIFY_SECRETS_FILE: /app/data/secrets/notifications.json
       ENABLE_RESTORE_API: ${ENABLE_RESTORE_API:-false}
       ENABLE_AI_FEATURES: ${ENABLE_AI_FEATURES:-false}
       AI_PROVIDER: ${AI_PROVIDER:-}
@@ -385,6 +394,13 @@ services:
     volumes:
       # The base map the `maps` profile installs, for maps in exports (ADR-0005, line 18).
       - basemap:/basemap:ro
+
+secrets:
+  # The read-only deploy key the image build uses to install the private authority-suite-sdk
+  # (backend/Dockerfile). Put its file's path in AUTHORITY_SDK_DEPLOY_KEY_FILE (in .env). Without
+  # it this empty file is used, and the build then asks GitHub over HTTPS.
+  authority_sdk_deploy_key:
+    file: ${AUTHORITY_SDK_DEPLOY_KEY_FILE:-./.no-authority-sdk-key}
 
 volumes:
   workbench-pgdata:

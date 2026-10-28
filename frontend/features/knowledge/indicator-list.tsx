@@ -43,7 +43,12 @@ export function IndicatorList({area, rows, loading, error, layer, filter, onFilt
   const clearTimer = () => { if (timer.current !== null) { window.clearTimeout(timer.current); timer.current = null; } };
   useEffect(() => clearTimer, []);
   // The chosen row stays in view when J / K or the map change it.
-  useEffect(() => { listRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView?.({block: 'nearest'}); }, [selected]);
+  // While the list has the keyboard, focus follows the choice, so the ring and a screen reader move with J / K.
+  useEffect(() => {
+    const row = listRef.current?.querySelector<HTMLElement>('[aria-selected="true"]');
+    row?.scrollIntoView?.({block: 'nearest'});
+    if (row && listRef.current?.contains(document.activeElement) && document.activeElement !== row) row.focus({preventScroll: true});
+  }, [selected]);
 
   const move = (by: number) => {
     const at = shown.findIndex(r => r.id === selected);

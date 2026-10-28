@@ -107,3 +107,13 @@ def test_each_piece_of_evidence_is_a_row_from_the_file_to_the_claim(tmp_path):
     assert changed["done"]["met"] is False and changed["done"]["left"] == 1
     assert ok(client.post(f"/api/documents/{doc_id}/recheck-hash"))["matches"] is False
     assert client.get("/api/claims/no-such-claim/custody-chain").status_code == 404
+
+
+def test_a_proposal_from_an_outside_service_is_counted_as_one():
+    """A provider's proposal (OpenAleph, OpenSanctions…) is an outside service in the chain and its seal, not the app."""
+    from app.services.custody_chain import _proposer, _proposer_actor
+
+    outside = {"provenance": {"provider": "OpenAleph"}}
+    assert (_proposer(outside), _proposer_actor(outside)) == ("OpenAleph", "outside")
+    assert _proposer_actor({"provenance": {"ner_engine": "spacy"}}) == "app"
+    assert _proposer_actor(None) == "app"

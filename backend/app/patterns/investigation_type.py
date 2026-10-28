@@ -78,7 +78,7 @@ def _held_schemas(db: Session, investigation_id: str) -> set[str]:
 
 def suggested(db: Session, investigation_id: str) -> list[dict[str, Any]]:
     """The areas the app would choose, each with the reasons, flags first."""
-    from app.patterns.engine import indicator
+    from app.patterns.engine import home_area, indicator
 
     share, users, names = _needs()
     reasons: dict[str, list[str]] = defaultdict(list)
@@ -86,10 +86,11 @@ def suggested(db: Session, investigation_id: str) -> list[dict[str, Any]]:
                                                       PatternFlag.gone_at.is_(None), PatternFlag.status != "dismissed"))
     for flag in open_flags:
         found = indicator(flag.indicator_id)
-        if found and found[0].areas[0] in names:
+        area = (home_area(flag.indicator_id) or found[0].areas[0]) if found else None
+        if found and area in names:
             why = f"Red Flag: {found[0].name} ({flag.indicator_id})"
-            if why not in reasons[found[0].areas[0]]:
-                reasons[found[0].areas[0]].append(why)
+            if why not in reasons[area]:
+                reasons[area].append(why)
     pointed: dict[str, float] = {}
     for kind in sorted(_held_schemas(db, investigation_id)):
         needing = users.get(kind, set())

@@ -13,7 +13,7 @@ import type {ElementType, ReactElement, ReactNode} from 'react';
 import {Glass} from '@fx/components/site/Glass';
 import {DEFAULT_MATERIAL, MATERIAL_ATTR} from '@fx/effects/materials/presets';
 
-import {currentAppearance, onAppearanceChange} from '../../lib/theme';
+import {effectiveAppearance, onAppearanceChange} from '../../lib/theme';
 
 /** How many board panels may be glass at once (with the rain pane, GlassLight draws at most this plus one). */
 export const FROST_LIMIT = 4;
@@ -29,12 +29,14 @@ export const frostedPanels = (): number => held;
 /** Whether the board's panels are frosted now: Rain Noir with Effects Full. */
 export function frostOn(): boolean {
   if (typeof window === 'undefined') return false;
-  const a = currentAppearance();
+  const a = effectiveAppearance();
   return a.theme === 'rain-noir' && a.effects === 'full';
 }
 
-export function FrostPanel({as = 'section', className, label, still = false, children}: {
+export function FrostPanel({as = 'section', className, label, still = false, attrs, children}: {
   as?: ElementType; className?: string; label?: string;
+  /** Plain attributes for the element (a data- name, a tabIndex), glass or not. */
+  attrs?: Record<string, string | number>;
   /** A picture of the page (Appearance's before/after): always plain, so it never takes a pane. */
   still?: boolean;
   children: ReactNode;
@@ -58,10 +60,10 @@ export function FrostPanel({as = 'section', className, label, still = false, chi
   }, [plain]);
   if (!glass) {
     const Tag = as;
-    return <Tag className={className} aria-label={label}>{children}</Tag>;
+    return <Tag className={className} aria-label={label} {...attrs}>{children}</Tag>;
   }
   // The pane's own attributes go through `causes`, which Glass puts on the element (as Pane does with its material).
-  const attrs: Record<string, string> = {[MATERIAL_ATTR]: DEFAULT_MATERIAL};
-  if (label) attrs['aria-label'] = label;
-  return <Glass as={as} className={`${className ?? ''} frost-panel`} causes={attrs}>{children}</Glass>;
+  const causes: Record<string, string | number> = {...attrs, [MATERIAL_ATTR]: DEFAULT_MATERIAL};
+  if (label) causes['aria-label'] = label;
+  return <Glass as={as} className={`${className ?? ''} frost-panel`} causes={causes}>{children}</Glass>;
 }

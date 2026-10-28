@@ -16,7 +16,7 @@ import {CameraIris} from '@fx/components/site/CameraIris';
 import {GlassLight} from '@fx/components/site/GlassLight';
 import {Neon} from '@fx/components/site/Neon';
 
-import {currentAppearance, onAppearanceChange, type NamedEffect} from '../../lib/theme';
+import {currentAppearance, effectiveAppearance, onAppearanceChange, type NamedEffect} from '../../lib/theme';
 import {frostOn} from './frost-panel';
 import {webglAvailable} from './webgl';
 
@@ -32,7 +32,7 @@ const reducedMotion = (): boolean => {
 /** Whether a named effect shows now: its theme, the Effects level, Calm motion and its own switch. */
 export function effectOn(name: NamedEffect, moving: boolean): boolean {
   if (typeof window === 'undefined') return false;
-  const a = currentAppearance();
+  const a = effectiveAppearance();
   if (a.theme !== 'rain-noir' || a.effects === 'off' || a.off.includes(name)) return false;
   if (moving && (a.effects === 'light' || a.motion === 'calm' || reducedMotion())) return false;
   return true;

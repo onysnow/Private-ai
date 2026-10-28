@@ -140,3 +140,17 @@ def test_a_payment_made_over_a_span_keeps_its_end_date(env):
 def test_ledger_404_for_unknown_investigation(env):
     client, _, _ = env
     assert client.get('/api/investigations/nope/financial-flows').status_code == 404
+
+
+def test_a_payment_whose_reviewed_evidence_contradicts_it_is_disputed(env):
+    # The same rule the network uses for a contested link: reviewed evidence against it.
+    client, inv, entity = env
+    a, b = entity('Acme Ltd'), entity('Harbor Trust')
+    src = client.post('/api/sources', json={'investigation_id': inv, 'title': 'Bank statement', 'source_type': 'document'}).json()['id']
+    rel_id = _payment(client, inv, a, b, amount='100', currency='EUR').json()['id']
+    assert _ledger(client, inv)['transactions'][0]['certainty'] == 'not_yet_shown'
+    ev_id = client.post('/api/evidence', json={'source_id': src, 'quote': 'No such wire', 'locator': 'p.3'}).json()['id']
+    client.post(f'/api/relationships/{rel_id}/evidence', json={'evidence_id': ev_id})
+    res = client.post(f'/api/relationships/{rel_id}/evidence/{ev_id}/reviews', json={'stance': 'contradicts', 'rationale': 'The statement shows no wire.'})
+    assert res.status_code == 200, res.text
+    assert _ledger(client, inv)['transactions'][0]['certainty'] == 'disputed'

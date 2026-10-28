@@ -25,7 +25,8 @@ export type ExtractionExplanation={candidate_id:string,candidate_type:string,rev
 export type ExtractionCandidate={id:string,candidate_type:string,payload:ExtractionPayload,review_status:string,document_id?:string,chunk_id?:string,confidence?:number,accepted_record_type?:string,accepted_record_id?:string,reviewer_note?:string,created_at?:string,reviewed_at?:string,explanation?:ExtractionExplanation};
 // TAS reasoning layer (issue #36). `ai` is optional on SettingsStatus so a frontend built from this
 // commit still validates an older backend's settings payload; the panel treats absence as "unknown".
-export type AiModuleName='case_synthesis'|'hypothesis_test'|'presentation_draft';
+export type AiModuleName='case_synthesis'|'hypothesis_test'|'presentation_draft'
+  |'research_vetting'|'quant_framing'|'las_argument_check'|'das_framing'|'das_options'|'evidence_plan'|'ehs_harm_minimisation'|'ehs_public_interest';
 export type AiReviewStatus='proposed'|'accepted'|'rejected';
 export type AiReasoningStatus={enabled:boolean,provider:string|null,provider_key_configured:boolean,endpoints_callable:boolean,model?:string|null,runs_on_this_computer?:boolean|null,remote_endpoint_allowed?:boolean,authority_suite:{present:boolean,source?:string|null,tas_version:string|null,modules:Record<string,{spec_file:string,available:boolean}>}};
 // presentation_draft's request stores the goal in `question` (same field the

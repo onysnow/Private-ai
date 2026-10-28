@@ -82,6 +82,9 @@ class EvidenceOut(ResponseModel):
     published_on: str | None = None
     retrieved_on: str | None = None
     limitations: list[str] | None = None
+    # Where the quote stands in its document's text, as stored (ADR-0015): passage, offsets, the text either side,
+    # how the words matched, the lines it spans; null for a quote with no document or not found in it.
+    anchor: dict[str, Any] | None = None
 
 
 class EvidencePoolRow(ResponseModel):
@@ -694,6 +697,9 @@ class LineageCandidateOut(ResponseModel):
     reviewer_note: str | None = None
     created_at: Timestamp
     reviewed_at: Timestamp | None = None
+    # Who decided it, as signed in then; null before this was kept or with no account.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
 
 
 class LineageDocumentOut(ResponseModel):
@@ -898,11 +904,19 @@ class DocumentChunkOut(ResponseModel):
     ordinal: int
     text: str
     created_at: Timestamp
+    # How legible a page read by OCR was to Tesseract, 0-100 (app/services/legibility.py); None when not measured.
+    ocr_legibility: float | None = None
+
+
+class DocumentLanguageOut(ResponseModel):
+    code: str
+    name: str
 
 
 class DocumentDetailOut(DocumentOut):
-    """A document with its extracted chunks (GET /documents/{id})."""
+    """A document with its extracted chunks (GET /documents/{id}), and the languages OpenAleph detected in it."""
     chunks: list[DocumentChunkOut]
+    languages: list[DocumentLanguageOut] = []
 
 
 class OpenAlephSyncOut(ResponseModel):
@@ -1672,6 +1686,9 @@ class ClaimEvidenceLinkOut(ResponseModel):
     evidence_id: str
     stance: str  # supports | contradicts | context
     note: str | None = None
+    # Who decided it, as signed in then; null before this was kept, or outside a request.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
     created_at: Timestamp
 
 
@@ -1711,6 +1728,9 @@ class ClaimReviewEventOut(ResponseModel):
     unmet_rules: list[str] | None = None
     reviewer_type: str = "HUMAN"
     suite_changes: dict[str, list[Any]] | None = None
+    # Who decided it, as signed in then; null before this was kept, or outside a request.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
     created_at: Timestamp
 
 
@@ -1875,6 +1895,8 @@ class InvestigationOut(ResponseModel):
     type_areas: list[str] | None = None
     # This case's default AI run settings (null until the reporter saves them).
     ai_run_profile: dict | None = None
+    # The last backup made of this case: {"at", "bytes", "sha256", "documents_included"}; null until one is made.
+    last_backup: dict | None = None
     created_at: Timestamp
 
 
@@ -2683,6 +2705,11 @@ class CustodyCardOut(ResponseModel):
     text: str | None = None
     quote: str | None = None
     page: int | None = None
+    # A passage: the lines of the page, as read, that the quote spans.
+    line_start: int | None = None
+    line_end: int | None = None
+    # A reading by OCR: how legible the page was (Tesseract's mean word confidence, 0-100); null until measured.
+    legibility: float | None = None
 
 
 class CustodySourceOut(ResponseModel):
@@ -2694,10 +2721,24 @@ class CustodySourceOut(ResponseModel):
 
 
 class CustodyAnchorOut(ResponseModel):
-    """Where the quote stands in the passage, found now (character offsets in the passage text)."""
-    start: int
-    end: int
-    exact: bool
+    """Where the quote stands in the passage (ADR-0015): the stored anchor found again, or, for a quote saved before
+    anchors were kept, found now. Offsets are characters in the passage text; null when the quote is not found."""
+    start: int | None = None
+    end: int | None = None
+    exact: bool | None = None
+    match: Literal["exact", "case", "spacing"] | None = None
+    # Characters of the text before and after the quote kept with the anchor (up to 32 each).
+    before: int | None = None
+    after: int | None = None
+    line_start: int | None = None
+    line_end: int | None = None
+    occurrences: int | None = None
+    # held: the stored place still holds the quote; moved: found elsewhere; lost: no longer in the text;
+    # not anchored: nothing stored, looked for now.
+    state: Literal["held", "moved", "lost", "not anchored"]
+    stored: bool
+    anchored_at: str | None = None
+    chunk_id: str | None = None
 
 
 class CustodyRestingOut(ResponseModel):
@@ -2948,6 +2989,8 @@ class AiModuleStatusOut(ResponseModel):
     spec_file: str
     available: bool
     vendored_tas: bool
+    # The suite system the module belongs to (tas, ras, qas, las, das, egs, ehs); null for an app-local module.
+    system: str | None = None
 
 
 class AiControlFlagOut(ResponseModel):
@@ -2961,12 +3004,49 @@ class AiControlSurfaceOut(ResponseModel):
     flags: dict[str, AiControlFlagOut]
 
 
+class AiFinalAuditOut(ResponseModel):
+    node: str  # e.g. tas/10
+    file: str
+
+
+class AiSuiteModuleOut(ResponseModel):
+    module: str
+    title: str
+    node: str
+    available: bool
+
+
+class AiSuiteSystemOut(ResponseModel):
+    """One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+    CHANGELOG numbers them, `latest_change` its newest entry."""
+    system: str
+    name: str
+    kind: str  # authority | support
+    row: int
+    version: str | None
+    latest_change: str | None
+    present: bool
+    module_count: int
+    final_audit: AiFinalAuditOut | None
+    modules: list[AiSuiteModuleOut]
+
+
+class AiNextRunOut(ResponseModel):
+    """A next run the suite service routes an answer to, by what the answer contains."""
+    module: str
+    system: str
+    row: int | None
+    title: str
+    why: str
+
+
 class AiAuthoritySuiteOut(ResponseModel):
-    """The vendored Authority System Suite: where it came from and the TAS version the prompts use."""
+    """The Authority System Suite (bundled in the Authority Suite SDK): where it came from and the TAS version the prompts use."""
     present: bool
     source: str | None
     tas_version: str | None
     modules: dict[str, AiModuleStatusOut]
+    systems: list[AiSuiteSystemOut] = []
     control_surface: AiControlSurfaceOut
 
 
@@ -3491,7 +3571,7 @@ class AiAnalysisCandidateSummaryOut(ResponseModel):
     for a human rejection, or null when not rejected."""
     id: str
     investigation_id: str
-    module: str  # case_synthesis | hypothesis_test | presentation_draft
+    module: str  # case_synthesis | hypothesis_test | presentation_draft | a suite module (app/ai/systems.py)
     request: dict[str, Any]
     review_status: str  # proposed | accepted | rejected
     confidence: float
@@ -3545,6 +3625,8 @@ class AiAnalysisCandidateOut(AiAnalysisCandidateSummaryOut):
     trace: dict[str, Any] | None
     # Your decisions claim by claim, by claim or hypothesis id (app/ai/reasoning.py review_ai_claim); {} when none.
     claim_reviews: dict[str, AiClaimReviewOut]
+    # Where this answer goes next by what it contains (app/ai/suite.py next_runs); [] for a rejected answer.
+    next_runs: list[AiNextRunOut] = []
     citation_details: list[CitationDetailOut] | None = Field(default=None, exclude_if=_absent_when_none)
     deck_preview: list[DeckSlideOut] | None = Field(default=None, exclude_if=_absent_when_none)
     # A presentation draft's "how we know" line (app/services/presentation.py how_we_know).
@@ -3682,7 +3764,10 @@ class AppUserOut(ResponseModel):
     token_last_used_at: Timestamp | None
     token_rotated_at: Timestamp | None
     token_revoked_at: Timestamp | None
-    token_status: Literal["active", "disabled", "revoked"]
+    token_status: Literal["active", "disabled", "revoked", "expired"]
+    # The key's last two characters, and when it stops working (null: made before keys expired).
+    token_hint: str | None = None
+    token_expires_at: Timestamp | None = None
     memberships: list[AppUserMembershipOut]
 
 
@@ -3692,6 +3777,7 @@ class AppUserCreatedOut(ResponseModel):
     display_name: str
     global_role: str
     token: str
+    token_expires_at: Timestamp | None = None
     token_notice: str
 
 
@@ -3701,7 +3787,7 @@ class AppUserUpdatedOut(ResponseModel):
     global_role: str
     disabled: bool
     disabled_at: Timestamp | None
-    token_status: Literal["active", "disabled", "revoked"]
+    token_status: Literal["active", "disabled", "revoked", "expired"]
 
 
 class AppUserTokenRotatedOut(ResponseModel):
@@ -3710,6 +3796,7 @@ class AppUserTokenRotatedOut(ResponseModel):
     token: str
     token_created_at: Timestamp
     token_rotated_at: Timestamp
+    token_expires_at: Timestamp | None = None
     token_notice: str
 
 
@@ -4737,7 +4824,7 @@ class SuiteMappingOut(ResponseModel):
     file: str | None
     match: Literal["same", "close", "none"]
     note: str
-    found: bool | None  # the term is still in the vendored suite; null when there is no term
+    found: bool | None  # the term is still in the suite; null when there is no term
 
 
 class SuiteUnmappedOut(ResponseModel):
@@ -4867,6 +4954,33 @@ class WireEventOut(ResponseModel):
     date: str
     title: str
     entity: str | None
+
+
+class WireLinkSourceOut(ResponseModel):
+    evidence_id: str
+    quote: str
+    locator: str
+    source_title: str
+    document_id: str | None
+    filename: str
+    page: int | None
+    stance: str | None
+    reviewed_at: datetime | None
+
+
+class WireLinkFlagOut(ResponseModel):
+    flag_id: str
+    id: str
+    level: str
+    text: str
+
+
+class WireLinkSourcesOut(ResponseModel):
+    """One link's evidence for The Wire's link panel (SEE_1): each quote with the page it stands on, and the open
+    Red Flags resting on the link."""
+    relationship_id: str
+    evidence: list[WireLinkSourceOut]
+    flags: list[WireLinkFlagOut]
 
 
 class WireOut(ResponseModel):
@@ -5052,10 +5166,17 @@ class RunPlanTypeCountOut(ResponseModel):
     count: int
 
 
+class RunPlanTierCountOut(ResponseModel):
+    tier: str
+    count: int
+
+
 class RunPlanPacketOut(ResponseModel):
     records: int
     by_type: list[RunPlanTypeCountOut]
     leads_only: int
+    # Records whose source sits below the tier floor, by tier: in the packet, but never counting toward a fact.
+    below_tier_floor: list[RunPlanTierCountOut]
     first: list[RunPlanRecordOut]
 
 
@@ -5142,6 +5263,17 @@ class AiRunEventOut(ResponseModel):
     detail: dict[str, Any] | None
 
 
+class AiRunRouteOut(ResponseModel):
+    """How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+    not know (a run recorded under a name since removed); "app" for the app-local draft."""
+    system: str | None
+    row: int | None
+    node: str | None
+    title: str
+    modules_in_system: int
+    final_audit: AiFinalAuditOut | None
+
+
 class AiRunOut(ResponseModel):
     run_id: str
     status: str
@@ -5158,6 +5290,8 @@ class AiRunOut(ResponseModel):
     problems: int
     message: str | None
     error: str | None
+    route: AiRunRouteOut
+    handoff_from: str | None = None
 
 
 class AiRunsOut(ResponseModel):
@@ -5167,3 +5301,359 @@ class AiRunsOut(ResponseModel):
 class AiRunEventsOut(ResponseModel):
     run: AiRunOut
     events: list[AiRunEventOut]
+
+
+# --- Settings kept on the server (app/services/preferences.py, notifications.py, connector_activity.py) ----------
+
+class NotificationKindOut(ResponseModel):
+    key: str
+    label: str
+    default: str
+    can_interrupt: bool
+    route: str
+
+
+class NotificationChannelOut(ResponseModel):
+    mode: str
+    address: str | None = None
+    url: str | None = None
+
+
+class NotificationServerOut(ResponseModel):
+    """What this server can send outside the app; never its mail account or keys."""
+    email: bool
+    webpush: bool
+    webpush_key: str | None = None
+
+
+class NotificationPrefsOut(ResponseModel):
+    routes: dict[str, str]
+    quiet_while_reading: bool
+    desktop: bool
+    backup_days: int
+    kinds: list[NotificationKindOut]
+    outside: dict[str, NotificationChannelOut]
+    server: NotificationServerOut
+    push_devices: int
+
+
+class InboxRowOut(ResponseModel):
+    key: str
+    kind: str
+    title: str
+    reason: str
+    href: str
+    created_at: Timestamp | None = None
+    level: str | None = None
+    actor: str
+    actor_kind: str
+    route: str
+
+
+class InboxOut(ResponseModel):
+    investigation_id: str
+    interrupt: list[InboxRowOut]
+    needs: list[InboxRowOut]
+    # "else" is a Python keyword; the JSON key stays "else".
+    else_: list[InboxRowOut] = Field(alias="else", serialization_alias="else")
+    week: dict[str, int]
+    quiet_while_reading: bool
+    desktop: bool
+
+
+class FactWatchOut(ResponseModel):
+    id: str
+    investigation_id: str
+    record_type: str
+    record_id: str
+    label: str
+    baseline: str
+    baseline_words: str
+    value: str
+    value_words: str
+    changed: bool
+    created_at: Timestamp
+    seen_at: Timestamp
+
+
+class ConnectorRunLineOut(ResponseModel):
+    id: str
+    provider: str
+    sent: str
+    is_party: bool
+    investigation_id: str
+    case: str
+    status: str
+    results: int
+    at: Timestamp
+
+
+class LookupSourceOut(ResponseModel):
+    key: str
+    label: str
+    kind: str
+    host: str
+    key_saved: bool
+    default: str
+    mode: str | None = None
+    last: ConnectorRunLineOut | None = None
+    cases_this_month: int
+    key_check: KeyCheckOut | None = None
+
+
+class CaseLookupsOut(ResponseModel):
+    investigation_id: str
+    name: str
+    modes: dict[str, str]
+    reason: str | None = None
+    set_at: Timestamp
+
+
+class OutboundLineOut(ResponseModel):
+    """One request that left this computer (app/services/outbound.py)."""
+    id: str
+    at: Timestamp
+    kind: str
+    service: str
+    destination: str
+    sent: str
+    outcome: str
+    investigation_id: str | None = None
+    case: str
+
+
+class LookupSettingsOut(ResponseModel):
+    sources: list[LookupSourceOut]
+    cases: list[CaseLookupsOut]
+    # Everything that left this computer in the last seven days, not only lookups.
+    week: list[OutboundLineOut]
+    can_change_defaults: bool
+
+
+class RunDefaultsCaseOut(ResponseModel):
+    investigation_id: str
+    name: str
+    differs: list[str]
+    reason: str | None = None
+    saved_at: str | None = None
+
+
+class ResearchSettingsOut(ResponseModel):
+    mode: str
+    ai_enabled: bool
+    model: str | None = None
+    settings: list[RunSettingOut]
+    defaults_reason: str | None = None
+    defaults_saved_at: Timestamp | None = None
+    locked: list[RunPlanLockedOut]
+    cases: list[RunDefaultsCaseOut]
+    can_change_defaults: bool
+
+
+class SavedQuestionOut(ResponseModel):
+    id: str
+    investigation_id: str
+    module: str
+    question: str
+    working_theory: str | None = None
+    created_by: str | None = None
+    created_at: Timestamp
+    last_run_id: str | None = None
+    last_run_at: Timestamp | None = None
+
+
+class CaseResearchOut(ResponseModel):
+    investigation_id: str
+    mode: str
+    own: bool
+    reason: str | None = None
+    default: str
+    ai_enabled: bool
+    questions: list[SavedQuestionOut]
+
+
+class NotificationTestOut(ResponseModel):
+    channel: str
+    sent: bool
+
+
+class KeyCheckOut(ResponseModel):
+    """Whether a source accepts its key, learned without a search."""
+    provider: str
+    state: str
+    detail: str
+    credits: int | None = None
+    at: str
+
+
+# --- your name and the app lock (ADR-0016) -------------------------------------------------------------------------
+
+class LockedCaseOut(ResponseModel):
+    id: str
+    name: str
+    set_at: str | None = None
+    open: bool
+
+
+class DiskStatusOut(ResponseModel):
+    """Whether the disk the app runs from is encrypted, as far as the app can tell without administrator rights."""
+    state: Literal["encrypted", "encrypting", "paused", "decrypting", "not_encrypted", "unknown"]
+    system: str
+    why: str = ""
+    how_to: str = ""
+    answered: bool = False   # the reporter's own answer, given where the app could not tell
+
+
+class LockStateOut(ResponseModel):
+    """The app lock as the screen needs it. While locked: only that it is locked and whether a PIN may open it."""
+    protection: Literal["none", "passphrase"]
+    locked: bool
+    pin: bool
+    known: bool = False          # the server knows this browser's session (a restart forgets them all)
+    session: str | None = None   # only from /session/start
+    name: str | None = None
+    idle_minutes: int | None = None
+    lock_on_hide: bool | None = None
+    lock_on_sleep: bool | None = None
+    quick_pin: bool | None = None
+    pin_set: bool | None = None
+    passphrase_set_at: Timestamp | None = None
+    recovery_set_at: Timestamp | None = None
+    backups_encrypted: bool | None = None
+    disk_answer: str | None = None
+    locked_cases: list[LockedCaseOut] | None = None
+    unsigned_decisions: int | None = None   # only while no name is given: decisions saved before names were kept
+    disk: DiskStatusOut | None = None
+
+
+class RecoveryWordsOut(ResponseModel):
+    """The 12 recovery words, shown this once: only an Argon2id hash of them is kept."""
+    words: list[str]
+
+
+class DeciderOut(ResponseModel):
+    name: str | None = None
+    decisions: int
+
+
+class DecidersOut(ResponseModel):
+    """Who decided what in a case over the last days (mockup ACCOUNT_2): name, or null for "a person"."""
+    days: int
+    people: list[DeciderOut]
+
+
+# --- Keep › Safety & data (app/services/safety_data.py, ADR-0015) ---------------------------------------------
+
+class SafetyTotalsOut(ResponseModel):
+    requests_left: int
+    services_reached: int
+    documents_sent_out: int
+    ai_calls_outside: int
+
+
+class SafetyStoreOut(ResponseModel):
+    """One place on this computer where the case lives (mockup KEEP_2's six stores)."""
+    id: str
+    name: str
+    count: int | None = None
+    count_note: str | None = None
+    bytes: int | None = None
+    oldest: str | None = None
+    where: str
+    in_backups: bool | None = None
+    warning: str | None = None
+
+
+class SafetyServiceOut(ResponseModel):
+    """A service the case can reach, with what has been sent to it in the period."""
+    id: str
+    name: str
+    about: str
+    # off · ask_first (only when you press it) · automatic (each new party looked up once) · on_request · local
+    state: Literal["off", "ask_first", "automatic", "on_request", "local"]
+    state_note: str
+    sent_count: int
+    sends: list[str]
+    where: Literal["inside", "outside"]
+    blocked_note: str | None = None
+
+
+class SafetyBackupOut(ResponseModel):
+    last_backup_at: str | None = None
+    encrypted: bool
+    restore_enabled: bool
+    # Kept when the backup was made; absent for one known only from the security log.
+    bytes: int | None = None
+    sha256: str | None = None
+
+
+class SafetyAccessOut(ResponseModel):
+    mode: Literal["local_only", "remote"]
+    refused_24h: int
+    log_readable: bool
+
+
+class SafetyHousekeepingOut(ResponseModel):
+    stray_files: int | None = None
+    stray_bytes: int | None = None
+
+
+class OutboundRequestOut(ResponseModel):
+    id: str
+    at: str
+    service: str
+    service_name: str
+    kind: str
+    value: str
+    reason: str
+    actor: Literal["you", "automatic"]
+    leaves_computer: bool
+    outcome: Literal["sent", "failed", "blocked"]
+    source: dict[str, Any] | None = None
+
+
+class SafetyDataOut(ResponseModel):
+    """Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015)."""
+    period: Literal["today", "7d", "30d", "all"]
+    totals: SafetyTotalsOut
+    exposure: str
+    stores: list[SafetyStoreOut]
+    services: list[SafetyServiceOut]
+    backup: SafetyBackupOut
+    access: SafetyAccessOut
+    housekeeping: SafetyHousekeepingOut
+    outbound: list[OutboundRequestOut]
+    outbound_total: int
+# --- The Authority System Suite catalog (app/ai/suite.py catalog) ------------------------
+
+
+class SuiteCatalogModuleOut(ResponseModel):
+    number: str
+    title: str
+    use_when: str
+    path: str                 # within the suite
+    runs_in: list[str]        # the app runs that use it; empty when none does
+    final_audit: bool         # runs in a fresh context, never in the run it audits
+
+
+class SuiteCatalogRecordOut(ResponseModel):
+    kind: str
+    prefix: str | None
+    id_field: str | None
+    fields: list[str]
+    closed: dict[str, list[str]]
+
+
+class SuiteCatalogSystemOut(ResponseModel):
+    code: str
+    name: str
+    row: int                  # AGENTS.md trigger table
+    kind: str                 # authority or support
+    modules: list[SuiteCatalogModuleOut]
+    records: list[SuiteCatalogRecordOut]
+
+
+class SuiteCatalogOut(ResponseModel):
+    """Every system, module and record of the suite, and which app runs use each module."""
+    source: str | None
+    systems: list[SuiteCatalogSystemOut]

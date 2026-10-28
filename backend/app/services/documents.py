@@ -14,6 +14,7 @@ from app.services.pdf_ocr import extract_pdf_chunks
 from app.services.image_reader import IMAGE_EXTENSIONS, extract_image_chunks
 from app.services.container_readers import CONTAINER_EXTENSIONS, read_container
 from app.services.document_reader import read_chunks
+from app.services.anchors import anchor_document_quotes
 from app.services.entity_signals import clean_names, norm_name, read_name, read_passage, split_title
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
@@ -22,7 +23,10 @@ from app.jobs.corpus import request_corpus_sync
 # Pictures are documents too (app/services/image_reader.py): kept as pictures, their text read by OCR.
 # Emails, mailboxes, .zip archives and spreadsheets are read by app/services/container_readers.py.
 SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'} | set(IMAGE_EXTENSIONS) | set(CONTAINER_EXTENSIONS)
-NAME_RE = re.compile(r"\b([A-Z][A-Za-z'’.-]+(?:\s+(?:[A-Z][A-Za-z'’.-]+|of|the|and|&)){1,5})\b")
+# Capitals and letters of the Latin alphabet, accented ones too (Société Vérandine, Brühlmark & Söhne).
+_NAME_UPPER = "A-ZÀ-ÖØ-Þ"
+_NAME_LETTER = "A-Za-zÀ-ÖØ-öø-ÿĀ-ž"
+NAME_RE = re.compile(rf"\b([{_NAME_UPPER}][{_NAME_LETTER}'’.-]+(?:\s+(?:[{_NAME_UPPER}][{_NAME_LETTER}'’.-]+|of|the|and|&)){{1,5}})\b")
 ORG_SUFFIX = re.compile(r"\b(Inc\.?|LLC|Ltd\.?|Corporation|Corp\.?|Company|Co\.?|Department|Commission|Authority|University|Foundation|Association|Committee|Council|Bank)\b", re.I)
 SENTENCE_SPLIT_RE = re.compile(r'(?<=[.!?])\s+')
 CLAIM_TRIGGER_RE = re.compile(r'\b(is|are|was|were|has|have|had|will|did|does|announced|reported|paid|owns|served|worked|received|filed|approved|voted)\b', re.I)
@@ -302,6 +306,9 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
                     once[key] = row
         doc.extraction_status = 'complete'
         doc.extraction_issues = issues or None
+        db.flush()
+        # Quotes saved from this document before it was read, or kept from an earlier reading, find their place.
+        anchor_document_quotes(db, doc)
         db.commit()
     except Exception as exc:
         # Drop any chunks/proposals added before the failure, then record why.
@@ -364,7 +371,7 @@ def serialize_chunk(chunk: DocumentChunk) -> dict:
     objects, relying on FastAPI's encoder to read their columns; with a
     declared response model that is fragile, so the shape is explicit."""
     return {'id': chunk.id, 'document_id': chunk.document_id, 'locator': chunk.locator, 'page_number': chunk.page_number,
-            'ordinal': chunk.ordinal, 'text': chunk.text, 'created_at': chunk.created_at}
+            'ordinal': chunk.ordinal, 'text': chunk.text, 'created_at': chunk.created_at, 'ocr_legibility': chunk.ocr_legibility}
 
 
 def serialize_candidate(candidate: ExtractionCandidate) -> dict:
@@ -403,6 +410,7 @@ def serialize_extraction_lineage(db: Session, candidate: ExtractionCandidate) ->
             'accepted_record_id': candidate.accepted_record_id,
             'reviewer_note': candidate.reviewer_note, 'created_at': candidate.created_at,
             'reviewed_at': candidate.reviewed_at,
+            'decided_by_id': candidate.decided_by_id, 'decided_by_name': candidate.decided_by_name,
         },
         'document': ({
             'id': doc.id, 'investigation_id': doc.investigation_id, 'source_id': doc.source_id,
@@ -498,6 +506,10 @@ def preview_entity_candidate_matches(db: Session, candidate: ExtractionCandidate
     }
 
 def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: str, note: str|None=None, entity_schema: str|None=None, caption: str|None=None, claim_status: str='lead', confidence: float|None=None, matched_entity_id: str|None=None, entity_identity_decision: str|None=None, target_entity_id: str|None=None) -> dict:
+    # Two people deciding at once: the second waits here for the first and then
+    # sees its decision, instead of a status read before either wrote.
+    lock_investigation_transaction(db, candidate.investigation_id)
+    db.refresh(candidate)
     if candidate.review_status != 'proposed':
         raise ValueError('Candidate has already been reviewed')
     if decision not in {'accept','reject'}: raise ValueError('Decision must be accept or reject')
@@ -698,11 +710,29 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     return {'candidate': serialize_candidate(candidate), 'record': record_out}
 
 
+def document_languages(db: Session, document_id: str) -> list[dict]:
+    """The languages OpenAleph detected in the document, as its proposals record them (`detected_languages`, ISO 639
+    codes), first seen first, each with its English name. The app's own reader detects no language, so a document
+    OpenAleph has not read has none."""
+    from followthemoney.types import registry
+
+    codes: list[str] = []
+    for payload in db.scalars(select(ExtractionCandidate.payload).where(ExtractionCandidate.document_id == document_id)):
+        provenance = payload.get('provenance') if isinstance(payload, dict) else None
+        found = provenance.get('detected_languages') if isinstance(provenance, dict) else None
+        for code in found if isinstance(found, list) else []:
+            clean = registry.language.clean(str(code))
+            if clean and clean not in codes:
+                codes.append(clean)
+    return [{'code': code, 'name': registry.language.caption(code) or code} for code in codes]
+
+
 def get_document_detail(db: Session, row: Document) -> dict:
-    """Serialize a Document with its chunks attached."""
+    """Serialize a Document with its chunks attached, and the languages detected in it."""
     result = serialize_document(db, row)
     chunks = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == row.id).order_by(DocumentChunk.ordinal)).all()
     result["chunks"] = [serialize_chunk(chunk) for chunk in chunks]
+    result["languages"] = document_languages(db, row.id)
     return result
 
 

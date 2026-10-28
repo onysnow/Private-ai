@@ -1,11 +1,21 @@
+
 import httpx
 
-from app.connectors.base import Connector, ExternalFinding
+from app.connectors.base import (
+    Connector,
+    ExternalFinding,
+    KeyCheck,
+    entity_sent_value,
+    key_check_from_status,
+)
 from app.core.config import settings
 
 
 class OpenSanctionsConnector(Connector):
+    requires_key = True
     """OpenSanctions FtM search and query-by-example enrichment adapter."""
+
+    requires_key = True
 
     def __init__(self, api_key: str | None = None):
         self.base_url = settings.opensanctions_base_url.rstrip("/")
@@ -22,6 +32,24 @@ class OpenSanctionsConnector(Connector):
         if self.api_key:
             headers["Authorization"] = f"ApiKey {self.api_key}"
         return headers
+
+    async def check_key(self) -> KeyCheck:
+        """GET /catalog: it needs the key, sends no query and uses no credits (only /match and /search do)."""
+        if not self.api_key:
+            return KeyCheck("no_key", "No key saved.")
+        async with httpx.AsyncClient(timeout=20) as client:
+            resp = await client.get(f"{self.base_url}/catalog", headers=self._headers())
+        return key_check_from_status(resp.status_code)
+
+    async def catalog(self, etag: str | None = None) -> tuple[int, dict, str | None]:
+        """The data catalogue (each dataset's version), asked with If-None-Match: (status, body, etag)."""
+        headers = self._headers()
+        if etag:
+            headers["If-None-Match"] = etag
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(f"{self.base_url}/catalog", headers=headers)
+        body = resp.json() if resp.status_code == 200 else {}
+        return resp.status_code, body if isinstance(body, dict) else {}, resp.headers.get("etag")
 
     def _require_key(self) -> None:
         if not self.api_key:
@@ -68,6 +96,10 @@ class OpenSanctionsConnector(Connector):
             if not isinstance(items, list):
                 return []
             return [self._parse_result(item) for item in items]
+
+    def enrich_sent(self, entity: dict) -> str:
+        # Query-by-example sends every property of the record, not one search line.
+        return entity_sent_value(None, entity.get("properties"))
 
     async def enrich(self, entity: dict) -> list[ExternalFinding]:
         """Match a canonical FtM entity using OpenSanctions query-by-example."""

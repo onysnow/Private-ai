@@ -12,21 +12,23 @@
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {useRouter} from 'next/navigation';
 import {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
-import type {ReactElement, ReactNode} from 'react';
+import type {CSSProperties, ReactElement, ReactNode} from 'react';
 
 import {StatusChip, type ClaimStatus} from '../../components/status';
 import {useWheelStep} from '../case-home/wheel-step';
 import {errorMessage} from '../../lib/api-client';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {getClaimCustodyChainOptions, listClaimsOptions, recheckHashMutation} from '../../lib/generated/@tanstack/react-query.gen';
-import type {ClaimDoneOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
+import type {ClaimDoneOut, CustodyAnchorOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 const COLUMNS = ['Files', 'Reading', 'Passage', 'Decision', 'The claim'] as const;
 const COL: Record<CustodyCardOut['kind'], number> = {file: 0, source: 0, reading: 1, passage: 2, decision: 3};
 const SOURCE_WORD: Record<string, string> = {public_record: 'Public record', document: 'Document', web: 'Web page', interview: 'Interview', social: 'Social post', other: 'Other'};
-const AI_MODULE: Record<string, string> = {case_synthesis: 'Case synthesis', hypothesis_test: 'Theory test', presentation_draft: 'Presentation'};
+const AI_MODULE: Record<string, string> = {case_synthesis: 'Case synthesis', hypothesis_test: 'Theory test', presentation_draft: 'Presentation',
+  research_vetting: 'Research vetting', quant_framing: 'Rival explanations', las_argument_check: 'Logic check', das_framing: 'Decision framing',
+  das_options: 'Options and evidence', evidence_plan: 'Evidence plan', ehs_harm_minimisation: 'Harm assessment', ehs_public_interest: 'Public interest'};
 const KIND_WORD: Record<CustodyCardOut['kind'], string> = {file: 'File', source: 'Source', reading: 'Reading', passage: 'Passage', decision: 'Decision'};
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 /** The cards' and the log's short form, as the mockup writes it: "2 Oct 09:14". */
@@ -49,6 +51,14 @@ function calmNow(): boolean {
   return document.documentElement.dataset.motion === 'calm' || Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 }
 
+/** Who acted, as a person reads it: an AI step names its module ("AI · Case synthesis"), never its code name. */
+export function whoWord(who: string): string {
+  const m = /^AI · (.+)$/.exec(who);
+  return m ? `AI · ${AI_MODULE[m[1]] ?? m[1].replace(/_/g, ' ')}` : who;
+}
+/** How many AI steps are drawn under the claim before the rest fold into one "+n more" card (research §3.11, very large). */
+const AI_SHOWN = 2;
+
 /** The seal: one line a write-up's methods note can carry. */
 export function sealLine(c: CustodyChainOut): string {
   const s = c.seal;
@@ -60,7 +70,7 @@ export function sealLine(c: CustodyChainOut): string {
 
 /** The custody log as a plain table for an editor or a lawyer (tab-separated, one row per step). */
 export function logTable(c: CustodyChainOut): string {
-  const rows = [['When (UTC)', 'Who', 'Kind', 'What was done'], ...c.log.map(e => [e.when, e.who, e.actor, e.what])];
+  const rows = [['When (UTC)', 'Who', 'Kind', 'What was done'], ...c.log.map(e => [e.when, whoWord(e.who), e.actor, e.what])];
   return `Chain of Custody: ${c.claim.text}\n${sealLine(c)}\n\n${rows.map(r => r.join('\t')).join('\n')}\n`;
 }
 
@@ -83,11 +93,37 @@ function Seal({chain}: {chain: CustodyChainOut}): ReactElement {
 }
 
 /** The quote lit in its passage. */
-function Lit({text, quote}: {text: string; quote?: string | null}): ReactElement {
-  if (!quote) return <>{text}</>;
-  const at = text.toLowerCase().indexOf(quote.toLowerCase());
-  if (at < 0) return <>{text}</>;
-  return <>{text.slice(0, at)}<mark>{text.slice(at, at + quote.length)}</mark>{text.slice(at + quote.length)}</>;
+function Lit({text, quote, span}: {text: string; quote?: string | null; span?: {start: number; end: number} | null}): ReactElement {
+  // The stored anchor's characters when there is one (ADR-0015); otherwise the words looked for, ignoring case.
+  const at = span ? span.start : quote ? text.toLowerCase().indexOf(quote.toLowerCase()) : -1;
+  const end = span ? span.end : at + (quote?.length ?? 0);
+  if (at < 0 || end > text.length) return <>{text}</>;
+  return <>{text.slice(0, at)}<mark>{text.slice(at, end)}</mark>{text.slice(end)}</>;
+}
+
+/** About 150 characters of a passage for its card, starting a little before the quote so the card shows it lit. */
+function excerpt(text: string, span: {start: number; end: number} | null): {text: string; span: {start: number; end: number} | null} {
+  const LEN = 150;
+  if (!span || span.end > text.length) return {text: text.length > LEN ? `${text.slice(0, LEN)}…` : text, span: null};
+  let from = Math.max(0, span.start - 40);
+  if (from > 0) { const space = text.indexOf(' ', from); from = space >= 0 && space < span.start ? space + 1 : from; }
+  const to = Math.max(from + LEN, Math.min(span.end, from + LEN * 2));
+  const lead = from > 0 ? '…' : '';
+  return {text: `${lead}${text.slice(from, to)}${to < text.length ? '…' : ''}`, span: {start: span.start - from + lead.length, end: Math.min(span.end, to) - from + lead.length}};
+}
+
+const spanOf = (a: CustodyAnchorOut | null | undefined) => a && a.start != null && a.end != null ? {start: a.start, end: a.end} : null;
+
+/** The server counts characters (code points); JavaScript strings count UTF-16 units, so a character outside the
+ * basic plane before or inside the quote would shift the highlight. Turn a stored span into this text's units. */
+export function unitSpan(text: string, span: {start: number; end: number} | null): {start: number; end: number} | null {
+  if (!span) return null;
+  const unit = (points: number) => {
+    let i = 0;
+    for (let n = 0; n < points && i < text.length; n += 1) i += (text.codePointAt(i) ?? 0) > 0xffff ? 2 : 1;
+    return i;
+  };
+  return {start: unit(span.start), end: unit(span.end)};
 }
 
 export function ChainOfCustody({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
@@ -171,7 +207,7 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
     : !claims.data?.length ? 'No claim yet. A Chain of Custody starts from a claim: add one in Claims.'
     : chainQ.isError ? errorMessage(chainQ.error, 'Could not trace this claim') : chainQ.isPending ? 'Tracing the claim…' : '';
 
-  return <section className="cc" aria-label="Chain of Custody" ref={rootRef}>
+  return <section className="cc" data-calm-zone="" aria-label="Chain of Custody" ref={rootRef}>
     <header className="cc-head">
       <h2>How this fact got here</h2>
       {chain && <p className="cc-seal"><button type="button" className="cc-seal-btn" onClick={() => void copySeal()}
@@ -202,7 +238,7 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
             <tbody>{chain.log.map((e, i) => <tr key={i} className={`${lit === e.card ? 'lit' : ''}${step === i ? ' now' : ''} actor-${e.actor}`}
               aria-current={step === i ? 'step' : undefined}
               onMouseEnter={() => stepTo(i)} onClick={() => e.card.includes(':') && setPicked(e.card)}>
-              <td className="cc-mono">{short(e.when)}</td><td>{e.who}</td><td>{e.what}</td>
+              <td className="cc-mono">{short(e.when)}</td><td>{whoWord(e.who)}</td><td>{e.what}</td>
             </tr>)}</tbody>
           </table>
         </section>
@@ -212,6 +248,7 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
           run: () => recheck.mutate({path: {document_id: fileOf(card)!}}),
           result: recheck.data && recheck.data.document_id === fileOf(card) ? recheck.data.matches : undefined,
           pending: recheck.isPending,
+          error: recheck.isError && recheck.variables?.path.document_id === fileOf(card) ? errorMessage(recheck.error, 'the server did not answer') : null,
         } : null}/>}
     </div>}
   </section>;
@@ -223,13 +260,31 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
 }): ReactElement {
   const box = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<{key: string; d: string; style: string; words: string; x: number; y: number}[]>([]);
-  // The lines are drawn between the cards where they actually sit (measured after layout and on resize).
+  // Fit: the whole chain at once, scaled down to the width it has.
+  const [scale, setScale] = useState(1);
+  useLayoutEffect(() => {
+    const host = box.current;
+    if (!host || !fit) { setScale(1); return; }
+    setScale(Math.min(1, host.clientWidth / host.scrollWidth, (window.innerHeight * 0.62) / host.scrollHeight));
+  }, [fit, chain]);
+  // More AI steps than fit under the claim fold into one card; it opens them all.
+  const [allAi, setAllAi] = useState(false);
+  useEffect(() => { setAllAi(false); }, [chain.claim.id]);
+  const aiShown = useMemo(() => (allAi || chain.ai.length <= AI_SHOWN + 1 ? chain.ai : chain.ai.slice(0, AI_SHOWN)), [allAi, chain.ai]);
+  const aiFolded = (id: string | null) => Boolean(id?.startsWith('ai:') && id !== 'ai:more' && !aiShown.some(a => `ai:${a.id}` === id));
+  // The lines are drawn between the cards where they actually sit (measured after layout and on resize). Under Fit
+  // the box is zoomed: the page sees zoomed sizes, the lines are drawn in the box's own units, so each is divided back.
   useLayoutEffect(() => {
     const host = box.current;
     if (!host) return;
     const measure = () => {
       const r0 = host.getBoundingClientRect();
-      const rect = (id: string) => host.querySelector<HTMLElement>(`[data-card="${id}"]`)?.getBoundingClientRect();
+      const k = host.offsetWidth ? r0.width / host.offsetWidth : 1;
+      const rect = (id: string) => {
+        const r = host.querySelector<HTMLElement>(`[data-card="${id}"]`)?.getBoundingClientRect();
+        return r && {left: r0.left + (r.left - r0.left) / k, right: r0.left + (r.right - r0.left) / k, top: r0.top + (r.top - r0.top) / k,
+          bottom: r0.top + (r.bottom - r0.top) / k, width: r.width / k, height: r.height / k};
+      };
       const out: typeof lines = [];
       const claim = rect('claim');
       for (const row of chain.rows) {
@@ -250,11 +305,11 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
         });
       }
       // The claim's "used in" line down to each AI step.
-      chain.ai.forEach(a => {
-        const ai = rect(`ai:${a.id}`);
+      [...aiShown.map(a => `ai:${a.id}`), ...(aiShown.length < chain.ai.length ? ['ai:more'] : [])].forEach(id => {
+        const ai = rect(id);
         if (!claim || !ai) return;
         const x = claim.left + claim.width / 2 - r0.left;
-        out.push({key: `claim>ai:${a.id}`, d: `M${x},${claim.bottom - r0.top}L${x},${ai.top - r0.top}`, style: 'ai', words: 'used in', x: x + 26, y: (claim.bottom + ai.top) / 2 - r0.top + 3});
+        out.push({key: `claim>${id}`, d: `M${x},${claim.bottom - r0.top}L${x},${ai.top - r0.top}`, style: 'ai', words: 'used in', x: x + 26, y: (claim.bottom + ai.top) / 2 - r0.top + 3});
       });
       setLines(out);
     };
@@ -262,14 +317,7 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
     ro?.observe(host);
     return () => ro?.disconnect();
-  }, [chain, fit]);
-  // Fit: the whole chain at once, scaled down to the width it has.
-  const [scale, setScale] = useState(1);
-  useLayoutEffect(() => {
-    const host = box.current;
-    if (!host || !fit) { setScale(1); return; }
-    setScale(Math.min(1, host.clientWidth / host.scrollWidth, (window.innerHeight * 0.62) / host.scrollHeight));
-  }, [fit, chain]);
+  }, [chain, fit, scale, aiShown]);
   const downstream = new Set(breaking ? chain.rows.filter(r => r.cards.some(c => c.id === breaking)).flatMap(r => r.cards.slice(r.cards.findIndex(c => c.id === breaking))).map(c => c.id) : []);
   const claimStatus = STATUS[chain.claim.status] ?? 'unshown';
   // The wires draw in from the file to the sentence when a chain opens: motion that explains the direction. With
@@ -277,7 +325,7 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
   const [draw] = useState(() => !calmNow());
   // A step lights the wires on both its sides.
   const wireLit = (key: string) => Boolean(lit && (key.startsWith(`${lit}>`) || key.endsWith(`>${lit}`)));
-  return <div className={`cc-wires${breaking ? ' breaking' : ''}`} ref={box} style={scale < 1 ? {zoom: scale} : undefined}>
+  return <div className={`cc-wires${breaking ? ' breaking' : ''}${draw ? ' draw' : ''}`} ref={box} style={scale < 1 ? {zoom: scale} : undefined}>
     <svg key={chain.claim.id} className={`cc-lines${draw ? ' draw' : ''}`} aria-hidden="true">
       {lines.map(l => <g key={l.key} className={`cc-wire w-${l.style}${wireLit(l.key) ? ' lit' : ''}`}>
         <path d={l.d}/>{l.words && <text x={l.x} y={l.y - (l.words.includes(' · ') ? 6 : 0)} textAnchor="middle">
@@ -285,18 +333,22 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
     </svg>
     {COLUMNS.map((c, i) => <p key={c} className="cc-col" style={{gridColumn: i + 1}}>{c.toUpperCase()}</p>)}
     {chain.rows.map((row, r) => row.cards.map(c => <CardBox key={c.id} card={c} row={r + 2} picked={picked === c.id} lit={lit === c.id} falls={downstream.has(c.id)}
-      against={row.stance === 'contradicts'} onPick={() => onPick(c.id)} onLight={onLight}/>))}
+      against={row.stance === 'contradicts'} anchor={spanOf(row.anchor)} onPick={() => onPick(c.id)} onLight={onLight}/>))}
     <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}${lit === 'claim' ? ' lit' : ''}`} data-card="claim" style={{gridColumn: 5, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
       aria-label={`The claim: ${chain.claim.text}`}>
       <StatusChip status={claimStatus}/>
       <b>{chain.claim.text}</b>
       <DoneList done={chain.done}/>
     </article>
-    {chain.ai.map((a, i) => <article key={a.id} className={`cc-card cc-ai${lit === `ai:${a.id}` ? ' lit' : ''}`} data-card={`ai:${a.id}`} style={{gridColumn: 5, gridRow: chain.rows.length + 2 + i}} aria-label="AI step">
+    {aiShown.map((a, i) => <article key={a.id} className={`cc-card cc-ai${lit === `ai:${a.id}` ? ' lit' : ''}`} data-card={`ai:${a.id}`} style={{gridColumn: 5, gridRow: chain.rows.length + 2 + i}} aria-label="AI step">
       <span className="cc-kind">AI</span><b>{AI_MODULE[a.module] ?? a.module} draft quoted this claim</b>
       <small>{short(a.when)} · {a.status === 'accepted' ? 'accepted' : 'not accepted yet'}</small>
       {a.run_id && <button type="button" className="cc-watch" onClick={() => onWatch(a.run_id!)}>Watch the run →</button>}
     </article>)}
+    {aiShown.length < chain.ai.length && <button type="button" className={`cc-card cc-ai cc-ai-more${aiFolded(lit) ? ' lit' : ''}`} data-card="ai:more" style={{gridColumn: 5, gridRow: chain.rows.length + 2 + aiShown.length}}
+      onClick={() => setAllAi(true)} aria-label={`Show ${chain.ai.length - aiShown.length} more AI steps that quoted this claim`}>
+      <span className="cc-kind">AI</span><b>+{chain.ai.length - aiShown.length} more AI drafts quoted this claim</b><small>Show them all</small>
+    </button>}
     {!chain.rows.length && <p className="cc-muted" style={{gridColumn: '1 / 5', gridRow: 2}}>
       This claim has no evidence linked to it yet, so there is no chain to draw. Link a quote to it in Claims to make it traceable.</p>}
   </div>;
@@ -306,7 +358,7 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
  * here, with what it waits on. Shape and word, never colour alone. */
 function DoneList({done}: {done: ClaimDoneOut}): ReactElement {
   return <div className="cc-done" aria-label="Done for Supported">
-    <p className="cc-done-head">Done for Supported · <span className={done.met ? 'ok' : 'bad'}>{done.met ? '✓ every rule met' : `${done.left} left`}</span>
+    <p className="cc-done-head">Done for Supported · <span className={done.met ? 'ok' : 'bad'}>{done.met ? (done.unknown ? '✓ every checkable rule met' : '✓ every rule met') : `${done.left} left`}</span>
       {done.unknown ? <span className="unknown"> · ○ {done.unknown} not checkable here</span> : null}</p>
     <ul>{done.rules.map(r => <li key={r.key} className={`done-${r.state}`} title={`${r.label}: ${r.detail}`}
       aria-label={`${r.label}: ${DONE_STATE[r.state].word}. ${r.detail}`}>
@@ -316,19 +368,21 @@ function DoneList({done}: {done: ClaimDoneOut}): ReactElement {
   </div>;
 }
 
-function CardBox({card, row, picked, lit, falls, against, onPick, onLight}: {
-  card: CustodyCardOut; row: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; onPick: () => void; onLight: (id: string | null) => void;
+function CardBox({card, row, picked, lit, falls, against, anchor, onPick, onLight}: {
+  card: CustodyCardOut; row: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; anchor: {start: number; end: number} | null;
+  onPick: () => void; onLight: (id: string | null) => void;
 }): ReactElement {
+  const shown = card.kind === 'passage' && card.text ? excerpt(card.text, unitSpan(card.text, anchor)) : null;
   const head = card.kind === 'decision' ? (card.title === 'Answered' ? 'Linked against' : card.title)
-    : card.kind === 'passage' ? `Passage${card.page ? ` · p.${card.page}` : ''}` : KIND_WORD[card.kind];
+    : card.kind === 'passage' ? `Passage${card.page ? ` · p.${card.page}` : ''}${lineSpan(card, 'l.')}` : KIND_WORD[card.kind];
   return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}`}
-    style={{gridColumn: COL[card.kind] + 1, gridRow: row}} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
+    style={{gridColumn: COL[card.kind] + 1, gridRow: row, '--col': COL[card.kind]} as CSSProperties} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
     aria-label={`${KIND_WORD[card.kind]}: ${card.title}. ${card.checks.map(c => `${c.label} ${c.ok === true ? 'passed' : c.ok === false ? 'failed' : 'not known'}`).join(', ')}`}>
     {card.kind === 'file' && <span className="cc-thumb" aria-hidden="true"><i/><i/><i/><i/></span>}
     <span className="cc-card-top"><span className="cc-kind">{head}</span>{card.checks.map(c => <Check key={c.label} {...c}/>)}</span>
-    {card.kind === 'passage' ? (card.text ? <span className="cc-text"><Lit text={card.text.length > 150 ? `${card.text.slice(0, 150)}…` : card.text} quote={card.quote}/></span> : <b>{card.title}</b>)
+    {card.kind === 'passage' ? (shown ? <span className="cc-text"><Lit text={shown.text} quote={card.quote} span={shown.span}/></span> : <b>{card.title}</b>)
       : card.kind === 'reading' ? <b>{card.title}{card.lines[0] ? `, ${card.lines[0]}` : ''}</b>
-      : card.kind === 'decision' ? <b>{card.title === 'Answered' ? `Answer: ${card.lines[0]}` : card.title === 'Quote saved' ? 'Typed in by a person' : card.lines[0]}</b>
+      : card.kind === 'decision' ? <b>{card.title === 'Answered' ? `Answer: ${card.lines[0]}` : card.title === 'Quote saved' ? `Typed in by ${card.who ?? 'a person'}` : card.lines[0]}</b>
       : <b className={card.kind === 'file' ? 'cc-file' : undefined}>{card.title}</b>}
     {card.quote && card.kind === 'source' && <span className="cc-text">“{card.quote}”</span>}
     {card.kind === 'decision' && card.title === 'Proposed' && card.lines[1] && <small className={card.lines[1].startsWith('accepted') ? 'cc-ok' : ''}>{card.lines[1].startsWith('accepted') ? `✓ ${card.lines[1].replace(/^a/, 'A')}` : card.lines[1]}</small>}
@@ -339,7 +393,7 @@ function CardBox({card, row, picked, lit, falls, against, onPick, onLight}: {
 
 function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
   card: CustodyCardOut; chain: CustodyChainOut; onOpen: (documentId: string, page: number | null) => void;
-  recheck: {run: () => void; result: boolean | null | undefined; pending: boolean} | null; breaks: boolean; onBreaks: () => void;
+  recheck: {run: () => void; result: boolean | null | undefined; pending: boolean; error: string | null} | null; breaks: boolean; onBreaks: () => void;
 }): ReactElement {
   const row = chain.rows.find(r => r.cards.some(c => c.id === card.id));
   const all = row?.cards ?? [card];
@@ -359,8 +413,9 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
   return <aside className="cc-detail" aria-label={`Step ${n} of ${all.length}: ${KIND_WORD[card.kind]}`}>
     <p className="cc-eyebrow">Step {n} of {all.length} · {KIND_WORD[card.kind]}</p>
     <h3>{title}</h3>
-    {file && <p className="cc-mono cc-muted">{file.title}{passage?.page ? ` · page ${passage.page}` : ''}</p>}
-    {(passage?.text || card.quote) && <blockquote><Lit text={passage?.text ?? card.quote ?? ''} quote={card.quote ?? passage?.quote}/></blockquote>}
+    {file && <p className="cc-mono cc-muted">{file.title}{passage && lineSpan(passage, 'lines') ? ` ·${lineSpan(passage, 'lines')}` : passage?.page ? ` · page ${passage.page}` : ''}</p>}
+    {(passage?.text || card.quote) && <blockquote><Lit text={passage?.text ?? card.quote ?? ''} quote={card.quote ?? passage?.quote}
+      span={passage?.text ? unitSpan(passage.text, spanOf(row?.anchor)) : null}/></blockquote>}
     <dl>
       {src && item('Source', <span className="cc-checks plain">
         <Check label={SOURCE_WORD[src.source_type] ?? src.source_type} ok={true}/>
@@ -369,10 +424,11 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
       {file && item('File', <span className="cc-checks plain">{chip(hash?.ok, hash?.ok ? 'hash matches' : hash?.ok === false ? 'hash differs' : 'hash not checked')}
         {reading && reading.checks[0]?.label === 'OCR' ? <Check label="read by OCR" ok={true}/> : reading ? chip(reading.checks[0]?.ok, 'text layer') : null}</span>)}
       {passage && item('Content', <span className="cc-checks plain">{chip(says?.ok, says?.ok ? 'says it · exact' : says?.ok === false ? 'does not say it' : 'not checked')}</span>)}
-      {row?.anchor && item('Anchor', `${row.anchor.exact ? 'exact' : 'same words, different case'} quote at characters ${row.anchor.start}–${row.anchor.end} of the passage (found now, not stored)`)}
+      {row?.anchor && item('Anchor', anchorWords(row.anchor))}
       {sha && item('SHA-256', <span className="cc-mono">{sha}
-        {recheck?.result !== undefined ? <> · {recheck.result ? '✓ re-checked now' : '✕ does not match the file now'}</> : <> · {hash?.ok ? '✓ re-checked when opened' : ''}</>}</span>)}
-      {decision && item('Decided', `${decision.title === 'Proposed' ? decision.lines.join(' · ') : decision.title === 'Answered' ? `Answered: ${decision.lines[0]}` : 'Typed in by a person'} · ${short(decision.when)}`)}
+        {recheck?.error ? <> · <span role="alert">✕ could not re-check: {recheck.error}</span></>
+          : recheck?.result !== undefined ? <> · {recheck.result ? '✓ re-checked now' : '✕ does not match the file now'}</> : <> · {hash?.ok ? '✓ re-checked when opened' : ''}</>}</span>)}
+      {decision && item('Decided', `${decision.title === 'Proposed' ? decision.lines.join(' · ') : decision.title === 'Answered' ? `Answered by ${decision.who ?? 'a person'}: ${decision.lines[0]}` : `Typed in by ${decision.who ?? 'a person'}`} · ${short(decision.when)}`)}
       {row && item('Rests on it', rests.length ? <span className="cc-checks">
         {(['claim', 'link'] as const).map(k => { const c = rests.filter(r => r.kind === k).length; return c ? <span key={k} className="cc-rest">{c} {k}{c === 1 ? '' : 's'}</span> : null; })}
         {rests.filter(r => r.kind === 'flag').map(f => <span key={f.id} className="cc-rest">{f.label} {f.level && <LevelMark level={f.level}/>}</span>)}</span> : 'nothing else yet')}
@@ -393,6 +449,27 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
   </aside>;
 }
 
+/** "l.14–22" on a passage card, "lines 14–22" in the detail: the passage's lines, as read, that the quote spans. */
+function lineSpan(card: CustodyCardOut, word: string): string {
+  if (card.line_start == null) return '';
+  // Joined so the span never breaks across lines ("l.14–22", not "l.14–" then "22").
+  return ` ${word}${word.endsWith('.') ? '' : '\u00a0'}${card.line_start}${card.line_end != null && card.line_end !== card.line_start ? `\u2060–\u2060${card.line_end}` : ''}`;
+}
+
+const MATCH_WORD: Record<string, string> = {exact: 'exact quote', case: 'same words, different case', spacing: 'same words, different spacing'};
+
+/** The stored anchor as found now (ADR-0015): how the words matched, the text kept either side, the offsets, and
+ * what happened to it since it was stored. */
+function anchorWords(a: CustodyAnchorOut): string {
+  if (a.start == null || a.end == null) {
+    return a.state === 'lost' ? `the quote is no longer in the text of this passage${a.anchored_at ? ` (anchored ${short(a.anchored_at)})` : ''}` : 'the quote is not in this passage';
+  }
+  const around = a.before === a.after ? `${a.before} characters before and after` : `${a.before} characters before, ${a.after} after`;
+  const where = `${MATCH_WORD[a.match ?? 'exact'] ?? 'quote'} + ${around}, offsets ${a.start}–${a.end}${(a.occurrences ?? 1) > 1 ? ` · 1 of ${a.occurrences} places` : ''}`;
+  return a.state === 'moved' ? `${where} · moved since it was anchored (the document was read again)`
+    : a.state === 'not anchored' ? `${where} · found now: saved before anchors were kept` : where;
+}
+
 function LevelMark({level}: {level: string}): ReactElement {
   const n = level === 'textbook' ? 3 : level === 'strong' ? 2 : 1;
   return <span className={`cc-level l-${level}`} aria-label={level}>{'▮'.repeat(n)}{'▯'.repeat(3 - n)} {level.toUpperCase()}</span>;
@@ -400,6 +477,6 @@ function LevelMark({level}: {level: string}): ReactElement {
 
 function LogList({log}: {log: CustodyLogOut[]}): ReactElement {
   return <ol className="cc-list" aria-label="The chain as a list">
-    {log.map((e, i) => <li key={i}><span className="cc-mono">{short(e.when)}</span> · {e.who}: {e.what}</li>)}
+    {log.map((e, i) => <li key={i}><span className="cc-mono">{short(e.when)}</span> · {whoWord(e.who)}: {e.what}</li>)}
   </ol>;
 }

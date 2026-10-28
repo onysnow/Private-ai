@@ -49,4 +49,5 @@ export const SAMPLE_RUN: AiRunOut = {
   run_id: 'sample', status: 'succeeded', finished: true, module: 'case_synthesis', question: 'Who controlled Fernhill Ltd between 2016 and 2023, and how?',
   working_theory: null, created_at: at(0), started_at: at(0), finished_at: at(72), candidate_id: null, review_status: null,
   events: SAMPLE_EVENTS.length, problems: 5, message: 'sample — not a real run', error: null,
+  route: {system: 'tas', row: 2, node: 'tas/08', title: 'Case synthesis', modules_in_system: 13, final_audit: {node: 'tas/10', file: '10_FINAL_ACCURACY_AUDIT.md'}},
 };

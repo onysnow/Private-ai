@@ -2,12 +2,12 @@
 // Decide (Workbench-redesign-2026.pdf, Check §3.1; mockup CHECK_1): every decision
 // only a person can make, on one whole screen. Queue on the left, grouped by where
 // it comes from; the evidence in the middle, still; the card on the right. Keys:
-// J/K move, 1/2/3 answer, Z undo. An answer waits a few seconds before it is sent.
+// J/K move, 1/2/3 answer, Z undo, O open the source. An answer waits a few seconds before it is sent.
 import Link from 'next/link';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {ReactElement} from 'react';
 
-import {AiTag, LevelChip} from '../../components/status';
+import {LevelChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {apiTime} from '../../lib/timestamps';
@@ -83,10 +83,19 @@ export function DecideScreen({investigationId, investigationName, active = true,
   }, []);
   const all = useDecisions(investigationId, {order});
   const items = useMemo(() => (kind ? all.items.filter(i => i.kind === kind) : all.items), [all.items, kind]);
+  // The chips count what still waits: an answer held (or being sent) leaves its kind's count at once, not only after
+  // the server's list reloads (the server's counts already leave out what it has saved).
+  const counts = useMemo(() => {
+    const left: Record<string, number> = {...all.counts};
+    const shown = new Set(all.items.map(i => i.id));
+    for (const i of all.query.data?.items ?? []) if (!shown.has(i.id) && left[i.kind]) left[i.kind] -= 1;
+    return left;
+  }, [all.counts, all.items, all.query.data]);
   const [selected, setSelected] = useState<string | null>(null);
+  const openDocument = useWorkbenchStore(state => state.openDocument);
   const index = Math.max(0, items.findIndex(i => i.id === selected));
   const item = items[index];
-  const total = Object.values(all.counts).reduce((n, v) => n + v, 0);
+  const total = Object.values(counts).reduce((n, v) => n + v, 0);
 
   const move = useCallback((step: number) => {
     const next = items[Math.min(items.length - 1, Math.max(0, index + step))];
@@ -107,10 +116,12 @@ export function DecideScreen({investigationId, investigationName, active = true,
       if (event.metaKey || event.ctrlKey || event.altKey || typing(event.target) || !singleKeysOn()) return;
       const key = event.key.toLowerCase();
       if (key === 'j') { event.preventDefault(); move(1); } else if (key === 'k') { event.preventDefault(); move(-1); } else if (key === 'z') { event.preventDefault(); all.undo(); }
+      // O opens the source in its own reader (research §3.1 keyboard), at the evidence's page.
+      else if (key === 'o' && item?.evidence?.document_id) { event.preventDefault(); openDocument(item.evidence.document_id, pageOf(item.evidence.locator)); }
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
-  }, [active, all, move]);
+  }, [active, all, item, move, openDocument]);
 
   const groups = useMemo(() => {
     const out: {key: string; group: DecisionItemOut['group']; label: string; items: DecisionItemOut[]}[] = [];
@@ -140,14 +151,14 @@ export function DecideScreen({investigationId, investigationName, active = true,
   const batch = all.held?.batch ? all.decided.filter(d => d.batch === all.held?.batch && d.state === 'held') : [];
   const kinds = Object.keys(KIND_LABEL) as DecisionKind[];
 
-  return <div className="dc" aria-label="Decide">
+  return <div className="dc" data-calm-zone="" aria-label="Decide">
     <aside className="dc-queue" aria-label="To decide">
       <h1>To decide</h1>
       <p className="ch-quiet">{investigationName ? `${investigationName} · ` : ''}only you can decide these</p>
       <div className="dc-chips" role="group" aria-label="Show">
         <button type="button" className={!kind ? 'on' : ''} aria-pressed={!kind} onClick={() => setKind(undefined)}>All {loading || failure ? '…' : total}</button>
-        {kinds.filter(k => all.counts[k]).map(k => <button key={k} type="button" className={kind === k ? 'on' : ''} aria-pressed={kind === k}
-          onClick={() => setKind(kind === k ? undefined : k)}>{KIND_LABEL[k]} {all.counts[k]}</button>)}
+        {kinds.filter(k => counts[k]).map(k => <button key={k} type="button" className={kind === k ? 'on' : ''} aria-pressed={kind === k}
+          onClick={() => setKind(kind === k ? undefined : k)}>{KIND_LABEL[k]} {counts[k]}</button>)}
       </div>
       <label className="dc-order">Order
         <select value={order} onChange={e => setOrder(e.target.value as DecisionOrder)}>
@@ -180,7 +191,7 @@ export function DecideScreen({investigationId, investigationName, active = true,
             <button type="button" className={`dc-row${item?.id === i.id ? ' on' : ''}`} aria-current={item?.id === i.id ? 'true' : undefined} onClick={() => setSelected(i.id)}>
               <span className={`dc-kind dc-kind-${i.kind}`} aria-hidden="true" title={KIND_LABEL[i.kind]}>{KIND_ICON[i.kind]}</span>
               <span className="dc-row-text"><span>{i.question}</span>
-                <small>{i.actor_kind === 'ai' ? 'AI draft' : i.actor} · {KIND_LABEL[i.kind].toLowerCase()} · {age(i.created_at)}{i.level ? ' · ' : ''}{i.level && <LevelChip level={i.level}/>}</small></span>
+                <small>{i.actor_kind === 'ai' ? 'AI draft' : i.actor}{i.kind === 'ai' ? '' : ` · ${KIND_LABEL[i.kind].toLowerCase()}`} · {age(i.created_at)}{i.level ? ' · ' : ''}{i.level && <LevelChip level={i.level}/>}</small></span>
             </button>
           </li>)}</ul>
         </div>;
@@ -191,7 +202,8 @@ export function DecideScreen({investigationId, investigationName, active = true,
     {item ? <>
       <EvidencePane item={item}/>
       <section className="dc-card" aria-label="Your decision">
-        <p className="ch-eyebrow">{KIND_LABEL[item.kind]} · {index + 1} of {items.length}{item.actor_kind === 'ai' && <> <AiTag/></>}</p>
+        {/* The card's own line names an AI proposer with its AI draft tag; the eyebrow does not repeat it. */}
+        <p className="ch-eyebrow">{KIND_LABEL[item.kind]} · {index + 1} of {items.length}</p>
         <DecisionCard item={item} position={index + 1} total={items.length} keys="decide" active={active} onDecide={onDecide}/>
         {item.choices.length === 0 && <Link className="dc-elsewhere" href={caseHref(item.open.href, investigationId)}>{item.open.label} ↗</Link>}
       </section>
@@ -220,7 +232,7 @@ export function DecideScreen({investigationId, investigationName, active = true,
           aria-label={blocked ? `${words} — ${blocked}` : `Undo ${words}`} title={blocked ? `${words}\n${blocked}` : `${words}\nClick to undo`}
           onClick={() => { if (!blocked && all.undo(d.item.id)) setSelected(d.item.id); }}>{SHAPE[d.choice.key]}</button>;
       })}</span>
-      <span className="dc-keys" aria-hidden="true"><kbd>J</kbd><kbd>K</kbd> move <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> decide <kbd>Z</kbd> undo</span>
+      <span className="dc-keys" aria-hidden="true"><kbd>J</kbd><kbd>K</kbd> move <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> decide <kbd>Z</kbd> undo <kbd>O</kbd> open the source</span>
       <span className="dc-toast" aria-live="polite">
         {failed ? <>Could not save “{failed.choice.label}”: {failed.error}. Your choice is kept. <button type="button" onClick={() => all.retry(failed.item.id)}>Retry</button> <button type="button" onClick={() => all.undo(failed.item.id)}>Drop it</button></>
           : all.undoError ? all.undoError

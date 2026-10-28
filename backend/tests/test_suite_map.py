@@ -1,7 +1,7 @@
 """The app's values against the Authority System Suite (app/ai/suite_map.py; Ony: "if
 there is a need for a value that doesn't exist in the Authority system but needs to
 exist, that's a problem"). A value the app adds must be mapped, or named as a suite
-gap, before it ships; a suite update that drops a term the app relies on fails here."""
+gap, before it ships; a change of the SDK pin that drops a term the app relies on fails here."""
 
 from pathlib import Path
 
@@ -21,10 +21,10 @@ def test_every_value_the_app_uses_is_mapped_to_the_suite_or_named_as_a_gap():
     assert sum(len(v) for v in app_vocabularies().values()) <= len(cov["mappings"])
 
 
-def test_every_mapped_suite_term_is_still_in_the_vendored_suite():
+def test_every_mapped_suite_term_is_still_in_the_suite():
     cov = coverage()
     drifted = [m for m in [*cov["mappings"], *cov["suite_requires_app_lacks"]] if m["found"] is False]
-    assert drifted == [], f"A suite update moved or dropped these terms; re-read the suite and update suite_map.json: {drifted}"
+    assert drifted == [], f"The suite the SDK bundles moved or dropped these terms; re-read the suite and update suite_map.json: {drifted}"
     assert all(m["suite_term"] is None for m in cov["mappings"] if m["match"] == "none")
     assert all(m["suite_term"] for m in cov["mappings"] if m["match"] != "none")
 

@@ -1,6 +1,11 @@
 import httpx
 
-from app.connectors.base import Connector, ExternalFinding
+from app.connectors.base import (
+    Connector,
+    ExternalFinding,
+    KeyCheck,
+    key_check_from_status,
+)
 from app.core.config import settings
 
 
@@ -20,6 +25,15 @@ class AlephConnector(Connector):
         if self.api_key:
             headers["Authorization"] = f"ApiKey {self.api_key}"
         return headers
+
+    async def check_key(self) -> KeyCheck:
+        """GET /api/2/notifications?limit=0: it answers only a signed-in key (403 otherwise) and sends no search terms.
+        (/api/2/metadata cannot tell: OpenAleph answers it for a bad key too, as an anonymous user.)"""
+        if not self.api_key:
+            return KeyCheck("no_key", "No key saved: public collections only.")
+        async with httpx.AsyncClient(timeout=20) as client:
+            resp = await client.get(f"{self.base_url}/api/2/notifications", params={"limit": 0}, headers=self._headers())
+        return key_check_from_status(resp.status_code)
 
     def _parse_result(self, item: dict) -> ExternalFinding:
         schema = item.get("schema")

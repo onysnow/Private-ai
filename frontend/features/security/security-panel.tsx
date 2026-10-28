@@ -15,6 +15,8 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {errorMessage} from '../../lib/api-client';
+import {describeRequest, wasRefused} from '../../lib/audit-words';
+import {shortStamp} from '../../lib/timestamps';
 import {settingsStatusQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {
   deleteConnectorCredential, getOrphanStoragePreview, getSecurityAudit, getSecurityAuditRetentionPreview, getSecurityAuditSummary,
@@ -52,6 +54,8 @@ export function SecurityPanel({settingsStatus, providers, part = 'all'}: Props):
   const [securityAuditRetention, setSecurityAuditRetention] = useState<SecurityAuditRetentionPreviewOut | null>(null);
   const [securityAuditStatus, setSecurityAuditStatus] = useState('');
   const [auditPruneConfirmation, setAuditPruneConfirmation] = useState('');
+  const [refusedOnly, setRefusedOnly] = useState(false);
+  const [technical, setTechnical] = useState(false);
 
   // The status block reads the settings status from the shared cache; a
   // credential change makes it stale, and the page's access check re-reads it.
@@ -212,7 +216,13 @@ export function SecurityPanel({settingsStatus, providers, part = 'all'}: Props):
       <div><small>Status: {Object.entries(securityAuditSummary.by_status).map(([k, v]) => `${k} ${v}`).join(' · ') || 'none'}</small></div>
     </div>}
     {securityAudit && <div>
-      {securityAudit.records.map(x => <div key={x.request_id}><small>{x.timestamp} · {x.method} {x.path} · {x.status_code} · {x.event} · {x.local_request ? 'local' : 'remote'}</small></div>)}
+      <div><label><input type="checkbox" checked={refusedOnly} onChange={e => setRefusedOnly(e.target.checked)}/> <small>Refused only</small></label>{' '}
+        <label><input type="checkbox" checked={technical} onChange={e => setTechnical(e.target.checked)}/> <small>Technical</small></label></div>
+      {securityAudit.records.filter(x => !refusedOnly || wasRefused(x.event, x.status_code)).map(x => {
+        const refused = wasRefused(x.event, x.status_code);
+        return <div key={x.request_id}><small>{shortStamp(x.timestamp)} · {x.local_request ? 'this computer' : `another device${x.client_host ? ` (${x.client_host})` : ''}`} · {describeRequest(x.method, x.path)} · {refused ? '✕ refused' : '✓ allowed'}
+          {technical && <code> · {x.method} {x.path} · {x.status_code} · {x.event}</code>}</small></div>;
+      })}
       {securityAudit.has_more && <Button onClick={loadOlderSecurityAudit}>Load 100 older events</Button>}
       <div><small>Showing {securityAudit.records.length} of {securityAudit.total_matched} matching event(s).</small></div>
     </div>}

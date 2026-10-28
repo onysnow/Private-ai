@@ -1,6 +1,7 @@
 'use client';
 // Local investigation deletion: preview first, then delete only after the
-// reporter types the exact investigation ID. Moved out of app/page.tsx
+// reporter types the case's name exactly (KEEP_2; the server holds the same
+// rule, and still takes the ID from a script). Moved out of app/page.tsx
 // (Foundation Fixes fix 3); its calls and reply checks are generated from
 // the API schema (fix 2).
 import {useMutation} from '@tanstack/react-query';
@@ -19,6 +20,10 @@ type Props = {
   /** Called after a deletion so the page can reload the investigation list. */
   onDeleted: (result: InvestigationDeletionResult) => Promise<void> | void;
 };
+
+/** Whether what was typed deletes the case: its name exactly, as the server checks it (spaces at either end aside). */
+export const confirmsDeletion = (typed: string, preview: InvestigationDeletionPreview): boolean =>
+  typed.trim() !== '' && typed.trim() === preview.requires_confirmation.trim();
 
 /** What happened to the investigation's OpenAleph casefile, as a sentence to
  * add to the status line (empty when it had none). */
@@ -47,7 +52,7 @@ export function DeletionPanel({investigationId, onDeleted}: Props): ReactElement
     try {
       const value = await previewMutation.mutateAsync(investigationId);
       setPreview(value);
-      setStatus(value.can_delete ? 'Preview ready. Type the exact investigation ID to enable deletion.' : 'Deletion is blocked by an unsafe document path.');
+      setStatus(value.can_delete ? 'Preview ready. Type the case’s name to enable deletion.' : 'Deletion is blocked by an unsafe document path.');
     } catch (error) {
       setPreview(null);
       setStatus(errorMessage(error, 'Deletion preview failed'));
@@ -55,10 +60,10 @@ export function DeletionPanel({investigationId, onDeleted}: Props): ReactElement
   };
 
   const runDelete = async () => {
-    if (!preview || confirmation !== preview.requires_confirmation) return;
+    if (!preview || !confirmsDeletion(confirmation, preview)) return;
     setStatus('Deleting investigation and owned local document files…');
     try {
-      const result = await deleteMutation.mutateAsync({id: preview.investigation_id, confirmation});
+      const result = await deleteMutation.mutateAsync({id: preview.investigation_id, confirmation: confirmation.trim()});
       setPreview(null);
       setConfirmation('');
       setStatus(`Deleted ${result.deleted_record_total} record(s) and ${result.document_files_deleted} owned document file(s); preserved ${result.shared_document_files_preserved} shared file(s).${casefileOutcome(result.openaleph_collection)}`);
@@ -81,9 +86,10 @@ export function DeletionPanel({investigationId, onDeleted}: Props): ReactElement
         {preview.openaleph_collection && <div>OpenAleph casefile “{preview.openaleph_collection.label}” is deleted too.</div>}
         {preview.unsafe_paths.map(x => <div key={x.document_id}><small><b>Blocked:</b> {x.error}</small></div>)}
         {preview.can_delete && <>
-          <p><small>To delete, type this exact ID: <code>{preview.requires_confirmation}</code></small></p>
-          <Input value={confirmation} onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmation(e.target.value)} placeholder="Exact investigation ID"/>
-          <Button onClick={runDelete} disabled={confirmation !== preview.requires_confirmation}>Permanently delete investigation</Button>
+          <p><small>To delete, type the case’s name: <code>{preview.requires_confirmation}</code></small></p>
+          <Input value={confirmation} onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmation(e.target.value)} placeholder="The case’s name"
+            aria-label="Type the case’s name to delete it" autoComplete="off" spellCheck={false}/>
+          <Button variant="destructive" onClick={runDelete} disabled={!confirmsDeletion(confirmation, preview)}>Permanently delete investigation</Button>
         </>}
       </div>}
       {status && <p className="muted">{status}</p>}

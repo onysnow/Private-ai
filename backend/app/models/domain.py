@@ -75,6 +75,15 @@ from app.models.patterns import (
     CheckItem,
     PatternFlag,
 )
+from app.models.preferences import (
+    FactWatch,
+    Preference,
+)
+from app.models.platform import (
+    NotificationDelivery,
+    PushSubscription,
+    SavedQuestion,
+)
 from app.models.annotations import (
     Collection,
     CollectionItem,
@@ -86,10 +95,12 @@ from app.models.ai import (
     AIAnalysisCandidate,
     AIRunEvent,
 )
+from app.models.outbound import OutboundRequest
 from app.models.writeups import (
     Writeup,
     WriteupVersion,
 )
+from app.models.safety import BackupEvent
 from app.models.stories import (
     Story,
     StoryClaim,
@@ -101,6 +112,7 @@ from app.models.decks import (
 from app.models.identity import (
     AppUser,
     InvestigationMembership,
+    LocalProfile,
 )
 from app.models.jobs import (
     BackgroundJob,
@@ -167,8 +179,15 @@ __all__ = [
     "CollectionItem",
     "PatternFlag",
     "CheckItem",
+    "Preference",
+    "FactWatch",
+    "OutboundRequest",
+    "SavedQuestion",
+    "NotificationDelivery",
+    "PushSubscription",
     "AIAnalysisCandidate",
     "AIRunEvent",
+    "BackupEvent",
     "Writeup",
     "WriteupVersion",
     "Story",
@@ -177,6 +196,7 @@ __all__ = [
     "Deck",
     "AppUser",
     "InvestigationMembership",
+    "LocalProfile",
     "BackgroundJob",
     "OpenAlephEntityLink",
     "OpenAlephEntitySetLink",

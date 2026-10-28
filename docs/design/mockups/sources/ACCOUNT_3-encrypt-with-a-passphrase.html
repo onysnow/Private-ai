@@ -1,0 +1,63 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="account.css"><style>
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 40px}
+.crumb{font-size:13px;color:var(--muted)} .crumb b{color:var(--text);font-weight:500}
+.steps{display:flex;gap:8px;align-items:center;font:500 11px 'IBM Plex Mono';color:var(--faint);letter-spacing:.06em}
+.steps .s{padding:4px 10px;border:1px solid var(--line);border-radius:999px}
+.steps .s.done{color:var(--ok);border-color:#3d5a4b}.steps .s.on{color:var(--amber);border-color:#6b4e22}
+h1{font:300 40px/1.05 'Source Serif 4 Variable';padding:4px 40px 18px}
+.wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:24px;padding:0 40px}
+.box{padding:20px 22px}
+.input{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);background:var(--p2);border-radius:10px;padding:12px 14px;margin-top:8px;font:500 18px 'IBM Plex Mono';letter-spacing:.2em;color:var(--text)}
+.input small{font:12px 'IBM Plex Sans Variable';letter-spacing:0;color:var(--muted)}
+.meter{display:flex;gap:4px;margin:12px 0 6px}.meter i{flex:1;height:6px;border-radius:3px;background:#3b2f22}.meter i.f{background:var(--ok)}
+.list{display:grid;gap:8px;margin-top:10px;font-size:13px}
+.list div{display:grid;grid-template-columns:18px 1fr;gap:8px}
+.y{color:var(--ok)} .n{color:var(--bad)}
+.rk{padding:20px 22px;border-color:#6b4e22;background:#1c150d}
+.code{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.code span{font:500 20px 'IBM Plex Mono';letter-spacing:.06em;color:var(--amber);background:#130e08;border:1px solid #4a3519;border-radius:8px;padding:10px 0;text-align:center}
+.acts{display:flex;gap:10px;margin-top:6px}
+.check{margin-top:16px;padding-top:14px;border-top:1px dashed #4a3519}
+.mini{display:flex;gap:10px;align-items:center;margin-top:8px}
+.mini .input{margin:0;width:150px;font-size:16px}
+.warn{margin-top:14px;padding:10px 12px;border-left:3px solid var(--bad);background:#24150f;border-radius:6px;font-size:12.5px;color:#e3b9ad}
+.foot{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:14px 40px;border-top:1px solid var(--line);background:rgba(18,15,12,.88)}
+.code.words{grid-template-columns:repeat(4,1fr)!important}.code.words span{font-size:15px!important;letter-spacing:0!important}.code.words i{font-style:normal;color:var(--faint);font-size:11px;margin-right:8px}
+</style></head><body>
+<div class="top"><div class="crumb">Sign your work · <b>Protect with a passphrase</b></div>
+ <div class="steps"><span class="s done">✓ NAME</span><span class="s done">✓ PASSPHRASE</span><span class="s on">● RECOVERY WORDS</span></div></div>
+<h1>Lock the app with a passphrase</h1>
+<div class="wrap">
+ <div style="display:grid;gap:16px;align-content:start">
+  <div class="panel box">
+   <p class="eyebrow">Your passphrase</p>
+   <div class="input">•••••••••••••••••••••••••<small>show</small></div>
+   <div class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i></div>
+   <p class="note">Strong: 5 words, about 64 bits. Four or more unrelated words beat a short password with symbols.</p>
+   <div class="input" style="margin-top:12px">•••••••••••••••••••••••••<small style="color:var(--ok)">✓ matches</small></div>
+  </div>
+  <div class="panel box">
+   <p class="eyebrow">What it protects</p>
+   <div class="list">
+    <div><span class="y">✓</span><span>The app: every case, record, claim, decision and note, until the passphrase is given</span></div>
+    <div><span class="y">✓</span><span>Locked cases: a case can have its own passphrase on top</span></div>
+    <div><span class="y">✓</span><span>Backups made from now on: encrypted, and they open on any computer with the passphrase or the recovery words</span></div>
+    <div><span class="n">✕</span><span>The files on disk if the laptop is taken: that is the disk encryption (Windows: BitLocker or Device encryption)</span></div>
+    <div><span class="n">✕</span><span>Copies you saved elsewhere before today, and exports you send out</span></div>
+   </div>
+  </div>
+ </div>
+ <div class="panel rk">
+  <p class="eyebrow" style="color:var(--amber)">Recovery words · shown once</p>
+  <p class="note" style="margin-top:6px">If you forget the passphrase, these are the only way back in, and they open your encrypted backups on any computer. The app keeps no copy and nobody, including the people who made the app, can reset it.</p>
+  <div class="code words"><span><i>1</i>harvest</span><span><i>2</i>lantern</span><span><i>3</i>orbit</span><span><i>4</i>velvet</span><span><i>5</i>copper</span><span><i>6</i>meadow</span><span><i>7</i>absorb</span><span><i>8</i>canyon</span><span><i>9</i>tribe</span><span><i>10</i>frost</span><span><i>11</i>ladder</span><span><i>12</i>violin</span></div>
+  <div class="acts"><button class="btn">Print them</button><button class="btn">Save as a file…</button><span class="note" style="align-self:center">Keep them away from this computer: a drawer, a safe, a trusted person.</span></div>
+  <div class="check">
+   <p class="eyebrow">Check you have them</p>
+   <div class="mini"><span class="note">Type word 7</span><div class="input">absorb</div><span style="color:var(--ok);font-size:13px">✓ right</span></div>
+  </div>
+  <div class="warn">Lose both the passphrase and these words and the app and its backups cannot be opened again, by anyone.</div>
+ </div>
+</div>
+<div class="foot"><span class="note">The app is locked from the next start, and after time away. Nothing is sent anywhere.</span><span style="display:flex;gap:12px;align-items:center"><button class="btn primary">I have them · open the app</button></span></div>
+</body></html>

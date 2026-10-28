@@ -13,10 +13,10 @@ import {mockApi} from '../test-support/mock-api';
 
 vi.mock('next/navigation', () => ({useRouter: () => ({push: vi.fn()}), usePathname: () => '/', useSearchParams: () => new URLSearchParams()}));
 
-const item = (id: string, question: string) => ({
-  kind: 'to_check', id, question, proposal: 'p', actor: 'Red Flags', actor_kind: 'app', created_at: '2026-10-09T10:00:00', rank: 1, reason: 'r',
-  level: null, group: {key: 'g', label: 'g'}, evidence: null, parties: [], consequences: [], choices: [], open: {href: '/check', label: 'Open'},
+const inboxRow = (key: string, kind: string, title: string, extra: Record<string, unknown> = {}) => ({
+  key, kind, title, reason: '', href: '/decide?kind=to_check', created_at: '2026-10-09T10:00:00', level: null, actor: 'Red Flags', actor_kind: 'app', route: 'needs', ...extra,
 });
+const inbox = (needs: unknown[], rest: unknown[] = []) => ({investigation_id: 'inv-1', interrupt: [], needs, else: rest, week: {}, quiet_while_reading: true, desktop: false});
 
 beforeEach(() => {
   connectGeneratedClient(new ApiClient('http://api.test'));
@@ -28,10 +28,9 @@ afterEach(() => cleanup());
 describe('Inbox', () => {
   it('lists what needs you, then everything else, and snoozes a row on this computer', async () => {
     mockApi({
-      'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {to_check: 2}, total: 2, offset: 0,
-        items: [item('c1', 'Does page 4 show the nominee?'), item('c2', 'Is Bellcastle the same company?')]},
-      'GET /api/investigations/inv-1/since': {investigation_id: 'inv-1', after: '2026-10-05T00:00:00',
-        changes: [{key: 'ai', count: 3, label: 'AI drafts to review', actor_kind: 'ai', href: '/decide?kind=ai', level: null}]},
+      'GET /api/investigations/inv-1/inbox': inbox(
+        [inboxRow('d:to_check:c1', 'to_check', 'Does page 4 show the nominee?'), inboxRow('d:to_check:c2', 'to_check', 'Is Bellcastle the same company?')],
+        [inboxRow('c:documents:3', 'documents', '3 documents added this week', {actor: '', actor_kind: 'person', route: 'else'})]),
     });
     render(<QueryProvider><Inbox open onClose={vi.fn()}/></QueryProvider>);
     const needs = await screen.findByRole('tabpanel', {name: 'Needs you'});
@@ -43,6 +42,20 @@ describe('Inbox', () => {
     expect(screen.getByText('1 snoozed on this computer; each comes back by itself.')).toBeInTheDocument();
     expect(screen.getByRole('tab', {name: /Needs you/})).toHaveTextContent('1');
     await user.click(screen.getByRole('tab', {name: /Everything else/}));
-    expect(await screen.findByText('3 AI drafts to review')).toBeInTheDocument();
+    expect(await screen.findByText('3 documents added this week')).toBeInTheDocument();
+  });
+});
+
+describe('Inbox rows from Settings › Notifications', () => {
+  it('shows a changed watch with what changed and marks it seen', async () => {
+    const api = mockApi({
+      'GET /api/investigations/inv-1/inbox': inbox([inboxRow('w:wa1:disputed', 'watch', 'Kestrel SA bought the harbour land', {reason: 'Lead → Disputed', actor: 'You watch this', href: '/check#claim-verification'})]),
+      'POST /api/watches/wa1/seen': {id: 'wa1'},
+    });
+    render(<QueryProvider><Inbox open onClose={vi.fn()}/></QueryProvider>);
+    expect(await screen.findByText('Lead → Disputed')).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Seen'}));
+    expect(api.calls('POST /api/watches/wa1/seen')).toHaveLength(1);
+    expect(screen.getByRole('link', {name: 'Choose what goes where'})).toHaveAttribute('href', '/settings#notifications');
   });
 });

@@ -5,7 +5,7 @@
 // generated from the API schema (fix 2). The archive goes up as a file and
 // comes down as one, so these three calls use the app's own client with the
 // generated Zod schema for the reply (see checkedReply in lib/api-generated.ts).
-import {useMutation} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ChangeEvent, ReactElement, ReactNode} from 'react';
 
@@ -13,9 +13,12 @@ import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Input} from '@/components/ui/input';
+import {agoText} from '../act/red-flags-board';
 import {errorMessage} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
+import {useLockStore} from '../../lib/app-lock';
+import {listInvestigationsOptions, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import type {BackupPreviewOut, BackupRestoreResultOut} from '../../lib/generated/types.gen';
 import {zBackupPreviewOut, zBackupRestoreResultOut} from '../../lib/generated/zod.gen';
 
@@ -27,9 +30,27 @@ type Props = {
   children?: ReactNode;
 };
 
-function archiveForm(file: File): FormData {
+/** What the server keeps about a case's last backup (investigations.last_backup). */
+export type LastBackup = {at: string; bytes: number; sha256: string; documents_included: boolean; encrypted?: boolean};
+
+export function lastBackupOf(value: unknown): LastBackup | null {
+  const v = value as Partial<LastBackup> | null | undefined;
+  return v && typeof v.at === 'string' && typeof v.bytes === 'number' ? v as LastBackup : null;
+}
+
+/** "1.4 GB", "820 KB": the archive's size in the units a person reads. */
+export function sizeWords(bytes: number): string {
+  const units = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+  let n = bytes, i = 0;
+  while (n >= 1000 && i < units.length - 1) { n /= 1000; i += 1; }
+  return `${i ? (n < 10 ? n.toFixed(1) : Math.round(n)) : n} ${units[i]}`;
+}
+
+function archiveForm(file: File, secret: string): FormData {
   const body = new FormData();
   body.append('file', file);
+  // An encrypted backup (ADR-0016) opens with the passphrase it was made under, or the recovery words.
+  if (secret) body.append('secret', secret);
   return body;
 }
 
@@ -38,16 +59,22 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
   const [preview, setPreview] = useState<BackupPreviewOut | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState('');
+  const [secret, setSecret] = useState('');
+  const [askSecret, setAskSecret] = useState(false);
+  const sealed = useLockStore(s => Boolean(s.state?.backups_encrypted));
+  const queryClient = useQueryClient();
+  const investigations = useQuery({...listInvestigationsOptions(), enabled: Boolean(investigationId)});
+  const last = lastBackupOf(investigations.data?.find(i => i.id === investigationId)?.last_backup);
 
   const download = useMutation({
     mutationFn: (id: string) => api.blob(`/api/investigations/${id}/export?include_documents=true`),
   });
   const inspect = useMutation({
-    mutationFn: (archive: File) => api.parsed('/api/backups/preview', checkedReply(zBackupPreviewOut), {method: 'POST', rawBody: archiveForm(archive)}),
+    mutationFn: (archive: File) => api.parsed('/api/backups/preview', checkedReply(zBackupPreviewOut), {method: 'POST', rawBody: archiveForm(archive, secret)}),
   });
   const restore = useMutation({
     mutationFn: (archive: File): Promise<BackupRestoreResultOut> =>
-      api.parsed('/api/backups/restore', checkedReply(zBackupRestoreResultOut), {method: 'POST', rawBody: archiveForm(archive)}),
+      api.parsed('/api/backups/restore', checkedReply(zBackupRestoreResultOut), {method: 'POST', rawBody: archiveForm(archive, secret)}),
   });
 
   const downloadBackup = async () => {
@@ -58,12 +85,13 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `investigation-${investigationId}.jwbackup.zip`;
+      link.download = `investigation-${investigationId}.jwbackup${sealed ? '.encrypted' : ''}.zip`;
       document.body.appendChild(link);
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
       setStatus('Backup downloaded.');
+      await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
     } catch (error) {
       setStatus(errorMessage(error, 'Backup download failed'));
     }
@@ -79,7 +107,9 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       setPreview(value);
       setStatus(value.can_restore ? 'Preview passed. Review the details before restoring.' : `Restore blocked by ${value.conflicts.length} conflict(s).`);
     } catch (error) {
-      setStatus(errorMessage(error, 'Backup preview failed'));
+      const said = errorMessage(error, 'Backup preview failed');
+      if (/passphrase|recovery words/i.test(said)) setAskSecret(true);
+      setStatus(said);
     }
   };
 
@@ -97,7 +127,10 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
   };
 
   const chooseFile = (e: ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files?.[0] || null);
+    const chosen = e.target.files?.[0] || null;
+    setFile(chosen);
+    setAskSecret(Boolean(chosen?.name.includes('.encrypted')));
+    setSecret('');
     setPreview(null);
     setConfirmed(false);
     setStatus('');
@@ -109,12 +142,17 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       <CardDescription>Export FollowTheMoney JSONL, evidence and claim provenance, leads/tasks, timeline, extracted document text, review decisions, and stored source files in one checksum-verified archive.</CardDescription>
     </CardHeader>
     <CardContent>
+      {investigationId && <p className="backup-last" aria-live="polite">{last
+        ? <><b>Last backup {agoText(last.at)}</b> · {sizeWords(last.bytes)} · ✓ checksum{last.encrypted ? ' · encrypted' : ''}{last.documents_included ? '' : ' · without the stored files'}</>
+        : <b>No backup of this case yet</b>}</p>}
       <Button onClick={downloadBackup} disabled={!investigationId}>Download backup</Button>
       <hr/>
       <h4>Restore safely</h4>
       <p className="muted">Restore is preview-first and never merges into an existing investigation. The preview checks archive integrity, every restored record ID, provenance lineage, and destination document paths before mutation.</p>
       <Input type="file" accept=".zip,.jwbackup.zip,application/zip" onChange={chooseFile}/>
-      <Button onClick={previewBackup} disabled={!file}>Preview restore</Button>
+      {askSecret && <Input type="password" autoComplete="off" value={secret} onChange={e => setSecret(e.target.value)}
+        aria-label="Passphrase or recovery words" placeholder="This backup is encrypted: its passphrase, or the 12 recovery words"/>}
+      <Button onClick={previewBackup} disabled={!file || (askSecret && !secret)}>Preview restore</Button>
       {preview && <div className="candidate">
         <b>{preview.investigation.name}</b>
         <div>{Object.values(preview.record_counts).reduce((a, b) => a + b, 0)} records · {preview.document_file_count} stored document file(s) · {preview.missing_document_count} missing raw file(s)</div>

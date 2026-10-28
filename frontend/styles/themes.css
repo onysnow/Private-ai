@@ -343,6 +343,9 @@ kbd { font: 500 11px var(--font-mono); padding: 1px 6px; border-radius: 5px; bor
 /* Edges: first-use labels, pins, where you have been (components/frame/app-frame.tsx) */
 .fr-hint { position: fixed; z-index: 74; padding: 4px 9px; border-radius: 8px; background: var(--surface-2); color: var(--text-muted); font-size: 11.5px; pointer-events: none; box-shadow: var(--shadow-panel); }
 .fr-hint-left { left: 14px; top: 50%; transform: translateY(-50%); }
+.fr-hint { transition: opacity 600ms ease; }
+.fr-hint.gone { opacity: 0; }
+html[data-motion='calm'] .fr-hint { transition: none; }
 .fr-hint-top { top: 14px; left: 50%; transform: translateX(-50%); }
 .fr-pin { all: unset; cursor: pointer; padding: 3px 8px; border-radius: 7px; font: 500 11.5px var(--font-ui); color: var(--text-muted); }
 .fr-pin.on { color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 14%, transparent); }

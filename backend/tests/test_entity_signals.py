@@ -73,3 +73,20 @@ def test_an_upload_proposes_a_name_held_as_an_alias_as_that_record(monkeypatch):
     names = {row["payload"]["caption"]: row for row in rows if row["candidate_type"] == "entity"}
     rationale = names["Ted Varn"]["payload"]["rationale"]
     assert (rationale["schema_basis"], rationale["existing_entity_id"]) == ("existing_record", record["id"])
+
+
+def test_names_with_accents_are_found_and_a_legal_form_ends_a_name():
+    """Seen comparing the Workbench's own reader with OpenAleph's
+    (docs/project-notes/EXTRACTION_PARITY.md): the pattern finder missed names
+    written with accents and ran a company into the next sentence."""
+    from types import SimpleNamespace
+
+    from app.services.documents import _candidate_payloads
+
+    def names(text):
+        chunk = SimpleNamespace(text=text, locator="line 1", id="c1")
+        return [p["caption"] for kind, p, _ in _candidate_payloads(chunk) if kind == "entity"]
+
+    assert names("Société Vérandine versa 12 000 € à Brühlmark & Söhne GmbH.") == ["Société Vérandine", "Brühlmark & Söhne GmbH"]
+    assert names("Meridian Holdings Ltd. Payments went to Bellcastle Trading.") == ["Meridian Holdings Ltd", "Bellcastle Trading"]
+    assert names("Kestrel Bay Co. Ltd. signed.") == ["Kestrel Bay Co. Ltd"]

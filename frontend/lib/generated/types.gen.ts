@@ -169,6 +169,10 @@ export type AiAnalysisCandidateOut = {
    */
   module: string;
   /**
+   * Next Runs
+   */
+  next_runs?: Array<AiNextRunOut>;
+  /**
    * Payload
    */
   payload: {
@@ -314,7 +318,7 @@ export type AiAnalysisCandidatesOut = {
 /**
  * AiAuthoritySuiteOut
  *
- * The vendored Authority System Suite: where it came from and the TAS version the prompts use.
+ * The Authority System Suite (bundled in the Authority Suite SDK): where it came from and the TAS version the prompts use.
  */
 export type AiAuthoritySuiteOut = {
   control_surface: AiControlSurfaceOut;
@@ -332,6 +336,10 @@ export type AiAuthoritySuiteOut = {
    * Source
    */
   source: string | null;
+  /**
+   * Systems
+   */
+  systems?: Array<AiSuiteSystemOut>;
   /**
    * Tas Version
    */
@@ -423,6 +431,20 @@ export type AiControlSurfaceOut = {
 };
 
 /**
+ * AiFinalAuditOut
+ */
+export type AiFinalAuditOut = {
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Node
+   */
+  node: string;
+};
+
+/**
  * AiLimitsOut
  */
 export type AiLimitsOut = {
@@ -467,9 +489,41 @@ export type AiModuleStatusOut = {
    */
   spec_file: string;
   /**
+   * System
+   */
+  system?: string | null;
+  /**
    * Vendored Tas
    */
   vendored_tas: boolean;
+};
+
+/**
+ * AiNextRunOut
+ *
+ * A next run the suite service routes an answer to, by what the answer contains.
+ */
+export type AiNextRunOut = {
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Row
+   */
+  row: number | null;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Why
+   */
+  why: string;
 };
 
 /**
@@ -701,6 +755,10 @@ export type AiRunOut = {
    */
   finished_at: string | null;
   /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
    * Message
    */
   message: string | null;
@@ -720,6 +778,7 @@ export type AiRunOut = {
    * Review Status
    */
   review_status: string | null;
+  route: AiRunRouteOut;
   /**
    * Run Id
    */
@@ -753,6 +812,36 @@ export type AiRunRefOut = {
 };
 
 /**
+ * AiRunRouteOut
+ *
+ * How the suite service routed a run (app/ai/suite.py run_route). `system` is null for a module the service does
+ * not know (a run recorded under a name since removed); "app" for the app-local draft.
+ */
+export type AiRunRouteOut = {
+  final_audit: AiFinalAuditOut | null;
+  /**
+   * Modules In System
+   */
+  modules_in_system: number;
+  /**
+   * Node
+   */
+  node: string | null;
+  /**
+   * Row
+   */
+  row: number | null;
+  /**
+   * System
+   */
+  system: string | null;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * AiRunsOut
  */
 export type AiRunsOut = {
@@ -760,6 +849,74 @@ export type AiRunsOut = {
    * Runs
    */
   runs: Array<AiRunOut>;
+};
+
+/**
+ * AiSuiteModuleOut
+ */
+export type AiSuiteModuleOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Node
+   */
+  node: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * AiSuiteSystemOut
+ *
+ * One system of the suite (app/ai/suite.py systems_status). `version` is its numbered version when its
+ * CHANGELOG numbers them, `latest_change` its newest entry.
+ */
+export type AiSuiteSystemOut = {
+  final_audit: AiFinalAuditOut | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Latest Change
+   */
+  latest_change: string | null;
+  /**
+   * Module Count
+   */
+  module_count: number;
+  /**
+   * Modules
+   */
+  modules: Array<AiSuiteModuleOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Present
+   */
+  present: boolean;
+  /**
+   * Row
+   */
+  row: number;
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Version
+   */
+  version: string | null;
 };
 
 /**
@@ -816,6 +973,10 @@ export type AppUserCreate = {
    * Global Role
    */
   global_role?: string;
+  /**
+   * Key Days
+   */
+  key_days?: number;
 };
 
 /**
@@ -840,6 +1001,10 @@ export type AppUserCreatedOut = {
    * Token
    */
   token: string;
+  /**
+   * Token Expires At
+   */
+  token_expires_at?: string | null;
   /**
    * Token Notice
    */
@@ -897,6 +1062,14 @@ export type AppUserOut = {
    */
   token_created_at: string;
   /**
+   * Token Expires At
+   */
+  token_expires_at?: string | null;
+  /**
+   * Token Hint
+   */
+  token_hint?: string | null;
+  /**
    * Token Last Used At
    */
   token_last_used_at: string | null;
@@ -911,7 +1084,7 @@ export type AppUserOut = {
   /**
    * Token Status
    */
-  token_status: 'active' | 'disabled' | 'revoked';
+  token_status: 'active' | 'disabled' | 'revoked' | 'expired';
 };
 
 /**
@@ -954,6 +1127,10 @@ export type AppUserTokenRotatedOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   token_created_at: string;
+  /**
+   * Token Expires At
+   */
+  token_expires_at?: string | null;
   /**
    * Token Notice
    */
@@ -1011,7 +1188,81 @@ export type AppUserUpdatedOut = {
   /**
    * Token Status
    */
-  token_status: 'active' | 'disabled' | 'revoked';
+  token_status: 'active' | 'disabled' | 'revoked' | 'expired';
+};
+
+/**
+ * AssistantRunRequest
+ *
+ * Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+ * test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+ * uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+ * (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+ * check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+ * then holds the goal).
+ */
+export type AssistantRunRequest = {
+  /**
+   * Changes
+   */
+  changes?: Array<RunChangeIn> | null;
+  /**
+   * Context
+   */
+  context?: string | null;
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module:
+    | 'case_synthesis'
+    | 'hypothesis_test'
+    | 'presentation_draft'
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
+  options?: RunOptionsIn | null;
+  packet_from?: PacketFromIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Record Refs
+   */
+  record_refs?: Array<RecordRef> | null;
+  /**
+   * Severity Floor
+   */
+  severity_floor?: 'ALL' | 'MATERIAL' | 'BLOCKING' | null;
+  /**
+   * Source Tier Floor
+   */
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
 };
 
 /**
@@ -1299,6 +1550,10 @@ export type BodyInspectBackup = {
    * File
    */
   file: Blob | File;
+  /**
+   * Secret
+   */
+  secret?: string | null;
 };
 
 /**
@@ -1309,6 +1564,10 @@ export type BodyPreviewBackupRestore = {
    * File
    */
   file: Blob | File;
+  /**
+   * Secret
+   */
+  secret?: string | null;
 };
 
 /**
@@ -1319,6 +1578,10 @@ export type BodyRestoreBackup = {
    * File
    */
   file: Blob | File;
+  /**
+   * Secret
+   */
+  secret?: string | null;
 };
 
 /**
@@ -1817,6 +2080,70 @@ export type CaseLeadCountsOut = {
 };
 
 /**
+ * CaseLockIn
+ */
+export type CaseLockIn = {
+  /**
+   * Old
+   */
+  old?: string | null;
+  /**
+   * Passphrase
+   */
+  passphrase: string;
+};
+
+/**
+ * CaseLookupsOut
+ */
+export type CaseLookupsOut = {
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Modes
+   */
+  modes: {
+    [key: string]: string;
+  };
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Set At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  set_at: string;
+};
+
+/**
+ * CaseLookupsPut
+ */
+export type CaseLookupsPut = {
+  /**
+   * Modes
+   *
+   * This case's own mode for each source it differs on.
+   */
+  modes: {
+    [key: string]: 'automatic' | 'ask' | 'off';
+  };
+  /**
+   * Reason
+   *
+   * One line on why this case looks up differently.
+   */
+  reason: string;
+};
+
+/**
  * CaseMoneyOut
  *
  * Money traced, counted once where it starts (payments whose payer received
@@ -1941,6 +2268,58 @@ export type CaseRecordOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   updated_at: string;
+};
+
+/**
+ * CaseResearchOut
+ */
+export type CaseResearchOut = {
+  /**
+   * Ai Enabled
+   */
+  ai_enabled: boolean;
+  /**
+   * Default
+   */
+  default: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Mode
+   */
+  mode: string;
+  /**
+   * Own
+   */
+  own: boolean;
+  /**
+   * Questions
+   */
+  questions: Array<SavedQuestionOut>;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+};
+
+/**
+ * CaseResearchPut
+ */
+export type CaseResearchPut = {
+  /**
+   * Mode
+   *
+   * This case's own research mode, or null to follow the default.
+   */
+  mode: 'off' | 'ask' | 'automatic' | null;
+  /**
+   * Reason
+   *
+   * One line on why, needed with a mode.
+   */
+  reason?: string | null;
 };
 
 /**
@@ -2470,6 +2849,20 @@ export type ChainStepOut = {
    * To
    */
   to: string;
+};
+
+/**
+ * ChangePassphraseIn
+ */
+export type ChangePassphraseIn = {
+  /**
+   * New
+   */
+  new: string;
+  /**
+   * Old
+   */
+  old: string;
 };
 
 /**
@@ -3051,6 +3444,14 @@ export type ClaimEvidenceLinkOut = {
    */
   created_at: string;
   /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
+  /**
    * Evidence Id
    */
   evidence_id: string;
@@ -3187,6 +3588,14 @@ export type ClaimReviewEventOut = {
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
    */
   created_at: string;
+  /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
   /**
    * From Agreement Grade
    */
@@ -3922,6 +4331,50 @@ export type ConnectorFindingOut = {
    * Source Url
    */
   source_url?: string | null;
+};
+
+/**
+ * ConnectorRunLineOut
+ */
+export type ConnectorRunLineOut = {
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * Case
+   */
+  case: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Is Party
+   */
+  is_party: boolean;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * Results
+   */
+  results: number;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Status
+   */
+  status: string;
 };
 
 /**
@@ -4989,21 +5442,62 @@ export type CustodyAiOut = {
 /**
  * CustodyAnchorOut
  *
- * Where the quote stands in the passage, found now (character offsets in the passage text).
+ * Where the quote stands in the passage (ADR-0015): the stored anchor found again, or, for a quote saved before
+ * anchors were kept, found now. Offsets are characters in the passage text; null when the quote is not found.
  */
 export type CustodyAnchorOut = {
   /**
+   * After
+   */
+  after?: number | null;
+  /**
+   * Anchored At
+   */
+  anchored_at?: string | null;
+  /**
+   * Before
+   */
+  before?: number | null;
+  /**
+   * Chunk Id
+   */
+  chunk_id?: string | null;
+  /**
    * End
    */
-  end: number;
+  end?: number | null;
   /**
    * Exact
    */
-  exact: boolean;
+  exact?: boolean | null;
+  /**
+   * Line End
+   */
+  line_end?: number | null;
+  /**
+   * Line Start
+   */
+  line_start?: number | null;
+  /**
+   * Match
+   */
+  match?: 'exact' | 'case' | 'spacing' | null;
+  /**
+   * Occurrences
+   */
+  occurrences?: number | null;
   /**
    * Start
    */
-  start: number;
+  start?: number | null;
+  /**
+   * State
+   */
+  state: 'held' | 'moved' | 'lost' | 'not anchored';
+  /**
+   * Stored
+   */
+  stored: boolean;
 };
 
 /**
@@ -5032,6 +5526,18 @@ export type CustodyCardOut = {
    * Kind
    */
   kind: 'file' | 'source' | 'reading' | 'passage' | 'decision';
+  /**
+   * Legibility
+   */
+  legibility?: number | null;
+  /**
+   * Line End
+   */
+  line_end?: number | null;
+  /**
+   * Line Start
+   */
+  line_start?: number | null;
   /**
    * Lines
    */
@@ -5370,6 +5876,36 @@ export type DataTableRowOut = {
    * X Formatted
    */
   x_formatted?: string | null;
+};
+
+/**
+ * DeciderOut
+ */
+export type DeciderOut = {
+  /**
+   * Decisions
+   */
+  decisions: number;
+  /**
+   * Name
+   */
+  name?: string | null;
+};
+
+/**
+ * DecidersOut
+ *
+ * Who decided what in a case over the last days (mockup ACCOUNT_2): name, or null for "a person".
+ */
+export type DecidersOut = {
+  /**
+   * Days
+   */
+  days: number;
+  /**
+   * People
+   */
+  people: Array<DeciderOut>;
 };
 
 /**
@@ -6107,6 +6643,50 @@ export type DemoSeedOut = {
 };
 
 /**
+ * DiskAnswerIn
+ */
+export type DiskAnswerIn = {
+  /**
+   * Answer
+   */
+  answer?: string | null;
+};
+
+/**
+ * DiskStatusOut
+ *
+ * Whether the disk the app runs from is encrypted, as far as the app can tell without administrator rights.
+ */
+export type DiskStatusOut = {
+  /**
+   * Answered
+   */
+  answered?: boolean;
+  /**
+   * How To
+   */
+  how_to?: string;
+  /**
+   * State
+   */
+  state:
+    | 'encrypted'
+    | 'encrypting'
+    | 'paused'
+    | 'decrypting'
+    | 'not_encrypted'
+    | 'unknown';
+  /**
+   * System
+   */
+  system: string;
+  /**
+   * Why
+   */
+  why?: string;
+};
+
+/**
  * DocumentChunkOut
  */
 export type DocumentChunkOut = {
@@ -6129,6 +6709,10 @@ export type DocumentChunkOut = {
    */
   locator: string;
   /**
+   * Ocr Legibility
+   */
+  ocr_legibility?: number | null;
+  /**
    * Ordinal
    */
   ordinal: number;
@@ -6145,7 +6729,7 @@ export type DocumentChunkOut = {
 /**
  * DocumentDetailOut
  *
- * A document with its extracted chunks (GET /documents/{id}).
+ * A document with its extracted chunks (GET /documents/{id}), and the languages OpenAleph detected in it.
  */
 export type DocumentDetailOut = {
   /**
@@ -6192,6 +6776,10 @@ export type DocumentDetailOut = {
    * Investigation Id
    */
   investigation_id: string;
+  /**
+   * Languages
+   */
+  languages?: Array<DocumentLanguageOut>;
   /**
    * Mime Type
    */
@@ -6308,6 +6896,20 @@ export type DocumentFormatsOut = {
    * Reader
    */
   reader: 'openaleph' | 'workbench';
+};
+
+/**
+ * DocumentLanguageOut
+ */
+export type DocumentLanguageOut = {
+  /**
+   * Code
+   */
+  code: string;
+  /**
+   * Name
+   */
+  name: string;
 };
 
 /**
@@ -8064,6 +8666,12 @@ export type EvidenceCreate = {
  */
 export type EvidenceOut = {
   /**
+   * Anchor
+   */
+  anchor?: {
+    [key: string]: unknown;
+  } | null;
+  /**
    * Authenticity Status
    */
   authenticity_status?: string | null;
@@ -8988,6 +9596,78 @@ export type ExtractionReviewOut = {
 };
 
 /**
+ * FactWatchCreate
+ */
+export type FactWatchCreate = {
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: 'claim' | 'red_flag';
+};
+
+/**
+ * FactWatchOut
+ */
+export type FactWatchOut = {
+  /**
+   * Baseline
+   */
+  baseline: string;
+  /**
+   * Baseline Words
+   */
+  baseline_words: string;
+  /**
+   * Changed
+   */
+  changed: boolean;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: string;
+  /**
+   * Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  seen_at: string;
+  /**
+   * Value
+   */
+  value: string;
+  /**
+   * Value Words
+   */
+  value_words: string;
+};
+
+/**
  * FigureItemOut
  */
 export type FigureItemOut = {
@@ -9831,6 +10511,88 @@ export type IdentityMergeAuditOut = {
 };
 
 /**
+ * InboxOut
+ */
+export type InboxOut = {
+  /**
+   * Desktop
+   */
+  desktop: boolean;
+  /**
+   * Else
+   */
+  else: Array<InboxRowOut>;
+  /**
+   * Interrupt
+   */
+  interrupt: Array<InboxRowOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Needs
+   */
+  needs: Array<InboxRowOut>;
+  /**
+   * Quiet While Reading
+   */
+  quiet_while_reading: boolean;
+  /**
+   * Week
+   */
+  week: {
+    [key: string]: number;
+  };
+};
+
+/**
+ * InboxRowOut
+ */
+export type InboxRowOut = {
+  /**
+   * Actor
+   */
+  actor: string;
+  /**
+   * Actor Kind
+   */
+  actor_kind: string;
+  /**
+   * Created At
+   */
+  created_at?: string | null;
+  /**
+   * Href
+   */
+  href: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Level
+   */
+  level?: string | null;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Route
+   */
+  route: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * IncompleteTransactionOut
  *
  * A Payment edge the ledger could not chart, with what is missing or
@@ -10286,6 +11048,12 @@ export type InvestigationOut = {
    */
   is_demo: boolean;
   /**
+   * Last Backup
+   */
+  last_backup?: {
+    [key: string]: unknown;
+  } | null;
+  /**
    * Name
    */
   name: string;
@@ -10372,6 +11140,34 @@ export type InvestigationUpdate = {
    * Question
    */
   question?: string | null;
+};
+
+/**
+ * KeyCheckOut
+ *
+ * Whether a source accepts its key, learned without a search.
+ */
+export type KeyCheckOut = {
+  /**
+   * At
+   */
+  at: string;
+  /**
+   * Credits
+   */
+  credits?: number | null;
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Provider
+   */
+  provider: string;
+  /**
+   * State
+   */
+  state: string;
 };
 
 /**
@@ -10828,6 +11624,14 @@ export type LineageCandidateOut = {
    */
   created_at: string;
   /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
+  /**
    * Document Id
    */
   document_id: string;
@@ -11010,6 +11814,213 @@ export type LineageSourceOut = {
    * Url
    */
   url?: string | null;
+};
+
+/**
+ * LockReasonIn
+ */
+export type LockReasonIn = {
+  /**
+   * Reason
+   */
+  reason?: string | null;
+};
+
+/**
+ * LockStateOut
+ *
+ * The app lock as the screen needs it. While locked: only that it is locked and whether a PIN may open it.
+ */
+export type LockStateOut = {
+  /**
+   * Backups Encrypted
+   */
+  backups_encrypted?: boolean | null;
+  disk?: DiskStatusOut | null;
+  /**
+   * Disk Answer
+   */
+  disk_answer?: string | null;
+  /**
+   * Idle Minutes
+   */
+  idle_minutes?: number | null;
+  /**
+   * Known
+   */
+  known?: boolean;
+  /**
+   * Lock On Hide
+   */
+  lock_on_hide?: boolean | null;
+  /**
+   * Lock On Sleep
+   */
+  lock_on_sleep?: boolean | null;
+  /**
+   * Locked
+   */
+  locked: boolean;
+  /**
+   * Locked Cases
+   */
+  locked_cases?: Array<LockedCaseOut> | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+  /**
+   * Passphrase Set At
+   */
+  passphrase_set_at?: string | null;
+  /**
+   * Pin
+   */
+  pin: boolean;
+  /**
+   * Pin Set
+   */
+  pin_set?: boolean | null;
+  /**
+   * Protection
+   */
+  protection: 'none' | 'passphrase';
+  /**
+   * Quick Pin
+   */
+  quick_pin?: boolean | null;
+  /**
+   * Recovery Set At
+   */
+  recovery_set_at?: string | null;
+  /**
+   * Session
+   */
+  session?: string | null;
+  /**
+   * Unsigned Decisions
+   */
+  unsigned_decisions?: number | null;
+};
+
+/**
+ * LockedCaseOut
+ */
+export type LockedCaseOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Open
+   */
+  open: boolean;
+  /**
+   * Set At
+   */
+  set_at?: string | null;
+};
+
+/**
+ * LockingIn
+ */
+export type LockingIn = {
+  /**
+   * Idle Minutes
+   */
+  idle_minutes?: number | null;
+  /**
+   * Lock On Hide
+   */
+  lock_on_hide?: boolean | null;
+  /**
+   * Lock On Sleep
+   */
+  lock_on_sleep?: boolean | null;
+  /**
+   * Quick Pin
+   */
+  quick_pin?: boolean | null;
+};
+
+/**
+ * LookupDefaultsPut
+ */
+export type LookupDefaultsPut = {
+  /**
+   * Defaults
+   *
+   * Each source's mode for cases that have not chosen their own.
+   */
+  defaults: {
+    [key: string]: 'automatic' | 'ask' | 'off';
+  };
+};
+
+/**
+ * LookupSettingsOut
+ */
+export type LookupSettingsOut = {
+  /**
+   * Can Change Defaults
+   */
+  can_change_defaults: boolean;
+  /**
+   * Cases
+   */
+  cases: Array<CaseLookupsOut>;
+  /**
+   * Sources
+   */
+  sources: Array<LookupSourceOut>;
+  /**
+   * Week
+   */
+  week: Array<OutboundLineOut>;
+};
+
+/**
+ * LookupSourceOut
+ */
+export type LookupSourceOut = {
+  /**
+   * Cases This Month
+   */
+  cases_this_month: number;
+  /**
+   * Default
+   */
+  default: string;
+  /**
+   * Host
+   */
+  host: string;
+  /**
+   * Key
+   */
+  key: string;
+  key_check?: KeyCheckOut | null;
+  /**
+   * Key Saved
+   */
+  key_saved: boolean;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Label
+   */
+  label: string;
+  last?: ConnectorRunLineOut | null;
+  /**
+   * Mode
+   */
+  mode?: string | null;
 };
 
 /**
@@ -11568,6 +12579,16 @@ export type MultiEnrichmentRequest = {
 };
 
 /**
+ * NameIn
+ */
+export type NameIn = {
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
  * NoteCreate
  */
 export type NoteCreate = {
@@ -11687,6 +12708,173 @@ export type NotesOut = {
    * Notes
    */
   notes: Array<NoteOut>;
+};
+
+/**
+ * NotificationChannelOut
+ */
+export type NotificationChannelOut = {
+  /**
+   * Address
+   */
+  address?: string | null;
+  /**
+   * Mode
+   */
+  mode: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
+ * NotificationChannelPut
+ */
+export type NotificationChannelPut = {
+  /**
+   * Address
+   *
+   * Email: your own address.
+   */
+  address?: string | null;
+  /**
+   * Mode
+   */
+  mode: 'off' | 'interrupts' | 'daily';
+  /**
+   * Url
+   *
+   * Phone: your ntfy address (ntfys://host/topic).
+   */
+  url?: string | null;
+};
+
+/**
+ * NotificationKindOut
+ */
+export type NotificationKindOut = {
+  /**
+   * Can Interrupt
+   */
+  can_interrupt: boolean;
+  /**
+   * Default
+   */
+  default: string;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Route
+   */
+  route: string;
+};
+
+/**
+ * NotificationPrefsOut
+ */
+export type NotificationPrefsOut = {
+  /**
+   * Backup Days
+   */
+  backup_days: number;
+  /**
+   * Desktop
+   */
+  desktop: boolean;
+  /**
+   * Kinds
+   */
+  kinds: Array<NotificationKindOut>;
+  /**
+   * Outside
+   */
+  outside: {
+    [key: string]: NotificationChannelOut;
+  };
+  /**
+   * Push Devices
+   */
+  push_devices: number;
+  /**
+   * Quiet While Reading
+   */
+  quiet_while_reading: boolean;
+  /**
+   * Routes
+   */
+  routes: {
+    [key: string]: string;
+  };
+  server: NotificationServerOut;
+};
+
+/**
+ * NotificationPrefsPut
+ */
+export type NotificationPrefsPut = {
+  /**
+   * Backup Days
+   *
+   * Mention a changed case not backed up for this many days (0: never).
+   */
+  backup_days?: 7 | 14 | 30 | 0 | null;
+  /**
+   * Desktop
+   */
+  desktop?: boolean;
+  /**
+   * Quiet While Reading
+   */
+  quiet_while_reading?: boolean;
+  /**
+   * Routes
+   *
+   * Where each kind goes; kinds left out keep their route.
+   */
+  routes?: {
+    [key: string]: 'interrupt' | 'needs' | 'else' | 'off';
+  };
+};
+
+/**
+ * NotificationServerOut
+ *
+ * What this server can send outside the app; never its mail account or keys.
+ */
+export type NotificationServerOut = {
+  /**
+   * Email
+   */
+  email: boolean;
+  /**
+   * Webpush
+   */
+  webpush: boolean;
+  /**
+   * Webpush Key
+   */
+  webpush_key?: string | null;
+};
+
+/**
+ * NotificationTestOut
+ */
+export type NotificationTestOut = {
+  /**
+   * Channel
+   */
+  channel: string;
+  /**
+   * Sent
+   */
+  sent: boolean;
 };
 
 /**
@@ -12255,6 +13443,104 @@ export type OrphanStoragePreviewOut = {
 };
 
 /**
+ * OutboundLineOut
+ *
+ * One request that left this computer (app/services/outbound.py).
+ */
+export type OutboundLineOut = {
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * Case
+   */
+  case: string;
+  /**
+   * Destination
+   */
+  destination: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id?: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Outcome
+   */
+  outcome: string;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Service
+   */
+  service: string;
+};
+
+/**
+ * OutboundRequestOut
+ */
+export type OutboundRequestOut = {
+  /**
+   * Actor
+   */
+  actor: 'you' | 'automatic';
+  /**
+   * At
+   */
+  at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Leaves Computer
+   */
+  leaves_computer: boolean;
+  /**
+   * Outcome
+   */
+  outcome: 'sent' | 'failed' | 'blocked';
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Service
+   */
+  service: string;
+  /**
+   * Service Name
+   */
+  service_name: string;
+  /**
+   * Source
+   */
+  source?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Value
+   */
+  value: string;
+};
+
+/**
  * OwnershipChainLinkOut
  *
  * An Ownership or Directorship link as the records state it.
@@ -12514,6 +13800,26 @@ export type PeekOut = {
     | 'task'
     | 'finding'
     | 'story';
+};
+
+/**
+ * PinIn
+ */
+export type PinIn = {
+  /**
+   * Pin
+   */
+  pin: string;
+};
+
+/**
+ * PinSetIn
+ */
+export type PinSetIn = {
+  /**
+   * Pin
+   */
+  pin?: string | null;
 };
 
 /**
@@ -13014,6 +14320,45 @@ export type ProviderLeadOut = {
 };
 
 /**
+ * PushSubscriptionIn
+ */
+export type PushSubscriptionIn = {
+  /**
+   * Endpoint
+   */
+  endpoint: string;
+  keys: PushSubscriptionKeys;
+  /**
+   * Label
+   */
+  label?: string | null;
+};
+
+/**
+ * PushSubscriptionKeys
+ */
+export type PushSubscriptionKeys = {
+  /**
+   * Auth
+   */
+  auth: string;
+  /**
+   * P256Dh
+   */
+  p256dh: string;
+};
+
+/**
+ * PushSubscriptionRemove
+ */
+export type PushSubscriptionRemove = {
+  /**
+   * Endpoint
+   */
+  endpoint: string;
+};
+
+/**
  * QueryRef
  *
  * One catalogued query and its parameters, as the AI writes them.
@@ -13288,6 +14633,32 @@ export type RecordTagsOut = {
    * Rows
    */
   rows: Array<RecordTagRowOut>;
+};
+
+/**
+ * RecoverIn
+ */
+export type RecoverIn = {
+  /**
+   * New Passphrase
+   */
+  new_passphrase: string;
+  /**
+   * Words
+   */
+  words: string;
+};
+
+/**
+ * RecoveryWordsOut
+ *
+ * The 12 recovery words, shown this once: only an Argon2id hash of them is kept.
+ */
+export type RecoveryWordsOut = {
+  /**
+   * Words
+   */
+  words: Array<string>;
 };
 
 /**
@@ -14055,6 +15426,82 @@ export type ReportingTaskUpdate = {
 };
 
 /**
+ * ResearchSettingsOut
+ */
+export type ResearchSettingsOut = {
+  /**
+   * Ai Enabled
+   */
+  ai_enabled: boolean;
+  /**
+   * Can Change Defaults
+   */
+  can_change_defaults: boolean;
+  /**
+   * Cases
+   */
+  cases: Array<RunDefaultsCaseOut>;
+  /**
+   * Defaults Reason
+   */
+  defaults_reason?: string | null;
+  /**
+   * Defaults Saved At
+   */
+  defaults_saved_at?: string | null;
+  /**
+   * Locked
+   */
+  locked: Array<RunPlanLockedOut>;
+  /**
+   * Mode
+   */
+  mode: string;
+  /**
+   * Model
+   */
+  model?: string | null;
+  /**
+   * Settings
+   */
+  settings: Array<RunSettingOut>;
+};
+
+/**
+ * ResearchSettingsPut
+ */
+export type ResearchSettingsPut = {
+  /**
+   * Flags
+   *
+   * Run defaults for new cases: the suite's flags.
+   */
+  flags?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Mode
+   *
+   * What the AI may start on its own, for cases that have not chosen.
+   */
+  mode?: 'off' | 'ask' | 'automatic' | null;
+  /**
+   * Options
+   *
+   * Run defaults for new cases: the run options.
+   */
+  options?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Reason
+   *
+   * Needed when the run defaults change.
+   */
+  reason?: string | null;
+};
+
+/**
  * ResolutionDecisionOut
  *
  * A reporter's identity decision on a finding, as stored.
@@ -14255,6 +15702,32 @@ export type RunChangeIn = {
 };
 
 /**
+ * RunDefaultsCaseOut
+ */
+export type RunDefaultsCaseOut = {
+  /**
+   * Differs
+   */
+  differs: Array<string>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Saved At
+   */
+  saved_at?: string | null;
+};
+
+/**
  * RunOptionsIn
  *
  * The run options beyond the two TAS §4 flags (app/ai/reasoning.py RUN_OPTIONS). None = the suite's default.
@@ -14412,6 +15885,10 @@ export type RunPlanOut = {
  */
 export type RunPlanPacketOut = {
   /**
+   * Below Tier Floor
+   */
+  below_tier_floor: Array<RunPlanTierCountOut>;
+  /**
    * By Type
    */
   by_type: Array<RunPlanTypeCountOut>;
@@ -14454,6 +15931,10 @@ export type RunPlanRecordOut = {
  */
 export type RunPlanRequest = {
   /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
    * Include External Leads
    */
   include_external_leads?: boolean;
@@ -14464,7 +15945,17 @@ export type RunPlanRequest = {
   /**
    * Module
    */
-  module?: 'case_synthesis' | 'hypothesis_test';
+  module?:
+    | 'case_synthesis'
+    | 'hypothesis_test'
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
   options?: RunOptionsIn | null;
   /**
    * Premises
@@ -14538,6 +16029,20 @@ export type RunPlanSystemOut = {
    * Why
    */
   why: string;
+};
+
+/**
+ * RunPlanTierCountOut
+ */
+export type RunPlanTierCountOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Tier
+   */
+  tier: string;
 };
 
 /**
@@ -14727,6 +16232,210 @@ export type RunSettingValueOut = {
 };
 
 /**
+ * SafetyAccessOut
+ */
+export type SafetyAccessOut = {
+  /**
+   * Log Readable
+   */
+  log_readable: boolean;
+  /**
+   * Mode
+   */
+  mode: 'local_only' | 'remote';
+  /**
+   * Refused 24H
+   */
+  refused_24h: number;
+};
+
+/**
+ * SafetyBackupOut
+ */
+export type SafetyBackupOut = {
+  /**
+   * Bytes
+   */
+  bytes?: number | null;
+  /**
+   * Encrypted
+   */
+  encrypted: boolean;
+  /**
+   * Last Backup At
+   */
+  last_backup_at?: string | null;
+  /**
+   * Restore Enabled
+   */
+  restore_enabled: boolean;
+  /**
+   * Sha256
+   */
+  sha256?: string | null;
+};
+
+/**
+ * SafetyDataOut
+ *
+ * Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015).
+ */
+export type SafetyDataOut = {
+  access: SafetyAccessOut;
+  backup: SafetyBackupOut;
+  /**
+   * Exposure
+   */
+  exposure: string;
+  housekeeping: SafetyHousekeepingOut;
+  /**
+   * Outbound
+   */
+  outbound: Array<OutboundRequestOut>;
+  /**
+   * Outbound Total
+   */
+  outbound_total: number;
+  /**
+   * Period
+   */
+  period: 'today' | '7d' | '30d' | 'all';
+  /**
+   * Services
+   */
+  services: Array<SafetyServiceOut>;
+  /**
+   * Stores
+   */
+  stores: Array<SafetyStoreOut>;
+  totals: SafetyTotalsOut;
+};
+
+/**
+ * SafetyHousekeepingOut
+ */
+export type SafetyHousekeepingOut = {
+  /**
+   * Stray Bytes
+   */
+  stray_bytes?: number | null;
+  /**
+   * Stray Files
+   */
+  stray_files?: number | null;
+};
+
+/**
+ * SafetyServiceOut
+ *
+ * A service the case can reach, with what has been sent to it in the period.
+ */
+export type SafetyServiceOut = {
+  /**
+   * About
+   */
+  about: string;
+  /**
+   * Blocked Note
+   */
+  blocked_note?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Sends
+   */
+  sends: Array<string>;
+  /**
+   * Sent Count
+   */
+  sent_count: number;
+  /**
+   * State
+   */
+  state: 'off' | 'ask_first' | 'automatic' | 'on_request' | 'local';
+  /**
+   * State Note
+   */
+  state_note: string;
+  /**
+   * Where
+   */
+  where: 'inside' | 'outside';
+};
+
+/**
+ * SafetyStoreOut
+ *
+ * One place on this computer where the case lives (mockup KEEP_2's six stores).
+ */
+export type SafetyStoreOut = {
+  /**
+   * Bytes
+   */
+  bytes?: number | null;
+  /**
+   * Count
+   */
+  count?: number | null;
+  /**
+   * Count Note
+   */
+  count_note?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * In Backups
+   */
+  in_backups?: boolean | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Oldest
+   */
+  oldest?: string | null;
+  /**
+   * Warning
+   */
+  warning?: string | null;
+  /**
+   * Where
+   */
+  where: string;
+};
+
+/**
+ * SafetyTotalsOut
+ */
+export type SafetyTotalsOut = {
+  /**
+   * Ai Calls Outside
+   */
+  ai_calls_outside: number;
+  /**
+   * Documents Sent Out
+   */
+  documents_sent_out: number;
+  /**
+   * Requests Left
+   */
+  requests_left: number;
+  /**
+   * Services Reached
+   */
+  services_reached: number;
+};
+
+/**
  * SameAnswerCandidateOut
  */
 export type SameAnswerCandidateOut = {
@@ -14779,6 +16488,68 @@ export type SameAnswerOut = {
    * Scope
    */
   scope: 'drop' | 'case';
+};
+
+/**
+ * SavedQuestionCreate
+ */
+export type SavedQuestionCreate = {
+  /**
+   * Module
+   */
+  module: 'case_synthesis' | 'hypothesis_test';
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
+};
+
+/**
+ * SavedQuestionOut
+ */
+export type SavedQuestionOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Last Run At
+   */
+  last_run_at?: string | null;
+  /**
+   * Last Run Id
+   */
+  last_run_id?: string | null;
+  /**
+   * Module
+   */
+  module: string;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
 };
 
 /**
@@ -14959,6 +16730,16 @@ export type SearchPartyOut = {
    * Schema
    */
   schema: string;
+};
+
+/**
+ * SecretIn
+ */
+export type SecretIn = {
+  /**
+   * Passphrase
+   */
+  passphrase: string;
 };
 
 /**
@@ -16141,6 +17922,110 @@ export type StyleWarningOut = {
 };
 
 /**
+ * SuiteCatalogModuleOut
+ */
+export type SuiteCatalogModuleOut = {
+  /**
+   * Final Audit
+   */
+  final_audit: boolean;
+  /**
+   * Number
+   */
+  number: string;
+  /**
+   * Path
+   */
+  path: string;
+  /**
+   * Runs In
+   */
+  runs_in: Array<string>;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Use When
+   */
+  use_when: string;
+};
+
+/**
+ * SuiteCatalogOut
+ *
+ * Every system, module and record of the suite, and which app runs use each module.
+ */
+export type SuiteCatalogOut = {
+  /**
+   * Source
+   */
+  source: string | null;
+  /**
+   * Systems
+   */
+  systems: Array<SuiteCatalogSystemOut>;
+};
+
+/**
+ * SuiteCatalogRecordOut
+ */
+export type SuiteCatalogRecordOut = {
+  /**
+   * Closed
+   */
+  closed: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Fields
+   */
+  fields: Array<string>;
+  /**
+   * Id Field
+   */
+  id_field: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Prefix
+   */
+  prefix: string | null;
+};
+
+/**
+ * SuiteCatalogSystemOut
+ */
+export type SuiteCatalogSystemOut = {
+  /**
+   * Code
+   */
+  code: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Modules
+   */
+  modules: Array<SuiteCatalogModuleOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Records
+   */
+  records: Array<SuiteCatalogRecordOut>;
+  /**
+   * Row
+   */
+  row: number;
+};
+
+/**
  * SuiteCoverageCountsOut
  */
 export type SuiteCoverageCountsOut = {
@@ -16271,6 +18156,54 @@ export type SuiteRequirementOut = {
    * Why
    */
   why: string;
+};
+
+/**
+ * SuiteRunRequest
+ *
+ * One run of another system of the Authority System Suite (app/ai/systems.py). `handoff_from` is the id of an
+ * answer you accepted, which the run starts from under the suite's INTEROP rules; some modules need one.
+ * `context` is what the module asks the requester for besides the question (an evidence plan's jurisdiction and
+ * access limits, a decision's owner and deadline, how each person was approached). `premises` are taken as given
+ * by the logic check only.
+ */
+export type SuiteRunRequest = {
+  /**
+   * Context
+   */
+  context?: string | null;
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module:
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
 };
 
 /**
@@ -18139,6 +20072,28 @@ export type WireFlagsOut = {
 };
 
 /**
+ * WireLinkFlagOut
+ */
+export type WireLinkFlagOut = {
+  /**
+   * Flag Id
+   */
+  flag_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Level
+   */
+  level: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * WireLinkOut
  */
 export type WireLinkOut = {
@@ -18186,6 +20141,69 @@ export type WireLinkOut = {
    * T
    */
   t: string;
+};
+
+/**
+ * WireLinkSourceOut
+ */
+export type WireLinkSourceOut = {
+  /**
+   * Document Id
+   */
+  document_id: string | null;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Locator
+   */
+  locator: string;
+  /**
+   * Page
+   */
+  page: number | null;
+  /**
+   * Quote
+   */
+  quote: string;
+  /**
+   * Reviewed At
+   */
+  reviewed_at: string | null;
+  /**
+   * Source Title
+   */
+  source_title: string;
+  /**
+   * Stance
+   */
+  stance: string | null;
+};
+
+/**
+ * WireLinkSourcesOut
+ *
+ * One link's evidence for The Wire's link panel (SEE_1): each quote with the page it stands on, and the open
+ * Red Flags resting on the link.
+ */
+export type WireLinkSourcesOut = {
+  /**
+   * Evidence
+   */
+  evidence: Array<WireLinkSourceOut>;
+  /**
+   * Flags
+   */
+  flags: Array<WireLinkFlagOut>;
+  /**
+   * Relationship Id
+   */
+  relationship_id: string;
 };
 
 /**
@@ -21174,6 +23192,10 @@ export type GetDocumentPageImageData = {
      * Highlight
      */
     highlight?: string;
+    /**
+     * Crop
+     */
+    crop?: boolean;
   };
   url: '/api/documents/{document_id}/page-image';
 };
@@ -23570,6 +25592,102 @@ export type SaveInvestigationRunProfileResponses = {
 export type SaveInvestigationRunProfileResponse =
   SaveInvestigationRunProfileResponses[keyof SaveInvestigationRunProfileResponses];
 
+export type InvestigationAssistantRunData = {
+  body: AssistantRunRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/run';
+};
+
+export type InvestigationAssistantRunErrors = {
+  /**
+   * Response 422 Investigation Assistant Run
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
+   */
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Assistant Run
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationAssistantRunError =
+  InvestigationAssistantRunErrors[keyof InvestigationAssistantRunErrors];
+
+export type InvestigationAssistantRunResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
+};
+
+export type InvestigationAssistantRunResponse =
+  InvestigationAssistantRunResponses[keyof InvestigationAssistantRunResponses];
+
+export type InvestigationSuiteRunData = {
+  body: SuiteRunRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/assistant/suite-run';
+};
+
+export type InvestigationSuiteRunErrors = {
+  /**
+   * Response 422 Investigation Suite Run
+   *
+   * The input does not match the route, or the model's answer did not pass its checks
+   */
+  422: ValidationErrorOut | AiOutputRejectedOut;
+  /**
+   * Response 502 Investigation Suite Run
+   *
+   * The AI provider failed (the details are logged on the server), or its answer could not be used at all
+   */
+  502: ErrorOut | AiModelFailedOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationSuiteRunError =
+  InvestigationSuiteRunErrors[keyof InvestigationSuiteRunErrors];
+
+export type InvestigationSuiteRunResponses = {
+  /**
+   * Successful Response
+   */
+  200: AiReasoningRunOut;
+  /**
+   * Queued: no proposal yet; follow the job (GET /api/jobs/{job_id})
+   */
+  202: AiReasoningRunOut;
+};
+
+export type InvestigationSuiteRunResponse =
+  InvestigationSuiteRunResponses[keyof InvestigationSuiteRunResponses];
+
 export type ListCaseRecordsData = {
   body?: never;
   path: {
@@ -24393,6 +26511,47 @@ export type ListInvestigationCrossReferencesResponses = {
 export type ListInvestigationCrossReferencesResponse =
   ListInvestigationCrossReferencesResponses[keyof ListInvestigationCrossReferencesResponses];
 
+export type InvestigationDecidersData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Days
+     */
+    days?: number;
+  };
+  url: '/api/investigations/{investigation_id}/deciders';
+};
+
+export type InvestigationDecidersErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type InvestigationDecidersError =
+  InvestigationDecidersErrors[keyof InvestigationDecidersErrors];
+
+export type InvestigationDecidersResponses = {
+  /**
+   * Successful Response
+   */
+  200: DecidersOut;
+};
+
+export type InvestigationDecidersResponse =
+  InvestigationDecidersResponses[keyof InvestigationDecidersResponses];
+
 export type GetDecisionsData = {
   body?: never;
   path: {
@@ -24860,6 +27019,40 @@ export type GetInvestigationGraphResponses = {
 export type GetInvestigationGraphResponse =
   GetInvestigationGraphResponses[keyof GetInvestigationGraphResponses];
 
+export type GetInboxData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/inbox';
+};
+
+export type GetInboxErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetInboxError = GetInboxErrors[keyof GetInboxErrors];
+
+export type GetInboxResponses = {
+  /**
+   * Successful Response
+   */
+  200: InboxOut;
+};
+
+export type GetInboxResponse = GetInboxResponses[keyof GetInboxResponses];
+
 export type ListIngestionBatchesData = {
   body?: never;
   path: {
@@ -25035,6 +27228,78 @@ export type LeadQueueResponses = {
 };
 
 export type LeadQueueResponse = LeadQueueResponses[keyof LeadQueueResponses];
+
+export type ClearCaseLookupsData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/lookups';
+};
+
+export type ClearCaseLookupsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ClearCaseLookupsError =
+  ClearCaseLookupsErrors[keyof ClearCaseLookupsErrors];
+
+export type ClearCaseLookupsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LookupSettingsOut;
+};
+
+export type ClearCaseLookupsResponse =
+  ClearCaseLookupsResponses[keyof ClearCaseLookupsResponses];
+
+export type PutCaseLookupsData = {
+  body: CaseLookupsPut;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/lookups';
+};
+
+export type PutCaseLookupsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutCaseLookupsError =
+  PutCaseLookupsErrors[keyof PutCaseLookupsErrors];
+
+export type PutCaseLookupsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LookupSettingsOut;
+};
+
+export type PutCaseLookupsResponse =
+  PutCaseLookupsResponses[keyof PutCaseLookupsResponses];
 
 export type GetRecordMarksData = {
   body?: never;
@@ -25658,6 +27923,153 @@ export type ListReportingTasksResponses = {
 
 export type ListReportingTasksResponse =
   ListReportingTasksResponses[keyof ListReportingTasksResponses];
+
+export type GetCaseResearchData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/research';
+};
+
+export type GetCaseResearchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaseResearchError =
+  GetCaseResearchErrors[keyof GetCaseResearchErrors];
+
+export type GetCaseResearchResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseResearchOut;
+};
+
+export type GetCaseResearchResponse =
+  GetCaseResearchResponses[keyof GetCaseResearchResponses];
+
+export type PutCaseResearchData = {
+  body: CaseResearchPut;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/research';
+};
+
+export type PutCaseResearchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutCaseResearchError =
+  PutCaseResearchErrors[keyof PutCaseResearchErrors];
+
+export type PutCaseResearchResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaseResearchOut;
+};
+
+export type PutCaseResearchResponse =
+  PutCaseResearchResponses[keyof PutCaseResearchResponses];
+
+export type GetSafetyDataData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Period
+     */
+    period?: 'today' | '7d' | '30d' | 'all';
+  };
+  url: '/api/investigations/{investigation_id}/safety-data';
+};
+
+export type GetSafetyDataErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSafetyDataError = GetSafetyDataErrors[keyof GetSafetyDataErrors];
+
+export type GetSafetyDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: SafetyDataOut;
+};
+
+export type GetSafetyDataResponse =
+  GetSafetyDataResponses[keyof GetSafetyDataResponses];
+
+export type SaveQuestionData = {
+  body: SavedQuestionCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/saved-questions';
+};
+
+export type SaveQuestionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SaveQuestionError = SaveQuestionErrors[keyof SaveQuestionErrors];
+
+export type SaveQuestionResponses = {
+  /**
+   * Successful Response
+   */
+  200: SavedQuestionOut;
+};
+
+export type SaveQuestionResponse =
+  SaveQuestionResponses[keyof SaveQuestionResponses];
 
 export type GetSinceData = {
   body?: never;
@@ -26618,6 +29030,43 @@ export type InvestigationVisualRestyleResponses = {
 export type InvestigationVisualRestyleResponse =
   InvestigationVisualRestyleResponses[keyof InvestigationVisualRestyleResponses];
 
+export type ListWatchesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/watches';
+};
+
+export type ListWatchesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListWatchesError = ListWatchesErrors[keyof ListWatchesErrors];
+
+export type ListWatchesResponses = {
+  /**
+   * Response List Watches
+   *
+   * Successful Response
+   */
+  200: Array<FactWatchOut>;
+};
+
+export type ListWatchesResponse =
+  ListWatchesResponses[keyof ListWatchesResponses];
+
 export type GetWatchlistData = {
   body?: never;
   path: {
@@ -27176,6 +29625,341 @@ export type LinkLeadResponses = {
 };
 
 export type LinkLeadResponse = LinkLeadResponses[keyof LinkLeadResponses];
+
+export type MeData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/me';
+};
+
+export type MeErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MeError = MeErrors[keyof MeErrors];
+
+export type MeResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type MeResponse = MeResponses[keyof MeResponses];
+
+export type LockCaseData = {
+  body: CaseLockIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/me/cases/{investigation_id}/lock';
+};
+
+export type LockCaseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type LockCaseError = LockCaseErrors[keyof LockCaseErrors];
+
+export type LockCaseResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type LockCaseResponse = LockCaseResponses[keyof LockCaseResponses];
+
+export type RemoveCaseLockData = {
+  body: SecretIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/me/cases/{investigation_id}/unlock-for-good';
+};
+
+export type RemoveCaseLockErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemoveCaseLockError =
+  RemoveCaseLockErrors[keyof RemoveCaseLockErrors];
+
+export type RemoveCaseLockResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type RemoveCaseLockResponse =
+  RemoveCaseLockResponses[keyof RemoveCaseLockResponses];
+
+export type DiskAnswerData = {
+  body: DiskAnswerIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/disk';
+};
+
+export type DiskAnswerErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DiskAnswerError = DiskAnswerErrors[keyof DiskAnswerErrors];
+
+export type DiskAnswerResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type DiskAnswerResponse = DiskAnswerResponses[keyof DiskAnswerResponses];
+
+export type LockingData = {
+  body: LockingIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/locking';
+};
+
+export type LockingErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type LockingError = LockingErrors[keyof LockingErrors];
+
+export type LockingResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type LockingResponse = LockingResponses[keyof LockingResponses];
+
+export type SetNameData = {
+  body: NameIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/name';
+};
+
+export type SetNameErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SetNameError = SetNameErrors[keyof SetNameErrors];
+
+export type SetNameResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type SetNameResponse = SetNameResponses[keyof SetNameResponses];
+
+export type ChangePassphraseData = {
+  body: ChangePassphraseIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/passphrase';
+};
+
+export type ChangePassphraseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ChangePassphraseError =
+  ChangePassphraseErrors[keyof ChangePassphraseErrors];
+
+export type ChangePassphraseResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type ChangePassphraseResponse =
+  ChangePassphraseResponses[keyof ChangePassphraseResponses];
+
+export type SetPinData = {
+  body: PinSetIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/pin';
+};
+
+export type SetPinErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SetPinError = SetPinErrors[keyof SetPinErrors];
+
+export type SetPinResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type SetPinResponse = SetPinResponses[keyof SetPinResponses];
+
+export type TurnOnData = {
+  body: SecretIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/protection';
+};
+
+export type TurnOnErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TurnOnError = TurnOnErrors[keyof TurnOnErrors];
+
+export type TurnOnResponses = {
+  /**
+   * Successful Response
+   */
+  200: RecoveryWordsOut;
+};
+
+export type TurnOnResponse = TurnOnResponses[keyof TurnOnResponses];
+
+export type TurnOffData = {
+  body: SecretIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/protection/off';
+};
+
+export type TurnOffErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TurnOffError = TurnOffErrors[keyof TurnOffErrors];
+
+export type TurnOffResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type TurnOffResponse = TurnOffResponses[keyof TurnOffResponses];
+
+export type NewRecoveryKeyData = {
+  body: SecretIn;
+  path?: never;
+  query?: never;
+  url: '/api/me/recovery-key';
+};
+
+export type NewRecoveryKeyErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type NewRecoveryKeyError =
+  NewRecoveryKeyErrors[keyof NewRecoveryKeyErrors];
+
+export type NewRecoveryKeyResponses = {
+  /**
+   * Successful Response
+   */
+  200: RecoveryWordsOut;
+};
+
+export type NewRecoveryKeyResponse =
+  NewRecoveryKeyResponses[keyof NewRecoveryKeyResponses];
 
 export type RemoveNoteData = {
   body?: never;
@@ -27745,6 +30529,42 @@ export type CreateLeadFromRelationshipContextResponses = {
 export type CreateLeadFromRelationshipContextResponse =
   CreateLeadFromRelationshipContextResponses[keyof CreateLeadFromRelationshipContextResponses];
 
+export type GetRelationshipSourcesData = {
+  body?: never;
+  path: {
+    /**
+     * Relationship Id
+     */
+    relationship_id: string;
+  };
+  query?: never;
+  url: '/api/relationships/{relationship_id}/sources';
+};
+
+export type GetRelationshipSourcesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetRelationshipSourcesError =
+  GetRelationshipSourcesErrors[keyof GetRelationshipSourcesErrors];
+
+export type GetRelationshipSourcesResponses = {
+  /**
+   * Successful Response
+   */
+  200: WireLinkSourcesOut;
+};
+
+export type GetRelationshipSourcesResponse =
+  GetRelationshipSourcesResponses[keyof GetRelationshipSourcesResponses];
+
 export type PatchRelationshipSuiteData = {
   body: RelationshipSuiteFields;
   path: {
@@ -27847,6 +30667,78 @@ export type UpdateReportingTaskEndpointResponses = {
 export type UpdateReportingTaskEndpointResponse =
   UpdateReportingTaskEndpointResponses[keyof UpdateReportingTaskEndpointResponses];
 
+export type DeleteSavedQuestionData = {
+  body?: never;
+  path: {
+    /**
+     * Saved Question Id
+     */
+    saved_question_id: string;
+  };
+  query?: never;
+  url: '/api/saved-questions/{saved_question_id}';
+};
+
+export type DeleteSavedQuestionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteSavedQuestionError =
+  DeleteSavedQuestionErrors[keyof DeleteSavedQuestionErrors];
+
+export type DeleteSavedQuestionResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteSavedQuestionResponse =
+  DeleteSavedQuestionResponses[keyof DeleteSavedQuestionResponses];
+
+export type RunSavedQuestionData = {
+  body?: never;
+  path: {
+    /**
+     * Saved Question Id
+     */
+    saved_question_id: string;
+  };
+  query?: never;
+  url: '/api/saved-questions/{saved_question_id}/run';
+};
+
+export type RunSavedQuestionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RunSavedQuestionError =
+  RunSavedQuestionErrors[keyof RunSavedQuestionErrors];
+
+export type RunSavedQuestionResponses = {
+  /**
+   * Successful Response
+   */
+  200: SavedQuestionOut;
+};
+
+export type RunSavedQuestionResponse =
+  RunSavedQuestionResponses[keyof RunSavedQuestionResponses];
+
 export type SearchWorkbenchData = {
   body?: never;
   path?: never;
@@ -27940,6 +30832,322 @@ export type SearchWorkbenchResponses = {
 export type SearchWorkbenchResponse =
   SearchWorkbenchResponses[keyof SearchWorkbenchResponses];
 
+export type SessionStateData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/session';
+};
+
+export type SessionStateErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SessionStateError = SessionStateErrors[keyof SessionStateErrors];
+
+export type SessionStateResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type SessionStateResponse =
+  SessionStateResponses[keyof SessionStateResponses];
+
+export type ActiveData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/session/active';
+};
+
+export type ActiveErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ActiveError = ActiveErrors[keyof ActiveErrors];
+
+export type ActiveResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type ActiveResponse = ActiveResponses[keyof ActiveResponses];
+
+export type CloseCaseData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/session/cases/{investigation_id}/close';
+};
+
+export type CloseCaseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CloseCaseError = CloseCaseErrors[keyof CloseCaseErrors];
+
+export type CloseCaseResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type CloseCaseResponse = CloseCaseResponses[keyof CloseCaseResponses];
+
+export type OpenCaseData = {
+  body: SecretIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/session/cases/{investigation_id}/open';
+};
+
+export type OpenCaseErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type OpenCaseError = OpenCaseErrors[keyof OpenCaseErrors];
+
+export type OpenCaseResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type OpenCaseResponse = OpenCaseResponses[keyof OpenCaseResponses];
+
+export type LockData = {
+  /**
+   * Body
+   */
+  body?: LockReasonIn | null;
+  path?: never;
+  query?: never;
+  url: '/api/session/lock';
+};
+
+export type LockErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type LockError = LockErrors[keyof LockErrors];
+
+export type LockResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type LockResponse = LockResponses[keyof LockResponses];
+
+export type RecoverData = {
+  body: RecoverIn;
+  path?: never;
+  query?: never;
+  url: '/api/session/recover';
+};
+
+export type RecoverErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecoverError = RecoverErrors[keyof RecoverErrors];
+
+export type RecoverResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type RecoverResponse = RecoverResponses[keyof RecoverResponses];
+
+export type StartSessionData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/session/start';
+};
+
+export type StartSessionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type StartSessionError = StartSessionErrors[keyof StartSessionErrors];
+
+export type StartSessionResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type StartSessionResponse =
+  StartSessionResponses[keyof StartSessionResponses];
+
+export type UnlockData = {
+  body: SecretIn;
+  path?: never;
+  query?: never;
+  url: '/api/session/unlock';
+};
+
+export type UnlockErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UnlockError = UnlockErrors[keyof UnlockErrors];
+
+export type UnlockResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type UnlockResponse = UnlockResponses[keyof UnlockResponses];
+
+export type UnlockPinData = {
+  body: PinIn;
+  path?: never;
+  query?: never;
+  url: '/api/session/unlock-pin';
+};
+
+export type UnlockPinErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UnlockPinError = UnlockPinErrors[keyof UnlockPinErrors];
+
+export type UnlockPinResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockStateOut;
+};
+
+export type UnlockPinResponse = UnlockPinResponses[keyof UnlockPinResponses];
+
+export type CheckConnectorKeyData = {
+  body?: never;
+  path: {
+    /**
+     * Provider
+     */
+    provider: string;
+  };
+  query?: never;
+  url: '/api/settings/connectors/{provider}/check';
+};
+
+export type CheckConnectorKeyErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The source failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CheckConnectorKeyError =
+  CheckConnectorKeyErrors[keyof CheckConnectorKeyErrors];
+
+export type CheckConnectorKeyResponses = {
+  /**
+   * Successful Response
+   */
+  200: KeyCheckOut;
+};
+
+export type CheckConnectorKeyResponse =
+  CheckConnectorKeyResponses[keyof CheckConnectorKeyResponses];
+
 export type DeleteConnectorCredentialData = {
   body?: never;
   path: {
@@ -28011,6 +31219,340 @@ export type SaveConnectorCredentialResponses = {
 
 export type SaveConnectorCredentialResponse =
   SaveConnectorCredentialResponses[keyof SaveConnectorCredentialResponses];
+
+export type GetLookupSettingsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Investigation Id
+     */
+    investigation_id?: string | null;
+  };
+  url: '/api/settings/lookups';
+};
+
+export type GetLookupSettingsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetLookupSettingsError =
+  GetLookupSettingsErrors[keyof GetLookupSettingsErrors];
+
+export type GetLookupSettingsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LookupSettingsOut;
+};
+
+export type GetLookupSettingsResponse =
+  GetLookupSettingsResponses[keyof GetLookupSettingsResponses];
+
+export type PutLookupDefaultsData = {
+  body: LookupDefaultsPut;
+  path?: never;
+  query?: {
+    /**
+     * Investigation Id
+     */
+    investigation_id?: string | null;
+  };
+  url: '/api/settings/lookups';
+};
+
+export type PutLookupDefaultsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutLookupDefaultsError =
+  PutLookupDefaultsErrors[keyof PutLookupDefaultsErrors];
+
+export type PutLookupDefaultsResponses = {
+  /**
+   * Successful Response
+   */
+  200: LookupSettingsOut;
+};
+
+export type PutLookupDefaultsResponse =
+  PutLookupDefaultsResponses[keyof PutLookupDefaultsResponses];
+
+export type GetNotificationPrefsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/settings/notifications';
+};
+
+export type GetNotificationPrefsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetNotificationPrefsError =
+  GetNotificationPrefsErrors[keyof GetNotificationPrefsErrors];
+
+export type GetNotificationPrefsResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type GetNotificationPrefsResponse =
+  GetNotificationPrefsResponses[keyof GetNotificationPrefsResponses];
+
+export type PutNotificationPrefsData = {
+  body: NotificationPrefsPut;
+  path?: never;
+  query?: never;
+  url: '/api/settings/notifications';
+};
+
+export type PutNotificationPrefsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutNotificationPrefsError =
+  PutNotificationPrefsErrors[keyof PutNotificationPrefsErrors];
+
+export type PutNotificationPrefsResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type PutNotificationPrefsResponse =
+  PutNotificationPrefsResponses[keyof PutNotificationPrefsResponses];
+
+export type PutNotificationChannelData = {
+  body: NotificationChannelPut;
+  path: {
+    /**
+     * Channel
+     */
+    channel: 'email' | 'phone' | 'webpush';
+  };
+  query?: never;
+  url: '/api/settings/notifications/channels/{channel}';
+};
+
+export type PutNotificationChannelErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutNotificationChannelError =
+  PutNotificationChannelErrors[keyof PutNotificationChannelErrors];
+
+export type PutNotificationChannelResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type PutNotificationChannelResponse =
+  PutNotificationChannelResponses[keyof PutNotificationChannelResponses];
+
+export type TestNotificationChannelData = {
+  body?: never;
+  path: {
+    /**
+     * Channel
+     */
+    channel: 'email' | 'phone' | 'webpush';
+  };
+  query?: never;
+  url: '/api/settings/notifications/channels/{channel}/test';
+};
+
+export type TestNotificationChannelErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The channel failed; the details are logged on the server
+   */
+  502: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TestNotificationChannelError =
+  TestNotificationChannelErrors[keyof TestNotificationChannelErrors];
+
+export type TestNotificationChannelResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationTestOut;
+};
+
+export type TestNotificationChannelResponse =
+  TestNotificationChannelResponses[keyof TestNotificationChannelResponses];
+
+export type AddPushSubscriptionData = {
+  body: PushSubscriptionIn;
+  path?: never;
+  query?: never;
+  url: '/api/settings/push-subscriptions';
+};
+
+export type AddPushSubscriptionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddPushSubscriptionError =
+  AddPushSubscriptionErrors[keyof AddPushSubscriptionErrors];
+
+export type AddPushSubscriptionResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type AddPushSubscriptionResponse =
+  AddPushSubscriptionResponses[keyof AddPushSubscriptionResponses];
+
+export type RemovePushSubscriptionData = {
+  body: PushSubscriptionRemove;
+  path?: never;
+  query?: never;
+  url: '/api/settings/push-subscriptions/remove';
+};
+
+export type RemovePushSubscriptionErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RemovePushSubscriptionError =
+  RemovePushSubscriptionErrors[keyof RemovePushSubscriptionErrors];
+
+export type RemovePushSubscriptionResponses = {
+  /**
+   * Successful Response
+   */
+  200: NotificationPrefsOut;
+};
+
+export type RemovePushSubscriptionResponse =
+  RemovePushSubscriptionResponses[keyof RemovePushSubscriptionResponses];
+
+export type GetResearchSettingsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/settings/research';
+};
+
+export type GetResearchSettingsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetResearchSettingsError =
+  GetResearchSettingsErrors[keyof GetResearchSettingsErrors];
+
+export type GetResearchSettingsResponses = {
+  /**
+   * Successful Response
+   */
+  200: ResearchSettingsOut;
+};
+
+export type GetResearchSettingsResponse =
+  GetResearchSettingsResponses[keyof GetResearchSettingsResponses];
+
+export type PutResearchSettingsData = {
+  body: ResearchSettingsPut;
+  path?: never;
+  query?: never;
+  url: '/api/settings/research';
+};
+
+export type PutResearchSettingsErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutResearchSettingsError =
+  PutResearchSettingsErrors[keyof PutResearchSettingsErrors];
+
+export type PutResearchSettingsResponses = {
+  /**
+   * Successful Response
+   */
+  200: ResearchSettingsOut;
+};
+
+export type PutResearchSettingsResponse =
+  PutResearchSettingsResponses[keyof PutResearchSettingsResponses];
 
 export type GetSecurityAlertsData = {
   body?: never;
@@ -28427,7 +31969,14 @@ export type RotateAppUserTokenData = {
      */
     user_id: string;
   };
-  query?: never;
+  query?: {
+    /**
+     * Key Days
+     *
+     * How long the new key works: 30 or 90 days.
+     */
+    key_days?: number;
+  };
   url: '/api/settings/security/users/{user_id}/token/rotate';
 };
 
@@ -28658,6 +32207,37 @@ export type PromoteStatementAssessmentResponses = {
 export type PromoteStatementAssessmentResponse =
   PromoteStatementAssessmentResponses[keyof PromoteStatementAssessmentResponses];
 
+export type GetSuiteCatalogData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/suite/catalog';
+};
+
+export type GetSuiteCatalogErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSuiteCatalogError =
+  GetSuiteCatalogErrors[keyof GetSuiteCatalogErrors];
+
+export type GetSuiteCatalogResponses = {
+  /**
+   * Successful Response
+   */
+  200: SuiteCatalogOut;
+};
+
+export type GetSuiteCatalogResponse =
+  GetSuiteCatalogResponses[keyof GetSuiteCatalogResponses];
+
 export type GetMappingSchemasData = {
   body?: never;
   path?: never;
@@ -28859,6 +32439,105 @@ export type GradeTimelineEventEndpointResponses = {
 
 export type GradeTimelineEventEndpointResponse =
   GradeTimelineEventEndpointResponses[keyof GradeTimelineEventEndpointResponses];
+
+export type CreateWatchData = {
+  body: FactWatchCreate;
+  path?: never;
+  query?: never;
+  url: '/api/watches';
+};
+
+export type CreateWatchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateWatchError = CreateWatchErrors[keyof CreateWatchErrors];
+
+export type CreateWatchResponses = {
+  /**
+   * Successful Response
+   */
+  200: FactWatchOut;
+};
+
+export type CreateWatchResponse =
+  CreateWatchResponses[keyof CreateWatchResponses];
+
+export type DeleteWatchData = {
+  body?: never;
+  path: {
+    /**
+     * Fact Watch Id
+     */
+    fact_watch_id: string;
+  };
+  query?: never;
+  url: '/api/watches/{fact_watch_id}';
+};
+
+export type DeleteWatchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteWatchError = DeleteWatchErrors[keyof DeleteWatchErrors];
+
+export type DeleteWatchResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteWatchResponse =
+  DeleteWatchResponses[keyof DeleteWatchResponses];
+
+export type SeeWatchData = {
+  body?: never;
+  path: {
+    /**
+     * Fact Watch Id
+     */
+    fact_watch_id: string;
+  };
+  query?: never;
+  url: '/api/watches/{fact_watch_id}/seen';
+};
+
+export type SeeWatchErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SeeWatchError = SeeWatchErrors[keyof SeeWatchErrors];
+
+export type SeeWatchResponses = {
+  /**
+   * Successful Response
+   */
+  200: FactWatchOut;
+};
+
+export type SeeWatchResponse = SeeWatchResponses[keyof SeeWatchResponses];
 
 export type DismissHitData = {
   body?: never;

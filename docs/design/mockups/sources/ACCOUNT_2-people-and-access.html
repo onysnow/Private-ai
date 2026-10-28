@@ -1,0 +1,94 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="account.css"><style>
+.top{display:flex;justify-content:space-between;align-items:center;padding:20px 32px 6px}
+.crumb{font-size:13px;color:var(--muted)} .crumb b{color:var(--text);font-weight:500}
+h1{font:300 40px/1 'Source Serif 4 Variable';padding:4px 32px 16px}
+.grid{display:grid;grid-template-columns:230px 1fr 360px;gap:18px;padding:0 32px}
+.side{padding:14px 10px}
+.side p.eyebrow{padding:10px 10px 6px}
+.row{display:flex;justify-content:space-between;padding:7px 10px;border-radius:8px;font-size:13.5px}
+.row span:last-child{font:12px 'IBM Plex Mono';color:var(--amber)}
+.row.cur{background:#2b2116;box-shadow:inset 3px 0 0 var(--amber)}
+.main{padding:18px 20px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th{text-align:left;font:500 11px 'IBM Plex Mono';letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:0 10px 8px;border-bottom:1px solid var(--line)}
+td{padding:12px 10px;border-bottom:1px solid #2b2219;vertical-align:top;font-size:13.5px}
+td small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.who{display:flex;gap:10px;align-items:center}
+.av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:500 12px 'IBM Plex Mono';border:1.5px solid var(--line);color:var(--muted)}
+.av.me{border-color:var(--amber);color:var(--amber)}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.acts .btn{padding:5px 10px;font-size:12px}
+.why{font-size:11.5px;color:var(--faint);margin-top:4px}
+.add{padding:18px 20px}
+.input{border:1px solid var(--line);background:var(--p2);border-radius:9px;padding:9px 12px;margin-top:6px;font-size:14px}
+.roles{display:grid;gap:8px;margin-top:8px}
+.r{display:grid;grid-template-columns:18px 1fr;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--p2)}
+.r.on{border-color:var(--amber);background:#2a2014}
+.r b{font-weight:600} .r small{display:block;color:var(--muted);font-size:12px}
+.keybox{margin-top:14px;padding:12px;border:1px dashed #6b4e22;border-radius:10px;background:#1f170e}
+.keybox code{font:500 15px 'IBM Plex Mono';color:var(--amber);letter-spacing:.04em}
+.decided{margin-top:16px;padding:16px 20px}
+.barrow{display:grid;grid-template-columns:90px 1fr 40px;gap:10px;align-items:center;font-size:13px;margin-top:8px}
+.track{height:8px;border-radius:4px;background:#2b2219;overflow:hidden}.track i{display:block;height:100%;background:#8a6a3c}
+.track i.me{background:var(--amber)}
+.banner{margin:14px 32px 0;padding:10px 14px;border:1px solid var(--line);border-radius:10px;display:flex;gap:10px;align-items:center;color:var(--muted);font-size:13px;background:var(--p1)}
+</style></head><body>
+<div class="top"><div class="crumb">Settings · <b>People and access</b></div><span class="chip">Search settings… <span class="key">⌘K</span></span></div>
+<h1>People and access</h1>
+<div class="grid">
+ <div class="panel side">
+  <p class="eyebrow">You</p>
+  <div class="row"><span>Your name</span><span>Ony</span></div>
+  <div class="row"><span>Appearance</span><span>Case Night</span></div>
+  <div class="row"><span>Notifications</span><span>in app</span></div>
+  <div class="row"><span>Your safety</span><span></span></div>
+  <p class="eyebrow">Cases</p>
+  <div class="row"><span>New-case setup</span><span></span></div>
+  <div class="row"><span>Outside lookups</span><span>ask</span></div>
+  <div class="row"><span>AI and research</span><span>ask first</span></div>
+  <p class="eyebrow">This computer</p>
+  <div class="row cur"><span>People and access</span><span>3</span></div>
+  <div class="row"><span>Connector keys</span><span>2 of 3</span></div>
+  <div class="row"><span>Backups</span><span>3 days ago</span></div>
+  <div class="row"><span>Security log</span><span></span></div>
+ </div>
+ <div class="panel main">
+  <div style="display:flex;justify-content:space-between;align-items:baseline"><p class="eyebrow">Who can reach Kestrel harbour case</p><span class="note">roles by shape and word: ◆ owner · ■ admin · ● reporter · ○ viewer</span></div>
+  <table>
+   <tr><th>Person</th><th>Role here</th><th>How they get in</th><th>Last seen</th><th></th></tr>
+   <tr><td><div class="who"><span class="av me">ON</span><div>Ony <span class="chip amber" style="margin-left:6px">you</span><small>signs as “Ony”</small></div></div></td>
+       <td>◆ Owner<small>every case, every setting</small></td><td>This computer<small>passphrase</small></td><td class="mono">now</td>
+       <td><div class="acts"><button class="btn">Rename</button><button class="btn" disabled>Remove</button></div><div class="why">The owner can't be removed.</div></td></tr>
+   <tr><td><div class="who"><span class="av">MR</span><div>Maya Rees<small>signs as “Maya Rees”</small></div></div></td>
+       <td>● Reporter<small>reads, decides, writes</small></td><td>Key <span class="mono">••••41</span><small>from her laptop · expires 14 Nov</small></td><td class="mono">2 h ago</td>
+       <td><div class="acts"><button class="btn">Change role</button><button class="btn">New key</button><button class="btn">Remove</button></div></td></tr>
+   <tr><td><div class="who"><span class="av">AP</span><div>A. Patel (legal)<small>signs as “A. Patel”</small></div></div></td>
+       <td>○ Viewer<small>reads only, decides nothing</small></td><td>Key <span class="mono">••••9c</span><small>expires 2 Nov</small></td><td class="mono">3 days ago</td>
+       <td><div class="acts"><button class="btn">Change role</button><button class="btn">New key</button><button class="btn">Remove</button></div></td></tr>
+  </table>
+  <div class="panel decided" style="background:var(--p2)">
+   <div style="display:flex;justify-content:space-between"><p class="eyebrow">Who decided what · this case, last 30 days</p><span class="note" style="color:var(--amber)">Open the custody log for one person ›</span></div>
+   <div class="barrow"><span>Ony</span><div class="track"><i class="me" style="width:78%"></i></div><span class="mono">168</span></div>
+   <div class="barrow"><span>Maya Rees</span><div class="track"><i style="width:22%"></i></div><span class="mono">46</span></div>
+   <div class="barrow"><span>A. Patel</span><div class="track"><i style="width:2%"></i></div><span class="mono">1</span></div>
+   <div class="barrow"><span style="color:var(--muted)">a person</span><div class="track"><i style="width:30%;background:#4a3d2e"></i></div><span class="mono">63</span></div>
+   <p class="note" style="margin-top:8px">“a person”: decided before 19 Oct, when names weren't kept yet. They stay that way.</p>
+  </div>
+ </div>
+ <div style="display:grid;gap:0;align-content:start">
+  <div class="panel add">
+   <p class="eyebrow">Add a person</p>
+   <div class="input">Jo Okafor</div>
+   <div class="roles">
+    <div class="r on"><span>●</span><div><b>Reporter</b><small>Reads, accepts and rejects, writes the story.</small></div></div>
+    <div class="r"><span>○</span><div><b>Viewer</b><small>Reads only. Good for an editor or a lawyer.</small></div></div>
+    <div class="r"><span>■</span><div><b>Admin</b><small>Everything a reporter can, plus deleting and restoring this case.</small></div></div>
+   </div>
+   <div style="display:flex;gap:8px;margin-top:12px;align-items:center"><span class="note">Key lasts</span><span class="chip amber">30 days</span><span class="chip">90 days</span><span class="note">· renew from their row</span></div>
+   <button class="btn primary" style="margin-top:14px;width:100%;justify-content:center">Make a one-time key for Jo</button>
+   <div class="keybox"><p class="eyebrow" style="color:var(--amber)">Shown once · copy it to Jo yourself</p><code>jw_7Kq2-Rv9m-T4xP-8nWc</code><p class="note" style="margin-top:6px">The app keeps only a fingerprint of it. Send it the way you'd send a source's number, not by email.</p></div>
+  </div>
+ </div>
+</div>
+<div class="banner"><span>○</span><span>Network access is <b style="color:var(--text)">off</b>: keys work only after you turn it on in Access and token. Until then only this computer reaches the app.</span><span style="margin-left:auto" class="btn">Access and token ›</span></div>
+</body></html>

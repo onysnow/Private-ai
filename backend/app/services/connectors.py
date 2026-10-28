@@ -30,6 +30,7 @@ from app.models.domain import (
     ConnectorFinding, ConnectorRun, Entity, Investigation, Lead, LeadProfile, LeadWorkflowEvent,
 )
 from app.schemas.api import ConnectorSearchRequest
+from app.services.outbound import destination_of, enrich_sent_text, mark_outbound_failed, record_outbound, send_outcome
 
 
 def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id: str, provider: str, findings: Sequence[ExternalFinding]) -> list[ConnectorFinding]:
@@ -82,20 +83,55 @@ def _fail_run(db: Session, run_id: str, exc: Exception) -> None:
     db.commit()
 
 
+# Parties worth looking up by name on their own (an address or a payment is not).
+NAMED_SCHEMAS = {"Person", "Company", "Organization", "LegalEntity", "PublicBody"}
+
+
+def require_lookup_allowed(db: Session, investigation_id: str, provider: str) -> None:
+    """Settings › Outside lookups: a source set to Off for this case is never asked, whoever asks."""
+    from app.services.preferences import lookup_mode, provider_label
+
+    if lookup_mode(db, investigation_id, provider) == "off":
+        raise HTTPException(403, f"Outside lookups to {provider_label(provider)} are off for this case. "
+                                 "Change it in Settings › Outside lookups.")
+
+
+def entity_query_label(entity: Entity) -> str:
+    """How a run made for a party is recorded (ConnectorRun.query), so a later run can find it."""
+    return f"entity:{entity.ftm_id or entity.id}"
+
+
+def automatic_lookups_due(db: Session, entity: Entity) -> list[str]:
+    """The sources set to Automatic for this case that have not yet looked this party up."""
+    from app.services.preferences import lookup_modes
+
+    if entity.schema not in NAMED_SCHEMAS:
+        return []
+    modes = lookup_modes(db, entity.investigation_id, registry.names())
+    done = set(db.scalars(select(ConnectorRun.provider).where(
+        ConnectorRun.investigation_id == entity.investigation_id, ConnectorRun.query == entity_query_label(entity),
+        ConnectorRun.status != "failed")))
+    return [p for p, mode in modes.items() if mode == "automatic" and p not in done]
+
+
 async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session) -> Any:
     if db.get(Investigation, body.investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     connector = registry.get(provider)
     if connector is None:
         raise HTTPException(404, "Connector not found")
+    require_lookup_allowed(db, body.investigation_id, provider)
     run = ConnectorRun(investigation_id=body.investigation_id, provider=provider, query=body.query)
     db.add(run); db.commit(); db.refresh(run)
     run_id = run.id
+    sent_id = record_outbound(db, body.investigation_id, service=provider, kind="search text", value=body.query,
+                              reason="A search you ran", actor="you", outcome=send_outcome(connector), source={"connector_run_id": run_id, "destination": destination_of(connector)})
     try:
         findings = await connector.search(body.query)
         return persist_connector_findings(db, run, body.investigation_id, provider, findings)
     except Exception as exc:
         _fail_run(db, run_id, exc)
+        mark_outbound_failed(db, sent_id)
         # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
         # echoed into the client-facing response (STRUCT-0028).
         raise HTTPException(
@@ -103,28 +139,47 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
         ) from exc
 
 
-async def enrich_entity(provider: str, entity: Entity, db: Session) -> Any:
+async def enrich_entity(provider: str, entity: Entity, db: Session, *, automatic: bool = False) -> Any:
+    """Look one party up at one source. ``automatic`` is a lookup the case's Automatic setting started, not a click."""
     connector = registry.get(provider)
     if connector is None:
         raise HTTPException(404, "Connector not found")
-    query_label = f"entity:{entity.ftm_id or entity.id}"
+    require_lookup_allowed(db, entity.investigation_id, provider)
+    query_label = entity_query_label(entity)
     run = ConnectorRun(
         investigation_id=entity.investigation_id, provider=provider, query=query_label,
     )
     db.add(run); db.commit(); db.refresh(run)
     run_id = run.id
+    payload = {"id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption, "properties": entity.properties or {}}
+    sent_id = record_outbound(db, entity.investigation_id, service=provider, kind="details of a record",
+                              value=enrich_sent_text(connector, payload),
+                              reason=f"Automatic lookup of {entity.caption}" if automatic else f"Look up {entity.caption}",
+                              actor="automatic" if automatic else "you", outcome=send_outcome(connector),
+                              source={"connector_run_id": run_id, "entity_id": entity.id, "destination": destination_of(connector)})
     try:
-        findings = await connector.enrich({
-            "id": entity.ftm_id,
-            "schema": entity.schema,
-            "caption": entity.caption,
-            "properties": entity.properties or {},
-        })
+        findings = await connector.enrich(payload)
         return persist_connector_findings(db, run, entity.investigation_id, provider, findings)
     except Exception as exc:
         _fail_run(db, run_id, exc)
+        mark_outbound_failed(db, sent_id)
         # Full exception text/class is persisted on the ConnectorRun row (run.error) rather than
         # echoed into the client-facing response (STRUCT-0028).
         raise HTTPException(
             502, f"{provider} enrichment failed. Details were logged server-side (connector run {run_id})."
         ) from exc
+
+
+def queue_automatic_lookups(db: Session, entity: Entity, request: Any, background: Any) -> None:
+    """Start the Automatic lookups for a party just added to a case, after the answer has gone back: the person who
+    added it does not wait on outside sources. Nothing is queued when no source is set to Automatic."""
+    from app.jobs.handlers import OUTSIDE_LOOKUP
+    from app.jobs.records import create_job
+    from app.jobs.runner import job_runner
+
+    if not automatic_lookups_due(db, entity):
+        return
+    runner = job_runner(request)
+    job = create_job(db, kind=OUTSIDE_LOOKUP, investigation_id=entity.investigation_id, subject_type="entity",
+                     subject_id=entity.id, runner=runner.mode, message="Waiting to look up")
+    background.add_task(runner.submit, job)

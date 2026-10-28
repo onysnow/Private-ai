@@ -31,7 +31,7 @@ zustand store (`frontend/lib/workbench-store.ts`). The backend is FastAPI with S
   - the checks: `validate_output_shape`, `validate_citations`, plus quote, chart and writing checks for drafts.
 - Runs are background jobs: `app/jobs/handlers.py` `ai_reasoning_job` passes `run_id=job.id`.
 - The old AI panel is still in Act › AI drafts: `frontend/components/ai-reasoning-panel.tsx`.
-- The vendored suite is `backend/app/ai/authority_suite/` (beta: report problems found there to Ony).
+- The suite is bundled in the `authority-suite-sdk` package, read through `backend/app/ai/authority_sdk.py` (beta: report problems found there to Ony).
 
 ## Migrations added in this stretch (`backend/alembic/versions/`)
 - `a9c3e7f1d204`: `pattern_flags.innocent`

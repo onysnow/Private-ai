@@ -14,10 +14,11 @@ from typing import Any
 from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 
-from app.core.time import utcnow_iso
+from app.core.time import utcnow_iso, utcnow_naive
 from app.core.config import settings
 from app.db.locking import investigation_export_snapshot, lock_investigation_transaction
 from app.jobs.corpus import request_corpus_sync
+from app.services.anchors import anchor_document_quotes
 from app.services.security import contained_path, resolve_storage_root
 from app.models.domain import (
     Investigation, Entity, Statement, Source, Evidence, ClaimEvidenceLink, Claim, ClaimReviewEvent, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment,
@@ -28,10 +29,12 @@ from app.models.domain import (
     ExternalRelationshipReview, ExternalRelationshipPromotion, Document,
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
+    Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
+
+
 EXPORT_VERSION = 1
 
 MODEL_BY_TABLE = {
@@ -45,7 +48,7 @@ MODEL_BY_TABLE = {
         DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion,
+        Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
     ]
 }
 
@@ -78,6 +81,9 @@ RESTORE_ORDER = [
     "pattern_flags",
     # What a person checks, with their decisions; an item may point at its flag and its document.
     "check_items",
+    # The case's own settings (Settings › Outside lookups for this case, with the reason it was set); only rows that
+    # belong to the case are exported, so a person's and the server's settings stay where they are.
+    "app_preferences",
     # The Authority System Suite's own records for the case (gaps, replies, hypotheses, ...).
     "case_records",
     # The TAS reasoning review queue travels with the investigation: a restored
@@ -93,6 +99,11 @@ RESTORE_ORDER = [
     "stories", "story_sections", "story_claims",
     # Each AI run's steps as they happened (ADR-0012): the run record travels with the case.
     "ai_run_events",
+    # Questions kept to be asked again (Before you run › Save this question); the run they last started is a job on
+    # the server that made the backup, so only its id travels.
+    "saved_questions",
+    # What left this computer, word for word (ADR-0015): part of the chain of custody, so it travels with the case.
+    "outbound_requests",
 ]
 
 
@@ -160,7 +171,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion,
+        Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -207,9 +218,12 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "collections": direct["collections"], "collection_items": direct["collection_items"],
         "pattern_flags": direct["pattern_flags"],
         "check_items": direct["check_items"],
+        "app_preferences": direct["app_preferences"],
         "case_records": direct["case_records"],
         "stories": direct["stories"], "story_sections": story_sections, "story_claims": story_claims,
         "ai_run_events": direct["ai_run_events"],
+        "saved_questions": direct["saved_questions"],
+        "outbound_requests": direct["outbound_requests"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -626,6 +640,7 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 raw_locations[doc_id] = str(dest)
 
         restored_counts: dict[str, int] = {}
+        db.info["restoring"] = True
         try:
             for table in RESTORE_ORDER:
                 model = MODEL_BY_TABLE[table]
@@ -642,6 +657,13 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 if rows:
                     db.flush()
                 restored_counts[table] = len(rows)
+            db.info.pop("restoring", None)
+            # A backup made before quotes were anchored (ADR-0015): anchor them in the restored passages.
+            for doc_row in records.get("documents", []):
+                doc = db.get(Document, doc_row["id"])
+                if doc is not None:
+                    anchor_document_quotes(db, doc, only_missing=True)
+            db.flush()
 
             # Install documents only after every database row has flushed successfully.
             # Use exclusive creation rather than replace() so a concurrent local file can
@@ -655,6 +677,7 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
 
             db.commit()
         except Exception:
+            db.info.pop("restoring", None)
             db.rollback()
             for dest in reversed(created_files):
                 try:
@@ -676,3 +699,27 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
     request_corpus_sync(db, investigation_id)
     return {"investigation_id": investigation_id, "restored_counts": restored_counts, "manifest": manifest}
 
+
+
+def record_backup(db: Session, investigation_id: str, data: bytes, manifest: dict[str, Any], *, encrypted: bool = False) -> None:
+    """Keep when this case was last backed up, so Settings › Backups and Safety & data can say so (mockup KEEP_2).
+    A backup that was made but not saved by the browser still counts: the app cannot see where the file went.
+    Someone who may only read the case (a viewer) can still download a backup; it is not recorded, since
+    recording it would be a change to the case they may not make."""
+    from app.core.authorization import current_authorization_scope
+    from app.models.investigations import Investigation
+
+    scope = current_authorization_scope()
+    if scope is not None and not scope.allows_write(investigation_id):
+        return
+
+    inv = db.get(Investigation, investigation_id)
+    if inv is None:
+        return
+    inv.last_backup = {"at": manifest["generated_at"], "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(),
+                       "documents_included": bool(manifest.get("documents_included")), "encrypted": encrypted}
+    db.commit()
+    # The history Keep › Safety & data reads (a row per backup, ADR-0015); never raises.
+    from app.services.backup_events import record_backup_event
+
+    record_backup_event(db, investigation_id, data, manifest, bool(manifest.get("documents_included")), encrypted=encrypted)

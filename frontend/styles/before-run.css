@@ -45,6 +45,11 @@
 .br-q { margin: 2px 0 6px; font: 400 16px/1.35 var(--font-read); }
 .br-theory { margin: 0 0 6px; font-size: 12.5px; color: var(--text-muted); }
 .br-tray { margin: 0; font-size: 12px; color: var(--text-muted); } .br-tray b { color: var(--text); }
+/* The packet's first records as small paper tiles beside the count (mockup AI_2); the title is on hover. */
+.br-packet { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.br-firsts { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; flex: none; }
+.br-firsts li { width: 20px; height: 26px; border-radius: 3px; display: grid; place-items: center; font: 600 9px var(--font-mono); color: var(--text-muted);
+  background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); cursor: default; }
 .br-plan { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; }
 .br-plan li { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; align-items: start; padding: 5px 8px; border-radius: 8px; border-left: 3px solid transparent; background: var(--surface-2); font-size: 13px; }
 .br-plan li small { display: block; color: var(--text-muted); font-size: 11.5px; }
@@ -70,6 +75,7 @@
 .br-boxes span.out { box-shadow: inset 0 0 0 1px var(--flag-strong); }
 .br-boxes span.never { opacity: .5; border: 1px dashed var(--line); box-shadow: none; }
 .br-boxes i { font-style: normal; color: var(--text-muted); }
+.br-lookups { margin: 0; font-size: 11.5px; color: var(--text-muted); }
 .br-facts { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 12px; font-size: 12.5px; }
 .br-facts dt { color: var(--text-muted); } .br-facts dd { margin: 0; }
 .br-echo { margin: 0; padding: 7px 9px; list-style: none; border-radius: 8px; background: var(--surface-2); font: 11.5px/1.6 var(--font-mono); max-height: 130px; overflow: auto; }
@@ -390,3 +396,15 @@ html[data-motion='calm'] .wr-plan { animation: none; }
 .cr-detail .wr-refs li.out { border: 1px dashed var(--status-disputed); box-shadow: none; }
 .cr-keys { color: var(--text-muted); font-size: 11px; }
 .wr-drawer .cr-key { margin: 2px 0; }
+
+/* Ask the case › Saved questions (saved-questions.tsx): each with Ask it, Run now, Stop asking it; then the case's mode. */
+.br-saved { max-width: 760px; padding: 10px 14px; border-radius: 14px; background: var(--surface-1); display: grid; gap: 8px; }
+.br-saved ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.br-saved li { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, auto); gap: 0 8px; align-items: center; font-size: 13px; }
+.br-saved li span { grid-column: 1; min-width: 0; }
+.br-saved li em { color: var(--text-muted); font-style: normal; }
+.br-saved li small { grid-column: 1; grid-row: 2; color: var(--text-muted); font-size: 11.5px; }
+.br-saved li .br-quiet { grid-row: 1 / span 2; }
+.br-saved-mode { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.br-saved-mode small { flex: 1 1 260px; color: var(--text-muted); font-size: 12px; }
+@media (max-width: 560px) { .br-saved li { grid-template-columns: minmax(0, 1fr); } .br-saved li .br-quiet, .br-saved li small { grid-row: auto; grid-column: 1; justify-self: start; } }

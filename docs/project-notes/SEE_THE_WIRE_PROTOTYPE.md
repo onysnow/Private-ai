@@ -1,4 +1,4 @@
-# See · "The Wire" prototype (11 Oct 2026, awaiting Ony's approval)
+# See · "The Wire" prototype (11 Oct 2026; Ony, 28 Oct: the approved design)
 
 Prototype: https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3. Source: docs/design/see-the-wire/
 (src.html with a `__DATA__` placeholder, prep.py builds the data from the 1MDB case and the red
@@ -26,6 +26,13 @@ flags API). Built on NETWORK_VIEW_RESEARCH.md. The name "The Wire" is a proposal
 - **Shell chains:** collapse to a stacked deck you click to open.
 - **Time strip:** money per quarter plus events. The handles fade links outside the window, and Play grows the case through time.
 - **Navigation:** a "Where you've been" trail, "Next most-flagged", arrow keys around the ring, and Esc to rise one altitude.
+
+## Touch (21 Oct 2026)
+- **Pinch** zooms about the fingers and crosses altitudes the way the wheel does; two fingers also pan. One finger pans, even from a card. A tap opens a card, a link or a "+N more" chip; a pan or pinch never counts as a tap.
+- **Lens:** one finger drags the loupe.
+- **Phone (≤900px wide):** the altimeter becomes a bar (Back, the three altitudes, Next flagged). The drawer is a bottom sheet you swipe down to close. Tools scroll sideways. The wire view fits a 390px screen.
+- Hover tooltips are mouse-only. Link hit areas and time-strip handles are wider on touch.
+- Tested in headless Chromium with touch emulation at 390×844: pan, pinch out and in, altitude bar, Back and Next, tap a card, swipe the sheet away, one link. Not tried on a real phone.
 
 ## Open for Ony
 - **The name** "The Wire".

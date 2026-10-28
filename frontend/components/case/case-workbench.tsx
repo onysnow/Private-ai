@@ -27,6 +27,7 @@ import {PanelErrorBoundary} from '../panel-error-boundary';
 import {ApiAccessPanel} from '../../features/api-access/api-access-panel';
 import {useApiAccess} from '../../features/api-access/use-api-access';
 import {BackupPanel} from '../../features/backups/backup-panel';
+import {SafetyScreen} from '../../features/safety/safety-screen';
 import {CaseHome} from '../../features/case-home/case-home';
 import {DecideScreen} from '../../features/case-home/decide-screen';
 import {TheWire} from '../../features/the-wire/the-wire';
@@ -305,6 +306,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},
       ])}
       {screen('keep', [
+        {anchor: 'safety-data', label: 'Safety & data', fill: true, render: () => <PanelErrorBoundary name="Safety & data"><SafetyScreen investigationId={inv} caseName={investigationName} active={view === 'keep'}/></PanelErrorBoundary>},
         {anchor: 'backup-restore', label: 'Backup & restore', render: () => <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>},
         {anchor: 'deletion', label: 'Delete', render: () => <PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary>},
         ...(access.settingsStatus ? [{anchor: 'access', label: 'Access', render: () => <PanelErrorBoundary name="Local security/settings status">

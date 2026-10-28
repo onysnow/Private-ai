@@ -410,16 +410,17 @@ def get_document_picture(document_id: str, db: Session = Depends(get_db)) -> Res
 @router.get("/documents/{document_id}/page-image", response_class=Response,
             responses=file_response("image/png", "One page of the document drawn as a picture, the passage marked"))
 def get_document_page_image(document_id: str, page: int = Query(1, ge=1), width: int = Query(360, ge=120, le=1600),
-                            highlight: str = Query("", max_length=2000), db: Session = Depends(get_db)) -> Response:
+                            highlight: str = Query("", max_length=2000), crop: bool = Query(False), db: Session = Depends(get_db)) -> Response:
     """A page of a PDF as PNG, with the passage's words highlighted where they are
-    found (X-Passage-Found says whether they were), for Next up's page beside the question."""
+    found (X-Passage-Found says whether they were), for Next up's page beside the question.
+    With `crop`, only the band of the page around the words is drawn."""
     from app.services.page_image import NoPage, page_png
 
     row = db.get(Document, document_id)
     if row is None:
         raise HTTPException(404, "Document not found")
     try:
-        data, pages, found = page_png(row.storage_path, resolve_storage_root(settings.document_storage_dir), page, width=width, highlight=highlight)
+        data, pages, found = page_png(row.storage_path, resolve_storage_root(settings.document_storage_dir), page, width=width, highlight=highlight, crop=crop)
     except NoPage as exc:
         raise HTTPException(415 if "Only a PDF" in str(exc) else 404, str(exc)) from exc
     except OSError as exc:

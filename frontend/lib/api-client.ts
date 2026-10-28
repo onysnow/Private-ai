@@ -10,10 +10,27 @@ export class ApiHttpError extends Error {
     public detail:string,
     /** A structured detail as sent ({message, document, ...}: an upload's 409 names the document already there). */
     public body?:Record<string,unknown>,
+    /** A request the server refused field by field (FastAPI's 422): each field's dotted path in the request body and what is wrong with it. */
+    public fieldErrors:FieldError[]=[],
   ){
     super(`${detail} (${status} ${endpoint})`);
     this.name='ApiHttpError';
   }
+}
+
+export type FieldError={path:string,message:string};
+
+/** FastAPI's validation detail ([{loc: ['body', 'caption'], msg: 'Field required'}, ...]) as field paths and
+ * messages; the leading 'body', 'query' or 'path' is dropped, so a path names the field the form sent. */
+export function fieldErrorsOf(detail:unknown[]):FieldError[]{
+  return detail.flatMap(item=>{
+    if(typeof item!=='object'||item===null)return [];
+    const {loc,msg}=item as {loc?:unknown,msg?:unknown};
+    if(!Array.isArray(loc)||typeof msg!=='string')return [];
+    const parts=loc.map(String);
+    if(['body','query','path','header'].includes(parts[0]??''))parts.shift();
+    return [{path:parts.join('.'),message:msg.replace(/^Value error, /,'')}];
+  });
 }
 
 const normalizeEndpoint=(endpoint:string)=>endpoint.startsWith('/')?endpoint:`/${endpoint}`;
@@ -21,6 +38,7 @@ const normalizeEndpoint=(endpoint:string)=>endpoint.startsWith('/')?endpoint:`/$
 async function parseError(response:Response,endpoint:string):Promise<ApiHttpError>{
   let detail=`Request failed with HTTP ${response.status}`;
   let structured:Record<string,unknown>|undefined;
+  let fields:FieldError[]=[];
   const type=response.headers.get('content-type')||'';
   try{
     if(type.includes('application/json')){
@@ -28,7 +46,12 @@ async function parseError(response:Response,endpoint:string):Promise<ApiHttpErro
       if(typeof body==='object'&&body!==null&&'detail' in body){
         const value=(body as {detail?:unknown}).detail;
         if(typeof value==='string'&&value.trim())detail=value.trim();
-        else if(Array.isArray(value))detail=value.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('; ');
+        else if(Array.isArray(value)){
+          fields=fieldErrorsOf(value);
+          // Each refused field said in words ("caption: Field required"), not as the JSON it came in.
+          detail=fields.length===value.length&&fields.length?fields.map(f=>f.path?`${f.path}: ${f.message}`:f.message).join('; ')
+            :value.map(x=>typeof x==='string'?x:JSON.stringify(x)).join('; ');
+        }
         // A structured detail ({message, document, ...}: an upload's 409 or 422) says it in its message.
         else if(typeof value==='object'&&value!==null&&typeof (value as {message?:unknown}).message==='string'){
           detail=(value as {message:string}).message;
@@ -40,11 +63,16 @@ async function parseError(response:Response,endpoint:string):Promise<ApiHttpErro
       if(text)detail=text.slice(0,1000);
     }
   }catch{/* preserve status fallback */}
-  return new ApiHttpError(endpoint,response.status,detail,structured);
+  return new ApiHttpError(endpoint,response.status,detail,structured,fields);
 }
+
+/** Said on window when the server answers 423 Locked (the app lock, ADR-0016): the lock gate shows the lock screen. */
+export const LOCKED_EVENT='pai:locked';
 
 export class ApiClient {
   private authToken='';
+  /** This browser's app-lock session (lib/app-lock.ts), sent with every request as X-Workbench-Session. */
+  private sessionKey='';
 
   constructor(public baseUrl:string){}
 
@@ -55,17 +83,20 @@ export class ApiClient {
   setAuthToken(token:string):void{this.authToken=token.trim()}
   clearAuthToken():void{this.authToken=''}
   hasAuthToken():boolean{return Boolean(this.authToken)}
+  setSessionKey(key:string):void{this.sessionKey=key.trim()}
 
   private async request(endpoint:string,options:RequestOptions={}):Promise<Response>{
     const path=normalizeEndpoint(endpoint);
     const headers=new Headers(options.headers||{});
     if(this.authToken&&!headers.has('authorization'))headers.set('authorization',`Bearer ${this.authToken}`);
+    if(this.sessionKey&&!headers.has('x-workbench-session'))headers.set('x-workbench-session',this.sessionKey);
     let body:BodyInit|undefined=options.rawBody;
     if(options.body!==undefined){
       headers.set('content-type','application/json');
       body=JSON.stringify(options.body);
     }
     const response=await fetch(`${this.baseUrl}${path}`,{...options,headers,body});
+    if(response.status===423&&typeof window!=='undefined')window.dispatchEvent(new Event(LOCKED_EVENT));
     if(!response.ok)throw await parseError(response,path);
     return response;
   }

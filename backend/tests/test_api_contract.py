@@ -102,7 +102,10 @@ SETTINGS = hypothesis.settings(
 # listens (its media type is declared; tests/test_opsconsole_package.py reads
 # it), and a migration upgrade would rewrite the schema of the database every
 # other test shares (its reply is the run status every other run start shows).
-NOT_CALLED = {("GET", "/api/console/events"), ("POST", "/api/console/schema/migrations/upgrade")}
+NOT_CALLED = {("GET", "/api/console/events"), ("POST", "/api/console/schema/migrations/upgrade"),
+              # These change who may call everything after them: a passphrase locks the API (423), a case lock
+              # takes the seeded case out of scope (404). tests/test_app_lock.py covers them (ADR-0016).
+              ("POST", "/api/me/protection"), ("PUT", "/api/me/cases/{investigation_id}/lock")}
 
 
 def _no_network(*_args: Any, **_kwargs: Any) -> Any:
@@ -441,8 +444,14 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     ok(client.post(f"/api/investigations/{inv}/story/writeup"))
     version = ok(client.post(f"/api/investigations/{inv}/story/versions", json={"name": "Before legal read"}))
 
+    # A watch on the claim (Settings › Notifications, "Watches on facts").
+    fact_watch = ok(client.post("/api/watches", json={"record_type": "claim", "record_id": claim["id"]}))
+    # A saved question the case can run again (app/services/saved_questions.py).
+    saved_question = ok(client.post(f"/api/investigations/{inv}/saved-questions", json={"module": "case_synthesis", "question": "Who paid Meridian?"}))
+
     return Seeded(
         ids={
+            "fact_watch_id": fact_watch["id"], "saved_question_id": saved_question["id"], "channel": "phone",
             "section_id": story["sections"][0]["id"], "version_id": version["id"], "run_id": draft["job"]["id"],
             "investigation_id": inv, "entity_id": meridian, "claim_id": claim["id"], "lead_id": lead, "relationship_id": relationship,
             "source_id": payment["source"]["id"], "evidence_id": payment["evidence"]["id"], "document_id": document["id"],

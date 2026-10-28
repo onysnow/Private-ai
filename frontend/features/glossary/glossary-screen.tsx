@@ -5,7 +5,7 @@
 // button opens a picker grouped by the catalogue map's families; chosen areas show as removable pills with Clear.
 // When several areas word a term themselves the card has a tab per area; an area that lists the term without its
 // own wording says "No definition yet" (the wording of every area's definition is Ony's to write, never made up).
-// Keys: / search, ↑ ↓ or J / K move, Enter pins.
+// Keys: / search, ↓ from the search box to the terms, ↑ ↓ or J / K move, Enter pins.
 import {useQuery} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
@@ -151,7 +151,11 @@ export function GlossaryScreen({tabs}: {tabs?: ReactNode}): ReactElement {
       {tabs}
       <label className="kg-search"><span className="sr-only">Search the glossary</span>
         <input ref={searchRef} value={text} onChange={e => setText(e.target.value)} placeholder={`Search ${hints.length ? hints.length.toLocaleString('en-GB') : ''} terms and definitions`}
-          aria-label="Search the glossary"/><kbd aria-hidden="true">/</kbd></label>
+          aria-label="Search the glossary" onKeyDown={e => {
+            // ↓ goes from the box to the first term; Enter opens the first term.
+            if (e.key === 'ArrowDown' && shown.length) { e.preventDefault(); setActive(0); scrollTo(0); listRef.current?.focus(); }
+            else if (e.key === 'Enter' && shown[0]) { e.preventDefault(); setActive(0); pin(shown[0].term); }
+          }}/><kbd aria-hidden="true">/</kbd></label>
       <AreaPicker families={families} chosen={chosen} onChange={setChosen}/>
       <p className="kg-count" aria-live="polite"><b>{shown.length.toLocaleString('en-GB')}</b> of {hints.length.toLocaleString('en-GB')} terms</p>
     </header>

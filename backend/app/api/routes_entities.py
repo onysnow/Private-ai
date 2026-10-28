@@ -10,7 +10,7 @@ reconciliation, and statement-promotion reads.
 """
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import MAX_OFFSET, authorize_request_resource
@@ -20,7 +20,7 @@ from app.schemas.api import (
     CanonicalMergeExecuteRequest, CanonicalResolutionRequest, EntityCreate, EntityUpdate,
     MultiEnrichmentRequest, PostMergeReconciliationRequest, PropertyConflictDecisionRequest,
 )
-from app.services.connectors import enrich_entity as _enrich_entity_single
+from app.services.connectors import enrich_entity as _enrich_entity_single, queue_automatic_lookups
 from app.services.dossier import entity_dossier
 from app.services.ownership_chain import ownership_chain
 from app.services.entity_merge import execute_entity_merge, preview_entity_merge
@@ -57,13 +57,15 @@ router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resour
 
 
 @router.post("/entities", response_model=EntityOut)
-def create_entity(body: EntityCreate, db: Session = Depends(get_db)) -> Any:
+def create_entity(body: EntityCreate, request: Request, background: BackgroundTasks, db: Session = Depends(get_db)) -> Any:
     try:
-        return _create_entity(db, body)
+        row = _create_entity(db, body)
     except LookupError as exc:
         raise HTTPException(404, str(exc))
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+    queue_automatic_lookups(db, row, request, background)
+    return row
 
 
 @router.patch("/entities/{entity_id}", response_model=EntityOut)

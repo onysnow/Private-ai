@@ -20,7 +20,7 @@ import {applySiteTuning, SAVED_TUNING_VERSION} from '@fx/lib/tuning';
 import {WaterDrops} from '@fx/components/site/WaterDrops';
 
 import {loadHeroPhoto, onHeroPhotoChange} from '../../lib/hero-photo';
-import {currentAppearance, onAppearanceChange} from '../../lib/theme';
+import {effectiveAppearance, onAppearanceChange} from '../../lib/theme';
 import {effectOn} from './board-effects';
 import {webglAvailable} from './webgl';
 
@@ -52,7 +52,7 @@ export function rainMode(): 'rain' | 'still' | null {
   if (!webglAvailable()) return null;
   if (effectOn('rain', true)) return 'rain';
   // The rain is allowed but may not move: Calm motion or reduced motion (Effects Light stays dry, as before).
-  if (effectOn('rain', false) && currentAppearance().effects === 'full') return 'still';
+  if (effectOn('rain', false) && effectiveAppearance().effects === 'full') return 'still';
   return null;
 }
 

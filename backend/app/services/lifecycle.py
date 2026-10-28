@@ -168,15 +168,22 @@ def preview_investigation_deletion(db: Session, investigation_id: str, storage_r
         },
         "unsafe_paths": unsafe_paths,
         "can_delete": not unsafe_paths,
-        "requires_confirmation": investigation_id,
+        # The reporter types the case's name to delete it (research §10, KEEP_2); the API also takes the ID.
+        "requires_confirmation": (inv.name or "").strip() or investigation_id,
         "openaleph_collection": _openaleph_collection(db, investigation_id),
     }
 
 
 def delete_investigation(db: Session, investigation_id: str, storage_root: str | Path, *, confirmation: str,
                          openaleph_client_factory: Callable[[], Any] | None = None) -> dict[str, Any]:
-    if confirmation != investigation_id:
-        raise ValueError("Deletion confirmation must exactly match the investigation ID")
+    # The case's name, typed exactly (spaces at either end aside), or its ID for a script or the demo loader. The ID
+    # is checked without reading anything; only a typed name is looked up.
+    typed = confirmation.strip()
+    if typed != investigation_id:
+        inv = db.get(Investigation, investigation_id)
+        name = (inv.name or "").strip() if inv is not None else ""
+        if not name or typed != name:
+            raise ValueError("Deletion confirmation must be the case's name, typed exactly")
 
     # PostgreSQL: serialize restore/delete operations for this investigation before
     # previewing mutable state. The transaction-scoped advisory lock also works when

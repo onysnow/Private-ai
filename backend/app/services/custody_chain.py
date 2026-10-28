@@ -8,8 +8,10 @@ quote stands in (and whether it says it), and the decision that put it on the cl
 done, in the line style of the status grammar: confirmed by a person, proposed and not yet confirmed, worked out
 by the app, against the claim, an AI step.
 
-Nothing is invented. What the records do not hold is left out or said ("not recorded"): there is no stored OCR
-legibility, so none is shown; the uploader comes only from the intake batch. The claim carries its Done checklist
+Nothing is invented. What the records do not hold is left out or said ("not recorded"): a page read before OCR
+legibility was measured shows none; a decision made before deciders were kept, or on this computer with no account,
+says "a person"; the uploader comes only from the intake batch. Each quote's anchor is the stored one found again
+(ADR-0015), with the passage's lines it spans; a quote saved before anchors were kept is found now and says so. The claim carries its Done checklist
 for Supported, run by the same code a claim review is held to (app/services/claim_done.py). Read-only, except that it re-hashes
 the files it shows (which writes nothing).
 """
@@ -34,6 +36,8 @@ from app.models.jobs import BackgroundJob
 from app.models.patterns import PatternFlag
 from app.models.relationships import RelationshipEdge, RelationshipEvidenceAttachment
 from app.models.sources import Evidence, Source
+from app.services.anchor_text import refind_anchor
+from app.services.anchors import chunk_dicts
 from app.services.claim_done import _document_of, _file_matches, _norm, done_checks
 from app.services.provenance import _record_extraction_lineage
 
@@ -61,6 +65,12 @@ def _passage(db: Session, doc: Document, quote: str, chunk_id: str | None) -> Do
         if wanted in _norm(chunk.text):
             return chunk
     return None
+
+
+def _proposer_actor(payload: Any) -> str:
+    """Who proposed it, by kind: an outside service (a provider such as OpenAleph or OpenSanctions) or the app."""
+    prov = payload.get("provenance") if isinstance(payload, dict) else None
+    return "outside" if isinstance(prov, dict) and prov.get("provider") else "app"
 
 
 def _proposer(payload: Any) -> str:
@@ -93,14 +103,25 @@ def _rests_on(db: Session, investigation_id: str, evidence_id: str, claim_id: st
     return out
 
 
-def _anchor(text: str | None, quote: str | None) -> dict[str, Any] | None:
-    if not text or not quote:
-        return None
-    at = text.find(quote)
-    if at >= 0:
-        return {"start": at, "end": at + len(quote), "exact": True}
-    at = text.lower().find(quote.lower())
-    return {"start": at, "end": at + len(quote), "exact": False} if at >= 0 else None
+def _person(name: str | None) -> str:
+    """A decider by name when one was kept; "a person" otherwise (decided before names were kept, or with no account)."""
+    return name or "a person"
+
+
+def _anchor(db: Session, ev: Evidence, doc: Document | None) -> tuple[dict[str, Any] | None, str | None]:
+    """The quote's anchor as found now, with what happened to the stored one (app/services/anchor_text.py)."""
+    if doc is None or not ev.quote:
+        return None, None
+    stored = ev.anchor if ev.anchor and ev.anchor.get("document_id", doc.id) == doc.id else None
+    found, state = refind_anchor(stored, chunk_dicts(db, doc.id), ev.quote)
+    if found is None:
+        return ({"state": state, "stored": stored is not None, "anchored_at": stored.get("anchored_at") if stored else None,
+                 "line_start": stored.get("line_start") if stored else None, "line_end": stored.get("line_end") if stored else None,
+                 "chunk_id": stored.get("chunk_id") if stored else None}, None)
+    return ({"start": found["start"], "end": found["end"], "exact": found["match"] == "exact", "match": found["match"],
+             "before": len(found.get("prefix") or ""), "after": len(found.get("suffix") or ""), "line_start": found["line_start"],
+             "line_end": found["line_end"], "occurrences": found.get("occurrences", 1), "state": state, "stored": stored is not None,
+             "anchored_at": stored.get("anchored_at") if stored else None, "chunk_id": found["chunk_id"]}, found["chunk_id"])
 
 
 def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
@@ -124,6 +145,7 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
         candidate = (lineage or {}).get("candidate") if lineage and lineage.get("document", {}) and doc and lineage["document"]["id"] == doc.id else None
         against = link.stance == "contradicts"
         cards: list[dict[str, Any]] = []
+        anchor: dict[str, Any] | None = None
         if doc is not None:
             matches = _file_matches(doc)
             hashes.append(matches)
@@ -136,7 +158,9 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             log.append({"when": doc.created_at, "who": who or "not recorded", "actor": "person" if who else "app",
                         "what": f"Uploaded {doc.filename} · SHA-256 recorded at intake", "card": f"file:{ev.id}"})
             job = _reading(db, doc)
-            chunk = _passage(db, doc, ev.quote or "", (candidate or {}).get("chunk_id"))
+            anchor, anchor_chunk = _anchor(db, ev, doc)
+            # The passage is where the quote's anchor is now; without one, the proposal's passage or the first that says it.
+            chunk = db.get(DocumentChunk, anchor_chunk) if anchor_chunk else _passage(db, doc, ev.quote or "", (candidate or {}).get("chunk_id"))
             method = (lineage or {}).get("chunk", {}).get("extraction_method") if lineage and lineage.get("chunk") else None
             if method is None and chunk is not None:
                 method = "ocr" if "(OCR)" in (chunk.locator or "") else "native_pdf" if doc.filename.lower().endswith(".pdf") else "native_text"
@@ -145,17 +169,27 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             read_when = job.finished_at if job and job.finished_at else None
             how = READ_METHOD.get(method or "", "read")
             page = chunk.page_number if chunk else None
+            # Measured only on pages with no text layer, so a figure means the page was read by OCR, by whichever reader.
+            legible = chunk.ocr_legibility if chunk is not None else None
+            if legible is not None:
+                method, how = "ocr", READ_METHOD["ocr"]
             cards.append({"id": f"read:{ev.id}", "kind": "reading", "title": f"Page {page} of {pages}" if page and pages else f"{pages or 'No'} pages read",
-                          "lines": [f"read by {how}" if method else "how it was read is not recorded"],
+                          "lines": [(f"read by {how}" if method else "how it was read is not recorded")
+                                    + (f" · {legible:.0f}% legible" if legible is not None else "")],
+                          "legibility": legible,
                           "who": "App reader", "actor": "app", "when": read_when,
                           "checks": [{"label": "OCR" if method == "ocr" else "native", "ok": doc.extraction_status == "complete"}],
                           "wire": {"style": "worked_out", "words": f"p.{page}" if page else "passage"}})
             if read_when:
                 log.append({"when": read_when, "who": "App reader", "actor": "app",
-                            "what": f"Read {pages} page{'s' if pages != 1 else ''} of {doc.filename}{' by OCR' if method == 'ocr' else ''}", "card": f"read:{ev.id}"})
+                            "what": f"Read {pages} page{'s' if pages != 1 else ''} of {doc.filename}"
+                                    + (f", page {page} by OCR" if method == "ocr" and page else " by OCR" if method == "ocr" else "")
+                                    + (f" ({legible:.0f}% legible)" if legible is not None else ""), "card": f"read:{ev.id}"})
             says = chunk is not None and bool(ev.quote) and _norm(ev.quote or "") in _norm(chunk.text)
+            spans = (anchor or {}).get("line_start"), (anchor or {}).get("line_end")
             cards.append({"id": f"passage:{ev.id}", "kind": "passage", "title": f"Passage · {chunk.locator}" if chunk else "Passage not found",
                           "lines": [], "text": chunk.text if chunk else None, "quote": ev.quote, "page": page,
+                          "line_start": spans[0] if chunk else None, "line_end": spans[1] if chunk else None,
                           "who": None, "actor": "app", "when": chunk.created_at if chunk else None,
                           "checks": [{"label": "says it", "ok": says if doc.extraction_status == "complete" else None}],
                           "wire": {"style": "proposed" if candidate else "confirmed", "words": "proposed" if candidate else "quoted"}})
@@ -170,32 +204,34 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             conf = candidate.get("confidence")
             cards.append({"id": f"decision:{ev.id}", "kind": "decision", "title": "Proposed",
                           "lines": [f"{proposer} · {candidate.get('candidate_type')}{f' · {conf:.2f}' if isinstance(conf, (int, float)) else ''}",
-                                    "accepted by a person" if accepted else "not yet decided"],
-                          "who": "a person" if accepted else proposer, "actor": "person" if accepted else "app",
+                                    f"accepted by {_person(candidate.get('decided_by_name'))}" if accepted else "not yet decided"],
+                          "who": _person(candidate.get("decided_by_name")) if accepted else proposer,
+                          "actor": "person" if accepted else _proposer_actor(candidate.get("payload")),
                           "when": candidate.get("reviewed_at") or candidate.get("created_at"),
                           "checks": [{"label": "accepted", "ok": accepted}],
                           "wire": {"style": "against" if against else ("confirmed" if accepted else "proposed"),
                                    "words": "against" if against else "supports"}})
-            log.append({"when": candidate.get("created_at"), "who": proposer, "actor": "app",
+            log.append({"when": candidate.get("created_at"), "who": proposer, "actor": _proposer_actor(candidate.get("payload")),
                         "what": f"Proposed this {candidate.get('candidate_type')}{f' ({conf:.2f})' if isinstance(conf, (int, float)) else ''}", "card": f"decision:{ev.id}"})
             if accepted and candidate.get("reviewed_at"):
-                log.append({"when": candidate["reviewed_at"], "who": "a person", "actor": "person", "what": "Accepted the proposal", "card": f"decision:{ev.id}"})
+                log.append({"when": candidate["reviewed_at"], "who": _person(candidate.get("decided_by_name")), "actor": "person",
+                            "what": "Accepted the proposal", "card": f"decision:{ev.id}"})
         else:
             cards.append({"id": f"decision:{ev.id}", "kind": "decision", "title": "Answered" if against and link.note else "Quote saved",
-                          "lines": [link.note] if link.note else ["typed in by a person"],
-                          "who": "a person", "actor": "person", "when": link.created_at, "checks": [],
+                          "lines": [link.note] if link.note else [f"typed in by {_person(link.decided_by_name)}"],
+                          "who": _person(link.decided_by_name), "actor": "person", "when": link.created_at, "checks": [],
                           "wire": {"style": "against" if against else "confirmed", "words": "against" if against else "supports"}})
-        log.append({"when": link.created_at, "who": "a person", "actor": "person",
+        log.append({"when": link.created_at, "who": _person(link.decided_by_name), "actor": "person",
                     "what": f"Linked as {'against' if against else 'supporting'} the claim{f': {link.note}' if link.note else ''}", "card": f"decision:{ev.id}"})
-        passage_card = next((c for c in cards if c["kind"] == "passage"), None)
         rows.append({"evidence_id": ev.id, "stance": link.stance, "cards": cards,
                      "source": {"title": source.title, "source_type": source.source_type, "tier": source.source_tier, "issuer": source.issuer_or_author} if source else None,
-                     "anchor": _anchor(passage_card.get("text") if passage_card else None, ev.quote),
+                     "anchor": anchor,
                      "rests_on": _rests_on(db, claim.investigation_id, ev.id, claim.id)})
 
     for event in db.scalars(select(ClaimReviewEvent).where(ClaimReviewEvent.claim_id == claim.id).order_by(ClaimReviewEvent.created_at)):
-        who = "a person" if (event.reviewer_type or "HUMAN").upper() == "HUMAN" else event.reviewer_type.lower()
-        log.append({"when": event.created_at, "who": who, "actor": "person" if who == "a person" else "app",
+        person = (event.reviewer_type or "HUMAN").upper() in ("HUMAN", "LEGAL_COUNSEL")
+        who = _person(event.decided_by_name) if person else event.reviewer_type.lower()
+        log.append({"when": event.created_at, "who": who, "actor": "person" if person else "app",
                     "what": f"Set the claim {event.to_status}" + (f": {event.rationale}" if event.rationale else ""), "card": "claim"})
     ai = []
     # An AI answer that cites this claim or one of its pieces of evidence (not merely had it in its packet).
@@ -210,7 +246,9 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
     log = sorted((e for e in log if e["when"] is not None), key=lambda e: e["when"])
     cards_all = [c for r in rows for c in r["cards"]]
     actors = {e["actor"] for e in log} | {c["actor"] for c in cards_all if c.get("who")}
-    people = 1 if "person" in actors else 0
+    # The people by name; decisions kept without a name count as one more only when no one is named.
+    named = {e["who"] for e in log if e["actor"] == "person" and e["who"] not in ("a person", "not recorded")}
+    people = len(named) or (1 if "person" in actors else 0)
     # The app's services that acted: in the log, or on a step (a reading with no recorded job still had a reader).
     app_services = len({e["who"] for e in log if e["actor"] == "app"} | {c["who"] for c in cards_all if c["actor"] == "app" and c.get("who")})
     supports = [r for r in rows if r["stance"] == "supports"]
@@ -223,7 +261,8 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             "steps": sum(len(r["cards"]) for r in rows) + 1,
             "people": people,
             "app_services": app_services,
-            "outside_services": 0,
+            "outside_services": len({e["who"] for e in log if e["actor"] == "outside"}
+                                    | {c["who"] for c in cards_all if c["actor"] == "outside" and c.get("who")}),
             "hashes_intact": None if not hashes else all(h is True for h in hashes),
             "hashes_checked": len(hashes),
             "ai_uses": len(ai),

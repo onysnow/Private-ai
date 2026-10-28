@@ -5,7 +5,7 @@
 1. **The stage header vs the mockups.** Every mockup shows only a breadcrumb above the screen. The app adds a stage
    header (title, a line of text, part tabs) above every screen, so Money doesn't fit on one 1440×900 screen as
    drawn. Changing it changes every screen.
-2. **The Wire (SEE_1):** a new mockup, from SEE_1, SEE_2 and research chapter 07, for his approval.
+2. ~~**The Wire (SEE_1):** a new mockup.~~ Ony, 28 Oct: the prototype artifact is the approved design; SEE_1's parts are built into it.
 3. **AI_2:** the default for outside lookups. The mockup says "Ask first"; the decided global default is
    automatic (INV §8). The app uses Ask first for runs.
 4. **AI_2:** should Tier C be shown at all? It is drawn hatched as "never counts".
@@ -40,8 +40,10 @@
 - **Rain Noir:** Glass panels; the calm "after the rain" still.
 
 ## Authority System Suite (beta) notes for Ony
-- The app runs TAS only (modules 08 and 06). LAS, QAS, RAS, DAS, EGS and EHS are vendored but never invoked, so the
-  plan and the run map show them as "not in the app yet".
+- The app runs TAS (modules 08 and 06) and one app run of each of the other six systems, all routed by one service
+  (`backend/app/ai/suite.py`; `POST .../assistant/run`). What runs, what crosses between runs, and eleven problems
+  in the suite itself are in `docs/authority-suite/SUITE_SYSTEMS_IN_APP.md`. Vendored at d2b2186. The screens to start a suite run need a
+  mockup first.
 - Two suite items describe chat sessions rather than an app run, so the app adapts them:
   - `research_depth: exhaustive` asks for "a disconfirming search per question"; in an app run the search is
     within the packet;

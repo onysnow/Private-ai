@@ -15,6 +15,7 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ai.reasoning import (
@@ -22,46 +23,109 @@ from app.ai.reasoning import (
     ReasoningInputError,
     list_ai_analysis_candidates,
     packet_of_run,
+    resolve_handoff,
     validate_reasoning_request,
 )
 from app.api.dependencies import MAX_OFFSET, authorize_request_resource
-from app.core.authorization import current_authorization_scope, require_scope_investigation_admin, scope_for_request
+from app.core.authorization import (
+    current_authorization_scope,
+    require_scope_investigation_admin,
+    scope_for_request,
+)
 from app.core.config import settings
 from app.db.session import get_db
 from app.jobs.handlers import AI_REASONING
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Investigation
-from app.schemas.responses import (
-    AiAnalysisCandidatesOut, AiModelFailedOut, AiOutputRejectedOut, AiReasoningRunOut, ClaimOut, ErrorOut, ConnectorFindingOut, ConnectorRunOut, CorpusSearchOut, CorpusStatusOut, DemoSeedOut, DocumentOut,
-    EvidencePoolRow, FinancialLedgerOut, GraphOut, MoneyChecksOut, InvestigationDeletionPreview, InvestigationDeletionResult,
-    InvestigationOut, LeadOut, LeadQueueOut, RunPlanOut, RunProfileOut, OpenAlephCorpusBindingOut, OpenAlephOperationFailureOut,
-    QuestionContextOut, RelationshipOut, ReportingTaskOut, SourceOut, TimelineOut, ValidationErrorOut, file_response, upstream,
-)
 from app.schemas.api import (
-    CaseSynthesisRequest, HypothesisTestRequest, InvestigationCreate,
-    InvestigationQuestionContextRequest, PresentationDraftRequest, RunPlanRequest, RunProfileIn,
+    AssistantRunRequest,
+    CaseSynthesisRequest,
+    HypothesisTestRequest,
+    InvestigationCreate,
+    InvestigationQuestionContextRequest,
+    PresentationDraftRequest,
+    RunPlanRequest,
+    RunProfileIn,
+    SuiteRunRequest,
+)
+from app.schemas.responses import (
+    DecidersOut,
+    AiAnalysisCandidatesOut,
+    AiModelFailedOut,
+    AiOutputRejectedOut,
+    AiReasoningRunOut,
+    ClaimOut,
+    ConnectorFindingOut,
+    ConnectorRunOut,
+    CorpusSearchOut,
+    CorpusStatusOut,
+    DemoSeedOut,
+    DocumentOut,
+    ErrorOut,
+    EvidencePoolRow,
+    FinancialLedgerOut,
+    GraphOut,
+    InvestigationDeletionPreview,
+    InvestigationDeletionResult,
+    InvestigationOut,
+    LeadOut,
+    LeadQueueOut,
+    MoneyChecksOut,
+    OpenAlephCorpusBindingOut,
+    OpenAlephOperationFailureOut,
+    QuestionContextOut,
+    RelationshipOut,
+    ReportingTaskOut,
+    RunPlanOut,
+    RunProfileOut,
+    SourceOut,
+    TimelineOut,
+    ValidationErrorOut,
+    file_response,
+    upstream,
 )
 from app.services.assistant_context import build_question_context
+from app.services.demo_seed import seed_demo_investigation
+from app.services.exports import build_investigation_export, record_backup
+from app.services.sealed_backups import seal
+from app.services.financial_flows import investigation_financial_ledger
 from app.services.run_plan import build_run_plan, get_profile as get_run_profile, save_profile as save_run_profile
-from app.services.exports import build_investigation_export
 from app.services.investigations import (
     create_investigation as _create_investigation,
+)
+from app.services.investigations import (
     lead_queue as _lead_queue,
+)
+from app.services.investigations import (
     list_investigation_claims as _list_investigation_claims,
+)
+from app.services.investigations import (
     list_investigation_connector_findings as _list_investigation_connector_findings,
+)
+from app.services.investigations import (
     list_investigation_connector_runs as _list_investigation_connector_runs,
+)
+from app.services.investigations import (
     list_investigation_documents as _list_investigation_documents,
+)
+from app.services.investigations import (
     list_investigation_evidence as _list_investigation_evidence,
+)
+from app.services.investigations import (
     list_investigation_leads as _list_investigation_leads,
+)
+from app.services.investigations import (
     list_investigation_reporting_tasks as _list_investigation_reporting_tasks,
+)
+from app.services.investigations import (
     list_investigation_sources as _list_investigation_sources,
+)
+from app.services.investigations import (
     list_investigations as _list_investigations,
 )
-from app.services.demo_seed import seed_demo_investigation
-from app.services.financial_flows import investigation_financial_ledger
-from app.services.money_checks import investigation_money_checks
 from app.services.lifecycle import delete_investigation, preview_investigation_deletion
+from app.services.money_checks import investigation_money_checks
 from app.services.openaleph_corpus import (
     ensure_openaleph_collection,
     get_binding,
@@ -76,6 +140,9 @@ from app.services.relationships import (
     investigation_graph,
     investigation_relationships,
 )
+from app.services.run_plan import build_run_plan
+from app.services.run_plan import get_profile as get_run_profile
+from app.services.run_plan import save_profile as save_run_profile
 from app.services.timeline import investigation_timeline
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -180,7 +247,7 @@ def investigation_question_context(
         raise HTTPException(404, str(exc))
 
 
-async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None, run_options: dict | None = None, premises: list[str] | None = None, changes: list[dict] | None = None, packet_from: dict | None = None) -> dict[str, Any]:
+async def _run_reasoning_endpoint(request: Request, response: Response, db: Session, *, investigation_id: str, module: str, question: str, max_results: int = 30, include_external_leads: bool = True, working_theory: str | None = None, control_flags: dict | None = None, record_refs: list[dict] | None = None, run_options: dict | None = None, premises: list[str] | None = None, changes: list[dict] | None = None, packet_from: dict | None = None, handoff_from: str | None = None, context: str | None = None) -> dict[str, Any]:
     """Validate, then run as a background job (Foundation Fixes fix 4).
 
     In the Docker stack the run is queued and this answers 202 with the job
@@ -190,11 +257,17 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
     """
     if not settings.enable_ai_features or not (settings.ai_provider or "").strip():
         raise HTTPException(400, "AI reasoning endpoints are not enabled on this deployment (enable_ai_features and ai_provider must both be set)")
+    if packet_from and handoff_from:
+        raise HTTPException(400, "A run starts either from an earlier run's packet (packet_from) or from an accepted answer (handoff_from), not both")
     try:
         resolved_flags = validate_reasoning_request(
             investigation_id=investigation_id, module=module, working_theory=working_theory,
             control_flags=control_flags, record_refs=record_refs, run_options=run_options, premises=premises,
+            handoff_from=handoff_from,
         )
+        # Refused before anything is queued: the answer handed over must be this case's, accepted, and of a module
+        # the receiving one takes from.
+        resolve_handoff(db, investigation_id=investigation_id, module=module, handoff_from=handoff_from)
         if packet_from:
             # Refused before anything is queued: the earlier run must be this case's and must have kept its packet.
             packet_of_run(db, investigation_id=investigation_id, run_id=str(packet_from["run_id"]))
@@ -211,6 +284,7 @@ async def _run_reasoning_endpoint(request: Request, response: Response, db: Sess
             "include_external_leads": include_external_leads, "record_refs": record_refs,
             "control_flags": control_flags if module in TAS_MODULES else None, "resolved_control_flags": resolved_flags,
             "run_options": run_options, "premises": premises, "changes": changes, "packet_from": packet_from,
+            "handoff_from": handoff_from, "context": context,
             "actor_id": scope.actor_id if scope is not None else "local-owner",
         },
         message="Waiting for the model",
@@ -248,6 +322,7 @@ def investigation_run_plan(investigation_id: str, body: RunPlanRequest, db: Sess
             max_results=body.max_results, include_external_leads=body.include_external_leads,
             flags={"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor},
             options=body.options.model_dump(exclude_none=True) if body.options else None, premises=body.premises,
+            handoff_from=body.handoff_from,
         )
     except LookupError as exc:
         raise HTTPException(404, str(exc))
@@ -312,13 +387,50 @@ async def investigation_hypothesis_test(
     )
 
 
+@router.post("/investigations/{investigation_id}/assistant/run", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
+async def investigation_assistant_run(
+    investigation_id: str, body: AssistantRunRequest, request: Request, response: Response, db: Session = Depends(get_db),
+) -> Any:
+    """Any AI run, through the one route the suite service gives its module (app/ai/suite.py): TAS, the other six
+    systems, or the app-local draft. The per-module endpoints below are this same route with the module fixed.
+    Every answer is a proposal and writes nothing else."""
+    flags = {"severity_floor": body.severity_floor, "source_tier_floor": body.source_tier_floor}
+    return await _run_reasoning_endpoint(
+        request, response, db, investigation_id=investigation_id, module=body.module, question=body.question,
+        max_results=body.max_results, include_external_leads=body.include_external_leads,
+        working_theory=body.working_theory, control_flags=flags if any(flags.values()) else None,
+        record_refs=[ref.model_dump() for ref in body.record_refs] if body.record_refs else None,
+        run_options=body.options.model_dump(exclude_none=True) if body.options else None, premises=body.premises,
+        changes=[c.model_dump() for c in body.changes] if body.changes else None,
+        packet_from=body.packet_from.model_dump() if body.packet_from else None,
+        handoff_from=body.handoff_from, context=body.context,
+    )
+
+
+@router.post("/investigations/{investigation_id}/assistant/suite-run", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
+async def investigation_suite_run(
+    investigation_id: str, body: SuiteRunRequest, request: Request, response: Response, db: Session = Depends(get_db),
+) -> Any:
+    """A run of another system of the Authority System Suite -- RAS, QAS, LAS, DAS, EGS or EHS
+    (app/ai/systems.py) -- through the same citation-validated pipeline as the TAS endpoints, with the same
+    guarantee: the answer is a proposal and writes nothing else. A run may start from an answer you accepted
+    (`handoff_from`); what crosses is decided by the suite's INTEROP rules (app/ai/interop.py) and every value held
+    back is listed in the run record.
+    """
+    return await _run_reasoning_endpoint(
+        request, response, db, investigation_id=investigation_id, module=body.module, question=body.question,
+        max_results=body.max_results, include_external_leads=body.include_external_leads, premises=body.premises,
+        handoff_from=body.handoff_from, context=body.context,
+    )
+
+
 @router.post("/investigations/{investigation_id}/assistant/presentation-draft", response_model=AiReasoningRunOut, responses=QUEUED_RUN)
 async def investigation_presentation_draft(
     investigation_id: str, body: PresentationDraftRequest, request: Request, response: Response, db: Session = Depends(get_db),
 ) -> Any:
     """Draft a brief/deck from a reporter-selected evidence set and a goal.
 
-    App-local reasoning module (not vendored TAS -- see
+    App-local reasoning module (not TAS -- see
     app/ai/presentation_modules/PRESENTATION_DRAFT.md), reusing the same
     citation-validated LLM pipeline and non-canonical-write guarantee as
     /assistant/case-synthesis and /assistant/hypothesis-test above: the
@@ -384,14 +496,18 @@ def export_investigation(
         payload, manifest = build_investigation_export(db, investigation_id, include_documents=include_documents)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
+    # Encrypted when a passphrase is set (ADR-0016): the file that leaves this computer is the sealed one.
+    payload, sealed = seal(db, payload)
+    record_backup(db, investigation_id, payload, manifest, encrypted=sealed)
     inv = manifest["investigation"]
     safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in inv["name"]).strip("_") or "investigation"
-    filename = f"{safe_name}.jwbackup.zip"
+    filename = f"{safe_name}.jwbackup{'.encrypted' if sealed else ''}.zip"
     return Response(
         content=payload, media_type="application/zip",
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"',
             "X-JW-Backup-Version": str(manifest["version"]),
+            "X-JW-Backup-Encrypted": "true" if sealed else "false",
         },
     )
 
@@ -603,3 +719,33 @@ def list_connector_findings(
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return _list_investigation_connector_findings(db, investigation_id, limit=limit, offset=offset)
+
+
+@router.get("/investigations/{investigation_id}/deciders", response_model=DecidersOut)
+def investigation_deciders(investigation_id: str, days: int = Query(30, ge=1, le=365), db: Session = Depends(get_db)) -> Any:
+    """Who decided what in this case over the last days (mockup ACCOUNT_2): quote links, claim reviews by a person and
+    decided proposals, by the name kept with each; null for decisions made before names were kept ("a person")."""
+    from collections import Counter
+    from datetime import timedelta
+
+    from app.core.time import utcnow_naive
+    from app.models.claims import Claim, ClaimEvidenceLink, ClaimReviewEvent
+    from app.models.documents import ExtractionCandidate
+
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    since = utcnow_naive() - timedelta(days=days)
+    names: Counter[str | None] = Counter()
+    for (name,) in db.execute(select(ClaimEvidenceLink.decided_by_name).join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
+                              .where(Claim.investigation_id == investigation_id, ClaimEvidenceLink.created_at >= since)):
+        names[name] += 1
+    for (name,) in db.execute(select(ClaimReviewEvent.decided_by_name).join(Claim, Claim.id == ClaimReviewEvent.claim_id)
+                              .where(Claim.investigation_id == investigation_id, ClaimReviewEvent.created_at >= since,
+                                     ClaimReviewEvent.reviewer_type.in_(("HUMAN", "LEGAL_COUNSEL")))):
+        names[name] += 1
+    for (name,) in db.execute(select(ExtractionCandidate.decided_by_name)
+                              .where(ExtractionCandidate.investigation_id == investigation_id, ExtractionCandidate.reviewed_at >= since,
+                                     ExtractionCandidate.review_status != "proposed")):
+        names[name] += 1
+    people = sorted(names.items(), key=lambda kv: (kv[0] is None, -kv[1], kv[0] or ""))
+    return {"days": days, "people": [{"name": n, "decisions": c} for n, c in people]}
