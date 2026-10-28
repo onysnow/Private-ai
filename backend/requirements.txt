@@ -59,3 +59,7 @@ mnemonic==0.21
 # needs git and read access to that repository: your own git login in developer mode,
 # the read-only deploy key in CI and in the Docker build (README.md, backend/Dockerfile).
 authority-suite-sdk @ git+https://github.com/onysnow/authority-suite-sdk@8b0bf4d88a7ec0a41b3de89cb9ae2c486af5347d
+# Following (ADR-0022, source intake Phase 3): feeds, podcasts and open-protocol accounts read with feedparser (BSD-2, with
+# feedparser-sgmllib, PSF-2.0), polled through the capture guard; socksio (MIT) lets httpx use a Tor the reporter runs.
+feedparser==6.0.14
+socksio==1.0.0

@@ -357,6 +357,24 @@ def _watchlist_hit(entry_id: str, document_id: str) -> str:
         return row.id
 
 
+def _followed(inv: str) -> tuple[str, str]:
+    """A followed source and one item in its queue (app/services/following.py), written directly: a closed platform,
+    which is never checked, so no request leaves the test."""
+    from app.db.session import SessionLocal
+    from app.models.following import Monitor, MonitorItem
+
+    with SessionLocal() as db:
+        monitor = Monitor(investigation_id=inv, kind="closed", url="https://www.instagram.com/meridian.holdings",
+                          name="instagram.com · closed platform", every_minutes=0, health="closed")
+        db.add(monitor)
+        db.flush()
+        item = MonitorItem(investigation_id=inv, monitor_id=monitor.id, key="https://example.org/meridian-statement",
+                           url="https://example.org/meridian-statement", title="Statement on the Meridian transfer")
+        db.add(item)
+        db.commit()
+        return monitor.id, item.id
+
+
 def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, reasoning: Any) -> Seeded:
     """The demo investigation and one of everything else the API can read."""
     def ok(response: httpx.Response) -> Any:
@@ -486,8 +504,11 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     recording = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Board call"}, files={
         "file": ("board-call.mp3", (Path(__file__).parent / "fixtures" / "media" / "harbour-talk.mp3").read_bytes(), "audio/mpeg")}))
 
+    monitor_id, monitor_item_id = _followed(inv)
+
     return Seeded(
         ids={
+            "monitor_id": monitor_id, "monitor_item_id": monitor_item_id,
             "fact_watch_id": fact_watch["id"], "saved_question_id": saved_question["id"], "channel": "phone",
             "section_id": story["sections"][0]["id"], "version_id": version["id"], "run_id": draft["job"]["id"],
             "investigation_id": inv, "entity_id": meridian, "claim_id": claim["id"], "lead_id": lead, "relationship_id": relationship,

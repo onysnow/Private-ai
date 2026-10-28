@@ -594,8 +594,36 @@ def capture_media_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     return collect_media(db, str(job.subject_id), report, read_document=read)
 
 
+FOLLOW_AUDIO = "follow_audio"
+
+
+def follow_audio_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Capture a followed podcast episode (ADR-0022): fetch its audio file, keep it as a recording of the case, then
+    transcribe it in a reading job of its own."""
+    from sqlalchemy import Engine
+
+    from app.db.session import build_session_factory
+    from app.jobs.records import create_job, execute_job
+    from app.models.following import MonitorItem
+    from app.services.following import fetch_audio
+
+    item = db.get(MonitorItem, str(job.subject_id))
+    if item is None:
+        return {"message": "The item was deleted before its audio was fetched", "result": {}}
+    report(5, "Fetching the episode's audio file")
+    document_id = fetch_audio(db, item, (job.payload or {}).get("actor"))
+    db.commit()
+    bind = db.get_bind()
+    factory = build_session_factory(bind if isinstance(bind, Engine) else bind.engine)
+    read_job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=job.investigation_id, subject_type="document",
+                          subject_id=document_id, runner=job.runner, payload={"parent_job_id": job.id})
+    execute_job(factory, read_job.id, HANDLERS)
+    return {"message": "Episode kept and sent to be transcribed", "result": {"document_id": document_id}}
+
+
 HANDLERS: dict[str, Handler] = {
     WEB_CAPTURE: web_capture_job,
+    FOLLOW_AUDIO: follow_audio_job,
     CAPTURE_MEDIA: capture_media_job,
     OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,

@@ -50,7 +50,15 @@ def _check_sources(db: Session) -> object:
     return check_sources(db)
 
 
+def _check_monitors(db: Session) -> object:
+    from app.services.following import check_due
+
+    return check_due(db)
+
+
 TASKS: list[Scheduled] = [
+    # Following (ADR-0022): each monitor keeps its own schedule; this asks which are due, every minute.
+    Scheduled("check_monitors", timedelta(minutes=1), _check_monitors),
     Scheduled("deliver_notifications", timedelta(minutes=1), _deliver_notifications),
     Scheduled("check_sources", timedelta(hours=6), _check_sources),
     Scheduled("prune_outbound", timedelta(days=1), _prune_outbound),

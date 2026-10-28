@@ -27,6 +27,7 @@ from app.models.sources import (
 from app.models.case_records import CaseRecord
 from app.models.captures import Capture
 from app.models.derived import DerivedFile, DocumentPhoto
+from app.models.following import Monitor, MonitorItem, PageVersion
 from app.models.media import DocumentMedia, TranscriptSegment
 from app.models.claims import (
     Claim,
@@ -132,6 +133,9 @@ __all__ = [
     "CaseRecord",
     "Capture",
     "DerivedFile",
+    "Monitor",
+    "MonitorItem",
+    "PageVersion",
     "DocumentPhoto",
     "DocumentMedia",
     "TranscriptSegment",

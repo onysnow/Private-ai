@@ -1952,6 +1952,18 @@ export type CapabilitiesOut = {
 };
 
 /**
+ * CaptureAllRequest
+ *
+ * Capturing several at once needs a reason; it goes on each item it captures (the custody log).
+ */
+export type CaptureAllRequest = {
+  /**
+   * Reason
+   */
+  reason: string;
+};
+
+/**
  * CaptureCreate
  *
  * A link to capture (ADR-0018): http or https, a public address.
@@ -4810,6 +4822,62 @@ export type ContextItemOut = {
    * Snippet
    */
   snippet: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * CopyGroupOut
+ *
+ * Items that restate one text: counted once; only the earliest is offered for capture.
+ */
+export type CopyGroupOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Members
+   */
+  members: Array<CopyMemberOut>;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * CopyMemberOut
+ */
+export type CopyMemberOut = {
+  /**
+   * First Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  first_seen_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Original
+   */
+  original: boolean;
+  /**
+   * Similarity
+   */
+  similarity?: number | null;
+  /**
+   * Source
+   */
+  source: string;
   /**
    * Title
    */
@@ -10292,6 +10360,78 @@ export type FlagSourceOut = {
 };
 
 /**
+ * FollowingEgressOut
+ */
+export type FollowingEgressOut = {
+  /**
+   * Direct
+   */
+  direct: number;
+  /**
+   * No Monitor
+   */
+  no_monitor: number;
+  /**
+   * Public Server
+   */
+  public_server: number;
+  /**
+   * Sources
+   */
+  sources: number;
+  /**
+   * Third Party
+   */
+  third_party: number;
+  /**
+   * Tor
+   */
+  tor: number;
+};
+
+/**
+ * FollowingOut
+ *
+ * Everything the Following screen shows: the sources, the queue (most at risk first), copies of one story, and
+ * what leaves this computer.
+ */
+export type FollowingOut = {
+  /**
+   * Captured
+   */
+  captured: number;
+  /**
+   * Copies
+   */
+  copies: Array<CopyGroupOut>;
+  egress: FollowingEgressOut;
+  /**
+   * Followed
+   */
+  followed: number;
+  /**
+   * Monitors
+   */
+  monitors: Array<MonitorOut>;
+  /**
+   * Queue
+   */
+  queue: Array<MonitorItemOut>;
+  /**
+   * Skipped
+   */
+  skipped: number;
+  /**
+   * Waiting
+   */
+  waiting: number;
+  /**
+   * Working
+   */
+  working: number;
+};
+
+/**
  * FontPairOut
  *
  * A heading and body font; empty names mean "keep the theme's own".
@@ -12834,6 +12974,256 @@ export type MoneyChecksOut = {
 };
 
 /**
+ * MonitorCheckOut
+ */
+export type MonitorCheckOut = {
+  /**
+   * State
+   */
+  state: 'ok' | 'warn' | 'bad' | 'wait';
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * MonitorCreate
+ *
+ * Something to follow (ADR-0022): a web address (a feed, sitemap, podcast or page; a page that names its feed is
+ * followed through the feed), a Bluesky handle (@name.bsky.social) or a Mastodon account (@name@server).
+ */
+export type MonitorCreate = {
+  /**
+   * Every Minutes
+   */
+  every_minutes?: number | null;
+  /**
+   * Route
+   */
+  route?: 'direct' | 'tor';
+  /**
+   * Target
+   */
+  target: string;
+};
+
+/**
+ * MonitorItemOut
+ *
+ * One thing a monitor turned up, as the queue shows it. `state`: waiting, capturing, saved, not_saved, skipped,
+ * gone (a captured item whose address now answers 404 or 410) or removal_recorded.
+ */
+export type MonitorItemOut = {
+  /**
+   * Capture Id
+   */
+  capture_id?: string | null;
+  /**
+   * Decision
+   */
+  decision: {
+    [key: string]: unknown;
+  };
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  /**
+   * Extra
+   */
+  extra: {
+    [key: string]: unknown;
+  };
+  /**
+   * First Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  first_seen_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Monitor Id
+   */
+  monitor_id: string;
+  /**
+   * Platform
+   */
+  platform?: string | null;
+  /**
+   * Published At
+   */
+  published_at?: string | null;
+  /**
+   * Rank
+   */
+  rank: number;
+  /**
+   * Risks
+   */
+  risks: Array<MonitorRiskOut>;
+  /**
+   * Source
+   */
+  source: string;
+  /**
+   * State
+   */
+  state:
+    | 'waiting'
+    | 'capturing'
+    | 'saved'
+    | 'not_saved'
+    | 'skipped'
+    | 'gone'
+    | 'removal_recorded'
+    | 'copy';
+  /**
+   * Summary
+   */
+  summary: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
+ * MonitorOut
+ *
+ * A source the case follows. `kind`: feed, sitemap, page, podcast, account (an open-protocol public account) or
+ * closed (a closed platform: no monitor). `health`: works, broken, moved (paused until a person accepts `moved_to`),
+ * paused, unchecked or closed. `leaves` says in words what each check sends and where.
+ */
+export type MonitorOut = {
+  /**
+   * Checks
+   */
+  checks: Array<MonitorCheckOut>;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by?: string | null;
+  /**
+   * Every Minutes
+   */
+  every_minutes: number;
+  /**
+   * Health
+   */
+  health: 'works' | 'broken' | 'moved' | 'paused' | 'unchecked' | 'closed';
+  /**
+   * Health Detail
+   */
+  health_detail?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'feed' | 'sitemap' | 'page' | 'podcast' | 'account' | 'closed';
+  /**
+   * Last Checked At
+   */
+  last_checked_at?: string | null;
+  /**
+   * Last Ok At
+   */
+  last_ok_at?: string | null;
+  /**
+   * Leaves
+   */
+  leaves: string;
+  /**
+   * Moved To
+   */
+  moved_to?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Next Check At
+   */
+  next_check_at?: string | null;
+  /**
+   * Platform
+   */
+  platform?: string | null;
+  /**
+   * Robots Allowed
+   */
+  robots_allowed?: boolean | null;
+  /**
+   * Route
+   */
+  route: 'direct' | 'tor';
+  /**
+   * Url
+   */
+  url: string;
+  /**
+   * Waiting
+   */
+  waiting: number;
+};
+
+/**
+ * MonitorRiskOut
+ */
+export type MonitorRiskOut = {
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Tone
+   */
+  tone: 'bad' | 'amber' | 'teal' | '';
+};
+
+/**
+ * MonitorUpdate
+ */
+export type MonitorUpdate = {
+  /**
+   * Accept Move
+   */
+  accept_move?: boolean | null;
+  /**
+   * Every Minutes
+   */
+  every_minutes?: 15 | 30 | 60 | 1440 | null;
+  /**
+   * Paused
+   */
+  paused?: boolean | null;
+  /**
+   * Route
+   */
+  route?: 'direct' | 'tor' | null;
+};
+
+/**
  * MultiEnrichmentRequest
  */
 export type MultiEnrichmentRequest = {
@@ -13956,6 +14346,54 @@ export type PacketFromIn = {
    * Step
    */
   step: number;
+};
+
+/**
+ * PageVersionOut
+ *
+ * One version of a followed page's main text; `diff` lists the lines removed (-) and added (+) since the one before.
+ */
+export type PageVersionOut = {
+  /**
+   * Capture Id
+   */
+  capture_id?: string | null;
+  /**
+   * Captured
+   */
+  captured: boolean;
+  /**
+   * Diff
+   */
+  diff: Array<string>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Layout Changes
+   */
+  layout_changes: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Lines Changed
+   */
+  lines_changed: number;
+  /**
+   * Number
+   */
+  number: number;
+  /**
+   * Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  seen_at: string;
+  /**
+   * Sha256
+   */
+  sha256: string;
 };
 
 /**
@@ -27654,6 +28092,77 @@ export type GetInvestigationFinancialFlowsResponses = {
 export type GetInvestigationFinancialFlowsResponse =
   GetInvestigationFinancialFlowsResponses[keyof GetInvestigationFinancialFlowsResponses];
 
+export type GetFollowingData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/following';
+};
+
+export type GetFollowingErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetFollowingError = GetFollowingErrors[keyof GetFollowingErrors];
+
+export type GetFollowingResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type GetFollowingResponse =
+  GetFollowingResponses[keyof GetFollowingResponses];
+
+export type CaptureAllData = {
+  body: CaptureAllRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/following/capture-all';
+};
+
+export type CaptureAllErrors = {
+  /**
+   * Response 422 Capture All
+   *
+   * No reason, or one too short
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureAllError = CaptureAllErrors[keyof CaptureAllErrors];
+
+export type CaptureAllResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type CaptureAllResponse = CaptureAllResponses[keyof CaptureAllResponses];
+
 export type GetInvestigationGraphData = {
   body?: never;
   path: {
@@ -28077,6 +28586,47 @@ export type GetInvestigationMoneyChecksResponses = {
 
 export type GetInvestigationMoneyChecksResponse =
   GetInvestigationMoneyChecksResponses[keyof GetInvestigationMoneyChecksResponses];
+
+export type CreateMonitorData = {
+  body: MonitorCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/monitors';
+};
+
+export type CreateMonitorErrors = {
+  /**
+   * No such investigation
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Monitor
+   *
+   * The input does not match the route, or the address cannot be followed (the message says why)
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateMonitorError = CreateMonitorErrors[keyof CreateMonitorErrors];
+
+export type CreateMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorOut;
+};
+
+export type CreateMonitorResponse =
+  CreateMonitorResponses[keyof CreateMonitorResponses];
 
 export type GetNotesData = {
   body?: never;
@@ -30640,6 +31190,338 @@ export type NewRecoveryKeyResponses = {
 
 export type NewRecoveryKeyResponse =
   NewRecoveryKeyResponses[keyof NewRecoveryKeyResponses];
+
+export type CaptureItemData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/capture';
+};
+
+export type CaptureItemErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The item is not waiting
+   */
+  409: ErrorOut;
+  /**
+   * The address cannot be captured
+   */
+  422: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureItemError = CaptureItemErrors[keyof CaptureItemErrors];
+
+export type CaptureItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type CaptureItemResponse =
+  CaptureItemResponses[keyof CaptureItemResponses];
+
+export type RecordRemovalData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/record-removal';
+};
+
+export type RecordRemovalErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecordRemovalError = RecordRemovalErrors[keyof RecordRemovalErrors];
+
+export type RecordRemovalResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type RecordRemovalResponse =
+  RecordRemovalResponses[keyof RecordRemovalResponses];
+
+export type SkipItemData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/skip';
+};
+
+export type SkipItemErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SkipItemError = SkipItemErrors[keyof SkipItemErrors];
+
+export type SkipItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type SkipItemResponse = SkipItemResponses[keyof SkipItemResponses];
+
+export type UndoItemData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/undo';
+};
+
+export type UndoItemErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UndoItemError = UndoItemErrors[keyof UndoItemErrors];
+
+export type UndoItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type UndoItemResponse = UndoItemResponses[keyof UndoItemResponses];
+
+export type DeleteMonitorData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Id
+     */
+    monitor_id: string;
+  };
+  query?: never;
+  url: '/api/monitors/{monitor_id}';
+};
+
+export type DeleteMonitorErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteMonitorError = DeleteMonitorErrors[keyof DeleteMonitorErrors];
+
+export type DeleteMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteMonitorResponse =
+  DeleteMonitorResponses[keyof DeleteMonitorResponses];
+
+export type UpdateMonitorData = {
+  body: MonitorUpdate;
+  path: {
+    /**
+     * Monitor Id
+     */
+    monitor_id: string;
+  };
+  query?: never;
+  url: '/api/monitors/{monitor_id}';
+};
+
+export type UpdateMonitorErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateMonitorError = UpdateMonitorErrors[keyof UpdateMonitorErrors];
+
+export type UpdateMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorOut;
+};
+
+export type UpdateMonitorResponse =
+  UpdateMonitorResponses[keyof UpdateMonitorResponses];
+
+export type CheckMonitorData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Id
+     */
+    monitor_id: string;
+  };
+  query?: never;
+  url: '/api/monitors/{monitor_id}/check';
+};
+
+export type CheckMonitorErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CheckMonitorError = CheckMonitorErrors[keyof CheckMonitorErrors];
+
+export type CheckMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorOut;
+};
+
+export type CheckMonitorResponse =
+  CheckMonitorResponses[keyof CheckMonitorResponses];
+
+export type GetVersionsData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Id
+     */
+    monitor_id: string;
+  };
+  query?: never;
+  url: '/api/monitors/{monitor_id}/versions';
+};
+
+export type GetVersionsErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetVersionsError = GetVersionsErrors[keyof GetVersionsErrors];
+
+export type GetVersionsResponses = {
+  /**
+   * Response Get Versions
+   *
+   * Successful Response
+   */
+  200: Array<PageVersionOut>;
+};
+
+export type GetVersionsResponse =
+  GetVersionsResponses[keyof GetVersionsResponses];
 
 export type RemoveNoteData = {
   body?: never;

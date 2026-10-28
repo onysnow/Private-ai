@@ -3436,6 +3436,22 @@
         "title": "CapabilitiesOut",
         "type": "object"
       },
+      "CaptureAllRequest": {
+        "description": "Capturing several at once needs a reason; it goes on each item it captures (the custody log).",
+        "properties": {
+          "reason": {
+            "maxLength": 2000,
+            "minLength": 8,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "CaptureAllRequest",
+        "type": "object"
+      },
       "CaptureCreate": {
         "description": "A link to capture (ADR-0018): http or https, a public address.",
         "properties": {
@@ -12548,6 +12564,84 @@
           "citation"
         ],
         "title": "ContextItemOut",
+        "type": "object"
+      },
+      "CopyGroupOut": {
+        "description": "Items that restate one text: counted once; only the earliest is offered for capture.",
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/CopyMemberOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "count",
+          "members"
+        ],
+        "title": "CopyGroupOut",
+        "type": "object"
+      },
+      "CopyMemberOut": {
+        "properties": {
+          "first_seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "First Seen At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "original": {
+            "title": "Original",
+            "type": "boolean"
+          },
+          "similarity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Similarity"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "title",
+          "first_seen_at",
+          "original"
+        ],
+        "title": "CopyMemberOut",
         "type": "object"
       },
       "CoreCapabilitiesOut": {
@@ -22113,6 +22207,106 @@
         "title": "FlagSourceOut",
         "type": "object"
       },
+      "FollowingEgressOut": {
+        "properties": {
+          "direct": {
+            "title": "Direct",
+            "type": "integer"
+          },
+          "no_monitor": {
+            "title": "No Monitor",
+            "type": "integer"
+          },
+          "public_server": {
+            "title": "Public Server",
+            "type": "integer"
+          },
+          "sources": {
+            "title": "Sources",
+            "type": "integer"
+          },
+          "third_party": {
+            "title": "Third Party",
+            "type": "integer"
+          },
+          "tor": {
+            "title": "Tor",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sources",
+          "third_party",
+          "direct",
+          "tor",
+          "public_server",
+          "no_monitor"
+        ],
+        "title": "FollowingEgressOut",
+        "type": "object"
+      },
+      "FollowingOut": {
+        "description": "Everything the Following screen shows: the sources, the queue (most at risk first), copies of one story, and\nwhat leaves this computer.",
+        "properties": {
+          "captured": {
+            "title": "Captured",
+            "type": "integer"
+          },
+          "copies": {
+            "items": {
+              "$ref": "#/components/schemas/CopyGroupOut"
+            },
+            "title": "Copies",
+            "type": "array"
+          },
+          "egress": {
+            "$ref": "#/components/schemas/FollowingEgressOut"
+          },
+          "followed": {
+            "title": "Followed",
+            "type": "integer"
+          },
+          "monitors": {
+            "items": {
+              "$ref": "#/components/schemas/MonitorOut"
+            },
+            "title": "Monitors",
+            "type": "array"
+          },
+          "queue": {
+            "items": {
+              "$ref": "#/components/schemas/MonitorItemOut"
+            },
+            "title": "Queue",
+            "type": "array"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          },
+          "waiting": {
+            "title": "Waiting",
+            "type": "integer"
+          },
+          "working": {
+            "title": "Working",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "monitors",
+          "queue",
+          "waiting",
+          "captured",
+          "skipped",
+          "copies",
+          "egress",
+          "working",
+          "followed"
+        ],
+        "title": "FollowingOut",
+        "type": "object"
+      },
       "FontPairOut": {
         "description": "A heading and body font; empty names mean \"keep the theme's own\".",
         "properties": {
@@ -26551,6 +26745,476 @@
         "title": "MoneyChecksOut",
         "type": "object"
       },
+      "MonitorCheckOut": {
+        "properties": {
+          "state": {
+            "enum": [
+              "ok",
+              "warn",
+              "bad",
+              "wait"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "text"
+        ],
+        "title": "MonitorCheckOut",
+        "type": "object"
+      },
+      "MonitorCreate": {
+        "description": "Something to follow (ADR-0022): a web address (a feed, sitemap, podcast or page; a page that names its feed is\nfollowed through the feed), a Bluesky handle (@name.bsky.social) or a Mastodon account (@name@server).",
+        "properties": {
+          "every_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Every Minutes"
+          },
+          "route": {
+            "default": "direct",
+            "enum": [
+              "direct",
+              "tor"
+            ],
+            "title": "Route",
+            "type": "string"
+          },
+          "target": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "title": "MonitorCreate",
+        "type": "object"
+      },
+      "MonitorItemOut": {
+        "description": "One thing a monitor turned up, as the queue shows it. `state`: waiting, capturing, saved, not_saved, skipped,\ngone (a captured item whose address now answers 404 or 410) or removal_recorded.",
+        "properties": {
+          "capture_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Id"
+          },
+          "decision": {
+            "additionalProperties": true,
+            "title": "Decision",
+            "type": "object"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "extra": {
+            "additionalProperties": true,
+            "title": "Extra",
+            "type": "object"
+          },
+          "first_seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "First Seen At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "monitor_id": {
+            "title": "Monitor Id",
+            "type": "string"
+          },
+          "platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "integer"
+          },
+          "risks": {
+            "items": {
+              "$ref": "#/components/schemas/MonitorRiskOut"
+            },
+            "title": "Risks",
+            "type": "array"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "waiting",
+              "capturing",
+              "saved",
+              "not_saved",
+              "skipped",
+              "gone",
+              "removal_recorded",
+              "copy"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "monitor_id",
+          "kind",
+          "title",
+          "summary",
+          "first_seen_at",
+          "state",
+          "risks",
+          "rank",
+          "source",
+          "extra",
+          "decision"
+        ],
+        "title": "MonitorItemOut",
+        "type": "object"
+      },
+      "MonitorOut": {
+        "description": "A source the case follows. `kind`: feed, sitemap, page, podcast, account (an open-protocol public account) or\nclosed (a closed platform: no monitor). `health`: works, broken, moved (paused until a person accepts `moved_to`),\npaused, unchecked or closed. `leaves` says in words what each check sends and where.",
+        "properties": {
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/MonitorCheckOut"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "every_minutes": {
+            "title": "Every Minutes",
+            "type": "integer"
+          },
+          "health": {
+            "enum": [
+              "works",
+              "broken",
+              "moved",
+              "paused",
+              "unchecked",
+              "closed"
+            ],
+            "title": "Health",
+            "type": "string"
+          },
+          "health_detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Health Detail"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "feed",
+              "sitemap",
+              "page",
+              "podcast",
+              "account",
+              "closed"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_checked_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Checked At"
+          },
+          "last_ok_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Ok At"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "string"
+          },
+          "moved_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moved To"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "next_check_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Check At"
+          },
+          "platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Platform"
+          },
+          "robots_allowed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Robots Allowed"
+          },
+          "route": {
+            "enum": [
+              "direct",
+              "tor"
+            ],
+            "title": "Route",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "waiting": {
+            "title": "Waiting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "url",
+          "name",
+          "every_minutes",
+          "route",
+          "health",
+          "checks",
+          "waiting",
+          "leaves",
+          "created_at"
+        ],
+        "title": "MonitorOut",
+        "type": "object"
+      },
+      "MonitorRiskOut": {
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "tone": {
+            "enum": [
+              "bad",
+              "amber",
+              "teal",
+              ""
+            ],
+            "title": "Tone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tone",
+          "text"
+        ],
+        "title": "MonitorRiskOut",
+        "type": "object"
+      },
+      "MonitorUpdate": {
+        "properties": {
+          "accept_move": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accept Move"
+          },
+          "every_minutes": {
+            "anyOf": [
+              {
+                "enum": [
+                  15,
+                  30,
+                  60,
+                  1440
+                ],
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Every Minutes"
+          },
+          "paused": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paused"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "enum": [
+                  "direct",
+                  "tor"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route"
+          }
+        },
+        "title": "MonitorUpdate",
+        "type": "object"
+      },
       "MultiEnrichmentRequest": {
         "properties": {
           "providers": {
@@ -28291,6 +28955,75 @@
           "step"
         ],
         "title": "PacketFromIn",
+        "type": "object"
+      },
+      "PageVersionOut": {
+        "description": "One version of a followed page's main text; `diff` lists the lines removed (-) and added (+) since the one before.",
+        "properties": {
+          "capture_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Id"
+          },
+          "captured": {
+            "title": "Captured",
+            "type": "boolean"
+          },
+          "diff": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Diff",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "layout_changes": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Layout Changes",
+            "type": "array"
+          },
+          "lines_changed": {
+            "title": "Lines Changed",
+            "type": "integer"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Seen At",
+            "type": "string"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "seen_at",
+          "sha256",
+          "lines_changed",
+          "diff",
+          "layout_changes",
+          "captured"
+        ],
+        "title": "PageVersionOut",
         "type": "object"
       },
       "PartyYearsOut": {
@@ -57682,6 +58415,124 @@
         "summary": "Get Investigation Financial Flows"
       }
     },
+    "/api/investigations/{investigation_id}/following": {
+      "get": {
+        "description": "The sources this case follows, the queue (most at risk first), copies of one story counted once, and what\nleaves this computer.",
+        "operationId": "get_following",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Following"
+      }
+    },
+    "/api/investigations/{investigation_id}/following/capture-all": {
+      "post": {
+        "description": "Capture everything waiting, at once. Needs a reason, kept on each item it captures; an item that cannot be\ncaptured stays waiting.",
+        "operationId": "capture_all",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptureAllRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Capture All"
+                }
+              }
+            },
+            "description": "No reason, or one too short"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Capture All"
+      }
+    },
     "/api/investigations/{investigation_id}/graph": {
       "get": {
         "operationId": "get_investigation_graph",
@@ -58396,6 +59247,84 @@
           }
         },
         "summary": "Get Investigation Money Checks"
+      }
+    },
+    "/api/investigations/{investigation_id}/monitors": {
+      "post": {
+        "description": "Follow something: the address is asked once to see what it is (a feed, sitemap, podcast or page; a page that\nnames its feed is followed through the feed), then checked on its schedule. A closed platform becomes a row with\nno monitor. Nothing is kept until a person captures it.",
+        "operationId": "create_monitor",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitorCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitorOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No such investigation"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Create Monitor"
+                }
+              }
+            },
+            "description": "The input does not match the route, or the address cannot be followed (the message says why)"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Create Monitor"
       }
     },
     "/api/investigations/{investigation_id}/notes": {
@@ -62466,6 +63395,540 @@
           }
         },
         "summary": "New Recovery Key"
+      }
+    },
+    "/api/monitor-items/{monitor_item_id}/capture": {
+      "post": {
+        "description": "Capture one item: a page through the ordinary web capture (ADR-0018), a podcast episode by fetching its audio\nfile and transcribing it. Answers with the whole screen.",
+        "operationId": "capture_item",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_item_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The item is not waiting"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The address cannot be captured"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Capture Item"
+      }
+    },
+    "/api/monitor-items/{monitor_item_id}/record-removal": {
+      "post": {
+        "description": "Record that something captured before is gone from its address (it answers 404 or 410), and when that was found.",
+        "operationId": "record_removal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_item_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Record Removal"
+      }
+    },
+    "/api/monitor-items/{monitor_item_id}/skip": {
+      "post": {
+        "operationId": "skip_item",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_item_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Skip Item"
+      }
+    },
+    "/api/monitor-items/{monitor_item_id}/undo": {
+      "post": {
+        "description": "Put a skipped item back in the queue.",
+        "operationId": "undo_item",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_item_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Undo Item"
+      }
+    },
+    "/api/monitors/{monitor_id}": {
+      "delete": {
+        "description": "Stop following. What was captured from it stays in the case; its queue and versions go.",
+        "operationId": "delete_monitor",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Delete Monitor"
+      },
+      "patch": {
+        "description": "Change how often it is checked, its route (Direct or Tor), pause or resume it, or accept the address it moved\nto (a moved source is never followed by itself).",
+        "operationId": "update_monitor",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitorUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitorOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Update Monitor"
+      }
+    },
+    "/api/monitors/{monitor_id}/check": {
+      "post": {
+        "description": "Check the source now instead of at its next time (the same polite, logged request).",
+        "operationId": "check_monitor",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitorOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Check Monitor"
+      }
+    },
+    "/api/monitors/{monitor_id}/versions": {
+      "get": {
+        "description": "Every version of a followed page's main text, newest first, with what changed from the one before.",
+        "operationId": "get_versions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PageVersionOut"
+                  },
+                  "title": "Response Get Versions",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Versions"
       }
     },
     "/api/notes/{note_id}": {

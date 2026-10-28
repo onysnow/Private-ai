@@ -5777,3 +5777,118 @@ class SuiteCatalogOut(ResponseModel):
     """Every system, module and record of the suite, and which app runs use each module."""
     source: str | None
     systems: list[SuiteCatalogSystemOut]
+
+
+# --- Following (ADR-0022) -------------------------------------------------------------------------------------------
+
+class MonitorCheckOut(ResponseModel):
+    state: Literal["ok", "warn", "bad", "wait"]
+    text: str
+
+
+class MonitorOut(ResponseModel):
+    """A source the case follows. `kind`: feed, sitemap, page, podcast, account (an open-protocol public account) or
+    closed (a closed platform: no monitor). `health`: works, broken, moved (paused until a person accepts `moved_to`),
+    paused, unchecked or closed. `leaves` says in words what each check sends and where."""
+    id: str
+    kind: Literal["feed", "sitemap", "page", "podcast", "account", "closed"]
+    platform: str | None = None
+    url: str
+    name: str
+    every_minutes: int
+    route: Literal["direct", "tor"]
+    health: Literal["works", "broken", "moved", "paused", "unchecked", "closed"]
+    health_detail: str | None = None
+    moved_to: str | None = None
+    checks: list[MonitorCheckOut]
+    last_checked_at: Timestamp | None = None
+    last_ok_at: Timestamp | None = None
+    next_check_at: Timestamp | None = None
+    robots_allowed: bool | None = None
+    waiting: int
+    leaves: str
+    created_by: str | None = None
+    created_at: Timestamp
+
+
+class MonitorRiskOut(ResponseModel):
+    tone: Literal["bad", "amber", "teal", ""]
+    text: str
+
+
+class MonitorItemOut(ResponseModel):
+    """One thing a monitor turned up, as the queue shows it. `state`: waiting, capturing, saved, not_saved, skipped,
+    gone (a captured item whose address now answers 404 or 410) or removal_recorded."""
+    id: str
+    monitor_id: str
+    kind: str
+    platform: str | None = None
+    title: str
+    url: str | None = None
+    summary: str
+    published_at: Timestamp | None = None
+    first_seen_at: Timestamp
+    state: Literal["waiting", "capturing", "saved", "not_saved", "skipped", "gone", "removal_recorded", "copy"]
+    risks: list[MonitorRiskOut]
+    rank: int
+    source: str
+    # What the source says besides: the episode's audio file and size, a transcript the publisher offers, the page
+    # version and how many lines changed.
+    extra: dict[str, Any]
+    capture_id: str | None = None
+    document_id: str | None = None
+    # Who captured, skipped or recorded it, when, and a bulk capture's reason.
+    decision: dict[str, Any]
+
+
+class CopyMemberOut(ResponseModel):
+    id: str
+    source: str
+    title: str
+    first_seen_at: Timestamp
+    original: bool
+    similarity: float | None = None
+
+
+class CopyGroupOut(ResponseModel):
+    """Items that restate one text: counted once; only the earliest is offered for capture."""
+    id: str
+    title: str
+    count: int
+    members: list[CopyMemberOut]
+
+
+class FollowingEgressOut(ResponseModel):
+    sources: int
+    third_party: int
+    direct: int
+    tor: int
+    public_server: int
+    no_monitor: int
+
+
+class FollowingOut(ResponseModel):
+    """Everything the Following screen shows: the sources, the queue (most at risk first), copies of one story, and
+    what leaves this computer."""
+    monitors: list[MonitorOut]
+    queue: list[MonitorItemOut]
+    waiting: int
+    captured: int
+    skipped: int
+    copies: list[CopyGroupOut]
+    egress: FollowingEgressOut
+    working: int
+    followed: int
+
+
+class PageVersionOut(ResponseModel):
+    """One version of a followed page's main text; `diff` lists the lines removed (-) and added (+) since the one before."""
+    id: str
+    number: int
+    seen_at: Timestamp
+    sha256: str
+    lines_changed: int
+    diff: list[str]
+    layout_changes: list[dict[str, Any]]
+    captured: bool
+    capture_id: str | None = None

@@ -26,8 +26,11 @@ import {
   cancelJobEndpoint,
   canonicalEntityResolution,
   capabilities,
+  captureAll,
+  captureItem,
   changePassphrase,
   checkConnectorKey,
+  checkMonitor,
   checkWatchlistNow,
   clearCaseLookups,
   closeCase,
@@ -48,6 +51,7 @@ import {
   createInvestigation,
   createLeadEndpoint,
   createLeadFromRelationshipContext,
+  createMonitor,
   createReportingTaskEndpoint,
   createSourceEndpoint,
   createTimelineEventEndpoint,
@@ -61,6 +65,7 @@ import {
   deleteConnectorCredential,
   deleteDeckEndpoint,
   deleteInvestigationMembership,
+  deleteMonitor,
   deleteSavedQuestion,
   deleteStorySection,
   deleteWatch,
@@ -130,6 +135,7 @@ import {
   getExtractionCandidateLineage,
   getExtractionEntityMatches,
   getExtractionOpenalephMatches,
+  getFollowing,
   getGlossaryEntry,
   getIdentifierTargets,
   getInbox,
@@ -173,6 +179,7 @@ import {
   getSuiteCoverage,
   getTaggedRecords,
   getTags,
+  getVersions,
   getWatchlist,
   getWire,
   getWriteupEndpoint,
@@ -284,6 +291,7 @@ import {
   putNotificationPrefs,
   putResearchSettings,
   recheckHash,
+  recordRemoval,
   recordStoryGate,
   recover,
   refreshOpenalephDocumentReview,
@@ -328,6 +336,7 @@ import {
   setPin,
   setStoryThesis,
   settingsStatus,
+  skipItem,
   startSession,
   startStoryWriteup,
   syncCorpusNow,
@@ -336,6 +345,7 @@ import {
   testNotificationChannel,
   turnOff,
   turnOn,
+  undoItem,
   unlock,
   unlockPin,
   untagARecord,
@@ -344,6 +354,7 @@ import {
   updateDeckEndpoint,
   updateEntity,
   updateLeadEndpoint,
+  updateMonitor,
   updateReportingTaskEndpoint,
   updateStorySection,
   updateWriteupEndpoint,
@@ -401,12 +412,21 @@ import type {
   CapabilitiesData,
   CapabilitiesError,
   CapabilitiesResponse,
+  CaptureAllData,
+  CaptureAllError,
+  CaptureAllResponse,
+  CaptureItemData,
+  CaptureItemError,
+  CaptureItemResponse,
   ChangePassphraseData,
   ChangePassphraseError,
   ChangePassphraseResponse,
   CheckConnectorKeyData,
   CheckConnectorKeyError,
   CheckConnectorKeyResponse,
+  CheckMonitorData,
+  CheckMonitorError,
+  CheckMonitorResponse,
   CheckWatchlistNowData,
   CheckWatchlistNowError,
   CheckWatchlistNowResponse,
@@ -467,6 +487,9 @@ import type {
   CreateLeadFromRelationshipContextData,
   CreateLeadFromRelationshipContextError,
   CreateLeadFromRelationshipContextResponse,
+  CreateMonitorData,
+  CreateMonitorError,
+  CreateMonitorResponse,
   CreateReportingTaskEndpointData,
   CreateReportingTaskEndpointError,
   CreateReportingTaskEndpointResponse,
@@ -506,6 +529,9 @@ import type {
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipError,
   DeleteInvestigationMembershipResponse,
+  DeleteMonitorData,
+  DeleteMonitorError,
+  DeleteMonitorResponse,
   DeleteSavedQuestionData,
   DeleteSavedQuestionError,
   DeleteSavedQuestionResponse,
@@ -712,6 +738,9 @@ import type {
   GetExtractionOpenalephMatchesData,
   GetExtractionOpenalephMatchesError,
   GetExtractionOpenalephMatchesResponse,
+  GetFollowingData,
+  GetFollowingError,
+  GetFollowingResponse,
   GetGlossaryEntryData,
   GetGlossaryEntryError,
   GetGlossaryEntryResponse,
@@ -841,6 +870,9 @@ import type {
   GetTagsData,
   GetTagsError,
   GetTagsResponse,
+  GetVersionsData,
+  GetVersionsError,
+  GetVersionsResponse,
   GetWatchlistData,
   GetWatchlistError,
   GetWatchlistResponse,
@@ -1170,6 +1202,9 @@ import type {
   RecheckHashData,
   RecheckHashError,
   RecheckHashResponse,
+  RecordRemovalData,
+  RecordRemovalError,
+  RecordRemovalResponse,
   RecordStoryGateData,
   RecordStoryGateError,
   RecordStoryGateResponse,
@@ -1302,6 +1337,9 @@ import type {
   SettingsStatusData,
   SettingsStatusError,
   SettingsStatusResponse,
+  SkipItemData,
+  SkipItemError,
+  SkipItemResponse,
   StartSessionData,
   StartSessionError,
   StartSessionResponse,
@@ -1326,6 +1364,9 @@ import type {
   TurnOnData,
   TurnOnError,
   TurnOnResponse,
+  UndoItemData,
+  UndoItemError,
+  UndoItemResponse,
   UnlockData,
   UnlockError,
   UnlockPinData,
@@ -1350,6 +1391,9 @@ import type {
   UpdateLeadEndpointData,
   UpdateLeadEndpointError,
   UpdateLeadEndpointResponse,
+  UpdateMonitorData,
+  UpdateMonitorError,
+  UpdateMonitorResponse,
   UpdateReportingTaskEndpointData,
   UpdateReportingTaskEndpointError,
   UpdateReportingTaskEndpointResponse,
@@ -7185,6 +7229,64 @@ export const getInvestigationFinancialFlowsOptions = (
     queryKey: getInvestigationFinancialFlowsQueryKey(options),
   });
 
+export const getFollowingQueryKey = (options: Options<GetFollowingData>) =>
+  createQueryKey('getFollowing', options);
+
+/**
+ * Get Following
+ *
+ * The sources this case follows, the queue (most at risk first), copies of one story counted once, and what
+ * leaves this computer.
+ */
+export const getFollowingOptions = (options: Options<GetFollowingData>) =>
+  queryOptions<
+    GetFollowingResponse,
+    GetFollowingError,
+    GetFollowingResponse,
+    ReturnType<typeof getFollowingQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getFollowing({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getFollowingQueryKey(options),
+  });
+
+/**
+ * Capture All
+ *
+ * Capture everything waiting, at once. Needs a reason, kept on each item it captures; an item that cannot be
+ * captured stays waiting.
+ */
+export const captureAllMutation = (
+  options?: Partial<Options<CaptureAllData>>,
+): UseMutationOptions<
+  CaptureAllResponse,
+  CaptureAllError,
+  Options<CaptureAllData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureAllResponse,
+    CaptureAllError,
+    Options<CaptureAllData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureAll({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getInvestigationGraphQueryKey = (
   options: Options<GetInvestigationGraphData>,
 ) => createQueryKey('getInvestigationGraph', options);
@@ -7557,6 +7659,37 @@ export const getInvestigationMoneyChecksOptions = (
     },
     queryKey: getInvestigationMoneyChecksQueryKey(options),
   });
+
+/**
+ * Create Monitor
+ *
+ * Follow something: the address is asked once to see what it is (a feed, sitemap, podcast or page; a page that
+ * names its feed is followed through the feed), then checked on its schedule. A closed platform becomes a row with
+ * no monitor. Nothing is kept until a person captures it.
+ */
+export const createMonitorMutation = (
+  options?: Partial<Options<CreateMonitorData>>,
+): UseMutationOptions<
+  CreateMonitorResponse,
+  CreateMonitorError,
+  Options<CreateMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateMonitorResponse,
+    CreateMonitorError,
+    Options<CreateMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getNotesQueryKey = (options: Options<GetNotesData>) =>
   createQueryKey('getNotes', options);
@@ -9671,6 +9804,236 @@ export const newRecoveryKeyMutation = (
   };
   return mutationOptions;
 };
+
+/**
+ * Capture Item
+ *
+ * Capture one item: a page through the ordinary web capture (ADR-0018), a podcast episode by fetching its audio
+ * file and transcribing it. Answers with the whole screen.
+ */
+export const captureItemMutation = (
+  options?: Partial<Options<CaptureItemData>>,
+): UseMutationOptions<
+  CaptureItemResponse,
+  CaptureItemError,
+  Options<CaptureItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureItemResponse,
+    CaptureItemError,
+    Options<CaptureItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Record Removal
+ *
+ * Record that something captured before is gone from its address (it answers 404 or 410), and when that was found.
+ */
+export const recordRemovalMutation = (
+  options?: Partial<Options<RecordRemovalData>>,
+): UseMutationOptions<
+  RecordRemovalResponse,
+  RecordRemovalError,
+  Options<RecordRemovalData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RecordRemovalResponse,
+    RecordRemovalError,
+    Options<RecordRemovalData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await recordRemoval({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Skip Item
+ */
+export const skipItemMutation = (
+  options?: Partial<Options<SkipItemData>>,
+): UseMutationOptions<
+  SkipItemResponse,
+  SkipItemError,
+  Options<SkipItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SkipItemResponse,
+    SkipItemError,
+    Options<SkipItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await skipItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Undo Item
+ *
+ * Put a skipped item back in the queue.
+ */
+export const undoItemMutation = (
+  options?: Partial<Options<UndoItemData>>,
+): UseMutationOptions<
+  UndoItemResponse,
+  UndoItemError,
+  Options<UndoItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UndoItemResponse,
+    UndoItemError,
+    Options<UndoItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await undoItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete Monitor
+ *
+ * Stop following. What was captured from it stays in the case; its queue and versions go.
+ */
+export const deleteMonitorMutation = (
+  options?: Partial<Options<DeleteMonitorData>>,
+): UseMutationOptions<
+  DeleteMonitorResponse,
+  DeleteMonitorError,
+  Options<DeleteMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteMonitorResponse,
+    DeleteMonitorError,
+    Options<DeleteMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update Monitor
+ *
+ * Change how often it is checked, its route (Direct or Tor), pause or resume it, or accept the address it moved
+ * to (a moved source is never followed by itself).
+ */
+export const updateMonitorMutation = (
+  options?: Partial<Options<UpdateMonitorData>>,
+): UseMutationOptions<
+  UpdateMonitorResponse,
+  UpdateMonitorError,
+  Options<UpdateMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateMonitorResponse,
+    UpdateMonitorError,
+    Options<UpdateMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Check Monitor
+ *
+ * Check the source now instead of at its next time (the same polite, logged request).
+ */
+export const checkMonitorMutation = (
+  options?: Partial<Options<CheckMonitorData>>,
+): UseMutationOptions<
+  CheckMonitorResponse,
+  CheckMonitorError,
+  Options<CheckMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CheckMonitorResponse,
+    CheckMonitorError,
+    Options<CheckMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await checkMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getVersionsQueryKey = (options: Options<GetVersionsData>) =>
+  createQueryKey('getVersions', options);
+
+/**
+ * Get Versions
+ *
+ * Every version of a followed page's main text, newest first, with what changed from the one before.
+ */
+export const getVersionsOptions = (options: Options<GetVersionsData>) =>
+  queryOptions<
+    GetVersionsResponse,
+    GetVersionsError,
+    GetVersionsResponse,
+    ReturnType<typeof getVersionsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getVersions({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getVersionsQueryKey(options),
+  });
 
 /**
  * Remove Note

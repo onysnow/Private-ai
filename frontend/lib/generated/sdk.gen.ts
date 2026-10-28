@@ -63,12 +63,21 @@ import type {
   CapabilitiesData,
   CapabilitiesErrors,
   CapabilitiesResponses,
+  CaptureAllData,
+  CaptureAllErrors,
+  CaptureAllResponses,
+  CaptureItemData,
+  CaptureItemErrors,
+  CaptureItemResponses,
   ChangePassphraseData,
   ChangePassphraseErrors,
   ChangePassphraseResponses,
   CheckConnectorKeyData,
   CheckConnectorKeyErrors,
   CheckConnectorKeyResponses,
+  CheckMonitorData,
+  CheckMonitorErrors,
+  CheckMonitorResponses,
   CheckWatchlistNowData,
   CheckWatchlistNowErrors,
   CheckWatchlistNowResponses,
@@ -129,6 +138,9 @@ import type {
   CreateLeadFromRelationshipContextData,
   CreateLeadFromRelationshipContextErrors,
   CreateLeadFromRelationshipContextResponses,
+  CreateMonitorData,
+  CreateMonitorErrors,
+  CreateMonitorResponses,
   CreateReportingTaskEndpointData,
   CreateReportingTaskEndpointErrors,
   CreateReportingTaskEndpointResponses,
@@ -168,6 +180,9 @@ import type {
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipErrors,
   DeleteInvestigationMembershipResponses,
+  DeleteMonitorData,
+  DeleteMonitorErrors,
+  DeleteMonitorResponses,
   DeleteSavedQuestionData,
   DeleteSavedQuestionErrors,
   DeleteSavedQuestionResponses,
@@ -375,6 +390,9 @@ import type {
   GetExtractionOpenalephMatchesData,
   GetExtractionOpenalephMatchesErrors,
   GetExtractionOpenalephMatchesResponses,
+  GetFollowingData,
+  GetFollowingErrors,
+  GetFollowingResponses,
   GetGlossaryEntryData,
   GetGlossaryEntryErrors,
   GetGlossaryEntryResponses,
@@ -504,6 +522,9 @@ import type {
   GetTagsData,
   GetTagsErrors,
   GetTagsResponses,
+  GetVersionsData,
+  GetVersionsErrors,
+  GetVersionsResponses,
   GetWatchlistData,
   GetWatchlistErrors,
   GetWatchlistResponses,
@@ -834,6 +855,9 @@ import type {
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
+  RecordRemovalData,
+  RecordRemovalErrors,
+  RecordRemovalResponses,
   RecordStoryGateData,
   RecordStoryGateErrors,
   RecordStoryGateResponses,
@@ -966,6 +990,9 @@ import type {
   SettingsStatusData,
   SettingsStatusErrors,
   SettingsStatusResponses,
+  SkipItemData,
+  SkipItemErrors,
+  SkipItemResponses,
   StartSessionData,
   StartSessionErrors,
   StartSessionResponses,
@@ -990,6 +1017,9 @@ import type {
   TurnOnData,
   TurnOnErrors,
   TurnOnResponses,
+  UndoItemData,
+  UndoItemErrors,
+  UndoItemResponses,
   UnlockData,
   UnlockErrors,
   UnlockPinData,
@@ -1014,6 +1044,9 @@ import type {
   UpdateLeadEndpointData,
   UpdateLeadEndpointErrors,
   UpdateLeadEndpointResponses,
+  UpdateMonitorData,
+  UpdateMonitorErrors,
+  UpdateMonitorResponses,
   UpdateReportingTaskEndpointData,
   UpdateReportingTaskEndpointErrors,
   UpdateReportingTaskEndpointResponses,
@@ -1072,10 +1105,17 @@ import {
   zCanonicalEntityResolutionPath,
   zCanonicalEntityResolutionResponse,
   zCapabilitiesResponse,
+  zCaptureAllBody,
+  zCaptureAllPath,
+  zCaptureAllResponse,
+  zCaptureItemPath,
+  zCaptureItemResponse,
   zChangePassphraseBody,
   zChangePassphraseResponse,
   zCheckConnectorKeyPath,
   zCheckConnectorKeyResponse,
+  zCheckMonitorPath,
+  zCheckMonitorResponse,
   zCheckWatchlistNowPath,
   zCheckWatchlistNowResponse,
   zClearCaseLookupsPath,
@@ -1122,6 +1162,9 @@ import {
   zCreateLeadEndpointResponse,
   zCreateLeadFromRelationshipContextPath,
   zCreateLeadFromRelationshipContextResponse,
+  zCreateMonitorBody,
+  zCreateMonitorPath,
+  zCreateMonitorResponse,
   zCreateReportingTaskEndpointBody,
   zCreateReportingTaskEndpointResponse,
   zCreateSourceEndpointBody,
@@ -1153,6 +1196,8 @@ import {
   zDeleteDeckEndpointResponse,
   zDeleteInvestigationMembershipPath,
   zDeleteInvestigationMembershipResponse,
+  zDeleteMonitorPath,
+  zDeleteMonitorResponse,
   zDeleteSavedQuestionPath,
   zDeleteSavedQuestionResponse,
   zDeleteStorySectionPath,
@@ -1297,6 +1342,8 @@ import {
   zGetExtractionEntityMatchesResponse,
   zGetExtractionOpenalephMatchesPath,
   zGetExtractionOpenalephMatchesResponse,
+  zGetFollowingPath,
+  zGetFollowingResponse,
   zGetGlossaryEntryQuery,
   zGetGlossaryEntryResponse,
   zGetIdentifierTargetsPath,
@@ -1384,6 +1431,8 @@ import {
   zGetTaggedRecordsResponse,
   zGetTagsPath,
   zGetTagsResponse,
+  zGetVersionsPath,
+  zGetVersionsResponse,
   zGetWatchlistPath,
   zGetWatchlistResponse,
   zGetWirePath,
@@ -1648,6 +1697,8 @@ import {
   zPutResearchSettingsResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
+  zRecordRemovalPath,
+  zRecordRemovalResponse,
   zRecordStoryGateBody,
   zRecordStoryGatePath,
   zRecordStoryGateResponse,
@@ -1752,6 +1803,8 @@ import {
   zSetStoryThesisPath,
   zSetStoryThesisResponse,
   zSettingsStatusResponse,
+  zSkipItemPath,
+  zSkipItemResponse,
   zStartSessionResponse,
   zStartStoryWriteupPath,
   zStartStoryWriteupResponse,
@@ -1768,6 +1821,8 @@ import {
   zTurnOffResponse,
   zTurnOnBody,
   zTurnOnResponse,
+  zUndoItemPath,
+  zUndoItemResponse,
   zUnlockBody,
   zUnlockPinBody,
   zUnlockPinResponse,
@@ -1790,6 +1845,9 @@ import {
   zUpdateLeadEndpointBody,
   zUpdateLeadEndpointPath,
   zUpdateLeadEndpointResponse,
+  zUpdateMonitorBody,
+  zUpdateMonitorPath,
+  zUpdateMonitorResponse,
   zUpdateReportingTaskEndpointBody,
   zUpdateReportingTaskEndpointPath,
   zUpdateReportingTaskEndpointResponse,
@@ -7333,6 +7391,66 @@ export const getInvestigationFinancialFlows = <
   });
 
 /**
+ * Get Following
+ *
+ * The sources this case follows, the queue (most at risk first), copies of one story counted once, and what
+ * leaves this computer.
+ */
+export const getFollowing = <ThrowOnError extends boolean = false>(
+  options: Options<GetFollowingData, ThrowOnError>,
+): RequestResult<GetFollowingResponses, GetFollowingErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetFollowingResponses,
+    GetFollowingErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetFollowingPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetFollowingResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/following',
+    ...options,
+  });
+
+/**
+ * Capture All
+ *
+ * Capture everything waiting, at once. Needs a reason, kept on each item it captures; an item that cannot be
+ * captured stays waiting.
+ */
+export const captureAll = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureAllData, ThrowOnError>,
+): RequestResult<CaptureAllResponses, CaptureAllErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CaptureAllResponses,
+    CaptureAllErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCaptureAllBody,
+          path: zCaptureAllPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureAllResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/following/capture-all',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Investigation Graph
  */
 export const getInvestigationGraph = <ThrowOnError extends boolean = false>(
@@ -7617,6 +7735,39 @@ export const getInvestigationMoneyChecks = <
       await zGetInvestigationMoneyChecksResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/money-checks',
     ...options,
+  });
+
+/**
+ * Create Monitor
+ *
+ * Follow something: the address is asked once to see what it is (a feed, sitemap, podcast or page; a page that
+ * names its feed is followed through the feed), then checked on its schedule. A closed platform becomes a row with
+ * no monitor. Nothing is kept until a person captures it.
+ */
+export const createMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<CreateMonitorData, ThrowOnError>,
+): RequestResult<CreateMonitorResponses, CreateMonitorErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CreateMonitorResponses,
+    CreateMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateMonitorBody,
+          path: zCreateMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateMonitorResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/monitors',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -9622,6 +9773,224 @@ export const newRecoveryKey = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Capture Item
+ *
+ * Capture one item: a page through the ordinary web capture (ADR-0018), a podcast episode by fetching its audio
+ * file and transcribing it. Answers with the whole screen.
+ */
+export const captureItem = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureItemData, ThrowOnError>,
+): RequestResult<CaptureItemResponses, CaptureItemErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CaptureItemResponses,
+    CaptureItemErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureItemPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureItemResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/capture',
+    ...options,
+  });
+
+/**
+ * Record Removal
+ *
+ * Record that something captured before is gone from its address (it answers 404 or 410), and when that was found.
+ */
+export const recordRemoval = <ThrowOnError extends boolean = false>(
+  options: Options<RecordRemovalData, ThrowOnError>,
+): RequestResult<RecordRemovalResponses, RecordRemovalErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RecordRemovalResponses,
+    RecordRemovalErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRecordRemovalPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRecordRemovalResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/record-removal',
+    ...options,
+  });
+
+/**
+ * Skip Item
+ */
+export const skipItem = <ThrowOnError extends boolean = false>(
+  options: Options<SkipItemData, ThrowOnError>,
+): RequestResult<SkipItemResponses, SkipItemErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    SkipItemResponses,
+    SkipItemErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zSkipItemPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zSkipItemResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/skip',
+    ...options,
+  });
+
+/**
+ * Undo Item
+ *
+ * Put a skipped item back in the queue.
+ */
+export const undoItem = <ThrowOnError extends boolean = false>(
+  options: Options<UndoItemData, ThrowOnError>,
+): RequestResult<UndoItemResponses, UndoItemErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    UndoItemResponses,
+    UndoItemErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zUndoItemPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zUndoItemResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/undo',
+    ...options,
+  });
+
+/**
+ * Delete Monitor
+ *
+ * Stop following. What was captured from it stays in the case; its queue and versions go.
+ */
+export const deleteMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteMonitorData, ThrowOnError>,
+): RequestResult<DeleteMonitorResponses, DeleteMonitorErrors, ThrowOnError> =>
+  (options.client ?? client).delete<
+    DeleteMonitorResponses,
+    DeleteMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteMonitorResponse.parseAsync(data),
+    url: '/api/monitors/{monitor_id}',
+    ...options,
+  });
+
+/**
+ * Update Monitor
+ *
+ * Change how often it is checked, its route (Direct or Tor), pause or resume it, or accept the address it moved
+ * to (a moved source is never followed by itself).
+ */
+export const updateMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateMonitorData, ThrowOnError>,
+): RequestResult<UpdateMonitorResponses, UpdateMonitorErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    UpdateMonitorResponses,
+    UpdateMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateMonitorBody,
+          path: zUpdateMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateMonitorResponse.parseAsync(data),
+    url: '/api/monitors/{monitor_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Check Monitor
+ *
+ * Check the source now instead of at its next time (the same polite, logged request).
+ */
+export const checkMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<CheckMonitorData, ThrowOnError>,
+): RequestResult<CheckMonitorResponses, CheckMonitorErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CheckMonitorResponses,
+    CheckMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCheckMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCheckMonitorResponse.parseAsync(data),
+    url: '/api/monitors/{monitor_id}/check',
+    ...options,
+  });
+
+/**
+ * Get Versions
+ *
+ * Every version of a followed page's main text, newest first, with what changed from the one before.
+ */
+export const getVersions = <ThrowOnError extends boolean = false>(
+  options: Options<GetVersionsData, ThrowOnError>,
+): RequestResult<GetVersionsResponses, GetVersionsErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetVersionsResponses,
+    GetVersionsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetVersionsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetVersionsResponse.parseAsync(data),
+    url: '/api/monitors/{monitor_id}/versions',
+    ...options,
   });
 
 /**

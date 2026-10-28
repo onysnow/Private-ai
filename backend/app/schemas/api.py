@@ -905,3 +905,24 @@ class CaseLockIn(BaseModel):
 
 class LockReasonIn(BaseModel):
     reason: str | None = None   # idle | hide | sleep | button
+
+
+class MonitorCreate(BaseModel):
+    """Something to follow (ADR-0022): a web address (a feed, sitemap, podcast or page; a page that names its feed is
+    followed through the feed), a Bluesky handle (@name.bsky.social) or a Mastodon account (@name@server)."""
+    target: str = Field(min_length=1, max_length=4096)
+    every_minutes: int | None = None
+    route: Literal["direct", "tor"] = "direct"
+
+
+class MonitorUpdate(BaseModel):
+    every_minutes: Literal[15, 30, 60, 1440] | None = None
+    route: Literal["direct", "tor"] | None = None
+    paused: bool | None = None
+    # Follow the address the source moved to (its old address answered 301 or 308).
+    accept_move: bool | None = None
+
+
+class CaptureAllRequest(BaseModel):
+    """Capturing several at once needs a reason; it goes on each item it captures (the custody log)."""
+    reason: str = Field(min_length=8, max_length=2000)
