@@ -87,11 +87,11 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
   - ~~The Decide filter chips only look at the first 200 items, so "Missing 176" shows nothing.~~ Checked 12 Oct: the server filters by kind before paging.
   - ~~On an API error, Decide shows "Failed to fetch" beside "Nothing waits for you".~~ Checked in code 28 Oct: a list that did not load says so alone, with a retry (`decide-screen.tsx`, `decideUnreachable`).
   - ~~Decide's "Open the document" goes to Bring in › Search.~~ Fixed earlier: it opens the reader at the evidence's page (MOCKUP_BUILD_LIST §6).
-  - The Home mini-network's nodes can't be clicked with the mouse (an SVG overlay sits on them). Since rebuilt (12 Oct): nodes have their own click; not re-checked in a browser on 28 Oct.
-  - The Home year strip changes only its label. Since rebuilt: a year sets the case's "as of" year, read by the mini-network, the graph, the timeline and the year slider; not re-checked in a browser on 28 Oct.
-  - Loading a demo failed 4 times ("Could not refresh instance '<Evidence…>'") while another case was being read.
+  - ~~The Home mini-network's nodes can't be clicked with the mouse (an SVG overlay sits on them).~~ Checked 28 Oct in Chromium on the Vekselberg demo: a mouse click at a node's centre points at the party ("Pointing at Arinter Management, Inc., lights 2016–18 everywhere").
+  - ~~The Home year strip changes only its label.~~ Checked 28 Oct in Chromium: a year sets the case's "as of" year ("· as of 2021") and the page's parts change with it.
+  - Loading a demo failed 4 times ("Could not refresh instance '<Evidence…>'") while another case was being read. Not re-checked 28 Oct with another case reading at the same time (a demo loaded alone works).
   - ~~A flag level reads "To be set by Ony".~~ Checked in code 28 Oct: shown as "not set", never guessed (`knowledge/families.ts`, `patterns/engine.py`).
-  - The graph's "Linked groups" layout freezes the page for about 20 s.
+  - The graph's "Linked groups" layout freezes the page for about 20 s. Not re-checked 28 Oct (needs the 1MDB-sized case).
   - ~~The Chain of Custody drawer ignores Esc.~~ Fixed 28 Oct (`case-workbench.tsx`; `tests/test-custody-drawer.test.tsx`).
   - The upload's "Document title" is never saved. Checked 28 Oct: it is saved as the document's source title (`store_document`), which is what the custody chain, the evidence pack and Is it real? show; the document lists still show the file name.
   - ~~Times disagree (UTC vs local)~~: every screen reads API times through `lib/timestamps.ts` (`tests/test-api-times-on-screen.test.tsx` holds it); date formats still differ between screens.
