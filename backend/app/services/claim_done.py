@@ -14,7 +14,10 @@ Authority System Suite's Tier A, the only tier that can carry a fact alone).
 When a person has set a source's suite tier it decides: E and F are leads only, A
 carries a fact alone, and only A, B and D count as independent origins (C never
 does). Evidence that restates another item counts as its original's origin, so a
-repeat is not a second source. A source with no tier falls back to its type."""
+repeat is not a second source. A source with no tier falls back to its type.
+
+Evidence of events from a file a person marked likely or confirmed synthetic supports nothing: the claim needs other
+support, or says it is supported only by a synthetic source. Evidence about the file itself still counts (ADR-0023)."""
 
 from __future__ import annotations
 
@@ -28,6 +31,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.domain import Claim, ClaimEvidenceLink, Document, DocumentChunk, Evidence, Source
+from app.services.authenticity import evidence_blocked
 from app.services.suite_fields import original_of
 
 DONE_STATUSES = {"supported", "confirmed"}
@@ -93,11 +97,14 @@ def _origin(source: Source) -> str:
 def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict[str, Any]:
     links = list(db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id == claim.id)))
     supporting: list[tuple[Evidence, Source | None]] = []
+    synthetic = 0
     for link in links:
         if link.stance != "supports":
             continue
         ev = db.get(Evidence, link.evidence_id)
-        if ev is not None:
+        if ev is not None and evidence_blocked(db, ev):
+            synthetic += 1  # evidence of events from a file a person marked AI-made: it supports nothing (ADR-0023)
+        elif ev is not None:
             supporting.append((ev, db.get(Source, ev.source_id)))
     contradicting = [link for link in links if link.stance == "contradicts"]
     rules: list[dict[str, Any]] = []
@@ -107,7 +114,9 @@ def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict
 
     n = len(supporting)
     rule("supporting", "At least one supporting item is linked", "met" if n else "not_met",
-         f"{n} supporting item{'s' if n != 1 else ''}" if n else "Link the evidence that shows it, with the stance Supports.")
+         (f"{n} supporting item{'s' if n != 1 else ''}" + (f"; {synthetic} marked AI-made does not count" if synthetic else "")) if n
+         else "Supported only by a synthetic source: it needs other support." if synthetic
+         else "Link the evidence that shows it, with the stance Supports.")
 
     says, unknown_says, failed_says = 0, 0, []
     hashes_ok, hash_failed, hash_unknown = 0, [], 0

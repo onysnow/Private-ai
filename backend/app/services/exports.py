@@ -32,6 +32,7 @@ from app.models.domain import (
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
     Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
     DocumentMedia, TranscriptSegment, DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion,
+    AuthenticityItem, AuthenticityCheck,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -52,6 +53,7 @@ MODEL_BY_TABLE = {
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
         DocumentMedia, TranscriptSegment, DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion,
+        AuthenticityItem, AuthenticityCheck,
     ]
 }
 
@@ -78,6 +80,8 @@ RESTORE_ORDER = [
     "document_photos", "derived_files",
     # What the case follows (ADR-0022): its sources, the queue with each decision and bulk reason, page versions.
     "monitors", "monitor_items", "page_versions",
+    # Is it real? (ADR-0023): each file's standing and its append-only history of findings and decisions.
+    "authenticity_items", "authenticity_checks",
     # Bulk imports and what happened to each file; an item points at its document.
     "ingestion_batches", "ingestion_batch_items",
     # Spreadsheet column mappings; the proposals they made are extraction candidates.
@@ -185,7 +189,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture, DocumentMedia, TranscriptSegment,
-        DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion,
+        DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion, AuthenticityItem, AuthenticityCheck,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -242,6 +246,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "document_media": direct["document_media"], "transcript_segments": direct["transcript_segments"],
         "document_photos": direct["document_photos"], "derived_files": direct["derived_files"],
         "monitors": direct["monitors"], "monitor_items": direct["monitor_items"], "page_versions": direct["page_versions"],
+        "authenticity_items": direct["authenticity_items"], "authenticity_checks": direct["authenticity_checks"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

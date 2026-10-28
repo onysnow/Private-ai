@@ -16,6 +16,7 @@ import '../styles/drop.css';
 import '../styles/following.css';
 import '../styles/safety.css';
 import '../styles/reading-room.css';
+import '../styles/is-it-real.css';
 import '../styles/learn.css';
 import '../styles/lock.css';
 import '../styles/safety.css';

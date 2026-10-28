@@ -21,6 +21,7 @@ import {compareTranscriptsOptions, getDocumentTranscriptOptions, listDerivedOpti
 import {createEvidenceEndpoint, makeCleanedCopy, makeClip} from '../../lib/generated/sdk.gen';
 import type {DerivedFileOut, DocumentDetailOut, TranscriptCompareRowOut, TranscriptOut, TranscriptSegmentOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {useWorkbenchStore} from '../../lib/workbench-store';
 
 const STEP = 5;
 /** The stretch of the recording the detailed outline shows at once. */
@@ -169,6 +170,7 @@ function Compare({rows, onSeek}: {rows: TranscriptCompareRowOut[]; onSeek: (s: n
 
 export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentDetailOut; caseName: string; decideHref: string; onClose: () => void}): ReactElement {
   const queryClient = useQueryClient();
+  const openRealness = useWorkbenchStore(state => state.openRealness);
   const transcript = useQuery({...getDocumentTranscriptOptions({path: {document_id: doc.id}}), enabled: doc.extraction_status === 'complete', retry: false});
   const t = transcript.data;
   // Names and claims found in the transcript wait in Decide, like any document's.
@@ -335,6 +337,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
         }}/></span>
       {findLower.length > 1 && <small className="rr-quiet">{found.length} found</small>}
       <span className="lr-badge">{kindWord} · {t ? clock(t.duration, false) : '…'}</span>
+      <button type="button" className="rr-real" onClick={() => openRealness(doc.id)}>Is it real?</button>
       <button type="button" className="rr-close" onClick={onClose} aria-label="Close the reading room">×</button>
     </header>
 

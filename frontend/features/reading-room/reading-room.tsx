@@ -362,6 +362,7 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
 function Room({investigationId, documentId, startPage, onClose}: {investigationId: string; documentId: string; startPage: number | null; onClose: () => void}): ReactElement {
   const queryClient = useQueryClient();
   const openDocument = useWorkbenchStore(state => state.openDocument);
+  const openRealness = useWorkbenchStore(state => state.openRealness);
   const detail = useQuery({...getDocumentOptions({path: {document_id: documentId}})});
   const candidatesKey = listDocumentCandidatesEndpointOptions({path: {document_id: documentId}});
   const candidates = useQuery(candidatesKey);
@@ -709,6 +710,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         Document {index + 1} of {tops0.length}
         <button type="button" disabled={index >= tops0.length - 1} onClick={() => openDocument(tops0[index + 1].id)} aria-label="Next document">›</button>
       </span>}
+      <button type="button" className="rr-real" onClick={() => openRealness(documentId)}>Is it real?</button>
       <button type="button" className="rr-close" onClick={onClose} aria-label="Close the reading room">×</button>
     </header>
 

@@ -6043,3 +6043,120 @@ class PageVersionOut(ResponseModel):
 # CaptureFollowOut names MonitorCheckOut, which is defined further down (Following).
 CaptureFollowOut.model_rebuild()
 CaptureOut.model_rebuild()
+
+
+class AuthenticityItemCardOut(ResponseModel):
+    """The item as the case holds it: what it is, who posted it, when it was captured or added, its file and fingerprint;
+    for text, the opening of its text and the quotes taken from it."""
+    document_id: str
+    kind: str
+    title: str
+    posted_by: str | None = None
+    outlet: str | None = None
+    captured_at: Timestamp | None = None
+    added_at: Timestamp
+    from_link: bool
+    filename: str
+    size: int | None = None
+    width: int | None = None
+    height: int | None = None
+    sha256: str
+    note: str | None = None
+    excerpt: str | None = None
+    quotes: list[str]
+    words: int | None = None
+
+
+class AuthenticityClaimOut(ResponseModel):
+    """A claim this item supports, and what a status would do to it: `outcome` is loses (no other support), keeps
+    (`others` other sources still support it; `other` is the first), unchanged, or about (a claim about the item
+    itself, which keeps its support)."""
+    id: str
+    text: str
+    status: str
+    outcome: str
+    others: int
+    other: dict[str, Any] | None = None
+
+
+class AuthenticityPreviewOut(ResponseModel):
+    """What a status with a role does to the claims that lean on the item; `applied` when it is the item's own now."""
+    status: str
+    role: str
+    applied: bool
+    blocking: bool
+    headline: str
+    claims: list[AuthenticityClaimOut]
+    losing: int
+    derived: list[dict[str, Any]]
+    restating: list[str]
+    suggestion: str | None = None
+
+
+class AuthenticityOptionOut(ResponseModel):
+    """One choice on the consent card: what it sends (`sends`, exactly), to whom, and why it is not offered when not."""
+    key: str
+    label: str
+    to: str
+    sends: str | None = None
+    available: bool
+    why_not: str | None = None
+
+
+class AuthenticityHistoryOut(ResponseModel):
+    """One append-only line: a finding (actor system) or a person's decision, consent or setting."""
+    id: str
+    kind: str
+    actor: str
+    person: str | None = None
+    method: str | None = None
+    tool: str | None = None
+    version: str | None = None
+    local: bool
+    text: str
+    at: Timestamp
+
+
+class AuthenticityOut(ResponseModel):
+    """Is it real? (mockup CHECK_3, ADR-0023): the item, the findings (provenance, source, hints), the status only a
+    person sets with what they checked and why, what it does to claims, the outside checks, and the history."""
+    item: AuthenticityItemCardOut
+    status: str
+    role: str
+    source_protected: bool
+    decided_by: str | None = None
+    decided_at: Timestamp | None = None
+    reason: str | None = None
+    checked: list[str]
+    platform_label: str | None = None
+    findings: dict[str, Any]
+    examined_at: Timestamp | None = None
+    preview: AuthenticityPreviewOut
+    outside: list[AuthenticityOptionOut]
+    history: list[AuthenticityHistoryOut]
+
+
+class AuthenticityCompareOut(ResponseModel):
+    """A comparison with the case's own files, made on this computer."""
+    text: str
+    matches: list[dict[str, Any]]
+    pool: int
+
+
+class AuthenticityOutsideOut(ResponseModel):
+    """An outside check allowed once: the address for the browser to open, the service, exactly what it carries, and
+    its row in the outbound log."""
+    url: str
+    service: str
+    sent: str
+    outbound_request_id: str
+
+
+class AuthenticityStatusOut(ResponseModel):
+    """A case file's standing, for lists."""
+    document_id: str
+    status: str
+    role: str
+    source_protected: bool
+    decided_at: Timestamp | None = None
+    flagged: bool

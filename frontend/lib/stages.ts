@@ -25,6 +25,7 @@ export const STAGES: Stage[] = [
     {label: 'Claims', anchor: 'claim-verification'},
     {label: 'To check', anchor: 'to-check'},
     {label: 'Connector findings', anchor: 'review-queue'},
+    {label: 'Is it real?', anchor: 'is-it-real'},
     {label: 'Chain of Custody', anchor: 'chain-of-custody'},
   ]},
   {key: 'map', route: '/see', n: 3, name: 'See', line: 'The reviewed records drawn four ways. Each chart says its rule and has its own key.', colour: SWATCH.amber, parts: [

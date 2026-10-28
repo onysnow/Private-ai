@@ -1266,6 +1266,469 @@ export type AssistantRunRequest = {
 };
 
 /**
+ * AuthenticityAboutClaimIn
+ *
+ * A claim about the item itself (that it circulated, when, posted by whom), which it supports even if synthetic.
+ */
+export type AuthenticityAboutClaimIn = {
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * AuthenticityClaimOut
+ *
+ * A claim this item supports, and what a status would do to it: `outcome` is loses (no other support), keeps
+ * (`others` other sources still support it; `other` is the first), unchanged, or about (a claim about the item
+ * itself, which keeps its support).
+ */
+export type AuthenticityClaimOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Other
+   */
+  other?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Others
+   */
+  others: number;
+  /**
+   * Outcome
+   */
+  outcome: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * AuthenticityCompareOut
+ *
+ * A comparison with the case's own files, made on this computer.
+ */
+export type AuthenticityCompareOut = {
+  /**
+   * Matches
+   */
+  matches: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Pool
+   */
+  pool: number;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * AuthenticityDecisionIn
+ *
+ * A person's decision on whether a case file is real (ADR-0023): the status, what they checked, and why.
+ */
+export type AuthenticityDecisionIn = {
+  /**
+   * Checked
+   */
+  checked?: Array<
+    | 'read_findings'
+    | 'looked_up_source'
+    | 'asked_poster'
+    | 'compared_copies'
+    | 'checked_place_time'
+  >;
+  /**
+   * Reason
+   */
+  reason?: string;
+  /**
+   * Status
+   */
+  status:
+    | 'verified_origin'
+    | 'unverified'
+    | 'likely_synthetic'
+    | 'confirmed_synthetic'
+    | 'disputed';
+};
+
+/**
+ * AuthenticityHistoryOut
+ *
+ * One append-only line: a finding (actor system) or a person's decision, consent or setting.
+ */
+export type AuthenticityHistoryOut = {
+  /**
+   * Actor
+   */
+  actor: string;
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Local
+   */
+  local: boolean;
+  /**
+   * Method
+   */
+  method?: string | null;
+  /**
+   * Person
+   */
+  person?: string | null;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Tool
+   */
+  tool?: string | null;
+  /**
+   * Version
+   */
+  version?: string | null;
+};
+
+/**
+ * AuthenticityItemCardOut
+ *
+ * The item as the case holds it: what it is, who posted it, when it was captured or added, its file and fingerprint;
+ * for text, the opening of its text and the quotes taken from it.
+ */
+export type AuthenticityItemCardOut = {
+  /**
+   * Added At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  added_at: string;
+  /**
+   * Captured At
+   */
+  captured_at?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Excerpt
+   */
+  excerpt?: string | null;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * From Link
+   */
+  from_link: boolean;
+  /**
+   * Height
+   */
+  height?: number | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Outlet
+   */
+  outlet?: string | null;
+  /**
+   * Posted By
+   */
+  posted_by?: string | null;
+  /**
+   * Quotes
+   */
+  quotes: Array<string>;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Size
+   */
+  size?: number | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Width
+   */
+  width?: number | null;
+  /**
+   * Words
+   */
+  words?: number | null;
+};
+
+/**
+ * AuthenticityOptionOut
+ *
+ * One choice on the consent card: what it sends (`sends`, exactly), to whom, and why it is not offered when not.
+ */
+export type AuthenticityOptionOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Sends
+   */
+  sends?: string | null;
+  /**
+   * To
+   */
+  to: string;
+  /**
+   * Why Not
+   */
+  why_not?: string | null;
+};
+
+/**
+ * AuthenticityOut
+ *
+ * Is it real? (mockup CHECK_3, ADR-0023): the item, the findings (provenance, source, hints), the status only a
+ * person sets with what they checked and why, what it does to claims, the outside checks, and the history.
+ */
+export type AuthenticityOut = {
+  /**
+   * Checked
+   */
+  checked: Array<string>;
+  /**
+   * Decided At
+   */
+  decided_at?: string | null;
+  /**
+   * Decided By
+   */
+  decided_by?: string | null;
+  /**
+   * Examined At
+   */
+  examined_at?: string | null;
+  /**
+   * Findings
+   */
+  findings: {
+    [key: string]: unknown;
+  };
+  /**
+   * History
+   */
+  history: Array<AuthenticityHistoryOut>;
+  item: AuthenticityItemCardOut;
+  /**
+   * Outside
+   */
+  outside: Array<AuthenticityOptionOut>;
+  /**
+   * Platform Label
+   */
+  platform_label?: string | null;
+  preview: AuthenticityPreviewOut;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Source Protected
+   */
+  source_protected: boolean;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
+ * AuthenticityOutsideIn
+ *
+ * One outside check, allowed once for this item: which of the consent card's choices.
+ */
+export type AuthenticityOutsideIn = {
+  /**
+   * Option
+   */
+  option: 'tineye' | 'lens' | 'web';
+};
+
+/**
+ * AuthenticityOutsideOut
+ *
+ * An outside check allowed once: the address for the browser to open, the service, exactly what it carries, and
+ * its row in the outbound log.
+ */
+export type AuthenticityOutsideOut = {
+  /**
+   * Outbound Request Id
+   */
+  outbound_request_id: string;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Service
+   */
+  service: string;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
+ * AuthenticityPreviewOut
+ *
+ * What a status with a role does to the claims that lean on the item; `applied` when it is the item's own now.
+ */
+export type AuthenticityPreviewOut = {
+  /**
+   * Applied
+   */
+  applied: boolean;
+  /**
+   * Blocking
+   */
+  blocking: boolean;
+  /**
+   * Claims
+   */
+  claims: Array<AuthenticityClaimOut>;
+  /**
+   * Derived
+   */
+  derived: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Headline
+   */
+  headline: string;
+  /**
+   * Losing
+   */
+  losing: number;
+  /**
+   * Restating
+   */
+  restating: Array<string>;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Suggestion
+   */
+  suggestion?: string | null;
+};
+
+/**
+ * AuthenticityStatusOut
+ *
+ * A case file's standing, for lists.
+ */
+export type AuthenticityStatusOut = {
+  /**
+   * Decided At
+   */
+  decided_at?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Flagged
+   */
+  flagged: boolean;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Source Protected
+   */
+  source_protected: boolean;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
+ * AuthenticityUpdate
+ *
+ * What the item is for (evidence of events, or the subject of the story), whether it is source-protected, and the
+ * label a platform showed beside it (not part of the file). Only the fields given change.
+ */
+export type AuthenticityUpdate = {
+  /**
+   * Platform Label
+   */
+  platform_label?: string | null;
+  /**
+   * Role
+   */
+  role?: 'events' | 'subject' | null;
+  /**
+   * Source Protected
+   */
+  source_protected?: boolean | null;
+};
+
+/**
  * BackgroundJobOut
  *
  * One piece of slow work and where it stands; the screen polls this.
@@ -24575,6 +25038,350 @@ export type GetDocumentResponses = {
 export type GetDocumentResponse =
   GetDocumentResponses[keyof GetDocumentResponses];
 
+export type GetAuthenticityData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity';
+};
+
+export type GetAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetAuthenticityError =
+  GetAuthenticityErrors[keyof GetAuthenticityErrors];
+
+export type GetAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOut;
+};
+
+export type GetAuthenticityResponse =
+  GetAuthenticityResponses[keyof GetAuthenticityResponses];
+
+export type UpdateAuthenticityData = {
+  body: AuthenticityUpdate;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity';
+};
+
+export type UpdateAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateAuthenticityError =
+  UpdateAuthenticityErrors[keyof UpdateAuthenticityErrors];
+
+export type UpdateAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOut;
+};
+
+export type UpdateAuthenticityResponse =
+  UpdateAuthenticityResponses[keyof UpdateAuthenticityResponses];
+
+export type AddAboutClaimData = {
+  body: AuthenticityAboutClaimIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/about-claim';
+};
+
+export type AddAboutClaimErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddAboutClaimError = AddAboutClaimErrors[keyof AddAboutClaimErrors];
+
+export type AddAboutClaimResponses = {
+  /**
+   * Successful Response
+   */
+  201: AuthenticityOut;
+};
+
+export type AddAboutClaimResponse =
+  AddAboutClaimResponses[keyof AddAboutClaimResponses];
+
+export type CompareAuthenticityData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/compare';
+};
+
+export type CompareAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CompareAuthenticityError =
+  CompareAuthenticityErrors[keyof CompareAuthenticityErrors];
+
+export type CompareAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityCompareOut;
+};
+
+export type CompareAuthenticityResponse =
+  CompareAuthenticityResponses[keyof CompareAuthenticityResponses];
+
+export type DecideAuthenticityData = {
+  body: AuthenticityDecisionIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/decision';
+};
+
+export type DecideAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The same status, nothing ticked, or no reason
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DecideAuthenticityError =
+  DecideAuthenticityErrors[keyof DecideAuthenticityErrors];
+
+export type DecideAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOut;
+};
+
+export type DecideAuthenticityResponse =
+  DecideAuthenticityResponses[keyof DecideAuthenticityResponses];
+
+export type ExamineAgainData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/examine';
+};
+
+export type ExamineAgainErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExamineAgainError = ExamineAgainErrors[keyof ExamineAgainErrors];
+
+export type ExamineAgainResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOut;
+};
+
+export type ExamineAgainResponse =
+  ExamineAgainResponses[keyof ExamineAgainResponses];
+
+export type OutsideAuthenticityData = {
+  body: AuthenticityOutsideIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/outside';
+};
+
+export type OutsideAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Source-protected, or that check is not offered for this item
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type OutsideAuthenticityError =
+  OutsideAuthenticityErrors[keyof OutsideAuthenticityErrors];
+
+export type OutsideAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOutsideOut;
+};
+
+export type OutsideAuthenticityResponse =
+  OutsideAuthenticityResponses[keyof OutsideAuthenticityResponses];
+
+export type PreviewAuthenticityData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query: {
+    /**
+     * Status
+     */
+    status:
+      | 'verified_origin'
+      | 'unverified'
+      | 'likely_synthetic'
+      | 'confirmed_synthetic'
+      | 'disputed';
+    /**
+     * Role
+     */
+    role?: 'events' | 'subject' | null;
+  };
+  url: '/api/documents/{document_id}/authenticity/preview';
+};
+
+export type PreviewAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unprocessable Content
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PreviewAuthenticityError =
+  PreviewAuthenticityErrors[keyof PreviewAuthenticityErrors];
+
+export type PreviewAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityPreviewOut;
+};
+
+export type PreviewAuthenticityResponse =
+  PreviewAuthenticityResponses[keyof PreviewAuthenticityResponses];
+
 export type ListDocumentCandidatesEndpointData = {
   body?: never;
   path: {
@@ -27749,6 +28556,44 @@ export type InvestigationSuiteRunResponses = {
 
 export type InvestigationSuiteRunResponse =
   InvestigationSuiteRunResponses[keyof InvestigationSuiteRunResponses];
+
+export type ListAuthenticityData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/authenticity';
+};
+
+export type ListAuthenticityErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListAuthenticityError =
+  ListAuthenticityErrors[keyof ListAuthenticityErrors];
+
+export type ListAuthenticityResponses = {
+  /**
+   * Response List Authenticity
+   *
+   * Successful Response
+   */
+  200: Array<AuthenticityStatusOut>;
+};
+
+export type ListAuthenticityResponse =
+  ListAuthenticityResponses[keyof ListAuthenticityResponses];
 
 export type GetCapturesData = {
   body?: never;

@@ -553,6 +553,244 @@ export const zAppUserUpdatedOut = z.object({
 });
 
 /**
+ * AuthenticityAboutClaimIn
+ *
+ * A claim about the item itself (that it circulated, when, posted by whom), which it supports even if synthetic.
+ */
+export const zAuthenticityAboutClaimIn = z.object({
+  text: z.string().min(10).max(2000),
+});
+
+/**
+ * AuthenticityClaimOut
+ *
+ * A claim this item supports, and what a status would do to it: `outcome` is loses (no other support), keeps
+ * (`others` other sources still support it; `other` is the first), unchanged, or about (a claim about the item
+ * itself, which keeps its support).
+ */
+export const zAuthenticityClaimOut = z.object({
+  id: z.string(),
+  other: z.record(z.string(), z.unknown()).nullish(),
+  others: z.int(),
+  outcome: z.string(),
+  status: z.string(),
+  text: z.string(),
+});
+
+/**
+ * AuthenticityCompareOut
+ *
+ * A comparison with the case's own files, made on this computer.
+ */
+export const zAuthenticityCompareOut = z.object({
+  matches: z.array(z.record(z.string(), z.unknown())),
+  pool: z.int(),
+  text: z.string(),
+});
+
+/**
+ * AuthenticityDecisionIn
+ *
+ * A person's decision on whether a case file is real (ADR-0023): the status, what they checked, and why.
+ */
+export const zAuthenticityDecisionIn = z.object({
+  checked: z
+    .array(
+      z.enum([
+        'read_findings',
+        'looked_up_source',
+        'asked_poster',
+        'compared_copies',
+        'checked_place_time',
+      ]),
+    )
+    .optional(),
+  reason: z.string().max(4000).optional().default(''),
+  status: z.enum([
+    'verified_origin',
+    'unverified',
+    'likely_synthetic',
+    'confirmed_synthetic',
+    'disputed',
+  ]),
+});
+
+/**
+ * AuthenticityHistoryOut
+ *
+ * One append-only line: a finding (actor system) or a person's decision, consent or setting.
+ */
+export const zAuthenticityHistoryOut = z.object({
+  actor: z.string(),
+  at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  kind: z.string(),
+  local: z.boolean(),
+  method: z.string().nullish(),
+  person: z.string().nullish(),
+  text: z.string(),
+  tool: z.string().nullish(),
+  version: z.string().nullish(),
+});
+
+/**
+ * AuthenticityItemCardOut
+ *
+ * The item as the case holds it: what it is, who posted it, when it was captured or added, its file and fingerprint;
+ * for text, the opening of its text and the quotes taken from it.
+ */
+export const zAuthenticityItemCardOut = z.object({
+  added_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  captured_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  document_id: z.string(),
+  excerpt: z.string().nullish(),
+  filename: z.string(),
+  from_link: z.boolean(),
+  height: z.int().nullish(),
+  kind: z.string(),
+  note: z.string().nullish(),
+  outlet: z.string().nullish(),
+  posted_by: z.string().nullish(),
+  quotes: z.array(z.string()),
+  sha256: z.string(),
+  size: z.int().nullish(),
+  title: z.string(),
+  width: z.int().nullish(),
+  words: z.int().nullish(),
+});
+
+/**
+ * AuthenticityOptionOut
+ *
+ * One choice on the consent card: what it sends (`sends`, exactly), to whom, and why it is not offered when not.
+ */
+export const zAuthenticityOptionOut = z.object({
+  available: z.boolean(),
+  key: z.string(),
+  label: z.string(),
+  sends: z.string().nullish(),
+  to: z.string(),
+  why_not: z.string().nullish(),
+});
+
+/**
+ * AuthenticityOutsideIn
+ *
+ * One outside check, allowed once for this item: which of the consent card's choices.
+ */
+export const zAuthenticityOutsideIn = z.object({
+  option: z.enum(['tineye', 'lens', 'web']),
+});
+
+/**
+ * AuthenticityOutsideOut
+ *
+ * An outside check allowed once: the address for the browser to open, the service, exactly what it carries, and
+ * its row in the outbound log.
+ */
+export const zAuthenticityOutsideOut = z.object({
+  outbound_request_id: z.string(),
+  sent: z.string(),
+  service: z.string(),
+  url: z.string(),
+});
+
+/**
+ * AuthenticityPreviewOut
+ *
+ * What a status with a role does to the claims that lean on the item; `applied` when it is the item's own now.
+ */
+export const zAuthenticityPreviewOut = z.object({
+  applied: z.boolean(),
+  blocking: z.boolean(),
+  claims: z.array(zAuthenticityClaimOut),
+  derived: z.array(z.record(z.string(), z.unknown())),
+  headline: z.string(),
+  losing: z.int(),
+  restating: z.array(z.string()),
+  role: z.string(),
+  status: z.string(),
+  suggestion: z.string().nullish(),
+});
+
+/**
+ * AuthenticityOut
+ *
+ * Is it real? (mockup CHECK_3, ADR-0023): the item, the findings (provenance, source, hints), the status only a
+ * person sets with what they checked and why, what it does to claims, the outside checks, and the history.
+ */
+export const zAuthenticityOut = z.object({
+  checked: z.array(z.string()),
+  decided_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  decided_by: z.string().nullish(),
+  examined_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  findings: z.record(z.string(), z.unknown()),
+  history: z.array(zAuthenticityHistoryOut),
+  item: zAuthenticityItemCardOut,
+  outside: z.array(zAuthenticityOptionOut),
+  platform_label: z.string().nullish(),
+  preview: zAuthenticityPreviewOut,
+  reason: z.string().nullish(),
+  role: z.string(),
+  source_protected: z.boolean(),
+  status: z.string(),
+});
+
+/**
+ * AuthenticityStatusOut
+ *
+ * A case file's standing, for lists.
+ */
+export const zAuthenticityStatusOut = z.object({
+  decided_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  document_id: z.string(),
+  flagged: z.boolean(),
+  role: z.string(),
+  source_protected: z.boolean(),
+  status: z.string(),
+});
+
+/**
+ * AuthenticityUpdate
+ *
+ * What the item is for (evidence of events, or the subject of the story), whether it is source-protected, and the
+ * label a platform showed beside it (not part of the file). Only the fields given change.
+ */
+export const zAuthenticityUpdate = z.object({
+  platform_label: z.string().max(1000).nullish(),
+  role: z.enum(['events', 'subject']).nullish(),
+  source_protected: z.boolean().nullish(),
+});
+
+/**
  * BackgroundJobOut
  *
  * One piece of slow work and where it stands; the screen polls this.
@@ -11049,6 +11287,97 @@ export const zGetDocumentPath = z.object({
  */
 export const zGetDocumentResponse = zDocumentDetailOut;
 
+export const zGetAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetAuthenticityResponse = zAuthenticityOut;
+
+export const zUpdateAuthenticityBody = zAuthenticityUpdate;
+
+export const zUpdateAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateAuthenticityResponse = zAuthenticityOut;
+
+export const zAddAboutClaimBody = zAuthenticityAboutClaimIn;
+
+export const zAddAboutClaimPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddAboutClaimResponse = zAuthenticityOut;
+
+export const zCompareAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCompareAuthenticityResponse = zAuthenticityCompareOut;
+
+export const zDecideAuthenticityBody = zAuthenticityDecisionIn;
+
+export const zDecideAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDecideAuthenticityResponse = zAuthenticityOut;
+
+export const zExamineAgainPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zExamineAgainResponse = zAuthenticityOut;
+
+export const zOutsideAuthenticityBody = zAuthenticityOutsideIn;
+
+export const zOutsideAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zOutsideAuthenticityResponse = zAuthenticityOutsideOut;
+
+export const zPreviewAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+export const zPreviewAuthenticityQuery = z.object({
+  status: z.enum([
+    'verified_origin',
+    'unverified',
+    'likely_synthetic',
+    'confirmed_synthetic',
+    'disputed',
+  ]),
+  role: z.enum(['events', 'subject']).nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPreviewAuthenticityResponse = zAuthenticityPreviewOut;
+
 export const zListDocumentCandidatesEndpointPath = z.object({
   document_id: z.string(),
 });
@@ -11926,6 +12255,17 @@ export const zInvestigationSuiteRunPath = z.object({
  * Successful Response
  */
 export const zInvestigationSuiteRunResponse = zAiReasoningRunOut;
+
+export const zListAuthenticityPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response List Authenticity
+ *
+ * Successful Response
+ */
+export const zListAuthenticityResponse = z.array(zAuthenticityStatusOut);
 
 export const zGetCapturesPath = z.object({
   investigation_id: z.string(),

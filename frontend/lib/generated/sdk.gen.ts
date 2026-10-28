@@ -15,6 +15,9 @@ import type {
   ActiveData,
   ActiveErrors,
   ActiveResponses,
+  AddAboutClaimData,
+  AddAboutClaimErrors,
+  AddAboutClaimResponses,
   AddChartToDeckEndpointData,
   AddChartToDeckEndpointErrors,
   AddChartToDeckEndpointResponses,
@@ -93,6 +96,9 @@ import type {
   CollectCaptureMediaData,
   CollectCaptureMediaErrors,
   CollectCaptureMediaResponses,
+  CompareAuthenticityData,
+  CompareAuthenticityErrors,
+  CompareAuthenticityResponses,
   CompareTranscriptsData,
   CompareTranscriptsErrors,
   CompareTranscriptsResponses,
@@ -162,6 +168,9 @@ import type {
   CreateWriteupEndpointData,
   CreateWriteupEndpointErrors,
   CreateWriteupEndpointResponses,
+  DecideAuthenticityData,
+  DecideAuthenticityErrors,
+  DecideAuthenticityResponses,
   DecideCheckData,
   DecideCheckErrors,
   DecideCheckResponses,
@@ -249,6 +258,9 @@ import type {
   EntityPostMergeReconciliationData,
   EntityPostMergeReconciliationErrors,
   EntityPostMergeReconciliationResponses,
+  ExamineAgainData,
+  ExamineAgainErrors,
+  ExamineAgainResponses,
   ExpandEntityInCorpusData,
   ExpandEntityInCorpusErrors,
   ExpandEntityInCorpusResponses,
@@ -285,6 +297,9 @@ import type {
   GetAllRecordTagsData,
   GetAllRecordTagsErrors,
   GetAllRecordTagsResponses,
+  GetAuthenticityData,
+  GetAuthenticityErrors,
+  GetAuthenticityResponses,
   GetBasemapFontData,
   GetBasemapFontErrors,
   GetBasemapFontResponses,
@@ -633,6 +648,9 @@ import type {
   ListAssessmentsData,
   ListAssessmentsErrors,
   ListAssessmentsResponses,
+  ListAuthenticityData,
+  ListAuthenticityErrors,
+  ListAuthenticityResponses,
   ListCaseRecordsData,
   ListCaseRecordsErrors,
   ListCaseRecordsResponses,
@@ -813,6 +831,9 @@ import type {
   OpenCaseData,
   OpenCaseErrors,
   OpenCaseResponses,
+  OutsideAuthenticityData,
+  OutsideAuthenticityErrors,
+  OutsideAuthenticityResponses,
   PatchClaimSuiteData,
   PatchClaimSuiteErrors,
   PatchClaimSuiteResponses,
@@ -837,6 +858,9 @@ import type {
   PresentationStylesData,
   PresentationStylesErrors,
   PresentationStylesResponses,
+  PreviewAuthenticityData,
+  PreviewAuthenticityErrors,
+  PreviewAuthenticityResponses,
   PreviewBackupRestoreData,
   PreviewBackupRestoreErrors,
   PreviewBackupRestoreResponses,
@@ -1065,6 +1089,9 @@ import type {
   UpdateAppUserData,
   UpdateAppUserErrors,
   UpdateAppUserResponses,
+  UpdateAuthenticityData,
+  UpdateAuthenticityErrors,
+  UpdateAuthenticityResponses,
   UpdateCaptureData,
   UpdateCaptureErrors,
   UpdateCaptureResponses,
@@ -1098,6 +1125,9 @@ import type {
 } from './types.gen';
 import {
   zActiveResponse,
+  zAddAboutClaimBody,
+  zAddAboutClaimPath,
+  zAddAboutClaimResponse,
   zAddChartToDeckEndpointBody,
   zAddChartToDeckEndpointPath,
   zAddChartToDeckEndpointResponse,
@@ -1162,6 +1192,8 @@ import {
   zCloseCaseResponse,
   zCollectCaptureMediaPath,
   zCollectCaptureMediaResponse,
+  zCompareAuthenticityPath,
+  zCompareAuthenticityResponse,
   zCompareTranscriptsPath,
   zCompareTranscriptsResponse,
   zConnectorSearchBody,
@@ -1215,6 +1247,9 @@ import {
   zCreateWatchResponse,
   zCreateWriteupEndpointBody,
   zCreateWriteupEndpointResponse,
+  zDecideAuthenticityBody,
+  zDecideAuthenticityPath,
+  zDecideAuthenticityResponse,
   zDecideCheckBody,
   zDecideCheckPath,
   zDecideCheckResponse,
@@ -1285,6 +1320,8 @@ import {
   zEntityMergePreviewResponse,
   zEntityPostMergeReconciliationPath,
   zEntityPostMergeReconciliationResponse,
+  zExamineAgainPath,
+  zExamineAgainResponse,
   zExpandEntityInCorpusPath,
   zExpandEntityInCorpusResponse,
   zExportDeckPptxPath,
@@ -1310,6 +1347,8 @@ import {
   zGetAiAnalysisCandidateEndpointResponse,
   zGetAllRecordTagsPath,
   zGetAllRecordTagsResponse,
+  zGetAuthenticityPath,
+  zGetAuthenticityResponse,
   zGetBasemapFontPath,
   zGetBasemapFontResponse,
   zGetBasemapSpritePath,
@@ -1557,6 +1596,8 @@ import {
   zListAreasResponse,
   zListAssessmentsPath,
   zListAssessmentsResponse,
+  zListAuthenticityPath,
+  zListAuthenticityResponse,
   zListCaseRecordsPath,
   zListCaseRecordsQuery,
   zListCaseRecordsResponse,
@@ -1693,6 +1734,9 @@ import {
   zOpenCaseBody,
   zOpenCasePath,
   zOpenCaseResponse,
+  zOutsideAuthenticityBody,
+  zOutsideAuthenticityPath,
+  zOutsideAuthenticityResponse,
   zPatchClaimSuiteBody,
   zPatchClaimSuitePath,
   zPatchClaimSuiteResponse,
@@ -1714,6 +1758,9 @@ import {
   zPlaceStoryClaimPath,
   zPlaceStoryClaimResponse,
   zPresentationStylesResponse,
+  zPreviewAuthenticityPath,
+  zPreviewAuthenticityQuery,
+  zPreviewAuthenticityResponse,
   zPreviewBackupRestoreBody,
   zPreviewBackupRestoreResponse,
   zPreviewTableMappingBody,
@@ -1893,6 +1940,9 @@ import {
   zUpdateAppUserBody,
   zUpdateAppUserPath,
   zUpdateAppUserResponse,
+  zUpdateAuthenticityBody,
+  zUpdateAuthenticityPath,
+  zUpdateAuthenticityResponse,
   zUpdateCaptureBody,
   zUpdateCapturePath,
   zUpdateCaptureResponse,
@@ -4185,6 +4235,263 @@ export const getDocument = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}',
+    ...options,
+  });
+
+/**
+ * Get Authenticity
+ *
+ * The screen. The findings are recorded the first time it is opened, on this computer; nothing is sent.
+ */
+export const getAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<GetAuthenticityData, ThrowOnError>,
+): RequestResult<
+  GetAuthenticityResponses,
+  GetAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetAuthenticityResponses,
+    GetAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity',
+    ...options,
+  });
+
+/**
+ * Update Authenticity
+ *
+ * What the item is for, whether it is source-protected, and the platform's own label.
+ */
+export const updateAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateAuthenticityData, ThrowOnError>,
+): RequestResult<
+  UpdateAuthenticityResponses,
+  UpdateAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    UpdateAuthenticityResponses,
+    UpdateAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateAuthenticityBody,
+          path: zUpdateAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Add About Claim
+ *
+ * Add a claim about the item itself, supported by it whatever its status (the subject of the story).
+ */
+export const addAboutClaim = <ThrowOnError extends boolean = false>(
+  options: Options<AddAboutClaimData, ThrowOnError>,
+): RequestResult<AddAboutClaimResponses, AddAboutClaimErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    AddAboutClaimResponses,
+    AddAboutClaimErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddAboutClaimBody,
+          path: zAddAboutClaimPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddAboutClaimResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/about-claim',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Compare Authenticity
+ *
+ * Compare with the case's own files, on this computer. Allowed for a source-protected item too.
+ */
+export const compareAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<CompareAuthenticityData, ThrowOnError>,
+): RequestResult<
+  CompareAuthenticityResponses,
+  CompareAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CompareAuthenticityResponses,
+    CompareAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCompareAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCompareAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/compare',
+    ...options,
+  });
+
+/**
+ * Decide Authenticity
+ *
+ * Set the status. Only a person does, with what they checked and why; the history keeps every decision.
+ */
+export const decideAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<DecideAuthenticityData, ThrowOnError>,
+): RequestResult<
+  DecideAuthenticityResponses,
+  DecideAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    DecideAuthenticityResponses,
+    DecideAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDecideAuthenticityBody,
+          path: zDecideAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDecideAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/decision',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Examine Again
+ *
+ * Read the findings again (after a new trust list, or a new copy in the case). Each run is a line in the history.
+ */
+export const examineAgain = <ThrowOnError extends boolean = false>(
+  options: Options<ExamineAgainData, ThrowOnError>,
+): RequestResult<ExamineAgainResponses, ExamineAgainErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    ExamineAgainResponses,
+    ExamineAgainErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExamineAgainPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExamineAgainResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/examine',
+    ...options,
+  });
+
+/**
+ * Outside Authenticity
+ *
+ * Allowed once: logs exactly what goes, to whom and why, and gives the address for the browser to open. The app
+ * itself sends nothing. Refused for a source-protected item.
+ */
+export const outsideAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<OutsideAuthenticityData, ThrowOnError>,
+): RequestResult<
+  OutsideAuthenticityResponses,
+  OutsideAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    OutsideAuthenticityResponses,
+    OutsideAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zOutsideAuthenticityBody,
+          path: zOutsideAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zOutsideAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/outside',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Preview Authenticity
+ *
+ * What a status (and role) would do to the claims that lean on the item, before it is recorded.
+ */
+export const previewAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<PreviewAuthenticityData, ThrowOnError>,
+): RequestResult<
+  PreviewAuthenticityResponses,
+  PreviewAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    PreviewAuthenticityResponses,
+    PreviewAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zPreviewAuthenticityPath,
+          query: zPreviewAuthenticityQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPreviewAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/preview',
     ...options,
   });
 
@@ -6803,6 +7110,37 @@ export const investigationSuiteRun = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * List Authenticity
+ *
+ * Each case file's standing that has been looked at or decided.
+ */
+export const listAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<ListAuthenticityData, ThrowOnError>,
+): RequestResult<
+  ListAuthenticityResponses,
+  ListAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListAuthenticityResponses,
+    ListAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListAuthenticityResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/authenticity',
+    ...options,
   });
 
 /**

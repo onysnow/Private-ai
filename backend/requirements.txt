@@ -35,6 +35,9 @@ warcio==1.8.1
 faster-whisper==1.2.1
 # The video or audio on a captured page (ADR-0020, Phase 2c): yt-dlp (Unlicense), one item, logged out.
 yt-dlp==2026.8.19
+# Content credentials (C2PA) validated on this computer against the bundled trust lists (ADR-0023): c2pa-python
+# (MIT OR Apache-2.0).
+c2pa-python==0.38.0
 av==17.0.0
 openaleph-client==1.1.4
 # Background job queue on PostgreSQL (ADR-0004). Its schema is vendored in

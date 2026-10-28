@@ -943,3 +943,28 @@ class MonitorUpdate(BaseModel):
 class CaptureAllRequest(BaseModel):
     """Capturing several at once needs a reason; it goes on each item it captures (the custody log)."""
     reason: str = Field(min_length=8, max_length=2000)
+
+
+class AuthenticityDecisionIn(BaseModel):
+    """A person's decision on whether a case file is real (ADR-0023): the status, what they checked, and why."""
+    status: Literal["verified_origin", "unverified", "likely_synthetic", "confirmed_synthetic", "disputed"]
+    checked: list[Literal["read_findings", "looked_up_source", "asked_poster", "compared_copies", "checked_place_time"]] = Field(default_factory=list)
+    reason: str = Field(default="", max_length=4000)
+
+
+class AuthenticityUpdate(BaseModel):
+    """What the item is for (evidence of events, or the subject of the story), whether it is source-protected, and the
+    label a platform showed beside it (not part of the file). Only the fields given change."""
+    role: Literal["events", "subject"] | None = None
+    source_protected: bool | None = None
+    platform_label: str | None = Field(default=None, max_length=1000)
+
+
+class AuthenticityOutsideIn(BaseModel):
+    """One outside check, allowed once for this item: which of the consent card's choices."""
+    option: Literal["tineye", "lens", "web"]
+
+
+class AuthenticityAboutClaimIn(BaseModel):
+    """A claim about the item itself (that it circulated, when, posted by whom), which it supports even if synthetic."""
+    text: str = Field(min_length=10, max_length=2000)

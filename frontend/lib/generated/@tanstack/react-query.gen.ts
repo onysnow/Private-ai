@@ -10,6 +10,7 @@ import {
 import { client } from '../client.gen';
 import {
   active,
+  addAboutClaim,
   addChartToDeckEndpoint,
   addChartToWriteupEndpoint,
   addCollection,
@@ -36,6 +37,7 @@ import {
   clearCaseLookups,
   closeCase,
   collectCaptureMedia,
+  compareAuthenticity,
   compareTranscripts,
   connectors,
   connectorSearch,
@@ -59,6 +61,7 @@ import {
   createTimelineEventEndpoint,
   createWatch,
   createWriteupEndpoint,
+  decideAuthenticity,
   decideCheck,
   decideCrossProviderCluster,
   decideEntityPostMergeReconciliation,
@@ -88,6 +91,7 @@ import {
   entityMergeHistory,
   entityMergePreview,
   entityPostMergeReconciliation,
+  examineAgain,
   expandEntityInCorpus,
   exportDeckPptx,
   exportInvestigation,
@@ -100,6 +104,7 @@ import {
   get1Mdb,
   getAiAnalysisCandidateEndpoint,
   getAllRecordTags,
+  getAuthenticity,
   getBasemapFont,
   getBasemapSprite,
   getBasemapStatus,
@@ -216,6 +221,7 @@ import {
   listAppUsers,
   listAreas,
   listAssessments,
+  listAuthenticity,
   listCaseRecords,
   listClaimEvidenceEndpoint,
   listClaims,
@@ -277,6 +283,7 @@ import {
   openalephIntegrationStatus,
   openCase,
   type Options,
+  outsideAuthenticity,
   patchClaimSuite,
   patchEvidenceSuite,
   patchInvestigation,
@@ -285,6 +292,7 @@ import {
   peekAtRecord,
   placeStoryClaim,
   presentationStyles,
+  previewAuthenticity,
   previewBackupRestore,
   previewTableMapping,
   promoteAiAnalysisCandidateToDeckEndpoint,
@@ -361,6 +369,7 @@ import {
   unlockPin,
   untagARecord,
   updateAppUser,
+  updateAuthenticity,
   updateCapture,
   updateClaimEndpoint,
   updateDeckEndpoint,
@@ -376,6 +385,9 @@ import type {
   ActiveData,
   ActiveError,
   ActiveResponse,
+  AddAboutClaimData,
+  AddAboutClaimError,
+  AddAboutClaimResponse,
   AddChartToDeckEndpointData,
   AddChartToDeckEndpointError,
   AddChartToDeckEndpointResponse,
@@ -454,6 +466,9 @@ import type {
   CollectCaptureMediaData,
   CollectCaptureMediaError,
   CollectCaptureMediaResponse,
+  CompareAuthenticityData,
+  CompareAuthenticityError,
+  CompareAuthenticityResponse,
   CompareTranscriptsData,
   CompareTranscriptsError,
   CompareTranscriptsResponse,
@@ -523,6 +538,9 @@ import type {
   CreateWriteupEndpointData,
   CreateWriteupEndpointError,
   CreateWriteupEndpointResponse,
+  DecideAuthenticityData,
+  DecideAuthenticityError,
+  DecideAuthenticityResponse,
   DecideCheckData,
   DecideCheckError,
   DecideCheckResponse,
@@ -610,6 +628,9 @@ import type {
   EntityPostMergeReconciliationData,
   EntityPostMergeReconciliationError,
   EntityPostMergeReconciliationResponse,
+  ExamineAgainData,
+  ExamineAgainError,
+  ExamineAgainResponse,
   ExpandEntityInCorpusData,
   ExpandEntityInCorpusError,
   ExpandEntityInCorpusResponse,
@@ -646,6 +667,9 @@ import type {
   GetAllRecordTagsData,
   GetAllRecordTagsError,
   GetAllRecordTagsResponse,
+  GetAuthenticityData,
+  GetAuthenticityError,
+  GetAuthenticityResponse,
   GetBasemapFontData,
   GetBasemapFontError,
   GetBasemapFontResponse,
@@ -993,6 +1017,9 @@ import type {
   ListAssessmentsData,
   ListAssessmentsError,
   ListAssessmentsResponse,
+  ListAuthenticityData,
+  ListAuthenticityError,
+  ListAuthenticityResponse,
   ListCaseRecordsData,
   ListCaseRecordsError,
   ListCaseRecordsResponse,
@@ -1173,6 +1200,9 @@ import type {
   OpenCaseData,
   OpenCaseError,
   OpenCaseResponse,
+  OutsideAuthenticityData,
+  OutsideAuthenticityError,
+  OutsideAuthenticityResponse,
   PatchClaimSuiteData,
   PatchClaimSuiteError,
   PatchClaimSuiteResponse,
@@ -1196,6 +1226,9 @@ import type {
   PresentationStylesData,
   PresentationStylesError,
   PresentationStylesResponse,
+  PreviewAuthenticityData,
+  PreviewAuthenticityError,
+  PreviewAuthenticityResponse,
   PreviewBackupRestoreData,
   PreviewBackupRestoreError,
   PreviewBackupRestoreResponse,
@@ -1424,6 +1457,9 @@ import type {
   UpdateAppUserData,
   UpdateAppUserError,
   UpdateAppUserResponse,
+  UpdateAuthenticityData,
+  UpdateAuthenticityError,
+  UpdateAuthenticityResponse,
   UpdateCaptureData,
   UpdateCaptureError,
   UpdateCaptureResponse,
@@ -3706,6 +3742,239 @@ export const getDocumentOptions = (options: Options<GetDocumentData>) =>
       return data;
     },
     queryKey: getDocumentQueryKey(options),
+  });
+
+export const getAuthenticityQueryKey = (
+  options: Options<GetAuthenticityData>,
+) => createQueryKey('getAuthenticity', options);
+
+/**
+ * Get Authenticity
+ *
+ * The screen. The findings are recorded the first time it is opened, on this computer; nothing is sent.
+ */
+export const getAuthenticityOptions = (options: Options<GetAuthenticityData>) =>
+  queryOptions<
+    GetAuthenticityResponse,
+    GetAuthenticityError,
+    GetAuthenticityResponse,
+    ReturnType<typeof getAuthenticityQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getAuthenticity({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getAuthenticityQueryKey(options),
+  });
+
+/**
+ * Update Authenticity
+ *
+ * What the item is for, whether it is source-protected, and the platform's own label.
+ */
+export const updateAuthenticityMutation = (
+  options?: Partial<Options<UpdateAuthenticityData>>,
+): UseMutationOptions<
+  UpdateAuthenticityResponse,
+  UpdateAuthenticityError,
+  Options<UpdateAuthenticityData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateAuthenticityResponse,
+    UpdateAuthenticityError,
+    Options<UpdateAuthenticityData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateAuthenticity({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add About Claim
+ *
+ * Add a claim about the item itself, supported by it whatever its status (the subject of the story).
+ */
+export const addAboutClaimMutation = (
+  options?: Partial<Options<AddAboutClaimData>>,
+): UseMutationOptions<
+  AddAboutClaimResponse,
+  AddAboutClaimError,
+  Options<AddAboutClaimData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddAboutClaimResponse,
+    AddAboutClaimError,
+    Options<AddAboutClaimData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addAboutClaim({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Compare Authenticity
+ *
+ * Compare with the case's own files, on this computer. Allowed for a source-protected item too.
+ */
+export const compareAuthenticityMutation = (
+  options?: Partial<Options<CompareAuthenticityData>>,
+): UseMutationOptions<
+  CompareAuthenticityResponse,
+  CompareAuthenticityError,
+  Options<CompareAuthenticityData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CompareAuthenticityResponse,
+    CompareAuthenticityError,
+    Options<CompareAuthenticityData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await compareAuthenticity({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Decide Authenticity
+ *
+ * Set the status. Only a person does, with what they checked and why; the history keeps every decision.
+ */
+export const decideAuthenticityMutation = (
+  options?: Partial<Options<DecideAuthenticityData>>,
+): UseMutationOptions<
+  DecideAuthenticityResponse,
+  DecideAuthenticityError,
+  Options<DecideAuthenticityData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DecideAuthenticityResponse,
+    DecideAuthenticityError,
+    Options<DecideAuthenticityData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await decideAuthenticity({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Examine Again
+ *
+ * Read the findings again (after a new trust list, or a new copy in the case). Each run is a line in the history.
+ */
+export const examineAgainMutation = (
+  options?: Partial<Options<ExamineAgainData>>,
+): UseMutationOptions<
+  ExamineAgainResponse,
+  ExamineAgainError,
+  Options<ExamineAgainData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ExamineAgainResponse,
+    ExamineAgainError,
+    Options<ExamineAgainData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await examineAgain({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Outside Authenticity
+ *
+ * Allowed once: logs exactly what goes, to whom and why, and gives the address for the browser to open. The app
+ * itself sends nothing. Refused for a source-protected item.
+ */
+export const outsideAuthenticityMutation = (
+  options?: Partial<Options<OutsideAuthenticityData>>,
+): UseMutationOptions<
+  OutsideAuthenticityResponse,
+  OutsideAuthenticityError,
+  Options<OutsideAuthenticityData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    OutsideAuthenticityResponse,
+    OutsideAuthenticityError,
+    Options<OutsideAuthenticityData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await outsideAuthenticity({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const previewAuthenticityQueryKey = (
+  options: Options<PreviewAuthenticityData>,
+) => createQueryKey('previewAuthenticity', options);
+
+/**
+ * Preview Authenticity
+ *
+ * What a status (and role) would do to the claims that lean on the item, before it is recorded.
+ */
+export const previewAuthenticityOptions = (
+  options: Options<PreviewAuthenticityData>,
+) =>
+  queryOptions<
+    PreviewAuthenticityResponse,
+    PreviewAuthenticityError,
+    PreviewAuthenticityResponse,
+    ReturnType<typeof previewAuthenticityQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await previewAuthenticity({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: previewAuthenticityQueryKey(options),
   });
 
 export const listDocumentCandidatesEndpointQueryKey = (
@@ -6248,6 +6517,36 @@ export const investigationSuiteRunMutation = (
   };
   return mutationOptions;
 };
+
+export const listAuthenticityQueryKey = (
+  options: Options<ListAuthenticityData>,
+) => createQueryKey('listAuthenticity', options);
+
+/**
+ * List Authenticity
+ *
+ * Each case file's standing that has been looked at or decided.
+ */
+export const listAuthenticityOptions = (
+  options: Options<ListAuthenticityData>,
+) =>
+  queryOptions<
+    ListAuthenticityResponse,
+    ListAuthenticityError,
+    ListAuthenticityResponse,
+    ReturnType<typeof listAuthenticityQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listAuthenticity({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listAuthenticityQueryKey(options),
+  });
 
 export const getCapturesQueryKey = (options: Options<GetCapturesData>) =>
   createQueryKey('getCaptures', options);

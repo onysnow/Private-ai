@@ -74,6 +74,11 @@ type WorkbenchState = {
   document: {serial: number; documentId: string; pageNumber: number | null} | null;
   openDocument: (documentId: string, pageNumber?: number | null) => void;
   closeDocument: () => void;
+  /** The case file whose "Is it real?" screen was last asked for (mockup CHECK_3): from a capture receipt, the
+   * reading room or the Check stage's list. */
+  realness: {serial: number; documentId: string} | null;
+  openRealness: (documentId: string) => void;
+  closeRealness: () => void;
   /** The Red Flag whose details were last asked for (a "To check" item's flag). */
   flag: {serial: number; flagId: string} | null;
   openFlag: (flagId: string) => void;
@@ -99,7 +104,7 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   investigationId: '',
   // A new case means a new trace, claim, dossier and relationship: nothing from the old one applies.
   setInvestigationId: id => set(state => (state.investigationId === id ? {investigationId: id}
-    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, flag: null, check: null, chain: null, aiRun: null, askCase: null, asOf: null, pointedParty: null})),
+    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, realness: null, flag: null, check: null, chain: null, aiRun: null, askCase: null, asOf: null, pointedParty: null})),
   investigationName: '',
   setInvestigationName: name => set(state => (state.investigationName === name ? state : {investigationName: name})),
   entityId: '',
@@ -123,6 +128,9 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   document: null,
   openDocument: (documentId, pageNumber = null) => set({document: {serial: nextSerial(), documentId, pageNumber}}),
   closeDocument: () => set({document: null}),
+  realness: null,
+  openRealness: documentId => set({realness: {serial: nextSerial(), documentId}}),
+  closeRealness: () => set({realness: null}),
   flag: null,
   openFlag: flagId => set({flag: {serial: nextSerial(), flagId}}),
   check: null,

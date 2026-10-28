@@ -186,6 +186,7 @@ function MediaPanel({capture, investigationId}: {capture: CaptureOut; investigat
 
 function Receipt({capture, investigationId}: {capture: CaptureOut; investigationId: string}): ReactElement {
   const openDocument = useWorkbenchStore(state => state.openDocument);
+  const openRealness = useWorkbenchStore(state => state.openRealness);
   const act = useCaptureAction(investigationId);
   const [copied, setCopied] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -200,6 +201,7 @@ function Receipt({capture, investigationId}: {capture: CaptureOut; investigation
   return <section className="cp-panel" aria-label="Capture receipt">
     <div className="cp-cap">Capture receipt
       <span className="cp-acts">{capture.document_id && <button type="button" className="p" onClick={() => openDocument(capture.document_id!)}>Open in reading room</button>}
+        {(capture.media_document_id ?? capture.document_id) && <button type="button" onClick={() => openRealness((capture.media_document_id ?? capture.document_id)!)}>Is it real? →</button>}
         <button type="button" disabled={checking} onClick={() => void recheck()}>{checking ? 'Checking…' : 'Re-check now'}</button></span></div>
     {error && <p role="alert" className="cp-err">{error}</p>}
     <div className="cp-rcpt">

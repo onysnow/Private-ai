@@ -45,6 +45,7 @@ from app.api.routes_suite import router as suite_router
 from app.api.routes_captures import router as captures_router
 from app.api.routes_following import router as following_router
 from app.api.routes_media import router as media_router
+from app.api.routes_authenticity import router as authenticity_router
 from app.api.routes_demo import router as demo_router
 from app.api.routes_session import router as session_router
 from app.api.routes_catalogue import router as catalogue_router
@@ -114,6 +115,7 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(captures_router)
     app.include_router(following_router)
     app.include_router(media_router)
+    app.include_router(authenticity_router)
     app.include_router(demo_router)
     app.include_router(session_router)
     app.include_router(catalogue_router)

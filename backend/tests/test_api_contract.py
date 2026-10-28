@@ -590,6 +590,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/provenance/extraction-lineage"): {"record_type": "evidence", "record_id": accepted["accepted_record_id"]},
             ("GET", "/api/provenance/trace"): {"record_type": "claim", "record_id": claim["id"]},
             ("GET", "/api/search"): {"q": "Meridian"},
+            ("GET", "/api/documents/{document_id}/authenticity/preview"): {"status": "likely_synthetic"},
             ("GET", "/api/catalogue/glossary/entry"): {"term": "Beneficial owner"},
             ("GET", "/api/investigations/{investigation_id}/marks"): {"record_type": "entity", "record_id": meridian},
             ("GET", "/api/investigations/{investigation_id}/peek"): {"record_type": "entity", "record_id": meridian},

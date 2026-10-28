@@ -37,6 +37,7 @@ import {StoryScreen} from '../../features/story/story-screen';
 import {TheDrop} from '../../features/the-drop/the-drop';
 import {Following} from '../../features/following/following';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
+import {IsItReal, RealnessList} from '../../features/is-it-real/is-it-real';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
@@ -289,6 +290,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
           <ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>},
         {anchor: 'to-check', label: 'To check', render: () => <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'review-queue', label: 'Connector findings', render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'is-it-real', label: 'Is it real?', render: () => <PanelErrorBoundary name="Is it real?"><RealnessList investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'chain-of-custody', label: 'Chain of Custody', render: () => <PanelErrorBoundary name="Chain of Custody (full)"><ChainOfCustody investigationId={inv} active={view === 'verify'}/></PanelErrorBoundary>},
       ])}
       {screen('map', [
@@ -329,6 +331,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
     {body}
     {drawer}
     <PanelErrorBoundary name="Reading room"><ReadingRoom investigationId={inv}/></PanelErrorBoundary>
+    <PanelErrorBoundary name="Is it real?"><IsItReal investigationId={inv}/></PanelErrorBoundary>
     <Toaster/>
   </div>;
 }
