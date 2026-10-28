@@ -59,6 +59,9 @@ class EvidenceCreate(BaseModel):
     # investigation, and when it was taken as its source states it.
     document_id: str | None = None
     captured_on: str | None = Field(default=None, pattern=r"^\d{4}(-\d{2}(-\d{2})?)?$")
+    # A quote from a recording (locator t=start,end): the reporter says they heard the part themselves. Without it the
+    # quote is refused: machines can invent words (ADR-0020).
+    heard: bool = False
 
 class ClaimEvidenceLinkCreate(BaseModel):
     evidence_id: str

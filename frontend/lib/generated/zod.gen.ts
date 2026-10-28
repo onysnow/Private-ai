@@ -3523,6 +3523,7 @@ export const zEvidenceCreate = z.object({
     .regex(/^\d{4}(-\d{2}(-\d{2})?)?$/)
     .nullish(),
   document_id: z.string().nullish(),
+  heard: z.boolean().optional().default(false),
   locator: z.string().nullish(),
   notes: z.string().nullish(),
   quote: z.string().nullish(),
@@ -3539,6 +3540,13 @@ export const zEvidenceOut = z.object({
   created_on: z.string().nullish(),
   document_id: z.string().nullish(),
   event_on: z.string().nullish(),
+  heard_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  heard_by: z.string().nullish(),
   id: z.string(),
   issuer_or_author: z.string().nullish(),
   limitations: z.array(z.string()).nullish(),

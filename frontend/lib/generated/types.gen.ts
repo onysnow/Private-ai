@@ -8875,6 +8875,10 @@ export type EvidenceCreate = {
    */
   document_id?: string | null;
   /**
+   * Heard
+   */
+  heard?: boolean;
+  /**
    * Locator
    */
   locator?: string | null;
@@ -8922,6 +8926,14 @@ export type EvidenceOut = {
    * Event On
    */
   event_on?: string | null;
+  /**
+   * Heard At
+   */
+  heard_at?: string | null;
+  /**
+   * Heard By
+   */
+  heard_by?: string | null;
   /**
    * Id
    */

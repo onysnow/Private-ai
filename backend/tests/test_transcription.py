@@ -168,3 +168,20 @@ def test_a_real_recording_is_transcribed_on_this_computer(monkeypatch):
     assert t["transcript"]["model"] == "tiny.en" and t["transcript"]["language"] == "en"
     assert 18 < t["duration"] < 20 and len(t["outline"]) > 100 and max(t["outline"]) == 1.0
     assert all(0 <= w["p"] <= 1 for s in t["segments"] for w in s["words"])
+
+
+def test_a_quote_from_a_recording_is_saved_only_once_it_was_heard(monkeypatch):
+    _stand_in(monkeypatch, SEGMENTS)
+    doc = _upload(_case("Heard"))
+    body = {"source_id": doc["source_id"], "quote": "I never saw a valuation before we voted.", "locator": "t=3.3,5.8"}
+    refused = client.post("/api/evidence", json=body)
+    assert refused.status_code == 400 and "Listen to this part of the recording" in refused.json()["detail"]
+    saved = client.post("/api/evidence", json={**body, "heard": True})
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["heard_by"] and saved.json()["heard_at"] and saved.json()["locator"] == "t=3.3,5.8"
+    # A quote from a written document needs no listening.
+    inv = doc["investigation_id"]
+    memo = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Memo"},
+                       files={"file": ("memo.txt", b"Kestrel SA paid the council.", "text/plain")}).json()
+    plain = client.post("/api/evidence", json={"source_id": memo["source_id"], "quote": "Kestrel SA paid the council.", "locator": "line 1"})
+    assert plain.status_code == 200 and plain.json()["heard_by"] is None

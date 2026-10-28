@@ -19517,6 +19517,11 @@
             ],
             "title": "Document Id"
           },
+          "heard": {
+            "default": false,
+            "title": "Heard",
+            "type": "boolean"
+          },
           "locator": {
             "anyOf": [
               {
@@ -19629,6 +19634,30 @@
               }
             ],
             "title": "Event On"
+          },
+          "heard_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heard At"
+          },
+          "heard_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heard By"
           },
           "id": {
             "title": "Id",

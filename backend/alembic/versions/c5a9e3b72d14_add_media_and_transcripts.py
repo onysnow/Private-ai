@@ -1,4 +1,4 @@
-"""document_media and transcript_segments: recordings read as documents, transcribed here (ADR-0020)
+"""document_media and transcript_segments: recordings read as documents, transcribed here; who heard a recording's quote (ADR-0020)
 
 Revision ID: c5a9e3b72d14
 Revises: b8e2d4f61a07
@@ -45,8 +45,15 @@ def upgrade():
     op.create_index("ix_transcript_segments_investigation_id", "transcript_segments", ["investigation_id"])
     op.create_index("ix_transcript_segments_document_id", "transcript_segments", ["document_id"])
     op.create_index("ix_transcript_segments_chunk_id", "transcript_segments", ["chunk_id"])
+    # A recording's quote is saved only once a person has heard the part: who and when.
+    with op.batch_alter_table("evidence") as batch:
+        batch.add_column(sa.Column("heard_by", sa.String(255), nullable=True))
+        batch.add_column(sa.Column("heard_at", sa.DateTime(), nullable=True))
 
 
 def downgrade():
+    with op.batch_alter_table("evidence") as batch:
+        batch.drop_column("heard_at")
+        batch.drop_column("heard_by")
     op.drop_table("transcript_segments")
     op.drop_table("document_media")

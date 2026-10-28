@@ -85,6 +85,8 @@ class EvidenceOut(ResponseModel):
     # Where the quote stands in its document's text, as stored (ADR-0015): passage, offsets, the text either side,
     # how the words matched, the lines it spans; null for a quote with no document or not found in it.
     anchor: dict[str, Any] | None = None
+    heard_by: str | None = None        # a recording's quote: who heard the part before it was saved
+    heard_at: Timestamp | None = None
 
 
 class EvidencePoolRow(ResponseModel):

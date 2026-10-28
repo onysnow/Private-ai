@@ -260,12 +260,12 @@ def promote_ai_analysis_candidate_to_deck_endpoint(candidate_id: str, body: Prom
 
 
 @router.post("/evidence", response_model=EvidenceOut)
-def create_evidence_endpoint(body: EvidenceCreate, db: Session = Depends(get_db)) -> Any:
+def create_evidence_endpoint(body: EvidenceCreate, request: Request, db: Session = Depends(get_db)) -> Any:
     source = db.get(Source, body.source_id)
     if source is None:
         raise HTTPException(404, "Source not found")
     try:
-        return create_evidence(db, body.model_dump())
+        return create_evidence(db, body.model_dump(), actor=scope_for_request(request).actor_id)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
 

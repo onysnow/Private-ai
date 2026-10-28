@@ -39,6 +39,7 @@ import {DocumentTranslation} from '../documents/document-translation';
 import {needsSchemaAnswer} from '../documents/schema-question';
 import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/entity-identity';
 import {proposerName} from './proposers';
+import {ListenRoom, isRecording} from './listen-room';
 
 type Tab = 'text' | 'original' | 'translation' | 'details';
 type Span = {start: number; end: number; id: string; kind: string; status: string; primary: boolean};
@@ -843,5 +844,13 @@ export function ReadingRoom({investigationId}: {investigationId: string}): React
   const opened = request ? `${request.documentId}:${request.serial}` : '';
   useEffect(() => { if (opened) window.dispatchEvent(new Event(FEATURE_OPEN_EVENT)); }, [opened]);
   if (!request || !investigationId) return null;
-  return <Room key={`${request.documentId}:${request.serial}`} investigationId={investigationId} documentId={request.documentId} startPage={request.pageNumber} onClose={close}/>;
+  return <Opened key={`${request.documentId}:${request.serial}`} investigationId={investigationId} documentId={request.documentId} startPage={request.pageNumber} onClose={close}/>;
+}
+
+/** A recording opens in Listen & read (mockup INTAKE_4); any other document in the reading room. */
+function Opened({investigationId, documentId, startPage, onClose}: {investigationId: string; documentId: string; startPage: number | null; onClose: () => void}): ReactElement {
+  const doc = useQuery({...getDocumentOptions({path: {document_id: documentId}})}).data;
+  const caseName = useQuery({...listInvestigationsOptions()}).data?.find(i => i.id === investigationId)?.name ?? 'Case';
+  if (doc && isRecording(doc)) return <ListenRoom doc={doc} caseName={caseName} decideHref={caseHref('/decide?kind=proposal', investigationId)} onClose={onClose}/>;
+  return <Room investigationId={investigationId} documentId={documentId} startPage={startPage} onClose={onClose}/>;
 }
