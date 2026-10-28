@@ -138,13 +138,21 @@ describe('Safety & data', () => {
   it('opens a card on a line after a pause, with its last requests, and Esc closes it', async () => {
     show();
     const box = await screen.findByRole('button', {name: /OpenSanctions: ON REQUEST/});
-    fireEvent.pointerEnter(box.closest('li')!);
-    expect(screen.queryByRole('tooltip')).toBeNull();
-    const card = await screen.findByRole('tooltip');
-    expect(card.textContent).toContain('Harbour Nominees Ltd');
-    expect(box).toHaveAttribute('aria-describedby', card.id);
-    fireEvent.keyDown(window, {key: 'Escape'});
-    await waitFor(() => expect(screen.queryByRole('tooltip')).toBeNull());
+    // The pause is timed on the test's own clock, so a busy machine cannot make it late.
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    try {
+      fireEvent.pointerEnter(box.closest('li')!);
+      await act(async () => { await vi.advanceTimersByTimeAsync(200); });
+      expect(screen.queryByRole('tooltip')).toBeNull();
+      await act(async () => { await vi.advanceTimersByTimeAsync(100); });
+      const card = screen.getByRole('tooltip');
+      expect(card.textContent).toContain('Harbour Nominees Ltd');
+      expect(box).toHaveAttribute('aria-describedby', card.id);
+      fireEvent.keyDown(window, {key: 'Escape'});
+      expect(screen.queryByRole('tooltip')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('pulses a line once when a request left since the last look', async () => {
