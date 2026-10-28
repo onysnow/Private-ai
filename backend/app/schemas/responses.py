@@ -141,6 +141,8 @@ class InvestigationDeletionPreview(ResponseModel):
     unsafe_paths: list[DeletionUnsafePath]
     # Files kept by web captures (ADR-0018), deleted with the case.
     capture_file_count: int = 0
+    # Files made from the case's files (ADR-0021), deleted with the case.
+    derived_file_count: int = 0
     can_delete: bool
     requires_confirmation: str
     openaleph_collection: DeletionCollectionOut | None
@@ -1640,6 +1642,7 @@ class BackupPreviewOut(ResponseModel):
     document_file_count: int
     missing_document_count: int
     capture_file_count: int = 0
+    derived_file_count: int = 0
     warnings: list[str]
     conflicts: list[RestoreConflictOut]
     can_restore: bool

@@ -1,0 +1,40 @@
+# The Workbench's native module: code taken from the ArtCraft apps (FilmCraft, LightCraft, PdfCraft;
+# MIT OR Apache-2.0), compiled into one Python extension, `workbench_native`. The crates come from
+# Ony's forks at a pinned commit; see NOTICE.md for what is used and its licences.
+[package]
+name = "workbench_native"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+publish = false
+license = "MIT OR Apache-2.0"
+
+[lib]
+name = "workbench_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.25", features = ["extension-module", "abi3-py311"] }
+numpy = "0.25"
+serde_json = "1"
+# FilmCraft: clip sync, restoration effects, loudness.
+filmcraft-audio-dsp = { git = "https://github.com/onysnow/filmcraft", rev = "0800a8b0aa4a703ba42172f415b45a61f8d8a5e1" }
+# LightCraft: photo metadata, RAW previews, HEIC, the YuNet face detector.
+lightcraft-meta = { git = "https://github.com/onysnow/lightcraft", rev = "76b5377868d912db69a777bda253a5b1b96b22bd" }
+lightcraft-raw = { git = "https://github.com/onysnow/lightcraft", rev = "76b5377868d912db69a777bda253a5b1b96b22bd" }
+lightcraft-heif = { git = "https://github.com/onysnow/lightcraft", rev = "76b5377868d912db69a777bda253a5b1b96b22bd" }
+lightcraft-faces = { git = "https://github.com/onysnow/lightcraft", rev = "76b5377868d912db69a777bda253a5b1b96b22bd" }
+# PdfCraft: redaction, hidden-data removal, compare, PDF/A, signing, OCR layer, pages.
+pdfcraft-automation = { git = "https://github.com/onysnow/pdfcraft", rev = "fb3fa5de5724d20afb44435f85a110710612315e", default-features = false }
+
+# PdfCraft builds on its own fixed copies of these; a dependent workspace has to name them again.
+[patch.crates-io]
+hayro = { git = "https://github.com/onysnow/pdfcraft", rev = "fb3fa5de5724d20afb44435f85a110710612315e" }
+hayro-interpret = { git = "https://github.com/onysnow/pdfcraft", rev = "fb3fa5de5724d20afb44435f85a110710612315e" }
+hayro-syntax = { git = "https://github.com/onysnow/pdfcraft", rev = "fb3fa5de5724d20afb44435f85a110710612315e" }
+hayro-jbig2 = { git = "https://github.com/onysnow/pdfcraft", rev = "fb3fa5de5724d20afb44435f85a110710612315e" }
+lopdf = { git = "https://github.com/onysnow/pdfcraft", rev = "fb3fa5de5724d20afb44435f85a110710612315e" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 16

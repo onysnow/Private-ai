@@ -2452,6 +2452,11 @@
             "title": "Conflicts",
             "type": "array"
           },
+          "derived_file_count": {
+            "default": 0,
+            "title": "Derived File Count",
+            "type": "integer"
+          },
           "document_file_count": {
             "title": "Document File Count",
             "type": "integer"
@@ -23596,6 +23601,11 @@
           "capture_file_count": {
             "default": 0,
             "title": "Capture File Count",
+            "type": "integer"
+          },
+          "derived_file_count": {
+            "default": 0,
+            "title": "Derived File Count",
             "type": "integer"
           },
           "document_file_summary": {
@@ -51666,7 +51676,7 @@
                 }
               }
             },
-            "description": "The picture this document is, as uploaded (PNG or JPEG)"
+            "description": "The picture this document is, as uploaded (PNG or JPEG), or the viewable copy of a HEIC or RAW photo"
           },
           "422": {
             "content": {

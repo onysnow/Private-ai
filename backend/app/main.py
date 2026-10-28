@@ -295,8 +295,9 @@ def create_app(
     # resolved objects (mypy does not narrow Optional parameters inside nested defs).
     limits_policy = request_limits or RequestLimitPolicy(
         default_bytes=app_settings.max_api_request_bytes,
-        # Allow multipart framing overhead while preserving the stricter route-level file limit.
-        document_bytes=app_settings.max_document_bytes + (1024 * 1024),
+        # Allow multipart framing overhead while preserving the stricter route-level file limit. The upload route
+        # takes recordings and photos up to MAX_MEDIA_BYTES (ADR-0020, ADR-0021) and checks each file's own limit.
+        document_bytes=max(app_settings.max_document_bytes, app_settings.max_media_bytes) + (1024 * 1024),
         backup_bytes=app_settings.max_backup_bytes + (1024 * 1024),
     )
     audit_logger = audit or SecurityAuditLogger(app_settings.audit_log_file)

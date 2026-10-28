@@ -44,11 +44,14 @@ pushd backend
 "..\.venv\Scripts\python.exe" -m app.services.transcription fetch >> "..\%SETUP_LOG%" 2>&1
 if not %errorlevel%==0 goto :failed
 popd
+rem The native module (ADR-0021) is built with Rust. Without it the app still runs; HEIC and RAW photos then say what to run.
+set "VPY=.venv\Scripts\python.exe"
+call :native_module
 ".venv\Scripts\python.exe" -c "import fastapi,uvicorn,sqlalchemy,httpx,followthemoney,multipart,pypdf,docx,alembic,fitz,openaleph_client,playwright,warcio,faster_whisper" >> "%SETUP_LOG%" 2>&1
 if not %errorlevel%==0 goto :failed
 
 del /q ".venv\.journalism_dependencies_ready_*" >nul 2>nul
-type nul > ".venv\.journalism_dependencies_ready_1_26"
+type nul > ".venv\.journalism_dependencies_ready_1_27"
 echo Runtime repair and import verification completed successfully.
 exit /b 0
 
@@ -60,3 +63,16 @@ exit /b 1
 echo Journalism Workbench runtime repair failed.
 echo Review %CD%\%SETUP_LOG% for the complete dependency error.
 exit /b 1
+
+:native_module
+rem The Workbench's native module (backend\native, ADR-0021): code from the ArtCraft apps, built here with Rust.
+rem It is optional: setup carries on without it, and a HEIC or RAW photo then says what to run.
+where cargo >nul 2>nul
+if errorlevel 1 (
+  echo Rust is not installed, so HEIC and RAW photos will not be read yet. Install it from https://rustup.rs and run setup again.
+  exit /b 0
+)
+echo Building the native module; the first build takes several minutes...
+"%VPY%" -m pip install .\backend\native >> "%SETUP_LOG%" 2>&1
+if errorlevel 1 echo The native module did not build; the app runs without it. Details are in %SETUP_LOG%.
+exit /b 0

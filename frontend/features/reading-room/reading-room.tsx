@@ -37,6 +37,7 @@ import {FEATURE_OPEN_EVENT, SHUTTER_EVENT} from '../effects/board-effects';
 import {confidenceBand} from '../documents/confidence';
 import {DocumentTranslation} from '../documents/document-translation';
 import {needsSchemaAnswer} from '../documents/schema-question';
+import {isPicture as isPictureFile} from '../documents/picture-evidence';
 import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/entity-identity';
 import {proposerName} from './proposers';
 import {ListenRoom, isRecording} from './listen-room';
@@ -826,7 +827,9 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
 // The backend takes document_id on evidence only for an uploaded picture (it also
 // stores the picture's date). For text the source and the locator already say where
 // the words are, so sending the id made "Keep as evidence" fail with a 400.
-const isPicture = (doc: {mime_type?: string | null}) => (doc.mime_type ?? '').toLowerCase().startsWith('image/');
+// A RAW photo usually arrives as application/octet-stream, so its name counts too (ADR-0021).
+const isPicture = (doc: {mime_type?: string | null; filename?: string | null}) =>
+  (doc.mime_type ?? '').toLowerCase().startsWith('image/') || isPictureFile(doc.filename ?? '');
 
 /** How far reading a document got, in words (not the stored status code). */
 export function readWord(status: string | null | undefined): string {

@@ -20,6 +20,9 @@ venv/
 .coverage
 backend/.coverage
 
+# The native module's Rust build output (backend/native, ADR-0021)
+backend/native/target/
+
 # Frontend dependencies/build output
 frontend/node_modules/
 frontend/.next/

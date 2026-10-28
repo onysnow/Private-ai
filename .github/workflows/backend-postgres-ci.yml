@@ -61,6 +61,23 @@ jobs:
         # which layers pytest/pytest-cov on top of requirements.txt.
         run: python -m pip install --upgrade pip && python -m pip install -r requirements-test.txt
 
+      - name: Set up Rust for the native module
+        # ADR-0021: backend/native compiles code from the ArtCraft apps into the workbench_native module.
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache the native module's build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/native/target
+          key: native-${{ runner.os }}-${{ hashFiles('backend/native/Cargo.lock', 'backend/native/src/**') }}
+          restore-keys: native-${{ runner.os }}-
+
+      - name: Build and install the native module
+        run: CARGO_TARGET_DIR=native/target python -m pip install ./native
+
       - name: Install the web-capture browser
         # ADR-0018: the capture tests drive a real Chromium against a page served on this runner.
         run: python -m playwright install --with-deps --only-shell chromium

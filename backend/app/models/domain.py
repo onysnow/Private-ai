@@ -26,6 +26,7 @@ from app.models.sources import (
 )
 from app.models.case_records import CaseRecord
 from app.models.captures import Capture
+from app.models.derived import DerivedFile, DocumentPhoto
 from app.models.media import DocumentMedia, TranscriptSegment
 from app.models.claims import (
     Claim,
@@ -130,6 +131,8 @@ from app.models.corpus import (
 __all__ = [
     "CaseRecord",
     "Capture",
+    "DerivedFile",
+    "DocumentPhoto",
     "DocumentMedia",
     "TranscriptSegment",
     "uid",

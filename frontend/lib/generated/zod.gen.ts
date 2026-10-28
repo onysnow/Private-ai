@@ -4565,6 +4565,7 @@ export const zInvestigationCreate = z.object({
 export const zInvestigationDeletionPreview = z.object({
   can_delete: z.boolean(),
   capture_file_count: z.int().optional().default(0),
+  derived_file_count: z.int().optional().default(0),
   document_file_summary: zDeletionFileSummary,
   document_files: z.array(zDeletionDocumentFile),
   investigation_id: z.string(),
@@ -6684,6 +6685,7 @@ export const zBackupPreviewOut = z.object({
   can_restore: z.boolean(),
   capture_file_count: z.int().optional().default(0),
   conflicts: z.array(zRestoreConflictOut),
+  derived_file_count: z.int().optional().default(0),
   document_file_count: z.int(),
   format: z.string(),
   investigation: zBackupInvestigationOut,
@@ -10628,7 +10630,7 @@ export const zGetDocumentPicturePath = z.object({
 });
 
 /**
- * The picture this document is, as uploaded (PNG or JPEG)
+ * The picture this document is, as uploaded (PNG or JPEG), or the viewable copy of a HEIC or RAW photo
  */
 export const zGetDocumentPictureResponse = z.string();
 

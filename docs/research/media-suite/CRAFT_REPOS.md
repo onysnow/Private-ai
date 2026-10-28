@@ -23,6 +23,27 @@ their code for it. All 22 onysnow forks were cloned (shallow) and read crate by 
   event tagging, ML voice/background separation, ENF analysis. These stay with the Python tools named in
   `MEDIA_SUITE_RESEARCH.md` §4.
 
+## Built and tried (28 Oct)
+
+Ony: build them and use what works; licensing is his to settle later. Each app's CLI was built (release, Rust 1.97)
+and its code tried on real files; what worked is now in the Workbench as its own native module (ADR-0021).
+
+| Code | Tried on | Result |
+|---|---|---|
+| PdfCraft redaction + hidden data | a memo naming an account and a person | Both gone from the text and from the file's bytes (checked with PyMuPDF); author metadata removed |
+| PdfCraft compare | two versions of the memo | Found exactly the two changed words, with their boxes |
+| PdfCraft PDF/A, signing | the memo | PDF/A-2b check named the missing XMP and the unembedded font; PAdES signature valid, unchanged since signing |
+| PdfCraft OCR | a scanned page | **Not working here**: its pinned models are refused by their S3 host from this container; the Hugging Face copies differ and read "1 1 1 1" |
+| FilmCraft clip sync | two copies of a recording 1.234 s apart | 1.2340 s in 0.23 s, "reliable"; against unrelated noise, "not reliable" |
+| FilmCraft DeHum, DeNoise, loudness | the harbour recording with 50 Hz hum and noise added | Hum −40 dB, its 150 Hz harmonic −46 dB, 0.03 s for 19 s; SNR 1.6 → 14.2 dB with DeNoise |
+| FilmCraft shot detection | a 7 s video cut at 2.0 s and 4.48 s | Exact at sensitivity 100; **none found at the default 50** (needs tuning on real footage) |
+| FilmCraft clip export, transcription | the same video | A 2.5 s H.264/AAC clip PyAV opens; Whisper base transcribed it (the app's faster-whisper stays) |
+| LightCraft metadata | Canon EOS 5D IV CR2, iPhone 12 Pro DNG, JPEG | Camera, serial, lens, capture time with offset, GPS; a JPEG's "modified" date is reported as the capture time, so the app records which tag it was |
+| LightCraft RAW preview, HEIC | the CR2 (62 MB), the DNG (29 MB), a HEIC | Full-size embedded previews in ~0.03 s; HEIC within 1.8 levels of its source |
+| LightCraft YuNet | the demo's four photos | One face in each portrait, none in the embassy graphic; small faces in crowds not tried (no such photo) |
+| EffectCraft filters | a photo | Find Edges in 96 ms, correct; kept for the forensic-filter step |
+| WordCraft, GridCraft, DeckCraft | the demo's .docx and .xlsx, a .pptx | Read, converted to PDF / CSV, slide drawn correctly |
+
 ## Licences
 
 | Repos | Licence |

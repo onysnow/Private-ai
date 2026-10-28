@@ -48,8 +48,9 @@ from app.services.openaleph_corpus import (
     import_openaleph_evidence_candidates, record_openaleph_operation_failure,
     refresh_openaleph_review_candidates, serialize_sync, sync_document_to_openaleph,
 )
-from app.services.image_reader import NotAPicture, stored_picture
+from app.services.image_reader import NotAPicture, shown_path, stored_picture
 from app.services.security import resolve_storage_root
+from app.services.photos import is_photo
 from app.services.transcription import is_media
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -326,8 +327,9 @@ async def upload_document(
     except UnsupportedFormat as exc:
         raise refused(415, str(exc))
     try:
-        # A recording may be larger than a document (ADR-0020).
-        data = await read_upload_limited(file, settings.max_media_bytes if is_media(file.filename) else settings.max_document_bytes)
+        # A recording or a camera's RAW photo may be larger than a document (ADR-0020, ADR-0021).
+        large = is_media(file.filename) or is_photo(file.filename)
+        data = await read_upload_limited(file, settings.max_media_bytes if large else settings.max_document_bytes)
     except HTTPException as exc:
         raise refused(exc.status_code, str(exc.detail))
     if not data:
@@ -390,7 +392,7 @@ def get_document(document_id: str, db: Session = Depends(get_db)) -> Any:
 
 
 @router.get("/documents/{document_id}/picture", response_class=Response,
-            responses=file_response("image/png", "The picture this document is, as uploaded (PNG or JPEG)"))
+            responses=file_response("image/png", "The picture this document is, as uploaded (PNG or JPEG), or the viewable copy of a HEIC or RAW photo"))
 def get_document_picture(document_id: str, db: Session = Depends(get_db)) -> Response:
     """The picture a document is (app/services/image_reader.py), for the app to
     show beside its evidence. Its type is read from its bytes; it is sent so
@@ -399,7 +401,7 @@ def get_document_picture(document_id: str, db: Session = Depends(get_db)) -> Res
     if row is None:
         raise HTTPException(404, "Document not found")
     try:
-        data, picture = stored_picture(row.storage_path, resolve_storage_root(settings.document_storage_dir))
+        data, picture = stored_picture(shown_path(db, row), resolve_storage_root(settings.document_storage_dir))
     except NotAPicture as exc:
         raise HTTPException(415, f"This document is not a picture: {exc}") from exc
     except OSError as exc:

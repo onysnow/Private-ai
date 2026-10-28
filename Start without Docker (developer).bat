@@ -4,7 +4,7 @@ cd /d "%~dp0"
 title Journalism Workbench - developer mode (no Docker)
 
 set "PY="
-set "RUNTIME_MARKER=.venv\.journalism_dependencies_ready_1_26"
+set "RUNTIME_MARKER=.venv\.journalism_dependencies_ready_1_27"
 set "SETUP_LOG=journalism-workbench-setup.log"
 
 echo ============================================================
@@ -79,6 +79,8 @@ if not exist "%RUNTIME_MARKER%" (
   "..\%VPY%" -m app.services.transcription fetch >> "..\%SETUP_LOG%" 2>&1
   if errorlevel 1 goto :dependency_failed
   popd
+  rem The native module (ADR-0021) is built with Rust. Without it the app still runs; HEIC and RAW photos then say what to run.
+  call :native_module
 )
 
 rem Never trust the marker alone. Verify imports needed by the actual local
@@ -173,3 +175,16 @@ exit /b 1
 echo Setup failed before dependency installation.
 pause
 exit /b 1
+
+:native_module
+rem The Workbench's native module (backend\native, ADR-0021): code from the ArtCraft apps, built here with Rust.
+rem It is optional: setup carries on without it, and a HEIC or RAW photo then says what to run.
+where cargo >nul 2>nul
+if errorlevel 1 (
+  echo Rust is not installed, so HEIC and RAW photos will not be read yet. Install it from https://rustup.rs and run setup again.
+  exit /b 0
+)
+echo Building the native module; the first build takes several minutes...
+"%VPY%" -m pip install .\backend\native >> "%SETUP_LOG%" 2>&1
+if errorlevel 1 echo The native module did not build; the app runs without it. Details are in %SETUP_LOG%.
+exit /b 0

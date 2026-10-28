@@ -1405,6 +1405,10 @@ export type BackupPreviewOut = {
    */
   conflicts: Array<RestoreConflictOut>;
   /**
+   * Derived File Count
+   */
+  derived_file_count?: number;
+  /**
    * Document File Count
    */
   document_file_count: number;
@@ -11177,6 +11181,10 @@ export type InvestigationDeletionPreview = {
    * Capture File Count
    */
   capture_file_count?: number;
+  /**
+   * Derived File Count
+   */
+  derived_file_count?: number;
   document_file_summary: DeletionFileSummary;
   /**
    * Document Files
@@ -23798,7 +23806,7 @@ export type GetDocumentPictureError =
 
 export type GetDocumentPictureResponses = {
   /**
-   * The picture this document is, as uploaded (PNG or JPEG)
+   * The picture this document is, as uploaded (PNG or JPEG), or the viewable copy of a HEIC or RAW photo
    */
   200: Blob | File;
 };

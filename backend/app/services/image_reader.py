@@ -18,6 +18,12 @@ import io
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+    from app.models.documents import Document
 
 # The kinds browsers show as <img>, Word and PowerPoint hold as pictures, and OpenAleph reads.
 IMAGE_EXTENSIONS = frozenset({".png", ".jpg", ".jpeg"})
@@ -104,6 +110,20 @@ def stored_picture(storage_path: str, storage_root: Path) -> tuple[bytes, Pictur
     return data, picture_of(data)
 
 
+def shown_path(db: Session, document: Document) -> str:
+    """The file the app shows for a picture document: for a HEIC or RAW photo, its viewable copy (a derived file,
+    app/services/photos.py) once the reading job has made it; for any other document, its own file."""
+    from app.services.photos import is_photo
+
+    if is_photo(document.filename):
+        from app.services.derived_files import latest
+
+        copy = latest(db, document.id, "preview")
+        if copy is not None:
+            return str(copy.storage_path)
+    return str(document.storage_path)
+
+
 def investigation_picture(investigation_id: str, document_id: str | None) -> tuple[bytes, Picture] | str:
     """A picture for an export, as its bytes and what it is, or why there is
     none. Only a picture document of the export's own investigation is read:
@@ -120,7 +140,7 @@ def investigation_picture(investigation_id: str, document_id: str | None) -> tup
         document = db.get(Document, document_id)
         if document is None or document.investigation_id != investigation_id:
             return "the picture is not a document of this investigation"
-        storage_path = document.storage_path
+        storage_path = shown_path(db, document)
     try:
         data, picture = stored_picture(storage_path, resolve_storage_root(settings.document_storage_dir))
     except NotAPicture as exc:

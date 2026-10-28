@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-
+from pathlib import Path
 from typing import TYPE_CHECKING, NoReturn
 
 from sqlalchemy.orm import Session
@@ -255,6 +255,13 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
         if job.attempts > 1 and _already_read(db, document_id):
             return "Already transcribed"
         return _check_watchlist_after_read(db, document_id, read_media_document(db, document_id, report))
+    # A HEIC or camera RAW photo is read through a viewable copy made on this computer (ADR-0021).
+    from app.services.photos import is_photo, read_photo_document
+
+    if stored_media is not None and is_photo(stored_media.filename):
+        if job.attempts > 1 and _already_read(db, document_id):
+            return "Already read"
+        return _check_watchlist_after_read(db, document_id, read_photo_document(db, document_id, report, job_id=job.id))
     # A retry of a read that stopped after its text was saved finishes the steps after it
     # instead of failing on "already read" (docs/project-notes/CRASH_RECOVERY.md). A new
     # reading job for a read document still fails: only a retry resumes.
@@ -283,6 +290,7 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             if local_text and message:
                 message = f"{message}; OpenAleph found no text, so the text is the Workbench's own reading"
             # OpenAleph may have read a scan by OCR too: its pages are measured the same way.
+            _keep_picture_claims(db, document_id)
             message = _measure_legibility(db, document_id, report, message or "Document read")
             return _check_watchlist_after_read(db, document_id, message)
 
@@ -318,7 +326,19 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
         else:
             message = (f"Document read; sending it to OpenAleph failed: {sync.error}" if sync.status == "failed"
                        else "Document read and sent to OpenAleph")
+    _keep_picture_claims(db, document_id)
     return _measure_legibility(db, document_id, report, message)
+
+
+def _keep_picture_claims(db: Session, document_id: str) -> None:
+    """A JPEG or PNG that was read: keep what the file claims about itself (app/services/photos.py). Never fails."""
+    from app.models.domain import Document
+    from app.services.image_reader import IMAGE_EXTENSIONS
+    from app.services.photos import record_claims
+
+    doc = db.get(Document, document_id)
+    if doc is not None and Path(doc.filename or "").suffix.lower() in IMAGE_EXTENSIONS:
+        record_claims(db, document_id)
 
 
 def _measure_legibility(db: Session, document_id: str, report: Report, message: str) -> str:
