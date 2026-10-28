@@ -5507,32 +5507,7 @@ class DecidersOut(ResponseModel):
     people: list[DeciderOut]
 
 
-# --- Keep › Safety & data (mockup KEEP-safety-and-data, ADR-0015) ---
-
-class OutboundEntryOut(ResponseModel):
-    """One request that carried case data to an outside service, as it was sent. `local` is true for a request to a
-    service on this computer: kept so the log is complete, and not counted as leaving."""
-    id: str
-    at: Timestamp
-    service: str
-    destination: str
-    local: bool
-    value_sent: str
-    value_kind: str
-    reason: str
-    actor: str
-    status: str
-    error: str | None
-    run_id: str | None
-    detail: dict[str, Any] | None
-
-
-class OutboundLogOut(ResponseModel):
-    period: str
-    service: str | None
-    total: int
-    entries: list[OutboundEntryOut]
-
+# --- Keep › Safety & data (app/services/safety_data.py, ADR-0015) ---------------------------------------------
 
 class SafetyTotalsOut(ResponseModel):
     requests_left: int
@@ -5541,110 +5516,72 @@ class SafetyTotalsOut(ResponseModel):
     ai_calls_outside: int
 
 
-class SafetyCaseRecordsOut(ResponseModel):
-    records: int
-    claims: int
-    in_backups: bool
-
-
-class SafetyDocumentsOut(ResponseModel):
-    files: int
-    bytes: int
-    in_backups: bool
-
-
-class SafetyBackupsStoreOut(ResponseModel):
-    count: int
-    last: Timestamp | None
-    encrypted: bool
-
-
-class SafetyKeysOut(ResponseModel):
-    set: int
-    total: int
-
-
-class SafetySecurityLogOut(ResponseModel):
-    events: int
-    since: str | None
-    bytes: int
-
-
-class SafetyPrivateAiOut(ResponseModel):
-    enabled: bool
-    provider: str | None
-    model: str | None
-    on_this_computer: bool | None
-    remote_allowed: bool
-
-
-class SafetyStoresOut(ResponseModel):
-    case_records: SafetyCaseRecordsOut
-    documents: SafetyDocumentsOut
-    backups: SafetyBackupsStoreOut
-    service_keys: SafetyKeysOut
-    security_log: SafetySecurityLogOut
-    private_ai: SafetyPrivateAiOut
+class SafetyStoreOut(ResponseModel):
+    """One place on this computer where the case lives (mockup KEEP_2's six stores)."""
+    id: str
+    name: str
+    count: int | None = None
+    count_note: str | None = None
+    bytes: int | None = None
+    oldest: str | None = None
+    where: str
+    in_backups: bool | None = None
+    warning: str | None = None
 
 
 class SafetyServiceOut(ResponseModel):
-    """An outside service the case can reach. `mode` is one of off / on_click / this_computer / automatic / blocked:
-    the app has no "ask first" switch yet (ADR-0015), so a lookup runs only when the reporter starts it (`on_click`).
-    `counted` is false when the app does not log that service's traffic, so the screen never shows a false zero."""
-    key: str
-    label: str
-    role: str
-    host: str
-    mode: str
-    why: str
-    sent: int
-    sends: list[str]
-    last: Timestamp | None
-    counted: bool
-
-
-class SafetyBackupCardOut(ResponseModel):
-    last: Timestamp | None
-    size_bytes: int | None
-    sha256: str | None
-    with_documents: bool | None
-    records: int | None
-    documents: int | None
-
-
-class SafetyAccessCardOut(ResponseModel):
-    refused_24h: int
-
-
-class SafetyHousekeepingCardOut(ResponseModel):
-    stray_files: int
-    stray_bytes: int
-
-
-class SafetyDeleteCardOut(ResponseModel):
-    records: int
-    files: int
-    shared_files: int
-
-
-class SafetyCardsOut(ResponseModel):
-    backup: SafetyBackupCardOut
-    access: SafetyAccessCardOut
-    housekeeping: SafetyHousekeepingCardOut
-    delete: SafetyDeleteCardOut
-
-
-class SafetyInvestigationOut(ResponseModel):
+    """A service the case can reach, with what has been sent to it in the period."""
     id: str
     name: str
+    about: str
+    state: Literal["off", "on_request", "local"]
+    state_note: str
+    sent_count: int
+    sends: list[str]
+    where: Literal["inside", "outside"]
+    blocked_note: str | None = None
 
 
-class SafetyAndDataOut(ResponseModel):
-    investigation: SafetyInvestigationOut
-    period: str
-    now: Timestamp
+class SafetyBackupOut(ResponseModel):
+    last_backup_at: str | None = None
+    encrypted: bool
+    restore_enabled: bool
+
+
+class SafetyAccessOut(ResponseModel):
+    mode: Literal["local_only", "remote"]
+    refused_24h: int
+    log_readable: bool
+
+
+class SafetyHousekeepingOut(ResponseModel):
+    stray_files: int | None = None
+    stray_bytes: int | None = None
+
+
+class OutboundRequestOut(ResponseModel):
+    id: str
+    at: str
+    service: str
+    service_name: str
+    kind: str
+    value: str
+    reason: str
+    actor: Literal["you", "automatic"]
+    leaves_computer: bool
+    outcome: Literal["sent", "failed", "blocked"]
+    source: dict[str, Any] | None = None
+
+
+class SafetyDataOut(ResponseModel):
+    """Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015)."""
+    period: Literal["today", "7d", "30d", "all"]
     totals: SafetyTotalsOut
-    stores: SafetyStoresOut
+    exposure: str
+    stores: list[SafetyStoreOut]
     services: list[SafetyServiceOut]
-    cards: SafetyCardsOut
-    not_counted: list[str]
+    backup: SafetyBackupOut
+    access: SafetyAccessOut
+    housekeeping: SafetyHousekeepingOut
+    outbound: list[OutboundRequestOut]
+    outbound_total: int

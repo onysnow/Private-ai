@@ -95,14 +95,12 @@ from app.models.ai import (
     AIAnalysisCandidate,
     AIRunEvent,
 )
+from app.models.outbound import OutboundRequest
 from app.models.writeups import (
     Writeup,
     WriteupVersion,
 )
-from app.models.safety import (
-    BackupEvent,
-    OutboundRequest,
-)
+from app.models.safety import BackupEvent
 from app.models.stories import (
     Story,
     StoryClaim,

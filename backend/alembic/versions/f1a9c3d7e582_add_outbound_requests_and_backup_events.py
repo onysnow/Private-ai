@@ -1,5 +1,5 @@
-"""when a backup was made (mockup KEEP-safety-and-data, ADR-0015). The outbound log it reads is the
-`outbound_requests` table of c3f8a2d6e914.
+"""when a backup was made (ADR-0015). The outbound log is the
+`outbound_requests` table of a3f7c1d9e642.
 
 Revision ID: f1a9c3d7e582
 Revises: c3f8a2d6e914

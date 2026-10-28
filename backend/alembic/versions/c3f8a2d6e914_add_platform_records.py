@@ -1,5 +1,6 @@
-"""what leaves the computer, saved questions, notifications delivered outside the app, push subscriptions; when an
-import finished (docs/project-notes/PLATFORM_NEEDS_PLAN.md)
+"""saved questions, notifications delivered outside the app, push subscriptions; when an
+import finished (docs/project-notes/PLATFORM_NEEDS_PLAN.md). The log of what leaves the computer is
+a3f7c1d9e642.
 
 Revision ID: c3f8a2d6e914
 Revises: b3f7d2a9c615
@@ -14,28 +15,6 @@ depends_on = None
 
 
 def upgrade():
-    op.create_table(
-        "outbound_requests",
-        sa.Column("id", sa.String(), primary_key=True),
-        sa.Column("investigation_id", sa.String(), sa.ForeignKey("investigations.id"), nullable=True),
-        sa.Column("at", sa.DateTime(), nullable=False),
-        sa.Column("kind", sa.String(length=32), nullable=False),
-        sa.Column("service", sa.String(length=64), nullable=False),
-        sa.Column("destination", sa.String(length=255), nullable=False),
-        sa.Column("local", sa.Boolean(), nullable=False),
-        sa.Column("value_sent", sa.Text(), nullable=False),
-        sa.Column("value_kind", sa.String(length=64), nullable=False),
-        sa.Column("reason", sa.String(length=64), nullable=False),
-        sa.Column("actor", sa.String(length=255), nullable=False),
-        sa.Column("status", sa.String(length=16), nullable=False),
-        sa.Column("error", sa.Text(), nullable=True),
-        sa.Column("run_id", sa.String(length=64), nullable=True),
-        sa.Column("detail", sa.JSON(), nullable=True),
-    )
-    op.create_index("ix_outbound_requests_investigation_id", "outbound_requests", ["investigation_id"])
-    op.create_index("ix_outbound_requests_at", "outbound_requests", ["at"])
-    op.create_index("ix_outbound_requests_kind", "outbound_requests", ["kind"])
-    op.create_index("ix_outbound_requests_service", "outbound_requests", ["service"])
     op.create_table(
         "saved_questions",
         sa.Column("id", sa.String(), primary_key=True),
@@ -81,4 +60,3 @@ def downgrade():
     op.drop_table("push_subscriptions")
     op.drop_table("notification_deliveries")
     op.drop_table("saved_questions")
-    op.drop_table("outbound_requests")

@@ -1,4 +1,3 @@
-import json
 
 import httpx
 
@@ -6,12 +5,14 @@ from app.connectors.base import (
     Connector,
     ExternalFinding,
     KeyCheck,
+    entity_sent_value,
     key_check_from_status,
 )
 from app.core.config import settings
 
 
 class OpenSanctionsConnector(Connector):
+    requires_key = True
     """OpenSanctions FtM search and query-by-example enrichment adapter."""
 
     requires_key = True
@@ -96,12 +97,9 @@ class OpenSanctionsConnector(Connector):
                 return []
             return [self._parse_result(item) for item in items]
 
-    def request_preview(self, *, query: str | None = None, entity: dict | None = None) -> tuple[str, str]:
-        if entity is not None:
-            # enrich() sends the schema and every property of the entity (query by example).
-            sent = {"schema": entity.get("schema"), "properties": entity.get("properties") or {}}
-            return json.dumps(sent, ensure_ascii=False, sort_keys=True), "entity details (schema and every property)"
-        return super().request_preview(query=query)
+    def enrich_sent(self, entity: dict) -> str:
+        # Query-by-example sends every property of the record, not one search line.
+        return entity_sent_value(None, entity.get("properties"))
 
     async def enrich(self, entity: dict) -> list[ExternalFinding]:
         """Match a canonical FtM entity using OpenSanctions query-by-example."""

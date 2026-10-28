@@ -484,7 +484,7 @@ def outside_lookup_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     for n, provider in enumerate(due):
         report(int(100 * n / max(1, len(due))), f"Looking {entity.caption} up in {provider_label(provider)}")
         try:
-            found += len(asyncio.run(enrich_entity(provider, entity, db)))
+            found += len(asyncio.run(enrich_entity(provider, entity, db, automatic=True)))
         except HTTPException:
             failed.append(provider_label(provider))
     message = f"{found} finding{'s' if found != 1 else ''} for {entity.caption}" + (f"; {', '.join(failed)} did not answer" if failed else "")

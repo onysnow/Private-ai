@@ -17,8 +17,8 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import SessionLocal, get_db
 from app.models.domain import Entity, Investigation
 from app.schemas.api import InvestigationUpdate
-from app.schemas.responses import CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
-from app.services import case_home, case_years, drop, wire
+from app.schemas.responses import SafetyDataOut, CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
+from app.services import case_home, case_years, drop, safety_data, wire
 from app.services.investigations import update_investigation
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -139,3 +139,10 @@ def stream_drop(investigation_id: str, db: Session = Depends(get_db)) -> Streami
             await asyncio.sleep(DROP_STREAM_TICK)
 
     return StreamingResponse(events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
+
+
+@router.get("/investigations/{investigation_id}/safety-data", response_model=SafetyDataOut)
+def get_safety_data(investigation_id: str, period: Literal["today", "7d", "30d", "all"] = "7d", db: Session = Depends(get_db)) -> Any:
+    """Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015)."""
+    _case(db, investigation_id)
+    return safety_data.safety_data(db, investigation_id, period)

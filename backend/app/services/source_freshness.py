@@ -34,7 +34,7 @@ MAX_RECHECKS_PER_CASE = 200
 # --- Key checks ------------------------------------------------------------------------------------------------
 
 def check_key(db: Session, provider: str) -> dict[str, Any]:
-    from app.services.outbound import record_outbound
+    from app.services.outbound import record_platform_request
 
     connector = registry.get(provider)
     if connector is None:
@@ -45,7 +45,7 @@ def check_key(db: Session, provider: str) -> dict[str, Any]:
     except Exception as exc:
         state, detail, credits = "failed", f"The source did not answer: {exc}", None
     if state not in ("no_key", "not_supported"):
-        record_outbound(db, kind="key_check", service=provider, destination=preferences.provider_host(connector) or provider,
+        record_platform_request(db, kind="key_check", service=provider, destination=preferences.provider_host(connector) or provider,
                         sent="the key only; no search and no names", outcome={"works": "sent", "refused": "refused"}.get(state, "failed"),
                         detail=None if state == "works" else detail)
     value = {"state": state, "detail": detail, "credits": credits, "at": utcnow_naive().isoformat()}
@@ -88,7 +88,7 @@ def _note_change(db: Session, source: str, label: str, version: str) -> None:
 
 def check_opensanctions(db: Session) -> str | None:
     """Ask for the catalogue; returns the new version when the searched dataset changed since the last check."""
-    from app.services.outbound import record_outbound
+    from app.services.outbound import record_platform_request
 
     connector = registry.get("opensanctions")
     if connector is None or not getattr(connector, "api_key", "") or not hasattr(connector, "catalog"):
@@ -98,10 +98,10 @@ def check_opensanctions(db: Session) -> str | None:
     try:
         status, body, etag = asyncio.run(connector.catalog(state.get("etag")))
     except Exception as exc:
-        record_outbound(db, kind="source_check", service="opensanctions", destination=host, outcome="failed", detail=str(exc),
+        record_platform_request(db, kind="source_check", service="opensanctions", destination=host, outcome="failed", detail=str(exc),
                         sent="a request for the list of datasets and their versions; no names")
         return None
-    record_outbound(db, kind="source_check", service="opensanctions", destination=host,
+    record_platform_request(db, kind="source_check", service="opensanctions", destination=host,
                     outcome="sent" if status in (200, 304) else ("refused" if status in (401, 403) else "failed"),
                     sent="a request for the list of datasets and their versions; no names")
     if status != 200:

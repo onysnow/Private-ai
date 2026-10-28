@@ -277,7 +277,7 @@ def recent_security_denials(
                     scanned += 1
                     if record["event"] not in counts:
                         continue
-                    stamp = _parse_audit_timestamp(record["timestamp"])
+                    stamp = parse_audit_timestamp(record["timestamp"])
                     if stamp is None or stamp.timestamp() < since:
                         continue
                     counts[record["event"]] += 1
@@ -304,7 +304,7 @@ def recent_security_denials(
     }
 
 
-def _parse_audit_timestamp(value: object) -> datetime | None:
+def parse_audit_timestamp(value: object) -> datetime | None:
     if not isinstance(value, str):
         return None
     try:
@@ -361,7 +361,7 @@ def preview_security_audit_retention(
             except json.JSONDecodeError:
                 parsed = None
             record = _safe_audit_record(parsed)
-            stamp = _parse_audit_timestamp(record.get("timestamp") if record else None)
+            stamp = parse_audit_timestamp(record.get("timestamp") if record else None)
             if record is None or stamp is None:
                 malformed += 1
                 lines.append((raw, None, None))

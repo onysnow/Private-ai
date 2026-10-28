@@ -163,9 +163,9 @@ def remove_subscription(db: Session, person: str, endpoint: str) -> None:
 # --- Sending ---------------------------------------------------------------------------------------------------
 
 def _record(db: Session, kind: str, service: str, destination: str, outcome: str, detail: str | None = None) -> None:
-    from app.services.outbound import record_outbound
+    from app.services.outbound import record_platform_request
 
-    record_outbound(db, kind=kind, service=service, destination=destination, outcome=outcome, detail=detail,
+    record_platform_request(db, kind=kind, service=service, destination=destination, outcome=outcome, detail=detail,
                     sent="the kind of alert and how many; no names, cases or text from the records")
 
 

@@ -122,15 +122,15 @@ _host_last: dict[str, float] = {}
 def download(url: str) -> bytes:
     """The file at a fixed public address, recorded in the log of what leaves this computer (only the request for a
     public file goes out; nothing from a case)."""
-    from app.services.outbound import record_outbound
+    from app.services.outbound import record_platform_request
 
     try:
         data = _download(url)
     except Exception as exc:
-        record_outbound(None, kind="download", service="demo case", destination=url, sent=f"a request for {url}",
+        record_platform_request(None, kind="download", service="demo case", destination=url, sent=f"a request for {url}",
                         outcome="failed", detail=str(exc))
         raise
-    record_outbound(None, kind="download", service="demo case", destination=url, sent=f"a request for {url}")
+    record_platform_request(None, kind="download", service="demo case", destination=url, sent=f"a request for {url}")
     return data
 
 

@@ -720,6 +720,6 @@ def record_backup(db: Session, investigation_id: str, data: bytes, manifest: dic
                        "documents_included": bool(manifest.get("documents_included")), "encrypted": encrypted}
     db.commit()
     # The history Keep › Safety & data reads (a row per backup, ADR-0015); never raises.
-    from app.services.safety import record_backup_event
+    from app.services.backup_events import record_backup_event
 
     record_backup_event(db, investigation_id, data, manifest, bool(manifest.get("documents_included")))

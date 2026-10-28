@@ -15,7 +15,7 @@ from app.db.session import Base
 
 def test_every_model_module_is_reexported_and_registers_on_the_shared_base():
     module_names = sorted(m.name for m in pkgutil.iter_modules(app.models.__path__) if m.name not in {"domain", "base"})
-    assert module_names == ["ai", "annotations", "case_records", "claims", "connectors", "corpus", "decks", "documents", "entities", "identity", "investigations", "jobs", "leads", "patterns", "platform", "preferences", "relationships", "safety", "sources", "stories", "watchlists", "writeups"]
+    assert module_names == ["ai", "annotations", "case_records", "claims", "connectors", "corpus", "decks", "documents", "entities", "identity", "investigations", "jobs", "leads", "outbound", "patterns", "platform", "preferences", "relationships", "safety", "sources", "stories", "watchlists", "writeups"]
     mapped = {mapper.class_.__name__: mapper.class_ for mapper in Base.registry.mappers}
     for name in module_names:
         module = importlib.import_module(f"app.models.{name}")
