@@ -3564,6 +3564,179 @@
         "title": "CaptureFileOut",
         "type": "object"
       },
+      "CaptureFollowIn": {
+        "description": "Check a captured page again: never, daily or weekly (the first check is one interval from now).",
+        "properties": {
+          "every": {
+            "enum": [
+              "never",
+              "daily",
+              "weekly"
+            ],
+            "title": "Every",
+            "type": "string"
+          }
+        },
+        "required": [
+          "every"
+        ],
+        "title": "CaptureFollowIn",
+        "type": "object"
+      },
+      "CaptureFollowOut": {
+        "description": "Checking a captured page again (INTAKE_3). `state`: unchecked, same, changed (since the capture), gone (now 404\nor 410), broken (could not be read), or for a link only, not_yet / answers (the address answers again: its page\nwaits in Following for a person to capture). `every`: never, daily or weekly. `changes` compare the captured\nversion with the latest, words only, as served.",
+        "properties": {
+          "captured_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured Text"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/WordChangeOut"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/MonitorCheckOut"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "every": {
+            "enum": [
+              "never",
+              "daily",
+              "weekly"
+            ],
+            "title": "Every",
+            "type": "string"
+          },
+          "health": {
+            "title": "Health",
+            "type": "string"
+          },
+          "health_detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Health Detail"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "last_checked_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Checked At"
+          },
+          "leaves": {
+            "title": "Leaves",
+            "type": "string"
+          },
+          "live_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Text"
+          },
+          "marked_changed": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marked Changed"
+          },
+          "monitor_id": {
+            "title": "Monitor Id",
+            "type": "string"
+          },
+          "next_check_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Check At"
+          },
+          "state": {
+            "enum": [
+              "unchecked",
+              "same",
+              "changed",
+              "gone",
+              "broken",
+              "not_yet",
+              "answers"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/CaptureVersionOut"
+            },
+            "title": "Versions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "monitor_id",
+          "every",
+          "health",
+          "checks",
+          "leaves",
+          "state",
+          "versions",
+          "changes"
+        ],
+        "title": "CaptureFollowOut",
+        "type": "object"
+      },
       "CaptureMessageOut": {
         "description": "A request line or status line with a few of its headers ([name, value] pairs).",
         "properties": {
@@ -3707,6 +3880,16 @@
             ],
             "title": "Finished At"
           },
+          "follow": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureFollowOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "http_status": {
             "anyOf": [
               {
@@ -3789,6 +3972,34 @@
               }
             ],
             "title": "Reason"
+          },
+          "reason_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "dead_link",
+                  "blocked",
+                  "timed_out",
+                  "tool_error"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason Kind"
+          },
+          "reason_kind_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason Kind By"
           },
           "requested_at": {
             "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
@@ -3943,6 +4154,72 @@
           "state"
         ],
         "title": "CaptureStageOut",
+        "type": "object"
+      },
+      "CaptureUpdate": {
+        "description": "A link only's reason, when the person knows better than the reply.",
+        "properties": {
+          "reason_kind": {
+            "enum": [
+              "dead_link",
+              "blocked",
+              "timed_out",
+              "tool_error"
+            ],
+            "title": "Reason Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason_kind"
+        ],
+        "title": "CaptureUpdate",
+        "type": "object"
+      },
+      "CaptureVersionOut": {
+        "properties": {
+          "capture_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Id"
+          },
+          "captured": {
+            "title": "Captured",
+            "type": "boolean"
+          },
+          "lines_changed": {
+            "title": "Lines Changed",
+            "type": "integer"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "seen_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Seen At",
+            "type": "string"
+          },
+          "text_sha256": {
+            "title": "Text Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "seen_at",
+          "captured",
+          "text_sha256",
+          "lines_changed"
+        ],
+        "title": "CaptureVersionOut",
         "type": "object"
       },
       "CaseChangeOut": {
@@ -26747,6 +27024,17 @@
       },
       "MonitorCheckOut": {
         "properties": {
+          "seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds"
+          },
           "state": {
             "enum": [
               "ok",
@@ -26756,6 +27044,17 @@
             ],
             "title": "State",
             "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
           },
           "text": {
             "title": "Text",
@@ -27175,7 +27474,8 @@
                   15,
                   30,
                   60,
-                  1440
+                  1440,
+                  10080
                 ],
                 "type": "integer"
               },
@@ -40312,6 +40612,51 @@
         "title": "WireQuoteOut",
         "type": "object"
       },
+      "WordChangeOut": {
+        "description": "A changed stretch of the page, word by word; `unchanged` counts the same lines between two changes.",
+        "properties": {
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/WordSegmentOut"
+            },
+            "title": "Segments",
+            "type": "array"
+          },
+          "unchanged": {
+            "title": "Unchanged",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unchanged",
+          "segments"
+        ],
+        "title": "WordChangeOut",
+        "type": "object"
+      },
+      "WordSegmentOut": {
+        "properties": {
+          "op": {
+            "enum": [
+              "same",
+              "del",
+              "ins"
+            ],
+            "title": "Op",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "text"
+        ],
+        "title": "WordSegmentOut",
+        "type": "object"
+      },
       "WriteupCreate": {
         "properties": {
           "content_json": {
@@ -41629,6 +41974,162 @@
           }
         },
         "summary": "Get Capture"
+      },
+      "patch": {
+        "description": "Set a link only's reason (dead link, blocked, timed out, tool error) when the person knows better.",
+        "operationId": "update_capture",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptureUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not a link-only capture"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Update Capture"
+      }
+    },
+    "/api/captures/{capture_id}/capture-latest": {
+      "post": {
+        "description": "Capture the page as it is now, as a new capture: both stay in the case. Answers with the new capture.",
+        "operationId": "capture_latest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "The new capture finished before the reply (developer mode)"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Capture Latest"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Capture Latest"
       }
     },
     "/api/captures/{capture_id}/files/{name}": {
@@ -41697,6 +42198,156 @@
           }
         },
         "summary": "Get Capture File"
+      }
+    },
+    "/api/captures/{capture_id}/follow": {
+      "put": {
+        "description": "Check this capture's page again: never, daily or weekly (a Following page monitor tied to the capture; version 1\nis the page as captured). For a link only, weekly is \"Ask again in 7 days\".",
+        "operationId": "follow_capture",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptureFollowIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The page is still being captured"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Follow Capture"
+      }
+    },
+    "/api/captures/{capture_id}/mark-changed": {
+      "post": {
+        "description": "Mark the capture's source \"changed since capture\", with who said so and which version they saw.",
+        "operationId": "mark_capture_changed",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The page has not changed since its capture"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Mark Capture Changed"
       }
     },
     "/api/captures/{capture_id}/media": {
@@ -41777,6 +42428,76 @@
           }
         },
         "summary": "Collect Capture Media"
+      }
+    },
+    "/api/captures/{capture_id}/recheck": {
+      "post": {
+        "description": "One visit now: the live page's main text compared with the last version. Nothing is kept as evidence; a\ndifferent text is kept as a version, not captured.",
+        "operationId": "recheck_capture",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Still being captured, or the address moved"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Recheck Capture"
       }
     },
     "/api/case-records/{case_record_id}": {

@@ -69,6 +69,9 @@ import type {
   CaptureItemData,
   CaptureItemErrors,
   CaptureItemResponses,
+  CaptureLatestData,
+  CaptureLatestErrors,
+  CaptureLatestResponses,
   ChangePassphraseData,
   ChangePassphraseErrors,
   ChangePassphraseResponses,
@@ -267,6 +270,9 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenErrors,
   FindOpenalephChildrenResponses,
+  FollowCaptureData,
+  FollowCaptureErrors,
+  FollowCaptureResponses,
   Get1MdbData,
   Get1MdbErrors,
   Get1MdbResponses,
@@ -765,6 +771,9 @@ import type {
   MarkAiRunThoughtData,
   MarkAiRunThoughtErrors,
   MarkAiRunThoughtResponses,
+  MarkCaptureChangedData,
+  MarkCaptureChangedErrors,
+  MarkCaptureChangedResponses,
   MarkRedFlagInnocentData,
   MarkRedFlagInnocentErrors,
   MarkRedFlagInnocentResponses,
@@ -852,6 +861,9 @@ import type {
   PutResearchSettingsData,
   PutResearchSettingsErrors,
   PutResearchSettingsResponses,
+  RecheckCaptureData,
+  RecheckCaptureErrors,
+  RecheckCaptureResponses,
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
@@ -1032,6 +1044,9 @@ import type {
   UpdateAppUserData,
   UpdateAppUserErrors,
   UpdateAppUserResponses,
+  UpdateCaptureData,
+  UpdateCaptureErrors,
+  UpdateCaptureResponses,
   UpdateClaimEndpointData,
   UpdateClaimEndpointErrors,
   UpdateClaimEndpointResponses,
@@ -1110,6 +1125,8 @@ import {
   zCaptureAllResponse,
   zCaptureItemPath,
   zCaptureItemResponse,
+  zCaptureLatestPath,
+  zCaptureLatestResponse,
   zChangePassphraseBody,
   zChangePassphraseResponse,
   zCheckConnectorKeyPath,
@@ -1262,6 +1279,9 @@ import {
   zFindingCandidatesResponse,
   zFindOpenalephChildrenPath,
   zFindOpenalephChildrenResponse,
+  zFollowCaptureBody,
+  zFollowCapturePath,
+  zFollowCaptureResponse,
   zGet1MdbResponse,
   zGetAiAnalysisCandidateEndpointPath,
   zGetAiAnalysisCandidateEndpointResponse,
@@ -1621,6 +1641,8 @@ import {
   zMarkAiRunThoughtBody,
   zMarkAiRunThoughtPath,
   zMarkAiRunThoughtResponse,
+  zMarkCaptureChangedPath,
+  zMarkCaptureChangedResponse,
   zMarkRedFlagInnocentBody,
   zMarkRedFlagInnocentPath,
   zMarkRedFlagInnocentResponse,
@@ -1695,6 +1717,8 @@ import {
   zPutNotificationPrefsResponse,
   zPutResearchSettingsBody,
   zPutResearchSettingsResponse,
+  zRecheckCapturePath,
+  zRecheckCaptureResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
   zRecordRemovalPath,
@@ -1833,6 +1857,9 @@ import {
   zUpdateAppUserBody,
   zUpdateAppUserPath,
   zUpdateAppUserResponse,
+  zUpdateCaptureBody,
+  zUpdateCapturePath,
+  zUpdateCaptureResponse,
   zUpdateClaimEndpointBody,
   zUpdateClaimEndpointPath,
   zUpdateClaimEndpointResponse,
@@ -2353,6 +2380,64 @@ export const getCapture = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Update Capture
+ *
+ * Set a link only's reason (dead link, blocked, timed out, tool error) when the person knows better.
+ */
+export const updateCapture = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateCaptureData, ThrowOnError>,
+): RequestResult<UpdateCaptureResponses, UpdateCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    UpdateCaptureResponses,
+    UpdateCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateCaptureBody,
+          path: zUpdateCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateCaptureResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Capture Latest
+ *
+ * Capture the page as it is now, as a new capture: both stay in the case. Answers with the new capture.
+ */
+export const captureLatest = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureLatestData, ThrowOnError>,
+): RequestResult<CaptureLatestResponses, CaptureLatestErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CaptureLatestResponses,
+    CaptureLatestErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureLatestPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureLatestResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/capture-latest',
+    ...options,
+  });
+
+/**
  * Get Capture File
  *
  * One kept file, downloaded as it was hashed (its SHA-256 is on the capture), never shown inline: a kept page is
@@ -2375,6 +2460,69 @@ export const getCaptureFile = <ThrowOnError extends boolean = false>(
         })
         .parseAsync(data),
     url: '/api/captures/{capture_id}/files/{name}',
+    ...options,
+  });
+
+/**
+ * Follow Capture
+ *
+ * Check this capture's page again: never, daily or weekly (a Following page monitor tied to the capture; version 1
+ * is the page as captured). For a link only, weekly is "Ask again in 7 days".
+ */
+export const followCapture = <ThrowOnError extends boolean = false>(
+  options: Options<FollowCaptureData, ThrowOnError>,
+): RequestResult<FollowCaptureResponses, FollowCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    FollowCaptureResponses,
+    FollowCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zFollowCaptureBody,
+          path: zFollowCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFollowCaptureResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/follow',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Mark Capture Changed
+ *
+ * Mark the capture's source "changed since capture", with who said so and which version they saw.
+ */
+export const markCaptureChanged = <ThrowOnError extends boolean = false>(
+  options: Options<MarkCaptureChangedData, ThrowOnError>,
+): RequestResult<
+  MarkCaptureChangedResponses,
+  MarkCaptureChangedErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MarkCaptureChangedResponses,
+    MarkCaptureChangedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zMarkCaptureChangedPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMarkCaptureChangedResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/mark-changed',
     ...options,
   });
 
@@ -2407,6 +2555,34 @@ export const collectCaptureMedia = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCollectCaptureMediaResponse.parseAsync(data),
     url: '/api/captures/{capture_id}/media',
+    ...options,
+  });
+
+/**
+ * Recheck Capture
+ *
+ * One visit now: the live page's main text compared with the last version. Nothing is kept as evidence; a
+ * different text is kept as a version, not captured.
+ */
+export const recheckCapture = <ThrowOnError extends boolean = false>(
+  options: Options<RecheckCaptureData, ThrowOnError>,
+): RequestResult<RecheckCaptureResponses, RecheckCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RecheckCaptureResponses,
+    RecheckCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRecheckCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRecheckCaptureResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/recheck',
     ...options,
   });
 

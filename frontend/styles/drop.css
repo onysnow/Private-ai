@@ -264,3 +264,27 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 @media (max-width: 1200px) { .dp { grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: 'tabs tabs' 'left line' 'right line' 'strip strip'; grid-template-rows: auto auto minmax(0, 1fr) auto; } }
 @media (max-width: 800px) { .dp { display: flex; flex-direction: column; height: auto; } }
 .dp-empty .cp-paste { margin-top: 12px; }
+
+/* Re-check, What changed, Check again later (INTAKE_3, app/services/capture_follow.py) */
+.cp-r { margin-left: auto; text-transform: none; letter-spacing: 0; color: var(--text-muted); }
+.cp-st.warn { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 12%, var(--surface-1)); }
+.cp-st.warn .cp-v { color: var(--accent-1); }
+.cp-versions { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cp-versions li { position: relative; padding-left: 20px; font-size: 12px; }
+.cp-versions li::before { content: ""; position: absolute; left: 2px; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--status-supported); }
+.cp-versions li.amber::before { background: var(--accent-1); }
+.cp-versions li span { display: block; color: var(--text-muted); }
+.cp-diff { border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; background: var(--surface-2); font: 14px/1.55 var(--font-read, Georgia, serif); }
+.cp-diff p { margin: 4px 0; }
+.cp-diff del { color: var(--status-disputed); background: color-mix(in srgb, var(--status-disputed) 14%, transparent); }
+.cp-diff ins { text-decoration: none; color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 14%, transparent); border-bottom: 1px dashed currentColor; }
+.cp-diff .cp-same { font: 500 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.cp-both { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cp-both pre { margin: 4px 0 0; white-space: pre-wrap; font: 12.5px/1.5 var(--font-read, Georgia, serif); max-height: 260px; overflow: auto; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; background: var(--surface-2); }
+.cp-seg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 4px; }
+.cp-seg button { all: unset; cursor: pointer; padding: 4px 12px; border-radius: 99px; border: 1px solid var(--line); font-size: 12px; color: var(--text); }
+.cp-seg button[aria-checked="true"] { border-color: var(--accent-1); color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 14%, transparent); }
+.cp-seg button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.cp-seg small { color: var(--text-muted); font-size: 11px; }
+.cp-acts button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 900px) { .cp-both { grid-template-columns: 1fr; } }

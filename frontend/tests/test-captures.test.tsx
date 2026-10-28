@@ -213,3 +213,81 @@ describe('Links & captures', () => {
     expect(screen.getByText(/Visiting the page once, from this computer, in a fresh browser with no stored cookies/)).toBeInTheDocument();
   });
 });
+
+describe('Checking a captured page again (INTAKE_3)', () => {
+  const follow = (over: Partial<NonNullable<CaptureOut['follow']>> = {}): NonNullable<CaptureOut['follow']> => ({
+    monitor_id: 'm1', every: 'weekly', health: 'works', health_detail: null, last_checked_at: '2026-10-19T10:16:20', next_check_at: '2026-10-26T10:16:20',
+    checks: [{state: 'ok', text: 'Answered 200 in 0.8 s', status: 200, seconds: 0.8}, {state: 'warn', text: 'Text differs from the last version · 2 lines'}],
+    leaves: 'One request a week to fernhill-holdings.example. The site sees a visit from this computer\'s address. Only the page\'s main text is compared.',
+    state: 'changed', item_id: 'i2', marked_changed: null, captured_text: 'Fernhill Ltd is owned by Harbour Nominees Ltd.', live_text: 'Fernhill Ltd is a privately held company.',
+    versions: [{number: 1, seen_at: '2026-10-12T08:31:00', captured: true, capture_id: 'c1', text_sha256: 'a3f907c2'.padEnd(60, '0') + '5d1e', lines_changed: 0},
+      {number: 2, seen_at: '2026-10-19T10:16:20', captured: false, capture_id: null, text_sha256: 'f'.repeat(64), lines_changed: 2}],
+    changes: [{unchanged: 0, segments: [{op: 'same', text: 'Fernhill Ltd is '}, {op: 'del', text: 'owned by Harbour Nominees Ltd.'}, {op: 'ins', text: 'a privately held company.'}]}],
+    ...over,
+  });
+
+  it('shows a page changed since its capture word by word, and captures version 2 keeping both', async () => {
+    const changed = capture({follow: follow()});
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [changed],
+      'POST /api/captures/c1/capture-latest': {status: 202, body: capture({id: 'c2', status: 'queued', outcome: null})},
+      'POST /api/captures/c1/mark-changed': capture({follow: follow({marked_changed: {at: '2026-10-19T10:17:00', by: 'local-owner', state: 'changed', version: 2}})}),
+      'PUT /api/captures/c1/follow': capture({follow: follow({every: 'daily'})})});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const main = await screen.findByRole('region', {name: 'The chosen capture'});
+    expect(within(main).getByText('Changed since capture')).toBeInTheDocument();
+    const recheck = within(main).getByRole('region', {name: 'Re-check'});
+    expect(within(recheck).getAllByRole('listitem').map(li => li.textContent).slice(0, 4))
+      .toEqual(['Link checked✓', 'Page fetched✓ 0.8 s · 200', 'Text read✓', 'Compared with v1! 2 lines differ']);
+    expect(recheck).toHaveTextContent('Version 2 · seen 2026-10-19 10:16, not captured');
+    expect(recheck).toHaveTextContent('Nothing is saved until you say so.');
+    const what = within(main).getByRole('region', {name: 'What changed'});
+    expect(what.querySelector('del')).toHaveTextContent('owned by Harbour Nominees Ltd.');
+    expect(what.querySelector('ins')).toHaveTextContent('a privately held company.');
+    await user.click(within(what).getByRole('button', {name: 'Side by side'}));
+    expect(what).toHaveTextContent('Version 1 · captured');
+    await user.click(within(what).getByRole('button', {name: 'Mark source “changed”'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/mark-changed')).toHaveLength(1));
+    await user.click(within(what).getByRole('button', {name: 'Capture version 2 · keeps both'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/capture-latest')).toHaveLength(1));
+    const again = screen.getByRole('region', {name: 'Check again later'});
+    expect(within(again).getByRole('radio', {name: 'Weekly'})).toHaveAttribute('aria-checked', 'true');
+    await user.click(within(again).getByRole('radio', {name: 'Daily'}));
+    await waitFor(() => expect(api.calls('PUT /api/captures/c1/follow')).toHaveLength(1));
+    expect(api.calls('PUT /api/captures/c1/follow')[0].body).toEqual({every: 'daily'});
+    expect(captureState(changed)).toMatchObject({word: 'Changed since capture', tone: 'amber'});
+    expect(captureState(capture({follow: follow({state: 'gone'})}))).toMatchObject({word: 'Gone', tone: 'bad'});
+  });
+
+  it('re-checks a saved page from its receipt', async () => {
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture()],
+      'POST /api/captures/c1/recheck': capture({follow: follow({state: 'same', every: 'never', next_check_at: null, changes: [], versions: [follow().versions[0]]})})});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const receipt = await screen.findByRole('region', {name: 'Capture receipt'});
+    await user.click(within(receipt).getByRole('button', {name: 'Re-check now'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/recheck')).toHaveLength(1));
+  });
+
+  it('lets a person give a link only its reason and ask again in 7 days', async () => {
+    const only = capture({outcome: 'link_only', suite_outcome: 'UNABLE_TO_OBTAIN', reason: 'The site answered HTTP 404', files: [], document_id: null,
+      displayed: {}, http_status: 404, reason_kind: 'dead_link', stages: stages(['done', 'stopped', 'skipped', 'skipped', 'skipped', 'skipped', 'skipped'])});
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [only],
+      'PATCH /api/captures/c1': {...only, reason_kind: 'blocked', reason_kind_by: 'local-owner'},
+      'PUT /api/captures/c1/follow': {...only, follow: follow({state: 'unchecked', last_checked_at: null, versions: [], changes: []})}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const outcome = await screen.findByRole('region', {name: 'Link only'});
+    const reasons = within(outcome).getByRole('radiogroup', {name: 'Why it could not be kept'});
+    expect(within(reasons).getByRole('radio', {name: 'Dead link'})).toHaveAttribute('aria-checked', 'true');
+    expect(reasons).toHaveTextContent('read from the reply');
+    await user.click(within(reasons).getByRole('radio', {name: 'Blocked'}));
+    await waitFor(() => expect(api.calls('PATCH /api/captures/c1')[0]?.body).toEqual({reason_kind: 'blocked'}));
+    await user.click(within(outcome).getByRole('button', {name: 'Ask again in 7 days'}));
+    await waitFor(() => expect(api.calls('PUT /api/captures/c1/follow')[0]?.body).toEqual({every: 'weekly'}));
+    expect(within(outcome).getByRole('button', {name: /Look for a copy elsewhere/})).toBeDisabled();
+  });
+});

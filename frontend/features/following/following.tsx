@@ -20,7 +20,7 @@ import type {FollowingOut, MonitorItemOut, MonitorOut, PageVersionOut} from '../
 import {apiTime} from '../../lib/timestamps';
 
 const TAG: Record<MonitorOut['kind'], string> = {feed: 'FEED', sitemap: 'MAP', page: 'PAGE', podcast: 'POD', account: 'OPEN', closed: 'LINK'};
-const EVERY: [number, string][] = [[15, '15 min'], [30, '30 min'], [60, 'hourly'], [1440, 'daily']];
+const EVERY: [number, string][] = [[15, '15 min'], [30, '30 min'], [60, 'hourly'], [1440, 'daily'], [10080, 'weekly']];
 const everyWord = (m: number) => EVERY.find(([n]) => n === m)?.[1] ?? `${m} min`;
 const BULK_REASONS = ['Account is deleting posts', 'Page is being edited now', 'Too many in the same hour'];
 const MARK = {ok: '✓', warn: '!', bad: '✕', wait: '·'} as const;
@@ -92,7 +92,7 @@ function SelectedSource({m, investigationId, onChanged}: {m: MonitorOut; investi
       <span className="fl-note">Look every</span>
       <span className="fl-rad" role="radiogroup" aria-label="Look every">{EVERY.map(([n, label]) =>
         <button key={n} type="button" role="radio" aria-checked={m.every_minutes === n} disabled={Boolean(busy)}
-          onClick={() => void act('every', () => updateMonitor({path: {monitor_id: m.id}, body: {every_minutes: n as 15 | 30 | 60 | 1440}, throwOnError: true}))}>{label}</button>)}</span>
+          onClick={() => void act('every', () => updateMonitor({path: {monitor_id: m.id}, body: {every_minutes: n as 15 | 30 | 60 | 1440 | 10080}, throwOnError: true}))}>{label}</button>)}</span>
       <span className="fl-note">Route</span>
       <span className="fl-rad" role="radiogroup" aria-label="Route">{(['direct', 'tor'] as const).map(r =>
         <button key={r} type="button" role="radio" aria-checked={m.route === r} disabled={Boolean(busy)} title={r === 'tor' ? 'Through a Tor you run on this computer; the app ships none' : undefined}

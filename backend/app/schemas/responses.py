@@ -5091,6 +5091,48 @@ class CaptureExchangeOut(ResponseModel):
     response: CaptureMessageOut | None = None
 
 
+class CaptureVersionOut(ResponseModel):
+    number: int
+    seen_at: Timestamp
+    captured: bool
+    capture_id: str | None = None
+    text_sha256: str
+    lines_changed: int
+
+
+class WordSegmentOut(ResponseModel):
+    op: Literal["same", "del", "ins"]
+    text: str
+
+
+class WordChangeOut(ResponseModel):
+    """A changed stretch of the page, word by word; `unchanged` counts the same lines between two changes."""
+    unchanged: int
+    segments: list[WordSegmentOut]
+
+
+class CaptureFollowOut(ResponseModel):
+    """Checking a captured page again (INTAKE_3). `state`: unchecked, same, changed (since the capture), gone (now 404
+    or 410), broken (could not be read), or for a link only, not_yet / answers (the address answers again: its page
+    waits in Following for a person to capture). `every`: never, daily or weekly. `changes` compare the captured
+    version with the latest, words only, as served."""
+    monitor_id: str
+    every: Literal["never", "daily", "weekly"]
+    health: str
+    health_detail: str | None = None
+    checks: list["MonitorCheckOut"]
+    last_checked_at: Timestamp | None = None
+    next_check_at: Timestamp | None = None
+    leaves: str
+    state: Literal["unchecked", "same", "changed", "gone", "broken", "not_yet", "answers"]
+    versions: list[CaptureVersionOut]
+    changes: list[WordChangeOut]
+    captured_text: str | None = None
+    live_text: str | None = None
+    item_id: str | None = None
+    marked_changed: dict[str, Any] | None = None
+
+
 class CaptureOut(ResponseModel):
     """A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
     not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why)."""
@@ -5124,6 +5166,10 @@ class CaptureOut(ResponseModel):
     media: dict[str, Any]
     media_document_id: str | None = None
     job: BackgroundJobOut | None = None
+    # A link only's reason in one word, read from the reply or set by a person (`reason_kind_by`).
+    reason_kind: Literal["dead_link", "blocked", "timed_out", "tool_error"] | None = None
+    reason_kind_by: str | None = None
+    follow: CaptureFollowOut | None = None
 
 
 # --- The Drop (app/services/drop.py) ---------------------------------------------------------
@@ -5784,6 +5830,9 @@ class SuiteCatalogOut(ResponseModel):
 class MonitorCheckOut(ResponseModel):
     state: Literal["ok", "warn", "bad", "wait"]
     text: str
+    # On the line for the request itself: the status the source answered and how long it took.
+    status: int | None = None
+    seconds: float | None = None
 
 
 class MonitorOut(ResponseModel):
@@ -5892,3 +5941,8 @@ class PageVersionOut(ResponseModel):
     layout_changes: list[dict[str, Any]]
     captured: bool
     capture_id: str | None = None
+
+
+# CaptureFollowOut names MonitorCheckOut, which is defined further down (Following).
+CaptureFollowOut.model_rebuild()
+CaptureOut.model_rebuild()

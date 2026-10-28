@@ -907,6 +907,16 @@ class LockReasonIn(BaseModel):
     reason: str | None = None   # idle | hide | sleep | button
 
 
+class CaptureFollowIn(BaseModel):
+    """Check a captured page again: never, daily or weekly (the first check is one interval from now)."""
+    every: Literal["never", "daily", "weekly"]
+
+
+class CaptureUpdate(BaseModel):
+    """A link only's reason, when the person knows better than the reply."""
+    reason_kind: Literal["dead_link", "blocked", "timed_out", "tool_error"]
+
+
 class MonitorCreate(BaseModel):
     """Something to follow (ADR-0022): a web address (a feed, sitemap, podcast or page; a page that names its feed is
     followed through the feed), a Bluesky handle (@name.bsky.social) or a Mastodon account (@name@server)."""
@@ -916,7 +926,7 @@ class MonitorCreate(BaseModel):
 
 
 class MonitorUpdate(BaseModel):
-    every_minutes: Literal[15, 30, 60, 1440] | None = None
+    every_minutes: Literal[15, 30, 60, 1440, 10080] | None = None
     route: Literal["direct", "tor"] | None = None
     paused: bool | None = None
     # Follow the address the source moved to (its old address answered 301 or 308).

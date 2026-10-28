@@ -28,6 +28,7 @@ import {
   capabilities,
   captureAll,
   captureItem,
+  captureLatest,
   changePassphrase,
   checkConnectorKey,
   checkMonitor,
@@ -94,6 +95,7 @@ import {
   findExtractionLineageEndpoint,
   findingCandidates,
   findOpenalephChildren,
+  followCapture,
   get1Mdb,
   getAiAnalysisCandidateEndpoint,
   getAllRecordTags,
@@ -260,6 +262,7 @@ import {
   makeLeadFromNote,
   makeLeadFromRedFlag,
   markAiRunThought,
+  markCaptureChanged,
   markRedFlagInnocent,
   markStoryReady,
   me,
@@ -290,6 +293,7 @@ import {
   putNotificationChannel,
   putNotificationPrefs,
   putResearchSettings,
+  recheckCapture,
   recheckHash,
   recordRemoval,
   recordStoryGate,
@@ -350,6 +354,7 @@ import {
   unlockPin,
   untagARecord,
   updateAppUser,
+  updateCapture,
   updateClaimEndpoint,
   updateDeckEndpoint,
   updateEntity,
@@ -418,6 +423,9 @@ import type {
   CaptureItemData,
   CaptureItemError,
   CaptureItemResponse,
+  CaptureLatestData,
+  CaptureLatestError,
+  CaptureLatestResponse,
   ChangePassphraseData,
   ChangePassphraseError,
   ChangePassphraseResponse,
@@ -616,6 +624,9 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenError,
   FindOpenalephChildrenResponse,
+  FollowCaptureData,
+  FollowCaptureError,
+  FollowCaptureResponse,
   Get1MdbData,
   Get1MdbError,
   Get1MdbResponse,
@@ -1113,6 +1124,9 @@ import type {
   MarkAiRunThoughtData,
   MarkAiRunThoughtError,
   MarkAiRunThoughtResponse,
+  MarkCaptureChangedData,
+  MarkCaptureChangedError,
+  MarkCaptureChangedResponse,
   MarkRedFlagInnocentData,
   MarkRedFlagInnocentError,
   MarkRedFlagInnocentResponse,
@@ -1199,6 +1213,9 @@ import type {
   PutResearchSettingsData,
   PutResearchSettingsError,
   PutResearchSettingsResponse,
+  RecheckCaptureData,
+  RecheckCaptureError,
+  RecheckCaptureResponse,
   RecheckHashData,
   RecheckHashError,
   RecheckHashResponse,
@@ -1379,6 +1396,9 @@ import type {
   UpdateAppUserData,
   UpdateAppUserError,
   UpdateAppUserResponse,
+  UpdateCaptureData,
+  UpdateCaptureError,
+  UpdateCaptureResponse,
   UpdateClaimEndpointData,
   UpdateClaimEndpointError,
   UpdateClaimEndpointResponse,
@@ -1867,6 +1887,64 @@ export const getCaptureOptions = (options: Options<GetCaptureData>) =>
     queryKey: getCaptureQueryKey(options),
   });
 
+/**
+ * Update Capture
+ *
+ * Set a link only's reason (dead link, blocked, timed out, tool error) when the person knows better.
+ */
+export const updateCaptureMutation = (
+  options?: Partial<Options<UpdateCaptureData>>,
+): UseMutationOptions<
+  UpdateCaptureResponse,
+  UpdateCaptureError,
+  Options<UpdateCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateCaptureResponse,
+    UpdateCaptureError,
+    Options<UpdateCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateCapture({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Capture Latest
+ *
+ * Capture the page as it is now, as a new capture: both stay in the case. Answers with the new capture.
+ */
+export const captureLatestMutation = (
+  options?: Partial<Options<CaptureLatestData>>,
+): UseMutationOptions<
+  CaptureLatestResponse,
+  CaptureLatestError,
+  Options<CaptureLatestData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureLatestResponse,
+    CaptureLatestError,
+    Options<CaptureLatestData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureLatest({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getCaptureFileQueryKey = (options: Options<GetCaptureFileData>) =>
   createQueryKey('getCaptureFile', options);
 
@@ -1896,6 +1974,65 @@ export const getCaptureFileOptions = (options: Options<GetCaptureFileData>) =>
   });
 
 /**
+ * Follow Capture
+ *
+ * Check this capture's page again: never, daily or weekly (a Following page monitor tied to the capture; version 1
+ * is the page as captured). For a link only, weekly is "Ask again in 7 days".
+ */
+export const followCaptureMutation = (
+  options?: Partial<Options<FollowCaptureData>>,
+): UseMutationOptions<
+  FollowCaptureResponse,
+  FollowCaptureError,
+  Options<FollowCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FollowCaptureResponse,
+    FollowCaptureError,
+    Options<FollowCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await followCapture({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Mark Capture Changed
+ *
+ * Mark the capture's source "changed since capture", with who said so and which version they saw.
+ */
+export const markCaptureChangedMutation = (
+  options?: Partial<Options<MarkCaptureChangedData>>,
+): UseMutationOptions<
+  MarkCaptureChangedResponse,
+  MarkCaptureChangedError,
+  Options<MarkCaptureChangedData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MarkCaptureChangedResponse,
+    MarkCaptureChangedError,
+    Options<MarkCaptureChangedData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await markCaptureChanged({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Collect Capture Media
  *
  * Collect the one video or audio item on a captured page, logged out (app/services/media_links.py), keep it
@@ -1915,6 +2052,36 @@ export const collectCaptureMediaMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await collectCaptureMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Recheck Capture
+ *
+ * One visit now: the live page's main text compared with the last version. Nothing is kept as evidence; a
+ * different text is kept as a version, not captured.
+ */
+export const recheckCaptureMutation = (
+  options?: Partial<Options<RecheckCaptureData>>,
+): UseMutationOptions<
+  RecheckCaptureResponse,
+  RecheckCaptureError,
+  Options<RecheckCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RecheckCaptureResponse,
+    RecheckCaptureError,
+    Options<RecheckCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await recheckCapture({
         ...options,
         ...fnOptions,
         throwOnError: true,

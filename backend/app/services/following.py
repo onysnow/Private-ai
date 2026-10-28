@@ -44,7 +44,7 @@ from app.models.following import Monitor, MonitorItem, PageVersion
 logger = logging.getLogger("journalism.following")
 
 KINDS = ("feed", "sitemap", "page", "podcast", "account", "closed")
-EVERY_MINUTES = (15, 30, 60, 1440)
+EVERY_MINUTES = (15, 30, 60, 1440, 10080)
 ROUTES = ("direct", "tor")
 USER_AGENT = "JournalismWorkbench/1.0 (following open sources; honours robots.txt)"
 MAX_SOURCE_BYTES = 20 * 1024 * 1024
@@ -503,6 +503,9 @@ def _sha(text: str) -> str:
 
 
 def _schedule(monitor: Monitor, now: datetime, *, after: timedelta | None = None) -> None:
+    if monitor.every_minutes == 0 and after is None:
+        monitor.next_check_at = None  # asked only when a person presses Re-check
+        return
     every = timedelta(minutes=monitor.every_minutes or 30)
     # A little jitter so many monitors on one host do not all ask in the same minute.
     jitter = timedelta(seconds=random.uniform(0, min(every.total_seconds() * 0.1, 300)))
@@ -635,7 +638,8 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
         _schedule(monitor, now)
         db.commit()
         return monitor
-    checks = [{"state": "ok", "text": f"Answered {got.status} in {got.seconds:.1f} s"}]
+    checks = [{"state": "ok", "text": f"Answered {got.status} in {got.seconds:.1f} s", "status": got.status,
+               "seconds": round(got.seconds, 2)}]
     if got.moved_to:
         monitor.health, monitor.moved_to = "moved", got.moved_to
         monitor.health_detail = f"moved: the old address answers {got.status} → {got.moved_to}"
@@ -658,7 +662,8 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
         return monitor
     if got.status != 200:
         monitor.health, monitor.health_detail = "broken", f"answered {got.status}"
-        monitor.checks = [{"state": "bad", "text": f"Answered {got.status}"}]
+        monitor.checks = [{"state": "bad", "text": f"Answered {got.status}", "status": got.status,
+                           "seconds": round(got.seconds, 2)}]
         _schedule(monitor, now)
         db.commit()
         return monitor
@@ -863,7 +868,8 @@ def overview(db: Session, investigation_id: str) -> dict[str, Any]:
 
 def leaves(monitor: Monitor) -> str:
     host = urlsplit(monitor.url).hostname or monitor.url
-    how = {15: "every 15 minutes", 30: "every 30 minutes", 60: "an hour", 1440: "a day"}.get(monitor.every_minutes, "")
+    how = {15: "every 15 minutes", 30: "every 30 minutes", 60: "an hour", 1440: "a day", 10080: "a week",
+           0: "only when you ask"}.get(monitor.every_minutes, "")
     if monitor.kind == "closed":
         return "Nothing is fetched: a closed platform has no monitor."
     if monitor.health == "moved":

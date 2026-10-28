@@ -19,7 +19,8 @@ from app.models.base import uid
 class Monitor(Base):
     """One source a case follows. `kind`: feed (RSS or Atom, a YouTube channel feed too), sitemap, page (one page's main
     text), podcast (a feed with audio), account (an open-protocol public account: Bluesky or Mastodon) or closed (a
-    closed platform: no monitor, link capture only). `every_minutes` is 15, 30, 60 or 1440; `route` is "direct" or
+    closed platform: no monitor, link capture only). `every_minutes` is 15, 30, 60, 1440 or 10080 (a week), or 0 for
+    "only when a person asks"; `route` is "direct" or
     "tor" (a Tor the reporter runs on this computer). `health` is "works" (the last check read the source), "broken"
     (`health_detail` says why; a moved address waits in `moved_to` until a person accepts it, and nothing is asked
     meanwhile), "paused" or "unchecked". `checks` are the last check's lines for the screen: [{state, text}].
@@ -49,6 +50,8 @@ class Monitor(Base):
     next_check_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
     created_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+    # The capture whose page this monitor checks again ("Check again later", INTAKE_3): version 1 is the captured page.
+    capture_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
 
 
 class MonitorItem(Base):

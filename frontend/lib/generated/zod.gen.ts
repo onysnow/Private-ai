@@ -860,6 +860,15 @@ export const zCaptureFileOut = z.object({
 });
 
 /**
+ * CaptureFollowIn
+ *
+ * Check a captured page again: never, daily or weekly (the first check is one interval from now).
+ */
+export const zCaptureFollowIn = z.object({
+  every: z.enum(['never', 'daily', 'weekly']),
+});
+
+/**
  * CaptureMessageOut
  *
  * A request line or status line with a few of its headers ([name, value] pairs).
@@ -902,59 +911,28 @@ export const zCaptureStageOut = z.object({
 });
 
 /**
- * CaptureOut
+ * CaptureUpdate
  *
- * A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
- * not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).
+ * A link only's reason, when the person knows better than the reply.
  */
-export const zCaptureOut = z.object({
-  captured_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullish(),
-  case_record_id: z.string().nullish(),
-  collector: z.string().nullish(),
-  content_verified: z.string(),
-  displayed: zCaptureDisplayedOut,
-  document_id: z.string().nullish(),
-  exchange: zCaptureExchangeOut,
-  files: z.array(zCaptureFileOut),
-  final_url: z.string().nullish(),
-  finished_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullish(),
-  http_status: z.int().nullish(),
-  id: z.string(),
-  investigation_id: z.string(),
-  job: zBackgroundJobOut.nullish(),
-  job_id: z.string().nullish(),
-  media: z.record(z.string(), z.unknown()),
-  media_document_id: z.string().nullish(),
-  outcome: z.enum(['saved', 'not_seen', 'link_only']).nullish(),
-  reason: z.string().nullish(),
-  requested_at: z
+export const zCaptureUpdate = z.object({
+  reason_kind: z.enum(['dead_link', 'blocked', 'timed_out', 'tool_error']),
+});
+
+/**
+ * CaptureVersionOut
+ */
+export const zCaptureVersionOut = z.object({
+  capture_id: z.string().nullish(),
+  captured: z.boolean(),
+  lines_changed: z.int(),
+  number: z.int(),
+  seen_at: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
-  robots_disallowed: z.boolean().nullish(),
-  source_id: z.string().nullish(),
-  stages: z.array(zCaptureStageOut),
-  started_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullish(),
-  status: z.enum(['queued', 'capturing', 'finished', 'failed']),
-  suite_outcome: z.enum(['OBTAINED', 'UNABLE_TO_OBTAIN']).nullish(),
-  tool: z.string().nullish(),
-  url: z.string(),
+  text_sha256: z.string(),
 });
 
 /**
@@ -5359,7 +5337,9 @@ export const zMoneyCheckOut = z.object({
  * MonitorCheckOut
  */
 export const zMonitorCheckOut = z.object({
+  seconds: z.number().nullish(),
   state: z.enum(['ok', 'warn', 'bad', 'wait']),
+  status: z.int().nullish(),
   text: z.string(),
 });
 
@@ -5499,7 +5479,13 @@ export const zFollowingOut = z.object({
 export const zMonitorUpdate = z.object({
   accept_move: z.boolean().nullish(),
   every_minutes: z
-    .union([z.literal(15), z.literal(30), z.literal(60), z.literal(1440)])
+    .union([
+      z.literal(15),
+      z.literal(30),
+      z.literal(60),
+      z.literal(1440),
+      z.literal(10080),
+    ])
     .nullish(),
   paused: z.boolean().nullish(),
   route: z.enum(['direct', 'tor']).nullish(),
@@ -9925,6 +9911,129 @@ export const zWireOut = z.object({
 });
 
 /**
+ * WordSegmentOut
+ */
+export const zWordSegmentOut = z.object({
+  op: z.enum(['same', 'del', 'ins']),
+  text: z.string(),
+});
+
+/**
+ * WordChangeOut
+ *
+ * A changed stretch of the page, word by word; `unchanged` counts the same lines between two changes.
+ */
+export const zWordChangeOut = z.object({
+  segments: z.array(zWordSegmentOut),
+  unchanged: z.int(),
+});
+
+/**
+ * CaptureFollowOut
+ *
+ * Checking a captured page again (INTAKE_3). `state`: unchecked, same, changed (since the capture), gone (now 404
+ * or 410), broken (could not be read), or for a link only, not_yet / answers (the address answers again: its page
+ * waits in Following for a person to capture). `every`: never, daily or weekly. `changes` compare the captured
+ * version with the latest, words only, as served.
+ */
+export const zCaptureFollowOut = z.object({
+  captured_text: z.string().nullish(),
+  changes: z.array(zWordChangeOut),
+  checks: z.array(zMonitorCheckOut),
+  every: z.enum(['never', 'daily', 'weekly']),
+  health: z.string(),
+  health_detail: z.string().nullish(),
+  item_id: z.string().nullish(),
+  last_checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  leaves: z.string(),
+  live_text: z.string().nullish(),
+  marked_changed: z.record(z.string(), z.unknown()).nullish(),
+  monitor_id: z.string(),
+  next_check_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  state: z.enum([
+    'unchecked',
+    'same',
+    'changed',
+    'gone',
+    'broken',
+    'not_yet',
+    'answers',
+  ]),
+  versions: z.array(zCaptureVersionOut),
+});
+
+/**
+ * CaptureOut
+ *
+ * A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
+ * not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).
+ */
+export const zCaptureOut = z.object({
+  captured_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  case_record_id: z.string().nullish(),
+  collector: z.string().nullish(),
+  content_verified: z.string(),
+  displayed: zCaptureDisplayedOut,
+  document_id: z.string().nullish(),
+  exchange: zCaptureExchangeOut,
+  files: z.array(zCaptureFileOut),
+  final_url: z.string().nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  follow: zCaptureFollowOut.nullish(),
+  http_status: z.int().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  job: zBackgroundJobOut.nullish(),
+  job_id: z.string().nullish(),
+  media: z.record(z.string(), z.unknown()),
+  media_document_id: z.string().nullish(),
+  outcome: z.enum(['saved', 'not_seen', 'link_only']).nullish(),
+  reason: z.string().nullish(),
+  reason_kind: z
+    .enum(['dead_link', 'blocked', 'timed_out', 'tool_error'])
+    .nullish(),
+  reason_kind_by: z.string().nullish(),
+  requested_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  robots_disallowed: z.boolean().nullish(),
+  source_id: z.string().nullish(),
+  stages: z.array(zCaptureStageOut),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  status: z.enum(['queued', 'capturing', 'finished', 'failed']),
+  suite_outcome: z.enum(['OBTAINED', 'UNABLE_TO_OBTAIN']).nullish(),
+  tool: z.string().nullish(),
+  url: z.string(),
+});
+
+/**
  * WriteupCreate
  */
 export const zWriteupCreate = z.object({
@@ -10206,10 +10315,50 @@ export const zGetCapturePath = z.object({
  */
 export const zGetCaptureResponse = zCaptureOut;
 
+export const zUpdateCaptureBody = zCaptureUpdate;
+
+export const zUpdateCapturePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateCaptureResponse = zCaptureOut;
+
+export const zCaptureLatestPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * The new capture finished before the reply (developer mode)
+ */
+export const zCaptureLatestResponse = zCaptureOut;
+
 export const zGetCaptureFilePath = z.object({
   capture_id: z.string(),
   name: z.string(),
 });
+
+export const zFollowCaptureBody = zCaptureFollowIn;
+
+export const zFollowCapturePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFollowCaptureResponse = zCaptureOut;
+
+export const zMarkCaptureChangedPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMarkCaptureChangedResponse = zCaptureOut;
 
 export const zCollectCaptureMediaPath = z.object({
   capture_id: z.string(),
@@ -10219,6 +10368,15 @@ export const zCollectCaptureMediaPath = z.object({
  * Already collected, or the collection finished before the reply (developer mode)
  */
 export const zCollectCaptureMediaResponse = zCaptureOut;
+
+export const zRecheckCapturePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRecheckCaptureResponse = zCaptureOut;
 
 export const zGetCaseRecordPath = z.object({
   case_record_id: z.string(),

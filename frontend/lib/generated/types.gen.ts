@@ -2030,6 +2030,98 @@ export type CaptureFileOut = {
 };
 
 /**
+ * CaptureFollowIn
+ *
+ * Check a captured page again: never, daily or weekly (the first check is one interval from now).
+ */
+export type CaptureFollowIn = {
+  /**
+   * Every
+   */
+  every: 'never' | 'daily' | 'weekly';
+};
+
+/**
+ * CaptureFollowOut
+ *
+ * Checking a captured page again (INTAKE_3). `state`: unchecked, same, changed (since the capture), gone (now 404
+ * or 410), broken (could not be read), or for a link only, not_yet / answers (the address answers again: its page
+ * waits in Following for a person to capture). `every`: never, daily or weekly. `changes` compare the captured
+ * version with the latest, words only, as served.
+ */
+export type CaptureFollowOut = {
+  /**
+   * Captured Text
+   */
+  captured_text?: string | null;
+  /**
+   * Changes
+   */
+  changes: Array<WordChangeOut>;
+  /**
+   * Checks
+   */
+  checks: Array<MonitorCheckOut>;
+  /**
+   * Every
+   */
+  every: 'never' | 'daily' | 'weekly';
+  /**
+   * Health
+   */
+  health: string;
+  /**
+   * Health Detail
+   */
+  health_detail?: string | null;
+  /**
+   * Item Id
+   */
+  item_id?: string | null;
+  /**
+   * Last Checked At
+   */
+  last_checked_at?: string | null;
+  /**
+   * Leaves
+   */
+  leaves: string;
+  /**
+   * Live Text
+   */
+  live_text?: string | null;
+  /**
+   * Marked Changed
+   */
+  marked_changed?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Monitor Id
+   */
+  monitor_id: string;
+  /**
+   * Next Check At
+   */
+  next_check_at?: string | null;
+  /**
+   * State
+   */
+  state:
+    | 'unchecked'
+    | 'same'
+    | 'changed'
+    | 'gone'
+    | 'broken'
+    | 'not_yet'
+    | 'answers';
+  /**
+   * Versions
+   */
+  versions: Array<CaptureVersionOut>;
+};
+
+/**
  * CaptureMessageOut
  *
  * A request line or status line with a few of its headers ([name, value] pairs).
@@ -2094,6 +2186,7 @@ export type CaptureOut = {
    * Finished At
    */
   finished_at?: string | null;
+  follow?: CaptureFollowOut | null;
   /**
    * Http Status
    */
@@ -2129,6 +2222,14 @@ export type CaptureOut = {
    * Reason
    */
   reason?: string | null;
+  /**
+   * Reason Kind
+   */
+  reason_kind?: 'dead_link' | 'blocked' | 'timed_out' | 'tool_error' | null;
+  /**
+   * Reason Kind By
+   */
+  reason_kind_by?: string | null;
   /**
    * Requested At
    *
@@ -2198,6 +2299,50 @@ export type CaptureStageOut = {
    * State
    */
   state: 'done' | 'waiting' | 'stopped' | 'skipped';
+};
+
+/**
+ * CaptureUpdate
+ *
+ * A link only's reason, when the person knows better than the reply.
+ */
+export type CaptureUpdate = {
+  /**
+   * Reason Kind
+   */
+  reason_kind: 'dead_link' | 'blocked' | 'timed_out' | 'tool_error';
+};
+
+/**
+ * CaptureVersionOut
+ */
+export type CaptureVersionOut = {
+  /**
+   * Capture Id
+   */
+  capture_id?: string | null;
+  /**
+   * Captured
+   */
+  captured: boolean;
+  /**
+   * Lines Changed
+   */
+  lines_changed: number;
+  /**
+   * Number
+   */
+  number: number;
+  /**
+   * Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  seen_at: string;
+  /**
+   * Text Sha256
+   */
+  text_sha256: string;
 };
 
 /**
@@ -12978,9 +13123,17 @@ export type MoneyChecksOut = {
  */
 export type MonitorCheckOut = {
   /**
+   * Seconds
+   */
+  seconds?: number | null;
+  /**
    * State
    */
   state: 'ok' | 'warn' | 'bad' | 'wait';
+  /**
+   * Status
+   */
+  status?: number | null;
   /**
    * Text
    */
@@ -13212,7 +13365,7 @@ export type MonitorUpdate = {
   /**
    * Every Minutes
    */
-  every_minutes?: 15 | 30 | 60 | 1440 | null;
+  every_minutes?: 15 | 30 | 60 | 1440 | 10080 | null;
   /**
    * Paused
    */
@@ -21072,6 +21225,36 @@ export type WireQuoteOut = {
 };
 
 /**
+ * WordChangeOut
+ *
+ * A changed stretch of the page, word by word; `unchanged` counts the same lines between two changes.
+ */
+export type WordChangeOut = {
+  /**
+   * Segments
+   */
+  segments: Array<WordSegmentOut>;
+  /**
+   * Unchanged
+   */
+  unchanged: number;
+};
+
+/**
+ * WordSegmentOut
+ */
+export type WordSegmentOut = {
+  /**
+   * Op
+   */
+  op: 'same' | 'del' | 'ins';
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * WriteupCreate
  */
 export type WriteupCreate = {
@@ -21864,6 +22047,94 @@ export type GetCaptureResponses = {
 
 export type GetCaptureResponse = GetCaptureResponses[keyof GetCaptureResponses];
 
+export type UpdateCaptureData = {
+  body: CaptureUpdate;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}';
+};
+
+export type UpdateCaptureErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not a link-only capture
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateCaptureError = UpdateCaptureErrors[keyof UpdateCaptureErrors];
+
+export type UpdateCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type UpdateCaptureResponse =
+  UpdateCaptureResponses[keyof UpdateCaptureResponses];
+
+export type CaptureLatestData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/capture-latest';
+};
+
+export type CaptureLatestErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Capture Latest
+   *
+   * Unprocessable Content
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureLatestError = CaptureLatestErrors[keyof CaptureLatestErrors];
+
+export type CaptureLatestResponses = {
+  /**
+   * The new capture finished before the reply (developer mode)
+   */
+  200: CaptureOut;
+  /**
+   * Successful Response
+   */
+  202: CaptureOut;
+};
+
+export type CaptureLatestResponse =
+  CaptureLatestResponses[keyof CaptureLatestResponses];
+
 export type GetCaptureFileData = {
   body?: never;
   path: {
@@ -21904,6 +22175,93 @@ export type GetCaptureFileResponses = {
    */
   200: unknown;
 };
+
+export type FollowCaptureData = {
+  body: CaptureFollowIn;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/follow';
+};
+
+export type FollowCaptureErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The page is still being captured
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FollowCaptureError = FollowCaptureErrors[keyof FollowCaptureErrors];
+
+export type FollowCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type FollowCaptureResponse =
+  FollowCaptureResponses[keyof FollowCaptureResponses];
+
+export type MarkCaptureChangedData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/mark-changed';
+};
+
+export type MarkCaptureChangedErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The page has not changed since its capture
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MarkCaptureChangedError =
+  MarkCaptureChangedErrors[keyof MarkCaptureChangedErrors];
+
+export type MarkCaptureChangedResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type MarkCaptureChangedResponse =
+  MarkCaptureChangedResponses[keyof MarkCaptureChangedResponses];
 
 export type CollectCaptureMediaData = {
   body?: never;
@@ -21952,6 +22310,50 @@ export type CollectCaptureMediaResponses = {
 
 export type CollectCaptureMediaResponse =
   CollectCaptureMediaResponses[keyof CollectCaptureMediaResponses];
+
+export type RecheckCaptureData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/recheck';
+};
+
+export type RecheckCaptureErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Still being captured, or the address moved
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecheckCaptureError =
+  RecheckCaptureErrors[keyof RecheckCaptureErrors];
+
+export type RecheckCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type RecheckCaptureResponse =
+  RecheckCaptureResponses[keyof RecheckCaptureResponses];
 
 export type GetCaseRecordData = {
   body?: never;
