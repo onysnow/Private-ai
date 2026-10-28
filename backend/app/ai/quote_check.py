@@ -13,7 +13,7 @@ its value or date stated in its found quotes (app/ai/value_check.py), or it
 is removed the same way.
 
 Applies to presentation drafts only: their output format is the
-Workbench's own. The two TAS analysis modules follow their vendored spec.
+Workbench's own. The two TAS analysis modules follow the suite's spec.
 """
 
 from __future__ import annotations

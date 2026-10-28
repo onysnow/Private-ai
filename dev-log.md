@@ -2759,3 +2759,24 @@ already ran eight modules of the other six with the suite's limits and INTEROP's
 base. The generic runner is reverted and #87's four suite commits are on this branch (its screen and feature
 commits are not). Kept from #102: `suite_catalog.py`, a drift test that holds #87's copied value lists to the
 suite's whole lists, `GET /api/suite/catalog`, and the Ollama context-window fix.
+## 2026-10-27: the Authority Suite SDK replaces the vendored suite copy
+
+- `backend/app/ai/authority_suite/` (the plain copy at b1c71e8) is gone. `authority-suite-sdk` is pinned in
+  `backend/requirements.txt` and imported only in `app/ai/authority_sdk.py`; everything the app reads from the suite
+  (module prompts, the control surface, the TAS version, the commit, the likelihood terms) goes through it.
+- `MODULE_FILES` now holds a suite path (a string) for TAS modules and a `Path` for the app-local one.
+  `SUITE_ROOT`, `TAS_ROOT`, `_vendored_suite_commit` and `_vendored_tas_version` are removed.
+- The status block keeps its keys (`authority_suite.present/source/tas_version/modules/control_surface`, `vendored_tas`),
+  so the API contract and the front end are unchanged. `source` now reads `...@d2b2186`.
+- The suite the app runs on moves from b1c71e8 to the SDK's d2b2186. Files the app reads that changed: TAS Module 08
+  (new rule 11, rules 9 and item 11 reworded), TAS Module 02 rule 7, and TAS CHANGELOG. Module 06, CONTROL_SURFACE,
+  OUTPUT_SCHEMAS (TAS, EHS, EGS) and the Standard are identical. TAS version is still 1.12. The meanings in
+  `suite_map.json` were read against b1c71e8; the tests confirm each term is still present in d2b2186, not that its
+  meaning is unchanged.
+- Installing the backend needs git (added to the Dockerfile) and credentials that can read the private SDK repository.
+- Access to the private SDK repository (same day): a read-only deploy key on `onysnow/authority-suite-sdk`. CI jobs that
+  install the backend use the composite action `.github/actions/authority-sdk-access` with the Actions secret
+  `AUTHORITY_SDK_DEPLOY_KEY`. The Docker build gets the key as a BuildKit secret (`authority_sdk_deploy_key`, never copied
+  into a layer; `git` and `openssh-client` are installed in the image). The compose files read it from the file named in
+  `AUTHORITY_SDK_DEPLOY_KEY_FILE` and fall back to the empty `.no-authority-sdk-key`, so compose commands never fail on a
+  missing key; the image build does, until a key is given, because the SDK repository is private.

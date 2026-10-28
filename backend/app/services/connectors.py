@@ -30,7 +30,7 @@ from app.models.domain import (
     ConnectorFinding, ConnectorRun, Entity, Investigation, Lead, LeadProfile, LeadWorkflowEvent,
 )
 from app.schemas.api import ConnectorSearchRequest
-from app.services.outbound import enrich_sent_text, mark_outbound_failed, record_outbound, send_outcome
+from app.services.outbound import destination_of, enrich_sent_text, mark_outbound_failed, record_outbound, send_outcome
 
 
 def persist_connector_findings(db: Session, run: ConnectorRun, investigation_id: str, provider: str, findings: Sequence[ExternalFinding]) -> list[ConnectorFinding]:
@@ -125,7 +125,7 @@ async def run_connector(provider: str, body: ConnectorSearchRequest, db: Session
     db.add(run); db.commit(); db.refresh(run)
     run_id = run.id
     sent_id = record_outbound(db, body.investigation_id, service=provider, kind="search text", value=body.query,
-                              reason="A search you ran", actor="you", outcome=send_outcome(connector), source={"connector_run_id": run_id})
+                              reason="A search you ran", actor="you", outcome=send_outcome(connector), source={"connector_run_id": run_id, "destination": destination_of(connector)})
     try:
         findings = await connector.search(body.query)
         return persist_connector_findings(db, run, body.investigation_id, provider, findings)
@@ -156,7 +156,7 @@ async def enrich_entity(provider: str, entity: Entity, db: Session, *, automatic
                               value=enrich_sent_text(connector, payload),
                               reason=f"Automatic lookup of {entity.caption}" if automatic else f"Look up {entity.caption}",
                               actor="automatic" if automatic else "you", outcome=send_outcome(connector),
-                              source={"connector_run_id": run_id, "entity_id": entity.id})
+                              source={"connector_run_id": run_id, "entity_id": entity.id, "destination": destination_of(connector)})
     try:
         findings = await connector.enrich(payload)
         return persist_connector_findings(db, run, entity.investigation_id, provider, findings)

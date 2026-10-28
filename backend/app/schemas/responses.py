@@ -3033,7 +3033,7 @@ class AiNextRunOut(ResponseModel):
 
 
 class AiAuthoritySuiteOut(ResponseModel):
-    """The vendored Authority System Suite: where it came from and the TAS version the prompts use."""
+    """The Authority System Suite (bundled in the Authority Suite SDK): where it came from and the TAS version the prompts use."""
     present: bool
     source: str | None
     tas_version: str | None
@@ -4816,7 +4816,7 @@ class SuiteMappingOut(ResponseModel):
     file: str | None
     match: Literal["same", "close", "none"]
     note: str
-    found: bool | None  # the term is still in the vendored suite; null when there is no term
+    found: bool | None  # the term is still in the suite; null when there is no term
 
 
 class SuiteUnmappedOut(ResponseModel):
@@ -5592,7 +5592,7 @@ class SuiteCatalogModuleOut(ResponseModel):
     number: str
     title: str
     use_when: str
-    path: str                 # within the vendored suite
+    path: str                 # within the suite
     runs_in: list[str]        # the app runs that use it; empty when none does
     final_audit: bool         # runs in a fresh context, never in the run it audits
 
@@ -5615,6 +5615,6 @@ class SuiteCatalogSystemOut(ResponseModel):
 
 
 class SuiteCatalogOut(ResponseModel):
-    """Every system, module and record of the vendored suite, and which app runs use each module."""
+    """Every system, module and record of the suite, and which app runs use each module."""
     source: str | None
     systems: list[SuiteCatalogSystemOut]

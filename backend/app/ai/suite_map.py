@@ -3,7 +3,7 @@ there is a need for a value that doesn't exist in the Authority system but needs
 to exist, that's a problem").
 
 ``suite_map.json`` maps every value the app uses to the suite term that defines it,
-with the file it is in, read against the vendored suite. Each is:
+with the file it is in, read against the suite the Authority Suite SDK bundles. Each is:
 
 - ``same``: the suite defines this meaning;
 - ``close``: the suite has a nearby idea with a different boundary (the note says how);
@@ -15,7 +15,7 @@ to carry that the app has nowhere to keep (app gaps).
 
 Two checks keep this honest (tests/test_suite_map.py): every value in the app's own
 lists below must be in the map, so a new value cannot arrive unmapped; and every
-mapped term must still be in the vendored suite, so an update that drops one fails.
+mapped term must still be in the suite the SDK bundles, so a pin change that drops one fails.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from app.ai.reasoning import SUITE_ROOT, _vendored_suite_commit, _vendored_tas_version
+from app.ai.authority_sdk import SuiteFileMissing, suite_source, suite_text, tas_version
 
 MAP_FILE = Path(__file__).resolve().parent / "suite_map.json"
 
@@ -85,8 +85,10 @@ def _load() -> dict[str, Any]:
 
 @lru_cache(maxsize=64)
 def _suite_text(file: str) -> str | None:
-    path = SUITE_ROOT / file
-    return path.read_text(encoding="utf-8") if path.is_file() else None
+    try:
+        return suite_text(file)
+    except SuiteFileMissing:
+        return None
 
 
 def _found(file: str | None, term: str | None) -> bool | None:
@@ -97,7 +99,7 @@ def _found(file: str | None, term: str | None) -> bool | None:
 
 
 def coverage() -> dict[str, Any]:
-    """The map with each term checked against the vendored suite, and the values the
+    """The map with each term checked against the suite, and the values the
     app uses that the map does not cover (each one a problem)."""
     data = _load()
     mapped = {(m["vocabulary"], m["value"]) for m in data["mappings"]}
@@ -107,7 +109,7 @@ def coverage() -> dict[str, Any]:
     lacks = [{**m, "found": _found(m["file"], m["suite_term"])} for m in data["suite_requires_app_lacks"]]
     counts = {k: sum(1 for m in mappings if m["match"] == k) for k in ("same", "close", "none")}
     return {
-        "source": _vendored_suite_commit(), "tas_version": _vendored_tas_version(),
+        "source": suite_source(), "tas_version": tas_version(),
         "counts": {**counts, "unmapped": len(unmapped), "app_lacks": sum(1 for m in lacks if not m.get("recorded_in")),
                    "app_recorded": sum(1 for m in lacks if m.get("recorded_in")),
                    "drifted": sum(1 for m in [*mappings, *lacks] if m["found"] is False)},

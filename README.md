@@ -98,9 +98,15 @@ starts skip it unless the OpenAleph version changes.
 
 Elasticsearch wants about 1 GB of heap (`OPENALEPH_ES_JAVA_OPTS`). The AI
 prompts are built from the [Authority System Suite](https://github.com/onysnow/Authority-System-Suite),
-copied into `backend/app/ai/authority_suite/` at the commit named in its
-`VENDORED_FROM` file (code Apache-2.0, documents CC BY 4.0). There are no
-submodules; a plain clone is complete.
+which comes from the [Authority Suite SDK](https://github.com/onysnow/authority-suite-sdk) the backend
+installs (pinned to one commit in `backend/requirements.txt`; the SDK bundles the suite at its own commit,
+code Apache-2.0, documents CC BY 4.0). This repo keeps no copy of the suite. The SDK repository is private,
+so installing the backend needs git and read access to it. Developer mode uses your own git login. CI and the
+Docker image use a read-only deploy key on the SDK repository: the Actions secret `AUTHORITY_SDK_DEPLOY_KEY`
+in CI, and for a local Docker build the path of the key file in `AUTHORITY_SDK_DEPLOY_KEY_FILE` (in `.env`).
+Keep that file outside this repository folder (for example in your `.ssh` folder): the image copies `backend/`,
+so a key kept there would end up inside it. Compose's bake builder will not read a build secret from outside the
+repository, so also set `COMPOSE_BAKE=false` in `.env`.
 
 ### Developer mode (no Docker)
 

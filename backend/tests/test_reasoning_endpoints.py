@@ -18,12 +18,11 @@ from app.ai.governor import governor
 from app.ai.llm_client import LLMProviderError, LLMResponse
 
 
-# The vendored TAS spec is a private submodule; CI without TAS_REPO_TOKEN runs
-# without it (see .github/workflows/backend-postgres-ci.yml). Tests that actually
-# build a prompt from it skip there, mirroring tests/test_tas_submodule_drift.py;
-# gating/queue/settings tests that never read a spec file still run.
-_SUITE_PRESENT = (reasoning_module.TAS_ROOT / "PROMPT_MODULES").exists()
-requires_suite = pytest.mark.skipif(not _SUITE_PRESENT, reason="vendored Authority System Suite missing")
+# The Authority System Suite comes from the Authority Suite SDK, which the backend
+# requires, so it is always present; the marker stays on the tests that build a prompt
+# from it so a broken SDK install skips them visibly instead of erroring.
+_SUITE_PRESENT = reasoning_module.MODULE_FILES["case_synthesis"].exists()
+requires_suite = pytest.mark.skipif(not _SUITE_PRESENT, reason="Authority System Suite missing from the SDK")
 
 
 class _FakeLLMClient:
@@ -298,7 +297,7 @@ def test_settings_status_reports_ai_reasoning_state_without_secrets():
         assert "sk-ant" not in r.text, "settings status must never leak key material"
         if ai["authority_suite"]["present"]:
             assert ai["endpoints_callable"] is True
-            assert ai["authority_suite"]["tas_version"] == "1.12", "TAS version is read from the vendored CHANGELOG's first version heading"
+            assert ai["authority_suite"]["tas_version"] == "1.12", "TAS version is read from the suite's CHANGELOG first version heading"
             assert ai["authority_suite"]["source"].startswith("onysnow/Authority-System-Suite@")
     finally:
         settings.anthropic_api_key = original_key

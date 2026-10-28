@@ -29,6 +29,7 @@ def test_root_compose_declares_core_stack_with_openaleph_always_on():
     assert services["backend"]["build"] == {
         "context": ".",
         "dockerfile": "backend/Dockerfile",
+        "secrets": ["authority_sdk_deploy_key"],
         "args": {"NEXT_PUBLIC_API_AUTH_TOKEN": "${API_AUTH_TOKEN:-docker-compose-local-dev-token}"},
     }
 
@@ -182,7 +183,8 @@ def test_production_compose_has_no_dev_shortcuts():
     assert env["ENABLE_RESTORE_API"] == "${ENABLE_RESTORE_API:-false}"
     assert env["AUDIT_LOG_FILE"].startswith("/app/data/") and env["API_AUTH_FAILURE_STATE_FILE"].startswith("/app/data/")
     assert "NEXT_PUBLIC_API_AUTH_TOKEN" not in text, "the shared token must not be baked into the public bundle"
-    assert services["backend"]["build"] == {"context": ".", "dockerfile": "backend/Dockerfile"}, "no build args: nothing baked into the screen"
+    assert services["backend"]["build"] == {"context": ".", "dockerfile": "backend/Dockerfile", "secrets": ["authority_sdk_deploy_key"]}, \
+        "no build args: nothing baked into the screen (the SDK deploy key is a build secret, never an arg)"
     assert (root / "DEPLOYMENT.md").read_text(encoding="utf-8").count("alembic downgrade") >= 1, "runbook must cover schema rollback"
 
 

@@ -430,7 +430,7 @@ async def investigation_presentation_draft(
 ) -> Any:
     """Draft a brief/deck from a reporter-selected evidence set and a goal.
 
-    App-local reasoning module (not vendored TAS -- see
+    App-local reasoning module (not TAS -- see
     app/ai/presentation_modules/PRESENTATION_DRAFT.md), reusing the same
     citation-validated LLM pipeline and non-canonical-write guarantee as
     /assistant/case-synthesis and /assistant/hypothesis-test above: the

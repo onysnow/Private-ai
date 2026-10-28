@@ -2,7 +2,7 @@
 Contradiction Testing (Module 06) as real, LLM-backed endpoints.
 
 This module owns exactly the glue between `build_question_context()`'s
-retrieval packet, the vendored TAS module prompts, an `LLMClient`, and
+retrieval packet, the TAS module prompts (from the Authority Suite SDK), an `LLMClient`, and
 strict citation validation. It deliberately knows nothing about HTTP —
 `app/api/routes.py` stays a thin wrapper (see STRUCTURE_AUDIT.md
 STRUCT-0002 for why routes.py should not keep absorbing logic).
@@ -32,7 +32,8 @@ from app.ai.chart_check import (
 from app.ai.governor import governor
 from app.ai.interop import hand_over, prompt_view
 from app.ai.suite import APP_MODULES_ROOT, ROUTES, SUITE_ROOT, TAS_ROOT, route as suite_route
-from app.ai.suite import next_runs, systems_status, vendored_commit
+from app.ai.authority_sdk import confidence_terms, suite_source, tas_version
+from app.ai.suite import next_runs, systems_status
 from app.ai.systems import SUITE_MODULES, check_shape, check_values, framing_text, run_checks, walk
 from app.ai.run_events import RunRecorder, instructions_in_packet, record_suite_thoughts, record_thoughts, run_events
 from app.ai.quote_check import check_presentation_quotes, prompt_record_texts
@@ -52,20 +53,18 @@ from app.visuals.spec import DRAWN_KINDS, QUESTIONS, spec_errors
 CHART_SCHEMA_QUESTIONS = "|".join(q.id for q in QUESTIONS.values() if any(k in DRAWN_KINDS for k in q.kinds))
 CHART_SCHEMA_KINDS = "|".join(dict.fromkeys(k.value for q in QUESTIONS.values() for k in q.kinds if k in DRAWN_KINDS))
 
-# The Authority System Suite (onysnow/Authority-System-Suite), vendored as a
-# plain copy at the commit in authority_suite/VENDORED_FROM. It replaced the
-# old tas_spec submodule, which held the Topic Authority System alone. The
-# prompts are built from TAS, the suite's investigative system; the other
-# systems (RAS, QAS, LAS, DAS, EGS, EHS) are kept so the hand-offs TAS names
-# in INTEROP.md resolve. See authority_suite/README_VENDORING.md to update it.
-# SUITE_ROOT, TAS_ROOT and APP_MODULES_ROOT come from app/ai/suite.py, the one front door to the suite.
-# presentation_draft is app-local -- not part of the vendored suite, not numbered or governed by TAS's
+# The Authority System Suite (onysnow/Authority-System-Suite) comes from the
+# Authority Suite SDK, which bundles it at one commit (app/ai/authority_sdk.py;
+# the pin is in requirements.txt). The repo keeps no copy: SUITE_ROOT is the
+# SDK's bundled folder. SUITE_ROOT, TAS_ROOT and APP_MODULES_ROOT come from
+# app/ai/suite.py, the one front door to the suite.
+# presentation_draft is app-local -- not part of the suite, not numbered or governed by TAS's
 # CONTROL_SURFACE. See PRESENTATION_DRAFT.md for why this is kept separate rather than added to TAS: it serves a
 # workflow (evidence + goal -> brief/deck) that TAS itself doesn't define, and formalizing it into TAS proper, if
 # that ever happens, is a decision for the suite's own owner, not something this app does on its own.
 
 # STRUCT-0025: tests/test_authority_suite_drift.py verifies every path below
-# still resolves inside the vendored suite. If you update the vendored copy
+# still resolves in the suite the SDK bundles. If you move the SDK pin
 # (or wire up a new TAS module here), run that test locally first -- an upstream rename/restructure should fail there, not silently at
 # request time with a FileNotFoundError. That drift test only covers
 # TAS_MODULES below; an app-local module's file moving is caught the plain
@@ -74,7 +73,7 @@ CHART_SCHEMA_KINDS = "|".join(dict.fromkeys(k.value for q in QUESTIONS.values() 
 # RAS 03+04) sends both, in order (build_system_prompt).
 MODULE_FILES = {key: r.files[0] for key, r in ROUTES.items()}
 
-# Which modules are vendored TAS content (the suite copy) vs. this app's
+# Which modules are TAS content (the suite) vs. this app's
 # own prompt content. Drives build_system_prompt()'s framing text and
 # CONTROL_SURFACE flag availability, and ai_reasoning_status()'s TAS-relative
 # path reporting -- a module outside the suite was never meant to resolve
@@ -95,9 +94,8 @@ QUOTE_RULE = ("string - copied word for word from that record's text in the pack
 CLASSIFICATIONS = ("SOURCE_STATEMENT", "CORROBORATED_FACT", "ALLEGATION", "INFERENCE", "HYPOTHESIS", "UNKNOWN",
                    "NEGATIVE_SEARCH_RESULT", "UNRESOLVED_CONFLICT")
 CONFIDENCE_LEVELS = ("LOW", "MEDIUM", "HIGH")
-# CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md: seven likelihood terms.
-CONFIDENCE_TERMS = ("ALMOST_CERTAIN", "VERY_LIKELY", "LIKELY", "ROUGHLY_EVEN_CHANCE", "UNLIKELY", "VERY_UNLIKELY",
-                    "ALMOST_NO_CHANCE")
+# CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md: seven likelihood terms, read from the Authority Suite SDK.
+CONFIDENCE_TERMS = confidence_terms()
 HYPOTHESIS_KINDS = ("WORKING_THEORY", "INNOCENT_EXPLANATION", "ALTERNATIVE_ATTRIBUTION", "DATA_QUALITY", "OTHER")
 # Spelled as Module 06 spells them, with spaces.
 CONFLICT_TYPES = ("DIRECT CONTRADICTION", "TEMPORAL CHANGE", "DEFINITIONAL MISMATCH", "SCOPE DIFFERENCE", "AMBIGUOUS",
@@ -582,8 +580,8 @@ def _validate_suite_values(module: str, payload: dict) -> list[str]:
 
 
 def _read(path: Path) -> str:
-    """Read one module's prompt file. A missing file for a vendored TAS
-    module (see TAS_MODULES) means the vendored suite copy is incomplete,
+    """Read one module's prompt file. A missing file for a TAS
+    module (see TAS_MODULES) means the suite the SDK bundles is incomplete,
     or was restructured upstream -- STRUCT-0025 drift test. A missing
     file for an app-local module means it was moved or deleted outside
     the suite entirely. Either way, surface a 400-class input error
@@ -594,8 +592,8 @@ def _read(path: Path) -> str:
         if path.is_relative_to(SUITE_ROOT):
             rel = path.relative_to(SUITE_ROOT)
             raise ReasoningInputError(
-                f"vendored Authority System Suite file {str(rel)!r} is missing -- backend/app/ai/authority_suite is "
-                "incomplete or no longer matches app/ai/reasoning.py MODULE_FILES"
+                f"Authority System Suite file {str(rel)!r} is missing from the suite the Authority Suite SDK bundles -- the "
+                "SDK pin in requirements.txt no longer matches app/ai/reasoning.py MODULE_FILES"
             ) from exc
         raise ReasoningInputError(
             f"module prompt file {str(path)!r} is missing -- it no longer matches app/ai/reasoning.py MODULE_FILES"
@@ -612,7 +610,7 @@ def build_system_prompt(module: str, reasoning_contract: dict, control_flags: di
 
     A TAS module (see TAS_MODULES) gets the suite's own framing language and its
     CONTROL_SURFACE flags block; an app-local module (presentation_draft)
-    gets neither -- it isn't part of the vendored suite and CONTROL_SURFACE
+    gets neither -- it isn't part of the suite and CONTROL_SURFACE
     is a TAS CORE concept with no runtime meaning outside it. Both still
     get the same non-negotiable evidence-authority rules and output
     contract below -- that part of this function's job doesn't change.
@@ -1508,30 +1506,10 @@ def list_ai_analysis_candidates(
     return [serialize_ai_analysis_candidate(row, include_payload=False) for row in rows]
 
 
-@lru_cache(maxsize=1)
-def _vendored_tas_version() -> str | None:
-    """The first '## <major>.<minor>' heading in TAS's CHANGELOG, e.g. '1.12'.
-    Dated directive entries ('## 2026-10-10 — DIR-0044 ...') above it are
-    skipped. None when the vendored copy is missing."""
-    changelog = TAS_ROOT / "CHANGELOG.md"
-    if not changelog.exists():
-        return None
-    for line in changelog.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"## (\d+\.\d+(?:\.\d+)?)\b", line)
-        if m:
-            return m.group(1)
-    return None
-
-
-def _vendored_suite_commit() -> str | None:
-    """'onysnow/Authority-System-Suite@<commit>', from authority_suite/VENDORED_FROM (app/ai/suite.py)."""
-    return vendored_commit()
-
-
 def ai_reasoning_status(settings: Settings = default_settings) -> dict:
     """What the settings panel shows about the AI layer: whether the
     endpoints are callable, which provider adapter is selected, and whether
-    the vendored Authority System Suite the prompts are built from is present.
+    the Authority System Suite the prompts are built from (bundled in the Authority Suite SDK) is present.
     Never reveals key material -- only whether a key is configured.
     """
     provider = (settings.ai_provider or "").strip()
@@ -1573,8 +1551,8 @@ def ai_reasoning_status(settings: Settings = default_settings) -> dict:
         },
         "authority_suite": {
             "present": TAS_ROOT.exists() and (TAS_ROOT / "PROMPT_MODULES").exists(),
-            "source": _vendored_suite_commit(),
-            "tas_version": _vendored_tas_version(),
+            "source": suite_source(),
+            "tas_version": tas_version(),
             "modules": modules,
             # Every system of the suite: its trigger-table row, kind, version and the modules the app runs from it.
             "systems": systems_status(),

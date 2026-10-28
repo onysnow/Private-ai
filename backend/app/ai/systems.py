@@ -1,8 +1,8 @@
 """The suite's other systems, run the way TAS is (AGENTS.md trigger table rows 1 and 3-7).
 
-Each entry is one app run: a system's own prompt module(s) from the vendored suite, an output contract trimmed
+Each entry is one app run: a system's own prompt module(s) from the suite the Authority Suite SDK bundles, an output contract trimmed
 from that system's EVALUATION/OUTPUT_SCHEMAS.md to what one call over a retrieval packet can honestly fill, the
-value lists copied from the suite (tests/test_authority_suite_drift.py reads them back out of the vendored text),
+value lists copied from the suite (tests/test_authority_suite_drift.py reads them back out of the suite's text),
 and the checks the suite's own rules make mechanical. A run may start from the accepted answer of an earlier run;
 what crosses that boundary is decided in app/ai/interop.py, never here.
 
@@ -20,13 +20,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-SUITE_ROOT = Path(__file__).resolve().parent / "authority_suite"
+from app.ai.authority_sdk import confidence_terms, suite_root
+
+# The suite the Authority Suite SDK bundles (app/ai/authority_sdk.py); this repo keeps no copy.
+SUITE_ROOT = suite_root()
 SYSTEMS_ROOT = SUITE_ROOT / "systems"
 
 _REF = {"record_type": "string", "record_id": "string"}
 # CORE/CALIBRATED_CONFIDENCE_LANGUAGE.md in every system; INTEROP.md §2 wire terms.
-CONFIDENCE_TERMS = ("ALMOST_CERTAIN", "VERY_LIKELY", "LIKELY", "ROUGHLY_EVEN_CHANCE", "UNLIKELY", "VERY_UNLIKELY",
-                    "ALMOST_NO_CHANCE")
+CONFIDENCE_TERMS = confidence_terms()  # from the Authority Suite SDK, not a copy
 
 # The systems by name, as their READMEs and AGENTS.md name them. "support" systems serve the authority systems and
 # issue no authority judgement (AGENTS.md [AG-067]).

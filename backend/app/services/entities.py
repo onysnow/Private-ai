@@ -13,7 +13,7 @@ from app.models.domain import (
     RelationshipEdge, Source, Statement, StatementPromotion,
 )
 from app.schemas.api import EntityCreate, EntityUpdate, PropertyConflictDecisionRequest
-from app.services.outbound import enrich_sent_text, mark_outbound_failed, record_outbound, send_outcome
+from app.services.outbound import destination_of, enrich_sent_text, mark_outbound_failed, record_outbound, send_outcome
 from app.services.connectors import persist_connector_findings
 from app.services.consolidation import get_enrichment_session_detail
 from app.services.ftm import make_ftm_entity
@@ -190,7 +190,7 @@ async def run_multi_enrichment(db: Session, entity: Entity, providers: list[str]
         payload = {"id": entity.ftm_id, "schema": entity.schema, "caption": entity.caption, "properties": entity.properties or {}}
         sent_id = record_outbound(db, entity.investigation_id, service=provider, kind="details of a record",
                                   value=enrich_sent_text(connector, payload), reason=f"Look up {entity.caption}", actor="you", outcome=send_outcome(connector),
-                                  source={"connector_run_id": run.id, "entity_id": entity.id})
+                                  source={"connector_run_id": run.id, "entity_id": entity.id, "destination": destination_of(connector)})
         try:
             findings = await connector.enrich(payload)
             rows = persist_connector_findings(db, run, entity.investigation_id, provider, findings)

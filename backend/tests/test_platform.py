@@ -60,27 +60,27 @@ def test_a_lookup_is_logged_with_what_was_sent(probe):
     with SessionLocal() as db:
         lines = outbound.recent(db)
     assert [(line["kind"], line["sent"], line["destination"], line["case"]) for line in lines] == [
-        ("lookup", "Harbour Nominees SA", "https://probe.example.org", "Kestrel SA"),
-        ("lookup", "Fernhill Ltd", "https://probe.example.org", "Kestrel SA"),
+        ("details of a record", "Harbour Nominees SA", "probe.example.org", "Kestrel SA"),
+        ("search text", "Fernhill Ltd", "probe.example.org", "Kestrel SA"),
     ]
     week = client.get("/api/settings/lookups").json()["week"]
     assert week[0]["sent"].startswith("Harbour Nominees SA")
 
 
-def test_a_failed_lookup_is_logged_and_a_refused_key_says_refused(probe):
+def test_a_failed_lookup_is_logged_as_failed(probe):
     async def refuse(query: str):
         raise RuntimeError("Client error '401 Unauthorized'")
     probe.search = refuse  # type: ignore[method-assign]
     inv = _case()
     assert client.post("/api/connectors/probe/search", json={"investigation_id": inv, "query": "Fernhill"}).status_code == 502
     with SessionLocal() as db:
-        assert outbound.recent(db)[0]["outcome"] == "refused"
+        assert outbound.recent(db)[0]["outcome"] == "failed"  # it went, and an error came back (ADR-0015)
 
 
 def test_the_log_keeps_ninety_days():
     with SessionLocal() as db:
-        db.add(OutboundRequest(kind="download", service="demo case", destination="example.org", value_sent="x", at=utcnow_naive() - timedelta(days=91)))
-        db.add(OutboundRequest(kind="download", service="demo case", destination="example.org", value_sent="y"))
+        db.add(OutboundRequest(kind="download", service="demo case", value="x", source={"destination": "example.org"}, at=utcnow_naive() - timedelta(days=91)))
+        db.add(OutboundRequest(kind="download", service="demo case", value="y", source={"destination": "example.org"}))
         db.commit()
         assert outbound.prune(db) == 1
         assert [r["sent"] for r in outbound.recent(db, days=365)] == ["y"]

@@ -1,5 +1,5 @@
 """The app-side Authority System Suite gaps (docs/authority-suite/SUITE_GAPS.md): the
-suite's closed lists match the vendored suite, the fields and records are stored and
+suite's closed lists match the suite, the fields and records are stored and
 checked, and the Confirmed rule reads a source's tier and collapses restatements."""
 
 import re
@@ -8,17 +8,17 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app.ai import suite_vocab
+from app.ai.authority_sdk import suite_text
 from app.ai.suite_map import coverage
 from app.main import app
 from app.models import domain
 
-SUITE = Path(suite_vocab.__file__).resolve().parent / "authority_suite"
 client = TestClient(app)
 
 
-def test_every_closed_list_matches_the_vendored_suite():
+def test_every_closed_list_matches_the_suite():
     for name, (file, line) in suite_vocab.VOCAB_SOURCES.items():
-        text = (SUITE / file).read_text(encoding="utf-8")
+        text = suite_text(file)
         values = getattr(suite_vocab, name)
         if line is None:
             bullets = {m.strip().lower() for m in re.findall(r"^- ([A-Z][A-Z _]+)$", text, re.M)}

@@ -67,7 +67,7 @@ def get_suite_coverage() -> Any:
 
 @router.get("/suite/catalog", response_model=SuiteCatalogOut)
 def get_suite_catalog() -> Any:
-    """Every system, module and record of the vendored Authority System Suite, read from its own files, with the
+    """Every system, module and record of the Authority System Suite (bundled in the Authority Suite SDK), read from its own files, with the
     app runs that use each module (none, for a module the app leaves out)."""
     from app.ai.suite import catalog
 

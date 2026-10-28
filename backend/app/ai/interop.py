@@ -1,4 +1,4 @@
-"""What crosses from one run's accepted answer into the next system's run (vendored INTEROP.md).
+"""What crosses from one run's accepted answer into the next system's run (the suite's INTEROP.md).
 
 INTEROP §0: a value that cannot cross a boundary under the file's rules is not converted, approximated, defaulted or
 dropped silently; it blocks, and the block names the field, both systems and the value. Here a blocked value is

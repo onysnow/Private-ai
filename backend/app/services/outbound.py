@@ -50,6 +50,11 @@ def enrich_sent_text(connector: Any, payload: dict) -> str:
     return say(payload) if callable(say) else entity_sent_value(payload.get("caption"), payload.get("properties"))
 
 
+def destination_of(connector: Any) -> str:
+    """The host a connector's requests go to, kept in a line's `source` so the log can say where it went."""
+    return host_of(str(getattr(connector, "base_url", "") or getattr(connector, "host", "") or ""))
+
+
 def send_outcome(connector: Any) -> str:
     """"blocked" when the connector will refuse before any request is made (it needs a key and has none): the attempt is logged, but nothing left."""
     return "blocked" if getattr(connector, "requires_key", False) and not getattr(connector, "configured", True) else "sent"

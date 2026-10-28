@@ -1,5 +1,5 @@
 """The one front door to the Authority System Suite: every AI module the app runs, which system and trigger-table
-row it belongs to, the vendored suite's version, and where an answer goes next.
+row it belongs to, the suite's version (from the Authority Suite SDK), and where an answer goes next.
 
 Everything that names a module, a system or a route reads it from here: the run pipeline (app/ai/reasoning.py)
 for its run record, the plan (app/services/run_plan.py), the settings status, and the single run endpoint
@@ -22,7 +22,7 @@ from typing import Any
 from app.ai.systems import SUITE_MODULES, SUITE_ROOT, SYSTEM_NAMES, SYSTEMS_ROOT
 
 TAS_ROOT = SYSTEMS_ROOT / "tas"
-# App-local module content: not part of the vendored suite (see presentation_modules/PRESENTATION_DRAFT.md).
+# App-local module content: not part of the suite (see presentation_modules/PRESENTATION_DRAFT.md).
 APP_MODULES_ROOT = Path(__file__).resolve().parent / "presentation_modules"
 
 # Why the router sends a run to each system: the trigger table's own condition (AGENTS.md rows 1-7).
@@ -170,18 +170,15 @@ def _version_of(system: str) -> dict[str, str | None]:
     return {"version": version, "latest_change": latest}
 
 
-@lru_cache(maxsize=1)
 def vendored_commit() -> str | None:
-    """'onysnow/Authority-System-Suite@d2b2186', from authority_suite/VENDORED_FROM."""
-    marker = SUITE_ROOT / "VENDORED_FROM"
-    if not marker.exists():
-        return None
-    first = marker.read_text(encoding="utf-8").splitlines()[:1]
-    return first[0].strip() or None if first else None
+    """'onysnow/Authority-System-Suite@d2b2186': the suite the Authority Suite SDK bundles."""
+    from app.ai.authority_sdk import suite_source
+
+    return suite_source()
 
 
 def module_count(system: str) -> int:
-    """How many prompt modules the system has in the vendored copy."""
+    """How many prompt modules the system has in the suite the SDK bundles."""
     folder = SYSTEMS_ROOT / system / "PROMPT_MODULES"
     return len(list(folder.glob("[0-9][0-9]_*.md"))) if folder.is_dir() else 0
 
@@ -218,7 +215,7 @@ def systems_status() -> list[dict[str, Any]]:
 
 
 def catalog() -> dict[str, Any]:
-    """Every module and record of the vendored suite, read from its own files (app/ai/suite_catalog.py), with the
+    """Every module and record of the suite the SDK bundles, read from its own files (app/ai/suite_catalog.py), with the
     app runs that use each module. A module no run uses is listed too, and a final audit says it never runs in the
     run it audits: what the app leaves out is shown, not hidden."""
     from app.ai import suite_catalog

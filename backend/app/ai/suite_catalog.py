@@ -1,11 +1,11 @@
-"""The Authority System Suite's systems, modules and records, read from the vendored copy (ADR-0017).
+"""The Authority System Suite's systems, modules and records, read from the copy the Authority Suite SDK bundles (ADR-0017).
 
 Every system has the same files: ``README.md`` (its name on the first line),
 ``PROMPT_MODULES/NN_TITLE.md`` (a ``## Use when`` and a ``## Prompt`` block),
 and ``EVALUATION/OUTPUT_SCHEMAS.md`` (LAS adds ``OUTPUT_SCHEMAS_MACHINE.md``),
 where each record is a heading followed by a JSON example and, beneath it, the
 closed values its fields take ("`status` is `VERIFIED` or `HELD_AS_ASSUMPTION`").
-Nothing here is written by hand: updating the vendored copy updates what runs.
+Nothing here is written by hand: moving the SDK pin (backend/requirements.txt) updates what runs.
 tests/test_suite_catalog.py fails if a system, a module or a record stops parsing.
 """
 
@@ -18,7 +18,9 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterator
 
-SUITE_ROOT = Path(__file__).resolve().parent / "authority_suite"
+from app.ai.authority_sdk import suite_root
+
+SUITE_ROOT = suite_root()  # the suite the Authority Suite SDK bundles; this repo keeps no copy
 SYSTEMS = ("ras", "tas", "qas", "las", "das", "egs", "ehs")   # AGENTS.md's order: the pipeline, then support
 
 _HEADING = re.compile(r"^(#{2,3}) (.+?)\s*$", re.M)
