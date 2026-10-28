@@ -15770,6 +15770,17 @@
             "title": "Locator",
             "type": "string"
           },
+          "ocr_legibility": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ocr Legibility"
+          },
           "ordinal": {
             "title": "Ordinal",
             "type": "integer"
@@ -15802,7 +15813,7 @@
         "type": "object"
       },
       "DocumentDetailOut": {
-        "description": "A document with its extracted chunks (GET /documents/{id}).",
+        "description": "A document with its extracted chunks (GET /documents/{id}), and the languages OpenAleph detected in it.",
         "properties": {
           "candidate_counts": {
             "additionalProperties": {
@@ -15861,6 +15872,14 @@
           "investigation_id": {
             "title": "Investigation Id",
             "type": "string"
+          },
+          "languages": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DocumentLanguageOut"
+            },
+            "title": "Languages",
+            "type": "array"
           },
           "mime_type": {
             "anyOf": [
@@ -16087,6 +16106,24 @@
           "max_bytes"
         ],
         "title": "DocumentFormatsOut",
+        "type": "object"
+      },
+      "DocumentLanguageOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "DocumentLanguageOut",
         "type": "object"
       },
       "DocumentOut": {

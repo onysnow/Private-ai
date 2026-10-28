@@ -371,7 +371,7 @@ def serialize_chunk(chunk: DocumentChunk) -> dict:
     objects, relying on FastAPI's encoder to read their columns; with a
     declared response model that is fragile, so the shape is explicit."""
     return {'id': chunk.id, 'document_id': chunk.document_id, 'locator': chunk.locator, 'page_number': chunk.page_number,
-            'ordinal': chunk.ordinal, 'text': chunk.text, 'created_at': chunk.created_at}
+            'ordinal': chunk.ordinal, 'text': chunk.text, 'created_at': chunk.created_at, 'ocr_legibility': chunk.ocr_legibility}
 
 
 def serialize_candidate(candidate: ExtractionCandidate) -> dict:
@@ -710,11 +710,29 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     return {'candidate': serialize_candidate(candidate), 'record': record_out}
 
 
+def document_languages(db: Session, document_id: str) -> list[dict]:
+    """The languages OpenAleph detected in the document, as its proposals record them (`detected_languages`, ISO 639
+    codes), first seen first, each with its English name. The app's own reader detects no language, so a document
+    OpenAleph has not read has none."""
+    from followthemoney.types import registry
+
+    codes: list[str] = []
+    for payload in db.scalars(select(ExtractionCandidate.payload).where(ExtractionCandidate.document_id == document_id)):
+        provenance = payload.get('provenance') if isinstance(payload, dict) else None
+        found = provenance.get('detected_languages') if isinstance(provenance, dict) else None
+        for code in found if isinstance(found, list) else []:
+            clean = registry.language.clean(str(code))
+            if clean and clean not in codes:
+                codes.append(clean)
+    return [{'code': code, 'name': registry.language.caption(code) or code} for code in codes]
+
+
 def get_document_detail(db: Session, row: Document) -> dict:
-    """Serialize a Document with its chunks attached."""
+    """Serialize a Document with its chunks attached, and the languages detected in it."""
     result = serialize_document(db, row)
     chunks = db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == row.id).order_by(DocumentChunk.ordinal)).all()
     result["chunks"] = [serialize_chunk(chunk) for chunk in chunks]
+    result["languages"] = document_languages(db, row.id)
     return result
 
 

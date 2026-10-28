@@ -6709,6 +6709,10 @@ export type DocumentChunkOut = {
    */
   locator: string;
   /**
+   * Ocr Legibility
+   */
+  ocr_legibility?: number | null;
+  /**
    * Ordinal
    */
   ordinal: number;
@@ -6725,7 +6729,7 @@ export type DocumentChunkOut = {
 /**
  * DocumentDetailOut
  *
- * A document with its extracted chunks (GET /documents/{id}).
+ * A document with its extracted chunks (GET /documents/{id}), and the languages OpenAleph detected in it.
  */
 export type DocumentDetailOut = {
   /**
@@ -6772,6 +6776,10 @@ export type DocumentDetailOut = {
    * Investigation Id
    */
   investigation_id: string;
+  /**
+   * Languages
+   */
+  languages?: Array<DocumentLanguageOut>;
   /**
    * Mime Type
    */
@@ -6888,6 +6896,20 @@ export type DocumentFormatsOut = {
    * Reader
    */
   reader: 'openaleph' | 'workbench';
+};
+
+/**
+ * DocumentLanguageOut
+ */
+export type DocumentLanguageOut = {
+  /**
+   * Code
+   */
+  code: string;
+  /**
+   * Name
+   */
+  name: string;
 };
 
 /**

@@ -847,6 +847,7 @@ export type {
   DocumentEmailOut,
   DocumentExtractionSettingsOut,
   DocumentFormatsOut,
+  DocumentLanguageOut,
   DocumentOut,
   DocumentReadFailedOut,
   DocumentReadFailureOut,

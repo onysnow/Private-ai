@@ -2706,15 +2706,39 @@ export const zDocumentChunkOut = z.object({
   document_id: z.string(),
   id: z.string(),
   locator: z.string(),
+  ocr_legibility: z.number().nullish(),
   ordinal: z.int(),
   page_number: z.int().nullish(),
   text: z.string(),
 });
 
 /**
+ * DocumentFormatsOut
+ *
+ * What an upload accepts now (app/services/document_formats.py).
+ */
+export const zDocumentFormatsOut = z.object({
+  accept: z.string(),
+  extensions: z.array(z.string()),
+  ingest_file_image: z.string().nullish(),
+  max_bytes: z.int(),
+  mime_types: z.array(z.string()),
+  openaleph_only_extensions: z.array(z.string()),
+  reader: z.enum(['openaleph', 'workbench']),
+});
+
+/**
+ * DocumentLanguageOut
+ */
+export const zDocumentLanguageOut = z.object({
+  code: z.string(),
+  name: z.string(),
+});
+
+/**
  * DocumentDetailOut
  *
- * A document with its extracted chunks (GET /documents/{id}).
+ * A document with its extracted chunks (GET /documents/{id}), and the languages OpenAleph detected in it.
  */
 export const zDocumentDetailOut = z.object({
   candidate_counts: z.record(z.string(), z.int()),
@@ -2731,6 +2755,7 @@ export const zDocumentDetailOut = z.object({
   filename: z.string(),
   id: z.string(),
   investigation_id: z.string(),
+  languages: z.array(zDocumentLanguageOut).optional().default([]),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
   openaleph_schema: z.string().nullish(),
@@ -2738,21 +2763,6 @@ export const zDocumentDetailOut = z.object({
   sha256: z.string(),
   source_id: z.string(),
   title: z.string().nullish(),
-});
-
-/**
- * DocumentFormatsOut
- *
- * What an upload accepts now (app/services/document_formats.py).
- */
-export const zDocumentFormatsOut = z.object({
-  accept: z.string(),
-  extensions: z.array(z.string()),
-  ingest_file_image: z.string().nullish(),
-  max_bytes: z.int(),
-  mime_types: z.array(z.string()),
-  openaleph_only_extensions: z.array(z.string()),
-  reader: z.enum(['openaleph', 'workbench']),
 });
 
 /**
