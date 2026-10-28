@@ -37400,6 +37400,177 @@
         "title": "TraceLeadOut",
         "type": "object"
       },
+      "TranscriptOut": {
+        "description": "A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player\n(one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one\nthe machine was unsure of.",
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "duration": {
+            "title": "Duration",
+            "type": "number"
+          },
+          "kind": {
+            "enum": [
+              "audio",
+              "video"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "outline": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Outline",
+            "type": "array"
+          },
+          "outline_step": {
+            "title": "Outline Step",
+            "type": "number"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptSegmentOut"
+            },
+            "title": "Segments",
+            "type": "array"
+          },
+          "streams": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Streams",
+            "type": "array"
+          },
+          "transcript": {
+            "additionalProperties": true,
+            "title": "Transcript",
+            "type": "object"
+          },
+          "unsure_below": {
+            "title": "Unsure Below",
+            "type": "number"
+          }
+        },
+        "required": [
+          "document_id",
+          "kind",
+          "duration",
+          "streams",
+          "outline",
+          "outline_step",
+          "transcript",
+          "unsure_below",
+          "segments"
+        ],
+        "title": "TranscriptOut",
+        "type": "object"
+      },
+      "TranscriptSegmentOut": {
+        "description": "A stretch of the recording: speech (its passage is `chunk_id`), or no speech, never quoted.",
+        "properties": {
+          "chunk_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Id"
+          },
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "speech",
+              "no_speech"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "words": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptWordOut"
+            },
+            "title": "Words",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "ordinal",
+          "start",
+          "end",
+          "kind",
+          "text",
+          "words"
+        ],
+        "title": "TranscriptSegmentOut",
+        "type": "object"
+      },
+      "TranscriptWordOut": {
+        "description": "One word: its text, start and end in seconds, and the model's probability for it.",
+        "properties": {
+          "e": {
+            "title": "E",
+            "type": "number"
+          },
+          "p": {
+            "title": "P",
+            "type": "number"
+          },
+          "s": {
+            "title": "S",
+            "type": "number"
+          },
+          "w": {
+            "title": "W",
+            "type": "string"
+          }
+        },
+        "required": [
+          "w",
+          "s",
+          "e",
+          "p"
+        ],
+        "title": "TranscriptWordOut",
+        "type": "object"
+      },
       "TranslationPartOut": {
         "description": "One page (or the whole document) in OpenAleph's original text and its machine translation.",
         "properties": {
@@ -51082,6 +51253,73 @@
         "summary": "Get Document Email"
       }
     },
+    "/api/documents/{document_id}/media": {
+      "get": {
+        "description": "The original recording, for the player: the stored bytes, never re-encoded.",
+        "operationId": "get_document_media",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "audio/mpeg": {},
+              "video/mp4": {}
+            },
+            "description": "The recording as uploaded, unaltered; byte ranges are honoured"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The document is not a recording"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Media"
+      }
+    },
     "/api/documents/{document_id}/openaleph/analyze": {
       "post": {
         "description": "\"Find names again\": OpenAleph analyses the document again\n(POST /api/2/entities/{id}/analyze) and what it finds becomes proposals,\nas a background job (ADR-0006). Answers 202 with the job while it runs;\nin developer mode (SQLite) the job has finished when this answers.",
@@ -51676,6 +51914,76 @@
           }
         },
         "summary": "Preview Table Mapping"
+      }
+    },
+    "/api/documents/{document_id}/transcript": {
+      "get": {
+        "description": "The transcript made on this computer: each segment with its words, and the parts with no speech.",
+        "operationId": "get_document_transcript",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No such document, or it has not been transcribed yet"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The document is not a recording"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Document Transcript"
       }
     },
     "/api/documents/{document_id}/translation": {

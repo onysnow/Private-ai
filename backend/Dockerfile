@@ -46,6 +46,10 @@ RUN --mount=type=secret,id=authority_sdk_deploy_key \
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright-browsers
 RUN python -m playwright install --with-deps --only-shell chromium && rm -rf /var/lib/apt/lists/*
 COPY backend/ .
+# The transcription model (ADR-0020), fetched once here so a read never downloads it; outside /app like the browser.
+ARG TRANSCRIPTION_MODEL=small
+ENV TRANSCRIPTION_MODEL=${TRANSCRIPTION_MODEL} TRANSCRIPTION_MODEL_DIR=/opt/whisper-models
+RUN python -m app.services.transcription fetch
 
 # Outside /app, so the development compose file's ./backend:/app bind mount
 # doesn't hide it.

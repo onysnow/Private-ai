@@ -116,9 +116,11 @@ import {
   getDocument,
   getDocumentEmail,
   getDocumentFormats,
+  getDocumentMedia,
   getDocumentPageImage,
   getDocumentPicture,
   getDocumentTable,
+  getDocumentTranscript,
   getDocumentTranslation,
   getDrop,
   getDropHistory,
@@ -666,6 +668,9 @@ import type {
   GetDocumentFormatsData,
   GetDocumentFormatsError,
   GetDocumentFormatsResponse,
+  GetDocumentMediaData,
+  GetDocumentMediaError,
+  GetDocumentMediaResponse,
   GetDocumentPageImageData,
   GetDocumentPageImageError,
   GetDocumentPageImageResponse,
@@ -676,6 +681,9 @@ import type {
   GetDocumentTableData,
   GetDocumentTableError,
   GetDocumentTableResponse,
+  GetDocumentTranscriptData,
+  GetDocumentTranscriptError,
+  GetDocumentTranscriptResponse,
   GetDocumentTranslationData,
   GetDocumentTranslationError,
   GetDocumentTranslationResponse,
@@ -3574,6 +3582,36 @@ export const getDocumentEmailOptions = (
     queryKey: getDocumentEmailQueryKey(options),
   });
 
+export const getDocumentMediaQueryKey = (
+  options: Options<GetDocumentMediaData>,
+) => createQueryKey('getDocumentMedia', options);
+
+/**
+ * Get Document Media
+ *
+ * The original recording, for the player: the stored bytes, never re-encoded.
+ */
+export const getDocumentMediaOptions = (
+  options: Options<GetDocumentMediaData>,
+) =>
+  queryOptions<
+    GetDocumentMediaResponse,
+    GetDocumentMediaError,
+    GetDocumentMediaResponse,
+    ReturnType<typeof getDocumentMediaQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentMedia({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentMediaQueryKey(options),
+  });
+
 /**
  * Analyze Openaleph Document
  *
@@ -3937,6 +3975,36 @@ export const previewTableMappingMutation = (
   };
   return mutationOptions;
 };
+
+export const getDocumentTranscriptQueryKey = (
+  options: Options<GetDocumentTranscriptData>,
+) => createQueryKey('getDocumentTranscript', options);
+
+/**
+ * Get Document Transcript
+ *
+ * The transcript made on this computer: each segment with its words, and the parts with no speech.
+ */
+export const getDocumentTranscriptOptions = (
+  options: Options<GetDocumentTranscriptData>,
+) =>
+  queryOptions<
+    GetDocumentTranscriptResponse,
+    GetDocumentTranscriptError,
+    GetDocumentTranscriptResponse,
+    ReturnType<typeof getDocumentTranscriptQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDocumentTranscript({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDocumentTranscriptQueryKey(options),
+  });
 
 export const getDocumentTranslationQueryKey = (
   options: Options<GetDocumentTranslationData>,

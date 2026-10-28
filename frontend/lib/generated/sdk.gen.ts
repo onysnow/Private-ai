@@ -332,6 +332,9 @@ import type {
   GetDocumentFormatsData,
   GetDocumentFormatsErrors,
   GetDocumentFormatsResponses,
+  GetDocumentMediaData,
+  GetDocumentMediaErrors,
+  GetDocumentMediaResponses,
   GetDocumentPageImageData,
   GetDocumentPageImageErrors,
   GetDocumentPageImageResponses,
@@ -342,6 +345,9 @@ import type {
   GetDocumentTableData,
   GetDocumentTableErrors,
   GetDocumentTableResponses,
+  GetDocumentTranscriptData,
+  GetDocumentTranscriptErrors,
+  GetDocumentTranscriptResponses,
   GetDocumentTranslationData,
   GetDocumentTranslationErrors,
   GetDocumentTranslationResponses,
@@ -1256,6 +1262,8 @@ import {
   zGetDocumentEmailPath,
   zGetDocumentEmailResponse,
   zGetDocumentFormatsResponse,
+  zGetDocumentMediaPath,
+  zGetDocumentMediaResponse,
   zGetDocumentPageImagePath,
   zGetDocumentPageImageQuery,
   zGetDocumentPageImageResponse,
@@ -1266,6 +1274,8 @@ import {
   zGetDocumentTablePath,
   zGetDocumentTableQuery,
   zGetDocumentTableResponse,
+  zGetDocumentTranscriptPath,
+  zGetDocumentTranscriptResponse,
   zGetDocumentTranslationPath,
   zGetDocumentTranslationResponse,
   zGetDropHistoryPath,
@@ -4038,6 +4048,37 @@ export const getDocumentEmail = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Document Media
+ *
+ * The original recording, for the player: the stored bytes, never re-encoded.
+ */
+export const getDocumentMedia = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentMediaData, ThrowOnError>,
+): RequestResult<
+  GetDocumentMediaResponses,
+  GetDocumentMediaErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentMediaResponses,
+    GetDocumentMediaErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentMediaPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentMediaResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/media',
+    ...options,
+  });
+
+/**
  * Analyze Openaleph Document
  *
  * "Find names again": OpenAleph analyses the document again
@@ -4362,6 +4403,37 @@ export const previewTableMapping = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Get Document Transcript
+ *
+ * The transcript made on this computer: each segment with its words, and the parts with no speech.
+ */
+export const getDocumentTranscript = <ThrowOnError extends boolean = false>(
+  options: Options<GetDocumentTranscriptData, ThrowOnError>,
+): RequestResult<
+  GetDocumentTranscriptResponses,
+  GetDocumentTranscriptErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetDocumentTranscriptResponses,
+    GetDocumentTranscriptErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDocumentTranscriptPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDocumentTranscriptResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/transcript',
+    ...options,
   });
 
 /**

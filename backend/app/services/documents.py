@@ -18,11 +18,13 @@ from app.services.anchors import anchor_document_quotes
 from app.services.entity_signals import clean_names, norm_name, read_name, read_passage, split_title
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
+from app.services.transcription import MEDIA_EXTENSIONS
 from app.jobs.corpus import request_corpus_sync
 
 # Pictures are documents too (app/services/image_reader.py): kept as pictures, their text read by OCR.
 # Emails, mailboxes, .zip archives and spreadsheets are read by app/services/container_readers.py.
-SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'} | set(IMAGE_EXTENSIONS) | set(CONTAINER_EXTENSIONS)
+# Audio and video are transcribed on this computer (app/services/transcription.py, ADR-0020).
+SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'} | set(IMAGE_EXTENSIONS) | set(CONTAINER_EXTENSIONS) | set(MEDIA_EXTENSIONS)
 # Capitals and letters of the Latin alphabet, accented ones too (Société Vérandine, Brühlmark & Söhne).
 _NAME_UPPER = "A-ZÀ-ÖØ-Þ"
 _NAME_LETTER = "A-Za-zÀ-ÖØ-öø-ÿĀ-ž"
@@ -55,6 +57,9 @@ def extract_chunks(path: Path) -> tuple[list[dict], list[str]]:
         raise ValueError(f"Unsupported document type: {ext or 'unknown'}")
     rows: list[dict] = []
     issues: list[str] = []
+    if ext in MEDIA_EXTENSIONS:
+        # The reading job transcribes a recording itself: its passages come with segments a chunk list cannot carry.
+        raise ValueError('A recording is read by transcription (app/services/transcription.py), not as text')
     if ext in CONTAINER_EXTENSIONS:
         return read_container(path)
     if ext in IMAGE_EXTENSIONS:

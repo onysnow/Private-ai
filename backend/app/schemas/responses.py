@@ -5009,6 +5009,44 @@ class CaseRecordOut(ResponseModel):
     updated_at: Timestamp
 
 
+# --- Recordings (app/services/transcription.py, ADR-0020) -----------------------------------------------------------
+
+class TranscriptWordOut(ResponseModel):
+    """One word: its text, start and end in seconds, and the model's probability for it."""
+    w: str
+    s: float
+    e: float
+    p: float
+
+
+class TranscriptSegmentOut(ResponseModel):
+    """A stretch of the recording: speech (its passage is `chunk_id`), or no speech, never quoted."""
+    id: str
+    chunk_id: str | None = None
+    ordinal: int
+    start: float
+    end: float
+    kind: Literal["speech", "no_speech"]
+    text: str
+    words: list[TranscriptWordOut]
+    speaker: str | None = None
+
+
+class TranscriptOut(ResponseModel):
+    """A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
+    (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
+    the machine was unsure of."""
+    document_id: str
+    kind: Literal["audio", "video"]
+    duration: float
+    streams: list[dict[str, Any]]
+    outline: list[float]
+    outline_step: float
+    transcript: dict[str, Any]
+    unsure_below: float
+    segments: list[TranscriptSegmentOut]
+
+
 # --- Web capture (app/services/web_capture.py, ADR-0018) ------------------------------------------------------------
 
 class CaptureFileOut(ResponseModel):

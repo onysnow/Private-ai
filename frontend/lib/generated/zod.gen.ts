@@ -8780,6 +8780,54 @@ export const zProvenanceTraceOut = z.object({
 });
 
 /**
+ * TranscriptWordOut
+ *
+ * One word: its text, start and end in seconds, and the model's probability for it.
+ */
+export const zTranscriptWordOut = z.object({
+  e: z.number(),
+  p: z.number(),
+  s: z.number(),
+  w: z.string(),
+});
+
+/**
+ * TranscriptSegmentOut
+ *
+ * A stretch of the recording: speech (its passage is `chunk_id`), or no speech, never quoted.
+ */
+export const zTranscriptSegmentOut = z.object({
+  chunk_id: z.string().nullish(),
+  end: z.number(),
+  id: z.string(),
+  kind: z.enum(['speech', 'no_speech']),
+  ordinal: z.int(),
+  speaker: z.string().nullish(),
+  start: z.number(),
+  text: z.string(),
+  words: z.array(zTranscriptWordOut),
+});
+
+/**
+ * TranscriptOut
+ *
+ * A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
+ * (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
+ * the machine was unsure of.
+ */
+export const zTranscriptOut = z.object({
+  document_id: z.string(),
+  duration: z.number(),
+  kind: z.enum(['audio', 'video']),
+  outline: z.array(z.number()),
+  outline_step: z.number(),
+  segments: z.array(zTranscriptSegmentOut),
+  streams: z.array(z.record(z.string(), z.unknown())),
+  transcript: z.record(z.string(), z.unknown()),
+  unsure_below: z.number(),
+});
+
+/**
  * TranslationPartOut
  *
  * One page (or the whole document) in OpenAleph's original text and its machine translation.
@@ -10513,6 +10561,15 @@ export const zGetDocumentEmailPath = z.object({
  */
 export const zGetDocumentEmailResponse = zDocumentEmailOut;
 
+export const zGetDocumentMediaPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * The recording as uploaded, unaltered; byte ranges are honoured
+ */
+export const zGetDocumentMediaResponse = z.string();
+
 export const zAnalyzeOpenalephDocumentPath = z.object({
   document_id: z.string(),
 });
@@ -10623,6 +10680,15 @@ export const zPreviewTableMappingPath = z.object({
  * Successful Response
  */
 export const zPreviewTableMappingResponse = zTableMappingPreviewOut;
+
+export const zGetDocumentTranscriptPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetDocumentTranscriptResponse = zTranscriptOut;
 
 export const zGetDocumentTranslationPath = z.object({
   document_id: z.string(),

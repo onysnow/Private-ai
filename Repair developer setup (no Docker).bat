@@ -39,11 +39,16 @@ if not %errorlevel%==0 goto :failed
 rem The browser web capture drives (ADR-0018): its headless shell only, which makes no calls of its own.
 ".venv\Scripts\python.exe" -m playwright install --only-shell chromium >> "%SETUP_LOG%" 2>&1
 if not %errorlevel%==0 goto :failed
-".venv\Scripts\python.exe" -c "import fastapi,uvicorn,sqlalchemy,httpx,followthemoney,multipart,pypdf,docx,alembic,fitz,openaleph_client,playwright,warcio" >> "%SETUP_LOG%" 2>&1
+rem The transcription model (ADR-0020), fetched once so reading a recording never downloads it.
+pushd backend
+"..\.venv\Scripts\python.exe" -m app.services.transcription fetch >> "..\%SETUP_LOG%" 2>&1
+if not %errorlevel%==0 goto :failed
+popd
+".venv\Scripts\python.exe" -c "import fastapi,uvicorn,sqlalchemy,httpx,followthemoney,multipart,pypdf,docx,alembic,fitz,openaleph_client,playwright,warcio,faster_whisper" >> "%SETUP_LOG%" 2>&1
 if not %errorlevel%==0 goto :failed
 
 del /q ".venv\.journalism_dependencies_ready_*" >nul 2>nul
-type nul > ".venv\.journalism_dependencies_ready_1_25"
+type nul > ".venv\.journalism_dependencies_ready_1_26"
 echo Runtime repair and import verification completed successfully.
 exit /b 0
 

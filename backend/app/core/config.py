@@ -75,6 +75,12 @@ class Settings(BaseSettings):
     capture_timeout_seconds: float = 45.0
     # What one capture may bring back, the page and everything it loads, before the rest is cut off.
     capture_max_megabytes: int = 100
+    # Audio and video (ADR-0020): the largest recording an upload takes, and the Whisper model that transcribes it on
+    # this computer (fetched once at setup into the folder below; a read never downloads it). Language: empty detects it.
+    max_media_bytes: int = 500 * 1024 * 1024
+    transcription_model: str = "small"
+    transcription_model_dir: str = "./data/models"
+    transcription_language: str = ""
     enable_pdf_ocr: bool = True
     pdf_ocr_language: str = "eng"
     pdf_ocr_dpi: int = 200

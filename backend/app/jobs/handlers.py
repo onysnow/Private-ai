@@ -247,6 +247,14 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
     document_id = job.subject_id
     if not document_id:
         raise ValueError("Job has no document")
+    # A recording is transcribed on this computer, whichever reader reads the rest (ADR-0020).
+    from app.services.transcription import is_media, read_media_document
+
+    stored_media = db.get(Document, document_id)
+    if stored_media is not None and is_media(stored_media.filename):
+        if job.attempts > 1 and _already_read(db, document_id):
+            return "Already transcribed"
+        return _check_watchlist_after_read(db, document_id, read_media_document(db, document_id, report))
     # A retry of a read that stopped after its text was saved finishes the steps after it
     # instead of failing on "already read" (docs/project-notes/CRASH_RECOVERY.md). A new
     # reading job for a read document still fails: only a retry resumes.

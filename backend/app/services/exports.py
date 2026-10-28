@@ -31,6 +31,7 @@ from app.models.domain import (
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
     Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
+    DocumentMedia, TranscriptSegment,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -50,6 +51,7 @@ MODEL_BY_TABLE = {
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
+        DocumentMedia, TranscriptSegment,
     ]
 }
 
@@ -69,6 +71,8 @@ RESTORE_ORDER = [
     "lead_links", "relationship_evidence_attachments", "relationship_evidence_review_events",
     "external_relationship_reviews", "external_relationship_promotions",
     "document_chunks", "extraction_candidates",
+    # A recording's file facts and its transcript segments (ADR-0020); a segment points at its passage.
+    "document_media", "transcript_segments",
     # Bulk imports and what happened to each file; an item points at its document.
     "ingestion_batches", "ingestion_batch_items",
     # Spreadsheet column mappings; the proposals they made are extraction candidates.
@@ -175,7 +179,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         StatementPromotion, CrossProviderDecision, RelationshipEdge,
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
-        Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
+        Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture, DocumentMedia, TranscriptSegment,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -229,6 +233,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "saved_questions": direct["saved_questions"],
         "outbound_requests": direct["outbound_requests"],
         "captures": direct["captures"],
+        "document_media": direct["document_media"], "transcript_segments": direct["transcript_segments"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

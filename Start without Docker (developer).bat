@@ -4,7 +4,7 @@ cd /d "%~dp0"
 title Journalism Workbench - developer mode (no Docker)
 
 set "PY="
-set "RUNTIME_MARKER=.venv\.journalism_dependencies_ready_1_25"
+set "RUNTIME_MARKER=.venv\.journalism_dependencies_ready_1_26"
 set "SETUP_LOG=journalism-workbench-setup.log"
 
 echo ============================================================
@@ -74,11 +74,16 @@ if not exist "%RUNTIME_MARKER%" (
   "%VPY%" -m playwright install --only-shell chromium >> "%SETUP_LOG%" 2>&1
   rem Inside this block %%errorlevel%% is read before the block runs; "if errorlevel" is read when the line runs.
   if errorlevel 1 goto :dependency_failed
+  rem The transcription model (ADR-0020), fetched once so reading a recording never downloads it.
+  pushd backend
+  "..\%VPY%" -m app.services.transcription fetch >> "..\%SETUP_LOG%" 2>&1
+  if errorlevel 1 goto :dependency_failed
+  popd
 )
 
 rem Never trust the marker alone. Verify imports needed by the actual local
 rem application before declaring setup complete.
-"%VPY%" -c "import fastapi,uvicorn,sqlalchemy,httpx,followthemoney,multipart,pypdf,docx,alembic,fitz,openaleph_client,playwright,warcio" >nul 2>> "%SETUP_LOG%"
+"%VPY%" -c "import fastapi,uvicorn,sqlalchemy,httpx,followthemoney,multipart,pypdf,docx,alembic,fitz,openaleph_client,playwright,warcio,faster_whisper" >nul 2>> "%SETUP_LOG%"
 if not %errorlevel%==0 goto :dependency_failed
 if not exist "%RUNTIME_MARKER%" type nul > "%RUNTIME_MARKER%"
 

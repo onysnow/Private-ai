@@ -30,6 +30,10 @@ Pillow==13.0.0
 # `playwright install chromium`), and the visit is kept as WARC 1.1 (warcio, Apache-2.0).
 playwright==1.64.1
 warcio==1.8.1
+# Audio and video transcribed on this computer (ADR-0020): faster-whisper (MIT) on CTranslate2 (MIT); PyAV (BSD-3)
+# decodes with the FFmpeg its wheels carry. av is pinned: 19 removed an argument faster-whisper 1.2.1 passes.
+faster-whisper==1.2.1
+av==17.0.0
 openaleph-client==1.1.4
 # Background job queue on PostgreSQL (ADR-0004). Its schema is vendored in
 # alembic/sql/; upgrading this pin needs a migration that runs procrastinate's

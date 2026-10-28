@@ -19341,6 +19341,124 @@ export type TraceLeadOut = {
 };
 
 /**
+ * TranscriptOut
+ *
+ * A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
+ * (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
+ * the machine was unsure of.
+ */
+export type TranscriptOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Duration
+   */
+  duration: number;
+  /**
+   * Kind
+   */
+  kind: 'audio' | 'video';
+  /**
+   * Outline
+   */
+  outline: Array<number>;
+  /**
+   * Outline Step
+   */
+  outline_step: number;
+  /**
+   * Segments
+   */
+  segments: Array<TranscriptSegmentOut>;
+  /**
+   * Streams
+   */
+  streams: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Transcript
+   */
+  transcript: {
+    [key: string]: unknown;
+  };
+  /**
+   * Unsure Below
+   */
+  unsure_below: number;
+};
+
+/**
+ * TranscriptSegmentOut
+ *
+ * A stretch of the recording: speech (its passage is `chunk_id`), or no speech, never quoted.
+ */
+export type TranscriptSegmentOut = {
+  /**
+   * Chunk Id
+   */
+  chunk_id?: string | null;
+  /**
+   * End
+   */
+  end: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'speech' | 'no_speech';
+  /**
+   * Ordinal
+   */
+  ordinal: number;
+  /**
+   * Speaker
+   */
+  speaker?: string | null;
+  /**
+   * Start
+   */
+  start: number;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Words
+   */
+  words: Array<TranscriptWordOut>;
+};
+
+/**
+ * TranscriptWordOut
+ *
+ * One word: its text, start and end in seconds, and the model's probability for it.
+ */
+export type TranscriptWordOut = {
+  /**
+   * E
+   */
+  e: number;
+  /**
+   * P
+   */
+  p: number;
+  /**
+   * S
+   */
+  s: number;
+  /**
+   * W
+   */
+  w: string;
+};
+
+/**
  * TranslationPartOut
  *
  * One page (or the whole document) in OpenAleph's original text and its machine translation.
@@ -23413,6 +23531,50 @@ export type GetDocumentEmailResponses = {
 export type GetDocumentEmailResponse =
   GetDocumentEmailResponses[keyof GetDocumentEmailResponses];
 
+export type GetDocumentMediaData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/media';
+};
+
+export type GetDocumentMediaErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The document is not a recording
+   */
+  415: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentMediaError =
+  GetDocumentMediaErrors[keyof GetDocumentMediaErrors];
+
+export type GetDocumentMediaResponses = {
+  /**
+   * The recording as uploaded, unaltered; byte ranges are honoured
+   */
+  200: Blob | File;
+};
+
+export type GetDocumentMediaResponse =
+  GetDocumentMediaResponses[keyof GetDocumentMediaResponses];
+
 export type AnalyzeOpenalephDocumentData = {
   body?: never;
   path: {
@@ -23800,6 +23962,50 @@ export type PreviewTableMappingResponses = {
 
 export type PreviewTableMappingResponse =
   PreviewTableMappingResponses[keyof PreviewTableMappingResponses];
+
+export type GetDocumentTranscriptData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/transcript';
+};
+
+export type GetDocumentTranscriptErrors = {
+  /**
+   * No such document, or it has not been transcribed yet
+   */
+  404: ErrorOut;
+  /**
+   * The document is not a recording
+   */
+  415: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDocumentTranscriptError =
+  GetDocumentTranscriptErrors[keyof GetDocumentTranscriptErrors];
+
+export type GetDocumentTranscriptResponses = {
+  /**
+   * Successful Response
+   */
+  200: TranscriptOut;
+};
+
+export type GetDocumentTranscriptResponse =
+  GetDocumentTranscriptResponses[keyof GetDocumentTranscriptResponses];
 
 export type GetDocumentTranslationData = {
   body?: never;
