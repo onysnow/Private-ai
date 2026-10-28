@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import re
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,8 @@ from app.models.domain import (
 )
 from app.services.outbound import record_outbound
 from app.services.suite_fields import original_of
+
+logger = logging.getLogger("journalism.authenticity")
 
 STATUSES = ("verified_origin", "unverified", "likely_synthetic", "confirmed_synthetic", "disputed")
 SYNTHETIC = {"likely_synthetic", "confirmed_synthetic"}
@@ -131,7 +134,9 @@ def read_credentials(data: bytes, mime: str, trust_pem: str | None = None) -> di
             return {"state": "absent"}
         if "NotSupported" in name or "UnsupportedType" in name:
             return {"state": "unsupported"}
-        return {"state": "invalid", "errors": [str(exc)[:300]]}
+        # The library's own words stay in the server log; the screen gets the app's fixed sentence.
+        logger.info("content credentials could not be read: %s", type(exc).__name__)
+        return {"state": "invalid", "errors": ["The content credentials in this file could not be read: they are damaged or not valid."]}
     active = report.get("active_manifest")
     manifest = (report.get("manifests") or {}).get(active) or {}
     failures = [f.get("code") for f in ((report.get("validation_results") or {}).get("activeManifest") or {}).get("failure", [])]

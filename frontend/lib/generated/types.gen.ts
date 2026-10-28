@@ -22894,7 +22894,7 @@ export type CaptureLatestErrors = {
   /**
    * Response 422 Capture Latest
    *
-   * Unprocessable Content
+   * The input does not match the route, or the address cannot be captured
    */
   422: ValidationErrorOut | ErrorOut;
   /**
@@ -25360,7 +25360,7 @@ export type PreviewAuthenticityErrors = {
    */
   404: ErrorOut;
   /**
-   * Unprocessable Content
+   * Not a status or role this screen knows
    */
   422: ValidationErrorOut;
   /**

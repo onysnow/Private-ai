@@ -116,7 +116,7 @@ def recheck_capture(capture_id: str, request: Request, db: Session = Depends(get
 
 @router.post("/captures/{capture_id}/capture-latest", response_model=CaptureOut, status_code=202, responses={
     200: {"model": CaptureOut, "description": "The new capture finished before the reply (developer mode)"},
-    404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}})
+    404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "The input does not match the route, or the address cannot be captured"}})
 async def capture_latest(capture_id: str, request: Request, response: Response, db: Session = Depends(get_db)) -> Any:
     """Capture the page as it is now, as a new capture: both stay in the case. Answers with the new capture."""
     row = _capture_or_404(db, capture_id)

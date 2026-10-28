@@ -62,7 +62,7 @@ def examine_again(document_id: str, db: Session = Depends(get_db)) -> Any:
 
 
 @router.get("/documents/{document_id}/authenticity/preview", response_model=AuthenticityPreviewOut, responses={
-    404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut}})
+    404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut, "description": "Not a status or role this screen knows"}})
 def preview_authenticity(document_id: str, status: AuthenticityStatus, role: AuthenticityRole | None = None,
                          db: Session = Depends(get_db)) -> Any:
     """What a status (and role) would do to the claims that lean on the item, before it is recorded."""

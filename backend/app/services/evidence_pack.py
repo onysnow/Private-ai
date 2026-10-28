@@ -16,6 +16,7 @@ import hashlib
 import html
 import io
 import json
+import logging
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -41,6 +42,8 @@ from app.services.custody_chain import claim_custody_chain
 from app.services.security import resolve_storage_root
 from app.services.stories import story_of, story_tree
 from app.services.writeups import extract_cited_refs, render_writeup_docx
+
+logger = logging.getLogger("journalism.evidence_pack")
 
 LIMIT = ("Fingerprints (SHA-256) show that the files have not changed since they were added to this case. They do not "
          "show what happened to a file before it was added, or that what a file says is true.")
@@ -280,8 +283,9 @@ def build_pack(db: Session, investigation_id: str) -> tuple[bytes, dict[str, Any
         buf = io.BytesIO()
         docx.save(buf)
         files["writeup.docx"] = buf.getvalue()
-    except Exception as exc:  # the .docx is a convenience beside index.html; say why it is missing
-        gaps.append(f"The .docx could not be made: {exc}")
+    except Exception:  # the .docx is a convenience beside index.html; say it is missing, keep the detail in the log
+        logger.exception("evidence pack: the .docx could not be made")
+        gaps.append("The .docx could not be made; index.html holds the same write-up.")
 
     rows = []
     for ex in exhibits:
