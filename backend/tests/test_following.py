@@ -242,9 +242,9 @@ def test_a_page_keeps_a_version_when_its_text_changes_not_its_layout(site):
     site.page = site.page.replace("is owned by Harbour Nominees Ltd (40%) and Kestrel SA (60%).",
                                   "is privately held; shareholders are not disclosed.")
     changed = _check(m["id"])
-    assert changed["checks"][1]["text"] == "Text differs from the last version · 1 lines"
+    assert changed["checks"][1]["text"] == "Text differs from the last version · 1 line"
     second = next(q for q in _screen(inv)["queue"] if q["extra"].get("page_version") == 2)
-    assert {"tone": "amber", "text": "Changed since capture · 1 lines"} in second["risks"]
+    assert {"tone": "amber", "text": "Changed since capture · 1 line"} in second["risks"]
     versions = client.get(f"/api/monitors/{m['id']}/versions").json()
     assert [v["number"] for v in versions] == [2, 1] and versions[1]["captured"]
     assert any(line.startswith("-") and "Kestrel SA (60%)" in line for line in versions[0]["diff"])

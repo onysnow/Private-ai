@@ -65,6 +65,37 @@ class FollowRefused(ValueError):
     """The address cannot be followed; the message says why and what can be done instead."""
 
 
+# Why a source could not be read, in the app's own words: what the screen shows is always one of these, never the
+# text of an error from a library.
+REASONS = {
+    "unreachable": "the site could not be reached",
+    "timeout": f"the site did not answer within {int(TIMEOUT_S)} s",
+    "too_large": f"the answer was larger than {MAX_SOURCE_BYTES // (1024 * 1024)} MB",
+    "redirects": "it sent the request on too many times",
+    "tor": "Tor is not running on this computer",
+    "address": "it is not a public web address",
+    "unreadable": "it is not a feed or page the app can read",
+}
+
+
+class FetchFailed(OSError):
+    """A source could not be read; `reason` is a key of REASONS."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(REASONS[reason])
+        self.reason = reason
+
+
+def reason_of(exc: BaseException) -> str:
+    from app.services.web_capture import CaptureRefused
+
+    if isinstance(exc, FetchFailed):
+        return REASONS[exc.reason]
+    if isinstance(exc, CaptureRefused):
+        return REASONS["address"]
+    return REASONS["unreadable"] if isinstance(exc, ValueError) else REASONS["unreachable"]
+
+
 @dataclass
 class Fetched:
     status: int
@@ -136,13 +167,13 @@ def fetch(url: str, *, route: str = "direct", etag: str | None = None, last_modi
                     for chunk in response.iter_bytes():
                         body.extend(chunk)
                         if len(body) > MAX_SOURCE_BYTES:
-                            raise OSError(f"the answer was larger than {MAX_SOURCE_BYTES // (1024 * 1024)} MB")
+                            raise FetchFailed("too_large")
                     return Fetched(response.status_code, current, dict(response.headers), bytes(body), time.monotonic() - started)
-            raise OSError("too many redirects")
+            raise FetchFailed("redirects")
     except httpx.HTTPError as exc:
         if route == "tor" and isinstance(exc, (httpx.ConnectError, httpx.ProxyError)):
-            raise OSError(f"Tor is not running on this computer ({settings.tor_socks_url})") from exc
-        raise OSError(str(exc) or exc.__class__.__name__) from exc
+            raise FetchFailed("tor") from exc
+        raise FetchFailed("timeout" if isinstance(exc, httpx.TimeoutException) else "unreachable") from exc
     finally:
         if guard is not None:
             guard.__exit__(None, None, None)
@@ -404,7 +435,7 @@ def discover(text: str, *, route: str = "direct") -> Found:
     try:
         got = fetch(url, route=route)
     except OSError as exc:
-        raise FollowRefused(f"The address could not be reached: {exc}") from exc
+        raise FollowRefused(f"The address could not be read: {reason_of(exc)}") from exc
     if got.moved_to:
         raise FollowRefused(f"The address has moved to {got.moved_to}: follow that address instead")
     if got.status != 200:
@@ -413,7 +444,7 @@ def discover(text: str, *, route: str = "direct") -> Found:
     head = got.body[:2000].lstrip().lower()
     host = urlsplit(url).hostname or url
     if b"<urlset" in head or b"<sitemapindex" in head:
-        return Found("sitemap", url, f"{host} · sitemap")
+        return Found("sitemap", url, f"{host} · news sitemap")
     if kind_hint in ("application/rss+xml", "application/atom+xml", "application/xml", "text/xml") or b"<rss" in head \
             or b"<feed" in head:
         entries, about = read_feed(got.body)
@@ -438,6 +469,14 @@ def follow(db: Session, investigation_id: str, text: str, *, every_minutes: int 
     found = discover(text, route=route)
     if db.scalar(select(Monitor.id).where(Monitor.investigation_id == investigation_id, Monitor.url == found.url)):
         raise FollowRefused("This case already follows that address")
+    if found.kind == "sitemap":
+        # A sitemap has no title of its own: it is named after a feed of the same site this case already follows.
+        host = urlsplit(found.url).hostname
+        for other in db.scalars(select(Monitor).where(Monitor.investigation_id == investigation_id,
+                                                      Monitor.kind.in_(("feed", "podcast")))):
+            if urlsplit(other.url).hostname == host:
+                found.name = f"{other.name.split(' · ')[0]} · news sitemap"
+                break
     default_every = {"feed": 30, "sitemap": 60, "page": 1440, "podcast": 1440, "account": 15, "closed": 0}[found.kind]
     every = every_minutes if every_minutes in EVERY_MINUTES else default_every
     monitor = Monitor(investigation_id=investigation_id, kind=found.kind, platform=found.platform, url=found.url,
@@ -454,6 +493,10 @@ def follow(db: Session, investigation_id: str, text: str, *, every_minutes: int 
 
 
 # --- Checking a source ---------------------------------------------------------------------------------------------
+
+def _lines(n: int) -> str:
+    return f"{n} line{'' if n == 1 else 's'}"
+
 
 def _sha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -587,8 +630,8 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
         got = fetch(monitor.url, route=monitor.route, etag=monitor.etag, last_modified=monitor.last_modified, accept=accept)
     except (OSError, ValueError) as exc:
         mark_outbound_failed(db, request_id)
-        monitor.health, monitor.health_detail = "broken", f"could not be reached: {exc}"
-        monitor.checks = [{"state": "bad", "text": f"Not reached: {exc}"}]
+        monitor.health, monitor.health_detail = "broken", f"could not be read: {reason_of(exc)}"
+        monitor.checks = [{"state": "bad", "text": f"Not read: {reason_of(exc)}"}]
         _schedule(monitor, now)
         db.commit()
         return monitor
@@ -624,7 +667,7 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
         if monitor.kind == "page":
             happened, lines = _page_version(db, monitor, got.body, now)
             checks.append({"state": "warn" if happened == "changed" else "ok", "text": {
-                "first": "Main text kept as version 1", "changed": f"Text differs from the last version · {lines} lines",
+                "first": "Main text kept as version 1", "changed": f"Text differs from the last version · {_lines(lines)}",
                 "layout": "Layout changed, text the same", "same": "Text the same as the last version"}[happened]})
         elif monitor.kind == "sitemap":
             entries, children = read_sitemap(got.body)
@@ -656,8 +699,8 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
         db.rollback()
         monitor = db.get(Monitor, monitor.id) or monitor
         monitor.last_checked_at = now
-        monitor.health, monitor.health_detail = "broken", f"could not be read: {exc}"
-        monitor.checks = [checks[0], {"state": "bad", "text": f"Could not be read: {exc}"}]
+        monitor.health, monitor.health_detail = "broken", f"could not be read: {reason_of(exc)}"
+        monitor.checks = [checks[0], {"state": "bad", "text": f"Could not be read: {reason_of(exc)}"}]
         _schedule(monitor, now)
         db.commit()
         return monitor
@@ -746,8 +789,8 @@ def risks(item: MonitorItem, monitor: Monitor, *, copies: int, captured_version:
         out.append({"tone": "amber", "text": f"At risk: edited {'once' if edits == 1 else f'{edits} times'} since first seen"})
     lines = (item.extra or {}).get("lines_changed")
     if str(item.key).startswith("version:") and lines:
-        out.append({"tone": "amber", "text": (f"Changed since capture · {lines} lines" if captured_version
-                                              else f"Changed · {lines} lines")})
+        out.append({"tone": "amber", "text": (f"Changed since capture · {_lines(lines)}" if captured_version
+                                              else f"Changed · {_lines(lines)}")})
     if copies:
         out.append({"tone": "teal", "text": f"Wire copy of {copies} other{'s' if copies != 1 else ''}"})
     if (item.extra or {}).get("publisher_transcript"):
@@ -959,11 +1002,11 @@ def fetch_audio(db: Session, item: MonitorItem, actor: str | None) -> str:
             with httpx.Client(proxy=proxy, timeout=120, follow_redirects=True, headers={"User-Agent": USER_AGENT},
                               trust_env=False) as client, client.stream("GET", url) as response:
                 if response.status_code != 200:
-                    raise OSError(f"the audio file answered {response.status_code}")
+                    raise FetchFailed("unreachable")
                 for chunk in response.iter_bytes():
                     body.extend(chunk)
                     if len(body) > settings.max_media_bytes:
-                        raise OSError("the audio file is larger than the app keeps")
+                        raise FetchFailed("too_large")
         finally:
             if guard is not None:
                 guard.__exit__(None, None, None)
@@ -971,7 +1014,7 @@ def fetch_audio(db: Session, item: MonitorItem, actor: str | None) -> str:
         from app.services.outbound import mark_outbound_failed
 
         mark_outbound_failed(db, request_id)
-        raise FollowRefused(f"The episode could not be fetched: {exc}") from exc
+        raise FollowRefused(f"The episode could not be fetched: {reason_of(exc)}") from exc
     doc = store_document(db, investigation_id=item.investigation_id, title=item.title or name, filename=name,
                          mime_type=None, data=bytes(body), storage_dir=Path(settings.document_storage_dir),
                          source_metadata={"followed_from": monitor.url, "episode": item.url, "audio_url": url,
