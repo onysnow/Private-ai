@@ -34,6 +34,8 @@ class Capture(Base):
     requested_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # This computer's UTC clock when the screenshot was taken: the time its band shows.
+    captured_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     files: Mapped[list] = mapped_column(JSON, default=list)
     displayed: Mapped[dict] = mapped_column(JSON, default=dict)
     # The capture lane: [{key, label, state, seconds}] (app/services/web_capture.py STAGES).

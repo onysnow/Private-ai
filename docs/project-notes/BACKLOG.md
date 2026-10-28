@@ -99,7 +99,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 - **Material types:**
   - CSV and XLSX make no payments unless mapped.
   - MP3, WAV and MP4 give a 415, and the demo's .mp3/.mov show "failed · 0 chunks" with no reason.
-  - A web link isn't fetched or archived, and "not a url" is accepted.
+  - A web link isn't fetched or archived, and "not a url" is accepted. (28 Oct: a link is captured: page, screenshot with clock, HAR and WARC with SHA-256, read as a document; ADR-0018, The Drop › Links & captures. A source's address is checked as a web address, `app/services/sources.py`.)
   - The watchlist "Check now" needs OpenAleph.
   - There is no form for manual entities, relationships or events.
 - **Data quality and counts:**

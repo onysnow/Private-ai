@@ -3599,6 +3599,19 @@
       "CaptureOut": {
         "description": "A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),\nnot_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).",
         "properties": {
+          "captured_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
           "case_record_id": {
             "anyOf": [
               {

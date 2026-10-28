@@ -511,7 +511,7 @@ def _stages(times: dict[str, float], stopped: str | None = None, skipped: tuple[
     return out
 
 
-_SENT = ("user-agent", "accept-language", "accept")
+_SENT = ("user-agent", "accept-language")
 _SERVED = ("content-type", "content-length", "last-modified", "etag", "date", "server")
 
 
@@ -638,6 +638,7 @@ def run_capture(db: Session, capture_id: str, report: Callable[[int | None, str 
     row.exchange = main_exchange(seen.har, seen.final_url)
     row.robots_disallowed = seen.robots_disallowed
     row.finished_at = utcnow_naive()
+    row.captured_at = seen.captured_at.astimezone(timezone.utc).replace(tzinfo=None) if seen.captured_at else None
     captured_at = seen.captured_at or datetime.now(timezone.utc)
     limitations = list(seen.limitations)
     if seen.refused_hosts:
@@ -702,6 +703,7 @@ def serialize_capture(row: Capture) -> dict[str, Any]:
         "status": row.status, "outcome": row.outcome, "suite_outcome": SUITE_OUTCOME.get(row.outcome or ""),
         "reason": row.reason, "http_status": row.http_status, "collector": row.collector, "tool": row.tool,
         "requested_at": row.requested_at, "started_at": row.started_at, "finished_at": row.finished_at,
+        "captured_at": row.captured_at,
         "files": row.files or [], "displayed": row.displayed or {}, "robots_disallowed": row.robots_disallowed,
         "stages": row.stages or [], "exchange": row.exchange or {},
         "source_id": row.source_id, "document_id": row.document_id, "case_record_id": row.case_record_id,

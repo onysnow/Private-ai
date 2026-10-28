@@ -5065,6 +5065,7 @@ class CaptureOut(ResponseModel):
     requested_at: Timestamp
     started_at: Timestamp | None = None
     finished_at: Timestamp | None = None
+    captured_at: Timestamp | None = None
     files: list[CaptureFileOut]
     displayed: CaptureDisplayedOut
     robots_disallowed: bool | None = None

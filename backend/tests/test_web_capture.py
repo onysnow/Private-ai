@@ -219,6 +219,7 @@ def test_a_captured_page_is_kept_hashed_and_read(site):
     inv, cap = _capture(site, "/story")
     assert cap["status"] == "finished" and cap["outcome"] == "saved" and cap["suite_outcome"] == "OBTAINED"
     assert cap["http_status"] == 200 and cap["final_url"] == site + "/story"
+    assert cap["started_at"] <= cap["captured_at"] <= cap["finished_at"]
     assert cap["displayed"] == {"title": "Harbour deal", "author": "J. Doe", "published": "2026-10-01"}
     assert cap["robots_disallowed"] is True  # noted, and the page was still kept
     assert cap["tool"].startswith("Journalism Workbench web capture: Playwright 1.64.1, Chromium ")

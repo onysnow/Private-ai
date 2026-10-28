@@ -899,6 +899,12 @@ export const zCaptureStageOut = z.object({
  * not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).
  */
 export const zCaptureOut = z.object({
+  captured_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
   case_record_id: z.string().nullish(),
   collector: z.string().nullish(),
   content_verified: z.string(),

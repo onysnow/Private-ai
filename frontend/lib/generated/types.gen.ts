@@ -2045,6 +2045,10 @@ export type CaptureMessageOut = {
  */
 export type CaptureOut = {
   /**
+   * Captured At
+   */
+  captured_at?: string | null;
+  /**
    * Case Record Id
    */
   case_record_id?: string | null;

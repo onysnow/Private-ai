@@ -28,6 +28,7 @@ def upgrade():
         sa.Column("requested_at", sa.DateTime(), nullable=False),
         sa.Column("started_at", sa.DateTime(), nullable=True),
         sa.Column("finished_at", sa.DateTime(), nullable=True),
+        sa.Column("captured_at", sa.DateTime(), nullable=True),
         sa.Column("files", sa.JSON(), nullable=False),
         sa.Column("displayed", sa.JSON(), nullable=False),
         sa.Column("stages", sa.JSON(), nullable=False),
