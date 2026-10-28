@@ -84,17 +84,21 @@ fn raw_format(data: &[u8]) -> Option<String> {
     lightcraft_raw::probe(data).map(|f| format!("{f:?}"))
 }
 
-/// A HEIC/HEIF photo decoded to 16-bit RGB(A), height × width × channels, plus its EXIF bytes.
+/// A HEIC/HEIF photo decoded to RGB(A), height × width × channels, always full-range 16-bit whatever the depth
+/// it was coded at; with the coded bit depth, its EXIF bytes and its ICC colour profile.
 #[pyfunction]
 #[pyo3(signature = (data, max_pixels=200_000_000))]
-fn decode_heic<'py>(py: Python<'py>, data: &[u8], max_pixels: u64) -> PyResult<(Bound<'py, PyArray3<u16>>, u8, Option<Bound<'py, PyBytes>>)> {
+#[allow(clippy::type_complexity)]
+fn decode_heic<'py>(py: Python<'py>, data: &[u8], max_pixels: u64)
+    -> PyResult<(Bound<'py, PyArray3<u16>>, u8, Option<Bound<'py, PyBytes>>, Option<Bound<'py, PyBytes>>)> {
     let opts = lightcraft_heif::Options { max_pixels, apply_transforms: true };
     let img = py.allow_threads(|| lightcraft_heif::decode(data, &opts)).map_err(|e| PyValueError::new_err(e.to_string()))?;
     let ch = if img.has_alpha { 4 } else { 3 };
     let arr = numpy::ndarray::Array3::from_shape_vec((img.height as usize, img.width as usize, ch), img.data)
         .map_err(|e| PyValueError::new_err(e.to_string()))?;
     let exif = img.exif.map(|e| PyBytes::new(py, &e));
-    Ok((arr.into_pyarray(py), img.bit_depth, exif))
+    let icc = img.icc.map(|e| PyBytes::new(py, &e));
+    Ok((arr.into_pyarray(py), img.bit_depth, exif, icc))
 }
 
 /// YuNet face detector. Boxes are fractions of the picture's width and height.

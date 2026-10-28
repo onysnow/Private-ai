@@ -46,6 +46,7 @@ if not %errorlevel%==0 goto :failed
 popd
 rem The native module (ADR-0021) is built with Rust. Without it the app still runs; HEIC and RAW photos then say what to run.
 set "VPY=.venv\Scripts\python.exe"
+del /q ".venv\.native_build_failed" >nul 2>nul
 call :native_module
 ".venv\Scripts\python.exe" -c "import fastapi,uvicorn,sqlalchemy,httpx,followthemoney,multipart,pypdf,docx,alembic,fitz,openaleph_client,playwright,warcio,faster_whisper" >> "%SETUP_LOG%" 2>&1
 if not %errorlevel%==0 goto :failed
@@ -69,10 +70,13 @@ rem The Workbench's native module (backend\native, ADR-0021): code from the ArtC
 rem It is optional: setup carries on without it, and a HEIC or RAW photo then says what to run.
 where cargo >nul 2>nul
 if errorlevel 1 (
-  echo Rust is not installed, so HEIC and RAW photos will not be read yet. Install it from https://rustup.rs and run setup again.
+  echo Rust is not installed, so HEIC and RAW photos will not be read yet. Install it from https://rustup.rs and launch again.
   exit /b 0
 )
 echo Building the native module; the first build takes several minutes...
 "%VPY%" -m pip install .\backend\native >> "%SETUP_LOG%" 2>&1
-if errorlevel 1 echo The native module did not build; the app runs without it. Details are in %SETUP_LOG%.
+if not errorlevel 1 exit /b 0
+rem A failed build is not retried on every launch (it takes minutes): "Repair developer setup" tries again.
+type nul > ".venv\.native_build_failed"
+echo The native module did not build; the app runs without it. Details are in %SETUP_LOG%; "Repair developer setup" tries again.
 exit /b 0

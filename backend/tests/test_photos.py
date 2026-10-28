@@ -88,6 +88,7 @@ def test_a_raw_photo_is_kept_as_it_came_and_shown_through_a_turned_copy(module):
         copy = db.scalars(select(DerivedFile).where(DerivedFile.document_id == doc["id"])).one()
         assert copy.operation == "preview" and copy.parent_sha256 == stored.sha256 and copy.parent_id is None
         assert copy.tool == native.LIGHTCRAFT and copy.mime_type == "image/jpeg"
+        assert copy.created_by == photos.MADE_WHILE_READING and copy.job_id
         assert copy.params["source"] == "the camera's embedded preview" and copy.params["raw_format"] == "Dng"
         kept = Path(copy.storage_path).read_bytes()
         assert hashlib.sha256(kept).hexdigest() == copy.sha256 and copy.size == len(kept)
@@ -116,6 +117,8 @@ def test_a_heic_photo_is_decoded_and_its_gps_kept_as_a_claim(module):
         assert round(claims.claims["gps"]["latitude"], 4) == 3.1417 and round(claims.claims["gps"]["longitude"], 4) == 101.6867
         copy = db.scalars(select(DerivedFile).where(DerivedFile.document_id == doc["id"])).one()
         assert copy.params["source"] == "decoded" and copy.params["bit_depth"] == 8
+        # The HEIC's own EXIF says where its time came from, as for any photo.
+        assert claims.date_tag == "Date/Time Modified"
     shown = client.get(f"/api/documents/{doc['id']}/picture")
     assert shown.status_code == 200 and Image.open(io.BytesIO(shown.content)).size == (449, 559)
 
@@ -216,6 +219,10 @@ def test_pdf_tools_never_write_over_the_file_they_opened(module, tmp_path):
     session.call("redact_apply", json.dumps({"doc": 1}))
     with pytest.raises(ValueError, match="never written over"):
         session.call("doc_save", json.dumps({"doc": 1}))
+    # Naming the opened file, however it is spelled, is refused too.
+    for same in ("memo.pdf", "./memo.pdf", "sub/../memo.pdf", str(work / "memo.pdf")):
+        with pytest.raises(ValueError, match="never written over"):
+            session.call("doc_save", json.dumps({"doc": 1, "path": same}))
     with pytest.raises(RuntimeError, match="outside the allowed directory"):
         session.call("doc_open", json.dumps({"path": str(tmp_path / "elsewhere.pdf")}))
     session.call("doc_save", json.dumps({"doc": 1, "path": "memo-redacted.pdf", "full": True}))
@@ -236,3 +243,74 @@ def test_two_recordings_of_one_event_are_lined_up(module):
     hum = (0.2 * np.sin(2 * np.pi * 50 * np.arange(rate * 2) / rate)).astype(np.float32)
     cleaned = module.audio.process("dehum", hum[None, :], float(rate))[0]
     assert np.abs(cleaned[rate:]).max() < 0.02  # the 50 Hz hum is gone once the filter has settled
+
+
+def test_a_failure_while_making_the_copy_marks_the_read_failed(module, monkeypatch):
+    def broken(path):
+        raise OSError("image file is truncated")
+
+    monkeypatch.setattr(photos, "viewable_copy", broken)
+    doc = _upload(_case("Broken"), "turned.dng", DNG.read_bytes())
+    assert doc["status"] == 422 and "The photo could not be read: image file is truncated" in doc["detail"]["error"]
+
+
+def test_a_dark_heic_is_not_brightened(monkeypatch, tmp_path):
+    """The decoder's samples are full-range 16-bit whatever depth the file was coded at: a very dark picture, whose
+    samples all lie under 256, must stay dark."""
+    import numpy as np
+    from PIL import Image
+
+    class Photo:
+        @staticmethod
+        def decode_heic(data):
+            return np.full((4, 6, 3), 200, dtype=np.uint16), 10, None, None
+
+    class Module:
+        photo = Photo
+
+    monkeypatch.setattr(photos, "native", lambda: Module)
+    night = tmp_path / "night.heic"
+    night.write_bytes(b"stand-in: the decoder is replaced")
+    jpeg, how, _claims = photos.viewable_copy(night)
+    assert how["bit_depth"] == 10 and how["colour_profile"] == "none in the file"
+    assert np.asarray(Image.open(io.BytesIO(jpeg))).max() <= 2
+
+
+def test_the_date_tag_is_the_one_the_time_came_from():
+    rows = [("EXIF", "Date/Time Original", ""), ("TIFF", "Date/Time Modified", "2016:07:20 14:05:00")]
+    assert photos.date_tag_of(rows, "2016-07-20T14:05:00") == "Date/Time Modified"
+    rows.append(("EXIF", "Date/Time Original", "2016:07:19 09:00:00"))
+    assert photos.date_tag_of(rows, "2016-07-19T09:00:00.830") == "Date/Time Original"
+    assert photos.date_tag_of(rows, None) is None
+
+
+def test_a_case_deleted_while_its_copy_is_made_gets_no_folder_back(module):
+    inv = _case("Deleted meanwhile")
+    doc = _upload(inv, "turned.dng", DNG.read_bytes())
+    with SessionLocal() as db:
+        stored = db.get(Document, doc["id"])
+        stored.sha256  # loaded before the deletion, as a reading job holds it
+        with SessionLocal() as other:
+            delete_investigation(other, inv, settings.document_storage_dir, confirmation=inv)
+        with pytest.raises(derived_files.CaseGone):
+            derived_files.write_derived(db, document=stored, data=b"copy", filename="x.jpg", mime_type="image/jpeg",
+                                        operation="preview", params={}, tool="test")
+    assert not (Path(settings.document_storage_dir) / inv).exists()
+
+
+def test_one_file_behind_two_trail_rows_restores(module):
+    inv = _case("Asked twice")
+    doc = _upload(inv, "turned.dng", DNG.read_bytes())
+    with SessionLocal() as db:
+        stored = db.get(Document, doc["id"])
+        first = db.scalars(select(DerivedFile).where(DerivedFile.document_id == doc["id"])).one()
+        again = derived_files.write_derived(db, document=stored, data=Path(first.storage_path).read_bytes(),
+                                            filename="turned.jpg", mime_type="image/jpeg", operation="preview",
+                                            params=first.params, tool=first.tool)
+        assert again.storage_path == first.storage_path and again.id != first.id
+        ids = {first.id, again.id}
+        data, _manifest = build_investigation_export(db, inv)
+        delete_investigation(db, inv, settings.document_storage_dir, confirmation=inv)
+        restore_investigation_export(db, data, Path(settings.document_storage_dir))
+        paths = {db.get(DerivedFile, i).storage_path for i in ids}
+        assert len(paths) == 1 and Path(paths.pop()).is_file()

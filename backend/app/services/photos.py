@@ -43,9 +43,15 @@ def is_photo(filename: str | None) -> bool:
     return Path(filename or "").suffix.lower() in PHOTO_EXTENSIONS
 
 
-def _jpeg(image: Image) -> bytes:
+# Who made a viewable copy: no person asks for it; the reading job makes it when the file is read (the job is recorded).
+MADE_WHILE_READING = "the Workbench, while reading the file"
+
+
+def _jpeg(image: Image, icc: bytes | None) -> bytes:
+    """The picture as a JPEG, carrying the colour profile it came with so it shows in the same colours."""
     out = io.BytesIO()
-    image.convert("RGB").save(out, format="JPEG", quality=PREVIEW_QUALITY)
+    extra = {"icc_profile": icc} if icc else {}
+    image.convert("RGB").save(out, format="JPEG", quality=PREVIEW_QUALITY, **extra)
     return out.getvalue()
 
 
@@ -59,6 +65,19 @@ def _orient(image: Image, orientation: int | None) -> Image:
     for op in ops.get(orientation or 1, []):
         image = image.transpose(op)
     return image
+
+
+def date_tag_of(rows: list[tuple[str, str, str]], capture_time: str | None) -> str | None:
+    """The tag the capture time was read from: the one whose value is that time (a tag that is present but empty or
+    unreadable is not it)."""
+    if not capture_time:
+        return None
+    wanted = capture_time[:19]
+    for tag in DATE_TAGS:
+        for _group, name, value in rows:
+            if name == tag and value[:19].replace(":", "-", 2).replace(" ", "T", 1) == wanted:
+                return tag
+    return None
 
 
 def viewable_copy(path: Path) -> tuple[bytes, dict[str, Any], dict[str, Any]]:
@@ -75,38 +94,37 @@ def viewable_copy(path: Path) -> tuple[bytes, dict[str, Any], dict[str, Any]]:
         if raw is None:
             raise NotAPhoto(f"the file does not open as a camera RAW photo ({ext})")
         claims = dict(photo.metadata(data))
+        claims["date_tag"] = date_tag_of(photo.tags(data), claims.get("capture_time"))
         preview = photo.raw_preview(data)
         if preview is None:
             raise NotAPhoto(f"this {raw} file carries no preview picture the app can show")
         with PILImage.open(io.BytesIO(preview)) as image:
             image.load()
+            icc = image.info.get("icc_profile")
             turned = ImageOps.exif_transpose(image) if image.getexif().get(0x0112) else _orient(image, claims.get("orientation"))
             how: dict[str, Any] = {"source": "the camera's embedded preview", "raw_format": raw, "width": turned.width,
-                   "height": turned.height, "format": "JPEG", "quality": PREVIEW_QUALITY}
-            return _jpeg(turned), how, {**claims, "kind": raw.upper()}
+                                   "height": turned.height, "format": "JPEG", "quality": PREVIEW_QUALITY,
+                                   "colour_profile": "kept" if icc else "none in the preview"}
+            return _jpeg(turned, icc), how, {**claims, "kind": raw.upper()}
     try:
-        pixels, bits, exif = photo.decode_heic(data)
+        pixels, bits, exif, icc = photo.decode_heic(data)
     except ValueError as exc:
         raise NotAPhoto(f"the file does not open as a HEIC photo ({exc})") from exc
     claims = dict(photo.metadata_from_exif(exif)) if exif else {}
-    scale = 257 if pixels.max() > 255 else 1
-    rgb = (np.asarray(pixels[..., :3]) // scale).astype("uint8")
+    claims["date_tag"] = date_tag_of(photo.tags(exif), claims.get("capture_time")) if exif else None
+    # The decoder gives full-range 16-bit samples whatever depth the file was coded at.
+    rgb = (np.asarray(pixels[..., :3]) // 257).astype("uint8")
     decoded = PILImage.fromarray(rgb, "RGB")
     how = {"source": "decoded", "bit_depth": bits, "width": decoded.width, "height": decoded.height,
-           "format": "JPEG", "quality": PREVIEW_QUALITY}
-    return _jpeg(decoded), how, {**claims, "kind": "HEIC"}
+           "format": "JPEG", "quality": PREVIEW_QUALITY, "colour_profile": "kept" if icc else "none in the file"}
+    return _jpeg(decoded, icc), how, {**claims, "kind": "HEIC"}
 
 
-def date_tag_of(data: bytes) -> str | None:
-    """The strongest date tag the file has, by name."""
-    names = {name for _group, name, _value in native().photo.tags(data)}
-    return next((t for t in DATE_TAGS if t in names), None)
-
-
-def keep_claims(db: Session, document: Document, claims: dict[str, Any], date_tag: str | None) -> None:
+def keep_claims(db: Session, document: Document, claims: dict[str, Any]) -> None:
     from app.models.derived import DocumentPhoto
 
     kind = claims.pop("kind", None) or Path(document.filename).suffix.lstrip(".").upper()
+    date_tag = claims.pop("date_tag", None)
     db.merge(DocumentPhoto(document_id=document.id, investigation_id=document.investigation_id, kind=kind[:16],
                            width=claims.get("width"), height=claims.get("height"), claims=claims, date_tag=date_tag,
                            tool=LIGHTCRAFT))
@@ -121,10 +139,11 @@ def record_claims(db: Session, document_id: str) -> None:
     if doc is None:
         return
     try:
+        photo = native().photo
         data = Path(doc.storage_path).read_bytes()
-        claims = dict(native().photo.metadata(data))
-        keep_claims(db, doc, {**claims, "kind": Path(doc.filename).suffix.lstrip(".").upper().replace("JPG", "JPEG")},
-                    date_tag_of(data))
+        claims = dict(photo.metadata(data))
+        claims["date_tag"] = date_tag_of(photo.tags(data), claims.get("capture_time"))
+        keep_claims(db, doc, {**claims, "kind": Path(doc.filename).suffix.lstrip(".").upper().replace("JPG", "JPEG")})
     except NativeUnavailable:
         return
     except Exception:  # what a file claims is extra; a picture that reads is never failed for it
@@ -137,8 +156,9 @@ def read_photo_document(db: Session, document_id: str, report: Callable[[int | N
     """The reading job for a HEIC or RAW photo: make the viewable copy, keep what the file claims, then read any text
     in the copy with OCR like any picture. A failure marks the document failed with the reason and raises."""
     from app.core.config import settings
+    from app.jobs.records import JobStopped
     from app.models.domain import Document
-    from app.services.derived_files import write_derived
+    from app.services.derived_files import CaseGone, write_derived
     from app.services.documents import extract_document
     from app.services.image_reader import extract_image_chunks
     from app.services.transcription import _fail
@@ -150,24 +170,34 @@ def read_photo_document(db: Session, document_id: str, report: Callable[[int | N
     path = Path(doc.storage_path)
     try:
         jpeg, how, claims = viewable_copy(path)
+        copy = write_derived(db, document=doc, data=jpeg, filename=f"{Path(doc.filename).stem}.jpg", mime_type="image/jpeg",
+                             operation="preview", params=how, tool=LIGHTCRAFT, job_id=job_id,
+                             created_by=MADE_WHILE_READING)
+        kind = claims["kind"]
+        try:
+            keep_claims(db, doc, dict(claims))
+        except Exception:  # what a file claims is extra; the copy and the read go on without it
+            db.rollback()
+            logger.exception("could not keep the photo metadata of %s", document_id)
+        report(50, "Reading any text in the picture")
+        chunks, issues = extract_image_chunks(Path(copy.storage_path), enable_ocr=settings.enable_pdf_ocr,
+                                              language=settings.pdf_ocr_language, dpi=settings.pdf_ocr_dpi)
+    except CaseGone:
+        db.rollback()
+        return "The document was deleted before it was read"
+    except JobStopped:
+        raise
     except (NativeUnavailable, NotAPhoto) as exc:
         _fail(db, document_id, str(exc))
         raise
-    copy = write_derived(db, document=doc, data=jpeg, filename=f"{path.stem}.jpg", mime_type="image/jpeg",
-                         operation="preview", params=how, tool=LIGHTCRAFT, job_id=job_id)
-    try:
-        keep_claims(db, doc, dict(claims), date_tag_of(path.read_bytes()))
-    except Exception:
-        db.rollback()
-        logger.exception("could not keep the photo metadata of %s", document_id)
-    report(50, "Reading any text in the picture")
-    chunks, issues = extract_image_chunks(Path(copy.storage_path), enable_ocr=settings.enable_pdf_ocr,
-                                          language=settings.pdf_ocr_language, dpi=settings.pdf_ocr_dpi)
-    issues = [f"Shown and read from a viewable copy ({how['source']}); the {claims['kind']} file is kept as it came.",
-              *issues]
+    except Exception as exc:
+        logger.exception("reading the photo %s failed", document_id)
+        _fail(db, document_id, f"The photo could not be read: {exc}")
+        raise RuntimeError(f"The photo could not be read: {exc}") from exc
+    issues = [f"Shown and read from a viewable copy ({how['source']}); the {kind} file is kept as it came.", *issues]
     doc = extract_document(db, document_id, text=(chunks, issues))
     if doc is None:
         return "The document was deleted before it was read"
     if doc.extraction_status != "complete":
         raise RuntimeError(doc.extraction_error or "The photo could not be read")
-    return f"{claims['kind']} photo: viewable copy made, {len(chunks)} passage{'s' if len(chunks) != 1 else ''} of text"
+    return f"{kind} photo: viewable copy made, {len(chunks)} passage{'s' if len(chunks) != 1 else ''} of text"

@@ -27,24 +27,30 @@ detector. The Workbench also refused HEIC and every camera RAW format, and read 
   `<storage>/<case>/derived/<document>/`, named by its SHA-256, with a `derived_files` row: the edit trail. Each row
   holds the exact bytes it was made from (`parent_sha256`, and `parent_id` when made from another derived file), its own
   SHA-256, the operation and every setting, the code (tool and commit) and any model with its SHA-256, who asked, when
-  and the job. `write_derived` refuses a path that is the case file's own. A PDF job opens a *copy* of the evidence in
-  its own folder, the only folder its tools may touch, and the module refuses a save that names no new file.
+  and the job. `write_derived` holds the case lock, rechecks that the case is still there, and refuses a path that is
+  the case file's own. A PDF job opens a *copy* of the evidence in its own folder, the only folder its tools may
+  touch; in that session every file it started with or opened is protected: a save or `out` naming one is refused,
+  and after any tool that can write, each is checked unchanged (else the call is an error and its result unused).
   Non-evidence files (drafts, write-ups, decks) keep being edited in place as today.
 - **HEIC and camera RAW photos** (`.heic .heif .dng .cr2 .cr3 .nef .nrw .arw .raf .rw2 .pef .orf`, up to
   `MAX_MEDIA_BYTES`) are accepted and kept as they came. The reading job makes a viewable JPEG (a derived file,
   operation `preview`): for RAW, the camera's own embedded preview, turned the way the file says; for HEIC, the picture
-  decoded. The app shows that copy wherever it shows a picture (the reading view, picture evidence, exports) and reads
-  text in it with the existing OCR; the original is what is hashed, exported and backed up.
+  decoded, both carrying the photo's colour profile. The app shows that copy wherever it shows a JPEG (the documents
+  list's picture view, picture evidence, exports; the reading view's Original tab shows only PDFs, for JPEGs too) and
+  reads text in it with the existing OCR; the original is what is hashed, exported and backed up. No person asks for
+  this copy: its trail row says it was made by the Workbench while reading the file, with the job.
   Like recordings (ADR-0020), these are read here whichever reader reads the rest: OpenAleph reads neither format,
   so they are the second exception to ADR-0006's "the Workbench reads nothing OpenAleph cannot".
 - **What a photo claims about itself** is kept for every photo, JPEG and PNG included, in `document_photos`: camera,
   serial, software, lens, capture time, GPS, orientation, and `date_tag`, the tag the time came from ("Date/Time
-  Modified" alone is weaker than "Date/Time Original"). These are claims, never findings; showing them and turning them
+  Modified" alone is weaker than "Date/Time Original"; the tag is the one whose value is the time read, not merely one
+  that is present). These are claims, never findings; showing them and turning them
   into proposals (a Place from GPS, a date) waits for its mockup.
 - **Built at setup.** The Docker image builds the module in its own stage and installs only the wheel. CI builds it for
   the tests. The Windows setup scripts build it when Rust is installed (https://rustup.rs, which also installs the
-  Microsoft C++ build tools Rust needs); without Rust, setup carries on, the app runs, and a HEIC or RAW photo fails its
-  read saying what to run.
+  Microsoft C++ build tools Rust needs). The launcher checks for the module on every start, so installing Rust later and
+  launching again builds it; a failed build is not retried until "Repair developer setup" is run. Without the module
+  the app runs, and a HEIC or RAW photo fails its read saying what to run.
 
 ## Consequences
 

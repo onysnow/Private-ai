@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -25,6 +26,10 @@ class WouldOverwrite(RuntimeError):
     """A derived file would land on a case file."""
 
 
+class CaseGone(LookupError):
+    """The document or its case was deleted while the file was being made."""
+
+
 def derived_folder(storage_root: str | Path, investigation_id: str, document_id: str) -> Path:
     return contained_path(resolve_storage_root(storage_root), investigation_id, "derived", document_id)
 
@@ -35,32 +40,50 @@ def write_derived(db: Session, *, document: Document, data: bytes, filename: str
                   created_by: str | None = None) -> DerivedFile:
     """Keep `data` as a file made from `document` (or from `parent`, a file made from it) and add its trail row.
     Never writes over the document's own file. Commits."""
+    from app.db.locking import lock_investigation_transaction
+    from app.models.investigations import Investigation
+
     if parent_sha256 is None:
         parent_sha256 = parent.sha256 if parent is not None else document.sha256
     digest = hashlib.sha256(data).hexdigest()
     safe = re.sub(r"[^A-Za-z0-9._-]+", "_", Path(filename).name) or "derived"
+    # Hold the case as delete and restore do, and check it is still there, before touching its folder: a case deleted
+    # while this file was being made must not get its folder back.
+    investigation_id, document_id = document.investigation_id, document.id
+    lock_investigation_transaction(db, investigation_id)
+    # Asked of the database, not this session's memory: the deletion may have come from another session.
+    present = db.execute(select(Document.id).join(Investigation, Investigation.id == Document.investigation_id)
+                         .where(Document.id == document_id)).first()
+    if present is None:
+        raise CaseGone("The document or its case was deleted")
     folder = derived_folder(settings.document_storage_dir, document.investigation_id, document.id)
-    folder.mkdir(parents=True, exist_ok=True)
     target = contained_path(folder, f"{digest[:16]}_{safe}")
     if target.resolve() == Path(document.storage_path).resolve():
         raise WouldOverwrite("A derived file may not be written over the case file it was made from")
+    created = False
     if not target.exists():
+        folder.mkdir(parents=True, exist_ok=True)
         staged = target.with_name(f".{target.name}.part")
         staged.write_bytes(data)
         staged.replace(target)
+        created = True
     row = DerivedFile(investigation_id=document.investigation_id, document_id=document.id,
                       parent_id=parent.id if parent is not None else None, parent_sha256=parent_sha256, sha256=digest,
                       size=len(data), mime_type=mime_type, storage_path=str(target), operation=operation, params=params,
                       tool=tool, model=model, model_sha256=model_sha256, job_id=job_id, created_by=created_by)
-    db.add(row)
-    db.commit()
+    try:
+        db.add(row)
+        db.commit()
+    except Exception:
+        db.rollback()
+        if created:
+            target.unlink(missing_ok=True)
+        raise
     db.refresh(row)
     return row
 
 
 def latest(db: Session, document_id: str, operation: str) -> DerivedFile | None:
-    from sqlalchemy import select
-
     return db.scalars(select(DerivedFile).where(DerivedFile.document_id == document_id, DerivedFile.operation == operation)
                       .order_by(DerivedFile.created_at.desc())).first()
 

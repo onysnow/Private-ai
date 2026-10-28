@@ -775,6 +775,8 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 staged.parent.mkdir(parents=True, exist_ok=True)
                 staged.write_bytes(raw)
                 staged_files.append((staged, dest))
+            # One file can stand behind several trail rows (the same copy asked for twice): install it once.
+            staged_derived: set[Path] = set()
             for entry, _problem in _derived_file_entries(manifest, records):
                 derived_id = str(entry["derived_id"])
                 dest = _derived_destination(document_storage_dir, investigation_id, records, entry)
@@ -783,11 +785,14 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 raw = zf.read(str(entry["archive_path"]))
                 if hashlib.sha256(raw).hexdigest() != entry["sha256"]:
                     raise ValueError(f"Derived file checksum mismatch: {derived_id}")
+                derived_locations[derived_id] = str(dest)
+                if dest in staged_derived:
+                    continue  # the name carries the hash checked above, so it is the same bytes
+                staged_derived.add(dest)
                 staged = contained_path(stage_root, "derived", derived_id, dest.name)
                 staged.parent.mkdir(parents=True, exist_ok=True)
                 staged.write_bytes(raw)
                 staged_files.append((staged, dest))
-                derived_locations[derived_id] = str(dest)
 
         restored_counts: dict[str, int] = {}
         db.info["restoring"] = True
