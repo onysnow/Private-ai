@@ -6,8 +6,8 @@ The native module (backend/native) does the reading. CI builds it (backend-postg
 on a computer without it these tests are skipped, except the one that checks the read then fails saying what to run.
 
 Fixtures: tests/fixtures/photos/turned.dng is a 14 KB DNG (a 64 x 48 sensor image and the 160 x 200 JPEG preview a
-camera embeds, EXIF orientation 6, i.e. to be turned 90 degrees clockwise, make Testcam, only a "Date/Time Modified");
-press.heic is a 449 x 559 HEIC photo whose EXIF carries GPS 3.1417 N, 101.6867 E.
+camera embeds, drawn shapes, EXIF orientation 6, i.e. to be turned 90 degrees clockwise, make Testcam, only a "Date/Time Modified");
+street.heic is a 449 x 559 HEIC picture (drawn shapes, no people) whose EXIF carries GPS 3.1417 N, 101.6867 E.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ from app.services.lifecycle import delete_investigation, preview_investigation_d
 
 client = TestClient(app)
 FIXTURES = Path(__file__).parent / "fixtures" / "photos"
-DNG, HEIC = FIXTURES / "turned.dng", FIXTURES / "press.heic"
+DNG, HEIC = FIXTURES / "turned.dng", FIXTURES / "street.heic"
 
 
 @pytest.fixture(autouse=True)
@@ -108,7 +108,7 @@ def test_a_raw_photo_is_kept_as_it_came_and_shown_through_a_turned_copy(module):
 def test_a_heic_photo_is_decoded_and_its_gps_kept_as_a_claim(module):
     from PIL import Image
 
-    doc = _upload(_case("HEIC"), "press.heic", HEIC.read_bytes(), "image/heic")
+    doc = _upload(_case("HEIC"), "street.heic", HEIC.read_bytes(), "image/heic")
     assert doc["status"] == 200 and doc["extraction_status"] == "complete", doc
     with SessionLocal() as db:
         claims = db.get(DocumentPhoto, doc["id"])
@@ -207,12 +207,12 @@ def test_pdf_tools_never_write_over_the_file_they_opened(module, tmp_path):
     work = tmp_path / "work"
     work.mkdir()
     pdf = pymupdf.open()
-    pdf.new_page().insert_text((72, 100), "Transfer to account 2112022011906 approved by Jho Low.")
+    pdf.new_page().insert_text((72, 100), "Transfer to account 4400917 approved by R. Halden.")
     pdf.save(work / "memo.pdf")
     before = (work / "memo.pdf").read_bytes()
     session = module.pdf.PdfSession(str(work))
     session.call("doc_open", json.dumps({"path": "memo.pdf"}))
-    session.call("redact_mark", json.dumps({"doc": 1, "words": ["2112022011906"]}))
+    session.call("redact_mark", json.dumps({"doc": 1, "words": ["4400917"]}))
     session.call("redact_apply", json.dumps({"doc": 1}))
     with pytest.raises(ValueError, match="never written over"):
         session.call("doc_save", json.dumps({"doc": 1}))
@@ -221,7 +221,7 @@ def test_pdf_tools_never_write_over_the_file_they_opened(module, tmp_path):
     session.call("doc_save", json.dumps({"doc": 1, "path": "memo-redacted.pdf", "full": True}))
     assert (work / "memo.pdf").read_bytes() == before
     text = pymupdf.open(work / "memo-redacted.pdf")[0].get_text()
-    assert "2112022011906" not in text and "Jho Low" in text
+    assert "4400917" not in text and "R. Halden" in text
 
 
 def test_two_recordings_of_one_event_are_lined_up(module):
