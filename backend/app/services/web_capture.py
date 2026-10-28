@@ -1,5 +1,5 @@
 """Web capture (ADR-0018): a pasted link becomes a source. One visit in a real browser (Playwright driving Chromium,
-no cookies, no login), and what it saw kept with a SHA-256 for each file:
+no stored cookies, no login), and what it saw kept with a SHA-256 for each file:
 
 - ``page.html``     the page source as the browser received it;
 - ``rendered.html`` the page as it stood once loaded, after its scripts ran (what the case document is read from);
@@ -22,6 +22,7 @@ import logging
 import re
 import socket
 import socketserver
+import shutil
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -38,6 +39,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.time import utcnow_naive
+from app.db.locking import lock_investigation_transaction
 from app.models.domain import Capture, Document, Investigation, Source
 from app.services.outbound import mark_outbound_failed, record_outbound
 from app.services.security import contained_path, resolve_storage_root
@@ -143,9 +145,12 @@ class _GuardHandler(socketserver.StreamRequestHandler):
         self._pipe(upstream)
 
     def _pipe(self, upstream: socket.socket) -> None:
+        guard: _Guard = self.server.guard  # type: ignore[attr-defined]
+
         def down() -> None:
             try:
-                while chunk := upstream.recv(65536):
+                # Past the capture's byte budget the connection is cut: a page cannot fill this computer's disk.
+                while (chunk := upstream.recv(65536)) and guard.spend(len(chunk)):
                     self.connection.sendall(chunk)
             except OSError:
                 pass
@@ -175,8 +180,12 @@ class _GuardServer(socketserver.ThreadingTCPServer):
 class _Guard:
     """A forward proxy on this computer's loopback for the capture browser alone."""
 
-    def __init__(self) -> None:
+    def __init__(self, budget: int | None = None) -> None:
         self.refused: list[str] = []
+        self.budget = budget if budget is not None else settings.capture_max_megabytes * 1024 * 1024
+        self.received = 0
+        self.over = False
+        self._count = threading.Lock()
         self._server = _GuardServer(("127.0.0.1", 0), _GuardHandler)
         self._server.guard = self  # type: ignore[attr-defined]
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
@@ -193,7 +202,17 @@ class _Guard:
         self._server.shutdown()
         self._server.server_close()
 
+    def spend(self, n: int) -> bool:
+        """Count bytes coming back to the browser; False once the visit has passed its budget."""
+        with self._count:
+            self.received += n
+            if self.received > self.budget:
+                self.over = True
+            return not self.over
+
     def open(self, host: str, port: int) -> socket.socket | None:
+        if self.over:
+            return None
         host = host.strip("[]").rstrip(".").lower()
         for family, kind, proto, _, address in resolve_public(host, port):
             try:
@@ -256,12 +275,19 @@ def _tool_name(browser_version: str) -> str:
     return f"Journalism Workbench web capture: Playwright {pw}, Chromium {browser_version}"
 
 
-def visit(url: str, har_path: Path, *, timeout_s: float | None = None, browser_path: str | None = None) -> Visit:
+def visit(url: str, har_path: Path, *, timeout_s: float | None = None, browser_path: str | None = None,
+          budget: int | None = None) -> Visit:
     """Load the page once and keep what came back, every connection through the guard. Never raises for what the
     site does: `error` says it, and `refused_hosts` names the private or unresolvable hosts it was kept from."""
-    with _Guard() as guard:
+    with _Guard(budget) as guard:
         out = _visit(url, har_path, guard, timeout_s=timeout_s, browser_path=browser_path)
         out.refused_hosts = list(guard.refused)
+        if guard.over:
+            limit = f"The page and what it loaded passed the {settings.capture_max_megabytes} MB capture limit; the rest was not loaded"
+            if out.response_status is None:
+                out.error = limit
+            else:
+                out.limitations.append(limit)
     if out.error is None and out.response_status is None:
         out.error = "No page came back"
     return out
@@ -517,7 +543,7 @@ _SERVED = ("content-type", "content-length", "last-modified", "etag", "date", "s
 
 def main_exchange(har: bytes | None, final_url: str | None) -> dict[str, Any]:
     """The request for the page itself and what the server answered, from the HAR: a few telling headers each, as
-    served and not verified. No cookies are ever sent; the request says so."""
+    served and not verified. The browser starts with no stored cookies; the request says whether one was sent."""
     if not har or not final_url:
         return {}
     try:
@@ -574,14 +600,22 @@ def run_capture(db: Session, capture_id: str, report: Callable[[int | None, str 
     if row is None:
         return {"message": "The capture was deleted", "result": {}}
     root = storage_root or settings.document_storage_dir
+    if row.status == "finished":
+        # A retried job never visits again: what was kept stays as hashed. Only a read that did not finish is resumed;
+        # a new visit is a new capture.
+        return _resume_reading(db, row, report, read_document)
     row.status, row.started_at = "capturing", utcnow_naive()
     db.commit()
     request_id = record_outbound(db, row.investigation_id, service=SERVICE, kind="web address", value=row.url,
-                                 reason="Capture this page (one visit, no cookies)", actor="you",
+                                 reason="Capture this page (one visit, no stored cookies or login)", actor="you",
                                  source={"capture_id": row.id, "destination": (urlsplit(row.url).hostname or "")[:255]})
     report(10, "Loading the page")
-    folder = capture_dir(root, row.investigation_id, row.id)
-    folder.mkdir(parents=True, exist_ok=True)
+    # The visit writes into a staging folder; its files move into the case's folder only once the case is known to
+    # still exist, under the lock deletion takes, so a capture can never leave files behind a deleted case.
+    staging = contained_path(resolve_storage_root(root), ".capture-staging", row.id)
+    shutil.rmtree(staging, ignore_errors=True)
+    staging.mkdir(parents=True)
+    folder = staging
     har_path = contained_path(folder, "page.har")
     times: dict[str, float] = {}
     clock = time.monotonic()
@@ -598,10 +632,9 @@ def run_capture(db: Session, capture_id: str, report: Callable[[int | None, str 
         seen = Visit(error=f"The capture browser failed: {_first_line(exc)}")
     times.update(seen.timings)
     outcome, reason = classify(seen)
+    investigation_id = row.investigation_id
     if seen.response_status is None:
         mark_outbound_failed(db, request_id)
-    row.stages = _stages(times, stopped=None if seen.response_status is not None else ("checked" if "checked" not in times else "fetched"))
-    db.commit()
     report(70, "Keeping the files")
 
     files: list[dict[str, Any]] = []
@@ -626,11 +659,21 @@ def run_capture(db: Session, capture_id: str, report: Callable[[int | None, str 
             if _sha256(contained_path(folder, kept["name"]).read_bytes()) != kept["sha256"]:
                 raise RuntimeError(f"capture file {kept['name']} changed while it was being kept")
         times["fingerprint"] = time.monotonic() - clock
-    if not files:
-        try:
-            folder.rmdir()
-        except OSError:
-            pass
+
+    lock_investigation_transaction(db, row.investigation_id)
+    db.expire_all()
+    row = db.get(Capture, capture_id)
+    if row is None or db.get(Investigation, investigation_id) is None:
+        shutil.rmtree(staging, ignore_errors=True)
+        db.rollback()
+        return {"message": "The case or the capture was deleted while the page was being visited; nothing was kept", "result": {}}
+    final = capture_dir(root, investigation_id, capture_id)
+    if files:
+        shutil.rmtree(final, ignore_errors=True)  # only a capture that never finished left anything here
+        final.parent.mkdir(parents=True, exist_ok=True)
+        staging.replace(final)
+    else:
+        shutil.rmtree(staging, ignore_errors=True)
 
     row.final_url, row.http_status, row.tool = seen.final_url, seen.response_status, seen.tool or None
     row.outcome, row.reason, row.files = outcome, reason, files
@@ -695,6 +738,27 @@ def run_capture(db: Session, capture_id: str, report: Callable[[int | None, str 
     words = {"saved": "Page kept", "not_seen": "Not seen", "link_only": "Link only"}[outcome]
     return {"message": f"{words}: {reason}" if reason else words,
             "result": {"capture_id": row.id, "outcome": outcome, "document_id": row.document_id}}
+
+
+def _resume_reading(db: Session, row: Capture, report: Callable[[int | None, str | None], None],
+                    read_document: Callable[[str], None] | None) -> dict[str, Any]:
+    """A finished capture's job run again: read its page if that did not finish, and change nothing else."""
+    doc = db.get(Document, row.document_id) if row.document_id else None
+    reread = doc is not None and doc.extraction_status != "complete" and read_document is not None
+    if reread and doc is not None and read_document is not None:
+        report(85, "Reading the page")
+        clock = time.monotonic()
+        read_document(doc.id)
+        seconds = time.monotonic() - clock
+        db.expire_all()
+        row = db.get(Capture, row.id) or row
+        doc = db.get(Document, row.document_id) if row.document_id else None
+        read_ok = doc is not None and doc.extraction_status == "complete"
+        row.stages = [{**stage, "state": "done" if read_ok else "stopped", "seconds": round(seconds, 2)} if stage["key"] == "text" else stage
+                      for stage in row.stages or []]
+        db.commit()
+    return {"message": "Already captured; only its reading was run again" if reread else "Already captured",
+            "result": {"capture_id": row.id, "outcome": row.outcome, "document_id": row.document_id}}
 
 
 def serialize_capture(row: Capture) -> dict[str, Any]:

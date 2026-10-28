@@ -583,6 +583,10 @@ def preview_investigation_restore(
     # has, so the preview always said none were missing.
     missing_documents = list(manifest.get("missing_document_files", []))
     warnings: list[str] = []
+    missing_captures = list(manifest.get("missing_capture_files", []))
+    if missing_captures:
+        warnings.append(f"Backup is missing {len(missing_captures)} web capture file(s) that were unavailable when exported; "
+                        "those captures are restored without them.")
     if missing_documents:
         warnings.append(
             f"Backup references {len(missing_documents)} document file(s) that were unavailable when exported; metadata/extracted text can still be restored."
@@ -610,7 +614,7 @@ def preview_investigation_restore(
 def _capture_file_entries(manifest: dict[str, Any], records: dict[str, list[dict[str, Any]]]) -> list[tuple[dict[str, Any], str | None]]:
     """The manifest's capture files, each with why it cannot be restored (None when it can). A backup is untrusted:
     a file must belong to a capture in this backup, be one that capture lists, and have a plain name."""
-    listed = {row.get("id"): {f.get("name") for f in row.get("files") or []} for row in records.get("captures", [])}
+    listed = {row.get("id"): {f.get("name"): f.get("sha256") for f in row.get("files") or []} for row in records.get("captures", [])}
     out: list[tuple[dict[str, Any], str | None]] = []
     for entry in manifest.get("capture_files", []):
         name = str(entry.get("name") or "")
@@ -618,6 +622,9 @@ def _capture_file_entries(manifest: dict[str, Any], records: dict[str, list[dict
             out.append((entry, "Capture file is not one of this backup's captures"))
         elif name != _safe_name(name) or name in (".", ".."):
             out.append((entry, f"Capture file name is not allowed: {name!r}"))
+        elif entry.get("sha256") != listed[entry.get("capture_id")][name]:
+            # The capture's record keeps each file's hash from when it was kept: bytes that differ are not that file.
+            out.append((entry, f"Capture file {name} does not match the SHA-256 its capture recorded"))
         else:
             out.append((entry, None))
     return out

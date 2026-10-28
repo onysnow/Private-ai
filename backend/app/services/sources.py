@@ -14,8 +14,12 @@ SOURCE_TYPES = ("web", "document", "interview", "public_record", "social", "othe
 
 def is_web_address(text: str) -> bool:
     """An http or https address with a host, and no spaces in it."""
-    parts = urlsplit(text)
-    return parts.scheme in ("http", "https") and bool(parts.hostname) and not any(c.isspace() for c in text)
+    try:
+        parts = urlsplit(text)
+        host = parts.hostname
+    except ValueError:  # a malformed address, such as an unclosed "[": not a web address
+        return False
+    return parts.scheme in ("http", "https") and bool(host) and not any(c.isspace() for c in text)
 
 
 def create_source(db: Session, payload: dict) -> Source:

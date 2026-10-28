@@ -72,7 +72,8 @@ if not exist "%RUNTIME_MARKER%" (
   if not %errorlevel%==0 goto :dependency_failed
   rem The browser web capture drives (ADR-0018): its headless shell only, which makes no calls of its own.
   "%VPY%" -m playwright install --only-shell chromium >> "%SETUP_LOG%" 2>&1
-  if not %errorlevel%==0 goto :dependency_failed
+  rem Inside this block %%errorlevel%% is read before the block runs; "if errorlevel" is read when the line runs.
+  if errorlevel 1 goto :dependency_failed
 )
 
 rem Never trust the marker alone. Verify imports needed by the actual local

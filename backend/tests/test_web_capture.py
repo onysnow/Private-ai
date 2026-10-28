@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.core.config import settings
 from app.db.session import SessionLocal
@@ -139,12 +139,22 @@ def test_screenshot_band_states_address_and_clock():
     assert out.getpixel((2, web_capture.BAND_HEIGHT + 2)) == (255, 255, 255)
 
 
-def test_restore_refuses_capture_files_the_backup_does_not_list():
-    records = {"captures": [{"id": "c1", "files": [{"name": "page.html"}]}]}
-    manifest = {"capture_files": [{"capture_id": "c1", "name": "page.html"}, {"capture_id": "c2", "name": "page.html"},
-                                  {"capture_id": "c1", "name": "../../etc/x"}]}
+def test_restore_refuses_capture_files_the_backup_does_not_list_or_whose_hash_differs():
+    records = {"captures": [{"id": "c1", "files": [{"name": "page.html", "sha256": "a" * 64}]}]}
+    manifest = {"capture_files": [{"capture_id": "c1", "name": "page.html", "sha256": "a" * 64},
+                                  {"capture_id": "c2", "name": "page.html", "sha256": "a" * 64},
+                                  {"capture_id": "c1", "name": "../../etc/x", "sha256": "a" * 64},
+                                  {"capture_id": "c1", "name": "page.html", "sha256": "b" * 64}]}
     problems = [problem for _, problem in _capture_file_entries(manifest, records)]
     assert problems[0] is None and problems[1] and problems[2]
+    assert problems[3] == "Capture file page.html does not match the SHA-256 its capture recorded"
+
+
+@pytest.mark.parametrize("url", ["http://[", "https://[::1", "http://exa mple.org/"])
+def test_a_malformed_address_is_refused_not_a_server_error(url):
+    inv = client.post("/api/investigations", json={"name": "Malformed"}).json()["id"]
+    r = client.post(f"/api/investigations/{inv}/captures", json={"url": url})
+    assert r.status_code == 422 and "is not a web address" in r.json()["detail"]
 
 
 # --- A real visit --------------------------------------------------------------------------------------------------
@@ -160,7 +170,23 @@ class _Site(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802
         routes = {"/story": (200, "text/html", PAGE), "/pic.png": (200, "image/png", PNG),
                   "/robots.txt": (200, "text/plain", b"User-agent: *\nDisallow: /story\n"),
-                  "/members": (403, "text/html", b"<p>Log in to read</p>"), "/gone": (404, "text/html", b"<p>Not here</p>")}
+                  "/members": (403, "text/html", b"<p>Log in to read</p>"), "/gone": (404, "text/html", b"<p>Not here</p>"),
+                  "/heavy": (200, "text/html", b"<html><body><p>Heavy page</p><script>fetch('/big.bin')</script></body></html>")}
+        if self.path == "/cookie":  # a site that sets a cookie on its way to the page
+            self.send_response(302)
+            self.send_header("Set-Cookie", "sid=abc; Path=/")
+            self.send_header("Location", "/story")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        if self.path == "/big.bin":  # one large thing the page loads
+            self.send_response(200)
+            self.send_header("Content-Type", "application/octet-stream")
+            self.send_header("Content-Length", str(3 * 1024 * 1024))
+            self.end_headers()
+            for _ in range(48):
+                self.wfile.write(b"x" * 65536)
+            return
         if self.path == "/jump":  # a redirect into the local network
             self.send_response(302)
             self.send_header("Location", "http://10.0.0.1/admin")
@@ -309,3 +335,69 @@ def test_capture_files_travel_in_a_backup_and_go_with_the_case(site, tmp_path):
         assert db.get(Investigation, inv) is not None and db.get(Capture, cap["id"]) is not None
     for kept in cap["files"]:
         assert hashlib.sha256((folder / kept["name"]).read_bytes()).hexdigest() == kept["sha256"]
+
+
+def test_a_capture_says_whether_a_cookie_the_site_set_was_sent(site):
+    # The browser starts with no stored cookies; one the site sets during the visit goes back to it, as in a private
+    # window, and the receipt's request line says so rather than claiming none.
+    _, cap = _capture(site, "/cookie", "Cookie")
+    assert cap["outcome"] == "saved" and cap["final_url"] == site + "/story"
+    assert ["cookie", "sent"] in cap["exchange"]["request"]["headers"]
+
+
+def test_a_page_past_the_byte_budget_is_cut_off(site, monkeypatch):
+    monkeypatch.setattr(settings, "capture_max_megabytes", 1)
+    _, cap = _capture(site, "/heavy", "Heavy")
+    assert cap["outcome"] == "saved"
+    with SessionLocal() as db:
+        limits = db.get(CaseRecord, cap["case_record_id"]).body["limitations"]
+    assert "The page and what it loaded passed the 1 MB capture limit; the rest was not loaded" in limits
+    har = next(f for f in cap["files"] if f["name"] == "page.har")
+    assert har["bytes"] < 2 * 1024 * 1024
+
+
+def test_a_retried_capture_job_does_not_visit_again(site, monkeypatch):
+    inv, cap = _capture(site, "/story", "Retried")
+    visits = []
+    monkeypatch.setattr(web_capture, "visit", lambda *a, **k: visits.append(a))
+    with SessionLocal() as db:
+        result = web_capture.run_capture(db, cap["id"], lambda *a: None)
+        assert result["message"] == "Already captured" and visits == []
+        assert db.scalar(select(func.count()).select_from(OutboundRequest).where(OutboundRequest.investigation_id == inv)) == 1
+    again = client.get(f"/api/captures/{cap['id']}").json()
+    assert again["files"] == cap["files"] and again["document_id"] == cap["document_id"]
+    for kept in cap["files"]:
+        assert hashlib.sha256(client.get(f"/api/captures/{cap['id']}/files/{kept['name']}").content).hexdigest() == kept["sha256"]
+
+
+def test_a_case_deleted_during_the_visit_keeps_nothing(site, monkeypatch):
+    real = web_capture.visit
+    with SessionLocal() as db:
+        db.add(Investigation(id="gone-case", name="Gone"))
+        db.commit()
+        row = web_capture.request_capture(db, "gone-case", site + "/story", collector="you")
+
+    def visit_then_delete(*args, **kwargs):
+        seen = real(*args, **kwargs)
+        with SessionLocal() as other:
+            delete_investigation(other, "gone-case", settings.document_storage_dir, confirmation="Gone")
+        return seen
+
+    monkeypatch.setattr(web_capture, "visit", visit_then_delete)
+    with SessionLocal() as db:
+        result = web_capture.run_capture(db, row.id, lambda *a: None)
+    assert result["message"].startswith("The case or the capture was deleted")
+    root = Path(settings.document_storage_dir)
+    assert not (root / "gone-case").exists()
+    assert not any((root / ".capture-staging").glob("*")) if (root / ".capture-staging").exists() else True
+
+
+def test_restore_preview_warns_when_capture_files_were_missing(site):
+    inv, cap = _capture(site, "/story", "Missing")
+    (web_capture.capture_dir(settings.document_storage_dir, inv, cap["id"]) / "screenshot.png").unlink()
+    with SessionLocal() as db:
+        data, manifest = build_investigation_export(db, inv)
+        assert manifest["missing_capture_files"] == [{"capture_id": cap["id"], "name": "screenshot.png"}]
+        delete_investigation(db, inv, settings.document_storage_dir, confirmation=inv)
+        preview = preview_investigation_restore(db, data, Path(settings.document_storage_dir))
+    assert any("missing 1 web capture file" in w for w in preview["warnings"])

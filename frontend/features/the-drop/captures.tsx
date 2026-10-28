@@ -129,7 +129,7 @@ function Lane({capture}: {capture: CaptureOut}): ReactElement {
     <dl className="cp-facts">
       <div><dt>Tool</dt><dd>{capture.tool?.replace('Journalism Workbench web capture: ', '') || '–'}</dd></div>
       <div><dt>Collector</dt><dd>{collectorName(capture)} · this computer</dd></div>
-      <div><dt>Signed in?</dt><dd>No · no cookies sent</dd></div>
+      <div><dt>Signed in?</dt><dd>No · a fresh browser, no stored cookies</dd></div>
       <div><dt>Started</dt><dd>{utc(capture.started_at ?? capture.requested_at)}</dd></div>
       <div><dt>Ended</dt><dd>{utc(capture.finished_at)}</dd></div>
       <div><dt>Clock shown in capture</dt><dd>{clock(capture.captured_at)}</dd></div>
@@ -175,7 +175,7 @@ function Outcome({capture, onAddFile}: {capture: CaptureOut; onAddFile: () => vo
     <p className="cp-out"><span className={`cp-chip big ${wall ? 'amber' : 'bad'}`}>{wall ? 'Not seen' : capture.status === 'failed' ? 'Stopped' : 'Link only'}</span>
       <b>{wall ? 'A login wall, paywall or block was in the way' : 'Saved as a link, with the reason'}</b></p>
     <p>{capture.reason}</p>
-    {wall ? <p>What was kept is what the site showed instead, marked <b>not seen</b>, never “shown”. This app signs in to nothing: no accounts, no cookies, no saved sessions.</p>
+    {wall ? <p>What was kept is what the site showed instead, marked <b>not seen</b>, never “shown”. This app signs in to nothing: no accounts, no stored cookies, no saved sessions.</p>
       : <p>That is an <b>outcome, not a gap</b>: it is logged with its reason and time. Nothing can be quoted from this link.</p>}
     <dl className="cp-kv">
       <dt>Kept</dt><dd>{capture.files.length ? <>The address, the time, and what the site sent instead: {capture.files.map(f => f.name).join(', ')}</> : 'The address as pasted and the time'}</dd>
@@ -229,7 +229,8 @@ export function CaptureLinkField({investigationId, captures, onCaptured}: {inves
 
 export function useCaptures(investigationId: string): UseQueryResult<CaptureOut[], GetCapturesError> {
   return useQuery({...getCapturesOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId),
-    refetchInterval: q => (q.state.data?.some(running) ? 1500 : false)});
+    // A finished capture may still be reading its page (its job is not done): keep following until both are.
+    refetchInterval: q => (q.state.data?.some(c => running(c) || (c.job ? !c.job.finished : false)) ? 1500 : false)});
 }
 
 /** The tab's three columns, set in The Drop's own grid. */
@@ -255,8 +256,8 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
       </section>
       <section className="cp-card" aria-label="What leaves this computer">
         <p className="dp-eyebrow cp-row">What leaves this computer <span className="cp-chip dash">ask first</span></p>
-        <p className="cp-safe"><b>✓ Nothing third-party is contacted.</b> The page is fetched from this computer.</p>
-        <p className="dp-quiet">The page’s own site sees one visit from this computer’s address, and it is written in Safety &amp; data’s outbound log before it goes.</p>
+        <p className="cp-safe"><b>✓ No outside capture service is used.</b> The page is fetched from this computer.</p>
+        <p className="dp-quiet">The page’s site sees one visit from this computer’s address, and so does every other site the page loads from (images, scripts, trackers): each is listed in page.har. The visit is written in Safety &amp; data’s outbound log before it goes.</p>
         <label className="cp-switch"><input type="checkbox" role="switch" checked={false} disabled readOnly/> Second witness: a public web archive saves it too <small>a later step</small></label>
         <label className="cp-switch"><input type="checkbox" role="switch" checked={false} disabled readOnly/> Time proof: a time server signs the fingerprint <small>a later step</small></label>
         <p className="dp-quiet">Off means off. Route: this computer’s own connection.</p>
@@ -268,7 +269,7 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
         <header className="cp-panel cp-head"><span><h2>{captureTitle(chosen)}</h2><code>{chosen.final_url && chosen.final_url !== chosen.url ? `${chosen.url} → ${chosen.final_url}` : chosen.url}</code></span>
           <span className={`cp-chip big ${state.tone}`}>{state.word}</span></header>
         <Lane capture={chosen}/>
-        {running(chosen) ? <p className="cp-note" role="status">Visiting the page once, from this computer, with no cookies. The receipt appears when it is kept.</p>
+        {running(chosen) ? <p className="cp-note" role="status">Visiting the page once, from this computer, in a fresh browser with no stored cookies. The receipt appears when it is kept.</p>
           : chosen.outcome === 'saved' ? <Receipt capture={chosen}/> : <Outcome capture={chosen} onAddFile={onAddFile}/>}
       </> : <div className="cp-none"><h2>Capture a web page</h2>
         <p className="dp-quiet">A pasted link becomes a source: the page as it was, when, and proof it has not changed since.</p></div>}

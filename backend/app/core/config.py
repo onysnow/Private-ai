@@ -73,6 +73,8 @@ class Settings(BaseSettings):
     # is kept as it stands then.
     capture_browser_path: str = ""
     capture_timeout_seconds: float = 45.0
+    # What one capture may bring back, the page and everything it loads, before the rest is cut off.
+    capture_max_megabytes: int = 100
     enable_pdf_ocr: bool = True
     pdf_ocr_language: str = "eng"
     pdf_ocr_dpi: int = 200

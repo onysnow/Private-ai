@@ -17,7 +17,10 @@ this system". The research (`SOURCE_INTAKE_RESEARCH.md` §3–4, §10 Phase 1) c
 ## Decision
 
 - **A real browser on this computer.** Playwright (Python, Apache-2.0) drives Chromium's headless shell to load the
-  page. One visit, by the reporter's own action; no cookies, no login, no stored session (decided 19 Oct). A site that
+  page. One visit, by the reporter's own action, in a fresh browser: no stored cookies, no login, no stored session
+  (decided 19 Oct). Cookies a site sets during that one visit are used within it, as in a private window, and thrown away
+  with the browser; each request's `cookie` line in the receipt says whether one was sent. (Blocking them outright is
+  not offered by Playwright across redirects, and a profile set to block cookies is ignored: tested 28 Oct.) A site that
   answers 401, 402, 403 or 407 (a login wall, a paywall, or a block on automated visits) is recorded as **not seen**,
   never as shown; a page that cannot be reached, or answers another error, is **link only**, with the reason. The
   browser's own calls home (updates, sign-in, suggestions) are switched off; the full Chromium makes them anyway, the
@@ -56,6 +59,8 @@ this system". The research (`SOURCE_INTAKE_RESEARCH.md` §3–4, §10 Phase 1) c
   pointed at the local network is a way in.
 - **robots.txt** is read but not obeyed for a one-off capture (decision 4): when it disallows the page, the receipt says
   so. Monitors (Phase 3) obey it.
+- **A byte budget.** One capture may bring back 100 MB (`CAPTURE_MAX_MEGABYTES`), the page and all it loads, counted at
+  the guard; past it the connections are cut and the capture says so.
 - **Off by default, per capture:** a second witness (a public archive) and a time proof (RFC 3161). Both leave this
   computer; they come in a later step and are logged when used.
 - **Route:** Direct. A Tor route per capture comes with Following (Phase 3), through a Tor the reporter runs.

@@ -156,6 +156,17 @@ describe('Links & captures', () => {
     expect(await within(paste).findByText(/private or local address/)).toBeInTheDocument();
   });
 
+  it('keeps following a finished capture while its page is still being read', async () => {
+    let calls = 0;
+    const reading = capture({stages: stages(['done', 'done', 'done', 'done', 'done', 'done', 'waiting'], 1),
+      job: {id: 'j1', kind: 'web_capture', status: 'running', finished: false, attempts: 1, runner: 'procrastinate', progress: 85,
+        message: 'Reading the page', error: null, investigation_id: 'inv-1', subject_type: 'capture', subject_id: 'c1',
+        created_at: '2026-10-19T10:14:01', started_at: '2026-10-19T10:14:02', finished_at: null, updated_at: '2026-10-19T10:14:09'}});
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': () => { calls += 1; return calls === 1 ? [reading] : [capture()]; }});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/captures').length).toBeGreaterThan(1), {timeout: 4000});
+  });
+
   it('shows a capture still running as a working lane, without a receipt', async () => {
     mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture({status: 'capturing', outcome: null, suite_outcome: null, files: [], finished_at: null,
       captured_at: null, displayed: {}, stages: stages(['waiting', 'waiting', 'waiting', 'waiting', 'waiting', 'waiting', 'waiting'])})]});
@@ -166,6 +177,6 @@ describe('Links & captures', () => {
     expect(within(lane).getByText('Capturing')).toBeInTheDocument();
     expect(within(lane).getAllByRole('listitem')[0]).toHaveTextContent('Link checked… working');
     expect(screen.queryByRole('region', {name: 'Capture receipt'})).toBeNull();
-    expect(screen.getByText(/Visiting the page once, from this computer, with no cookies/)).toBeInTheDocument();
+    expect(screen.getByText(/Visiting the page once, from this computer, in a fresh browser with no stored cookies/)).toBeInTheDocument();
   });
 });
