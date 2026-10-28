@@ -522,7 +522,7 @@
         "type": "object"
       },
       "AiAuthoritySuiteOut": {
-        "description": "The vendored Authority System Suite: where it came from and the TAS version the prompts use.",
+        "description": "The Authority System Suite (bundled in the Authority Suite SDK): where it came from and the TAS version the prompts use.",
         "properties": {
           "control_surface": {
             "$ref": "#/components/schemas/AiControlSurfaceOut"
@@ -27334,104 +27334,6 @@
         "title": "OrphanStoragePreviewOut",
         "type": "object"
       },
-      "OutboundEntryOut": {
-        "description": "One request that carried case data to an outside service, as it was sent. `local` is true for a request to a\nservice on this computer: kept so the log is complete, and not counted as leaving.",
-        "properties": {
-          "actor": {
-            "title": "Actor",
-            "type": "string"
-          },
-          "at": {
-            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
-            "title": "At",
-            "type": "string"
-          },
-          "destination": {
-            "title": "Destination",
-            "type": "string"
-          },
-          "detail": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Detail"
-          },
-          "error": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Error"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "local": {
-            "title": "Local",
-            "type": "boolean"
-          },
-          "reason": {
-            "title": "Reason",
-            "type": "string"
-          },
-          "run_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Run Id"
-          },
-          "service": {
-            "title": "Service",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "value_kind": {
-            "title": "Value Kind",
-            "type": "string"
-          },
-          "value_sent": {
-            "title": "Value Sent",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "at",
-          "service",
-          "destination",
-          "local",
-          "value_sent",
-          "value_kind",
-          "reason",
-          "actor",
-          "status",
-          "error",
-          "run_id",
-          "detail"
-        ],
-        "title": "OutboundEntryOut",
-        "type": "object"
-      },
       "OutboundLineOut": {
         "description": "One request that left this computer (app/services/outbound.py).",
         "properties": {
@@ -27494,42 +27396,83 @@
         "title": "OutboundLineOut",
         "type": "object"
       },
-      "OutboundLogOut": {
+      "OutboundRequestOut": {
         "properties": {
-          "entries": {
-            "items": {
-              "$ref": "#/components/schemas/OutboundEntryOut"
-            },
-            "title": "Entries",
-            "type": "array"
+          "actor": {
+            "enum": [
+              "you",
+              "automatic"
+            ],
+            "title": "Actor",
+            "type": "string"
           },
-          "period": {
-            "title": "Period",
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "leaves_computer": {
+            "title": "Leaves Computer",
+            "type": "boolean"
+          },
+          "outcome": {
+            "enum": [
+              "sent",
+              "failed",
+              "blocked"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
             "type": "string"
           },
           "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "service_name": {
+            "title": "Service Name",
+            "type": "string"
+          },
+          "source": {
             "anyOf": [
               {
-                "type": "string"
+                "additionalProperties": true,
+                "type": "object"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Service"
+            "title": "Source"
           },
-          "total": {
-            "title": "Total",
-            "type": "integer"
+          "value": {
+            "title": "Value",
+            "type": "string"
           }
         },
         "required": [
-          "period",
+          "id",
+          "at",
           "service",
-          "total",
-          "entries"
+          "service_name",
+          "kind",
+          "value",
+          "reason",
+          "actor",
+          "leaves_computer",
+          "outcome"
         ],
-        "title": "OutboundLogOut",
+        "title": "OutboundRequestOut",
         "type": "object"
       },
       "OwnershipChainLinkOut": {
@@ -32057,41 +32000,96 @@
         "title": "RunSettingValueOut",
         "type": "object"
       },
-      "SafetyAccessCardOut": {
+      "SafetyAccessOut": {
         "properties": {
+          "log_readable": {
+            "title": "Log Readable",
+            "type": "boolean"
+          },
+          "mode": {
+            "enum": [
+              "local_only",
+              "remote"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
           "refused_24h": {
             "title": "Refused 24H",
             "type": "integer"
           }
         },
         "required": [
-          "refused_24h"
+          "mode",
+          "refused_24h",
+          "log_readable"
         ],
-        "title": "SafetyAccessCardOut",
+        "title": "SafetyAccessOut",
         "type": "object"
       },
-      "SafetyAndDataOut": {
+      "SafetyBackupOut": {
         "properties": {
-          "cards": {
-            "$ref": "#/components/schemas/SafetyCardsOut"
+          "encrypted": {
+            "title": "Encrypted",
+            "type": "boolean"
           },
-          "investigation": {
-            "$ref": "#/components/schemas/SafetyInvestigationOut"
+          "last_backup_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Backup At"
           },
-          "not_counted": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Not Counted",
-            "type": "array"
+          "restore_enabled": {
+            "title": "Restore Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "encrypted",
+          "restore_enabled"
+        ],
+        "title": "SafetyBackupOut",
+        "type": "object"
+      },
+      "SafetyDataOut": {
+        "description": "Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015).",
+        "properties": {
+          "access": {
+            "$ref": "#/components/schemas/SafetyAccessOut"
           },
-          "now": {
-            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
-            "title": "Now",
+          "backup": {
+            "$ref": "#/components/schemas/SafetyBackupOut"
+          },
+          "exposure": {
+            "title": "Exposure",
             "type": "string"
           },
+          "housekeeping": {
+            "$ref": "#/components/schemas/SafetyHousekeepingOut"
+          },
+          "outbound": {
+            "items": {
+              "$ref": "#/components/schemas/OutboundRequestOut"
+            },
+            "title": "Outbound",
+            "type": "array"
+          },
+          "outbound_total": {
+            "title": "Outbound Total",
+            "type": "integer"
+          },
           "period": {
+            "enum": [
+              "today",
+              "7d",
+              "30d",
+              "all"
+            ],
             "title": "Period",
             "type": "string"
           },
@@ -32103,408 +32101,83 @@
             "type": "array"
           },
           "stores": {
-            "$ref": "#/components/schemas/SafetyStoresOut"
+            "items": {
+              "$ref": "#/components/schemas/SafetyStoreOut"
+            },
+            "title": "Stores",
+            "type": "array"
           },
           "totals": {
             "$ref": "#/components/schemas/SafetyTotalsOut"
           }
         },
         "required": [
-          "investigation",
           "period",
-          "now",
           "totals",
+          "exposure",
           "stores",
           "services",
-          "cards",
-          "not_counted"
-        ],
-        "title": "SafetyAndDataOut",
-        "type": "object"
-      },
-      "SafetyBackupCardOut": {
-        "properties": {
-          "documents": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Documents"
-          },
-          "last": {
-            "anyOf": [
-              {
-                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
-                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Last"
-          },
-          "records": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Records"
-          },
-          "sha256": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Sha256"
-          },
-          "size_bytes": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Size Bytes"
-          },
-          "with_documents": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "With Documents"
-          }
-        },
-        "required": [
-          "last",
-          "size_bytes",
-          "sha256",
-          "with_documents",
-          "records",
-          "documents"
-        ],
-        "title": "SafetyBackupCardOut",
-        "type": "object"
-      },
-      "SafetyBackupsStoreOut": {
-        "properties": {
-          "count": {
-            "title": "Count",
-            "type": "integer"
-          },
-          "encrypted": {
-            "title": "Encrypted",
-            "type": "boolean"
-          },
-          "last": {
-            "anyOf": [
-              {
-                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
-                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Last"
-          }
-        },
-        "required": [
-          "count",
-          "last",
-          "encrypted"
-        ],
-        "title": "SafetyBackupsStoreOut",
-        "type": "object"
-      },
-      "SafetyCardsOut": {
-        "properties": {
-          "access": {
-            "$ref": "#/components/schemas/SafetyAccessCardOut"
-          },
-          "backup": {
-            "$ref": "#/components/schemas/SafetyBackupCardOut"
-          },
-          "delete": {
-            "$ref": "#/components/schemas/SafetyDeleteCardOut"
-          },
-          "housekeeping": {
-            "$ref": "#/components/schemas/SafetyHousekeepingCardOut"
-          }
-        },
-        "required": [
           "backup",
           "access",
           "housekeeping",
-          "delete"
+          "outbound",
+          "outbound_total"
         ],
-        "title": "SafetyCardsOut",
+        "title": "SafetyDataOut",
         "type": "object"
       },
-      "SafetyCaseRecordsOut": {
-        "properties": {
-          "claims": {
-            "title": "Claims",
-            "type": "integer"
-          },
-          "in_backups": {
-            "title": "In Backups",
-            "type": "boolean"
-          },
-          "records": {
-            "title": "Records",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "records",
-          "claims",
-          "in_backups"
-        ],
-        "title": "SafetyCaseRecordsOut",
-        "type": "object"
-      },
-      "SafetyDeleteCardOut": {
-        "properties": {
-          "files": {
-            "title": "Files",
-            "type": "integer"
-          },
-          "records": {
-            "title": "Records",
-            "type": "integer"
-          },
-          "shared_files": {
-            "title": "Shared Files",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "records",
-          "files",
-          "shared_files"
-        ],
-        "title": "SafetyDeleteCardOut",
-        "type": "object"
-      },
-      "SafetyDocumentsOut": {
-        "properties": {
-          "bytes": {
-            "title": "Bytes",
-            "type": "integer"
-          },
-          "files": {
-            "title": "Files",
-            "type": "integer"
-          },
-          "in_backups": {
-            "title": "In Backups",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "files",
-          "bytes",
-          "in_backups"
-        ],
-        "title": "SafetyDocumentsOut",
-        "type": "object"
-      },
-      "SafetyHousekeepingCardOut": {
+      "SafetyHousekeepingOut": {
         "properties": {
           "stray_bytes": {
-            "title": "Stray Bytes",
-            "type": "integer"
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stray Bytes"
           },
           "stray_files": {
-            "title": "Stray Files",
-            "type": "integer"
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stray Files"
           }
         },
-        "required": [
-          "stray_files",
-          "stray_bytes"
-        ],
-        "title": "SafetyHousekeepingCardOut",
+        "title": "SafetyHousekeepingOut",
         "type": "object"
       },
-      "SafetyInvestigationOut": {
+      "SafetyServiceOut": {
+        "description": "A service the case can reach, with what has been sent to it in the period.",
         "properties": {
+          "about": {
+            "title": "About",
+            "type": "string"
+          },
+          "blocked_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocked Note"
+          },
           "id": {
             "title": "Id",
             "type": "string"
           },
           "name": {
             "title": "Name",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name"
-        ],
-        "title": "SafetyInvestigationOut",
-        "type": "object"
-      },
-      "SafetyKeysOut": {
-        "properties": {
-          "set": {
-            "title": "Set",
-            "type": "integer"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "set",
-          "total"
-        ],
-        "title": "SafetyKeysOut",
-        "type": "object"
-      },
-      "SafetyPrivateAiOut": {
-        "properties": {
-          "enabled": {
-            "title": "Enabled",
-            "type": "boolean"
-          },
-          "model": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Model"
-          },
-          "on_this_computer": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "On This Computer"
-          },
-          "provider": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Provider"
-          },
-          "remote_allowed": {
-            "title": "Remote Allowed",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "enabled",
-          "provider",
-          "model",
-          "on_this_computer",
-          "remote_allowed"
-        ],
-        "title": "SafetyPrivateAiOut",
-        "type": "object"
-      },
-      "SafetySecurityLogOut": {
-        "properties": {
-          "bytes": {
-            "title": "Bytes",
-            "type": "integer"
-          },
-          "events": {
-            "title": "Events",
-            "type": "integer"
-          },
-          "since": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Since"
-          }
-        },
-        "required": [
-          "events",
-          "since",
-          "bytes"
-        ],
-        "title": "SafetySecurityLogOut",
-        "type": "object"
-      },
-      "SafetyServiceOut": {
-        "description": "An outside service the case can reach. `mode` is one of off / on_click / this_computer / automatic / blocked:\nthe app has no \"ask first\" switch yet (ADR-0015), so a lookup runs only when the reporter starts it (`on_click`).\n`counted` is false when the app does not log that service's traffic, so the screen never shows a false zero.",
-        "properties": {
-          "counted": {
-            "title": "Counted",
-            "type": "boolean"
-          },
-          "host": {
-            "title": "Host",
-            "type": "string"
-          },
-          "key": {
-            "title": "Key",
-            "type": "string"
-          },
-          "label": {
-            "title": "Label",
-            "type": "string"
-          },
-          "last": {
-            "anyOf": [
-              {
-                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
-                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Last"
-          },
-          "mode": {
-            "title": "Mode",
-            "type": "string"
-          },
-          "role": {
-            "title": "Role",
             "type": "string"
           },
           "sends": {
@@ -32514,60 +32187,133 @@
             "title": "Sends",
             "type": "array"
           },
-          "sent": {
-            "title": "Sent",
+          "sent_count": {
+            "title": "Sent Count",
             "type": "integer"
           },
-          "why": {
-            "title": "Why",
+          "state": {
+            "enum": [
+              "off",
+              "on_request",
+              "local"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "state_note": {
+            "title": "State Note",
+            "type": "string"
+          },
+          "where": {
+            "enum": [
+              "inside",
+              "outside"
+            ],
+            "title": "Where",
             "type": "string"
           }
         },
         "required": [
-          "key",
-          "label",
-          "role",
-          "host",
-          "mode",
-          "why",
-          "sent",
+          "id",
+          "name",
+          "about",
+          "state",
+          "state_note",
+          "sent_count",
           "sends",
-          "last",
-          "counted"
+          "where"
         ],
         "title": "SafetyServiceOut",
         "type": "object"
       },
-      "SafetyStoresOut": {
+      "SafetyStoreOut": {
+        "description": "One place on this computer where the case lives (mockup KEEP_2's six stores).",
         "properties": {
-          "backups": {
-            "$ref": "#/components/schemas/SafetyBackupsStoreOut"
+          "bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bytes"
           },
-          "case_records": {
-            "$ref": "#/components/schemas/SafetyCaseRecordsOut"
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
           },
-          "documents": {
-            "$ref": "#/components/schemas/SafetyDocumentsOut"
+          "count_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count Note"
           },
-          "private_ai": {
-            "$ref": "#/components/schemas/SafetyPrivateAiOut"
+          "id": {
+            "title": "Id",
+            "type": "string"
           },
-          "security_log": {
-            "$ref": "#/components/schemas/SafetySecurityLogOut"
+          "in_backups": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In Backups"
           },
-          "service_keys": {
-            "$ref": "#/components/schemas/SafetyKeysOut"
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "oldest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warning"
+          },
+          "where": {
+            "title": "Where",
+            "type": "string"
           }
         },
         "required": [
-          "case_records",
-          "documents",
-          "backups",
-          "service_keys",
-          "security_log",
-          "private_ai"
+          "id",
+          "name",
+          "where"
         ],
-        "title": "SafetyStoresOut",
+        "title": "SafetyStoreOut",
         "type": "object"
       },
       "SafetyTotalsOut": {
@@ -35065,7 +34811,7 @@
         "type": "object"
       },
       "SuiteCatalogOut": {
-        "description": "Every system, module and record of the vendored suite, and which app runs use each module.",
+        "description": "Every system, module and record of the suite, and which app runs use each module.",
         "properties": {
           "source": {
             "anyOf": [
@@ -54115,7 +53861,7 @@
     },
     "/api/investigations/{investigation_id}/assistant/presentation-draft": {
       "post": {
-        "description": "Draft a brief/deck from a reporter-selected evidence set and a goal.\n\nApp-local reasoning module (not vendored TAS -- see\napp/ai/presentation_modules/PRESENTATION_DRAFT.md), reusing the same\ncitation-validated LLM pipeline and non-canonical-write guarantee as\n/assistant/case-synthesis and /assistant/hypothesis-test above: the\nresult is a review_status=\"proposed\" AIAnalysisCandidate, promoted to\na Writeup and/or Deck only by a separate, human action.",
+        "description": "Draft a brief/deck from a reporter-selected evidence set and a goal.\n\nApp-local reasoning module (not TAS -- see\napp/ai/presentation_modules/PRESENTATION_DRAFT.md), reusing the same\ncitation-validated LLM pipeline and non-canonical-write guarantee as\n/assistant/case-synthesis and /assistant/hypothesis-test above: the\nresult is a review_status=\"proposed\" AIAnalysisCandidate, promoted to\na Writeup and/or Deck only by a separate, human action.",
         "operationId": "investigation_presentation_draft",
         "parameters": [
           {
@@ -57397,192 +57143,6 @@
         "summary": "Add Note"
       }
     },
-    "/api/investigations/{investigation_id}/outbound-log": {
-      "get": {
-        "description": "Newest first. Only requests that left this computer, unless `include_local` is true.",
-        "operationId": "get_outbound_log",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "investigation_id",
-            "required": true,
-            "schema": {
-              "title": "Investigation Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "period",
-            "required": false,
-            "schema": {
-              "default": "7d",
-              "enum": [
-                "today",
-                "7d",
-                "30d",
-                "all"
-              ],
-              "title": "Period",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "service",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Service"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "default": 200,
-              "maximum": 1000,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "include_local",
-            "required": false,
-            "schema": {
-              "default": false,
-              "title": "Include Local",
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OutboundLogOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorOut"
-                }
-              }
-            },
-            "description": "The request's input does not match what the route declares"
-          },
-          "4XX": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorOut"
-                }
-              }
-            },
-            "description": "Refused: why, in a sentence"
-          }
-        },
-        "summary": "Get Outbound Log"
-      }
-    },
-    "/api/investigations/{investigation_id}/outbound-log.csv": {
-      "get": {
-        "operationId": "export_outbound_log",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "investigation_id",
-            "required": true,
-            "schema": {
-              "title": "Investigation Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "period",
-            "required": false,
-            "schema": {
-              "default": "all",
-              "enum": [
-                "today",
-                "7d",
-                "30d",
-                "all"
-              ],
-              "title": "Period",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "service",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Service"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "text/csv": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": "The whole outbound log as a CSV file, for a source-protection file"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorOut"
-                }
-              }
-            },
-            "description": "The request's input does not match what the route declares"
-          },
-          "4XX": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorOut"
-                }
-              }
-            },
-            "description": "Refused: why, in a sentence"
-          }
-        },
-        "summary": "Export Outbound Log"
-      }
-    },
     "/api/investigations/{investigation_id}/paths": {
       "get": {
         "description": "Every chain of links between two parties, up to max_len links, each with how sure its weakest link is.",
@@ -58371,9 +57931,10 @@
         "summary": "Put Case Research"
       }
     },
-    "/api/investigations/{investigation_id}/safety-and-data": {
+    "/api/investigations/{investigation_id}/safety-data": {
       "get": {
-        "operationId": "get_safety_and_data",
+        "description": "Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015).",
+        "operationId": "get_safety_data",
         "parameters": [
           {
             "in": "path",
@@ -58406,7 +57967,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SafetyAndDataOut"
+                  "$ref": "#/components/schemas/SafetyDataOut"
                 }
               }
             },
@@ -58433,7 +57994,7 @@
             "description": "Refused: why, in a sentence"
           }
         },
-        "summary": "Get Safety And Data"
+        "summary": "Get Safety Data"
       }
     },
     "/api/investigations/{investigation_id}/saved-questions": {
@@ -64909,7 +64470,7 @@
     },
     "/api/suite/catalog": {
       "get": {
-        "description": "Every system, module and record of the vendored Authority System Suite, read from its own files, with the\napp runs that use each module (none, for a module the app leaves out).",
+        "description": "Every system, module and record of the Authority System Suite (bundled in the Authority Suite SDK), read from its own files, with the\napp runs that use each module (none, for a module the app leaves out).",
         "operationId": "get_suite_catalog",
         "responses": {
           "200": {

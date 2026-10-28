@@ -82,7 +82,6 @@ import {
   expandEntityInCorpus,
   exportDeckPptx,
   exportInvestigation,
-  exportOutboundLog,
   exportWriteupDocx,
   externalRelationshipCandidates,
   findExtractionLineageEndpoint,
@@ -145,14 +144,13 @@ import {
   getOpenalephDocumentReviewStatus,
   getOpenalephDocumentSync,
   getOrphanStoragePreview,
-  getOutboundLog,
   getOwnershipChain,
   getPartyYears,
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
   getResearchSettings,
-  getSafetyAndData,
+  getSafetyData,
   getSameAnswerCandidates,
   getSecurityAlerts,
   getSecurityAudit,
@@ -563,9 +561,6 @@ import type {
   ExportInvestigationData,
   ExportInvestigationError,
   ExportInvestigationResponse,
-  ExportOutboundLogData,
-  ExportOutboundLogError,
-  ExportOutboundLogResponse,
   ExportWriteupDocxData,
   ExportWriteupDocxError,
   ExportWriteupDocxResponse,
@@ -752,9 +747,6 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewError,
   GetOrphanStoragePreviewResponse,
-  GetOutboundLogData,
-  GetOutboundLogError,
-  GetOutboundLogResponse,
   GetOwnershipChainData,
   GetOwnershipChainError,
   GetOwnershipChainResponse,
@@ -773,9 +765,9 @@ import type {
   GetResearchSettingsData,
   GetResearchSettingsError,
   GetResearchSettingsResponse,
-  GetSafetyAndDataData,
-  GetSafetyAndDataError,
-  GetSafetyAndDataResponse,
+  GetSafetyDataData,
+  GetSafetyDataError,
+  GetSafetyDataResponse,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesError,
   GetSameAnswerCandidatesResponse,
@@ -5485,7 +5477,7 @@ export const investigationRunPlanMutation = (
  *
  * Draft a brief/deck from a reporter-selected evidence set and a goal.
  *
- * App-local reasoning module (not vendored TAS -- see
+ * App-local reasoning module (not TAS -- see
  * app/ai/presentation_modules/PRESENTATION_DRAFT.md), reusing the same
  * citation-validated LLM pipeline and non-canonical-write guarantee as
  * /assistant/case-synthesis and /assistant/hypothesis-test above: the
@@ -7385,61 +7377,6 @@ export const addNoteMutation = (
   return mutationOptions;
 };
 
-export const getOutboundLogQueryKey = (options: Options<GetOutboundLogData>) =>
-  createQueryKey('getOutboundLog', options);
-
-/**
- * Get Outbound Log
- *
- * Newest first. Only requests that left this computer, unless `include_local` is true.
- */
-export const getOutboundLogOptions = (options: Options<GetOutboundLogData>) =>
-  queryOptions<
-    GetOutboundLogResponse,
-    GetOutboundLogError,
-    GetOutboundLogResponse,
-    ReturnType<typeof getOutboundLogQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getOutboundLog({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getOutboundLogQueryKey(options),
-  });
-
-export const exportOutboundLogQueryKey = (
-  options: Options<ExportOutboundLogData>,
-) => createQueryKey('exportOutboundLog', options);
-
-/**
- * Export Outbound Log
- */
-export const exportOutboundLogOptions = (
-  options: Options<ExportOutboundLogData>,
-) =>
-  queryOptions<
-    ExportOutboundLogResponse,
-    ExportOutboundLogError,
-    ExportOutboundLogResponse,
-    ReturnType<typeof exportOutboundLogQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await exportOutboundLog({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: exportOutboundLogQueryKey(options),
-  });
-
 export const howAreTheyConnectedQueryKey = (
   options: Options<HowAreTheyConnectedData>,
 ) => createQueryKey('howAreTheyConnected', options);
@@ -7883,24 +7820,23 @@ export const putCaseResearchMutation = (
   return mutationOptions;
 };
 
-export const getSafetyAndDataQueryKey = (
-  options: Options<GetSafetyAndDataData>,
-) => createQueryKey('getSafetyAndData', options);
+export const getSafetyDataQueryKey = (options: Options<GetSafetyDataData>) =>
+  createQueryKey('getSafetyData', options);
 
 /**
- * Get Safety And Data
+ * Get Safety Data
+ *
+ * Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015).
  */
-export const getSafetyAndDataOptions = (
-  options: Options<GetSafetyAndDataData>,
-) =>
+export const getSafetyDataOptions = (options: Options<GetSafetyDataData>) =>
   queryOptions<
-    GetSafetyAndDataResponse,
-    GetSafetyAndDataError,
-    GetSafetyAndDataResponse,
-    ReturnType<typeof getSafetyAndDataQueryKey>
+    GetSafetyDataResponse,
+    GetSafetyDataError,
+    GetSafetyDataResponse,
+    ReturnType<typeof getSafetyDataQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getSafetyAndData({
+      const { data } = await getSafetyData({
         ...options,
         ...queryKey[0],
         signal,
@@ -7908,7 +7844,7 @@ export const getSafetyAndDataOptions = (
       });
       return data;
     },
-    queryKey: getSafetyAndDataQueryKey(options),
+    queryKey: getSafetyDataQueryKey(options),
   });
 
 /**
@@ -11261,7 +11197,7 @@ export const getSuiteCatalogQueryKey = (
 /**
  * Get Suite Catalog
  *
- * Every system, module and record of the vendored Authority System Suite, read from its own files, with the
+ * Every system, module and record of the Authority System Suite (bundled in the Authority Suite SDK), read from its own files, with the
  * app runs that use each module (none, for a module the app leaves out).
  */
 export const getSuiteCatalogOptions = (

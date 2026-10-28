@@ -6,16 +6,17 @@
 // to use it: docs/frontend/react-hook-form-zod.md.
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
-import type {FieldPath, FieldValues, UseFormProps, UseFormReturn} from 'react-hook-form';
+import type {FieldPath, FieldValues, Resolver, UseFormProps, UseFormReturn} from 'react-hook-form';
 import type {BaseSyntheticEvent} from 'react';
-import type {ZodType, ZodTypeDef} from 'zod';
+import type {ZodType} from 'zod';
 
 import {ApiHttpError, errorMessage} from './api-client';
 
 /** useForm checked by a Zod schema, on leaving each field and again on submit. */
-export function useZodForm<T extends FieldValues>(schema: ZodType<T, ZodTypeDef, unknown>,
+export function useZodForm<T extends FieldValues>(schema: ZodType<T, FieldValues>,
   props: Omit<UseFormProps<T>, 'resolver'> = {}): UseFormReturn<T> {
-  return useForm<T>({mode: 'onBlur', ...props, resolver: zodResolver(schema)});
+  // zod 4's resolver types a schema's input apart from its output; the form holds the output (T) throughout.
+  return useForm<T>({mode: 'onBlur', ...props, resolver: zodResolver(schema) as unknown as Resolver<T>});
 }
 
 /** Is a field rendered at this dotted path (a FormField registered it), so an error set on it is seen?

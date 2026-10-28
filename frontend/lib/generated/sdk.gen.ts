@@ -231,9 +231,6 @@ import type {
   ExportInvestigationData,
   ExportInvestigationErrors,
   ExportInvestigationResponses,
-  ExportOutboundLogData,
-  ExportOutboundLogErrors,
-  ExportOutboundLogResponses,
   ExportWriteupDocxData,
   ExportWriteupDocxErrors,
   ExportWriteupDocxResponses,
@@ -420,9 +417,6 @@ import type {
   GetOrphanStoragePreviewData,
   GetOrphanStoragePreviewErrors,
   GetOrphanStoragePreviewResponses,
-  GetOutboundLogData,
-  GetOutboundLogErrors,
-  GetOutboundLogResponses,
   GetOwnershipChainData,
   GetOwnershipChainErrors,
   GetOwnershipChainResponses,
@@ -441,9 +435,9 @@ import type {
   GetResearchSettingsData,
   GetResearchSettingsErrors,
   GetResearchSettingsResponses,
-  GetSafetyAndDataData,
-  GetSafetyAndDataErrors,
-  GetSafetyAndDataResponses,
+  GetSafetyDataData,
+  GetSafetyDataErrors,
+  GetSafetyDataResponses,
   GetSameAnswerCandidatesData,
   GetSameAnswerCandidatesErrors,
   GetSameAnswerCandidatesResponses,
@@ -1184,9 +1178,6 @@ import {
   zExportInvestigationPath,
   zExportInvestigationQuery,
   zExportInvestigationResponse,
-  zExportOutboundLogPath,
-  zExportOutboundLogQuery,
-  zExportOutboundLogResponse,
   zExportWriteupDocxPath,
   zExportWriteupDocxResponse,
   zExternalRelationshipCandidatesPath,
@@ -1311,9 +1302,6 @@ import {
   zGetOpenalephDocumentSyncPath,
   zGetOpenalephDocumentSyncResponse,
   zGetOrphanStoragePreviewResponse,
-  zGetOutboundLogPath,
-  zGetOutboundLogQuery,
-  zGetOutboundLogResponse,
   zGetOwnershipChainPath,
   zGetOwnershipChainResponse,
   zGetPartyYearsPath,
@@ -1326,9 +1314,9 @@ import {
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
   zGetResearchSettingsResponse,
-  zGetSafetyAndDataPath,
-  zGetSafetyAndDataQuery,
-  zGetSafetyAndDataResponse,
+  zGetSafetyDataPath,
+  zGetSafetyDataQuery,
+  zGetSafetyDataResponse,
   zGetSameAnswerCandidatesPath,
   zGetSameAnswerCandidatesResponse,
   zGetSecurityAlertsQuery,
@@ -5968,7 +5956,7 @@ export const investigationRunPlan = <ThrowOnError extends boolean = false>(
  *
  * Draft a brief/deck from a reporter-selected evidence set and a goal.
  *
- * App-local reasoning module (not vendored TAS -- see
+ * App-local reasoning module (not TAS -- see
  * app/ai/presentation_modules/PRESENTATION_DRAFT.md), reusing the same
  * citation-validated LLM pipeline and non-canonical-write guarantee as
  * /assistant/case-synthesis and /assistant/hypothesis-test above: the
@@ -7443,62 +7431,6 @@ export const addNote = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Get Outbound Log
- *
- * Newest first. Only requests that left this computer, unless `include_local` is true.
- */
-export const getOutboundLog = <ThrowOnError extends boolean = false>(
-  options: Options<GetOutboundLogData, ThrowOnError>,
-): RequestResult<GetOutboundLogResponses, GetOutboundLogErrors, ThrowOnError> =>
-  (options.client ?? client).get<
-    GetOutboundLogResponses,
-    GetOutboundLogErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) =>
-      await z
-        .object({
-          body: z.never().optional(),
-          path: zGetOutboundLogPath,
-          query: zGetOutboundLogQuery.optional(),
-        })
-        .parseAsync(data),
-    responseValidator: async (data) =>
-      await zGetOutboundLogResponse.parseAsync(data),
-    url: '/api/investigations/{investigation_id}/outbound-log',
-    ...options,
-  });
-
-/**
- * Export Outbound Log
- */
-export const exportOutboundLog = <ThrowOnError extends boolean = false>(
-  options: Options<ExportOutboundLogData, ThrowOnError>,
-): RequestResult<
-  ExportOutboundLogResponses,
-  ExportOutboundLogErrors,
-  ThrowOnError
-> =>
-  (options.client ?? client).get<
-    ExportOutboundLogResponses,
-    ExportOutboundLogErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) =>
-      await z
-        .object({
-          body: z.never().optional(),
-          path: zExportOutboundLogPath,
-          query: zExportOutboundLogQuery.optional(),
-        })
-        .parseAsync(data),
-    responseValidator: async (data) =>
-      await zExportOutboundLogResponse.parseAsync(data),
-    url: '/api/investigations/{investigation_id}/outbound-log.csv',
-    ...options,
-  });
-
-/**
  * How Are They Connected
  *
  * Every chain of links between two parties, up to max_len links, each with how sure its weakest link is.
@@ -7852,31 +7784,29 @@ export const putCaseResearch = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Get Safety And Data
+ * Get Safety Data
+ *
+ * Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015).
  */
-export const getSafetyAndData = <ThrowOnError extends boolean = false>(
-  options: Options<GetSafetyAndDataData, ThrowOnError>,
-): RequestResult<
-  GetSafetyAndDataResponses,
-  GetSafetyAndDataErrors,
-  ThrowOnError
-> =>
+export const getSafetyData = <ThrowOnError extends boolean = false>(
+  options: Options<GetSafetyDataData, ThrowOnError>,
+): RequestResult<GetSafetyDataResponses, GetSafetyDataErrors, ThrowOnError> =>
   (options.client ?? client).get<
-    GetSafetyAndDataResponses,
-    GetSafetyAndDataErrors,
+    GetSafetyDataResponses,
+    GetSafetyDataErrors,
     ThrowOnError
   >({
     requestValidator: async (data) =>
       await z
         .object({
           body: z.never().optional(),
-          path: zGetSafetyAndDataPath,
-          query: zGetSafetyAndDataQuery.optional(),
+          path: zGetSafetyDataPath,
+          query: zGetSafetyDataQuery.optional(),
         })
         .parseAsync(data),
     responseValidator: async (data) =>
-      await zGetSafetyAndDataResponse.parseAsync(data),
-    url: '/api/investigations/{investigation_id}/safety-and-data',
+      await zGetSafetyDataResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/safety-data',
     ...options,
   });
 
@@ -11336,7 +11266,7 @@ export const promoteStatementAssessment = <
 /**
  * Get Suite Catalog
  *
- * Every system, module and record of the vendored Authority System Suite, read from its own files, with the
+ * Every system, module and record of the Authority System Suite (bundled in the Authority Suite SDK), read from its own files, with the
  * app runs that use each module (none, for a module the app leaves out).
  */
 export const getSuiteCatalog = <ThrowOnError extends boolean = false>(

@@ -318,7 +318,7 @@ export type AiAnalysisCandidatesOut = {
 /**
  * AiAuthoritySuiteOut
  *
- * The vendored Authority System Suite: where it came from and the TAS version the prompts use.
+ * The Authority System Suite (bundled in the Authority Suite SDK): where it came from and the TAS version the prompts use.
  */
 export type AiAuthoritySuiteOut = {
   control_surface: AiControlSurfaceOut;
@@ -1189,80 +1189,6 @@ export type AppUserUpdatedOut = {
    * Token Status
    */
   token_status: 'active' | 'disabled' | 'revoked' | 'expired';
-};
-
-/**
- * AssistantRunRequest
- *
- * Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
- * test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
- * uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
- * (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
- * check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
- * then holds the goal).
- */
-export type AssistantRunRequest = {
-  /**
-   * Changes
-   */
-  changes?: Array<RunChangeIn> | null;
-  /**
-   * Context
-   */
-  context?: string | null;
-  /**
-   * Handoff From
-   */
-  handoff_from?: string | null;
-  /**
-   * Include External Leads
-   */
-  include_external_leads?: boolean;
-  /**
-   * Max Results
-   */
-  max_results?: number;
-  /**
-   * Module
-   */
-  module:
-    | 'case_synthesis'
-    | 'hypothesis_test'
-    | 'presentation_draft'
-    | 'research_vetting'
-    | 'quant_framing'
-    | 'las_argument_check'
-    | 'das_framing'
-    | 'das_options'
-    | 'evidence_plan'
-    | 'ehs_harm_minimisation'
-    | 'ehs_public_interest';
-  options?: RunOptionsIn | null;
-  packet_from?: PacketFromIn | null;
-  /**
-   * Premises
-   */
-  premises?: Array<string> | null;
-  /**
-   * Question
-   */
-  question: string;
-  /**
-   * Record Refs
-   */
-  record_refs?: Array<RecordRef> | null;
-  /**
-   * Severity Floor
-   */
-  severity_floor?: 'ALL' | 'MATERIAL' | 'BLOCKING' | null;
-  /**
-   * Source Tier Floor
-   */
-  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
-  /**
-   * Working Theory
-   */
-  working_theory?: string | null;
 };
 
 /**
@@ -13495,71 +13421,6 @@ export type OrphanStoragePreviewOut = {
 };
 
 /**
- * OutboundEntryOut
- *
- * One request that carried case data to an outside service, as it was sent. `local` is true for a request to a
- * service on this computer: kept so the log is complete, and not counted as leaving.
- */
-export type OutboundEntryOut = {
-  /**
-   * Actor
-   */
-  actor: string;
-  /**
-   * At
-   *
-   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
-   */
-  at: string;
-  /**
-   * Destination
-   */
-  destination: string;
-  /**
-   * Detail
-   */
-  detail: {
-    [key: string]: unknown;
-  } | null;
-  /**
-   * Error
-   */
-  error: string | null;
-  /**
-   * Id
-   */
-  id: string;
-  /**
-   * Local
-   */
-  local: boolean;
-  /**
-   * Reason
-   */
-  reason: string;
-  /**
-   * Run Id
-   */
-  run_id: string | null;
-  /**
-   * Service
-   */
-  service: string;
-  /**
-   * Status
-   */
-  status: string;
-  /**
-   * Value Kind
-   */
-  value_kind: string;
-  /**
-   * Value Sent
-   */
-  value_sent: string;
-};
-
-/**
  * OutboundLineOut
  *
  * One request that left this computer (app/services/outbound.py).
@@ -13606,25 +13467,55 @@ export type OutboundLineOut = {
 };
 
 /**
- * OutboundLogOut
+ * OutboundRequestOut
  */
-export type OutboundLogOut = {
+export type OutboundRequestOut = {
   /**
-   * Entries
+   * Actor
    */
-  entries: Array<OutboundEntryOut>;
+  actor: 'you' | 'automatic';
   /**
-   * Period
+   * At
    */
-  period: string;
+  at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Leaves Computer
+   */
+  leaves_computer: boolean;
+  /**
+   * Outcome
+   */
+  outcome: 'sent' | 'failed' | 'blocked';
+  /**
+   * Reason
+   */
+  reason: string;
   /**
    * Service
    */
-  service: string | null;
+  service: string;
   /**
-   * Total
+   * Service Name
    */
-  total: number;
+  service_name: string;
+  /**
+   * Source
+   */
+  source?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Value
+   */
+  value: string;
 };
 
 /**
@@ -16319,9 +16210,17 @@ export type RunSettingValueOut = {
 };
 
 /**
- * SafetyAccessCardOut
+ * SafetyAccessOut
  */
-export type SafetyAccessCardOut = {
+export type SafetyAccessOut = {
+  /**
+   * Log Readable
+   */
+  log_readable: boolean;
+  /**
+   * Mode
+   */
+  mode: 'local_only' | 'remote';
   /**
    * Refused 24H
    */
@@ -16329,163 +16228,87 @@ export type SafetyAccessCardOut = {
 };
 
 /**
- * SafetyAndDataOut
+ * SafetyBackupOut
  */
-export type SafetyAndDataOut = {
-  cards: SafetyCardsOut;
-  investigation: SafetyInvestigationOut;
-  /**
-   * Not Counted
-   */
-  not_counted: Array<string>;
-  /**
-   * Now
-   *
-   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
-   */
-  now: string;
-  /**
-   * Period
-   */
-  period: string;
-  /**
-   * Services
-   */
-  services: Array<SafetyServiceOut>;
-  stores: SafetyStoresOut;
-  totals: SafetyTotalsOut;
-};
-
-/**
- * SafetyBackupCardOut
- */
-export type SafetyBackupCardOut = {
-  /**
-   * Documents
-   */
-  documents: number | null;
-  /**
-   * Last
-   */
-  last: string | null;
-  /**
-   * Records
-   */
-  records: number | null;
-  /**
-   * Sha256
-   */
-  sha256: string | null;
-  /**
-   * Size Bytes
-   */
-  size_bytes: number | null;
-  /**
-   * With Documents
-   */
-  with_documents: boolean | null;
-};
-
-/**
- * SafetyBackupsStoreOut
- */
-export type SafetyBackupsStoreOut = {
-  /**
-   * Count
-   */
-  count: number;
+export type SafetyBackupOut = {
   /**
    * Encrypted
    */
   encrypted: boolean;
   /**
-   * Last
+   * Last Backup At
    */
-  last: string | null;
+  last_backup_at?: string | null;
+  /**
+   * Restore Enabled
+   */
+  restore_enabled: boolean;
 };
 
 /**
- * SafetyCardsOut
+ * SafetyDataOut
+ *
+ * Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015).
  */
-export type SafetyCardsOut = {
-  access: SafetyAccessCardOut;
-  backup: SafetyBackupCardOut;
-  delete: SafetyDeleteCardOut;
-  housekeeping: SafetyHousekeepingCardOut;
+export type SafetyDataOut = {
+  access: SafetyAccessOut;
+  backup: SafetyBackupOut;
+  /**
+   * Exposure
+   */
+  exposure: string;
+  housekeeping: SafetyHousekeepingOut;
+  /**
+   * Outbound
+   */
+  outbound: Array<OutboundRequestOut>;
+  /**
+   * Outbound Total
+   */
+  outbound_total: number;
+  /**
+   * Period
+   */
+  period: 'today' | '7d' | '30d' | 'all';
+  /**
+   * Services
+   */
+  services: Array<SafetyServiceOut>;
+  /**
+   * Stores
+   */
+  stores: Array<SafetyStoreOut>;
+  totals: SafetyTotalsOut;
 };
 
 /**
- * SafetyCaseRecordsOut
+ * SafetyHousekeepingOut
  */
-export type SafetyCaseRecordsOut = {
-  /**
-   * Claims
-   */
-  claims: number;
-  /**
-   * In Backups
-   */
-  in_backups: boolean;
-  /**
-   * Records
-   */
-  records: number;
-};
-
-/**
- * SafetyDeleteCardOut
- */
-export type SafetyDeleteCardOut = {
-  /**
-   * Files
-   */
-  files: number;
-  /**
-   * Records
-   */
-  records: number;
-  /**
-   * Shared Files
-   */
-  shared_files: number;
-};
-
-/**
- * SafetyDocumentsOut
- */
-export type SafetyDocumentsOut = {
-  /**
-   * Bytes
-   */
-  bytes: number;
-  /**
-   * Files
-   */
-  files: number;
-  /**
-   * In Backups
-   */
-  in_backups: boolean;
-};
-
-/**
- * SafetyHousekeepingCardOut
- */
-export type SafetyHousekeepingCardOut = {
+export type SafetyHousekeepingOut = {
   /**
    * Stray Bytes
    */
-  stray_bytes: number;
+  stray_bytes?: number | null;
   /**
    * Stray Files
    */
-  stray_files: number;
+  stray_files?: number | null;
 };
 
 /**
- * SafetyInvestigationOut
+ * SafetyServiceOut
+ *
+ * A service the case can reach, with what has been sent to it in the period.
  */
-export type SafetyInvestigationOut = {
+export type SafetyServiceOut = {
+  /**
+   * About
+   */
+  about: string;
+  /**
+   * Blocked Note
+   */
+  blocked_note?: string | null;
   /**
    * Id
    */
@@ -16494,126 +16317,70 @@ export type SafetyInvestigationOut = {
    * Name
    */
   name: string;
-};
-
-/**
- * SafetyKeysOut
- */
-export type SafetyKeysOut = {
-  /**
-   * Set
-   */
-  set: number;
-  /**
-   * Total
-   */
-  total: number;
-};
-
-/**
- * SafetyPrivateAiOut
- */
-export type SafetyPrivateAiOut = {
-  /**
-   * Enabled
-   */
-  enabled: boolean;
-  /**
-   * Model
-   */
-  model: string | null;
-  /**
-   * On This Computer
-   */
-  on_this_computer: boolean | null;
-  /**
-   * Provider
-   */
-  provider: string | null;
-  /**
-   * Remote Allowed
-   */
-  remote_allowed: boolean;
-};
-
-/**
- * SafetySecurityLogOut
- */
-export type SafetySecurityLogOut = {
-  /**
-   * Bytes
-   */
-  bytes: number;
-  /**
-   * Events
-   */
-  events: number;
-  /**
-   * Since
-   */
-  since: string | null;
-};
-
-/**
- * SafetyServiceOut
- *
- * An outside service the case can reach. `mode` is one of off / on_click / this_computer / automatic / blocked:
- * the app has no "ask first" switch yet (ADR-0015), so a lookup runs only when the reporter starts it (`on_click`).
- * `counted` is false when the app does not log that service's traffic, so the screen never shows a false zero.
- */
-export type SafetyServiceOut = {
-  /**
-   * Counted
-   */
-  counted: boolean;
-  /**
-   * Host
-   */
-  host: string;
-  /**
-   * Key
-   */
-  key: string;
-  /**
-   * Label
-   */
-  label: string;
-  /**
-   * Last
-   */
-  last: string | null;
-  /**
-   * Mode
-   */
-  mode: string;
-  /**
-   * Role
-   */
-  role: string;
   /**
    * Sends
    */
   sends: Array<string>;
   /**
-   * Sent
+   * Sent Count
    */
-  sent: number;
+  sent_count: number;
   /**
-   * Why
+   * State
    */
-  why: string;
+  state: 'off' | 'on_request' | 'local';
+  /**
+   * State Note
+   */
+  state_note: string;
+  /**
+   * Where
+   */
+  where: 'inside' | 'outside';
 };
 
 /**
- * SafetyStoresOut
+ * SafetyStoreOut
+ *
+ * One place on this computer where the case lives (mockup KEEP_2's six stores).
  */
-export type SafetyStoresOut = {
-  backups: SafetyBackupsStoreOut;
-  case_records: SafetyCaseRecordsOut;
-  documents: SafetyDocumentsOut;
-  private_ai: SafetyPrivateAiOut;
-  security_log: SafetySecurityLogOut;
-  service_keys: SafetyKeysOut;
+export type SafetyStoreOut = {
+  /**
+   * Bytes
+   */
+  bytes?: number | null;
+  /**
+   * Count
+   */
+  count?: number | null;
+  /**
+   * Count Note
+   */
+  count_note?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * In Backups
+   */
+  in_backups?: boolean | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Oldest
+   */
+  oldest?: string | null;
+  /**
+   * Warning
+   */
+  warning?: string | null;
+  /**
+   * Where
+   */
+  where: string;
 };
 
 /**
@@ -18157,7 +17924,7 @@ export type SuiteCatalogModuleOut = {
 /**
  * SuiteCatalogOut
  *
- * Every system, module and record of the vendored suite, and which app runs use each module.
+ * Every system, module and record of the suite, and which app runs use each module.
  */
 export type SuiteCatalogOut = {
   /**
@@ -27601,104 +27368,6 @@ export type AddNoteResponses = {
 
 export type AddNoteResponse = AddNoteResponses[keyof AddNoteResponses];
 
-export type GetOutboundLogData = {
-  body?: never;
-  path: {
-    /**
-     * Investigation Id
-     */
-    investigation_id: string;
-  };
-  query?: {
-    /**
-     * Period
-     */
-    period?: 'today' | '7d' | '30d' | 'all';
-    /**
-     * Service
-     */
-    service?: string | null;
-    /**
-     * Limit
-     */
-    limit?: number;
-    /**
-     * Include Local
-     */
-    include_local?: boolean;
-  };
-  url: '/api/investigations/{investigation_id}/outbound-log';
-};
-
-export type GetOutboundLogErrors = {
-  /**
-   * The request's input does not match what the route declares
-   */
-  422: ValidationErrorOut;
-  /**
-   * Refused: why, in a sentence
-   */
-  '4XX': ErrorOut;
-};
-
-export type GetOutboundLogError =
-  GetOutboundLogErrors[keyof GetOutboundLogErrors];
-
-export type GetOutboundLogResponses = {
-  /**
-   * Successful Response
-   */
-  200: OutboundLogOut;
-};
-
-export type GetOutboundLogResponse =
-  GetOutboundLogResponses[keyof GetOutboundLogResponses];
-
-export type ExportOutboundLogData = {
-  body?: never;
-  path: {
-    /**
-     * Investigation Id
-     */
-    investigation_id: string;
-  };
-  query?: {
-    /**
-     * Period
-     */
-    period?: 'today' | '7d' | '30d' | 'all';
-    /**
-     * Service
-     */
-    service?: string | null;
-  };
-  url: '/api/investigations/{investigation_id}/outbound-log.csv';
-};
-
-export type ExportOutboundLogErrors = {
-  /**
-   * The request's input does not match what the route declares
-   */
-  422: ValidationErrorOut;
-  /**
-   * Refused: why, in a sentence
-   */
-  '4XX': ErrorOut;
-};
-
-export type ExportOutboundLogError =
-  ExportOutboundLogErrors[keyof ExportOutboundLogErrors];
-
-export type ExportOutboundLogResponses = {
-  /**
-   * The whole outbound log as a CSV file, for a source-protection file
-   */
-  200: Blob | File;
-};
-
-export type ExportOutboundLogResponse =
-  ExportOutboundLogResponses[keyof ExportOutboundLogResponses];
-
 export type HowAreTheyConnectedData = {
   body?: never;
   path: {
@@ -28208,7 +27877,7 @@ export type PutCaseResearchResponses = {
 export type PutCaseResearchResponse =
   PutCaseResearchResponses[keyof PutCaseResearchResponses];
 
-export type GetSafetyAndDataData = {
+export type GetSafetyDataData = {
   body?: never;
   path: {
     /**
@@ -28222,10 +27891,10 @@ export type GetSafetyAndDataData = {
      */
     period?: 'today' | '7d' | '30d' | 'all';
   };
-  url: '/api/investigations/{investigation_id}/safety-and-data';
+  url: '/api/investigations/{investigation_id}/safety-data';
 };
 
-export type GetSafetyAndDataErrors = {
+export type GetSafetyDataErrors = {
   /**
    * The request's input does not match what the route declares
    */
@@ -28236,18 +27905,17 @@ export type GetSafetyAndDataErrors = {
   '4XX': ErrorOut;
 };
 
-export type GetSafetyAndDataError =
-  GetSafetyAndDataErrors[keyof GetSafetyAndDataErrors];
+export type GetSafetyDataError = GetSafetyDataErrors[keyof GetSafetyDataErrors];
 
-export type GetSafetyAndDataResponses = {
+export type GetSafetyDataResponses = {
   /**
    * Successful Response
    */
-  200: SafetyAndDataOut;
+  200: SafetyDataOut;
 };
 
-export type GetSafetyAndDataResponse =
-  GetSafetyAndDataResponses[keyof GetSafetyAndDataResponses];
+export type GetSafetyDataResponse =
+  GetSafetyDataResponses[keyof GetSafetyDataResponses];
 
 export type SaveQuestionData = {
   body: SavedQuestionCreate;
