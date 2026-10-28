@@ -444,7 +444,11 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
   const quotesWaiting = all.filter(x => x.candidate_type === 'evidence' && x.review_status === 'proposed').length;
   const tops0 = docs.filter(d => !d.parent_document_id);
   const index = tops0.findIndex(d => d.id === documentId);
-  const ocr = pageChunks.some(ch => /\(OCR\)/i.test(ch.locator));
+  // How legible the page was to OCR, as the reader measured it once the read was done (backend legibility.py); a
+  // figure is only ever measured on a page OCR read.
+  const legibility = pageChunks.map(ch => ch.ocr_legibility).find((n): n is number => n != null);
+  const ocr = legibility !== undefined || pageChunks.some(ch => /\(OCR\)/i.test(ch.locator));
+  const languages = doc?.languages ?? [];
   const isPdf = /\.pdf$/i.test(doc?.filename ?? '');
 
   // Focus the first waiting proposal of the page once there is one.
@@ -722,7 +726,11 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
           <div className="rr-paper-scroll" onMouseUp={readSelection} onKeyUp={e => { if (e.shiftKey) readSelection(); }}>
             <p className="rr-chips">
               {paged && <span>Page {current} of {pages.length}</span>}
-              {pageChunks.length > 0 && <span>{ocr ? 'Read by OCR' : 'Read from the file’s own text'}</span>}
+              {pageChunks.length > 0 && <span title={ocr && legibility === undefined ? 'The reader has not measured this page yet, or could not.' : undefined}>
+                {ocr ? `Read by OCR · ${legibility !== undefined ? `${Math.round(legibility)}% legible` : 'legibility not measured'}` : 'Read from the file’s own text'}</span>}
+              <span className="rr-lang" title={languages.length ? 'Detected by OpenAleph when it read the document'
+                : 'The app’s own reader does not detect a language; OpenAleph has not read this document'}>
+                {languages.length ? languages.map(l => l.name).join(' · ') : 'Language not detected'}</span>
               {paged && <small>p. {current}</small>}
             </p>
             <h2 className="rr-doc-title">{title}</h2>

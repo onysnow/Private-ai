@@ -904,11 +904,19 @@ class DocumentChunkOut(ResponseModel):
     ordinal: int
     text: str
     created_at: Timestamp
+    # How legible a page read by OCR was to Tesseract, 0-100 (app/services/legibility.py); None when not measured.
+    ocr_legibility: float | None = None
+
+
+class DocumentLanguageOut(ResponseModel):
+    code: str
+    name: str
 
 
 class DocumentDetailOut(DocumentOut):
-    """A document with its extracted chunks (GET /documents/{id})."""
+    """A document with its extracted chunks (GET /documents/{id}), and the languages OpenAleph detected in it."""
     chunks: list[DocumentChunkOut]
+    languages: list[DocumentLanguageOut] = []
 
 
 class OpenAlephSyncOut(ResponseModel):

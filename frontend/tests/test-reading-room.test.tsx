@@ -80,6 +80,23 @@ describe('reading room helpers', () => {
 });
 
 describe('ReadingRoom', () => {
+  it('says how legible an OCR page was and which languages OpenAleph detected, and says so when neither is known', async () => {
+    const scanned = {...doc, languages: [{code: 'eng', name: 'English'}, {code: 'fra', name: 'French'}],
+      chunks: [{...doc.chunks[0], locator: 'page 4 (OCR)', ocr_legibility: 91.4}]};
+    routes({'GET /api/documents/d1': scanned});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    expect(await within(room).findByText('Read by OCR · 91% legible')).toBeInTheDocument();
+    expect(within(room).getByText('English · French')).toHaveAttribute('title', 'Detected by OpenAleph when it read the document');
+    cleanup();
+
+    routes({'GET /api/documents/d1': {...doc, chunks: [{...doc.chunks[0], locator: 'page 4 (OCR)'}]}});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const again = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    expect(await within(again).findByText('Read by OCR · legibility not measured')).toBeInTheDocument();
+    expect(within(again).getByText('Language not detected')).toBeInTheDocument();
+  });
+
   it('marks what was found, accepts a proposal with A after a moment to undo it, and sends it on closing', async () => {
     const api = routes({'POST /api/extraction-candidates/x1/review': {candidate: {...name, review_status: 'accepted'}, record: null}});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
