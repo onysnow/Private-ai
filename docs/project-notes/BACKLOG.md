@@ -85,20 +85,20 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 ## Found by the browser walkthrough (11 Oct) — not yet discussed with Ony
 - **P1:**
   - ~~The Decide filter chips only look at the first 200 items, so "Missing 176" shows nothing.~~ Checked 12 Oct: the server filters by kind before paging.
-  - On an API error, Decide shows "Failed to fetch" beside "Nothing waits for you".
-  - Decide's "Open the document" goes to Bring in › Search.
-  - The Home mini-network's nodes can't be clicked with the mouse (an SVG overlay sits on them).
-  - The Home year strip changes only its label.
+  - ~~On an API error, Decide shows "Failed to fetch" beside "Nothing waits for you".~~ Checked in code 28 Oct: a list that did not load says so alone, with a retry (`decide-screen.tsx`, `decideUnreachable`).
+  - ~~Decide's "Open the document" goes to Bring in › Search.~~ Fixed earlier: it opens the reader at the evidence's page (MOCKUP_BUILD_LIST §6).
+  - The Home mini-network's nodes can't be clicked with the mouse (an SVG overlay sits on them). Since rebuilt (12 Oct): nodes have their own click; not re-checked in a browser on 28 Oct.
+  - The Home year strip changes only its label. Since rebuilt: a year sets the case's "as of" year, read by the mini-network, the graph, the timeline and the year slider; not re-checked in a browser on 28 Oct.
   - Loading a demo failed 4 times ("Could not refresh instance '<Evidence…>'") while another case was being read.
-  - A flag level reads "To be set by Ony".
+  - ~~A flag level reads "To be set by Ony".~~ Checked in code 28 Oct: shown as "not set", never guessed (`knowledge/families.ts`, `patterns/engine.py`).
   - The graph's "Linked groups" layout freezes the page for about 20 s.
-  - The Chain of Custody drawer ignores Esc.
-  - The upload's "Document title" is never saved.
-  - Times disagree (UTC vs local) and date formats are mixed.
+  - ~~The Chain of Custody drawer ignores Esc.~~ Fixed 28 Oct (`case-workbench.tsx`; `tests/test-custody-drawer.test.tsx`).
+  - The upload's "Document title" is never saved. Checked 28 Oct: it is saved as the document's source title (`store_document`), which is what the custody chain, the evidence pack and Is it real? show; the document lists still show the file name.
+  - ~~Times disagree (UTC vs local)~~: every screen reads API times through `lib/timestamps.ts` (`tests/test-api-times-on-screen.test.tsx` holds it); date formats still differ between screens.
 - **Inert controls:**
-  - Timeline marks (hover only) and legend items do nothing.
-  - Chart-builder bars do nothing.
-  - Party chips inside a flag's detail do nothing.
+  - Timeline marks (hover only) and legend items do nothing. Left for the Timeline rebuild (TIME_1/TIME_2, waiting for approval).
+  - ~~Chart-builder bars do nothing.~~ Fixed 28 Oct: a bar, slice or point traces the first record behind its value (`pickedRow`, `chart-builder-panel.tsx`).
+  - ~~Party chips inside a flag's detail do nothing.~~ Fixed 28 Oct: a party named in the open flag's picture filters the list to its flags, and again shows all (`red-flags-board.tsx`).
 - **Material types:**
   - CSV and XLSX make no payments unless mapped.
   - MP3, WAV and MP4 give a 415, and the demo's .mp3/.mov show "failed · 0 chunks" with no reason. (28 Oct: recordings are accepted and transcribed on this computer, ADR-0020; a read without the model fetched fails saying what to run.)

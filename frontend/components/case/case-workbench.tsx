@@ -205,6 +205,13 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
   useEffect(() => { useWorkbenchStore.getState().setInvestigationName(investigationName); }, [investigationName]);
   const provenance = useWorkbenchStore(state => state.provenance);
   const clearProvenance = useWorkbenchStore(state => state.clearProvenance);
+  // Esc closes the Chain of Custody drawer, as it closes the other sheets (BACKLOG P1: it ignored Esc).
+  useEffect(() => {
+    if (!provenance) return undefined;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !e.defaultPrevented) clearProvenance(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [provenance, clearProvenance]);
   const accessLabel = access.state === 'authenticated' ? 'API: session active' : access.state === 'local' ? 'API: local access' : access.state === 'needs_token' ? 'API: token needed'
     : access.state === 'remote_disabled' ? 'API: remote disabled' : access.state === 'error' ? 'API: connection error' : 'API: checking…';
   // Decide shows a server that does not answer as its own error state, alone, with a retry (BACKLOG P1:
