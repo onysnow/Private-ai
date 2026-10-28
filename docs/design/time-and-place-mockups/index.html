@@ -162,6 +162,17 @@ body.shownotes .screen.on .notes{display:block}
 .notes li{margin-bottom:2px}
 .notes li b{color:var(--text);font-weight:600}
 .notes .qq{font-family:var(--f-mono);color:var(--teal);font-size:10.5px}
+.listbox{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;min-width:0}
+.opt:hover{border-color:var(--line2)}
+.opt[aria-selected="true"]{border-color:rgba(221,146,49,.75);background:linear-gradient(0deg,var(--amber-d),var(--amber-d)),var(--card);box-shadow:0 0 0 1px rgba(221,146,49,.2)}
+.opt .t{font:600 12.5px/1.25 var(--f-ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opt .s{font:400 10.5px var(--f-mono);color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opts{display:flex;flex-direction:column;gap:5px}
+.opts .opt{padding:6px 9px;align-items:flex-start}
+.opts .opt .t{white-space:normal}
+.opt[aria-selected="true"] .rdot{border-color:var(--amber);background:radial-gradient(var(--amber) 0 3px,transparent 4px)}
+
 /* ---------- Time and place (TIME_1, TIME_2, PLACE_1) ---------- */
 .c-time{grid-template-columns:1fr 352px}
 .c-place{grid-template-columns:1fr 352px}
@@ -169,6 +180,24 @@ body.shownotes .screen.on .notes{display:block}
 .legend b{font-weight:500;color:var(--faint);letter-spacing:.12em;text-transform:uppercase}
 .legend .g{display:inline-flex;align-items:center;gap:5px}
 .legend svg{display:block}
+.legend.filt{flex-wrap:wrap;row-gap:4px}
+.legend button.g{border:1px solid transparent;background:transparent;border-radius:99px;padding:1px 7px 1px 4px;font:inherit;color:inherit;cursor:pointer}
+.legend button.g:hover{border-color:var(--line2)}
+.legend button.g[aria-pressed=false]{opacity:.42;text-decoration:line-through}
+.legend button#hiderough[aria-pressed=false]{opacity:1;text-decoration:none;border-color:var(--line2)}
+.legend button#hiderough[aria-pressed=true]{color:var(--amber-l);border-color:var(--amber)}
+.legend button.g i{font-style:normal;color:var(--faint);margin-left:2px}
+.legend .sw{display:inline-block;width:8px;height:8px;border-radius:2px}
+.ctl .seg button{padding:3px 9px}
+#play[aria-pressed=true]{background:var(--amber);color:#1c1208}
+.listview{display:none;max-height:430px;overflow:auto;border:1px solid var(--line);border-radius:9px}
+.listview table{width:100%;border-collapse:collapse;font-size:12px}
+.listview th{position:sticky;top:0;background:var(--panel);text-align:left;font:500 10px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:6px 8px;border-bottom:1px solid var(--line2)}
+.listview td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.listview tr.sel td{background:var(--sel)}
+.listmode .lanes{display:none}.listmode .listview{display:block}
+.keys{font:500 10px var(--f-mono);color:var(--faint);display:flex;gap:10px;flex-wrap:wrap}
+.keys kbd{margin-right:3px}
 .lanes{position:relative}
 .lanes svg{display:block}
 .lanes text{font-family:var(--f-ui)}
@@ -179,7 +208,7 @@ body.shownotes .screen.on .notes{display:block}
 .lead{border:1px solid rgba(229,115,90,.5);background:var(--bad-d);border-radius:9px;padding:7px 10px;display:flex;gap:10px;align-items:center;font-size:12px}
 .lead b{color:var(--bad)}
 .strip{display:flex;gap:8px;overflow:hidden}
-.film{flex:none;width:150px;height:86px;border:1px solid var(--line2);border-radius:9px;background:var(--card);padding:7px 8px;display:flex;flex-direction:column;gap:4px;cursor:grab;position:relative}
+.film{flex:none;width:150px;height:78px;border:1px solid var(--line2);border-radius:9px;background:var(--card);padding:7px 8px;display:flex;flex-direction:column;gap:4px;cursor:grab;position:relative}
 .film .k{font:500 9px var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
 .film .x{font-size:11.5px;line-height:1.3;color:var(--text);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .film .d{font:500 10px var(--f-mono);color:var(--mute);margin-top:auto}
@@ -235,6 +264,105 @@ body.shownotes .screen.on .notes{display:block}
 .ladder .skip{font:500 10px var(--f-mono);color:var(--faint);padding:1px 8px 1px 30px}
 .ladder button span:last-child{font:500 10px var(--f-mono);color:var(--faint)}
 
+
+/* top bar: mode switch beside the views */
+.topbar .seg.mode button.hot{background:var(--amber-d);color:var(--amber-l)}
+/* TIME_3 build your own */
+.palette{display:flex;flex-direction:column;gap:6px}
+.pcard{display:grid;grid-template-columns:1fr auto;gap:2px 8px;border:1px solid var(--line2);border-radius:9px;background:var(--card);padding:6px 8px;cursor:grab}
+.pcard .k{font:500 9px var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.pcard .x{grid-column:1;font-size:12px;line-height:1.3}
+.pcard .d{grid-column:1;font:500 10px var(--f-mono);color:var(--mute)}
+.pcard .btn{grid-column:2;grid-row:1/4;align-self:center}
+.pcard.in{opacity:.5;cursor:default}
+.board-line{position:relative;display:flex;gap:12px;align-items:flex-start;padding:30px 4px 10px;min-height:230px;overflow-x:auto}
+.board-line::before{content:'';position:absolute;left:0;right:0;top:16px;height:2px;background:linear-gradient(90deg,var(--amber),rgba(221,146,49,.25))}
+.bcard{position:relative;flex:none;width:150px;border:1px solid var(--line2);border-radius:10px;background:var(--card);padding:8px;display:flex;flex-direction:column;gap:5px;cursor:pointer}
+.bcard::before{content:'';position:absolute;left:50%;top:-18px;width:9px;height:9px;margin-left:-4px;border-radius:50%;background:var(--amber)}
+.bcard.sel{border-color:var(--amber);box-shadow:0 0 0 1px rgba(221,146,49,.4)}
+.bcard.ph{border-style:dashed;background:repeating-linear-gradient(135deg,var(--card) 0 10px,#2f2621 10px 20px)}
+.bcard.ph::before{background:transparent;border:1.5px dashed var(--amber-l)}
+.bcard .pic{height:64px;border-radius:6px;overflow:hidden}
+.bcard .t{font-size:12px;line-height:1.3}
+.bcard .d{font:500 10px var(--f-mono);color:var(--mute)}
+.bcard .d.off{color:var(--amber-l)}
+.bcard .tools{display:flex;justify-content:space-between;align-items:center}
+.bcard .grip{font:600 12px var(--f-mono);color:var(--faint);cursor:grab}
+.bcard .rm{border:0;background:transparent;color:var(--mute);font-size:14px;padding:0 3px}
+.bcard .rm:hover{color:var(--bad)}
+.bcard.drag{opacity:.4}
+.phform{display:flex;gap:10px;align-items:flex-end;border:1px dashed rgba(221,146,49,.5);border-radius:10px;padding:8px 10px}
+.phform label{display:flex;flex-direction:column;gap:3px;font:500 10px var(--f-mono);color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+.phform input{background:var(--ground);border:1px solid var(--line2);border-radius:7px;padding:5px 8px;font:13px var(--f-ui);text-transform:none;letter-spacing:0;color:var(--text)}
+/* TIME_4 replay */
+.steps{position:relative;display:flex;flex-direction:column;gap:2px;padding-left:16px}
+.steps::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--line2)}
+.steps .prog{position:absolute;left:6px;top:8px;width:2px;background:var(--amber);transition:height .4s}
+.steps button{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;border:0;background:transparent;border-radius:8px;padding:6px 8px;color:var(--mute)}
+.steps button::before{content:'';position:absolute;left:-14px;top:11px;width:8px;height:8px;border-radius:50%;background:var(--panel);border:2px solid var(--faint)}
+.steps button.done::before{background:var(--amber);border-color:var(--amber)}
+.steps button.on{background:var(--sel);color:var(--text)}
+.steps button.on::before{background:var(--amber);border-color:var(--amber-l);box-shadow:0 0 0 4px rgba(221,146,49,.25);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px rgba(221,146,49,.08)}}
+@media (prefers-reduced-motion:reduce){.steps button.on::before{animation:none}}
+.steps b{font-weight:600;font-size:12.5px}
+.steps span{font:500 10px var(--f-mono);color:var(--faint)}
+.steps .fig{color:var(--amber-l)}
+.deck{position:relative;height:520px;perspective:1200px;overflow:hidden;border-radius:10px;background:radial-gradient(500px 260px at 50% 85%,rgba(221,146,49,.08),transparent 70%)}
+.deck .head{position:absolute;left:24px;top:16px;right:24px}
+.deck .head small{font:500 10px var(--f-mono);letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+.deck .head h2{font:400 24px/1.25 var(--f-title);margin:4px 0}
+.deck .head p{color:var(--mute);font-size:13px}
+.dcard{position:absolute;left:50%;top:150px;width:420px;height:300px;margin-left:-210px;border-radius:12px;border:1px solid var(--line2);background:var(--card);overflow:hidden;transition:transform .6s cubic-bezier(.16,1,.3,1),opacity .6s;box-shadow:0 24px 50px rgba(0,0,0,.45)}
+.dcard .pic{height:236px}
+.dcard .cap1{padding:8px 12px;font-size:12.5px;display:flex;justify-content:space-between;gap:8px}
+.dcard .cap1 span{font:500 10px var(--f-mono);color:var(--mute)}
+.transport{display:flex;gap:8px;align-items:center}
+.scrub{flex:1;min-width:0}
+/* TIME_5 board */
+.cork{position:relative;height:540px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#2b2018;background-image:radial-gradient(rgba(0,0,0,.25) 1px,transparent 1.5px),radial-gradient(rgba(255,220,170,.05) 1px,transparent 1.5px);background-size:9px 9px,13px 13px;background-position:0 0,4px 6px}
+.cork .slidehint{position:absolute;right:10px;bottom:8px;font:500 10px var(--f-mono);color:rgba(240,234,225,.45)}
+.pinned{position:absolute;background:#efe7d9;color:#2a221c;border-radius:3px;box-shadow:0 10px 22px rgba(0,0,0,.5);padding:9px 10px;font:12px/1.35 var(--f-read);cursor:pointer}
+.pinned::after{content:'';position:absolute;left:50%;top:-6px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff9b84,#b5402b);box-shadow:0 2px 3px rgba(0,0,0,.5)}
+.pinned.sel{outline:2px solid var(--amber);outline-offset:3px}
+.pinned .hd{font:600 9px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:#6b5d50;margin-bottom:4px}
+.pinned.note{background:#f2d36b;font:600 14px/1.25 'Jost',var(--f-ui);transform:rotate(-3deg)}
+.pinned.person{background:#e8e2d6;text-align:center;font:600 12px var(--f-ui)}
+.pinned.person .face{width:64px;height:64px;border-radius:50%;margin:4px auto 6px;background:radial-gradient(circle at 50% 38%,#8d7a69 0 30%,transparent 31%),radial-gradient(circle at 50% 100%,#8d7a69 0 46%,#cfc6b8 47%)}
+.pinned.photo{padding:7px 7px 18px;background:#f4efe6}
+.pinned.photo .ph{width:150px;height:96px;background:linear-gradient(180deg,#8fa3ad 0,#b7c3c4 45%,#5f5a52 46%,#4b4741 100%);position:relative}
+.dock{height:46px}
+/* TIME_6 slider */
+.slide{display:grid;grid-template-columns:56px 1fr 56px;align-items:center;gap:10px;height:560px}
+.slide .arrow{height:100%;border:0;border-radius:10px;background:transparent;color:var(--mute);font-size:28px}
+.slide .arrow:hover{background:var(--sel);color:var(--text)}
+.slide .card{height:100%;display:grid;grid-template-columns:1.2fr 1fr;gap:18px;padding:18px;border-radius:12px;border:1px solid var(--line2);background:var(--card)}
+.slide .big{font:300 54px/1 var(--f-title);color:var(--amber-l)}
+.slide .pic{border-radius:9px;overflow:hidden;border:1px solid var(--line2)}
+.sstrip{height:54px}
+/* TIME_7 curve */
+.years{display:flex;gap:6px}
+.years button{flex:1;border:1px solid var(--line2);border-radius:9px;background:transparent;color:var(--mute);padding:6px 4px 4px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.years button b{font:400 18px var(--f-title);color:var(--text)}
+.years button i{display:block;width:70%;background:rgba(240,234,225,.25);border-radius:2px}
+.years button.on{border-color:var(--amber);background:var(--amber-d)}
+.years button.on i{background:var(--amber)}
+.years button span{font:500 10px var(--f-mono)}
+/* TIME_8 periods */
+.per{position:absolute;left:0;right:0;top:56px;bottom:0;overflow:hidden}
+.pscreen{position:absolute;inset:0;padding:30px 170px 40px 60px;display:grid;grid-template-columns:1fr 1.15fr;gap:40px;transition:transform .7s cubic-bezier(.16,1,.3,1),opacity .5s}
+.pscreen .yr{font:200 190px/0.9 var(--f-title);letter-spacing:-.04em;opacity:.9}
+.pscreen h2{font:400 34px/1.15 var(--f-title);margin:10px 0 12px}
+.pscreen p.sum{font:17px/1.6 var(--f-read);max-width:560px;color:rgba(240,234,225,.9)}
+.pscreen .by{font:500 11px var(--f-mono);color:rgba(240,234,225,.6);margin-top:10px}
+.pscreen .pics{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:center}
+.pscreen .pics > div{height:190px;border-radius:10px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.4);position:relative}
+.pscreen .pics span{position:absolute;left:8px;bottom:6px;font:500 10px var(--f-mono);background:rgba(0,0,0,.55);color:#f0eae1;padding:1px 6px;border-radius:4px}
+.pdots{position:absolute;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:5}
+.pdots button{display:flex;align-items:center;gap:8px;justify-content:flex-end;border:0;background:transparent;color:rgba(240,234,225,.55);font:500 10.5px var(--f-mono)}
+.pdots button i{width:10px;height:10px;border-radius:50%;border:2px solid currentColor}
+.pdots button.on{color:#fff}.pdots button.on i{background:#fff}
+
 /* PLACE_1 */
 .map{position:relative;height:500px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
 .map svg{display:block}
@@ -271,7 +399,13 @@ body.shownotes .screen.on .notes{display:block}
   <div class="pk" id="pk" role="tablist" aria-label="Screens">
     <button role="tab" data-s="lanes" aria-selected="true">Timeline · Lanes <span>TIME_1 · 1</span></button>
     <button role="tab" data-s="stack" aria-selected="false">Timeline · Stack in depth <span>TIME_2 · 2</span></button>
-    <button role="tab" data-s="places" aria-selected="false">Places <span>PLACE_1 · 3</span></button>
+    <button role="tab" data-s="build" aria-selected="false">Build your own <span>TIME_3 · 3</span></button>
+    <button role="tab" data-s="replay" aria-selected="false">Replay <span>TIME_4 · 4</span></button>
+    <button role="tab" data-s="board" aria-selected="false">Board <span>TIME_5 · 5</span></button>
+    <button role="tab" data-s="slider" aria-selected="false">Slider <span>6</span></button>
+    <button role="tab" data-s="curve" aria-selected="false">Curve <span>7</span></button>
+    <button role="tab" data-s="periods" aria-selected="false">Periods <span>8</span></button>
+    <button role="tab" data-s="places" aria-selected="false">Places <span>PLACE_1 · 9</span></button>
   </div>
   <div class="sp"></div>
   <button class="nbtn" id="nbtn" aria-pressed="false">Needs / open questions · <kbd>N</kbd></button>
@@ -280,41 +414,41 @@ body.shownotes .screen.on .notes{display:block}
 
 <!-- =================== TIME_1  Lanes =================== -->
 <section class="screen on" id="lanes" data-name="TIME_1 · Timeline, Lanes" aria-label="Timeline, Lanes">
-  <div class="topbar">
-    <div class="crumbs"><span>The harbour land</span><i>›</i><span>See</span><i>›</i><b>Timeline</b></div>
-    <div class="seg" role="tablist" aria-label="Timeline views">
-      <button role="tab" aria-selected="false" data-v="slider">Slider</button>
-      <button role="tab" aria-selected="false" data-v="curve">Curve</button>
-      <button role="tab" aria-selected="false" data-v="periods">Periods</button>
-      <button role="tab" aria-selected="false" data-v="board">Board</button>
-      <button role="tab" aria-selected="true" class="hot" data-v="lanes">Lanes</button>
-      <button role="tab" aria-selected="false" data-v="story">Story</button>
-      <button role="tab" aria-selected="false" data-v="stack">Stack</button>
-    </div>
-    <span class="status">● Chosen because 52 events</span>
-    <div class="sp"></div>
-    <div class="search"><span aria-hidden="true">⌕</span> Search the case, or type a command… <kbd>⌘K</kbd></div>
-  </div>
+  <div class="topbar" data-view="lanes" data-status="52 events · opened on the next unresolved"></div>
   <div class="titlerow"><h1>What happened when, and how sure are we?</h1><p>One lane per party. Each mark says whether the event is shown; its band says how exact the date is.</p></div>
 
   <div class="cols c-time">
     <div class="col">
       <div class="panel fl" style="display:flex;flex-direction:column;gap:9px;padding-bottom:10px">
-        <div class="row" style="gap:12px">
-          <div class="legend" aria-label="Key, always on">
-            <b>Mark: is it shown</b>
-            <span class="g"><svg width="12" height="12"><circle cx="6" cy="6" r="4.5" fill="var(--ok)"/></svg>✓ shown</span>
-            <span class="g"><svg width="12" height="12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="var(--amber-l)" stroke-width="1.4" stroke-dasharray="2 1.6"/></svg>? not yet shown</span>
-            <span class="g"><svg width="12" height="12"><circle cx="6" cy="6" r="4.5" fill="var(--bad)"/><rect x="5.2" y="2.6" width="1.6" height="4.4" fill="#1c1208"/><rect x="5.2" y="8" width="1.6" height="1.4" fill="#1c1208"/></svg>! disputed</span>
-            <span class="g"><svg width="12" height="12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="var(--teal)" stroke-width="1.4" stroke-dasharray="0.5 2"/></svg>ƒ worked out</span>
-            <b style="margin-left:4px">Band: date</b>
-            <span class="g"><svg width="34" height="10"><rect x="0" y="2" width="34" height="6" rx="3" fill="rgba(240,234,225,.16)"/></svg>month / year</span>
-            <span class="g"><svg width="30" height="10"><rect x="0" y="3" width="30" height="4" rx="2" fill="var(--mute)"/></svg>from – to</span>
-          </div>
+        <div class="row ctl" style="gap:8px">
+          <button class="btn sm pri" id="play" aria-pressed="false" title="Replay the case month by month">▶ Play <kbd>Space</kbd></button>
+          <span class="cap" style="margin:0 0 0 6px">Lanes by</span>
+          <div class="seg" id="laneby" aria-label="Lanes by"><button aria-pressed="true" data-by="party">Party</button><button aria-pressed="false" data-by="kind">Kind</button><button aria-pressed="false" data-by="source">Source</button><button aria-pressed="false" data-by="sure">How sure</button></div>
+          <span class="cap" style="margin:0 0 0 6px">Zoom</span>
+          <div class="seg" id="zoom" aria-label="Zoom"><button aria-pressed="true">All</button><button aria-pressed="false">5 y</button><button aria-pressed="false">2 y</button><button aria-pressed="false">1 y</button></div>
           <div class="sp grow"></div>
-          <div class="seg" aria-label="Lanes by"><button aria-pressed="true">By party</button><button aria-pressed="false">By source</button></div>
+          <div class="seg" id="layers" aria-label="Show on the lanes"><button aria-pressed="true" data-l="flags" title="Red Flags as brackets over the time they cover">Flags <kbd>F</kbd></button><button aria-pressed="true" data-l="money" title="A money row: one bar per payment">Money <kbd>M</kbd></button><button aria-pressed="true" data-l="periods" title="Named periods as tints">Periods <kbd>P</kbd></button></div>
+          <button class="btn sm" id="listbtn" aria-pressed="false">List <kbd>L</kbd></button>
+        </div>
+        <div class="row" style="gap:12px">
+          <div class="legend filt" aria-label="Key, always on; click an item to hide it">
+            <b>Mark</b>
+            <button class="g" aria-pressed="true" data-m="ok"><svg width="12" height="12"><circle cx="6" cy="6" r="4.5" fill="var(--ok)"/></svg>✓ shown <i>31</i></button>
+            <button class="g" aria-pressed="true" data-m="q"><svg width="12" height="12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="var(--amber-l)" stroke-width="1.4" stroke-dasharray="2 1.6"/></svg>? not yet <i>14</i></button>
+            <button class="g" aria-pressed="true" data-m="bad"><svg width="12" height="12"><circle cx="6" cy="6" r="4.5" fill="var(--bad)"/><rect x="5.2" y="2.6" width="1.6" height="4.4" fill="#1c1208"/><rect x="5.2" y="8" width="1.6" height="1.4" fill="#1c1208"/></svg>! disputed <i>2</i></button>
+            <button class="g" aria-pressed="true" data-m="f"><svg width="12" height="12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="var(--teal)" stroke-width="1.4" stroke-dasharray="0.5 2"/></svg>ƒ worked out <i>5</i></button>
+            <b style="margin-left:4px">Kind</b>
+            <button class="g" aria-pressed="true" data-k="bank"><i class="sw" style="background:var(--amber-l)"></i>bank <i>14</i></button>
+            <button class="g" aria-pressed="true" data-k="mail"><i class="sw" style="background:var(--teal)"></i>email <i>9</i></button>
+            <button class="g" aria-pressed="true" data-k="filing"><i class="sw" style="background:var(--plum)"></i>filing <i>12</i></button>
+            <button class="g" aria-pressed="true" data-k="file"><i class="sw" style="background:#D9C7A3"></i>minutes · news <i>13</i></button>
+            <b style="margin-left:4px">Date</b>
+            <span class="g"><svg width="26" height="10"><rect x="0" y="2" width="26" height="6" rx="3" fill="rgba(240,234,225,.16)"/></svg>month / year</span>
+            <button class="g" aria-pressed="false" id="hiderough" title="Hide events known only to the month or the year">hide them <i>9</i></button>
+          </div>
         </div>
         <div class="lanes" id="lanesvg"></div>
+        <div class="listview" id="listview" aria-label="The same events as a list"></div>
         <div class="lead" id="seqlead"><span class="ico bad">↯</span><div class="grow"><b>Out of order.</b> The €42,000 “deposit” (May 2019) comes before any recorded award. A tender is usually followed by an award, then a contract, then payment.</div><button class="btn sm bad">Make a lead</button><button class="btn sm">Why this order?</button></div>
         <div class="row" style="align-items:stretch;gap:10px">
           <div style="flex:1;min-width:0">
@@ -328,7 +462,7 @@ body.shownotes .screen.on .notes{display:block}
           </div>
           <div class="tray"><b>Undated · 3</b> kept here, never placed on a day<div style="margin-top:4px;line-height:1.35">“last spring” in an email (no year) · a photo whose camera kept no date · minutes p.6, date torn</div></div>
         </div>
-        <div class="rail" id="rail1"></div>
+        <div class="keys" id="keys1"><span><kbd>Space</kbd>play</span><span><kbd>J</kbd><kbd>K</kbd>events</span><span><kbd>←</kbd><kbd>→</kbd>move the as-of handle</span><span><kbd>+</kbd><kbd>−</kbd><kbd>0</kbd>zoom</span><span><kbd>F</kbd><kbd>M</kbd><kbd>P</kbd>flags · money · periods</span><span><kbd>L</kbd>list</span><span><kbd>G</kbd>go to a date</span><span><kbd>Esc</kbd>unlight</span><span>click a name to light it in every lane</span></div>
       </div>
     </div>
 
@@ -344,37 +478,26 @@ body.shownotes .screen.on .notes{display:block}
         <li><b>Axis:</b> spans the case's own years; the 1952 record is a stub at the left edge, so 2016–21 are not crushed.</li>
         <li><b>Labels never overlap:</b> each label takes a free spot beside its mark, and marks too close for their own labels become one group (“3 payments · Feb–Apr 2018”).</li>
         <li><b>Plain words:</b> no “incorporationDate”, no <span class="qq">source:&lt;uuid&gt;</span>; each date shown once; a month or year is a band, never an invented 1 Jan.</li>
-        <li><b>94 “source saved” dates</b> (when a file was saved, photo dates) are not events and are left off this view.</li></ul></div>
+        <li><b>94 “source saved” dates</b> (when a file was saved, photo dates) are not events and are left off this view.</li>
+        <li><b>From the earlier designs:</b> Play (Space) grows the case month by month; the key is also the filter, with counts; zoom presets and the window over the quarter bars; Flags, Money and Periods on the lanes; click a name to light that party in every lane; Before and after in this lane; List view (L); opens on the next unresolved event.</li></ul></div>
       <div><h4>Needs (backend)</h4><ul>
         <li>Per-event fact status from the grade plus the linked claim (one mark, not three vocabularies).</li>
         <li>Placeholders: an event with no record, drawn dashed in My timeline.</li>
         <li>A sequence-rules file (tender → award → contract → payment; formed → director → payments).</li>
-        <li>Named periods (a small table) for the Periods and Board views.</li></ul></div>
+        <li>Named periods (a small table) for the Periods and Board views.</li>
+        <li>Play needs nothing new: it moves the as-of handle month by month over the same data.</li></ul></div>
       <div><h4>Questions for Ony</h4><ul>
         <li>Which view opens a new case? Drawn: Lanes above 40 events, Periods once periods are named, Slider otherwise.</li>
         <li>Should an out-of-order pair become a lead on its own, or only when you press Make a lead? Drawn: only on the button.</li>
-        <li>Lanes by source as well as by party: keep both?</li></ul></div>
+        <li>Lanes by party, kind, source and how sure: keep all four, as drawn?</li>
+        <li>Money row and Red Flag brackets on by default, as drawn, or off until asked?</li></ul></div>
     </div>
   </aside>
 </section>
 
 <!-- =================== TIME_2  Stack in depth =================== -->
 <section class="screen" id="stack" data-name="TIME_2 · Timeline, Stack in depth" aria-label="Timeline, Stack in depth">
-  <div class="topbar">
-    <div class="crumbs"><span>The harbour land</span><i>›</i><span>See</span><i>›</i><b>Timeline</b></div>
-    <div class="seg" role="tablist" aria-label="Timeline views">
-      <button role="tab" aria-selected="false" data-v="slider">Slider</button>
-      <button role="tab" aria-selected="false" data-v="curve">Curve</button>
-      <button role="tab" aria-selected="false" data-v="periods">Periods</button>
-      <button role="tab" aria-selected="false" data-v="board">Board</button>
-      <button role="tab" aria-selected="false" data-v="lanes">Lanes</button>
-      <button role="tab" aria-selected="false" data-v="story">Story</button>
-      <button role="tab" aria-selected="true" class="hot" data-v="stack">Stack</button>
-    </div>
-    <span class="status">● Step: week, the finest the evidence allows</span>
-    <div class="sp"></div>
-    <div class="search"><span aria-hidden="true">⌕</span> Search the case, or type a command… <kbd>⌘K</kbd></div>
-  </div>
+  <div class="topbar" data-view="stack" data-status="Step: week, the finest the evidence allows"></div>
   <div class="titlerow"><h1>The money, one week at a time</h1><p>Each layer is a stretch of time holding the evidence dated in it. Scroll pushes the top layer out; empty stretches are skipped.</p></div>
 
   <div class="cols" style="grid-template-columns:232px 1fr 352px">
@@ -384,15 +507,15 @@ body.shownotes .screen.on .notes{display:block}
         <div class="ladder" id="ladder"></div>
         <div class="sep"></div>
         <div class="cap">Step</div>
-        <div class="seg" style="flex-wrap:wrap" aria-label="Step"><button>hour</button><button>day</button><button aria-pressed="true">week</button><button>month</button><button>year</button></div>
+        <div class="seg" style="flex-wrap:wrap" aria-label="Step"><button>Auto</button><button>minute</button><button>hour</button><button>day</button><button aria-pressed="true">week</button><button>month</button><button>year</button></div>
         <p class="note small" style="margin-top:8px">Auto picks the finest step the dates support. Evidence dated only to a month gets its own dashed layer at the start of that month, never a day.</p>
       </div>
     </div>
     <div class="col">
       <div class="panel fl" style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
-        <div class="stackwrap" id="stackwrap" tabindex="0" aria-label="Stack of time layers; scroll or press Space for the next layer"></div>
+        <div class="stackwrap" id="stackwrap" tabindex="0" aria-label="Stack of time layers; scroll or press the down arrow for the next layer, Space to play"></div>
         <div class="row" style="gap:10px">
-          <button class="btn sm" id="prevL">↑ Back a layer</button><button class="btn sm pri" id="nextL">Next layer <kbd>Space</kbd></button>
+          <button class="btn sm" id="playS" aria-pressed="false">▶ Play <kbd>Space</kbd></button><button class="btn sm" id="prevL">Back <kbd>↑</kbd></button><button class="btn sm pri" id="nextL">Next layer <kbd>↓</kbd></button>
           <span class="note small grow">One notch of the wheel = one layer. Each card shows the evidence itself; one hue per kind:</span>
           <span class="chip" style="color:var(--amber-l)">bank</span><span class="chip" style="color:var(--teal)">email</span><span class="chip" style="color:var(--plum)">filing</span><span class="chip" style="color:var(--ok)">photo</span><span class="chip" style="color:#D9C7A3">news</span>
         </div>
@@ -418,8 +541,139 @@ body.shownotes .screen.on .notes{display:block}
         <li>Reduced motion: layers step without the fly-out.</li></ul></div>
       <div><h4>Questions for Ony</h4><ul>
         <li>Library first (Swiper cards, Codrops 3D stack) or the plain CSS 3D drawn here? Drawn: CSS, no package.</li>
+        <li>Keys: <kbd>Space</kbd> plays on every timeline view (as in the Walkthrough); layers step with <kbd>↓</kbd> <kbd>↑</kbd> or <kbd>J</kbd> <kbd>K</kbd>. Drawn so; it was Space for the next layer.</li>
         <li>Should a layer show every card, or the first five with “+3 more” when it is crowded?</li></ul></div>
     </div>
+  </aside>
+</section>
+
+<!-- =================== TIME_3  Build your own (a mode) =================== -->
+<section class="screen" id="build" data-name="TIME_3 · Timeline, Build your own" aria-label="Timeline, Build your own">
+  <div class="topbar" data-view="build" data-status="Your timelines are yours: the record is never changed by them"></div>
+  <div class="titlerow"><h1>Build your own timeline</h1><p>Pick the evidence, put it in the order you want to tell it, and leave placeholders for what you still need. The record's own dates stay on every card.</p></div>
+  <div class="cols" style="grid-template-columns:300px 1fr 340px">
+    <div class="col"><div class="panel fl ox">
+      <div class="cap">All the evidence · 52 <span class="r">drag one in, or Add</span></div>
+      <div class="search" style="margin:0 0 8px;width:auto"><span aria-hidden="true">⌕</span> Find evidence…</div>
+      <div class="row" style="gap:5px;flex-wrap:wrap;margin-bottom:8px"><span class="chip ok">all 52</span><span class="chip" style="color:var(--amber-l)">bank 14</span><span class="chip" style="color:var(--teal)">email 9</span><span class="chip" style="color:var(--plum)">filing 12</span><span class="chip" style="color:#D9C7A3">minutes · news 13</span><span class="chip" style="color:var(--ok)">photo 4</span></div>
+      <div class="palette" id="palette"></div>
+    </div></div>
+    <div class="col"><div class="panel fl" style="display:flex;flex-direction:column;gap:10px">
+      <div class="row" style="gap:6px">
+        <div class="seg" id="tlnames" aria-label="Your timelines"><button aria-pressed="true">For the editor <span class="mini">7</span></button><button aria-pressed="false">Ross's year <span class="mini">4</span></button><button aria-pressed="false">The bid, for counsel <span class="mini">5</span></button></div>
+        <button class="btn sm">+ New timeline</button><div class="sp grow"></div>
+        <span class="note small">Saved on this computer · not part of the evidence</span>
+      </div>
+      <div class="lead" style="border-color:rgba(221,146,49,.45);background:var(--amber-d)"><span class="ico amber">⇄</span><div class="grow">Your order, not the record's. A card told out of date order says so in amber, and the record's date never moves.</div><button class="btn sm" id="cmpbtn">Compare with the record</button></div>
+      <div class="board-line" id="bline" aria-label="Your timeline, in your order"></div>
+      <div class="mini" style="margin-top:-6px">7 cards · the line scrolls sideways · drop a card from the left anywhere on it</div>
+      <div class="cap">Placeholder · drawn dashed, nothing attached yet</div>
+      <div class="phform"><label>When, if known<input value="spring 2019" aria-label="When, if known"></label><label class="grow">What you think happened<input value="The award was settled before the bids closed" aria-label="What you think happened"></label><button class="btn sm pri" id="addph">Add the placeholder</button></div>
+      <p class="note small">A placeholder stays a question in To check until a record is attached to it. Drag a card by its ⋮⋮ to move it; × takes it off this timeline only.</p>
+    </div></div>
+    <div class="col"><div class="panel fl ox" id="bpanel"></div></div>
+  </div>
+  <aside class="notes" aria-label="Needs and open questions for this screen">
+    <div class="nh"><b>Needs · open questions</b><span>TIME_3 · “Build your own” from the Timeline mockups (10 Oct), now a mode (DECISIONS.md)</span></div>
+    <div class="ng">
+      <div><h4>Carried over</h4><ul><li>Several named timelines, New timeline.</li><li>A palette of every piece of evidence; drag in or Add; drag to reorder; Remove.</li><li>Placeholders: “When, if known”, drawn dashed.</li></ul></div>
+      <div><h4>Needs (backend)</h4><ul><li>A small table of your timelines: name, the ordered evidence ids, placeholders. In the backup.</li><li>A placeholder is a To check item until a record is attached.</li></ul></div>
+      <div><h4>Questions for Ony</h4><ul><li>Should a built timeline become a deck's outline (one slide per card)? Not drawn.</li><li>Share a built timeline with the case, or keep it per person? Drawn: per person.</li></ul></div>
+    </div>
+  </aside>
+</section>
+
+<!-- =================== TIME_4  Replay (the story scrub) =================== -->
+<section class="screen" id="replay" data-name="TIME_4 · Timeline, Replay" aria-label="Timeline, Replay">
+  <div class="topbar" data-view="replay" data-status="Replay: the case as it grew, one step at a time"></div>
+  <div class="titlerow"><h1>How the money moved, step by step</h1><p>Replay walks the story in the order things happened. At each step you see only what was on the record by then.</p></div>
+  <div class="cols" style="grid-template-columns:290px 1fr 340px">
+    <div class="col"><div class="panel fl ox"><div class="cap">The steps · 7 <span class="r">click one to jump</span></div><div class="steps" id="steps"></div></div></div>
+    <div class="col"><div class="panel fl" style="display:flex;flex-direction:column;gap:10px;padding:12px 14px">
+      <div class="deck" id="deck" aria-live="polite"></div>
+      <div class="transport">
+        <button class="btn sm" id="rprev" aria-label="Previous step">⏮</button><button class="btn sm pri" id="rplay" aria-pressed="false">▶ Play <kbd>Space</kbd></button><button class="btn sm" id="rnext" aria-label="Next step">⏭</button>
+        <div class="scrub" id="scrub"></div>
+        <div class="seg" aria-label="Speed"><button aria-pressed="true">1×</button><button aria-pressed="false">2×</button></div>
+        <button class="btn sm" aria-pressed="true" id="rstop" title="Replay stops at an event nobody has resolved">Stop at the unresolved</button>
+      </div>
+    </div></div>
+    <div class="col"><div class="panel fl ox" id="rpanel"></div></div>
+  </div>
+  <aside class="notes" aria-label="Needs and open questions for this screen">
+    <div class="nh"><b>Needs · open questions</b><span>TIME_4 · the Story view's scrub, now Replay (DECISIONS.md); Play from the Walkthrough</span></div>
+    <div class="ng">
+      <div><h4>Carried over</h4><ul><li>The step list with a progress line and the current step lit; figures per step (“3 records”, “€29,400”).</li><li>A deck of the step's evidence; the wheel moves one record.</li><li>Play grows the case month by month (also on Lanes and Stack, Space).</li></ul></div>
+      <div><h4>Needs</h4><ul><li>The steps come from the Story's sections and their claims, in date order; no new table.</li><li>Reduced motion: steps change without the deck's slide.</li></ul></div>
+      <div><h4>Questions for Ony</h4><ul><li>Should Replay stop at every unresolved event, as drawn, or only when asked?</li></ul></div>
+    </div>
+  </aside>
+</section>
+
+<!-- =================== TIME_5  Board (Ony's corkboard) =================== -->
+<section class="screen" id="board" data-name="TIME_5 · Timeline, Board" aria-label="Timeline, Board">
+  <div class="topbar" data-view="board" data-status="One board per named period"></div>
+  <div class="titlerow"><h1>The bid, on one board</h1><p>Each period gets a board: the documents, people, notes, small charts and pictures of that stretch, joined by string where the record joins them.</p></div>
+  <div class="cols" style="grid-template-columns:1fr 340px">
+    <div class="col"><div class="panel fl" style="display:flex;flex-direction:column;gap:8px;padding:10px 12px">
+      <div class="row" style="gap:6px"><div class="seg" id="pertabs" aria-label="Periods"><button aria-pressed="false">Set-up · 2016–17</button><button aria-pressed="false">The money · 2018</button><button aria-pressed="true">The bid · 2019</button><button aria-pressed="false">Cover · 2020–21</button></div><div class="sp grow"></div><span class="note small">Scroll slides the board sideways to the next period; the string draws as you go.</span></div>
+      <div class="cork" id="cork"></div>
+      <div class="dock" id="dock"></div>
+    </div></div>
+    <div class="col"><div class="panel fl ox" id="corkpanel"></div></div>
+  </div>
+  <aside class="notes" aria-label="Needs and open questions for this screen">
+    <div class="nh"><b>Needs · open questions</b><span>TIME_5 · Ony's canvas frames 7, 12 and 13 (the board with string, the corkboard rich and clean)</span></div>
+    <div class="ng">
+      <div><h4>Carried over</h4><ul><li>Pinned cards of every kind: documents, people, sticky notes, small graphs, photos.</li><li>Red string only where the record joins two items (a payment, a signature, a meeting), never decoration.</li><li>It slides sideways as you scroll; a period timeline docked below with one dot per item.</li></ul></div>
+      <div><h4>Needs</h4><ul><li>Named periods (the same small table as Lanes' tints).</li><li>Sticky notes are your notes on the period (the notes table, record type “period”).</li></ul></div>
+      <div><h4>Questions for Ony</h4><ul><li>Rich (as drawn) or Clean (cards only, no pictures) as the default?</li><li>Let people move cards on the board, or keep the layout automatic? Drawn: they can move them; the string follows.</li></ul></div>
+    </div>
+  </aside>
+</section>
+
+<!-- =================== TIME_6  Slider =================== -->
+<section class="screen" id="slider" data-name="TIME_6 · Timeline, Slider" aria-label="Timeline, Slider">
+  <div class="topbar" data-view="slider" data-status="Proposed as the opening view for a case with under 40 events"></div>
+  <div class="titlerow"><h1>One event at a time</h1><p>For a small case, or for reading the record start to end: the evidence large, its date and its words.</p></div>
+  <div class="cols" style="grid-template-columns:1fr 340px">
+    <div class="col"><div class="panel fl" style="display:flex;flex-direction:column;gap:12px;padding:14px 16px">
+      <div class="slide" id="slide"></div>
+      <div class="sstrip" id="sstrip"></div>
+    </div></div>
+    <div class="col"><div class="panel fl ox" id="slpanel"></div></div>
+  </div>
+  <aside class="notes" aria-label="Needs and open questions for this screen">
+    <div class="nh"><b>Needs · open questions</b><span>TIME_6 · Workbench redesign board 4 (Slider)</span></div>
+    <div class="ng"><div><h4>Carried over</h4><ul><li>One event, a big evidence card, arrows and keys (<kbd>←</kbd> <kbd>→</kbd>).</li></ul></div><div><h4>Needs</h4><ul><li>A picture of each piece of evidence (as the Stack).</li></ul></div><div><h4>Questions for Ony</h4><ul><li>Open small cases here (under 40 events), as drawn?</li></ul></div></div>
+  </aside>
+</section>
+
+<!-- =================== TIME_7  Curve =================== -->
+<section class="screen" id="curve" data-name="TIME_7 · Timeline, Curve" aria-label="Timeline, Curve">
+  <div class="topbar" data-view="curve" data-status="Pick a year; the line rises with each event in it"></div>
+  <div class="titlerow"><h1>2019, as the record fills it</h1><p>Each year shows how many events it holds. Under the chosen year the line climbs with every event, so a busy month reads as a steep stretch.</p></div>
+  <div class="cols" style="grid-template-columns:1fr 340px">
+    <div class="col"><div class="panel fl" style="display:flex;flex-direction:column;gap:10px;padding:12px 14px">
+      <div class="years" id="years"></div>
+      <div id="curvesvg"></div>
+      <div class="row" style="gap:8px"><button class="btn sm" id="cprev">← Previous in 2019</button><button class="btn sm pri" id="cnext">Next in 2019 →</button><span class="note small grow">The line counts events, not money; a dashed step is an event known only to the month.</span></div>
+    </div></div>
+    <div class="col"><div class="panel fl ox" id="cpanel"></div></div>
+  </div>
+  <aside class="notes" aria-label="Needs and open questions for this screen">
+    <div class="nh"><b>Needs · open questions</b><span>TIME_7 · Workbench redesign board 5 (Curve)</span></div>
+    <div class="ng"><div><h4>Carried over</h4><ul><li>A year picker with the count under each year; the line rises under the chosen year; previous and next within the year.</li></ul></div><div><h4>Needs</h4><ul><li>No new data.</li></ul></div><div><h4>Questions for Ony</h4><ul><li>Keep Curve as its own view, or fold it into Lanes' year zoom?</li></ul></div></div>
+  </aside>
+</section>
+
+<!-- =================== TIME_8  Periods =================== -->
+<section class="screen" id="periods" data-name="TIME_8 · Timeline, Periods" aria-label="Timeline, Periods">
+  <div class="topbar" data-view="periods" data-status="Proposed as the opening view once periods are named"></div>
+  <div class="per" id="per"></div>
+  <aside class="notes" aria-label="Needs and open questions for this screen">
+    <div class="nh"><b>Needs · open questions</b><span>TIME_8 · Workbench redesign board 6 (Periods)</span></div>
+    <div class="ng"><div><h4>Carried over</h4><ul><li>Each period its own screen, colour and giant year; your summary; the evidence pictures; the wheel (or <kbd>↓</kbd>) steps through periods.</li></ul></div><div><h4>Needs</h4><ul><li>Named periods with a written summary (yours, never generated).</li></ul></div><div><h4>Questions for Ony</h4><ul><li>Should a period's summary be required before Periods opens a case?</li></ul></div></div>
   </aside>
 </section>
 
@@ -488,7 +742,7 @@ body.shownotes .screen.on .notes{display:block}
 </section>
 
 </div></div></div>
-<div class="foot"><span id="fname"></span> · Invented names and sample values throughout. Nothing here is a measurement. Keys: 1–3 screens, N notes.</div>
+<div class="foot"><span id="fname"></span> · Invented names and sample values throughout. Nothing here is a measurement. Keys: 1–9 screens, N notes.</div>
 
 <script>
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
@@ -499,24 +753,52 @@ var SVGNS='http://www.w3.org/2000/svg';
 var C={ok:'#6CC49A',amber:'#DD9231',amberl:'#F0B565',teal:'#3AB3AD',bad:'#E5735A',plum:'#B994DC',text:'#F0EAE1',mute:'#ABA093',faint:'#7C7168',line:'rgba(240,234,225,.10)',panel:'#211A16',card:'#2A221E'};
 
 /* ---------- frame ---------- */
-var SCREENS=['lanes','stack','places'];
+var SCREENS=['lanes','stack','build','replay','board','slider','curve','periods','places'];
+var VIEWS=[['lanes','Lanes'],['stack','Stack'],['replay','Replay'],['board','Board'],['slider','Slider'],['curve','Curve'],['periods','Periods']];
 var stage=$('#stage'),vp=$('#vp');
 var bare=/[?&]bare/.test(location.search);
 if(bare)document.body.classList.add('bare');
 function fit(){var w=$('#vpwrap').getBoundingClientRect().width;var k=bare?1:Math.min(1,w/1440);stage.style.transform='scale('+k+')';vp.style.width=(1440*k)+'px';vp.style.height=(900*k)+'px'}
 window.addEventListener('resize',fit);
+/* one topbar for every timeline screen: the views, and the mode (the record, or a timeline you build) */
+$$('.topbar[data-view]').forEach(function(t){var v=t.dataset.view,mode=v==='build'?'build':'record';
+  t.innerHTML='<div class="crumbs"><span>The harbour land</span><i>›</i><span>See</span><i>›</i><b>Timeline</b></div>'+
+    '<div class="seg mode" role="tablist" aria-label="Mode"><button role="tab" data-go="lanes" aria-selected="'+(mode==='record')+'"'+(mode==='record'?' class="hot"':'')+'>The record</button><button role="tab" data-go="build" aria-selected="'+(mode==='build')+'"'+(mode==='build'?' class="hot"':'')+'>Build your own</button></div>'+
+    (mode==='record'?'<div class="seg" role="tablist" aria-label="Views of the record">'+VIEWS.map(function(w){return '<button role="tab" data-go="'+w[0]+'" aria-selected="'+(w[0]===v)+'"'+(w[0]===v?' class="hot"':'')+'>'+w[1]+'</button>'}).join('')+'</div>':'')+
+    '<span class="status">● '+t.dataset.status+'</span><div class="sp"></div><div class="search"><span aria-hidden="true">⌕</span> Search the case, or type a command… <kbd>⌘K</kbd></div>'});
 function show(id){
   if(SCREENS.indexOf(id)<0)id='lanes';
   $$('.screen').forEach(function(s){s.classList.toggle('on',s.id===id)});
   $$('#pk button').forEach(function(b){b.setAttribute('aria-selected',b.dataset.s===id?'true':'false')});
   $('#fname').textContent=$('#'+id).dataset.name;
+  if(id!=='lanes')stopPlay();
+  if(id==='board'){drawBoard();boardPanel()}if(id==='slider')drawSlider();
   try{history.replaceState(null,'','#'+id)}catch(e){}
 }
 $$('#pk button').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.s)})});
-$$('.seg [data-v]').forEach(function(b){b.addEventListener('click',function(){
-  if(b.dataset.v==='lanes')show('lanes');else if(b.dataset.v==='stack')show('stack');
-  else{b.title='Not drawn in this mockup: Lanes and Stack are drawn';}
-})});
+$$('.topbar [data-go]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.go)})});
+/* TIME_1 controls */
+function press(group,btn){$$('button',group).forEach(function(x){x.setAttribute('aria-pressed',x===btn?'true':'false')})}
+function redraw(){drawLanes();listView()}
+$$('#laneby button').forEach(function(b){b.addEventListener('click',function(){BY=b.dataset.by;LIT=null;press($('#laneby'),b);redraw()})});
+var ZOOMS=[[2016,2022],[2017,2022],[2018,2020],[2019,2020]];
+function setZoom(i){ZOOM=ZOOMS[Math.max(0,Math.min(3,i))];press($('#zoom'),$$('#zoom button')[ZOOMS.indexOf(ZOOM)]);redraw()}
+$$('#zoom button').forEach(function(b,i){b.addEventListener('click',function(){setZoom(i)})});
+function toggleLayer(k){SHOWL[k]=!SHOWL[k];$('#layers [data-l="'+k+'"]').setAttribute('aria-pressed',SHOWL[k]?'true':'false');redraw()}
+$$('#layers button').forEach(function(b){b.addEventListener('click',function(){toggleLayer(b.dataset.l)})});
+$$('.legend.filt [data-m]').forEach(function(b){b.addEventListener('click',function(){HIDEM[b.dataset.m]=!HIDEM[b.dataset.m];b.setAttribute('aria-pressed',HIDEM[b.dataset.m]?'false':'true');redraw()})});
+$$('.legend.filt [data-k]').forEach(function(b){b.addEventListener('click',function(){HIDEK[b.dataset.k]=!HIDEK[b.dataset.k];b.setAttribute('aria-pressed',HIDEK[b.dataset.k]?'false':'true');redraw()})});
+$('#hiderough').addEventListener('click',function(){HIDEROUGH=!HIDEROUGH;this.setAttribute('aria-pressed',HIDEROUGH?'true':'false');redraw()});
+function toggleList(){var on=!$('#lanes').classList.contains('listmode');$('#lanes').classList.toggle('listmode',on);$('#listbtn').setAttribute('aria-pressed',on?'true':'false');listView()}
+$('#listbtn').addEventListener('click',toggleList);
+/* Play: the case grows month by month from its first record; each new event pulses once; Space pauses */
+function stopPlay(){if(PLAYING){clearInterval(PLAYING);PLAYING=null;var b=$('#play');if(b){b.setAttribute('aria-pressed','false');b.innerHTML='▶ Play <kbd>Space</kbd>'}}}
+var PAUSED=false;
+function play(){if(PLAYING){stopPlay();PAUSED=true;drawLanes();return}
+  if(!PAUSED||ASOF>=2021.95)ASOF=2016;PAUSED=false;$('#play').setAttribute('aria-pressed','true');$('#play').innerHTML='❚❚ Pause <kbd>Space</kbd>';
+  PLAYING=setInterval(function(){var was=ASOF;ASOF=Math.round((ASOF+1/12)*12)/12;EV.forEach(function(e){var t=yr(e.d);e.pulse=t>was&&t<=ASOF});
+    if(ASOF>=2022){ASOF=2022;stopPlay()}drawLanes()},RM?900:260)}
+$('#play').addEventListener('click',play);
 function setNotes(on){document.body.classList.toggle('shownotes',on);$('#nbtn').setAttribute('aria-pressed',on?'true':'false')}
 $('#nbtn').addEventListener('click',function(){setNotes(!document.body.classList.contains('shownotes'))});
 
@@ -559,76 +841,125 @@ var EV=[
   {id:'p2',lane:'mine',d:'2018-02-06',d2:'2018-04-11',prec:'range',mark:'ok',mine:true,t:'Your belief: three payments kept under €10,000',lab:'kept under €10,000',src:'3 bank lines under it',kind:'mine'},
   {id:'p3',lane:'mine',d:'2019-03',prec:'month',mark:'q',ph:true,t:'Placeholder: M. Ross meets the council',lab:'Ross meets the council?',src:'No record yet',kind:'mine'}
 ];
-var SEL='g1';
+var SEL='e11';
 var QUARTERS=[2,3,1,0,1,2,3,1,2,5,4,2,6,9,7,3,2,1,2,1,1,2,1,0];
 var SHOWNSHARE=[1,1,1,.5,1,1,.67,1,1,1,1,.5,.83,.78,.57,.67,.5,0,.5,1,1,1,1,1];
+/* what the controls hold */
+var BY='party',ZOOM=[2016,2022],SHOWL={flags:true,money:true,periods:true},HIDEM={},HIDEK={},HIDEROUGH=false,ASOF=2020,LIT=null,PLAYING=null;
+/* who else each event involves (for lighting a party), and payments for the money row */
+var WITH={e4:['kes'],e5:['kes'],e6:['kes'],e7:['kes'],e10:['hc'],e11:['kes'],e12:['kes'],e13:['hc'],e14:['hn'],e9:['kes']};
+var PAY=[['2018-02-06',9800],['2018-03-09',9800],['2018-04-11',9800],['2018-08-20',60000],['2019-05-15',42000,1],['2019-06-10',240000],['2019-10-02',1250000]];
+function kindOf(e){return e.kind==='news'?'file':e.kind}
+function srcOf(e){return e.mine?'Yours':e.src.split(/[,(]/)[0].replace(/ p\.\d.*/,'').trim()}
+function laneSet(){
+  if(BY==='party')return LANES;
+  var mine=LANES[0],out=[mine],seen={};
+  var key=BY==='kind'?kindOf:BY==='source'?srcOf:function(e){return e.mark};
+  var name={bank:'Bank lines',mail:'Email',filing:'Company filings',file:'Minutes and news',ok:'✓ Shown',q:'? Not yet shown',bad:'! Disputed',f:'ƒ Worked out'};
+  EV.forEach(function(e){if(e.lane==='mine')return;var k=key(e);if(!seen[k]){seen[k]=1;out.push({id:'by:'+k,name:name[k]||k,sub:BY==='source'?'source':BY==='kind'?'kind':'how sure'})}});
+  return out.slice(0,8);
+}
+function laneOf(e){if(e.lane==='mine'||BY==='party')return e.lane;var k=BY==='kind'?kindOf(e):BY==='source'?srcOf(e):e.mark;return 'by:'+k}
+function hidden(e){return HIDEM[e.mark]||HIDEK[kindOf(e)]||(HIDEROUGH&&(e.prec==='month'||e.prec==='year'))}
 
 function drawLanes(){
   var host=$('#lanesvg');host.innerHTML='';
-  var W=984,H=430,X0=176,X1=W-10,TOP=52,LH=50;
+  var lanes=laneSet();
+  var W=984,LH=42,TOP=52,MONEY=SHOWL.money?46:0,H=TOP+30+lanes.length*LH+MONEY+6,X0=176,X1=W-10;
+  var Y0=ZOOM[0],Y1=ZOOM[1];
   var x=function(v){return X0+(v-Y0)/(Y1-Y0)*(X1-X0)};
-  var s=el('svg',{width:W,height:H,viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Lanes from 2016 to 2021'},host);
+  var s=el('svg',{width:W,height:H,viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Lanes from '+Y0+' to '+(Y1-1)},host);
   var defs=el('defs',{},s);
+  var cp=el('clipPath',{id:'plot'},defs);el('rect',{x:X0-2,y:0,width:X1-X0+4,height:H},cp);
   var mk=el('marker',{id:'arr',viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'},defs);el('path',{d:'M0,0 L8,4 L0,8 z',fill:C.mute},mk);
   var mk2=el('marker',{id:'arrb',viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'},defs);el('path',{d:'M0,0 L8,4 L0,8 z',fill:C.bad},mk2);
   var hp=el('pattern',{id:'hatch',width:6,height:6,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},defs);el('rect',{width:2,height:6,fill:'rgba(221,146,49,.25)'},hp);
-  var ay=H-20,laneY=function(i){return TOP+30+i*LH};
+  var ay=H-20-MONEY,laneY=function(i){return TOP+30+i*LH};
+  var plot=el('g',{'clip-path':'url(#plot)'},s);
   /* named periods, as tints */
   var PERBOX=[];var PER=[['Set-up',2016,2018],['The money',2018,2019],['The bid',2019,2020],['Cover',2020,2022]];
-  PER.forEach(function(p,i){el('rect',{x:x(p[1]),y:TOP+4,width:x(p[2])-x(p[1]),height:ay-TOP-4,fill:i%2?'rgba(240,234,225,.025)':'transparent'},s);
-    var pt=el('text',{x:x(p[1])+6,y:TOP+12,'font-size':9.5,fill:C.faint,'font-family':'IBM Plex Mono','letter-spacing':'.12em'},p[0].toUpperCase(),s);PERBOX.push([x(p[1])+6,TOP+2,x(p[1])+6+pt.getComputedTextLength(),TOP+14])});
-  /* quarter density bars + share-shown line */
-  var bw=(X1-X0)/24;
-  QUARTERS.forEach(function(n,i){el('rect',{x:X0+i*bw+2,y:40-n*3.4,width:bw-4,height:n*3.4,rx:1.5,fill:i>=8&&i<12?'rgba(221,146,49,.6)':'rgba(240,234,225,.20)'},s)});
-  var pts=SHOWNSHARE.map(function(v,i){return (X0+i*bw+bw/2)+','+(40-v*30)}).join(' ');
+  if(SHOWL.periods)PER.forEach(function(p,i){if(p[2]<=Y0||p[1]>=Y1)return;var a=Math.max(p[1],Y0),b=Math.min(p[2],Y1);el('rect',{x:x(a),y:TOP+4,width:x(b)-x(a),height:ay-TOP-4,fill:i%2?'rgba(240,234,225,.025)':'transparent'},plot);
+    var pt=el('text',{x:x(a)+6,y:TOP+12,'font-size':9.5,fill:C.faint,'font-family':'IBM Plex Mono','letter-spacing':'.12em'},p[0].toUpperCase(),plot);PERBOX.push([x(a)+6,TOP+2,x(a)+6+pt.getComputedTextLength(),TOP+14])});
+  /* overview: the whole case's quarters always, with the zoom window over them */
+  var OX0=X0,OX1=X1,obw=(OX1-OX0)/24,ox=function(v){return OX0+(v-2016)/6*(OX1-OX0)};
+  QUARTERS.forEach(function(n,i){var q=2016+i/4;el('rect',{x:OX0+i*obw+2,y:40-n*3.4,width:obw-4,height:n*3.4,rx:1.5,fill:q>=ASOF?'rgba(124,113,104,.3)':(i>=8&&i<12?'rgba(221,146,49,.6)':'rgba(240,234,225,.20)')},s)});
+  var pts=SHOWNSHARE.map(function(v,i){return (OX0+i*obw+obw/2)+','+(40-v*30)}).join(' ');
   el('polyline',{points:pts,fill:'none',stroke:C.ok,'stroke-width':1.3,opacity:.85},s);
+  var wz=el('g',{class:'zwin'},s);
+  el('rect',{x:ox(Y0),y:6,width:ox(Y1)-ox(Y0),height:38,rx:4,fill:'rgba(221,146,49,.05)',stroke:'rgba(221,146,49,.55)','stroke-dasharray':Y1-Y0>=6?'2 4':'none'},wz);
+  [ox(Y0),ox(Y1)].forEach(function(hx){el('rect',{x:hx-3,y:16,width:6,height:18,rx:2,fill:C.amber,opacity:Y1-Y0>=6?.45:1},wz)});
+  el('title',{},wz,'The zoom window: drag it or its edges');
   el('text',{x:12,y:22,'font-size':9.5,fill:C.faint,'font-family':'IBM Plex Mono'},'RECORDS PER QUARTER',s);
   el('text',{x:12,y:36,'font-size':9.5,fill:C.ok,'font-family':'IBM Plex Mono'},'── share shown',s);
   /* lanes */
-  LANES.forEach(function(l,i){var y=laneY(i);
-    el('line',{x1:X0,x2:X1,y1:y,y2:y,stroke:l.mine?'rgba(221,146,49,.35)':C.line,'stroke-dasharray':l.mine?'3 4':'none'},s);
-    el('text',{x:12,y:y-1,'font-size':12.5,'font-weight':600,fill:l.mine?C.amberl:C.text},l.name,s);
-    el('text',{x:12,y:y+13,'font-size':10.5,fill:C.faint},l.sub,s);
-    if(l.mine)el('line',{x1:8,x2:W-8,y1:y+LH/2,y2:y+LH/2,stroke:C.line2||'rgba(240,234,225,.2)'},s);
+  lanes.forEach(function(l,i){var y=laneY(i);var lit=LIT===l.id;
+    el('line',{x1:X0,x2:X1,y1:y,y2:y,stroke:l.mine?'rgba(221,146,49,.35)':(lit?'rgba(58,179,173,.5)':C.line),'stroke-dasharray':l.mine?'3 4':'none'},s);
+    var nm=el('g',{class:'lname',tabindex:l.mine||BY!=='party'?-1:0,role:l.mine||BY!=='party'?'presentation':'button','data-lane':l.id,'aria-label':'Light '+l.name+' in every lane'},s);
+    el('rect',{x:6,y:y-14,width:160,height:32,rx:7,fill:lit?'rgba(58,179,173,.14)':'transparent'},nm);
+    el('text',{x:12,y:y-1,'font-size':12.5,'font-weight':600,fill:l.mine?C.amberl:(lit?C.teal:C.text)},l.name,nm);
+    el('text',{x:12,y:y+13,'font-size':10.5,fill:C.faint},l.sub+(lit?' · lit':''),nm);
+    if(l.mine)el('line',{x1:8,x2:W-8,y1:y+LH/2,y2:y+LH/2,stroke:'rgba(240,234,225,.2)'},s);
   });
   /* axis */
   el('line',{x1:X0,x2:X1,y1:ay,y2:ay,stroke:C.line},s);
-  for(var q=0;q<=24;q++){var xx=X0+q*bw;el('line',{x1:xx,x2:xx,y1:ay,y2:ay+(q%4?3:7),stroke:q%4?C.faint:C.mute},s);
-    if(q%4===0&&q<24)el('text',{x:xx+4,y:ay+15,'font-size':11,fill:C.mute,'font-family':'IBM Plex Mono'},String(Y0+q/4),s);}
+  var span=Y1-Y0,step=span>=5?1:span>=2?.25:1/12;
+  for(var t=Y0;t<=Y1+1e-6;t+=step){var xx=x(t);var major=Math.abs(t-Math.round(t))<1e-6;
+    el('line',{x1:xx,x2:xx,y1:ay,y2:ay+(major?7:3),stroke:major?C.mute:C.faint},s);
+    if(t<Y1-1e-6&&(major||span<2))el('text',{x:xx+4,y:ay+15,'font-size':11,fill:C.mute,'font-family':'IBM Plex Mono'},major?String(Math.round(t)):(span<2?MON[Math.round((t-Math.floor(t))*12)%12]:''),s);}
   var st=el('g',{class:'ev',tabindex:0},s);
   el('rect',{x:12,y:ay-4,width:132,height:20,rx:10,fill:'rgba(240,234,225,.05)',stroke:C.line},st);
   el('text',{x:22,y:ay+10,'font-size':10.5,fill:C.mute,'font-family':'IBM Plex Mono'},'‹ 1952 · 1 earlier',st);
-  el('title',{},st,'Harbour land first registered, 1952. Kept off the axis so 2016–21 stay readable.');
-  /* as-of line */
-  var asx=x(2020);
-  el('line',{x1:asx,x2:asx,y1:TOP+4,y2:ay,stroke:C.amber,'stroke-width':1,'stroke-dasharray':'1 3',opacity:.8},s);
-  /* sequence arrows */
+  el('title',{},st,'Harbour land first registered, 1952. Kept off the axis so the case\'s own years stay readable.');
+  /* money row: one bar per payment, on a log scale; the €10,000 reporting line dashed; one currency, never added up */
+  if(SHOWL.money){var my=ay+MONEY-4,mh=34,lg=function(v){return Math.log10(v)};var mx=function(v){return my-(lg(v)-3)/(6.2-3)*mh};
+    el('text',{x:12,y:my-8,'font-size':12,'font-weight':600,fill:C.amberl},'Money',s);
+    el('text',{x:62,y:my-8,'font-size':10,fill:C.faint},'€ · log · never added',s);
+    el('line',{x1:X0,x2:X1,y1:my,y2:my,stroke:C.line},s);
+    var l10=mx(10000);el('line',{x1:X0,x2:X1,y1:l10,y2:l10,stroke:C.bad,'stroke-dasharray':'4 4',opacity:.7},plot);
+    el('text',{x:X1-4,y:l10-3,'text-anchor':'end','font-size':9.5,fill:C.bad,'font-family':'IBM Plex Mono'},'€10,000 REPORTING LINE',plot);
+    PAY.forEach(function(p){var v=yr(p[0]);var bx=x(v);var late=v>ASOF;
+      el('rect',{x:bx-2.5,y:mx(p[1]),width:5,height:my-mx(p[1]),rx:1,fill:p[2]?'none':C.amberl,stroke:p[2]?C.amberl:'none','stroke-dasharray':p[2]?'2 2':'none',opacity:late?.18:.9},plot)});}
+  /* as-of line, and what came after it fades */
+  var asx=x(ASOF);
+  if(ASOF>Y0&&ASOF<Y1){el('rect',{x:asx,y:TOP+4,width:X1-asx,height:ay-TOP-4,fill:'rgba(15,11,9,.35)'},plot);
+    el('line',{x1:asx,x2:asx,y1:6,y2:ay+6,stroke:C.amber,'stroke-width':1.5},s);el('circle',{cx:asx,cy:ay,r:4.5,fill:C.amber},s);}
   function cx(e){return x(yr(e.d)+(e.prec==='month'?1/24:e.prec==='year'?.5:0))}
-  function ly(e){return laneY(LANES.findIndex(function(l){return l.id===e.lane}))}
-  var seq=EV.filter(function(e){return e.seq}).sort(function(a,b){return a.seq-b.seq});
+  function ly(e){return laneY(lanes.findIndex(function(l){return l.id===laneOf(e)}))}
+  var vis=EV.filter(function(e){return !hidden(e)&&lanes.some(function(l){return l.id===laneOf(e)})});
+  /* sequence arrows */
+  var seq=vis.filter(function(e){return e.seq}).sort(function(a,b){return a.seq-b.seq});
   var boxes=PERBOX.slice();
-  for(var k=0;k<seq.length-1;k++){var A=seq[k],B=seq[k+1],bad=B.broken;var ax2=cx(A),ay2=ly(A),bx=cx(B),by=ly(B);var mx=(ax2+bx)/2;
-    el('path',{d:'M'+(ax2+6)+','+ay2+' C'+mx+','+ay2+' '+mx+','+by+' '+(bx-8)+','+by,fill:'none',stroke:bad?C.bad:'rgba(171,160,147,.5)','stroke-width':bad?1.5:1,'stroke-dasharray':bad?'5 4':'2 3','marker-end':bad?'url(#arrb)':'url(#arr)'},s);}
+  for(var k=0;k<seq.length-1;k++){var A=seq[k],B=seq[k+1],bad=B.broken;var ax2=cx(A),ay2=ly(A),bx2=cx(B),by=ly(B);var mxx=(ax2+bx2)/2;
+    el('path',{d:'M'+(ax2+6)+','+ay2+' C'+mxx+','+ay2+' '+mxx+','+by+' '+(bx2-8)+','+by,fill:'none',stroke:bad?C.bad:'rgba(171,160,147,.5)','stroke-width':bad?1.5:1,'stroke-dasharray':bad?'5 4':'2 3','marker-end':bad?'url(#arrb)':'url(#arr)',opacity:yr(B.d)>ASOF?.25:1},plot);}
+  /* Red Flag bracket over the time it covers */
+  if(SHOWL.flags&&BY==='party'&&!HIDEK.bank){var fl=laneY(lanes.findIndex(function(l){return l.id==='fern'}));var fa=x(yr('2018-02-06'))-10,fb=x(yr('2018-04-11'))+10,fy=fl-22;
+    var fg=el('g',{class:'ev','data-id':'flag',tabindex:0,role:'button','aria-label':'Red Flag: payments just under the reporting line'},plot);
+    el('path',{d:'M'+fa+','+(fy+7)+' L'+fa+','+fy+' L'+fb+','+fy+' L'+fb+','+(fy+7),fill:'none',stroke:C.bad,'stroke-width':1.6},fg);
+    var ft=el('text',{x:fb+6,y:fy+4,'font-size':10,fill:C.bad,'font-family':'IBM Plex Mono'},'▮▮ FLAG · just under €10,000 ×3',fg);
+    boxes.push([fa,fy-2,fb+6+ft.getComputedTextLength(),fy+8]);}
   /* marks */
-  var labels=[];var groups={};
-  EV.forEach(function(e){
-    var y=ly(e);
-    var g=el('g',{class:'ev'+((e.group||e.id)===SEL?' sel':''),tabindex:0,'data-id':e.group||e.id,role:'button','aria-label':e.t},s);
+  var labels=[];var groups={};var litpts=[];
+  vis.forEach(function(e){
+    var y=ly(e);var late=yr(e.d)>ASOF;
+    var g=el('g',{class:'ev'+((e.group||e.id)===SEL?' sel':''),tabindex:0,'data-id':e.group||e.id,role:'button','aria-label':e.t,opacity:late?.22:1},plot);
+    if(LIT&&(e.lane===LIT||(WITH[e.id]||[]).indexOf(LIT)>=0)&&e.lane!==LIT)litpts.push([x(yr(e.d)),y]);
     if(e.group){
       if(groups[e.group])return;groups[e.group]=1;
       var mem=EV.filter(function(m){return m.group===e.group});var xa=x(yr(mem[0].d)),xb=x(yr(mem[mem.length-1].d));
       el('rect',{class:'hit',x:xa-8,y:y-9,width:xb-xa+16,height:18,rx:9,fill:'rgba(108,196,154,.10)',stroke:'rgba(108,196,154,.35)'},g);
       mem.forEach(function(m){el('circle',{cx:x(yr(m.d)),cy:y,r:4.5,fill:C.ok},g)});
+      if(SEL==='g1')el('rect',{x:xa-12,y:y-13,width:xb-xa+24,height:26,rx:13,fill:'none',stroke:C.amber,'stroke-width':1.6},g);
       boxes.push([xa-8,y-9,xb+8,y+9]);
-      labels.push({g:g,x0:xa-8,x1:xb+8,y:y,txt:'3 payments · €9,800 each · Feb–Apr 2018',fill:C.text,lane:e.lane});
+      labels.push({g:g,x0:xa-8,x1:xb+8,y:y,txt:'3 payments · €9,800 each · Feb–Apr 2018',fill:C.text});
       return;
     }
     var xx=x(yr(e.d));
-    if(e.prec==='range'){var x2=x(yr(e.d2));
+    if(e.prec==='range'){var x2=x(Math.min(yr(e.d2),Y1+1));
+      var straddle=yr(e.d)<ASOF&&yr(e.d2)>ASOF&&!e.ended;
       el('rect',{class:'hit',x:xx,y:y-3,width:Math.max(4,x2-xx),height:6,rx:3,fill:e.mark==='f'?'none':(e.ended?'rgba(171,160,147,.35)':(e.mine?'rgba(221,146,49,.55)':'rgba(171,160,147,.7)')),stroke:e.mark==='f'?C.teal:'none','stroke-dasharray':e.mark==='f'?'1 3':'none','stroke-width':1.6},g);
       if(e.ended)el('line',{x1:x2,x2:x2,y1:y-6,y2:y+6,stroke:C.mute,'stroke-width':1.4},g);
       boxes.push([xx,y-3,x2,y+3]);
-      labels.push({g:g,x0:xx,x1:Math.min(x2,xx+4),y:y,range:true,txt:(e.mark==='f'?'ƒ ':'')+e.lab,fill:e.ended?C.faint:(e.mine?C.amberl:C.text),lane:e.lane});
+      labels.push({g:g,x0:xx,x1:Math.min(x2,xx+4),y:y,range:true,txt:(e.mark==='f'?'ƒ ':'')+e.lab,fill:e.ended?C.faint:(e.mine?C.amberl:C.text)});
       return;
     }
     var w=e.prec==='month'?(x(1/12+Y0)-x(Y0)):e.prec==='year'?(x(Y0+1)-x(Y0)):0;
@@ -638,29 +969,43 @@ function drawLanes(){
     else if(e.mark==='bad'){el('circle',{class:'hit',cx:xx,cy:y,r:5.4,fill:C.bad},g);el('text',{x:xx,y:y+3.6,'text-anchor':'middle','font-size':9,'font-weight':800,fill:'#1c1208'},'!',g)}
     else el('circle',{class:'hit',cx:xx,cy:y,r:4.6,fill:'none',stroke:C.teal,'stroke-width':1.5,'stroke-dasharray':'.6 2.2'},g);
     if(e.id===SEL)el('circle',{cx:xx,cy:y,r:10,fill:'none',stroke:C.amber,'stroke-width':1.6},g);
+    if(e.pulse)el('circle',{cx:xx,cy:y,r:14,fill:'none',stroke:C.amberl,'stroke-width':1,opacity:.6},g);
     boxes.push([xx-6,y-6,xx+6,y+6]);
     labels.push({g:g,x0:Math.min(xx-6,w?xx-w/2:xx),x1:Math.max(xx+6,w?xx+w/2:xx),y:y,txt:e.lab||e.t,fill:e.ph?C.amberl:(e.mark==='q'?C.mute:(e.mark==='bad'?C.bad:C.text)),italic:e.ph});
   });
-  var dep=EV.find(function(e){return e.broken});var dt=el('text',{x:cx(dep)+2,y:ly(dep)+21,'font-size':10,fill:C.bad,'font-family':'IBM Plex Mono'},'↯ no award recorded',s);
-  boxes.push([cx(dep)+2,ly(dep)+11,cx(dep)+2+dt.getComputedTextLength(),ly(dep)+24]);
-  /* label placement: right inline, right above, right below, left inline, left above, left below */
+  /* a lit party: rings on its events in other lanes, joined by a stitch in time order */
+  if(LIT&&BY==='party'){litpts.sort(function(a,b){return a[0]-b[0]});
+    if(litpts.length>1)el('polyline',{points:litpts.map(function(p){return p[0]+','+p[1]}).join(' '),fill:'none',stroke:C.teal,'stroke-width':1.2,'stroke-dasharray':'1 3',opacity:.9},plot);
+    litpts.forEach(function(p){el('circle',{cx:p[0],cy:p[1],r:9,fill:'none',stroke:C.teal,'stroke-width':1.6},plot)});}
+  var dep=vis.find(function(e){return e.broken});
+  if(dep){var dt=el('text',{x:cx(dep)+2,y:ly(dep)+21,'font-size':10,fill:C.bad,'font-family':'IBM Plex Mono',opacity:yr(dep.d)>ASOF?.22:1},'↯ no award recorded',plot);
+    boxes.push([cx(dep)+2,ly(dep)+11,cx(dep)+2+dt.getComputedTextLength(),ly(dep)+24]);}
   function hit(b){for(var i=0;i<boxes.length;i++){var o=boxes[i];if(b[0]<o[2]+3&&b[2]>o[0]-3&&b[1]<o[3]&&b[3]>o[1])return true}return b[0]<X0-2||b[2]>X1+2}
   labels.forEach(function(L){
     var t=el('text',{'font-size':11.5,fill:L.fill,'font-style':L.italic?'italic':'normal','paint-order':'stroke',stroke:'#211A16','stroke-width':3},L.txt,L.g);
-    var tw=t.getComputedTextLength();
-    var mid=(L.x0+L.x1)/2;
+    var tw=t.getComputedTextLength();var mid=(L.x0+L.x1)/2;
     var tries=L.range?[[L.x0+2,L.y-8,'start'],[L.x0+2,L.y+16,'start']]:[[L.x1+5,L.y+4,'start'],[mid,L.y-11,'middle'],[mid,L.y+19,'middle'],[L.x1+3,L.y-10,'start'],[L.x1+3,L.y+18,'start'],[L.x0-5,L.y+4,'end'],[L.x0-3,L.y-10,'end'],[L.x0-3,L.y+18,'end']];
     var done=false;
     for(var i=0;i<tries.length&&!done;i++){var T=tries[i];var bx0=T[2]==='end'?T[0]-tw:T[0];if(T[2]==='middle')bx0=T[0]-tw/2;var b=[bx0,T[1]-10,bx0+tw,T[1]+3];
       if(!hit(b)){t.setAttribute('x',T[0]);t.setAttribute('y',T[1]);t.setAttribute('text-anchor',T[2]);boxes.push(b);done=true}}
     if(!done){t.setAttribute('x',L.x1+5);t.setAttribute('y',L.y+4);t.textContent='';el('title',{},L.g,L.txt)}
   });
-  el('text',{x:asx+4,y:TOP-2,'font-size':9.5,fill:C.amberl,'font-family':'IBM Plex Mono'},'AS OF END OF 2019',s);
-  $$('.ev',s).forEach(function(g){if(!g.dataset.id)return;
-    g.addEventListener('click',function(){SEL=g.dataset.id;drawLanes();evPanel()});
-    g.addEventListener('keydown',function(ev){if(ev.key==='Enter'){SEL=g.dataset.id;drawLanes();evPanel()}});});
+  if(ASOF>Y0&&ASOF<Y1)el('text',{x:asx>X1-240?asx-4:asx+4,'text-anchor':asx>X1-240?'end':'start',y:TOP-2,'font-size':9.5,fill:C.amberl,'font-family':'IBM Plex Mono','paint-order':'stroke',stroke:'#211A16','stroke-width':3},(PLAYING?'▶ ':'')+'AS OF '+(ASOF%1?MON[Math.round((ASOF%1)*12)%12].toUpperCase()+' ':'END OF ')+Math.floor(ASOF%1?ASOF:ASOF-1)+' · LATER EVENTS FADE',s);
+  $$('.ev',s).forEach(function(g){if(!g.dataset.id||g.dataset.id==='flag')return;
+    g.addEventListener('click',function(){SEL=g.dataset.id;drawLanes();evPanel();listView()});
+    g.addEventListener('keydown',function(ev){if(ev.key==='Enter'){SEL=g.dataset.id;drawLanes();evPanel();listView()}});});
+  $$('.lname',s).forEach(function(g){if(g.getAttribute('role')!=='button')return;var id=g.dataset.lane;
+    g.addEventListener('click',function(){LIT=LIT===id?null:id;drawLanes()});
+    g.addEventListener('keydown',function(ev){if(ev.key==='Enter'){LIT=LIT===id?null:id;drawLanes()}});});
 }
-
+function listView(){
+  var rows=EV.filter(function(e){return !hidden(e)}).slice().sort(function(a,b){return yr(a.d)-yr(b.d)});
+  var mk={ok:'✓ shown',q:'? not yet shown',bad:'! disputed',f:'ƒ worked out'};
+  $('#listview').innerHTML='<table><thead><tr><th>When</th><th>What</th><th>Who</th><th>Is it shown</th><th>From</th></tr></thead><tbody>'+rows.map(function(e){
+    var when=e.prec==='range'?e.d+' → '+(e.ended?e.d2:'now'):e.prec==='year'?e.d+' (year only)':e.prec==='month'?MON[+e.d.split('-')[1]-1]+' '+e.d.split('-')[0]+' (month only)':e.d;
+    var who=(LANES.find(function(l){return l.id===e.lane})||{}).name;
+    return '<tr class="'+((e.group||e.id)===SEL?'sel':'')+'"><td class="mono">'+when+'</td><td>'+esc(e.t)+'</td><td>'+esc(who)+'</td><td>'+mk[e.mark]+'</td><td>'+esc(e.src)+'</td></tr>'}).join('')+'</tbody></table>';
+}
 function rail(id,label,lit){
   var host=$('#'+id);host.innerHTML='';
   var a=document.createElement('div');a.className='asof';a.innerHTML='<small>As of end of</small><b>2019</b>';host.appendChild(a);
@@ -676,6 +1021,13 @@ function rail(id,label,lit){
   var t=document.createElement('div');t.className='mini';t.style.cssText='flex:none;width:'+(id==='rail1'?'140px':'120px')+';line-height:1.5';t.innerHTML=label;host.appendChild(t);
 }
 
+function around(e){
+  var same=EV.filter(function(v){return v.lane===e.lane&&!v.group&&v.id!==e.id}).sort(function(a,b){return yr(a.d)-yr(b.d)});
+  var t=yr(e.d),before=same.filter(function(v){return yr(v.d)<t}).slice(-1)[0],after=same.filter(function(v){return yr(v.d)>t})[0];
+  var who=(LANES.find(function(l){return l.id===e.lane})||{}).name;
+  var row=function(v,w){return v?'<div class="evrow"><span class="ico">'+w+'</span><span class="dt">'+(v.prec==='month'?MON[+v.d.split('-')[1]-1]+' '+v.d.slice(0,4):v.prec==='year'?v.d:v.d)+'</span><span>'+esc(v.lab||v.t)+'</span></div>':'<div class="evrow"><span class="ico">'+w+'</span><span class="dt">—</span><span class="note">nothing recorded</span></div>'};
+  return '<div class="sep"></div><div class="cap">Before and after in this lane <span class="r">'+esc(who)+'</span></div>'+row(before,'←')+row(after,'→');
+}
 function evPanel(){
   var p=$('#evpanel');
   if(SEL==='g1'){
@@ -689,10 +1041,10 @@ function evPanel(){
     '<div class="ln"><span>21.03.18</span><span>Office rent</span><span>-1,450.00</span></div>'+
     '<div class="ln lit"><span>11.04.18</span><span>FERNHILL LTD ref 3/3</span><span>9,800.00</span></div></div>'+
     '<div class="grade" style="margin:10px 0"><b>Confirmed:</b> each line is on the bank\'s own statement, re-checked against its hash today.</div>'+
-    '<div class="row" style="gap:6px;margin-bottom:10px"><button class="btn sm pri">Open the source</button><button class="btn sm">Chain of Custody</button><button class="btn sm">More ▾</button></div>'+
+    '<div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap"><button class="btn sm pri">Open the source</button><button class="btn sm">Trace</button><button class="btn sm">Chain of Custody</button></div>'+
     '<div class="sep"></div><div class="cap t">The same payments elsewhere</div>'+
     '<div class="views"><span class="chip teal">Money · 3 rows</span><span class="chip teal">The Wire · 1 link</span><span class="chip">Places · no place</span></div>'+
-    '<div class="sep"></div><div class="cap">In My timeline</div><p class="note">Under your belief “kept under €10,000”. It has records under it, so it is drawn solid.</p>';
+    '<div class="sep"></div><div class="cap">In My timeline</div><p class="note">Under your belief “kept under €10,000”. It has records under it, so it is drawn solid.</p>'+around(EV.find(function(v){return v.id==='e7'}));
   }else{
     var e=EV.find(function(v){return v.id===SEL})||EV[0];
     var mk={ok:'<span class="chip ok">✓ shown</span>',q:'<span class="chip amber dash">? not yet shown</span>',bad:'<span class="chip bad">! disputed</span>',f:'<span class="chip teal dash">ƒ worked out</span>'}[e.mark];
@@ -703,8 +1055,8 @@ function evPanel(){
       '<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:8px">'+mk+'<span class="chip">'+pr+'</span></div>'+
       '<dl class="kv" style="margin-bottom:10px">'+(when?'<dt>When</dt><dd class="mono">'+when+'</dd>':'')+'<dt>From</dt><dd>'+esc(e.src)+'</dd></dl>'+
       (e.ph?'<p class="note">Dashed until evidence is attached. Drag a record onto it, or it stays a question in To check.</p><div class="row" style="gap:6px;margin-top:10px"><button class="btn sm pri">Add to To check</button><button class="btn sm">Attach a record…</button></div>':
-       e.broken?'<div class="lead" style="margin-bottom:10px"><span class="ico bad">↯</span><div>Comes before any recorded award (tender 15 Jan → bid 4 Mar → <b>?</b> → this).</div></div><div class="grade" style="border-color:var(--amber)"><b>Possible:</b> one email says so; no bank line yet.</div><div class="row" style="gap:6px;margin-top:10px"><button class="btn sm pri">Open the source</button><button class="btn sm bad">Make a lead</button></div>':
-       '<div class="row" style="gap:6px"><button class="btn sm pri">Open the source</button><button class="btn sm">Chain of Custody</button><button class="btn sm">More ▾</button></div>');
+       e.broken?'<div class="lead" style="margin-bottom:10px"><span class="ico bad">↯</span><div>Comes before any recorded award (tender 15 Jan → bid 4 Mar → <b>?</b> → this).</div></div><div class="grade" style="border-color:var(--amber)"><b>Possible:</b> one email says so; no bank line yet.</div><div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn sm pri">Open the source</button><button class="btn sm bad">Make a lead</button><button class="btn sm">Add to my timeline</button></div>'+'<p class="note small" style="margin-top:8px">Opened here because it is the next event nobody has resolved.</p>':
+       '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm pri">Open the source</button><button class="btn sm">Trace</button><button class="btn sm">Add to my timeline</button></div>')+(e.lane==='mine'?'':around(e));
   }
 }
 
@@ -767,6 +1119,11 @@ function stepL(n){var t=Math.max(0,Math.min(LAYERS.length-1,TOPL+n));if(t!==TOPL
 var wheelLock=0;
 $('#stackwrap').addEventListener('wheel',function(e){e.preventDefault();var now=Date.now();if(now-wheelLock<450)return;wheelLock=now;stepL(e.deltaY>0?1:-1)},{passive:false});
 $('#nextL').addEventListener('click',function(){stepL(1)});$('#prevL').addEventListener('click',function(){stepL(-1)});
+/* Space plays the stack: a layer every 1.6 s, as Play does on every timeline view */
+var SPLAY=null;function playStack(){var b=$('#playS');if(SPLAY){clearInterval(SPLAY);SPLAY=null;b.setAttribute('aria-pressed','false');b.innerHTML='▶ Play <kbd>Space</kbd>';return}
+  if(TOPL>=LAYERS.length-1){TOPL=0;drawStack();cardPanel()}b.setAttribute('aria-pressed','true');b.innerHTML='❚❚ Pause <kbd>Space</kbd>';
+  SPLAY=setInterval(function(){if(TOPL>=LAYERS.length-1){playStack();return}stepL(1)},1600)}
+$('#playS').addEventListener('click',playStack);
 
 /* ---------- PLACE_1 map ---------- */
 var PL=[
@@ -882,17 +1239,226 @@ function placePanel(){
 $$('#pathseg button').forEach(function(b){b.addEventListener('click',function(){PATH=b.dataset.p;$$('#pathseg button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});$('#pathnote').textContent=PATHS[PATH].note;drawMap()})});
 $('#reset').addEventListener('click',function(e){e.preventDefault();WIN=[2016,2022];drawMap();placeStrip()});
 
+/* ---------- evidence used by the new views (the same sample case) ---------- */
+var POOL={
+  b1:{k:'bank',h:'hue-bank',cap:'Fernhill Ltd → Kestrel SA €9,800',d:'6 Feb 2018',t:2018.10,src:'Bank statement, Kestrel SA, p.3',o:LAYERS[0].cards[0].o},
+  m1:{k:'mail',h:'hue-mail',cap:'“Three transfers, as discussed”',d:'7 Feb 2018',t:2018.10,src:'Email, M. Ross',o:LAYERS[0].cards[1].o},
+  f1:{k:'file',h:'hue-file',cap:'Fernhill Ltd changes its bank',d:'8 Feb 2018',t:2018.11,src:'Company register',o:LAYERS[0].cards[2].o},
+  n1:{k:'news',h:'hue-news',cap:'Courier: council “reviewing” the land',d:'March 2018 · month only',t:2018.17,src:'The Marlow Courier',o:LAYERS[1].cards[0].o,fuzzy:1},
+  b2:{k:'bank',h:'hue-bank',cap:'Fernhill Ltd → Kestrel SA €9,800',d:'9 Mar 2018',t:2018.19,src:'Bank statement, p.4',o:LAYERS[2].cards[0].o},
+  ph1:{k:'photo',h:'hue-photo',cap:'Survey stakes on the harbour land',d:'10 Mar 2018',t:2018.19,src:'Photo (camera clock)',o:LAYERS[2].cards[1].o},
+  b3:{k:'bank',h:'hue-bank',cap:'Fernhill Ltd → Kestrel SA €9,800',d:'11 Apr 2018',t:2018.27,src:'Bank statement, p.4',o:LAYERS[3].cards[0].o},
+  t1:{k:'file',h:'hue-file',cap:'Council opens the tender',d:'15 Jan 2019',t:2019.04,src:'Council minutes, p.2',o:{reg:'Council minutes',title:'Tender: the harbour land',body:'The council resolved to open a tender for plot 14, Quay North.'}},
+  bid:{k:'file',h:'hue-file',cap:'Kestrel SA bids for the land',d:'4 Mar 2019',t:2019.17,src:'Council minutes, p.3',o:{reg:'Council minutes',title:'Bids received',body:'One bid received, from Kestrel SA. Clerk to report.'}},
+  dep:{k:'mail',h:'hue-mail',cap:'“The deposit went across in May”',d:'May 2019 · month only',t:2019.37,src:'Email, 2 May 2019',o:{from:'A. Weber',sub:'Re: harbour',body:'The <b>deposit went across in May</b>, as agreed with the council. €42k.'},fuzzy:1},
+  fence:{k:'photo',h:'hue-photo',cap:'New fences on the land',d:'14 Aug 2019',t:2019.62,src:'Photo (camera clock)',o:{ts:'2019:08:14 11:20'}},
+  land:{k:'bank',h:'hue-bank',cap:'Kestrel SA → Harbour Council €1,250,000',d:'2 Oct 2019',t:2019.75,src:'Council minutes, p.4',o:{p:'p.4',lines:[['02.10','LAND PRICE','1,250,000.00',1],['02.10','Fee','-35.00']]}}
+};
+var KW={bank:'Bank line',mail:'Email',file:'Filing',photo:'Photo',news:'News'};
+var KC={bank:'var(--amber-l)',mail:'var(--teal)',file:'var(--plum)',photo:'var(--ok)',news:'#D9C7A3'};
+
+/* ---------- TIME_3 build your own ---------- */
+var BUILT=['t1','bid','dep','b1','m1','land',{ph:1,when:'spring 2019',what:'The award was settled before the bids closed'}],BSEL='dep',DRAG=null;
+function idOf(it){return typeof it==='string'?it:'ph'}
+function drawBuild(){
+  var line=$('#bline');line.innerHTML='';var lastT=-1;
+  BUILT.forEach(function(it,i){var c=document.createElement('div');
+    if(typeof it!=='string'){c.className='bcard ph'+(BSEL==='ph'?' sel':'');c.innerHTML='<div class="tools"><span class="grip" title="Drag to move">⋮⋮</span><button class="rm" aria-label="Remove">×</button></div><div class="t"><i>'+esc(it.what)+'</i></div><div class="d off">'+esc(it.when)+' · placeholder</div><div class="note small">nothing attached yet</div>'}
+    else{var e=POOL[it];var off=e.t<lastT;lastT=Math.max(lastT,e.t);
+      c.className='bcard '+e.h+(BSEL===it?' sel':'');c.innerHTML='<div class="tools"><span class="grip" title="Drag to move">⋮⋮</span><span class="mini" style="color:'+KC[e.k]+'">'+KW[e.k]+'</span><button class="rm" aria-label="Remove from this timeline">×</button></div><div class="pic">'+pic(e.k,e.o)+'</div><div class="t">'+esc(e.cap)+'</div><div class="d'+(off?' off':'')+'">'+e.d+(off?' · earlier than the card before':'')+'</div>'}
+    c.draggable=true;c.tabIndex=0;
+    c.addEventListener('click',function(ev){if(ev.target.classList.contains('rm')){BUILT.splice(i,1);drawBuild();return}BSEL=idOf(it);drawBuild();buildPanel()});
+    c.addEventListener('dragstart',function(){DRAG=i;c.classList.add('drag')});
+    c.addEventListener('dragover',function(ev){ev.preventDefault()});
+    c.addEventListener('drop',function(ev){ev.preventDefault();if(typeof DRAG==='number'&&DRAG!==i){var m=BUILT.splice(DRAG,1)[0];BUILT.splice(i,0,m)}else if(typeof DRAG==='string'&&BUILT.indexOf(DRAG)<0){BUILT.splice(i,0,DRAG)}DRAG=null;drawBuild();palette()});
+    line.appendChild(c)});
+  line.ondragover=function(ev){ev.preventDefault()};
+  line.ondrop=function(ev){if(typeof DRAG==='string'&&BUILT.indexOf(DRAG)<0){BUILT.push(DRAG);DRAG=null;drawBuild();palette()}};
+}
+function palette(){var p=$('#palette');p.innerHTML='';
+  Object.keys(POOL).forEach(function(id){var e=POOL[id];var inn=BUILT.indexOf(id)>=0;var d=document.createElement('div');d.className='pcard'+(inn?' in':'');d.draggable=!inn;
+    d.innerHTML='<span class="k" style="color:'+KC[e.k]+'">'+KW[e.k]+'</span><span class="x">'+esc(e.cap)+'</span><span class="d">'+e.d+'</span>'+(inn?'<span class="mini">✓ in it</span>':'<button class="btn sm">Add</button>');
+    d.addEventListener('dragstart',function(){DRAG=id});
+    var b=$('button',d);if(b)b.addEventListener('click',function(){BUILT.push(id);BSEL=id;drawBuild();palette();buildPanel()});
+    p.appendChild(d)});
+}
+function buildPanel(){var p=$('#bpanel');
+  if(BSEL==='ph'){p.innerHTML='<div class="cap">Placeholder · yours</div><div class="ev-title">The award was settled before the bids closed</div><div class="row" style="gap:6px;margin-bottom:8px"><span class="chip amber dash">? nothing attached</span><span class="chip">spring 2019 · your guess</span></div><p class="note">It is also a question in To check. Attach a record and it turns solid here and in Lanes\' My timeline.</p><div class="row" style="gap:6px;margin-top:10px"><button class="btn sm pri">Attach a record…</button><button class="btn sm">Open in To check</button></div>';return}
+  var e=POOL[BSEL]||POOL.dep;
+  p.innerHTML='<div class="cap">'+KW[e.k]+' <span class="r">in “For the editor”</span></div><div class="ev-title">'+esc(e.cap)+'</div>'+
+    '<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">'+(e.fuzzy?'<span class="chip amber dash">month only · never a day</span>':'<span class="chip">'+e.d+'</span>')+(e.k==='mail'?'<span class="chip amber dash">? not yet shown</span>':'<span class="chip ok">✓ shown</span>')+'</div>'+
+    '<div style="height:190px;border-radius:9px;overflow:hidden;border:1px solid var(--line2);margin-bottom:10px">'+pic(e.k,e.o)+'</div>'+
+    '<dl class="kv" style="margin-bottom:10px"><dt>In the record</dt><dd>'+e.d+' · '+esc(e.src)+'</dd><dt>In your order</dt><dd>card '+(BUILT.indexOf(BSEL)+1)+' of '+BUILT.length+(BSEL==='dep'?' · told before the bank lines of Feb 2018 it explains':'')+'</dd></dl>'+
+    '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm pri">Open the source</button><button class="btn sm">Show in Lanes</button><button class="btn sm">Remove from this timeline</button></div>'+
+    '<div class="sep"></div><p class="note small">Removing takes it off this timeline only. The evidence, its date and its links stay as they are.</p>';
+}
+$('#addph').addEventListener('click',function(){BUILT.push({ph:1,when:'spring 2019',what:'The award was settled before the bids closed'});drawBuild()});
+$$('#tlnames button').forEach(function(b){b.addEventListener('click',function(){press($('#tlnames'),b)})});
+
+/* ---------- TIME_4 replay ---------- */
+var STEPS=[
+  {t:'Kestrel SA is set up',when:'Mar 2016 – Jul 2017',fig:'2 records',cards:['f1'],known:'4 events on the record · 4 shown',chg:'Kestrel SA registered; A. Weber a director.'},
+  {t:'Three payments, each just under €10,000',when:'Feb – Apr 2018',fig:'3 records · €29,400',cards:['b1','b2','b3'],known:'11 events · 9 shown · 2 not yet',chg:'3 bank lines; the email that says “three transfers”; a Red Flag raised.'},
+  {t:'The council opens a tender',when:'15 Jan 2019',fig:'1 record',cards:['t1'],known:'15 events · 12 shown',chg:'Council minutes, p.2.'},
+  {t:'Kestrel SA is the only bidder',when:'4 Mar 2019',fig:'1 record',cards:['bid'],known:'17 events · 13 shown',chg:'Council minutes, p.3: one bid received.'},
+  {t:'A €42,000 “deposit”, with no award recorded',when:'May 2019 · month only',fig:'1 email · €42,000',cards:['dep'],known:'18 events · 13 shown · 1 out of order',chg:'Comes before any award. Replay stops here: nobody has resolved it.',unres:1},
+  {t:'Fences go up on the land',when:'14 Aug 2019',fig:'1 photo',cards:['fence'],known:'20 events · 15 shown',chg:'A photo, dated by its camera clock (claimed, not proved).'},
+  {t:'Kestrel SA pays €1,250,000 for the land',when:'2 Oct 2019',fig:'1 record · €1,250,000',cards:['land'],known:'23 events · 17 shown',chg:'Council minutes, p.4: the sale.'}
+];
+var STEP=4,CARD=0,RPLAY=null;
+function drawReplay(){
+  var st=$('#steps');st.innerHTML='<div class="prog" style="height:'+(STEP/(STEPS.length-1)*100)+'%"></div>';
+  STEPS.forEach(function(S,i){var b=document.createElement('button');b.className=(i<STEP?'done':'')+(i===STEP?' on':'');
+    b.innerHTML='<b>'+esc(S.t)+'</b><span>'+S.when+'</span><span class="fig">'+S.fig+(S.unres?' · unresolved':'')+'</span>';b.addEventListener('click',function(){STEP=i;CARD=0;drawReplay()});st.appendChild(b)});
+  var S=STEPS[STEP],dk=$('#deck');dk.innerHTML='<div class="head"><small>Step '+(STEP+1)+' of '+STEPS.length+' · '+S.when+'</small><h2>'+esc(S.t)+'</h2><p>'+esc(S.chg)+'</p></div>';
+  S.cards.forEach(function(id,j){var e=POOL[id];var d=j-CARD;var c=document.createElement('div');c.className='dcard '+e.h;
+    c.style.transform='translate3d('+(d*34)+'px,'+(Math.abs(d)*14)+'px,'+(-Math.abs(d)*120)+'px) rotateY('+(d*-8)+'deg)';c.style.zIndex=10-Math.abs(d);c.style.opacity=Math.abs(d)>2?0:1-Math.abs(d)*.25;
+    c.innerHTML='<div class="pic">'+pic(e.k,e.o)+'</div><div class="cap1"><b>'+esc(e.cap)+'</b><span>'+e.d+'</span></div>';dk.appendChild(c)});
+  if(S.cards.length>1){var n=document.createElement('div');n.className='gap';n.style.bottom='12px';n.textContent='record '+(CARD+1)+' of '+S.cards.length+' · the wheel moves one';dk.appendChild(n)}
+  /* scrubber: the case's months, the steps as ticks, the as-of handle */
+  var host=$('#scrub');host.innerHTML='';var W=440,H=34;var s=el('svg',{width:'100%',height:H,viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'none'},host);
+  var tx=function(v){return 6+(v-2016)/4*(W-12)};el('line',{x1:6,x2:W-6,y1:20,y2:20,stroke:C.line2||'rgba(240,234,225,.2)','stroke-width':3},s);
+  var ts=[2016.2,2018.2,2019.04,2019.17,2019.37,2019.62,2019.75];el('line',{x1:6,x2:tx(ts[STEP]),y1:20,y2:20,stroke:C.amber,'stroke-width':3},s);
+  ts.forEach(function(v,i){el('circle',{cx:tx(v),cy:20,r:i===STEP?6:3.5,fill:i<=STEP?C.amber:C.faint,stroke:STEPS[i].unres?C.bad:'none','stroke-width':2},s)});
+  [2016,2017,2018,2019,2020].forEach(function(y){el('text',{x:tx(y),y:9,'font-size':9,fill:C.faint,'font-family':'IBM Plex Mono'},String(y),s)});
+  $('#rpanel').innerHTML='<div class="cap">By this step <span class="r">'+S.when+'</span></div><div class="ev-title">What was on the record</div><p class="note" style="margin-bottom:8px">'+S.known+'</p>'+
+    (S.unres?'<div class="lead" style="margin-bottom:10px"><span class="ico bad">↯</span><div><b>Unresolved.</b> Replay waits here until you go on.</div></div>':'')+
+    '<div class="cap">Evidence at this step · '+S.cards.length+'</div>'+S.cards.map(function(id){var e=POOL[id];return '<div class="evrow"><span class="ico" style="color:'+KC[e.k]+'">●</span><span class="dt">'+e.d+'</span><span>'+esc(e.cap)+'</span></div>'}).join('')+
+    '<div class="row" style="gap:6px;margin-top:12px;flex-wrap:wrap"><button class="btn sm pri">Show in Lanes at this date</button><button class="btn sm">Open the source</button></div>'+
+    '<div class="sep"></div><p class="note small">The steps are the Story\'s claims in date order. Nothing here is generated; each step\'s words are the claim\'s own.</p>';
+}
+function replayToggle(){var b=$('#rplay');if(RPLAY){clearInterval(RPLAY);RPLAY=null;b.setAttribute('aria-pressed','false');b.innerHTML='▶ Play <kbd>Space</kbd>';return}
+  if(STEP>=STEPS.length-1){STEP=0;CARD=0;drawReplay()}b.setAttribute('aria-pressed','true');b.innerHTML='❚❚ Pause <kbd>Space</kbd>';
+  RPLAY=setInterval(function(){var S=STEPS[STEP];if(CARD<S.cards.length-1){CARD++}else if(STEP<STEPS.length-1&&!(S.unres&&$('#rstop').getAttribute('aria-pressed')==='true'&&CARD===S.cards.length-1&&RPLAY._held!==STEP)){STEP++;CARD=0}else{if(S.unres)RPLAY._held=STEP;replayToggle();drawReplay();return}drawReplay()},RM?1400:1800)}
+$('#rplay').addEventListener('click',replayToggle);
+$('#rprev').addEventListener('click',function(){STEP=Math.max(0,STEP-1);CARD=0;drawReplay()});
+$('#rnext').addEventListener('click',function(){STEP=Math.min(STEPS.length-1,STEP+1);CARD=0;drawReplay()});
+$('#rstop').addEventListener('click',function(){this.setAttribute('aria-pressed',this.getAttribute('aria-pressed')==='true'?'false':'true')});
+var rlock=0;$('#deck').addEventListener('wheel',function(e){e.preventDefault();var n=Date.now();if(n-rlock<400)return;rlock=n;var S=STEPS[STEP];CARD=Math.max(0,Math.min(S.cards.length-1,CARD+(e.deltaY>0?1:-1)));drawReplay()},{passive:false});
+
+/* ---------- TIME_5 board ---------- */
+var PINS=[
+  {id:'tender',x:40,y:40,w:200,cls:'',hd:'Council minutes · 15 Jan 2019',body:'<b>Tender opened</b> for plot 14, Quay North. Closing date 1 March.',t:2019.04},
+  {id:'ross',x:300,y:30,w:130,cls:'person',hd:'',body:'<div class="face"></div>M. Ross<div style="font:500 10px var(--f-mono);color:#6b5d50">councillor · person</div>',t:2019.2},
+  {id:'bid',x:520,y:56,w:200,cls:'',hd:'Council minutes · 4 Mar 2019',body:'One bid received, from <b>Kestrel SA</b>. Clerk to report.',t:2019.17},
+  {id:'note',x:770,y:40,w:150,cls:'note',hd:'',body:'Who decided the award, and when?',t:2019.3},
+  {id:'dep',x:120,y:260,w:220,cls:'',hd:'Email · May 2019 · month only',body:'“The <b>deposit went across in May</b>, as agreed with the council. €42k.”',t:2019.37},
+  {id:'graph',x:420,y:250,w:220,cls:'',hd:'Payments to Kestrel SA · 2019',body:'<svg width="196" height="70" aria-label="Payments chart"><rect x="10" y="40" width="22" height="22" fill="#c98a3c"/><rect x="60" y="20" width="22" height="42" fill="#c98a3c"/><rect x="110" y="4" width="22" height="58" fill="#c98a3c"/><line x1="0" y1="62" x2="196" y2="62" stroke="#6b5d50"/><text x="6" y="70" font-size="8" font-family="IBM Plex Mono" fill="#6b5d50">May</text><text x="56" y="70" font-size="8" font-family="IBM Plex Mono" fill="#6b5d50">Jun</text><text x="106" y="70" font-size="8" font-family="IBM Plex Mono" fill="#6b5d50">Oct</text></svg>',t:2019.5},
+  {id:'fence',x:700,y:250,w:170,cls:'photo',hd:'',body:'<div class="ph"><div style="position:absolute;left:8%;right:8%;top:42%;height:24%;background:repeating-linear-gradient(90deg,#3d3b36 0 2px,transparent 2px 10px);border-top:2px solid #3d3b36"></div></div><div style="font:500 10px var(--f-mono);margin-top:5px">14 Aug 2019 · fences</div>',t:2019.62},
+  {id:'land',x:560,y:420,w:230,cls:'',hd:'Council minutes · 2 Oct 2019',body:'Sale of plot 14 to <b>Kestrel SA</b> for <b>€1,250,000</b>.',t:2019.75}
+];
+var YARN=[['tender','bid','the same tender'],['ross','tender','chaired the meeting'],['bid','dep','?',1],['dep','graph','the €42,000'],['bid','land','the sale'],['fence','land','the same plot']];
+var PSELB='dep';
+function drawBoard(){
+  var c=$('#cork');c.innerHTML='';var W=c.clientWidth||1000,H=540;
+  var s=el('svg',{width:W,height:H,style:'position:absolute;inset:0;pointer-events:none'},c);
+  var by={};PINS.forEach(function(p){by[p.id]=p});
+  function mid(p){return [p.x+p.w/2,p.y+12]}
+  YARN.forEach(function(y,i){var a=mid(by[y[0]]),b=mid(by[y[1]]);var sag=Math.abs(a[0]-b[0])*.18+20;
+    var d='M'+a[0]+','+a[1]+' Q'+((a[0]+b[0])/2)+','+(Math.max(a[1],b[1])+sag)+' '+b[0]+','+b[1];
+    var path=el('path',{d:d,fill:'none',stroke:y[3]?'rgba(229,115,90,.75)':'#c8352a','stroke-width':2,'stroke-dasharray':y[3]?'5 5':'none',class:'yarn'},s);
+    var L=path.getTotalLength?path.getTotalLength():400;if(!y[3]&&!RM){path.style.strokeDasharray=L;path.style.strokeDashoffset=L;path.style.transition='stroke-dashoffset 1.2s ease '+(i*.25)+'s';setTimeout(function(){path.style.strokeDashoffset=0},40)}
+    el('text',{x:(a[0]+b[0])/2,y:(Math.max(a[1],b[1])+sag/2)+4,'text-anchor':'middle','font-size':10,fill:'#f2d9c7','font-family':'IBM Plex Mono','paint-order':'stroke',stroke:'#2b2018','stroke-width':4},y[2],s)});
+  PINS.forEach(function(p){var d=document.createElement('div');d.className='pinned '+p.cls+(p.id===PSELB?' sel':'');d.style.cssText='left:'+p.x+'px;top:'+p.y+'px;width:'+p.w+'px;transform:rotate('+((p.id.length%5)-2)*.8+'deg)';d.tabIndex=0;
+    d.innerHTML=(p.hd?'<div class="hd">'+p.hd+'</div>':'')+p.body;d.addEventListener('click',function(){PSELB=p.id;drawBoard();boardPanel()});c.appendChild(d)});
+  var h=document.createElement('div');h.className='slidehint';h.textContent='scroll → Cover · 2020–21';c.appendChild(h);
+  /* the period's own timeline, docked below: one dot per item */
+  var dk=$('#dock');dk.innerHTML='';var DW=dk.clientWidth||1000;var ds=el('svg',{width:DW,height:46},dk);var dx=function(v){return 20+(v-2019)*(DW-40)};
+  el('line',{x1:20,x2:DW-20,y1:22,y2:22,stroke:C.line2||'rgba(240,234,225,.2)'},ds);
+  for(var m=0;m<12;m++)el('text',{x:dx(2019+m/12)+2,y:42,'font-size':9.5,fill:C.faint,'font-family':'IBM Plex Mono'},MON[m],ds);
+  PINS.forEach(function(p){el('circle',{cx:dx(p.t),cy:22,r:p.id===PSELB?6:4,fill:p.id===PSELB?C.amber:(p.cls==='note'?'#f2d36b':C.text)},ds)});
+  el('text',{x:20,y:12,'font-size':9.5,fill:C.faint,'font-family':'IBM Plex Mono'},'THE BID · 2019 · one dot per item on the board',ds);
+}
+function boardPanel(){var p=PINS.find(function(v){return v.id===PSELB});var links=YARN.filter(function(y){return y[0]===p.id||y[1]===p.id});
+  $('#corkpanel').innerHTML='<div class="cap">On the board <span class="r">The bid · 2019</span></div><div class="ev-title">'+(p.hd||({ross:'M. Ross',note:'Your note',fence:'Photo · 14 Aug 2019'}[p.id]))+'</div>'+
+    (p.id==='note'?'<p class="note">A sticky note is yours: a note on the period. It is never evidence and carries no string of its own.</p>':'<div class="row" style="gap:6px;margin-bottom:8px">'+(p.id==='dep'?'<span class="chip amber dash">? not yet shown</span><span class="chip">month only</span>':'<span class="chip ok">✓ shown</span>')+'</div>')+
+    '<div class="cap" style="margin-top:8px">String · '+links.length+'</div>'+links.map(function(y){var o=y[0]===p.id?y[1]:y[0];var q=PINS.find(function(v){return v.id===o});return '<div class="evrow"><span class="ico'+(y[3]?' amber':'')+'">'+(y[3]?'?':'—')+'</span><span class="dt">'+esc(y[2])+'</span><span>'+(q.hd||({ross:'M. Ross',note:'your note',fence:'the photo'}[o])||o)+'</span></div>'}).join('')+
+    '<p class="note small" style="margin-top:8px">String is drawn only where a record joins two items. A dashed string is a link not yet shown.</p>'+
+    '<div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btn sm pri">Open the source</button><button class="btn sm">Show in Lanes</button></div>';
+}
+$$('#pertabs button').forEach(function(b){b.addEventListener('click',function(){press($('#pertabs'),b)})});
+
+/* ---------- TIME_6 slider ---------- */
+var SLIDES=['t1','bid','dep','fence','land'],SI=2;
+function slide(n){SI=(SI+n+SLIDES.length)%SLIDES.length;drawSlider()}
+function drawSlider(){var e=POOL[SLIDES[SI]];
+  $('#slide').innerHTML='<button class="arrow" aria-label="Previous event">‹</button><div class="card '+e.h+'"><div style="display:flex;flex-direction:column;gap:10px"><span class="mini">EVENT '+(SI+21)+' OF 52 · '+KW[e.k].toUpperCase()+'</span><div class="big">'+e.d.replace(' · month only','')+'</div><div class="ev-title" style="font-size:24px">'+esc(e.cap)+'</div><div class="row" style="gap:6px">'+(e.fuzzy?'<span class="chip amber dash">month only · never a day</span>':'')+(e.k==='mail'?'<span class="chip amber dash">? not yet shown</span>':'<span class="chip ok">✓ shown</span>')+'</div><p class="note">'+esc(e.src)+'</p><div class="row" style="gap:6px;margin-top:auto"><button class="btn sm pri">Open the source</button><button class="btn sm">Show in Lanes</button></div></div><div class="pic">'+pic(e.k,e.o)+'</div></div><button class="arrow" aria-label="Next event">›</button>';
+  var bt=$$('#slide .arrow');bt[0].addEventListener('click',function(){slide(-1)});bt[1].addEventListener('click',function(){slide(1)});
+  var host=$('#sstrip');host.innerHTML='';var W=host.clientWidth||1000;var s=el('svg',{width:W,height:54},host);var x=function(v){return 20+(v-2016)/6*(W-40)};
+  el('line',{x1:20,x2:W-20,y1:24,y2:24,stroke:'rgba(240,234,225,.2)'},s);
+  EV.forEach(function(v){if(v.lane==='mine')return;el('circle',{cx:x(yr(v.d)),cy:24,r:3,fill:C.faint},s)});
+  el('circle',{cx:x(e.t),cy:24,r:7,fill:C.amber},s);
+  for(var y=2016;y<2022;y++)el('text',{x:x(y)+3,y:46,'font-size':10,fill:C.mute,'font-family':'IBM Plex Mono'},String(y),s);
+  $('#slpanel').innerHTML='<div class="cap">Reading the record <span class="r">← → </span></div><div class="ev-title">Event '+(SI+21)+' of 52</div><p class="note">Every event in date order; month- and year-only events sit at the start of their month or year, said so on the card.</p><div class="sep"></div><div class="cap">Next</div>'+SLIDES.slice(SI+1,SI+3).map(function(id){var n=POOL[id];return '<div class="evrow"><span class="ico">→</span><span class="dt">'+n.d+'</span><span>'+esc(n.cap)+'</span></div>'}).join('');
+}
+
+/* ---------- TIME_7 curve ---------- */
+var CYR=2019;var CY={2016:2,2017:3,2018:5,2019:6,2020:1,2021:1};var CPICK='e11';
+function drawCurve(){
+  var ys=$('#years');ys.innerHTML='';var mx=Math.max.apply(null,Object.keys(CY).map(function(k){return CY[k]}));
+  Object.keys(CY).forEach(function(y){var b=document.createElement('button');b.className=+y===CYR?'on':'';b.innerHTML='<b>'+y+'</b><i style="height:'+(4+CY[y]/mx*26)+'px"></i><span>'+CY[y]+' event'+(CY[y]>1?'s':'')+'</span>';b.addEventListener('click',function(){CYR=+y;drawCurve()});ys.appendChild(b)});
+  var evs=EV.filter(function(e){return e.lane!=='mine'&&Math.floor(yr(e.d))===CYR}).sort(function(a,b){return yr(a.d)-yr(b.d)});
+  var host=$('#curvesvg');host.innerHTML='';var W=1000,H=470,X0=40,X1=W-20,B=H-40,T=40;var x=function(v){return X0+(v-CYR)*(X1-X0)};
+  var s=el('svg',{width:W,height:H,viewBox:'0 0 '+W+' '+H},host);
+  for(var m=0;m<12;m++){el('line',{x1:x(CYR+m/12),x2:x(CYR+m/12),y1:T,y2:B,stroke:C.line},s);el('text',{x:x(CYR+m/12)+4,y:B+18,'font-size':11,fill:C.mute,'font-family':'IBM Plex Mono'},MON[m],s)}
+  el('line',{x1:X0,x2:X1,y1:B,y2:B,stroke:C.line2||'rgba(240,234,225,.2)'},s);
+  var n=Math.max(1,evs.length),yv=function(k){return B-(k/n)*(B-T-30)};var px=X0,py=B,d='M'+X0+','+B;
+  evs.forEach(function(e,k){var ex=x(yr(e.d)+(e.prec==='month'?1/24:0));d+=' L'+ex+','+py+' L'+ex+','+yv(k+1);
+    var g=el('g',{class:'ev'+(e.id===CPICK?' sel':''),tabindex:0,role:'button','aria-label':e.t},s);
+    if(e.prec==='month')el('line',{x1:ex,x2:ex,y1:py,y2:yv(k+1),stroke:C.amberl,'stroke-width':3,'stroke-dasharray':'4 4'},s);
+    var mk=e.mark==='ok'?C.ok:e.mark==='bad'?C.bad:C.amberl;el('circle',{class:'hit',cx:ex,cy:yv(k+1),r:6,fill:e.mark==='q'?C.panel:mk,stroke:mk,'stroke-width':2,'stroke-dasharray':e.mark==='q'?'2.4 2':'none'},g);
+    if(e.id===CPICK)el('circle',{cx:ex,cy:yv(k+1),r:12,fill:'none',stroke:C.amber,'stroke-width':1.6},g);
+    el('text',{x:ex+10,y:yv(k+1)-8,'font-size':12,fill:C.text,'paint-order':'stroke',stroke:'#211A16','stroke-width':3},e.lab||e.t,g);
+    g.addEventListener('click',function(){CPICK=e.id;drawCurve()});py=yv(k+1)});
+  d+=' L'+X1+','+py;el('path',{d:d,fill:'none',stroke:C.amber,'stroke-width':2.4},s);
+  el('text',{x:X0,y:T-14,'font-size':10,fill:C.faint,'font-family':'IBM Plex Mono'},'EVENTS SO FAR IN '+CYR+' · '+evs.length,s);
+  var e=EV.find(function(v){return v.id===CPICK})||evs[0];
+  $('#cpanel').innerHTML=e?'<div class="cap">Event <span class="r">'+CYR+'</span></div><div class="ev-title">'+esc(e.t)+'</div><dl class="kv"><dt>From</dt><dd>'+esc(e.src)+'</dd></dl><div class="row" style="gap:6px;margin-top:10px"><button class="btn sm pri">Open the source</button><button class="btn sm">Show in Lanes</button></div>':'<p class="note">No events in '+CYR+'.</p>';
+}
+function curveStep(n){var evs=EV.filter(function(e){return e.lane!=='mine'&&Math.floor(yr(e.d))===CYR}).sort(function(a,b){return yr(a.d)-yr(b.d)});var i=evs.findIndex(function(e){return e.id===CPICK});CPICK=(evs[Math.max(0,Math.min(evs.length-1,i+n))]||{}).id;drawCurve()}
+$('#cprev').addEventListener('click',function(){curveStep(-1)});$('#cnext').addEventListener('click',function(){curveStep(1)});
+
+/* ---------- TIME_8 periods ---------- */
+var PERS=[
+  {n:'Set-up',y:'2016',c:'#2c3a3e',sum:'Kestrel SA is registered in Luxembourg; A. Weber is its first director. In July 2017 Harbour Nominees Ltd takes over, and Kestrel SA comes to own Loop Two BV.',pics:[['file',LAYERS[4].cards[0].o,'Mar 2016 · register'],['file',LAYERS[0].cards[2].o,'Jul 2017 · directors']]},
+  {n:'The money',y:'2018',c:'#3d2a1e',sum:'Fernhill Ltd pays Kestrel SA three times, each €9,800, from February to April; an email speaks of “three transfers, so nobody has to fill in a form”. Harbour Nominees adds €60,000 in August.',pics:[['bank',LAYERS[0].cards[0].o,'6 Feb 2018 · bank line'],['mail',LAYERS[0].cards[1].o,'7 Feb 2018 · email']]},
+  {n:'The bid',y:'2019',c:'#3a2433',sum:'The council opens a tender in January; Kestrel SA is the only bidder. A €42,000 “deposit” is mentioned in May, before any award is recorded. In October the land is sold for €1,250,000.',pics:[['file',POOL.bid.o,'4 Mar 2019 · minutes'],['photo',POOL.fence.o,'14 Aug 2019 · photo']]},
+  {n:'Cover',y:'2020',c:'#22302a',sum:'Kestrel SA\'s accounts for 2019–20 are not found. In May 2021 the harbour authority extends the lease.',pics:[['news',LAYERS[1].cards[0].o,'May 2021 · Courier'],['file',{reg:'Business register',title:'Accounts 2019–20',body:'No filing found.'},'2020 · not found']]}
+];
+var PI=2;
+function periodStep(n){PI=Math.max(0,Math.min(PERS.length-1,PI+n));drawPeriods()}
+function drawPeriods(){var host=$('#per');host.innerHTML='';
+  PERS.forEach(function(P,i){var d=i-PI;var sc=document.createElement('div');sc.className='pscreen';sc.style.background='linear-gradient(160deg,'+P.c+',#18120f 75%)';sc.style.transform='translateY('+(d*100)+'%)';sc.style.opacity=d===0?1:.3;sc.setAttribute('aria-hidden',d!==0);
+    sc.innerHTML='<div><div class="mini" style="color:rgba(240,234,225,.6)">PERIOD '+(i+1)+' OF 4</div><div class="yr">'+P.y+'</div><h2>'+P.n+'</h2><p class="sum">'+esc(P.sum)+'</p><div class="by">Summary written by you · 12 Oct · each sentence cites its records</div><div class="row" style="gap:6px;margin-top:16px"><button class="btn sm pri">Open in Lanes</button><button class="btn sm">The board for this period</button></div></div><div class="pics">'+P.pics.map(function(q){return '<div>'+pic(q[0],q[1])+'<span>'+q[2]+'</span></div>'}).join('')+'</div>';host.appendChild(sc)});
+  var dots=document.createElement('div');dots.className='pdots';PERS.forEach(function(P,i){var b=document.createElement('button');b.className=i===PI?'on':'';b.innerHTML=P.n+' <i></i>';b.addEventListener('click',function(){PI=i;drawPeriods()});dots.appendChild(b)});host.appendChild(dots);
+}
+var plock=0;$('#per').addEventListener('wheel',function(e){e.preventDefault();var n=Date.now();if(n-plock<600)return;plock=n;periodStep(e.deltaY>0?1:-1)},{passive:false});
+
 document.addEventListener('keydown',function(e){
   if(isTyping(e)||e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key==='n'||e.key==='N'){setNotes(!document.body.classList.contains('shownotes'));e.preventDefault();return}
-  if(e.key>='1'&&e.key<='3'){show(SCREENS[+e.key-1]);return}
-  if($('#stack').classList.contains('on')){if(e.key===' '||e.key==='ArrowDown'){stepL(1);e.preventDefault()}else if(e.key==='ArrowUp'){stepL(-1);e.preventDefault()}}
-  if($('#places').classList.contains('on')&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){var ord=PL.slice().sort(function(a,b){return (a.y+a.x/3)-(b.y+b.x/3)});var i=ord.findIndex(function(p){return p.id===PSEL});i=(i+(e.key==='ArrowRight'?1:-1)+ord.length)%ord.length;PSEL=ord[i].id;drawMap();placePanel()}
+  if(e.key>='1'&&e.key<='9'){show(SCREENS[+e.key-1]);return}
+  var on=function(id){return $('#'+id).classList.contains('on')};
+  if(on('lanes')){
+    if(e.key===' '){play();e.preventDefault()}
+    else if(e.key==='f'||e.key==='F')toggleLayer('flags');else if(e.key==='m'||e.key==='M')toggleLayer('money');else if(e.key==='p'||e.key==='P')toggleLayer('periods');
+    else if(e.key==='l'||e.key==='L')toggleList();
+    else if(e.key==='+'||e.key==='=')setZoom(ZOOMS.indexOf(ZOOM)+1);else if(e.key==='-')setZoom(ZOOMS.indexOf(ZOOM)-1);else if(e.key==='0')setZoom(0);
+    else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){stopPlay();ASOF=Math.max(2016,Math.min(2022,ASOF+(e.key==='ArrowRight'?1:-1)/12));drawLanes();e.preventDefault()}
+    else if(e.key==='j'||e.key==='k'||e.key==='J'||e.key==='K'){var ids=[];EV.slice().sort(function(a,b){return yr(a.d)-yr(b.d)}).forEach(function(v){var id=v.group||v.id;if(ids.indexOf(id)<0&&!hidden(v))ids.push(id)});var i=ids.indexOf(SEL);SEL=ids[(i+((e.key==='j'||e.key==='J')?1:-1)+ids.length)%ids.length];redraw();evPanel()}
+    else if(e.key==='Escape'){LIT=null;stopPlay();drawLanes()}
+  }
+  if(on('stack')){if(e.key===' '){playStack();e.preventDefault()}else if(e.key==='ArrowDown'||e.key==='j'||e.key==='J'){stepL(1);e.preventDefault()}else if(e.key==='ArrowUp'||e.key==='k'||e.key==='K'){stepL(-1);e.preventDefault()}}
+  if(on('replay')&&e.key===' '){replayToggle();e.preventDefault()}
+  if(on('slider')&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){slide(e.key==='ArrowRight'?1:-1);e.preventDefault()}
+  if(on('periods')&&(e.key==='ArrowDown'||e.key==='ArrowUp')){periodStep(e.key==='ArrowDown'?1:-1);e.preventDefault()}
+  if(on('places')&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){var ord=PL.slice().sort(function(a,b){return (a.y+a.x/3)-(b.y+b.x/3)});var i2=ord.findIndex(function(p){return p.id===PSEL});i2=(i2+(e.key==='ArrowRight'?1:-1)+ord.length)%ord.length;PSEL=ord[i2].id;drawMap();placePanel()}
 });
 
-drawLanes();evPanel();rail('rail1','Wheel over the lanes moves this moment. <kbd>Ctrl</kbd>+wheel zooms.',[2018,2019]);
-drawStack();cardPanel();rail('rail2','The stack starts at the moment on the rail.',[2018,2018.5]);
+drawLanes();evPanel();listView();
+drawStack();cardPanel();rail('rail2','The stack starts at the moment on the rail. <kbd>Space</kbd> plays it.',[2018,2018.5]);
 drawMap();placeStrip();placePanel();
+palette();drawBuild();buildPanel();drawReplay();drawSlider();drawCurve();drawPeriods();
 var h=(location.hash||'').slice(1);show(SCREENS.indexOf(h)>=0?h:'lanes');
 if(/[?&]notes/.test(location.search))setNotes(true);
 fit();
