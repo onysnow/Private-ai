@@ -520,7 +520,31 @@ def outside_lookup_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     return {"message": message, "result": {"findings": found, "failed": failed}}
 
 
+WEB_CAPTURE = "web_capture"
+
+
+def web_capture_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Capture a pasted link (ADR-0018), then read the page it kept like an uploaded file, in a job of its own so a
+    read that fails can be retried from the document."""
+    from sqlalchemy import Engine
+
+    from app.db.session import build_session_factory
+    from app.jobs.records import create_job, execute_job
+    from app.services.web_capture import run_capture
+
+    bind = db.get_bind()
+    factory = build_session_factory(bind if isinstance(bind, Engine) else bind.engine)
+
+    def read(document_id: str) -> None:
+        read_job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=job.investigation_id, subject_type="document",
+                              subject_id=document_id, runner=job.runner, payload={"parent_job_id": job.id})
+        execute_job(factory, read_job.id, HANDLERS)
+
+    return run_capture(db, str(job.subject_id), report, read_document=read)
+
+
 HANDLERS: dict[str, Handler] = {
+    WEB_CAPTURE: web_capture_job,
     OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,
     ANALYZE_DOCUMENT: analyze_document_job,

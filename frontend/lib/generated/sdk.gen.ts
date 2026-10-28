@@ -93,6 +93,9 @@ import type {
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipErrors,
   CreateCanonicalRelationshipResponses,
+  CreateCaptureData,
+  CreateCaptureErrors,
+  CreateCaptureResponses,
   CreateCaseRecordData,
   CreateCaseRecordErrors,
   CreateCaseRecordResponses,
@@ -267,6 +270,15 @@ import type {
   GetBasemapTileData,
   GetBasemapTileErrors,
   GetBasemapTileResponses,
+  GetCaptureData,
+  GetCaptureErrors,
+  GetCaptureFileData,
+  GetCaptureFileErrors,
+  GetCaptureFileResponses,
+  GetCaptureResponses,
+  GetCapturesData,
+  GetCapturesErrors,
+  GetCapturesResponses,
   GetCaseRecordData,
   GetCaseRecordErrors,
   GetCaseRecordResponses,
@@ -1072,6 +1084,9 @@ import {
   zCreateAppUserResponse,
   zCreateCanonicalRelationshipBody,
   zCreateCanonicalRelationshipResponse,
+  zCreateCaptureBody,
+  zCreateCapturePath,
+  zCreateCaptureResponse,
   zCreateCaseRecordBody,
   zCreateCaseRecordPath,
   zCreateCaseRecordResponse,
@@ -1203,6 +1218,11 @@ import {
   zGetBasemapStatusResponse,
   zGetBasemapTilePath,
   zGetBasemapTileResponse,
+  zGetCaptureFilePath,
+  zGetCapturePath,
+  zGetCaptureResponse,
+  zGetCapturesPath,
+  zGetCapturesResponse,
   zGetCaseRecordPath,
   zGetCaseRecordResponse,
   zGetCaseResearchPath,
@@ -2231,6 +2251,57 @@ export const capabilities = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCapabilitiesResponse.parseAsync(data),
     url: '/api/capabilities',
+    ...options,
+  });
+
+/**
+ * Get Capture
+ */
+export const getCapture = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaptureData, ThrowOnError>,
+): RequestResult<GetCaptureResponses, GetCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCaptureResponses,
+    GetCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCaptureResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}',
+    ...options,
+  });
+
+/**
+ * Get Capture File
+ *
+ * One kept file, downloaded as it was hashed (its SHA-256 is on the capture), never shown inline: a kept page is
+ * the site's own code and does not run inside the app.
+ */
+export const getCaptureFile = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaptureFileData, ThrowOnError>,
+): RequestResult<GetCaptureFileResponses, GetCaptureFileErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCaptureFileResponses,
+    GetCaptureFileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCaptureFilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    url: '/api/captures/{capture_id}/files/{name}',
     ...options,
   });
 
@@ -6138,6 +6209,65 @@ export const investigationSuiteRun = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zInvestigationSuiteRunResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/assistant/suite-run',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Captures
+ *
+ * The case's captures, newest first.
+ */
+export const getCaptures = <ThrowOnError extends boolean = false>(
+  options: Options<GetCapturesData, ThrowOnError>,
+): RequestResult<GetCapturesResponses, GetCapturesErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCapturesResponses,
+    GetCapturesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCapturesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCapturesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures',
+    ...options,
+  });
+
+/**
+ * Create Capture
+ *
+ * Capture the page at `url`: one visit, no cookies, every file kept with its SHA-256, and the page's text as a
+ * case document. Answers at once with the queued capture; follow `job` (GET /api/jobs/{id}) or the capture itself.
+ */
+export const createCapture = <ThrowOnError extends boolean = false>(
+  options: Options<CreateCaptureData, ThrowOnError>,
+): RequestResult<CreateCaptureResponses, CreateCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CreateCaptureResponses,
+    CreateCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateCaptureBody,
+          path: zCreateCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateCaptureResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/captures',
     ...options,
     headers: {
       'Content-Type': 'application/json',

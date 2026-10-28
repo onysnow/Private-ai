@@ -2440,6 +2440,11 @@
             "title": "Can Restore",
             "type": "boolean"
           },
+          "capture_file_count": {
+            "default": 0,
+            "title": "Capture File Count",
+            "type": "integer"
+          },
           "conflicts": {
             "items": {
               "$ref": "#/components/schemas/RestoreConflictOut"
@@ -3424,6 +3429,469 @@
           "note"
         ],
         "title": "CapabilitiesOut",
+        "type": "object"
+      },
+      "CaptureCreate": {
+        "description": "A link to capture (ADR-0018): http or https, a public address.",
+        "properties": {
+          "url": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "CaptureCreate",
+        "type": "object"
+      },
+      "CaptureDisplayedOut": {
+        "description": "What the page displayed about itself, as displayed and not verified.",
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author"
+          },
+          "published": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "CaptureDisplayedOut",
+        "type": "object"
+      },
+      "CaptureExchangeOut": {
+        "description": "What was sent for the page itself and what came back, as served and not verified.",
+        "properties": {
+          "request": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureMessageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "response": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureMessageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "CaptureExchangeOut",
+        "type": "object"
+      },
+      "CaptureFileOut": {
+        "description": "One file a capture kept, with its SHA-256.",
+        "properties": {
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "role",
+          "bytes",
+          "sha256"
+        ],
+        "title": "CaptureFileOut",
+        "type": "object"
+      },
+      "CaptureMessageOut": {
+        "description": "A request line or status line with a few of its headers ([name, value] pairs).",
+        "properties": {
+          "headers": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Headers",
+            "type": "array"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          }
+        },
+        "required": [
+          "headers"
+        ],
+        "title": "CaptureMessageOut",
+        "type": "object"
+      },
+      "CaptureOut": {
+        "description": "A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),\nnot_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).",
+        "properties": {
+          "case_record_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Case Record Id"
+          },
+          "collector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collector"
+          },
+          "content_verified": {
+            "title": "Content Verified",
+            "type": "string"
+          },
+          "displayed": {
+            "$ref": "#/components/schemas/CaptureDisplayedOut"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "exchange": {
+            "$ref": "#/components/schemas/CaptureExchangeOut"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/CaptureFileOut"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "final_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Url"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "http_status": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Http Status"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BackgroundJobOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "enum": [
+                  "saved",
+                  "not_seen",
+                  "link_only"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "requested_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "robots_disallowed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Robots Disallowed"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/CaptureStageOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "capturing",
+              "finished",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "suite_outcome": {
+            "anyOf": [
+              {
+                "enum": [
+                  "OBTAINED",
+                  "UNABLE_TO_OBTAIN"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suite Outcome"
+          },
+          "tool": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "investigation_id",
+          "url",
+          "status",
+          "requested_at",
+          "files",
+          "displayed",
+          "stages",
+          "exchange",
+          "content_verified"
+        ],
+        "title": "CaptureOut",
+        "type": "object"
+      },
+      "CaptureStageOut": {
+        "description": "One box of the capture lane.",
+        "properties": {
+          "key": {
+            "enum": [
+              "checked",
+              "fetched",
+              "source",
+              "screenshot",
+              "archive",
+              "fingerprint",
+              "text"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds"
+          },
+          "state": {
+            "enum": [
+              "done",
+              "waiting",
+              "stopped",
+              "skipped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "state"
+        ],
+        "title": "CaptureStageOut",
         "type": "object"
       },
       "CaseChangeOut": {
@@ -23066,6 +23534,11 @@
             "title": "Can Delete",
             "type": "boolean"
           },
+          "capture_file_count": {
+            "default": 0,
+            "title": "Capture File Count",
+            "type": "integer"
+          },
           "document_file_summary": {
             "$ref": "#/components/schemas/DeletionFileSummary"
           },
@@ -40126,6 +40599,133 @@
         "summary": "Capabilities"
       }
     },
+    "/api/captures/{capture_id}": {
+      "get": {
+        "operationId": "get_capture",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Capture"
+      }
+    },
+    "/api/captures/{capture_id}/files/{name}": {
+      "get": {
+        "description": "One kept file, downloaded as it was hashed (its SHA-256 is on the capture), never shown inline: a kept page is\nthe site's own code and does not run inside the app.",
+        "operationId": "get_capture_file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/gzip": {},
+              "application/json": {},
+              "image/png": {},
+              "text/html": {}
+            },
+            "description": "The file exactly as it was kept and hashed (page source, picture, HAR or WARC)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No such capture or file, or the file is gone from this computer"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Capture File"
+      }
+    },
     "/api/case-records/{case_record_id}": {
       "get": {
         "operationId": "get_case_record",
@@ -54464,6 +55064,136 @@
           }
         },
         "summary": "Investigation Suite Run"
+      }
+    },
+    "/api/investigations/{investigation_id}/captures": {
+      "get": {
+        "description": "The case's captures, newest first.",
+        "operationId": "get_captures",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaptureOut"
+                  },
+                  "title": "Response Get Captures",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Captures"
+      },
+      "post": {
+        "description": "Capture the page at `url`: one visit, no cookies, every file kept with its SHA-256, and the page's text as a\ncase document. Answers at once with the queued capture; follow `job` (GET /api/jobs/{id}) or the capture itself.",
+        "operationId": "create_capture",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptureCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No such investigation"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Create Capture"
+                }
+              }
+            },
+            "description": "The input does not match the route, or the address is not one this computer will visit (not http or https, or a private address)"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Create Capture"
       }
     },
     "/api/investigations/{investigation_id}/case-records": {

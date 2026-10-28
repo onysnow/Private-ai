@@ -36,6 +36,7 @@ import {
   convertLeadEndpoint,
   createAppUser,
   createCanonicalRelationship,
+  createCapture,
   createCaseRecord,
   createClaimEndpoint,
   createClaimReview,
@@ -94,6 +95,9 @@ import {
   getBasemapSprite,
   getBasemapStatus,
   getBasemapTile,
+  getCapture,
+  getCaptureFile,
+  getCaptures,
   getCaseRecord,
   getCaseResearch,
   getCatalogueMap,
@@ -424,6 +428,9 @@ import type {
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipError,
   CreateCanonicalRelationshipResponse,
+  CreateCaptureData,
+  CreateCaptureError,
+  CreateCaptureResponse,
   CreateCaseRecordData,
   CreateCaseRecordError,
   CreateCaseRecordResponse,
@@ -598,6 +605,14 @@ import type {
   GetBasemapTileData,
   GetBasemapTileError,
   GetBasemapTileResponse,
+  GetCaptureData,
+  GetCaptureError,
+  GetCaptureFileData,
+  GetCaptureFileError,
+  GetCaptureResponse,
+  GetCapturesData,
+  GetCapturesError,
+  GetCapturesResponse,
   GetCaseRecordData,
   GetCaseRecordError,
   GetCaseRecordResponse,
@@ -1769,6 +1784,59 @@ export const capabilitiesOptions = (options?: Options<CapabilitiesData>) =>
       return data;
     },
     queryKey: capabilitiesQueryKey(options),
+  });
+
+export const getCaptureQueryKey = (options: Options<GetCaptureData>) =>
+  createQueryKey('getCapture', options);
+
+/**
+ * Get Capture
+ */
+export const getCaptureOptions = (options: Options<GetCaptureData>) =>
+  queryOptions<
+    GetCaptureResponse,
+    GetCaptureError,
+    GetCaptureResponse,
+    ReturnType<typeof getCaptureQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCapture({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaptureQueryKey(options),
+  });
+
+export const getCaptureFileQueryKey = (options: Options<GetCaptureFileData>) =>
+  createQueryKey('getCaptureFile', options);
+
+/**
+ * Get Capture File
+ *
+ * One kept file, downloaded as it was hashed (its SHA-256 is on the capture), never shown inline: a kept page is
+ * the site's own code and does not run inside the app.
+ */
+export const getCaptureFileOptions = (options: Options<GetCaptureFileData>) =>
+  queryOptions<
+    unknown,
+    GetCaptureFileError,
+    unknown,
+    ReturnType<typeof getCaptureFileQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaptureFile({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaptureFileQueryKey(options),
   });
 
 export const getCaseRecordQueryKey = (options: Options<GetCaseRecordData>) =>
@@ -5627,6 +5695,63 @@ export const investigationSuiteRunMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await investigationSuiteRun({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getCapturesQueryKey = (options: Options<GetCapturesData>) =>
+  createQueryKey('getCaptures', options);
+
+/**
+ * Get Captures
+ *
+ * The case's captures, newest first.
+ */
+export const getCapturesOptions = (options: Options<GetCapturesData>) =>
+  queryOptions<
+    GetCapturesResponse,
+    GetCapturesError,
+    GetCapturesResponse,
+    ReturnType<typeof getCapturesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaptures({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCapturesQueryKey(options),
+  });
+
+/**
+ * Create Capture
+ *
+ * Capture the page at `url`: one visit, no cookies, every file kept with its SHA-256, and the page's text as a
+ * case document. Answers at once with the queued capture; follow `job` (GET /api/jobs/{id}) or the capture itself.
+ */
+export const createCaptureMutation = (
+  options?: Partial<Options<CreateCaptureData>>,
+): UseMutationOptions<
+  CreateCaptureResponse,
+  CreateCaptureError,
+  Options<CreateCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateCaptureResponse,
+    CreateCaptureError,
+    Options<CreateCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createCapture({
         ...options,
         ...fnOptions,
         throwOnError: true,

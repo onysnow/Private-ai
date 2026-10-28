@@ -748,6 +748,11 @@ class CaseRecordCreate(BaseModel):
     body: dict[str, Any]
 
 
+class CaptureCreate(BaseModel):
+    """A link to capture (ADR-0018): http or https, a public address."""
+    url: str = Field(min_length=1, max_length=4096)
+
+
 class CaseRecordAmend(BaseModel):
     body: dict[str, Any]
 

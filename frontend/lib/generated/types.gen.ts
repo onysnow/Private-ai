@@ -1397,6 +1397,10 @@ export type BackupPreviewOut = {
    */
   can_restore: boolean;
   /**
+   * Capture File Count
+   */
+  capture_file_count?: number;
+  /**
    * Conflicts
    */
   conflicts: Array<RestoreConflictOut>;
@@ -1941,6 +1945,229 @@ export type CapabilitiesOut = {
    * Product
    */
   product: string;
+};
+
+/**
+ * CaptureCreate
+ *
+ * A link to capture (ADR-0018): http or https, a public address.
+ */
+export type CaptureCreate = {
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
+ * CaptureDisplayedOut
+ *
+ * What the page displayed about itself, as displayed and not verified.
+ */
+export type CaptureDisplayedOut = {
+  /**
+   * Author
+   */
+  author?: string | null;
+  /**
+   * Published
+   */
+  published?: string | null;
+  /**
+   * Title
+   */
+  title?: string | null;
+};
+
+/**
+ * CaptureExchangeOut
+ *
+ * What was sent for the page itself and what came back, as served and not verified.
+ */
+export type CaptureExchangeOut = {
+  request?: CaptureMessageOut | null;
+  response?: CaptureMessageOut | null;
+};
+
+/**
+ * CaptureFileOut
+ *
+ * One file a capture kept, with its SHA-256.
+ */
+export type CaptureFileOut = {
+  /**
+   * Bytes
+   */
+  bytes: number;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Sha256
+   */
+  sha256: string;
+};
+
+/**
+ * CaptureMessageOut
+ *
+ * A request line or status line with a few of its headers ([name, value] pairs).
+ */
+export type CaptureMessageOut = {
+  /**
+   * Headers
+   */
+  headers: Array<Array<string>>;
+  /**
+   * Method
+   */
+  method?: string | null;
+  /**
+   * Status
+   */
+  status?: string | null;
+  /**
+   * Target
+   */
+  target?: string | null;
+};
+
+/**
+ * CaptureOut
+ *
+ * A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
+ * not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).
+ */
+export type CaptureOut = {
+  /**
+   * Case Record Id
+   */
+  case_record_id?: string | null;
+  /**
+   * Collector
+   */
+  collector?: string | null;
+  /**
+   * Content Verified
+   */
+  content_verified: string;
+  displayed: CaptureDisplayedOut;
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  exchange: CaptureExchangeOut;
+  /**
+   * Files
+   */
+  files: Array<CaptureFileOut>;
+  /**
+   * Final Url
+   */
+  final_url?: string | null;
+  /**
+   * Finished At
+   */
+  finished_at?: string | null;
+  /**
+   * Http Status
+   */
+  http_status?: number | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  job?: BackgroundJobOut | null;
+  /**
+   * Job Id
+   */
+  job_id?: string | null;
+  /**
+   * Outcome
+   */
+  outcome?: 'saved' | 'not_seen' | 'link_only' | null;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Requested At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  requested_at: string;
+  /**
+   * Robots Disallowed
+   */
+  robots_disallowed?: boolean | null;
+  /**
+   * Source Id
+   */
+  source_id?: string | null;
+  /**
+   * Stages
+   */
+  stages: Array<CaptureStageOut>;
+  /**
+   * Started At
+   */
+  started_at?: string | null;
+  /**
+   * Status
+   */
+  status: 'queued' | 'capturing' | 'finished' | 'failed';
+  /**
+   * Suite Outcome
+   */
+  suite_outcome?: 'OBTAINED' | 'UNABLE_TO_OBTAIN' | null;
+  /**
+   * Tool
+   */
+  tool?: string | null;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
+ * CaptureStageOut
+ *
+ * One box of the capture lane.
+ */
+export type CaptureStageOut = {
+  /**
+   * Key
+   */
+  key:
+    | 'checked'
+    | 'fetched'
+    | 'source'
+    | 'screenshot'
+    | 'archive'
+    | 'fingerprint'
+    | 'text';
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Seconds
+   */
+  seconds?: number | null;
+  /**
+   * State
+   */
+  state: 'done' | 'waiting' | 'stopped' | 'skipped';
 };
 
 /**
@@ -10920,6 +11147,10 @@ export type InvestigationDeletionPreview = {
    * Can Delete
    */
   can_delete: boolean;
+  /**
+   * Capture File Count
+   */
+  capture_file_count?: number;
   document_file_summary: DeletionFileSummary;
   /**
    * Document Files
@@ -21005,6 +21236,85 @@ export type CapabilitiesResponses = {
 export type CapabilitiesResponse =
   CapabilitiesResponses[keyof CapabilitiesResponses];
 
+export type GetCaptureData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}';
+};
+
+export type GetCaptureErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaptureError = GetCaptureErrors[keyof GetCaptureErrors];
+
+export type GetCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type GetCaptureResponse = GetCaptureResponses[keyof GetCaptureResponses];
+
+export type GetCaptureFileData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+    /**
+     * Name
+     */
+    name: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/files/{name}';
+};
+
+export type GetCaptureFileErrors = {
+  /**
+   * No such capture or file, or the file is gone from this computer
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaptureFileError =
+  GetCaptureFileErrors[keyof GetCaptureFileErrors];
+
+export type GetCaptureFileResponses = {
+  /**
+   * The file exactly as it was kept and hashed (page source, picture, HAR or WARC)
+   */
+  200: unknown;
+};
+
 export type GetCaseRecordData = {
   body?: never;
   path: {
@@ -25687,6 +25997,84 @@ export type InvestigationSuiteRunResponses = {
 
 export type InvestigationSuiteRunResponse =
   InvestigationSuiteRunResponses[keyof InvestigationSuiteRunResponses];
+
+export type GetCapturesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/captures';
+};
+
+export type GetCapturesErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCapturesError = GetCapturesErrors[keyof GetCapturesErrors];
+
+export type GetCapturesResponses = {
+  /**
+   * Response Get Captures
+   *
+   * Successful Response
+   */
+  200: Array<CaptureOut>;
+};
+
+export type GetCapturesResponse =
+  GetCapturesResponses[keyof GetCapturesResponses];
+
+export type CreateCaptureData = {
+  body: CaptureCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/captures';
+};
+
+export type CreateCaptureErrors = {
+  /**
+   * No such investigation
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Capture
+   *
+   * The input does not match the route, or the address is not one this computer will visit (not http or https, or a private address)
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateCaptureError = CreateCaptureErrors[keyof CreateCaptureErrors];
+
+export type CreateCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  202: CaptureOut;
+};
+
+export type CreateCaptureResponse =
+  CreateCaptureResponses[keyof CreateCaptureResponses];
 
 export type ListCaseRecordsData = {
   body?: never;

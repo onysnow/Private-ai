@@ -819,6 +819,128 @@ export const zCanonicalStatementOut = z.object({
 });
 
 /**
+ * CaptureCreate
+ *
+ * A link to capture (ADR-0018): http or https, a public address.
+ */
+export const zCaptureCreate = z.object({
+  url: z.string().min(1).max(4096),
+});
+
+/**
+ * CaptureDisplayedOut
+ *
+ * What the page displayed about itself, as displayed and not verified.
+ */
+export const zCaptureDisplayedOut = z.object({
+  author: z.string().nullish(),
+  published: z.string().nullish(),
+  title: z.string().nullish(),
+});
+
+/**
+ * CaptureFileOut
+ *
+ * One file a capture kept, with its SHA-256.
+ */
+export const zCaptureFileOut = z.object({
+  bytes: z.int(),
+  name: z.string(),
+  role: z.string(),
+  sha256: z.string(),
+});
+
+/**
+ * CaptureMessageOut
+ *
+ * A request line or status line with a few of its headers ([name, value] pairs).
+ */
+export const zCaptureMessageOut = z.object({
+  headers: z.array(z.array(z.string())),
+  method: z.string().nullish(),
+  status: z.string().nullish(),
+  target: z.string().nullish(),
+});
+
+/**
+ * CaptureExchangeOut
+ *
+ * What was sent for the page itself and what came back, as served and not verified.
+ */
+export const zCaptureExchangeOut = z.object({
+  request: zCaptureMessageOut.nullish(),
+  response: zCaptureMessageOut.nullish(),
+});
+
+/**
+ * CaptureStageOut
+ *
+ * One box of the capture lane.
+ */
+export const zCaptureStageOut = z.object({
+  key: z.enum([
+    'checked',
+    'fetched',
+    'source',
+    'screenshot',
+    'archive',
+    'fingerprint',
+    'text',
+  ]),
+  label: z.string(),
+  seconds: z.number().nullish(),
+  state: z.enum(['done', 'waiting', 'stopped', 'skipped']),
+});
+
+/**
+ * CaptureOut
+ *
+ * A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
+ * not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).
+ */
+export const zCaptureOut = z.object({
+  case_record_id: z.string().nullish(),
+  collector: z.string().nullish(),
+  content_verified: z.string(),
+  displayed: zCaptureDisplayedOut,
+  document_id: z.string().nullish(),
+  exchange: zCaptureExchangeOut,
+  files: z.array(zCaptureFileOut),
+  final_url: z.string().nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  http_status: z.int().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  job: zBackgroundJobOut.nullish(),
+  job_id: z.string().nullish(),
+  outcome: z.enum(['saved', 'not_seen', 'link_only']).nullish(),
+  reason: z.string().nullish(),
+  requested_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  robots_disallowed: z.boolean().nullish(),
+  source_id: z.string().nullish(),
+  stages: z.array(zCaptureStageOut),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  status: z.enum(['queued', 'capturing', 'finished', 'failed']),
+  suite_outcome: z.enum(['OBTAINED', 'UNABLE_TO_OBTAIN']).nullish(),
+  tool: z.string().nullish(),
+  url: z.string(),
+});
+
+/**
  * CaseChangeOut
  */
 export const zCaseChangeOut = z.object({
@@ -4426,6 +4548,7 @@ export const zInvestigationCreate = z.object({
  */
 export const zInvestigationDeletionPreview = z.object({
   can_delete: z.boolean(),
+  capture_file_count: z.int().optional().default(0),
   document_file_summary: zDeletionFileSummary,
   document_files: z.array(zDeletionDocumentFile),
   investigation_id: z.string(),
@@ -6543,6 +6666,7 @@ export const zRestoreConflictOut = z.object({
  */
 export const zBackupPreviewOut = z.object({
   can_restore: z.boolean(),
+  capture_file_count: z.int().optional().default(0),
   conflicts: z.array(zRestoreConflictOut),
   document_file_count: z.int(),
   format: z.string(),
@@ -9787,6 +9911,20 @@ export const zGetBasemapTileResponse = z.string();
  */
 export const zCapabilitiesResponse = zCapabilitiesOut;
 
+export const zGetCapturePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCaptureResponse = zCaptureOut;
+
+export const zGetCaptureFilePath = z.object({
+  capture_id: z.string(),
+  name: z.string(),
+});
+
 export const zGetCaseRecordPath = z.object({
   case_record_id: z.string(),
 });
@@ -11100,6 +11238,28 @@ export const zInvestigationSuiteRunPath = z.object({
  * Successful Response
  */
 export const zInvestigationSuiteRunResponse = zAiReasoningRunOut;
+
+export const zGetCapturesPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response Get Captures
+ *
+ * Successful Response
+ */
+export const zGetCapturesResponse = z.array(zCaptureOut);
+
+export const zCreateCaptureBody = zCaptureCreate;
+
+export const zCreateCapturePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateCaptureResponse = zCaptureOut;
 
 export const zListCaseRecordsPath = z.object({
   investigation_id: z.string(),
