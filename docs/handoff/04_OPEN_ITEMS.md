@@ -5,7 +5,7 @@
 1. **The stage header vs the mockups.** Every mockup shows only a breadcrumb above the screen. The app adds a stage
    header (title, a line of text, part tabs) above every screen, so Money doesn't fit on one 1440×900 screen as
    drawn. Changing it changes every screen.
-2. **The Wire (SEE_1):** a new mockup, from SEE_1, SEE_2 and research chapter 07, for his approval.
+2. ~~**The Wire (SEE_1):** a new mockup.~~ Ony, 28 Oct: the prototype artifact is the approved design; SEE_1's parts are built into it.
 3. **AI_2:** the default for outside lookups. The mockup says "Ask first"; the decided global default is
    automatic (INV §8). The app uses Ask first for runs.
 4. **AI_2:** should Tier C be shown at all? It is drawn hatched as "never counts".

@@ -432,6 +432,9 @@ import type {
   GetRedFlagsData,
   GetRedFlagsErrors,
   GetRedFlagsResponses,
+  GetRelationshipSourcesData,
+  GetRelationshipSourcesErrors,
+  GetRelationshipSourcesResponses,
   GetResearchSettingsData,
   GetResearchSettingsErrors,
   GetResearchSettingsResponses,
@@ -1313,6 +1316,8 @@ import {
   zGetRecordProvenanceTraceResponse,
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
+  zGetRelationshipSourcesPath,
+  zGetRelationshipSourcesResponse,
   zGetResearchSettingsResponse,
   zGetSafetyDataPath,
   zGetSafetyDataQuery,
@@ -4034,6 +4039,7 @@ export const findOpenalephChildren = <ThrowOnError extends boolean = false>(
  *
  * A page of a PDF as PNG, with the passage's words highlighted where they are
  * found (X-Passage-Found says whether they were), for Next up's page beside the question.
+ * With `crop`, only the band of the page around the words is drawn.
  */
 export const getDocumentPageImage = <ThrowOnError extends boolean = false>(
   options: Options<GetDocumentPageImageData, ThrowOnError>,
@@ -9872,6 +9878,38 @@ export const createLeadFromRelationshipContext = <
     responseValidator: async (data) =>
       await zCreateLeadFromRelationshipContextResponse.parseAsync(data),
     url: '/api/relationships/{relationship_id}/lead-from-context',
+    ...options,
+  });
+
+/**
+ * Get Relationship Sources
+ *
+ * The Wire's link panel (SEE_1): each piece of evidence on the link with the page its quote stands on, its
+ * latest review, and the open Red Flags resting on the link. Reads only.
+ */
+export const getRelationshipSources = <ThrowOnError extends boolean = false>(
+  options: Options<GetRelationshipSourcesData, ThrowOnError>,
+): RequestResult<
+  GetRelationshipSourcesResponses,
+  GetRelationshipSourcesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetRelationshipSourcesResponses,
+    GetRelationshipSourcesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetRelationshipSourcesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRelationshipSourcesResponse.parseAsync(data),
+    url: '/api/relationships/{relationship_id}/sources',
     ...options,
   });
 

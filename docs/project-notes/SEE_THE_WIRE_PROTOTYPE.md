@@ -1,4 +1,4 @@
-# See · "The Wire" prototype (11 Oct 2026, awaiting Ony's approval)
+# See · "The Wire" prototype (11 Oct 2026; Ony, 28 Oct: the approved design)
 
 Prototype: https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3. Source: docs/design/see-the-wire/
 (src.html with a `__DATA__` placeholder, prep.py builds the data from the 1MDB case and the red

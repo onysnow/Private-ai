@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 // The Wire (features/the-wire): the case drawn as one map. Parties and links from the
 // server, the account kept on its holder's card, a party's drawer with its flags and
-// the dossier link, names shown as text (never as markup), and the empty case.
+// the dossier link, names shown as text (never as markup), the empty case, and touch
+// (a finger's pan is not a tap, no hover tips for a finger, the phone bar's Back and Next).
 import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -170,5 +171,110 @@ describe('The Wire', () => {
     expect(document.querySelector('.tw-tip')?.textContent).toMatch(/Enter opens every record on this link/);
     fireEvent.keyDown(window, {key: 'Enter'});
     await waitFor(() => expect(document.querySelector('.tw-alttitle')?.textContent).toBe('one link, opened'));
+  });
+
+  it('opens a card on a tap, but not at the end of a finger pan that started on it', async () => {
+    mockApi({'GET /api/investigations/inv-1/wire': WIRE});
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    await waitFor(() => expect(map.querySelectorAll('g.node').length).toBe(4));
+    const card = map.querySelectorAll('g.node')[0];
+    const drawer = document.querySelector('.tw-drawer')!;
+    const touch = {pointerType: 'touch', pointerId: 7};
+    fireEvent.pointerDown(card, {...touch, clientX: 100, clientY: 100});
+    fireEvent.pointerMove(card, {...touch, clientX: 160, clientY: 130});
+    fireEvent.pointerUp(card, {...touch, clientX: 160, clientY: 130});
+    fireEvent.click(card);
+    expect(drawer.classList.contains('open')).toBe(false);
+    // A tap: the finger goes down and up without moving.
+    fireEvent.pointerDown(card, {...touch, clientX: 100, clientY: 100});
+    fireEvent.pointerUp(card, {...touch, clientX: 100, clientY: 100});
+    fireEvent.click(card);
+    await waitFor(() => expect(drawer.classList.contains('open')).toBe(true));
+  });
+
+  it('shows a card\'s hover tip for the mouse, never for a finger', async () => {
+    mockApi({'GET /api/investigations/inv-1/wire': WIRE});
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    await waitFor(() => expect(map.querySelectorAll('g.node').length).toBe(4));
+    const card = map.querySelectorAll('g.node')[0];
+    const tip = document.querySelector('.tw-tip')!;
+    fireEvent.pointerEnter(card, {pointerType: 'touch', clientX: 100, clientY: 100});
+    expect(tip.classList.contains('on')).toBe(false);
+    fireEvent.pointerEnter(card, {pointerType: 'mouse', clientX: 100, clientY: 100});
+    expect(tip.classList.contains('on')).toBe(true);
+  });
+
+  it('has Back and Next flagged on the altitude bar, as Esc and the trail do', async () => {
+    mockApi({'GET /api/investigations/inv-1/wire': SEE1, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH});
+    document.documentElement.dataset.motion = 'calm';
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
+    const title = document.querySelector('.tw-alttitle')!;
+    const before = title.textContent;
+    fireEvent.click(screen.getByRole('button', {name: '‹ Back'}));
+    await waitFor(() => expect(title.textContent).toBe('the whole case'));
+    expect(before).not.toBe('the whole case');
+    fireEvent.click(screen.getByRole('button', {name: 'Next flagged ›'}));
+    await waitFor(() => expect(title.textContent).toBe(before));
+  });
+
+  it('opens a link with its panel: the sentence, how sure, the page drawn with the words lit, its sources and its Red Flag', async () => {
+    const openDocument = vi.fn();
+    const openFlag = vi.fn();
+    useWorkbenchStore.setState({openDocument, openFlag});
+    const api = mockApi({
+      'GET /api/investigations/inv-1/wire': SEE1, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH,
+      'GET /api/relationships/o1/sources': {relationship_id: 'o1', flags: [{flag_id: 'f9', id: 'ML-023', level: 'textbook', text: 'Circular ownership'}], evidence: [
+        {evidence_id: 'e1', quote: 'Loop Two BV holds all the shares', locator: 'p.4', source_title: 'Share register', document_id: 'd1', filename: 'register.pdf',
+          page: 4, stance: 'supports', reviewed_at: '2026-10-06T10:00:00'},
+        {evidence_id: 'e2', quote: 'sole shareholder', locator: '', source_title: 'Board minutes (typed)', document_id: null, filename: '', page: null, stance: null, reviewed_at: null},
+      ]},
+      'GET /api/documents/d1/page-image': () => new Response(new Uint8Array([137, 80, 78, 71]), {headers: {'content-type': 'image/png'}}),
+    });
+    document.documentElement.dataset.motion = 'calm';
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
+    const pill = await waitFor(() => {
+      const g = [...document.querySelectorAll<SVGGElement>('.elab')].find(x => x.style.display !== 'none' && x.textContent?.includes('owns 100%'));
+      expect(g).toBeTruthy();
+      return g!;
+    });
+    fireEvent.click(pill);
+    const panel = await screen.findByRole('complementary', {name: 'The link'});
+    expect(panel.querySelector('h2')?.textContent).toBe('Loop Two BV owns 100% since 2016 Kestrel SA');
+    expect(panel.textContent).toContain('✓ Shown');
+    await waitFor(() => expect(panel.textContent).toContain('2 sources'));
+    expect(api.lastUrl('GET /api/documents/d1/page-image').searchParams.get('highlight')).toBe('Loop Two BV holds all the shares');
+    expect(api.lastUrl('GET /api/documents/d1/page-image').searchParams.get('crop')).toBe('true');
+    expect(panel.textContent).toContain('Share register · p.4 · supports it, reviewed 6 Oct 2026');
+    expect(panel.textContent).toContain('Board minutes (typed) · not reviewed yet');
+    fireEvent.click(screen.getByRole('button', {name: 'Open the source'}));
+    expect(openDocument).toHaveBeenCalledWith('d1', 4);
+    fireEvent.click(screen.getByRole('button', {name: /Circular ownership/}));
+    expect(openFlag).toHaveBeenCalledWith('f9');
+    // Esc steps back up from the link: the panel goes with it.
+    fireEvent.keyDown(window, {key: 'Escape'});
+    await waitFor(() => expect(screen.queryByRole('complementary', {name: 'The link'})).toBeNull());
+  });
+
+  it('arranges the whole case by who controls whom when most links are ownership or directorship, and says why', async () => {
+    // Loop Two owns Kestrel, Weber runs it, Kestrel owns Fernhill: 3 of 4 links are control.
+    const control = {...SEE1, links: [...SEE1.links.filter(l => l.id !== 'x1'),
+      {id: 'o2', s: 'k', t: 'f', schema: 'Ownership', fam: 'owns', amount: null, cur: '', date: '', role: '', pct: '40', ev: []}]};
+    mockApi({'GET /api/investigations/inv-1/wire': control, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH});
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    expect(screen.getByRole('button', {name: 'Who controls whom'})).toHaveAttribute('aria-pressed', 'true');
+    expect(document.querySelector('.tw-chosen')?.textContent).toBe('Chosen because 3 of 4 links are ownership or directorship');
+    const bands = () => [...map.querySelectorAll('.terr-l')].map(t => t.textContent);
+    expect(bands()).toEqual(['Top of the chain', '1 step down', '2 steps down', 'In no chain of control']);
+    fireEvent.click(screen.getByRole('button', {name: 'By kind'}));
+    expect(screen.getByRole('button', {name: 'By kind'})).toHaveAttribute('aria-pressed', 'true');
+    expect(document.querySelector('.tw-chosen')?.textContent).toBe('By kind: your choice');
+    expect(bands()).toEqual(['Company', 'Person']);
+    fireEvent.click(screen.getByRole('button', {name: 'Linked groups'}));
+    expect(screen.getByText(/Each patch is a group/)).toBeInTheDocument();
   });
 });

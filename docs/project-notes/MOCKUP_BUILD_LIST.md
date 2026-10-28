@@ -21,7 +21,7 @@ screen · disabled controls say why.
 
 | Mockup | Status | Notes |
 |---|---|---|
-| The Wire (See prototype) | **work in progress** (Ony, 12 Oct: needs much more design work; redesign from SEE_1, SEE_2 and research ch. 07, mockup first) | Whole case / around a party / one link, lens, follow the money, time strip. Remaining: label links with sentences and certainty line styles from SEE_1 (see §5). Not yet run on 1MDB (downloads blocked in the cloud). |
+| The Wire (See prototype) | **built** (Ony, 28 Oct: the prototype artifact is the approved design; no new mockup) | Whole case / around a party / one link, lens, follow the money, time strip; SEE_1's parts and the prototype's touch and phone layout added 28 Oct (§5). Not yet run on 1MDB (downloads blocked in the cloud). |
 | Decide (CHECK_1) table-row cards | **built** 12 Oct | Row facts in the question, cells shown, "already in the case". |
 | App-side suite gaps | **data built** 12 Oct | §1 below; each shown on its screen with that screen's section. |
 
@@ -126,13 +126,13 @@ Also from the backlog: watchlist highlights redesign; Sources & evidence as a br
 ## 5. See — mockups SEE_1 (network) and SEE_2 (money) (§07), plus Timeline and Places
 
 SEE_1 "Who controls Kestrel SA": The Wire is now See's map; SEE_1's parts go into it.
-**Ony, 12 Oct: the two screenshots of The Wire he sent with the mockups are work in progress and need much more design work than the other screens; they are not targets. The Wire is redesigned from SEE_1, SEE_2 and research chapter 07, as a mockup for Ony to approve first.**
-- [ ] Every link labelled with its sentence and certainty glyph ("✓ owns 60%", "? signs for · not yet shown", "ƒ owns 40% · worked out")
-- [ ] Certainty line styles: solid shown / dashed not yet shown / double disputed / dotted worked out / faint ended, with the key always on
-- [ ] Flag rings with level and count; lettered stubs for long links
-- [ ] Right detail panel for a link: sentence, status, the source scan with the words lit, Open the source / Chain of Custody, its Red Flag, "How is X linked to Y?"
-- [ ] Active chips (As of end of 2019 ✕ · Lit Kestrel SA ✕ · Clear all) and the as-of time rail with histogram, "11 of 14 links held by then · 1 ended · 2 undated"
-- [ ] Arrangement switch (Who controls whom · Around a party · By kind · Linked groups · Grid) with "Chosen because…"
+**Ony, 28 Oct: The Wire prototype (https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3) is the approved design; no new mockup.** (This replaces the 12 Oct note that it needed a redesign.) 28 Oct: the prototype's touch and phone layout ported (pinch across altitudes, a finger's pan never counts as a tap, no hover tips for a finger, wider hit areas, below 900 px of the Wire's own width an altitude bar with Back and Next flagged, the drawer a bottom sheet a swipe down closes).
+- [x] Every link labelled with its sentence and certainty glyph ("✓ owns 60%", "? signs for · not yet shown", "ƒ owns 40% · worked out") (19 Oct, `linkSentence`)
+- [x] Certainty line styles: solid shown / dashed not yet shown / double disputed / dotted worked out / faint ended, with the key always on (19 Oct)
+- [x] Flag rings with level and count; lettered stubs for long links (19 Oct: ring and badge; lettered stubs not built)
+- [x] Right detail panel for a link: sentence, status, the source scan with the words lit, Open the source / Chain of Custody, its Red Flag, "How is X linked to Y?" (28 Oct: opens with "One link", `features/the-wire/link-panel.tsx`, `GET /relationships/{id}/sources`; the scan is the page cropped round the words, `page-image?crop=true`; Chain of Custody is per claim, so the panel offers Trace; "How is X linked to Y?" stays with Follow the money)
+- [x] Active chips (As of end of 2019 ✕ · Lit Kestrel SA ✕ · Clear all) and the as-of time rail with histogram, "11 of 14 links held by then · 1 ended · 2 undated" (19 Oct: chips and the counts line; no histogram on the rail beyond the money bars)
+- [x] Arrangement switch (Who controls whom · Around a party · By kind · Linked groups · Grid) with "Chosen because…" (28 Oct: Who controls whom (bands by steps down), Around a party (the altitude), By kind, Linked groups (the server's map), Grid; the first is Who controls whom when more than half the links are ownership or directorship)
 SEE_2 "Where did the money go" (12 Oct: See › Money, `features/money`, loads with the view; the dead Money link now opens it):
 - [x] Currency tabs with counts, Columns / Flow / Ledger switch, "Traced so far" running total (click a band; Esc clears)
 - [x] Comes from → passes through → goes to columns in SVG, labelled bands with the status grammar; missing money drawn as a hatched "No recorded source" ghost with its arithmetic; a round trip's latest payment drawn as a return arc (never "cannot draw")

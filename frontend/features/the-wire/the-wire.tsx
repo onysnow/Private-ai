@@ -3,7 +3,7 @@
 // (docs/design/see-the-wire, SEE_THE_WIRE_PROTOTYPE.md). The map itself is drawn by
 // wire-engine.ts; this component lays out its chrome, loads the case and mounts it.
 import {useQuery} from '@tanstack/react-query';
-import {useEffect, useMemo, useRef} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
@@ -12,8 +12,9 @@ import type {RelationshipOut} from '../../lib/generated/types.gen';
 import {certaintyOf} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
+import {LinkPanel} from './link-panel';
 import {mountWire} from './wire-engine';
-import type {LinkInfo, LinkSure} from './wire-engine';
+import type {LinkInfo, LinkSure, OpenLink} from './wire-engine';
 
 const SURE_OF = {supported: 'shown', unsupported: 'unshown', contested: 'disputed'} as const satisfies Record<string, LinkSure>;
 
@@ -43,6 +44,10 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
   const openDossier = useWorkbenchStore(state => state.openDossier);
   const openFlag = useWorkbenchStore(state => state.openFlag);
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
+  const openDocument = useWorkbenchStore(state => state.openDocument);
+  const traceEvidence = (evidenceId: string, title: string) => openProvenance({title, kind: 'evidence', acceptedRecordType: 'evidence', acceptedRecordId: evidenceId});
+  // The link "One link" has open (SEE_1's link panel follows it).
+  const [link, setLink] = useState<OpenLink | null>(null);
   const data = query.data;
 
   useEffect(() => {
@@ -51,6 +56,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
       active: () => activeRef.current,
       openDossier,
       openFlag,
+      openLink: setLink,
       traceEvidence: (evidenceId, title) => openProvenance({title, kind: 'evidence', acceptedRecordType: 'evidence', acceptedRecordId: evidenceId}),
     }, info);
   }, [data, info, infoReady, openDossier, openFlag, openProvenance]);
@@ -83,6 +89,14 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
 
     <header className="tw-head tw-glass">
       <h2>The Wire <i className="tw-alttitle">the whole case</i></h2>
+      <div className="tw-arrange" role="group" aria-label="Arrange the parties">
+        <button type="button" data-a="control" aria-pressed="false">Who controls whom</button>
+        <button type="button" data-a="party" aria-pressed="false">Around a party</button>
+        <button type="button" data-a="kind" aria-pressed="false">By kind</button>
+        <button type="button" data-a="groups" aria-pressed="false">Linked groups</button>
+        <button type="button" data-a="grid" aria-pressed="false">Grid</button>
+      </div>
+      <p className="tw-chosen"/>
       <p className="tw-rule" aria-live="polite"/>
       <div className="tw-active" aria-label="Active filters"/>
     </header>
@@ -102,6 +116,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
     </div>
 
     <nav className="tw-alt tw-glass" aria-label="How close you are">
+      <button type="button" className="tw-mob tw-mback">‹ Back</button>
       <div className="cap">Altitude</div>
       <div className="track">
         <div className="rail"/>
@@ -111,6 +126,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
         <button type="button" className="stop" data-m="wire" style={{top: 208}}><i/>One link</button>
       </div>
       <div className="tw-zoom">100%</div>
+      <button type="button" className="tw-mob tw-mnext">Next flagged ›</button>
     </nav>
 
     <aside className="tw-trail tw-glass" aria-label="Where you have been">
@@ -137,6 +153,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
 
     <div className="tw-wire" aria-live="polite"><svg className="tw-wsvg"/></div>
     <aside className="tw-drawer tw-glass" aria-live="polite"/>
+    {link ? <LinkPanel link={link} info={info} onClose={() => setLink(null)} openDocument={openDocument} openFlag={openFlag} traceEvidence={traceEvidence}/> : null}
     <div className="tw-tip tw-glass" role="tooltip"/>
   </div>;
 }

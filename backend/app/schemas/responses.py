@@ -4948,6 +4948,33 @@ class WireEventOut(ResponseModel):
     entity: str | None
 
 
+class WireLinkSourceOut(ResponseModel):
+    evidence_id: str
+    quote: str
+    locator: str
+    source_title: str
+    document_id: str | None
+    filename: str
+    page: int | None
+    stance: str | None
+    reviewed_at: datetime | None
+
+
+class WireLinkFlagOut(ResponseModel):
+    flag_id: str
+    id: str
+    level: str
+    text: str
+
+
+class WireLinkSourcesOut(ResponseModel):
+    """One link's evidence for The Wire's link panel (SEE_1): each quote with the page it stands on, and the open
+    Red Flags resting on the link."""
+    relationship_id: str
+    evidence: list[WireLinkSourceOut]
+    flags: list[WireLinkFlagOut]
+
+
 class WireOut(ResponseModel):
     investigation_id: str
     entities: list[WireEntityOut]

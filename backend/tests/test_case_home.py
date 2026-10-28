@@ -335,6 +335,10 @@ def test_a_page_is_drawn_with_its_passage_marked(tmp_path, monkeypatch):
     assert reply.status_code == 200 and reply.headers["content-type"] == "image/png"
     assert reply.headers["x-page-count"] == "2" and reply.headers["x-passage-found"] == "1"
     assert fitz.Pixmap(reply.content).width == 200
+    # Cropped: a window on the words drawn at the asked width (a pixel either way from rounding the window's edges),
+    # much less tall than the page.
+    band = fitz.Pixmap(client.get(f"/api/documents/{doc_id}/page-image", params={"page": 2, "width": 200, "highlight": "on behalf of Fernhill", "crop": True}).content)
+    assert abs(band.width - 200) <= 1 and band.height < fitz.Pixmap(reply.content).height / 2
     assert client.get(f"/api/documents/{doc_id}/page-image", params={"highlight": "not on the page"}).headers["x-passage-found"] == "0"
     assert client.get(f"/api/documents/{doc_id}/page-image", params={"page": 3}).status_code == 404
 
