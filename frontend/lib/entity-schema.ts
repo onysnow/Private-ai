@@ -41,6 +41,8 @@ export const entityFormSchema = z.object({
 });
 
 export type EntityFormValues = z.infer<typeof entityFormSchema>;
+/** What the form holds before validation (`properties` may be missing; the schema defaults it). */
+export type EntityFormInput = z.input<typeof entityFormSchema>;
 export type PropertyEntryValues = z.infer<typeof propertyEntrySchema>;
 
 /** Converts CanonicalEntity.properties (Record<string,string[]>) into the

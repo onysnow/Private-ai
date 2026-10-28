@@ -103,3 +103,30 @@ def test_suite_value_lists_match_the_vendored_schemas():
                 assert stated, f"{key}: {path}.{name} value {value!r} is not in {module.system}/EVALUATION"
                 where, phrase = stated
                 assert phrase in (r.SUITE_ROOT / "systems" / module.system / where).read_text(encoding="utf-8"), (key, value)
+
+
+# A copied list may leave values out only where an app run must not use them, each with the rule (app/ai/systems.py).
+_NARROWED = {
+    ("evidence_plan", "status"): "a plan is written PLANNED or NOT_SOUGHT; SOUGHT, DONE and STOPPED record work a person did",
+    ("ehs_harm_minimisation", "decision"): "EHS judges nothing in an app run: every decision stays PENDING (AGENTS.md [AG-067])",
+    ("ehs_public_interest", "decision"): "EHS judges nothing in an app run: every decision stays PENDING (AGENTS.md [AG-067])",
+}
+
+
+def test_suite_value_lists_are_the_suites_whole_lists():
+    """Where the suite's schema states a field's values as a list (read by app/ai/suite_catalog.py), the app's copy
+    is that list: a value the suite adds or drops fails here, not only a renamed one."""
+    from app.ai import suite_catalog
+    from app.ai.systems import SUITE_MODULES
+
+    for key, module in SUITE_MODULES.items():
+        records = suite_catalog.system(module.system).records
+        for path, name, allowed in module.values:
+            lists = [set(rec.closed[name]) for rec in records if name in rec.closed]
+            if not lists:
+                continue  # stated in prose only; test_suite_value_lists_match_the_vendored_schemas covers it
+            app = set(allowed)
+            if (key, name) in _NARROWED:
+                assert any(app <= suite for suite in lists), f"{key}: {path}.{name} {sorted(app)} is not within the suite's list"
+            else:
+                assert app in lists, f"{key}: {path}.{name} {sorted(app)} is not the suite's list {[sorted(s) for s in lists]}"

@@ -17,7 +17,8 @@ import httpx
 import pytest
 
 from app.ai.llm_client import (
-    LLMConfigurationError, LLMProviderError, OllamaLLMClient, get_llm_client, is_local_endpoint, parse_ollama_response,
+    LLMConfigurationError, LLMContextError, LLMProviderError, OllamaLLMClient, context_tokens_needed, get_llm_client,
+    is_local_endpoint, parse_ollama_response,
 )
 from app.core.config import Settings
 
@@ -62,8 +63,38 @@ def test_generate_sends_the_schema_and_reads_the_reply():
     assert response.text == '{"ok": true}' and response.model == "llama3.2" and not response.truncated
     assert [path for path, _ in seen] == ["/api/show", "/api/chat"]
     chat = seen[1][1]
-    assert chat["format"] == schema and chat["options"] == {"num_predict": 321} and chat["stream"] is False
+    assert chat["format"] == schema and chat["options"] == {"num_predict": 321, "num_ctx": 4096} and chat["stream"] is False
     assert [m["role"] for m in chat["messages"]] == ["system", "user"]
+
+
+def test_the_context_window_is_sized_to_the_request():
+    """Ollama's default 4096-token window drops the start of a longer prompt, the instructions first, without an
+    error (an earlier trial kept 2,050 of 26,957 tokens). The window is sized to each request instead."""
+    seen: list = []
+    show = {"details": {}, "model_info": {"qwen2.context_length": 32768}}
+    client = OllamaLLMClient("http://127.0.0.1:11434", "qwen2.5:3b", transport=_ollama(show=show, seen=seen))
+    client.generate("s" * 30000, "u" * 30000, max_tokens=2000)
+    num_ctx = seen[1][1]["options"]["num_ctx"]
+    assert num_ctx == context_tokens_needed("s" * 30000, "u" * 30000, 2000) and num_ctx >= 20000 + 2000
+
+    seen.clear()
+    with pytest.raises(LLMContextError, match="holds 32768"):
+        client.generate("s" * 120000, "u", max_tokens=2000)
+    assert [path for path, _ in seen] == ["/api/show"], "nothing is sent that cannot fit"
+
+
+def test_a_prompt_that_still_filled_the_window_is_refused():
+    chat = {"model": "llama3.2", "message": {"role": "assistant", "content": "{}"}, "done": True, "done_reason": "stop",
+            "prompt_eval_count": 4096}
+    client = OllamaLLMClient("http://127.0.0.1:11434", "llama3.2", transport=_ollama(chat=chat))
+    with pytest.raises(LLMContextError, match="dropped"):
+        client.generate("system", "user", max_tokens=64)
+
+    # A prompt that fit, however little room it left the answer, is not refused (Ollama read 10,503 tokens of an
+    # 18,432-token window whole).
+    chat["prompt_eval_count"] = 4096 - 64 - 100
+    client = OllamaLLMClient("http://127.0.0.1:11434", "llama3.2", transport=_ollama(chat=chat))
+    assert client.generate("system", "user", max_tokens=64).text == "{}"
 
 
 @pytest.mark.parametrize("model, show", [

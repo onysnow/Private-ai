@@ -156,3 +156,46 @@ def test_suite_records_and_restatements_travel_in_a_backup(tmp_path):
         restore_investigation_export(db, package, tmp_path / "restored-documents")
         assert db.get(domain.CaseRecord, gap["id"]).record_id == "GAP-0001"
         assert db.get(domain.Evidence, repeat).restates_evidence_id == original
+
+
+def test_the_other_records_keep_their_rules():
+    """HYP, CFLT, ESRC, EPIT and CAPT, each refused when it breaks the rule the
+    suite states for it and kept when it does not (docs/authority-suite/SUITE_COVERAGE.md)."""
+    inv, claim = _case()
+    url = f"/api/investigations/{inv}/case-records"
+
+    def post(kind, body):
+        return client.post(url, json={"kind": kind, "body": body})
+
+    # HYP: a kind from the suite's list.
+    assert post("HYP", {"hypothesis": "The fee was for real work", "kind": "GUESS"}).status_code == 400
+    assert post("HYP", {"hypothesis": "The fee was for real work", "kind": "INNOCENT_EXPLANATION",
+                        "falsifiers": ["No deliverable exists"]}).json()["record_id"] == "HYP-0001"
+
+    # CFLT: a resolution names its resolving evidence; the same-proposition test is stated.
+    conflict = {"statement_a": {"statement": "Paid in March"}, "statement_b": {"statement": "Paid in May"},
+                "same_proposition": True, "same_proposition_basis": "Same payment, same ledger",
+                "conflict_type": "DIRECT CONTRADICTION"}
+    assert post("CFLT", {**conflict, "resolution": "March is right"}).status_code == 400
+    assert post("CFLT", {**conflict, "same_proposition_basis": ""}).status_code == 400
+    assert post("CFLT", {**conflict, "resolution": "March is right", "resolving_evidence": ["ev-1"]}).status_code == 200
+
+    # ESRC: a breach, or a waived step, names who decided, when and why.
+    source = {"source_code_name": "HERON", "planned_step": "CONTACT"}
+    assert post("ESRC", {**source, "breach_decision": "BREACH"}).status_code == 400
+    assert post("ESRC", {**source, "steps_waived": ["metadata check"], "decided_by": "Editor"}).status_code == 400
+    assert post("ESRC", {**source, "breach_decision": "BREACH", "decided_by": "Editor", "decided_at": "2026-10-24",
+                         "decision_reason": "Court order"}).status_code == 200
+
+    # EPIT: a decision is a named person's; OTHER grounds are stated.
+    interest = {"public_interest": "EXPOSING_CRIME", "written_at": "2026-10-24"}
+    assert post("EPIT", {**interest, "decision": "PUBLISH"}).status_code == 400
+    assert post("EPIT", {**interest, "public_interest": "OTHER"}).status_code == 400
+    assert post("EPIT", {**interest, "decision": "PUBLISH", "decided_by": "Editor"}).status_code == 200
+
+    # CAPT: a SHA-256 hash and a custody log with at least one entry.
+    capture = {"url": "https://example.test/filing", "captured_at": "2026-10-24", "hash_value": "a" * 64,
+               "custody_log": [{"person": "Reporter", "time": "2026-10-24T10:00", "action": "captured"}]}
+    assert post("CAPT", {**capture, "hash_value": "not-a-hash"}).status_code == 400
+    assert post("CAPT", {**capture, "custody_log": []}).status_code == 400
+    assert post("CAPT", capture).json()["record_id"] == "CAPT-0001"

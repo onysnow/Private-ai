@@ -228,8 +228,10 @@ def requeue_for_retry(db: Session, job: BackgroundJob) -> BackgroundJob:
     requeued = db.execute(
         update(BackgroundJob)
         .where(BackgroundJob.id == job.id, BackgroundJob.status.in_(("failed", "cancelled")))
+        # The last attempt's queue job has finished; until the runner hands this
+        # attempt over, no queue job stands behind it (app/jobs/recovery.py).
         .values(status="queued", error=None, progress=None, message="Waiting to start", finished_at=None,
-                updated_at=utcnow_naive())
+                queue_job_id=None, updated_at=utcnow_naive())
     )
     db.commit()
     db.refresh(job)

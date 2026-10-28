@@ -18,6 +18,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import Engine
@@ -27,6 +28,7 @@ from starlette.concurrency import run_in_threadpool
 from app.db.session import build_session_factory
 from app.jobs import corpus as corpus_jobs
 from app.jobs.handlers import HANDLERS
+from app.jobs import recovery
 from app.jobs.queue_schema import QUEUE_SCHEMA, ensure_queue_schema
 from app.jobs.records import Handler, execute_job, mark_interrupted
 from app.jobs.schedule import TICK_SECONDS, scheduler_tick
@@ -38,6 +40,8 @@ QUEUE_NAME = "workbench"
 TASK_NAME = "workbench.run_background_job"
 TICK_TASK_NAME = "workbench.scheduler_tick"
 RUNNERS = ("auto", "inline", "procrastinate")
+RECOVER_DOCUMENTS_AFTER = timedelta(minutes=10)
+RECOVER_JOBS_AFTER = timedelta(hours=1)
 
 
 def resolve_runner(configured: str, engine: Engine) -> str:
@@ -112,6 +116,10 @@ class JobRunner:
                 count = mark_interrupted(db, runner="inline")
             if count:
                 logger.info("marked %d interrupted job(s) as failed", count)
+            # Nothing else runs this process's jobs, so whatever is unfinished now
+            # was left by the process that stopped.
+            self._recover(documents_older_than=timedelta(0), jobs_older_than=timedelta(0),
+                          staged_older_than=timedelta(0))
             # No worker in this mode: the app's timed work runs from a loop here instead (app/jobs/schedule.py).
             self._ticker = asyncio.create_task(self._tick_forever())
             return
@@ -149,6 +157,20 @@ class JobRunner:
             with contextlib.suppress(Exception):
                 await self.queue.close_async()
 
+    def _recover(self, *, documents_older_than: timedelta, jobs_older_than: timedelta,
+                 staged_older_than: timedelta) -> None:
+        """Give what a stopped process left half-done a final state (recovery.py)."""
+        from app.core.config import settings
+        from app.services.security import resolve_storage_root
+
+        try:
+            with self.session_factory() as db:
+                recovery.recover(db, runner=self.mode, storage_root=resolve_storage_root(settings.document_storage_dir),
+                                 documents_older_than=documents_older_than, jobs_older_than=jobs_older_than,
+                                 staged_older_than=staged_older_than)
+        except Exception:
+            logger.warning("could not look for work a stopped process left unfinished", exc_info=True)
+
     async def _retry_stalled(self) -> None:
         """Hand back jobs whose worker stopped heartbeating (a crash or a
         killed container), as Procrastinate's docs recommend.
@@ -177,6 +199,11 @@ class JobRunner:
                 logger.info("closed stalled job %s: a newer one with its queueing lock is waiting", job.id)
             except Exception:
                 logger.warning("could not retry stalled job %s", job.id, exc_info=True)
+        # Another API process may be between saving a row and queueing its job,
+        # so only what has not moved for a while counts as left behind; a job
+        # waits longer than the longest OpenAleph read can take.
+        await run_in_threadpool(self._recover, documents_older_than=RECOVER_DOCUMENTS_AFTER,
+                                jobs_older_than=RECOVER_JOBS_AFTER, staged_older_than=RECOVER_JOBS_AFTER)
 
     async def _tick_forever(self) -> None:
         while True:

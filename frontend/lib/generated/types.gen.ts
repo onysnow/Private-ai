@@ -1266,6 +1266,80 @@ export type AssistantRunRequest = {
 };
 
 /**
+ * AssistantRunRequest
+ *
+ * Any AI run, routed by the suite service (app/ai/suite.py) by its module: TAS's case synthesis and theory
+ * test, the other six systems' modules, or the app-local presentation draft. Each module takes only the fields it
+ * uses and refuses the rest before anything is queued: `working_theory` (theory test), the TAS settings
+ * (`severity_floor`, `source_tier_floor`, `options`, `changes`, `packet_from`), `premises` (TAS and the logic
+ * check), `handoff_from` and `context` (the suite's other systems), `record_refs` (presentation draft; `question`
+ * then holds the goal).
+ */
+export type AssistantRunRequest = {
+  /**
+   * Changes
+   */
+  changes?: Array<RunChangeIn> | null;
+  /**
+   * Context
+   */
+  context?: string | null;
+  /**
+   * Handoff From
+   */
+  handoff_from?: string | null;
+  /**
+   * Include External Leads
+   */
+  include_external_leads?: boolean;
+  /**
+   * Max Results
+   */
+  max_results?: number;
+  /**
+   * Module
+   */
+  module:
+    | 'case_synthesis'
+    | 'hypothesis_test'
+    | 'presentation_draft'
+    | 'research_vetting'
+    | 'quant_framing'
+    | 'las_argument_check'
+    | 'das_framing'
+    | 'das_options'
+    | 'evidence_plan'
+    | 'ehs_harm_minimisation'
+    | 'ehs_public_interest';
+  options?: RunOptionsIn | null;
+  packet_from?: PacketFromIn | null;
+  /**
+   * Premises
+   */
+  premises?: Array<string> | null;
+  /**
+   * Question
+   */
+  question: string;
+  /**
+   * Record Refs
+   */
+  record_refs?: Array<RecordRef> | null;
+  /**
+   * Severity Floor
+   */
+  severity_floor?: 'ALL' | 'MATERIAL' | 'BLOCKING' | null;
+  /**
+   * Source Tier Floor
+   */
+  source_tier_floor?: 'A' | 'B' | 'C' | 'D' | null;
+  /**
+   * Working Theory
+   */
+  working_theory?: string | null;
+};
+
+/**
  * BackgroundJobOut
  *
  * One piece of slow work and where it stands; the screen polls this.
@@ -18051,6 +18125,110 @@ export type StyleWarningOut = {
 };
 
 /**
+ * SuiteCatalogModuleOut
+ */
+export type SuiteCatalogModuleOut = {
+  /**
+   * Final Audit
+   */
+  final_audit: boolean;
+  /**
+   * Number
+   */
+  number: string;
+  /**
+   * Path
+   */
+  path: string;
+  /**
+   * Runs In
+   */
+  runs_in: Array<string>;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Use When
+   */
+  use_when: string;
+};
+
+/**
+ * SuiteCatalogOut
+ *
+ * Every system, module and record of the vendored suite, and which app runs use each module.
+ */
+export type SuiteCatalogOut = {
+  /**
+   * Source
+   */
+  source: string | null;
+  /**
+   * Systems
+   */
+  systems: Array<SuiteCatalogSystemOut>;
+};
+
+/**
+ * SuiteCatalogRecordOut
+ */
+export type SuiteCatalogRecordOut = {
+  /**
+   * Closed
+   */
+  closed: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Fields
+   */
+  fields: Array<string>;
+  /**
+   * Id Field
+   */
+  id_field: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Prefix
+   */
+  prefix: string | null;
+};
+
+/**
+ * SuiteCatalogSystemOut
+ */
+export type SuiteCatalogSystemOut = {
+  /**
+   * Code
+   */
+  code: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Modules
+   */
+  modules: Array<SuiteCatalogModuleOut>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Records
+   */
+  records: Array<SuiteCatalogRecordOut>;
+  /**
+   * Row
+   */
+  row: number;
+};
+
+/**
  * SuiteCoverageCountsOut
  */
 export type SuiteCoverageCountsOut = {
@@ -32205,6 +32383,37 @@ export type PromoteStatementAssessmentResponses = {
 
 export type PromoteStatementAssessmentResponse =
   PromoteStatementAssessmentResponses[keyof PromoteStatementAssessmentResponses];
+
+export type GetSuiteCatalogData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/suite/catalog';
+};
+
+export type GetSuiteCatalogErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSuiteCatalogError =
+  GetSuiteCatalogErrors[keyof GetSuiteCatalogErrors];
+
+export type GetSuiteCatalogResponses = {
+  /**
+   * Successful Response
+   */
+  200: SuiteCatalogOut;
+};
+
+export type GetSuiteCatalogResponse =
+  GetSuiteCatalogResponses[keyof GetSuiteCatalogResponses];
 
 export type GetMappingSchemasData = {
   body?: never;

@@ -23,7 +23,7 @@ from app.core.config import settings
 from app.db.session import get_db
 from app.models.domain import AIAnalysisCandidate, Investigation, Source, StatementAssessment, TimelineEvent
 from app.schemas.responses import (
-    SuiteCoverageOut,
+    SuiteCatalogOut, SuiteCoverageOut,
     AiAnalysisCandidateOut, AiAnalysisCandidateReviewOut, CapabilitiesOut, DeckOut, EvidenceOut, HealthOut,
     OpenAlephStatusOut, PresentationStyleCatalogOut, RelationshipSchemasOut, SearchOut, StatementPromotionOut,
     TimelineEventRowOut, WriteupOut,
@@ -63,6 +63,15 @@ def get_suite_coverage() -> Any:
     from app.ai.suite_map import coverage
 
     return coverage()
+
+
+@router.get("/suite/catalog", response_model=SuiteCatalogOut)
+def get_suite_catalog() -> Any:
+    """Every system, module and record of the vendored Authority System Suite, read from its own files, with the
+    app runs that use each module (none, for a module the app leaves out)."""
+    from app.ai.suite import catalog
+
+    return catalog()
 
 
 @router.get("/health", response_model=HealthOut)

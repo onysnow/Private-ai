@@ -35023,6 +35023,176 @@
         "title": "StyleWarningOut",
         "type": "object"
       },
+      "SuiteCatalogModuleOut": {
+        "properties": {
+          "final_audit": {
+            "title": "Final Audit",
+            "type": "boolean"
+          },
+          "number": {
+            "title": "Number",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "runs_in": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Runs In",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "use_when": {
+            "title": "Use When",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "title",
+          "use_when",
+          "path",
+          "runs_in",
+          "final_audit"
+        ],
+        "title": "SuiteCatalogModuleOut",
+        "type": "object"
+      },
+      "SuiteCatalogOut": {
+        "description": "Every system, module and record of the vendored suite, and which app runs use each module.",
+        "properties": {
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteCatalogSystemOut"
+            },
+            "title": "Systems",
+            "type": "array"
+          }
+        },
+        "required": [
+          "source",
+          "systems"
+        ],
+        "title": "SuiteCatalogOut",
+        "type": "object"
+      },
+      "SuiteCatalogRecordOut": {
+        "properties": {
+          "closed": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Closed",
+            "type": "object"
+          },
+          "fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "id_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id Field"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "prefix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefix"
+          }
+        },
+        "required": [
+          "kind",
+          "prefix",
+          "id_field",
+          "fields",
+          "closed"
+        ],
+        "title": "SuiteCatalogRecordOut",
+        "type": "object"
+      },
+      "SuiteCatalogSystemOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteCatalogModuleOut"
+            },
+            "title": "Modules",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/SuiteCatalogRecordOut"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "row",
+          "kind",
+          "modules",
+          "records"
+        ],
+        "title": "SuiteCatalogSystemOut",
+        "type": "object"
+      },
       "SuiteCoverageCountsOut": {
         "properties": {
           "app_lacks": {
@@ -64735,6 +64905,45 @@
           }
         },
         "summary": "Promote Statement Assessment"
+      }
+    },
+    "/api/suite/catalog": {
+      "get": {
+        "description": "Every system, module and record of the vendored Authority System Suite, read from its own files, with the\napp runs that use each module (none, for a module the app leaves out).",
+        "operationId": "get_suite_catalog",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuiteCatalogOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Suite Catalog"
       }
     },
     "/api/table-mapping/schemas": {

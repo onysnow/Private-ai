@@ -17,13 +17,13 @@ export default defineConfig({
   plugins: [
     '@hey-api/client-fetch',
     '@hey-api/typescript',
-    // The app uses Zod 3 (package.json); checked 2026-10-01 that the plugin
-    // supports it via compatibilityVersion. The database keeps UTC times
+    // The app uses Zod 4 (package.json; moved from Zod 3 on 2026-10-24 for
+    // GHSA-mrhx-c7xc-m3w5, docs/project-notes/SECURITY_REGISTER.md). The database keeps UTC times
     // without an offset (backend app/core/time.py), so those must pass too.
     // (The response models declare their times with a pattern that allows
     // both, Timestamp in backend/app/schemas/responses.py; this covers any
     // "date-time" format the schema may still carry.)
-    {name: 'zod', compatibilityVersion: 3, dates: {local: true, offset: true}},
+    {name: 'zod', compatibilityVersion: 4, dates: {local: true, offset: true}},
     {name: '@hey-api/sdk', validator: true},
     '@tanstack/react-query',
   ],

@@ -18,6 +18,7 @@ import {
   entityFormSchema,
   entityFormValuesToProperties,
   propertiesToEntityFormEntries,
+  type EntityFormInput,
   type EntityFormValues,
 } from '@/lib/entity-schema';
 import {Button} from '@/components/ui/button';

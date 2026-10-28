@@ -1044,6 +1044,11 @@ def _run_reasoning_module(
                 db, investigation_id=investigation_id, question=question,
                 max_results=max_results, include_external_leads=include_external_leads,
             )
+        # The packet is the model's text and the run record's: plain JSON values only
+        # (a reviewed relationship's advisory carries datetimes; docs/project-notes/MODEL_TRIAL.md).
+        from fastapi.encoders import jsonable_encoder
+
+        packet = jsonable_encoder(packet)
         if module in QUOTE_CHECKED_MODULES:
             # The full quotable text of every cited record: the model quotes
             # from it and the quote check searches it (app/ai/quote_check.py).
@@ -1277,12 +1282,14 @@ def describe_reasoning_failure(exc: Exception) -> tuple[int, Any, dict[str, str]
     reasoning endpoints have always given -- or None for an unexpected error.
     A run that executes as a background job keeps this in the job's result."""
     from app.ai.governor import ReasoningThrottled
-    from app.ai.llm_client import LLMProviderError
+    from app.ai.llm_client import LLMContextError, LLMProviderError
 
     if isinstance(exc, ReasoningInputError):
         return 400, str(exc), None
     if isinstance(exc, ReasoningThrottled):
         return 429, str(exc), {"Retry-After": str(exc.retry_after_seconds)}
+    if isinstance(exc, LLMContextError):
+        return 400, f"The request is too long for the model: {exc}", None
     if isinstance(exc, LLMProviderError):
         # STRUCT-0028: no raw vendor error text in the response; the exception
         # message is what the server log/audit gets.

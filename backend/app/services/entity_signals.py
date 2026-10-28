@@ -186,6 +186,11 @@ def clean_names(raw: str) -> list[tuple[str, int, int]]:
         if ends_sentence and i + 1 < len(words):
             parts[-1][-1] = (word.rstrip(".!?;:"), at)
             parts.append([])
+        # A legal form ends the name ("Meridian Holdings Ltd. Payments went..."), unless
+        # another legal form follows it ("Samsung Co. Ltd.").
+        elif (word.endswith(".") and CORPORATE_SUFFIX.fullmatch(word) and i + 1 < len(words)
+              and not CORPORATE_SUFFIX.fullmatch(words[i + 1][0])):
+            parts.append([])
     out = []
     for part in parts:
         while part and part[-1][0].lower().strip(".,") in EDGE_WORDS:

@@ -284,6 +284,8 @@ def test_the_corpus_is_searched_with_highlights_and_similar_documents_are_found(
     minutes = _upload(live, inv, "minutes.pdf", _pdf(
         "Board minutes of Kestrelwood Holdings Limited.",
         "Page two: Jonathan Whitaker approved the Zanzibar transfer to Meridian Holdings Ltd."), "application/pdf")
+    # The note repeats what it shares with the memo, so more_like_this has terms to go on (the same fixture as
+    # PR #82 / #93, where this test kept passing).
     other = _upload(
         live, inv, "note.txt",
         b"Meridian Holdings Ltd records show Jane Doe paid Angela Merkel. "
@@ -301,8 +303,16 @@ def test_the_corpus_is_searched_with_highlights_and_similar_documents_are_found(
     meridian = client.get(f"/api/investigations/{inv}/corpus/search", params={"q": "Meridian"}).json()
     assert {row["document_id"] for row in meridian["results"]} == {memo["id"], minutes["id"], other["id"]}, meridian
 
-    similar = client.get(f"/api/documents/{other['id']}/similar").json()
-    assert similar["state"] == "ok", similar
+    # more_like_this reads Elasticsearch's term statistics, which can lag the
+    # indexing a search already sees (run 69 of this workflow found none), so ask
+    # again for a while before calling it a miss.
+    deadline = time.monotonic() + 30
+    while True:
+        similar = client.get(f"/api/documents/{other['id']}/similar").json()
+        assert similar["state"] == "ok", similar
+        if memo["id"] in [row["document_id"] for row in similar["results"]] or time.monotonic() > deadline:
+            break
+        time.sleep(2)
     assert memo["id"] in [row["document_id"] for row in similar["results"]], similar
     assert other["id"] not in [row["document_id"] for row in similar["results"]]
 
