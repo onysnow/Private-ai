@@ -7453,6 +7453,32 @@
         "title": "ClaimUpdate",
         "type": "object"
       },
+      "ClipCreate": {
+        "description": "A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`.",
+        "properties": {
+          "end": {
+            "exclusiveMinimum": 0.0,
+            "title": "End",
+            "type": "number"
+          },
+          "from_cleaned": {
+            "default": false,
+            "title": "From Cleaned",
+            "type": "boolean"
+          },
+          "start": {
+            "minimum": 0.0,
+            "title": "Start",
+            "type": "number"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "ClipCreate",
+        "type": "object"
+      },
       "ClusterDecisionOut": {
         "properties": {
           "confidence": {
@@ -7920,6 +7946,24 @@
           "collections"
         ],
         "title": "CollectionsOut",
+        "type": "object"
+      },
+      "CompareWordOut": {
+        "properties": {
+          "differs": {
+            "title": "Differs",
+            "type": "boolean"
+          },
+          "w": {
+            "title": "W",
+            "type": "string"
+          }
+        },
+        "required": [
+          "w",
+          "differs"
+        ],
+        "title": "CompareWordOut",
         "type": "object"
       },
       "ConfirmIn": {
@@ -16544,6 +16588,123 @@
           "created"
         ],
         "title": "DemoSeedOut",
+        "type": "object"
+      },
+      "DerivedFileOut": {
+        "description": "A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and\n`parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when.",
+        "properties": {
+          "created_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "mime_type": {
+            "title": "Mime Type",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "model_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Sha256"
+          },
+          "operation": {
+            "title": "Operation",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "parent_sha256": {
+            "title": "Parent Sha256",
+            "type": "string"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "tool": {
+            "title": "Tool",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "parent_sha256",
+          "sha256",
+          "size",
+          "mime_type",
+          "operation",
+          "params",
+          "tool",
+          "created_at"
+        ],
+        "title": "DerivedFileOut",
         "type": "object"
       },
       "DisabledIn": {
@@ -30370,6 +30531,117 @@
         "title": "ProviderLeadOut",
         "type": "object"
       },
+      "PublisherCueOut": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "text"
+        ],
+        "title": "PublisherCueOut",
+        "type": "object"
+      },
+      "PublisherTranscriptOut": {
+        "description": "The episode's own transcript as its publisher offers it (podcast:transcript), fetched with the episode and kept\nas it came: its address, type, SHA-256 and when it was fetched; `error` when it could not be read.",
+        "properties": {
+          "bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bytes"
+          },
+          "cues": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PublisherCueOut"
+            },
+            "title": "Cues",
+            "type": "array"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "fetched_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fetched At"
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sha256"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "PublisherTranscriptOut",
+        "type": "object"
+      },
       "PushSubscriptionIn": {
         "properties": {
           "endpoint": {
@@ -38489,6 +38761,82 @@
         "title": "TraceLeadOut",
         "type": "object"
       },
+      "TranscriptCompareRowOut": {
+        "description": "One of our segments beside the publisher's words for the same stretch of time; `differs` counts the words\nmarked on both sides. Neither side is right by default.",
+        "properties": {
+          "differs": {
+            "title": "Differs",
+            "type": "integer"
+          },
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "kind": {
+            "enum": [
+              "speech",
+              "no_speech"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "no_speech_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "No Speech Text"
+          },
+          "ours": {
+            "items": {
+              "$ref": "#/components/schemas/CompareWordOut"
+            },
+            "title": "Ours",
+            "type": "array"
+          },
+          "segment_id": {
+            "title": "Segment Id",
+            "type": "string"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "theirs": {
+            "items": {
+              "$ref": "#/components/schemas/CompareWordOut"
+            },
+            "title": "Theirs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "segment_id",
+          "start",
+          "end",
+          "kind",
+          "ours",
+          "theirs",
+          "differs"
+        ],
+        "title": "TranscriptCompareRowOut",
+        "type": "object"
+      },
       "TranscriptOut": {
         "description": "A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player\n(one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one\nthe machine was unsure of.",
         "properties": {
@@ -38518,6 +38866,24 @@
           "outline_step": {
             "title": "Outline Step",
             "type": "number"
+          },
+          "parts": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/TranscriptPartOut"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "publisher": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublisherTranscriptOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "segments": {
             "items": {
@@ -38556,6 +38922,25 @@
           "segments"
         ],
         "title": "TranscriptOut",
+        "type": "object"
+      },
+      "TranscriptPartOut": {
+        "description": "A part of the episode as its feed names it (podcast:chapters).",
+        "properties": {
+          "start": {
+            "title": "Start",
+            "type": "number"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "title"
+        ],
+        "title": "TranscriptPartOut",
         "type": "object"
       },
       "TranscriptSegmentOut": {
@@ -52185,6 +52570,64 @@
         "summary": "Seed Demo"
       }
     },
+    "/api/derived-files/{derived_file_id}/file": {
+      "get": {
+        "description": "A file made from a case file, as it was kept and hashed (its SHA-256 is on its trail row).",
+        "operationId": "get_derived_file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "derived_file_id",
+            "required": true,
+            "schema": {
+              "title": "Derived File Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {},
+              "audio/wav": {},
+              "image/jpeg": {}
+            },
+            "description": "The derived file as it was hashed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Derived File"
+      }
+    },
     "/api/document-formats": {
       "get": {
         "description": "The kinds of file an upload accepts now: every format OpenAleph's\ningest-file reads while OpenAleph reads uploads, else the Workbench's\nown reader's list. ``accept`` is ready for a file picker.",
@@ -52791,6 +53234,238 @@
           }
         },
         "summary": "Sync Openaleph Document"
+      }
+    },
+    "/api/documents/{document_id}/derived": {
+      "get": {
+        "description": "Every file made from this document, oldest first, with its edit-trail row.",
+        "operationId": "list_derived",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DerivedFileOut"
+                  },
+                  "title": "Response List Derived",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Derived"
+      }
+    },
+    "/api/documents/{document_id}/derived/cleaned": {
+      "post": {
+        "description": "A 16 kHz mono copy with the hum taken out and light noise reduction, for listening only. The recording itself\nis not changed; the copy is a new file with its edit-trail row.",
+        "operationId": "make_cleaned_copy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DerivedFileOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not a recording that has been read"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The native module is not installed on this computer"
+          }
+        },
+        "summary": "Make Cleaned Copy"
+      }
+    },
+    "/api/documents/{document_id}/derived/clip": {
+      "post": {
+        "description": "The part from `start` to `end` seconds kept as its own WAV file, cut from the original (or the cleaned copy).",
+        "operationId": "make_clip",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClipCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DerivedFileOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Make Clip"
+                }
+              }
+            },
+            "description": "The input does not match the route, or the part is outside the recording"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Make Clip"
       }
     },
     "/api/documents/{document_id}/email": {
@@ -53574,6 +54249,80 @@
           }
         },
         "summary": "Get Document Transcript"
+      }
+    },
+    "/api/documents/{document_id}/transcript/compare": {
+      "get": {
+        "description": "Our transcript beside the publisher's, part by part; the words that differ are marked on both sides.",
+        "operationId": "compare_transcripts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TranscriptCompareRowOut"
+                  },
+                  "title": "Response Compare Transcripts",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No such document, or no publisher's transcript to compare with"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Compare Transcripts"
       }
     },
     "/api/documents/{document_id}/translation": {

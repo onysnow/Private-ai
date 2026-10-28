@@ -93,6 +93,9 @@ import type {
   CollectCaptureMediaData,
   CollectCaptureMediaErrors,
   CollectCaptureMediaResponses,
+  CompareTranscriptsData,
+  CompareTranscriptsErrors,
+  CompareTranscriptsResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
@@ -348,6 +351,9 @@ import type {
   GetDemoCaseData,
   GetDemoCaseErrors,
   GetDemoCaseResponses,
+  GetDerivedFileData,
+  GetDerivedFileErrors,
+  GetDerivedFileResponses,
   GetDocumentData,
   GetDocumentEmailData,
   GetDocumentEmailErrors,
@@ -651,6 +657,9 @@ import type {
   ListDemoCasesData,
   ListDemoCasesErrors,
   ListDemoCasesResponses,
+  ListDerivedData,
+  ListDerivedErrors,
+  ListDerivedResponses,
   ListDocumentCandidatesEndpointData,
   ListDocumentCandidatesEndpointErrors,
   ListDocumentCandidatesEndpointResponses,
@@ -759,6 +768,12 @@ import type {
   LockingErrors,
   LockingResponses,
   LockResponses,
+  MakeCleanedCopyData,
+  MakeCleanedCopyErrors,
+  MakeCleanedCopyResponses,
+  MakeClipData,
+  MakeClipErrors,
+  MakeClipResponses,
   MakeLeadFromHitData,
   MakeLeadFromHitErrors,
   MakeLeadFromHitResponses,
@@ -1141,6 +1156,8 @@ import {
   zCloseCaseResponse,
   zCollectCaptureMediaPath,
   zCollectCaptureMediaResponse,
+  zCompareTranscriptsPath,
+  zCompareTranscriptsResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -1329,6 +1346,8 @@ import {
   zGetDeckEndpointResponse,
   zGetDemoCasePath,
   zGetDemoCaseResponse,
+  zGetDerivedFilePath,
+  zGetDerivedFileResponse,
   zGetDocumentEmailPath,
   zGetDocumentEmailResponse,
   zGetDocumentFormatsResponse,
@@ -1551,6 +1570,8 @@ import {
   zListDecksEndpointPath,
   zListDecksEndpointResponse,
   zListDemoCasesResponse,
+  zListDerivedPath,
+  zListDerivedResponse,
   zListDocumentCandidatesEndpointPath,
   zListDocumentCandidatesEndpointQuery,
   zListDocumentCandidatesEndpointResponse,
@@ -1632,6 +1653,11 @@ import {
   zLockingBody,
   zLockingResponse,
   zLockResponse,
+  zMakeCleanedCopyPath,
+  zMakeCleanedCopyResponse,
+  zMakeClipBody,
+  zMakeClipPath,
+  zMakeClipResponse,
   zMakeLeadFromHitPath,
   zMakeLeadFromHitResponse,
   zMakeLeadFromNotePath,
@@ -3968,6 +3994,33 @@ export const seedDemo = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Derived File
+ *
+ * A file made from a case file, as it was kept and hashed (its SHA-256 is on its trail row).
+ */
+export const getDerivedFile = <ThrowOnError extends boolean = false>(
+  options: Options<GetDerivedFileData, ThrowOnError>,
+): RequestResult<GetDerivedFileResponses, GetDerivedFileErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetDerivedFileResponses,
+    GetDerivedFileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDerivedFilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDerivedFileResponse.parseAsync(data),
+    url: '/api/derived-files/{derived_file_id}/file',
+    ...options,
+  });
+
+/**
  * Get Document Formats
  *
  * The kinds of file an upload accepts now: every format OpenAleph's
@@ -4283,6 +4336,95 @@ export const syncOpenalephDocument = <ThrowOnError extends boolean = false>(
       await zSyncOpenalephDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}/corpus/openaleph/sync',
     ...options,
+  });
+
+/**
+ * List Derived
+ *
+ * Every file made from this document, oldest first, with its edit-trail row.
+ */
+export const listDerived = <ThrowOnError extends boolean = false>(
+  options: Options<ListDerivedData, ThrowOnError>,
+): RequestResult<ListDerivedResponses, ListDerivedErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ListDerivedResponses,
+    ListDerivedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListDerivedPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListDerivedResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived',
+    ...options,
+  });
+
+/**
+ * Make Cleaned Copy
+ *
+ * A 16 kHz mono copy with the hum taken out and light noise reduction, for listening only. The recording itself
+ * is not changed; the copy is a new file with its edit-trail row.
+ */
+export const makeCleanedCopy = <ThrowOnError extends boolean = false>(
+  options: Options<MakeCleanedCopyData, ThrowOnError>,
+): RequestResult<
+  MakeCleanedCopyResponses,
+  MakeCleanedCopyErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MakeCleanedCopyResponses,
+    MakeCleanedCopyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zMakeCleanedCopyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakeCleanedCopyResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived/cleaned',
+    ...options,
+  });
+
+/**
+ * Make Clip
+ *
+ * The part from `start` to `end` seconds kept as its own WAV file, cut from the original (or the cleaned copy).
+ */
+export const makeClip = <ThrowOnError extends boolean = false>(
+  options: Options<MakeClipData, ThrowOnError>,
+): RequestResult<MakeClipResponses, MakeClipErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    MakeClipResponses,
+    MakeClipErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMakeClipBody,
+          path: zMakeClipPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zMakeClipResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived/clip',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -4704,6 +4846,37 @@ export const getDocumentTranscript = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetDocumentTranscriptResponse.parseAsync(data),
     url: '/api/documents/{document_id}/transcript',
+    ...options,
+  });
+
+/**
+ * Compare Transcripts
+ *
+ * Our transcript beside the publisher's, part by part; the words that differ are marked on both sides.
+ */
+export const compareTranscripts = <ThrowOnError extends boolean = false>(
+  options: Options<CompareTranscriptsData, ThrowOnError>,
+): RequestResult<
+  CompareTranscriptsResponses,
+  CompareTranscriptsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    CompareTranscriptsResponses,
+    CompareTranscriptsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCompareTranscriptsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCompareTranscriptsResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/transcript/compare',
     ...options,
   });
 

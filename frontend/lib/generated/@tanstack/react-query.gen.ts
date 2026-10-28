@@ -36,6 +36,7 @@ import {
   clearCaseLookups,
   closeCase,
   collectCaptureMedia,
+  compareTranscripts,
   connectors,
   connectorSearch,
   convertLeadEndpoint,
@@ -121,6 +122,7 @@ import {
   getDecisions,
   getDeckEndpoint,
   getDemoCase,
+  getDerivedFile,
   getDocument,
   getDocumentEmail,
   getDocumentFormats,
@@ -222,6 +224,7 @@ import {
   listCrossProviderDecisions,
   listDecksEndpoint,
   listDemoCases,
+  listDerived,
   listDocumentCandidatesEndpoint,
   listDocuments,
   listDocumentTableMappings,
@@ -258,6 +261,8 @@ import {
   lock,
   lockCase,
   locking,
+  makeCleanedCopy,
+  makeClip,
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
@@ -447,6 +452,9 @@ import type {
   CollectCaptureMediaData,
   CollectCaptureMediaError,
   CollectCaptureMediaResponse,
+  CompareTranscriptsData,
+  CompareTranscriptsError,
+  CompareTranscriptsResponse,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchError,
@@ -701,6 +709,9 @@ import type {
   GetDemoCaseData,
   GetDemoCaseError,
   GetDemoCaseResponse,
+  GetDerivedFileData,
+  GetDerivedFileError,
+  GetDerivedFileResponse,
   GetDocumentData,
   GetDocumentEmailData,
   GetDocumentEmailError,
@@ -1004,6 +1015,9 @@ import type {
   ListDemoCasesData,
   ListDemoCasesError,
   ListDemoCasesResponse,
+  ListDerivedData,
+  ListDerivedError,
+  ListDerivedResponse,
   ListDocumentCandidatesEndpointData,
   ListDocumentCandidatesEndpointError,
   ListDocumentCandidatesEndpointResponse,
@@ -1112,6 +1126,12 @@ import type {
   LockingError,
   LockingResponse,
   LockResponse,
+  MakeCleanedCopyData,
+  MakeCleanedCopyError,
+  MakeCleanedCopyResponse,
+  MakeClipData,
+  MakeClipError,
+  MakeClipResponse,
   MakeLeadFromHitData,
   MakeLeadFromHitError,
   MakeLeadFromHitResponse,
@@ -3502,6 +3522,33 @@ export const seedDemoMutation = (
   return mutationOptions;
 };
 
+export const getDerivedFileQueryKey = (options: Options<GetDerivedFileData>) =>
+  createQueryKey('getDerivedFile', options);
+
+/**
+ * Get Derived File
+ *
+ * A file made from a case file, as it was kept and hashed (its SHA-256 is on its trail row).
+ */
+export const getDerivedFileOptions = (options: Options<GetDerivedFileData>) =>
+  queryOptions<
+    GetDerivedFileResponse,
+    GetDerivedFileError,
+    GetDerivedFileResponse,
+    ReturnType<typeof getDerivedFileQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDerivedFile({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDerivedFileQueryKey(options),
+  });
+
 export const getDocumentFormatsQueryKey = (
   options?: Options<GetDocumentFormatsData>,
 ) => createQueryKey('getDocumentFormats', options);
@@ -3785,6 +3832,92 @@ export const syncOpenalephDocumentMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await syncOpenalephDocument({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listDerivedQueryKey = (options: Options<ListDerivedData>) =>
+  createQueryKey('listDerived', options);
+
+/**
+ * List Derived
+ *
+ * Every file made from this document, oldest first, with its edit-trail row.
+ */
+export const listDerivedOptions = (options: Options<ListDerivedData>) =>
+  queryOptions<
+    ListDerivedResponse,
+    ListDerivedError,
+    ListDerivedResponse,
+    ReturnType<typeof listDerivedQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listDerived({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listDerivedQueryKey(options),
+  });
+
+/**
+ * Make Cleaned Copy
+ *
+ * A 16 kHz mono copy with the hum taken out and light noise reduction, for listening only. The recording itself
+ * is not changed; the copy is a new file with its edit-trail row.
+ */
+export const makeCleanedCopyMutation = (
+  options?: Partial<Options<MakeCleanedCopyData>>,
+): UseMutationOptions<
+  MakeCleanedCopyResponse,
+  MakeCleanedCopyError,
+  Options<MakeCleanedCopyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeCleanedCopyResponse,
+    MakeCleanedCopyError,
+    Options<MakeCleanedCopyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeCleanedCopy({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Make Clip
+ *
+ * The part from `start` to `end` seconds kept as its own WAV file, cut from the original (or the cleaned copy).
+ */
+export const makeClipMutation = (
+  options?: Partial<Options<MakeClipData>>,
+): UseMutationOptions<
+  MakeClipResponse,
+  MakeClipError,
+  Options<MakeClipData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeClipResponse,
+    MakeClipError,
+    Options<MakeClipData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeClip({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -4249,6 +4382,36 @@ export const getDocumentTranscriptOptions = (
       return data;
     },
     queryKey: getDocumentTranscriptQueryKey(options),
+  });
+
+export const compareTranscriptsQueryKey = (
+  options: Options<CompareTranscriptsData>,
+) => createQueryKey('compareTranscripts', options);
+
+/**
+ * Compare Transcripts
+ *
+ * Our transcript beside the publisher's, part by part; the words that differ are marked on both sides.
+ */
+export const compareTranscriptsOptions = (
+  options: Options<CompareTranscriptsData>,
+) =>
+  queryOptions<
+    CompareTranscriptsResponse,
+    CompareTranscriptsError,
+    CompareTranscriptsResponse,
+    ReturnType<typeof compareTranscriptsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await compareTranscripts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: compareTranscriptsQueryKey(options),
   });
 
 export const getDocumentTranslationQueryKey = (

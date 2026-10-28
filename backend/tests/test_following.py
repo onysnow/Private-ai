@@ -31,6 +31,16 @@ from app.services.lifecycle import delete_investigation
 client = TestClient(app)
 RECORDING = Path(__file__).parent / "fixtures" / "media" / "harbour-talk.mp3"
 
+# The publisher's own transcript of the episode: it hears "an evaluation" where ours heard "a valuation".
+EP41_VTT = """WEBVTT
+
+00:00:00.000 --> 00:00:02.800
+<v Host>Last week we spoke about the harbour land.
+
+00:00:03.000 --> 00:00:06.000
+<v Guest>I never saw an evaluation before we voted.
+"""
+
 WIRE = ("Harbour authority approves Kestrel lease extension for another twenty years after a closed council "
         "vote on Tuesday evening, documents seen by the paper show")
 
@@ -40,6 +50,8 @@ def _rss(items: list[dict], title: str = "The Fernhill Courier") -> bytes:
     for it in items:
         enclosure = f'<enclosure url="{it["audio"]}" length="76257" type="audio/mpeg"/>' if it.get("audio") else ""
         transcript = f'<podcast:transcript url="{it["transcript"]}" type="text/vtt"/>' if it.get("transcript") else ""
+        if it.get("chapters"):
+            transcript += f'<podcast:chapters url="{it["chapters"]}" type="application/json+chapters"/>'
         parts.append(f"<item><guid>{it['id']}</guid><title>{it['title']}</title><link>{it['link']}</link>"
                      f"<description>{it.get('text', '')}</description><pubDate>{it['date']}</pubDate>{enclosure}{transcript}</item>")
     return (f'<?xml version="1.0"?><rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0"><channel>'
@@ -117,10 +129,16 @@ def _handler(site: Site) -> type[BaseHTTPRequestHandler]:
             if path == "/podcast.xml":
                 items = [{"id": "ep41", "title": "Ep. 41 · The parcel question", "link": site.base + "/ep41",
                           "date": "Sat, 17 Oct 2026 06:00:00 GMT", "audio": site.base + "/ep41.mp3",
-                          "transcript": site.base + "/ep41.vtt"}]
+                          "transcript": site.base + "/ep41.vtt", "chapters": site.base + "/ep41-chapters.json"}]
                 return self._send(200, _rss(items, "Fernhill Notes"), "application/rss+xml")
             if path == "/ep41.mp3":
                 return self._send(200, RECORDING.read_bytes(), "audio/mpeg")
+            if path == "/ep41.vtt":
+                return self._send(200, EP41_VTT.encode(), "text/vtt")
+            if path == "/ep41-chapters.json":
+                return self._send(200, json.dumps({"version": "1.2.0", "chapters": [
+                    {"startTime": 0, "title": "Welcome"}, {"startTime": 2.8, "title": "The board meeting"}]}).encode(),
+                    "application/json+chapters")
             if path.startswith(("/news/", "/gazette/")):
                 return self._send(200, b"<html><body>story</body></html>", "text/html")
             return self._send(404)

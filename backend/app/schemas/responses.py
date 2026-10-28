@@ -5037,6 +5037,70 @@ class TranscriptSegmentOut(ResponseModel):
     speaker: str | None = None
 
 
+class PublisherCueOut(ResponseModel):
+    start: float
+    end: float
+    text: str
+    speaker: str | None = None
+
+
+class PublisherTranscriptOut(ResponseModel):
+    """The episode's own transcript as its publisher offers it (podcast:transcript), fetched with the episode and kept
+    as it came: its address, type, SHA-256 and when it was fetched; `error` when it could not be read."""
+    url: str
+    type: str | None = None
+    sha256: str | None = None
+    bytes: int | None = None
+    fetched_at: str | None = None
+    error: str | None = None
+    cues: list[PublisherCueOut] = []
+
+
+class TranscriptPartOut(ResponseModel):
+    """A part of the episode as its feed names it (podcast:chapters)."""
+    start: float
+    title: str
+
+
+class CompareWordOut(ResponseModel):
+    w: str
+    differs: bool
+
+
+class TranscriptCompareRowOut(ResponseModel):
+    """One of our segments beside the publisher's words for the same stretch of time; `differs` counts the words
+    marked on both sides. Neither side is right by default."""
+    segment_id: str
+    start: float
+    end: float
+    kind: Literal["speech", "no_speech"]
+    speaker: str | None = None
+    ours: list[CompareWordOut]
+    theirs: list[CompareWordOut]
+    no_speech_text: str | None = None
+    differs: int
+
+
+class DerivedFileOut(ResponseModel):
+    """A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
+    `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when."""
+    id: str
+    document_id: str
+    parent_id: str | None = None
+    parent_sha256: str
+    sha256: str
+    size: int
+    mime_type: str
+    operation: str
+    params: dict[str, Any]
+    tool: str
+    model: str | None = None
+    model_sha256: str | None = None
+    job_id: str | None = None
+    created_by: str | None = None
+    created_at: Timestamp
+
+
 class TranscriptOut(ResponseModel):
     """A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
     (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
@@ -5050,6 +5114,9 @@ class TranscriptOut(ResponseModel):
     transcript: dict[str, Any]
     unsure_below: float
     segments: list[TranscriptSegmentOut]
+    # From the episode's feed, when it came through Following: the publisher's own transcript, and its parts.
+    publisher: PublisherTranscriptOut | None = None
+    parts: list[TranscriptPartOut] = []
 
 
 # --- Web capture (app/services/web_capture.py, ADR-0018) ------------------------------------------------------------

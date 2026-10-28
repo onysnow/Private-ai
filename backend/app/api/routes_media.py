@@ -4,7 +4,7 @@ segment, words, their times and how sure the machine was, and the parts with no 
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -12,8 +12,14 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.core.config import settings
 from app.db.session import get_db
+from app.core.authorization import scope_for_request
+from app.models.derived import DerivedFile
 from app.models.domain import Document, DocumentMedia, TranscriptSegment
-from app.schemas.responses import ErrorOut, TranscriptOut
+from app.schemas.api import ClipCreate
+from app.schemas.responses import DerivedFileOut, ErrorOut, TranscriptCompareRowOut, TranscriptOut, ValidationErrorOut
+from app.services import derived_files, media_derived, publisher_transcript
+from app.services.derived_files import CaseGone
+from app.services.native import NativeUnavailable
 from app.services.security import resolve_storage_root
 from app.services.transcription import UNSURE_BELOW, is_media, media_type
 
@@ -56,10 +62,87 @@ def get_document_transcript(document_id: str, db: Session = Depends(get_db)) -> 
     if media is None:
         raise HTTPException(404, "This recording has not been transcribed yet")
     segments = db.scalars(select(TranscriptSegment).where(TranscriptSegment.document_id == row.id).order_by(TranscriptSegment.ordinal))
+    publisher, parts = publisher_transcript.extras(db, row)
     return {
+        "publisher": publisher, "parts": parts,
         "document_id": row.id, "kind": media.kind, "duration": media.duration, "streams": media.streams,
         "outline": media.outline, "outline_step": media.outline_step, "transcript": media.transcript,
         "unsure_below": UNSURE_BELOW,
         "segments": [{"id": s.id, "chunk_id": s.chunk_id, "ordinal": s.ordinal, "start": s.start, "end": s.end, "kind": s.kind,
                       "text": s.text, "words": s.words, "speaker": s.speaker} for s in segments],
     }
+
+
+def _segments(db: Session, document_id: str) -> list[dict[str, Any]]:
+    return [{"id": s.id, "start": s.start, "end": s.end, "kind": s.kind, "text": s.text, "speaker": s.speaker}
+            for s in db.scalars(select(TranscriptSegment).where(TranscriptSegment.document_id == document_id)
+                                .order_by(TranscriptSegment.ordinal))]
+
+
+@router.get("/documents/{document_id}/transcript/compare", response_model=list[TranscriptCompareRowOut], responses={
+    404: {"model": ErrorOut, "description": "No such document, or no publisher's transcript to compare with"},
+    415: {"model": ErrorOut}})
+def compare_transcripts(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Our transcript beside the publisher's, part by part; the words that differ are marked on both sides."""
+    row = _recording(db, document_id)
+    publisher, _parts = publisher_transcript.extras(db, row)
+    if not publisher or not publisher.get("cues"):
+        raise HTTPException(404, "This recording has no publisher's transcript to compare with")
+    return publisher_transcript.compare(_segments(db, row.id), publisher["cues"])
+
+
+@router.get("/documents/{document_id}/derived", response_model=list[DerivedFileOut], responses={404: {"model": ErrorOut}})
+def list_derived(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Every file made from this document, oldest first, with its edit-trail row."""
+    if db.get(Document, document_id) is None:
+        raise HTTPException(404, "Document not found")
+    rows = db.scalars(select(DerivedFile).where(DerivedFile.document_id == document_id).order_by(DerivedFile.created_at))
+    return [derived_files.serialize(r) for r in rows]
+
+
+def _made(fn: Any) -> Any:
+    try:
+        return derived_files.serialize(fn())
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except CaseGone as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@router.post("/documents/{document_id}/derived/cleaned", response_model=DerivedFileOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ErrorOut, "description": "Not a recording that has been read"},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def make_cleaned_copy(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """A 16 kHz mono copy with the hum taken out and light noise reduction, for listening only. The recording itself
+    is not changed; the copy is a new file with its edit-trail row."""
+    row = _recording(db, document_id)
+    return _made(lambda: media_derived.cleaned_copy(db, row, actor=scope_for_request(request).actor_id))
+
+
+@router.post("/documents/{document_id}/derived/clip", response_model=DerivedFileOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The input does not match the route, or the part is outside the recording"}})
+def make_clip(document_id: str, body: ClipCreate, request: Request, db: Session = Depends(get_db)) -> Any:
+    """The part from `start` to `end` seconds kept as its own WAV file, cut from the original (or the cleaned copy)."""
+    row = _recording(db, document_id)
+    return _made(lambda: media_derived.clip(db, row, body.start, body.end, actor=scope_for_request(request).actor_id,
+                                            from_cleaned=body.from_cleaned))
+
+
+@router.get("/derived-files/{derived_file_id}/file", response_class=FileResponse, responses={
+    200: {"content": {"audio/wav": {}, "image/jpeg": {}, "application/pdf": {}}, "description": "The derived file as it was hashed"},
+    404: {"model": ErrorOut}})
+def get_derived_file(derived_file_id: str, db: Session = Depends(get_db)) -> Any:
+    """A file made from a case file, as it was kept and hashed (its SHA-256 is on its trail row)."""
+    row = db.get(DerivedFile, derived_file_id)
+    if row is None:
+        raise HTTPException(404, "Derived file not found")
+    root = resolve_storage_root(settings.document_storage_dir).resolve()
+    path = Path(row.storage_path).resolve()
+    if not path.is_relative_to(root) or not path.is_file():
+        raise HTTPException(404, "The file is missing from this computer")
+    return FileResponse(path, media_type=row.mime_type, filename=path.name.split("_", 1)[-1], content_disposition_type="inline",
+                        headers={"X-Content-SHA256": row.sha256, "X-Content-Type-Options": "nosniff",
+                                 "Content-Security-Policy": "default-src 'none'"})

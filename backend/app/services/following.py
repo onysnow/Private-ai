@@ -256,6 +256,9 @@ def read_feed(body: bytes) -> tuple[list[Entry], dict[str, Any]]:
         transcript = item.get("podcast_transcript")
         if transcript:
             extra["publisher_transcript"] = {"url": transcript.get("url"), "type": transcript.get("type")}
+        chapters = item.get("podcast_chapters")
+        if chapters:
+            extra["chapters"] = {"url": chapters.get("url"), "type": chapters.get("type")}
         duration = item.get("itunes_duration")
         if duration:
             extra["duration"] = str(duration)
@@ -692,7 +695,8 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
         else:
             entries, about = read_feed(got.body)
             new = _upsert(db, monitor, entries, now)
-            noun = "posts" if monitor.kind == "account" else ("episodes" if monitor.kind == "podcast" else "items")
+            noun = "post" if monitor.kind == "account" else ("episode" if monitor.kind == "podcast" else "item")
+            noun += "" if len(entries) == 1 else "s"
             checks.append({"state": "ok", "text": f"Read {len(entries)} {'latest ' if monitor.kind == 'account' else ''}{noun}"})
             if monitor.kind == "podcast" and about["transcripts"]:
                 checks.append({"state": "ok", "text": f"Transcripts offered for {about['transcripts']}"})
@@ -1026,4 +1030,35 @@ def fetch_audio(db: Session, item: MonitorItem, actor: str | None) -> str:
                          source_metadata={"followed_from": monitor.url, "episode": item.url, "audio_url": url,
                                           "collected_by": actor, "route": f"Following, {monitor.route}"})
     item.document_id = doc.id
+    _publisher_extras(db, monitor, item, doc)
     return doc.id
+
+
+def _publisher_extras(db: Session, monitor: Monitor, item: MonitorItem, doc: Any) -> None:
+    """The episode's own transcript and chapters, when the feed names them: fetched now, through the same route, each
+    request logged, and kept on the episode's source as they came (app/services/publisher_transcript.py)."""
+    from app.models.domain import Source
+    from app.services import publisher_transcript
+    from app.services.outbound import mark_outbound_failed
+
+    source = db.get(Source, doc.source_id)
+    if source is None:
+        return
+    for key, what, accept in (("publisher_transcript", "GET (the publisher's transcript)", "text/vtt, application/x-subrip, application/json, */*;q=0.5"),
+                              ("chapters", "GET (the episode's chapters)", "application/json+chapters, application/json, */*;q=0.5")):
+        named = (item.extra or {}).get(key) or {}
+        url = named.get("url")
+        if not url:
+            continue
+        request_id = _log(db, monitor, what, url)
+        try:
+            got = fetch(url, route=monitor.route, accept=accept)
+            if got.status != 200:
+                raise FetchFailed("unreachable")
+            if len(got.body) > publisher_transcript.MAX_BYTES:
+                raise FetchFailed("too_large")
+            publisher_transcript.keep(db, source, key, url=url, kind=named.get("type"), body=got.body)
+        except (OSError, ValueError) as exc:
+            mark_outbound_failed(db, request_id)
+            publisher_transcript.keep(db, source, key, url=url, kind=named.get("type"), body=None, error=reason_of(exc))
+    db.commit()

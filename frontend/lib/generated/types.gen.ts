@@ -4240,6 +4240,26 @@ export type ClaimUpdate = {
 };
 
 /**
+ * ClipCreate
+ *
+ * A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`.
+ */
+export type ClipCreate = {
+  /**
+   * End
+   */
+  end: number;
+  /**
+   * From Cleaned
+   */
+  from_cleaned?: boolean;
+  /**
+   * Start
+   */
+  start: number;
+};
+
+/**
  * ClusterDecisionOut
  */
 export type ClusterDecisionOut = {
@@ -4531,6 +4551,20 @@ export type CollectionsOut = {
    * Investigation Id
    */
   investigation_id: string;
+};
+
+/**
+ * CompareWordOut
+ */
+export type CompareWordOut = {
+  /**
+   * Differs
+   */
+  differs: boolean;
+  /**
+   * W
+   */
+  w: string;
 };
 
 /**
@@ -7098,6 +7132,79 @@ export type DemoSeedOut = {
    * Investigation Id
    */
   investigation_id: string;
+};
+
+/**
+ * DerivedFileOut
+ *
+ * A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
+ * `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when.
+ */
+export type DerivedFileOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Job Id
+   */
+  job_id?: string | null;
+  /**
+   * Mime Type
+   */
+  mime_type: string;
+  /**
+   * Model
+   */
+  model?: string | null;
+  /**
+   * Model Sha256
+   */
+  model_sha256?: string | null;
+  /**
+   * Operation
+   */
+  operation: string;
+  /**
+   * Params
+   */
+  params: {
+    [key: string]: unknown;
+  };
+  /**
+   * Parent Id
+   */
+  parent_id?: string | null;
+  /**
+   * Parent Sha256
+   */
+  parent_sha256: string;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Size
+   */
+  size: number;
+  /**
+   * Tool
+   */
+  tool: string;
 };
 
 /**
@@ -15176,6 +15283,65 @@ export type ProviderLeadOut = {
 };
 
 /**
+ * PublisherCueOut
+ */
+export type PublisherCueOut = {
+  /**
+   * End
+   */
+  end: number;
+  /**
+   * Speaker
+   */
+  speaker?: string | null;
+  /**
+   * Start
+   */
+  start: number;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * PublisherTranscriptOut
+ *
+ * The episode's own transcript as its publisher offers it (podcast:transcript), fetched with the episode and kept
+ * as it came: its address, type, SHA-256 and when it was fetched; `error` when it could not be read.
+ */
+export type PublisherTranscriptOut = {
+  /**
+   * Bytes
+   */
+  bytes?: number | null;
+  /**
+   * Cues
+   */
+  cues?: Array<PublisherCueOut>;
+  /**
+   * Error
+   */
+  error?: string | null;
+  /**
+   * Fetched At
+   */
+  fetched_at?: string | null;
+  /**
+   * Sha256
+   */
+  sha256?: string | null;
+  /**
+   * Type
+   */
+  type?: string | null;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
  * PushSubscriptionIn
  */
 export type PushSubscriptionIn = {
@@ -19962,6 +20128,51 @@ export type TraceLeadOut = {
 };
 
 /**
+ * TranscriptCompareRowOut
+ *
+ * One of our segments beside the publisher's words for the same stretch of time; `differs` counts the words
+ * marked on both sides. Neither side is right by default.
+ */
+export type TranscriptCompareRowOut = {
+  /**
+   * Differs
+   */
+  differs: number;
+  /**
+   * End
+   */
+  end: number;
+  /**
+   * Kind
+   */
+  kind: 'speech' | 'no_speech';
+  /**
+   * No Speech Text
+   */
+  no_speech_text?: string | null;
+  /**
+   * Ours
+   */
+  ours: Array<CompareWordOut>;
+  /**
+   * Segment Id
+   */
+  segment_id: string;
+  /**
+   * Speaker
+   */
+  speaker?: string | null;
+  /**
+   * Start
+   */
+  start: number;
+  /**
+   * Theirs
+   */
+  theirs: Array<CompareWordOut>;
+};
+
+/**
  * TranscriptOut
  *
  * A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
@@ -19990,6 +20201,11 @@ export type TranscriptOut = {
    */
   outline_step: number;
   /**
+   * Parts
+   */
+  parts?: Array<TranscriptPartOut>;
+  publisher?: PublisherTranscriptOut | null;
+  /**
    * Segments
    */
   segments: Array<TranscriptSegmentOut>;
@@ -20009,6 +20225,22 @@ export type TranscriptOut = {
    * Unsure Below
    */
   unsure_below: number;
+};
+
+/**
+ * TranscriptPartOut
+ *
+ * A part of the episode as its feed names it (podcast:chapters).
+ */
+export type TranscriptPartOut = {
+  /**
+   * Start
+   */
+  start: number;
+  /**
+   * Title
+   */
+  title: string;
 };
 
 /**
@@ -24019,6 +24251,46 @@ export type SeedDemoResponses = {
 
 export type SeedDemoResponse = SeedDemoResponses[keyof SeedDemoResponses];
 
+export type GetDerivedFileData = {
+  body?: never;
+  path: {
+    /**
+     * Derived File Id
+     */
+    derived_file_id: string;
+  };
+  query?: never;
+  url: '/api/derived-files/{derived_file_id}/file';
+};
+
+export type GetDerivedFileErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDerivedFileError =
+  GetDerivedFileErrors[keyof GetDerivedFileErrors];
+
+export type GetDerivedFileResponses = {
+  /**
+   * The derived file as it was hashed
+   */
+  200: Blob | File;
+};
+
+export type GetDerivedFileResponse =
+  GetDerivedFileResponses[keyof GetDerivedFileResponses];
+
 export type GetDocumentFormatsData = {
   body?: never;
   path?: never;
@@ -24412,6 +24684,139 @@ export type SyncOpenalephDocumentResponses = {
 
 export type SyncOpenalephDocumentResponse =
   SyncOpenalephDocumentResponses[keyof SyncOpenalephDocumentResponses];
+
+export type ListDerivedData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived';
+};
+
+export type ListDerivedErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListDerivedError = ListDerivedErrors[keyof ListDerivedErrors];
+
+export type ListDerivedResponses = {
+  /**
+   * Response List Derived
+   *
+   * Successful Response
+   */
+  200: Array<DerivedFileOut>;
+};
+
+export type ListDerivedResponse =
+  ListDerivedResponses[keyof ListDerivedResponses];
+
+export type MakeCleanedCopyData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived/cleaned';
+};
+
+export type MakeCleanedCopyErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Not a recording that has been read
+   */
+  422: ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeCleanedCopyError =
+  MakeCleanedCopyErrors[keyof MakeCleanedCopyErrors];
+
+export type MakeCleanedCopyResponses = {
+  /**
+   * Successful Response
+   */
+  201: DerivedFileOut;
+};
+
+export type MakeCleanedCopyResponse =
+  MakeCleanedCopyResponses[keyof MakeCleanedCopyResponses];
+
+export type MakeClipData = {
+  body: ClipCreate;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived/clip';
+};
+
+export type MakeClipErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Make Clip
+   *
+   * The input does not match the route, or the part is outside the recording
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeClipError = MakeClipErrors[keyof MakeClipErrors];
+
+export type MakeClipResponses = {
+  /**
+   * Successful Response
+   */
+  201: DerivedFileOut;
+};
+
+export type MakeClipResponse = MakeClipResponses[keyof MakeClipResponses];
 
 export type GetDocumentEmailData = {
   body?: never;
@@ -24924,6 +25329,52 @@ export type GetDocumentTranscriptResponses = {
 
 export type GetDocumentTranscriptResponse =
   GetDocumentTranscriptResponses[keyof GetDocumentTranscriptResponses];
+
+export type CompareTranscriptsData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/transcript/compare';
+};
+
+export type CompareTranscriptsErrors = {
+  /**
+   * No such document, or no publisher's transcript to compare with
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CompareTranscriptsError =
+  CompareTranscriptsErrors[keyof CompareTranscriptsErrors];
+
+export type CompareTranscriptsResponses = {
+  /**
+   * Response Compare Transcripts
+   *
+   * Successful Response
+   */
+  200: Array<TranscriptCompareRowOut>;
+};
+
+export type CompareTranscriptsResponse =
+  CompareTranscriptsResponses[keyof CompareTranscriptsResponses];
 
 export type GetDocumentTranslationData = {
   body?: never;

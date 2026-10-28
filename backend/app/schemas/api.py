@@ -907,6 +907,13 @@ class LockReasonIn(BaseModel):
     reason: str | None = None   # idle | hide | sleep | button
 
 
+class ClipCreate(BaseModel):
+    """A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`."""
+    start: float = Field(ge=0)
+    end: float = Field(gt=0)
+    from_cleaned: bool = False
+
+
 class CaptureFollowIn(BaseModel):
     """Check a captured page again: never, daily or weekly (the first check is one interval from now)."""
     every: Literal["never", "daily", "weekly"]

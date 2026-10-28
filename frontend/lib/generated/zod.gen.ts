@@ -1612,6 +1612,17 @@ export const zClaimUpdate = z.object({
 });
 
 /**
+ * ClipCreate
+ *
+ * A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`.
+ */
+export const zClipCreate = z.object({
+  end: z.number().gt(0),
+  from_cleaned: z.boolean().optional().default(false),
+  start: z.number().gte(0),
+});
+
+/**
  * ClusterDecisionOut
  */
 export const zClusterDecisionOut = z.object({
@@ -1773,6 +1784,14 @@ export const zCollectionUpdate = z.object({
 export const zCollectionsOut = z.object({
   collections: z.array(zCollectionSummaryOut),
   investigation_id: z.string(),
+});
+
+/**
+ * CompareWordOut
+ */
+export const zCompareWordOut = z.object({
+  differs: z.boolean(),
+  w: z.string(),
 });
 
 /**
@@ -2810,6 +2829,34 @@ export const zDemoCaseOut = z.object({
 export const zDemoSeedOut = z.object({
   created: z.boolean(),
   investigation_id: z.string(),
+});
+
+/**
+ * DerivedFileOut
+ *
+ * A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
+ * `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when.
+ */
+export const zDerivedFileOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullish(),
+  document_id: z.string(),
+  id: z.string(),
+  job_id: z.string().nullish(),
+  mime_type: z.string(),
+  model: z.string().nullish(),
+  model_sha256: z.string().nullish(),
+  operation: z.string(),
+  params: z.record(z.string(), z.unknown()),
+  parent_id: z.string().nullish(),
+  parent_sha256: z.string(),
+  sha256: z.string(),
+  size: z.int(),
+  tool: z.string(),
 });
 
 /**
@@ -6412,6 +6459,32 @@ export const zEntityMatchPreviewOut = z.object({
 });
 
 /**
+ * PublisherCueOut
+ */
+export const zPublisherCueOut = z.object({
+  end: z.number(),
+  speaker: z.string().nullish(),
+  start: z.number(),
+  text: z.string(),
+});
+
+/**
+ * PublisherTranscriptOut
+ *
+ * The episode's own transcript as its publisher offers it (podcast:transcript), fetched with the episode and kept
+ * as it came: its address, type, SHA-256 and when it was fetched; `error` when it could not be read.
+ */
+export const zPublisherTranscriptOut = z.object({
+  bytes: z.int().nullish(),
+  cues: z.array(zPublisherCueOut).optional().default([]),
+  error: z.string().nullish(),
+  fetched_at: z.string().nullish(),
+  sha256: z.string().nullish(),
+  type: z.string().nullish(),
+  url: z.string(),
+});
+
+/**
  * PushSubscriptionKeys
  */
 export const zPushSubscriptionKeys = z.object({
@@ -8998,6 +9071,34 @@ export const zProvenanceTraceOut = z.object({
 });
 
 /**
+ * TranscriptCompareRowOut
+ *
+ * One of our segments beside the publisher's words for the same stretch of time; `differs` counts the words
+ * marked on both sides. Neither side is right by default.
+ */
+export const zTranscriptCompareRowOut = z.object({
+  differs: z.int(),
+  end: z.number(),
+  kind: z.enum(['speech', 'no_speech']),
+  no_speech_text: z.string().nullish(),
+  ours: z.array(zCompareWordOut),
+  segment_id: z.string(),
+  speaker: z.string().nullish(),
+  start: z.number(),
+  theirs: z.array(zCompareWordOut),
+});
+
+/**
+ * TranscriptPartOut
+ *
+ * A part of the episode as its feed names it (podcast:chapters).
+ */
+export const zTranscriptPartOut = z.object({
+  start: z.number(),
+  title: z.string(),
+});
+
+/**
  * TranscriptWordOut
  *
  * One word: its text, start and end in seconds, and the model's probability for it.
@@ -9039,6 +9140,8 @@ export const zTranscriptOut = z.object({
   kind: z.enum(['audio', 'video']),
   outline: z.array(z.number()),
   outline_step: z.number(),
+  parts: z.array(zTranscriptPartOut).optional().default([]),
+  publisher: zPublisherTranscriptOut.nullish(),
   segments: z.array(zTranscriptSegmentOut),
   streams: z.array(z.record(z.string(), z.unknown())),
   transcript: z.record(z.string(), z.unknown()),
@@ -10853,6 +10956,15 @@ export const zLoadDemoCaseResponse = zDemoCaseProgressOut;
  */
 export const zSeedDemoResponse = zDemoSeedOut;
 
+export const zGetDerivedFilePath = z.object({
+  derived_file_id: z.string(),
+});
+
+/**
+ * The derived file as it was hashed
+ */
+export const zGetDerivedFileResponse = z.string();
+
 /**
  * Successful Response
  */
@@ -10950,6 +11062,37 @@ export const zSyncOpenalephDocumentPath = z.object({
  * Successful Response
  */
 export const zSyncOpenalephDocumentResponse = zOpenAlephDocumentSyncOut;
+
+export const zListDerivedPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Response List Derived
+ *
+ * Successful Response
+ */
+export const zListDerivedResponse = z.array(zDerivedFileOut);
+
+export const zMakeCleanedCopyPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeCleanedCopyResponse = zDerivedFileOut;
+
+export const zMakeClipBody = zClipCreate;
+
+export const zMakeClipPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeClipResponse = zDerivedFileOut;
 
 export const zGetDocumentEmailPath = z.object({
   document_id: z.string(),
@@ -11088,6 +11231,17 @@ export const zGetDocumentTranscriptPath = z.object({
  * Successful Response
  */
 export const zGetDocumentTranscriptResponse = zTranscriptOut;
+
+export const zCompareTranscriptsPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Response Compare Transcripts
+ *
+ * Successful Response
+ */
+export const zCompareTranscriptsResponse = z.array(zTranscriptCompareRowOut);
 
 export const zGetDocumentTranslationPath = z.object({
   document_id: z.string(),

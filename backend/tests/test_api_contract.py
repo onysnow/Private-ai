@@ -357,6 +357,21 @@ def _watchlist_hit(entry_id: str, document_id: str) -> str:
         return row.id
 
 
+def _publisher_transcript(document_id: str) -> None:
+    """The recording's publisher offers its own transcript (app/services/publisher_transcript.py), as an episode
+    collected through Following would have it."""
+    from app.db.session import SessionLocal
+    from app.models.domain import Document, Source
+    from app.services import publisher_transcript
+
+    with SessionLocal() as db:
+        doc = db.get(Document, document_id)
+        source = db.get(Source, doc.source_id)
+        publisher_transcript.keep(db, source, "publisher_transcript", url="https://example.org/board-call.vtt", kind="text/vtt",
+                                  body=b"WEBVTT\n\n00:00:00.000 --> 00:00:02.000\nThe board met on Tuesday.\n")
+        db.commit()
+
+
 def _followed(inv: str) -> tuple[str, str]:
     """A followed source and one item in its queue (app/services/following.py), written directly: a closed platform,
     which is never checked, so no request leaves the test."""
@@ -503,6 +518,9 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # A recording, transcribed by a stand-in for the model (app/services/transcription.py).
     recording = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Board call"}, files={
         "file": ("board-call.mp3", (Path(__file__).parent / "fixtures" / "media" / "harbour-talk.mp3").read_bytes(), "audio/mpeg")}))
+    _publisher_transcript(recording["id"])
+    # A part of it kept as its own file (app/services/media_derived.py), with its edit-trail row.
+    clip = ok(client.post(f"/api/documents/{recording['id']}/derived/clip", json={"start": 0, "end": 1}))
 
     monitor_id, monitor_item_id = _followed(inv)
 
@@ -521,6 +539,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
             "indicator_id": "BO-001", "case_id": "deripaska-en-rusal", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
             "check_id": _check_item(client), "case_record_id": case_record["id"], "thought_id": "CLM-0001", "capture_id": capture["id"],
+            "derived_file_id": clip["id"],
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={
@@ -537,6 +556,10 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/documents/{document_id}/picture"): {"document_id": picture["id"]},
             ("GET", "/api/documents/{document_id}/media"): {"document_id": recording["id"]},
             ("GET", "/api/documents/{document_id}/transcript"): {"document_id": recording["id"]},
+            **{(method, path): {"document_id": recording["id"]} for method, path in (
+                ("GET", "/api/documents/{document_id}/transcript/compare"),
+                ("POST", "/api/documents/{document_id}/derived/clip"),
+                ("POST", "/api/documents/{document_id}/derived/cleaned"))},
             ("GET", "/api/documents/{document_id}/page-image"): {"document_id": minutes["id"]},
             **{(method, path): {"document_id": ledger["id"]} for method, path in (
                 ("GET", "/api/documents/{document_id}/table"),
