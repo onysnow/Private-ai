@@ -135,8 +135,19 @@ describe('The Wire', () => {
     expect(labels).toEqual(expect.arrayContaining(['✓ owns 100% since 2016', '? signs for', '✕ emailed about filing · 2 Nov 2018']));
     // The ended directorship says so, once the window passes its end.
     await waitFor(() => expect(labels.concat([...map.querySelectorAll('.elab text')].map(t => t.textContent))).toContain('✓ director · ended Jul 2017'));
-    // The flag badge gives the level in words with the count.
-    expect(map.textContent).toContain('TEXTBOOK · 2');
+    // A flagged card's outline takes its level; the count sits in a circle on its corner, named in words.
+    const kestrel = [...map.querySelectorAll('g.node')].find(g => g.classList.contains('textbook'))!;
+    expect(kestrel.querySelector('.card-bg')?.getAttribute('stroke')).toBe('#FF8070');
+    expect(kestrel.querySelector('.flag-dot')?.getAttribute('aria-label')).toBe('2 open Red Flags, the strongest textbook');
+    expect(kestrel.querySelector('.flag-dot .flag-n')?.textContent).toBe('2');
+    // Hovering the circle brightens the glow and shows the flags themselves.
+    fireEvent.pointerEnter(kestrel.querySelector('.flag-dot')!, {pointerType: 'mouse'});
+    expect(kestrel.classList.contains('flag-hot')).toBe(true);
+    const tip = document.querySelector('.tw-tip')!;
+    expect(tip.textContent).toContain('2 open Red Flags');
+    expect(tip.textContent).toContain('Circular ownership');
+    fireEvent.pointerLeave(kestrel.querySelector('.flag-dot')!);
+    expect(kestrel.classList.contains('flag-hot')).toBe(false);
     expect(screen.getByLabelText('Key').textContent).toMatch(/How sure.*always on.*shown.*not yet shown.*disputed.*worked out by the app.*ended, drawn faint/);
     expect(document.querySelector('.tw-counts')?.textContent).toBe('Showing all 4 links · 1 ended, drawn faint · 1 undated, always shown');
   });

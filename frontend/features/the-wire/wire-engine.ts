@@ -357,12 +357,16 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     // A tagged party's card is wider on the left, so its tag ring clears the card's edge and its name.
     const own = isChain ? [] : partyTags[id] ?? [];
     const pad = own.length ? 14 : 0, dx = -70 - pad / 2, tx = -52 + pad / 3;
-    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4}, card);
+    // A flagged card's outline takes its level's colour over a glow (paintFlag); the glow sits behind the card.
+    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'flag-glow', fill: 'none', filter: 'url(#tw-flagglow)', style: 'display:none'}, card);
+    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4, 'data-ring': K.ring}, card);
     el('circle', {cx: dx, cy: 0, r: 10, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5}, card);
     el('text', {class: 'card-t', x: tx, y: -4}, card);
     el('text', {class: 'card-s', x: tx, y: 14}, card);
     const beads = el('g', {}, card);
-    const flag = el('g', {transform: 'translate(90,-27)'}, card); // the card's top right corner; the tab stands above it
+    const flag = el('g', {transform: 'translate(91,-28)', class: 'flag-dot'}, card); // the count's circle, on the card's top right corner
+    on<PointerEvent>(flag, 'pointerenter', ev => { if (ev.pointerType === 'touch') return; g.classList.add('flag-hot'); showFlagTip(ev, id); });
+    on(flag, 'pointerleave', () => { g.classList.remove('flag-hot'); hideTip(); });
     g.appendChild(halo); // over the card, so its ring round the kind dot shows
     // Your tags: one arc per tag, sharing a ring outside the flag ring (shown while the Your tags layer is on). Each arc
     // is its swatch brightened, over a blurred copy that breathes, so the ring reads as giving off light.
@@ -404,28 +408,45 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     N.beads.textContent = '';
     accts.forEach((_, i) => { el('circle', {cx: -78 + i * 13, cy: 33, r: 4.5, fill: KIND.account.fill, stroke: KIND.account.ring, 'stroke-width': 1.3}, N.beads); });
     if (accts.length) { const tx = el('text', {class: 'card-s', x: -78 + accts.length * 13, y: 36.5}, N.beads); tx.textContent = `${accts.length} ${accts.length > 1 ? 'ACCOUNTS' : 'ACCOUNT'}`; }
-    paintFlag(N.flag, flagsOf(N.id));
+    paintFlag(N, flagsOf(N.id));
   }
-  function paintFlag(g: SVGGElement, f: Flags): void {
+  const LEVEL_C: Record<string, string> = {textbook: '#FF8070', strong: '#F6966A', faint: '#E9AFA8'};
+  function paintFlag(N: NodeEl, f: Flags): void {
+    const g = N.flag, bg = N.card.querySelector<SVGRectElement>('.card-bg')!, glow = N.card.querySelector<SVGRectElement>('.flag-glow')!;
     g.textContent = '';
     const n = nOpen(f);
+    if (!n) {
+      bg.setAttribute('stroke', bg.dataset.ring ?? ''); bg.setAttribute('stroke-width', '1.4'); bg.removeAttribute('stroke-dasharray');
+      glow.style.display = 'none'; N.g.classList.remove('flagged', 'faint', 'strong', 'textbook');
+      return;
+    }
+    const lvl = f.textbook ? 'textbook' : f.strong ? 'strong' : 'faint', c = LEVEL_C[lvl];
+    // The outline is the level: its colour, a glow behind it (stronger by level, brighter on hover), dashed when faint
+    // so the level never rests on colour alone.
+    bg.setAttribute('stroke', c); bg.setAttribute('stroke-width', '1.8');
+    if (lvl === 'faint') bg.setAttribute('stroke-dasharray', '5 3'); else bg.removeAttribute('stroke-dasharray');
+    glow.style.display = ''; glow.setAttribute('stroke', c);
+    N.g.classList.remove('faint', 'strong', 'textbook'); N.g.classList.add('flagged', lvl);
+    // The count in a small circle on the top right corner; hover it for the flags themselves.
+    el('circle', {r: 15, class: 'flag-hit', fill: 'transparent'}, g);
+    el('circle', {r: 10.5, class: 'flag-disc', fill: lvl === 'textbook' ? '#8E2420' : '#1b2633', stroke: c, 'stroke-width': 1.6}, g);
+    const t = el('text', {y: 4, 'text-anchor': 'middle', class: 'flag-n', fill: lvl === 'textbook' ? '#ffe9e4' : c}, g);
+    t.textContent = String(n);
+    g.setAttribute('aria-label', `${n} open Red Flag${n > 1 ? 's' : ''}, the strongest ${lvl}`);
+  }
+  function showFlagTip(ev: PointerEvent, id: string): void {
+    const f = flagsOf(id), n = nOpen(f);
     if (!n) return;
-    const lvl = f.textbook ? 'textbook' : f.strong ? 'strong' : 'faint';
-    // Level in bars and in its word, then the count (SEE_1 "▮▮▮ TEXTBOOK · 2"), on a tab standing on the card's top
-    // edge near its right corner, like a folder's tab: wholly above the card, so it never covers the name.
-    const word = `${lvl.toUpperCase()} · ${n}`;
-    const w = 32 + word.length * 6.4, x1 = -12, x0 = x1 - w, top = -19;
-    const edge = lvl === 'textbook' ? '#FF8070' : lvl === 'strong' ? '#F6966A' : '#E9AFA8';
-    el('path', {d: `M${x0 - 4},0 Q${x0},0 ${x0},-4 V${top + 5} Q${x0},${top} ${x0 + 5},${top} H${x1 - 5} Q${x1},${top} ${x1},${top + 5} V-4 Q${x1},0 ${x1 + 4},0 Z`,
-      class: `flag-tab ${lvl}`, fill: lvl === 'textbook' ? '#8E2420' : lvl === 'strong' ? '#3b383e' : '#393c48', stroke: edge, 'stroke-width': 1.3,
-      'stroke-dasharray': lvl === 'faint' ? '2.5 2' : 'none'}, g);
-    const bars = lvl === 'textbook' ? 3 : lvl === 'strong' ? 2 : 1;
-    for (let i = 0; i < 3; i++) el('rect', {x: x0 + 8 + i * 4, y: -6 - (i + 1) * 3.2, width: 2.6, height: (i + 1) * 3.2 + 2,
-      fill: i < bars ? (lvl === 'textbook' ? '#ffe9e4' : edge) : 'rgb(245 236 218 / .2)'}, g);
-    const t = el('text', {x: x1 - 7, y: -5.5, 'text-anchor': 'end', class: 'flag-n', fill: lvl === 'textbook' ? '#ffe9e4' : '#F5ECDA'}, g);
-    t.textContent = word;
-    const ti = el('title', {}, g);
-    ti.textContent = `${n} open Red Flag${n > 1 ? 's' : ''}, the strongest ${lvl}`;
+    const counts = (['textbook', 'strong', 'faint'] as const).filter(k => f[k]).map(k => `${f[k]} ${k}`).join(' · ');
+    let h = `<b>${n} open Red Flag${n > 1 ? 's' : ''}</b><span class="m">${counts}</span>`;
+    const rank: Record<string, number> = {textbook: 0, strong: 1, faint: 2};
+    const items = [...f.items].sort((x, y) => (rank[x.level] ?? 3) - (rank[y.level] ?? 3));
+    for (const it of items.slice(0, 4)) h += `<span class="tip-flag"><i class="${esc(it.level)}">${esc(it.level)}</i>${esc(it.text)}</span>`;
+    if (f.items.length > 4) h += `<span class="m">and ${f.items.length - 4} more</span>`;
+    h += '<span class="m">An indicator, not a finding. Click the card to open them.</span>';
+    tip.innerHTML = h;
+    placeTip(ev);
+    tip.classList.add('on');
   }
 
   /* ---------- layouts ---------- */
@@ -628,7 +649,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const fl = flagsOf(id);
       // The ring: any open Red Flag, its edge by level (textbook pulses, strong solid, faint dashed).
       const lvl = fl.textbook ? 'textbook' : fl.strong ? 'strong' : fl.faint ? 'faint' : '';
-      N.halo.style.display = v > 0 && lvl ? '' : 'none';
+      N.halo.style.display = v === 1 && lvl ? '' : 'none'; // a card shows its level in its outline
       if (lvl && N.halo.dataset.level !== lvl) {
         N.halo.dataset.level = lvl;
         N.halo.setAttribute('class', `halo ${lvl}`);
@@ -721,7 +742,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const N = node[id];
       if (N.cur.v === 2 && !N.isChain && N.cur.o > 0.5) {
         const s = toScreen(P[id].x, P[id].y);
-        cardBoxes.push({x0: s.x - (94 + (-70 - N.dx) * 2) * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - (nOpen(flagsOf(id)) ? 48 : 32) * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
+        cardBoxes.push({x0: s.x - (94 + (-70 - N.dx) * 2) * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - (nOpen(flagsOf(id)) ? 40 : 32) * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
       }
     }
     const rtBoxes: Box[] = [];
@@ -1357,7 +1378,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     k += `<div class="row">${line(`stroke-dasharray="${SURE.worked.dash}" stroke-linecap="round"`)}<b>${SURE.worked.g}</b> worked out by the app</div>`;
     k += `<div class="row">${line('stroke-opacity=".38"')}ended, drawn faint</div>`;
     k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><path d="M1 7H8M26 7H33" stroke="#baac91" stroke-width="2"/><circle cx="12" cy="7" r="5" fill="none" stroke="#baac91"/><circle cx="22" cy="7" r="5" fill="none" stroke="#baac91"/></svg>a long link: its two ends, one letter</div>';
-    k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><circle cx="17" cy="7" r="5.5" fill="#4e4234" stroke="#d4a152" stroke-width="1.4"/><circle cx="17" cy="7" r="6.6" fill="none" stroke="#F6966A" stroke-width="1.4" transform="scale(1)"/></svg>ring: open Red Flags, the badge their level and count</div>';
+    k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><circle cx="17" cy="7" r="5.5" fill="#4e4234" stroke="#d4a152" stroke-width="1.4"/><circle cx="17" cy="7" r="6.6" fill="none" stroke="#F6966A" stroke-width="1.4" transform="scale(1)"/></svg>a party with open Red Flags: its outline in the level\'s colour, dashed when faint; the corner circle counts them</div>';
     q('.tw-key-sure').innerHTML = k;
   })();
 

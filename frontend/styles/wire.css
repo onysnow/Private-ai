@@ -181,7 +181,21 @@
 .tw .card-bg { fill: var(--surface-1); }
 .tw .card-t { font: 600 12.5px var(--font-ui); fill: var(--text); pointer-events: none; }
 .tw .card-s { font: 500 10px var(--font-mono); fill: var(--text-muted); letter-spacing: .06em; pointer-events: none; }
-.tw .flag-n { font: 600 10.5px var(--font-mono); }
+.tw .flag-n { font: 700 11px var(--font-mono); pointer-events: none; }
+/* A flagged card: its outline glows in its level's colour; hovering the count's circle brightens it and shows the flags. */
+.tw .flag-glow { stroke-width: 5; opacity: .45; transition: opacity .18s, stroke-width .18s; pointer-events: none; }
+.tw .node.strong .flag-glow { opacity: .6; }
+.tw .node.textbook .flag-glow { opacity: .75; animation: tw-flag-breathe 2.6s ease-in-out infinite; }
+.tw .node.flagged:hover .flag-glow { opacity: .8; }
+.tw .node.flag-hot .flag-glow { opacity: 1; stroke-width: 8; animation: none; }
+.tw .flag-dot { cursor: help; }
+.tw .flag-disc { transition: transform .18s; transform-box: fill-box; transform-origin: center; }
+.tw .node.flag-hot .flag-disc { transform: scale(1.15); }
+@keyframes tw-flag-breathe { 0%, 100% { opacity: .55; } 50% { opacity: .95; } }
+:root[data-motion="calm"] .tw .node.textbook .flag-glow { animation: none; }
+.tw-tip .tip-flag { display: block; margin-top: 5px; line-height: 1.35; }
+.tw-tip .tip-flag i { font: 600 9.5px var(--font-mono); font-style: normal; letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; padding: 0 4px; border-radius: 3px; border: 1px solid; }
+.tw-tip .tip-flag i.faint { color: #E9AFA8; border-style: dashed; } .tw-tip .tip-flag i.strong { color: #F6966A; } .tw-tip .tip-flag i.textbook { color: #ffe9e4; background: #8E2420; border-color: #FF8070; }
 .tw .sec { font-family: var(--font-mono); font-weight: 500; letter-spacing: .16em; fill: var(--text-muted); text-transform: uppercase; pointer-events: none; }
 .tw .node { cursor: pointer; }
 .tw .node:hover .ring { stroke-width: 2.6; }
@@ -229,7 +243,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tw .pulse { display: none; }
-  .tw .halo, .tw .halo.textbook, .tw .tw-tagring .glow { animation: none; }
+  .tw .halo, .tw .halo.textbook, .tw .tw-tagring .glow, .tw .node.textbook .flag-glow { animation: none; }
   .tw-drawer, .tw-needle, .tw-map, .tw-wire { transition: none; }
 }
 /* Touch (the prototype's 21 Oct pass): fatter hit areas where the pointer is a finger. */

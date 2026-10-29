@@ -95,6 +95,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
           <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/>
           <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -10"/>
         </filter>
+        <filter id="tw-flagglow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="4.5"/></filter>
         <filter id="tw-tagglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/></feMerge></filter>
         <radialGradient id="tw-glow"><stop offset="0" stopColor="#E8A95B" stopOpacity=".35"/><stop offset="1" stopColor="#E8A95B" stopOpacity="0"/></radialGradient>
       </defs>
