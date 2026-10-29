@@ -302,3 +302,16 @@ def test_a_failed_load_lets_the_next_one_start(monkeypatch):
         demo_cases.set_state(case_id, state="idle")
     assert calls == ["us-v-anise-structuring", "vekselberg-shell-network"]
     assert not routes_demo._build_lock.locked() and routes_demo._building is None
+
+
+def test_an_allegation_is_testimony_and_an_authoritys_own_record_is_primary(tmp_path):
+    """A complaint's allegations alone never confirm a claim: Tier B (testimony to corroborate), the OFAC notice Tier A."""
+    from app.models.domain import Source
+
+    docs = [(meta, f"stand-in for {meta['id']}".encode()) for meta in demo_cases.manifest("vekselberg-shell-network")]
+    with SessionLocal() as db:
+        inv, _ = demo_cases.build(db, "vekselberg-shell-network", docs, storage_dir=tmp_path)
+        tiers = {d.filename: db.get(Source, d.source_id).source_tier for d in db.query(Document).filter_by(investigation_id=inv.id)}
+    admitted = {m["filename"]: m.get("admitted") for m, _ in docs}
+    assert tiers and all(tiers[name] == ("A" if admitted[name] else "B") for name in tiers), tiers
+    assert tiers["fr-2018-09147-ofac-sdn-notice.pdf"] == "A"

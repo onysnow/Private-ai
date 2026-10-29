@@ -144,6 +144,10 @@ def build(db: Session, case_id: str, documents: list[tuple[dict[str, Any], bytes
         if source is not None:
             source.url = meta["url"]
             source.source_type = meta.get("source_type", "public_record")
+            # The suite's tier (TAS): the record of an authority's own action, or an admission, is a primary official
+            # record (A); a complaint, indictment or affidavit is a party's sworn assertion, testimony to corroborate
+            # (B). So an allegation alone can make a claim Supported but never Confirmed (DECISIONS_LOG, 29 Oct).
+            source.source_tier = "A" if meta.get("admitted") else "B"
         docs[meta["id"]] = doc
     db.commit()
 
