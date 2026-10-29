@@ -87,6 +87,8 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
 - "+N more" is a perfect circle with a stack of discs fanned out behind its left side; on hover the discs slide into
   it one after another and it opens leftwards (away from its leader) into "+N more parties", the words uncovered as
   the chip grows.
+- Then: the stack's discs are solid, one per kind among the hidden parties in that kind's colour, with a thin edge of
+  ground between them; the chip's face is always opaque, so nothing shows through it or crosses the number.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
   circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
