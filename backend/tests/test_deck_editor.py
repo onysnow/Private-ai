@@ -86,7 +86,9 @@ def test_a_deck_prints_to_pdf_as_slides_and_as_a_handout_with_its_draft_band_and
         width, height = doc[0].rect.width, doc[0].rect.height
         assert round(width / height, 2) == 1.78
         pages = [" ".join(page.get_text().split()) for page in doc]
-    assert "Draft" in pages[1].replace(" ", "") and "Draft" not in pages[0].replace(" ", "")  # the sale cites a claim not yet shown
+    # The sale cites a claim not yet shown (the ribbon's letters are spaced and set in capitals, so compare loosely).
+    squeezed = [p.replace(" ", "").lower() for p in pages]
+    assert "draft" in squeezed[1] and "draft" not in squeezed[0]
     assert "The council sold plot 14 to Kestrel SA" in pages[1] and "Sources 1, 2" in pages[1]
     assert "Where each line comes from" in pages[3] and "Say the tender dates aloud" not in " ".join(pages)
 
