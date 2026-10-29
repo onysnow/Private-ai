@@ -81,7 +81,8 @@ function SelectedSource({m, investigationId, onChanged}: {m: MonitorOut; investi
     <p className="fl-cap">Selected source<span className="r">{works ? <span className="fl-chip ok">Works today</span>
       : m.health === 'unchecked' ? <span className="fl-chip dash">Not checked yet</span> : <span className="fl-chip bad">Does not work today</span>}</span></p>
     <h3 className="fl-h3">{m.name}</h3>
-    <p className="fl-addr">{m.platform === 'bluesky' ? 'Open protocol · public posts only · no login' : m.url}</p>
+    <p className="fl-addr">{m.platform === 'bluesky' ? 'Open protocol · public posts only · no login'
+      : m.platform === 'telegram' ? `Public channel · web preview, the latest posts · no login · ${m.url.replace('https://t.me/s/', 't.me/')}` : m.url}</p>
     <ul className="fl-checks">{m.checks.map((c, i) => <li key={i}><span className={`fl-ico ${c.state}`} aria-hidden="true">{MARK[c.state]}</span>{c.text}</li>)}</ul>
     {m.health === 'moved' && m.moved_to && <div className="fl-moved">
       <p>The old address points to <span className="fl-mono">{m.moved_to}</span>. A moved source is never followed by itself.</p>
@@ -179,12 +180,12 @@ function FollowForm({investigationId, onDone}: {investigationId: string; onDone:
   };
   return <form className="fl-panel fl-follow" onSubmit={e => void submit(e)} aria-label="Follow something">
     <p className="fl-cap">Follow something</p>
-    <label className="fl-note" htmlFor="fl-target">A web address (a news feed, sitemap, podcast or page), a Bluesky handle (@name.bsky.social) or a Mastodon account (@name@server)</label>
-    <input id="fl-target" className="fl-input" value={target} onChange={e => setTarget(e.target.value)} placeholder="https://… or @handle" autoFocus/>
+    <label className="fl-note" htmlFor="fl-target">A web address (a news feed, sitemap, podcast or page), a Bluesky handle (@name.bsky.social), a Mastodon account (@name@server) or a public Telegram channel (t.me/name)</label>
+    <input id="fl-target" className="fl-input" value={target} onChange={e => setTarget(e.target.value)} placeholder="https://…, @handle or t.me/channel" autoFocus/>
     <div className="fl-row wrap"><span className="fl-note">Route</span>
       <span className="fl-rad" role="radiogroup" aria-label="Route">{(['direct', 'tor'] as const).map(r =>
         <button key={r} type="button" role="radio" aria-checked={route === r} onClick={() => setRoute(r)}>{r === 'direct' ? 'Direct' : 'Neutral route'}</button>)}</span></div>
-    <p className="fl-note">The address is asked once to see what it is. Closed platforms (X, Instagram, Facebook, TikTok, LinkedIn…) get a row with no monitor: the app never signs in.</p>
+    <p className="fl-note">The address is asked once to see what it is. Closed platforms (X, Instagram, Facebook, TikTok, LinkedIn, Telegram groups and private channels…) get a row with no monitor: the app never signs in.</p>
     <div className="fl-row"><button type="submit" className="fl-btn pri sm" disabled={busy || !target.trim()}>{busy ? 'Asking…' : 'Follow'}</button>
       <button type="button" className="fl-btn sm" onClick={() => onDone(null)}>Cancel</button></div>
     {error && <p role="alert" className="fl-error">{error}</p>}

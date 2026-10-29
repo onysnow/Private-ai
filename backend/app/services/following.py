@@ -382,6 +382,54 @@ def read_bluesky(body: bytes, handle: str) -> list[Entry]:
     return entries
 
 
+_TG_POST = re.compile(r'data-post="([A-Za-z0-9_]+/\d+)"')
+_TG_TEXT = re.compile(r'<div class="tgme_widget_message_text js-message_text"[^>]*>(.*?)</div>', re.S)
+_TG_TIME = re.compile(r'<a class="tgme_widget_message_date" href="([^"]+)"><time datetime="([^"]+)"')
+_TG_FORWARD = re.compile(r'<div class="tgme_widget_message_forwarded_from[^"]*">(.*?)</div>', re.S)
+_TG_EDITED = re.compile(r'class="tgme_widget_message_meta">(.*?)<a class="tgme_widget_message_date"', re.S)
+_TG_VIEWS = re.compile(r'<span class="tgme_widget_message_views">([^<]+)</span>')
+_TG_MEDIA = (("tgme_widget_message_photo", "photo"), ("tgme_widget_message_video", "video"),
+             ("tgme_widget_message_roundvideo", "video message"), ("tgme_widget_message_voice", "voice message"),
+             ("tgme_widget_message_document", "file"), ("tgme_widget_message_poll", "poll"))
+
+
+def _tg_text(markup: str) -> str:
+    markup = re.sub(r"<br\s*/?>", "\n", markup)
+    return html.unescape(re.sub(r"<[^>]+>", "", markup)).strip()
+
+
+def read_telegram(body: bytes) -> list[Entry]:
+    """The posts a public Telegram channel's web preview (t.me/s/<channel>) shows: the latest twenty or so. A post
+    forwarded from another channel is kept and says where from; a post with only a picture, a video or a file is
+    named by what it carries, as the preview does not show it."""
+    page = body.decode("utf-8", "replace")
+    starts = [m for m in _TG_POST.finditer(page)]
+    entries = []
+    for n, m in enumerate(starts):
+        block = page[m.start():starts[n + 1].start() if n + 1 < len(starts) else len(page)]
+        when = _TG_TIME.search(block)
+        text_m = _TG_TEXT.search(block)
+        text = _tg_text(text_m.group(1)) if text_m else ""
+        carries = next((word for cls, word in _TG_MEDIA if cls in block), None)
+        extra: dict[str, Any] = {}
+        forward = _TG_FORWARD.search(block)
+        if forward:
+            # "Forwarded from <name>"; the name is blank when the original poster hides it.
+            extra["forwarded_from"] = re.sub(r"^Forwarded from\s*", "", _tg_text(forward.group(1)).replace("\xa0", " ")) or "a hidden sender"
+        if carries:
+            extra["carries"] = carries
+        views = _TG_VIEWS.search(block)
+        if views:
+            extra["views"] = views.group(1).strip()
+        meta = _TG_EDITED.search(block)
+        if meta and "edited" in _tg_text(meta.group(1)):
+            extra["edited"] = True
+        title = text.split("\n", 1)[0][:200] if text else f"({carries or 'a post the preview does not show'})"
+        entries.append(Entry(key=f"telegram:{m.group(1)}", url=when.group(1) if when else f"https://t.me/{m.group(1)}",
+                             title=title, summary=text, published=_iso(when.group(2)) if when else None, extra=extra))
+    return list(reversed(entries))  # newest first, as the other readers give them
+
+
 # --- Following something -------------------------------------------------------------------------------------------
 
 @dataclass
@@ -413,6 +461,18 @@ def _mastodon_feed(text: str) -> tuple[str, str] | None:
     return None
 
 
+_TG_NAME = r"([A-Za-z][A-Za-z0-9_]{3,31})"
+
+
+def _telegram_channel(text: str) -> str | None:
+    """The public channel a Telegram address names: t.me/<name>, t.me/s/<name> or a post's t.me/<name>/<n>. A private
+    group's invite (t.me/+…, t.me/joinchat/…) or a private channel's post (t.me/c/…) names none."""
+    m = re.match(rf"^(?:https?://)?(?:www\.)?(?:t|telegram)\.me/(?:s/)?{_TG_NAME}(?:/\d+)?/?(?:[?#].*)?$", text.strip())
+    if not m or m.group(1).lower() in ("joinchat", "addstickers", "share", "proxy", "socks", "addlist", "boost", "iv"):
+        return None
+    return m.group(1)
+
+
 def closed_platform(url: str) -> str | None:
     host = (urlsplit(url).hostname or "").lower()
     return next((h for h in CLOSED_HOSTS if host == h or host.endswith("." + h)), None)
@@ -428,10 +488,13 @@ def discover(text: str, *, route: str = "direct") -> Found:
     mastodon = _mastodon_feed(text)
     if mastodon:
         return Found("account", mastodon[0], f"{mastodon[1]} · public account", "mastodon")
+    channel = _telegram_channel(text)
+    if channel:
+        return _telegram(channel, route)
     url = text.strip()
     if not re.match(r"^https?://", url, re.I):
-        raise FollowRefused("Give a web address (https://…), a Bluesky handle (@name.bsky.social) or a Mastodon "
-                            "account (@name@server)")
+        raise FollowRefused("Give a web address (https://…), a Bluesky handle (@name.bsky.social), a Mastodon "
+                            "account (@name@server) or a public Telegram channel (t.me/name)")
     closed = closed_platform(url)
     if closed:
         return Found("closed", url, f"{closed} · closed platform")
@@ -461,6 +524,23 @@ def discover(text: str, *, route: str = "direct") -> Found:
         # A page that names its feed: following the feed is lighter for the site and lists every new item.
         return discover(feeds[0], route=route)
     return Found("page", url, f"{title or host} · page")
+
+
+def _telegram(channel: str, route: str) -> Found:
+    """A public channel is followed through its web preview, which Telegram shows logged out; a channel without one
+    (private, or a person or group) cannot be followed."""
+    url = f"https://t.me/s/{channel}"
+    try:
+        got = fetch(url, route=route, accept="text/html")
+    except OSError as exc:
+        raise FollowRefused(f"The channel could not be read: {reason_of(exc)}") from exc
+    if got.status != 200 or urlsplit(got.url).path.rstrip("/") != f"/s/{channel}" or b"tgme_channel_info" not in got.body:
+        raise FollowRefused(f"t.me/{channel} has no public web preview: only a public channel can be followed. A private "
+                            "channel, a group or a person's account is captured one post at a time from a pasted link, "
+                            "or from files you supply.")
+    title = re.search(rb'<meta property="og:title" content="([^"]*)"', got.body)
+    name = html.unescape(title.group(1).decode("utf-8", "replace")) if title else channel
+    return Found("account", url, f"{name} (t.me/{channel}) · public Telegram channel", "telegram")
 
 
 def follow(db: Session, investigation_id: str, text: str, *, every_minutes: int | None = None, route: str = "direct",
@@ -630,7 +710,7 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
         return monitor
     monitor.robots_allowed = True
     request_id = _log(db, monitor, "GET (anything new since my last visit?)", monitor.url)
-    accept = "application/json" if monitor.platform == "bluesky" else (
+    accept = "application/json" if monitor.platform == "bluesky" else "text/html" if monitor.platform == "telegram" else (
         "application/rss+xml, application/atom+xml, application/xml;q=0.9, */*;q=0.5" if monitor.kind != "page" else "text/html")
     try:
         got = fetch(monitor.url, route=monitor.route, etag=monitor.etag, last_modified=monitor.last_modified, accept=accept)
@@ -690,6 +770,12 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
         elif monitor.platform == "bluesky":
             handle = re.search(r"actor=([^&]+)", monitor.url)
             entries = read_bluesky(got.body, handle.group(1) if handle else "")
+            new = _upsert(db, monitor, entries, now)
+            checks.append({"state": "ok", "text": f"Read {len(entries)} latest posts"})
+        elif monitor.platform == "telegram":
+            if b"tgme_channel_info" not in got.body:
+                raise ValueError("the channel no longer has a public web preview")
+            entries = read_telegram(got.body)
             new = _upsert(db, monitor, entries, now)
             checks.append({"state": "ok", "text": f"Read {len(entries)} latest posts"})
         else:
@@ -883,6 +969,9 @@ def leaves(monitor: Monitor) -> str:
     if monitor.platform == "bluesky":
         return (f"One request {how} to {host}, Bluesky's public read-only server, naming this handle. That server "
                 f"learns you read this account{'; through Tor' if monitor.route == 'tor' else ''}.")
+    if monitor.platform == "telegram":
+        return (f"One request {how} to t.me for this channel's public web preview{route}. Telegram learns that "
+                f"{'a Tor exit' if monitor.route == 'tor' else 'this computer'} read the channel; no account is used.")
     if monitor.kind == "podcast":
         return f"One request {how} to {host} for the feed{route}. The audio file is fetched only when you capture an episode."
     if monitor.kind == "page":

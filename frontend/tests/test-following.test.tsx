@@ -102,6 +102,17 @@ describe('Following', () => {
     expect(api.calls('PATCH /api/monitors/m1').map(c => c.body)).toEqual([{every_minutes: 60}, {route: 'tor'}]);
   });
 
+  it('names a public Telegram channel by what is read of it: the web preview, no login', async () => {
+    const channel = monitor({id: 'm3', kind: 'account', platform: 'telegram', url: 'https://t.me/s/harbourwatch',
+      name: 'Harbour Watch (t.me/harbourwatch) · public Telegram channel', every_minutes: 15,
+      leaves: "One request every 15 minutes to t.me for this channel's public web preview. Telegram learns that this computer read the channel; no account is used."});
+    mockApi({'GET /api/investigations/inv-1/following': screenData({monitors: [channel]}), 'GET /api/monitors/m3/versions': []});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const chosen = await screen.findByRole('region', {name: 'Selected source'});
+    expect(within(chosen).getByText('Public channel · web preview, the latest posts · no login · t.me/harbourwatch')).toBeInTheDocument();
+    expect(within(chosen).getByText(/no account is used/)).toBeInTheDocument();
+  });
+
   it('says a closed platform has no monitor and offers link capture', async () => {
     mockApi({'GET /api/investigations/inv-1/following': screenData(), 'GET /api/monitors/m1/versions': []});
     render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);

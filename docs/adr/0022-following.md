@@ -22,7 +22,9 @@ until a person captures it; several at once needs a reason in the custody log.
   `page` (one page's main text: navigation, headers, footers, scripts and asides left out, so a menu or an advert is a
   layout change, not a new version), `podcast` (a feed whose items carry audio; `podcast:transcript` noted),
   `account` (Bluesky through its public read-only server `public.api.bsky.app`, Mastodon through the account's public
-  RSS; no login anywhere) and `closed` (X, Instagram, Facebook, TikTok, LinkedIn, Threads, WhatsApp, Telegram, …: a row
+  RSS, a public Telegram channel through the web preview Telegram shows logged out at `t.me/s/<channel>`, its latest
+  posts with forwards, edits and media-only posts named (added 29 Oct 2026); no login anywhere) and `closed` (X,
+  Instagram, Facebook, TikTok, LinkedIn, Threads, WhatsApp, Telegram groups, private channels and invites, …: a row
   with no monitor; a pasted link is captured logged out, or the reporter supplies files). Following something asks the
   address once to see what it is; a page that names its feed is followed through the feed.
 - **Polite.** Every request goes through the capture guard (public addresses only, a 20 MB budget) or, on the Tor
@@ -45,8 +47,7 @@ until a person captures it; several at once needs a reason in the custody log.
 
 - New packages: `feedparser` 6.0.14 (BSD-2, with `feedparser-sgmllib`, PSF-2.0) and `socksio` 1.0.0 (MIT) for the Tor
   route through httpx.
-- Not built: newsletters into a dedicated mailbox (needs a mail account the app does not have), public Telegram
-  channels (read from `t.me/s/…` pages), MinHash for large corpora (pairwise shingles are enough for one case's
+- Not built: newsletters into a dedicated mailbox (needs a mail account the app does not have), MinHash for large corpora (pairwise shingles are enough for one case's
   fortnight), a per-platform "works today" check beyond the monitor's own health, and encrypting the monitor list at
   rest (it lives in the case database like every other record).
 - Each followed site sees a visit from this computer's address on the Direct route; the screen says so per source.
