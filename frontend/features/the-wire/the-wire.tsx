@@ -16,7 +16,7 @@ import {AllLinks} from './all-links';
 import {LinkPanel} from './link-panel';
 import {KIND_SYMBOL, brighten, mountWire} from './wire-engine';
 import {KIND_ICON} from '../../components/network/party-icons';
-import {Wallet} from 'lucide-react';
+import {Link2, Wallet} from 'lucide-react';
 import type {LucideIcon} from 'lucide-react';
 import {GridLight, lampColour} from '../effects/grid-light';
 import {webglAvailable} from '../effects/webgl';
@@ -129,6 +129,11 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
           <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/>
           <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -10"/>
         </filter>
+        {/* The name chip's reveal: opaque, then fading out where the name is cut (the chip's far end on the right; just
+            before the circle on the left). */}
+        <linearGradient id="tw-fade-r" x1="0" x2="1"><stop offset="0.7" stopColor="#fff"/><stop offset="1" stopColor="#fff" stopOpacity="0"/></linearGradient>
+        <linearGradient id="tw-fade-l" x1="0" x2="1"><stop offset="0.55" stopColor="#fff"/><stop offset="0.82" stopColor="#fff" stopOpacity="0"/></linearGradient>
+        <symbol id="tw-i-link" viewBox="0 0 24 24"><Link2 width={24} height={24} strokeWidth={2.4} color="currentColor"/></symbol>
         {/* A dot's name, partly revealed: its first words fading out (and its dark halo with them). */}
         <linearGradient id="tw-peek" x1="0" x2="1"><stop offset="0.5" style={{stopColor: 'var(--text)'}}/><stop offset="1" style={{stopColor: 'var(--text)', stopOpacity: 0}}/></linearGradient>
         <linearGradient id="tw-peek-halo" x1="0" x2="1"><stop offset="0.5" style={{stopColor: 'var(--ground)'}}/><stop offset="1" style={{stopColor: 'var(--ground)', stopOpacity: 0}}/></linearGradient>

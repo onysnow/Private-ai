@@ -45,7 +45,7 @@ type Bundle = {key: string; a: string; b: string; links: WireLinkOut[]; strands:
 type Chain = {id: string; mids: string[]; ends: string[]; open: boolean};
 type NodeEl = {
   id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dx: number; hw: number; hh: number;
-  pill: {g: SVGGElement; bg: SVGRectElement; t: SVGTextElement} | null; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
+  pill: {g: SVGGElement; bg: SVGRectElement; t: SVGTextElement; reveal: SVGRectElement; badge: SVGGElement; n: SVGTextElement} | null; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
 type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
@@ -378,7 +378,18 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     } else {
       // Its name is a chip that grows out from behind the circle (placeLabels, revealName).
       const pg = el('g', {class: 'peek-pill', style: 'display:none'}, dot);
-      pill = {g: pg, bg: el('rect', {class: 'peek-bg', y: -DOT_R, height: DOT_R * 2, rx: DOT_R, stroke: K.ring}, pg), t: el('text', {class: 'peek-t', y: 4}, pg)};
+      // The name is drawn whole and uncovered by a mask that slides with the chip, so it is revealed as the chip opens.
+      const mid = `tw-pm-${++maskSerial}`;
+      const mask = el('mask', {id: mid, maskUnits: 'userSpaceOnUse', x: -1200, y: -40, width: 2400, height: 80}, pg);
+      const bg = el('rect', {class: 'peek-bg', y: -DOT_R, height: DOT_R * 2, rx: DOT_R, stroke: K.ring}, pg);
+      const content = el('g', {mask: `url(#${mid})`}, pg);
+      const t = el('text', {class: 'peek-t', y: 4}, content);
+      // How many parties it is linked to: a link icon and the count.
+      const badge = el('g', {class: 'peek-badge'}, content);
+      el('rect', {class: 'peek-badge-bg', y: -7.5, height: 15, rx: 7.5}, badge);
+      el('use', {href: '#tw-i-link', x: 3, y: -5, width: 10, height: 10, color: K.ring}, badge);
+      const n = el('text', {class: 'peek-n', x: 15, y: 3.5}, badge);
+      pill = {g: pg, bg, t, reveal: el('rect', {class: 'peek-reveal', y: -DOT_R - 2, height: DOT_R * 2 + 4, fill: '#fff'}, mask), badge, n};
       // A party drawn as a dot is the card's own circle with its kind's icon, the same size on screen as on a card.
       el('circle', {r: DOT_R, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5, class: 'ring'}, dot);
       kindIcon(E[id].kind, 0, 0, 13, K.ring, dot);
@@ -916,24 +927,37 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
      shows the name's first characters fading out; hovering the party slides it open to the whole name and how many
      parties it is linked to. It lives in the dot's own group, so it keeps the circle's size on screen. */
   const PEEK = 13, PILL_FS = 11.5;
+  let maskSerial = 0;
   function revealName(N: NodeEl, full: boolean): void {
     const P = N.pill;
     if (!P || P.g.style.display === 'none') return;
-    const name = P.g.dataset.name ?? '', extra = P.g.dataset.extra ?? '';
+    const name = P.g.dataset.name ?? '', count = P.g.dataset.count ?? '';
     // Opened, it may take the other side: the side it rests on can have a panel where the whole name would reach.
     const dir = Number(full ? P.g.dataset.odir : P.g.dataset.dir) || 1;
-    P.t.textContent = '';
-    el('tspan', {}, P.t).textContent = full || name.length <= PEEK ? name : name.slice(0, PEEK);
-    if (full && extra) el('tspan', {class: 'peek-x', dx: 7}, P.t).textContent = extra;
-    P.t.classList.toggle('peek', !full && name.length > PEEK);
-    let tw = (P.t.textContent ?? '').length * PILL_FS * 0.55;
-    try { tw = P.t.getComputedTextLength() || tw; } catch { /* not laid out (tests) */ }
-    const inner = DOT_R + 7, reach = inner + tw + 12;
-    P.t.setAttribute('x', String(dir * inner)); P.t.setAttribute('text-anchor', dir > 0 ? 'start' : 'end');
+    if (P.t.textContent !== name) P.t.textContent = name;
+    if (P.n.textContent !== count) P.n.textContent = count;
+    let nameW = name.length * PILL_FS * 0.55, restW = Math.min(name.length, PEEK) * PILL_FS * 0.55;
+    try {
+      nameW = P.t.getComputedTextLength() || nameW;
+      restW = name.length > PEEK ? P.t.getSubStringLength(0, PEEK) || restW : nameW;
+    } catch { /* not laid out (tests) */ }
+    const inner = DOT_R + 7, badgeW = 19 + count.length * 6.6;
+    // The name always reads from its start: on the right it starts by the circle; on the left it starts at the chip's
+    // far end and slides outward as the chip opens (a transform, so it moves with the chip).
+    const tx = dir > 0 ? inner : -(inner + (full ? nameW : restW));
+    P.t.setAttribute('x', '0'); P.t.setAttribute('text-anchor', 'start'); P.t.style.transform = `translateX(${tx}px)`;
+    P.badge.querySelector('rect')!.setAttribute('width', String(badgeW));
+    P.badge.setAttribute('transform', `translate(${dir > 0 ? inner + nameW + 8 : -(inner + nameW + 8 + badgeW)},0)`);
+    // At rest the chip reaches past the name's first characters, which fade out; opened, past the name and the badge.
+    const reach = full ? inner + nameW + 8 + badgeW + 8 : inner + restW + 12;
     // From the circle's centre outward: the chip's rounded end is wholly behind the circle, so none of it shows round it.
-    const x = dir > 0 ? 0 : -reach, w = reach;
-    P.bg.setAttribute('x', String(x)); P.bg.setAttribute('width', String(w));
-    P.bg.style.setProperty('x', `${x}px`); P.bg.style.setProperty('width', `${w}px`);
+    const x = dir > 0 ? 0 : -reach;
+    for (const r of [P.bg, P.reveal]) {
+      r.setAttribute('x', String(x)); r.setAttribute('width', String(reach));
+      r.style.setProperty('x', `${x}px`); r.style.setProperty('width', `${reach}px`);
+    }
+    // At rest the name fades out where it is cut: at the chip's far end on the right, by the circle on the left.
+    P.reveal.setAttribute('fill', full || name.length <= PEEK ? '#fff' : `url(#tw-fade-${dir > 0 ? 'r' : 'l'})`);
     N.g.classList.toggle('peek-open', full);
   }
   function placeLabels(cands: {id: string; N: NodeEl; d: Pt; pri: number}[]): Box[] {
@@ -970,7 +994,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       P.g.style.display = '';
       const odir = openRoom(dir) ? dir : openRoom(dir === 1 ? -1 : 1) ? (dir === 1 ? -1 : 1) : dir;
       P.g.dataset.name = name; P.g.dataset.dir = String(dir); P.g.dataset.odir = String(odir);
-      P.g.dataset.extra = extra;
+      P.g.dataset.count = String(deg[c.id]);
       revealName(c.N, c.N.g.classList.contains('hovering'));
     }
     return boxes;

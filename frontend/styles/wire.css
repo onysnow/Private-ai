@@ -197,14 +197,22 @@
 .tw .terr-l { font-family: var(--font-display); font-style: italic; fill: var(--text); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
 .tw .terr-s { font-family: var(--font-mono); fill: var(--text-muted); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
 .tw .lbl { font-family: var(--font-ui); fill: var(--text); opacity: var(--lo, 1); paint-order: stroke; stroke: var(--ground); stroke-linejoin: round; pointer-events: none; }
-/* A dot's name chip: it grows out from behind the circle, the start of the name fading out at rest, the whole name
-   and its link count when the party is hovered (the chip slides open). */
-.tw .peek-bg { fill: color-mix(in srgb, var(--surface-1) 90%, transparent); stroke-width: 1.1; stroke-opacity: .55; transition: x .22s ease, width .22s ease, stroke-opacity .2s, fill .2s; }
+/* A dot's name chip. It grows out from behind the circle; on hover every part of it moves together: the chip slides
+   open, the name is uncovered as it goes (the mask slides with the chip), the link badge fades and slides in, the circle
+   swells a little and its rings brighten. */
+.tw .peek-bg, .tw .peek-reveal { transition: x .26s cubic-bezier(.2,.8,.2,1), width .26s cubic-bezier(.2,.8,.2,1), stroke-opacity .2s, fill .2s; }
+.tw .peek-bg { fill: color-mix(in srgb, var(--surface-1) 90%, transparent); stroke-width: 1.1; stroke-opacity: .55; }
 .tw .node.peek-open .peek-bg { stroke-opacity: 1; fill: color-mix(in srgb, var(--surface-2, #22364b) 96%, transparent); }
-.tw .peek-t { font: 500 11.5px var(--font-ui); fill: var(--text); pointer-events: none; }
-.tw .peek-t.peek { fill: url(#tw-peek); }
-.tw .peek-x { font-size: 10.5px; fill: var(--text-muted); }
+.tw .peek-t { font: 500 11.5px var(--font-ui); fill: var(--text); pointer-events: none; transition: transform .26s cubic-bezier(.2,.8,.2,1); }
+.tw .peek-badge { opacity: 0; transition: opacity .2s .08s; pointer-events: none; }
+.tw .node.peek-open .peek-badge { opacity: 1; }
+.tw .peek-badge-bg { fill: color-mix(in srgb, var(--text) 8%, transparent); }
+.tw .peek-n { font: 600 10px var(--font-mono); fill: var(--text-muted); }
 .tw .peek-pill { cursor: pointer; }
+.tw .node .ring, .tw .node .ring + .kind-icon { transform-box: fill-box; transform-origin: center; transition: transform .26s cubic-bezier(.2,.8,.2,1); }
+.tw .node.peek-open .ring, .tw .node.peek-open .ring + .kind-icon { transform: scale(1.1); }
+.tw .node.peek-open > .halo { stroke-width: 3; }
+.tw .node.peek-open .tw-tagring .glow { opacity: 1; animation: none; }
 .tw .lens-sum { fill: var(--accent-1); }
 .tw .card-bg { fill: var(--surface-1); }
 .tw .card-t { font: 600 12.5px var(--font-ui); fill: var(--text); pointer-events: none; }
@@ -285,7 +293,7 @@
 @media (prefers-reduced-motion: reduce) {
   .tw .pulse { display: none; }
   .tw .halo, .tw .halo.textbook, .tw .tw-tagring .glow, .tw .node.textbook .flag-glow { animation: none; }
-  .tw .peek-bg { transition: none; }
+  .tw .peek-bg, .tw .peek-reveal, .tw .peek-badge, .tw .peek-t, .tw .node .ring { transition: none; }
   .tw-drawer, .tw-needle, .tw-map, .tw-wire { transition: none; }
 }
 /* Touch (the prototype's 21 Oct pass): fatter hit areas where the pointer is a finger. */
