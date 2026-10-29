@@ -221,7 +221,7 @@ export function timelineBody(investigationId: string, events: unknown[] = []): T
  * Lanes draws them: no parties, typed in the app, and one mark derived as the backend does for a verified date
  * (shown), a disputed one, or else not yet shown. */
 export function lanesBody(investigationId: string, events: unknown[] = [], extra: Record<string, unknown> = {}): Record<string, unknown> {
-  const filled = events.map(raw => {
+  const filled: Array<Record<string, unknown>> = events.map(raw => {
     const e = raw as Record<string, unknown>;
     const fact = e.fact ?? (e.verification_status === 'verified' ? 'shown' : e.verification_status === 'disputed' ? 'disputed' : 'not_yet');
     return {parties: [], source_key: 'you', source_label: 'Typed by you', fact, fact_note: null, placeholder: false, grade: null, ...e};

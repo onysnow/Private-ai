@@ -44,7 +44,7 @@ function laneName(view: TimelineLanesOut, by: LanesBy, key: string): Lane {
 const shortTitle = (t: string, n = 34) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
 const money = (n: number, currency?: string | null) => `${currency === 'EUR' ? '€' : ''}${n.toLocaleString('en-GB', {maximumFractionDigits: 0})}${currency && currency !== 'EUR' ? ` ${currency}` : ''}`;
 
-export function TimelineLanes({investigationId}: {investigationId: string}): ReactElement {
+export function TimelineLanes({investigationId, picked}: {investigationId: string; picked?: {id: string; serial: number} | null}): ReactElement {
   const queryClient = useQueryClient();
   const path = {investigation_id: investigationId};
   const lanes = useQuery({...timelineLanesViewOptions({path}), enabled: Boolean(investigationId)});
@@ -110,8 +110,9 @@ export function TimelineLanes({investigationId}: {investigationId: string}): Rea
     return (open.find(e => span(e)[1] >= firstAt) ?? open[0])?.id ?? null;
   }, [allDated, firstAt]);
   useEffect(() => {
-    if (selected === null && opensOn) setSelected(opensOn);
-  }, [opensOn, selected]);
+    if (selected === null && opensOn && !picked) setSelected(opensOn);
+  }, [opensOn, selected, picked]);
+  useEffect(() => { if (picked) setSelected(picked.id); }, [picked]);
   const x = (t: number) => LABEL_W + ((t - from) / (to - from)) * chartW;
   const xCase = (t: number) => LABEL_W + ((t - caseFrom) / (caseTo - caseFrom)) * chartW;
 
@@ -367,7 +368,7 @@ export function TimelineLanes({investigationId}: {investigationId: string}): Rea
                       // A range is a thin line with its label above; a month or year a band with its label after it.
                       const lx = ranged ? cx + 10 : many ? m.x1 + 12 : fuzzy ? Math.max(cx + 12, m.x1 + 12) : cx + 12;
                       const ly = ranged ? y - 9 : y + 4;
-                      const showLabel = on || fits(`${lane.key}${ranged ? ':above' : ''}`, lx, label);
+                      const showLabel = fits(`${lane.key}${ranged ? ':above' : ''}`, lx, label) || on;
                       return <g key={m.ids.join()} className={`tl2-mark f-${FACT[e.fact].tone}${later ? ' later' : ''}${on ? ' on' : ''}${lightOn ? '' : ' dim'}${placeholder ? ' placeholder' : ''}${seq ? ' seq' : ''}`}
                         onClick={() => setSelected(m.ids[0])} role="button" tabIndex={-1}
                         aria-label={`${dateWords(e.date_start, e.precision)}: ${e.title}, ${FACT[e.fact].name}`}>
