@@ -101,6 +101,7 @@ def main() -> None:
             context.add_init_script(f"try{{const k='pai:appearance';const a=JSON.parse(localStorage.getItem(k)||'{{}}');"
                                     f"a.theme='{args.theme}';localStorage.setItem(k,JSON.stringify(a));}}catch(e){{}}")
         page = context.new_page()
+        page.set_default_navigation_timeout(180000)  # a development server compiles each screen on its first visit
         # On a fresh install the app first asks whose name goes on decisions; answer it so the screens show.
         page.goto(f"{args.web}/?inv={args.case}", wait_until="domcontentloaded")
         settle(page, args.wait)
