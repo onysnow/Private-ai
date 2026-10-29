@@ -16133,6 +16133,10 @@ export type PlaceOut = {
    */
   longitude: number;
   /**
+   * Placed From
+   */
+  placed_from?: string | null;
+  /**
    * Precision
    */
   precision?: string | null;
@@ -16140,6 +16144,10 @@ export type PlaceOut = {
    * Schema
    */
   schema: string;
+  /**
+   * Sure
+   */
+  sure?: 'document' | 'approximate' | 'not_yet';
 };
 
 /**

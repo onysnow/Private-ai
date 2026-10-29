@@ -28,7 +28,6 @@ left out; its surviving record stands for it.
 from __future__ import annotations
 
 import re
-
 from collections.abc import Sequence
 from typing import Any
 
@@ -79,7 +78,13 @@ def investigation_places(db: Session, investigation_id: str) -> dict[str, Any]:
     omitted: list[dict[str, Any]] = []
     for entity in entities:
         props = entity.properties or {}
-        if not (isinstance(props, dict) and ({"latitude", "longitude"} & set(props))):
+        if not ({"latitude", "longitude"} & set(props)):
+            # An address or a property with no coordinates is named here, never looked up (Places, "Can't be placed").
+            if entity.schema in SAME_SPOT:
+                full = _first_text(props, "full") or entity.caption
+                omitted.append({"entity_id": entity.id, "caption": entity.caption, "schema": entity.schema,
+                                "reason": "a post box, not a place" if POST_BOX.search(full)
+                                else "no coordinates recorded; nothing is looked up"})
             continue
         latitude, why_lat = _coordinate(props, "latitude")
         longitude, why_lon = _coordinate(props, "longitude")
@@ -87,9 +92,14 @@ def investigation_places(db: Session, investigation_id: str) -> dict[str, Any]:
             omitted.append({"entity_id": entity.id, "caption": entity.caption, "schema": entity.schema,
                             "reason": "; ".join(r for r in (why_lat, why_lon) if r)})
             continue
+        if latitude == 0 and longitude == 0:
+            omitted.append({"entity_id": entity.id, "caption": entity.caption, "schema": entity.schema,
+                            "reason": "0, 0 is where a camera or a record with no fix puts a point, not a place"})
+            continue
+        sure, placed_from = _sureness(db, entity, _precision(props))
         places.append({"entity_id": entity.id, "caption": entity.caption, "schema": entity.schema, "latitude": latitude, "longitude": longitude,
                        "address": _first_text(props, "full"), "country": _first_text(props, "country"),
-                       "precision": _precision(props), "links": []})
+                       "precision": _precision(props), "sure": sure, "placed_from": placed_from, "links": []})
     if places:
         by_id = {place["entity_id"]: place for place in places}
         edges = db.scalars(select(RelationshipEdge).where(
@@ -111,6 +121,33 @@ def investigation_places(db: Session, investigation_id: str) -> dict[str, Any]:
 
 # Schemas that stand for one spot on the ground, as an address does (FollowTheMoney Address and RealEstate).
 SAME_SPOT = ("Address", "RealEstate")
+
+POST_BOX = re.compile(r"\b(?:P\.?\s?O\.?\s?Box|Post(?:fach| box)|Apartado|Bo[iî]te postale)\b", re.IGNORECASE)
+# Precision words that put a point in a town or wider, not at an address.
+ROUGH = {"town", "city", "village", "municipality", "district", "region", "province", "state", "country", "postcode", "approximate"}
+
+
+def _sureness(db: Session, entity: Entity, precision: str | None) -> tuple[str, str | None]:
+    """How sure the place is, as its ring says (mockup PLACE_1): "document" when its coordinates were read from a
+    document or a source, "approximate" when its record says it is known only to a town or wider, "not_yet" otherwise
+    (typed with nothing behind it). Nothing is ever worked out: lookups are off. Also the source it was read from."""
+    from app.models.domain import Document, Source, Statement
+
+    rough = bool(precision) and str(precision).split()[0] in ROUGH
+    for st in db.scalars(select(Statement).where(Statement.entity_id == entity.id, Statement.prop.in_(("latitude", "longitude")))):
+        origin = st.origin or ""
+        source = None
+        if origin.startswith("source:"):
+            source = db.get(Source, origin[len("source:"):].split("#")[0])
+        elif origin.startswith("document:"):
+            doc = db.get(Document, origin[len("document:"):].split("#")[0])
+            source = db.get(Source, doc.source_id) if doc is not None and doc.source_id else None
+            if source is None and doc is not None:
+                return ("approximate" if rough else "document"), doc.filename
+        if source is not None:
+            return ("approximate" if rough else "document"), source.title
+    return ("approximate" if rough else "not_yet"), None
+
 
 _PRECISION = re.compile(r"\bPrecision:\s*([A-Za-z][A-Za-z -]{0,30}?)\s*[.;\n]")
 

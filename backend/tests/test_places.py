@@ -115,3 +115,37 @@ def test_a_property_s_events_reach_its_address_and_the_address_says_how_exact_it
     place = client.get(f"/api/investigations/{inv}/places").json()["places"][0]
     assert place["precision"] == "building"
     assert [(e["title"], e["via"]) for e in place["events"]] == [("Unit bought for $30.6m", "link")]
+
+
+def test_each_place_says_how_sure_it_is_and_what_cannot_be_placed_says_why():
+    from app.models.domain import Source, Statement
+
+    with SessionLocal() as db:
+        inv = Investigation(name="Rings")
+        db.add(inv)
+        db.commit()
+
+        def entity(schema: str, caption: str, **props: list[str]) -> str:
+            return create_entity(db, EntityCreate(investigation_id=inv.id, schema=schema, caption=caption, properties=props)).id
+
+        registry = Source(investigation_id=inv.id, title="Land registry extract, p.1", source_type="document")
+        db.add(registry)
+        db.commit()
+        land = entity("RealEstate", "The harbour land", latitude=["50.1"], longitude=["-3.5"])
+        for st in db.query(Statement).filter(Statement.entity_id == land):
+            st.origin = f"source:{registry.id}"
+        db.commit()
+        entity("Address", "Fernhill Ltd, Marlow", latitude=["51.57"], longitude=["-0.77"], notes=["Precision: town."])
+        entity("Address", "Harbour Hotel?", latitude=["50.2"], longitude=["-3.6"])
+        entity("Address", "P.O. Box 118, Marlow", full=["P.O. Box 118, Marlow"])
+        entity("Address", "Near the old ferry ramp")
+        entity("Address", "From a photo", latitude=["0"], longitude=["0.0"])
+        inv_id = inv.id
+    body = client.get(f"/api/investigations/{inv_id}/places").json()
+    rings = {p["caption"]: (p["sure"], p["placed_from"]) for p in body["places"]}
+    assert rings == {"The harbour land": ("document", "Land registry extract, p.1"),
+                     "Fernhill Ltd, Marlow": ("approximate", None), "Harbour Hotel?": ("not_yet", None)}
+    assert {o["caption"]: o["reason"] for o in body["omitted"]} == {
+        "P.O. Box 118, Marlow": "a post box, not a place",
+        "Near the old ferry ramp": "no coordinates recorded; nothing is looked up",
+        "From a photo": "0, 0 is where a camera or a record with no fix puts a point, not a place"}

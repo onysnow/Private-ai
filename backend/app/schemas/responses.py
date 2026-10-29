@@ -4097,6 +4097,10 @@ class PlaceOut(ResponseModel):
     # How exact the point is, as the record says ("building", "street", "city"): read from its notes'
     # "Precision: …", which is where a place's precision is kept (FollowTheMoney's Address has no field for it).
     precision: str | None = None
+    # How sure the place is (its ring on the map): read from a document, approximate (a town or wider), or not yet
+    # shown; and the document or source it was read from.
+    sure: Literal["document", "approximate", "not_yet"] = "not_yet"
+    placed_from: str | None = None
     links: list[PlaceLinkOut]
     events: list[PlaceEventOut] = Field(default_factory=list)
 

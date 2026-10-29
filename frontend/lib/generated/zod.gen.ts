@@ -6895,8 +6895,13 @@ export const zPlaceOut = z.object({
   latitude: z.number(),
   links: z.array(zPlaceLinkOut),
   longitude: z.number(),
+  placed_from: z.string().nullish(),
   precision: z.string().nullish(),
   schema: z.string(),
+  sure: z
+    .enum(['document', 'approximate', 'not_yet'])
+    .optional()
+    .default('not_yet'),
 });
 
 /**

@@ -128,7 +128,38 @@ def keep_claims(db: Session, document: Document, claims: dict[str, Any]) -> None
     db.merge(DocumentPhoto(document_id=document.id, investigation_id=document.investigation_id, kind=kind[:16],
                            width=claims.get("width"), height=claims.get("height"), claims=claims, date_tag=date_tag,
                            tool=LIGHTCRAFT))
+    propose_place(db, document, claims.get("gps"))
     db.commit()
+
+
+def propose_place(db: Session, document: Document, gps: Any) -> None:
+    """GPS in a photo's own metadata becomes a place proposed in Decide, never a place by itself (DECISIONS_LOG 6,
+    call 7): a person accepts it or not. 0, 0 is no fix and is not proposed; a photo is proposed once."""
+    from sqlalchemy import select
+
+    from app.models.domain import ExtractionCandidate
+
+    if not isinstance(gps, dict):
+        return
+    try:
+        lat, lon = float(str(gps.get("latitude"))), float(str(gps.get("longitude")))
+    except (TypeError, ValueError):
+        return
+    if (lat == 0 and lon == 0) or not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        return
+    if any((c.payload or {}).get("from") == "photo_gps" for c in db.scalars(
+            select(ExtractionCandidate).where(ExtractionCandidate.document_id == document.id))):
+        return
+    db.add(ExtractionCandidate(
+        investigation_id=document.investigation_id, document_id=document.id, chunk_id=None, candidate_type="entity",
+        confidence=0.6, payload={
+            "caption": f"Where {document.filename} was taken", "suggested_schema": "Address", "from": "photo_gps",
+            "locator": "the photo's own metadata (GPS)",
+            "properties": {"latitude": [f"{lat:.6f}"], "longitude": [f"{lon:.6f}"],
+                           "notes": ["Precision: camera GPS. A claim the file makes about itself: a camera's clock and "
+                                     "position can be wrong or set by hand."]},
+            "reason": "The photo's metadata gives a GPS position. It is what the file claims, not a finding.",
+        }))
 
 
 def record_claims(db: Session, document_id: str) -> None:

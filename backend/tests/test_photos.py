@@ -25,7 +25,7 @@ from sqlalchemy import select
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.main import app
-from app.models.domain import DerivedFile, Document, DocumentPhoto
+from app.models.domain import DerivedFile, Document, DocumentPhoto, ExtractionCandidate
 from app.services import derived_files, native, photos
 from app.services.exports import build_investigation_export, preview_investigation_restore, restore_investigation_export
 from app.services.lifecycle import delete_investigation, preview_investigation_deletion
@@ -119,6 +119,13 @@ def test_a_heic_photo_is_decoded_and_its_gps_kept_as_a_claim(module):
         assert copy.params["source"] == "decoded" and copy.params["bit_depth"] == 8
         # The HEIC's own EXIF says where its time came from, as for any photo.
         assert claims.date_tag == "Date/Time Modified"
+        # Its GPS is proposed in Decide as a place, never made one by itself (DECISIONS_LOG 6, call 7).
+        [proposed] = db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc["id"],
+                                                                  ExtractionCandidate.candidate_type == "entity")).all()
+        assert proposed.review_status == "proposed" and proposed.payload["suggested_schema"] == "Address"
+        assert round(float(proposed.payload["properties"]["latitude"][0]), 4) == 3.1417
+    places = client.get(f"/api/investigations/{doc['investigation_id']}/places").json()
+    assert places["places"] == []
     shown = client.get(f"/api/documents/{doc['id']}/picture")
     assert shown.status_code == 200 and Image.open(io.BytesIO(shown.content)).size == (449, 559)
 

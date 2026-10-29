@@ -32025,6 +32025,17 @@
             "title": "Longitude",
             "type": "number"
           },
+          "placed_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Placed From"
+          },
           "precision": {
             "anyOf": [
               {
@@ -32038,6 +32049,16 @@
           },
           "schema": {
             "title": "Schema",
+            "type": "string"
+          },
+          "sure": {
+            "default": "not_yet",
+            "enum": [
+              "document",
+              "approximate",
+              "not_yet"
+            ],
+            "title": "Sure",
             "type": "string"
           }
         },

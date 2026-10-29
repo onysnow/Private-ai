@@ -105,6 +105,14 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   stages; a company's life: formed → director → payment) and only a needed step that is missing is said, and only when
   the scene is set (an earlier step is recorded, or the step itself only later); two dates that overlap are never
   said to be out of order.
+- **Places, decided while building:** the map is drawn by the app from the records' own coordinates (a projection
+  that keeps a kilometre the same length both ways), so it works with no base map and shows rings, paths and edge
+  markers; the self-hosted base map stays one switch away ("On the base map") when installed. A place is "read from a
+  document" when its coordinates came from a document or a source, "approximate" when its record says a town or wider,
+  else "not yet shown". An address or a property with no coordinates, a post box, and 0, 0 (a camera with no fix) are
+  listed under Can't be placed with why. A place more than five times the typical distance from the others (and over
+  50 km) is an edge marker. A photo's GPS is proposed in Decide as an Address, with a note that it is the file's own
+  claim.
 - **Why:** the research (§2.9) names Lanes the working view and the checker the innovation; a lead made by the app
   alone would fill the queue with what the reporter has not looked at. Everything else follows the drawn mockups.
 - **Where:** `app/services/timeline_lanes.py`, `app/services/sequence_rules.py`, `timeline_periods` table,
