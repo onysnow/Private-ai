@@ -3002,6 +3002,7 @@ export const zDecisionItemOut = z.object({
   question: z.string(),
   rank: z.int(),
   reason: z.string(),
+  unlocks: z.array(z.string()).optional().default([]),
 });
 
 /**
@@ -12690,7 +12691,7 @@ export const zGetDecisionsQuery = z.object({
     ])
     .nullish(),
   order: z
-    .enum(['consequence', 'source', 'oldest'])
+    .enum(['consequence', 'source', 'oldest', 'unlocks'])
     .optional()
     .default('consequence'),
   offset: z.int().gte(0).optional().default(0),

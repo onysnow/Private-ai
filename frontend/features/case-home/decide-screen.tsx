@@ -70,6 +70,11 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
   </section>;
 }
 
+/** A queue row's first unlock, the rest counted (all of them on the card). */
+function Unlocks({items}: {items: string[]}): ReactElement {
+  return <small className="dc-unlocks" title={items.join(' · ')}><span aria-hidden="true">◆</span> unlocks: {items[0]}{items.length > 1 ? ` (+${items.length - 1})` : ''}</small>;
+}
+
 export function DecideScreen({investigationId, investigationName, active = true, unreachable = null}: {
   investigationId: string; investigationName: string; active?: boolean;
   /** The case frame could not reach the server (no case is known yet): shown as this screen's error state. */
@@ -163,6 +168,7 @@ export function DecideScreen({investigationId, investigationName, active = true,
       <label className="dc-order">Order
         <select value={order} onChange={e => setOrder(e.target.value as DecisionOrder)}>
           <option value="source">by source (read once, decide all)</option>
+          <option value="unlocks">by what it unlocks (Red Flags, claims ready)</option>
           <option value="consequence">by what it changes most</option>
           <option value="oldest">oldest first</option>
         </select>
@@ -191,7 +197,8 @@ export function DecideScreen({investigationId, investigationName, active = true,
             <button type="button" className={`dc-row${item?.id === i.id ? ' on' : ''}`} aria-current={item?.id === i.id ? 'true' : undefined} onClick={() => setSelected(i.id)}>
               <span className={`dc-kind dc-kind-${i.kind}`} aria-hidden="true" title={KIND_LABEL[i.kind]}>{KIND_ICON[i.kind]}</span>
               <span className="dc-row-text"><span>{i.question}</span>
-                <small>{i.actor_kind === 'ai' ? 'AI draft' : i.actor}{i.kind === 'ai' ? '' : ` · ${KIND_LABEL[i.kind].toLowerCase()}`} · {age(i.created_at)}{i.level ? ' · ' : ''}{i.level && <LevelChip level={i.level}/>}</small></span>
+                <small>{i.actor_kind === 'ai' ? 'AI draft' : i.actor}{i.kind === 'ai' ? '' : ` · ${KIND_LABEL[i.kind].toLowerCase()}`} · {age(i.created_at)}{i.level ? ' · ' : ''}{i.level && <LevelChip level={i.level}/>}</small>
+                {(i.unlocks ?? []).length > 0 && <Unlocks items={i.unlocks ?? []}/>}</span>
             </button>
           </li>)}</ul>
         </div>;

@@ -288,6 +288,24 @@ describe('Decide', () => {
     expect(within(queue).queryByRole('button', {name: /Accept all/})).toBeNull();
   });
 
+  it('sorts by what a Yes unlocks, showing it on the row and on the card as a dry run', async () => {
+    const asked: string[] = [];
+    const loop = {...proposal('p3', 'medium', 'Does this passage show the ownership Cedar Ltd → Alder Ltd?'),
+      unlocks: ['Raises the Red Flag “Circular ownership” (Textbook)']};
+    routes({'GET /api/investigations/inv-1/decisions': ({url}: {url: URL}) => {
+      asked.push(url.searchParams.get('order') ?? '');
+      return {investigation_id: 'inv-1', counts: {proposal: 2}, total: 2, offset: 0, items: [loop, proposal('p1', 'high', 'Keep this as a claim to check: “The parcel was sold”?')]};
+    }});
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    const queue = await screen.findByRole('complementary', {name: 'To decide'});
+    await userEvent.selectOptions(within(queue).getByLabelText('Order'), 'unlocks');
+    await waitFor(() => expect(asked).toContain('unlocks'));
+    expect(within(queue).getByText(/unlocks: Raises the Red Flag “Circular ownership” \(Textbook\)/)).toBeInTheDocument();
+    const unlocks = await screen.findByLabelText('What a Yes unlocks');
+    expect(within(unlocks).getByText('Raises the Red Flag “Circular ownership” (Textbook)')).toBeInTheDocument();
+    expect(within(unlocks).getByText(/nothing is saved until you answer/)).toBeInTheDocument();
+  });
+
   it('accepts all high proposals of a source after a confirmation naming the count, with one undo', async () => {
     vi.useFakeTimers({shouldAdvanceTime: true});
     const named = {...proposal('p4', 'high', 'Is “Fernhill Ltd” in this passage the record Fernhill Ltd?'),

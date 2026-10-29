@@ -30,6 +30,7 @@ from app.models.domain import (
     TimelineEvent, WatchlistEntry, WatchlistHit,
 )
 from app.services.relationships import RELATIONSHIP_SCHEMAS, investigation_relationships
+from app.services.unlocks import unlocks
 
 LEVEL_RANK = {"textbook": 3, "strong": 2, "faint": 1}
 CLAIM_SURE = {"supported": "supported", "confirmed": "supported", "disputed": "disputed", "rejected": "ruled_out",
@@ -644,7 +645,11 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
     for k, read in readers.items():
         if kind in (None, k):
             items.extend(read(db, investigation_id))
-    if order == "oldest":
+    if order == "unlocks":
+        # Every item's dry run, to put what changes most first (app/services/unlocks.py).
+        unlocks(db, investigation_id, items)
+        items.sort(key=lambda i: (-i["unlock_score"], -i["rank"], i["created_at"]))
+    elif order == "oldest":
         items.sort(key=lambda i: i["created_at"])
     elif order == "source":
         items.sort(key=lambda i: (i["group"]["key"], -i["rank"], i["created_at"]))
@@ -652,6 +657,8 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
         items.sort(key=lambda i: (-i["rank"], i["created_at"]))
     total = len(items)
     page = items[offset:offset + limit]
+    if order != "unlocks":
+        unlocks(db, investigation_id, page)
     if any("_entity_row" in i for i in page):
         from app.services.documents import preview_entity_candidate_matches
 
@@ -667,6 +674,7 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
     for item in page:
         item.pop("_entity_row", None)
         item.pop("_payment_ends", None)
+        item.pop("unlock_score", None)
     return {"investigation_id": investigation_id, "counts": decision_counts(db, investigation_id), "total": total,
             "offset": offset, "items": page}
 

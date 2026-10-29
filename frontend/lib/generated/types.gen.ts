@@ -7294,6 +7294,10 @@ export type DecisionItemOut = {
    * Reason
    */
   reason: string;
+  /**
+   * Unlocks
+   */
+  unlocks?: Array<string>;
 };
 
 /**
@@ -29877,7 +29881,7 @@ export type GetDecisionsData = {
     /**
      * Order
      */
-    order?: 'consequence' | 'source' | 'oldest';
+    order?: 'consequence' | 'source' | 'oldest' | 'unlocks';
     /**
      * Offset
      */

@@ -47,7 +47,7 @@ def get_standing(investigation_id: str, db: Session = Depends(get_db)) -> Any:
 def get_decisions(
     investigation_id: str, db: Session = Depends(get_db),
     kind: Literal["to_check", "missing", "proposal", "match", "outside", "ai", "watchlist"] | None = None,
-    order: Literal["consequence", "source", "oldest"] = "consequence",
+    order: Literal["consequence", "source", "oldest", "unlocks"] = "consequence",
     offset: int = Query(0, ge=0), limit: int = Query(200, ge=1, le=500),
 ) -> Any:
     # The Red Flags and To check items as last brought up to date: reading never writes (GET .../red-flags says

@@ -4807,6 +4807,7 @@ class DecisionItemOut(ResponseModel):
     open: DecisionLinkOut
     known: list[str] = []
     confidence_band: Literal["high", "medium", "low"] | None = None  # a document proposal's confidence, as a word
+    unlocks: list[str] = []  # what a Yes would change, from a dry run (app/services/unlocks.py)
 
 
 class CaseDecisionsOut(ResponseModel):

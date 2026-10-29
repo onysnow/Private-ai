@@ -391,6 +391,10 @@
 .ch-happens dl > div { display: contents; }
 .ch-happens dt { font-weight: 650; white-space: nowrap; }
 .ch-happens dd { margin: 0; }
+.ch-unlocks { margin-top: 8px; padding-top: 8px; border-top: 1px dashed color-mix(in srgb, var(--accent-2) 45%, transparent); }
+.ch-unlocks p { margin: 0; font-size: 13px; font-weight: 650; } .ch-unlocks p small { font-weight: 400; color: var(--text-muted); }
+.ch-unlocks ul { margin: 4px 0 0; }
+.dc-row-text small.dc-unlocks { display: block; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-body, inherit); font-size: 11px; }
 .ch-happens-yes dt { color: var(--status-supported); } .ch-happens-no dt { color: var(--status-disputed); } .ch-happens-unsure dt { color: var(--status-unshown); }
 @media (prefers-reduced-motion: reduce) { .dc-last button, .dc-bulk-confirm { animation: cv-fade 120ms both; } }
 html[data-motion='calm'] .dc-last button, html[data-motion='calm'] .dc-bulk-confirm { animation: cv-fade 120ms both; }

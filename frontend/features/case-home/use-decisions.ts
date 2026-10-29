@@ -16,7 +16,7 @@ import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 
 export const HOLD_MS = 10_000;
 export type DecisionKind = DecisionItemOut['kind'];
-export type DecisionOrder = 'consequence' | 'source' | 'oldest';
+export type DecisionOrder = 'consequence' | 'source' | 'oldest' | 'unlocks';
 
 export const KIND_LABEL: Record<DecisionKind, string> = {
   to_check: 'To check', missing: 'Missing', proposal: 'Proposals', match: 'Matches', outside: 'Outside', ai: 'AI drafts', watchlist: 'Watchlist',

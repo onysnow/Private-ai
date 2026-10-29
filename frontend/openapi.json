@@ -16923,6 +16923,14 @@
           "reason": {
             "title": "Reason",
             "type": "string"
+          },
+          "unlocks": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Unlocks",
+            "type": "array"
           }
         },
         "required": [
@@ -61494,7 +61502,8 @@
               "enum": [
                 "consequence",
                 "source",
-                "oldest"
+                "oldest",
+                "unlocks"
               ],
               "title": "Order",
               "type": "string"
