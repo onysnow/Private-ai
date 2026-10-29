@@ -645,6 +645,9 @@ import type {
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
+  GetYourSafetyData,
+  GetYourSafetyErrors,
+  GetYourSafetyResponses,
   GradeTimelineEventEndpointData,
   GradeTimelineEventEndpointErrors,
   GradeTimelineEventEndpointResponses,
@@ -1698,6 +1701,8 @@ import {
   zGetWireResponse,
   zGetWriteupEndpointPath,
   zGetWriteupEndpointResponse,
+  zGetYourSafetyPath,
+  zGetYourSafetyResponse,
   zGradeTimelineEventEndpointBody,
   zGradeTimelineEventEndpointPath,
   zGradeTimelineEventEndpointResponse,
@@ -11157,6 +11162,35 @@ export const listWriteupsEndpoint = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListWriteupsEndpointResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/writeups',
+    ...options,
+  });
+
+/**
+ * Get Your Safety
+ *
+ * Your safety: signs that the story raises the danger to the reporter or their sources, from the case's records,
+ * and the questions only the reporter can answer (their answers never reach this server). Shown apart from Red
+ * Flags; never blocks work.
+ */
+export const getYourSafety = <ThrowOnError extends boolean = false>(
+  options: Options<GetYourSafetyData, ThrowOnError>,
+): RequestResult<GetYourSafetyResponses, GetYourSafetyErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetYourSafetyResponses,
+    GetYourSafetyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetYourSafetyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetYourSafetyResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/your-safety',
     ...options,
   });
 

@@ -220,6 +220,7 @@ import {
   getWatchlist,
   getWire,
   getWriteupEndpoint,
+  getYourSafety,
   gradeTimelineEventEndpoint,
   health,
   howAreTheyConnected,
@@ -1050,6 +1051,9 @@ import type {
   GetWriteupEndpointData,
   GetWriteupEndpointError,
   GetWriteupEndpointResponse,
+  GetYourSafetyData,
+  GetYourSafetyError,
+  GetYourSafetyResponse,
   GradeTimelineEventEndpointData,
   GradeTimelineEventEndpointError,
   GradeTimelineEventEndpointResponse,
@@ -11158,6 +11162,35 @@ export const listWriteupsEndpointOptions = (
       return data;
     },
     queryKey: listWriteupsEndpointQueryKey(options),
+  });
+
+export const getYourSafetyQueryKey = (options: Options<GetYourSafetyData>) =>
+  createQueryKey('getYourSafety', options);
+
+/**
+ * Get Your Safety
+ *
+ * Your safety: signs that the story raises the danger to the reporter or their sources, from the case's records,
+ * and the questions only the reporter can answer (their answers never reach this server). Shown apart from Red
+ * Flags; never blocks work.
+ */
+export const getYourSafetyOptions = (options: Options<GetYourSafetyData>) =>
+  queryOptions<
+    GetYourSafetyResponse,
+    GetYourSafetyError,
+    GetYourSafetyResponse,
+    ReturnType<typeof getYourSafetyQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getYourSafety({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getYourSafetyQueryKey(options),
   });
 
 export const listJobsEndpointQueryKey = (

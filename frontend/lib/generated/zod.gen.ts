@@ -8335,6 +8335,15 @@ export const zSafetyBackupOut = z.object({
 });
 
 /**
+ * SafetyGuideOut
+ */
+export const zSafetyGuideOut = z.object({
+  publisher: z.string(),
+  title: z.string(),
+  url: z.string(),
+});
+
+/**
  * SafetyHousekeepingOut
  */
 export const zSafetyHousekeepingOut = z.object({
@@ -8357,6 +8366,30 @@ export const zSafetyServiceOut = z.object({
   state: z.enum(['off', 'ask_first', 'automatic', 'on_request', 'local']),
   state_note: z.string(),
   where: z.enum(['inside', 'outside']),
+});
+
+/**
+ * SafetySourceOut
+ */
+export const zSafetySourceOut = z.object({
+  publisher: z.string(),
+  title: z.string(),
+  url: z.string(),
+});
+
+/**
+ * SafetyQuestionOut
+ *
+ * A sign only the reporter can say. The answer stays in their browser; this server never receives it.
+ */
+export const zSafetyQuestionOut = z.object({
+  definition: z.string(),
+  id: z.string(),
+  innocent: z.array(z.string()),
+  name: z.string(),
+  question: z.string(),
+  source: zSafetySourceOut,
+  textbook: z.string(),
 });
 
 /**
@@ -8402,6 +8435,33 @@ export const zSafetyDataOut = z.object({
   services: z.array(zSafetyServiceOut),
   stores: z.array(zSafetyStoreOut),
   totals: zSafetyTotalsOut,
+});
+
+/**
+ * SafetyTraceOut
+ */
+export const zSafetyTraceOut = z.object({
+  document_id: z.string(),
+  filename: z.string(),
+  traces: z.array(z.string()),
+});
+
+/**
+ * SafetySignOut
+ *
+ * A safety sign from the case's records (catalogue/indicators/sa.yaml), shown apart from Red Flags. No level: the
+ * catalogue's Faint and Strong for safety are not set yet.
+ */
+export const zSafetySignOut = z.object({
+  definition: z.string(),
+  documents: z.array(zSafetyTraceOut).optional().default([]),
+  evidence: z.string(),
+  id: z.string(),
+  innocent: z.array(z.string()),
+  level: z.string().nullish(),
+  name: z.string(),
+  source: zSafetySourceOut,
+  textbook: z.string(),
 });
 
 /**
@@ -11514,6 +11574,17 @@ export const zWriteupVersionsOut = z.object({
  */
 export const zWriteupsOut = z.object({
   writeups: z.array(zWriteupSummaryOut),
+});
+
+/**
+ * YourSafetyOut
+ */
+export const zYourSafetyOut = z.object({
+  guides: z.array(zSafetyGuideOut),
+  investigation_id: z.string(),
+  levels_set: z.boolean(),
+  questions: z.array(zSafetyQuestionOut),
+  signs: z.array(zSafetySignOut),
 });
 
 export const zGetAiAnalysisCandidateEndpointPath = z.object({
@@ -14711,6 +14782,15 @@ export const zListWriteupsEndpointQuery = z.object({
  * Successful Response
  */
 export const zListWriteupsEndpointResponse = zWriteupsOut;
+
+export const zGetYourSafetyPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetYourSafetyResponse = zYourSafetyOut;
 
 export const zListJobsEndpointQuery = z.object({
   investigation_id: z.string().nullish(),

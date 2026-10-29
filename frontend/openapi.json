@@ -37201,6 +37201,29 @@
         "title": "SafetyDataOut",
         "type": "object"
       },
+      "SafetyGuideOut": {
+        "properties": {
+          "publisher": {
+            "title": "Publisher",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "publisher",
+          "url"
+        ],
+        "title": "SafetyGuideOut",
+        "type": "object"
+      },
       "SafetyHousekeepingOut": {
         "properties": {
           "stray_bytes": {
@@ -37227,6 +37250,52 @@
           }
         },
         "title": "SafetyHousekeepingOut",
+        "type": "object"
+      },
+      "SafetyQuestionOut": {
+        "description": "A sign only the reporter can say. The answer stays in their browser; this server never receives it.",
+        "properties": {
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "innocent": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Innocent",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SafetySourceOut"
+          },
+          "textbook": {
+            "title": "Textbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "definition",
+          "innocent",
+          "source",
+          "textbook",
+          "question"
+        ],
+        "title": "SafetyQuestionOut",
         "type": "object"
       },
       "SafetyServiceOut": {
@@ -37301,6 +37370,94 @@
           "where"
         ],
         "title": "SafetyServiceOut",
+        "type": "object"
+      },
+      "SafetySignOut": {
+        "description": "A safety sign from the case's records (catalogue/indicators/sa.yaml), shown apart from Red Flags. No level: the\ncatalogue's Faint and Strong for safety are not set yet.",
+        "properties": {
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "documents": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SafetyTraceOut"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "evidence": {
+            "title": "Evidence",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "innocent": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Innocent",
+            "type": "array"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SafetySourceOut"
+          },
+          "textbook": {
+            "title": "Textbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "definition",
+          "innocent",
+          "source",
+          "textbook",
+          "evidence"
+        ],
+        "title": "SafetySignOut",
+        "type": "object"
+      },
+      "SafetySourceOut": {
+        "properties": {
+          "publisher": {
+            "title": "Publisher",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "publisher",
+          "url"
+        ],
+        "title": "SafetySourceOut",
         "type": "object"
       },
       "SafetyStoreOut": {
@@ -37419,6 +37576,32 @@
           "ai_calls_outside"
         ],
         "title": "SafetyTotalsOut",
+        "type": "object"
+      },
+      "SafetyTraceOut": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "traces": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Traces",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document_id",
+          "filename",
+          "traces"
+        ],
+        "title": "SafetyTraceOut",
         "type": "object"
       },
       "SameAnswerCandidateOut": {
@@ -45860,6 +46043,48 @@
           "writeups"
         ],
         "title": "WriteupsOut",
+        "type": "object"
+      },
+      "YourSafetyOut": {
+        "properties": {
+          "guides": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyGuideOut"
+            },
+            "title": "Guides",
+            "type": "array"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "levels_set": {
+            "title": "Levels Set",
+            "type": "boolean"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyQuestionOut"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "signs": {
+            "items": {
+              "$ref": "#/components/schemas/SafetySignOut"
+            },
+            "title": "Signs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "signs",
+          "questions",
+          "guides",
+          "levels_set"
+        ],
+        "title": "YourSafetyOut",
         "type": "object"
       },
       "opsconsole__api__checks__RunIn": {
@@ -71464,6 +71689,66 @@
           }
         },
         "summary": "List Writeups Endpoint"
+      }
+    },
+    "/api/investigations/{investigation_id}/your-safety": {
+      "get": {
+        "description": "Your safety: signs that the story raises the danger to the reporter or their sources, from the case's records,\nand the questions only the reporter can answer (their answers never reach this server). Shown apart from Red\nFlags; never blocks work.",
+        "operationId": "get_your_safety",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YourSafetyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Your Safety"
       }
     },
     "/api/jobs": {

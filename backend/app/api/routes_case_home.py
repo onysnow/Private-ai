@@ -18,7 +18,7 @@ from app.core.authorization import scope_for_request
 from app.db.session import SessionLocal, get_db
 from app.models.domain import Entity, Investigation
 from app.schemas.api import InvestigationUpdate
-from app.schemas.responses import ByHandAddedOut, ByHandPreviewOut, ByHandSuggestionOut, ErrorOut, ValidationErrorOut, SafetyDataOut, CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
+from app.schemas.responses import ByHandAddedOut, ByHandPreviewOut, ByHandSuggestionOut, ErrorOut, ValidationErrorOut, SafetyDataOut, YourSafetyOut, CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
 from app.services import case_home, case_years, drop, safety_data, wire
 from app.services import manual_entry as manual_entry_types
 from app.services.investigations import update_investigation
@@ -148,6 +148,17 @@ def get_safety_data(investigation_id: str, period: Literal["today", "7d", "30d",
     """Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015)."""
     _case(db, investigation_id)
     return safety_data.safety_data(db, investigation_id, period)
+
+
+@router.get("/investigations/{investigation_id}/your-safety", response_model=YourSafetyOut, responses={404: {"model": ErrorOut}})
+def get_your_safety(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """Your safety: signs that the story raises the danger to the reporter or their sources, from the case's records,
+    and the questions only the reporter can answer (their answers never reach this server). Shown apart from Red
+    Flags; never blocks work."""
+    from app.services import your_safety
+
+    _case(db, investigation_id)
+    return your_safety.your_safety(db, investigation_id)
 
 
 # --- Add by hand (mockup ENTRY_1, app/services/manual_entry.py) -------------------------------------------------------

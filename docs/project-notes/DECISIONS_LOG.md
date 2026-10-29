@@ -167,3 +167,23 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
 - **Found in PdfCraft (for Ony, onysnow/pdfcraft):** `doc_remove_hidden` asked to remove a category the file does not
   hold fails with "there are no redaction marks to apply", a message from another tool. The app now asks only for
   categories the file holds.
+
+## 9. Your safety: built without the SA levels (29 Oct)
+
+- **Question:** the panel (research §13) waited on Ony setting Faint and Strong for the 42 safety indicators
+  (`catalogue/indicators/sa.yaml`, every one "To be set by Ony").
+- **Calls:**
+  1. No level is made up. A sign from the records shows "level not set", as the research drew for this state; the
+     catalogue's levels are sourced research, and an unsourced number would read as one.
+  2. Signs from the records, read here with nothing sent: SA-007, SA-008 and SA-009 from the case's open Red Flags in
+     organised crime, corruption and environmental crime, and SA-008 also from parties with the PEP topic; SA-033 from
+     photos whose files say where, with what or by whom they were taken (with a pointer to the photo's Remove
+     metadata copy). The other record-checkable signs need lookups (CPJ, RSF, court records) the app does not make.
+  3. Only you can say: direct threats (SA-013), being followed (SA-014), pressure on family (SA-015), doxxing
+     (SA-018), Yes / No / Not sure. A Yes meets that indicator's published definition as worded, its Textbook, and is
+     the only thing that raises the notice (in the panel and one slim line on Case home). It never blocks work.
+  4. The answers and the safety plan stay in the browser (localStorage): never sent to the server, not in backups, not
+     shared with a team, as the research asks. Clearing the browser's data clears them; the panel says where they are.
+  5. Guides open only after a line saying which site they open, and nothing from the case goes with them. Their
+     addresses are ones the catalogue already checked (Rory Peck Trust, Freedom of the Press Foundation, CPJ).
+  6. No inbox kind `safety` yet: nothing fires on the server, so there is nothing to notify.

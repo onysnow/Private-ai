@@ -6358,6 +6358,57 @@ class OutboundRequestOut(ResponseModel):
     source: dict[str, Any] | None = None
 
 
+class SafetyGuideOut(ResponseModel):
+    title: str
+    publisher: str
+    url: str
+
+
+class SafetySourceOut(ResponseModel):
+    title: str
+    publisher: str
+    url: str
+
+
+class SafetyTraceOut(ResponseModel):
+    document_id: str
+    filename: str
+    traces: list[str]
+
+
+class SafetySignOut(ResponseModel):
+    """A safety sign from the case's records (catalogue/indicators/sa.yaml), shown apart from Red Flags. No level: the
+    catalogue's Faint and Strong for safety are not set yet."""
+    id: str
+    name: str
+    definition: str
+    innocent: list[str]
+    source: SafetySourceOut
+    textbook: str
+    evidence: str
+    level: str | None = None
+    documents: list[SafetyTraceOut] = []
+
+
+class SafetyQuestionOut(ResponseModel):
+    """A sign only the reporter can say. The answer stays in their browser; this server never receives it."""
+    id: str
+    name: str
+    definition: str
+    innocent: list[str]
+    source: SafetySourceOut
+    textbook: str
+    question: str
+
+
+class YourSafetyOut(ResponseModel):
+    investigation_id: str
+    signs: list[SafetySignOut]
+    questions: list[SafetyQuestionOut]
+    guides: list[SafetyGuideOut]
+    levels_set: bool
+
+
 class SafetyDataOut(ResponseModel):
     """Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015)."""
     period: Literal["today", "7d", "30d", "all"]

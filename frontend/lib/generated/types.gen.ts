@@ -19151,6 +19151,24 @@ export type SafetyDataOut = {
 };
 
 /**
+ * SafetyGuideOut
+ */
+export type SafetyGuideOut = {
+  /**
+   * Publisher
+   */
+  publisher: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
  * SafetyHousekeepingOut
  */
 export type SafetyHousekeepingOut = {
@@ -19162,6 +19180,39 @@ export type SafetyHousekeepingOut = {
    * Stray Files
    */
   stray_files?: number | null;
+};
+
+/**
+ * SafetyQuestionOut
+ *
+ * A sign only the reporter can say. The answer stays in their browser; this server never receives it.
+ */
+export type SafetyQuestionOut = {
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Innocent
+   */
+  innocent: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Question
+   */
+  question: string;
+  source: SafetySourceOut;
+  /**
+   * Textbook
+   */
+  textbook: string;
 };
 
 /**
@@ -19206,6 +19257,66 @@ export type SafetyServiceOut = {
    * Where
    */
   where: 'inside' | 'outside';
+};
+
+/**
+ * SafetySignOut
+ *
+ * A safety sign from the case's records (catalogue/indicators/sa.yaml), shown apart from Red Flags. No level: the
+ * catalogue's Faint and Strong for safety are not set yet.
+ */
+export type SafetySignOut = {
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Documents
+   */
+  documents?: Array<SafetyTraceOut>;
+  /**
+   * Evidence
+   */
+  evidence: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Innocent
+   */
+  innocent: Array<string>;
+  /**
+   * Level
+   */
+  level?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  source: SafetySourceOut;
+  /**
+   * Textbook
+   */
+  textbook: string;
+};
+
+/**
+ * SafetySourceOut
+ */
+export type SafetySourceOut = {
+  /**
+   * Publisher
+   */
+  publisher: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url: string;
 };
 
 /**
@@ -19272,6 +19383,24 @@ export type SafetyTotalsOut = {
    * Services Reached
    */
   services_reached: number;
+};
+
+/**
+ * SafetyTraceOut
+ */
+export type SafetyTraceOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Traces
+   */
+  traces: Array<string>;
 };
 
 /**
@@ -24264,6 +24393,32 @@ export type WriteupsOut = {
    * Writeups
    */
   writeups: Array<WriteupSummaryOut>;
+};
+
+/**
+ * YourSafetyOut
+ */
+export type YourSafetyOut = {
+  /**
+   * Guides
+   */
+  guides: Array<SafetyGuideOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Levels Set
+   */
+  levels_set: boolean;
+  /**
+   * Questions
+   */
+  questions: Array<SafetyQuestionOut>;
+  /**
+   * Signs
+   */
+  signs: Array<SafetySignOut>;
 };
 
 export type GetAiAnalysisCandidateEndpointData = {
@@ -35770,6 +35925,45 @@ export type ListWriteupsEndpointResponses = {
 
 export type ListWriteupsEndpointResponse =
   ListWriteupsEndpointResponses[keyof ListWriteupsEndpointResponses];
+
+export type GetYourSafetyData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/your-safety';
+};
+
+export type GetYourSafetyErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetYourSafetyError = GetYourSafetyErrors[keyof GetYourSafetyErrors];
+
+export type GetYourSafetyResponses = {
+  /**
+   * Successful Response
+   */
+  200: YourSafetyOut;
+};
+
+export type GetYourSafetyResponse =
+  GetYourSafetyResponses[keyof GetYourSafetyResponses];
 
 export type ListJobsEndpointData = {
   body?: never;

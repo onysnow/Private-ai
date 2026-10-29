@@ -548,3 +548,5 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .ch-show-all:focus-visible { outline: 2px solid var(--accent-1); border-radius: 4px; }
 .ch-change .ai-tag { align-self: flex-start; margin-top: 4px; }
 .ch-next-foot > span[aria-live] { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* A Textbook safety sign (Your safety, research §13): one slim line under the case's title band. */
+.ch-home:has(> .ys-notice) { grid-template-rows: auto auto minmax(0, 1fr) auto; }

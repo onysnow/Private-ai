@@ -19,6 +19,7 @@ import {errorMessage} from '../../lib/api-client';
 import {getSafetyDataOptions, getSigningKeyOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {OutboundRequestOut, SafetyDataOut, SafetyServiceOut, SafetyStoreOut} from '../../lib/generated/types.gen';
 import {apiTime, shortStamp} from '../../lib/timestamps';
+import {YourSafety} from './your-safety';
 
 type Period = SafetyDataOut['period'];
 const PERIODS: [Period, string][] = [['today', 'Today'], ['7d', '7 days'], ['30d', '30 days'], ['all', 'All']];
@@ -194,6 +195,8 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
         </table>
       </section>
 
+      <div className="sd-right">
+      <YourSafety investigationId={investigationId}/>
       <section className="sd-panel sd-log" aria-label="Outbound log">
         <p className="sd-eyebrow">Outbound log · append-only</p>
         <h3 className="sd-h3">What left, word for word</h3>
@@ -219,6 +222,7 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
             </li>)}
           </ol>}
       </section>
+      </div>
 
       <section className="sd-cards" aria-label="Keep it safe">
         <article className="sd-card">

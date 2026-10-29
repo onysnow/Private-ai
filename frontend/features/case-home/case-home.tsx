@@ -42,6 +42,7 @@ import {HOLD_MS, useDecisions} from './use-decisions';
 import {useWheelStep} from './wheel-step';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AiStrip} from '../ai/ai-strip';
+import {SafetyNotice} from '../safety/your-safety';
 
 const CLAIM_STATUS: Record<string, ClaimStatus> = {
   supported: 'supported', confirmed: 'supported', disputed: 'disputed', rejected: 'ruled_out', lead: 'unshown', unverified: 'unshown',
@@ -553,6 +554,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
       <CaseQuestion investigation={investigation}/>
       <StandingStrip investigationId={id}/>
     </RainPane>
+    {!preview && <SafetyNotice investigationId={investigation.id} onOpen={() => router.push(caseHref('/keep#safety-data', investigation.id))}/>}
     <div className="ch-grid">
       <div className="ch-col"><BringIn investigationId={id}/><CheckModule investigationId={id}/></div>
       <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id} markVisit={!preview}/></div>
