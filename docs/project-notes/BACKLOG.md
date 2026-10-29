@@ -74,7 +74,16 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   strongest flag, "click to see every flag and who it touches"), opening towards the side with room. A click opens a
   panel of every flag, each with the parties it touches as chips (a chip makes its party pulse on the map), and the
   map dims to the party, those parties and the lines between them. Esc, the close button or a click on the map closes
-  it. The preview's flags are samples, said so in the panel.
+  it. The preview's flags are samples.
+- Then (his correction): a click shows the flags on the Wire, not in a panel. The map glides to frame the party and every
+  party its flags touch, the rest dims, and each flag is a curve in its level's colour from the flagged party to each
+  party it touches, drawing itself in, labelled once with the flag's words (whole flag on hover). Flags touching no
+  other party stack beside the card. Labels are placed so none overlaps a party or another label. Esc or a click on
+  empty map puts the Wire back.
+- While the count's box is open, the card's details and tag pins step aside (they clashed).
+- Your tags, redesigned (four options in artifact MF1DH391BFR9YsEFALLNQP; he picked A, pins on the bottom edge):
+  a small pin per tag on the card's bottom edge; hover drops them on the spring into a row of named pills, words
+  centred, under the details line. The ring round the kind circle is gone.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
   the kind's ring colour): bronze for a company, blue for a person, green for an organisation, rust for a vessel.
 All of it waits for his yes before the app changes.
