@@ -365,7 +365,6 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
           <button type="button" className="lr-pbtn ghost" onClick={() => seek(now + STEP)} aria-label="Forward 5 seconds">+5</button>
         </div>
         <p className="lr-time" aria-live="off">{clock(now).replace(/\.\d$/, '')}<small>.{clock(now).slice(-1)}</small></p>
-        <p className="lr-keys"><kbd>Space</kbd> play <kbd>←</kbd><kbd>→</kbd> 5 s <kbd>P</kbd> pin <kbd>H</kbd> heard</p>
       </div>
       {t ? <Outline t={t} now={now} duration={duration || t.duration} pinned={pinned} onSeek={seek}/> : <div className="lr-wf"/>}
       {MediaTag === 'audio' && mediaElement}

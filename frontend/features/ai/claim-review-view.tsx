@@ -14,6 +14,7 @@ import {singleKeysOn} from '../../lib/shortcuts';
 import {
   getAiAnalysisCandidateEndpointOptions, getAiAnalysisCandidateEndpointQueryKey, reviewAiAnalysisCandidateEndpointMutation, reviewAiClaimEndpointMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
+import {AiNotice} from '../../components/status';
 import type {AiAnalysisCandidateOut} from '../../lib/generated/types.gen';
 import {acceptedByAPerson, decisionWords, REJECT_REASONS, reviewItems} from './claim-review';
 import type {Decision, ReviewItem} from './claim-review';
@@ -194,7 +195,7 @@ export function ReviewSheet({candidateId, header, onBack, onSaved, active = true
         <button type="submit" disabled={!note.trim() || whole.isPending}>Reject</button></form>}
       {!open && <span className="br-ok" role="status">The answer was {candidate.review_status}{candidate.review_status === 'accepted' && counts.reject ? `, without the ${counts.reject} claim${counts.reject === 1 ? '' : 's'} you rejected` : ''}.</span>}
       {whole.isError && <span role="alert" className="br-bad">{errorMessage(whole.error, 'Not saved')}</span>}
-      <span className="br-note">{open ? 'Claims you have not decided are accepted with the answer. Nothing joins the case until you accept it.' : 'Decisions close with the answer.'}</span>
+      <AiNotice>{open ? 'Claims you have not decided are accepted with the answer. Nothing joins the case until you accept it.' : 'Decisions close with the answer.'}</AiNotice>
     </footer>}
   </section>;
 }

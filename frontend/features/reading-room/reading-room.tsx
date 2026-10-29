@@ -814,7 +814,6 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
     </div>}
 
     <footer className="rr-foot">
-      <span className="rr-keys"><kbd>J</kbd><kbd>K</kbd> move · <kbd>A</kbd><kbd>R</kbd> decide · <kbd>1</kbd>–<kbd>4</kbd> answer · <kbd>E</kbd> clip · <kbd>U</kbd> undo · <kbd>?</kbd></span>
       <span><b>{counts.accepted}</b> accepted · <b>{counts.rejected}</b> rejected · <b>{counts.waiting}</b> waiting</span>
       <span aria-live="polite" className="rr-status">{status}</span>
       {index >= 0 && index < tops0.length - 1 && <button type="button" className="rr-next" onClick={() => openDocument(tops0[index + 1].id)}>Next ›</button>}

@@ -260,6 +260,21 @@ html[data-fx-off~='grain'] body::after { display: none; }
 .lv-textbook { color: var(--text); background: var(--flag-textbook-fill); border: 1.5px solid var(--flag-textbook-edge); }
 .lv-meaning { text-transform: none; letter-spacing: 0; font-weight: 500; }
 .ai-tag { padding: 3px 7px; border-radius: 5px; color: var(--ai-mark); border: 1px solid var(--ai-mark); font-family: var(--font-mono); letter-spacing: .04em; text-transform: none; }
+/* Status marks (Ony, 29 Oct; Settings › Appearance › Status marks): colour only by default, the word in a reveal and
+   read by screen readers; "shape" adds the mark; "words" is the full chip. .st-always keeps the word (a legend). */
+.st-word { white-space: nowrap; }
+.ai-notice { display: inline-grid; place-items: center; min-width: 26px; height: 22px; padding: 0 5px; border-radius: 6px; color: var(--ai-mark); border: 1.5px solid var(--ai-mark); font: 700 11px/1 var(--font-mono); letter-spacing: .04em; }
+.st-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+html:not([data-status='words']) .st:not(.st-always) .st-word, html:not([data-status='words']) .lv:not(.st-always) .st-word {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+html:not([data-status='words']) .st:not(.st-always), html:not([data-status='words']) .lv:not(.st-always) { position: relative; padding: 0; gap: 0; justify-content: center; }
+html:not([data-status]) .st:not(.st-always), html[data-status='colour'] .st:not(.st-always) { width: 12px; height: 12px; border: none; background: currentColor; border-radius: 50%; }
+html:not([data-status]) .st:not(.st-always) .st-mark, html[data-status='colour'] .st:not(.st-always) .st-mark,
+html:not([data-status]) .lv:not(.st-always) .lv-bars, html[data-status='colour'] .lv:not(.st-always) .lv-bars { display: none; }
+html:not([data-status]) .lv:not(.st-always), html[data-status='colour'] .lv:not(.st-always) { width: 14px; height: 14px; border-radius: 4px; }
+html:not([data-status]) .lv-faint:not(.st-always), html[data-status='colour'] .lv-faint:not(.st-always) { background: var(--flag-faint); }
+html[data-status='shape'] .st:not(.st-always) { width: 20px; height: 20px; font-size: 12px; }
+html[data-status='shape'] .lv:not(.st-always) { padding: 3px 6px; }
 
 /* Settings › Appearance */
 .ap-compare { margin: 4px 0 10px; }

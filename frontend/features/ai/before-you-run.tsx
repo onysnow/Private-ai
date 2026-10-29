@@ -30,6 +30,7 @@ import {investigationCaseSynthesis, investigationHypothesisTest} from '../../lib
 import type {RunOptionsIn, RunPlanOut, RunSettingOut} from '../../lib/generated/types.gen';
 import {listAiRunsOptions, listAiRunsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {ReviewSheet} from './claim-review-view';
+import {AiNotice} from '../../components/status';
 import {SavedQuestions} from './saved-questions';
 import {WatchTheRun} from './watch-the-run';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -534,7 +535,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       {keep.isError && <span role="alert" className="br-bad">{errorMessage(keep.error, 'Could not save the question.')}</span>}
       {!running && outcome && step === 2 && <span role="status" className={outcome.ok ? 'br-ok' : 'br-bad'}>{outcome.text}</span>}
       {running && step === 2 && <span role="status">Running in the background. The answer will wait for you in AI drafts.{runId && <> <button type="button" className="br-quiet" onClick={() => setStep(3)}>Watch it</button></>}</span>}
-      <span className="br-note">AI can be wrong. Every result waits for you.</span>
+      <AiNotice>AI can be wrong. Every result waits for you.</AiNotice>
       <button type="button" className="br-cancel" onClick={cancel}>Cancel</button>
     </footer>
   </section>;

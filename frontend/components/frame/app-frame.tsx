@@ -263,6 +263,10 @@ function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open
     ['Alt →  /  Alt ←', 'Open or close the steps'], ['Alt ↓  /  Alt ↑', 'Open or close the tools'], ['G then H', 'Go to the case home'],
     ['1 – 4', 'Case home: go to a module'], ['J / K', 'Case home and Decide: step through the list'], ['Enter', 'Case home: open the focused module whole-screen'],
     ['S / D / U', 'Case home: answer Next up (shows it, does not, unclear)'], ['1 / 2 / 3', 'Decide: answer the card'], ['Z', 'Undo the last answer'],
+    ['O', 'Decide: open the source · The Drop: choose files'],
+    ['J / K', 'The Drop and the Reading room: move through the list'], ['Enter', 'The Drop: open the file in the reading room'], ['F', 'The Drop: problems and files in progress only'],
+    ['A / R', 'Reading room: accept or reject'], ['1 – 4', 'Reading room: answer the card'], ['E', 'Reading room: keep as evidence (clip)'], ['U', 'Reading room: undo'],
+    ['Space', 'Listen room: play or pause'], ['← / →', 'Listen room: 5 seconds back or on'], ['P', 'Listen room: pin a line'], ['H', 'Listen room: I heard this'],
     ['?', 'This list'], ['Esc', 'Close what is open']];
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="fr-help">

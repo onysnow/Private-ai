@@ -1008,6 +1008,15 @@ By clutter carried × how often it is open:
 
 ---
 
+## Ony's answers (29 Oct)
+
+1. **Statuses and flag levels: colour only by default, the word on reveal.** An accessibility setting can change it
+   (shape, or shape and word, for readers who cannot rely on colour).
+2. **Legacy panels: convert now, as they are.**
+3. **Key strips: behind `?`.**
+4. **AI disclosures: the AI mark, the sentence on hover.**
+Questions 3 and 4 below (Settings' kept/leaves line, chart rules) were not asked yet.
+
 ## Open questions for Ony
 
 1. **Shape alone, or shape and word?** The status grammar (`components/status.tsx:1–3`, `lib/stages.ts:25`: "Every status shows a shape and a word") says each status shows its word too. Your 29 Oct rule says the type is inferred and named on hover. Do claim statuses and flag levels become shape-only with the word on hover (as Following's health already is), or are they the context exception?

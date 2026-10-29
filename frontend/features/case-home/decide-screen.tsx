@@ -232,7 +232,6 @@ export function DecideScreen({investigationId, investigationName, active = true,
           aria-label={blocked ? `${words} — ${blocked}` : `Undo ${words}`} title={blocked ? `${words}\n${blocked}` : `${words}\nClick to undo`}
           onClick={() => { if (!blocked && all.undo(d.item.id)) setSelected(d.item.id); }}>{SHAPE[d.choice.key]}</button>;
       })}</span>
-      <span className="dc-keys" aria-hidden="true"><kbd>J</kbd><kbd>K</kbd> move <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> decide <kbd>Z</kbd> undo <kbd>O</kbd> open the source</span>
       <span className="dc-toast" aria-live="polite">
         {failed ? <>Could not save “{failed.choice.label}”: {failed.error}. Your choice is kept. <button type="button" onClick={() => all.retry(failed.item.id)}>Retry</button> <button type="button" onClick={() => all.undo(failed.item.id)}>Drop it</button></>
           : all.undoError ? all.undoError

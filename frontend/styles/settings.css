@@ -244,3 +244,8 @@ html[data-motion='calm'] .fr-alarm { animation: none; }
 html[data-theme-fade]::view-transition-old(root), html[data-theme-fade]::view-transition-new(root) { animation-duration: 450ms; animation-timing-function: ease-out; }
 html[data-theme-fade='slow']::view-transition-old(root), html[data-theme-fade='slow']::view-transition-new(root) { animation-duration: 700ms; }
 html[data-theme-fade='calm']::view-transition-old(root), html[data-theme-fade='calm']::view-transition-new(root) { animation-duration: 120ms; }
+
+/* Status marks (Settings › Appearance; components/status.tsx). */
+.ap-status { margin: 14px 0 0; padding: 0; border: none; display: grid; gap: 8px; }
+.ap-status legend { margin-bottom: 6px; font-weight: 600; font-size: 15px; color: var(--text); }
+.ap-status label { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text); cursor: pointer; }

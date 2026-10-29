@@ -40,9 +40,12 @@ type Props = {
   className?: string;
   /** Spoken with the mark when it has no words of its own (an icon or a shape). */
   label?: string;
+  /** False when the mark already holds the same words for screen readers (a status chip's hidden word), so they are
+   *  not read twice. */
+  describe?: boolean;
 };
 
-export function Reveal({detail, children, tabbable = true, className, label}: Props): ReactElement {
+export function Reveal({detail, children, tabbable = true, className, label, describe = true}: Props): ReactElement {
   const id = useId();
   const ref = useRef<HTMLSpanElement>(null);
   const card = useSyncExternalStore(subscribe, () => open, () => null);
@@ -58,16 +61,16 @@ export function Reveal({detail, children, tabbable = true, className, label}: Pr
   return <>
     <span ref={ref} className={`rv${tabbable ? ' rv-mark' : ''}${mine ? ' rv-open' : ''}${className ? ` ${className}` : ''}`}
       tabIndex={tabbable ? 0 : undefined} role={tabbable && label ? 'img' : undefined} aria-label={tabbable ? label : undefined}
-      aria-describedby={tabbable ? `${id}-detail` : undefined} aria-expanded={tabbable ? mine : undefined}
+      aria-describedby={tabbable && describe ? `${id}-detail` : undefined} aria-expanded={tabbable ? mine : undefined}
       onMouseEnter={() => (mine ? keepOpen() : show(false))} onMouseLeave={closeSoon}
       onFocus={() => { if (!mine) show(true); }}
       onBlur={e => { if (!(e.relatedTarget instanceof Node && document.getElementById('rv-card')?.contains(e.relatedTarget))) { if (!open?.pinned) closeSoon(); } }}
       onClick={tabbable ? () => (mine && card?.pinned ? set(null) : show(true, true)) : undefined}
       onKeyDown={tabbable ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (mine && card?.pinned) set(null); else show(true, true); } } : undefined}>
       {/* A control inside the mark takes focus itself: it carries the description, which is not inherited. */}
-      {!tabbable && isValidElement<{'aria-describedby'?: string}>(children) ? cloneElement(children, {'aria-describedby': `${id}-detail`}) : children}
+      {!tabbable && describe && isValidElement<{'aria-describedby'?: string}>(children) ? cloneElement(children, {'aria-describedby': `${id}-detail`}) : children}
     </span>
-    <span id={`${id}-detail`} hidden>{detail}</span>
+    {describe && <span id={`${id}-detail`} hidden>{detail}</span>}
     {mine && typeof document !== 'undefined' && createPortal(<Card anchor={card!.anchor} pinned={card!.pinned}>{detail}</Card>, document.body)}
   </>;
 }

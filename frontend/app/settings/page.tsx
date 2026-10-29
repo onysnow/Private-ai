@@ -308,7 +308,7 @@ function Settings(): ReactElement {
       </> : <p className="st-hint">The Authority System Suite is not in this build.</p>}/>,
     levels: <div className={card}>
       <p className="text-sm">Every Red Flag has three levels. The rules that set them are written down per indicator, with the numbers they come from.</p>
-      <dl className="st-levels">{(['faint', 'strong', 'textbook'] as const).map(l => <div key={l}><dt><LevelChip level={l}/></dt><dd>{LEVEL_WORDS[l].meaning}</dd></div>)}</dl>
+      <dl className="st-levels">{(['faint', 'strong', 'textbook'] as const).map(l => <div key={l}><dt><LevelChip level={l} showWord/></dt><dd>{LEVEL_WORDS[l].meaning}</dd></div>)}</dl>
       <Link href="/glossary" className="mt-3 inline-block text-sm text-primary hover:underline">Each indicator’s levels in the Glossary</Link>
     </div>,
     demo: <div className="flex flex-col gap-8">

@@ -20,6 +20,9 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   details) is revealed on hover or click, unless the context gives a reason to show it. Categorical facts (what type
   of thing something is) are inferred through the UI (a mark, shape, colour or position) and named on hover or
   click. Applies to the whole app; build every new screen this way.
+  Ony's answers (29 Oct, `docs/research/ui-density/SUBTEXT_AND_TYPES.md`): statuses and flag levels are colour only
+  by default, the word on reveal, with an accessibility setting to add the shape or the word; key hints live behind
+  `?`; AI notices are the AI mark with the sentence on hover; the old panels are converted now, as they are.
 - **Fill the space (29 Oct).** When a row, card or box has a lot of empty space above and below its content, make the
   text or icon bigger instead of leaving the space empty.
 - Approval mode is auto: proceed without stopping on routine steps.

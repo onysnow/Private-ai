@@ -83,7 +83,7 @@ describe('ClaimsPanel', () => {
     expect(screen.getByText(/not graded → robust evidence, high agreement/)).toBeInTheDocument();
   });
 
-  it('shows every status in the list as a shape and a word, never colour alone', async () => {
+  it('shows every status in the list by its colour, with its shape and word in the chip for the other settings and screen readers', async () => {
     await renderPanel({[CLAIMS]: [
       claimFixture(),
       claimFixture({id: 'claim-2', text: 'The vendor was paid twice.', status: 'disputed'}),
@@ -100,9 +100,10 @@ describe('ClaimsPanel', () => {
     ];
     for (const [text, word, shape, mark] of expected) {
       const row = screen.getByText(text).closest('button')!;
-      // The row's left edge takes the shape (solid, dashed, double, dotted); its chip carries the mark and the word.
+      // The row's left edge takes the shape (solid, dashed, double, dotted); its chip carries the mark and the word
+      // (shown by Settings › Appearance › Status marks, read by screen readers, named on hover).
       expect(row).toHaveClass(`cl-${shape}`);
-      const chip = within(row).getByText(word);
+      const chip = within(row).getByText(word).closest('.st')!;
       expect(chip).toHaveClass('st', `st-${shape}`);
       expect(chip.querySelector('[aria-hidden="true"]')?.textContent).toBe(mark);
     }
@@ -178,7 +179,7 @@ describe('ClaimsPanel', () => {
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toEqual({status: 'confirmed', confidence: 0.4, rationale: 'Board minutes confirm the date directly.'});
     // The reply is what the screen shows now: the list, the history, and no further request.
     expect(screen.getByText('90% confidence')).toBeInTheDocument();
-    expect(screen.getAllByText('Confirmed')[0]).toHaveClass('st-supported');
+    expect(screen.getAllByText('Confirmed')[0].closest('.st')).toHaveClass('st-supported');
     expect(screen.getByText('unverified → confirmed')).toBeInTheDocument();
     expect(screen.getByText('Board minutes confirm the date directly.')).toBeInTheDocument();
     expect(api.calls(CLAIMS)).toHaveLength(1);

@@ -42,7 +42,7 @@ describe('theme storage', () => {
 
   it('ignores unknown or unready values', () => {
     window.localStorage.setItem('pai:appearance', JSON.stringify({theme: 'neon-pink', format: 'desk', effects: 'loud'}));
-    expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], custom: null});
+    expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], status: 'colour', custom: null});
   });
 });
 
@@ -282,10 +282,19 @@ describe('AppFrame', () => {
 });
 
 describe('status grammar', () => {
-  it('always shows a word and a shape, not only a colour', () => {
+  it('keeps the shape and the word in every chip, for the Status marks setting and screen readers', () => {
     render(<><StatusChip status="disputed"/><StatusChip status="unshown"/><LevelChip level="strong" showMeaning/></>);
     expect(screen.getByText('Disputed').closest('.st')).toHaveTextContent('✕Disputed');
     expect(screen.getByText('Not yet shown').closest('.st')).toHaveClass('st-unshown');
     expect(screen.getByText('Strong').closest('.lv')).toHaveTextContent('▮▮▯Strong · it looks serious');
+  });
+
+  it('shows colour alone by default, and the shape or the word when Status marks asks for them', () => {
+    keepAppearance({status: 'shape'});
+    expect(document.documentElement.dataset.status).toBe('shape');
+    keepAppearance({status: 'words'});
+    expect(keptAppearance().status).toBe('words');
+    keepAppearance({status: 'colour'});
+    expect(document.documentElement.dataset.status).toBe('colour');
   });
 });

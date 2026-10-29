@@ -675,7 +675,6 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
       {data.watchlist && data.watchlist.hits > 0 && <p className="dp-watch"><i aria-hidden="true">◉</i><b>{data.watchlist.hits} watchlist hit{data.watchlist.hits === 1 ? '' : 's'}</b> · {data.watchlist.names.slice(0, 3).join(', ')}</p>}
       {firstToRead && <button type="button" className="dp-cta" onClick={() => openDocument(firstToRead.document_id)}>
         Open the reading room{problems.length ? ' — problems first' : ''}<kbd aria-hidden="true">⏎</kbd></button>}
-      <p className="dp-keys"><kbd>J</kbd><kbd>K</kbd> move · <kbd>⏎</kbd> open in reading room · <kbd>F</kbd> problems only · <kbd>O</kbd> choose files · <kbd>?</kbd> all keys</p>
     </div>
 
     <nav className="dp-strip" aria-label="Files in this drop">

@@ -9,6 +9,7 @@ import type {CSSProperties, ReactElement} from 'react';
 import {useEffect, useState} from 'react';
 
 import {STATUS_WORDS, LEVEL_WORDS} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {clearHeroPhoto, loadHeroPhoto, onHeroPhotoChange, saveHeroPhoto, type HeroPhoto} from '../../lib/hero-photo';
 import {webglAvailable} from '../effects/webgl';
 import {ThemeCompare, type Look} from './theme-compare';
@@ -283,6 +284,12 @@ export function AppearancePanel(): ReactElement {
         {webgl && now.theme === 'rain-noir' && now.effects !== 'off' && !now.off.includes('rain') && <RainPhoto/>}
         <Switch on={now.motion === 'calm'} label="Calm motion" line="Slides become fades, moving effects stand still and the rain shows a still “after the rain” frame. Your computer’s reduce-motion setting does the same."
           onChange={on => keepAppearance({motion: on ? 'calm' : 'normal'})}/>
+        <fieldset className="ap-status">
+          <legend><Reveal detail="How a claim's status and a Red Flag's level show. Colour alone is the quietest; add the shape, or the word, if colour is hard to tell apart. The word is always on hover and read by screen readers.">
+            <span>Status marks</span></Reveal></legend>
+          {([['colour', 'Colour'], ['shape', 'Colour and shape'], ['words', 'Colour, shape and word']] as const).map(([id, name]) =>
+            <label key={id}><input type="radio" name="status-marks" checked={now.status === id} onChange={() => keepAppearance({status: id})}/> {name}</label>)}
+        </fieldset>
       </div>
 
       <div className="ap-pane">
