@@ -128,6 +128,8 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   - A card's outline no longer changes with its Red Flags: always the kind's colour (a flag shows only in the count's
     circle). Square badges are inset from the outline with an outline of their own, as the person's circle is.
   - The shapes preview now has the chip liquid too (it never had it), clipped to each card's own shape, with the switch.
+  - Owns lines (his pick from the label options, D with C's mark): small arrows drift along every owns line from owner
+    to owned; where the share is known, a round mark mid-line shows it ("100%"); hovering the mark shows the sentence.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
     so the chips showed through to the lines. Fixed; the liquid's range is subtle but visible again.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
