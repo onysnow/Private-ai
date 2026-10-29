@@ -241,7 +241,8 @@ def test_outside_checks_are_consented_logged_and_blocked_for_a_protected_item(si
     assert blocked.status_code == 409 and "source-protected" in blocked.json()["detail"]
     with SessionLocal() as db:
         rows = list(db.scalars(select(OutboundRequest).where(OutboundRequest.investigation_id == inv)))
-        assert [(r.service, r.outcome) for r in rows if r.service in ("TinEye", "authenticity")] == [("TinEye", "sent"), ("authenticity", "blocked")]
+        # Written in the same second on a fast run, so compared without their order.
+        assert sorted((r.service, r.outcome) for r in rows if r.service in ("TinEye", "authenticity")) == [("TinEye", "sent"), ("authenticity", "blocked")]
     # Comparing with the case's own files stays possible: nothing leaves.
     _upload(inv, "same_picture.jpg", _picture(quality=60), "image/jpeg")
     compared = client.post(f"/api/documents/{doc_id}/authenticity/compare").json()
