@@ -149,6 +149,14 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   Done in the three Wire previews: unconfirmed links, the unknown-share ring and the flag pennants' tethers now march.
 - Hovering "+N": the branching preview paths start from the "+N" circle itself, not from the card it hangs off, and
   keep clear of the way the chip opens (leftwards). Done in the shapes preview.
+- With "Lines take the parties' colours" on, every line now starts in the colour of the party it leaves. A one-way
+  line (money, owns) turns into its own colour near the sender, then into the receiving party's colour. (Shapes
+  preview; also fixed the switch stopping working after a recentre.)
+- On hover, outlined kind icons turn solid: the body fills in the kind's colour and the details (door, windows, mast,
+  wallet fold) are cut out in the badge colour. Done in the shapes preview.
+- The dot's link count (all connections) and a card's "+N" (only those not drawn) mean different things, and he
+  couldn't tell. Options page for showing connections not drawn, the same on cards and dots (artifact Hidden
+  Connections): A the same "+N" everywhere, B pips (drawn vs not), C stubs that reach out. Waiting for his pick.
 - Research before designing more: how 2026 UI hints at more information, and how ownership share is shown (the
   key-and-ring share mark is not good). Findings to discuss with him before any redesign.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
