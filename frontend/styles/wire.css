@@ -197,9 +197,14 @@
 .tw .terr-l { font-family: var(--font-display); font-style: italic; fill: var(--text); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
 .tw .terr-s { font-family: var(--font-mono); fill: var(--text-muted); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
 .tw .lbl { font-family: var(--font-ui); fill: var(--text); opacity: var(--lo, 1); paint-order: stroke; stroke: var(--ground); stroke-linejoin: round; pointer-events: none; }
-.tw .lbl.peek { fill: url(#tw-peek); stroke: url(#tw-peek-halo); }
-/* A dot's name is part of the party: hovering the half-shown name reveals it in full, as hovering the circle does. */
-.tw .node .lbl[data-name] { pointer-events: auto; cursor: pointer; }
+/* A dot's name chip: it grows out from behind the circle, the start of the name fading out at rest, the whole name
+   and its link count when the party is hovered (the chip slides open). */
+.tw .peek-bg { fill: color-mix(in srgb, var(--surface-1) 90%, transparent); stroke-width: 1.1; stroke-opacity: .55; transition: x .22s ease, width .22s ease, stroke-opacity .2s, fill .2s; }
+.tw .node.peek-open .peek-bg { stroke-opacity: 1; fill: color-mix(in srgb, var(--surface-2, #22364b) 96%, transparent); }
+.tw .peek-t { font: 500 11.5px var(--font-ui); fill: var(--text); pointer-events: none; }
+.tw .peek-t.peek { fill: url(#tw-peek); }
+.tw .peek-x { font-size: 10.5px; fill: var(--text-muted); }
+.tw .peek-pill { cursor: pointer; }
 .tw .lens-sum { fill: var(--accent-1); }
 .tw .card-bg { fill: var(--surface-1); }
 .tw .card-t { font: 600 12.5px var(--font-ui); fill: var(--text); pointer-events: none; }
@@ -280,6 +285,7 @@
 @media (prefers-reduced-motion: reduce) {
   .tw .pulse { display: none; }
   .tw .halo, .tw .halo.textbook, .tw .tw-tagring .glow, .tw .node.textbook .flag-glow { animation: none; }
+  .tw .peek-bg { transition: none; }
   .tw-drawer, .tw-needle, .tw-map, .tw-wire { transition: none; }
 }
 /* Touch (the prototype's 21 Oct pass): fatter hit areas where the pointer is a finger. */

@@ -44,7 +44,8 @@ type Strand = {fam: string; s: string; t: string; links: WireLinkOut[]; sum: num
 type Bundle = {key: string; a: string; b: string; links: WireLinkOut[]; strands: Record<string, Strand>};
 type Chain = {id: string; mids: string[]; ends: string[]; open: boolean};
 type NodeEl = {
-  id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dx: number; hw: number; hh: number; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
+  id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dx: number; hw: number; hh: number;
+  pill: {g: SVGGElement; bg: SVGRectElement; t: SVGTextElement} | null; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
 type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
@@ -370,10 +371,14 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const halo = el('circle', {r: 26, fill: 'none', stroke: '#FF8070', 'stroke-width': 2, class: 'halo', style: 'display:none'}, g);
     const dust = el('circle', {r: 2.4, fill: K.ring, opacity: 0.5}, g);
     const dot = el('g', {}, g);
+    let pill: NodeEl['pill'] = null;
     if (isChain) {
       for (let i = 2; i >= 0; i--) el('rect', {x: -58 + i * 5, y: -17 - i * 5, width: 116, height: 34, rx: 7, fill: K.fill, stroke: K.ring, 'stroke-width': 1.2, opacity: 1 - i * 0.22}, dot);
       el('text', {class: 'card-s', x: 0, y: 4, 'text-anchor': 'middle'}, dot);
     } else {
+      // Its name is a chip that grows out from behind the circle (placeLabels, revealName).
+      const pg = el('g', {class: 'peek-pill', style: 'display:none'}, dot);
+      pill = {g: pg, bg: el('rect', {class: 'peek-bg', y: -12, height: 24, rx: 12, stroke: K.ring}, pg), t: el('text', {class: 'peek-t', y: 4}, pg)};
       // A party drawn as a dot is the card's own circle with its kind's icon, the same size on screen as on a card.
       el('circle', {r: DOT_R, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5, class: 'ring'}, dot);
       kindIcon(E[id].kind, 0, 0, 13, K.ring, dot);
@@ -411,10 +416,15 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const sharp = el('g', {class: 'sharp'}, tags);
       own.forEach((t, i) => { const c = brighten(t.colour); arc(glow, c, i, 7); arc(sharp, c, i, 2.8); });
     }
-    const N: NodeEl = {id, g, halo, tags, dx, hw: 90 + pad / 2, hh: 27, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
+    const N: NodeEl = {id, g, halo, tags, dx, hw: 90 + pad / 2, hh: 27, pill, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
     on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); onNodeClick(id); });
-    on<PointerEvent>(g, 'pointerenter', ev => { if (ev.pointerType !== 'touch') { showTip(ev, id); revealName(N, true); } });
-    on(g, 'pointerleave', () => { hideTip(); revealName(N, false); });
+    on<PointerEvent>(g, 'pointerenter', ev => {
+      if (ev.pointerType === 'touch') return;
+      // An opened name chip comes to the front of the map.
+      if (!g.classList.contains('hovering') && g.nextSibling) g.parentNode?.appendChild(g);
+      g.classList.add('hovering'); showTip(ev, id); revealName(N, true);
+    });
+    on(g, 'pointerleave', () => { g.classList.remove('hovering'); hideTip(); revealName(N, false); });
     node[id] = N;
     return N;
   }
@@ -732,6 +742,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         for (const c of Array.from(N.tags.querySelectorAll('circle'))) c.setAttribute('r', String(r));
       }
       N.lbl.style.display = 'none';
+      if (N.pill) N.pill.g.style.display = 'none';
       if (v === 1 && !(lens.on && mode === 'case' && d.in)) cands.push({id, N, d, pri: fscore(fl) * 10 + deg[id] + (mode === 'case' ? 0 : 100)});
     }
     const stubbed: EdgeEl[] = [];
@@ -895,40 +906,65 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     q('.tw-zoom').textContent = `${Math.round(C.k * 100)}%`;
   }
 
-  /* A dot's name sits beside it, on whichever side has more open room, partly revealed: its first few words, fading
-     out. Hovering the party shows the whole name there (revealName). */
-  const PEEK = 13;
+  /* A dot's name is a chip that grows out from behind its circle, on whichever side has more open room: at rest it
+     shows the name's first characters fading out; hovering the party slides it open to the whole name and how many
+     parties it is linked to. It lives in the dot's own group, so it keeps the circle's size on screen. */
+  const PEEK = 13, PILL_FS = 11.5;
   function revealName(N: NodeEl, full: boolean): void {
-    const name = N.lbl.dataset.name;
-    if (!name || N.lbl.style.display === 'none') return;
-    N.lbl.textContent = full || name.length <= PEEK ? name : name.slice(0, PEEK);
-    N.lbl.classList.toggle('peek', !full && name.length > PEEK);
+    const P = N.pill;
+    if (!P || P.g.style.display === 'none') return;
+    const name = P.g.dataset.name ?? '', extra = P.g.dataset.extra ?? '';
+    // Opened, it may take the other side: the side it rests on can have a panel where the whole name would reach.
+    const dir = Number(full ? P.g.dataset.odir : P.g.dataset.dir) || 1;
+    P.t.textContent = '';
+    el('tspan', {}, P.t).textContent = full || name.length <= PEEK ? name : name.slice(0, PEEK);
+    if (full && extra) el('tspan', {class: 'peek-x', dx: 7}, P.t).textContent = extra;
+    P.t.classList.toggle('peek', !full && name.length > PEEK);
+    let tw = (P.t.textContent ?? '').length * PILL_FS * 0.55;
+    try { tw = P.t.getComputedTextLength() || tw; } catch { /* not laid out (tests) */ }
+    const inner = DOT_R + 7, reach = inner + tw + 12;
+    P.t.setAttribute('x', String(dir * inner)); P.t.setAttribute('text-anchor', dir > 0 ? 'start' : 'end');
+    const x = dir > 0 ? -DOT_R - 2 : -reach, w = reach + DOT_R + 2;
+    P.bg.setAttribute('x', String(x)); P.bg.setAttribute('width', String(w));
+    P.bg.style.setProperty('x', `${x}px`); P.bg.style.setProperty('width', `${w}px`);
+    N.g.classList.toggle('peek-open', full);
   }
   function placeLabels(cands: {id: string; N: NodeEl; d: Pt; pri: number}[]): Box[] {
     const boxes = terrBoxes.concat(cardBoxes, secBoxes);
     cands.sort((a, b) => b.pri - a.pri);
-    const fsS = mode === 'case' ? 12 : 11.5;
     const fp = focus && node[focus] ? node[focus].cur : null, centre = fp ? toScreen(fp.x, fp.y) : {x: W / 2, y: H / 2};
+    // The panels over the map: a name chip, opened, must not run under one.
+    const rb = root.getBoundingClientRect();
+    const panels: Box[] = Array.from(root.querySelectorAll<HTMLElement>('.tw-glass, .tw-tools')).filter(e => e.offsetParent).map(e => {
+      const r = e.getBoundingClientRect();
+      return {x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top};
+    });
     for (const c of cands) {
+      const P = c.N.pill;
+      if (!P) continue;
       const name = E[c.id].short, shown = name.length > PEEK ? name.slice(0, PEEK) : name;
-      const s = toScreen(c.d.x, c.d.y), r = DOT_R * curCs * C.k, w = shown.length * fsS * 0.56;
+      const u = curCs * C.k, s = toScreen(c.d.x, c.d.y), r = DOT_R * u, reach = (DOT_R + 7 + shown.length * PILL_FS * 0.55 + 12) * u;
       const side = (dir: 1 | -1) => {
-        const x0 = dir > 0 ? s.x + r + 6 : s.x - r - 6 - w;
-        return {x0: x0 - 3, x1: x0 + w + 3, y0: s.y - fsS * 0.7, y1: s.y + fsS * 0.5};
+        const x0 = dir > 0 ? s.x + r : s.x - reach, x1 = dir > 0 ? s.x + reach : s.x - r;
+        return {x0: x0 - 2, x1: x1 + 2, y0: s.y - 13 * u, y1: s.y + 13 * u};
       };
-      const room = (b: Box) => b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes);
-      // Outward from the party in the middle has more room, unless something sits there.
-      const out: 1 | -1 = s.x >= centre.x ? 1 : -1;
-      const dir = room(side(out)) ? out : room(side(out === 1 ? -1 : 1)) ? (out === 1 ? -1 : 1) : 0;
+      const extra = `${deg[c.id]} linked ${deg[c.id] === 1 ? 'party' : 'parties'}`;
+      const open = (DOT_R + 7 + (name.length + extra.length + 1) * PILL_FS * 0.55 + 12) * u;
+      const opened = (dir: 1 | -1): Box => ({x0: dir > 0 ? s.x : s.x - open, x1: dir > 0 ? s.x + open : s.x, y0: s.y - 13 * u, y1: s.y + 13 * u});
+      const room = (dir: 1 | -1) => { const b = side(dir); return b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes); };
+      const openRoom = (dir: 1 | -1) => { const b = opened(dir); return b.x0 >= 0 && b.x1 <= W && !overlap(b, panels); };
+      // Outward from the party in the middle has more room, unless something sits there; a side where the opened
+      // chip would run under a panel or off the map comes second.
+      const out: 1 | -1 = s.x >= centre.x ? 1 : -1, other: 1 | -1 = out === 1 ? -1 : 1;
+      const order = ([out, other] as (1 | -1)[]).sort((a, b) => Number(openRoom(b)) - Number(openRoom(a)));
+      const dir = order.find(d => room(d)) ?? 0;
       if (!dir) continue;
       boxes.push(side(dir));
-      c.N.lbl.style.display = '';
-      c.N.lbl.dataset.name = name;
-      c.N.lbl.setAttribute('font-size', String(fsS / C.k)); c.N.lbl.setAttribute('stroke-width', String(4 / C.k));
-      c.N.lbl.setAttribute('x', String((dir * (r + 6)) / C.k)); c.N.lbl.setAttribute('y', String((fsS * 0.35) / C.k));
-      c.N.lbl.setAttribute('text-anchor', dir > 0 ? 'start' : 'end');
-      c.N.lbl.dataset.side = dir > 0 ? 'r' : 'l';
-      revealName(c.N, false);
+      P.g.style.display = '';
+      const odir = openRoom(dir) ? dir : openRoom(dir === 1 ? -1 : 1) ? (dir === 1 ? -1 : 1) : dir;
+      P.g.dataset.name = name; P.g.dataset.dir = String(dir); P.g.dataset.odir = String(odir);
+      P.g.dataset.extra = extra;
+      revealName(c.N, c.N.g.classList.contains('hovering'));
     }
     return boxes;
   }
