@@ -82,9 +82,13 @@ https://framer.com/m/InkBleedComponent-DpjWv7.js@kqaA6CCQV2BFK6BSX295 (Framer's 
 "Show me the wire where the backgrounds have this subtle shader effect":
 https://framer.com/m/Shader-Button-v12VJe.js@PhehsfTqnG7o5bWDuNUT (Framer's "Shader Button", whose fill is a moving
 "Liquid Gradient" shader).
-- Preview made with our own shader: a slow domain-warped gradient in the Wire's ground blues behind the map, and a darker
-  patch with its own seed inside each panel, with switches to compare against today. In the app it would draw at half
-  resolution, pause off screen, and stay off under calm motion, Effects off and reduced motion. It waits for his yes.
+- He meant the chips' backgrounds, not the map ground (29 Oct). Preview made with our own shader: one slow
+  domain-warped liquid in the chips' blue drawn for the whole map, each chip showing the patch under it (so it flows on
+  from chip to chip and lifts with a hovered chip). In the app it would draw once a frame at half resolution, pause off
+  screen, and stay off under calm motion, Effects off and reduced motion. It waits for his yes.
+- He asked why the cards are rounded rectangles rather than chips: the app's cards have had 11px corners since they were
+  first drawn (PR #60), and only a dot's name is a full pill. The previews now draw cards as pills; the app changes only
+  on his yes.
 
 ## Testimonial rotation (Ony, 29 Oct)
 Ony sent https://framer.com/m/Testimonial-Rotation-JRnz0w.js@VcEYXbVlwUb8LpYlJsb6 without a note.
