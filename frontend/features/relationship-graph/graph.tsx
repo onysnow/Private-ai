@@ -169,7 +169,7 @@ export function Graph({relationships: allRelationships, entities, onNode, onEdge
       <select className="cf-tool" value={centre ?? ''} onChange={e => setFocus(e.target.value)} aria-label="Party at the centre">
         {[...all.parties].sort((a, b) => a.label.localeCompare(b.label)).map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
       </select></label>}
-    {familiesPresent.length > 1 && <div role="group" aria-label="Show links" style={{display: 'flex', flexWrap: 'wrap', gap: 6}}>
+    {familiesPresent.length > 1 && <div role="group" aria-label="Show links" title="Each kind of link: ✓ drawn, struck through hidden. Click to hide or show it." style={{display: 'flex', flexWrap: 'wrap', gap: 6}}>
       {familiesPresent.map(f => <button key={f} type="button" className="cf-chip" aria-pressed={!hidden.has(f)}
         onClick={() => setHidden(cur => { const next = new Set(cur); if (next.has(f)) next.delete(f); else next.add(f); return next; })}>
         <span className="cf-chip-line" style={{width: 14, height: 3, background: LINK[f].colour, display: 'inline-block', borderRadius: 2}}/>

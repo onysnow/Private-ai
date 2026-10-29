@@ -105,17 +105,17 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 - **Data quality and counts:**
   - The 1MDB queue has about 15,000 items.
   - Deripaska proposes a railway (CSX) claim from the whole Federal Register issue.
-  - The Home counts and the Next-up counts disagree.
+  - ~~The Home counts and the Next-up counts disagree.~~ Checked 29 Oct in Chromium on the Vekselberg demo: "984 to decide" on the strip, "1 of 984" on Next up.
 - **Layout:**
-  - At phone width, Home and Decide overflow and Red Flags collapses.
-  - The Leads board pushes the tabs off-screen.
+  - ~~At phone width, Home and Decide overflow and Red Flags collapses.~~ Fixed 29 Oct: their one-column layout used `1fr`, which never shrinks below its widest child; now `minmax(0, 1fr)` (`styles/case.css`). Checked in Chromium at 390 px: no screen scrolls sideways; Red Flags already stacked.
+  - The Leads board pushes the tabs off-screen. Not reproduced 29 Oct on a case with 2 leads (tabs stay at 1440 and 390 px); not tried on a case with many.
   - Graph nodes are unreadable at the default zoom.
-  - The "If you answer" box is clipped.
-  - Hydration warnings appear on several screens.
+  - ~~The "If you answer" box is clipped.~~ No such box any more (29 Oct: the words are not in the code).
+  - ~~Hydration warnings appear on several screens.~~ Checked 29 Oct in Chromium: none on Home, Decide, Bring in, Check, See, Act or Keep, at 1440 and 390 px.
 - **Hard to reach:**
-  - There is no way to start a second case from the UI.
-  - Graph legend chips don't show whether they filter.
-  - Batch import drops the case name.
+  - ~~There is no way to start a second case from the UI.~~ Fixed earlier: "+ Start a new case" in the case menu (`app-frame.tsx`).
+  - ~~Graph legend chips don't show whether they filter.~~ Fixed 29 Oct: a filter chip that is on carries a ✓ and one that is off is struck through, not only faded (`globals.css` `.cf-chip`); checked in Chromium on See › Relationships.
+  - Batch import drops the case name. Not reproduced 29 Oct: a batch is labelled from its files; what "the case name" meant is in the walkthrough's notes, which were in that session only.
 - **Not tested** (not installed in the cloud): base map, OpenAleph, AI drafts.
 - Screenshots and scripts: `/tmp/claude-0/walk/` (cloud session only).
 

@@ -402,10 +402,11 @@ html[data-motion='calm'] .dc-last button, html[data-motion='calm'] .dc-bulk-conf
 @media (max-width: 980px) {
   .cv-home-wrap { height: auto; overflow: visible; }
   .ch-home, .dc { height: auto; }
-  .ch-top { grid-template-columns: 1fr; grid-template-areas: 'name' 'tools' 'q' 'strip'; }
+  /* minmax(0, 1fr), not 1fr: a 1fr column never shrinks below its widest child, which pushed a phone's page sideways. */
+  .ch-top { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'name' 'tools' 'q' 'strip'; }
   .ch-top > .ch-search { justify-self: start; width: 100%; } .ch-top > .ch-tools { justify-self: end; }
   .ch-strip { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
-  .ch-grid, .dc, .ch-bottom { grid-template-columns: 1fr; }
+  .ch-grid, .dc, .ch-bottom { grid-template-columns: minmax(0, 1fr); }
   .ch-mod { flex: none; min-height: 220px; }
   .dc-empty { grid-column: auto; }
 }

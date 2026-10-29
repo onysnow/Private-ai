@@ -189,7 +189,10 @@
   .cf-segmented button.on { background: #3a2f1f; color: var(--accent-1); }
   .cf-segmented button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: -2px; }
   .cf-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-1); color: var(--text-muted); cursor: pointer; max-width: 100%; text-align: left; }
-  .cf-chip[aria-pressed="false"] { color: var(--text-muted); opacity: .7; }
+  /* A filter chip says whether it is on by shape and word, not by fading alone: on carries a tick, off is struck through. */
+  .cf-chip[aria-pressed="true"] { border-color: var(--accent-1); color: var(--text); }
+  .cf-chip[aria-pressed="true"]::before { content: "✓"; font-weight: 700; color: var(--accent-1); }
+  .cf-chip[aria-pressed="false"] { color: var(--text-muted); opacity: .7; text-decoration: line-through; }
   .cf-chip[aria-pressed="false"] .cf-chip-line { opacity: .35; }
   .cf-chip:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
   .cf-tool { font: inherit; font-size: 12px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text-muted); cursor: pointer; }
