@@ -310,7 +310,9 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
   const [caption, setCaption] = useState(proposalText(c));
   const matches = useQuery({...getExtractionEntityMatchesOptions({path: {candidate_id: c.id}}), enabled: c.candidate_type === 'entity' && c.review_status === 'proposed'});
   const targets = useQuery({...getIdentifierTargetsOptions({path: {candidate_id: c.id}}), enabled: c.candidate_type === 'identifier' && c.review_status === 'proposed'});
-  const open = c.review_status === 'proposed' && !held;
+  // A proposal held back by the OCR quality gate (the page was hard to read) can still be decided here, by eye.
+  const gated = c.review_status === 'held';
+  const open = (c.review_status === 'proposed' || gated) && !held;
   const ask = openQuestion(c, answer, Boolean(matches.data?.strong_match));
   const blocked = ask !== null || (c.candidate_type === 'entity' && matches.isPending);
   const kind = kindWord(c);
@@ -328,12 +330,14 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
     aria-label={`${kind}: ${proposalText(c)}`} onClick={onFocus} onMouseEnter={() => onLight(true)} onMouseLeave={() => onLight(false)}>
     <header>
       <b>{kind}</b>
-      {c.review_status === 'proposed' ? <span className="rr-chip">Proposed</span> : <span className={`rr-chip ${c.review_status}`}>{c.review_status === 'accepted' ? '✓ Accepted' : '✕ Rejected'}</span>}
+      {c.review_status === 'proposed' ? <span className="rr-chip">Proposed</span> : gated ? <span className="rr-chip held">Held back · hard to read</span>
+        : <span className={`rr-chip ${c.review_status}`}>{c.review_status === 'accepted' ? '✓ Accepted' : '✕ Rejected'}</span>}
       <Dots confidence={c.confidence}/>
       <small>{proposerOf(c)} · {locator}</small>
     </header>
     {editing ? <input className="rr-edit" aria-label="Edit the name" value={caption} onChange={e => setCaption(e.target.value)} onClick={e => e.stopPropagation()}/>
       : <p className="rr-card-text">{caption}{schema && schema !== 'LegalEntity' ? <small className="rr-card-kind"> · {SCHEMA_WORD[schema] ?? schema}</small> : null}</p>}
+    {gated && c.reviewer_note && <p className="rr-gate">{c.reviewer_note}</p>}
     {held ? <p className="rr-held" role="status">{held.decision === 'accept' ? '✓ Accepted' : '✕ Rejected'}: saved in a moment.
       <button type="button" onClick={e => { e.stopPropagation(); onUndo(); }}>Undo <kbd>U</kbd></button></p>
       : open ? <>

@@ -405,3 +405,35 @@ def test_a_table_document_gets_no_page_count():
         db.commit()
     item = ok(client.get(f"/api/investigations/{inv}/decisions"))["items"][0]
     assert item["group"]["pages"] is None and item["group"]["pages_read"] is None
+
+
+def test_a_name_whose_kind_the_text_does_not_give_is_not_offered_as_a_person():
+    """Audit #1: "Add 'United States' as a Person?" The name-finder's guess of a kind the text gave no sign of is never
+    shown as fact on the card, and is never taken from the guess when a proposal is accepted without a kind."""
+    from app.db.session import SessionLocal
+    from app.models.domain import Document, DocumentChunk, ExtractionCandidate, Source
+
+    inv = _inv("Kinds")
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Filing", source_type="document")
+        db.add(src)
+        db.flush()
+        doc = Document(investigation_id=inv, source_id=src.id, filename="filing.txt", sha256="0" * 64, storage_path="/nowhere", extraction_status="complete")
+        db.add(doc)
+        db.flush()
+        chunk = DocumentChunk(document_id=doc.id, locator="paragraph 1", ordinal=1, text="Funds moved through the United States.")
+        db.add(chunk)
+        db.flush()
+        row = ExtractionCandidate(investigation_id=inv, document_id=doc.id, chunk_id=chunk.id, candidate_type="entity", confidence=0.4,
+                                  payload={"caption": "United States", "suggested_schema": "Person", "schema_choices": ["Person", "Organization"],
+                                           "span": {"start_char": 23, "end_char": 36}})
+        db.add(row)
+        db.commit()
+        cand = row.id
+    items = ok(client.get(f"/api/investigations/{inv}/decisions"))["items"]
+    card = next(i for i in items if i.get("question", "").startswith("Add “United States”"))
+    assert "Person" not in card["question"] and "does not say what kind" in card["question"]
+    yes = next(c for c in card["choices"] if c["key"] == "yes")
+    assert yes["body"]["entity_schema"] == "LegalEntity" and "kind not known" in yes["label"]
+    refused = client.post(f"/api/extraction-candidates/{cand}/review", json={"decision": "accept"})
+    assert refused.status_code == 400 and "does not say what kind" in refused.json()["detail"]

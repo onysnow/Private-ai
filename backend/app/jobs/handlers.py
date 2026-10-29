@@ -384,7 +384,36 @@ def _measure_legibility(db: Session, document_id: str, report: Report, message: 
                 chunk.ocr_legibility = value
         db.commit()
     done = sum(1 for v in measured.values() if v is not None)
-    return f"{message}; legibility measured on {done} of {len(pages)} scanned page{'s' if len(pages) != 1 else ''}"
+    held = hold_illegible(db, document_id)
+    tail = f"; {held} proposal{'s' if held != 1 else ''} from pages too hard to read held back for you to check by eye" if held else ""
+    return f"{message}; legibility measured on {done} of {len(pages)} scanned page{'s' if len(pages) != 1 else ''}{tail}"
+
+
+def hold_illegible(db: Session, document_id: str) -> int:
+    """The OCR quality gate: a proposal read from a page less legible than OCR_LEGIBILITY_FLOOR is held back from
+    Decide (status "held"), with the page's figure; it waits in the reading room, beside the page, where a person can
+    still accept it. Returns how many were held."""
+    from sqlalchemy import select
+
+    from app.core.time import utcnow_naive
+    from app.models.domain import DocumentChunk, ExtractionCandidate
+
+    floor = settings.ocr_legibility_floor
+    low = {c.id: c.ocr_legibility for c in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == document_id))
+           if c.ocr_legibility is not None and c.ocr_legibility < floor}
+    if not low:
+        return 0
+    held = 0
+    for candidate in db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == document_id,
+                                                                  ExtractionCandidate.review_status == "proposed")):
+        if candidate.chunk_id in low:
+            candidate.review_status = "held"
+            candidate.reviewer_note = (f"Held back: read by OCR from a page only {low[candidate.chunk_id]:.0f}% legible "
+                                       f"(under {floor:.0f}%). Check it against the page before using it.")
+            candidate.reviewed_at = utcnow_naive()
+            held += 1
+    db.commit()
+    return held
 
 
 def _already_read(db: Session, document_id: str) -> bool:

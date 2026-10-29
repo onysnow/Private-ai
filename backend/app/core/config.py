@@ -80,6 +80,9 @@ class Settings(BaseSettings):
     # A capture's time proof (ADR-0025), off until a person asks: the time server that signs the capture's fingerprint
     # (RFC 3161). Its root must be in app/trust/tsa/ for the token to be checked here.
     capture_time_server: str = "https://freetsa.org/tsr"
+    # OCR quality gate: proposals read from a page less legible than this (mean Tesseract word confidence, 0-100;
+    # app/services/legibility.py) are held back from Decide, and wait in the reading room beside the page.
+    ocr_legibility_floor: float = 60.0
     # Audio and video (ADR-0020): the largest recording an upload takes, and the Whisper model that transcribes it on
     # this computer (fetched once at setup into the folder below; a read never downloads it). Language: empty detects it.
     max_media_bytes: int = 500 * 1024 * 1024

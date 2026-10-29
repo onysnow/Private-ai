@@ -380,7 +380,11 @@ def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> Non
     row: ExtractionCandidate = item["_entity_row"]
     p = row.payload if isinstance(row.payload, dict) else {}
     caption = str(p.get("caption") or "").strip()
-    schema = str(p.get("suggested_schema") or "Thing")
+    # The name-finder's guess of a kind the text gave no sign of (it would say "Add “United States” as a Person?") is
+    # never shown as fact: the record is added as "kind not known" (FollowTheMoney's LegalEntity) until a person says.
+    unknown_kind = row.confidence < 0.5 or bool(p.get("schema_question"))
+    schema = "LegalEntity" if unknown_kind else str(p.get("suggested_schema") or "Thing")
+    kind_words = "a record, kind not known" if unknown_kind else f"a {schema}"
     path = f"/api/extraction-candidates/{row.id}/review"
     numbers = [n for n in p.get("rows") or [] if isinstance(n, int)]
     where, source = (f"in {_rows_phrase(numbers)}", "these rows") if numbers else ("in this passage", "this passage")
@@ -392,7 +396,14 @@ def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> Non
         item["choices"] = [_choice("yes", "Same record", path, {**base, "entity_identity_decision": "same"},
                                    f"{source.capitalize()} {'are' if numbers else 'is'} added to {other}; no new record."),
                            _choice("no", "A different one", path, {**base, "entity_identity_decision": "different"},
-                                   f"“{caption}” becomes a new {schema}, kept apart from {other}.")]
+                                   f"“{caption}” becomes {kind_words}, kept apart from {other}.")]
+    elif unknown_kind:
+        item["question"] = f"Add “{caption}” as a name? The text does not say what kind it is."
+        item["consequences"] = []
+        item["choices"] = [_choice("yes", "Add it, kind not known", path, {"decision": "accept", "entity_schema": schema},
+                                   f"Creates the record {caption} with {source} as its source, its kind “not known” "
+                                   "(person, company, place…) until you say on the record."),
+                           _choice("no", "Not a name", path, {"decision": "reject"}, REJECTED.format("no record is made"))]
     else:
         item["question"] = f"Add “{caption}” as a {schema}?"
         item["consequences"] = []

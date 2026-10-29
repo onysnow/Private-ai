@@ -525,7 +525,8 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     # sees its decision, instead of a status read before either wrote.
     lock_investigation_transaction(db, candidate.investigation_id)
     db.refresh(candidate)
-    if candidate.review_status != 'proposed':
+    # A proposal held back by the OCR quality gate (app/jobs/handlers.py hold_illegible) can still be decided by a person.
+    if candidate.review_status not in ('proposed', 'held'):
         raise ValueError('Candidate has already been reviewed')
     if decision not in {'accept','reject'}: raise ValueError('Decision must be accept or reject')
     candidate.reviewer_note = note
@@ -592,7 +593,12 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
         ))
         rtype='claim'
     elif candidate.candidate_type=='entity':
-        cap=(caption or candidate.payload.get('caption') or '').strip(); schema=entity_schema or candidate.payload.get('suggested_schema') or 'Thing'
+        cap=(caption or candidate.payload.get('caption') or '').strip()
+        # A kind the text gave no sign of (the name-finder's low band, or OpenAleph's name with no kind) is never
+        # taken from the guess: the person says which kind, or "not sure" (LegalEntity).
+        if not entity_schema and (candidate.confidence < 0.5 or candidate.payload.get('schema_question')):
+            raise ValueError(f'The text does not say what kind of record “{cap}” is: say which (or “not sure”) before it is added')
+        schema=entity_schema or candidate.payload.get('suggested_schema') or 'Thing'
         preview = preview_entity_candidate_matches(db, candidate)
         strong = preview.get('strong_match')
         if strong and entity_identity_decision is None:
