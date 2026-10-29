@@ -38,8 +38,9 @@ STAGES = {
                        ("access", "Access")]),
 }
 
-# The Next.js development badge is not part of the app.
-QUIET = "nextjs-portal{display:none!important}"
+# Not part of a screen's design: the Next.js development badge, the first-visit hints over the edges, and the skip link
+# (it shows when the page takes focus).
+QUIET = "nextjs-portal,.fr-hint,.fr-skip{display:none!important}"
 
 
 def screens(case: str) -> list[tuple[str, str]]:
@@ -61,7 +62,30 @@ def settle(page: Page, wait_ms: int) -> None:
     page.wait_for_timeout(wait_ms)
 
 
+# Chromium's print can let a box that scrolls on screen spill its contents over what is below it; a screen shows the
+# part in view, so every scrolling box is clipped before printing.
+# Chromium's PDF does not always clip them either, so whatever lies outside a scrolling box's visible area is hidden.
+CLIP_SCROLLERS = """() => {
+  const boxes = [...document.querySelectorAll('*')].filter(el => { const s = getComputedStyle(el);
+    return /(auto|scroll|hidden)/.test(s.overflowY + s.overflowX) && el.scrollHeight > el.clientHeight + 1; });
+  for (const box of boxes) {
+    const r = box.getBoundingClientRect();
+    for (const el of box.querySelectorAll('*')) {
+      const e = el.getBoundingClientRect();
+      if (e.height && (e.top >= r.bottom - 1 || e.bottom <= r.top + 1)) el.style.setProperty('visibility', 'hidden', 'important');
+    }
+    box.style.setProperty('overflow', 'hidden', 'important');
+  } }"""
+
+
+# In print, heights measured against the window (100vh, dvh) can be laid out against the paper instead; the page is held
+# at the window's size so a screen prints as it shows.
+HOLD_SIZE = f"html,body{{width:{W}px!important;height:{H}px!important;overflow:hidden!important}}"
+
+
 def print_page(page: Page) -> bytes:
+    page.add_style_tag(content=HOLD_SIZE)
+    page.evaluate(CLIP_SCROLLERS)
     page.emulate_media(media="screen")
     return page.pdf(width=f"{W}px", height=f"{H}px", print_background=True, page_ranges="1",
                     margin={"top": "0", "right": "0", "bottom": "0", "left": "0"})
@@ -136,7 +160,7 @@ def main() -> None:
         # The style guide: one page per section, as the page lays itself out for print.
         page.goto(f"{args.web}/style-guide", wait_until="domcontentloaded")
         settle(page, args.wait)
-        page.add_style_tag(content=".fr-top,.fr-handle,.fr-crumb,[class*='fr-edge']{display:none!important}")
+        page.add_style_tag(content=".fr-crumbs,.fr-handle,.fr-handle-rv,.fr-top,.fr-left{display:none!important}")
         page.emulate_media(media="screen")
         guide = page.pdf(width=f"{W}px", height=f"{H}px", print_background=True,
                          margin={"top": "0", "right": "0", "bottom": "0", "left": "0"})
