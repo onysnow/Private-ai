@@ -67,6 +67,14 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   (grey) a slow breath. Dashed still means not yet shown.
 - The blue and yellow arcs on a card are the Your tags ring (one arc per tag, in the tag's colour); the preview's details
   now name the tags on hover.
+- Then: the person icon's loop is a small double nod (he didn't understand the circling light; he likes the others).
+- Strong and faint: the moving beam runs round the count's circle only; the textbook siren alone runs round the outline.
+- The owns line's gliding light is a much softer gradient (stacked, fading lengths, blurred), with no hard ends.
+- The Red Flag count opens on hover: the circle grows on the spring into a small card (how many, of which levels, the
+  strongest flag, "click to see every flag and who it touches"), opening towards the side with room. A click opens a
+  panel of every flag, each with the parties it touches as chips (a chip makes its party pulse on the map), and the
+  map dims to the party, those parties and the lines between them. Esc, the close button or a click on the map closes
+  it. The preview's flags are samples, said so in the panel.
 All of it waits for his yes before the app changes.
 
 ## Later: our own globe, with the Wire's links on it (Ony, 29 Oct)
