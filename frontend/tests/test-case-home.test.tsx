@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {CaseHome, continuousYears, sourceLine, yearSpan} from '../features/case-home/case-home';
+import {CaseHome, continuousYears, moneyCaption, sourceLine, yearSpan} from '../features/case-home/case-home';
 import {DecideScreen} from '../features/case-home/decide-screen';
 import {pageOf} from '../features/case-home/decision-card';
 import {HOLD_MS, markTerms} from '../features/case-home/use-decisions';
@@ -28,7 +28,7 @@ const INV = {id: 'inv-1', name: 'Kestrel SA', description: null, question: 'Who 
 
 const standing = {
   investigation_id: 'inv-1', claims: {total: 22, supported: 11, disputed: 3, unshown: 8, ruled_out: 0}, to_check: 1, missing: 1, to_decide: 2,
-  to_decide_by_kind: {to_check: 1, missing: 1}, money: {currency: 'EUR', amount: 29400, payments: 3, from_sources: 1, other_currencies: []},
+  to_decide_by_kind: {to_check: 1, missing: 1}, money: {currency: 'EUR', amount: 29400, payments: 3, starting_payers: 1, others: []},
   timeline: {events: 46, from: '2016', to: '2023', years: [{year: '2016', events: 4}, {year: '2017', events: 9}]},
   documents: {total: 14, unread: 2, failed: 0}, sources: 5, evidence: 9, network: {parties: 31, links: 46},
   flags: {open: 1, textbook: 1, strong: 0, faint: 0}, leads: {open: 2}, watchlist: {names: 1, new_hits: 0},
@@ -110,6 +110,7 @@ describe('Case home', () => {
     expect(within(strip).getByRole('link', {name: /3\s*claims disputed/})).toHaveAttribute('href', '/check?inv=inv-1#claim-verification');
     expect(within(strip).getByRole('link', {name: /2\s*to decide/})).toHaveAttribute('href', '/decide?inv=inv-1');
     expect(within(strip).getByText('€29,400')).toBeInTheDocument();
+    expect(within(strip).getByText('money traced from 1 starting payer · 3 payments')).toBeInTheDocument();
     const card = await screen.findByTestId('decision-card');
     expect(within(card).getByText('From the Textbook Red Flag Circular ownership')).toBeInTheDocument();
     expect(within(card).getByText('nominee arrangement', {selector: 'mark'})).toBeInTheDocument();
@@ -403,6 +404,13 @@ describe('sourceLine', () => {
     expect(sourceLine(undefined)).toBe('No passage yet');
     expect(sourceLine({count: 0, leads_open: 1})).toBe('No passage yet · 1 lead open');
     expect(sourceLine({count: 2, sources_for: 2, names: ['Filing']})).toBe('2 sources for · Filing');
+  });
+});
+
+describe('moneyCaption', () => {
+  it('names what the figure counts and lists every other currency with its own sum', () => {
+    expect(moneyCaption({starting_payers: 1, payments: 3, others: []})).toBe('money traced from 1 starting payer · 3 payments');
+    expect(moneyCaption({starting_payers: 2, payments: 1, others: [{currency: 'USD', amount: 900}]})).toMatch(/^money traced from 2 starting payers · 1 payment · also .*900/);
   });
 });
 

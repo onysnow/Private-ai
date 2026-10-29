@@ -565,7 +565,7 @@ function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
         </g>;
       })}
     </svg>
-    <p className="rb-pay-focus" aria-live="polite"><b>{sign}{cur.amount.toLocaleString('en-GB')}{sign ? '' : ` ${currency}`}</b> on {day(cur.dateTime!)} · {cur.from} → {cur.to}
+    <p className="rb-pay-focus" aria-live="polite"><b>{sign}{cur.amount.toLocaleString('en-GB')}{sign ? '' : ` ${currency}`}</b> on {day(cur.dateTime!)}{cur.dateEnd ? ` to ${day(cur.dateEnd)}` : ''} · {cur.from} → {cur.to}
       {' '}<span className={`rb-pay-word c-${cur.certainty}`}>{CERTAINTY_WORD[cur.certainty]}</span>{cur.evidence ? <i> · {cur.evidence}</i> : null}</p>
   </figure>;
 }

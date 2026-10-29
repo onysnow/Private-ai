@@ -74,7 +74,7 @@ def test_the_case_question_is_set_changed_and_cleared():
 def test_standing_counts_on_the_server():
     inv = _inv("Standing")
     empty = ok(client.get(f"/api/investigations/{inv}/standing"))
-    assert empty["claims"]["total"] == 0 and empty["to_decide"] == 0 and empty["money"] == {"currency": None, "amount": 0.0, "payments": 0, "from_sources": 0, "other_currencies": []}
+    assert empty["claims"]["total"] == 0 and empty["to_decide"] == 0 and empty["money"] == {"currency": None, "amount": 0.0, "payments": 0, "starting_payers": 0, "others": []}
     assert empty["timeline"] == {"events": 0, "from": None, "to": None, "years": []}
     for status in ("supported", "confirmed", "disputed", "lead"):
         ok(post_claim(client, {"investigation_id": inv, "text": f"A {status} claim", "status": status, "confidence": 0.5}))
@@ -217,7 +217,16 @@ def test_money_traced_counts_each_sum_once_where_it_starts():
         ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": src, "target_entity_id": dst,
                                                    "properties": {"amount": ["700000000"], "currency": ["USD"], "date": ["2009-09-30"]}}))
     money = ok(client.get(f"/api/investigations/{inv}/standing"))["money"]
-    assert money == {"currency": "USD", "amount": 700000000.0, "payments": 2, "from_sources": 1, "other_currencies": []}
+    assert money == {"currency": "USD", "amount": 700000000.0, "payments": 2, "starting_payers": 1, "others": []}
+    # Two payments from one payer are one starting payer; a second currency keeps its own sum and is listed, not hidden.
+    ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": a, "target_entity_id": c,
+                                               "properties": {"amount": ["5000000"], "currency": ["USD"], "date": ["2010-01-04"]}}))
+    d, e = _party(inv, "Bank"), _party(inv, "Agent")
+    ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": d, "target_entity_id": e,
+                                               "properties": {"amount": ["900"], "currency": ["GBP"], "date": ["2010-02-01"]}}))
+    money = ok(client.get(f"/api/investigations/{inv}/standing"))["money"]
+    assert money == {"currency": "USD", "amount": 705000000.0, "payments": 3, "starting_payers": 1,
+                     "others": [{"currency": "GBP", "amount": 900.0, "payments": 1, "starting_payers": 1}]}
 
 
 def test_a_proposal_shows_the_passage_around_it_not_the_top_of_the_page():

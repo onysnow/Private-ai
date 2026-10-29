@@ -4640,14 +4640,22 @@ class CaseClaimCountsOut(ResponseModel):
     ruled_out: int
 
 
+class CaseMoneyOtherOut(ResponseModel):
+    currency: str
+    amount: float
+    payments: int
+    starting_payers: int
+
+
 class CaseMoneyOut(ResponseModel):
     """Money traced, counted once where it starts (payments whose payer received
-    nothing in the case), and how many payments carry it."""
+    nothing in the case), how many payments carry it, and how many different payers
+    it starts from; each other currency with its own figures."""
     currency: str | None
     amount: float
     payments: int
-    from_sources: int = 0
-    other_currencies: list[str]
+    starting_payers: int = 0
+    others: list[CaseMoneyOtherOut]
 
 
 class CaseYearOut(ResponseModel):

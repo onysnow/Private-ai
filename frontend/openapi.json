@@ -5738,8 +5738,36 @@
         "title": "CaseLookupsPut",
         "type": "object"
       },
+      "CaseMoneyOtherOut": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "payments": {
+            "title": "Payments",
+            "type": "integer"
+          },
+          "starting_payers": {
+            "title": "Starting Payers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "currency",
+          "amount",
+          "payments",
+          "starting_payers"
+        ],
+        "title": "CaseMoneyOtherOut",
+        "type": "object"
+      },
       "CaseMoneyOut": {
-        "description": "Money traced, counted once where it starts (payments whose payer received\nnothing in the case), and how many payments carry it.",
+        "description": "Money traced, counted once where it starts (payments whose payer received\nnothing in the case), how many payments carry it, and how many different payers\nit starts from; each other currency with its own figures.",
         "properties": {
           "amount": {
             "title": "Amount",
@@ -5756,20 +5784,20 @@
             ],
             "title": "Currency"
           },
-          "from_sources": {
-            "default": 0,
-            "title": "From Sources",
-            "type": "integer"
-          },
-          "other_currencies": {
+          "others": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/CaseMoneyOtherOut"
             },
-            "title": "Other Currencies",
+            "title": "Others",
             "type": "array"
           },
           "payments": {
             "title": "Payments",
+            "type": "integer"
+          },
+          "starting_payers": {
+            "default": 0,
+            "title": "Starting Payers",
             "type": "integer"
           }
         },
@@ -5777,7 +5805,7 @@
           "currency",
           "amount",
           "payments",
-          "other_currencies"
+          "others"
         ],
         "title": "CaseMoneyOut",
         "type": "object"

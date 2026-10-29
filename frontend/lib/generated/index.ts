@@ -602,6 +602,7 @@ export type {
   CaseLockIn,
   CaseLookupsOut,
   CaseLookupsPut,
+  CaseMoneyOtherOut,
   CaseMoneyOut,
   CaseNetworkCountsOut,
   CaseRecordAmend,

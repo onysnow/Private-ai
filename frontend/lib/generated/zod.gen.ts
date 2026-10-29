@@ -1379,17 +1379,28 @@ export const zCaseLookupsPut = z.object({
 });
 
 /**
+ * CaseMoneyOtherOut
+ */
+export const zCaseMoneyOtherOut = z.object({
+  amount: z.number(),
+  currency: z.string(),
+  payments: z.int(),
+  starting_payers: z.int(),
+});
+
+/**
  * CaseMoneyOut
  *
  * Money traced, counted once where it starts (payments whose payer received
- * nothing in the case), and how many payments carry it.
+ * nothing in the case), how many payments carry it, and how many different payers
+ * it starts from; each other currency with its own figures.
  */
 export const zCaseMoneyOut = z.object({
   amount: z.number(),
   currency: z.string().nullable(),
-  from_sources: z.int().optional().default(0),
-  other_currencies: z.array(z.string()),
+  others: z.array(zCaseMoneyOtherOut),
   payments: z.int(),
+  starting_payers: z.int().optional().default(0),
 });
 
 /**

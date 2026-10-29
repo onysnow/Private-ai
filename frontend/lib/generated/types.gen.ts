@@ -3251,10 +3251,33 @@ export type CaseLookupsPut = {
 };
 
 /**
+ * CaseMoneyOtherOut
+ */
+export type CaseMoneyOtherOut = {
+  /**
+   * Amount
+   */
+  amount: number;
+  /**
+   * Currency
+   */
+  currency: string;
+  /**
+   * Payments
+   */
+  payments: number;
+  /**
+   * Starting Payers
+   */
+  starting_payers: number;
+};
+
+/**
  * CaseMoneyOut
  *
  * Money traced, counted once where it starts (payments whose payer received
- * nothing in the case), and how many payments carry it.
+ * nothing in the case), how many payments carry it, and how many different payers
+ * it starts from; each other currency with its own figures.
  */
 export type CaseMoneyOut = {
   /**
@@ -3266,17 +3289,17 @@ export type CaseMoneyOut = {
    */
   currency: string | null;
   /**
-   * From Sources
+   * Others
    */
-  from_sources?: number;
-  /**
-   * Other Currencies
-   */
-  other_currencies: Array<string>;
+  others: Array<CaseMoneyOtherOut>;
   /**
    * Payments
    */
   payments: number;
+  /**
+   * Starting Payers
+   */
+  starting_payers?: number;
 };
 
 /**

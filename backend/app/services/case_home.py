@@ -66,11 +66,14 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
     # again at each layer (on the 1MDB case, $12.4B for about $4.6B moved).
     paid_to = {t["to_entity_id"] for t in ledger["transactions"]}
     by_currency: dict[str, list[float]] = {}
+    payers: dict[str, set[str]] = {}
     all_payments: dict[str, int] = {}
     for t in ledger["transactions"]:
         all_payments[t["currency"]] = all_payments.get(t["currency"], 0) + 1
         if t["from_entity_id"] not in paid_to:
             by_currency.setdefault(t["currency"], []).append(float(t["amount"]))
+            payers.setdefault(t["currency"], set()).add(t["from_entity_id"])
+    # The tile shows the currency most money starts in (by starting payments); the others are listed with theirs.
     currency = max(by_currency, key=lambda c: len(by_currency[c])) if by_currency else None
     waiting = decision_counts(db, inv)
     return {
@@ -83,8 +86,9 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
         "to_decide_by_kind": waiting,
         "money": {"currency": currency, "amount": round(sum(by_currency[currency]), 2) if currency else 0.0,
                   "payments": all_payments.get(currency, 0) if currency else 0,
-                  "from_sources": len(by_currency[currency]) if currency else 0,
-                  "other_currencies": sorted(c for c in by_currency if c != currency)},
+                  "starting_payers": len(payers[currency]) if currency else 0,
+                  "others": [{"currency": c, "amount": round(sum(by_currency[c]), 2), "payments": all_payments.get(c, 0),
+                              "starting_payers": len(payers[c])} for c in sorted(by_currency) if c != currency]},
         "timeline": {"events": sum(years.values()), "from": min(years) if years else None, "to": max(years) if years else None,
                      "years": [{"year": y, "events": years.get(y, 0), "flags": flag_year_counts.get(y, 0)}
                                for y in sorted(set(years) | set(flag_year_counts))]},

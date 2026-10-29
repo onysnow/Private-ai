@@ -20,6 +20,7 @@ import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
 import {basemapStatusBody, placesBody} from '../test-support/page-routes';
+import {placeEventWhen} from '../features/places/places-timeline';
 
 type Handler = (event: {features?: {properties: Record<string, unknown>}[]}) => void;
 const {maps, protocols} = vi.hoisted(() => ({maps: [] as FakeMapInstance[], protocols: [] as string[]}));
@@ -68,6 +69,14 @@ const STATUS = basemapStatusBody(true);
 
 beforeEach(() => { maps.length = 0; strips.length = 0; connectGeneratedClient(new ApiClient('http://api.test')); useWorkbenchStore.setState({investigationId: 'inv-1', dossier: null}); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+
+describe('placeEventWhen', () => {
+  it('says a date at the precision it was recorded, never inventing a day', () => {
+    expect(placeEventWhen({date_start: '2009', date_end: '2013'})).toBe('2009 – 2013');
+    expect(placeEventWhen({date_start: '2014-05', date_end: null})).toBe('May 2014');
+    expect(placeEventWhen({date_start: '2014-05-03', date_end: '2014-05-03'})).toBe('3 May 2014');
+  });
+});
 
 describe('the base map style', () => {
   it('asks only this app for tiles, fonts and sprites, in the grayscale flavor, with every place named', () => {
