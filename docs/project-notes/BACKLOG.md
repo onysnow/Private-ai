@@ -145,6 +145,10 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   otherwise.
 - Gradients can say things (direction, from whom to whom, how much): keep an eye out for places to use them as the app
   is built, and propose them.
+- No dashed line stands still. Every dashed or dotted line moves (marches along its direction), or isn't dashed.
+  Done in the three Wire previews: unconfirmed links, the unknown-share ring and the flag pennants' tethers now march.
+- Research before designing more: how 2026 UI hints at more information, and how ownership share is shown (the
+  key-and-ring share mark is not good). Findings to discuss with him before any redesign.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
     so the chips showed through to the lines. Fixed; the liquid's range is subtle but visible again.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
