@@ -12,6 +12,17 @@ The "approved" items below may be built straight away.
 
 6. **Done 19 Oct (first slice): Keep › Safety & data** (mockup KEEP-safety-and-data, ADR-0015): what lives on this computer and what left it, the outbound log word for word (CSV export), the last backup, the four Keep cards. Open: ADR-0015's five questions for Ony (the log in backups; AI calls as the question or the whole text; which OpenAleph calls to log; the default for outside lookups; when "last backup" is noted), Your safety panel, stray-file cleanup, encrypted backups.
 
+## After the whole site is built: show less at rest (Ony, 29 Oct)
+"When we finish the entire site, I want to go through and bury more details behind hoverable effects because there is way
+too much text many of the times. I also want the whole container to have a small effect when you're inside it to help
+keep track of the mouse amongst all the UI. And by default I will want only the most important pieces of data viewed
+when you're not hovering, have selected or in said container."
+- A pass over every screen once the build list is done, not now. At rest each container shows only its most important
+  data; hovering, selecting or being inside a container reveals the rest (DECISIONS_LOG 12's detail levels and the
+  research §7.4 ideas B "four depths" and D are the starting point).
+- Every container gets a small effect while the pointer is inside it, so the pointer is easy to keep track of.
+- Keep the floor (research §3): status, level and provenance stay visible at rest.
+
 ## Ony's standing requirement for every card
 Wherever a card appears (decision, dashboard widget, flag, timeline row, to-check item), it must:
 - let him infer the most important facts: who, what, how much, when, from where;

@@ -15,6 +15,9 @@ import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AllLinks} from './all-links';
 import {LinkPanel} from './link-panel';
 import {brighten, mountWire} from './wire-engine';
+import {GridLight} from '../effects/grid-light';
+import {webglAvailable} from '../effects/webgl';
+import {currentAppearance, onAppearanceChange} from '../../lib/theme';
 import type {LinkInfo, LinkSure, OpenLink, PartyTags} from './wire-engine';
 
 const SURE_OF = {supported: 'shown', unsupported: 'unshown', contested: 'disputed'} as const satisfies Record<string, LinkSure>;
@@ -53,6 +56,17 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
     return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
   }, [partyTags]);
   const [tagsOn, setTagsOn] = useState(true);
+  // Lamps behind the grid (features/effects/grid-light.tsx): Effects Full and normal motion only, where WebGL works.
+  const grid = useRef<HTMLDivElement>(null);
+  const [gridLight, setGridLight] = useState(false);
+  useEffect(() => {
+    const read = () => {
+      const a = currentAppearance();
+      setGridLight(a.effects === 'full' && a.motion !== 'calm' && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches && webglAvailable());
+    };
+    read();
+    return onAppearanceChange(read);
+  }, []);
   // The parties' Red Flags are as the rules last left them: when the records have changed since, this runs them once
   // and the run refetches the Wire.
   useRedFlagsQuery(investigationId);
@@ -89,7 +103,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
   if (!data || !data.entities.length) return <div className="tw tw-state"><p>No parties in this case yet. Records you accept in Decide appear here.</p></div>;
 
   return <div className={tagsOn ? 'tw' : 'tw tw-tags-off'} ref={root} aria-label="The Wire">
-    <div className="tw-grid" aria-hidden="true"><i className="tw-grid-glow"/></div>
+    <div className="tw-grid" ref={grid} aria-hidden="true">{gridLight && <GridLight grid={grid}/>}</div>
     <svg className="tw-map" role="img" aria-label="Map of the parties in this case and how they are linked">
       <defs>
         <filter id="tw-goo" x="-20%" y="-20%" width="140%" height="140%">
