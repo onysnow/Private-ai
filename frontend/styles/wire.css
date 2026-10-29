@@ -245,6 +245,9 @@
 .tw .more text { font: 500 11px var(--font-ui); }
 .tw .more-n { font: 700 12px var(--font-mono); fill: #F3C887; }
 .tw .more-w { fill: var(--text-muted); letter-spacing: .04em; }
+.tw .more .more-f { display: none; }
+.tw .more:hover .more-f, .tw .more:focus-visible .more-f { display: inline; }
+.tw .more:hover .more-s, .tw .more:focus-visible .more-s { display: none; }
 .tw .more-lead { fill: none; stroke: #E8A95B; stroke-opacity: .55; pointer-events: none; }
 .tw .hop-bg { fill: var(--ground); }
 .tw .round-l { font: 600 11px var(--font-mono); letter-spacing: .06em; fill: #ffe9e4; }

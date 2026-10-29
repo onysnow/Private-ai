@@ -44,7 +44,7 @@ type Strand = {fam: string; s: string; t: string; links: WireLinkOut[]; sum: num
 type Bundle = {key: string; a: string; b: string; links: WireLinkOut[]; strands: Record<string, Strand>};
 type Chain = {id: string; mids: string[]; ends: string[]; open: boolean};
 type NodeEl = {
-  id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dx: number; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
+  id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dx: number; hw: number; hh: number; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
 type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
@@ -110,6 +110,11 @@ const monthYear = (d: string): string => { const [y, m] = d.split('-'); return m
 
 /** A strand's sentence, from the fixed link verbs (research §2.2): "owns 60%", "director since 2017",
  * "paid 29,400 EUR · 3× Feb–Apr 2018", "bid for · 4 Mar 2019". It reads from the strand's first party to its second. */
+/** A jurisdiction code written out ("VG" → "British Virgin Islands"); the code itself when the browser has no name. */
+export const placeName = (code: string): string => {
+  try { return new Intl.DisplayNames(['en'], {type: 'region'}).of(code.toUpperCase()) ?? code; } catch { return code; }
+};
+
 /** Text cut to `n` characters at a word, with an ellipsis when cut (the whole of it is on hover). */
 export const clipWords = (text: string, n: number): string => {
   if (text.length <= n) return text;
@@ -380,7 +385,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     // A flagged card's outline takes its level's colour over a glow (paintFlag); the glow sits behind the card.
     el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'flag-glow', fill: 'none', filter: 'url(#tw-flagglow)', style: 'display:none'}, card);
     el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4, 'data-ring': K.ring}, card);
-    el('circle', {cx: dx, cy: 0, r: 11, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5}, card);
+    el('circle', {cx: dx, cy: 0, r: 11, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5, class: 'kind-dot'}, card);
     if (!isChain) kindIcon(E[id].kind, dx, 0, 13, K.ring, card);
     el('text', {class: 'card-t', x: tx, y: -4}, card);
     el('text', {class: 'card-s', x: tx, y: 14}, card);
@@ -402,7 +407,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const sharp = el('g', {class: 'sharp'}, tags);
       own.forEach((t, i) => { const c = brighten(t.colour); arc(glow, c, i, 7); arc(sharp, c, i, 2.8); });
     }
-    const N: NodeEl = {id, g, halo, tags, dx, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
+    const N: NodeEl = {id, g, halo, tags, dx, hw: 90 + pad / 2, hh: 27, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
     on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); onNodeClick(id); });
     on<PointerEvent>(g, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showTip(ev, id); });
     on(g, 'pointerleave', hideTip);
@@ -419,20 +424,30 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     if (!e) return;
     const t = N.card.querySelector('.card-t')!;
     t.textContent = '';
-    const all = wrapWords(e.short, 19), L = all.slice(0, 2);
-    if (all.length > 2) L[1] = `${L[1].slice(0, 19)}…`;
-    // The kind is the icon in the dot; the second line is the jurisdiction, when there is one, and the name centres
-    // when there is not.
-    const x = t.getAttribute('x') ?? '-52', jur = (e.jur ?? '').toUpperCase();
-    t.setAttribute('y', String(jur ? -4 : 4));
-    L.forEach((s, i) => { const ts = el('tspan', {x, dy: i ? 14 : (L.length > 1 ? -7 : 0)}, t); ts.textContent = s; });
+    const all = wrapWords(e.short, 22), L = all.slice(0, 2);
+    if (all.length > 2) L[1] = `${L[1].slice(0, 21)}…`;
+    // The card is as wide as its name (no empty run after it) and one line tall for a one-line name. The kind is the
+    // icon in the dot; the jurisdiction is on hover (showTip), where it is written out in full.
+    const spans = L.map((line, i) => { const ts = el('tspan', {dy: i ? 14 : (L.length > 1 ? -7 : 0)}, t); ts.textContent = line; return ts; });
+    let textW = 0;
+    spans.forEach((ts, i) => { let w = L[i].length * 7.2; try { w = ts.getComputedTextLength() || w; } catch { /* not laid out (tests) */ } textW = Math.max(textW, w); });
+    const pad = N.tags ? 14 : 0, textOff = 38 + pad * 4 / 3;
+    const W = Math.min(250, Math.max(112, textOff + textW + 16)), hw = W / 2, hh = L.length > 1 ? 25 : pad ? 23 : 19;
+    const dx = -hw + 20 + pad / 2, tx = -hw + textOff;
+    N.dx = dx; N.hw = hw; N.hh = hh;
+    t.setAttribute('x', String(tx)); t.setAttribute('y', '4');
+    spans.forEach(ts => ts.setAttribute('x', String(tx)));
+    for (const r of Array.from(N.card.querySelectorAll<SVGRectElement>('.card-bg, .flag-glow'))) {
+      r.setAttribute('x', String(-hw)); r.setAttribute('y', String(-hh)); r.setAttribute('width', String(W)); r.setAttribute('height', String(hh * 2));
+    }
+    N.card.querySelector('.kind-dot')?.setAttribute('cx', String(dx));
+    N.card.querySelector('.kind-icon')?.setAttribute('x', String(dx - 6.5));
+    N.card.querySelector('.card-s')!.textContent = '';
+    N.flag.setAttribute('transform', `translate(${hw + 1},${-hh - 1})`);
     const accts = rollAccounts ? D.entities.filter(a => a.holder === N.id) : [];
-    const s = N.card.querySelector('.card-s')!;
-    s.setAttribute('y', String(L.length > 1 ? 20 : 14));
-    s.textContent = jur;
     N.beads.textContent = '';
-    accts.forEach((_, i) => { el('circle', {cx: -78 + i * 13, cy: 33, r: 4.5, fill: KIND.account.fill, stroke: KIND.account.ring, 'stroke-width': 1.3}, N.beads); });
-    if (accts.length) { const tx = el('text', {class: 'card-s', x: -78 + accts.length * 13, y: 36.5}, N.beads); tx.textContent = `${accts.length} ${accts.length > 1 ? 'ACCOUNTS' : 'ACCOUNT'}`; }
+    accts.forEach((_, i) => { el('circle', {cx: -hw + 12 + i * 13, cy: hh + 6, r: 4.5, fill: KIND.account.fill, stroke: KIND.account.ring, 'stroke-width': 1.3}, N.beads); });
+    if (accts.length) { const ax = el('text', {class: 'card-s', x: -hw + 12 + accts.length * 13, y: hh + 9.5}, N.beads); ax.textContent = `${accts.length} ${accts.length > 1 ? 'ACCOUNTS' : 'ACCOUNT'}`; }
     paintFlag(N, flagsOf(N.id));
   }
   const LEVEL_C: Record<string, string> = {textbook: '#FF8070', strong: '#F6966A', faint: '#E9AFA8'};
@@ -786,7 +801,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const N = node[id];
       if (N.cur.v === 2 && !N.isChain && N.cur.o > 0.5) {
         const s = toScreen(P[id].x, P[id].y);
-        cardBoxes.push({x0: s.x - (94 + (-70 - N.dx) * 2) * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - (nOpen(flagsOf(id)) ? 40 : 32) * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
+        cardBoxes.push({x0: s.x - (N.hw + 4) * C.k * cs, x1: s.x + (N.hw + 12) * C.k * cs, y0: s.y - (N.hh + (nOpen(flagsOf(id)) ? 13 : 5)) * C.k * cs,
+          y1: s.y + (N.hh + (D.entities.some(a => a.holder === id) ? 16 : 4)) * C.k * cs});
       }
     }
     const rtBoxes: Box[] = [];
@@ -1105,10 +1121,17 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         // A folded stack: a leader back to its party, then a tab with three stacked dots and the count.
         const lead = el('path', {class: 'more-lead'}, gM);
         const g = el('g', {class: 'more', transform: `translate(${m.x},${m.y})`, role: 'button', tabindex: 0, 'aria-label': `Show ${m.n} more linked to ${E[m.p].short}`}, gM);
-        const w = 80 + String(m.n).length * 8;
-        el('rect', {x: -w / 2, y: -13, width: w, height: 26, rx: 6, class: 'more-bg'}, g);
-        for (const [i, dx] of [0, 5, 10].entries()) el('circle', {cx: -w / 2 + 11 + dx, cy: 0, r: 4.2, class: `more-stack s${i}`}, g);
-        const t = el('text', {x: -w / 2 + 30, y: 4.5}, g);
+        const w = 80 + String(m.n).length * 8, ws = 40 + String(m.n).length * 8;
+        // At rest a condensed tab (three stacked dots and the count); on hover or keyboard focus it opens to the full chip.
+        // It is placed by its full width, so opening never covers anything.
+        const small = el('g', {class: 'more-s'}, g);
+        el('rect', {x: -ws / 2, y: -11, width: ws, height: 22, rx: 11, class: 'more-bg'}, small);
+        for (const [i, dx] of [0, 4, 8].entries()) el('circle', {cx: -ws / 2 + 10 + dx, cy: 0, r: 3.4, class: `more-stack s${i}`}, small);
+        el('text', {x: -ws / 2 + 25, y: 4.5, class: 'more-n'}, small).textContent = `+${m.n}`;
+        const full = el('g', {class: 'more-f'}, g);
+        el('rect', {x: -w / 2, y: -13, width: w, height: 26, rx: 6, class: 'more-bg'}, full);
+        for (const [i, dx] of [0, 5, 10].entries()) el('circle', {cx: -w / 2 + 11 + dx, cy: 0, r: 4.2, class: `more-stack s${i}`}, full);
+        const t = el('text', {x: -w / 2 + 30, y: 4.5}, full);
         el('tspan', {class: 'more-n'}, t).textContent = `+${m.n}`;
         el('tspan', {class: 'more-w', dx: 4}, t).textContent = 'more';
         const open = () => { expanded.add(m.p); go('party', {noTrail: true}); };
@@ -1376,7 +1399,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       tip.innerHTML = `<b>${c.mids.length > 1 ? `Chain of ${c.mids.length} companies` : 'One company in between'}</b><span class="m">${c.mids.map(m => esc(E[m].short)).join(' → ')}. Each owns the next and nothing else. Click to open it out.</span>`;
     } else {
       const e = E[id], f = flagsOf(id);
-      tip.innerHTML = `<b>${esc(e.short)}</b><span class="m">${esc((KIND[e.kind] ?? KIND.other).name)} · ${deg[id]} linked ${deg[id] === 1 ? 'party' : 'parties'}${nOpen(f) ? ` · ${nOpen(f)} open flags` : ''}</span>`;
+      tip.innerHTML = `<b>${esc(e.short)}</b><span class="m">${esc((KIND[e.kind] ?? KIND.other).name)}${e.jur ? ` · ${esc(placeName(e.jur))}` : ''} · ${deg[id]} linked ${deg[id] === 1 ? 'party' : 'parties'}${nOpen(f) ? ` · ${nOpen(f)} open flags` : ''}</span>`;
     }
     placeTip(ev);
     tip.classList.add('on');
