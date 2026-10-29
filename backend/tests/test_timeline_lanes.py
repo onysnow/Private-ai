@@ -161,3 +161,14 @@ def test_a_built_timeline_is_the_owners_order_of_this_cases_events():
     assert client.delete(f"/api/investigations/{other}/built-timelines/{built['id']}").status_code == 404
     assert client.delete(f"/api/investigations/{inv}/built-timelines/{built['id']}").status_code == 204
     assert ok(client.get(f"/api/investigations/{inv}/built-timelines")) == []
+
+
+def test_the_board_keeps_where_cards_were_moved_its_notes_and_its_style():
+    inv = _inv("Board")
+    assert ok(client.get(f"/api/investigations/{inv}/timeline/board")) == {"style": "rich", "positions": {}, "notes": []}
+    body = {"style": "clean", "positions": {"2019": {"event:a": [0.25, 0.5]}},
+            "notes": [{"id": "n1", "board": "2019", "text": "Who decided the award, and when?", "x": 0.6, "y": 0.1}]}
+    assert ok(client.put(f"/api/investigations/{inv}/timeline/board", json=body)) == body
+    assert ok(client.get(f"/api/investigations/{inv}/timeline/board")) == body
+    off = client.put(f"/api/investigations/{inv}/timeline/board", json={**body, "notes": [{**body["notes"][0], "x": 3}]})
+    assert off.status_code == 422

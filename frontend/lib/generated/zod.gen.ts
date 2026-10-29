@@ -900,6 +900,28 @@ export const zBasemapStatusOut = z.object({
 });
 
 /**
+ * BoardNoteIn
+ */
+export const zBoardNoteIn = z.object({
+  board: z.string().min(1).max(128),
+  id: z.string().min(1).max(64),
+  text: z.string().min(1).max(400),
+  x: z.number().gte(0).lte(1),
+  y: z.number().gte(0).lte(1),
+});
+
+/**
+ * BoardNoteOut
+ */
+export const zBoardNoteOut = z.object({
+  board: z.string(),
+  id: z.string(),
+  text: z.string(),
+  x: z.number(),
+  y: z.number(),
+});
+
+/**
  * Body_check_evidence_pack
  */
 export const zBodyCheckEvidencePack = z.object({
@@ -9485,6 +9507,29 @@ export const zLeadTaskConversionOut = z.object({
 });
 
 /**
+ * TimelineBoardIn
+ *
+ * Where the cards sit on each board (as fractions of the board, so they keep their place at any width), the
+ * reporter's sticky notes, and the board's style: Rich (tacks, paper, string) or Clean.
+ */
+export const zTimelineBoardIn = z.object({
+  notes: z.array(zBoardNoteIn).max(200).optional(),
+  positions: z
+    .record(z.string(), z.record(z.string(), z.tuple([z.number(), z.number()])))
+    .optional(),
+  style: z.enum(['rich', 'clean']).optional().default('rich'),
+});
+
+/**
+ * TimelineBoardOut
+ */
+export const zTimelineBoardOut = z.object({
+  notes: z.array(zBoardNoteOut),
+  positions: z.record(z.string(), z.record(z.string(), z.array(z.number()))),
+  style: z.enum(['rich', 'clean']),
+});
+
+/**
  * TimelineClaimAdvisoryOut
  */
 export const zTimelineClaimAdvisoryOut = z.object({
@@ -14096,6 +14141,26 @@ export const zGetInvestigationTimelineQuery = z.object({
  * Successful Response
  */
 export const zGetInvestigationTimelineResponse = zTimelineOut;
+
+export const zGetTimelineBoardPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetTimelineBoardResponse = zTimelineBoardOut;
+
+export const zPutTimelineBoardBody = zTimelineBoardIn;
+
+export const zPutTimelineBoardPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPutTimelineBoardResponse = zTimelineBoardOut;
 
 export const zTimelineLanesViewPath = z.object({
   investigation_id: z.string(),

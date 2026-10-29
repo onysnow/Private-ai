@@ -759,6 +759,20 @@ class BuiltTimelineOut(ResponseModel):
     updated_at: Timestamp
 
 
+class BoardNoteOut(ResponseModel):
+    id: str
+    board: str
+    text: str
+    x: float
+    y: float
+
+
+class TimelineBoardOut(ResponseModel):
+    style: Literal["rich", "clean"]
+    positions: dict[str, dict[str, list[float]]]
+    notes: list[BoardNoteOut]
+
+
 class TimelineLanesOut(ResponseModel):
     investigation_id: str
     events: list[TimelineLaneEventOut]

@@ -603,6 +603,9 @@ import type {
   GetTagsData,
   GetTagsErrors,
   GetTagsResponses,
+  GetTimelineBoardData,
+  GetTimelineBoardErrors,
+  GetTimelineBoardResponses,
   GetVersionsData,
   GetVersionsErrors,
   GetVersionsResponses,
@@ -963,6 +966,9 @@ import type {
   PutResearchSettingsData,
   PutResearchSettingsErrors,
   PutResearchSettingsResponses,
+  PutTimelineBoardData,
+  PutTimelineBoardErrors,
+  PutTimelineBoardResponses,
   RecheckCaptureData,
   RecheckCaptureErrors,
   RecheckCaptureResponses,
@@ -1627,6 +1633,8 @@ import {
   zGetTaggedRecordsResponse,
   zGetTagsPath,
   zGetTagsResponse,
+  zGetTimelineBoardPath,
+  zGetTimelineBoardResponse,
   zGetVersionsPath,
   zGetVersionsResponse,
   zGetWatchlistPath,
@@ -1915,6 +1923,9 @@ import {
   zPutNotificationPrefsResponse,
   zPutResearchSettingsBody,
   zPutResearchSettingsResponse,
+  zPutTimelineBoardBody,
+  zPutTimelineBoardPath,
+  zPutTimelineBoardResponse,
   zRecheckCapturePath,
   zRecheckCaptureResponse,
   zRecheckHashPath,
@@ -10160,6 +10171,72 @@ export const getInvestigationTimeline = <ThrowOnError extends boolean = false>(
       await zGetInvestigationTimelineResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/timeline',
     ...options,
+  });
+
+/**
+ * Get Timeline Board
+ *
+ * Where the Board's cards sit, its notes, and its style (Rich by default, DECISIONS_LOG 6, call 9).
+ */
+export const getTimelineBoard = <ThrowOnError extends boolean = false>(
+  options: Options<GetTimelineBoardData, ThrowOnError>,
+): RequestResult<
+  GetTimelineBoardResponses,
+  GetTimelineBoardErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetTimelineBoardResponses,
+    GetTimelineBoardErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetTimelineBoardPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTimelineBoardResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/board',
+    ...options,
+  });
+
+/**
+ * Put Timeline Board
+ *
+ * Keep where the cards were moved to, the notes, and the style. Kept with the case, so it travels in a backup.
+ */
+export const putTimelineBoard = <ThrowOnError extends boolean = false>(
+  options: Options<PutTimelineBoardData, ThrowOnError>,
+): RequestResult<
+  PutTimelineBoardResponses,
+  PutTimelineBoardErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutTimelineBoardResponses,
+    PutTimelineBoardErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutTimelineBoardBody,
+          path: zPutTimelineBoardPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutTimelineBoardResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/board',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

@@ -206,6 +206,7 @@ import {
   getSuiteCoverage,
   getTaggedRecords,
   getTags,
+  getTimelineBoard,
   getVersions,
   getWatchlist,
   getWire,
@@ -327,6 +328,7 @@ import {
   putNotificationChannel,
   putNotificationPrefs,
   putResearchSettings,
+  putTimelineBoard,
   recheckCapture,
   recheckHash,
   recordRemoval,
@@ -996,6 +998,9 @@ import type {
   GetTagsData,
   GetTagsError,
   GetTagsResponse,
+  GetTimelineBoardData,
+  GetTimelineBoardError,
+  GetTimelineBoardResponse,
   GetVersionsData,
   GetVersionsError,
   GetVersionsResponse,
@@ -1355,6 +1360,9 @@ import type {
   PutResearchSettingsData,
   PutResearchSettingsError,
   PutResearchSettingsResponse,
+  PutTimelineBoardData,
+  PutTimelineBoardError,
+  PutTimelineBoardResponse,
   RecheckCaptureData,
   RecheckCaptureError,
   RecheckCaptureResponse,
@@ -10151,6 +10159,65 @@ export const getInvestigationTimelineInfiniteOptions = (
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getTimelineBoardQueryKey = (
+  options: Options<GetTimelineBoardData>,
+) => createQueryKey('getTimelineBoard', options);
+
+/**
+ * Get Timeline Board
+ *
+ * Where the Board's cards sit, its notes, and its style (Rich by default, DECISIONS_LOG 6, call 9).
+ */
+export const getTimelineBoardOptions = (
+  options: Options<GetTimelineBoardData>,
+) =>
+  queryOptions<
+    GetTimelineBoardResponse,
+    GetTimelineBoardError,
+    GetTimelineBoardResponse,
+    ReturnType<typeof getTimelineBoardQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTimelineBoard({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTimelineBoardQueryKey(options),
+  });
+
+/**
+ * Put Timeline Board
+ *
+ * Keep where the cards were moved to, the notes, and the style. Kept with the case, so it travels in a backup.
+ */
+export const putTimelineBoardMutation = (
+  options?: Partial<Options<PutTimelineBoardData>>,
+): UseMutationOptions<
+  PutTimelineBoardResponse,
+  PutTimelineBoardError,
+  Options<PutTimelineBoardData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutTimelineBoardResponse,
+    PutTimelineBoardError,
+    Options<PutTimelineBoardData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putTimelineBoard({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const timelineLanesViewQueryKey = (

@@ -2014,6 +2014,58 @@ export type BasemapStatusOut = {
 };
 
 /**
+ * BoardNoteIn
+ */
+export type BoardNoteIn = {
+  /**
+   * Board
+   */
+  board: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * X
+   */
+  x: number;
+  /**
+   * Y
+   */
+  y: number;
+};
+
+/**
+ * BoardNoteOut
+ */
+export type BoardNoteOut = {
+  /**
+   * Board
+   */
+  board: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * X
+   */
+  x: number;
+  /**
+   * Y
+   */
+  y: number;
+};
+
+/**
  * Body_check_evidence_pack
  */
 export type BodyCheckEvidencePack = {
@@ -20934,6 +20986,53 @@ export type TaskWorkflowEventOut = {
 };
 
 /**
+ * TimelineBoardIn
+ *
+ * Where the cards sit on each board (as fractions of the board, so they keep their place at any width), the
+ * reporter's sticky notes, and the board's style: Rich (tacks, paper, string) or Clean.
+ */
+export type TimelineBoardIn = {
+  /**
+   * Notes
+   */
+  notes?: Array<BoardNoteIn>;
+  /**
+   * Positions
+   */
+  positions?: {
+    [key: string]: {
+      [key: string]: [number, number];
+    };
+  };
+  /**
+   * Style
+   */
+  style?: 'rich' | 'clean';
+};
+
+/**
+ * TimelineBoardOut
+ */
+export type TimelineBoardOut = {
+  /**
+   * Notes
+   */
+  notes: Array<BoardNoteOut>;
+  /**
+   * Positions
+   */
+  positions: {
+    [key: string]: {
+      [key: string]: Array<number>;
+    };
+  };
+  /**
+   * Style
+   */
+  style: 'rich' | 'clean';
+};
+
+/**
  * TimelineClaimAdvisoryOut
  */
 export type TimelineClaimAdvisoryOut = {
@@ -33905,6 +34004,86 @@ export type GetInvestigationTimelineResponses = {
 
 export type GetInvestigationTimelineResponse =
   GetInvestigationTimelineResponses[keyof GetInvestigationTimelineResponses];
+
+export type GetTimelineBoardData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/board';
+};
+
+export type GetTimelineBoardErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetTimelineBoardError =
+  GetTimelineBoardErrors[keyof GetTimelineBoardErrors];
+
+export type GetTimelineBoardResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelineBoardOut;
+};
+
+export type GetTimelineBoardResponse =
+  GetTimelineBoardResponses[keyof GetTimelineBoardResponses];
+
+export type PutTimelineBoardData = {
+  body: TimelineBoardIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/board';
+};
+
+export type PutTimelineBoardErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutTimelineBoardError =
+  PutTimelineBoardErrors[keyof PutTimelineBoardErrors];
+
+export type PutTimelineBoardResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelineBoardOut;
+};
+
+export type PutTimelineBoardResponse =
+  PutTimelineBoardResponses[keyof PutTimelineBoardResponses];
 
 export type TimelineLanesViewData = {
   body?: never;

@@ -13,14 +13,15 @@ import {TimelinePeriods, inPeriod} from './periods';
 import {TimelineReplay} from './replay';
 import {TimelineStack} from './stack';
 import {BuildYourOwn} from './build-your-own';
+import {TimelineBoard} from './board';
 import {span} from './lanes-model';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 export {EVENT_GRADES} from './lanes-model';
 
 type Props = {investigationId: string};
-type View = 'lanes' | 'stack' | 'replay' | 'periods';
-const VIEWS: Array<[View, string]> = [['lanes', 'Lanes'], ['stack', 'Stack'], ['replay', 'Replay'], ['periods', 'Periods']];
+type View = 'lanes' | 'stack' | 'replay' | 'board' | 'periods';
+const VIEWS: Array<[View, string]> = [['lanes', 'Lanes'], ['stack', 'Stack'], ['replay', 'Replay'], ['board', 'Board'], ['periods', 'Periods']];
 
 export function TimelinePanel({investigationId}: Props): ReactElement {
   // The same query each view reads: the count and why it opened where it did, said once at the top.
@@ -36,6 +37,7 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
     lanes: 'One lane per party. Each mark says whether the event is shown; its band says how exact the date is.',
     stack: 'Each layer is a stretch of time holding the evidence dated in it. Scroll pushes the top layer out; empty stretches are skipped.',
     replay: 'Replay walks the story in the order things happened. At each step you see only what was on the record by then.',
+    board: 'Each period gets a board: its documents, people, notes and payments, joined by string where the record joins them.',
     periods: 'Each period you named, with your summary of it and its evidence.',
   };
   return <section className="tl2-panel" aria-labelledby="tl2-title">
@@ -57,6 +59,7 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
     {mode === 'record' && view === 'stack' && lanes.data && <TimelineStack view={lanes.data} onShowInLanes={show}/>}
     {mode === 'record' && view === 'replay' && lanes.data && <TimelineReplay view={lanes.data}
       onShowInLanes={(id, step) => { setAsOf(new Date(span({date_start: step.date_start, date_end: step.date_end})[1]).getUTCFullYear()); show(id); }}/>}
+    {mode === 'record' && view === 'board' && lanes.data && <TimelineBoard view={lanes.data} investigationId={investigationId} onShowInLanes={show}/>}
     {mode === 'record' && view === 'periods' && lanes.data && <TimelinePeriods view={lanes.data} investigationId={investigationId} onSelect={show}
       onOpenLanes={p => { const first = inPeriod(lanes.data!.events, p)[0]; if (first) show(first.id); else setView('lanes'); }}/>}
   </section>;

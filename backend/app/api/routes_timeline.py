@@ -11,10 +11,11 @@ from app.api.dependencies import authorize_request_resource
 from app.core.authorization import scope_for_request
 from app.db.session import get_db
 from app.models.domain import BuiltTimeline, Investigation, TimelinePeriod
-from app.schemas.api import BuiltTimelineIn, TimelinePeriodIn
+from app.schemas.api import BuiltTimelineIn, TimelineBoardIn, TimelinePeriodIn
 from app.schemas.responses import (
     BuiltTimelineOut,
     ErrorOut,
+    TimelineBoardOut,
     TimelineLanesOut,
     TimelinePeriodOut,
     ValidationErrorOut,
@@ -130,3 +131,29 @@ def delete_built_timeline(investigation_id: str, built_id: str, request: Request
     db.delete(_built(db, request, investigation_id, built_id))
     db.commit()
     return Response(status_code=204)
+
+
+BOARD_KEY = "timeline_board"
+BOARD_EMPTY = {"style": "rich", "positions": {}, "notes": []}
+
+
+@router.get("/investigations/{investigation_id}/timeline/board", response_model=TimelineBoardOut,
+            responses={404: {"model": ErrorOut}})
+def get_timeline_board(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """Where the Board's cards sit, its notes, and its style (Rich by default, DECISIONS_LOG 6, call 9)."""
+    from app.services.preferences import _get
+
+    _case(db, investigation_id)
+    row = _get(db, "case", investigation_id, BOARD_KEY)
+    return {**BOARD_EMPTY, **(row.value if row is not None else {})}
+
+
+@router.put("/investigations/{investigation_id}/timeline/board", response_model=TimelineBoardOut,
+            responses={404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut}})
+def put_timeline_board(investigation_id: str, body: TimelineBoardIn, db: Session = Depends(get_db)) -> Any:
+    """Keep where the cards were moved to, the notes, and the style. Kept with the case, so it travels in a backup."""
+    from app.services.preferences import _put
+
+    _case(db, investigation_id)
+    value = body.model_dump()
+    return _put(db, "case", investigation_id, BOARD_KEY, value, investigation_id=investigation_id).value

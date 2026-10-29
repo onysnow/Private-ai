@@ -3482,6 +3482,82 @@
         "title": "BasemapStatusOut",
         "type": "object"
       },
+      "BoardNoteIn": {
+        "properties": {
+          "board": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Board",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 400,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "x": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "board",
+          "text",
+          "x",
+          "y"
+        ],
+        "title": "BoardNoteIn",
+        "type": "object"
+      },
+      "BoardNoteOut": {
+        "properties": {
+          "board": {
+            "title": "Board",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "board",
+          "text",
+          "x",
+          "y"
+        ],
+        "title": "BoardNoteOut",
+        "type": "object"
+      },
       "Body_check_evidence_pack": {
         "properties": {
           "file": {
@@ -40188,6 +40264,89 @@
         "title": "TaskWorkflowEventOut",
         "type": "object"
       },
+      "TimelineBoardIn": {
+        "description": "Where the cards sit on each board (as fractions of the board, so they keep their place at any width), the\nreporter's sticky notes, and the board's style: Rich (tacks, paper, string) or Clean.",
+        "properties": {
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/BoardNoteIn"
+            },
+            "maxItems": 200,
+            "title": "Notes",
+            "type": "array"
+          },
+          "positions": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              "type": "object"
+            },
+            "title": "Positions",
+            "type": "object"
+          },
+          "style": {
+            "default": "rich",
+            "enum": [
+              "rich",
+              "clean"
+            ],
+            "title": "Style",
+            "type": "string"
+          }
+        },
+        "title": "TimelineBoardIn",
+        "type": "object"
+      },
+      "TimelineBoardOut": {
+        "properties": {
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/BoardNoteOut"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "positions": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "object"
+            },
+            "title": "Positions",
+            "type": "object"
+          },
+          "style": {
+            "enum": [
+              "rich",
+              "clean"
+            ],
+            "title": "Style",
+            "type": "string"
+          }
+        },
+        "required": [
+          "style",
+          "positions",
+          "notes"
+        ],
+        "title": "TimelineBoardOut",
+        "type": "object"
+      },
       "TimelineClaimAdvisoryOut": {
         "properties": {
           "message": {
@@ -68336,6 +68495,134 @@
           }
         },
         "summary": "Get Investigation Timeline"
+      }
+    },
+    "/api/investigations/{investigation_id}/timeline/board": {
+      "get": {
+        "description": "Where the Board's cards sit, its notes, and its style (Rich by default, DECISIONS_LOG 6, call 9).",
+        "operationId": "get_timeline_board",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineBoardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Timeline Board"
+      },
+      "put": {
+        "description": "Keep where the cards were moved to, the notes, and the style. Kept with the case, so it travels in a backup.",
+        "operationId": "put_timeline_board",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimelineBoardIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineBoardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Put Timeline Board"
       }
     },
     "/api/investigations/{investigation_id}/timeline/lanes": {
