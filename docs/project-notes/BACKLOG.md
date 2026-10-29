@@ -103,6 +103,8 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   says Esc closes. Pennants avoid parties, link labels and each other; one pushed off its thread keeps a dotted tether.
 - Then: no coloured glow on hover anywhere (cards, dots, "+N", link labels); the hover is the lift, the brighter
   outline and the sheen. Kind icons larger (25px in a 38px badge) to fill the badge.
+- Then: every icon is centred on its own drawn bounds, not its 24-unit box (several lucide icons sit off-centre in
+  their box), and a card's badge circle is inset from the card's outline with an outline of its own in the kind's colour.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
   circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
