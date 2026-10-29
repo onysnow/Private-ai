@@ -51,6 +51,8 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   and the BitLocker reading is untested on a real Windows machine.
 
 ## Waiting on Ony
+- **Add by hand, works today, check a pack (29 Oct):** mockups ENTRY_1, WORKS_1 and CHECK_4 in
+  `docs/design/entry-and-checks-mockups/` (open `index.html`), nine open questions in its README.
 - **See ("The Wire"):** the prototype is at https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3,
   with its source in `docs/design/see-the-wire/` and the design in `SEE_THE_WIRE_PROTOTYPE.md`.
   It awaits his approval before it is built.

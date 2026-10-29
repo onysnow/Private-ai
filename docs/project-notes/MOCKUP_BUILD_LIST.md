@@ -171,6 +171,7 @@ Timeline and Places: **no mockup in the 16 screens** — the canvas frames 4–1
 **28 Oct: mockups drawn, waiting for Ony's approval:** TIME_1 Timeline · Lanes, TIME_2 Timeline · Stack in depth, PLACE_1 Places (`docs/design/time-and-place-mockups/`, seven open questions in its README). Nothing is built until he approves.
 Deck editor (research §9; it had only ever been designed in words): **28 Oct: mockups DECK_1 Deck editor and DECK_2 Present drawn, waiting for Ony's approval** (`docs/design/deck-mockups/`, five open questions in its README).
 Media tools (the native module's first screens, ADR-0021): **28 Oct: mockups MEDIA_1 A photo, MEDIA_2 A recording and MEDIA_3 A PDF drawn, waiting for Ony's approval** (`docs/design/media-mockups/`, nine open questions in its README).
+Add by hand, works today, check a pack: **29 Oct: mockups ENTRY_1 Add by hand (a party, link or event), WORKS_1 Does it work today? and CHECK_4 Check a pack drawn, waiting for Ony's approval** (`docs/design/entry-and-checks-mockups/`, nine open questions in its README).
 
 ## 6. Check — mockups CHECK_1 (Decide) and CHECK_2 (Chain of Custody) (§06)
 
