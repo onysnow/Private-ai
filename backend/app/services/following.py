@@ -750,11 +750,11 @@ def recheck_captured(db: Session, *, now: datetime | None = None, fetch: Callabl
             continue
         if got.status in (404, 410):
             capture = db.get(Capture, item.capture_id) if item.capture_id else None
+            kept_at = (capture.captured_at or capture.finished_at) if capture is not None else None
             db.add(MonitorItem(investigation_id=item.investigation_id, monitor_id=item.monitor_id, key=f"{item.url}#gone", url=item.url,
                                title=item.title, flags=["gone"], state="new", first_seen_at=now, last_seen_at=now,
                                displayed={"http_status": got.status, "capture_id": item.capture_id,
-                                          "captured_at": (capture.captured_at or capture.finished_at).isoformat()
-                                          if capture is not None and (capture.captured_at or capture.finished_at) else None}))
+                                          "captured_at": kept_at.isoformat() if kept_at is not None else None}))
             db.commit()
             gone += 1
     return {"rechecked": len(rows), "gone": gone}
@@ -838,7 +838,7 @@ def overview(db: Session, investigation_id: str) -> dict[str, Any]:
     for c in db.scalars(select(MonitorItem).where(MonitorItem.investigation_id == investigation_id, MonitorItem.copy_of.is_not(None))
                         .order_by(MonitorItem.first_seen_at)).all():
         copies.setdefault(str(c.copy_of), []).append(c)
-    stories = []
+    stories: list[dict[str, Any]] = []
     for original_id, its in copies.items():
         original = db.get(MonitorItem, original_id)
         if original is None or not any(c.state == "new" for c in its) and original.state != "new":
