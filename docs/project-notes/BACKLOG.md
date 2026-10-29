@@ -92,6 +92,16 @@ Ony sent https://framer.com/m/Testimonial-Rotation-JRnz0w.js@VcEYXbVlwUb8LpYlJsb
   a slide, progress bars and arrows, pausing on hover, and still under reduced motion.
 - The natural home is the website. Not started; it waits for Ony to say where he wants it.
 
+## Iridiums, liquid metal (Ony, 29 Oct)
+Ony sent https://framer.com/m/Iridiums-cvu6Qo.js@zVtz2mLljephiv025VmE without a note.
+- What it is, from its code: a pale, iridescent liquid metal drawn in a shader. It is not a painted pattern. It builds a
+  photo studio (strip lights, a horizon, two softboxes, a floor) and a drifting liquid surface, then reflects the
+  studio in the surface at every pixel. The colour comes from each channel reflecting at a slightly different angle.
+  Its controls are angle, dispersion, exposure, Fresnel, grain, highlight, lights, polish, relief, scale, shadow, speed,
+  strips, tint and vignette.
+- It is the same idea as the OnySnow light engine (light from a modelled scene, not painted on), so a version of our own
+  would belong in onysnow-studios. Not started; it waits for Ony to say where he wants it.
+
 ## The Wire's chips in Nova Glow's motion (Ony, 29 Oct)
 "This is how smooth I want the chips, and also how I want any glow animations. The styling is sharper": Framer's
 "Nova Glow Navigation" (https://framer.com/m/Nova-Glow-Navigation-zmwqc6.js@AeSS5plwSRxLlwjuE91J).
