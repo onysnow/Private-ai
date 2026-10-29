@@ -108,10 +108,11 @@ Ony sent https://framer.com/m/Iridiums-cvu6Qo.js@zVtz2mLljephiv025VmE without a 
 His corrections to the first preview: keep the chips as they are (no recolouring, nothing removed) and only add the
 styling; give our icons that kind of animation and care without copying Nova's icon; glow only on the chip being
 hovered, in the chip's own colour as light. Red Flags: on faint (yellow) and strong (orange) the glow is only on the
-count's circle at the top right; a chip with a textbook flag glows whole, red, pulsing like a siren.
+count's circle at the top right; a chip with a textbook flag carries a police siren: a red beam sweeping round its
+outline, the red light coming only from that moving beam, never from the whole outline (his correction, 29 Oct).
 - The second preview does that: today's chips with a spring, a sheen, words that roll up on "+N more" and link chips, a
   glow in the kind's colour on hover, each kind icon's own animation on hover, the flag circle lit on hover, and the
-  textbook chip pulsing red with a beam round its outline at rest (faster on hover). Faint is yellow there, outline and
+  textbook chip's red siren beam sweeping round its outline at rest (faster on hover). Faint is yellow there, outline and
   circle. It waits for his yes before the app changes.
 
 ## Ony's standing requirement for every card
