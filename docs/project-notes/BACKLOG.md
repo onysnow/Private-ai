@@ -105,6 +105,11 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   outline and the sheen. Kind icons larger (25px in a 38px badge) to fill the badge.
 - Then: every icon is centred on its own drawn bounds, not its 24-unit box (several lucide icons sit off-centre in
   their box), and a card's badge circle is inset from the card's outline with an outline of its own in the kind's colour.
+- Then: the link label said only "Owns" (who owns what?) and its hover jumped. Now at rest it is a check, the verb and
+  an arrow pointing along the line from owner to owned; hover widens it evenly on the spring, uncovering the words, and
+  rolls up to the whole sentence ("Viktor Vekselberg owns 100% of Renova Group"); both lines are centred so nothing
+  jumps. Its tooltip says what the check means. Also fixed: the Red Flag box's invisible glow caught the pointer at
+  rest and opened the box over neighbouring labels.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
   circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
