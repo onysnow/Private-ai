@@ -20,6 +20,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.domain import (
+    BuiltTimeline,
     Claim,
     ClaimEvidenceLink,
     Entity,
@@ -244,6 +245,25 @@ def save_period(db: Session, investigation_id: str, *, name: str, date_start: st
         raise ValueError("The period ends before it starts")
     row = period or TimelinePeriod(investigation_id=investigation_id, made_by=actor)
     row.name, row.date_start, row.date_end, row.summary = name[:120], a[0], b[0], summary.strip()
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def save_built(db: Session, investigation_id: str, owner: str, *, name: str, items: list[str],
+               built: BuiltTimeline | None = None) -> BuiltTimeline:
+    """Keep a person's own timeline. Every item must be an event of this case (as the timeline gives it); an item named
+    twice is kept once, where it first appears. The events themselves are never changed."""
+    name = name.strip()
+    if not name:
+        raise ValueError("Give the timeline a name")
+    known = {e["id"] for e in investigation_timeline(db, investigation_id)["events"]}
+    unknown = [i for i in items if i not in known]
+    if unknown:
+        raise ValueError(f"Not an event in this case: {unknown[0]}")
+    row = built or BuiltTimeline(investigation_id=investigation_id, owner=owner)
+    row.name, row.items = name[:120], list(dict.fromkeys(items))
     db.add(row)
     db.commit()
     db.refresh(row)

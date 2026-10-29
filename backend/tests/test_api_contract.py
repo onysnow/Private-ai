@@ -535,10 +535,11 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # A named period of the timeline (app/services/timeline_lanes.py).
     period_id = client.post(f"/api/investigations/{inv}/timeline/periods",
                             json={"name": "The money", "date_start": "2018", "date_end": "2018-12"}).json()["id"]
+    built_id = client.post(f"/api/investigations/{inv}/built-timelines", json={"name": "For the editor", "items": []}).json()["id"]
 
     return Seeded(
         ids={
-            "monitor_id": monitor_id, "monitor_item_id": monitor_item_id, "voice": "1", "period_id": period_id,
+            "monitor_id": monitor_id, "monitor_item_id": monitor_item_id, "voice": "1", "period_id": period_id, "built_id": built_id,
             "fact_watch_id": fact_watch["id"], "saved_question_id": saved_question["id"], "channel": "phone",
             "section_id": story["sections"][0]["id"], "version_id": version["id"], "run_id": draft["job"]["id"],
             "investigation_id": inv, "entity_id": meridian, "claim_id": claim["id"], "lead_id": lead, "relationship_id": relationship,

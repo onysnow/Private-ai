@@ -12,6 +12,7 @@ import {TimelineLanes} from './lanes';
 import {TimelinePeriods, inPeriod} from './periods';
 import {TimelineReplay} from './replay';
 import {TimelineStack} from './stack';
+import {BuildYourOwn} from './build-your-own';
 import {span} from './lanes-model';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -25,9 +26,10 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
   // The same query each view reads: the count and why it opened where it did, said once at the top.
   const lanes = useQuery({...timelineLanesViewOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const [view, setView] = useState<View>('lanes');
+  const [mode, setMode] = useState<'record' | 'build'>('record');
   // An event picked in another view, shown in Lanes (with a serial so picking the same one again still moves there).
   const [focus, setFocus] = useState<{id: string; serial: number} | null>(null);
-  const show = (id: string) => { setFocus(f => ({id, serial: (f?.serial ?? 0) + 1})); setView('lanes'); };
+  const show = (id: string) => { setFocus(f => ({id, serial: (f?.serial ?? 0) + 1})); setMode('record'); setView('lanes'); };
   const setAsOf = useWorkbenchStore(st => st.setAsOf);
   const n = lanes.data?.events.length ?? 0;
   const LEDE: Record<View, string> = {
@@ -38,19 +40,24 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
   };
   return <section className="tl2-panel" aria-labelledby="tl2-title">
     <header className="tl2-head">
-      <h2 id="tl2-title">What happened when, and how sure are we?</h2>
-      <p>{LEDE[view]}</p>
-      <div className="tl2-views" role="tablist" aria-label="Timeline views">
-        {VIEWS.map(([k, w]) => <button key={k} role="tab" aria-selected={view === k} onClick={() => setView(k)}>{w}</button>)}
+      <div className="tl2-views" role="group" aria-label="The record or your own">
+        <button aria-pressed={mode === 'record'} onClick={() => setMode('record')}>The record</button>
+        <button aria-pressed={mode === 'build'} onClick={() => setMode('build')}>Build your own</button>
       </div>
+      <h2 id="tl2-title">{mode === 'build' ? 'Build your own timeline' : 'What happened when, and how sure are we?'}</h2>
+      <p>{mode === 'build' ? 'Pick the evidence, put it in the order you want to tell it, and leave placeholders for what you still need. The record’s own dates stay on every card.' : LEDE[view]}</p>
+      {mode === 'record' && <div className="tl2-views" role="tablist" aria-label="Timeline views">
+        {VIEWS.map(([k, w]) => <button key={k} role="tab" aria-selected={view === k} onClick={() => setView(k)}>{w}</button>)}
+      </div>}
       {lanes.data && <p className="tl2-status">{n} {n === 1 ? 'event' : 'events'}{lanes.data.opens_on && view === 'lanes' ? ' · opened on the next unresolved' : ''}
         {lanes.data.span.busiest ? ` · ${lanes.data.span.first}–${lanes.data.span.last} · busiest ${lanes.data.span.busiest}` : ''}</p>}
     </header>
-    {view === 'lanes' && <TimelineLanes investigationId={investigationId} picked={focus}/>}
-    {view === 'stack' && lanes.data && <TimelineStack view={lanes.data} onShowInLanes={show}/>}
-    {view === 'replay' && lanes.data && <TimelineReplay view={lanes.data}
+    {mode === 'build' && lanes.data && <BuildYourOwn view={lanes.data} investigationId={investigationId} onShowInLanes={show}/>}
+    {mode === 'record' && view === 'lanes' && <TimelineLanes investigationId={investigationId} picked={focus}/>}
+    {mode === 'record' && view === 'stack' && lanes.data && <TimelineStack view={lanes.data} onShowInLanes={show}/>}
+    {mode === 'record' && view === 'replay' && lanes.data && <TimelineReplay view={lanes.data}
       onShowInLanes={(id, step) => { setAsOf(new Date(span({date_start: step.date_start, date_end: step.date_end})[1]).getUTCFullYear()); show(id); }}/>}
-    {view === 'periods' && lanes.data && <TimelinePeriods view={lanes.data} investigationId={investigationId} onSelect={show}
+    {mode === 'record' && view === 'periods' && lanes.data && <TimelinePeriods view={lanes.data} investigationId={investigationId} onSelect={show}
       onOpenLanes={p => { const first = inPeriod(lanes.data!.events, p)[0]; if (first) show(first.id); else setView('lanes'); }}/>}
   </section>;
 }

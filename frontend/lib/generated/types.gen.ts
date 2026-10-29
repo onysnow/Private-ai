@@ -2092,6 +2092,50 @@ export type BodyUploadDocument = {
 };
 
 /**
+ * BuiltTimelineIn
+ *
+ * A person's own timeline: its name, and the case's event ids in the order they want to tell them.
+ */
+export type BuiltTimelineIn = {
+  /**
+   * Items
+   */
+  items?: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * BuiltTimelineOut
+ */
+export type BuiltTimelineOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Items
+   */
+  items: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Owner
+   */
+  owner: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+};
+
+/**
  * ByHandAddedOut
  *
  * What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties.
@@ -30132,6 +30176,180 @@ export type ListAuthenticityResponses = {
 
 export type ListAuthenticityResponse =
   ListAuthenticityResponses[keyof ListAuthenticityResponses];
+
+export type ListBuiltTimelinesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/built-timelines';
+};
+
+export type ListBuiltTimelinesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListBuiltTimelinesError =
+  ListBuiltTimelinesErrors[keyof ListBuiltTimelinesErrors];
+
+export type ListBuiltTimelinesResponses = {
+  /**
+   * Response List Built Timelines
+   *
+   * Successful Response
+   */
+  200: Array<BuiltTimelineOut>;
+};
+
+export type ListBuiltTimelinesResponse =
+  ListBuiltTimelinesResponses[keyof ListBuiltTimelinesResponses];
+
+export type CreateBuiltTimelineData = {
+  body: BuiltTimelineIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/built-timelines';
+};
+
+export type CreateBuiltTimelineErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Built Timeline
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateBuiltTimelineError =
+  CreateBuiltTimelineErrors[keyof CreateBuiltTimelineErrors];
+
+export type CreateBuiltTimelineResponses = {
+  /**
+   * Successful Response
+   */
+  201: BuiltTimelineOut;
+};
+
+export type CreateBuiltTimelineResponse =
+  CreateBuiltTimelineResponses[keyof CreateBuiltTimelineResponses];
+
+export type DeleteBuiltTimelineData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Built Id
+     */
+    built_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/built-timelines/{built_id}';
+};
+
+export type DeleteBuiltTimelineErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteBuiltTimelineError =
+  DeleteBuiltTimelineErrors[keyof DeleteBuiltTimelineErrors];
+
+export type DeleteBuiltTimelineResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteBuiltTimelineResponse =
+  DeleteBuiltTimelineResponses[keyof DeleteBuiltTimelineResponses];
+
+export type UpdateBuiltTimelineData = {
+  body: BuiltTimelineIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Built Id
+     */
+    built_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/built-timelines/{built_id}';
+};
+
+export type UpdateBuiltTimelineErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Update Built Timeline
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateBuiltTimelineError =
+  UpdateBuiltTimelineErrors[keyof UpdateBuiltTimelineErrors];
+
+export type UpdateBuiltTimelineResponses = {
+  /**
+   * Successful Response
+   */
+  200: BuiltTimelineOut;
+};
+
+export type UpdateBuiltTimelineResponse =
+  UpdateBuiltTimelineResponses[keyof UpdateBuiltTimelineResponses];
 
 export type ByHandAddData = {
   body: EntryIn;

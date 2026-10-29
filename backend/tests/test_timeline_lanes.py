@@ -141,3 +141,23 @@ def test_replay_steps_are_the_story_claims_in_the_order_things_happened():
         ("Kestrel SA is set up", "2016-03-01", "2017-07-03", False),
         ("A deposit, with no award recorded", "2019-05", None, True)]
     assert len(view["steps"][0]["event_ids"]) == 2
+
+
+def test_a_built_timeline_is_the_owners_order_of_this_cases_events():
+    inv = _inv("Built")
+    a = _event(inv, "Council opens the tender", "2019-01-15")
+    b = _event(inv, "The deposit went across", "2019-05", precision="month")
+    made = client.post(f"/api/investigations/{inv}/built-timelines", json={"name": "For the editor", "items": [b, a, b]})
+    assert made.status_code == 201, made.text
+    built = made.json()
+    assert built["items"] == [b, a] and built["owner"] == "local-owner"
+    bad = client.put(f"/api/investigations/{inv}/built-timelines/{built['id']}", json={"name": "For the editor", "items": ["relationship:nope"]})
+    assert bad.status_code == 422 and "Not an event in this case" in bad.json()["detail"]
+    ok(client.put(f"/api/investigations/{inv}/built-timelines/{built['id']}", json={"name": "Ross's year", "items": [a]}))
+    assert [(t["name"], t["items"]) for t in ok(client.get(f"/api/investigations/{inv}/built-timelines"))] == [("Ross's year", [a])]
+    # The events themselves are untouched.
+    assert {e["title"] for e in _lanes(inv)["events"]} == {"Council opens the tender", "The deposit went across"}
+    other = _inv("Elsewhere")
+    assert client.delete(f"/api/investigations/{other}/built-timelines/{built['id']}").status_code == 404
+    assert client.delete(f"/api/investigations/{inv}/built-timelines/{built['id']}").status_code == 204
+    assert ok(client.get(f"/api/investigations/{inv}/built-timelines")) == []

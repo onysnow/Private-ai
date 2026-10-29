@@ -32,7 +32,7 @@ from app.models.domain import (
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
     Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
     DocumentMedia, TranscriptSegment, DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion,
-    AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod,
+    AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod, BuiltTimeline,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -53,7 +53,7 @@ MODEL_BY_TABLE = {
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
         DocumentMedia, TranscriptSegment, DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion,
-        AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod,
+        AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod, BuiltTimeline,
     ]
 }
 
@@ -86,6 +86,8 @@ RESTORE_ORDER = [
     "evidence_packs",
     # The reporter's named periods of the timeline.
     "timeline_periods",
+    # Each person's own built timelines (their order of the case's events).
+    "built_timelines",
     # Bulk imports and what happened to each file; an item points at its document.
     "ingestion_batches", "ingestion_batch_items",
     # Spreadsheet column mappings; the proposals they made are extraction candidates.
@@ -193,7 +195,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture, DocumentMedia, TranscriptSegment,
-        DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion, AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod,
+        DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion, AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod, BuiltTimeline,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())

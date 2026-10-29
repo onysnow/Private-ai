@@ -138,6 +138,9 @@ import type {
   CreateAppUserData,
   CreateAppUserErrors,
   CreateAppUserResponses,
+  CreateBuiltTimelineData,
+  CreateBuiltTimelineErrors,
+  CreateBuiltTimelineResponses,
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipErrors,
   CreateCanonicalRelationshipResponses,
@@ -213,6 +216,9 @@ import type {
   DecidePropertyConflictData,
   DecidePropertyConflictErrors,
   DecidePropertyConflictResponses,
+  DeleteBuiltTimelineData,
+  DeleteBuiltTimelineErrors,
+  DeleteBuiltTimelineResponses,
   DeleteConnectorCredentialData,
   DeleteConnectorCredentialErrors,
   DeleteConnectorCredentialResponses,
@@ -696,6 +702,9 @@ import type {
   ListAuthenticityData,
   ListAuthenticityErrors,
   ListAuthenticityResponses,
+  ListBuiltTimelinesData,
+  ListBuiltTimelinesErrors,
+  ListBuiltTimelinesResponses,
   ListCaseRecordsData,
   ListCaseRecordsErrors,
   ListCaseRecordsResponses,
@@ -1149,6 +1158,9 @@ import type {
   UpdateAuthenticityData,
   UpdateAuthenticityErrors,
   UpdateAuthenticityResponses,
+  UpdateBuiltTimelineData,
+  UpdateBuiltTimelineErrors,
+  UpdateBuiltTimelineResponses,
   UpdateCaptureData,
   UpdateCaptureErrors,
   UpdateCaptureResponses,
@@ -1285,6 +1297,9 @@ import {
   zConvertLeadEndpointResponse,
   zCreateAppUserBody,
   zCreateAppUserResponse,
+  zCreateBuiltTimelineBody,
+  zCreateBuiltTimelinePath,
+  zCreateBuiltTimelineResponse,
   zCreateCanonicalRelationshipBody,
   zCreateCanonicalRelationshipResponse,
   zCreateCaptureBody,
@@ -1348,6 +1363,8 @@ import {
   zDecidePropertyConflictBody,
   zDecidePropertyConflictPath,
   zDecidePropertyConflictResponse,
+  zDeleteBuiltTimelinePath,
+  zDeleteBuiltTimelineResponse,
   zDeleteConnectorCredentialPath,
   zDeleteConnectorCredentialResponse,
   zDeleteDeckEndpointPath,
@@ -1691,6 +1708,8 @@ import {
   zListAssessmentsResponse,
   zListAuthenticityPath,
   zListAuthenticityResponse,
+  zListBuiltTimelinesPath,
+  zListBuiltTimelinesResponse,
   zListCaseRecordsPath,
   zListCaseRecordsQuery,
   zListCaseRecordsResponse,
@@ -2045,6 +2064,9 @@ import {
   zUpdateAuthenticityBody,
   zUpdateAuthenticityPath,
   zUpdateAuthenticityResponse,
+  zUpdateBuiltTimelineBody,
+  zUpdateBuiltTimelinePath,
+  zUpdateBuiltTimelineResponse,
   zUpdateCaptureBody,
   zUpdateCapturePath,
   zUpdateCaptureResponse,
@@ -7400,6 +7422,138 @@ export const listAuthenticity = <ThrowOnError extends boolean = false>(
       await zListAuthenticityResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/authenticity',
     ...options,
+  });
+
+/**
+ * List Built Timelines
+ *
+ * Your own timelines in this case (each person sees only theirs).
+ */
+export const listBuiltTimelines = <ThrowOnError extends boolean = false>(
+  options: Options<ListBuiltTimelinesData, ThrowOnError>,
+): RequestResult<
+  ListBuiltTimelinesResponses,
+  ListBuiltTimelinesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListBuiltTimelinesResponses,
+    ListBuiltTimelinesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListBuiltTimelinesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListBuiltTimelinesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/built-timelines',
+    ...options,
+  });
+
+/**
+ * Create Built Timeline
+ *
+ * Start a timeline of your own.
+ */
+export const createBuiltTimeline = <ThrowOnError extends boolean = false>(
+  options: Options<CreateBuiltTimelineData, ThrowOnError>,
+): RequestResult<
+  CreateBuiltTimelineResponses,
+  CreateBuiltTimelineErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateBuiltTimelineResponses,
+    CreateBuiltTimelineErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateBuiltTimelineBody,
+          path: zCreateBuiltTimelinePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateBuiltTimelineResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/built-timelines',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Built Timeline
+ *
+ * Delete one of your timelines; the events in it stay as they are.
+ */
+export const deleteBuiltTimeline = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteBuiltTimelineData, ThrowOnError>,
+): RequestResult<
+  DeleteBuiltTimelineResponses,
+  DeleteBuiltTimelineErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteBuiltTimelineResponses,
+    DeleteBuiltTimelineErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteBuiltTimelinePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteBuiltTimelineResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/built-timelines/{built_id}',
+    ...options,
+  });
+
+/**
+ * Update Built Timeline
+ *
+ * Rename it, or change which events it tells and in what order.
+ */
+export const updateBuiltTimeline = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateBuiltTimelineData, ThrowOnError>,
+): RequestResult<
+  UpdateBuiltTimelineResponses,
+  UpdateBuiltTimelineErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateBuiltTimelineResponses,
+    UpdateBuiltTimelineErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateBuiltTimelineBody,
+          path: zUpdateBuiltTimelinePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateBuiltTimelineResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/built-timelines/{built_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

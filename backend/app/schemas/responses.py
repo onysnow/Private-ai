@@ -751,6 +751,14 @@ class TimelineStepOut(ResponseModel):
     unresolved: bool
 
 
+class BuiltTimelineOut(ResponseModel):
+    id: str
+    name: str
+    owner: str
+    items: list[str]
+    updated_at: Timestamp
+
+
 class TimelineLanesOut(ResponseModel):
     investigation_id: str
     events: list[TimelineLaneEventOut]

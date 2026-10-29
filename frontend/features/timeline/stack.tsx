@@ -60,7 +60,7 @@ function layerLabel(at: number, step: Step): string {
 export function layersFor(events: TimelineLaneEventOut[], step: Step): Layer[] {
   const map = new Map<string, Layer>();
   for (const e of events) {
-    if (!e.date_start || e.placeholder) continue;
+    if (!e.date_start || e.placeholder || e.precision === 'unknown') continue;
     const g = grain(e);
     const fuzzy = g !== 'day' && rank[g as Step] > rank[step];
     const own: Step = fuzzy ? (g as Step) : step;

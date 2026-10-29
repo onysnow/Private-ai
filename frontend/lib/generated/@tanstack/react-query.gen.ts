@@ -51,6 +51,7 @@ import {
   connectorSearch,
   convertLeadEndpoint,
   createAppUser,
+  createBuiltTimeline,
   createCanonicalRelationship,
   createCapture,
   createCaseRecord,
@@ -76,6 +77,7 @@ import {
   decideEntityPostMergeReconciliation,
   decideInvestigationCrossReference,
   decidePropertyConflict,
+  deleteBuiltTimeline,
   deleteConnectorCredential,
   deleteDeckEndpoint,
   deleteInvestigationMembership,
@@ -237,6 +239,7 @@ import {
   listAreas,
   listAssessments,
   listAuthenticity,
+  listBuiltTimelines,
   listCaseRecords,
   listClaimEvidenceEndpoint,
   listClaims,
@@ -389,6 +392,7 @@ import {
   untagARecord,
   updateAppUser,
   updateAuthenticity,
+  updateBuiltTimeline,
   updateCapture,
   updateClaimEndpoint,
   updateDeckEndpoint,
@@ -528,6 +532,9 @@ import type {
   CreateAppUserData,
   CreateAppUserError,
   CreateAppUserResponse,
+  CreateBuiltTimelineData,
+  CreateBuiltTimelineError,
+  CreateBuiltTimelineResponse,
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipError,
   CreateCanonicalRelationshipResponse,
@@ -603,6 +610,9 @@ import type {
   DecidePropertyConflictData,
   DecidePropertyConflictError,
   DecidePropertyConflictResponse,
+  DeleteBuiltTimelineData,
+  DeleteBuiltTimelineError,
+  DeleteBuiltTimelineResponse,
   DeleteConnectorCredentialData,
   DeleteConnectorCredentialError,
   DeleteConnectorCredentialResponse,
@@ -1085,6 +1095,9 @@ import type {
   ListAuthenticityData,
   ListAuthenticityError,
   ListAuthenticityResponse,
+  ListBuiltTimelinesData,
+  ListBuiltTimelinesError,
+  ListBuiltTimelinesResponse,
   ListCaseRecordsData,
   ListCaseRecordsError,
   ListCaseRecordsResponse,
@@ -1537,6 +1550,9 @@ import type {
   UpdateAuthenticityData,
   UpdateAuthenticityError,
   UpdateAuthenticityResponse,
+  UpdateBuiltTimelineData,
+  UpdateBuiltTimelineError,
+  UpdateBuiltTimelineResponse,
   UpdateCaptureData,
   UpdateCaptureError,
   UpdateCaptureResponse,
@@ -6775,6 +6791,123 @@ export const listAuthenticityOptions = (
     },
     queryKey: listAuthenticityQueryKey(options),
   });
+
+export const listBuiltTimelinesQueryKey = (
+  options: Options<ListBuiltTimelinesData>,
+) => createQueryKey('listBuiltTimelines', options);
+
+/**
+ * List Built Timelines
+ *
+ * Your own timelines in this case (each person sees only theirs).
+ */
+export const listBuiltTimelinesOptions = (
+  options: Options<ListBuiltTimelinesData>,
+) =>
+  queryOptions<
+    ListBuiltTimelinesResponse,
+    ListBuiltTimelinesError,
+    ListBuiltTimelinesResponse,
+    ReturnType<typeof listBuiltTimelinesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listBuiltTimelines({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listBuiltTimelinesQueryKey(options),
+  });
+
+/**
+ * Create Built Timeline
+ *
+ * Start a timeline of your own.
+ */
+export const createBuiltTimelineMutation = (
+  options?: Partial<Options<CreateBuiltTimelineData>>,
+): UseMutationOptions<
+  CreateBuiltTimelineResponse,
+  CreateBuiltTimelineError,
+  Options<CreateBuiltTimelineData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateBuiltTimelineResponse,
+    CreateBuiltTimelineError,
+    Options<CreateBuiltTimelineData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createBuiltTimeline({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete Built Timeline
+ *
+ * Delete one of your timelines; the events in it stay as they are.
+ */
+export const deleteBuiltTimelineMutation = (
+  options?: Partial<Options<DeleteBuiltTimelineData>>,
+): UseMutationOptions<
+  DeleteBuiltTimelineResponse,
+  DeleteBuiltTimelineError,
+  Options<DeleteBuiltTimelineData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteBuiltTimelineResponse,
+    DeleteBuiltTimelineError,
+    Options<DeleteBuiltTimelineData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteBuiltTimeline({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update Built Timeline
+ *
+ * Rename it, or change which events it tells and in what order.
+ */
+export const updateBuiltTimelineMutation = (
+  options?: Partial<Options<UpdateBuiltTimelineData>>,
+): UseMutationOptions<
+  UpdateBuiltTimelineResponse,
+  UpdateBuiltTimelineError,
+  Options<UpdateBuiltTimelineData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateBuiltTimelineResponse,
+    UpdateBuiltTimelineError,
+    Options<UpdateBuiltTimelineData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateBuiltTimeline({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 /**
  * By Hand Add

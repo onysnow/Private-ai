@@ -92,8 +92,9 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
     setStoreAsOf(at === null ? null : new Date(at).getUTCFullYear());
   }, [setStoreAsOf]);
 
-  const events = useMemo(() => (view?.events ?? []).filter(e => e.date_start && !hidden.has(e.fact) && !(hideFuzzy && isFuzzy(e) && !e.date_end)), [view, hidden, hideFuzzy]);
-  const allDated = useMemo(() => (view?.events ?? []).filter(e => e.date_start), [view]);
+  const events = useMemo(() => (view?.events ?? []).filter(e => e.date_start && e.precision !== 'unknown' && !hidden.has(e.fact) && !(hideFuzzy && isFuzzy(e) && !e.date_end)), [view, hidden, hideFuzzy]);
+  // A date nobody knows (a placeholder's "when not known") is never drawn on a day.
+  const allDated = useMemo(() => (view?.events ?? []).filter(e => e.date_start && e.precision !== 'unknown'), [view]);
   // The axis spans the case's own years: a record far before the rest (a 1952 founding) is a stub at the left edge.
   const firstAt = mainStart(allDated.map(e => span(e)[0])) ?? Date.UTC(2020, 0, 1);
   const lastAt = allDated.length ? Math.max(...allDated.map(e => span(e)[1])) : Date.UTC(2021, 0, 1);

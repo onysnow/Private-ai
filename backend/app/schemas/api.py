@@ -996,3 +996,9 @@ class TimelinePeriodIn(BaseModel):
     date_start: str = Field(min_length=4, max_length=32)
     date_end: str = Field(min_length=4, max_length=32)
     summary: str = Field(default="", max_length=4000)
+
+
+class BuiltTimelineIn(BaseModel):
+    """A person's own timeline: its name, and the case's event ids in the order they want to tell them."""
+    name: str = Field(min_length=1, max_length=120)
+    items: list[str] = Field(default_factory=list, max_length=500)

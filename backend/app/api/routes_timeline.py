@@ -4,14 +4,16 @@ app/services/timeline_lanes.py; routes stay thin."""
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
 from app.core.authorization import scope_for_request
 from app.db.session import get_db
-from app.models.domain import Investigation, TimelinePeriod
-from app.schemas.api import TimelinePeriodIn
+from app.models.domain import BuiltTimeline, Investigation, TimelinePeriod
+from app.schemas.api import BuiltTimelineIn, TimelinePeriodIn
 from app.schemas.responses import (
+    BuiltTimelineOut,
     ErrorOut,
     TimelineLanesOut,
     TimelinePeriodOut,
@@ -77,5 +79,54 @@ def update_timeline_period(investigation_id: str, period_id: str, body: Timeline
 def delete_timeline_period(investigation_id: str, period_id: str, db: Session = Depends(get_db)) -> Response:
     """Take a period away; its events stay."""
     db.delete(_period(db, investigation_id, period_id))
+    db.commit()
+    return Response(status_code=204)
+
+
+def _built(db: Session, request: Request, investigation_id: str, built_id: str) -> BuiltTimeline:
+    row = db.get(BuiltTimeline, built_id)
+    if row is None or row.investigation_id != investigation_id or row.owner != scope_for_request(request).actor_id:
+        raise HTTPException(404, "No such timeline of yours in this case")
+    return row
+
+
+@router.get("/investigations/{investigation_id}/built-timelines", response_model=list[BuiltTimelineOut],
+            responses={404: {"model": ErrorOut}})
+def list_built_timelines(investigation_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Your own timelines in this case (each person sees only theirs)."""
+    _case(db, investigation_id)
+    owner = scope_for_request(request).actor_id
+    return list(db.scalars(select(BuiltTimeline).where(BuiltTimeline.investigation_id == investigation_id,
+                                                       BuiltTimeline.owner == owner).order_by(BuiltTimeline.created_at)))
+
+
+@router.post("/investigations/{investigation_id}/built-timelines", response_model=BuiltTimelineOut, status_code=201,
+             responses={404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}})
+def create_built_timeline(investigation_id: str, body: BuiltTimelineIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Start a timeline of your own."""
+    _case(db, investigation_id)
+    try:
+        return timeline_lanes.save_built(db, investigation_id, scope_for_request(request).actor_id, name=body.name, items=body.items)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@router.put("/investigations/{investigation_id}/built-timelines/{built_id}", response_model=BuiltTimelineOut,
+            responses={404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}})
+def update_built_timeline(investigation_id: str, built_id: str, body: BuiltTimelineIn, request: Request,
+                          db: Session = Depends(get_db)) -> Any:
+    """Rename it, or change which events it tells and in what order."""
+    row = _built(db, request, investigation_id, built_id)
+    try:
+        return timeline_lanes.save_built(db, investigation_id, row.owner, name=body.name, items=body.items, built=row)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@router.delete("/investigations/{investigation_id}/built-timelines/{built_id}", status_code=204,
+               responses={404: {"model": ErrorOut}})
+def delete_built_timeline(investigation_id: str, built_id: str, request: Request, db: Session = Depends(get_db)) -> Response:
+    """Delete one of your timelines; the events in it stay as they are."""
+    db.delete(_built(db, request, investigation_id, built_id))
     db.commit()
     return Response(status_code=204)

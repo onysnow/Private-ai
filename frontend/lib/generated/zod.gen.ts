@@ -942,6 +942,31 @@ export const zBodyUploadDocument = z.object({
 });
 
 /**
+ * BuiltTimelineIn
+ *
+ * A person's own timeline: its name, and the case's event ids in the order they want to tell them.
+ */
+export const zBuiltTimelineIn = z.object({
+  items: z.array(z.string()).max(500).optional(),
+  name: z.string().min(1).max(120),
+});
+
+/**
+ * BuiltTimelineOut
+ */
+export const zBuiltTimelineOut = z.object({
+  id: z.string(),
+  items: z.array(z.string()),
+  name: z.string(),
+  owner: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
  * ByHandAddedOut
  *
  * What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties.
@@ -12931,6 +12956,50 @@ export const zListAuthenticityPath = z.object({
  * Successful Response
  */
 export const zListAuthenticityResponse = z.array(zAuthenticityStatusOut);
+
+export const zListBuiltTimelinesPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response List Built Timelines
+ *
+ * Successful Response
+ */
+export const zListBuiltTimelinesResponse = z.array(zBuiltTimelineOut);
+
+export const zCreateBuiltTimelineBody = zBuiltTimelineIn;
+
+export const zCreateBuiltTimelinePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateBuiltTimelineResponse = zBuiltTimelineOut;
+
+export const zDeleteBuiltTimelinePath = z.object({
+  investigation_id: z.string(),
+  built_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteBuiltTimelineResponse = z.void();
+
+export const zUpdateBuiltTimelineBody = zBuiltTimelineIn;
+
+export const zUpdateBuiltTimelinePath = z.object({
+  investigation_id: z.string(),
+  built_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateBuiltTimelineResponse = zBuiltTimelineOut;
 
 export const zByHandAddBody = zEntryIn;
 
