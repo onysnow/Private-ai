@@ -187,3 +187,15 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   5. Guides open only after a line saying which site they open, and nothing from the case goes with them. Their
      addresses are ones the catalogue already checked (Rory Peck Trust, Freedom of the Press Foundation, CPJ).
   6. No inbox kind `safety` yet: nothing fires on the server, so there is nothing to notify.
+
+## 10. The monitor list "encrypted at rest" (29 Oct)
+
+- **Question:** ADR-0022 left encrypting the monitor list at rest for later (source intake research: who you follow
+  says what the story is about).
+- **Call:** not encrypted inside the app. ADR-0016 already decided that the databases are protected at rest by the
+  disk's encryption, which the app reports, and that backups are sealed once a passphrase is set. Encrypting the list
+  with the passphrase would stop Following from checking sources whenever the app is locked or restarted, which is
+  when it most needs to run. Instead, Following says under the list what protects it now: whether the disk is
+  encrypted, and whether backups are.
+- **Why:** the protection the research asks for exists (disk encryption, sealed backups); a second key on one table
+  would add a way for the watcher to stop silently and protect nothing the disk does not.

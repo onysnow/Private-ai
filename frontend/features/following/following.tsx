@@ -13,6 +13,7 @@ import {useEffect, useMemo, useState} from 'react';
 import type {FormEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
+import {useLockStore} from '../../lib/app-lock';
 import {caseHref} from '../../lib/case-href';
 import {getFollowingOptions, getFollowingQueryKey, getVersionsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {captureAll, captureItem, checkMonitor, createMonitor, deleteMonitor, recordRemoval, skipItem, undoItem, updateMonitor} from '../../lib/generated/sdk.gen';
@@ -249,6 +250,7 @@ export function Following({investigationId, active = true}: {investigationId: st
       {adding && <FollowForm investigationId={investigationId} onDone={m => { setAdding(false); if (m) { setPicked(m.id); void refresh(); } }}/>}
       <section className="fl-panel" aria-label="Sources followed">
         <p className="fl-cap">Sources followed<span className="r">{monitors.length}{monitors.some(m => m.last_checked_at) ? ` · health checked ${hhmm(monitors.map(m => m.last_checked_at ?? '').sort().at(-1))}` : ''}</span></p>
+        <ListAtRest/>
         {!monitors.length ? <p className="fl-note">Nothing is followed yet. Follow a news feed, a sitemap, a page, a podcast or a public account; what they publish waits here for you.</p>
           : <div role="listbox" aria-label="Sources" className="fl-mons">{monitors.map(m =>
             <SourceRow key={m.id} m={m} picked={m.id === selected?.id} onPick={() => setPicked(m.id)}/>)}</div>}
@@ -303,4 +305,19 @@ export function Following({investigationId, active = true}: {investigationId: st
     </div>
     </>}
   </section>;
+}
+
+/** Who you follow says what the story is about (source intake research, source protection). The list is in the case
+ *  database, protected at rest by the disk's encryption as ADR-0016 decides; backups are sealed once a passphrase is set
+ *  (DECISIONS_LOG 10). Says which of those holds now. */
+function ListAtRest(): ReactElement | null {
+  const state = useLockStore(s => s.state);
+  if (!state) return null;
+  const disk = state.disk?.state;
+  const diskWords = disk === 'encrypted' || disk === 'encrypting' ? 'the disk is encrypted' : disk === 'not_encrypted' ? 'the disk is not encrypted'
+    : 'the app cannot tell whether the disk is encrypted';
+  const sealed = state.protection === 'passphrase';
+  return <p className={`fl-note fl-atrest${disk === 'encrypted' && sealed ? '' : ' warn'}`}>
+    This list says what the story is about. On this computer {diskWords}; backups {sealed ? 'are encrypted with your passphrase' : 'are not encrypted until you set a passphrase (Settings › Your safety)'}.
+  </p>;
 }

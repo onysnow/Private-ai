@@ -147,3 +147,5 @@
 .wt-acts form { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; } .wt-acts input { flex: 1 1 200px; min-width: 0; }
 .wt-switch { display: flex; gap: 8px; align-items: center; font-size: 12.5px; margin-top: 6px; }
 .fl-works { grid-column: 1 / -1; min-width: 0; }
+.fl-atrest { font-size: 12px; margin: 2px 0 8px; }
+.fl-atrest.warn::before { content: "▲ "; color: var(--status-provisional, var(--accent-1)); }
