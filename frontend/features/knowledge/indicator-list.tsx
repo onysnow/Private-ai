@@ -12,17 +12,18 @@ import type {CaseLayer} from './case-layer';
 import {strongest} from './case-layer';
 import {HOW_CHECKED, shortAreaName} from './families';
 
-export type ListFilter = 'all' | 'fires' | 'records' | 'lookups' | 'person';
+export type ListFilter = 'all' | 'computed' | 'fires' | 'records' | 'lookups' | 'person';
 const PREVIEW_MS = 300;
 
 export function filterRows(rows: CatalogueIndicatorRowOut[], filter: ListFilter, layer: Pick<CaseLayer, 'flags'>): CatalogueIndicatorRowOut[] {
   if (filter === 'all') return rows;
   if (filter === 'fires') return rows.filter(r => layer.flags.has(r.id));
+  if (filter === 'computed') return rows.filter(r => r.rule);
   return rows.filter(r => r.checkable === filter);
 }
 
 const EMPTY: Record<ListFilter, string> = {
-  all: 'holds no indicator yet', fires: 'fires in this case', records: 'is checked from your records',
+  all: 'holds no indicator yet', computed: 'is computed by the app yet', fires: 'fires in this case', records: 'is checked from your records',
   lookups: 'is checked after outside lookups', person: 'is checked only by a person',
 };
 
@@ -35,6 +36,7 @@ export function IndicatorList({area, rows, loading, error, layer, filter, onFilt
   const shown = filterRows(rows, filter, layer);
   const count = (f: ListFilter) => filterRows(rows, f, layer).length;
   const chips: {key: ListFilter; label: string}[] = [
+    ...(count('computed') ? [{key: 'computed' as const, label: `◆ The app computes ${count('computed')}`}] : []),
     {key: 'all', label: `All ${rows.length}`},
     ...(layer.investigationId ? [{key: 'fires' as const, label: `Fire here ${count('fires')}`}] : []),
     ...(['records', 'lookups', 'person'] as const).map(k => ({key: k, label: `${HOW_CHECKED[k].glyph} ${HOW_CHECKED[k].word} ${count(k)}`})),

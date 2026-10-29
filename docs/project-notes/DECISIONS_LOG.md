@@ -217,3 +217,27 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   5. No Tor route for mail: the reporter's mail server already knows the account; the form asks for a mailbox kept for
      newsletters, never their own.
   6. Each check is a line in the outbound log, saying the server and the sender asked about.
+
+## 12. UI simplification: the sixteen questions (29 Oct)
+
+- **Questions:** `docs/research/ui-simplification/UI_SIMPLIFICATION_RESEARCH.md` §8.
+- **Calls:**
+  1. Words: **Less / Usual / Everything**. The Media Suite's "Detail: Full / Calm" is not used in the app; "Calm
+     motion" stays the motion setting's name, so no two settings share a word.
+  2. One level for the whole app, kept on this computer, plus a per-fold memory ("always show this").
+  3. Default **Usual** for everyone; the tutorial case opens at Less and says where Usual begins.
+  4. Offers: yes, never applied by the app, at most once a session, with Don't ask again.
+  5. A Textbook safety notice sits at the top of the case at every level: it is part of the floor (entry 9).
+  6. Spines replace the section tab strip on stage pages once they exist (the strip stays until then).
+  7. Editorial, Desk and Story stay about how things look; how much shows is the level alone.
+  8. Bulk import moves to The Drop and "Stage relationship from a reviewed claim" to the claim, when the Library
+     becomes List + slot.
+  9. Every fold says "N folded · show": a fold that hides its count hides the floor.
+  10. Learn opens filtered to what the app computes, the rest marked reference and checklist.
+  11. First: the inspector slot and overlay rules (they remove windows everywhere), then the older heavy panels
+      (Library, Claims, Connectors), then Case home and Decide, as the research's order of work.
+  12. One inspector at a time with a trail; another row replaces what is open; Back and Esc step back.
+  13. The old Relationships panel's add forms and grid move into the Wire's own slot; the Wire itself is unchanged.
+  14. Case switcher, New case, Inbox and the shortcut list become modes of the command bar.
+  15, 16. The Awwwards list and North Star's working panel need Ony (links, a login); the study continues from the
+      public material until he sends them.
