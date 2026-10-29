@@ -57,3 +57,8 @@ class Capture(Base):
     # took and the tool; the recording it became is media_document_id.
     media: Mapped[dict] = mapped_column(JSON, default=dict)
     media_document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True)
+    # What outside services said about this capture, each asked for by a person and logged before it went
+    # (app/services/capture_witness.py, ADR-0025): "time_proof" (an RFC 3161 token over the WARC's SHA-256),
+    # "archive" (a public web archive's own copy), "elsewhere" (a copy an archive already holds of a page that could
+    # not be kept), and "asked" (what the capture was started with, done once it is saved).
+    witnesses: Mapped[dict | None] = mapped_column(JSON, nullable=True)

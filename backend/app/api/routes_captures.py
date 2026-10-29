@@ -17,7 +17,7 @@ from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Capture
 from app.schemas.api import CaptureCreate, CaptureFollowIn, CaptureUpdate
 from app.schemas.responses import CaptureOut, CaptureQuoteOut, ErrorOut, ValidationErrorOut
-from app.services import capture_follow, capture_quotes
+from app.services import capture_follow, capture_quotes, capture_witness
 from app.services.web_capture import CaptureRefused, capture_file, list_captures, request_capture, serialize_capture
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -31,6 +31,9 @@ def _out(db: Session, row: Capture) -> dict[str, Any]:
     out["reason_kind"] = row.reason_kind or capture_follow.guess_reason_kind(row)
     out["reason_kind_by"] = row.reason_kind_by
     out["follow"] = capture_follow.follow_state(db, row)
+    out["witnesses"] = capture_witness.serialize(row)
+    out["source_protected"] = capture_witness.protected(db, row)
+    out["time_server"] = capture_witness.time_server_host()
     job = db.get(BackgroundJob, row.job_id) if row.job_id else None
     out["job"] = serialize_job(job) if job is not None else None
     # A capture whose job ended without finishing it (stopped, or the server went down mid-visit) says so.
@@ -54,13 +57,16 @@ async def create_capture(investigation_id: str, body: CaptureCreate, request: Re
                          db: Session = Depends(get_db)) -> Any:
     """Capture the page at `url`: one visit, no cookies, every file kept with its SHA-256, and the page's text as a
     case document. Answers at once with the queued capture; follow `job` (GET /api/jobs/{id}) or the capture itself."""
-    return await _start(db, request, response, investigation_id, body.url)
+    return await _start(db, request, response, investigation_id, body.url,
+                        asked={"time_proof_on": body.time_proof, "second_witness_on": body.second_witness})
 
 
 async def _start(db: Session, request: Request, response: Response, investigation_id: str, url: str,
-                 after: Callable[[Capture], None] | None = None) -> dict[str, Any]:
+                 after: Callable[[Capture], None] | None = None, asked: dict[str, bool] | None = None) -> dict[str, Any]:
     try:
         row = request_capture(db, investigation_id, url, collector=scope_for_request(request).actor_id)
+        if asked:
+            capture_witness.ask_when_saved(row, **asked)
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
     except CaptureRefused as exc:
@@ -180,6 +186,38 @@ async def collect_capture_media(capture_id: str, request: Request, response: Res
     if done is not None and done.finished_at is not None:
         response.status_code = 200
     return _out(db, row)
+
+
+def _witness(db: Session, capture_id: str, request: Request, run: Callable[..., Capture]) -> dict[str, Any]:
+    row = _capture_or_404(db, capture_id)
+    try:
+        run(db, row, scope_for_request(request).actor_id)
+    except capture_witness.WitnessRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    db.expire_all()
+    return _out(db, db.get(Capture, capture_id) or row)
+
+
+WITNESS_REFUSED: dict[int | str, dict[str, Any]] = {404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Not asked: the capture is source-protected, or has nothing to send"}}
+
+
+@router.post("/captures/{capture_id}/time-proof", response_model=CaptureOut, responses=WITNESS_REFUSED)
+def capture_time_proof(capture_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Ask a time server to sign this capture's fingerprint (RFC 3161). Only the WARC's SHA-256 is sent, logged first;
+    the token is kept beside the capture's files and checked here. A failure is kept on the capture with its reason."""
+    return _witness(db, capture_id, request, capture_witness.time_proof)
+
+
+@router.post("/captures/{capture_id}/second-witness", response_model=CaptureOut, responses=WITNESS_REFUSED)
+def capture_second_witness(capture_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Ask a public web archive to visit the page and keep its own copy. Only the address is sent, logged first."""
+    return _witness(db, capture_id, request, capture_witness.second_witness)
+
+
+@router.post("/captures/{capture_id}/look-elsewhere", response_model=CaptureOut, responses=WITNESS_REFUSED)
+def capture_look_elsewhere(capture_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """For a page that could not be kept: ask a public web archive whether it holds a copy, and from when."""
+    return _witness(db, capture_id, request, capture_witness.look_elsewhere)
 
 
 @router.get("/investigations/{investigation_id}/captures", response_model=list[CaptureOut])

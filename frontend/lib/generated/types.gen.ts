@@ -2427,11 +2427,71 @@ export type CaptureAllRequest = {
 };
 
 /**
+ * CaptureArchiveOut
+ *
+ * A public web archive asked about this page (ADR-0025): "saved" (it kept its own copy, at `url`), "found" (it
+ * already held one), "none" (it holds none) or "failed" (with the reason). Only the address was sent.
+ */
+export type CaptureArchiveOut = {
+  /**
+   * Answered At
+   */
+  answered_at?: string | null;
+  /**
+   * Archived At
+   */
+  archived_at?: string | null;
+  /**
+   * Archived Status
+   */
+  archived_status?: string | null;
+  /**
+   * Asked At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  asked_at: string;
+  /**
+   * By
+   */
+  by: string;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Service
+   */
+  service: string;
+  /**
+   * State
+   */
+  state: 'saved' | 'found' | 'none' | 'failed';
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
  * CaptureCreate
  *
- * A link to capture (ADR-0018): http or https, a public address.
+ * A link to capture (ADR-0018): http or https, a public address. The two switches (ADR-0025) ask outside
+ * witnesses once the page is kept: a time server signs its fingerprint, a public web archive keeps its own copy.
  */
 export type CaptureCreate = {
+  /**
+   * Second Witness
+   */
+  second_witness?: boolean;
+  /**
+   * Time Proof
+   */
+  time_proof?: boolean;
   /**
    * Url
    */
@@ -2708,6 +2768,10 @@ export type CaptureOut = {
    */
   source_id?: string | null;
   /**
+   * Source Protected
+   */
+  source_protected?: boolean;
+  /**
    * Stages
    */
   stages: Array<CaptureStageOut>;
@@ -2724,6 +2788,10 @@ export type CaptureOut = {
    */
   suite_outcome?: 'OBTAINED' | 'UNABLE_TO_OBTAIN' | null;
   /**
+   * Time Server
+   */
+  time_server: string;
+  /**
    * Tool
    */
   tool?: string | null;
@@ -2731,6 +2799,7 @@ export type CaptureOut = {
    * Url
    */
   url: string;
+  witnesses: CaptureWitnessesOut;
 };
 
 /**
@@ -2854,6 +2923,81 @@ export type CaptureStageOut = {
 };
 
 /**
+ * CaptureTimeProofOut
+ *
+ * An RFC 3161 token over the capture's WARC SHA-256 (ADR-0025): `time` is the time server's clock; `check` says
+ * whether it was checked here (signature and chain to a bundled root, this fingerprint, this request's nonce).
+ */
+export type CaptureTimeProofOut = {
+  /**
+   * Answered At
+   */
+  answered_at?: string | null;
+  /**
+   * Asked At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  asked_at: string;
+  /**
+   * By
+   */
+  by: string;
+  /**
+   * Check
+   */
+  check?: 'checked' | 'not_checked' | 'failed' | null;
+  /**
+   * Check Detail
+   */
+  check_detail?: string | null;
+  /**
+   * Fingerprint
+   */
+  fingerprint?: string | null;
+  /**
+   * Of
+   */
+  of: string;
+  /**
+   * Policy
+   */
+  policy?: string | null;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Serial
+   */
+  serial?: string | null;
+  /**
+   * Server
+   */
+  server: string;
+  /**
+   * Signer
+   */
+  signer?: string | null;
+  /**
+   * State
+   */
+  state: 'stamped' | 'failed';
+  /**
+   * Time
+   */
+  time?: string | null;
+  /**
+   * Token
+   */
+  token?: string | null;
+};
+
+/**
  * CaptureUpdate
  *
  * A link only's reason, when the person knows better than the reply.
@@ -2895,6 +3039,15 @@ export type CaptureVersionOut = {
    * Text Sha256
    */
   text_sha256: string;
+};
+
+/**
+ * CaptureWitnessesOut
+ */
+export type CaptureWitnessesOut = {
+  archive?: CaptureArchiveOut | null;
+  elsewhere?: CaptureArchiveOut | null;
+  time_proof?: CaptureTimeProofOut | null;
 };
 
 /**
@@ -23003,6 +23156,50 @@ export type FollowCaptureResponses = {
 export type FollowCaptureResponse =
   FollowCaptureResponses[keyof FollowCaptureResponses];
 
+export type CaptureLookElsewhereData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/look-elsewhere';
+};
+
+export type CaptureLookElsewhereErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not asked: the capture is source-protected, or has nothing to send
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureLookElsewhereError =
+  CaptureLookElsewhereErrors[keyof CaptureLookElsewhereErrors];
+
+export type CaptureLookElsewhereResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type CaptureLookElsewhereResponse =
+  CaptureLookElsewhereResponses[keyof CaptureLookElsewhereResponses];
+
 export type MarkCaptureChangedData = {
   body?: never;
   path: {
@@ -23222,6 +23419,94 @@ export type RecheckCaptureResponses = {
 
 export type RecheckCaptureResponse =
   RecheckCaptureResponses[keyof RecheckCaptureResponses];
+
+export type CaptureSecondWitnessData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/second-witness';
+};
+
+export type CaptureSecondWitnessErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not asked: the capture is source-protected, or has nothing to send
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureSecondWitnessError =
+  CaptureSecondWitnessErrors[keyof CaptureSecondWitnessErrors];
+
+export type CaptureSecondWitnessResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type CaptureSecondWitnessResponse =
+  CaptureSecondWitnessResponses[keyof CaptureSecondWitnessResponses];
+
+export type CaptureTimeProofData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/time-proof';
+};
+
+export type CaptureTimeProofErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not asked: the capture is source-protected, or has nothing to send
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureTimeProofError =
+  CaptureTimeProofErrors[keyof CaptureTimeProofErrors];
+
+export type CaptureTimeProofResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type CaptureTimeProofResponse =
+  CaptureTimeProofResponses[keyof CaptureTimeProofResponses];
 
 export type GetCaseRecordData = {
   body?: never;

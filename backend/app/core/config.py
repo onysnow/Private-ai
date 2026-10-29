@@ -77,6 +77,9 @@ class Settings(BaseSettings):
     capture_max_megabytes: int = 100
     # Following (ADR-0022): a monitor or capture set to the Tor route goes to the Tor the reporter runs on this computer.
     tor_socks_url: str = "socks5h://127.0.0.1:9050"
+    # A capture's time proof (ADR-0025), off until a person asks: the time server that signs the capture's fingerprint
+    # (RFC 3161). Its root must be in app/trust/tsa/ for the token to be checked here.
+    capture_time_server: str = "https://freetsa.org/tsr"
     # Audio and video (ADR-0020): the largest recording an upload takes, and the Whisper model that transcribes it on
     # this computer (fetched once at setup into the folder below; a read never downloads it). Language: empty detects it.
     max_media_bytes: int = 500 * 1024 * 1024

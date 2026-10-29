@@ -30,6 +30,9 @@ import {
   captureAll,
   captureItem,
   captureLatest,
+  captureLookElsewhere,
+  captureSecondWitness,
+  captureTimeProof,
   changePassphrase,
   checkConnectorKey,
   checkMonitor,
@@ -446,6 +449,15 @@ import type {
   CaptureLatestData,
   CaptureLatestError,
   CaptureLatestResponse,
+  CaptureLookElsewhereData,
+  CaptureLookElsewhereError,
+  CaptureLookElsewhereResponse,
+  CaptureSecondWitnessData,
+  CaptureSecondWitnessError,
+  CaptureSecondWitnessResponse,
+  CaptureTimeProofData,
+  CaptureTimeProofError,
+  CaptureTimeProofResponse,
   ChangePassphraseData,
   ChangePassphraseError,
   ChangePassphraseResponse,
@@ -2072,6 +2084,35 @@ export const followCaptureMutation = (
 };
 
 /**
+ * Capture Look Elsewhere
+ *
+ * For a page that could not be kept: ask a public web archive whether it holds a copy, and from when.
+ */
+export const captureLookElsewhereMutation = (
+  options?: Partial<Options<CaptureLookElsewhereData>>,
+): UseMutationOptions<
+  CaptureLookElsewhereResponse,
+  CaptureLookElsewhereError,
+  Options<CaptureLookElsewhereData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureLookElsewhereResponse,
+    CaptureLookElsewhereError,
+    Options<CaptureLookElsewhereData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureLookElsewhere({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Mark Capture Changed
  *
  * Mark the capture's source "changed since capture", with who said so and which version they saw.
@@ -2210,6 +2251,65 @@ export const recheckCaptureMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await recheckCapture({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Capture Second Witness
+ *
+ * Ask a public web archive to visit the page and keep its own copy. Only the address is sent, logged first.
+ */
+export const captureSecondWitnessMutation = (
+  options?: Partial<Options<CaptureSecondWitnessData>>,
+): UseMutationOptions<
+  CaptureSecondWitnessResponse,
+  CaptureSecondWitnessError,
+  Options<CaptureSecondWitnessData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureSecondWitnessResponse,
+    CaptureSecondWitnessError,
+    Options<CaptureSecondWitnessData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureSecondWitness({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Capture Time Proof
+ *
+ * Ask a time server to sign this capture's fingerprint (RFC 3161). Only the WARC's SHA-256 is sent, logged first;
+ * the token is kept beside the capture's files and checked here. A failure is kept on the capture with its reason.
+ */
+export const captureTimeProofMutation = (
+  options?: Partial<Options<CaptureTimeProofData>>,
+): UseMutationOptions<
+  CaptureTimeProofResponse,
+  CaptureTimeProofError,
+  Options<CaptureTimeProofData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureTimeProofResponse,
+    CaptureTimeProofError,
+    Options<CaptureTimeProofData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureTimeProof({
         ...options,
         ...fnOptions,
         throwOnError: true,

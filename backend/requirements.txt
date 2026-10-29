@@ -38,6 +38,9 @@ yt-dlp==2026.8.19
 # Content credentials (C2PA) validated on this computer against the bundled trust lists (ADR-0023): c2pa-python
 # (MIT OR Apache-2.0).
 c2pa-python==0.38.0
+# A capture's time proof (ADR-0025): RFC 3161 requests and tokens checked against the bundled roots, Trail of Bits'
+# rfc3161-client (Apache-2.0).
+rfc3161-client==1.0.9
 av==17.0.0
 openaleph-client==1.1.4
 # Background job queue on PostgreSQL (ADR-0004). Its schema is vendored in

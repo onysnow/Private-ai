@@ -1066,11 +1066,47 @@ export const zCaptureAllRequest = z.object({
 });
 
 /**
+ * CaptureArchiveOut
+ *
+ * A public web archive asked about this page (ADR-0025): "saved" (it kept its own copy, at `url`), "found" (it
+ * already held one), "none" (it holds none) or "failed" (with the reason). Only the address was sent.
+ */
+export const zCaptureArchiveOut = z.object({
+  answered_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  archived_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  archived_status: z.string().nullish(),
+  asked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  by: z.string(),
+  reason: z.string().nullish(),
+  sent: z.string(),
+  service: z.string(),
+  state: z.enum(['saved', 'found', 'none', 'failed']),
+  url: z.string().nullish(),
+});
+
+/**
  * CaptureCreate
  *
- * A link to capture (ADR-0018): http or https, a public address.
+ * A link to capture (ADR-0018): http or https, a public address. The two switches (ADR-0025) ask outside
+ * witnesses once the page is kept: a time server signs its fingerprint, a public web archive keeps its own copy.
  */
 export const zCaptureCreate = z.object({
+  second_witness: z.boolean().optional().default(false),
+  time_proof: z.boolean().optional().default(false),
   url: z.string().min(1).max(4096),
 });
 
@@ -1190,6 +1226,45 @@ export const zCaptureStageOut = z.object({
 });
 
 /**
+ * CaptureTimeProofOut
+ *
+ * An RFC 3161 token over the capture's WARC SHA-256 (ADR-0025): `time` is the time server's clock; `check` says
+ * whether it was checked here (signature and chain to a bundled root, this fingerprint, this request's nonce).
+ */
+export const zCaptureTimeProofOut = z.object({
+  answered_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  asked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  by: z.string(),
+  check: z.enum(['checked', 'not_checked', 'failed']).nullish(),
+  check_detail: z.string().nullish(),
+  fingerprint: z.string().nullish(),
+  of: z.string(),
+  policy: z.string().nullish(),
+  reason: z.string().nullish(),
+  sent: z.string(),
+  serial: z.string().nullish(),
+  server: z.string(),
+  signer: z.string().nullish(),
+  state: z.enum(['stamped', 'failed']),
+  time: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  token: z.string().nullish(),
+});
+
+/**
  * CaptureUpdate
  *
  * A link only's reason, when the person knows better than the reply.
@@ -1212,6 +1287,15 @@ export const zCaptureVersionOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
   text_sha256: z.string(),
+});
+
+/**
+ * CaptureWitnessesOut
+ */
+export const zCaptureWitnessesOut = z.object({
+  archive: zCaptureArchiveOut.nullish(),
+  elsewhere: zCaptureArchiveOut.nullish(),
+  time_proof: zCaptureTimeProofOut.nullish(),
 });
 
 /**
@@ -10402,6 +10486,7 @@ export const zCaptureOut = z.object({
     ),
   robots_disallowed: z.boolean().nullish(),
   source_id: z.string().nullish(),
+  source_protected: z.boolean().optional().default(false),
   stages: z.array(zCaptureStageOut),
   started_at: z
     .string()
@@ -10411,8 +10496,10 @@ export const zCaptureOut = z.object({
     .nullish(),
   status: z.enum(['queued', 'capturing', 'finished', 'failed']),
   suite_outcome: z.enum(['OBTAINED', 'UNABLE_TO_OBTAIN']).nullish(),
+  time_server: z.string(),
   tool: z.string().nullish(),
   url: z.string(),
+  witnesses: zCaptureWitnessesOut,
 });
 
 /**
@@ -10733,6 +10820,15 @@ export const zFollowCapturePath = z.object({
  */
 export const zFollowCaptureResponse = zCaptureOut;
 
+export const zCaptureLookElsewherePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCaptureLookElsewhereResponse = zCaptureOut;
+
 export const zMarkCaptureChangedPath = z.object({
   capture_id: z.string(),
 });
@@ -10781,6 +10877,24 @@ export const zRecheckCapturePath = z.object({
  * Successful Response
  */
 export const zRecheckCaptureResponse = zCaptureOut;
+
+export const zCaptureSecondWitnessPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCaptureSecondWitnessResponse = zCaptureOut;
+
+export const zCaptureTimeProofPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCaptureTimeProofResponse = zCaptureOut;
 
 export const zGetCaseRecordPath = z.object({
   case_record_id: z.string(),

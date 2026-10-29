@@ -5230,6 +5230,48 @@ class CaptureQuoteOut(ResponseModel):
     unanchored: bool
 
 
+class CaptureTimeProofOut(ResponseModel):
+    """An RFC 3161 token over the capture's WARC SHA-256 (ADR-0025): `time` is the time server's clock; `check` says
+    whether it was checked here (signature and chain to a bundled root, this fingerprint, this request's nonce)."""
+    state: Literal["stamped", "failed"]
+    server: str
+    asked_at: Timestamp
+    by: str
+    of: str
+    sent: str
+    answered_at: Timestamp | None = None
+    reason: str | None = None
+    token: str | None = None
+    time: Timestamp | None = None
+    signer: str | None = None
+    serial: str | None = None
+    policy: str | None = None
+    fingerprint: str | None = None
+    check: Literal["checked", "not_checked", "failed"] | None = None
+    check_detail: str | None = None
+
+
+class CaptureArchiveOut(ResponseModel):
+    """A public web archive asked about this page (ADR-0025): "saved" (it kept its own copy, at `url`), "found" (it
+    already held one), "none" (it holds none) or "failed" (with the reason). Only the address was sent."""
+    state: Literal["saved", "found", "none", "failed"]
+    service: str
+    asked_at: Timestamp
+    by: str
+    sent: str
+    answered_at: Timestamp | None = None
+    reason: str | None = None
+    url: str | None = None
+    archived_at: Timestamp | None = None
+    archived_status: str | None = None
+
+
+class CaptureWitnessesOut(ResponseModel):
+    time_proof: CaptureTimeProofOut | None = None
+    archive: CaptureArchiveOut | None = None
+    elsewhere: CaptureArchiveOut | None = None
+
+
 class CaptureOut(ResponseModel):
     """A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
     not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why)."""
@@ -5267,6 +5309,12 @@ class CaptureOut(ResponseModel):
     reason_kind: Literal["dead_link", "blocked", "timed_out", "tool_error"] | None = None
     reason_kind_by: str | None = None
     follow: CaptureFollowOut | None = None
+    # What outside services were asked about this capture (ADR-0025), and whether this one is source-protected (then
+    # nothing is sent from here).
+    witnesses: CaptureWitnessesOut
+    source_protected: bool = False
+    # The host a time proof would be asked of (CAPTURE_TIME_SERVER), so the screen can say where it goes first.
+    time_server: str
 
 
 # --- The Drop (app/services/drop.py) ---------------------------------------------------------

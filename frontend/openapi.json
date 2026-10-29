@@ -4210,9 +4210,120 @@
         "title": "CaptureAllRequest",
         "type": "object"
       },
-      "CaptureCreate": {
-        "description": "A link to capture (ADR-0018): http or https, a public address.",
+      "CaptureArchiveOut": {
+        "description": "A public web archive asked about this page (ADR-0025): \"saved\" (it kept its own copy, at `url`), \"found\" (it\nalready held one), \"none\" (it holds none) or \"failed\" (with the reason). Only the address was sent.",
         "properties": {
+          "answered_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answered At"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At"
+          },
+          "archived_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived Status"
+          },
+          "asked_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Asked At",
+            "type": "string"
+          },
+          "by": {
+            "title": "By",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "string"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "saved",
+              "found",
+              "none",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "state",
+          "service",
+          "asked_at",
+          "by",
+          "sent"
+        ],
+        "title": "CaptureArchiveOut",
+        "type": "object"
+      },
+      "CaptureCreate": {
+        "description": "A link to capture (ADR-0018): http or https, a public address. The two switches (ADR-0025) ask outside\nwitnesses once the page is kept: a time server signs its fingerprint, a public web archive keeps its own copy.",
+        "properties": {
+          "second_witness": {
+            "default": false,
+            "title": "Second Witness",
+            "type": "boolean"
+          },
+          "time_proof": {
+            "default": false,
+            "title": "Time Proof",
+            "type": "boolean"
+          },
           "url": {
             "maxLength": 4096,
             "minLength": 1,
@@ -4787,6 +4898,11 @@
             ],
             "title": "Source Id"
           },
+          "source_protected": {
+            "default": false,
+            "title": "Source Protected",
+            "type": "boolean"
+          },
           "stages": {
             "items": {
               "$ref": "#/components/schemas/CaptureStageOut"
@@ -4832,6 +4948,10 @@
             ],
             "title": "Suite Outcome"
           },
+          "time_server": {
+            "title": "Time Server",
+            "type": "string"
+          },
           "tool": {
             "anyOf": [
               {
@@ -4846,6 +4966,9 @@
           "url": {
             "title": "Url",
             "type": "string"
+          },
+          "witnesses": {
+            "$ref": "#/components/schemas/CaptureWitnessesOut"
           }
         },
         "required": [
@@ -4859,7 +4982,9 @@
           "stages",
           "exchange",
           "content_verified",
-          "media"
+          "media",
+          "witnesses",
+          "time_server"
         ],
         "title": "CaptureOut",
         "type": "object"
@@ -5057,6 +5182,170 @@
         "title": "CaptureStageOut",
         "type": "object"
       },
+      "CaptureTimeProofOut": {
+        "description": "An RFC 3161 token over the capture's WARC SHA-256 (ADR-0025): `time` is the time server's clock; `check` says\nwhether it was checked here (signature and chain to a bundled root, this fingerprint, this request's nonce).",
+        "properties": {
+          "answered_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answered At"
+          },
+          "asked_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Asked At",
+            "type": "string"
+          },
+          "by": {
+            "title": "By",
+            "type": "string"
+          },
+          "check": {
+            "anyOf": [
+              {
+                "enum": [
+                  "checked",
+                  "not_checked",
+                  "failed"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check"
+          },
+          "check_detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check Detail"
+          },
+          "fingerprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fingerprint"
+          },
+          "of": {
+            "title": "Of",
+            "type": "string"
+          },
+          "policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "string"
+          },
+          "serial": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serial"
+          },
+          "server": {
+            "title": "Server",
+            "type": "string"
+          },
+          "signer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signer"
+          },
+          "state": {
+            "enum": [
+              "stamped",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token"
+          }
+        },
+        "required": [
+          "state",
+          "server",
+          "asked_at",
+          "by",
+          "of",
+          "sent"
+        ],
+        "title": "CaptureTimeProofOut",
+        "type": "object"
+      },
       "CaptureUpdate": {
         "description": "A link only's reason, when the person knows better than the reply.",
         "properties": {
@@ -5121,6 +5410,42 @@
           "lines_changed"
         ],
         "title": "CaptureVersionOut",
+        "type": "object"
+      },
+      "CaptureWitnessesOut": {
+        "properties": {
+          "archive": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureArchiveOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "elsewhere": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureArchiveOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "time_proof": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureTimeProofOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "CaptureWitnessesOut",
         "type": "object"
       },
       "CaseChangeOut": {
@@ -43566,6 +43891,76 @@
         "summary": "Follow Capture"
       }
     },
+    "/api/captures/{capture_id}/look-elsewhere": {
+      "post": {
+        "description": "For a page that could not be kept: ask a public web archive whether it holds a copy, and from when.",
+        "operationId": "capture_look_elsewhere",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not asked: the capture is source-protected, or has nothing to send"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Capture Look Elsewhere"
+      }
+    },
     "/api/captures/{capture_id}/mark-changed": {
       "post": {
         "description": "Mark the capture's source \"changed since capture\", with who said so and which version they saw.",
@@ -43912,6 +44307,146 @@
           }
         },
         "summary": "Recheck Capture"
+      }
+    },
+    "/api/captures/{capture_id}/second-witness": {
+      "post": {
+        "description": "Ask a public web archive to visit the page and keep its own copy. Only the address is sent, logged first.",
+        "operationId": "capture_second_witness",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not asked: the capture is source-protected, or has nothing to send"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Capture Second Witness"
+      }
+    },
+    "/api/captures/{capture_id}/time-proof": {
+      "post": {
+        "description": "Ask a time server to sign this capture's fingerprint (RFC 3161). Only the WARC's SHA-256 is sent, logged first;\nthe token is kept beside the capture's files and checked here. A failure is kept on the capture with its reason.",
+        "operationId": "capture_time_proof",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "capture_id",
+            "required": true,
+            "schema": {
+              "title": "Capture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not asked: the capture is source-protected, or has nothing to send"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Capture Time Proof"
       }
     },
     "/api/case-records/{case_record_id}": {

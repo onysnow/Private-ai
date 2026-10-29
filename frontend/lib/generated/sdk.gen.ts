@@ -75,6 +75,15 @@ import type {
   CaptureLatestData,
   CaptureLatestErrors,
   CaptureLatestResponses,
+  CaptureLookElsewhereData,
+  CaptureLookElsewhereErrors,
+  CaptureLookElsewhereResponses,
+  CaptureSecondWitnessData,
+  CaptureSecondWitnessErrors,
+  CaptureSecondWitnessResponses,
+  CaptureTimeProofData,
+  CaptureTimeProofErrors,
+  CaptureTimeProofResponses,
   ChangePassphraseData,
   ChangePassphraseErrors,
   ChangePassphraseResponses,
@@ -1181,6 +1190,12 @@ import {
   zCaptureItemResponse,
   zCaptureLatestPath,
   zCaptureLatestResponse,
+  zCaptureLookElsewherePath,
+  zCaptureLookElsewhereResponse,
+  zCaptureSecondWitnessPath,
+  zCaptureSecondWitnessResponse,
+  zCaptureTimeProofPath,
+  zCaptureTimeProofResponse,
   zChangePassphraseBody,
   zChangePassphraseResponse,
   zCheckConnectorKeyPath,
@@ -2587,6 +2602,37 @@ export const followCapture = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Capture Look Elsewhere
+ *
+ * For a page that could not be kept: ask a public web archive whether it holds a copy, and from when.
+ */
+export const captureLookElsewhere = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureLookElsewhereData, ThrowOnError>,
+): RequestResult<
+  CaptureLookElsewhereResponses,
+  CaptureLookElsewhereErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CaptureLookElsewhereResponses,
+    CaptureLookElsewhereErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureLookElsewherePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureLookElsewhereResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/look-elsewhere',
+    ...options,
+  });
+
+/**
  * Mark Capture Changed
  *
  * Mark the capture's source "changed since capture", with who said so and which version they saw.
@@ -2737,6 +2783,69 @@ export const recheckCapture = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zRecheckCaptureResponse.parseAsync(data),
     url: '/api/captures/{capture_id}/recheck',
+    ...options,
+  });
+
+/**
+ * Capture Second Witness
+ *
+ * Ask a public web archive to visit the page and keep its own copy. Only the address is sent, logged first.
+ */
+export const captureSecondWitness = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureSecondWitnessData, ThrowOnError>,
+): RequestResult<
+  CaptureSecondWitnessResponses,
+  CaptureSecondWitnessErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CaptureSecondWitnessResponses,
+    CaptureSecondWitnessErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureSecondWitnessPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureSecondWitnessResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/second-witness',
+    ...options,
+  });
+
+/**
+ * Capture Time Proof
+ *
+ * Ask a time server to sign this capture's fingerprint (RFC 3161). Only the WARC's SHA-256 is sent, logged first;
+ * the token is kept beside the capture's files and checked here. A failure is kept on the capture with its reason.
+ */
+export const captureTimeProof = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureTimeProofData, ThrowOnError>,
+): RequestResult<
+  CaptureTimeProofResponses,
+  CaptureTimeProofErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CaptureTimeProofResponses,
+    CaptureTimeProofErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureTimeProofPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureTimeProofResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/time-proof',
     ...options,
   });
 

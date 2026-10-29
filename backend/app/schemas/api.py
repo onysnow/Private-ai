@@ -752,8 +752,11 @@ class CaseRecordCreate(BaseModel):
 
 
 class CaptureCreate(BaseModel):
-    """A link to capture (ADR-0018): http or https, a public address."""
+    """A link to capture (ADR-0018): http or https, a public address. The two switches (ADR-0025) ask outside
+    witnesses once the page is kept: a time server signs its fingerprint, a public web archive keeps its own copy."""
     url: str = Field(min_length=1, max_length=4096)
+    time_proof: bool = False
+    second_witness: bool = False
 
 
 class CaseRecordAmend(BaseModel):
