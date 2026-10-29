@@ -75,6 +75,8 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   panel of every flag, each with the parties it touches as chips (a chip makes its party pulse on the map), and the
   map dims to the party, those parties and the lines between them. Esc, the close button or a click on the map closes
   it. The preview's flags are samples, said so in the panel.
+- The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
+  the kind's ring colour): bronze for a company, blue for a person, green for an organisation, rust for a vessel.
 All of it waits for his yes before the app changes.
 
 ## Later: our own globe, with the Wire's links on it (Ony, 29 Oct)
