@@ -26,6 +26,26 @@ when you're not hovering, have selected or in said container."
   current party, the key's title) and open on hover or keyboard focus; the panel the pointer is in lights its edge at the
   pointer, and over the map the pointer carries a small lamp on the grid. The rest of the site follows in the pass.
 
+## Later: animated presentations (Ony, 29 Oct)
+"At some point I would like the option to create animated presentations like the one I am pasting":
+https://framer.com/m/Chronical-Timeline-JMbe1o.js@IcxcWf1SSSwxMOG63dAo (Framer's "Chronical Timeline").
+- What that component is: a story you scroll through rather than click through. A sticky frame holds the current
+  item while the page scrolls. Each item has a year in large type, a section label ("01/ Section label"), a description
+  and a picture or video. The items are revealed and turned as you scroll, with parallax, and a smoothing setting eases
+  the scroll.
+- Where it would sit: beside DECK_1's slides and PDF (DECISIONS_LOG 15), an export or present mode that turns a deck, or a
+  case's timeline, into a scrolling animated story. The same citation rule applies: every line keeps its source, and a
+  line resting on a claim that isn't shown yet keeps its Draft mark.
+- Not started; it waits until Ony asks for it.
+
+## The Wire's chips in Nova Glow's motion (Ony, 29 Oct)
+"This is how smooth I want the chips, and also how I want any glow animations. The styling is sharper": Framer's
+"Nova Glow Navigation" (https://framer.com/m/Nova-Glow-Navigation-zmwqc6.js@AeSS5plwSRxLlwjuE91J). The preview he is
+looking at takes from it a spring (bounce .25, .45 s), dark glass chips with a hairline of light on their top edge, a
+comet of light running round edges (on strong and textbook flags and the Wire's top panel), a sheen crossing a chip on
+hover, the labels rolling up into their fuller wording, and the logo's orbit as the focus party's mark. Glows stay the
+light engine's 16,000 K blue. It waits for his yes before the app changes.
+
 ## Ony's standing requirement for every card
 Wherever a card appears (decision, dashboard widget, flag, timeline row, to-check item), it must:
 - let him infer the most important facts: who, what, how much, when, from where;
