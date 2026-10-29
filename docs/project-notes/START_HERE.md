@@ -20,6 +20,8 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   details) is revealed on hover or click, unless the context gives a reason to show it. Categorical facts (what type
   of thing something is) are inferred through the UI (a mark, shape, colour or position) and named on hover or
   click. Applies to the whole app; build every new screen this way.
+- **Fill the space (29 Oct).** When a row, card or box has a lot of empty space above and below its content, make the
+  text or icon bigger instead of leaving the space empty.
 - Approval mode is auto: proceed without stopping on routine steps.
 
 ## Running and testing (cloud container)

@@ -20,6 +20,8 @@ Read docs/project-notes/START_HERE.md first: it says where the work stands. The 
   details) is revealed on hover or click, unless the context gives a reason to show it. Categorical facts (what type
   of thing something is) are inferred through the UI (a mark, shape, colour or position) and named on hover or
   click. Applies to the whole app; build every new screen this way.
+- **Fill the space (29 Oct).** When a row, card or box has a lot of empty space above and below its content, make the
+  text or icon bigger instead of leaving the space empty.
 - **Approval mode is auto:** proceed without stopping on routine steps.
 - **Don't create new problems while fixing things.**
 - **The Authority System Suite is in beta** (bundled in `authority-suite-sdk`, which `backend/app/ai/authority_sdk.py` imports; this repo keeps no copy). When a problem's cause is in the suite
