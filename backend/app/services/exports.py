@@ -254,6 +254,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "monitors": direct["monitors"], "monitor_items": direct["monitor_items"], "page_versions": direct["page_versions"],
         "authenticity_items": direct["authenticity_items"], "authenticity_checks": direct["authenticity_checks"],
         "evidence_packs": direct["evidence_packs"],
+        "timeline_periods": direct["timeline_periods"], "built_timelines": direct["built_timelines"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 

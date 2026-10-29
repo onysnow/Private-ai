@@ -224,6 +224,9 @@ _NOT_INVESTIGATION_RECORDS = {
     "case_id",
     # A way the app tells a person outside it (routes_preferences.py: email, phone, webpush): theirs, in no case.
     "channel",
+    # A voice in a recording (routes for Voices, app/services/voices.py): a number within the document named in the same
+    # path, which document_id traces.
+    "voice",
     # Records that live inside an investigation named in the same path, and are looked up through it:
     # a story section (stories.section_of), an AI run and a thought in it (routes_ai_runs._run_row, run_events),
     # a version of the story's write-up (routes_stories._version).
