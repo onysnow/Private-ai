@@ -69,6 +69,17 @@
 .fl-flag { padding: 2px 9px; border-radius: 999px; border: 1px solid currentColor; font: 600 12px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
 .fl-flag.amber { color: var(--accent-1); }
 .fl-flag.bad { color: var(--status-disputed); }
+.fl-flag.teal { color: var(--accent-2); }
+
+.fl-stories { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.fl-story-title { margin: 0 0 6px; font-weight: 600; font-size: 15px; line-height: 1.35; }
+.fl-copy { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 10px; align-items: center; padding: 3px 0; font-size: 14px; }
+.fl-copy .fl-name { font-weight: 500; font-size: 14px; }
+.fl-copy.first .fl-flag { justify-self: start; }
+.fl-same { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px; }
+.fl-same::before { content: ''; grid-area: 1 / 1; height: 4px; border-radius: 2px; background: var(--surface-3); }
+.fl-bar { grid-area: 1 / 1; height: 4px; border-radius: 2px; background: var(--accent-2); }
+.fl-same b { font: 600 13px var(--font-mono); }
 
 .fl-versions { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .fl-version { all: unset; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 5px 8px; border-radius: 8px; font-size: 16px; }

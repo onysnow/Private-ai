@@ -48,10 +48,18 @@ robots.txt (4); no legal review needed for Following as scoped (11).
 - **The screen** (Bring in › Following) is built to Ony's rule of 29 Oct: titles, numbers, icons and alerts show; the
   rest is revealed on hover, focus or click (`components/ui/reveal.tsx`, the shared component for that rule).
 
+- **The same story, counted once.** A new entry whose title and summary share at least 70% of their three-word runs
+  with an entry seen in the last 14 days (any source in the case) is a copy of the earliest: it waits outside the queue,
+  is counted once with its original, and is not offered for capture (copies restate one text; they do not support each
+  other). The Same story panel lists each copy with its share of wording in common. Stopping the original's source
+  makes its copies originals again.
+- **Gone.** Once a day each page a person captured from a direct source is asked for again (robots.txt obeyed, one line
+  in the outbound log, kind "capture recheck"). A 404 or 410 adds a "gone" item to the queue, offered as Record removal:
+  the capture is the copy that remains. Nothing else is read or kept.
+
 ## Not in this step
 
-- Duplicate clusters ("same story, n copies": MinHash over syndicated text), "gone" detection for captured addresses
-  (a re-check of each captured item), discovery of a site's feed from its page (`<link rel="alternate">`), following
+- Discovery of a site's feed from its page (`<link rel="alternate">`), following
   the sitemaps an index lists, Bluesky, Mastodon and public Telegram, and newsletters through a dedicated mailbox.
 - The monitor list is not encrypted on its own: it is in the case's database, which the disk encryption covers
   (ADR-0016).

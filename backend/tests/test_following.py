@@ -532,3 +532,110 @@ def test_a_site_that_trickles_its_answer_is_cut_off(site, monkeypatch):
     site.routes["/feed.xml"] = {"body": RSS}
     with pytest.raises(following.FetchFailed):
         following.guarded_get(site.base + "/feed.xml")
+
+
+# --- The same story, counted once ----------------------------------------------------------------------------------
+
+STORY = ("Harbour authority approves Kestrel lease extension", "The harbour authority voted on Monday to extend the Kestrel SA lease on "
+         "the parcel by twenty five years, despite objections from two councillors and the fishing cooperative.")
+
+
+OTHER = {"a-1": "A different piece about the weather in the port this week and the ferry timetable.",
+         "b-1": "Council budget hearing moved to Thursday after the auditor asked for two more weeks to finish."}
+
+
+def _story_feed(title: str, summary: str, guid: str) -> bytes:
+    return (f'<?xml version="1.0"?><rss version="2.0"><channel><title>t</title><item><title>{title}</title>'
+            f'<link>https://news.example/{guid}</link><guid>{guid}</guid><description>{summary}</description></item>'
+            f'<item><title>Unrelated</title><link>https://news.example/u-{guid}</link><guid>u-{guid}</guid>'
+            f'<description>{OTHER[guid]}</description></item>'
+            f'</channel></rss>').encode()
+
+
+def test_the_same_story_from_another_source_is_a_copy_counted_once(site, monkeypatch):
+    made = _fake_capture(monkeypatch)
+    site.routes["/a.xml"] = {"body": _story_feed(*STORY, "a-1")}
+    site.routes["/b.xml"] = {"body": _story_feed(STORY[0], STORY[1].replace("Monday", "Monday evening"), "b-1")}
+    first = _follow(site, "/a.xml")
+    inv = first["investigation_id"]
+    second = client.post(f"/api/investigations/{inv}/monitors", json={"url": site.base + "/b.xml"}).json()
+    assert second["new_items"] == 1  # its copy of the story waits with the original, not as its own
+    view = client.get(f"/api/investigations/{inv}/following").json()
+    assert view["counts"]["waiting"] == 3  # four entries, the copy counted once with its original
+    titles = [i["title"] for i in view["at_risk"]]
+    assert titles.count(STORY[0]) == 1
+    original = next(i for i in view["at_risk"] if i["title"] == STORY[0])
+    assert original["monitor_id"] == first["id"] and original["copies"] == 1
+    [story] = view["same_story"]
+    assert story["original"]["id"] == original["id"] and len(story["copies"]) == 1
+    copy = story["copies"][0]
+    assert copy["monitor_id"] == second["id"] and 0.7 <= copy["similarity"] < 1 and "only the earliest" in copy["capture_blocked"]
+    assert client.post(f"/api/monitor-items/{copy['id']}/capture").status_code == 409
+    done = client.post(f"/api/investigations/{inv}/following/capture-all", json={"reason": "Everything new"}).json()
+    assert len(done["captured"]) == 3 and copy["url"] not in made
+    # Stopping the source of the original makes the copy an original again.
+    assert client.delete(f"/api/monitors/{first['id']}").status_code == 204
+    with SessionLocal() as db:
+        assert db.get(MonitorItem, copy["id"]).copy_of is None
+
+
+def test_short_or_different_entries_are_not_copies():
+    a = following.shingles(" ".join(STORY))
+    assert following.similarity(a, following.shingles(" ".join(STORY))) == 1.0
+    assert following.shingles("Too short to judge") == set()
+    assert following.similarity(a, following.shingles("A different piece about the weather in the port this week and the ferry timetable")) < 0.2
+
+
+def test_copies_travel_in_a_backup_with_their_original_first(site, tmp_path, monkeypatch):
+    monkeypatch.setattr(settings, "document_storage_dir", str(tmp_path / "documents"))
+    site.routes["/a.xml"] = {"body": _story_feed(*STORY, "a-1")}
+    site.routes["/b.xml"] = {"body": _story_feed(*STORY, "b-1")}
+    first = _follow(site, "/a.xml")
+    inv = first["investigation_id"]
+    client.post(f"/api/investigations/{inv}/monitors", json={"url": site.base + "/b.xml"})
+    with SessionLocal() as db:
+        data, _ = build_investigation_export(db, inv)
+        delete_investigation(db, inv, settings.document_storage_dir, confirmation=inv)
+        restore_investigation_export(db, data, Path(settings.document_storage_dir))
+        assert len([i for i in db.scalars(select(MonitorItem).where(MonitorItem.investigation_id == inv)).all() if i.copy_of]) == 1
+
+
+# --- Is a captured page still there? ------------------------------------------------------------------------------
+
+def test_a_captured_page_that_is_removed_becomes_a_gone_item_to_record(site, monkeypatch):
+    _fake_capture(monkeypatch)
+    site.routes["/feed.xml"] = {"body": RSS}
+    m = _follow(site)
+    inv = m["investigation_id"]
+    first = client.get(f"/api/investigations/{inv}/following").json()["at_risk"][0]
+    client.post(f"/api/monitor-items/{first['id']}/capture")
+    asked: list[str] = []
+
+    def fetch(url, headers=None, route="direct"):
+        asked.append(url)
+        return following.Fetched(404 if url == first["url"] else 404, {}, b"", url)
+
+    with SessionLocal() as db:
+        assert following.recheck_captured(db, fetch=fetch) == {"rechecked": 1, "gone": 1}
+        assert following.recheck_captured(db, fetch=fetch) == {"rechecked": 0, "gone": 0}  # once a day
+        lines = db.scalars(select(OutboundRequest).where(OutboundRequest.investigation_id == inv, OutboundRequest.kind == "capture recheck")).all()
+        assert [line.value for line in lines] == [first["url"]]
+    assert first["url"] in asked
+    gone = next(i for i in client.get(f"/api/investigations/{inv}/following").json()["at_risk"] if "gone" in i["flags"])
+    assert gone["displayed"]["http_status"] == 404 and "Nothing to capture" in gone["capture_blocked"]
+    assert client.post(f"/api/monitor-items/{gone['id']}/capture").status_code == 409
+    assert client.post(f"/api/monitor-items/{first['id']}/record", json={}).status_code == 409  # not a removed page
+    recorded = client.post(f"/api/monitor-items/{gone['id']}/record", json={"reason": "Removed after our questions"}).json()
+    assert recorded["state"] == "recorded" and recorded["reason"] == "Removed after our questions"
+    assert all(i["id"] != gone["id"] for i in client.get(f"/api/investigations/{inv}/following").json()["at_risk"])
+
+
+def test_a_page_still_there_or_not_captured_is_left_alone(site, monkeypatch):
+    _fake_capture(monkeypatch)
+    site.routes["/feed.xml"] = {"body": RSS}
+    m = _follow(site)
+    item = client.get(f"/api/investigations/{m['investigation_id']}/following").json()["at_risk"][0]
+    client.post(f"/api/monitor-items/{item['id']}/capture")
+    with SessionLocal() as db:
+        assert following.recheck_captured(db, fetch=lambda url, headers=None, route="direct": following.Fetched(200, {}, b"ok", url)) == {"rechecked": 1, "gone": 0}
+    assert all("gone" not in i["flags"] for i in client.get(f"/api/investigations/{m['investigation_id']}/following").json()["at_risk"])

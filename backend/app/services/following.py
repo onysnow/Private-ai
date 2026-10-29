@@ -17,6 +17,7 @@ import difflib
 import hashlib
 import logging
 import random
+import re
 import threading
 import time
 from dataclasses import dataclass, field
@@ -28,7 +29,7 @@ from urllib.robotparser import RobotFileParser
 
 import httpx
 from lxml import etree
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -429,7 +430,11 @@ def update_monitor(db: Session, row: Monitor, changes: dict[str, Any]) -> Monito
 
 def delete_monitor(db: Session, row: Monitor) -> None:
     """Stop following. What the monitor found goes with it; captures a person made from it stay, they are the case's."""
-    # In this order, flushed: the items and versions point at the monitor, and PostgreSQL checks each delete.
+    # In this order, flushed: the items and versions point at the monitor, and PostgreSQL checks each delete. A copy
+    # elsewhere of one of these items becomes an original again.
+    mine = select(MonitorItem.id).where(MonitorItem.monitor_id == row.id).scalar_subquery()
+    db.execute(update(MonitorItem).where(MonitorItem.copy_of.in_(mine), MonitorItem.monitor_id != row.id).values(copy_of=None, similarity=None))
+    db.execute(update(MonitorItem).where(MonitorItem.monitor_id == row.id).values(copy_of=None))
     db.execute(delete(MonitorItem).where(MonitorItem.monitor_id == row.id))
     db.execute(delete(MonitorVersion).where(MonitorVersion.monitor_id == row.id))
     db.flush()
@@ -482,15 +487,18 @@ class _Outcome:
 
 def _record_entries(db: Session, row: Monitor, entries: list[dict[str, Any]], now: datetime) -> _Outcome:
     out = _Outcome(seen=len(entries))
+    fresh: list[MonitorItem] = []
     known = {i.key: i for i in db.scalars(select(MonitorItem).where(MonitorItem.monitor_id == row.id)).all()}
     for e in entries:
         digest = _hash(e["title"], e["summary"], e.get("updated", ""))
         displayed = {k: v for k, v in e.items() if k not in ("key", "url", "title") and v}
         item = known.get(e["key"])
         if item is None:
-            db.add(MonitorItem(investigation_id=row.investigation_id, monitor_id=row.id, key=e["key"], url=e["url"],
+            made = MonitorItem(investigation_id=row.investigation_id, monitor_id=row.id, key=e["key"], url=e["url"],
                                title=e["title"] or None, displayed=displayed, content_hash=digest, flags=[], state="new",
-                               first_seen_at=now, last_seen_at=now))
+                               first_seen_at=now, last_seen_at=now)
+            db.add(made)
+            fresh.append(made)
             out.new += 1
             continue
         item.last_seen_at = now
@@ -501,7 +509,58 @@ def _record_entries(db: Session, row: Monitor, entries: list[dict[str, Any]], no
             item.edits += 1
             if "edited" not in item.flags:
                 item.flags = [*item.flags, "edited"]
+    if fresh:
+        db.flush()
+        mark_copies(db, row.investigation_id, fresh, now)
     return out
+
+
+# --- The same story, counted once (research §5.1, §7: "restates, does not establish") -------------------------------
+# Two entries are the same story when most of their wording is the same: the share of three-word runs they have in
+# common (Jaccard over shingles) of their title and summary. The earliest is the original and stays in the queue; a
+# later one is its copy, kept out of the queue and not offered for capture. Exact copies score 1.0.
+
+COPY_THRESHOLD = 0.7
+COPY_WINDOW = timedelta(days=14)
+MIN_WORDS = 8
+_WORD = re.compile(r"[\w']+", re.UNICODE)
+
+
+def shingles(text: str, size: int = 3) -> set[tuple[str, ...]]:
+    words = _WORD.findall(text.lower())
+    if len(words) < MIN_WORDS:
+        return set()
+    return {tuple(words[i:i + size]) for i in range(len(words) - size + 1)}
+
+
+def similarity(a: set[tuple[str, ...]], b: set[tuple[str, ...]]) -> float:
+    return len(a & b) / len(a | b) if a and b else 0.0
+
+
+def _wording(item: MonitorItem) -> str:
+    return f"{item.title or ''} {(item.displayed or {}).get('summary', '')}"
+
+
+def mark_copies(db: Session, investigation_id: str, fresh: list[MonitorItem], now: datetime) -> None:
+    """Point each new entry at the earliest entry with the same wording, if there is one."""
+    earlier = list(db.scalars(select(MonitorItem).where(
+        MonitorItem.investigation_id == investigation_id, MonitorItem.copy_of.is_(None),
+        MonitorItem.first_seen_at >= now - COPY_WINDOW).order_by(MonitorItem.first_seen_at, MonitorItem.id).limit(2000)).all())
+    fresh_ids = {f.id for f in fresh}
+    seen = [(e, shingles(_wording(e))) for e in earlier if e.id not in fresh_ids and not (e.displayed or {}).get("version")]
+    for item in fresh:
+        mine = shingles(_wording(item))
+        if not mine:
+            continue
+        best, score = None, 0.0
+        for other, theirs in seen:
+            s = similarity(mine, theirs)
+            if s > score:
+                best, score = other, s
+        if best is not None and score >= COPY_THRESHOLD:
+            item.copy_of, item.similarity = best.id, round(score, 3)
+        else:
+            seen.append((item, mine))  # an original: a later entry in the same poll may copy it
 
 
 def _changed_lines(before: str, after: str) -> tuple[int, int]:
@@ -648,6 +707,59 @@ def poll_due(db: Session) -> dict[str, int]:
     return {"polled": polled}
 
 
+# --- Is a captured page still there? (mockup FOLLOW_1, "Gone") ------------------------------------------------------
+# Once a day each page a person captured from a followed source is asked for again, as politely as a poll (robots.txt,
+# the same guarded request, one line in the outbound log). A 404 or 410 means the site removed it: a "gone" item joins
+# the queue, so a person can record that the capture is now the only copy. Nothing else is read or kept.
+
+RECHECK_EVERY = timedelta(days=1)
+RECHECKS_PER_TICK = 6
+
+
+def recheck_captured(db: Session, *, now: datetime | None = None, fetch: Callable[..., Fetched] | None = None) -> dict[str, int]:
+    from app.services.outbound import mark_outbound_failed, record_outbound
+
+    fetch = fetch or guarded_get
+    now = now or utcnow_naive()
+    rows = db.execute(
+        select(MonitorItem, Monitor).join(Monitor, Monitor.id == MonitorItem.monitor_id).join(Capture, Capture.id == MonitorItem.capture_id)
+        .where(MonitorItem.state == "captured", Monitor.active.is_(True), Monitor.route == "direct", Capture.outcome == "saved",
+               ~MonitorItem.key.endswith("#gone"),
+               (MonitorItem.rechecked_at.is_(None)) | (MonitorItem.rechecked_at <= now - RECHECK_EVERY))
+        .order_by(MonitorItem.rechecked_at.is_not(None), MonitorItem.rechecked_at).limit(RECHECKS_PER_TICK)).all()
+    gone = 0
+    for item, monitor in rows:
+        item.rechecked_at = now
+        db.commit()
+        if db.scalar(select(MonitorItem.id).where(MonitorItem.monitor_id == item.monitor_id, MonitorItem.key == f"{item.url}#gone")):
+            continue
+        try:
+            parser, problem = _robots_for(item.url, monitor.route, fetch, now)
+            if problem is not None or (parser is not None and not parser.can_fetch(USER_AGENT_TOKEN, item.url)):
+                continue
+            request_id = record_outbound(
+                db, item.investigation_id, service="following", kind="capture recheck", value=item.url, actor="scheduler",
+                reason="Following: asks whether a captured page is still there (direct)",
+                source={"monitor_id": monitor.id, "item_id": item.id, "host": urlsplit(item.url).hostname})
+            try:
+                got = fetch(item.url, {}, route=monitor.route)
+            except FetchFailed:
+                mark_outbound_failed(db, request_id)
+                continue
+        except FetchFailed:
+            continue
+        if got.status in (404, 410):
+            capture = db.get(Capture, item.capture_id) if item.capture_id else None
+            db.add(MonitorItem(investigation_id=item.investigation_id, monitor_id=item.monitor_id, key=f"{item.url}#gone", url=item.url,
+                               title=item.title, flags=["gone"], state="new", first_seen_at=now, last_seen_at=now,
+                               displayed={"http_status": got.status, "capture_id": item.capture_id,
+                                          "captured_at": (capture.captured_at or capture.finished_at).isoformat()
+                                          if capture is not None and (capture.captured_at or capture.finished_at) else None}))
+            db.commit()
+            gone += 1
+    return {"rechecked": len(rows), "gone": gone}
+
+
 # --- Reading it back ----------------------------------------------------------------------------------------------------
 
 def host_of(row: Monitor) -> str:
@@ -665,7 +777,8 @@ def egress_line(row: Monitor) -> str:
 
 
 def serialize_monitor(db: Session, row: Monitor) -> dict[str, Any]:
-    new = len(db.scalars(select(MonitorItem.id).where(MonitorItem.monitor_id == row.id, MonitorItem.state == "new")).all())
+    new = len(db.scalars(select(MonitorItem.id).where(MonitorItem.monitor_id == row.id, MonitorItem.state == "new",
+                                                      MonitorItem.copy_of.is_(None))).all())  # a copy waits with its original
     versions = len(db.scalars(select(MonitorVersion.id).where(MonitorVersion.monitor_id == row.id)).all())
     return {
         "id": row.id, "investigation_id": row.investigation_id, "kind": row.kind, "url": row.url, "host": host_of(row),
@@ -685,6 +798,12 @@ def capture_blocker(db: Session, item: MonitorItem, monitor: Monitor | None) -> 
     """Why this item cannot be captured from here, or None. A capture is a direct visit from this computer (ADR-0018),
     so an item from a source followed through Tor is not captured that way: the route chosen to hide the reporter's
     address would be dropped. An older version of a watched page cannot be captured: the page shows a newer one now."""
+    if "gone" in (item.flags or []):
+        return f"Nothing to capture: the address answers {(item.displayed or {}).get('http_status', 404)} now. Your capture is the copy that remains"
+    if item.copy_of:
+        original = db.get(MonitorItem, item.copy_of)
+        return (f"A copy of “{original.title if original else 'an earlier entry'}”, seen first: copies restate one text and do "
+                "not support each other, so only the earliest is offered for capture")
     if monitor is not None and monitor.route == "tor":
         return ("This source is followed through Tor. A capture visits the page directly from this computer, and "
                 "capturing through Tor is not built yet, so it is not started from here")
@@ -697,25 +816,42 @@ def capture_blocker(db: Session, item: MonitorItem, monitor: Monitor | None) -> 
     return None
 
 
-def serialize_item(row: MonitorItem, monitor: Monitor | None = None, blocked: str | None = None) -> dict[str, Any]:
+def serialize_item(row: MonitorItem, monitor: Monitor | None = None, blocked: str | None = None, copies: int = 0) -> dict[str, Any]:
     return {
         "id": row.id, "monitor_id": row.monitor_id, "monitor_kind": monitor.kind if monitor else None,
         "monitor_title": (monitor.title or host_of(monitor)) if monitor else None, "url": row.url, "title": row.title,
         "displayed": row.displayed or {}, "edits": row.edits, "flags": list(row.flags or []), "state": row.state,
         "reason": row.reason, "decided_by": row.decided_by, "decided_at": row.decided_at, "capture_id": row.capture_id,
         "first_seen_at": row.first_seen_at, "last_seen_at": row.last_seen_at, "capture_blocked": blocked,
+        "copy_of": row.copy_of, "similarity": row.similarity, "copies": copies,
     }
 
 
 def overview(db: Session, investigation_id: str) -> dict[str, Any]:
     monitors = list(db.scalars(select(Monitor).where(Monitor.investigation_id == investigation_id).order_by(Monitor.created_at)).all())
     by_id = {m.id: m for m in monitors}
-    waiting = [i for i in db.scalars(select(MonitorItem).where(MonitorItem.investigation_id == investigation_id, MonitorItem.state == "new")).all() if i.monitor_id in by_id]
+    new = [i for i in db.scalars(select(MonitorItem).where(MonitorItem.investigation_id == investigation_id, MonitorItem.state == "new")).all() if i.monitor_id in by_id]
+    # A copy waits outside the queue and is counted once, with its original.
+    waiting = [i for i in new if not i.copy_of]
     waiting.sort(key=lambda i: (-_risk(i), i.first_seen_at), reverse=False)
+    copies: dict[str, list[MonitorItem]] = {}
+    for c in db.scalars(select(MonitorItem).where(MonitorItem.investigation_id == investigation_id, MonitorItem.copy_of.is_not(None))
+                        .order_by(MonitorItem.first_seen_at)).all():
+        copies.setdefault(str(c.copy_of), []).append(c)
+    stories = []
+    for original_id, its in copies.items():
+        original = db.get(MonitorItem, original_id)
+        if original is None or not any(c.state == "new" for c in its) and original.state != "new":
+            continue  # every copy and its original decided: nothing about it waits
+        stories.append({"original": serialize_item(original, by_id.get(original.monitor_id), copies=len(its)),
+                        "copies": [serialize_item(c, by_id.get(c.monitor_id), capture_blocker(db, c, by_id.get(c.monitor_id))) for c in its]})
+    stories.sort(key=lambda s: s["original"]["first_seen_at"], reverse=True)
     out = [serialize_monitor(db, m) for m in monitors]
     return {
         "monitors": out,
-        "at_risk": [serialize_item(i, by_id.get(i.monitor_id), capture_blocker(db, i, by_id.get(i.monitor_id))) for i in waiting],
+        "at_risk": [serialize_item(i, by_id.get(i.monitor_id), capture_blocker(db, i, by_id.get(i.monitor_id)), len(copies.get(i.id, [])))
+                    for i in waiting],
+        "same_story": stories[:20],
         "counts": {"monitors": len(out), "working": sum(1 for m in out if m["health"] == "ok"), "waiting": len(waiting),
                    "direct": sum(1 for m in monitors if m.route == "direct" and m.active), "tor": sum(1 for m in monitors if m.route == "tor" and m.active)},
     }

@@ -56,8 +56,15 @@ def _follow(db: Session) -> object:
     return poll_due(db)
 
 
+def _recheck(db: Session) -> object:
+    from app.services.following import recheck_captured
+
+    return recheck_captured(db)
+
+
 TASKS: list[Scheduled] = [
     Scheduled("follow_sources", timedelta(minutes=1), _follow),
+    Scheduled("recheck_captures", timedelta(minutes=10), _recheck),
     Scheduled("deliver_notifications", timedelta(minutes=1), _deliver_notifications),
     Scheduled("check_sources", timedelta(hours=6), _check_sources),
     Scheduled("prune_outbound", timedelta(days=1), _prune_outbound),

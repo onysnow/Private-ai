@@ -154,6 +154,33 @@ describe('Following', () => {
   });
 });
 
+describe('Following: same story and removed pages', () => {
+  it('lists the copies of a story with how much of the wording is the same, and marks the original', async () => {
+    const original = item({id: 'i1', copies: 1});
+    const copy = item({id: 'i2', monitor_id: 'm2', copy_of: 'i1', similarity: 0.91, flags: [], edits: 0});
+    mockApi({'GET /api/investigations/inv-1/following': following({at_risk: [original], same_story: [{original, copies: [copy]}]}),
+      'GET /api/monitors/m1/versions': []});
+    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
+    const story = await screen.findByRole('region', {name: 'Same story'});
+    expect(within(story).getByText('91%')).toBeVisible();
+    expect(within(story).getByText('Fernhill Ltd · About page')).toBeVisible();
+    expect(within(screen.getByRole('region', {name: 'Most at risk first'})).getByText('+1 copy')).toBeVisible();
+  });
+
+  it('offers Record removal, not Capture, for a page the site removed', async () => {
+    const gone = item({flags: ['gone'], edits: 0, displayed: {http_status: 410, captured_at: '2026-10-12T08:00:00'},
+      capture_blocked: 'Nothing to capture: the address answers 410 now.'});
+    const api = mockApi({'GET /api/investigations/inv-1/following': following({at_risk: [gone]}), 'GET /api/monitors/m1/versions': [],
+      'POST /api/monitor-items/i1/record': item({state: 'recorded'}), 'GET /api/investigations/inv-1/captures': [], 'GET /api/investigations/inv-1/drop': {}});
+    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
+    const queue = await screen.findByRole('region', {name: 'Most at risk first'});
+    expect(await within(queue).findByText('Gone · 410')).toBeVisible();
+    expect(within(queue).queryByRole('button', {name: 'Capture'})).toBeNull();
+    await userEvent.click(within(queue).getByRole('button', {name: 'Record removal'}));
+    await waitFor(() => expect(api.calls('POST /api/monitor-items/i1/record')).toHaveLength(1));
+  });
+});
+
 describe('Reveal around a control', () => {
   it('gives the control itself the description, since it is the one that takes focus', () => {
     render(<Reveal tabbable={false} detail="Sent through the Tor running on this computer"><button type="button">Tor</button></Reveal>);

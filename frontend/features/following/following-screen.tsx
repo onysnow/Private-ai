@@ -12,8 +12,8 @@ import type {FormEvent, ReactElement, ReactNode} from 'react';
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {getCapturesQueryKey, getDropQueryKey, getFollowingOptions, getFollowingQueryKey, getVersionsOptions} from '../../lib/generated/@tanstack/react-query.gen';
-import {captureAll, captureItem, createMonitor, deleteMonitor, pollMonitor, skipItem, updateMonitor} from '../../lib/generated/sdk.gen';
-import type {MonitorItemOut, MonitorOut, MonitorVersionOut} from '../../lib/generated/types.gen';
+import {captureAll, captureItem, createMonitor, deleteMonitor, pollMonitor, recordRemoval, skipItem, updateMonitor} from '../../lib/generated/sdk.gen';
+import type {MonitorItemOut, MonitorOut, MonitorVersionOut, SameStoryOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 
 type Kind = MonitorOut['kind'];
@@ -45,7 +45,7 @@ export const sourceName = (m: MonitorOut): string => m.title || m.host;
 /** The alerts an item carries, in words short enough to stay on screen. */
 export function itemAlerts(item: MonitorItemOut): {word: string; tone: string}[] {
   const out: {word: string; tone: string}[] = [];
-  if (item.flags.includes('gone')) out.push({word: 'Gone', tone: 'bad'});
+  if (item.flags.includes('gone')) out.push({word: `Gone · ${(item.displayed as {http_status?: number}).http_status ?? 404}`, tone: 'bad'});
   if (item.flags.includes('edited')) out.push({word: item.edits > 1 ? `Edited ${item.edits}×` : 'Edited', tone: 'amber'});
   if (item.flags.includes('changed')) {
     const d = item.displayed as {lines_added?: number; lines_removed?: number};
@@ -160,6 +160,7 @@ function Item({item, kind, investigationId}: {item: MonitorItemOut; kind?: Kind;
   const queryClient = useQueryClient();
   const [status, setStatus] = useState('');
   const d = item.displayed as Record<string, string | number | undefined>;
+  const copies = item.copies ?? 0;
   const run = async (what: string, call: () => Promise<unknown>) => {
     setStatus(what);
     try {
@@ -181,13 +182,21 @@ function Item({item, kind, investigationId}: {item: MonitorItemOut; kind?: Kind;
           {d.audio && <span className="rv-row">Audio file{d.audio_bytes ? ` · ${Math.round(Number(d.audio_bytes) / 1e6)} MB` : ''}</span>}
           {d.transcript && <span className="rv-row">The publisher offers a transcript</span>}
           {d.summary && <span className="rv-row">{String(d.summary).slice(0, 240)}</span>}
+          {item.flags.includes('gone') && d.captured_at && <span className="rv-row">You captured it {time(String(d.captured_at))}</span>}
         </>}><span>{item.title || item.url}</span></Reveal>
       </p>
-      {itemAlerts(item).length > 0 && <p className="fl-alerts">{itemAlerts(item).map(a => <span key={a.word} className={`fl-flag ${a.tone}`}>{a.word}</span>)}</p>}
+      {(itemAlerts(item).length > 0 || copies > 0) && <p className="fl-alerts">
+        {itemAlerts(item).map(a => <span key={a.word} className={`fl-flag ${a.tone}`}>{a.word}</span>)}
+        {copies > 0 && <Reveal detail={`${copies} later ${copies === 1 ? 'entry repeats' : 'entries repeat'} this text. They are counted once, with this one, and are listed under Same story.`}>
+          <span className="fl-flag teal">+{copies} {copies === 1 ? 'copy' : 'copies'}</span></Reveal>}
+      </p>}
       {status && <p role="status" className="fl-status">{status}</p>}
     </div>
     <div className="fl-acts">
-      {item.capture_blocked
+      {item.flags.includes('gone')
+        ? <Reveal tabbable={false} detail="Records that the site removed this page: your capture is the copy that remains.">
+          <button type="button" className="p" onClick={() => void run('Recording…', () => recordRemoval({path: {monitor_item_id: item.id}, body: {}, throwOnError: true}))}>Record removal</button></Reveal>
+        : item.capture_blocked
         ? <Reveal tabbable={false} detail={item.capture_blocked}><button type="button" className="p" aria-disabled="true">Capture</button></Reveal>
         : <button type="button" className="p" onClick={() => void run('Capturing…', () => captureItem({path: {monitor_item_id: item.id}, throwOnError: true}))}>Capture</button>}
       <button type="button" onClick={() => void run('Skipping…', () => skipItem({path: {monitor_item_id: item.id}, body: {}, throwOnError: true}))}>Skip</button>
@@ -246,6 +255,24 @@ function Versions({m}: {m: MonitorOut}): ReactElement {
   </li>)}</ol>;
 }
 
+function SameStory({stories, names}: {stories: SameStoryOut[]; names: Map<string, string>}): ReactElement | null {
+  if (!stories.length) return null;
+  return <section className="fl-card" aria-label="Same story">
+    <p className="fl-eyebrow"><Reveal detail="Copies restate one text. They do not support each other. Only the earliest is offered for capture.">
+      <span>Same story</span></Reveal><b>{stories.length}</b></p>
+    <ul className="fl-stories">{stories.slice(0, 3).map(s => <li key={s.original.id}>
+      <p className="fl-story-title">{s.original.title || s.original.url}</p>
+      <p className="fl-copy first"><span className="fl-name">{names.get(s.original.monitor_id) ?? s.original.monitor_title}</span>
+        <Reveal detail={`First seen ${time(s.original.first_seen_at)}`}><span className="fl-flag teal">first</span></Reveal></p>
+      {s.copies.map(c => <p key={c.id} className="fl-copy">
+        <span className="fl-name">{names.get(c.monitor_id) ?? c.monitor_title}</span>
+        <Reveal detail={`${Math.round((c.similarity ?? 0) * 100)}% of the wording is the same · seen ${time(c.first_seen_at)}`}>
+          <span className="fl-same"><span className="fl-bar" style={{width: `${Math.round((c.similarity ?? 0) * 100)}%`}}/><b>{Math.round((c.similarity ?? 0) * 100)}%</b></span></Reveal>
+      </p>)}
+    </li>)}</ul>
+  </section>;
+}
+
 export function FollowingScreen({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
   const query = useQuery({...getFollowingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && active,
     refetchInterval: active ? 30_000 : false});
@@ -299,6 +326,7 @@ export function FollowingScreen({investigationId, active = true}: {investigation
           <p className="fl-eyebrow"><span>Changes &amp; versions</span>{chosen && <span className="fl-small">{sourceName(chosen)}</span>}</p>
           {chosen ? <Versions m={chosen}/> : <p className="fl-quiet">Nothing chosen</p>}
         </section>
+        <SameStory stories={data?.same_story ?? []} names={new Map(monitors.map(m => [m.id, sourceName(m)]))}/>
         {counts && <section className="fl-card" aria-label="What leaves this computer">
           <p className="fl-eyebrow"><span>What leaves this computer</span></p>
           <Reveal detail="Each site is asked directly or through your own Tor; no third-party service is used. The list of what you follow stays on this computer and is never sent. Every look is in Safety & data’s outbound log.">

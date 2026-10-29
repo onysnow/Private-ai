@@ -5349,6 +5349,8 @@ export const zMonitorCreate = z.object({
 export const zMonitorItemOut = z.object({
   capture_blocked: z.string().nullish(),
   capture_id: z.string().nullish(),
+  copies: z.int().optional().default(0),
+  copy_of: z.string().nullish(),
   decided_at: z
     .string()
     .regex(
@@ -5376,7 +5378,8 @@ export const zMonitorItemOut = z.object({
     .nullish(),
   monitor_title: z.string().nullish(),
   reason: z.string().nullish(),
-  state: z.enum(['new', 'captured', 'skipped']),
+  similarity: z.number().nullish(),
+  state: z.enum(['new', 'captured', 'skipped', 'recorded']),
   title: z.string().nullish(),
   url: z.string(),
 });
@@ -5464,15 +5467,6 @@ export const zMonitorOut = z.object({
   title: z.string().nullish(),
   url: z.string(),
   versions: z.int(),
-});
-
-/**
- * FollowingOut
- */
-export const zFollowingOut = z.object({
-  at_risk: z.array(zMonitorItemOut),
-  counts: zFollowingCountsOut,
-  monitors: z.array(zMonitorOut),
 });
 
 /**
@@ -7406,6 +7400,26 @@ export const zSameAnswerOut = z.object({
   caption: z.string(),
   label: z.string().nullish(),
   scope: z.enum(['drop', 'case']),
+});
+
+/**
+ * SameStoryOut
+ *
+ * One story seen from several sources: the earliest, and the copies counted once with it.
+ */
+export const zSameStoryOut = z.object({
+  copies: z.array(zMonitorItemOut),
+  original: zMonitorItemOut,
+});
+
+/**
+ * FollowingOut
+ */
+export const zFollowingOut = z.object({
+  at_risk: z.array(zMonitorItemOut),
+  counts: zFollowingCountsOut,
+  monitors: z.array(zMonitorOut),
+  same_story: z.array(zSameStoryOut).optional().default([]),
 });
 
 /**
@@ -12889,6 +12903,17 @@ export const zCaptureItemPath = z.object({
  * Successful Response
  */
 export const zCaptureItemResponse = zMonitorItemCaptureOut;
+
+export const zRecordRemovalBody = zMonitorItemSkip;
+
+export const zRecordRemovalPath = z.object({
+  monitor_item_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRecordRemovalResponse = zMonitorItemOut;
 
 export const zSkipItemBody = zMonitorItemSkip;
 

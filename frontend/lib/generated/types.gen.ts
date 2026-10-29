@@ -10340,6 +10340,10 @@ export type FollowingOut = {
    * Monitors
    */
   monitors: Array<MonitorOut>;
+  /**
+   * Same Story
+   */
+  same_story?: Array<SameStoryOut>;
 };
 
 /**
@@ -12952,6 +12956,14 @@ export type MonitorItemOut = {
    */
   capture_id?: string | null;
   /**
+   * Copies
+   */
+  copies?: number;
+  /**
+   * Copy Of
+   */
+  copy_of?: string | null;
+  /**
    * Decided At
    */
   decided_at?: string | null;
@@ -13006,9 +13018,13 @@ export type MonitorItemOut = {
    */
   reason?: string | null;
   /**
+   * Similarity
+   */
+  similarity?: number | null;
+  /**
    * State
    */
-  state: 'new' | 'captured' | 'skipped';
+  state: 'new' | 'captured' | 'skipped' | 'recorded';
   /**
    * Title
    */
@@ -17150,6 +17166,19 @@ export type SameAnswerOut = {
    * Scope
    */
   scope: 'drop' | 'case';
+};
+
+/**
+ * SameStoryOut
+ *
+ * One story seen from several sources: the earliest, and the copies counted once with it.
+ */
+export type SameStoryOut = {
+  /**
+   * Copies
+   */
+  copies: Array<MonitorItemOut>;
+  original: MonitorItemOut;
 };
 
 /**
@@ -31218,6 +31247,49 @@ export type CaptureItemResponses = {
 
 export type CaptureItemResponse =
   CaptureItemResponses[keyof CaptureItemResponses];
+
+export type RecordRemovalData = {
+  body: MonitorItemSkip;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/record';
+};
+
+export type RecordRemovalErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not a removed page, or already recorded or skipped
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecordRemovalError = RecordRemovalErrors[keyof RecordRemovalErrors];
+
+export type RecordRemovalResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorItemOut;
+};
+
+export type RecordRemovalResponse =
+  RecordRemovalResponses[keyof RecordRemovalResponses];
 
 export type SkipItemData = {
   body: MonitorItemSkip;

@@ -22180,6 +22180,14 @@
             },
             "title": "Monitors",
             "type": "array"
+          },
+          "same_story": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SameStoryOut"
+            },
+            "title": "Same Story",
+            "type": "array"
           }
         },
         "required": [
@@ -26762,6 +26770,22 @@
             ],
             "title": "Capture Id"
           },
+          "copies": {
+            "default": 0,
+            "title": "Copies",
+            "type": "integer"
+          },
+          "copy_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Copy Of"
+          },
           "decided_at": {
             "anyOf": [
               {
@@ -26862,11 +26886,23 @@
             ],
             "title": "Reason"
           },
+          "similarity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Similarity"
+          },
           "state": {
             "enum": [
               "new",
               "captured",
-              "skipped"
+              "skipped",
+              "recorded"
             ],
             "title": "State",
             "type": "string"
@@ -33799,6 +33835,27 @@
           "candidates"
         ],
         "title": "SameAnswerOut",
+        "type": "object"
+      },
+      "SameStoryOut": {
+        "description": "One story seen from several sources: the earliest, and the copies counted once with it.",
+        "properties": {
+          "copies": {
+            "items": {
+              "$ref": "#/components/schemas/MonitorItemOut"
+            },
+            "title": "Copies",
+            "type": "array"
+          },
+          "original": {
+            "$ref": "#/components/schemas/MonitorItemOut"
+          }
+        },
+        "required": [
+          "original",
+          "copies"
+        ],
+        "title": "SameStoryOut",
         "type": "object"
       },
       "SavedIn": {
@@ -63549,6 +63606,86 @@
           }
         },
         "summary": "Capture Item"
+      }
+    },
+    "/api/monitor-items/{monitor_item_id}/record": {
+      "post": {
+        "description": "Record that a captured page was removed from its site: the capture is the copy that remains. The record is this\nitem, with when it was found gone and what the address answered.",
+        "operationId": "record_removal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "monitor_item_id",
+            "required": true,
+            "schema": {
+              "title": "Monitor Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitorItemSkip"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitorItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not a removed page, or already recorded or skipped"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Record Removal"
       }
     },
     "/api/monitor-items/{monitor_item_id}/skip": {

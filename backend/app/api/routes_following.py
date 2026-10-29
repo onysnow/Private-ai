@@ -177,11 +177,30 @@ def skip_item(monitor_item_id: str, body: MonitorItemSkip, request: Request, db:
     return following.serialize_item(item, db.get(Monitor, item.monitor_id))
 
 
+@router.post("/monitor-items/{monitor_item_id}/record", response_model=MonitorItemOut, responses={
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Not a removed page, or already recorded or skipped"}})
+def record_removal(monitor_item_id: str, body: MonitorItemSkip, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Record that a captured page was removed from its site: the capture is the copy that remains. The record is this
+    item, with when it was found gone and what the address answered."""
+    item = _item(db, monitor_item_id)
+    if "gone" not in (item.flags or []):
+        raise HTTPException(409, "Only a page found removed can be recorded as removed")
+    if not _claim(db, item.id, "recorded"):
+        raise HTTPException(409, "This item was already recorded or skipped")
+    db.refresh(item)
+    item.reason = (body.reason or "").strip() or None
+    item.decided_by, item.decided_at = scope_for_request(request).actor_id, utcnow_naive()
+    db.commit()
+    return following.serialize_item(item, db.get(Monitor, item.monitor_id))
+
+
 @router.post("/investigations/{investigation_id}/following/capture-all", response_model=CaptureAllOut, responses={404: {"model": ErrorOut}})
 async def capture_all(investigation_id: str, body: MonitorCaptureAll, request: Request, db: Session = Depends(get_db)) -> Any:
     """Capture several waiting items at once, with a reason that goes on each (EGS rule 8), at most 50 a time, one
     after another. An item whose address cannot be visited stays in the queue."""
-    query = select(MonitorItem).where(MonitorItem.investigation_id == investigation_id, MonitorItem.state == "new")
+    query = select(MonitorItem).where(MonitorItem.investigation_id == investigation_id, MonitorItem.state == "new",
+                                      MonitorItem.copy_of.is_(None),  # copies are never offered: their original is
+                                      ~MonitorItem.key.endswith("#gone"))  # nor a removed page: nothing is left to capture
     if body.item_ids is not None:
         query = query.where(MonitorItem.id.in_(body.item_ids))
     waiting = sorted(db.scalars(query).all(), key=lambda i: (-following._risk(i), i.first_seen_at))

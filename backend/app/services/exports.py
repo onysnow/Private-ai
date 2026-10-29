@@ -725,6 +725,8 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                     rows = _parents_first(rows)
                 elif table == "evidence":
                     rows = _parents_first(rows, "restates_evidence_id")
+                elif table == "monitor_items":
+                    rows = _parents_first(rows, "copy_of")
                 for raw_row in rows:
                     row = dict(raw_row)
                     if table == "documents" and row["id"] in raw_locations:

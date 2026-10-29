@@ -5826,7 +5826,7 @@ class MonitorItemOut(ResponseModel):
     displayed: dict[str, Any]
     edits: int
     flags: list[str]
-    state: Literal["new", "captured", "skipped"]
+    state: Literal["new", "captured", "skipped", "recorded"]
     reason: str | None = None
     decided_by: str | None = None
     decided_at: Timestamp | None = None
@@ -5835,6 +5835,17 @@ class MonitorItemOut(ResponseModel):
     last_seen_at: Timestamp
     # Why Capture is not offered for this item (a source followed through Tor, a page version that is gone), or null.
     capture_blocked: str | None = None
+    # The earlier entry this one copies (the same story), and the share of wording in common; `copies` counts the
+    # later entries that copy this one.
+    copy_of: str | None = None
+    similarity: float | None = None
+    copies: int = 0
+
+
+class SameStoryOut(ResponseModel):
+    """One story seen from several sources: the earliest, and the copies counted once with it."""
+    original: MonitorItemOut
+    copies: list[MonitorItemOut]
 
 
 class FollowingCountsOut(ResponseModel):
@@ -5848,6 +5859,7 @@ class FollowingCountsOut(ResponseModel):
 class FollowingOut(ResponseModel):
     monitors: list[MonitorOut]
     at_risk: list[MonitorItemOut]
+    same_story: list[SameStoryOut] = []
     counts: FollowingCountsOut
 
 

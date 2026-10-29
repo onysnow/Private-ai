@@ -858,6 +858,9 @@ import type {
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
+  RecordRemovalData,
+  RecordRemovalErrors,
+  RecordRemovalResponses,
   RecordStoryGateData,
   RecordStoryGateErrors,
   RecordStoryGateResponses,
@@ -1697,6 +1700,9 @@ import {
   zPutResearchSettingsResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
+  zRecordRemovalBody,
+  zRecordRemovalPath,
+  zRecordRemovalResponse,
   zRecordStoryGateBody,
   zRecordStoryGatePath,
   zRecordStoryGateResponse,
@@ -9794,6 +9800,38 @@ export const captureItem = <ThrowOnError extends boolean = false>(
       await zCaptureItemResponse.parseAsync(data),
     url: '/api/monitor-items/{monitor_item_id}/capture',
     ...options,
+  });
+
+/**
+ * Record Removal
+ *
+ * Record that a captured page was removed from its site: the capture is the copy that remains. The record is this
+ * item, with when it was found gone and what the address answered.
+ */
+export const recordRemoval = <ThrowOnError extends boolean = false>(
+  options: Options<RecordRemovalData, ThrowOnError>,
+): RequestResult<RecordRemovalResponses, RecordRemovalErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RecordRemovalResponses,
+    RecordRemovalErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zRecordRemovalBody,
+          path: zRecordRemovalPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRecordRemovalResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/record',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

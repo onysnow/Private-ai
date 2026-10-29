@@ -292,6 +292,7 @@ import {
   putNotificationPrefs,
   putResearchSettings,
   recheckHash,
+  recordRemoval,
   recordStoryGate,
   recover,
   refreshOpenalephDocumentReview,
@@ -1204,6 +1205,9 @@ import type {
   RecheckHashData,
   RecheckHashError,
   RecheckHashResponse,
+  RecordRemovalData,
+  RecordRemovalError,
+  RecordRemovalResponse,
   RecordStoryGateData,
   RecordStoryGateError,
   RecordStoryGateResponse,
@@ -9817,6 +9821,36 @@ export const captureItemMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await captureItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Record Removal
+ *
+ * Record that a captured page was removed from its site: the capture is the copy that remains. The record is this
+ * item, with when it was found gone and what the address answered.
+ */
+export const recordRemovalMutation = (
+  options?: Partial<Options<RecordRemovalData>>,
+): UseMutationOptions<
+  RecordRemovalResponse,
+  RecordRemovalError,
+  Options<RecordRemovalData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RecordRemovalResponse,
+    RecordRemovalError,
+    Options<RecordRemovalData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await recordRemoval({
         ...options,
         ...fnOptions,
         throwOnError: true,

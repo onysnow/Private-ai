@@ -3,7 +3,7 @@ The app watches; a person captures (EGS rule 8): an item here is a link to a pos
 
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.time import utcnow_naive
@@ -46,7 +46,7 @@ class Monitor(Base):
 
 class MonitorItem(Base):
     """Something a monitor found that nobody has captured: a feed entry, a sitemap address, a page whose text changed.
-    `state` is new, captured or skipped. `flags` say why it is at risk: edited (its entry changed after first seen),
+    `state` is new, captured, skipped or recorded (a person recorded that a captured page was removed). `flags` say why it is at risk: edited (its entry changed after first seen),
     changed (a page's text changed since the last version), gone (a captured address now answers 404 or 410)."""
 
     __tablename__ = "monitor_items"
@@ -68,6 +68,12 @@ class MonitorItem(Base):
     capture_id: Mapped[str | None] = mapped_column(ForeignKey("captures.id"), nullable=True)
     first_seen_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+    # The same story seen earlier, from this or another source (a wire copy, a syndicated text): this item then copies
+    # it, waits outside the queue and is not offered for capture. `similarity` is the share of their wording in common.
+    copy_of: Mapped[str | None] = mapped_column(ForeignKey("monitor_items.id"), nullable=True, index=True)
+    similarity: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # When a captured item's address was last asked whether it is still there (once a day; a 404 or 410 makes a "gone" item).
+    rechecked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
 class MonitorVersion(Base):
