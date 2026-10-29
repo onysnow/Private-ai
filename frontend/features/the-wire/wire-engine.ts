@@ -627,8 +627,23 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   let hopEls: {k: string; g: SVGGElement}[] = [];
   const overlap = (b: Box, list: Box[]) => list.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
 
+  // The grid is far behind the map: it follows the camera at a sixth of its travel and a fraction of its zoom.
+  const gridEl = root.querySelector<HTMLElement>('.tw-grid');
+  let gridKey = '';
+  function moveGrid(): void {
+    if (!gridEl) return;
+    const still = RM(), gs = still ? 48 : 48 * Math.pow(C.k, 0.2);
+    const off = (v: number) => (still ? 0 : ((v % gs) + gs) % gs);
+    const key = `${off(-C.x * C.k / 6).toFixed(1)}|${off(-C.y * C.k / 6).toFixed(1)}|${gs.toFixed(2)}`;
+    if (key === gridKey) return;
+    gridKey = key;
+    const [gx, gy] = key.split('|');
+    gridEl.style.setProperty('--gx', `${gx}px`); gridEl.style.setProperty('--gy', `${gy}px`); gridEl.style.setProperty('--gs', `${gs.toFixed(2)}px`);
+  }
+
   function render(): void {
     cam.setAttribute('transform', `translate(${W / 2},${H / 2}) scale(${C.k}) translate(${-C.x},${-C.y})`);
+    moveGrid();
     const P: Record<string, Pt> = {};
     const cands: {id: string; N: NodeEl; d: Pt; pri: number}[] = [];
     // Cards keep a readable size on screen (about 170 px wide) whatever the zoom.

@@ -3,9 +3,22 @@
    slides in from the right. Chrome reads the theme's role tokens (themes.css); the kinds
    and link families keep the prototype's colours, each named in the key. */
 .tw { container: tw / inline-size; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; position: relative; height: 100%; min-height: 560px; overflow: hidden; border-radius: 16px; background: var(--ground); color: var(--text); font: 14px/1.45 var(--font-ui); }
-.tw::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+/* The grid sits far behind the map: it moves a sixth as far as the map when you pan or zoom (--gx, --gy, --gs, set by
+   the engine), and a slow wave of light runs along its lines only. Both stop under Calm motion and reduced motion. */
+.tw-grid { position: absolute; inset: 0; pointer-events: none; --g: 48px;
   background-image: linear-gradient(color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px);
-  background-size: 48px 48px; }
+  background-size: var(--gs, var(--g)) var(--gs, var(--g)); background-position: var(--gx, 0px) var(--gy, 0px); }
+.tw-grid-glow { position: absolute; inset: 0;
+  background-image: linear-gradient(rgb(232 169 91 / .3) 1px, transparent 1px), linear-gradient(90deg, rgb(232 169 91 / .3) 1px, transparent 1px),
+    linear-gradient(rgb(232 169 91 / .06) 3px, transparent 3px), linear-gradient(90deg, rgb(232 169 91 / .06) 3px, transparent 3px);
+  background-size: var(--gs, var(--g)) var(--gs, var(--g));
+  background-position: var(--gx, 0px) var(--gy, 0px), var(--gx, 0px) var(--gy, 0px), calc(var(--gx, 0px) - 1px) calc(var(--gy, 0px) - 1px), calc(var(--gx, 0px) - 1px) calc(var(--gy, 0px) - 1px);
+  -webkit-mask-image: linear-gradient(115deg, transparent 0 40%, #000 50%, transparent 60% 100%); mask-image: linear-gradient(115deg, transparent 0 40%, #000 50%, transparent 60% 100%);
+  -webkit-mask-size: 300% 100%; mask-size: 300% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  animation: tw-grid-wave 14s linear infinite, tw-grid-breathe 7s ease-in-out infinite; }
+@keyframes tw-grid-wave { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; } to { -webkit-mask-position: 0% 0; mask-position: 0% 0; } }
+@keyframes tw-grid-breathe { 0%, 100% { opacity: .4; } 50% { opacity: .85; } }
+:root[data-motion="calm"] .tw-grid-glow { animation: none; display: none; }
 .tw button, .tw input, .tw select { font: inherit; color: inherit; }
 .tw button { cursor: pointer; touch-action: manipulation; }
 .tw :focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
@@ -244,6 +257,7 @@
 @media (prefers-reduced-motion: reduce) {
   .tw .pulse { display: none; }
   .tw .halo, .tw .halo.textbook, .tw .tw-tagring .glow, .tw .node.textbook .flag-glow { animation: none; }
+  .tw-grid-glow { animation: none; display: none; }
   .tw-drawer, .tw-needle, .tw-map, .tw-wire { transition: none; }
 }
 /* Touch (the prototype's 21 Oct pass): fatter hit areas where the pointer is a finger. */

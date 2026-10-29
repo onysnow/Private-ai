@@ -89,6 +89,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
   if (!data || !data.entities.length) return <div className="tw tw-state"><p>No parties in this case yet. Records you accept in Decide appear here.</p></div>;
 
   return <div className={tagsOn ? 'tw' : 'tw tw-tags-off'} ref={root} aria-label="The Wire">
+    <div className="tw-grid" aria-hidden="true"><i className="tw-grid-glow"/></div>
     <svg className="tw-map" role="img" aria-label="Map of the parties in this case and how they are linked">
       <defs>
         <filter id="tw-goo" x="-20%" y="-20%" width="140%" height="140%">
