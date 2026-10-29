@@ -52,6 +52,23 @@ https://framer.com/m/Chronical-Timeline-JMbe1o.js@IcxcWf1SSSwxMOG63dAo (Framer's
   - Decks and the animated presentations above: a slide layout that compares up to five parties or sources.
 - Not started; a mockup comes first when Ony picks where.
 
+## Later: our own globe, with the Wire's links on it (Ony, 29 Oct)
+"I eventually want to be able to use this globe and make it our own. Then we will be able to map out the events,
+financial flows like that on the wire, but have it displayed on the globe":
+https://framer.com/m/TacticalGlobe3D-uVMtXj.js@UhPxNuaENi2YMvlzEzft (Framer's "TacticalGlobe3D").
+- What it is, from its code: a globe drawn in SVG with sphere maths of its own (an orthographic projection), no 3D
+  library. It uses the Natural Earth 110m country outlines (the world-atlas file, which it fetches from a CDN). Drag turns
+  it, it spins slowly when left alone, and it has an atmosphere, stars, a grid, country hover and markers with labels.
+- Making it our own means writing our own globe in that style, not copying the component: its code carries no licence.
+  Natural Earth is public domain, so the outlines can ship with the app, which also keeps the globe working offline
+  (nothing fetched from a CDN).
+- What it would show: the Wire's parties at their places, its links as arcs over the globe in the same family colours
+  and line styles (money arcs with the moving lights running the way the money went), and Timeline events as markers,
+  played through the time strip.
+- Where it sits: the Places screen already draws with MapLibre, which can show its map as a globe. Whether the globe is
+  that, or our own SVG globe in the Framer style, is a call to make with Ony at the mockup.
+- Not started; it waits until Ony asks for it.
+
 ## The Wire's chips in Nova Glow's motion (Ony, 29 Oct)
 "This is how smooth I want the chips, and also how I want any glow animations. The styling is sharper": Framer's
 "Nova Glow Navigation" (https://framer.com/m/Nova-Glow-Navigation-zmwqc6.js@AeSS5plwSRxLlwjuE91J).
