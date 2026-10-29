@@ -256,3 +256,15 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
      where the browser's window-management permission is granted, never asked for at start.
   5. Keep "If they ask": it is folded to one line per source until the presenter opens it, so it does not compete
      with the notes.
+
+## 14. Relationships folded into The Wire (29 Oct; Ony: "Continue", after entry 12, call 13)
+
+- **Call:** See › Relationships is gone. Its list of every link, the reviewed-duplicate switch and each link's
+  evidence and assessments are The Wire's "All links" panel (`features/the-wire/all-links.tsx`). Its add forms are not
+  carried over: See › Add by hand adds a party or a link, payments included, and asks where it comes from, which the
+  old forms did not. A request to open a relationship (a party's dossier, Claims) opens The Wire with All links.
+- **What went with it:** the old network drawing's "Your tags" layer (the reporter's tags on parties as a filter).
+  Tags are still kept and shown where they are made; the Wire does not draw them. `features/relationship-graph/graph.tsx`
+  is no longer mounted anywhere; its helpers stay in use.
+- **Found on the way:** inside the Wire, the theme's filled buttons drew light text on amber (the Wire's buttons inherit
+  colour); the links panel now gives them dark text.

@@ -12,6 +12,7 @@ import type {RelationshipOut} from '../../lib/generated/types.gen';
 import {certaintyOf} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
+import {AllLinks} from './all-links';
 import {LinkPanel} from './link-panel';
 import {mountWire} from './wire-engine';
 import type {LinkInfo, LinkSure, OpenLink} from './wire-engine';
@@ -48,6 +49,10 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
   const traceEvidence = (evidenceId: string, title: string) => openProvenance({title, kind: 'evidence', acceptedRecordType: 'evidence', acceptedRecordId: evidenceId});
   // The link "One link" has open (SEE_1's link panel follows it).
   const [link, setLink] = useState<OpenLink | null>(null);
+  // Every link as a list, with its evidence and the way to add one (the old Relationships panel's work).
+  const [allLinks, setAllLinks] = useState(false);
+  const asked = useWorkbenchStore(state => state.relationship);
+  useEffect(() => { if (asked) setAllLinks(true); }, [asked]);
   const data = query.data;
 
   useEffect(() => {
@@ -107,6 +112,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
       <button type="button" className="tw-tool tw-blens" aria-pressed="false">Lens <kbd>L</kbd></button>
       <button type="button" className="tw-tool tw-bpath" aria-pressed="false">Follow the money <kbd>F</kbd></button>
       <button type="button" className="tw-tool tw-bgroup" aria-pressed="true">Accounts in holders</button>
+      <button type="button" className="tw-tool" aria-pressed={allLinks} onClick={() => setAllLinks(a => !a)}>All links · {graph.data?.edges.length ?? 0}</button>
     </div>
 
     <div className="tw-pathbox tw-glass">
@@ -154,6 +160,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
     <div className="tw-wire" aria-live="polite"><svg className="tw-wsvg"/></div>
     <aside className="tw-drawer tw-glass" aria-live="polite"/>
     {link ? <LinkPanel link={link} info={info} onClose={() => setLink(null)} openDocument={openDocument} openFlag={openFlag} traceEvidence={traceEvidence}/> : null}
+    {allLinks && <AllLinks investigationId={investigationId} onClose={() => setAllLinks(false)}/>}
     <div className="tw-tip tw-glass" role="tooltip"/>
   </div>;
 }

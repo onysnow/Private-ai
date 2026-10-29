@@ -58,7 +58,6 @@ import type {Section} from './section-screen';
 import {YearSlider} from '../charts/year-slider';
 import {RedFlagsPanel} from '../../features/red-flags/red-flags-panel';
 import {ToCheckPanel} from '../../features/to-check/to-check-panel';
-import {RelationshipGraphPanel} from '../../features/relationship-graph/relationship-graph-panel';
 import {ReviewQueuePanel} from '../../features/review-queue/review-queue-panel';
 import {SearchPanel} from '../../features/search/search-panel';
 import {SecurityPanel} from '../../features/security/security-panel';
@@ -160,7 +159,11 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         if (!req || seen.current[key] === req.serial) continue;
         seen.current[key] = req.serial;
         const stage = STAGES.find(s => s.key === STAGE_OF_REQUEST[key]);
-        if (stage && viewOfPath(window.location.pathname) !== stage.key) router.push(caseHref(stage.route, state.investigationId));
+        if (!stage) continue;
+        // A relationship opens in The Wire's All links (the old Relationships panel's work moved there).
+        const anchor = key === 'relationship' ? 'the-wire' : '';
+        if (viewOfPath(window.location.pathname) !== stage.key) router.push(caseHref(`${stage.route}${anchor ? `#${anchor}` : ''}`, state.investigationId));
+        else if (anchor && window.location.hash !== `#${anchor}`) window.location.hash = anchor;
       }
     });
   }, [fixedView, router]);
@@ -264,7 +267,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
 
       {stage('map', <>
         <YearSlider investigationId={inv}/>
-        <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
+        <div id="the-wire" style={{height: 720, position: 'relative'}}><PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={false}/></PanelErrorBoundary></div>
         <div id="money-flows"><PanelErrorBoundary name="Money"><MoneyView investigationId={inv} active={false}/></PanelErrorBoundary></div>
         <div id="timeline"><PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary></div>
         <div id="places"><PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary></div>
@@ -307,8 +310,6 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       {screen('map', [
         {anchor: 'the-wire', label: 'The Wire', fill: true, render: () => <PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
         {anchor: 'money-flows', label: 'Money', render: () => <PanelErrorBoundary name="Money"><MoneyView investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
-        {anchor: 'relationship-graph', label: 'Relationships', render: () => <><YearSlider investigationId={inv}/>
-          <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary></>},
         {anchor: 'timeline', label: 'Timeline', render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'places', label: 'Places', render: () => <PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'add-by-hand', label: 'Add by hand', render: () => <PanelErrorBoundary name="Add by hand"><AddByHand investigationId={inv}/></PanelErrorBoundary>},

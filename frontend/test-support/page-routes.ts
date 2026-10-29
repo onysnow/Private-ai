@@ -331,6 +331,8 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/connector-findings`]: records.findings ?? [],
     [`GET ${base}/entities`]: records.entities ?? [],
     [`GET ${base}/graph`]: records.graph ?? emptyGraph(),
+    // The Wire (See; in the single-page view since it took over the Relationships panel).
+    [`GET ${base}/wire`]: {investigation_id: id, entities: [], links: [], events: []},
     [`GET ${base}/timeline`]: timelineBody(id, records.events ?? []),
     [`GET ${base}/timeline/lanes`]: lanesBody(id, records.events ?? []),
     [`GET ${base}/leads/queue`]: leadQueueBody(id, records.leads ?? []),
@@ -347,7 +349,6 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/places`]: placesBody(id),
     [`GET ${base}/tags`]: tagsBody(id),
     [`GET ${base}/collections`]: {investigation_id: id, collections: []},
-    [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
     [`GET ${base}/red-flags`]: {investigation_id: id, rules: [], flags: [], gone: []},
     [`GET ${base}/checks`]: {investigation_id: id, items: [], gone: []},
     // See › Money loads with the view (features/money): no payments yet.

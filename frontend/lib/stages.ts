@@ -31,7 +31,6 @@ export const STAGES: Stage[] = [
   ]},
   {key: 'map', route: '/see', n: 3, name: 'See', line: 'The reviewed records drawn four ways. Each chart says its rule and has its own key.', colour: SWATCH.amber, parts: [
     {label: 'The Wire', anchor: 'the-wire'},
-    {label: 'Relationships', anchor: 'relationship-graph'},
     {label: 'Timeline', anchor: 'timeline'},
     {label: 'Money', anchor: 'money-flows'},
     {label: 'Places', anchor: 'places'},
