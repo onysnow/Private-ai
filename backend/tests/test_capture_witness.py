@@ -92,7 +92,7 @@ def test_a_time_proof_sends_the_fingerprint_only_keeps_the_token_and_checks_it_h
     (method, url, content), = outside.calls
     assert method == "POST" and url == settings.capture_time_server and WARC not in (content or b"")
     line, = _log(inv)
-    assert line.kind == "fingerprint" and line.value == fingerprint and line.outcome == "sent" and "freetsa.org" in line.service
+    assert line.kind == "fingerprint" and line.value == fingerprint and line.outcome == "sent" and line.service == "time server (freetsa.org)"
     # The token is a new file beside the others, hashed like them; the WARC is as it was.
     files = {f["name"]: f for f in r.json()["files"]}
     token = (FIXTURES / "freetsa-hello.tsr").read_bytes()
