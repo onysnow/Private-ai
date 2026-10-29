@@ -52,6 +52,23 @@ https://framer.com/m/Chronical-Timeline-JMbe1o.js@IcxcWf1SSSwxMOG63dAo (Framer's
   - Decks and the animated presentations above: a slide layout that compares up to five parties or sources.
 - Not started; a mockup comes first when Ony picks where.
 
+## The Wire previews: Ony's later corrections (29 Oct)
+In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYmbmf67wntahWt), after the entries below:
+- Dots are the card's own end circle, the same size (38px), with the card's name type; the flag count sits on the outline
+  at 45 degrees on the right end; the "+N more" leader meets the outline square on.
+- A dot's half-shown name: the pill stays whole and crisp, only the words fade at its end; hover grows the pill.
+- Kind icons: slow, eased, context-specific loops while hovered (person: a breath and a light circling the head;
+  company: a light rising floor by floor; organisation: a gleam along the columns; vessel: riding a swell; property: a
+  warm light behind the door; bank account: a coin sliding in). Leaving lets the loop finish its cycle and settle.
+- The chip liquid is scaled to each chip, as the Shader Button's fill is to the button: one or two broad soft bands
+  and a fine grain, each chip its own seed.
+- Every link line moves by family, and the families may change colour: owns (gold) a soft light gliding owner to owned,
+  directs or works for (now teal) small beads marching, paid (copper) the money lights as today, kind not yet known
+  (grey) a slow breath. Dashed still means not yet shown.
+- The blue and yellow arcs on a card are the Your tags ring (one arc per tag, in the tag's colour); the preview's details
+  now name the tags on hover.
+All of it waits for his yes before the app changes.
+
 ## Later: our own globe, with the Wire's links on it (Ony, 29 Oct)
 "I eventually want to be able to use this globe and make it our own. Then we will be able to map out the events,
 financial flows like that on the wire, but have it displayed on the globe":
