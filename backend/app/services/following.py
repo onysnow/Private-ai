@@ -68,7 +68,24 @@ class Fetched:
 
 
 class FetchFailed(Exception):
-    """The request could not be made or never finished: a refused address, no route, a timeout, a reset."""
+    """The request could not be made or never finished: a refused address, no route, a timeout, a reset. `reason` is
+    one of the app's own sentences, never the network library's text, so nothing internal reaches the screen."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(reason)
+        self.reason = reason
+
+
+def _network_reason(exc: BaseException, route: str) -> str:
+    if isinstance(exc, httpx.ProxyError) or (route == "tor" and isinstance(exc, httpx.ConnectError)):
+        return "the Tor on this computer did not answer"
+    if isinstance(exc, httpx.TimeoutException):
+        return "it did not answer in time"
+    if isinstance(exc, httpx.ConnectError):
+        return "the connection could not be made"
+    if isinstance(exc, (httpx.RemoteProtocolError, httpx.ReadError)):
+        return "the connection broke off"
+    return "the request failed"
 
 
 _pace_lock = threading.Lock()
@@ -99,7 +116,7 @@ def guarded_get(url: str, headers: dict[str, str] | None = None, *, route: str =
     try:
         web_capture.check_address(url)
     except web_capture.CaptureRefused as exc:
-        raise FetchFailed(str(exc)) from exc
+        raise FetchFailed("it is not a public web address") from exc
     parts = urlsplit(url)
     host = (parts.hostname or "").rstrip(".").lower()
     sent = {"User-Agent": USER_AGENT, "Accept": "*/*", "Accept-Encoding": "gzip, deflate", **(headers or {})}
@@ -113,7 +130,7 @@ def guarded_get(url: str, headers: dict[str, str] | None = None, *, route: str =
         else:
             infos = web_capture.resolve_public(host, parts.port or (443 if parts.scheme == "https" else 80))
             if not infos:
-                raise FetchFailed(f"{host} is not a public web address, or could not be found")
+                raise FetchFailed("it is not a public web address, or could not be found")
             ip = str(infos[0][4][0]).split("%", 1)[0]
             client = httpx.Client(timeout=timeout, follow_redirects=False, trust_env=False)
             target = urlunsplit((parts.scheme, _netloc_for_ip(ip, parts.port, parts.scheme), parts.path or "/", parts.query, ""))
@@ -133,14 +150,9 @@ def guarded_get(url: str, headers: dict[str, str] | None = None, *, route: str =
                 return Fetched(response.status_code, {k.lower(): v for k, v in response.headers.items()}, b"".join(chunks), url, truncated)
     except FetchFailed:
         raise
-    except httpx.HTTPError as exc:
-        raise FetchFailed(_first_line(exc) or exc.__class__.__name__) from exc
-    except (OSError, ValueError) as exc:
-        raise FetchFailed(_first_line(exc) or exc.__class__.__name__) from exc
-
-
-def _first_line(exc: BaseException) -> str:
-    return (str(exc).strip().splitlines() or [""])[0][:300]
+    except (httpx.HTTPError, OSError, ValueError) as exc:
+        logger.info("following: request to %s failed", host, exc_info=True)
+        raise FetchFailed(_network_reason(exc, route)) from exc
 
 
 # --- robots.txt (decision 4: a monitor is a robot, so it obeys) ------------------------------------------------------
@@ -312,7 +324,7 @@ def looks_like_html(got: Fetched) -> bool:
 def infer_kind(url: str) -> str:
     parts = urlsplit(url)
     host, path = (parts.hostname or "").lower(), parts.path.lower()
-    if host.endswith("youtube.com") and "/feeds/videos.xml" in path:
+    if host in ("youtube.com", "www.youtube.com") and path == "/feeds/videos.xml":
         return "youtube"
     if "sitemap" in path and path.endswith((".xml", ".xml.gz")):
         return "sitemap"
@@ -552,7 +564,7 @@ def poll_monitor(db: Session, row: Monitor, *, now: datetime | None = None, fetc
                     health, reason = "broken", f"The site answered HTTP {got.status}"
     except FetchFailed as exc:
         mark_outbound_failed(db, request_id)
-        health, ok, reason = "broken", False, f"Could not reach it: {exc}"
+        health, ok, reason = "broken", False, f"Could not reach it: {exc.reason}"
         row.http_status = None
     row.health, row.health_reason = health, reason
     if ok:

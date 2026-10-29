@@ -89,6 +89,7 @@ def test_entities_in_a_feed_are_not_expanded_and_files_are_not_read():
 
 def test_the_kind_is_worked_out_from_the_address():
     assert following.infer_kind("https://www.youtube.com/feeds/videos.xml?channel_id=UC1") == "youtube"
+    assert following.infer_kind("https://evilyoutube.com/feeds/videos.xml") != "youtube"
     assert following.infer_kind("https://x.example/news-sitemap.xml") == "sitemap"
     assert following.infer_kind("https://x.example/feed.xml") == "feed" and following.infer_kind("https://x.example/about") == "page"
 
@@ -271,7 +272,7 @@ def test_each_poll_is_in_the_outbound_log_before_it_goes(site):
 def test_an_unreachable_site_marks_its_log_line_failed(site):
     m = _follow(site, "/feed.xml").copy()
     unreachable = client.post(f"/api/investigations/{_case()}/monitors", json={"url": "http://127.0.0.1:1/feed.xml"}).json()
-    assert unreachable["health"] == "broken" and unreachable["health_reason"].startswith("Could not reach it")
+    assert unreachable["health"] == "broken" and unreachable["health_reason"] == "Could not reach it: the connection could not be made"
     with SessionLocal() as db:
         assert db.scalar(select(OutboundRequest.outcome).where(OutboundRequest.investigation_id == unreachable["investigation_id"])) == "failed"
 
@@ -317,7 +318,7 @@ def test_the_tor_route_goes_through_the_reporters_tor(monkeypatch):
 
     monkeypatch.setattr(following.httpx, "Client", FakeClient)
     monkeypatch.setattr(settings, "follow_host_gap_seconds", 0.0)
-    with pytest.raises(following.FetchFailed, match="Tor is not running"):
+    with pytest.raises(following.FetchFailed, match="the Tor on this computer did not answer"):
         following.guarded_get("https://news.example/feed.xml", route="tor")
     assert seen["proxy"] == settings.tor_socks_url and seen["target"] == "https://news.example/feed.xml"
     m = following.egress_line(Monitor(url="https://news.example/feed.xml", interval_minutes=60, route="tor"))
