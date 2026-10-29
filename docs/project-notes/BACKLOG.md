@@ -391,3 +391,13 @@ Both PDFs are on Ony's PC (Documents\Private-ai-design); Ony pasted the text of 
 - **Approved 12 Oct, ahead of the order:** The Wire (See) and closing the app-side suite gaps.
 - **Decisions still Ony's (§12 table):** product name; edge panels on dwell or click only; Next up order; whether Textbook/safety notices may interrupt; Rain Noir rain default and photo; outside lookups default (automatic vs ask first); the seven Supported rules, the written override and the IPCC grid; whether watchlist hits and AI drafts live in Decide; unset Faint/Strong levels ("not set" vs hidden, per-case thresholds); every area's glossary definition; dotted worked-out links and money checks as Red Flags; stories per case, default gates, signed packs; social posting; "Paper Trail" vs "Run record"; website licence, price, telemetry, photos; backup passphrase.
 - **ADRs needed before packages (§12):** motion library, command palette, Rain Noir effects port, local fonts, virtualised list, TipTap, PDF and share-card rendering, AI run event store, evidence anchors and check results; optional d3-sankey, timeline library, C2PA, headless browser.
+- He found the options pages sloppy and not inventive, and that UI should be simple. All three rebuilt (same links):
+  - Name tab (Name Tag Options): one simple design in the Wire's look, with motion values taken from his Framer
+    references (Nova Glow Navigation, Expanded Card). The tab grows out of the badge and shows the name preview and the
+    link count; hover grows the same tab into a small card (name; kind · where; "3 links · 2 not on the map") and
+    shows the ones not on the map as faint names under it; click recentres.
+  - How much is owned (Ownership Share): only on the line or its mark, never on the owned card. A a key whose blade is
+    as long as the share, B line weight in the register's steps, C four strands, D the rest peels away.
+  - Connections not on the map (Hidden Connections): A ports in the outline, B the stack behind it, C into the fog,
+    D a lens onto the rest. Waiting for his picks.
+
