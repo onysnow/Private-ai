@@ -130,6 +130,21 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   - The shapes preview now has the chip liquid too (it never had it), clipped to each card's own shape, with the switch.
   - Owns lines (his pick from the label options, D with C's mark): small arrows drift along every owns line from owner
     to owned; where the share is known, a round mark mid-line shows it ("100%"); hovering the mark shows the sentence.
+  - Then: no dotted pulses on lines. Paid and directs lines carry a soft light that is a true gradient (fading tail,
+    bright head), moved a frame at a time and eased; the flag threads have no pulse. Owns: the mid-line mark holds a key
+    in a ring as long as the share (full ring = all of it, dashed = share not stated); hover draws the ring to the share,
+    slides the amount out of the mark and shows the sentence above. Hover previews always branch outwards (within 60
+    degrees of straight out from the map's middle, never across the dot's own name) and stay inside the map.
+  - Switch "Lines take the parties' colours": a one-way link (paid, owns) leaves in its own colour and turns into the
+    colour of the party it reaches; a link with no direction blends both parties' colours with its own in the middle.
+  - Five options for the dot's name tag (artifact for dot tags): the half-shown pill (now), name only, label below, a tab
+    off the badge, an initial flag on the dot. Waiting for his pick.
+
+## Standing preferences (Ony, 29 Oct)
+- Reveal on hover is the default treatment for most things: the least at rest, the detail on hover, unless he says
+  otherwise.
+- Gradients can say things (direction, from whom to whom, how much): keep an eye out for places to use them as the app
+  is built, and propose them.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
     so the chips showed through to the lines. Fixed; the liquid's range is subtle but visible again.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
