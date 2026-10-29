@@ -69,6 +69,29 @@ https://framer.com/m/TacticalGlobe3D-uVMtXj.js@UhPxNuaENi2YMvlzEzft (Framer's "T
   that, or our own SVG globe in the Framer style, is a call to make with Ony at the mockup.
 - Not started; it waits until Ony asks for it.
 
+## Website titles that soak in like ink (Ony, 29 Oct)
+"For our product page, for titles I want to try using this animation/styling":
+https://framer.com/m/InkBleedComponent-DpjWv7.js@kqaA6CCQV2BFK6BSX295 (Framer's "Ink Bleed Text").
+- What it is, from its code: each word soaks in from soft, fibrous edges and dries into crisp type, using an SVG filter
+  per word (fractal noise pushing the edges about, plus a blur), 1.6 s a word with a 0.14 s stagger, started when it
+  scrolls into view; hovering wets it again.
+- Preview made with our own code (the component has no licence) on SITE_1's titles: on the site's dark ground, in a serif,
+  and on paper. It goes in the website (MOCKUP_BUILD_LIST §10) once Ony picks a version.
+
+## The Wire with a liquid shader in its backgrounds (Ony, 29 Oct)
+"Show me the wire where the backgrounds have this subtle shader effect":
+https://framer.com/m/Shader-Button-v12VJe.js@PhehsfTqnG7o5bWDuNUT (Framer's "Shader Button", whose fill is a moving
+"Liquid Gradient" shader).
+- Preview made with our own shader: a slow domain-warped gradient in the Wire's ground blues behind the map, and a darker
+  patch with its own seed inside each panel, with switches to compare against today. In the app it would draw at half
+  resolution, pause off screen, and stay off under calm motion, Effects off and reduced motion. It waits for his yes.
+
+## Testimonial rotation (Ony, 29 Oct)
+Ony sent https://framer.com/m/Testimonial-Rotation-JRnz0w.js@VcEYXbVlwUb8LpYlJsb6 without a note.
+- What it is, from its code: one quote at a time, with an avatar, a name and a byline, changing every 6 s with a blur and
+  a slide, progress bars and arrows, pausing on hover, and still under reduced motion.
+- The natural home is the website. Not started; it waits for Ony to say where he wants it.
+
 ## The Wire's chips in Nova Glow's motion (Ony, 29 Oct)
 "This is how smooth I want the chips, and also how I want any glow animations. The styling is sharper": Framer's
 "Nova Glow Navigation" (https://framer.com/m/Nova-Glow-Navigation-zmwqc6.js@AeSS5plwSRxLlwjuE91J).
