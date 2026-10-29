@@ -1,0 +1,38 @@
+/* Style guide (/style-guide). One section per printed page (1440 × 900). */
+.sg { min-height: 100vh; background: var(--ground); color: var(--text); font-family: var(--font-ui); }
+.sg-section { box-sizing: border-box; min-height: 900px; padding: 48px 64px; background: var(--ground); color: var(--text); break-after: page; display: flex; flex-direction: column; gap: 18px; }
+.sg-eyebrow { margin: 0; font: 600 12px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
+.sg-title { margin: 0 0 8px; font: 300 40px/1.1 var(--font-display); }
+.sg h3 { margin: 10px 0 0; font: 600 16px var(--font-display); color: var(--text-muted); }
+.sg-mood { margin: 0; font-size: 16px; color: var(--text-muted); }
+.sg-rules { margin: 0; padding-left: 24px; display: grid; gap: 16px; font-size: 19px; line-height: 1.45; max-width: 1000px; }
+.sg-swatches { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+.sg-swatch { display: grid; gap: 4px; font-size: 13px; }
+.sg-swatch code { font: 12px var(--font-mono); color: var(--text-muted); }
+.sg-chip { height: 72px; border-radius: 10px; border: 1px solid var(--line); }
+.sg-type { display: grid; gap: 14px; }
+.sg-type-row { display: grid; grid-template-columns: 160px minmax(0, 1fr) 360px; gap: 20px; align-items: baseline; }
+.sg-type-row code, .sg-space code, .sg-radius code, .sg-depth code { font: 12px var(--font-mono); color: var(--text-muted); }
+.sg-role { font: 600 12px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.sg-fonts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.sg-fonts div { display: grid; gap: 6px; padding: 14px 16px; border-radius: 12px; background: var(--surface-1); font-size: 22px; }
+.sg-fonts b { font: 600 12px var(--font-mono); color: var(--text-muted); }
+.sg-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+.sg-space { display: grid; gap: 6px; justify-items: center; }
+.sg-space i { display: block; background: var(--accent-1); }
+.sg-radius { width: 96px; height: 64px; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--line); }
+.sg-depth { width: 260px; height: 140px; border-radius: 14px; display: grid; place-content: center; gap: 6px; text-align: center; }
+.sg-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.sg-grid3 > div { padding: 18px 20px; border-radius: 14px; background: var(--surface-1); display: grid; gap: 14px; align-content: start; }
+.sg-line { margin: 0; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+/* The "Colour and shape" column, drawn here whatever this computer's setting is. */
+.sg-shape .st:not(.st-always) { width: 20px !important; height: 20px !important; background: none !important; border: 1.5px solid currentColor !important; font-size: 12px; }
+.sg-shape .st:not(.st-always) .st-mark, .sg-shape .lv:not(.st-always) .lv-bars { display: inline !important; }
+.sg-shape .lv:not(.st-always) { width: auto !important; height: auto !important; padding: 3px 6px !important; }
+.sg-marks { display: flex; flex-wrap: wrap; gap: 26px; }
+.sg-marks > div { display: grid; justify-items: center; gap: 8px; font-size: 14px; min-width: 90px; text-align: center; }
+.sg-marks .fl-kind { width: 28px; height: 28px; }
+.sg-marks .fl-health { font-size: 22px; width: auto; }
+.sg-f { font: 700 22px var(--font-read); color: var(--accent-2); }
+.sg-static { position: static !important; animation: none !important; }
+.sg-panel { max-width: 420px; }
