@@ -6615,7 +6615,7 @@ export const zPinSetIn = z.object({
  *
  * An event on the investigation's timeline that happened at a place:
  * one about the place's own record ("place") or about a relationship
- * linking something to it ("link"). `first_day` and `last_day` are the
+ * linking something to it, or about a record linked to it ("link"). `first_day` and `last_day` are the
  * days its dates as recorded can mean; `exact` is false when a date is
  * known only to the month or year.
  */
@@ -6662,6 +6662,7 @@ export const zPlaceOut = z.object({
   latitude: z.number(),
   links: z.array(zPlaceLinkOut),
   longitude: z.number(),
+  precision: z.string().nullish(),
   schema: z.string(),
 });
 

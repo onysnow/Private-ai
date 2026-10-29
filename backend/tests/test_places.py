@@ -89,3 +89,29 @@ def test_each_place_carries_the_dated_events_at_it_from_the_timeline():
     ]
     ownership = next(link for link in places["Villa Kyrenia"]["links"] if link["caption"] == "Meridian Holdings Ltd")
     assert events[0]["relationship_id"] == ownership["relationship_id"] and events[1]["relationship_id"] is None
+
+
+def test_a_property_s_events_reach_its_address_and_the_address_says_how_exact_it_is():
+    """Audit #12: a place made as an Address linked to the property at it (the 1MDB demo's places) gets the property's
+    events, through that link; a person linked to it does not bring theirs. The point's precision, as its notes record
+    it, is said."""
+    from app.models.domain import Entity
+    from app.schemas.api import EntityCreate, TimelineEventCreate
+    from app.services.entities import create_entity
+    from app.services.timeline import create_timeline_event
+
+    inv = client.post("/api/investigations", json={"name": "Spots"}).json()["id"]
+    with SessionLocal() as db:
+        address = create_entity(db, EntityCreate(investigation_id=inv, schema="Address", caption="15 West 63rd Street",
+                                                 properties={"full": ["15 West 63rd Street, New York"], "latitude": ["40.77"], "longitude": ["-73.98"],
+                                                             "notes": ["Precision: building. Geocoded from the public street address."]}))
+        flat = create_entity(db, EntityCreate(investigation_id=inv, schema="RealEstate", caption="Park Laurel unit"))
+        owner = create_entity(db, EntityCreate(investigation_id=inv, schema="Person", caption="A. Buyer"))
+        create_relationship(db, investigation_id=inv, schema="UnknownLink", source_entity_id=flat.id, target_entity_id=address.id, properties={})
+        create_relationship(db, investigation_id=inv, schema="UnknownLink", source_entity_id=owner.id, target_entity_id=address.id, properties={})
+        create_timeline_event(db, TimelineEventCreate(investigation_id=inv, title="Unit bought for $30.6m", date_start="2010-06", precision="month", entity_id=flat.id))
+        create_timeline_event(db, TimelineEventCreate(investigation_id=inv, title="Buyer flew to Macau", date_start="2011", precision="year", entity_id=owner.id))
+        assert db.get(Entity, address.id) is not None
+    place = client.get(f"/api/investigations/{inv}/places").json()["places"][0]
+    assert place["precision"] == "building"
+    assert [(e["title"], e["via"]) for e in place["events"]] == [("Unit bought for $30.6m", "link")]

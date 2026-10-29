@@ -146,9 +146,12 @@ def test_the_rebuilt_emails_carry_only_the_quoted_words():
 def test_the_word_file_says_it_is_a_conversion():
     import docx
     d = DOCS["docx-doj-2016-introduction"]
-    paragraphs = [p.text for p in docx.Document(str(demo_1mdb.FILES / d["filename"])).paragraphs]
-    assert paragraphs[0].startswith("Converted to Word by the Workbench from ")
-    assert any(p.startswith("6. 1MDB was ostensibly created") for p in paragraphs)
+    word = docx.Document(str(demo_1mdb.FILES / d["filename"]))
+    # It says so in its properties, not in its text: the reader reads the text as the complaint's (audit #12).
+    assert word.core_properties.comments.startswith("Converted to Word by the Workbench from ")
+    assert "Not an original Word file" in word.core_properties.comments
+    paragraphs = [p.text for p in word.paragraphs]
+    assert paragraphs[0].startswith("6. 1MDB was ostensibly created")
 
 
 def test_a_file_that_cannot_be_fetched_stays_a_link():

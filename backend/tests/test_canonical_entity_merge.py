@@ -103,3 +103,23 @@ def test_merged_alias_search_dossier_and_provenance_resolve_to_active_entity():
     assert trace_body["record_id"] == target["id"]
     assert trace_body["root"]["id"] == target["id"]
     assert trace_body["root"]["alias_resolution"]["requested_entity_id"] == source["id"]
+
+
+def test_a_merged_away_name_stays_the_surviving_record_s_alias():
+    """Audit #2: after a merge, a reading that meets the merged-away record's name finds the surviving record, not a
+    new one: each name it was held under that the survivor does not hold becomes the survivor's alias."""
+    from app.db.session import SessionLocal
+    from app.models.domain import Entity
+    from app.services.resolution import entity_names
+
+    client = TestClient(app)
+    inv = _inv(client, "Merge keeps names")
+    source = _entity(client, inv, "Todd C. Hansen")
+    target = _entity(client, inv, "Todd Hansen")
+    _mark_same(client, source, target)
+    fresh = client.get(f"/api/entities/{source['id']}/merge-preview", params={"target_entity_id": target["id"]}).json()
+    assert client.post(f"/api/entities/{source['id']}/merge", json={"target_entity_id": target["id"], "preview_digest": fresh["preview_digest"]}).status_code == 200
+    with SessionLocal() as db:
+        survivor = db.get(Entity, target["id"])
+        assert entity_names(survivor) == ["Todd Hansen", "Todd C. Hansen"]
+        assert survivor.properties["alias"] == ["Todd C. Hansen"]

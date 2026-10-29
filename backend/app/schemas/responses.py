@@ -3940,7 +3940,7 @@ class PlaceLinkOut(ResponseModel):
 class PlaceEventOut(ResponseModel):
     """An event on the investigation's timeline that happened at a place:
     one about the place's own record ("place") or about a relationship
-    linking something to it ("link"). `first_day` and `last_day` are the
+    linking something to it, or about a record linked to it ("link"). `first_day` and `last_day` are the
     days its dates as recorded can mean; `exact` is false when a date is
     known only to the month or year."""
     id: str
@@ -3966,6 +3966,9 @@ class PlaceOut(ResponseModel):
     longitude: float
     address: str | None = None
     country: str | None = None
+    # How exact the point is, as the record says ("building", "street", "city"): read from its notes'
+    # "Precision: …", which is where a place's precision is kept (FollowTheMoney's Address has no field for it).
+    precision: str | None = None
     links: list[PlaceLinkOut]
     events: list[PlaceEventOut] = Field(default_factory=list)
 

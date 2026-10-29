@@ -63,22 +63,19 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
 ## Asked for: navigation
 - **Clicking a party anywhere jumps to Bring in** (the dossier lives in Connectors; `case-workbench.tsx` `STAGE_OF_REQUEST.dossier = 'collect'`). Proposed: open the dossier as a side panel over the current screen. Ony has not answered this yet.
 
-## Found by the data audit (11 Oct) — not yet discussed with Ony
-1. **"Add 'United States' as a Person?"** The name-finder's guess of the kind is shown as fact, and about 30 of 37 are wrong. The kind question asked in Review is never asked on the card (`case_home.py:266`, `entity_signals.py:116`).
-2. **Names already held as aliases are offered as new records**, e.g. "Jho Low" (9 of them). `resolution.py:68-71` only matches captions.
-3. **The CSV is read twice**: by the table mapping, and as one 3,793-character text block with junk names. Skip the text name-finder for table-mapped files.
-4. **Timeline entries from record dates:** raw titles ("— startDate"), raw origin ids, no amount, and duplicates of recorded events (`timeline.py:233-259`, `timeline-panel.tsx:141`).
-5. **Range dates show invented days** ("1 Jan 2009 to 1 Jan 2013"; `lib/dates.ts:4-11`).
-6. **The payments ledger drops `date_end`** (`financial_flows.py:91`). World View → Oceanco shows "—".
-7. **The Case home money tile hides the other currencies** (36 payments). "17 sources" means 17 starting payers. Failed documents are not counted.
-8. **The Case home flag cards join the parties with →** instead of showing the summary. The return leg of a cycle is lost.
-9. **BO-031 fires on one person's two bank accounts** (`shared_holder_link.py`).
-10. **OCR noise from photos becomes claims, names and evidence.** Add a quality gate.
-11. **94 "Source date" timeline events** (including photo dates) clutter the chronology.
-12. **Places have no events or precision.** Also:
-    - an inference claim is forced to Supported (`more.json:14195`);
-    - an editor's note in the .docx is read as content;
-    - a duplicate lead.
+## Found by the data audit (11 Oct) — Ony, 29 Oct: "Fix". Each checked against the code on 29 Oct, then fixed with tests
+1. ~~**"Add 'United States' as a Person?"**~~ Fixed 29 Oct: a name whose kind the text gives no sign of is offered as "Add it, kind not known" (LegalEntity), never as the guess; accepting one without a kind is refused (`case_home.py` `_entity_question`, `documents.py` `review_candidate`). Not done: a place or country kind among the choices (FollowTheMoney has none).
+2. ~~**Names already held as aliases are offered as new records.**~~ Already fixed before 29 Oct (every name and alias is matched, `resolution.py`). Fixed 29 Oct: a merge keeps the merged-away record's names as the survivor's aliases (`entity_merge.py`).
+3. ~~**The CSV is read twice.**~~ Fixed 29 Oct: a table (CSV, TSV, XLSX) is never read as running text for proposals, mapped or not; mapping one withdraws such proposals kept from before (`documents.py`, `table_mappings.py`).
+4. ~~**Timeline entries from record dates.**~~ Fixed 29 Oct: a link's dates make one event in words with its amount, start and end; a record's date reads "X: incorporation date"; a date already on the timeline for that record or a party of that link is not drawn again; no raw origin id (`timeline.py`, `timeline-panel.tsx`).
+5. ~~**Range dates show invented days.**~~ Fixed before 29 Oct in `lib/dates.ts`; the Places strip's tooltip fixed 29 Oct (`places-timeline.tsx`).
+6. ~~**The payments ledger drops `date_end`.**~~ Fixed before 29 Oct; 29 Oct: a payment known only by its end date reads "by" it, and the money strip and the Red Flags payment line keep the end.
+7. ~~**The Case home money tile.**~~ Fixed 29 Oct: "from N starting payers" (different payers), every other currency listed with its sum, documents that could not be read counted.
+8. ~~**The Case home flag cards join the parties with →.**~~ Fixed 29 Oct: the flag's summary at every level; a loop's summary keeps its way back.
+9. ~~**BO-031 fires on one person's two bank accounts.**~~ Already fixed before 29 Oct (detector version 2, only dealings between legal persons). It is the app's Red Flags engine, not the Authority Suite.
+10. ~~**OCR noise from photos becomes claims, names and evidence.**~~ Fixed 29 Oct: proposals read by OCR from a page under 60% legible (`OCR_LEGIBILITY_FLOOR`) are held back from Decide and wait in the reading room, "Held back · hard to read", decidable by eye (`handlers.py` `hold_illegible`).
+11. ~~**94 "Source date" timeline events.**~~ Fixed 29 Oct: a source's own date is an event only on request ("Also show when each source was published or filed"; `include_source_dates`).
+12. ~~**Places have no events or precision.**~~ Fixed 29 Oct: a property's events reach the address it is linked to, and a place says how exact it is ("exact to the building", from its notes). Also fixed in the demo data: the two inference claims are leads, not Confirmed and Supported; the converted .docx keeps its converter's note in its properties, not its text (its SHA-256 updated in `more.json`); the duplicate lead became next actions on the two leads it repeated.
 
 Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 

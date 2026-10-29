@@ -92,7 +92,7 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
         <tbody>{places.map(place => <tr key={place.entity_id}>
           <th scope="row"><Button variant="link" size="sm" onClick={() => pick(place.entity_id)}>{place.caption}</Button>
             <small> · {place.schema}</small></th>
-          <td>{place.address ? `${place.address} · ` : ''}{coordinates(place)}{place.country ? ` · ${place.country.toUpperCase()}` : ''}</td>
+          <td>{place.address ? `${place.address} · ` : ''}{coordinates(place)}{place.precision ? ` · exact to the ${place.precision}` : ''}{place.country ? ` · ${place.country.toUpperCase()}` : ''}</td>
           <td>{place.links.length === 0 ? '—' : place.links.map(link => <div key={`${link.relationship_id}-${link.direction}`}>
             <Button variant="link" size="sm" onClick={() => openDossier(link.entity_id)}>{link.caption}</Button>
             <small> · {link.schema}</small>

@@ -30934,7 +30934,7 @@
         "type": "object"
       },
       "PlaceEventOut": {
-        "description": "An event on the investigation's timeline that happened at a place:\none about the place's own record (\"place\") or about a relationship\nlinking something to it (\"link\"). `first_day` and `last_day` are the\ndays its dates as recorded can mean; `exact` is false when a date is\nknown only to the month or year.",
+        "description": "An event on the investigation's timeline that happened at a place:\none about the place's own record (\"place\") or about a relationship\nlinking something to it, or about a record linked to it (\"link\"). `first_day` and `last_day` are the\ndays its dates as recorded can mean; `exact` is false when a date is\nknown only to the month or year.",
         "properties": {
           "date_end": {
             "anyOf": [
@@ -31110,6 +31110,17 @@
           "longitude": {
             "title": "Longitude",
             "type": "number"
+          },
+          "precision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precision"
           },
           "schema": {
             "title": "Schema",

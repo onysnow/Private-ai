@@ -1653,7 +1653,7 @@
    "filename": "doj-2016-complaint-introduction-converted.docx",
    "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
    "mode": "ship",
-   "sha256": "d362759722dab37c2d1664e29604ea0efc159b529aac4363bd9638643be63435",
+   "sha256": "961eb734c62a76de58811c0f944fba7175b55444bc80b54e8ee1c56f78144c95",
    "hash": "pin",
    "publisher": "Journalism Workbench (conversion of a U.S. Government work)",
    "source_type": "public_record",
@@ -12819,10 +12819,10 @@
   {
    "id": "cl-03",
    "text": "Malaysian Official 1 in the US filings is Najib Razak, then prime minister.",
-   "status": "confirmed",
-   "evidence_grade": "robust",
+   "status": "lead",
+   "evidence_grade": "medium",
    "agreement_grade": "high",
-   "rationale": "Inference from two independent documents describing the same statement: the DOJ quotes the Malaysian AG's 26 Jan 2016 release with \"[MALAYSIAN OFFICIAL 1]\" where the original says the prime minister; the Malaysian court convicted Najib over the same RM2,081,476,926/US$681m.",
+   "rationale": "An inference, not a documented fact: Inference from two independent documents describing the same statement: the DOJ quotes the Malaysian AG's 26 Jan 2016 release with \"[MALAYSIAN OFFICIAL 1]\" where the original says the prime minister; the Malaysian court convicted Najib over the same RM2,081,476,926/US$681m.",
    "evidence": [
     {
      "doc": "doj-2017-complaint-equanimity-yacht",
@@ -14192,7 +14192,7 @@
   {
    "index": 26,
    "text": "\"Abu Dhabi Official 1\" and \"Abu Dhabi Official 2\" in the DPA are Khadem al-Qubaisi and Mohamed al-Husseiny.",
-   "status": "supported",
+   "status": "lead",
    "evidence_grade": "medium",
    "agreement_grade": "medium",
    "rationale": "Still inference from matching amounts/dates; FINMA/MAS name Husseiny (Falcon chairman) but not as \"Abu Dhabi Official 2\".",
@@ -14652,17 +14652,6 @@
     "tanore"
    ],
    "claims": []
-  },
-  {
-   "title": "Get the Ng trial record and the SEC order",
-   "priority": "normal",
-   "detail": "Several regrades note that the 2022 Ng jury verdict and the SEC order are not in the documents.",
-   "next_action": "Download the E.D.N.Y. judgment in US v Ng (18-cr-538) and the SEC administrative order of Oct 2020.",
-   "entities": [
-    "roger-ng",
-    "goldman-group"
-   ],
-   "claims": []
   }
  ],
  "lead_updates": [
@@ -14722,6 +14711,22 @@
     "cl-12"
    ],
    "next_action": "GLEIF has Aabar Investments PJS (LEI 549300O7PJ78GQ1SWE89) but no record for the BVI or Seychelles look-alikes; ask the BVI and Seychelles registries."
+  },
+  {
+   "title": "Obtain the SEC administrative order against Goldman (Oct 2020)",
+   "entities": [
+    "goldman-group"
+   ],
+   "claims": [],
+   "next_action": "Several regrades note the SEC order is not in the documents: download the SEC administrative order of Oct 2020."
+  },
+  {
+   "title": "Pull the Leissner plea transcript and the Roger Ng trial record",
+   "entities": [
+    "roger-ng"
+   ],
+   "claims": [],
+   "next_action": "Several regrades note the 2022 Ng jury verdict is not in the documents: download the E.D.N.Y. judgment in US v Ng (18-cr-538)."
   }
  ]
 }
