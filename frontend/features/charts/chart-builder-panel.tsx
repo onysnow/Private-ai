@@ -205,9 +205,13 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
           {report && <CheckReportView report={report} kindName={kindName(kind)}/>}
           {drawn && <ChartFrame kind="built-chart" title={drawnTitle} question={`${kindName(drawn.spec.kind as string)}, drawn from this investigation's records and checked against the design rules.`}
             rule={{label: 'What it shows:', text: drawn.text.description}}
-            footer={<><span>{drawn.text.source_line}</span><Reveal label="Tracing a value" detail="Numbered buttons in the data table trace each value to its record."><span aria-hidden="true">ⓘ</span></Reveal></>}>
+            footer={<><span>{drawn.text.source_line}</span><Reveal label="Tracing a value" detail="Click a bar, slice or point to trace its value to a record; the numbered buttons in the data table trace each one."><span aria-hidden="true">ⓘ</span></Reveal></>}>
             <div style={{padding: '12px 16px'}}>
-            <ChartFigure visual={drawn} renderCitations={refs => <span>{refs.map((ref, index) => {
+            <ChartFigure visual={drawn} onPick={row => {
+              // A bar, slice or point traces the first record behind its value; the table lists them all.
+              const request = row.record_refs[0] ? traceRequest(row.record_refs[0], `${drawnTitle}: ${row.label}`) : null;
+              if (request) openProvenance(request);
+            }} renderCitations={refs => <span>{refs.map((ref, index) => {
             const request = traceRequest(ref, `${drawnTitle}: record ${index + 1}`);
             return request
               ? <Reveal key={`${ref.record_type}:${ref.record_id}`} tabbable={false} detail={`Trace this ${ref.record_type.replace('_', ' ')}`}>

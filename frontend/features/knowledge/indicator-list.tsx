@@ -34,17 +34,18 @@ export function FlagLevelChip({level, showWord = false}: {level: string; showWor
   return level === 'faint' || level === 'strong' || level === 'textbook' ? <LevelChip level={level as FlagLevel} showWord={showWord}/> : <span>{level}</span>;
 }
 
-export type ListFilter = 'all' | 'fires' | 'records' | 'lookups' | 'person';
+export type ListFilter = 'all' | 'computed' | 'fires' | 'records' | 'lookups' | 'person';
 const PREVIEW_MS = 300;
 
 export function filterRows(rows: CatalogueIndicatorRowOut[], filter: ListFilter, layer: Pick<CaseLayer, 'flags'>): CatalogueIndicatorRowOut[] {
   if (filter === 'all') return rows;
   if (filter === 'fires') return rows.filter(r => layer.flags.has(r.id));
+  if (filter === 'computed') return rows.filter(r => r.rule);
   return rows.filter(r => r.checkable === filter);
 }
 
 const EMPTY: Record<ListFilter, string> = {
-  all: 'holds no indicator yet', fires: 'fires in this case', records: 'is checked from your records',
+  all: 'holds no indicator yet', computed: 'is computed by the app yet', fires: 'fires in this case', records: 'is checked from your records',
   lookups: 'is checked after outside lookups', person: 'is checked only by a person',
 };
 
@@ -86,6 +87,10 @@ export function IndicatorList({area, rows, loading, error, layer, filter, onFilt
     <h2 className="kc-title kc-title-s kc-clip">{area ? <Reveal detail={<><b>{area.name}</b><span className="rv-row rv-mono">{area.key}</span></>}>{shortAreaName(area.name)}</Reveal> : 'Choose an area'}
       {' '}<span className="kc-count">{rows.length} indicators</span></h2>
     <div className="kc-chips" role="group" aria-label="Show">
+      {/* The indicators the app computes itself: the mark and the count; the words on hover or focus, and in the name. */}
+      {count('computed') > 0 && <Reveal tabbable={false} describe={false} detail={<>The app <b>computes</b> these</>}>
+        <button type="button" className={`kc-chip${filter === 'computed' ? ' on' : ''}`} aria-pressed={filter === 'computed'} onClick={() => onFilter('computed')}>
+          <span aria-hidden="true">◆</span><span className="sr-only">The app computes</span>{' '}{count('computed')}</button></Reveal>}
       {chips.map(c => <button type="button" key={c.key} className={`kc-chip${filter === c.key ? ' on' : ''}`} aria-pressed={filter === c.key}
         onClick={() => onFilter(c.key)}>{c.label}</button>)}
       {/* How it is checked: the shape and the count; the word on hover or focus, and in the button's name. */}

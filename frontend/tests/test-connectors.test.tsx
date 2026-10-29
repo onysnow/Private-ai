@@ -18,7 +18,7 @@ import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
 import type {Routes} from '../test-support/mock-api';
-import {dossierFixture, dossierRoutes, entityFixture, findingFixture} from '../test-support/page-routes';
+import {entityFixture, findingFixture} from '../test-support/page-routes';
 
 const wrap = (node: ReactElement) => render(<QueryProvider>{node}</QueryProvider>);
 
@@ -144,7 +144,9 @@ describe('ConnectorsPanel', () => {
     });
     await userEvent.setup().click(screen.getByRole('button', {name: 'Different'}));
 
-    await screen.findByText('Latest decision: negative');
+    // The decision is its shape; its word is on hover (Ony, 29 Oct).
+    expect((await screen.findByText('Latest decision: negative')).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('img', {name: 'Latest decision: negative'})).toHaveTextContent('✕');
     expect(api.lastBody(decision)).toEqual({finding_ids: ['find-1', 'find-2'], decision: 'negative', confidence: 0.5});
     expect(api.calls(CLUSTERS)).toHaveLength(2);
     expect(api.unmatched()).toEqual([]);
@@ -158,13 +160,14 @@ describe('ConnectorsPanel', () => {
     expect(screen.queryByText('Cross-provider candidates')).not.toBeInTheDocument();
   });
 
-  it('opens the selected entity\'s dossier through the shared store', async () => {
-    const api = await renderPanel(dossierRoutes('ent-1', dossierFixture(entityA)));
+  it('opens the selected entity\'s dossier in the inspector slot, through the shared store', async () => {
+    const api = await renderPanel();
     await userEvent.setup().click(screen.getByRole('button', {name: 'Open dossier'}));
 
-    await screen.findByText('Kestrelwood Holdings Ltd dossier');
     expect(useWorkbenchStore.getState().dossier).toMatchObject({entityId: 'ent-1'});
-    expect(api.calls('GET /api/entities/ent-1/dossier')).toHaveLength(1);
+    expect(useWorkbenchStore.getState().inspector).toMatchObject([{kind: 'dossier', entityId: 'ent-1'}]);
+    // The panel itself no longer draws the dossier: the slot does, wherever you are.
+    expect(screen.queryByText('Kestrelwood Holdings Ltd dossier')).not.toBeInTheDocument();
     expect(api.unmatched()).toEqual([]);
   });
 

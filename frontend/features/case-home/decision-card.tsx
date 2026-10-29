@@ -119,12 +119,17 @@ function PageThumb({documentId, page, passage}: {documentId: string; page: numbe
  *  to, then what holds whichever way you answer. */
 export function WhatHappens({item}: {item: DecisionItemOut}): ReactElement | null {
   const answers = item.choices.filter(c => c.happens);
-  if (!answers.length && !item.consequences.length) return null;
+  const unlocks = item.unlocks ?? [];
+  if (!answers.length && !item.consequences.length && !unlocks.length) return null;
   return <div className="ch-happens" aria-label="What happens">
     <p className="ch-eyebrow">What happens</p>
     {answers.length > 0 && <dl>{answers.map(c => <div key={c.key} className={`ch-happens-${c.key}`}>
       <dt><span aria-hidden="true">{MARK[c.key]}</span> {c.label}</dt><dd>{c.happens}</dd>
     </div>)}</dl>}
+    {unlocks.length > 0 && <div className="ch-unlocks" aria-label="What a Yes unlocks">
+      <p><span aria-hidden="true">◆</span> A Yes unlocks <small>(a dry run of the rules; nothing is saved until you answer)</small></p>
+      <ul>{unlocks.map(u => <li key={u}>{u}</li>)}</ul>
+    </div>}
     {item.consequences.length > 0 && <ul>{item.consequences.map(c => <li key={c}>{c}</li>)}</ul>}
   </div>;
 }

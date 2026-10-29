@@ -20,6 +20,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Reveal} from '../../components/ui/reveal';
 import type {PlaceEventOut, PlaceOut} from '../../lib/generated/types.gen';
+import {dateWords} from '../../lib/dates';
 import {DAY_MS, dayText, eventWindow, eventsExtent, isoDay} from '../../lib/place-times';
 import type {TimeWindow} from '../../lib/place-times';
 
@@ -29,6 +30,11 @@ const PICKED_COLOUR = '#8A2F1E';
 const DIM_COLOUR = '#9C8E78';
 const WINDOW_SHADE = 'rgba(138, 47, 30, 0.22)';
 const STATUS_WORDS: Record<string, string> = {verified: 'verified', asserted: 'asserted', disputed: 'disputed', system_recorded: 'recorded'};
+
+/** When an event happened, in words at the precision it was recorded: "2009 – 2013", never "1 Jan 2009 – 31 Dec 2013". */
+export function placeEventWhen(event: Pick<PlaceEventOut, 'date_start' | 'date_end'>): string {
+  return event.date_end && event.date_end !== event.date_start ? `${dateWords(event.date_start)} – ${dateWords(event.date_end)}` : dateWords(event.date_start);
+}
 
 type Mark = {value: [number, number, number, number]; name: string; event: PlaceEventOut; placeId: string};
 
@@ -53,9 +59,7 @@ export function stripOption(places: PlaceOut[], picked: string | null, span: Tim
     // Rich text, not HTML: the titles come from the records, so they are never read as markup.
     tooltip: {trigger: 'item', renderMode: 'richText', formatter: (params: unknown) => {
       const mark = (params as {data: Mark}).data;
-      const {from, to} = eventWindow(mark.event);
-      const when = to - from > DAY_MS ? `${dayText(from)} – ${dayText(to - DAY_MS)}` : dayText(from);
-      return `${mark.event.title}\n${when}${mark.event.exact ? '' : ' (not known to the day)'} · ${STATUS_WORDS[mark.event.verification_status] ?? mark.event.verification_status}`;
+      return `${mark.event.title}\n${placeEventWhen(mark.event)} · ${STATUS_WORDS[mark.event.verification_status] ?? mark.event.verification_status}`;
     }},
     // The axis ends with the last day an event covers.
     xAxis: {type: 'time', axisLabel: {hideOverlap: true}, ...(extent ? {min: extent.from, max: extent.to - 1} : {})},

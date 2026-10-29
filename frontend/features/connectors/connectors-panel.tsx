@@ -24,7 +24,6 @@ import {connectorSearch, decideCrossProviderCluster, enrichEntity, enrichEntityM
 import type {EnrichmentClusterOut, EntityOut} from '../../lib/generated/types.gen';
 import {reportPayloadError} from '../../lib/report-error';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {DossierPanel} from '../dossier/dossier-panel';
 
 type Props = {
   investigationId: string;
@@ -34,14 +33,14 @@ type Props = {
   picker?: ReactNode;
 };
 
-// One empty list while the entities load, so the effect below sees the same value.
-const NO_ENTITIES: EntityOut[] = [];
-
-/** A provider run's health as Following's shapes (features/following/following-screen.tsx HEALTH): ● worked, ✕ failed,
- *  ○ anything else; the word on hover. */
+/** A provider run's health as Following's shapes (features/following/marks.tsx HEALTH): ● worked, ✕ failed, ○ anything
+ *  else; the word on hover (Ony, 29 Oct). */
 const runGlyph = (status: string): [string, string] => (['ok', 'completed', 'succeeded'].includes(status) ? ['●', 'ok'] : status === 'failed' ? ['✕', 'bad'] : ['○', 'quiet']);
 type Run = {provider: string; status: string; result_count?: number | null};
 const DECISION_MARK: Record<string, string> = {positive: '✓', negative: '✕', unsure: '○'};
+
+// One empty list while the entities load, so the effect below sees the same value.
+const NO_ENTITIES: EntityOut[] = [];
 
 export function ConnectorsPanel({investigationId, providers, picker}: Props): ReactElement {
   const queryClient = useQueryClient();
@@ -117,8 +116,8 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
       await queryClient.fetchQuery(enrichmentSessionClustersOptions({path: {session_id: session.id}}));
       if (!current()) return;
       setEnrichStatus(`${session.status} · ${summary}`);
-      setRuns(session.runs);
       setClusterSession(session.id);
+      setRuns(session.runs);
       await reloadFindings();
     } catch (error) {
       if (!current()) return;
@@ -166,7 +165,6 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
         const [glyph, tone] = runGlyph(r.status);
         return <span key={r.provider} className={`cn-run ${tone}`}><i aria-hidden="true">{glyph}</i> {r.provider}{r.result_count ? ` ${r.result_count}` : ''}</span>;
       })}</Reveal></p> : <p className="muted">{enrichStatus}</p>)}
-      <DossierPanel investigationId={investigationId}/>
       {clusters.length > 0 && <div>
         <h4>Cross-provider candidates</h4>
         {clusters.map(c => <div className="candidate" key={c.cluster_key}>

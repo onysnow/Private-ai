@@ -1,27 +1,40 @@
-"""Following (ADR-0021): addresses the app watches for a case, what they found, and the at-risk queue a person works
-through: capture an item, or skip it. The app never captures by itself."""
+"""Following (ADR-0022, mockup FOLLOW_1): sources a case follows, the queue of what they turned up, and what a person
+does with it. The service is app/services/following.py; routes stay thin."""
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from sqlalchemy import select, update
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
-from app.api.routes_captures import capture_out, start_capture
+from app.api.routes_documents import _submit_or_record_failure
 from app.core.authorization import scope_for_request
 from app.core.time import utcnow_naive
 from app.db.session import get_db
-from app.models.domain import Monitor, MonitorItem, MonitorVersion
-from app.schemas.api import MonitorCaptureAll, MonitorCreate, MonitorItemSkip, MonitorUpdate
-from app.schemas.responses import (CaptureAllOut, ErrorOut, FollowingOut, MonitorItemCaptureOut, MonitorItemOut, MonitorOut,
-                                   MonitorVersionOut, ValidationErrorOut)
+from app.jobs.handlers import EXTRACT_DOCUMENT, FOLLOW_AUDIO, WEB_CAPTURE
+from app.jobs.records import create_job
+from app.jobs.runner import job_runner
+from app.models.following import Monitor, MonitorItem
+from app.schemas.api import CaptureAllRequest, MailboxCreate, MonitorCreate, MonitorUpdate, PlatformChecksUpdate
+from app.schemas.responses import (
+    BackgroundJobOut,
+    ErrorOut,
+    FollowingOut,
+    MonitorOut,
+    PageVersionOut,
+    PlatformChecksOut,
+    PlatformForUrlOut,
+    ValidationErrorOut,
+)
 from app.services import following
-from app.services.web_capture import CaptureRefused
+from app.services.web_capture import CaptureRefused, request_capture
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
-MAX_CAPTURE_ALL = 50
+
+def _actor(request: Request) -> str | None:
+    return scope_for_request(request).actor_id
 
 
 def _monitor(db: Session, monitor_id: str) -> Monitor:
@@ -38,176 +51,265 @@ def _item(db: Session, item_id: str) -> MonitorItem:
     return row
 
 
-@router.get("/investigations/{investigation_id}/following", response_model=FollowingOut, responses={404: {"model": ErrorOut}})
+@router.get("/investigations/{investigation_id}/following", response_model=FollowingOut)
 def get_following(investigation_id: str, db: Session = Depends(get_db)) -> Any:
-    """What the case follows, and the items waiting for a person, the most at risk first."""
-    from app.models.domain import Investigation
-
-    if db.get(Investigation, investigation_id) is None:
-        raise HTTPException(404, "Investigation not found")
+    """The sources this case follows, the queue (most at risk first), copies of one story counted once, and what
+    leaves this computer."""
     return following.overview(db, investigation_id)
 
 
-@router.post("/investigations/{investigation_id}/monitors", response_model=MonitorOut, status_code=201, responses={
-    404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "The address is private, not http or https, or already followed"},
+@router.post("/investigations/{investigation_id}/monitors", response_model=MonitorOut, responses={
+    404: {"model": ErrorOut, "description": "No such investigation"},
+    422: {"model": ValidationErrorOut | ErrorOut,
+          "description": "The input does not match the route, or the address cannot be followed (the message says why)"},
 })
 def create_monitor(investigation_id: str, body: MonitorCreate, request: Request, db: Session = Depends(get_db)) -> Any:
-    """Follow an address. With `poll` it is looked at once before the reply, so its health is known."""
-    scope = scope_for_request(request)
+    """Follow something: the address is asked once to see what it is (a feed, sitemap, podcast or page; a page that
+    names its feed is followed through the feed), then checked on its schedule. A closed platform becomes a row with
+    no monitor. Nothing is kept until a person captures it."""
     try:
-        row = following.create_monitor(db, investigation_id, body.url, kind=body.kind, interval_minutes=body.interval_minutes,
-                                       route=body.route, title=body.title, created_by=scope.actor_id)
+        row = following.follow(db, investigation_id, body.target, every_minutes=body.every_minutes, route=body.route,
+                               actor=_actor(request))
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
-    except following.FollowRefused as exc:
+    except (following.FollowRefused, CaptureRefused) as exc:
         raise HTTPException(422, str(exc)) from exc
-    if body.poll:
-        following.poll_monitor(db, row, actor=scope.actor_id)
-    return following.serialize_monitor(db, row)
+    return following.serialize_monitor(row)
 
 
-@router.patch("/monitors/{monitor_id}", response_model=MonitorOut, responses={404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "Not a setting a monitor can have, or an address this computer will not visit"}})
-def update_monitor(monitor_id: str, body: MonitorUpdate, db: Session = Depends(get_db)) -> Any:
-    """Change how often, the route, the name, pause or resume it, or accept the address it moved to."""
-    row = _monitor(db, monitor_id)
+@router.post("/investigations/{investigation_id}/monitors/mailbox", response_model=MonitorOut, responses={
+    404: {"model": ErrorOut, "description": "No such investigation"},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The mailbox or sender cannot be followed (the message says why)"},
+})
+def create_mailbox_monitor(investigation_id: str, body: MailboxCreate, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Follow one sender's newsletters in a dedicated mailbox, read over IMAP with TLS and never marked read. The
+    password is kept in its own file on this computer, not in the case or a backup."""
+    from app.services import mailbox
+
     try:
-        following.update_monitor(db, row, body.model_dump(exclude_unset=True))
-    except following.FollowRefused as exc:
+        row = mailbox.follow(db, investigation_id, host=body.host, user=body.user, password=body.password, sender=body.sender,
+                             port=body.port, every_minutes=body.every_minutes, actor=_actor(request))
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except mailbox.MailboxRefused as exc:
         raise HTTPException(422, str(exc)) from exc
-    return following.serialize_monitor(db, row)
+    return following.serialize_monitor(row)
+
+
+@router.patch("/monitors/{monitor_id}", response_model=MonitorOut, responses={404: {"model": ErrorOut},
+                                                                         409: {"model": ErrorOut}})
+def update_monitor(monitor_id: str, body: MonitorUpdate, db: Session = Depends(get_db)) -> Any:
+    """Change how often it is checked, its route (Direct or Tor), pause or resume it, or accept the address it moved
+    to (a moved source is never followed by itself)."""
+    row = _monitor(db, monitor_id)
+    if row.kind == "closed":
+        raise HTTPException(409, "A closed platform has no monitor to change")
+    if body.every_minutes is not None:
+        row.every_minutes = body.every_minutes
+        row.next_check_at = utcnow_naive()
+    if body.route is not None:
+        row.route = body.route
+        row.etag = row.last_modified = None
+    if body.paused is not None:
+        row.health = "paused" if body.paused else "unchecked"
+        row.next_check_at = None if body.paused else utcnow_naive()
+    if body.accept_move:
+        if not row.moved_to:
+            raise HTTPException(409, "This source has not moved")
+        row.url, row.moved_to, row.etag, row.last_modified = row.moved_to, None, None, None
+        row.health, row.health_detail, row.next_check_at = "unchecked", None, utcnow_naive()
+    db.commit()
+    return following.serialize_monitor(row, list(db.query(MonitorItem).filter(MonitorItem.monitor_id == row.id)))
 
 
 @router.delete("/monitors/{monitor_id}", status_code=204, responses={404: {"model": ErrorOut}})
-def delete_monitor(monitor_id: str, db: Session = Depends(get_db)) -> Response:
-    """Stop following. What it found goes with it; pages already captured from it stay in the case."""
-    following.delete_monitor(db, _monitor(db, monitor_id))
-    return Response(status_code=204)
+def delete_monitor(monitor_id: str, db: Session = Depends(get_db)) -> None:
+    """Stop following. What was captured from it stays in the case; its queue and versions go."""
+    from app.models.following import PageVersion
 
-
-@router.post("/monitors/{monitor_id}/poll", response_model=MonitorOut, responses={404: {"model": ErrorOut}})
-def poll_monitor(monitor_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
-    """Look now, outside the schedule (one request, logged like any other)."""
     row = _monitor(db, monitor_id)
-    following.poll_monitor(db, row, actor=scope_for_request(request).actor_id)
-    return following.serialize_monitor(db, row)
+    if row.kind == "mailbox":
+        from app.services import mailbox
 
-
-@router.get("/monitors/{monitor_id}/versions", response_model=list[MonitorVersionOut], responses={404: {"model": ErrorOut}})
-def get_versions(monitor_id: str, db: Session = Depends(get_db)) -> Any:
-    """A watched page's versions, newest first, each with the lines that changed from the one before."""
-    _monitor(db, monitor_id)
-    rows = db.scalars(select(MonitorVersion).where(MonitorVersion.monitor_id == monitor_id).order_by(MonitorVersion.number.desc())).all()
-    return [following.serialize_version(db, r, with_changes=True) for r in rows]
-
-
-@router.get("/monitors/{monitor_id}/items", response_model=list[MonitorItemOut], responses={404: {"model": ErrorOut}})
-def get_monitor_items(monitor_id: str, state: str | None = None, db: Session = Depends(get_db)) -> Any:
-    """Everything this monitor found, newest first; `state` narrows to new, captured or skipped."""
-    monitor = _monitor(db, monitor_id)
-    query = select(MonitorItem).where(MonitorItem.monitor_id == monitor_id).order_by(MonitorItem.first_seen_at.desc())
-    if state:
-        query = query.where(MonitorItem.state == state)
-    return [following.serialize_item(r, monitor) for r in db.scalars(query.limit(500)).all()]
-
-
-class _NotCaptured(Exception):
-    def __init__(self, status: int, reason: str) -> None:
-        super().__init__(reason)
-        self.status, self.reason = status, reason
-
-
-def _claim(db: Session, item_id: str, state: str) -> bool:
-    """Take the item out of the queue in one statement, so two requests cannot both act on it (a double click, a
-    Capture all overlapping a Skip): only the one whose update finds it still new goes ahead."""
-    done = db.execute(update(MonitorItem).where(MonitorItem.id == item_id, MonitorItem.state == "new").values(state=state))
+        mailbox.forget(db, row)
+    db.query(MonitorItem).filter(MonitorItem.monitor_id == row.id).delete()
+    db.query(PageVersion).filter(PageVersion.monitor_id == row.id).delete()
+    db.delete(row)
     db.commit()
-    return getattr(done, "rowcount", 0) == 1
 
 
-async def _capture_item(db: Session, request: Request, item: MonitorItem, reason: str | None) -> dict[str, Any]:
-    monitor = db.get(Monitor, item.monitor_id)
-    blocked = following.capture_blocker(db, item, monitor)
-    if blocked:
-        raise _NotCaptured(409, blocked)
-    if not _claim(db, item.id, "captured"):
-        raise _NotCaptured(409, "This item was already captured or skipped")
+@router.post("/monitors/{monitor_id}/check", response_model=MonitorOut, responses={404: {"model": ErrorOut}})
+def check_monitor(monitor_id: str, db: Session = Depends(get_db)) -> Any:
+    """Check the source now instead of at its next time (the same polite, logged request)."""
+    row = following.check(db, _monitor(db, monitor_id))
+    return following.serialize_monitor(row, list(db.query(MonitorItem).filter(MonitorItem.monitor_id == row.id)))
+
+
+@router.get("/monitors/{monitor_id}/versions", response_model=list[PageVersionOut], responses={404: {"model": ErrorOut}})
+def get_versions(monitor_id: str, db: Session = Depends(get_db)) -> Any:
+    """Every version of a followed page's main text, newest first, with what changed from the one before."""
+    _monitor(db, monitor_id)
+    return following.versions(db, monitor_id)
+
+
+async def _capture(db: Session, request: Request, item: MonitorItem, *, reason: str | None = None) -> None:
+    kind, url = following.capture_target(db, item)
+    if not following.claim(db, item, to="captured"):
+        raise following.FollowRefused("This item was already captured or skipped")
     try:
-        capture = await start_capture(db, request, item.investigation_id, item.url)
+        await _start_capture(db, request, item, kind, url, reason=reason)
     except Exception:
+        # The capture did not start: the item goes back in the queue, unless something else decided it meanwhile.
         db.rollback()
-        db.execute(update(MonitorItem).where(MonitorItem.id == item.id, MonitorItem.capture_id.is_(None)).values(state="new"))
+        db.execute(update(MonitorItem).where(MonitorItem.id == item.id, MonitorItem.state == "captured",
+                                             MonitorItem.capture_id.is_(None)).values(state="waiting"))
         db.commit()
         raise
-    item = db.get(MonitorItem, item.id) or item
-    item.capture_id = capture.id
-    item.decided_by, item.decided_at, item.reason = scope_for_request(request).actor_id, utcnow_naive(), reason
-    number = (item.displayed or {}).get("version")
-    if number:  # the page's latest version (capture_blocker refused an older one); kept once the capture saves it
-        version = db.scalars(select(MonitorVersion).where(MonitorVersion.monitor_id == item.monitor_id, MonitorVersion.number == number)).first()
-        if version is not None:
-            version.capture_id = capture.id
-    db.commit()
-    return {"item": following.serialize_item(item, monitor), "capture": capture_out(db, capture)}
 
 
-@router.post("/monitor-items/{monitor_item_id}/capture", response_model=MonitorItemCaptureOut, responses={
-    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Already captured or skipped, from a source followed through Tor, or a page version that is gone"},
-    422: {"model": ValidationErrorOut | ErrorOut, "description": "An address this computer will not visit"}})
+async def _start_capture(db: Session, request: Request, item: MonitorItem, kind: str, url: str, *, reason: str | None) -> None:
+    actor = _actor(request)
+    if kind == "email":
+        from app.services import mailbox
+
+        try:
+            document_id = mailbox.capture(db, item, actor)
+        except mailbox.MailboxRefused as exc:
+            raise following.FollowRefused(str(exc)) from exc
+        following.mark_captured(db, item, actor, reason=reason)
+        job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=item.investigation_id, subject_type="document",
+                         subject_id=document_id, runner=job_runner(request).mode, message="Waiting to read the newsletter")
+    elif kind == "audio":
+        job = create_job(db, kind=FOLLOW_AUDIO, investigation_id=item.investigation_id, subject_type="monitor_item",
+                         subject_id=item.id, runner=job_runner(request).mode, message="Waiting to fetch the episode",
+                         payload={"actor": actor})
+        following.mark_captured(db, item, actor, reason=reason)
+    else:
+        capture = request_capture(db, item.investigation_id, url, collector=actor)
+        job = create_job(db, kind=WEB_CAPTURE, investigation_id=item.investigation_id, subject_type="capture",
+                         subject_id=capture.id, runner=job_runner(request).mode, message="Waiting to visit the page")
+        capture.job_id = job.id
+        db.commit()
+        following.mark_captured(db, item, actor, capture_id=capture.id, reason=reason)
+    await _submit_or_record_failure(request, job, db)
+
+
+@router.post("/monitor-items/{monitor_item_id}/capture", response_model=FollowingOut, responses={
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "The item is not waiting"},
+    422: {"model": ErrorOut, "description": "The address cannot be captured"},
+})
 async def capture_item(monitor_item_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
-    """A person captures what a monitor found: the same capture as pasting the link (ADR-0018)."""
+    """Capture one item: a page through the ordinary web capture (ADR-0018), a podcast episode by fetching its audio
+    file and transcribing it. Answers with the whole screen."""
+    item = _item(db, monitor_item_id)
+    if item.state != "waiting":
+        raise HTTPException(409, "Only an item waiting in the queue can be captured")
+    try:
+        await _capture(db, request, item)
+    except (following.FollowRefused, CaptureRefused) as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return following.overview(db, item.investigation_id)
+
+
+@router.post("/investigations/{investigation_id}/following/capture-all", response_model=FollowingOut, responses={
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "No reason, or one too short"},
+})
+async def capture_all(investigation_id: str, body: CaptureAllRequest, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Capture everything waiting, at once. Needs a reason, kept on each item it captures; an item that cannot be
+    captured stays waiting."""
+    try:
+        reason = following.bulk_ready(body.reason)
+    except following.FollowRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+    waiting = db.query(MonitorItem).filter(MonitorItem.investigation_id == investigation_id,
+                                           MonitorItem.state == "waiting").all()
+    for item in waiting:
+        try:
+            await _capture(db, request, item, reason=f"Bulk · {reason}")
+        except (following.FollowRefused, CaptureRefused):
+            db.rollback()
+    return following.overview(db, investigation_id)
+
+
+@router.post("/monitor-items/{monitor_item_id}/skip", response_model=FollowingOut, responses={404: {"model": ErrorOut},
+                                                                                   409: {"model": ErrorOut}})
+def skip_item(monitor_item_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     item = _item(db, monitor_item_id)
     try:
-        return await _capture_item(db, request, item, None)
-    except _NotCaptured as exc:
-        raise HTTPException(exc.status, exc.reason) from exc
-    except CaptureRefused as exc:
+        following.skip(db, item, _actor(request))
+    except following.FollowRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    return following.overview(db, item.investigation_id)
+
+
+@router.post("/monitor-items/{monitor_item_id}/undo", response_model=FollowingOut, responses={404: {"model": ErrorOut},
+                                                                                   409: {"model": ErrorOut}})
+def undo_item(monitor_item_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Put a skipped item back in the queue."""
+    item = _item(db, monitor_item_id)
+    try:
+        following.undo(db, item, _actor(request))
+    except following.FollowRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    return following.overview(db, item.investigation_id)
+
+
+@router.post("/monitor-items/{monitor_item_id}/record-removal", response_model=FollowingOut,
+             responses={404: {"model": ErrorOut}, 409: {"model": ErrorOut}})
+def record_removal(monitor_item_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Record that something captured before is gone from its address (it answers 404 or 410), and when that was found."""
+    item = _item(db, monitor_item_id)
+    try:
+        following.record_removal(db, item, _actor(request))
+    except following.FollowRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    return following.overview(db, item.investigation_id)
+
+
+# --- Does it work today? (mockup WORKS_1, app/services/platform_checks.py) --------------------------------------------
+
+@router.get("/platform-checks", response_model=PlatformChecksOut)
+def get_platform_checks(db: Session = Depends(get_db)) -> Any:
+    """Each platform the app saves from, tried on its public test item: today, the last 14 days, the settings."""
+    from app.services import platform_checks
+
+    return platform_checks.overview(db)
+
+
+@router.patch("/platform-checks", response_model=PlatformChecksOut, responses={422: {"model": ValidationErrorOut | ErrorOut}})
+def change_platform_checks(body: PlatformChecksUpdate, db: Session = Depends(get_db)) -> Any:
+    """Turn the daily check on or off, the warning before a capture, or change a test item."""
+    from app.services import platform_checks
+
+    try:
+        platform_checks.change(db, daily=body.daily, warn=body.warn, items=body.items)
+    except (ValueError, CaptureRefused) as exc:
         raise HTTPException(422, str(exc)) from exc
+    return platform_checks.overview(db)
 
 
-@router.post("/monitor-items/{monitor_item_id}/skip", response_model=MonitorItemOut, responses={404: {"model": ErrorOut}, 409: {"model": ErrorOut}})
-def skip_item(monitor_item_id: str, body: MonitorItemSkip, request: Request, db: Session = Depends(get_db)) -> Any:
-    """Leave it uncaptured. It stays in the monitor's history, out of the queue."""
-    item = _item(db, monitor_item_id)
-    if not _claim(db, item.id, "skipped"):
-        raise HTTPException(409, "This item was already captured or skipped")
-    db.refresh(item)
-    item.reason = (body.reason or "").strip() or None
-    item.decided_by, item.decided_at = scope_for_request(request).actor_id, utcnow_naive()
-    db.commit()
-    return following.serialize_item(item, db.get(Monitor, item.monitor_id))
+@router.post("/platform-checks/run", response_model=BackgroundJobOut, status_code=202,
+             responses={422: {"model": ValidationErrorOut | ErrorOut, "description": "No such platform"}})
+async def run_platform_checks(request: Request, platform: str | None = Query(None, max_length=32), db: Session = Depends(get_db)) -> Any:
+    """Try every platform now (or one), as a background job; each request goes in the outbound log."""
+    from app.jobs.handlers import CHECK_PLATFORMS
+    from app.jobs.records import serialize_job
+    from app.models.domain import BackgroundJob
+    from app.services.platform_checks import BY_KEY
+
+    if platform is not None and platform not in BY_KEY:
+        raise HTTPException(422, f"No platform called {platform}")
+    job = create_job(db, kind=CHECK_PLATFORMS, subject_type="platforms", subject_id=platform or "all", runner=job_runner(request).mode,
+                     payload={"platform": platform}, message="Waiting to try the platforms")
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    return serialize_job(db.get(BackgroundJob, job.id) or job)
 
 
-@router.post("/monitor-items/{monitor_item_id}/record", response_model=MonitorItemOut, responses={
-    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Not a removed page, or already recorded or skipped"}})
-def record_removal(monitor_item_id: str, body: MonitorItemSkip, request: Request, db: Session = Depends(get_db)) -> Any:
-    """Record that a captured page was removed from its site: the capture is the copy that remains. The record is this
-    item, with when it was found gone and what the address answered."""
-    item = _item(db, monitor_item_id)
-    if "gone" not in (item.flags or []):
-        raise HTTPException(409, "Only a page found removed can be recorded as removed")
-    if not _claim(db, item.id, "recorded"):
-        raise HTTPException(409, "This item was already recorded or skipped")
-    db.refresh(item)
-    item.reason = (body.reason or "").strip() or None
-    item.decided_by, item.decided_at = scope_for_request(request).actor_id, utcnow_naive()
-    db.commit()
-    return following.serialize_item(item, db.get(Monitor, item.monitor_id))
+@router.get("/platform-checks/for", response_model=PlatformForUrlOut | None)
+def platform_for_url(url: str = Query(..., max_length=4000), db: Session = Depends(get_db)) -> Any:
+    """The platform a pasted link is on, and how it was at its last check: none when it is not one the app tries, or
+    the warning is off."""
+    from app.services import platform_checks
 
-
-@router.post("/investigations/{investigation_id}/following/capture-all", response_model=CaptureAllOut, responses={404: {"model": ErrorOut}})
-async def capture_all(investigation_id: str, body: MonitorCaptureAll, request: Request, db: Session = Depends(get_db)) -> Any:
-    """Capture several waiting items at once, with a reason that goes on each (EGS rule 8), at most 50 a time, one
-    after another. An item whose address cannot be visited stays in the queue."""
-    query = select(MonitorItem).where(MonitorItem.investigation_id == investigation_id, MonitorItem.state == "new",
-                                      MonitorItem.copy_of.is_(None),  # copies are never offered: their original is
-                                      ~MonitorItem.key.endswith("#gone"))  # nor a removed page: nothing is left to capture
-    if body.item_ids is not None:
-        query = query.where(MonitorItem.id.in_(body.item_ids))
-    waiting = sorted(db.scalars(query).all(), key=lambda i: (-following._risk(i), i.first_seen_at))
-    done: list[Any] = []
-    for item in waiting[:MAX_CAPTURE_ALL]:
-        try:
-            done.append(await _capture_item(db, request, item, body.reason))
-        except (CaptureRefused, _NotCaptured):
-            continue
-    return {"captured": done, "left": max(0, len(waiting) - len(done))}
+    return platform_checks.for_url(db, url)

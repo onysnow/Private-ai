@@ -78,13 +78,13 @@ def test_events_over_time_fills_quiet_years_with_zero_and_cites_the_events(demo)
     db, inv_id = demo
     data = run_query(db, inv_id, QueryRef(name="events_over_time", params={"granularity": "year"}))
     assert data.unit_kind == "count" and data.record_noun == "events"
-    assert [(r.key, r.value) for r in data.rows] == [("2019", 1.0), ("2020", 0.0), ("2021", 1.0), ("2022", 0.0), ("2023", 2.0), ("2024", 2.0)]
+    assert [(r.key, r.value) for r in data.rows] == [("2019", 1.0), ("2020", 0.0), ("2021", 1.0), ("2022", 0.0), ("2023", 1.0), ("2024", 2.0)]
     quiet = data.rows[1]
     assert quiet.record_refs == [] and quiet.record_count == 0
     late_2023 = data.rows[4]
-    # The reporter's event and the Payment relationship's own date both fall in 2023.
-    assert {ref.record_type for ref in late_2023.record_refs} == {"timeline_event", "relationship"}
-    assert data.record_count == 6
+    # The reporter's event about the payment, once: the Payment's own date is the same day and not drawn again.
+    assert {ref.record_type for ref in late_2023.record_refs} == {"timeline_event"}
+    assert data.record_count == 5
 
 
 def test_events_dated_only_to_a_year_are_left_out_of_a_monthly_series_with_the_reason(demo):

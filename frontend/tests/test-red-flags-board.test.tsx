@@ -171,6 +171,22 @@ describe('the audit fixes (19 Oct)', () => {
     expect(fig.textContent).not.toContain('→');
   });
 
+  it('a party named in the open flag filters the list to its flags, and again shows them all', async () => {
+    const shared = flag('f3', indicator('BO-032', 'Apparently unrelated parties share an address', {}), 'textbook', 2, {
+      parties: [{id: 'fh', name: 'Fernhill Ltd', schema: 'Company'}, {id: 'ks', name: 'Kestrel SA', schema: 'Company'}],
+      facts: {family: 'shared_property', kind: 'address', value: '1 Harbour Road', spellings: []}});
+    mockApi({...routes, 'GET /api/investigations/inv-1/red-flags': body([shared, ...flags])});
+    renderBoard();
+    const user = userEvent.setup();
+    const fig = await screen.findByRole('figure', {name: /share the address 1 Harbour Road/});
+    const kestrel = within(fig).getByRole('button', {name: 'Kestrel SA'});
+    await user.click(kestrel);
+    expect(kestrel).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('combobox', {name: 'Party'})).toHaveValue('ks');
+    await user.click(kestrel);
+    expect(screen.getByRole('combobox', {name: 'Party'})).toHaveValue('');
+  });
+
   it('keeps this visit as the last one when the tab closes, not only when the screen does', async () => {
     mockApi(routes);
     renderBoard();

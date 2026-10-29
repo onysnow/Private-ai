@@ -208,6 +208,9 @@
   .rb-open[data-dir] > *, .rb-open.preview > * { animation: rb-fade 120ms linear both; } }
 html[data-motion='calm'] .rb-row, html[data-motion='calm'] .rb-row.lit, html[data-motion='calm'] .rb-changed-now, html[data-motion='calm'] .rf-why-list { animation: none; }
 html[data-motion='calm'] .rb-open[data-dir] > *, html[data-motion='calm'] .rb-open.preview > * { animation: rb-fade 120ms linear both; }
+.rb-name { all: unset; cursor: pointer; font-weight: 700; border-bottom: 1px dotted var(--text-muted); }
+.rb-name:hover, .rb-name[aria-pressed=true] { color: var(--accent-1); border-bottom-color: var(--accent-1); }
+.rb-name:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
 
 /* 29 Oct rule: sub-text on reveal. The marks that are left carry the meaning, so they are drawn larger. */
 .rb .lv-bars { font-size: 12.5px; }

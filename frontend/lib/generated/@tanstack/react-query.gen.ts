@@ -9,7 +9,9 @@ import {
 
 import { client } from '../client.gen';
 import {
+  acceptDocumentSync,
   active,
+  addAboutClaim,
   addChartToDeckEndpoint,
   addChartToWriteupEndpoint,
   addCollection,
@@ -23,26 +25,41 @@ import {
   analyzeOpenalephDocument,
   assessStatement,
   attachRelationshipEvidenceEndpoint,
+  byHandAdd,
+  byHandPreview,
+  byHandSuggest,
   cancelJobEndpoint,
   canonicalEntityResolution,
   capabilities,
   captureAll,
   captureItem,
+  captureLatest,
+  captureLookElsewhere,
+  captureSecondWitness,
+  captureTimeProof,
   changePassphrase,
+  changePlatformChecks,
   checkConnectorKey,
+  checkEvidencePack,
+  checkMonitor,
   checkWatchlistNow,
   clearCaseLookups,
   closeCase,
   collectCaptureMedia,
+  compareAuthenticity,
+  compareRedacted,
+  compareTranscripts,
   connectors,
   connectorSearch,
   convertLeadEndpoint,
   createAppUser,
+  createBuiltTimeline,
   createCanonicalRelationship,
   createCapture,
   createCaseRecord,
   createClaimEndpoint,
   createClaimReview,
+  createDeckEndpoint,
   createEntity,
   createEvidenceEndpoint,
   createExtractedRelationshipProposal,
@@ -50,23 +67,29 @@ import {
   createInvestigation,
   createLeadEndpoint,
   createLeadFromRelationshipContext,
+  createMailboxMonitor,
   createMonitor,
   createReportingTaskEndpoint,
   createSourceEndpoint,
   createTimelineEventEndpoint,
+  createTimelinePeriod,
   createWatch,
   createWriteupEndpoint,
+  decideAuthenticity,
   decideCheck,
   decideCrossProviderCluster,
   decideEntityPostMergeReconciliation,
   decideInvestigationCrossReference,
   decidePropertyConflict,
+  deckChecksEndpoint,
+  deleteBuiltTimeline,
   deleteConnectorCredential,
   deleteDeckEndpoint,
   deleteInvestigationMembership,
   deleteMonitor,
   deleteSavedQuestion,
   deleteStorySection,
+  deleteTimelinePeriod,
   deleteWatch,
   deleteWriteupEndpoint,
   diskAnswer,
@@ -85,23 +108,33 @@ import {
   entityMergeHistory,
   entityMergePreview,
   entityPostMergeReconciliation,
+  examineAgain,
   expandEntityInCorpus,
+  exportDeckPdf,
   exportDeckPptx,
+  exportEvidencePack,
   exportInvestigation,
   exportWriteupDocx,
+  exportWriteupPdf,
   externalRelationshipCandidates,
+  findDocumentSync,
   findExtractionLineageEndpoint,
   findingCandidates,
   findOpenalephChildren,
+  findPhotoFaces,
+  findVoices,
+  followCapture,
   get1Mdb,
   getAiAnalysisCandidateEndpoint,
   getAllRecordTags,
+  getAuthenticity,
   getBasemapFont,
   getBasemapSprite,
   getBasemapStatus,
   getBasemapTile,
   getCapture,
   getCaptureFile,
+  getCaptureQuotes,
   getCaptures,
   getCaseRecord,
   getCaseResearch,
@@ -112,12 +145,14 @@ import {
   getClaimSources,
   getCollection,
   getCollections,
+  getCopyPage,
   getCorpusInsights,
   getCorpusStatus,
   getCorpusSync,
   getDecisions,
   getDeckEndpoint,
   getDemoCase,
+  getDerivedFile,
   getDocument,
   getDocumentEmail,
   getDocumentFormats,
@@ -150,7 +185,6 @@ import {
   getLead,
   getLookupSettings,
   getMappingSchemas,
-  getMonitorItems,
   getNotes,
   getNotificationPrefs,
   getOpenalephCorpusBinding,
@@ -159,8 +193,11 @@ import {
   getOrphanStoragePreview,
   getOwnershipChain,
   getPartyYears,
+  getPhoto,
+  getPlatformChecks,
   getRecordMarks,
   getRecordProvenanceTrace,
+  getRedaction,
   getRedFlags,
   getRelationshipSources,
   getResearchSettings,
@@ -170,8 +207,11 @@ import {
   getSecurityAudit,
   getSecurityAuditRetentionPreview,
   getSecurityAuditSummary,
+  getSigningKey,
   getSimilarDocuments,
   getSince,
+  getSound,
+  getSpectrogram,
   getStanding,
   getStory,
   getStoryVersion,
@@ -179,10 +219,12 @@ import {
   getSuiteCoverage,
   getTaggedRecords,
   getTags,
+  getTimelineBoard,
   getVersions,
   getWatchlist,
   getWire,
   getWriteupEndpoint,
+  getYourSafety,
   gradeTimelineEventEndpoint,
   health,
   howAreTheyConnected,
@@ -211,6 +253,8 @@ import {
   listAppUsers,
   listAreas,
   listAssessments,
+  listAuthenticity,
+  listBuiltTimelines,
   listCaseRecords,
   listClaimEvidenceEndpoint,
   listClaims,
@@ -220,6 +264,7 @@ import {
   listCrossProviderDecisions,
   listDecksEndpoint,
   listDemoCases,
+  listDerived,
   listDocumentCandidatesEndpoint,
   listDocuments,
   listDocumentTableMappings,
@@ -256,18 +301,25 @@ import {
   lock,
   lockCase,
   locking,
+  makeCleanedCopy,
+  makeClip,
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
+  makePhotoCopy,
+  makeRedactedCopy,
   markAiRunThought,
+  markCaptureChanged,
   markRedFlagInnocent,
   markStoryReady,
   me,
   nameStoryVersion,
+  nameVoice,
   newRecoveryKey,
   openalephIntegrationStatus,
   openCase,
   type Options,
+  outsideAuthenticity,
   patchClaimSuite,
   patchEvidenceSuite,
   patchInvestigation,
@@ -275,8 +327,9 @@ import {
   patchSourceSuite,
   peekAtRecord,
   placeStoryClaim,
-  pollMonitor,
+  platformForUrl,
   presentationStyles,
+  previewAuthenticity,
   previewBackupRestore,
   previewTableMapping,
   promoteAiAnalysisCandidateToDeckEndpoint,
@@ -291,10 +344,13 @@ import {
   putNotificationChannel,
   putNotificationPrefs,
   putResearchSettings,
+  putTimelineBoard,
+  recheckCapture,
   recheckHash,
   recordRemoval,
   recordStoryGate,
   recover,
+  refindCaptureQuotes,
   refreshOpenalephDocumentReview,
   relationshipSchemas,
   removeCaseLock,
@@ -319,6 +375,7 @@ import {
   reviewRelationshipEvidenceEndpoint,
   revokeAppUserToken,
   rotateAppUserToken,
+  runPlatformChecks,
   runRedFlags,
   runSavedQuestion,
   runTableMapping,
@@ -344,12 +401,17 @@ import {
   syncOpenalephDocument,
   tagARecord,
   testNotificationChannel,
+  timelineLanesView,
   turnOff,
   turnOn,
+  undoItem,
   unlock,
   unlockPin,
   untagARecord,
   updateAppUser,
+  updateAuthenticity,
+  updateBuiltTimeline,
+  updateCapture,
   updateClaimEndpoint,
   updateDeckEndpoint,
   updateEntity,
@@ -357,13 +419,20 @@ import {
   updateMonitor,
   updateReportingTaskEndpoint,
   updateStorySection,
+  updateTimelinePeriod,
   updateWriteupEndpoint,
   uploadDocument,
 } from '../sdk.gen';
 import type {
+  AcceptDocumentSyncData,
+  AcceptDocumentSyncError,
+  AcceptDocumentSyncResponse,
   ActiveData,
   ActiveError,
   ActiveResponse,
+  AddAboutClaimData,
+  AddAboutClaimError,
+  AddAboutClaimResponse,
   AddChartToDeckEndpointData,
   AddChartToDeckEndpointError,
   AddChartToDeckEndpointResponse,
@@ -403,6 +472,15 @@ import type {
   AttachRelationshipEvidenceEndpointData,
   AttachRelationshipEvidenceEndpointError,
   AttachRelationshipEvidenceEndpointResponse,
+  ByHandAddData,
+  ByHandAddError,
+  ByHandAddResponse,
+  ByHandPreviewData,
+  ByHandPreviewError,
+  ByHandPreviewResponse,
+  ByHandSuggestData,
+  ByHandSuggestError,
+  ByHandSuggestResponse,
   CancelJobEndpointData,
   CancelJobEndpointError,
   CancelJobEndpointResponse,
@@ -418,12 +496,33 @@ import type {
   CaptureItemData,
   CaptureItemError,
   CaptureItemResponse,
+  CaptureLatestData,
+  CaptureLatestError,
+  CaptureLatestResponse,
+  CaptureLookElsewhereData,
+  CaptureLookElsewhereError,
+  CaptureLookElsewhereResponse,
+  CaptureSecondWitnessData,
+  CaptureSecondWitnessError,
+  CaptureSecondWitnessResponse,
+  CaptureTimeProofData,
+  CaptureTimeProofError,
+  CaptureTimeProofResponse,
   ChangePassphraseData,
   ChangePassphraseError,
   ChangePassphraseResponse,
+  ChangePlatformChecksData,
+  ChangePlatformChecksError,
+  ChangePlatformChecksResponse,
   CheckConnectorKeyData,
   CheckConnectorKeyError,
   CheckConnectorKeyResponse,
+  CheckEvidencePackData,
+  CheckEvidencePackError,
+  CheckEvidencePackResponse,
+  CheckMonitorData,
+  CheckMonitorError,
+  CheckMonitorResponse,
   CheckWatchlistNowData,
   CheckWatchlistNowError,
   CheckWatchlistNowResponse,
@@ -436,6 +535,15 @@ import type {
   CollectCaptureMediaData,
   CollectCaptureMediaError,
   CollectCaptureMediaResponse,
+  CompareAuthenticityData,
+  CompareAuthenticityError,
+  CompareAuthenticityResponse,
+  CompareRedactedData,
+  CompareRedactedError,
+  CompareRedactedResponse,
+  CompareTranscriptsData,
+  CompareTranscriptsError,
+  CompareTranscriptsResponse,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchError,
@@ -448,6 +556,9 @@ import type {
   CreateAppUserData,
   CreateAppUserError,
   CreateAppUserResponse,
+  CreateBuiltTimelineData,
+  CreateBuiltTimelineError,
+  CreateBuiltTimelineResponse,
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipError,
   CreateCanonicalRelationshipResponse,
@@ -463,6 +574,9 @@ import type {
   CreateClaimReviewData,
   CreateClaimReviewError,
   CreateClaimReviewResponse,
+  CreateDeckEndpointData,
+  CreateDeckEndpointError,
+  CreateDeckEndpointResponse,
   CreateEntityData,
   CreateEntityError,
   CreateEntityResponse,
@@ -484,6 +598,9 @@ import type {
   CreateLeadFromRelationshipContextData,
   CreateLeadFromRelationshipContextError,
   CreateLeadFromRelationshipContextResponse,
+  CreateMailboxMonitorData,
+  CreateMailboxMonitorError,
+  CreateMailboxMonitorResponse,
   CreateMonitorData,
   CreateMonitorError,
   CreateMonitorResponse,
@@ -496,12 +613,18 @@ import type {
   CreateTimelineEventEndpointData,
   CreateTimelineEventEndpointError,
   CreateTimelineEventEndpointResponse,
+  CreateTimelinePeriodData,
+  CreateTimelinePeriodError,
+  CreateTimelinePeriodResponse,
   CreateWatchData,
   CreateWatchError,
   CreateWatchResponse,
   CreateWriteupEndpointData,
   CreateWriteupEndpointError,
   CreateWriteupEndpointResponse,
+  DecideAuthenticityData,
+  DecideAuthenticityError,
+  DecideAuthenticityResponse,
   DecideCheckData,
   DecideCheckError,
   DecideCheckResponse,
@@ -517,6 +640,12 @@ import type {
   DecidePropertyConflictData,
   DecidePropertyConflictError,
   DecidePropertyConflictResponse,
+  DeckChecksEndpointData,
+  DeckChecksEndpointError,
+  DeckChecksEndpointResponse,
+  DeleteBuiltTimelineData,
+  DeleteBuiltTimelineError,
+  DeleteBuiltTimelineResponse,
   DeleteConnectorCredentialData,
   DeleteConnectorCredentialError,
   DeleteConnectorCredentialResponse,
@@ -535,6 +664,9 @@ import type {
   DeleteStorySectionData,
   DeleteStorySectionError,
   DeleteStorySectionResponse,
+  DeleteTimelinePeriodData,
+  DeleteTimelinePeriodError,
+  DeleteTimelinePeriodResponse,
   DeleteWatchData,
   DeleteWatchError,
   DeleteWatchResponse,
@@ -589,21 +721,36 @@ import type {
   EntityPostMergeReconciliationData,
   EntityPostMergeReconciliationError,
   EntityPostMergeReconciliationResponse,
+  ExamineAgainData,
+  ExamineAgainError,
+  ExamineAgainResponse,
   ExpandEntityInCorpusData,
   ExpandEntityInCorpusError,
   ExpandEntityInCorpusResponse,
+  ExportDeckPdfData,
+  ExportDeckPdfError,
+  ExportDeckPdfResponse,
   ExportDeckPptxData,
   ExportDeckPptxError,
   ExportDeckPptxResponse,
+  ExportEvidencePackData,
+  ExportEvidencePackError,
+  ExportEvidencePackResponse,
   ExportInvestigationData,
   ExportInvestigationError,
   ExportInvestigationResponse,
   ExportWriteupDocxData,
   ExportWriteupDocxError,
   ExportWriteupDocxResponse,
+  ExportWriteupPdfData,
+  ExportWriteupPdfError,
+  ExportWriteupPdfResponse,
   ExternalRelationshipCandidatesData,
   ExternalRelationshipCandidatesError,
   ExternalRelationshipCandidatesResponse,
+  FindDocumentSyncData,
+  FindDocumentSyncError,
+  FindDocumentSyncResponse,
   FindExtractionLineageEndpointData,
   FindExtractionLineageEndpointError,
   FindExtractionLineageEndpointResponse,
@@ -613,6 +760,15 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenError,
   FindOpenalephChildrenResponse,
+  FindPhotoFacesData,
+  FindPhotoFacesError,
+  FindPhotoFacesResponse,
+  FindVoicesData,
+  FindVoicesError,
+  FindVoicesResponse,
+  FollowCaptureData,
+  FollowCaptureError,
+  FollowCaptureResponse,
   Get1MdbData,
   Get1MdbError,
   Get1MdbResponse,
@@ -622,6 +778,9 @@ import type {
   GetAllRecordTagsData,
   GetAllRecordTagsError,
   GetAllRecordTagsResponse,
+  GetAuthenticityData,
+  GetAuthenticityError,
+  GetAuthenticityResponse,
   GetBasemapFontData,
   GetBasemapFontError,
   GetBasemapFontResponse,
@@ -638,6 +797,9 @@ import type {
   GetCaptureError,
   GetCaptureFileData,
   GetCaptureFileError,
+  GetCaptureQuotesData,
+  GetCaptureQuotesError,
+  GetCaptureQuotesResponse,
   GetCaptureResponse,
   GetCapturesData,
   GetCapturesError,
@@ -669,6 +831,9 @@ import type {
   GetCollectionsData,
   GetCollectionsError,
   GetCollectionsResponse,
+  GetCopyPageData,
+  GetCopyPageError,
+  GetCopyPageResponse,
   GetCorpusInsightsData,
   GetCorpusInsightsError,
   GetCorpusInsightsResponse,
@@ -687,6 +852,9 @@ import type {
   GetDemoCaseData,
   GetDemoCaseError,
   GetDemoCaseResponse,
+  GetDerivedFileData,
+  GetDerivedFileError,
+  GetDerivedFileResponse,
   GetDocumentData,
   GetDocumentEmailData,
   GetDocumentEmailError,
@@ -783,9 +951,6 @@ import type {
   GetMappingSchemasData,
   GetMappingSchemasError,
   GetMappingSchemasResponse,
-  GetMonitorItemsData,
-  GetMonitorItemsError,
-  GetMonitorItemsResponse,
   GetNotesData,
   GetNotesError,
   GetNotesResponse,
@@ -810,12 +975,21 @@ import type {
   GetPartyYearsData,
   GetPartyYearsError,
   GetPartyYearsResponse,
+  GetPhotoData,
+  GetPhotoError,
+  GetPhotoResponse,
+  GetPlatformChecksData,
+  GetPlatformChecksError,
+  GetPlatformChecksResponse,
   GetRecordMarksData,
   GetRecordMarksError,
   GetRecordMarksResponse,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceError,
   GetRecordProvenanceTraceResponse,
+  GetRedactionData,
+  GetRedactionError,
+  GetRedactionResponse,
   GetRedFlagsData,
   GetRedFlagsError,
   GetRedFlagsResponse,
@@ -843,12 +1017,20 @@ import type {
   GetSecurityAuditSummaryData,
   GetSecurityAuditSummaryError,
   GetSecurityAuditSummaryResponse,
+  GetSigningKeyData,
+  GetSigningKeyError,
+  GetSigningKeyResponse,
   GetSimilarDocumentsData,
   GetSimilarDocumentsError,
   GetSimilarDocumentsResponse,
   GetSinceData,
   GetSinceError,
   GetSinceResponse,
+  GetSoundData,
+  GetSoundError,
+  GetSoundResponse,
+  GetSpectrogramData,
+  GetSpectrogramError,
   GetStandingData,
   GetStandingError,
   GetStandingResponse,
@@ -870,6 +1052,9 @@ import type {
   GetTagsData,
   GetTagsError,
   GetTagsResponse,
+  GetTimelineBoardData,
+  GetTimelineBoardError,
+  GetTimelineBoardResponse,
   GetVersionsData,
   GetVersionsError,
   GetVersionsResponse,
@@ -882,6 +1067,9 @@ import type {
   GetWriteupEndpointData,
   GetWriteupEndpointError,
   GetWriteupEndpointResponse,
+  GetYourSafetyData,
+  GetYourSafetyError,
+  GetYourSafetyResponse,
   GradeTimelineEventEndpointData,
   GradeTimelineEventEndpointError,
   GradeTimelineEventEndpointResponse,
@@ -966,6 +1154,12 @@ import type {
   ListAssessmentsData,
   ListAssessmentsError,
   ListAssessmentsResponse,
+  ListAuthenticityData,
+  ListAuthenticityError,
+  ListAuthenticityResponse,
+  ListBuiltTimelinesData,
+  ListBuiltTimelinesError,
+  ListBuiltTimelinesResponse,
   ListCaseRecordsData,
   ListCaseRecordsError,
   ListCaseRecordsResponse,
@@ -993,6 +1187,9 @@ import type {
   ListDemoCasesData,
   ListDemoCasesError,
   ListDemoCasesResponse,
+  ListDerivedData,
+  ListDerivedError,
+  ListDerivedResponse,
   ListDocumentCandidatesEndpointData,
   ListDocumentCandidatesEndpointError,
   ListDocumentCandidatesEndpointResponse,
@@ -1101,6 +1298,12 @@ import type {
   LockingError,
   LockingResponse,
   LockResponse,
+  MakeCleanedCopyData,
+  MakeCleanedCopyError,
+  MakeCleanedCopyResponse,
+  MakeClipData,
+  MakeClipError,
+  MakeClipResponse,
   MakeLeadFromHitData,
   MakeLeadFromHitError,
   MakeLeadFromHitResponse,
@@ -1110,9 +1313,18 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagError,
   MakeLeadFromRedFlagResponse,
+  MakePhotoCopyData,
+  MakePhotoCopyError,
+  MakePhotoCopyResponse,
+  MakeRedactedCopyData,
+  MakeRedactedCopyError,
+  MakeRedactedCopyResponse,
   MarkAiRunThoughtData,
   MarkAiRunThoughtError,
   MarkAiRunThoughtResponse,
+  MarkCaptureChangedData,
+  MarkCaptureChangedError,
+  MarkCaptureChangedResponse,
   MarkRedFlagInnocentData,
   MarkRedFlagInnocentError,
   MarkRedFlagInnocentResponse,
@@ -1125,6 +1337,9 @@ import type {
   NameStoryVersionData,
   NameStoryVersionError,
   NameStoryVersionResponse,
+  NameVoiceData,
+  NameVoiceError,
+  NameVoiceResponse,
   NewRecoveryKeyData,
   NewRecoveryKeyError,
   NewRecoveryKeyResponse,
@@ -1134,6 +1349,9 @@ import type {
   OpenCaseData,
   OpenCaseError,
   OpenCaseResponse,
+  OutsideAuthenticityData,
+  OutsideAuthenticityError,
+  OutsideAuthenticityResponse,
   PatchClaimSuiteData,
   PatchClaimSuiteError,
   PatchClaimSuiteResponse,
@@ -1154,12 +1372,15 @@ import type {
   PlaceStoryClaimData,
   PlaceStoryClaimError,
   PlaceStoryClaimResponse,
-  PollMonitorData,
-  PollMonitorError,
-  PollMonitorResponse,
+  PlatformForUrlData,
+  PlatformForUrlError,
+  PlatformForUrlResponse,
   PresentationStylesData,
   PresentationStylesError,
   PresentationStylesResponse,
+  PreviewAuthenticityData,
+  PreviewAuthenticityError,
+  PreviewAuthenticityResponse,
   PreviewBackupRestoreData,
   PreviewBackupRestoreError,
   PreviewBackupRestoreResponse,
@@ -1202,6 +1423,12 @@ import type {
   PutResearchSettingsData,
   PutResearchSettingsError,
   PutResearchSettingsResponse,
+  PutTimelineBoardData,
+  PutTimelineBoardError,
+  PutTimelineBoardResponse,
+  RecheckCaptureData,
+  RecheckCaptureError,
+  RecheckCaptureResponse,
   RecheckHashData,
   RecheckHashError,
   RecheckHashResponse,
@@ -1214,6 +1441,9 @@ import type {
   RecoverData,
   RecoverError,
   RecoverResponse,
+  RefindCaptureQuotesData,
+  RefindCaptureQuotesError,
+  RefindCaptureQuotesResponse,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewError,
   RefreshOpenalephDocumentReviewResponse,
@@ -1286,6 +1516,9 @@ import type {
   RotateAppUserTokenData,
   RotateAppUserTokenError,
   RotateAppUserTokenResponse,
+  RunPlatformChecksData,
+  RunPlatformChecksError,
+  RunPlatformChecksResponse,
   RunRedFlagsData,
   RunRedFlagsError,
   RunRedFlagsResponse,
@@ -1361,12 +1594,18 @@ import type {
   TestNotificationChannelData,
   TestNotificationChannelError,
   TestNotificationChannelResponse,
+  TimelineLanesViewData,
+  TimelineLanesViewError,
+  TimelineLanesViewResponse,
   TurnOffData,
   TurnOffError,
   TurnOffResponse,
   TurnOnData,
   TurnOnError,
   TurnOnResponse,
+  UndoItemData,
+  UndoItemError,
+  UndoItemResponse,
   UnlockData,
   UnlockError,
   UnlockPinData,
@@ -1379,6 +1618,15 @@ import type {
   UpdateAppUserData,
   UpdateAppUserError,
   UpdateAppUserResponse,
+  UpdateAuthenticityData,
+  UpdateAuthenticityError,
+  UpdateAuthenticityResponse,
+  UpdateBuiltTimelineData,
+  UpdateBuiltTimelineError,
+  UpdateBuiltTimelineResponse,
+  UpdateCaptureData,
+  UpdateCaptureError,
+  UpdateCaptureResponse,
   UpdateClaimEndpointData,
   UpdateClaimEndpointError,
   UpdateClaimEndpointResponse,
@@ -1400,6 +1648,9 @@ import type {
   UpdateStorySectionData,
   UpdateStorySectionError,
   UpdateStorySectionResponse,
+  UpdateTimelinePeriodData,
+  UpdateTimelinePeriodError,
+  UpdateTimelinePeriodResponse,
   UpdateWriteupEndpointData,
   UpdateWriteupEndpointError,
   UpdateWriteupEndpointResponse,
@@ -1867,6 +2118,64 @@ export const getCaptureOptions = (options: Options<GetCaptureData>) =>
     queryKey: getCaptureQueryKey(options),
   });
 
+/**
+ * Update Capture
+ *
+ * Set a link only's reason (dead link, blocked, timed out, tool error) when the person knows better.
+ */
+export const updateCaptureMutation = (
+  options?: Partial<Options<UpdateCaptureData>>,
+): UseMutationOptions<
+  UpdateCaptureResponse,
+  UpdateCaptureError,
+  Options<UpdateCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateCaptureResponse,
+    UpdateCaptureError,
+    Options<UpdateCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateCapture({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Capture Latest
+ *
+ * Capture the page as it is now, as a new capture: both stay in the case. Answers with the new capture.
+ */
+export const captureLatestMutation = (
+  options?: Partial<Options<CaptureLatestData>>,
+): UseMutationOptions<
+  CaptureLatestResponse,
+  CaptureLatestError,
+  Options<CaptureLatestData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureLatestResponse,
+    CaptureLatestError,
+    Options<CaptureLatestData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureLatest({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getCaptureFileQueryKey = (options: Options<GetCaptureFileData>) =>
   createQueryKey('getCaptureFile', options);
 
@@ -1896,6 +2205,94 @@ export const getCaptureFileOptions = (options: Options<GetCaptureFileData>) =>
   });
 
 /**
+ * Follow Capture
+ *
+ * Check this capture's page again: never, daily or weekly (a Following page monitor tied to the capture; version 1
+ * is the page as captured). For a link only, weekly is "Ask again in 7 days".
+ */
+export const followCaptureMutation = (
+  options?: Partial<Options<FollowCaptureData>>,
+): UseMutationOptions<
+  FollowCaptureResponse,
+  FollowCaptureError,
+  Options<FollowCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FollowCaptureResponse,
+    FollowCaptureError,
+    Options<FollowCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await followCapture({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Capture Look Elsewhere
+ *
+ * For a page that could not be kept: ask a public web archive whether it holds a copy, and from when.
+ */
+export const captureLookElsewhereMutation = (
+  options?: Partial<Options<CaptureLookElsewhereData>>,
+): UseMutationOptions<
+  CaptureLookElsewhereResponse,
+  CaptureLookElsewhereError,
+  Options<CaptureLookElsewhereData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureLookElsewhereResponse,
+    CaptureLookElsewhereError,
+    Options<CaptureLookElsewhereData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureLookElsewhere({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Mark Capture Changed
+ *
+ * Mark the capture's source "changed since capture", with who said so and which version they saw.
+ */
+export const markCaptureChangedMutation = (
+  options?: Partial<Options<MarkCaptureChangedData>>,
+): UseMutationOptions<
+  MarkCaptureChangedResponse,
+  MarkCaptureChangedError,
+  Options<MarkCaptureChangedData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MarkCaptureChangedResponse,
+    MarkCaptureChangedError,
+    Options<MarkCaptureChangedData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await markCaptureChanged({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Collect Capture Media
  *
  * Collect the one video or audio item on a captured page, logged out (app/services/media_links.py), keep it
@@ -1915,6 +2312,155 @@ export const collectCaptureMediaMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await collectCaptureMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getCaptureQuotesQueryKey = (
+  options: Options<GetCaptureQuotesData>,
+) => createQueryKey('getCaptureQuotes', options);
+
+/**
+ * Get Capture Quotes
+ *
+ * The quotes pinned from this captured page, each found again in the saved copy and (once the page
+ * was checked again) on the live page.
+ */
+export const getCaptureQuotesOptions = (
+  options: Options<GetCaptureQuotesData>,
+) =>
+  queryOptions<
+    GetCaptureQuotesResponse,
+    GetCaptureQuotesError,
+    GetCaptureQuotesResponse,
+    ReturnType<typeof getCaptureQuotesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCaptureQuotes({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCaptureQuotesQueryKey(options),
+  });
+
+/**
+ * Refind Capture Quotes
+ *
+ * Read the saved copy's quotes again: each is found again in the page's passages and its place kept.
+ */
+export const refindCaptureQuotesMutation = (
+  options?: Partial<Options<RefindCaptureQuotesData>>,
+): UseMutationOptions<
+  RefindCaptureQuotesResponse,
+  RefindCaptureQuotesError,
+  Options<RefindCaptureQuotesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RefindCaptureQuotesResponse,
+    RefindCaptureQuotesError,
+    Options<RefindCaptureQuotesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await refindCaptureQuotes({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Recheck Capture
+ *
+ * One visit now: the live page's main text compared with the last version. Nothing is kept as evidence; a
+ * different text is kept as a version, not captured.
+ */
+export const recheckCaptureMutation = (
+  options?: Partial<Options<RecheckCaptureData>>,
+): UseMutationOptions<
+  RecheckCaptureResponse,
+  RecheckCaptureError,
+  Options<RecheckCaptureData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RecheckCaptureResponse,
+    RecheckCaptureError,
+    Options<RecheckCaptureData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await recheckCapture({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Capture Second Witness
+ *
+ * Ask a public web archive to visit the page and keep its own copy. Only the address is sent, logged first.
+ */
+export const captureSecondWitnessMutation = (
+  options?: Partial<Options<CaptureSecondWitnessData>>,
+): UseMutationOptions<
+  CaptureSecondWitnessResponse,
+  CaptureSecondWitnessError,
+  Options<CaptureSecondWitnessData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureSecondWitnessResponse,
+    CaptureSecondWitnessError,
+    Options<CaptureSecondWitnessData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureSecondWitness({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Capture Time Proof
+ *
+ * Ask a time server to sign this capture's fingerprint (RFC 3161). Only the WARC's SHA-256 is sent, logged first;
+ * the token is kept beside the capture's files and checked here. A failure is kept on the capture with its reason.
+ */
+export const captureTimeProofMutation = (
+  options?: Partial<Options<CaptureTimeProofData>>,
+): UseMutationOptions<
+  CaptureTimeProofResponse,
+  CaptureTimeProofError,
+  Options<CaptureTimeProofData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureTimeProofResponse,
+    CaptureTimeProofError,
+    Options<CaptureTimeProofData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureTimeProof({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -3137,6 +3683,63 @@ export const addChartToDeckEndpointMutation = (
   return mutationOptions;
 };
 
+export const deckChecksEndpointQueryKey = (
+  options: Options<DeckChecksEndpointData>,
+) => createQueryKey('deckChecksEndpoint', options);
+
+/**
+ * Deck Checks Endpoint
+ *
+ * Each slide's checks: a claim not yet shown, 7×7, a long run of text slides, a claim changed since made.
+ */
+export const deckChecksEndpointOptions = (
+  options: Options<DeckChecksEndpointData>,
+) =>
+  queryOptions<
+    DeckChecksEndpointResponse,
+    DeckChecksEndpointError,
+    DeckChecksEndpointResponse,
+    ReturnType<typeof deckChecksEndpointQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await deckChecksEndpoint({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: deckChecksEndpointQueryKey(options),
+  });
+
+export const exportDeckPdfQueryKey = (options: Options<ExportDeckPdfData>) =>
+  createQueryKey('exportDeckPdf', options);
+
+/**
+ * Export Deck Pdf
+ *
+ * Slides (one 16:9 page each) or, with `handout`, an A4 page per slide with its speaker notes.
+ */
+export const exportDeckPdfOptions = (options: Options<ExportDeckPdfData>) =>
+  queryOptions<
+    ExportDeckPdfResponse,
+    ExportDeckPdfError,
+    ExportDeckPdfResponse,
+    ReturnType<typeof exportDeckPdfQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await exportDeckPdf({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: exportDeckPdfQueryKey(options),
+  });
+
 export const exportDeckPptxQueryKey = (options: Options<ExportDeckPptxData>) =>
   createQueryKey('exportDeckPptx', options);
 
@@ -3335,6 +3938,114 @@ export const seedDemoMutation = (
   return mutationOptions;
 };
 
+export const getDerivedFileQueryKey = (options: Options<GetDerivedFileData>) =>
+  createQueryKey('getDerivedFile', options);
+
+/**
+ * Get Derived File
+ *
+ * A file made from a case file, as it was kept and hashed (its SHA-256 is on its trail row).
+ */
+export const getDerivedFileOptions = (options: Options<GetDerivedFileData>) =>
+  queryOptions<
+    GetDerivedFileResponse,
+    GetDerivedFileError,
+    GetDerivedFileResponse,
+    ReturnType<typeof getDerivedFileQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getDerivedFile({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getDerivedFileQueryKey(options),
+  });
+
+export const getCopyPageQueryKey = (options: Options<GetCopyPageData>) =>
+  createQueryKey('getCopyPage', options);
+
+/**
+ * Get Copy Page
+ *
+ * One page of a redacted copy as PNG, for Compare.
+ */
+export const getCopyPageOptions = (options: Options<GetCopyPageData>) =>
+  queryOptions<
+    GetCopyPageResponse,
+    GetCopyPageError,
+    GetCopyPageResponse,
+    ReturnType<typeof getCopyPageQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCopyPage({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCopyPageQueryKey(options),
+  });
+
+export const getCopyPageInfiniteQueryKey = (
+  options: Options<GetCopyPageData>,
+): QueryKey<Options<GetCopyPageData>> =>
+  createQueryKey('getCopyPage', options, true);
+
+/**
+ * Get Copy Page
+ *
+ * One page of a redacted copy as PNG, for Compare.
+ */
+export const getCopyPageInfiniteOptions = (
+  options: Options<GetCopyPageData>,
+) => {
+  const opts = infiniteQueryOptions<
+    GetCopyPageResponse,
+    GetCopyPageError,
+    InfiniteData<GetCopyPageResponse>,
+    QueryKey<Options<GetCopyPageData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetCopyPageData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetCopyPageData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  page: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getCopyPage({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getCopyPageInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
 export const getDocumentFormatsQueryKey = (
   options?: Options<GetDocumentFormatsData>,
 ) => createQueryKey('getDocumentFormats', options);
@@ -3424,6 +4135,239 @@ export const getDocumentOptions = (options: Options<GetDocumentData>) =>
       return data;
     },
     queryKey: getDocumentQueryKey(options),
+  });
+
+export const getAuthenticityQueryKey = (
+  options: Options<GetAuthenticityData>,
+) => createQueryKey('getAuthenticity', options);
+
+/**
+ * Get Authenticity
+ *
+ * The screen. The findings are recorded the first time it is opened, on this computer; nothing is sent.
+ */
+export const getAuthenticityOptions = (options: Options<GetAuthenticityData>) =>
+  queryOptions<
+    GetAuthenticityResponse,
+    GetAuthenticityError,
+    GetAuthenticityResponse,
+    ReturnType<typeof getAuthenticityQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getAuthenticity({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getAuthenticityQueryKey(options),
+  });
+
+/**
+ * Update Authenticity
+ *
+ * What the item is for, whether it is source-protected, and the platform's own label.
+ */
+export const updateAuthenticityMutation = (
+  options?: Partial<Options<UpdateAuthenticityData>>,
+): UseMutationOptions<
+  UpdateAuthenticityResponse,
+  UpdateAuthenticityError,
+  Options<UpdateAuthenticityData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateAuthenticityResponse,
+    UpdateAuthenticityError,
+    Options<UpdateAuthenticityData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateAuthenticity({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add About Claim
+ *
+ * Add a claim about the item itself, supported by it whatever its status (the subject of the story).
+ */
+export const addAboutClaimMutation = (
+  options?: Partial<Options<AddAboutClaimData>>,
+): UseMutationOptions<
+  AddAboutClaimResponse,
+  AddAboutClaimError,
+  Options<AddAboutClaimData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddAboutClaimResponse,
+    AddAboutClaimError,
+    Options<AddAboutClaimData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addAboutClaim({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Compare Authenticity
+ *
+ * Compare with the case's own files, on this computer. Allowed for a source-protected item too.
+ */
+export const compareAuthenticityMutation = (
+  options?: Partial<Options<CompareAuthenticityData>>,
+): UseMutationOptions<
+  CompareAuthenticityResponse,
+  CompareAuthenticityError,
+  Options<CompareAuthenticityData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CompareAuthenticityResponse,
+    CompareAuthenticityError,
+    Options<CompareAuthenticityData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await compareAuthenticity({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Decide Authenticity
+ *
+ * Set the status. Only a person does, with what they checked and why; the history keeps every decision.
+ */
+export const decideAuthenticityMutation = (
+  options?: Partial<Options<DecideAuthenticityData>>,
+): UseMutationOptions<
+  DecideAuthenticityResponse,
+  DecideAuthenticityError,
+  Options<DecideAuthenticityData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DecideAuthenticityResponse,
+    DecideAuthenticityError,
+    Options<DecideAuthenticityData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await decideAuthenticity({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Examine Again
+ *
+ * Read the findings again (after a new trust list, or a new copy in the case). Each run is a line in the history.
+ */
+export const examineAgainMutation = (
+  options?: Partial<Options<ExamineAgainData>>,
+): UseMutationOptions<
+  ExamineAgainResponse,
+  ExamineAgainError,
+  Options<ExamineAgainData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ExamineAgainResponse,
+    ExamineAgainError,
+    Options<ExamineAgainData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await examineAgain({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Outside Authenticity
+ *
+ * Allowed once: logs exactly what goes, to whom and why, and gives the address for the browser to open. The app
+ * itself sends nothing. Refused for a source-protected item.
+ */
+export const outsideAuthenticityMutation = (
+  options?: Partial<Options<OutsideAuthenticityData>>,
+): UseMutationOptions<
+  OutsideAuthenticityResponse,
+  OutsideAuthenticityError,
+  Options<OutsideAuthenticityData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    OutsideAuthenticityResponse,
+    OutsideAuthenticityError,
+    Options<OutsideAuthenticityData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await outsideAuthenticity({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const previewAuthenticityQueryKey = (
+  options: Options<PreviewAuthenticityData>,
+) => createQueryKey('previewAuthenticity', options);
+
+/**
+ * Preview Authenticity
+ *
+ * What a status (and role) would do to the claims that lean on the item, before it is recorded.
+ */
+export const previewAuthenticityOptions = (
+  options: Options<PreviewAuthenticityData>,
+) =>
+  queryOptions<
+    PreviewAuthenticityResponse,
+    PreviewAuthenticityError,
+    PreviewAuthenticityResponse,
+    ReturnType<typeof previewAuthenticityQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await previewAuthenticity({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: previewAuthenticityQueryKey(options),
   });
 
 export const listDocumentCandidatesEndpointQueryKey = (
@@ -3628,6 +4572,154 @@ export const syncOpenalephDocumentMutation = (
   return mutationOptions;
 };
 
+export const listDerivedQueryKey = (options: Options<ListDerivedData>) =>
+  createQueryKey('listDerived', options);
+
+/**
+ * List Derived
+ *
+ * Every file made from this document, oldest first, with its edit-trail row.
+ */
+export const listDerivedOptions = (options: Options<ListDerivedData>) =>
+  queryOptions<
+    ListDerivedResponse,
+    ListDerivedError,
+    ListDerivedResponse,
+    ReturnType<typeof listDerivedQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listDerived({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listDerivedQueryKey(options),
+  });
+
+/**
+ * Make Cleaned Copy
+ *
+ * A 16 kHz mono copy for listening only: with no steps given, the hum taken out and light noise reduction; with
+ * steps, those (hum, room noise, loudness), its loudness before and after kept in the trail. The recording itself is
+ * not changed; the copy is a new file with its edit-trail row.
+ */
+export const makeCleanedCopyMutation = (
+  options?: Partial<Options<MakeCleanedCopyData>>,
+): UseMutationOptions<
+  MakeCleanedCopyResponse,
+  MakeCleanedCopyError,
+  Options<MakeCleanedCopyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeCleanedCopyResponse,
+    MakeCleanedCopyError,
+    Options<MakeCleanedCopyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeCleanedCopy({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Make Clip
+ *
+ * The part from `start` to `end` seconds kept as its own WAV file, cut from the original (or the cleaned copy).
+ */
+export const makeClipMutation = (
+  options?: Partial<Options<MakeClipData>>,
+): UseMutationOptions<
+  MakeClipResponse,
+  MakeClipError,
+  Options<MakeClipData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeClipResponse,
+    MakeClipError,
+    Options<MakeClipData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeClip({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Make Photo Copy
+ *
+ * A copy of the photo with faces blurred, metadata removed, cropped, an area redacted (with its reason) or turned,
+ * made from the photo as shown or from another copy. The photo itself is never written.
+ */
+export const makePhotoCopyMutation = (
+  options?: Partial<Options<MakePhotoCopyData>>,
+): UseMutationOptions<
+  MakePhotoCopyResponse,
+  MakePhotoCopyError,
+  Options<MakePhotoCopyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakePhotoCopyResponse,
+    MakePhotoCopyError,
+    Options<MakePhotoCopyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makePhotoCopy({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Make Redacted Copy
+ *
+ * A redacted copy: the content under each box removed for good, the hidden data asked for taken out, PDF/A-2b if
+ * asked, then checked: the saved copy must hold no text under any box. Each box's page, place and reason are kept in
+ * the trail, not the words under it. The case's file is unchanged.
+ */
+export const makeRedactedCopyMutation = (
+  options?: Partial<Options<MakeRedactedCopyData>>,
+): UseMutationOptions<
+  MakeRedactedCopyResponse,
+  MakeRedactedCopyError,
+  Options<MakeRedactedCopyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeRedactedCopyResponse,
+    MakeRedactedCopyError,
+    Options<MakeRedactedCopyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeRedactedCopy({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getDocumentEmailQueryKey = (
   options: Options<GetDocumentEmailData>,
 ) => createQueryKey('getDocumentEmail', options);
@@ -3659,6 +4751,36 @@ export const getDocumentEmailOptions = (
     },
     queryKey: getDocumentEmailQueryKey(options),
   });
+
+/**
+ * Find Photo Faces
+ *
+ * Where a detector finds faces in the photo as shown. Nothing names, matches or groups a face. The detector's
+ * model (232 KB) is fetched the first time, pinned and written to the outbound log.
+ */
+export const findPhotoFacesMutation = (
+  options?: Partial<Options<FindPhotoFacesData>>,
+): UseMutationOptions<
+  FindPhotoFacesResponse,
+  FindPhotoFacesError,
+  Options<FindPhotoFacesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FindPhotoFacesResponse,
+    FindPhotoFacesError,
+    Options<FindPhotoFacesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await findPhotoFaces({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getDocumentMediaQueryKey = (
   options: Options<GetDocumentMediaData>,
@@ -3842,6 +4964,33 @@ export const getDocumentPageImageInfiniteOptions = (
   return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const getPhotoQueryKey = (options: Options<GetPhotoData>) =>
+  createQueryKey('getPhoto', options);
+
+/**
+ * Get Photo
+ *
+ * What the photo claims about itself and what the machine proposes about it (mockup MEDIA_1).
+ */
+export const getPhotoOptions = (options: Options<GetPhotoData>) =>
+  queryOptions<
+    GetPhotoResponse,
+    GetPhotoError,
+    GetPhotoResponse,
+    ReturnType<typeof getPhotoQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPhoto({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPhotoQueryKey(options),
+  });
+
 export const getDocumentPictureQueryKey = (
   options: Options<GetDocumentPictureData>,
 ) => createQueryKey('getDocumentPicture', options);
@@ -3903,6 +5052,64 @@ export const recheckHashMutation = (
   return mutationOptions;
 };
 
+export const getRedactionQueryKey = (options: Options<GetRedactionData>) =>
+  createQueryKey('getRedaction', options);
+
+/**
+ * Get Redaction
+ *
+ * What Redact before sharing shows (mockup MEDIA_3): the pages in points, the boxes the machine proposes (phone
+ * numbers and emails by pattern, people named in this case), the hidden data the file carries, PDF/A-2b now. Read
+ * from a copy: the case's file is never opened for writing.
+ */
+export const getRedactionOptions = (options: Options<GetRedactionData>) =>
+  queryOptions<
+    GetRedactionResponse,
+    GetRedactionError,
+    GetRedactionResponse,
+    ReturnType<typeof getRedactionQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getRedaction({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getRedactionQueryKey(options),
+  });
+
+export const compareRedactedQueryKey = (
+  options: Options<CompareRedactedData>,
+) => createQueryKey('compareRedacted', options);
+
+/**
+ * Compare Redacted
+ *
+ * How a redacted copy differs from the case's file: the words each holds, the pages changed, the hidden data the
+ * copy still carries.
+ */
+export const compareRedactedOptions = (options: Options<CompareRedactedData>) =>
+  queryOptions<
+    CompareRedactedResponse,
+    CompareRedactedError,
+    CompareRedactedResponse,
+    ReturnType<typeof compareRedactedQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await compareRedacted({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: compareRedactedQueryKey(options),
+  });
+
 export const getSimilarDocumentsQueryKey = (
   options: Options<GetSimilarDocumentsData>,
 ) => createQueryKey('getSimilarDocuments', options);
@@ -3935,6 +5142,174 @@ export const getSimilarDocumentsOptions = (
     },
     queryKey: getSimilarDocumentsQueryKey(options),
   });
+
+export const getSoundQueryKey = (options: Options<GetSoundData>) =>
+  createQueryKey('getSound', options);
+
+/**
+ * Get Sound
+ *
+ * Whether mains hum is in the recording and at which frequency, its loudness, and any accepted sync.
+ */
+export const getSoundOptions = (options: Options<GetSoundData>) =>
+  queryOptions<
+    GetSoundResponse,
+    GetSoundError,
+    GetSoundResponse,
+    ReturnType<typeof getSoundQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSound({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSoundQueryKey(options),
+  });
+
+export const getSpectrogramQueryKey = (options: Options<GetSpectrogramData>) =>
+  createQueryKey('getSpectrogram', options);
+
+/**
+ * Get Spectrogram
+ *
+ * A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B).
+ */
+export const getSpectrogramOptions = (options: Options<GetSpectrogramData>) =>
+  queryOptions<
+    unknown,
+    GetSpectrogramError,
+    unknown,
+    ReturnType<typeof getSpectrogramQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSpectrogram({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSpectrogramQueryKey(options),
+  });
+
+export const getSpectrogramInfiniteQueryKey = (
+  options: Options<GetSpectrogramData>,
+): QueryKey<Options<GetSpectrogramData>> =>
+  createQueryKey('getSpectrogram', options, true);
+
+/**
+ * Get Spectrogram
+ *
+ * A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B).
+ */
+export const getSpectrogramInfiniteOptions = (
+  options: Options<GetSpectrogramData>,
+) => {
+  const opts = infiniteQueryOptions<
+    unknown,
+    GetSpectrogramError,
+    InfiniteData<unknown>,
+    QueryKey<Options<GetSpectrogramData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetSpectrogramData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetSpectrogramData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getSpectrogram({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getSpectrogramInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Find Document Sync
+ *
+ * Where another recording of the same event lines up in this one, found by matching their sound. Nothing is kept
+ * until a person accepts it.
+ */
+export const findDocumentSyncMutation = (
+  options?: Partial<Options<FindDocumentSyncData>>,
+): UseMutationOptions<
+  FindDocumentSyncResponse,
+  FindDocumentSyncError,
+  Options<FindDocumentSyncData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FindDocumentSyncResponse,
+    FindDocumentSyncError,
+    Options<FindDocumentSyncData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await findDocumentSync({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Accept Document Sync
+ *
+ * Accept the offset: it is found again here (not taken from the request) and kept beside the recording with who
+ * accepted it and when.
+ */
+export const acceptDocumentSyncMutation = (
+  options?: Partial<Options<AcceptDocumentSyncData>>,
+): UseMutationOptions<
+  AcceptDocumentSyncResponse,
+  AcceptDocumentSyncError,
+  Options<AcceptDocumentSyncData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AcceptDocumentSyncResponse,
+    AcceptDocumentSyncError,
+    Options<AcceptDocumentSyncData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await acceptDocumentSync({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getDocumentTableQueryKey = (
   options: Options<GetDocumentTableData>,
@@ -4084,6 +5459,36 @@ export const getDocumentTranscriptOptions = (
     queryKey: getDocumentTranscriptQueryKey(options),
   });
 
+export const compareTranscriptsQueryKey = (
+  options: Options<CompareTranscriptsData>,
+) => createQueryKey('compareTranscripts', options);
+
+/**
+ * Compare Transcripts
+ *
+ * Our transcript beside the publisher's, part by part; the words that differ are marked on both sides.
+ */
+export const compareTranscriptsOptions = (
+  options: Options<CompareTranscriptsData>,
+) =>
+  queryOptions<
+    CompareTranscriptsResponse,
+    CompareTranscriptsError,
+    CompareTranscriptsResponse,
+    ReturnType<typeof compareTranscriptsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await compareTranscripts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: compareTranscriptsQueryKey(options),
+  });
+
 export const getDocumentTranslationQueryKey = (
   options: Options<GetDocumentTranslationData>,
 ) => createQueryKey('getDocumentTranslation', options);
@@ -4114,6 +5519,66 @@ export const getDocumentTranslationOptions = (
     },
     queryKey: getDocumentTranslationQueryKey(options),
   });
+
+/**
+ * Find Voices
+ *
+ * Tell the voices of a transcribed recording apart, on this computer (ADR-0026). Answers at once with the job.
+ * Names given earlier are cleared, and kept in the history.
+ */
+export const findVoicesMutation = (
+  options?: Partial<Options<FindVoicesData>>,
+): UseMutationOptions<
+  FindVoicesResponse,
+  FindVoicesError,
+  Options<FindVoicesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FindVoicesResponse,
+    FindVoicesError,
+    Options<FindVoicesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await findVoices({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Name Voice
+ *
+ * Name this voice (a person only; the machine never names a voice), or clear its name. The earlier name is kept
+ * in the history. Never applied to another recording.
+ */
+export const nameVoiceMutation = (
+  options?: Partial<Options<NameVoiceData>>,
+): UseMutationOptions<
+  NameVoiceResponse,
+  NameVoiceError,
+  Options<NameVoiceData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    NameVoiceResponse,
+    NameVoiceError,
+    Options<NameVoiceData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await nameVoice({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const enrichmentSessionDetailQueryKey = (
   options: Options<EnrichmentSessionDetailData>,
@@ -5851,6 +7316,239 @@ export const investigationSuiteRunMutation = (
   return mutationOptions;
 };
 
+export const listAuthenticityQueryKey = (
+  options: Options<ListAuthenticityData>,
+) => createQueryKey('listAuthenticity', options);
+
+/**
+ * List Authenticity
+ *
+ * Each case file's standing that has been looked at or decided.
+ */
+export const listAuthenticityOptions = (
+  options: Options<ListAuthenticityData>,
+) =>
+  queryOptions<
+    ListAuthenticityResponse,
+    ListAuthenticityError,
+    ListAuthenticityResponse,
+    ReturnType<typeof listAuthenticityQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listAuthenticity({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listAuthenticityQueryKey(options),
+  });
+
+export const listBuiltTimelinesQueryKey = (
+  options: Options<ListBuiltTimelinesData>,
+) => createQueryKey('listBuiltTimelines', options);
+
+/**
+ * List Built Timelines
+ *
+ * Your own timelines in this case (each person sees only theirs).
+ */
+export const listBuiltTimelinesOptions = (
+  options: Options<ListBuiltTimelinesData>,
+) =>
+  queryOptions<
+    ListBuiltTimelinesResponse,
+    ListBuiltTimelinesError,
+    ListBuiltTimelinesResponse,
+    ReturnType<typeof listBuiltTimelinesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listBuiltTimelines({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listBuiltTimelinesQueryKey(options),
+  });
+
+/**
+ * Create Built Timeline
+ *
+ * Start a timeline of your own.
+ */
+export const createBuiltTimelineMutation = (
+  options?: Partial<Options<CreateBuiltTimelineData>>,
+): UseMutationOptions<
+  CreateBuiltTimelineResponse,
+  CreateBuiltTimelineError,
+  Options<CreateBuiltTimelineData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateBuiltTimelineResponse,
+    CreateBuiltTimelineError,
+    Options<CreateBuiltTimelineData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createBuiltTimeline({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete Built Timeline
+ *
+ * Delete one of your timelines; the events in it stay as they are.
+ */
+export const deleteBuiltTimelineMutation = (
+  options?: Partial<Options<DeleteBuiltTimelineData>>,
+): UseMutationOptions<
+  DeleteBuiltTimelineResponse,
+  DeleteBuiltTimelineError,
+  Options<DeleteBuiltTimelineData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteBuiltTimelineResponse,
+    DeleteBuiltTimelineError,
+    Options<DeleteBuiltTimelineData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteBuiltTimeline({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update Built Timeline
+ *
+ * Rename it, or change which events it tells and in what order.
+ */
+export const updateBuiltTimelineMutation = (
+  options?: Partial<Options<UpdateBuiltTimelineData>>,
+): UseMutationOptions<
+  UpdateBuiltTimelineResponse,
+  UpdateBuiltTimelineError,
+  Options<UpdateBuiltTimelineData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateBuiltTimelineResponse,
+    UpdateBuiltTimelineError,
+    Options<UpdateBuiltTimelineData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateBuiltTimeline({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * By Hand Add
+ *
+ * Add a party, a link or an event by hand, with where it comes from: a passage, a source with no file, or none yet
+ * (then a lead to find one). Who typed it is kept on the record and in its custody chain.
+ */
+export const byHandAddMutation = (
+  options?: Partial<Options<ByHandAddData>>,
+): UseMutationOptions<
+  ByHandAddResponse,
+  ByHandAddError,
+  Options<ByHandAddData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ByHandAddResponse,
+    ByHandAddError,
+    Options<ByHandAddData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await byHandAdd({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * By Hand Preview
+ *
+ * What the case already holds of it, what waits in Decide, and what a link would change. Nothing is written.
+ */
+export const byHandPreviewMutation = (
+  options?: Partial<Options<ByHandPreviewData>>,
+): UseMutationOptions<
+  ByHandPreviewResponse,
+  ByHandPreviewError,
+  Options<ByHandPreviewData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ByHandPreviewResponse,
+    ByHandPreviewError,
+    Options<ByHandPreviewData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await byHandPreview({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const byHandSuggestQueryKey = (options: Options<ByHandSuggestData>) =>
+  createQueryKey('byHandSuggest', options);
+
+/**
+ * By Hand Suggest
+ *
+ * The case's parties whose names start with, then contain, what was typed in a blank.
+ */
+export const byHandSuggestOptions = (options: Options<ByHandSuggestData>) =>
+  queryOptions<
+    ByHandSuggestResponse,
+    ByHandSuggestError,
+    ByHandSuggestResponse,
+    ReturnType<typeof byHandSuggestQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await byHandSuggest({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: byHandSuggestQueryKey(options),
+  });
+
 export const getCapturesQueryKey = (options: Options<GetCapturesData>) =>
   createQueryKey('getCaptures', options);
 
@@ -6855,6 +8553,36 @@ export const listDecksEndpointOptions = (
     queryKey: listDecksEndpointQueryKey(options),
   });
 
+/**
+ * Create Deck Endpoint
+ *
+ * A new deck without an AI draft (DECK_1): from the case's story tree (a slide per section, its claims cited) or
+ * blank.
+ */
+export const createDeckEndpointMutation = (
+  options?: Partial<Options<CreateDeckEndpointData>>,
+): UseMutationOptions<
+  CreateDeckEndpointResponse,
+  CreateDeckEndpointError,
+  Options<CreateDeckEndpointData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateDeckEndpointResponse,
+    CreateDeckEndpointError,
+    Options<CreateDeckEndpointData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createDeckEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const investigationDeletionPreviewQueryKey = (
   options: Options<InvestigationDeletionPreviewData>,
 ) => createQueryKey('investigationDeletionPreview', options);
@@ -7171,6 +8899,67 @@ export const listInvestigationEvidenceInfiniteOptions = (
   return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const exportEvidencePackQueryKey = (
+  options: Options<ExportEvidencePackData>,
+) => createQueryKey('exportEvidencePack', options);
+
+/**
+ * Export Evidence Pack
+ *
+ * The story's evidence pack (app/services/evidence_pack.py), made on this computer. Stamped "Export as draft"
+ * while a check before an outward export is open; X-Pack-Draft, X-Pack-Exhibits and X-Pack-Gaps say so.
+ */
+export const exportEvidencePackOptions = (
+  options: Options<ExportEvidencePackData>,
+) =>
+  queryOptions<
+    ExportEvidencePackResponse,
+    ExportEvidencePackError,
+    ExportEvidencePackResponse,
+    ReturnType<typeof exportEvidencePackQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await exportEvidencePack({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: exportEvidencePackQueryKey(options),
+  });
+
+/**
+ * Check Evidence Pack
+ *
+ * Check a pack someone sent back (CHECK_4): read here, in memory; every file's SHA-256 recomputed and compared
+ * with the list kept when the pack was made. Nothing of the pack is kept or sent anywhere.
+ */
+export const checkEvidencePackMutation = (
+  options?: Partial<Options<CheckEvidencePackData>>,
+): UseMutationOptions<
+  CheckEvidencePackResponse,
+  CheckEvidencePackError,
+  Options<CheckEvidencePackData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CheckEvidencePackResponse,
+    CheckEvidencePackError,
+    Options<CheckEvidencePackData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await checkEvidencePack({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const exportInvestigationQueryKey = (
   options: Options<ExportInvestigationData>,
 ) => createQueryKey('exportInvestigation', options);
@@ -7235,7 +9024,8 @@ export const getFollowingQueryKey = (options: Options<GetFollowingData>) =>
 /**
  * Get Following
  *
- * What the case follows, and the items waiting for a person, the most at risk first.
+ * The sources this case follows, the queue (most at risk first), copies of one story counted once, and what
+ * leaves this computer.
  */
 export const getFollowingOptions = (options: Options<GetFollowingData>) =>
   queryOptions<
@@ -7259,8 +9049,8 @@ export const getFollowingOptions = (options: Options<GetFollowingData>) =>
 /**
  * Capture All
  *
- * Capture several waiting items at once, with a reason that goes on each (EGS rule 8), at most 50 a time, one
- * after another. An item whose address cannot be visited stays in the queue.
+ * Capture everything waiting, at once. Needs a reason, kept on each item it captures; an item that cannot be
+ * captured stays waiting.
  */
 export const captureAllMutation = (
   options?: Partial<Options<CaptureAllData>>,
@@ -7662,7 +9452,9 @@ export const getInvestigationMoneyChecksOptions = (
 /**
  * Create Monitor
  *
- * Follow an address. With `poll` it is looked at once before the reply, so its health is known.
+ * Follow something: the address is asked once to see what it is (a feed, sitemap, podcast or page; a page that
+ * names its feed is followed through the feed), then checked on its schedule. A closed platform becomes a row with
+ * no monitor. Nothing is kept until a person captures it.
  */
 export const createMonitorMutation = (
   options?: Partial<Options<CreateMonitorData>>,
@@ -7678,6 +9470,36 @@ export const createMonitorMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Create Mailbox Monitor
+ *
+ * Follow one sender's newsletters in a dedicated mailbox, read over IMAP with TLS and never marked read. The
+ * password is kept in its own file on this computer, not in the case or a backup.
+ */
+export const createMailboxMonitorMutation = (
+  options?: Partial<Options<CreateMailboxMonitorData>>,
+): UseMutationOptions<
+  CreateMailboxMonitorResponse,
+  CreateMailboxMonitorError,
+  Options<CreateMailboxMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateMailboxMonitorResponse,
+    CreateMailboxMonitorError,
+    Options<CreateMailboxMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createMailboxMonitor({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -8863,6 +10685,10 @@ export const getInvestigationTimelineQueryKey = (
 
 /**
  * Get Investigation Timeline
+ *
+ * The case's events in date order. A source's own date (when a document was published or filed) is an event
+ * only with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what
+ * happened.
  */
 export const getInvestigationTimelineOptions = (
   options: Options<GetInvestigationTimelineData>,
@@ -8892,6 +10718,10 @@ export const getInvestigationTimelineInfiniteQueryKey = (
 
 /**
  * Get Investigation Timeline
+ *
+ * The case's events in date order. A source's own date (when a document was published or filed) is an event
+ * only with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what
+ * happened.
  */
 export const getInvestigationTimelineInfiniteOptions = (
   options: Options<GetInvestigationTimelineData>,
@@ -8935,6 +10765,183 @@ export const getInvestigationTimelineInfiniteOptions = (
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getTimelineBoardQueryKey = (
+  options: Options<GetTimelineBoardData>,
+) => createQueryKey('getTimelineBoard', options);
+
+/**
+ * Get Timeline Board
+ *
+ * Where the Board's cards sit, its notes, and its style (Rich by default, DECISIONS_LOG 6, call 9).
+ */
+export const getTimelineBoardOptions = (
+  options: Options<GetTimelineBoardData>,
+) =>
+  queryOptions<
+    GetTimelineBoardResponse,
+    GetTimelineBoardError,
+    GetTimelineBoardResponse,
+    ReturnType<typeof getTimelineBoardQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTimelineBoard({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTimelineBoardQueryKey(options),
+  });
+
+/**
+ * Put Timeline Board
+ *
+ * Keep where the cards were moved to, the notes, and the style. Kept with the case, so it travels in a backup.
+ */
+export const putTimelineBoardMutation = (
+  options?: Partial<Options<PutTimelineBoardData>>,
+): UseMutationOptions<
+  PutTimelineBoardResponse,
+  PutTimelineBoardError,
+  Options<PutTimelineBoardData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PutTimelineBoardResponse,
+    PutTimelineBoardError,
+    Options<PutTimelineBoardData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await putTimelineBoard({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const timelineLanesViewQueryKey = (
+  options: Options<TimelineLanesViewData>,
+) => createQueryKey('timelineLanesView', options);
+
+/**
+ * Timeline Lanes View
+ *
+ * The case's events as lanes: each with its parties, where it comes from and whether it is shown; the reporter's
+ * periods; the sequence checks; records not on the timeline yet; and sources with no date.
+ */
+export const timelineLanesViewOptions = (
+  options: Options<TimelineLanesViewData>,
+) =>
+  queryOptions<
+    TimelineLanesViewResponse,
+    TimelineLanesViewError,
+    TimelineLanesViewResponse,
+    ReturnType<typeof timelineLanesViewQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await timelineLanesView({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: timelineLanesViewQueryKey(options),
+  });
+
+/**
+ * Create Timeline Period
+ *
+ * Name a stretch of the case's time.
+ */
+export const createTimelinePeriodMutation = (
+  options?: Partial<Options<CreateTimelinePeriodData>>,
+): UseMutationOptions<
+  CreateTimelinePeriodResponse,
+  CreateTimelinePeriodError,
+  Options<CreateTimelinePeriodData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateTimelinePeriodResponse,
+    CreateTimelinePeriodError,
+    Options<CreateTimelinePeriodData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createTimelinePeriod({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete Timeline Period
+ *
+ * Take a period away; its events stay.
+ */
+export const deleteTimelinePeriodMutation = (
+  options?: Partial<Options<DeleteTimelinePeriodData>>,
+): UseMutationOptions<
+  DeleteTimelinePeriodResponse,
+  DeleteTimelinePeriodError,
+  Options<DeleteTimelinePeriodData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteTimelinePeriodResponse,
+    DeleteTimelinePeriodError,
+    Options<DeleteTimelinePeriodData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteTimelinePeriod({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update Timeline Period
+ *
+ * Rename a period, move its dates, or change its summary.
+ */
+export const updateTimelinePeriodMutation = (
+  options?: Partial<Options<UpdateTimelinePeriodData>>,
+): UseMutationOptions<
+  UpdateTimelinePeriodResponse,
+  UpdateTimelinePeriodError,
+  Options<UpdateTimelinePeriodData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateTimelinePeriodResponse,
+    UpdateTimelinePeriodError,
+    Options<UpdateTimelinePeriodData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateTimelinePeriod({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const getInvestigationTypeQueryKey = (
@@ -9232,6 +11239,36 @@ export const getWireOptions = (options: Options<GetWireData>) =>
     queryKey: getWireQueryKey(options),
   });
 
+export const exportWriteupPdfQueryKey = (
+  options: Options<ExportWriteupPdfData>,
+) => createQueryKey('exportWriteupPdf', options);
+
+/**
+ * Export Writeup Pdf
+ *
+ * The write-up as a PDF (Export sheet › Write-up for reading), stamped "Export as draft" while a check is open.
+ */
+export const exportWriteupPdfOptions = (
+  options: Options<ExportWriteupPdfData>,
+) =>
+  queryOptions<
+    ExportWriteupPdfResponse,
+    ExportWriteupPdfError,
+    ExportWriteupPdfResponse,
+    ReturnType<typeof exportWriteupPdfQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await exportWriteupPdf({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: exportWriteupPdfQueryKey(options),
+  });
+
 export const listWriteupsEndpointQueryKey = (
   options: Options<ListWriteupsEndpointData>,
 ) => createQueryKey('listWriteupsEndpoint', options);
@@ -9258,6 +11295,35 @@ export const listWriteupsEndpointOptions = (
       return data;
     },
     queryKey: listWriteupsEndpointQueryKey(options),
+  });
+
+export const getYourSafetyQueryKey = (options: Options<GetYourSafetyData>) =>
+  createQueryKey('getYourSafety', options);
+
+/**
+ * Get Your Safety
+ *
+ * Your safety: signs that the story raises the danger to the reporter or their sources, from the case's records,
+ * and the questions only the reporter can answer (their answers never reach this server). Shown apart from Red
+ * Flags; never blocks work.
+ */
+export const getYourSafetyOptions = (options: Options<GetYourSafetyData>) =>
+  queryOptions<
+    GetYourSafetyResponse,
+    GetYourSafetyError,
+    GetYourSafetyResponse,
+    ReturnType<typeof getYourSafetyQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getYourSafety({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getYourSafetyQueryKey(options),
   });
 
 export const listJobsEndpointQueryKey = (
@@ -9805,7 +11871,8 @@ export const newRecoveryKeyMutation = (
 /**
  * Capture Item
  *
- * A person captures what a monitor found: the same capture as pasting the link (ADR-0018).
+ * Capture one item: a page through the ordinary web capture (ADR-0018), a podcast episode by fetching its audio
+ * file and transcribing it. Answers with the whole screen.
  */
 export const captureItemMutation = (
   options?: Partial<Options<CaptureItemData>>,
@@ -9834,8 +11901,7 @@ export const captureItemMutation = (
 /**
  * Record Removal
  *
- * Record that a captured page was removed from its site: the capture is the copy that remains. The record is this
- * item, with when it was found gone and what the address answered.
+ * Record that something captured before is gone from its address (it answers 404 or 410), and when that was found.
  */
 export const recordRemovalMutation = (
   options?: Partial<Options<RecordRemovalData>>,
@@ -9863,8 +11929,6 @@ export const recordRemovalMutation = (
 
 /**
  * Skip Item
- *
- * Leave it uncaptured. It stays in the monitor's history, out of the queue.
  */
 export const skipItemMutation = (
   options?: Partial<Options<SkipItemData>>,
@@ -9891,9 +11955,38 @@ export const skipItemMutation = (
 };
 
 /**
+ * Undo Item
+ *
+ * Put a skipped item back in the queue.
+ */
+export const undoItemMutation = (
+  options?: Partial<Options<UndoItemData>>,
+): UseMutationOptions<
+  UndoItemResponse,
+  UndoItemError,
+  Options<UndoItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UndoItemResponse,
+    UndoItemError,
+    Options<UndoItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await undoItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Delete Monitor
  *
- * Stop following. What it found goes with it; pages already captured from it stay in the case.
+ * Stop following. What was captured from it stays in the case; its queue and versions go.
  */
 export const deleteMonitorMutation = (
   options?: Partial<Options<DeleteMonitorData>>,
@@ -9922,7 +12015,8 @@ export const deleteMonitorMutation = (
 /**
  * Update Monitor
  *
- * Change how often, the route, the name, pause or resume it, or accept the address it moved to.
+ * Change how often it is checked, its route (Direct or Tor), pause or resume it, or accept the address it moved
+ * to (a moved source is never followed by itself).
  */
 export const updateMonitorMutation = (
   options?: Partial<Options<UpdateMonitorData>>,
@@ -9948,53 +12042,25 @@ export const updateMonitorMutation = (
   return mutationOptions;
 };
 
-export const getMonitorItemsQueryKey = (
-  options: Options<GetMonitorItemsData>,
-) => createQueryKey('getMonitorItems', options);
-
 /**
- * Get Monitor Items
+ * Check Monitor
  *
- * Everything this monitor found, newest first; `state` narrows to new, captured or skipped.
+ * Check the source now instead of at its next time (the same polite, logged request).
  */
-export const getMonitorItemsOptions = (options: Options<GetMonitorItemsData>) =>
-  queryOptions<
-    GetMonitorItemsResponse,
-    GetMonitorItemsError,
-    GetMonitorItemsResponse,
-    ReturnType<typeof getMonitorItemsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getMonitorItems({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getMonitorItemsQueryKey(options),
-  });
-
-/**
- * Poll Monitor
- *
- * Look now, outside the schedule (one request, logged like any other).
- */
-export const pollMonitorMutation = (
-  options?: Partial<Options<PollMonitorData>>,
+export const checkMonitorMutation = (
+  options?: Partial<Options<CheckMonitorData>>,
 ): UseMutationOptions<
-  PollMonitorResponse,
-  PollMonitorError,
-  Options<PollMonitorData>
+  CheckMonitorResponse,
+  CheckMonitorError,
+  Options<CheckMonitorData>
 > => {
   const mutationOptions: UseMutationOptions<
-    PollMonitorResponse,
-    PollMonitorError,
-    Options<PollMonitorData>
+    CheckMonitorResponse,
+    CheckMonitorError,
+    Options<CheckMonitorData>
   > = {
     mutationFn: async (fnOptions) => {
-      const { data } = await pollMonitor({
+      const { data } = await checkMonitor({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -10011,7 +12077,7 @@ export const getVersionsQueryKey = (options: Options<GetVersionsData>) =>
 /**
  * Get Versions
  *
- * A watched page's versions, newest first, each with the lines that changed from the one before.
+ * Every version of a followed page's main text, newest first, with what changed from the one before.
  */
 export const getVersionsOptions = (options: Options<GetVersionsData>) =>
   queryOptions<
@@ -10107,6 +12173,122 @@ export const makeLeadFromNoteMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await makeLeadFromNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getPlatformChecksQueryKey = (
+  options?: Options<GetPlatformChecksData>,
+) => createQueryKey('getPlatformChecks', options);
+
+/**
+ * Get Platform Checks
+ *
+ * Each platform the app saves from, tried on its public test item: today, the last 14 days, the settings.
+ */
+export const getPlatformChecksOptions = (
+  options?: Options<GetPlatformChecksData>,
+) =>
+  queryOptions<
+    GetPlatformChecksResponse,
+    GetPlatformChecksError,
+    GetPlatformChecksResponse,
+    ReturnType<typeof getPlatformChecksQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPlatformChecks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPlatformChecksQueryKey(options),
+  });
+
+/**
+ * Change Platform Checks
+ *
+ * Turn the daily check on or off, the warning before a capture, or change a test item.
+ */
+export const changePlatformChecksMutation = (
+  options?: Partial<Options<ChangePlatformChecksData>>,
+): UseMutationOptions<
+  ChangePlatformChecksResponse,
+  ChangePlatformChecksError,
+  Options<ChangePlatformChecksData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ChangePlatformChecksResponse,
+    ChangePlatformChecksError,
+    Options<ChangePlatformChecksData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await changePlatformChecks({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const platformForUrlQueryKey = (options: Options<PlatformForUrlData>) =>
+  createQueryKey('platformForUrl', options);
+
+/**
+ * Platform For Url
+ *
+ * The platform a pasted link is on, and how it was at its last check: none when it is not one the app tries, or
+ * the warning is off.
+ */
+export const platformForUrlOptions = (options: Options<PlatformForUrlData>) =>
+  queryOptions<
+    PlatformForUrlResponse,
+    PlatformForUrlError,
+    PlatformForUrlResponse,
+    ReturnType<typeof platformForUrlQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await platformForUrl({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: platformForUrlQueryKey(options),
+  });
+
+/**
+ * Run Platform Checks
+ *
+ * Try every platform now (or one), as a background job; each request goes in the outbound log.
+ */
+export const runPlatformChecksMutation = (
+  options?: Partial<Options<RunPlatformChecksData>>,
+): UseMutationOptions<
+  RunPlatformChecksResponse,
+  RunPlatformChecksError,
+  Options<RunPlatformChecksData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RunPlatformChecksResponse,
+    RunPlatformChecksError,
+    Options<RunPlatformChecksData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await runPlatformChecks({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -11645,6 +13827,33 @@ export const rotateAppUserTokenMutation = (
   };
   return mutationOptions;
 };
+
+export const getSigningKeyQueryKey = (options?: Options<GetSigningKeyData>) =>
+  createQueryKey('getSigningKey', options);
+
+/**
+ * Get Signing Key
+ *
+ * This computer's evidence-pack signing key: its fingerprint, to give out with a pack, and when it was made.
+ */
+export const getSigningKeyOptions = (options?: Options<GetSigningKeyData>) =>
+  queryOptions<
+    GetSigningKeyResponse,
+    GetSigningKeyError,
+    GetSigningKeyResponse,
+    ReturnType<typeof getSigningKeyQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSigningKey({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSigningKeyQueryKey(options),
+  });
 
 export const settingsStatusQueryKey = (options?: Options<SettingsStatusData>) =>
   createQueryKey('settingsStatus', options);

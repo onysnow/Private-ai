@@ -75,19 +75,24 @@ class Settings(BaseSettings):
     capture_timeout_seconds: float = 45.0
     # What one capture may bring back, the page and everything it loads, before the rest is cut off.
     capture_max_megabytes: int = 100
-    # Following (ADR-0021): how long one poll may take, the most it reads, the pause between two requests to the same
-    # host, how many monitors one minute's tick polls, and the Tor the reporter runs (the app ships none).
-    follow_timeout_seconds: float = 20.0
-    follow_max_megabytes: int = 8
-    follow_host_gap_seconds: float = 2.0
-    follow_max_per_tick: int = 12
-    tor_socks_url: str = "socks5://127.0.0.1:9050"
+    # Following (ADR-0022): a monitor or capture set to the Tor route goes to the Tor the reporter runs on this computer.
+    tor_socks_url: str = "socks5h://127.0.0.1:9050"
+    # A capture's time proof (ADR-0025), off until a person asks: the time server that signs the capture's fingerprint
+    # (RFC 3161). Its root must be in app/trust/tsa/ for the token to be checked here.
+    capture_time_server: str = "https://freetsa.org/tsr"
+    # OCR quality gate: proposals read from a page less legible than this (mean Tesseract word confidence, 0-100;
+    # app/services/legibility.py) are held back from Decide, and wait in the reading room beside the page.
+    ocr_legibility_floor: float = 60.0
     # Audio and video (ADR-0020): the largest recording an upload takes, and the Whisper model that transcribes it on
     # this computer (fetched once at setup into the folder below; a read never downloads it). Language: empty detects it.
     max_media_bytes: int = 500 * 1024 * 1024
     transcription_model: str = "small"
     transcription_model_dir: str = "./data/models"
     transcription_language: str = ""
+    # Where the voice models are kept (ADR-0026; python -m app.services.voices fetch).
+    voices_model_dir: str = "./data/models/voices"
+    # Where the face detector's model is kept (fetched the first time faces are looked for; DECISIONS_LOG 7, call 4).
+    faces_model_dir: str = "./data/models/faces"
     enable_pdf_ocr: bool = True
     pdf_ocr_language: str = "eng"
     pdf_ocr_dpi: int = 200

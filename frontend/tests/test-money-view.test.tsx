@@ -326,6 +326,14 @@ describe('MoneyView', () => {
     expect(row).toHaveTextContent('01 Mar 2021 to Jun 2021');
   });
 
+  it('shows a payment known only by its end date as "by" that date', async () => {
+    const ended = {...LEDGER, transactions: LEDGER.transactions.map(t => t.id === 'p5' ? {...t, dateTime: null, dateEnd: '2021-06'} : t)};
+    mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': ended});
+    const {container} = wrap(<MoneyView investigationId="inv-1"/>);
+    await screen.findByText(/each just under the €10,000 line/);
+    await waitFor(() => expect([...container.querySelectorAll('tr')].find(r => r.textContent?.includes('Loop Two BV'))).toHaveTextContent('by Jun 2021'));
+  });
+
   it('shows the reason when the ledger cannot be read', async () => {
     mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {status: 500, body: {detail: 'ledger unavailable'}}});
     wrap(<MoneyView investigationId="inv-1"/>);

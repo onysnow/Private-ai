@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import logging
-
-from typing import TYPE_CHECKING, NoReturn
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, NoReturn
 
 from sqlalchemy.orm import Session
 
@@ -255,6 +255,13 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
         if job.attempts > 1 and _already_read(db, document_id):
             return "Already transcribed"
         return _check_watchlist_after_read(db, document_id, read_media_document(db, document_id, report))
+    # A HEIC or camera RAW photo is read through a viewable copy made on this computer (ADR-0021).
+    from app.services.photos import is_photo, read_photo_document
+
+    if stored_media is not None and is_photo(stored_media.filename):
+        if job.attempts > 1 and _already_read(db, document_id):
+            return "Already read"
+        return _check_watchlist_after_read(db, document_id, read_photo_document(db, document_id, report, job_id=job.id))
     # A retry of a read that stopped after its text was saved finishes the steps after it
     # instead of failing on "already read" (docs/project-notes/CRASH_RECOVERY.md). A new
     # reading job for a read document still fails: only a retry resumes.
@@ -283,24 +290,48 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
             if local_text and message:
                 message = f"{message}; OpenAleph found no text, so the text is the Workbench's own reading"
             # OpenAleph may have read a scan by OCR too: its pages are measured the same way.
+            _keep_picture_claims(db, document_id)
             message = _measure_legibility(db, document_id, report, message or "Document read")
             return _check_watchlist_after_read(db, document_id, message)
 
     report(5, "Reading the document")
     from app.jobs.records import JobStopped
-    from app.services.pdf_ocr import PAGE_PROGRESS, ReadingStopped
+    from app.models.domain import Source
+    from app.services.documents import FoundSoFar
+    from app.services.pdf_ocr import PAGE_PROGRESS, PAGE_TEXT, ReadingStopped
+
+    stored_doc = db.get(Document, document_id)
+    stored_source = db.get(Source, stored_doc.source_id) if stored_doc is not None else None
+    found = FoundSoFar(((stored_source.metadata_json or {}) if stored_source is not None else {}).get("part"))
+    where: dict[str, Any] = {}
+
+    def say() -> None:
+        words = f"Reading{' with OCR' if where['ocr'] else ''} · page {where['page']} of {where['total']}"
+        so_far = found.words()
+        report(5 + int(70 * where["page"] / max(where["total"], 1)), f"{words} · {so_far}" if so_far else words)
 
     def page_read(page_no: int, total: int, ocr: bool) -> None:
+        where.update(page=page_no, total=total, ocr=ocr)
         try:
-            report(5 + int(70 * page_no / max(total, 1)), f"Reading{' with OCR' if ocr else ''} · page {page_no} of {total}")
+            say()
         except JobStopped:
             raise ReadingStopped(STOPPED_READ) from None
 
+    def page_text(page_no: int, text: str) -> None:
+        found.add(page_no, text)
+        if where and found.words():
+            try:
+                say()
+            except JobStopped:
+                raise ReadingStopped(STOPPED_READ) from None
+
     token = PAGE_PROGRESS.set(page_read)
+    text_token = PAGE_TEXT.set(page_text)
     try:
         doc = db.get(Document, document_id) if resuming else extract_document(db, document_id)
     finally:
         PAGE_PROGRESS.reset(token)
+        PAGE_TEXT.reset(text_token)
     if doc is None:
         return "The document was deleted before it was read"
     if doc.extraction_status == "failed" and doc.extraction_error == STOPPED_READ:
@@ -318,7 +349,19 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
         else:
             message = (f"Document read; sending it to OpenAleph failed: {sync.error}" if sync.status == "failed"
                        else "Document read and sent to OpenAleph")
+    _keep_picture_claims(db, document_id)
     return _measure_legibility(db, document_id, report, message)
+
+
+def _keep_picture_claims(db: Session, document_id: str) -> None:
+    """A JPEG or PNG that was read: keep what the file claims about itself (app/services/photos.py). Never fails."""
+    from app.models.domain import Document
+    from app.services.image_reader import IMAGE_EXTENSIONS
+    from app.services.photos import record_claims
+
+    doc = db.get(Document, document_id)
+    if doc is not None and Path(doc.filename or "").suffix.lower() in IMAGE_EXTENSIONS:
+        record_claims(db, document_id)
 
 
 def _measure_legibility(db: Session, document_id: str, report: Report, message: str) -> str:
@@ -364,7 +407,36 @@ def _measure_legibility(db: Session, document_id: str, report: Report, message: 
                 chunk.ocr_legibility = value
         db.commit()
     done = sum(1 for v in measured.values() if v is not None)
-    return f"{message}; legibility measured on {done} of {len(pages)} scanned page{'s' if len(pages) != 1 else ''}"
+    held = hold_illegible(db, document_id)
+    tail = f"; {held} proposal{'s' if held != 1 else ''} from pages too hard to read held back for you to check by eye" if held else ""
+    return f"{message}; legibility measured on {done} of {len(pages)} scanned page{'s' if len(pages) != 1 else ''}{tail}"
+
+
+def hold_illegible(db: Session, document_id: str) -> int:
+    """The OCR quality gate: a proposal read from a page less legible than OCR_LEGIBILITY_FLOOR is held back from
+    Decide (status "held"), with the page's figure; it waits in the reading room, beside the page, where a person can
+    still accept it. Returns how many were held."""
+    from sqlalchemy import select
+
+    from app.core.time import utcnow_naive
+    from app.models.domain import DocumentChunk, ExtractionCandidate
+
+    floor = settings.ocr_legibility_floor
+    low = {c.id: c.ocr_legibility for c in db.scalars(select(DocumentChunk).where(DocumentChunk.document_id == document_id))
+           if c.ocr_legibility is not None and c.ocr_legibility < floor}
+    if not low:
+        return 0
+    held = 0
+    for candidate in db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == document_id,
+                                                                  ExtractionCandidate.review_status == "proposed")):
+        if candidate.chunk_id in low:
+            candidate.review_status = "held"
+            candidate.reviewer_note = (f"Held back: read by OCR from a page only {low[candidate.chunk_id]:.0f}% legible "
+                                       f"(under {floor:.0f}%). Check it against the page before using it.")
+            candidate.reviewed_at = utcnow_naive()
+            held += 1
+    db.commit()
+    return held
 
 
 def _already_read(db: Session, document_id: str) -> bool:
@@ -574,8 +646,59 @@ def capture_media_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     return collect_media(db, str(job.subject_id), report, read_document=read)
 
 
+FOLLOW_AUDIO = "follow_audio"
+FIND_VOICES = "find_voices"
+CHECK_PLATFORMS = "check_platforms"
+
+
+def check_platforms_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Does it work today? (WORKS_1): try each platform's public test item now, on a person's request."""
+    from app.services.platform_checks import BY_KEY, check, check_all
+
+    only = (job.payload or {}).get("platform")
+    if only in BY_KEY:
+        row = check(db, only, actor="you")
+        return {"message": f"{BY_KEY[only].name}: {row.detail}", "result": {"platform": only, "state": row.state}}
+    n = check_all(db, actor="you", report=report)
+    return {"message": f"{n} platforms tried", "result": {"platforms": n}}
+
+
+def find_voices_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Tell the voices of a transcribed recording apart (ADR-0026), on a person's request."""
+    from app.services.voices import find_in_document
+
+    return {"message": find_in_document(db, str(job.subject_id), report), "result": {"document_id": str(job.subject_id)}}
+
+
+def follow_audio_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Capture a followed podcast episode (ADR-0022): fetch its audio file, keep it as a recording of the case, then
+    transcribe it in a reading job of its own."""
+    from sqlalchemy import Engine
+
+    from app.db.session import build_session_factory
+    from app.jobs.records import create_job, execute_job
+    from app.models.following import MonitorItem
+    from app.services.following import fetch_audio
+
+    item = db.get(MonitorItem, str(job.subject_id))
+    if item is None:
+        return {"message": "The item was deleted before its audio was fetched", "result": {}}
+    report(5, "Fetching the episode's audio file")
+    document_id = fetch_audio(db, item, (job.payload or {}).get("actor"))
+    db.commit()
+    bind = db.get_bind()
+    factory = build_session_factory(bind if isinstance(bind, Engine) else bind.engine)
+    read_job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=job.investigation_id, subject_type="document",
+                          subject_id=document_id, runner=job.runner, payload={"parent_job_id": job.id})
+    execute_job(factory, read_job.id, HANDLERS)
+    return {"message": "Episode kept and sent to be transcribed", "result": {"document_id": document_id}}
+
+
 HANDLERS: dict[str, Handler] = {
     WEB_CAPTURE: web_capture_job,
+    FOLLOW_AUDIO: follow_audio_job,
+    FIND_VOICES: find_voices_job,
+    CHECK_PLATFORMS: check_platforms_job,
     CAPTURE_MEDIA: capture_media_job,
     OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,

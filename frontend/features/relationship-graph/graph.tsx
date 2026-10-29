@@ -18,7 +18,7 @@
 // relationship; clicking a party opens its dossier, a link its relationship.
 import dynamic from 'next/dynamic';
 import {useCallback, useMemo, useState} from 'react';
-import type {ReactElement, ReactNode} from 'react';
+import type {ReactElement} from 'react';
 
 import {ChartFrame, ContestedMark, FootStat, KeyRow, KeySection, LineSwatch, Segmented} from '../../components/charts/chart-frame';
 import {ConnectionGrid} from '../../components/connection-grid';
@@ -93,7 +93,7 @@ type Props = {
   /** Controls the panel adds to the frame's tools (e.g. showing reviewed duplicate copies). */
   extraTools?: ReactElement;
   /** A line the panel adds to the footer. */
-  footnote?: ReactNode;
+  footnote?: string;
   /** The investigation, for "How are these two connected?". */
   investigationId?: string;
   /** The reporter's tags on parties, by party id, for the tag layer (the panel reads them). */
@@ -170,13 +170,13 @@ export function Graph({relationships: allRelationships, entities, onNode, onEdge
       <select className="cf-tool" value={centre ?? ''} onChange={e => setFocus(e.target.value)} aria-label="Party at the centre">
         {[...all.parties].sort((a, b) => a.label.localeCompare(b.label)).map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
       </select></label>}
+    {/* Each family is its line and its count; the family's name, and what a press does, on reveal (Ony, 29 Oct). */}
     {familiesPresent.length > 1 && <div role="group" aria-label="Show links" style={{display: 'flex', flexWrap: 'wrap', gap: 6}}>
-      {/* Each filter is its family's line and count; the family's name is revealed (and is the button's name). */}
-      {familiesPresent.map(f => <Reveal key={f} tabbable={false} describe={false} detail={LINK[f].name}><button type="button" className="cf-chip" aria-pressed={!hidden.has(f)}
-        aria-label={`${LINK[f].name} · ${all.links.filter(l => l.family === f).length}`}
+      {familiesPresent.map(f => <Reveal key={f} tabbable={false} detail={<><b>{LINK[f].name}</b><span className="rv-row">Press to {hidden.has(f) ? 'show' : 'hide'} these links.</span></>}>
+        <button type="button" className="cf-chip" aria-pressed={!hidden.has(f)}
         onClick={() => setHidden(cur => { const next = new Set(cur); if (next.has(f)) next.delete(f); else next.add(f); return next; })}>
-        <span className="cf-chip-line" style={{width: 18, height: 3, background: LINK[f].colour, display: 'inline-block', borderRadius: 2}}/>
-        {all.links.filter(l => l.family === f).length}</button></Reveal>)}
+        <span className="cf-chip-line" aria-hidden="true" style={{width: 18, height: 3, background: LINK[f].colour, display: 'inline-block', borderRadius: 2}}/>
+        <span className="sr-only">{LINK[f].name}</span> {all.links.filter(l => l.family === f).length}</button></Reveal>)}
     </div>}
     <div role="group" aria-label="Layers" style={{display: 'flex', flexWrap: 'wrap', gap: 6}}>
       {([['tags', 'Your tags'], ['dates', 'Link dates']] as [Layer, string][]).map(([layer, name]) => <button key={layer} type="button" className="cf-chip"
@@ -211,16 +211,17 @@ export function Graph({relationships: allRelationships, entities, onNode, onEdge
     </KeySection>}
   </>;
 
-  // The counts show; the sentences (crossings, the year, how to use the drawing) are revealed on them.
   const footer = <>
-    <Reveal detail="Point at a party or link for its details; click to open it."><FootStat value={parties.length}>parties</FootStat></Reveal>
+    <FootStat value={parties.length}>parties</FootStat>
     <FootStat value={links.length}>links</FootStat>
     {contested > 0 && <FootStat value={contested}>contested</FootStat>}
     {unsupported > 0 && <FootStat value={unsupported}>not yet supported</FootStat>}
-    {crossings !== null && <Reveal detail={crossingsLine(crossings, parties.length)}><span data-testid="graph-crossings"><FootStat value={crossings}>{crossings === 1 ? 'crossing' : 'crossings'}</FootStat></span></Reveal>}
+    {/* The counts stay; the sentences behind them are on reveal. */}
+    {crossings !== null && <Reveal detail={<span data-testid="graph-crossings">{crossingsLine(crossings, parties.length)}</span>}><span><FootStat value={crossings}>crossing{crossings === 1 ? '' : 's'}</FootStat></span></Reveal>}
     {asOf !== null && <Reveal detail={`As of ${asOf}: ${allRelationships.length - relationships.length} of ${allRelationships.length} links had not started or had ended${undated ? `; ${undated} undated always shown` : ''}.`}>
-      <FootStat value={allRelationships.length - relationships.length}>{`not by ${asOf}`}</FootStat></Reveal>}
+      <span><FootStat value={`${relationships.length} of ${allRelationships.length}`}>as of {asOf}</FootStat></span></Reveal>}
     {footnote && <span>{footnote}</span>}
+    <Reveal label="Using the network" detail="Point at a party or link for its details; click to open it."><span aria-hidden="true">ⓘ</span></Reveal>
   </>;
 
   return <ChartFrame kind="network" title="Who is linked to whom" testId="relationship-network"

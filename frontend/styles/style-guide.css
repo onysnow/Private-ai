@@ -36,3 +36,36 @@
 .sg-f { font: 700 22px var(--font-read); color: var(--accent-2); }
 .sg-static { position: static !important; animation: none !important; }
 .sg-panel { max-width: 420px; }
+
+/* Following's parts as the style guide draws them (from the first Following screen), scoped to the guide. */
+.sg .fl-card { box-sizing: border-box; padding: 14px 16px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel); display: flex; flex-direction: column; gap: 10px; }
+.sg .fl-eyebrow { margin: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; font: 600 12px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
+.sg .fl-eyebrow b { color: var(--text); letter-spacing: 0; }
+.sg .fl-eyebrow > span:first-child { white-space: nowrap; }
+.sg .fl-kind { display: block; width: 20px; height: 20px; color: var(--accent-2); }
+.sg .fl-health { display: inline-block; width: 18px; text-align: center; font-size: 16px; line-height: 1; }
+.sg .fl-health.ok { color: var(--status-supported); }
+.sg .fl-health.amber { color: var(--accent-1); }
+.sg .fl-health.bad { color: var(--status-disputed); }
+.sg .fl-health.quiet { color: var(--text-muted); }
+.sg .fl-sources { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.sg .fl-sources button { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto auto; align-items: center; gap: 12px;
+.sg .fl-sources button:hover { border-color: var(--line); }
+.sg .fl-sources button.on { border-color: var(--accent-1); background: var(--surface-3); }
+.sg .fl-name { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-weight: 600; font-size: 16px; line-height: 1.3; }
+.sg .fl-badge { min-width: 26px; padding: 3px 8px; box-sizing: border-box; text-align: center; border-radius: 999px; background: var(--accent-1); color: var(--ground); font: 700 14px var(--font-mono); }
+.sg .fl-nums { font-size: 15px; color: var(--text-muted); }
+.sg .fl-nums b { color: var(--text); font: 600 19px var(--font-mono); }
+.sg .fl-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sg .fl-chips button { all: unset; cursor: pointer; padding: 5px 14px; border-radius: 999px; border: 1px solid var(--line); font-size: 14px; color: var(--text-muted); }
+.sg .fl-chips button.on { border-color: var(--accent-1); color: var(--accent-1); }
+.sg .fl-acts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.sg .fl-acts button, .sg .fl-all button { all: unset; cursor: pointer; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.sg .fl-acts button.p, .sg .fl-all button.p { background: var(--accent-1); border-color: var(--accent-1); color: var(--ground); }
+.sg .fl-acts button.danger { color: var(--status-disputed); }
+.sg .fl-acts button:disabled, .sg .fl-risk button:disabled, .sg .fl-acts button[aria-disabled='true'] { opacity: .45; cursor: default; }
+.sg .fl-alerts { margin: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.sg .fl-flag { padding: 2px 9px; border-radius: 999px; border: 1px solid currentColor; font: 600 12px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+.sg .fl-flag.amber { color: var(--accent-1); }
+.sg .fl-flag.bad { color: var(--status-disputed); }
+.sg .fl-flag.teal { color: var(--accent-2); }

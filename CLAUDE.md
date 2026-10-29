@@ -7,8 +7,11 @@ Read docs/project-notes/START_HERE.md first: it says where the work stands. The 
   folder, joined with `&&`. He uses Windows Command Prompt, where `;` does not separate commands.
   His repo is `C:\Users\Wigi\Documents\Private-ai`.
   Example: `cd /d C:\Users\Wigi\Documents\Private-ai && git push origin timeline-wip-cloud:timeline-wip`
-- **Mockups first:** he approves before the app changes. When he gives feedback, discuss the change
-  with him and edit only after he agrees.
+- **Don't wait on him (29 Oct 2026):** make each open decision on what is best for the app, build
+  it, and write the call and its reason in docs/project-notes/DECISIONS_LOG.md so he can read them
+  later. Mockups and screens follow the research and UX/UI docs (REDESIGN_RESEARCH.md, the
+  ui-simplification and source-intake research, the mockup folders); no approval round is needed
+  before building. When he gives feedback on something built, change it as he says.
 - **Execute instructions** rather than acknowledging them. No unrequested recommendations. Never
   re-raise something he ruled out.
 - **No assumptions:** say what was checked and what wasn't.

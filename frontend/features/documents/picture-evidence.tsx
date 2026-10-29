@@ -17,8 +17,9 @@ import {errorMessage} from '../../lib/api-client';
 import {investigationVisualCatalogQueryKey, listInvestigationEvidenceQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {createEvidenceEndpoint} from '../../lib/generated/sdk.gen';
 
-// The pictures the app shows (backend app/services/image_reader.py IMAGE_EXTENSIONS).
-const PICTURE_EXTENSIONS = ['.png', '.jpg', '.jpeg'];
+// The pictures the app shows (backend app/services/image_reader.py IMAGE_EXTENSIONS), and the HEIC and camera RAW
+// photos it shows through a viewable copy (app/services/photos.py PHOTO_EXTENSIONS, ADR-0021).
+const PICTURE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.heic', '.heif', '.dng', '.cr2', '.cr3', '.nef', '.nrw', '.arw', '.raf', '.rw2', '.pef', '.orf'];
 // A date as the timeline records one: a year, a month or a day.
 const PARTIAL_DATE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
 

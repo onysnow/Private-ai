@@ -373,7 +373,7 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
         {previewKind && openFlag ? <OpenFlag key={`peek-${openFlag.id}`} flag={openFlag} kind={previewKind} step={0} setStep={() => undefined} investigationId={investigationId}
           asking={false} setAsking={() => undefined} preview {...actionsFor(openFlag)}/>
           : flag && kind ? <OpenFlag key={flag.id} flag={flag} kind={kind} step={step} setStep={setStep} investigationId={investigationId}
-          asking={asking} setAsking={setAsking} {...actionsFor(flag)}/> : <p className="rb-quiet">{waiting ? '' : 'Choose a flag to read it in full.'}</p>}
+          asking={asking} setAsking={setAsking} onParty={id => setParty(p => (p === id ? '' : id))} filtered={party} {...actionsFor(flag)}/> : <p className="rb-quiet">{waiting ? '' : 'Choose a flag to read it in full.'}</p>}
       </section>
 
       <aside className="rb-before" aria-label="Before you call it">
@@ -383,9 +383,11 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
   </div>;
 }
 
-function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking, preview = false, onLead, onDismiss, onReopen}: {
+function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking, preview = false, onParty, filtered = '', onLead, onDismiss, onReopen}: {
   flag: RedFlagOut; kind: Kind; step: number; setStep: (f: (s: number) => number) => void; investigationId: string;
   asking: boolean; setAsking: (v: boolean) => void; preview?: boolean;
+  /** A party named in the picture filters the list to its flags (as the rings under the list do); again, shows all. */
+  onParty?: (id: string) => void; filtered?: string;
   onLead: () => Promise<void> | void; onDismiss: (reason: string) => Promise<void> | void; onReopen: () => Promise<void> | void;
 }): ReactElement {
   const ind = flag.indicator;
@@ -408,7 +410,7 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
     </div>
     <h3>{ind?.name ?? flag.indicator_id}</h3>
     <p className="rb-summary"><GlossaryText text={flag.summary}/></p>
-    <Picture flag={flag} investigationId={investigationId}/>
+    <Picture flag={flag} investigationId={investigationId} onParty={onParty} filtered={filtered}/>
     <div className="rb-ladder-row">
       <section className="rb-ladder" aria-label="Level ladder: what would raise it">
         <p className="rb-eyebrow">Level ladder · what would raise it</p>
@@ -455,7 +457,7 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
 }
 
 /** A small picture of what the flag rests on: the payments for a band rule, the loop for a cycle, the chain otherwise. */
-function Picture({flag, investigationId}: {flag: RedFlagOut; investigationId: string}): ReactElement {
+function Picture({flag, investigationId, onParty, filtered = ''}: {flag: RedFlagOut; investigationId: string; onParty?: (id: string) => void; filtered?: string}): ReactElement {
   const family = (flag.facts as {family?: string})?.family;
   const ledger = useQuery({...getInvestigationFinancialFlowsOptions({path: {investigation_id: investigationId}}), enabled: family === 'count_in_band'});
   if (family === 'count_in_band') {
@@ -465,24 +467,32 @@ function Picture({flag, investigationId}: {flag: RedFlagOut; investigationId: st
     return <Payments pays={pays}/>;
   }
   const names = flag.parties.map(p => p.name);
+  // Each party a button when the board can filter by it: its flags only, or all again.
+  const who = (i: number): ReactElement => {
+    const p = flag.parties[i];
+    if (!p || !onParty) return <b>{names[i]}</b>;
+    const on = filtered === p.id;
+    return <Reveal tabbable={false} detail={on ? 'Show every flag again' : `Show only ${p.name}’s flags`}>
+      <button type="button" className="rb-name" aria-pressed={on} onClick={() => onParty(p.id)}>{p.name}</button></Reveal>;
+  };
   if (family === 'shared_property') {
     // Two (or more) parties and the one detail they share, with no link drawn between them: none is in the records.
     const facts = flag.facts as {kind?: string; value?: string; spellings?: string[]};
     const others = (facts.spellings ?? []).filter(v => v !== facts.value);
     return <figure className="rb-picture rb-shared" aria-label={`${names.join(' and ')} share the ${facts.kind ?? 'detail'} ${facts.value ?? ''}`}>
       <figcaption><Reveal detail="No link joins them in the records."><span>What they share</span></Reveal></figcaption>
-      <p className="rb-shared-row">{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> · </i>}<b>{n}</b></span>)}</p>
+      <p className="rb-shared-row">{names.map((_n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> · </i>}{who(i)}</span>)}</p>
       <p className="rb-shared-value"><small>{facts.kind ?? 'detail'}</small> “{facts.value}”{others.length > 0 && <i> also written “{others.join('”, “')}”</i>}</p>
     </figure>;
   }
   if (family === 'cycle') return <figure className="rb-picture rb-loop" aria-label={`A loop: ${names.join(' → ')} → ${names[0]}`}>
     <figcaption><span>The loop it rests on</span></figcaption>
-    <p>{names.map((n, i) => <span key={i}><b>{n}</b> → </span>)}<b>{names[0]}</b> ↺</p>
+    <p>{names.map((_n, i) => <span key={i}>{who(i)} → </span>)}<b>{names[0]}</b> ↺</p>
   </figure>;
   return <figure className="rb-picture rb-chain" aria-label={`The parties it rests on: ${names.join(', ')}`}>
     <figcaption><span>The parties it rests on</span>{unshown(flag) > 0 && <Reveal detail={`${unshown(flag)} link${unshown(flag) === 1 ? '' : 's'} not yet shown`}>
       <small className="rb-rests">○ {unshown(flag)}</small></Reveal>}</figcaption>
-    <p>{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}<b>{n}</b></span>)}</p>
+    <p>{names.map((_n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}{who(i)}</span>)}</p>
   </figure>;
 }
 
@@ -579,7 +589,7 @@ function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
         </g>;
       })}
     </svg>
-    <p className="rb-pay-focus" aria-live="polite"><b>{sign}{cur.amount.toLocaleString('en-GB')}{sign ? '' : ` ${currency}`}</b> on {day(cur.dateTime!)} · {cur.from} → {cur.to}
+    <p className="rb-pay-focus" aria-live="polite"><b>{sign}{cur.amount.toLocaleString('en-GB')}{sign ? '' : ` ${currency}`}</b> on {day(cur.dateTime!)}{cur.dateEnd ? ` to ${day(cur.dateEnd)}` : ''} · {cur.from} → {cur.to}
       {' '}<StatusChip status={CERTAINTY_STATUS[cur.certainty]} label={cur.evidence ? `${CERTAINTY_WORD[cur.certainty]} · ${cur.evidence}` : CERTAINTY_WORD[cur.certainty]} focusable/></p>
   </figure>;
 }

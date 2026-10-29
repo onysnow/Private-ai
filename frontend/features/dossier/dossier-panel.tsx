@@ -49,7 +49,8 @@ import type {ReconciliationDecision, ReconciliationRecordType} from './reconcili
 // The entity form is loaded on demand so it stays out of the page's first load.
 const EntityForm = dynamic(() => import('../../components/entity-form').then(m => m.EntityForm), {ssr: false, loading: () => <p className="muted">Loading form…</p>});
 
-type Props = {investigationId: string};
+/** `entityId`: the dossier to show, as the inspector slot's trail names it; without it, the latest request is answered. */
+type Props = {investigationId: string; entityId?: string};
 
 /** How a relationship's attached evidence was reviewed, counted by stance.
  * A compact graph edge carries an aggregate advisory without these counts. */
@@ -72,7 +73,7 @@ function evidenceReviewCounts(r: EntityRelationshipOut): string | null {
   return Object.entries(r.advisory.relationship_evidence_review_counts).filter(([, count]) => Number(count) > 0).map(([stance, count]) => `${stance} ${count}`).join(' · ');
 }
 
-export function DossierPanel({investigationId}: Props): ReactElement | null {
+export function DossierPanel({investigationId, entityId: shownId}: Props): ReactElement | null {
   const queryClient = useQueryClient();
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
   const openClaim = useWorkbenchStore(state => state.openClaim);
@@ -81,7 +82,7 @@ export function DossierPanel({investigationId}: Props): ReactElement | null {
   const setEntityId = useWorkbenchStore(state => state.setEntityId);
   const asked = useWorkbenchStore(state => state.dossier);
   // The entity whose dossier is shown (as asked for; a merged alias answers with its surviving record).
-  const [openId, setOpenId] = useState('');
+  const [openId, setOpenId] = useState(shownId ?? '');
   const [editingEntity, setEditingEntity] = useState(false);
   const [mergePreviews, setMergePreviews] = useState<Record<string, CanonicalMergePreviewOut>>({});
   const [pendingConflict, setPendingConflict] = useState<PendingConflict | null>(null);
@@ -94,17 +95,17 @@ export function DossierPanel({investigationId}: Props): ReactElement | null {
   const reconciliationQuery = useQuery({...entityPostMergeReconciliationOptions({path: {entity_id: activeId}}), enabled: Boolean(activeId)});
 
   // A new case starts with no dossier open.
-  useEffect(() => { setOpenId(''); setMergePreviews({}); setEditingEntity(false); }, [investigationId]);
+  useEffect(() => { setOpenId(shownId ?? ''); setMergePreviews({}); setEditingEntity(false); }, [investigationId, shownId]);
 
   // Each request to open a dossier is answered once.
   const answered = useRef(0);
   useEffect(() => {
-    if (!asked || asked.serial === answered.current) return;
+    if (shownId !== undefined || !asked || asked.serial === answered.current) return;
     answered.current = asked.serial;
     setMergePreviews({});
     setEditingEntity(false);
     setOpenId(asked.entityId);
-  }, [asked]);
+  }, [asked, shownId]);
 
   // A dossier asked for by a merged alias answers with the surviving record:
   // the selected entity follows it.

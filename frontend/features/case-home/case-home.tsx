@@ -45,6 +45,7 @@ import {HOLD_MS, useDecisions} from './use-decisions';
 import {useWheelStep} from './wheel-step';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AiStrip} from '../ai/ai-strip';
+import {SafetyNotice} from '../safety/your-safety';
 
 const CLAIM_STATUS: Record<string, ClaimStatus> = {
   supported: 'supported', confirmed: 'supported', disputed: 'disputed', rejected: 'ruled_out', lead: 'unshown', unverified: 'unshown',
@@ -162,6 +163,14 @@ function CaseQuestion({investigation}: {investigation: InvestigationOut}): React
   </div>;
 }
 
+/** What the money figure counts: where it starts, how many payments, and every other currency with its own sum
+ *  (one figure never adds currencies together, and none is hidden). */
+export function moneyCaption(m: {starting_payers?: number; payments: number; others: {currency: string; amount: number}[]}): string {
+  const n = m.starting_payers ?? 0;
+  const base = `money traced from ${n} starting payer${n === 1 ? '' : 's'} · ${m.payments} payment${m.payments === 1 ? '' : 's'}`;
+  return m.others.length ? `${base} · also ${m.others.map(o => money(o.amount, o.currency)).join(', ')}` : base;
+}
+
 /** The strip's marks for what a number counts: a person to decide, a coin, a calendar, a page. */
 function StripIcon({name}: {name: 'person' | 'coin' | 'calendar' | 'page'}): ReactElement {
   const d: Record<typeof name, ReactNode> = {
@@ -187,10 +196,10 @@ function StandingStrip({investigationId}: {investigationId: string}): ReactEleme
     {cell('dis', s?.claims.disputed ?? '·', 'claims disputed', '/check#claim-verification', '✕', 'bad')}
     {cell('uns', s?.claims.unshown ?? '·', 'not yet shown', '/check#claim-verification', '○')}
     {cell('dec', s?.to_decide ?? '·', 'to decide · need a person', '/decide', <StripIcon name="person"/>, 'need')}
-    {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? `money traced from ${s.money.from_sources ?? 0} source${s.money.from_sources === 1 ? '' : 's'} · ${s.money.payments} payment${s.money.payments === 1 ? '' : 's'}` : 'money traced', '/see#money-flows', <StripIcon name="coin"/>)}
+    {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? moneyCaption(s.money) : 'money traced', '/see#money-flows', <StripIcon name="coin"/>)}
     {cell('yrs', s?.timeline.from ? (s.timeline.from === s.timeline.to ? s.timeline.from : `${s.timeline.from}–${s.timeline.to?.slice(2)}`) : '—',
       s ? `${s.timeline.events} events · ${continuousYears(s.timeline.years).length} years` : 'events', '/see#timeline', <StripIcon name="calendar"/>)}
-    {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread` : 'documents', '/bring-in#document-ingestion', <StripIcon name="page"/>)}
+    {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread${s.documents.failed ? ` · ${s.documents.failed} could not be read` : ''}` : 'documents', '/bring-in#document-ingestion', <StripIcon name="page"/>)}
   </ul>;
 }
 
@@ -343,7 +352,7 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
           <button type="button" className={`ch-flag ch-flag-${f.level}`} onClick={() => openFlag(f.id)}>
             <span className="ch-flag-top"><LevelChip level={f.level}/>{fresh && <span className="ch-new" aria-hidden="true"/>}</span>
             <b>{f.indicator?.name ?? f.indicator_id}</b>
-            <span className="ch-flag-parties">{f.summary && f.level !== 'textbook' ? f.summary : flagChain(f.parties, /circular|loop/i.test(f.indicator?.name ?? ''))}</span>
+            <span className="ch-flag-parties">{f.summary || flagChain(f.parties, /circular|loop/i.test(f.indicator?.name ?? ''))}</span>
             {innocent.length > 0 && f.level === 'textbook' && <span className="ch-innocent"><em>Could be innocent</em>{innocent[0]}
               {innocent.length > 1 && <span className="ch-more"> {innocent.length - 1} more ›</span>}</span>}
           </button></Reveal>;
@@ -581,6 +590,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
       <CaseQuestion investigation={investigation}/>
       <StandingStrip investigationId={id}/>
     </RainPane>
+    {!preview && <SafetyNotice investigationId={investigation.id} onOpen={() => router.push(caseHref('/keep#safety-data', investigation.id))}/>}
     <div className="ch-grid">
       <div className="ch-col"><BringIn investigationId={id}/><CheckModule investigationId={id}/></div>
       <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id} markVisit={!preview}/></div>

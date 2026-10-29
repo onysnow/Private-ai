@@ -96,21 +96,50 @@ html[data-motion='calm'] .sd-pulse .sd-line { animation: none; border-top-color:
 .sd[data-checking] .sd-tiles dd, .sd[data-checking] .sd-count { opacity: .6; }
 @media (max-width: 1100px) { .sd { height: 100%; overflow: auto; } .sd-grid { grid-template-columns: 1fr; } .sd-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sd-diagram { grid-template-columns: 1fr; gap: 10px; } }
 
-/* What each service is now sits in its hover card (keyboard and touch reach it too), not in a CSS-only hover. */
+.sd-box > span:not(.sd-state) { display: none; }
+.sd-service:hover .sd-box > span:not(.sd-state), .sd-box:focus-visible > span:not(.sd-state) { display: block; }
 .sd-services { align-content: start; }
 .sd-map { overflow: hidden; }
 @media (max-width: 1100px) { .sd-map { overflow: visible; } .sd-rows { max-height: 60vh; } }
 
-/* 29 Oct rule: locations, modes and log details on reveal; the marks and figures left are drawn larger. */
-.sd-store { grid-template-columns: 26px minmax(0, 1fr); column-gap: 8px; align-items: center; }
-.sd-store > .sd-mark { grid-row: 1 / span 3; font-size: 18px; text-align: center; }
-.sd-mark-ai { font: 700 12px var(--font-mono); color: var(--ai-mark); border: 1.5px solid var(--ai-mark); border-radius: 6px; padding: 1px 3px; }
-.sd-inbk { color: var(--text-muted); }
-.sd-state { justify-self: start; width: 20px; height: 20px; padding: 0; display: inline-grid; place-items: center; font: 700 12px var(--font-mono); letter-spacing: 0; }
-.sd-failed { color: var(--status-disputed); font-weight: 600; }
-.sd-card h3 { font-size: 18px; }
-.sd-foot { font-size: 14px; }
-/* Access › server status: one row of names, each value on reveal. */
-.sec-status { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
-.sec-chip { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 12.5px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
-.sec-refused { color: var(--status-disputed); }
+/* Your safety (research §13): teal (accent-2) frame, never the flag reds; the alarm colour only for a Textbook sign. */
+.sd-right { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.sd-right > .sd-log { flex: 1 1 0; min-height: 160px; overflow: hidden; }
+.ys { flex: 0 1 auto; max-height: 62%; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border: 1px dashed color-mix(in srgb, var(--accent-2) 55%, transparent); }
+.ys-eyebrow { color: var(--accent-2); }
+.ys-notice { margin: 0; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--status-disputed); background: color-mix(in srgb, var(--status-disputed) 12%, transparent); font-size: 13px; }
+.ys-notice b { color: var(--status-disputed); font: 700 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
+.ys-notice span { color: var(--text-muted); }
+.ys-notice.slim { margin: 0 0 10px; }
+.ys-signs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ys-signs li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.ys-id { font: 700 16px var(--font-mono); color: var(--accent-1); padding-top: 0; text-align: center; }
+.ys-name { margin: 0; font-weight: 600; font-size: 13.5px; }
+.ys-ev { margin: 2px 0 0; font-size: 12.5px; color: var(--text-muted); }
+.ys-signs details { margin-top: 3px; font-size: 12px; color: var(--text-muted); }
+.ys-signs summary { cursor: pointer; color: var(--accent-2); }
+.ys-signs details p { margin: 3px 0 0; }
+.ys-src { font-style: italic; }
+.ys-level { align-self: start; padding: 2px 8px; border-radius: 999px; border: 1px dashed var(--line); font: 600 10.5px var(--font-mono); color: var(--text-muted); white-space: nowrap; }
+.ys-ask { margin: 4px 0 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; }
+.ys-ask legend { font: 600 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+.ys-ask legend span { text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 6px; }
+.ys-q { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.ys-q p { margin: 0; flex: 1 1 220px; font-size: 13px; }
+.ys-q > span { display: inline-flex; gap: 4px; }
+.ys-q label { cursor: pointer; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; }
+.ys-q label.on { border-color: var(--accent-2); color: var(--accent-2); }
+.ys-q label:focus-within { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.ys-q input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ys-q small { flex-basis: 100%; color: var(--text-muted); font-size: 12px; }
+.ys-guides { display: flex; flex-wrap: wrap; gap: 6px; }
+.ys-open { margin: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12.5px; color: var(--text-muted); }
+.ys-plan { display: flex; flex-direction: column; gap: 6px; }
+.ys-plan label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-muted); }
+.ys-plan textarea { font: 13px var(--font-ui); color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; resize: vertical; }
+/* As drawn: Your safety and the log fill the right side top to bottom; the Keep cards sit under the map. */
+.sd-grid:has(> .sd-right) .sd-right { grid-column: 2; grid-row: 1 / span 2; }
+.sd-grid:has(> .sd-right) .sd-cards { grid-column: 1; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; }
+.sd-grid:has(> .sd-right) .sd-card p:not(.sd-eyebrow):not(.sd-warn):not(.sd-kept) { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ys { max-height: 58%; }
+@media (max-width: 1100px) { .sd-grid:has(> .sd-right) .sd-right, .sd-grid:has(> .sd-right) .sd-cards { grid-column: 1; grid-row: auto; } .ys { max-height: none; } }

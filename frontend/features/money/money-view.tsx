@@ -380,7 +380,7 @@ function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
         const on = lit.has(t.id);
         return <tr key={t.id} className={`${on ? 'lit' : ''}${flagged.has(t.id) ? ' flagged' : ''}${traced.has(t.id) ? ' traced' : ''}`} onMouseEnter={() => onLight(t.id, from + i)}
           aria-current={on ? 'true' : undefined}>
-          <td>{day(t.dateTime ?? null)}{t.dateEnd ? ` to ${day(t.dateEnd)}` : ''}</td><td>{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>{t.dateTime ? day(t.dateTime) : t.dateEnd ? `by ${day(t.dateEnd)}` : day(null)}{t.dateTime && t.dateEnd ? ` to ${day(t.dateEnd)}` : ''}</td><td>{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
           <td><StatusChip status={c.status} label={c.word}/></td>
           <td>{t.locator ?? <span className="mn-muted">none attached</span>}</td>
           {full && <td>{t.statedPurpose ?? <span className="mn-muted">none stated</span>}</td>}
@@ -425,7 +425,7 @@ function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[
         return <g key={f.id} className="mn-bracket"><path d={`M${Math.min(...xs) - 4},${top + 8}V${top}H${Math.max(...xs) + 4}V${top + 8}`}/></g>;
       })}
       {dated.map(t => <rect key={t.id} x={x(time(t.dateTime!)) - 3} width={6} y={H - B - h(t.amount)} height={h(t.amount)}
-        className={`mn-bar mn-bar-${t.certainty}${lit.has(t.id) ? ' lit' : ''}`}><title>{day(t.dateTime ?? null)} · {t.from} → {t.to} · {amountText(t.amount, currency)}</title></rect>)}
+        className={`mn-bar mn-bar-${t.certainty}${lit.has(t.id) ? ' lit' : ''}`}><title>{day(t.dateTime ?? null)}{t.dateEnd ? ` to ${day(t.dateEnd)}` : ''} · {t.from} → {t.to} · {amountText(t.amount, currency)}</title></rect>)}
       {dated.filter(t => t.amount >= 10 * (line ?? 10000)).map(t => <text key={`v${t.id}`} x={x(time(t.dateTime!)) + 6} y={H - B - h(t.amount) + 8} className="mn-bar-value">{amountText(t.amount, currency)}</text>)}
     </svg>
     <p className="mn-muted mn-axis-note"><Reveal detail={`Bar height: amount, on a log scale${flags.length ? '' : ` · no structuring flag on these ${currency} payments`}`}><span>log scale</span></Reveal></p>

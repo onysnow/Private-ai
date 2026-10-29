@@ -4,7 +4,7 @@ segment, words, their times and how sure the machine was, and the parts with no 
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -12,8 +12,29 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import authorize_request_resource
 from app.core.config import settings
 from app.db.session import get_db
+from app.core.authorization import scope_for_request
+from app.models.derived import DerivedFile
 from app.models.domain import Document, DocumentMedia, TranscriptSegment
-from app.schemas.responses import ErrorOut, TranscriptOut
+from app.schemas.api import CleanIn, ClipCreate, PhotoCopyIn, RedactIn, SyncIn, VoiceName
+from app.schemas.responses import (
+    BackgroundJobOut,
+    DerivedFileOut,
+    ErrorOut,
+    FacesOut,
+    PhotoOut,
+    RedactCompareOut,
+    RedactionOut,
+    SoundOut,
+    SyncOut,
+    TranscriptCompareRowOut,
+    TranscriptOut,
+    ValidationErrorOut,
+    VoicesOut,
+    file_response,
+)
+from app.services import derived_files, media_derived, publisher_transcript, voices
+from app.services.derived_files import CaseGone
+from app.services.native import NativeUnavailable
 from app.services.security import resolve_storage_root
 from app.services.transcription import UNSURE_BELOW, is_media, media_type
 
@@ -56,10 +77,355 @@ def get_document_transcript(document_id: str, db: Session = Depends(get_db)) -> 
     if media is None:
         raise HTTPException(404, "This recording has not been transcribed yet")
     segments = db.scalars(select(TranscriptSegment).where(TranscriptSegment.document_id == row.id).order_by(TranscriptSegment.ordinal))
+    publisher, parts = publisher_transcript.extras(db, row)
     return {
+        "publisher": publisher, "parts": parts,
         "document_id": row.id, "kind": media.kind, "duration": media.duration, "streams": media.streams,
         "outline": media.outline, "outline_step": media.outline_step, "transcript": media.transcript,
-        "unsure_below": UNSURE_BELOW,
+        "unsure_below": UNSURE_BELOW, "voices": voices.serialize(media),
         "segments": [{"id": s.id, "chunk_id": s.chunk_id, "ordinal": s.ordinal, "start": s.start, "end": s.end, "kind": s.kind,
                       "text": s.text, "words": s.words, "speaker": s.speaker} for s in segments],
     }
+
+
+def _segments(db: Session, document_id: str) -> list[dict[str, Any]]:
+    return [{"id": s.id, "start": s.start, "end": s.end, "kind": s.kind, "text": s.text, "speaker": s.speaker}
+            for s in db.scalars(select(TranscriptSegment).where(TranscriptSegment.document_id == document_id)
+                                .order_by(TranscriptSegment.ordinal))]
+
+
+@router.get("/documents/{document_id}/transcript/compare", response_model=list[TranscriptCompareRowOut], responses={
+    404: {"model": ErrorOut, "description": "No such document, or no publisher's transcript to compare with"},
+    415: {"model": ErrorOut}})
+def compare_transcripts(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Our transcript beside the publisher's, part by part; the words that differ are marked on both sides."""
+    row = _recording(db, document_id)
+    publisher, _parts = publisher_transcript.extras(db, row)
+    if not publisher or not publisher.get("cues"):
+        raise HTTPException(404, "This recording has no publisher's transcript to compare with")
+    return publisher_transcript.compare(_segments(db, row.id), publisher["cues"])
+
+
+@router.get("/documents/{document_id}/derived", response_model=list[DerivedFileOut], responses={404: {"model": ErrorOut}})
+def list_derived(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Every file made from this document, oldest first, with its edit-trail row."""
+    if db.get(Document, document_id) is None:
+        raise HTTPException(404, "Document not found")
+    rows = db.scalars(select(DerivedFile).where(DerivedFile.document_id == document_id).order_by(DerivedFile.created_at))
+    return [derived_files.serialize(r) for r in rows]
+
+
+def _made(fn: Any) -> Any:
+    try:
+        return derived_files.serialize(fn())
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except CaseGone as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@router.post("/documents/{document_id}/derived/cleaned", response_model=DerivedFileOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "Not a recording that has been read, or steps that cannot be used"},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def make_cleaned_copy(document_id: str, request: Request, body: CleanIn | None = None, db: Session = Depends(get_db)) -> Any:
+    """A 16 kHz mono copy for listening only: with no steps given, the hum taken out and light noise reduction; with
+    steps, those (hum, room noise, loudness), its loudness before and after kept in the trail. The recording itself is
+    not changed; the copy is a new file with its edit-trail row."""
+    from app.services import media_sound
+
+    row = _recording(db, document_id)
+    actor = scope_for_request(request).actor_id
+    if body is None:
+        return _made(lambda: media_derived.cleaned_copy(db, row, actor=actor))
+    return _made(lambda: media_sound.clean(db, row, hum=body.hum, noise=body.noise, loudness_target=body.loudness_target, actor=actor))
+
+
+@router.post("/documents/{document_id}/derived/clip", response_model=DerivedFileOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The input does not match the route, or the part is outside the recording"}})
+def make_clip(document_id: str, body: ClipCreate, request: Request, db: Session = Depends(get_db)) -> Any:
+    """The part from `start` to `end` seconds kept as its own WAV file, cut from the original (or the cleaned copy)."""
+    row = _recording(db, document_id)
+    return _made(lambda: media_derived.clip(db, row, body.start, body.end, actor=scope_for_request(request).actor_id,
+                                            from_cleaned=body.from_cleaned))
+
+
+@router.post("/documents/{document_id}/voices", response_model=BackgroundJobOut, status_code=202, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut},
+    409: {"model": ErrorOut, "description": "Not transcribed yet, or the voices are already being found"},
+    503: {"model": ErrorOut, "description": "The voice models are not on this computer"}})
+async def find_voices(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Tell the voices of a transcribed recording apart, on this computer (ADR-0026). Answers at once with the job.
+    Names given earlier are cleared, and kept in the history."""
+    from app.api.routes_documents import _submit_or_record_failure
+    from app.jobs.handlers import FIND_VOICES
+    from app.jobs.records import create_job, serialize_job
+    from app.jobs.runner import job_runner
+    from app.models.domain import BackgroundJob
+
+    row = _recording(db, document_id)
+    if db.get(DocumentMedia, row.id) is None:
+        raise HTTPException(409, "This recording has not been transcribed yet")
+    why = voices.available()
+    if why:
+        raise HTTPException(503, why)
+    running = db.scalar(select(BackgroundJob.id).where(BackgroundJob.kind == FIND_VOICES, BackgroundJob.subject_id == row.id,
+                                                       BackgroundJob.status.in_(("queued", "running"))))
+    if running:
+        raise HTTPException(409, "The voices of this recording are already being found")
+    job = create_job(db, kind=FIND_VOICES, investigation_id=row.investigation_id, subject_type="document", subject_id=row.id,
+                     runner=job_runner(request).mode, message="Waiting to listen for voices")
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    return serialize_job(db.get(BackgroundJob, job.id) or job)
+
+
+@router.patch("/documents/{document_id}/voices/{voice}", response_model=VoicesOut, responses={
+    404: {"model": ErrorOut, "description": "No such recording or voice"}, 415: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The party is not in this case"}})
+def name_voice(document_id: str, voice: str, body: VoiceName, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Name this voice (a person only; the machine never names a voice), or clear its name. The earlier name is kept
+    in the history. Never applied to another recording."""
+    row = _recording(db, document_id)
+    try:
+        voices.name(db, row.id, voice, name=body.name, entity_id=body.entity_id, actor=scope_for_request(request).actor_id)
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return voices.serialize(db.get(DocumentMedia, row.id))
+
+
+@router.get("/derived-files/{derived_file_id}/file", response_class=FileResponse, responses={
+    200: {"content": {"audio/wav": {}, "image/jpeg": {}, "application/pdf": {}}, "description": "The derived file as it was hashed"},
+    404: {"model": ErrorOut}})
+def get_derived_file(derived_file_id: str, db: Session = Depends(get_db)) -> Any:
+    """A file made from a case file, as it was kept and hashed (its SHA-256 is on its trail row)."""
+    row = db.get(DerivedFile, derived_file_id)
+    if row is None:
+        raise HTTPException(404, "Derived file not found")
+    root = resolve_storage_root(settings.document_storage_dir).resolve()
+    path = Path(row.storage_path).resolve()
+    if not path.is_relative_to(root) or not path.is_file():
+        raise HTTPException(404, "The file is missing from this computer")
+    return FileResponse(path, media_type=row.mime_type, filename=path.name.split("_", 1)[-1], content_disposition_type="inline",
+                        headers={"X-Content-SHA256": row.sha256, "X-Content-Type-Options": "nosniff",
+                                 "Content-Security-Policy": "default-src 'none'"})
+
+
+def _picture_document(db: Session, document_id: str) -> Document:
+    from app.services.image_reader import is_picture_name
+
+    row = db.get(Document, document_id)
+    if row is None:
+        raise HTTPException(404, "Document not found")
+    if not is_picture_name(row):
+        raise HTTPException(415, "This document is not a photo or a picture")
+    return row
+
+
+@router.get("/documents/{document_id}/photo", response_model=PhotoOut, responses={404: {"model": ErrorOut}, 415: {"model": ErrorOut}})
+def get_photo(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """What the photo claims about itself and what the machine proposes about it (mockup MEDIA_1)."""
+    from app.services import photo_tools
+
+    return photo_tools.photo_view(db, _picture_document(db, document_id))
+
+
+@router.post("/documents/{document_id}/faces", response_model=FacesOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ErrorOut},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def find_photo_faces(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Where a detector finds faces in the photo as shown. Nothing names, matches or groups a face. The detector's
+    model (232 KB) is fetched the first time, pinned and written to the outbound log."""
+    from app.services import photo_tools
+
+    row = _picture_document(db, document_id)
+    try:
+        faces = photo_tools.find_faces(photo_tools.base_bytes(db, row, None))
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except photo_tools.ToolRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return {"faces": faces, "model": photo_tools.FACE_MODEL_NAME, "model_sha256": photo_tools.FACE_MODEL[2]}
+
+
+@router.post("/documents/{document_id}/derived/photo", response_model=DerivedFileOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The copy cannot be made as asked, said why"},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def make_photo_copy(document_id: str, body: PhotoCopyIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """A copy of the photo with faces blurred, metadata removed, cropped, an area redacted (with its reason) or turned,
+    made from the photo as shown or from another copy. The photo itself is never written."""
+    from app.services import photo_tools
+
+    row = _picture_document(db, document_id)
+    parent = db.get(DerivedFile, body.from_id) if body.from_id else None
+    if body.from_id and parent is None:
+        raise HTTPException(404, "No such copy")
+    try:
+        return derived_files.serialize(photo_tools.make_copy(db, row, body.operation, body.params, parent=parent,
+                                                             actor=scope_for_request(request).actor_id))
+    except photo_tools.ToolRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except CaseGone as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@router.get("/documents/{document_id}/sound", response_model=SoundOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ErrorOut}, 503: {"model": ErrorOut}})
+def get_sound(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Whether mains hum is in the recording and at which frequency, its loudness, and any accepted sync."""
+    from app.services import media_sound
+
+    row = _recording(db, document_id)
+    try:
+        return media_sound.sound_view(db, row)
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+
+
+@router.get("/documents/{document_id}/spectrogram.png", response_class=Response, responses={
+    200: {"content": {"image/png": {}}, "description": "A stretch of the recording as a spectrogram, 0 to 4 kHz"},
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}})
+def get_spectrogram(document_id: str, start: float = Query(0, ge=0), end: float = Query(60, gt=0), cleaned: bool = False,
+                    db: Session = Depends(get_db)) -> Response:
+    """A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B)."""
+    from app.services import media_sound
+
+    row = _recording(db, document_id)
+    try:
+        return Response(media_sound.spectrogram_png(db, row, start, end, cleaned=cleaned), media_type="image/png",
+                        headers={"Cache-Control": "private, max-age=300", "X-Content-Type-Options": "nosniff"})
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@router.post("/documents/{document_id}/sync", response_model=SyncOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}, 503: {"model": ErrorOut}})
+def find_document_sync(document_id: str, body: SyncIn, db: Session = Depends(get_db)) -> Any:
+    """Where another recording of the same event lines up in this one, found by matching their sound. Nothing is kept
+    until a person accepts it."""
+    from app.services import media_sound
+
+    row, other = _recording(db, document_id), _recording(db, body.other_document_id)
+    try:
+        return media_sound.find_sync(db, row, other)
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+
+
+@router.post("/documents/{document_id}/sync/accept", response_model=SyncOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}, 503: {"model": ErrorOut}})
+def accept_document_sync(document_id: str, body: SyncIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Accept the offset: it is found again here (not taken from the request) and kept beside the recording with who
+    accepted it and when."""
+    from app.services import media_sound
+
+    row, other = _recording(db, document_id), _recording(db, body.other_document_id)
+    try:
+        return media_sound.accept_sync(db, row, media_sound.find_sync(db, row, other), actor=scope_for_request(request).actor_id)
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+
+
+def _pdf_document(db: Session, document_id: str) -> Document:
+    from app.services.pdf_redact import is_pdf
+
+    row = db.get(Document, document_id)
+    if row is None:
+        raise HTTPException(404, "Document not found")
+    if not is_pdf(row):
+        raise HTTPException(415, "This document is not a PDF")
+    return row
+
+
+def _redact_errors(fn: Any) -> Any:
+    from app.services.pdf_redact import RedactRefused
+
+    try:
+        return fn()
+    except RedactRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except CaseGone as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@router.get("/documents/{document_id}/redaction", response_model=RedactionOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ErrorOut, "description": "PdfCraft could not read the PDF"},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def get_redaction(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """What Redact before sharing shows (mockup MEDIA_3): the pages in points, the boxes the machine proposes (phone
+    numbers and emails by pattern, people named in this case), the hidden data the file carries, PDF/A-2b now. Read
+    from a copy: the case's file is never opened for writing."""
+    from app.services import pdf_redact
+
+    row = _pdf_document(db, document_id)
+    return _redact_errors(lambda: pdf_redact.redaction_view(db, row))
+
+
+@router.post("/documents/{document_id}/derived/redacted", response_model=DerivedFileOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The copy cannot be made as asked, or text was left under a box"},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def make_redacted_copy(document_id: str, body: RedactIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """A redacted copy: the content under each box removed for good, the hidden data asked for taken out, PDF/A-2b if
+    asked, then checked: the saved copy must hold no text under any box. Each box's page, place and reason are kept in
+    the trail, not the words under it. The case's file is unchanged."""
+    from app.services import pdf_redact
+
+    row = _pdf_document(db, document_id)
+    return _redact_errors(lambda: derived_files.serialize(pdf_redact.make_redacted(
+        db, row, boxes=[b.model_dump() for b in body.boxes], remove=list(body.remove), pdfa=body.pdfa,
+        made_for=body.made_for, actor=scope_for_request(request).actor_id)))
+
+
+def _redacted_copy(db: Session, derived_file_id: str) -> DerivedFile:
+    row = db.get(DerivedFile, derived_file_id)
+    if row is None:
+        raise HTTPException(404, "Derived file not found")
+    if row.mime_type != "application/pdf":
+        raise HTTPException(415, "This copy is not a PDF")
+    root = resolve_storage_root(settings.document_storage_dir).resolve()
+    if not Path(row.storage_path).resolve().is_relative_to(root) or not Path(row.storage_path).is_file():
+        raise HTTPException(404, "The file is missing from this computer")
+    return row
+
+
+@router.get("/derived-files/{derived_file_id}/page.png", response_class=Response, responses={
+    **file_response("image/png", "One page of a PDF copy drawn as a picture"),
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}, 503: {"model": ErrorOut}})
+def get_copy_page(derived_file_id: str, page: int = Query(1, ge=1), width: int = Query(600, ge=120, le=1600),
+                  db: Session = Depends(get_db)) -> Response:
+    """One page of a redacted copy as PNG, for Compare."""
+    from app.services import pdf_redact
+
+    row = _redacted_copy(db, derived_file_id)
+    png = _redact_errors(lambda: pdf_redact.copy_page_png(row, page, width))
+    return Response(png, media_type="image/png", headers={"Cache-Control": "private, max-age=3600"})
+
+
+@router.get("/documents/{document_id}/redaction/compare", response_model=RedactCompareOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}, 503: {"model": ErrorOut}})
+def compare_redacted(document_id: str, copy_id: str = Query(...), db: Session = Depends(get_db)) -> Any:
+    """How a redacted copy differs from the case's file: the words each holds, the pages changed, the hidden data the
+    copy still carries."""
+    from app.services import pdf_redact
+
+    row = _pdf_document(db, document_id)
+    copy = _redacted_copy(db, copy_id)
+    if copy.document_id != row.id:
+        raise HTTPException(404, "That copy is not one of this PDF's")
+    return _redact_errors(lambda: pdf_redact.compare(row, copy))

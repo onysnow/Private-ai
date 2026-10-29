@@ -50,21 +50,23 @@ def _check_sources(db: Session) -> object:
     return check_sources(db)
 
 
-def _follow(db: Session) -> object:
-    from app.services.following import poll_due
+def _check_monitors(db: Session) -> object:
+    from app.services.following import check_due
 
-    return poll_due(db)
+    return check_due(db)
 
 
-def _recheck(db: Session) -> object:
-    from app.services.following import recheck_captured
+def _check_platforms(db: Session) -> object:
+    from app.services.platform_checks import daily
 
-    return recheck_captured(db)
+    return daily(db)
 
 
 TASKS: list[Scheduled] = [
-    Scheduled("follow_sources", timedelta(minutes=1), _follow),
-    Scheduled("recheck_captures", timedelta(minutes=10), _recheck),
+    # Does it work today? (WORKS_1): once a day, only when a person turned it on.
+    Scheduled("check_platforms", timedelta(days=1), _check_platforms),
+    # Following (ADR-0022): each monitor keeps its own schedule; this asks which are due, every minute.
+    Scheduled("check_monitors", timedelta(minutes=1), _check_monitors),
     Scheduled("deliver_notifications", timedelta(minutes=1), _deliver_notifications),
     Scheduled("check_sources", timedelta(hours=6), _check_sources),
     Scheduled("prune_outbound", timedelta(days=1), _prune_outbound),

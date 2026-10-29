@@ -1,7 +1,7 @@
 """Web capture (ADR-0018): a pasted link becomes a source. Capturing is a background job; the capture's row says what
 was kept, and each kept file can be downloaded as it was hashed."""
 
-from typing import Any
+from typing import Any, Callable
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import FileResponse
@@ -15,8 +15,9 @@ from app.jobs.handlers import CAPTURE_MEDIA, WEB_CAPTURE
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Capture
-from app.schemas.api import CaptureCreate
-from app.schemas.responses import CaptureOut, ErrorOut, ValidationErrorOut
+from app.schemas.api import CaptureCreate, CaptureFollowIn, CaptureUpdate
+from app.schemas.responses import CaptureOut, CaptureQuoteOut, ErrorOut, ValidationErrorOut
+from app.services import capture_follow, capture_quotes, capture_witness
 from app.services.web_capture import CaptureRefused, capture_file, list_captures, request_capture, serialize_capture
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -25,8 +26,14 @@ MEDIA_TYPES = {".html": "text/html; charset=utf-8", ".png": "image/png", ".har":
                ".gz": "application/gzip"}
 
 
-def capture_out(db: Session, row: Capture) -> dict[str, Any]:
+def _out(db: Session, row: Capture) -> dict[str, Any]:
     out = serialize_capture(row)
+    out["reason_kind"] = row.reason_kind or capture_follow.guess_reason_kind(row)
+    out["reason_kind_by"] = row.reason_kind_by
+    out["follow"] = capture_follow.follow_state(db, row)
+    out["witnesses"] = capture_witness.serialize(row)
+    out["source_protected"] = capture_witness.protected(db, row)
+    out["time_server"] = capture_witness.time_server_host()
     job = db.get(BackgroundJob, row.job_id) if row.job_id else None
     out["job"] = serialize_job(job) if job is not None else None
     # A capture whose job ended without finishing it (stopped, or the server went down mid-visit) says so.
@@ -40,20 +47,6 @@ def capture_out(db: Session, row: Capture) -> dict[str, Any]:
     return out
 
 
-async def start_capture(db: Session, request: Request, investigation_id: str, url: str) -> Capture:
-    """Queue a capture of `url` and start its job (inline mode finishes it before this returns). Refuses an address it
-    will never visit (CaptureRefused); LookupError when the case does not exist. Shared with Following, where a person
-    captures what a monitor found."""
-    row = request_capture(db, investigation_id, url, collector=scope_for_request(request).actor_id)
-    job = create_job(db, kind=WEB_CAPTURE, investigation_id=investigation_id, subject_type="capture", subject_id=row.id,
-                     runner=job_runner(request).mode, message="Waiting to visit the page")
-    row.job_id = job.id
-    db.commit()
-    await _submit_or_record_failure(request, job, db)
-    db.expire_all()
-    return db.get(Capture, row.id) or row
-
-
 @router.post("/investigations/{investigation_id}/captures", response_model=CaptureOut, status_code=202, responses={
     200: {"model": CaptureOut, "description": "The capture finished before the reply (developer mode runs jobs inline)"},
     404: {"model": ErrorOut, "description": "No such investigation"},
@@ -64,16 +57,102 @@ async def create_capture(investigation_id: str, body: CaptureCreate, request: Re
                          db: Session = Depends(get_db)) -> Any:
     """Capture the page at `url`: one visit, no cookies, every file kept with its SHA-256, and the page's text as a
     case document. Answers at once with the queued capture; follow `job` (GET /api/jobs/{id}) or the capture itself."""
+    return await _start(db, request, response, investigation_id, body.url,
+                        asked={"time_proof_on": body.time_proof, "second_witness_on": body.second_witness})
+
+
+async def _start(db: Session, request: Request, response: Response, investigation_id: str, url: str,
+                 after: Callable[[Capture], None] | None = None, asked: dict[str, bool] | None = None) -> dict[str, Any]:
     try:
-        row = await start_capture(db, request, investigation_id, body.url)
+        row = request_capture(db, investigation_id, url, collector=scope_for_request(request).actor_id)
+        if asked:
+            capture_witness.ask_when_saved(row, **asked)
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
     except CaptureRefused as exc:
         raise HTTPException(422, str(exc)) from exc
-    out = capture_out(db, row)
+    job = create_job(db, kind=WEB_CAPTURE, investigation_id=investigation_id, subject_type="capture", subject_id=row.id,
+                     runner=job_runner(request).mode, message="Waiting to visit the page")
+    row.job_id = job.id
+    db.commit()
+    if after is not None:
+        after(row)
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    row = db.get(Capture, row.id) or row
+    out = _out(db, row)
     if out["job"] is not None and out["job"]["finished"]:
         response.status_code = 200
     return out
+
+
+def _capture_or_404(db: Session, capture_id: str) -> Capture:
+    row = db.get(Capture, capture_id)
+    if row is None:
+        raise HTTPException(404, "Capture not found")
+    return row
+
+
+@router.put("/captures/{capture_id}/follow", response_model=CaptureOut, responses={
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "The page is still being captured"}})
+def follow_capture(capture_id: str, body: CaptureFollowIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Check this capture's page again: never, daily or weekly (a Following page monitor tied to the capture; version 1
+    is the page as captured). For a link only, weekly is "Ask again in 7 days"."""
+    row = _capture_or_404(db, capture_id)
+    try:
+        capture_follow.set_every(db, row, body.every, scope_for_request(request).actor_id)
+    except capture_follow.FollowCaptureRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    return _out(db, row)
+
+
+@router.post("/captures/{capture_id}/recheck", response_model=CaptureOut, responses={
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Still being captured, or the address moved"}})
+def recheck_capture(capture_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """One visit now: the live page's main text compared with the last version. Nothing is kept as evidence; a
+    different text is kept as a version, not captured."""
+    row = _capture_or_404(db, capture_id)
+    try:
+        capture_follow.recheck(db, row, scope_for_request(request).actor_id)
+    except capture_follow.FollowCaptureRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    db.expire_all()
+    return _out(db, db.get(Capture, capture_id) or row)
+
+
+@router.post("/captures/{capture_id}/capture-latest", response_model=CaptureOut, status_code=202, responses={
+    200: {"model": CaptureOut, "description": "The new capture finished before the reply (developer mode)"},
+    404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "The input does not match the route, or the address cannot be captured"}})
+async def capture_latest(capture_id: str, request: Request, response: Response, db: Session = Depends(get_db)) -> Any:
+    """Capture the page as it is now, as a new capture: both stay in the case. Answers with the new capture."""
+    row = _capture_or_404(db, capture_id)
+    actor = scope_for_request(request).actor_id
+    return await _start(db, request, response, row.investigation_id, row.final_url or row.url,
+                        after=lambda new: capture_follow.link_new_capture(db, row, new, actor))
+
+
+@router.post("/captures/{capture_id}/mark-changed", response_model=CaptureOut, responses={
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "The page has not changed since its capture"}})
+def mark_capture_changed(capture_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Mark the capture's source "changed since capture", with who said so and which version they saw."""
+    row = _capture_or_404(db, capture_id)
+    try:
+        capture_follow.mark_source_changed(db, row, scope_for_request(request).actor_id)
+    except capture_follow.FollowCaptureRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    return _out(db, row)
+
+
+@router.patch("/captures/{capture_id}", response_model=CaptureOut, responses={
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Not a link-only capture"}})
+def update_capture(capture_id: str, body: CaptureUpdate, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Set a link only's reason (dead link, blocked, timed out, tool error) when the person knows better."""
+    row = _capture_or_404(db, capture_id)
+    try:
+        capture_follow.set_reason_kind(db, row, body.reason_kind, scope_for_request(request).actor_id)
+    except capture_follow.FollowCaptureRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    return _out(db, row)
 
 
 @router.post("/captures/{capture_id}/media", response_model=CaptureOut, status_code=202, responses={
@@ -92,7 +171,7 @@ async def collect_capture_media(capture_id: str, request: Request, response: Res
         raise HTTPException(409, "The media on this page is already being collected")
     if (row.media or {}).get("status") == "collected":
         response.status_code = 200  # one item per page: what was collected stays as it was hashed
-        return capture_out(db, row)
+        return _out(db, row)
     job = create_job(db, kind=CAPTURE_MEDIA, investigation_id=row.investigation_id, subject_type="capture", subject_id=row.id,
                      runner=job_runner(request).mode, message="Waiting to look for the video or audio")
     row.media = {**(row.media or {}), "status": "collecting", "job_id": job.id}
@@ -106,13 +185,45 @@ async def collect_capture_media(capture_id: str, request: Request, response: Res
         db.commit()
     if done is not None and done.finished_at is not None:
         response.status_code = 200
-    return capture_out(db, row)
+    return _out(db, row)
+
+
+def _witness(db: Session, capture_id: str, request: Request, run: Callable[..., Capture]) -> dict[str, Any]:
+    row = _capture_or_404(db, capture_id)
+    try:
+        run(db, row, scope_for_request(request).actor_id)
+    except capture_witness.WitnessRefused as exc:
+        raise HTTPException(409, str(exc)) from exc
+    db.expire_all()
+    return _out(db, db.get(Capture, capture_id) or row)
+
+
+WITNESS_REFUSED: dict[int | str, dict[str, Any]] = {404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Not asked: the capture is source-protected, or has nothing to send"}}
+
+
+@router.post("/captures/{capture_id}/time-proof", response_model=CaptureOut, responses=WITNESS_REFUSED)
+def capture_time_proof(capture_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Ask a time server to sign this capture's fingerprint (RFC 3161). Only the WARC's SHA-256 is sent, logged first;
+    the token is kept beside the capture's files and checked here. A failure is kept on the capture with its reason."""
+    return _witness(db, capture_id, request, capture_witness.time_proof)
+
+
+@router.post("/captures/{capture_id}/second-witness", response_model=CaptureOut, responses=WITNESS_REFUSED)
+def capture_second_witness(capture_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Ask a public web archive to visit the page and keep its own copy. Only the address is sent, logged first."""
+    return _witness(db, capture_id, request, capture_witness.second_witness)
+
+
+@router.post("/captures/{capture_id}/look-elsewhere", response_model=CaptureOut, responses=WITNESS_REFUSED)
+def capture_look_elsewhere(capture_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """For a page that could not be kept: ask a public web archive whether it holds a copy, and from when."""
+    return _witness(db, capture_id, request, capture_witness.look_elsewhere)
 
 
 @router.get("/investigations/{investigation_id}/captures", response_model=list[CaptureOut])
 def get_captures(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     """The case's captures, newest first."""
-    return [capture_out(db, row) for row in list_captures(db, investigation_id)]
+    return [_out(db, row) for row in list_captures(db, investigation_id)]
 
 
 @router.get("/captures/{capture_id}", response_model=CaptureOut, responses={404: {"model": ErrorOut}})
@@ -120,7 +231,7 @@ def get_capture(capture_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Capture, capture_id)
     if row is None:
         raise HTTPException(404, "Capture not found")
-    return capture_out(db, row)
+    return _out(db, row)
 
 
 @router.get("/captures/{capture_id}/files/{name}", response_class=FileResponse, responses={
@@ -142,3 +253,18 @@ def get_capture_file(capture_id: str, name: str, db: Session = Depends(get_db)) 
     return FileResponse(path, media_type=MEDIA_TYPES.get(suffix, "application/octet-stream"), filename=entry["name"],
                         content_disposition_type="inline" if suffix == ".png" else "attachment",
                         headers={"X-Content-SHA256": entry["sha256"], "X-Content-Type-Options": "nosniff"})
+
+
+@router.get("/captures/{capture_id}/quotes", response_model=list[CaptureQuoteOut], responses={404: {"model": ErrorOut}})
+def get_capture_quotes(capture_id: str, db: Session = Depends(get_db)) -> Any:
+    """The quotes pinned from this captured page, each found again in the saved copy and (once the page
+    was checked again) on the live page."""
+    return capture_quotes.quotes(db, _capture_or_404(db, capture_id))
+
+
+@router.post("/captures/{capture_id}/quotes/refind", response_model=list[CaptureQuoteOut], responses={404: {"model": ErrorOut}})
+def refind_capture_quotes(capture_id: str, db: Session = Depends(get_db)) -> Any:
+    """Read the saved copy's quotes again: each is found again in the page's passages and its place kept."""
+    row = _capture_or_404(db, capture_id)
+    capture_quotes.refind(db, row)
+    return capture_quotes.quotes(db, row)

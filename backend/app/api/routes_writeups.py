@@ -4,17 +4,18 @@ the uploaded-file Document model -- see app/services/writeups.py). CRUD plus
 STRUCT-0002.
 """
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, File, HTTPException, Request, Response, UploadFile
 from fastapi.responses import StreamingResponse
 from io import BytesIO
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
+from app.core.authorization import scope_for_request
 from app.db.session import get_db
 from app.models.domain import Investigation, Writeup
 from app.schemas.api import ChartToSave, WriteupCreate, WriteupUpdate
 from app.services.saved_charts import ChartRefused, add_chart_to_writeup
-from app.schemas.responses import ErrorOut, ValidationErrorOut, DeletedOut, WriteupOut, WriteupsOut, file_response
+from app.schemas.responses import ErrorOut, ValidationErrorOut, DeletedOut, PackCheckOut, SigningKeyOut, WriteupOut, WriteupsOut, file_response
 from app.services.assistant_context import describe_record_refs
 from app.services.writeups import create_writeup, delete_writeup, list_writeups, render_writeup_docx, serialize_writeup, update_writeup
 
@@ -115,3 +116,64 @@ def add_chart_to_writeup_endpoint(writeup_id: str, body: ChartToSave, db: Sessio
     except ChartRefused as exc:
         raise _refused(exc)
     return serialize_writeup(row)
+
+
+@router.post("/investigations/{investigation_id}/evidence-pack/check", response_model=PackCheckOut, responses={
+    404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "Not a .zip, or not an evidence pack"}})
+async def check_evidence_pack(investigation_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)) -> Any:
+    """Check a pack someone sent back (CHECK_4): read here, in memory; every file's SHA-256 recomputed and compared
+    with the list kept when the pack was made. Nothing of the pack is kept or sent anywhere."""
+    from app.services.pack_check import PackRefused, check
+
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    data = await file.read()
+    try:
+        return check(db, investigation_id, data, file.filename or "")
+    except PackRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@router.get("/investigations/{investigation_id}/writeup.pdf", response_class=Response, responses={
+    **file_response("application/pdf", "The story's write-up for reading, printed on this computer"),
+    404: {"model": ErrorOut, "description": "No story write-up"}, 503: {"model": ErrorOut, "description": "The printing browser is not installed"}})
+def export_writeup_pdf(investigation_id: str, db: Session = Depends(get_db)) -> Response:
+    """The write-up as a PDF (Export sheet › Write-up for reading), stamped "Export as draft" while a check is open."""
+    from app.services.evidence_pack import NoStory, writeup_pdf
+    from app.services.print_pdf import PdfUnavailable
+
+    try:
+        data, _title = writeup_pdf(db, investigation_id)
+    except NoStory as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except PdfUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    return Response(content=data, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="write-up-{investigation_id[:8]}.pdf"'})
+
+
+@router.get("/settings/signing-key", response_model=SigningKeyOut)
+def get_signing_key(db: Session = Depends(get_db)) -> Any:
+    """This computer's evidence-pack signing key: its fingerprint, to give out with a pack, and when it was made."""
+    from app.services.pack_signing import public
+
+    return public(db)
+
+
+@router.get("/investigations/{investigation_id}/evidence-pack.zip", response_class=Response, responses={
+    **file_response("application/zip", "The evidence pack: the write-up, its exhibits with fingerprints, custody, readiness, gaps"),
+    404: {"model": ErrorOut, "description": "No story write-up to pack"}})
+def export_evidence_pack(investigation_id: str, request: Request, db: Session = Depends(get_db)) -> Response:
+    """The story's evidence pack (app/services/evidence_pack.py), made on this computer. Stamped "Export as draft"
+    while a check before an outward export is open; X-Pack-Draft, X-Pack-Exhibits and X-Pack-Gaps say so."""
+    from app.services.evidence_pack import NoStory, build_pack
+
+    try:
+        data, summary = build_pack(db, investigation_id, actor=scope_for_request(request).actor_id)
+    except NoStory as exc:
+        raise HTTPException(404, str(exc)) from exc
+    name = f"evidence-pack-{investigation_id[:8]}{'-DRAFT' if summary['draft'] else ''}.zip"
+    return Response(content=data, media_type="application/zip", headers={
+        "Content-Disposition": f'attachment; filename="{name}"', "X-Pack-Draft": "1" if summary["draft"] else "0",
+        "X-Pack-Exhibits": str(summary["exhibits"]), "X-Pack-Gaps": str(summary["gaps"]),
+        "Access-Control-Expose-Headers": "Content-Disposition, X-Pack-Draft, X-Pack-Exhibits, X-Pack-Gaps"})

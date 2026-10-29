@@ -1,7 +1,7 @@
 from __future__ import annotations
 import hashlib, re, uuid
 from pathlib import Path
-from typing import Iterable, NamedTuple
+from typing import Any, Iterable, NamedTuple
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
@@ -18,13 +18,14 @@ from app.services.anchors import anchor_document_quotes
 from app.services.entity_signals import clean_names, norm_name, read_name, read_passage, split_title
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
+from app.services.photos import PHOTO_EXTENSIONS
 from app.services.transcription import MEDIA_EXTENSIONS
 from app.jobs.corpus import request_corpus_sync
 
 # Pictures are documents too (app/services/image_reader.py): kept as pictures, their text read by OCR.
 # Emails, mailboxes, .zip archives and spreadsheets are read by app/services/container_readers.py.
 # Audio and video are transcribed on this computer (app/services/transcription.py, ADR-0020).
-SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'} | set(IMAGE_EXTENSIONS) | set(CONTAINER_EXTENSIONS) | set(MEDIA_EXTENSIONS)
+SUPPORTED_EXTENSIONS = {'.txt', '.md', '.csv', '.html', '.htm', '.pdf', '.docx'} | set(IMAGE_EXTENSIONS) | set(CONTAINER_EXTENSIONS) | set(MEDIA_EXTENSIONS) | set(PHOTO_EXTENSIONS)
 # Capitals and letters of the Latin alphabet, accented ones too (Société Vérandine, Brühlmark & Söhne).
 _NAME_UPPER = "A-ZÀ-ÖØ-Þ"
 _NAME_LETTER = "A-Za-zÀ-ÖØ-öø-ÿĀ-ž"
@@ -60,6 +61,9 @@ def extract_chunks(path: Path) -> tuple[list[dict], list[str]]:
     if ext in MEDIA_EXTENSIONS:
         # The reading job transcribes a recording itself: its passages come with segments a chunk list cannot carry.
         raise ValueError('A recording is read by transcription (app/services/transcription.py), not as text')
+    if ext in PHOTO_EXTENSIONS:
+        # A HEIC or RAW photo is read through its viewable copy, which the reading job makes and keeps.
+        raise ValueError('A HEIC or RAW photo is read through its viewable copy (app/services/photos.py), not as text')
     if ext in CONTAINER_EXTENSIONS:
         return read_container(path)
     if ext in IMAGE_EXTENSIONS:
@@ -123,6 +127,100 @@ def extract_chunks(path: Path) -> tuple[list[dict], list[str]]:
         if not rows:
             issues.append('This file has no readable text content.')
     return rows, issues
+
+
+def _marker(text: str) -> re.Pattern[str]:
+    """A marker's words with any run of space between them, as a reader may break lines anywhere."""
+    return re.compile(r'\s+'.join(re.escape(word) for word in text.split()))
+
+
+def own_part(chunks: list[dict], part: dict | None) -> tuple[list[tuple[int, int] | None], str | None]:
+    """Where in each chunk a document's own text is, when its file holds more than it.
+
+    A gazette page carries the notices printed beside the one a source is
+    (a Federal Register PDF of one notice starts with the end of the notice
+    before it). ``part`` names the first words of the document's own text and
+    the last (``{"from": ..., "to": ...}``, the last included); each chunk gets
+    the (start, end) of its share of that text, or None for none of it. Without
+    ``part`` every chunk is wholly the document's. When the first words are
+    not found, nothing is cut and the second value says so."""
+    if not part:
+        return [(0, len(c.get('text') or '')) for c in chunks], None
+    start, stop = _marker(part['from']), _marker(part['to'])
+    out: list[tuple[int, int] | None] = []
+    inside, ended = False, False
+    for c in chunks:
+        text = c.get('text') or ''
+        a = 0
+        if not inside and not ended:
+            found = start.search(text)
+            if found is None:
+                out.append(None)
+                continue
+            inside, a = True, found.start()
+        if ended:
+            out.append(None)
+            continue
+        end = stop.search(text, a)
+        if end is not None:
+            inside, ended = False, True
+            out.append((a, end.end()))
+        else:
+            out.append((a, len(text)))
+    if not any(out):
+        return [(0, len(c.get('text') or '')) for c in chunks], (
+            f"The start of this document's own text (\"{part['from']}\") was not found, so the whole file was read for proposals.")
+    return out, None
+
+
+class _Part(NamedTuple):
+    text: str
+    locator: str | None
+
+
+def _part_payloads(chunk: DocumentChunk, share: tuple[int, int], **kwargs: Any) -> Iterable[tuple[str, dict, float]]:
+    """``_candidate_payloads`` over one chunk's share of the document's own text, with spans counted in the whole chunk."""
+    a, b = share
+    if (a, b) == (0, len(chunk.text)):
+        yield from _candidate_payloads(chunk, **kwargs)
+        return
+    part = chunk.text[a:b]
+    lead = len(part) - len(part.lstrip())
+    for typ, payload, conf in _candidate_payloads(_Part(part, chunk.locator), **kwargs):  # type: ignore[arg-type]
+        span = payload.get('span')
+        if span:
+            payload = {**payload, 'span': {'start_char': span['start_char'] + a + lead, 'end_char': span['end_char'] + a + lead}}
+        yield typ, payload, conf
+
+
+class FoundSoFar:
+    """What the reader will propose from the pages read so far, counted as a read goes (Case home's Bring in: "4 names
+    and 2 claims found so far"): the same proposals, one per name and per claim sentence, from the document's own
+    part. The proposals themselves are made once the whole file is read."""
+
+    def __init__(self, part: dict | None = None) -> None:
+        self.part = part
+        self.pages: list[dict] = []
+        self.seen: set[tuple[str, str]] = set()
+        self.counts = {'entity': 0, 'claim': 0}
+
+    def add(self, page_no: int, text: str) -> None:
+        self.pages.append({'locator': f'page {page_no}', 'text': text})
+        share = own_part(self.pages, self.part)[0][-1]
+        if share is None:
+            return
+        part = text[share[0]:share[1]]
+        for typ, payload, _conf in _candidate_payloads(_Part(part, None), include_entities=settings.enable_local_entity_suggestions):  # type: ignore[arg-type]
+            key = _once_key(typ, payload)
+            if typ in self.counts and key is not None and key not in self.seen:
+                self.seen.add(key)
+                self.counts[typ] += 1
+
+    def words(self) -> str:
+        """"4 names and 2 claims found so far", or "" before anything is found."""
+        parts = [f"{n} {one if n == 1 else many}" for n, one, many in
+                 ((self.counts['entity'], 'name', 'names'), (self.counts['claim'], 'claim', 'claims')) if n]
+        return f"{' and '.join(parts)} found so far" if parts else ""
 
 
 def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True,
@@ -277,12 +375,20 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
     for record in held:
         for name in entity_names(record)[1:]:
             existing.setdefault(norm_name(name), (record.id, record.schema))
-    # A table already mapped to records (app/services/table_mappings.py) has its names from its
-    # columns: reading its cells again as running text would only add junk names.
+    # A table (CSV, TSV, XLSX) gets its names, links and payments from its columns, through a mapping
+    # (app/services/table_mappings.py), whether it is mapped yet or not: its cells read as running text
+    # make junk names, claims and one whole-block passage. Its text is still kept, so it can be searched.
+    from app.services.table_mappings import is_table
+
+    table = is_table(doc)
     mapped = db.scalar(select(TableMapping.id).where(TableMapping.document_id == doc.id).limit(1)) is not None
-    find_names = find_names and not mapped
+    find_names = find_names and not mapped and not table
     try:
         chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
+        source = db.get(Source, doc.source_id)
+        shares, not_found = own_part(chunks, ((source.metadata_json or {}) if source else {}).get('part'))
+        if not_found:
+            issues = [*(issues or []), not_found]
         # One proposal per name (and per claim sentence) in a document, with every place it is
         # mentioned: a name on 146 pages is one thing to decide, mentioned 146 times.
         once: dict[tuple[str, str], ExtractionCandidate] = {}
@@ -291,8 +397,11 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
             provenance = item.pop('provenance', None)
             chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
             db.add(chunk); db.flush()
-            for typ, payload, conf in _candidate_payloads(chunk, include_entities=find_names and settings.enable_local_entity_suggestions,
-                                                          existing=existing):
+            share = shares[ordinal - 1]
+            if table or share is None:
+                continue
+            for typ, payload, conf in _part_payloads(chunk, share, include_entities=find_names and settings.enable_local_entity_suggestions,
+                                                     existing=existing):
                 if provenance:
                     payload = {**payload, 'provenance': provenance}
                 key = _once_key(typ, payload)
@@ -515,7 +624,8 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
     # sees its decision, instead of a status read before either wrote.
     lock_investigation_transaction(db, candidate.investigation_id)
     db.refresh(candidate)
-    if candidate.review_status != 'proposed':
+    # A proposal held back by the OCR quality gate (app/jobs/handlers.py hold_illegible) can still be decided by a person.
+    if candidate.review_status not in ('proposed', 'held'):
         raise ValueError('Candidate has already been reviewed')
     if decision not in {'accept','reject'}: raise ValueError('Decision must be accept or reject')
     candidate.reviewer_note = note
@@ -582,7 +692,12 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
         ))
         rtype='claim'
     elif candidate.candidate_type=='entity':
-        cap=(caption or candidate.payload.get('caption') or '').strip(); schema=entity_schema or candidate.payload.get('suggested_schema') or 'Thing'
+        cap=(caption or candidate.payload.get('caption') or '').strip()
+        # A kind the text gave no sign of (the name-finder's low band, or OpenAleph's name with no kind) is never
+        # taken from the guess: the person says which kind, or "not sure" (LegalEntity).
+        if not entity_schema and (candidate.confidence < 0.5 or candidate.payload.get('schema_question')):
+            raise ValueError(f'The text does not say what kind of record “{cap}” is: say which (or “not sure”) before it is added')
+        schema=entity_schema or candidate.payload.get('suggested_schema') or 'Thing'
         preview = preview_entity_candidate_matches(db, candidate)
         strong = preview.get('strong_match')
         if strong and entity_identity_decision is None:

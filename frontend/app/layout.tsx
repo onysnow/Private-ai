@@ -16,9 +16,15 @@ import '../styles/drop.css';
 import '../styles/following.css';
 import '../styles/style-guide.css';
 import '../styles/safety.css';
+import '../styles/lanes.css';
+import '../styles/media.css';
+import '../styles/decks.css';
 import '../styles/reading-room.css';
+import '../styles/is-it-real.css';
 import '../styles/learn.css';
 import '../styles/lock.css';
+import '../styles/pack-check.css';
+import '../styles/by-hand.css';
 import '../styles/safety.css';
 // Deck font pairings (SIL OFL, served by the app itself -- see
 // backend/app/services/presentation_style.py FONT_PAIRS). Only @font-face

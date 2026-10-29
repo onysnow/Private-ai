@@ -108,8 +108,8 @@ def test_deck_with_a_column_chart_exports_too(demo):
     db.refresh(row)
     prs = render_deck_pptx(row, describe_record_refs(db, investigation_id=inv_id, refs=deck_citation_refs(row.slides_json)))
     chart_shape = next(shape for shape in list(prs.slides)[1].shapes if shape.has_chart)
-    assert list(chart_shape.chart.plots[0].categories) == ["2019 †", "2020", "2021 †", "2022", "2023", "2024"]
-    assert list(chart_shape.chart.plots[0].series[0].values) == [1.0, 0.0, 1.0, 0.0, 2.0, 2.0]
+    assert list(chart_shape.chart.plots[0].categories) == ["2019 †", "2020", "2021 †", "2022", "2023 †", "2024"]
+    assert list(chart_shape.chart.plots[0].series[0].values) == [1.0, 0.0, 1.0, 0.0, 1.0, 2.0]
 
 
 def _writeup_with_chart(db, inv_id, chart):

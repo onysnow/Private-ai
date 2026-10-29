@@ -21,6 +21,7 @@ import type {DecisionKind, DecisionOrder} from './use-decisions';
 
 const ORDER: Record<DecisionOrder, [string, string]> = {
   source: ['Source', 'By source: read a document once, decide all it holds.'],
+  unlocks: ['Unlocks', 'By what it unlocks: the Red Flags it raises and the claims it makes ready.'],
   consequence: ['Impact', 'By what it changes most.'],
   oldest: ['Oldest', 'Oldest first.'],
 };
@@ -75,6 +76,12 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
         : <p className="ch-quiet"><Reveal tabbable={false} detail="This kind has no passage to show."><Link href={caseHref(item.open.href, inv)}>{item.open.label} →</Link></Reveal></p>}
     </div>}
   </section>;
+}
+
+/** A queue row's mark for what a Yes unlocks, with how many; what they are is in the row's reveal (all of them on the
+ *  card). */
+function Unlocks({count}: {count: number}): ReactElement {
+  return <span className="dc-unlocks" aria-hidden="true">◆{count > 1 ? <small>{count}</small> : null}</span>;
 }
 
 export function DecideScreen({investigationId, investigationName, active = true, unreachable = null}: {
@@ -170,7 +177,7 @@ export function DecideScreen({investigationId, investigationName, active = true,
       </div>
       <label className="dc-order">Order
         <Reveal tabbable={false} detail={ORDER[order][1]}>
-          <select value={order} onChange={e => setOrder(e.target.value as DecisionOrder)}>
+          <select aria-label="Order" value={order} onChange={e => setOrder(e.target.value as DecisionOrder)}>
             {(Object.keys(ORDER) as DecisionOrder[]).map(o => <option key={o} value={o}>{ORDER[o][0]}</option>)}
           </select></Reveal>
       </label>
@@ -199,10 +206,12 @@ export function DecideScreen({investigationId, investigationName, active = true,
           </div>}
           {/* A row is its kind mark, its question and its level; who proposed it, the kind's name and its age are on hover or focus. */}
           <ul>{g.items.map(i => <li key={i.id}>
-            <Reveal tabbable={false} detail={<><b>{KIND_LABEL[i.kind]}</b><span className="rv-row">{i.actor_kind === 'ai' ? 'AI draft' : i.actor} · {age(i.created_at)} ago</span></>}>
+            <Reveal tabbable={false} detail={<><b>{KIND_LABEL[i.kind]}</b><span className="rv-row">{i.actor_kind === 'ai' ? 'AI draft' : i.actor} · {age(i.created_at)} ago</span>
+              {(i.unlocks ?? []).length > 0 && <span className="rv-row">◆ Unlocks: {(i.unlocks ?? []).join(' · ')}</span>}</>}>
               <button type="button" className={`dc-row${item?.id === i.id ? ' on' : ''}`} aria-current={item?.id === i.id ? 'true' : undefined} onClick={() => setSelected(i.id)}>
                 <KindMark kind={i.kind} bare/>
                 <span className="dc-row-text"><span>{i.question}</span></span>
+                {(i.unlocks ?? []).length > 0 && <Unlocks count={(i.unlocks ?? []).length}/>}
                 {i.level && <LevelChip level={i.level}/>}
               </button></Reveal>
           </li>)}</ul>

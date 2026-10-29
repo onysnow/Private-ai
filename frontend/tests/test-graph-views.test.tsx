@@ -95,7 +95,8 @@ describe('the network frame', () => {
     render(<Graph relationships={[rel('r1', 'Ownership', bellcastle, meridian), rel('r2', 'Family', jane, meridian)]}
       entities={entities} onNode={vi.fn()} onEdge={vi.fn()}/>);
     expect(await screen.findByTestId('network-stub')).toHaveTextContent('3 parties');
-    const chip = screen.getByRole('button', {name: 'Family or associate · 1'});
+    // The chip is the family's line and its count; the name is read with it and revealed on hover (Ony, 29 Oct).
+    const chip = screen.getByRole('button', {name: 'Family or associate 1'});
     await user.click(chip);
     expect(chip).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByTestId('network-stub')).toHaveTextContent('2 parties');
@@ -107,9 +108,7 @@ describe('the network frame', () => {
     // Placed by the stub: Meridian (0,0), Cobalt (200,0), Bellcastle (100,-50), Dunmore (100,50): the two links cross.
     render(<Graph relationships={[rel('r1', 'Payment', meridian, c), rel('r2', 'Payment', bellcastle, d)]}
       entities={[meridian, bellcastle, c, d]} onNode={vi.fn()} onEdge={vi.fn()}/>);
-    // The count shows; its sentence is revealed on it (Ony, 29 Oct), in the page for screen readers.
-    expect(await screen.findByTestId('graph-crossings')).toHaveTextContent('1 crossing');
-    expect(screen.getByText('1 pair of links crosses in this drawing.').closest('[hidden]')).not.toBeNull();
+    expect(await screen.findByTestId('graph-crossings')).toHaveTextContent('1 pair of links crosses in this drawing.');
     expect(crossingsLine(0, 30)).toBe('No links cross in this drawing.');
     expect(crossingsLine(3, 25)).toBe('3 pairs of links cross in this drawing. The connection grid shows the same links without crossings.');
   });

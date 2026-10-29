@@ -1,0 +1,146 @@
+/* Is it real? (mockup CHECK_3, features/is-it-real/is-it-real.tsx): the item, four layers of findings, the consent
+   card and the history, over the whole screen like the reading room. */
+.ir { position: fixed; inset: 0; z-index: 72; display: grid; grid-template-columns: minmax(280px, 330px) minmax(0, 1fr) minmax(300px, 340px);
+  grid-template-rows: auto auto minmax(0, 1fr); grid-template-areas: 'top top top' 'title title title' 'left mid right';
+  gap: 0 16px; padding: 0 24px 16px; background: var(--ground); color: var(--text); font-family: var(--font-ui); overflow: hidden; }
+.ir-top { grid-area: top; display: flex; align-items: center; gap: 16px; padding: 12px 0 4px; }
+.ir-top h1 { margin: 0; font: 400 22px var(--font-display); }
+.ir-top .rr-close { margin-left: 8px; }
+.ir-top .ir-mono:first-of-type { margin-left: auto; }
+.ir-title { grid-area: title; display: flex; align-items: baseline; gap: 18px; padding: 0 0 10px; }
+.ir-title h1 { margin: 0; font: 400 34px/1.1 var(--font-display); letter-spacing: -.01em; }
+.ir-title p { margin: 0; font-size: 13.5px; color: var(--text-muted); }
+.ir-kind { margin-left: auto; padding: 4px 12px; border-radius: 9px; border: 1px solid var(--accent-1); color: var(--accent-1); font-size: 12.5px; text-transform: capitalize; }
+.ir-col { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
+.ir > aside:first-of-type { grid-area: left; } .ir-mid { grid-area: mid; } .ir > aside:last-of-type { grid-area: right; }
+.ir-panel { padding: 12px 14px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel); font-size: 12.5px; }
+.ir-cap { margin: 0 0 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 500 11px var(--font-mono);
+  letter-spacing: .12em; text-transform: uppercase; color: var(--accent-1); }
+.ir-cap-title { display: flex; align-items: baseline; gap: 8px; color: var(--text); text-transform: none; letter-spacing: 0; font: 500 14.5px var(--font-ui); }
+.ir-cap-title i { font-style: normal; color: var(--accent-1); font: 500 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.ir-tag { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-muted); font: 500 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+.ir-tag.ir-good { border-color: var(--status-supported); color: var(--status-supported); }
+.ir-tag.ir-bad { border-color: var(--status-disputed); color: var(--status-disputed); }
+.ir-mono { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; }
+.ir-top .ir-mono { text-transform: uppercase; letter-spacing: .14em; }
+.ir-dim { color: var(--text-muted); }
+.ir-quiet { color: var(--text-muted); padding: 24px; }
+.ir-small { margin: 6px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+.ir-small b { color: var(--text); font-weight: 600; }
+.ir-err { grid-column: 1 / -1; margin: 0 0 8px; color: var(--status-disputed); font-size: 12.5px; }
+
+.ir-status { padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--text); font: 500 10.5px var(--font-mono); letter-spacing: .1em; }
+.ir-status[data-status=verified_origin] { border-color: var(--status-supported); color: var(--status-supported); }
+.ir-status[data-status=likely_synthetic] { border-color: var(--accent-1); color: var(--accent-1); }
+.ir-status[data-status=confirmed_synthetic] { border-color: var(--accent-plum, #a58bd8); color: var(--accent-plum, #a58bd8); }
+.ir-status[data-status=disputed] { border-color: var(--status-disputed); color: var(--status-disputed); }
+.ir-pic { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 1; object-fit: cover; border-radius: 10px; background: var(--surface-2); padding: 0; }
+.ir-excerpt { margin: 0; padding: 12px 14px; border-radius: 10px; background: var(--surface-2); font: 13.5px/1.6 var(--font-read); max-height: 120px; overflow: hidden; }
+.ir-excerpt mark { background: none; color: inherit; text-decoration: underline; text-decoration-color: var(--accent-1); text-underline-offset: 3px; box-shadow: inset 0 -.5em 0 color-mix(in srgb, var(--accent-1) 18%, transparent); }
+.ir-item-title { margin: 10px 0 0; font: 500 14px/1.35 var(--font-ui); }
+.ir-kv { margin: 8px 0 0; display: grid; gap: 4px; }
+.ir-kv > div { display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.ir-kv dt { font: 500 9.5px/1.6 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.ir-kv dd { margin: 0; line-height: 1.45; overflow-wrap: anywhere; }
+.ir-kv code { font: 12px var(--font-mono); color: var(--text-muted); }
+.ir-dots dd { position: relative; padding-left: 16px; }
+.ir-dots dd::before { content: ''; position: absolute; left: 0; top: .45em; width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.ir-dots dd[data-tone=good]::before { background: var(--accent-2); }
+.ir-dots dd[data-tone=warn]::before { background: var(--accent-1); }
+.ir-switch { display: flex; align-items: center; gap: 10px; margin-top: 10px; cursor: pointer; font-size: 13px; }
+.ir-switch input { appearance: none; width: 30px; height: 17px; border-radius: 999px; background: var(--surface-3); position: relative; cursor: pointer; margin: 0; flex: none; }
+.ir-switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 13px; height: 13px; border-radius: 50%; background: var(--text-muted); transition: left var(--dur-fast, .15s); }
+.ir-switch input:checked { background: color-mix(in srgb, var(--accent-1) 70%, transparent); }
+.ir-switch input:checked::after { left: 15px; background: var(--text); }
+.ir-switch input:disabled { opacity: .5; cursor: default; }
+.ir-rule { padding-top: 10px; border-top: 1px solid var(--line); }
+.ir-chip { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--accent-2); color: var(--accent-2); font: 500 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; font-style: normal; }
+.ir-chip.ir-bad { border-color: var(--status-disputed); color: var(--status-disputed); }
+.ir-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; border-radius: 10px; border: 1px solid var(--line); }
+.ir-seg button { all: unset; cursor: pointer; text-align: center; padding: 6px 8px; border-radius: 7px; font-size: 12.5px; color: var(--text-muted); }
+.ir-seg button[aria-checked=true] { background: var(--surface-3); color: var(--text); }
+.ir-headline { margin: 0; font: 400 15.5px/1.35 var(--font-ui); }
+.ir-headline[data-tone=bad] { color: var(--status-disputed); }
+.ir-headline[data-tone=good] { color: var(--accent-2); }
+.ir-claims { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.ir-claims li { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); }
+.ir-claims p { margin: 3px 0 6px; font-size: 13px; line-height: 1.4; }
+.ir-claims small { color: var(--text-muted); }
+
+.ir-states { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+.ir-state { padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); color: var(--text-muted); opacity: .55; font: 11px var(--font-mono); }
+.ir-state[data-on] { opacity: 1; color: var(--text); font-weight: 600; }
+.ir-state[data-on][data-tone=good] { border-color: var(--status-supported); background: color-mix(in srgb, var(--status-supported) 12%, transparent); }
+.ir-state[data-on][data-tone=warn] { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 10%, transparent); }
+.ir-state[data-on][data-tone=bad] { border-color: var(--status-disputed); background: color-mix(in srgb, var(--status-disputed) 12%, transparent); }
+.ir-flag { margin: 10px 0 0; padding: 8px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--accent-1) 60%, transparent);
+  background: color-mix(in srgb, var(--accent-1) 10%, transparent); font-size: 12.5px; line-height: 1.5; }
+.ir-flag b { margin-right: 8px; color: var(--accent-1); font: 500 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.ir-input { width: 100%; box-sizing: border-box; padding: 7px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: 12.5px var(--font-ui); }
+.ir-kv .ir-input { padding: 4px 8px; }
+
+.ir-decide { box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-1) 55%, transparent), var(--shadow-panel); }
+.ir-statuses { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.ir-statuses button { all: unset; cursor: pointer; text-align: center; padding: 9px 6px; border-radius: 9px; border: 1px solid var(--line);
+  font: 500 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.ir-statuses button[data-current] { color: var(--text); background: var(--surface-3); }
+.ir-statuses button[aria-checked=true] { color: var(--accent-1); border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 12%, transparent); }
+.ir-statuses button[aria-checked=true][data-status=confirmed_synthetic] { color: var(--accent-plum, #a58bd8); border-color: var(--accent-plum, #a58bd8); background: color-mix(in srgb, var(--accent-plum, #a58bd8) 12%, transparent); }
+.ir-statuses button[aria-checked=true][data-status=verified_origin] { color: var(--status-supported); border-color: var(--status-supported); background: color-mix(in srgb, var(--status-supported) 12%, transparent); }
+.ir-statuses button[aria-checked=true][data-status=disputed] { color: var(--status-disputed); border-color: var(--status-disputed); background: color-mix(in srgb, var(--status-disputed) 12%, transparent); }
+.ir-checks { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 8px; font-size: 12.5px; color: var(--text-muted); }
+.ir-checks label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.ir-reason { resize: vertical; min-height: 38px; }
+.ir-acts { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.ir-primary { all: unset; cursor: pointer; padding: 7px 14px; border-radius: 9px; background: var(--accent-1); color: var(--accent-foreground, #1a1208); font-size: 13px; font-weight: 500; }
+.ir-primary:disabled { cursor: default; opacity: .45; }
+.ir-ghost { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 9px; border: 1px solid var(--line); font-size: 13px; }
+.ir-ghost:disabled { opacity: .5; cursor: default; }
+.ir button:focus-visible, .ir input:focus-visible, .ir textarea:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+
+.ir-consent { box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-1) 55%, transparent), var(--shadow-panel); }
+.ir-blocked { box-shadow: 0 0 0 1px color-mix(in srgb, var(--status-disputed) 60%, transparent), var(--shadow-panel); background: color-mix(in srgb, var(--status-disputed) 8%, var(--surface-1)); }
+.ir-badcap { color: var(--status-disputed); }
+.ir-options { display: grid; gap: 6px; }
+.ir-options button { all: unset; cursor: pointer; display: grid; grid-template-columns: 14px 1fr; gap: 2px 10px; padding: 7px 12px; border-radius: 10px; border: 1px solid var(--line); }
+.ir-options button::before { content: ''; grid-row: span 2; align-self: start; margin-top: 3px; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--text-muted); }
+.ir-options button[aria-checked=true] { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 10%, transparent); }
+.ir-options button[aria-checked=true]::before { border-color: var(--accent-1); background: radial-gradient(var(--accent-1) 45%, transparent 50%); }
+.ir-options button:disabled { cursor: default; opacity: .5; }
+.ir-options b { font-weight: 500; font-size: 13px; }
+.ir-options small { font: 11px var(--font-mono); color: var(--text-muted); }
+.ir-sent { margin-top: 10px; padding: 10px 12px; border-radius: 9px; background: var(--surface-3); display: grid; gap: 4px; }
+.ir-sent span { color: var(--accent-1); font: 500 11px var(--font-mono); }
+.ir-sent code { font: 11.5px var(--font-mono); overflow-wrap: anywhere; }
+.ir-history ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ir-history li { display: grid; grid-template-columns: 46px 1fr; gap: 8px; font-size: 12px; line-height: 1.45; }
+.ir-history li p { margin: 0; }
+.ir-history li b { color: var(--accent-2); font-size: 10px; text-transform: uppercase; }
+.ir-history li[data-actor=person] { padding: 6px; margin: -6px; border-radius: 8px; background: color-mix(in srgb, var(--accent-1) 9%, transparent); }
+.ir-history li[data-actor=person] b { color: var(--accent-1); }
+.ir-history time { color: var(--text-muted); }
+.ir-again { margin-top: 12px; font-size: 12px; }
+
+@media (max-width: 1100px) {
+  .ir { grid-template-columns: 1fr; grid-template-areas: 'top' 'title' 'mid'; overflow-y: auto; }
+  .ir > aside:first-of-type, .ir > aside:last-of-type { grid-area: auto; }
+  .ir-col { overflow: visible; }
+  .ir-statuses { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* The Check stage's list of files. */
+.ir-list ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; }
+.ir-list button { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  border-radius: 10px; background: var(--surface-1); font-size: 13px; }
+.ir-list button:hover { background: var(--surface-2); }
+.ir-list button:focus-visible { outline: 2px solid var(--accent-1); }
+.ir-list-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ir-services { display: inline-flex; gap: 4px; margin-top: 8px; }
+.ir-services button { all: unset; cursor: pointer; padding: 3px 9px; border-radius: 7px; border: 1px solid var(--line); font-size: 11.5px; color: var(--text-muted); }
+.ir-services button[aria-pressed=true] { color: var(--text); border-color: var(--accent-1); }
+.ir-new { display: grid; gap: 6px; border-style: dashed !important; }
+.ir-new .ir-ghost { justify-self: start; font-size: 12px; padding: 4px 10px; }
+/* Show only what matters (29 Oct): the item's kind is a mark, its fingerprint a # with the hash on reveal. */
+.ir-title > .rv { margin-left: auto; }
+.ir-title .ir-kind { margin-left: 0; font-size: 18px; padding: 2px 12px; }
+.ir-fp { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 4px; border: 1px solid currentColor; font: 600 11px var(--font-mono); color: var(--text-muted); }

@@ -138,11 +138,16 @@ def build(db: Session, case_id: str, documents: list[tuple[dict[str, Any], bytes
     for meta, data in documents:
         doc = store_document(db, investigation_id=inv.id, title=meta["title"], filename=meta["filename"], mime_type="application/pdf", data=data,
                              storage_dir=storage_dir, source_metadata={"url": meta["url"], "publisher": meta["publisher"], "date": meta["date"],
-                                                                       "licence": meta["licence_note"], "demo": case_id})
+                                                                       "licence": meta["licence_note"], "demo": case_id,
+                                                                       **({"part": meta["part"]} if meta.get("part") else {})})
         source = db.get(Source, doc.source_id)
         if source is not None:
             source.url = meta["url"]
             source.source_type = meta.get("source_type", "public_record")
+            # The suite's tier (TAS): the record of an authority's own action, or an admission, is a primary official
+            # record (A); a complaint, indictment or affidavit is a party's sworn assertion, testimony to corroborate
+            # (B). So an allegation alone can make a claim Supported but never Confirmed (DECISIONS_LOG, 29 Oct).
+            source.source_tier = "A" if meta.get("admitted") else "B"
         docs[meta["id"]] = doc
     db.commit()
 

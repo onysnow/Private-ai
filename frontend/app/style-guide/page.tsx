@@ -8,7 +8,7 @@ import type {ReactElement, ReactNode} from 'react';
 import {AiNotice, LevelChip, StatusChip} from '../../components/status';
 import {Reveal} from '../../components/ui/reveal';
 import {KIND_ICON} from '../../components/network/party-icons';
-import {HEALTH, KIND_NAME, KindIcon} from '../../features/following/following-screen';
+import {HEALTH, KIND_NAME, KindIcon} from '../../features/following/marks';
 import {THEMES} from '../../lib/theme';
 
 const ROLES: [string, string][] = [

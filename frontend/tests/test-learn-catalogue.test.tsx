@@ -153,6 +153,8 @@ describe('Learn › Red Flags catalogue', () => {
     // The strongest flag in the newly chosen area opens.
     await waitFor(() => expect(window.location.search).toContain('area=ML'));
     await waitFor(() => expect(window.location.search).toContain('indicator=ML-021'));
+    // Learn opens on what the app computes (DECISIONS_LOG 12).
+    expect(await screen.findByRole('button', {name: 'The app computes 2'})).toHaveAttribute('aria-pressed', 'true');
     await userEvent.setup().click(screen.getByRole('button', {name: 'Person 0'}));
     expect(screen.getByText(/No indicator in Money laundering is checked only by a person/)).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('button', {name: 'Clear'}));

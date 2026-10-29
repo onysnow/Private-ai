@@ -163,7 +163,7 @@ def test_relationship_proposal_is_broken_down_per_part(env):
     person = next(c for c in rows if c['candidate_type'] == 'entity' and c['payload']['caption'] == 'Alice Example')
     org = next(c for c in rows if c['candidate_type'] == 'entity' and c['payload']['caption'].startswith('Example Company'))
     claim_id = client.post(f"/api/extraction-candidates/{claim['id']}/review", json={'decision': 'accept'}).json()['record']['id']
-    a = client.post(f"/api/extraction-candidates/{person['id']}/review", json={'decision': 'accept'}).json()['record']['id']
+    a = client.post(f"/api/extraction-candidates/{person['id']}/review", json={'decision': 'accept', 'entity_schema': 'Person'}).json()['record']['id']
     b = client.post(f"/api/extraction-candidates/{org['id']}/review", json={'decision': 'accept', 'entity_schema': 'Company'}).json()['record']['id']
     staged = client.post(f"/api/claims/{claim_id}/relationship-proposals",
                          json={'schema': 'Employment', 'source_entity_id': a, 'target_entity_id': b, 'note': 'from filing'})

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.time import utcnow_naive
 from app.models.domain import Document, Evidence, Source
-from app.services.image_reader import NotAPicture, stored_picture
+from app.services.image_reader import NotAPicture, shown_path, stored_picture
 from app.services.security import resolve_storage_root
 from app.visuals.data_service import date_bounds
 
@@ -16,7 +16,7 @@ def _require_picture(db: Session, source_id: str, document_id: str) -> None:
     if document is None or source is None or document.investigation_id != source.investigation_id:
         raise ValueError("The picture must be a document of this investigation")
     try:
-        stored_picture(document.storage_path, resolve_storage_root(settings.document_storage_dir))
+        stored_picture(shown_path(db, document), resolve_storage_root(settings.document_storage_dir))
     except NotAPicture as exc:
         raise ValueError(f"The document is not a picture: {exc}") from exc
     except OSError as exc:

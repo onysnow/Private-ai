@@ -39,10 +39,13 @@ import {FEATURE_OPEN_EVENT, SHUTTER_EVENT} from '../effects/board-effects';
 import {confidenceBand} from '../documents/confidence';
 import {DocumentTranslation} from '../documents/document-translation';
 import {needsSchemaAnswer} from '../documents/schema-question';
+import {isPicture as isPictureFile} from '../documents/picture-evidence';
 import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/entity-identity';
-import {proposerName} from './proposers';
 import {FingerprintMark, PartyMark, ProposalKindMark} from '../the-drop/kind-marks';
+import {proposerName} from './proposers';
 import {ListenRoom, isRecording} from './listen-room';
+import {PhotoRoom} from './photo-room';
+import {RedactRoom} from './redact-room';
 
 type Tab = 'text' | 'original' | 'translation' | 'details';
 type Span = {start: number; end: number; id: string; kind: string; status: string; primary: boolean};
@@ -315,7 +318,9 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
   const [caption, setCaption] = useState(proposalText(c));
   const matches = useQuery({...getExtractionEntityMatchesOptions({path: {candidate_id: c.id}}), enabled: c.candidate_type === 'entity' && c.review_status === 'proposed'});
   const targets = useQuery({...getIdentifierTargetsOptions({path: {candidate_id: c.id}}), enabled: c.candidate_type === 'identifier' && c.review_status === 'proposed'});
-  const open = c.review_status === 'proposed' && !held;
+  // A proposal held back by the OCR quality gate (the page was hard to read) can still be decided here, by eye.
+  const gated = c.review_status === 'held';
+  const open = (c.review_status === 'proposed' || gated) && !held;
   const ask = openQuestion(c, answer, Boolean(matches.data?.strong_match));
   const blocked = ask !== null || (c.candidate_type === 'entity' && matches.isPending);
   const kind = kindWord(c);
@@ -332,16 +337,19 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
   return <article id={`rr-card-${c.id}`} className={`rr-card rr-${c.candidate_type}${focus ? ' on' : ''}${lit ? ' lit' : ''}${open ? '' : ' done'}`}
     aria-label={`${kind}: ${proposalText(c)}`} onClick={onFocus} onMouseEnter={() => onLight(true)} onMouseLeave={() => onLight(false)}>
     {/* The card's kind is its icon; a waiting proposal is the default and needs no word (its dashed edge says it);
-        accepted and rejected are shapes, their words on hover. */}
+        accepted and rejected are shapes, their words on hover. A proposal held back as hard to read keeps its words:
+        the person must know to check it by eye. */}
     <header>
       <ProposalKindMark kind={c.candidate_type} detail={kind}/>
-      {c.review_status !== 'proposed' && <Reveal label={c.review_status === 'accepted' ? 'Accepted' : 'Rejected'} detail={c.review_status === 'accepted' ? 'Accepted' : 'Rejected'}>
-        <span className={`rr-chip ${c.review_status}`} aria-hidden="true">{c.review_status === 'accepted' ? '✓' : '✕'}</span></Reveal>}
+      {gated ? <span className="rr-chip held">Held back · hard to read</span>
+        : c.review_status !== 'proposed' && <Reveal label={c.review_status === 'accepted' ? 'Accepted' : 'Rejected'} detail={c.review_status === 'accepted' ? 'Accepted' : 'Rejected'}>
+          <span className={`rr-chip ${c.review_status}`} aria-hidden="true">{c.review_status === 'accepted' ? '✓' : '✕'}</span></Reveal>}
       <Dots confidence={c.confidence} detail={`${proposerOf(c)} · ${locator}`}/>
     </header>
     {editing ? <input className="rr-edit" aria-label="Edit the name" value={caption} onChange={e => setCaption(e.target.value)} onClick={e => e.stopPropagation()}/>
       : <p className="rr-card-text">{schema && schema !== 'LegalEntity' ? <><PartyMark schema={schema}/>{' '}</> : null}{caption}
         {schema && schema !== 'LegalEntity' ? <span className="st-sr"> · {SCHEMA_WORD[schema] ?? schema}</span> : null}</p>}
+    {gated && c.reviewer_note && <p className="rr-gate">{c.reviewer_note}</p>}
     {held ? <p className="rr-held" role="status">{held.decision === 'accept' ? '✓ Accepted' : '✕ Rejected'}: saved in a moment.
       <button type="button" onClick={e => { e.stopPropagation(); onUndo(); }}>Undo <kbd>U</kbd></button></p>
       : open ? <>
@@ -367,9 +375,10 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
   </article>;
 }
 
-function Room({investigationId, documentId, startPage, onClose}: {investigationId: string; documentId: string; startPage: number | null; onClose: () => void}): ReactElement {
+function Room({investigationId, documentId, startPage, onClose, onRedact}: {investigationId: string; documentId: string; startPage: number | null; onClose: () => void; onRedact: () => void}): ReactElement {
   const queryClient = useQueryClient();
   const openDocument = useWorkbenchStore(state => state.openDocument);
+  const openRealness = useWorkbenchStore(state => state.openRealness);
   const detail = useQuery({...getDocumentOptions({path: {document_id: documentId}})});
   const candidatesKey = listDocumentCandidatesEndpointOptions({path: {document_id: documentId}});
   const candidates = useQuery(candidatesKey);
@@ -717,6 +726,9 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         Document {index + 1} of {tops0.length}
         <button type="button" disabled={index >= tops0.length - 1} onClick={() => openDocument(tops0[index + 1].id)} aria-label="Next document">›</button>
       </span>}
+      {/\.pdf$/i.test(doc?.filename ?? '') && <Reveal tabbable={false} detail="Redact before sharing: a copy with text truly removed">
+        <button type="button" className="rr-real" onClick={onRedact} aria-label="Redact before sharing">Redact</button></Reveal>}
+      <button type="button" className="rr-real" onClick={() => openRealness(documentId)}>Is it real?</button>
       <button type="button" className="rr-close" onClick={onClose} aria-label="Close the reading room">×</button>
     </header>
 
@@ -746,8 +758,9 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
             </p>
             <h2 className="rr-doc-title">{title}</h2>
             {pageChunks.map((ch, i) => <div key={ch.id} className="rr-para">
-              <span className="rr-pilcrow" aria-hidden="true">¶{i + 1}</span>
-              <p className="rr-passage" data-chunk={ch.id} title={ch.locator}>
+              {/* Where the passage sits in the file is on hover of its ¶ mark. */}
+              <Reveal tabbable={false} className="rr-pilcrow" detail={ch.locator}><span aria-hidden="true">¶{i + 1}</span></Reveal>
+              <p className="rr-passage" data-chunk={ch.id}>
                 <Marked text={ch.text} spans={byChunk.get(ch.id) ?? []} find={find} focus={focus} lit={lit} onFocus={setFocus} onLight={setLit}/></p>
             </div>)}
             {!chunks.length && <p className="rr-quiet">{doc ? 'No text was read from this document.' : 'Opening…'}</p>}
@@ -836,7 +849,9 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
 // The backend takes document_id on evidence only for an uploaded picture (it also
 // stores the picture's date). For text the source and the locator already say where
 // the words are, so sending the id made "Keep as evidence" fail with a 400.
-const isPicture = (doc: {mime_type?: string | null}) => (doc.mime_type ?? '').toLowerCase().startsWith('image/');
+// A RAW photo usually arrives as application/octet-stream, so its name counts too (ADR-0021).
+const isPicture = (doc: {mime_type?: string | null; filename?: string | null}) =>
+  (doc.mime_type ?? '').toLowerCase().startsWith('image/') || isPictureFile(doc.filename ?? '');
 
 /** How far reading a document got, in words (not the stored status code). */
 export function readWord(status: string | null | undefined): string {
@@ -861,6 +876,12 @@ export function ReadingRoom({investigationId}: {investigationId: string}): React
 function Opened({investigationId, documentId, startPage, onClose}: {investigationId: string; documentId: string; startPage: number | null; onClose: () => void}): ReactElement {
   const doc = useQuery({...getDocumentOptions({path: {document_id: documentId}})}).data;
   const caseName = useQuery({...listInvestigationsOptions()}).data?.find(i => i.id === investigationId)?.name ?? 'Case';
+  const [asText, setAsText] = useState(false);
+  const [redacting, setRedacting] = useState(false);
   if (doc && isRecording(doc)) return <ListenRoom doc={doc} caseName={caseName} decideHref={caseHref('/decide?kind=proposal', investigationId)} onClose={onClose}/>;
-  return <Room investigationId={investigationId} documentId={documentId} startPage={startPage} onClose={onClose}/>;
+  // A photo opens on its Picture (mockup MEDIA_1); "Text in it" reads it here as any document.
+  if (doc && isPicture(doc) && !asText) return <PhotoRoom doc={doc} caseName={caseName} onClose={onClose} onText={() => setAsText(true)}/>;
+  // A PDF's Redact before sharing (mockup MEDIA_3) opens from the reading room and returns to it.
+  if (doc && redacting) return <RedactRoom doc={doc} caseName={caseName} onClose={() => setRedacting(false)}/>;
+  return <Room investigationId={investigationId} documentId={documentId} startPage={startPage} onClose={onClose} onRedact={() => setRedacting(true)}/>;
 }

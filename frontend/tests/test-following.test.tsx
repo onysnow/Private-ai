@@ -1,189 +1,151 @@
 // @vitest-environment jsdom
-// Following (Bring in › Following; mockup FOLLOW_1, ADR-0021), built to the rule that a screen shows titles, numbers,
-// icons and alerts and keeps the rest for hover, focus or click: the sub-text is not on screen until asked for, a
-// source's kind and health are marks named in their reveal, and a person captures or skips what a monitor found.
-import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+// Following (Bring in; mockup FOLLOW_1, ADR-0022): the sources and whether they work today, the queue most at risk
+// first with Capture, Skip and Record removal, Capture all only with a reason, a source's schedule and route, and a
+// closed platform with no monitor.
+import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {Reveal, REVEAL_DWELL_MS} from '../components/ui/reveal';
-import {FollowingScreen, itemAlerts} from '../features/following/following-screen';
+import {Following} from '../features/following/following';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import type {FollowingOut, MonitorItemOut, MonitorOut} from '../lib/generated/types.gen';
 import {QueryProvider} from '../lib/query-client';
 import {mockApi} from '../test-support/mock-api';
 
+vi.mock('next/navigation', () => ({useRouter: () => ({push: vi.fn()}), usePathname: () => '/bring-in', useSearchParams: () => new URLSearchParams()}));
+
 function monitor(over: Partial<MonitorOut> = {}): MonitorOut {
-  return {
-    id: 'm1', investigation_id: 'inv-1', kind: 'feed', url: 'https://www.marlow-courier.example/feed.xml', host: 'www.marlow-courier.example',
-    title: 'The Marlow Courier', interval_minutes: 30, route: 'direct', active: true, health: 'ok', health_reason: null, http_status: 200,
-    failures: 0, moved_to: null, last_checked_at: '2026-10-19T10:02:00', last_ok_at: '2026-10-19T10:02:00', next_check_at: '2026-10-19T10:32:00',
-    last_poll: {at: '2026-10-19T10:02:00', items_seen: 14, items_new: 4, not_modified: false, seconds: 0.4}, new_items: 1, versions: 0,
-    egress: 'One request every 30 minutes to www.marlow-courier.example, asking "anything new since my last visit?" (an ETag).',
-    created_by: 'you', created_at: '2026-10-12T08:00:00', ...over,
-  };
+  return {id: 'm1', kind: 'feed', platform: null, url: 'https://www.marlow-courier.example/feed.xml', name: 'The Marlow Courier · news feed',
+    every_minutes: 30, route: 'direct', health: 'works', health_detail: null, moved_to: null,
+    checks: [{state: 'ok', text: 'Answered 200 in 0.4 s'}, {state: 'ok', text: 'Read 14 items'}],
+    last_checked_at: '2026-10-28T10:02:00', last_ok_at: '2026-10-28T10:02:00', next_check_at: '2026-10-28T10:32:00', robots_allowed: true,
+    waiting: 2, leaves: 'One request every 30 minutes to marlow-courier.example, asking “anything new since my last visit?”.',
+    created_by: 'Ony', created_at: '2026-10-19T09:00:00', ...over};
 }
-
 function item(over: Partial<MonitorItemOut> = {}): MonitorItemOut {
-  return {
-    id: 'i1', monitor_id: 'm1', monitor_kind: 'feed', monitor_title: 'The Marlow Courier', url: 'https://www.marlow-courier.example/a',
-    title: 'Harbour authority approves Kestrel lease extension', displayed: {published: 'Mon, 19 Oct 2026 09:48:00 GMT'}, edits: 2,
-    flags: ['edited'], state: 'new', reason: null, decided_by: null, decided_at: null, capture_id: null,
-    first_seen_at: '2026-10-19T09:48:00', last_seen_at: '2026-10-19T10:02:00', ...over,
-  };
+  return {id: 'i1', monitor_id: 'm1', kind: 'feed', platform: null, title: 'Harbour authority approves Kestrel lease extension',
+    url: 'https://www.marlow-courier.example/lease', summary: '', published_at: '2026-10-28T09:48:00', first_seen_at: '2026-10-28T09:50:00',
+    state: 'waiting', risks: [{tone: 'amber', text: 'At risk: edited twice since first seen'}, {tone: 'teal', text: 'Wire copy of 3 others'}],
+    rank: 2, source: 'The Marlow Courier · news feed', extra: {}, capture_id: null, document_id: null, decision: {}, ...over};
+}
+function screenData(over: Partial<FollowingOut> = {}): FollowingOut {
+  return {monitors: [monitor(), monitor({id: 'm2', kind: 'closed', name: 'instagram.com · closed platform', url: 'https://www.instagram.com/kestrel.sa/',
+    health: 'closed', checks: [], waiting: 0, leaves: 'Nothing is fetched: a closed platform has no monitor.'})],
+  queue: [item({id: 'gone', title: 'Statement on the Kestrel lease', state: 'gone', rank: 3, risks: [{tone: 'bad', text: 'Removed: now answers 404'}]}),
+    item(), item({id: 'i2', title: 'Ferry timetable changes', rank: 0, risks: [{tone: '', text: 'New · no sign of risk'}]})],
+  waiting: 3, captured: 0, skipped: 0, copies: [], egress: {sources: 2, third_party: 0, direct: 1, tor: 0, public_server: 0, no_monitor: 1},
+  working: 1, followed: 1, ...over};
 }
 
-const following = (over: Partial<FollowingOut> = {}): FollowingOut => ({
-  monitors: [monitor(), monitor({id: 'm2', kind: 'page', title: 'Fernhill Ltd · About page', host: 'fernhill.example', health: 'moved',
-    moved_to: 'https://fernhill-holdings.example/about', health_reason: 'The address now points to https://fernhill-holdings.example/about', new_items: 0, versions: 2})],
-  at_risk: [item()], counts: {monitors: 2, working: 1, waiting: 1, direct: 2, tor: 0}, ...over,
-});
-
-beforeEach(() => connectGeneratedClient(new ApiClient('http://api.test')));
-afterEach(() => { cleanup(); vi.useRealTimers(); });
-
-describe('Reveal', () => {
-  it('keeps its detail off screen until hover, focus or a click, and Esc closes it', async () => {
-    const user = userEvent.setup();
-    render(<Reveal label="Feed" detail="An RSS or Atom feed">◎</Reveal>);
-    const mark = screen.getByRole('img', {name: 'Feed'});
-    expect(screen.queryByRole('tooltip')).toBeNull();
-    expect(mark).toHaveAccessibleDescription('An RSS or Atom feed');  // read with the mark, never hidden from a screen reader
-    await user.click(mark);
-    expect(screen.getByRole('tooltip')).toHaveTextContent('An RSS or Atom feed');
-    await user.keyboard('{Escape}');
-    expect(screen.queryByRole('tooltip')).toBeNull();
-  });
-
-  it('opens on hover after a short dwell', async () => {
-    vi.useFakeTimers();
-    render(<Reveal detail="Answered 200 in 0.4 s"><span>Works</span></Reveal>);
-    fireEvent.mouseEnter(screen.getByText('Works').parentElement!);
-    expect(screen.queryByRole('tooltip')).toBeNull();
-    act(() => { vi.advanceTimersByTime(REVEAL_DWELL_MS + 10); });
-    expect(screen.getByRole('tooltip')).toHaveTextContent('Answered 200 in 0.4 s');
-  });
-});
+beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
+afterEach(() => cleanup());
 
 describe('Following', () => {
-  it('words an item’s alerts short enough to stay on screen', () => {
-    expect(itemAlerts(item())).toEqual([{word: 'Edited 2×', tone: 'amber'}]);
-    expect(itemAlerts(item({flags: ['changed'], edits: 0, displayed: {lines_added: 2, lines_removed: 1}}))).toEqual([{word: 'Changed +2 −1', tone: 'amber'}]);
-    expect(itemAlerts(item({flags: [], edits: 0}))).toEqual([]);
-  });
-
-  it('shows titles, numbers, marks and alerts, and keeps the sub-text for a reveal', async () => {
-    mockApi({'GET /api/investigations/inv-1/following': following(), 'GET /api/monitors/m1/versions': []});
-    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
-    const sources = await screen.findByRole('region', {name: 'Sources followed'});
-    expect(await within(sources).findByText('The Marlow Courier')).toBeVisible();
-    expect(within(sources).getByLabelText('1 new')).toHaveTextContent('1');
-    // No timings, read counts or explanations on screen: they are in reveals.
-    // (Their words are in the page for screen readers, in hidden elements read with each mark.)
-    for (const words of [/0\.4 s/, /Read 14/, /never captures by itself/, /Posted Mon/]) {
-      expect(screen.queryAllByText(words, {exact: false}).filter(el => !el.closest('[hidden]'))).toEqual([]);
-    }
-    // The alert stays on screen; the item's posted date does not.
+  it('shows the sources, the queue most at risk first, and what leaves this computer', async () => {
+    mockApi({'GET /api/investigations/inv-1/following': screenData(), 'GET /api/monitors/m1/versions': []});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const sources = await screen.findByRole('listbox', {name: 'Sources'});
+    const feed = within(sources).getByRole('option', {name: /The Marlow Courier · news feed/});
+    expect(feed).toHaveAttribute('aria-selected', 'true');
+    expect(within(feed).getByText('2 new')).toBeInTheDocument();
+    expect(within(sources).getByRole('option', {name: /instagram\.com · closed platform/})).toHaveTextContent('none');
+    expect(screen.getByText('1 of 1 working today')).toBeInTheDocument();
     const queue = screen.getByRole('region', {name: 'Most at risk first'});
-    expect(within(queue).getByText('Edited 2×')).toBeVisible();
-    expect(screen.queryByRole('tooltip')).toBeNull();
-    // The selected source's kind is a mark named on demand.
-    const selected = screen.getByRole('region', {name: /Selected source/});
-    await userEvent.click(within(selected).getByRole('img', {name: 'News feed'}));
-    expect(screen.getByRole('tooltip')).toHaveTextContent(/RSS or Atom feed/);
+    const rows = within(queue).getAllByRole('listitem');
+    expect(rows[0]).toHaveTextContent('Statement on the Kestrel lease');
+    expect(within(rows[0]).getByRole('button', {name: 'Record removal'})).toBeInTheDocument();
+    expect(within(rows[1]).getByText('At risk: edited twice since first seen')).toBeInTheDocument();
+    expect(within(rows[1]).getByRole('button', {name: 'Capture'})).toBeInTheDocument();
+    const leaves = screen.getByRole('region', {name: 'What leaves this computer'});
+    expect(leaves).toHaveTextContent('0 third-party services. 1 source is asked directly, 1 has no monitor.');
+    const chosen = screen.getByRole('region', {name: 'Selected source'});
+    // What leaves this computer is one line on screen; its sentence is on hover (Ony, 29 Oct).
+    expect(within(chosen).getByText('↗ 1 request · 30 min · direct')).toBeVisible();
+    expect(within(chosen).getByText(/Leaves this computer:/).closest('[hidden]')).not.toBeNull();
+    // The kind is an icon and the health a shape; their words and the check results are on hover.
+    expect(within(feed).queryByText('FEED')).toBeNull();
+    expect(within(chosen).getByText('✓ Answered 200 in 0.4 s').closest('[hidden]')).not.toBeNull();
+    expect(within(rows[1]).getByText('The Marlow Courier · news feed').closest('[hidden]')).not.toBeNull();
+    expect(within(chosen).getByRole('radio', {name: '30 min'})).toHaveAttribute('aria-checked', 'true');
   });
 
-  it('offers the new address of a moved source and accepts it', async () => {
-    const api = mockApi({'GET /api/investigations/inv-1/following': following(), 'GET /api/monitors/m2/versions': [],
-      'PATCH /api/monitors/m2': monitor({id: 'm2', kind: 'page', health: 'waiting'})});
-    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
-    await userEvent.click(await screen.findByRole('button', {name: /Fernhill Ltd/}));
-    await userEvent.click(screen.getByRole('button', {name: 'Use the new address'}));
-    await waitFor(() => expect(api.calls('PATCH /api/monitors/m2')).toHaveLength(1));
-    expect(api.calls('PATCH /api/monitors/m2')[0].body).toEqual({url: 'https://fernhill-holdings.example/about'});
-  });
-
-  it('a person captures or skips what was found', async () => {
-    const api = mockApi({'GET /api/investigations/inv-1/following': following(), 'GET /api/monitors/m1/versions': [],
-      'POST /api/monitor-items/i1/capture': {item: item({state: 'captured'}), capture: {}}, 'POST /api/monitor-items/i1/skip': item({state: 'skipped'}),
-      'GET /api/investigations/inv-1/captures': [], 'GET /api/investigations/inv-1/drop': {}});
-    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
+  it('captures, skips, and captures all only with a reason', async () => {
+    const after = screenData({queue: [item({state: 'capturing', capture_id: 'c1', decision: {action: 'captured', by: 'Ony', at: '2026-10-28T10:05:00'}})], waiting: 0});
+    const api = mockApi({'GET /api/investigations/inv-1/following': screenData(), 'GET /api/monitors/m1/versions': [],
+      'POST /api/monitor-items/i1/capture': after,
+      'POST /api/monitor-items/i2/skip': screenData({skipped: 1, queue: [...screenData().queue.slice(0, 2),
+        item({id: 'i2', title: 'Ferry timetable changes', state: 'skipped', rank: 0, risks: [{tone: '', text: 'New · no sign of risk'}],
+          decision: {action: 'skipped', by: 'Ony', at: '2026-10-28T10:04:00'}})]}),
+      'POST /api/investigations/inv-1/following/capture-all': after});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
     const queue = await screen.findByRole('region', {name: 'Most at risk first'});
-    await userEvent.click(await within(queue).findByRole('button', {name: 'Capture'}));
-    await waitFor(() => expect(api.calls('POST /api/monitor-items/i1/capture')).toHaveLength(1));
-    await userEvent.click(within(queue).getByRole('button', {name: 'Skip'}));
-    await waitFor(() => expect(api.calls('POST /api/monitor-items/i1/skip')).toHaveLength(1));
-  });
-
-  it('capturing all asks for a reason first', async () => {
-    const api = mockApi({'GET /api/investigations/inv-1/following': following(), 'GET /api/monitors/m1/versions': [],
-      'POST /api/investigations/inv-1/following/capture-all': {captured: [], left: 0}, 'GET /api/investigations/inv-1/captures': []});
-    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
-    await userEvent.click(await screen.findByRole('button', {name: 'Capture all…'}));
-    await userEvent.type(screen.getByLabelText('Why capture all of them'), 'Named in the Kestrel story');
-    await userEvent.click(screen.getByRole('button', {name: /Capture 1/}));
+    const rows = within(queue).getAllByRole('listitem');
+    await user.click(within(rows[2]).getByRole('button', {name: 'Skip'}));
+    await waitFor(() => expect(api.calls('POST /api/monitor-items/i2/skip')).toHaveLength(1));
+    expect(await within(queue).findByText('Skipped')).toBeInTheDocument();
+    expect(within(queue).getByRole('button', {name: 'Undo'})).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Capture all…'}));
+    const go = screen.getByRole('button', {name: 'Capture all'});
+    expect(go).toBeDisabled();
+    await user.click(screen.getByRole('button', {name: 'Account is deleting posts'}));
+    expect(go).toBeEnabled();
+    await user.click(go);
     await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/following/capture-all')).toHaveLength(1));
-    expect(api.calls('POST /api/investigations/inv-1/following/capture-all')[0].body).toEqual({reason: 'Named in the Kestrel story'});
+    expect(api.calls('POST /api/investigations/inv-1/following/capture-all')[0].body).toEqual({reason: 'Account is deleting posts'});
   });
 
-  it('follows a new address with how often and which route', async () => {
-    const api = mockApi({'GET /api/investigations/inv-1/following': following({monitors: [], at_risk: [], counts: {monitors: 0, working: 0, waiting: 0, direct: 0, tor: 0}}),
-      'POST /api/investigations/inv-1/monitors': {status: 201, body: monitor()}});
-    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
-    await userEvent.click(await screen.findByRole('button', {name: '+ Follow something'}));
-    const form = screen.getByRole('form', {name: 'Follow something'});
-    await userEvent.type(within(form).getByLabelText('Address to follow'), 'https://www.marlow-courier.example/feed.xml');
-    await userEvent.click(within(form).getByRole('button', {name: 'hourly'}));
-    await userEvent.click(within(form).getByRole('button', {name: 'Tor'}));
-    await userEvent.click(within(form).getByRole('button', {name: 'Follow'}));
-    await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/monitors')).toHaveLength(1));
-    expect(api.calls('POST /api/investigations/inv-1/monitors')[0].body).toEqual(
-      {url: 'https://www.marlow-courier.example/feed.xml', interval_minutes: 60, route: 'tor', poll: true});
+  it('changes how often a source is asked and its route', async () => {
+    const api = mockApi({'GET /api/investigations/inv-1/following': screenData(), 'GET /api/monitors/m1/versions': [],
+      'PATCH /api/monitors/m1': monitor({every_minutes: 60})});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    const chosen = await screen.findByRole('region', {name: 'Selected source'});
+    await user.click(within(chosen).getByRole('radio', {name: 'hourly'}));
+    await user.click(within(chosen).getByRole('radio', {name: 'Neutral route'}));
+    await waitFor(() => expect(api.calls('PATCH /api/monitors/m1')).toHaveLength(2));
+    expect(api.calls('PATCH /api/monitors/m1').map(c => c.body)).toEqual([{every_minutes: 60}, {route: 'tor'}]);
   });
 
-  it('says why an item cannot be captured, and does not capture it', async () => {
-    const api = mockApi({'GET /api/investigations/inv-1/following': following({at_risk: [item({capture_blocked: 'This source is followed through Tor.'})]}),
-      'GET /api/monitors/m1/versions': []});
-    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
-    const capture = await screen.findByRole('button', {name: 'Capture'});
-    expect(capture).toHaveAttribute('aria-disabled', 'true');
-    expect(capture).toHaveAccessibleDescription('This source is followed through Tor.');
-    await userEvent.click(capture);
-    expect(api.calls('POST /api/monitor-items/i1/capture')).toHaveLength(0);
-  });
-});
-
-describe('Following: same story and removed pages', () => {
-  it('lists the copies of a story with how much of the wording is the same, and marks the original', async () => {
-    const original = item({id: 'i1', copies: 1});
-    const copy = item({id: 'i2', monitor_id: 'm2', copy_of: 'i1', similarity: 0.91, flags: [], edits: 0});
-    mockApi({'GET /api/investigations/inv-1/following': following({at_risk: [original], same_story: [{original, copies: [copy]}]}),
-      'GET /api/monitors/m1/versions': []});
-    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
-    const story = await screen.findByRole('region', {name: 'Same story'});
-    expect(within(story).getByText('91%')).toBeVisible();
-    expect(within(story).getByText('Fernhill Ltd · About page')).toBeVisible();
-    expect(within(screen.getByRole('region', {name: 'Most at risk first'})).getByText('+1 copy')).toBeVisible();
+  it('names a public Telegram channel by what is read of it: the web preview, no login', async () => {
+    const channel = monitor({id: 'm3', kind: 'account', platform: 'telegram', url: 'https://t.me/s/harbourwatch',
+      name: 'Harbour Watch (t.me/harbourwatch) · public Telegram channel', every_minutes: 15,
+      leaves: "One request every 15 minutes to t.me for this channel's public web preview. Telegram learns that this computer read the channel; no account is used."});
+    mockApi({'GET /api/investigations/inv-1/following': screenData({monitors: [channel]}), 'GET /api/monitors/m3/versions': []});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const chosen = await screen.findByRole('region', {name: 'Selected source'});
+    expect(within(chosen).getByText('Public channel · web preview, the latest posts · no login · t.me/harbourwatch')).toBeInTheDocument();
+    expect(within(chosen).getByText(/no account is used/)).toBeInTheDocument();
   });
 
-  it('offers Record removal, not Capture, for a page the site removed', async () => {
-    const gone = item({flags: ['gone'], edits: 0, displayed: {http_status: 410, captured_at: '2026-10-12T08:00:00'},
-      capture_blocked: 'Nothing to capture: the address answers 410 now.'});
-    const api = mockApi({'GET /api/investigations/inv-1/following': following({at_risk: [gone]}), 'GET /api/monitors/m1/versions': [],
-      'POST /api/monitor-items/i1/record': item({state: 'recorded'}), 'GET /api/investigations/inv-1/captures': [], 'GET /api/investigations/inv-1/drop': {}});
-    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
-    const queue = await screen.findByRole('region', {name: 'Most at risk first'});
-    expect(await within(queue).findByText('Gone · 410')).toBeVisible();
-    expect(within(queue).queryByRole('button', {name: 'Capture'})).toBeNull();
-    await userEvent.click(within(queue).getByRole('button', {name: 'Record removal'}));
-    await waitFor(() => expect(api.calls('POST /api/monitor-items/i1/record')).toHaveLength(1));
+  it('says a closed platform has no monitor and offers link capture', async () => {
+    mockApi({'GET /api/investigations/inv-1/following': screenData(), 'GET /api/monitors/m1/versions': []});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('option', {name: /instagram\.com · closed platform/}));
+    const chosen = screen.getByRole('region', {name: 'Selected source'});
+    expect(within(chosen).getByText('No monitor')).toBeInTheDocument();
+    expect(within(chosen).getByText(/The app does not sign in to any account/)).toBeInTheDocument();
+    expect(within(chosen).getByRole('link', {name: 'Paste a link'})).toBeInTheDocument();
   });
-});
 
-describe('Reveal around a control', () => {
-  it('gives the control itself the description, since it is the one that takes focus', () => {
-    render(<Reveal tabbable={false} detail="Sent through the Tor running on this computer"><button type="button">Tor</button></Reveal>);
-    expect(screen.getByRole('button', {name: 'Tor'})).toHaveAccessibleDescription('Sent through the Tor running on this computer');
+  it('follows one sender in a newsletter mailbox, its password sent once and never shown', async () => {
+    const api = mockApi({'GET /api/investigations/inv-1/following': screenData(), 'GET /api/monitors/m1/versions': [],
+      'POST /api/investigations/inv-1/monitors/mailbox': monitor({id: 'm3', kind: 'mailbox', platform: 'email', name: 'Newsletters from news@harbourwatch.example.org'})});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: '+ Follow something'}));
+    await user.click(screen.getByRole('radio', {name: 'A newsletter mailbox'}));
+    expect(screen.getByRole('button', {name: 'Follow'})).toBeDisabled();
+    expect(screen.getByText(/never loads the images in it/)).toBeInTheDocument();
+    await user.type(screen.getByLabelText('Mail server'), 'imap.example.net');
+    await user.type(screen.getByLabelText('User name'), 'desk@example.net');
+    await user.type(screen.getByLabelText(/^Password/), 'right horse');
+    expect(screen.getByLabelText(/^Password/)).toHaveAttribute('type', 'password');
+    await user.type(screen.getByLabelText('The sender to follow'), 'news@harbourwatch.example.org');
+    await user.click(screen.getByRole('button', {name: 'Follow'}));
+    await waitFor(() => expect(api.lastBody('POST /api/investigations/inv-1/monitors/mailbox')).toEqual(
+      {host: 'imap.example.net', user: 'desk@example.net', password: 'right horse', sender: 'news@harbourwatch.example.org'}));
   });
 });

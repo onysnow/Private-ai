@@ -28,6 +28,10 @@ class Capture(Base):
     status: Mapped[str] = mapped_column(String(16), default="queued")
     outcome: Mapped[str | None] = mapped_column(String(16), nullable=True)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # A link-only capture's reason in one word (dead_link, blocked, timed_out, tool_error): read from the reply, and
+    # changed by a person when they know better; `reason_kind_by` is that person.
+    reason_kind: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    reason_kind_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
     http_status: Mapped[int | None] = mapped_column(Integer, nullable=True)
     collector: Mapped[str | None] = mapped_column(String(255), nullable=True)
     tool: Mapped[str | None] = mapped_column(String(255), nullable=True)
@@ -53,3 +57,8 @@ class Capture(Base):
     # took and the tool; the recording it became is media_document_id.
     media: Mapped[dict] = mapped_column(JSON, default=dict)
     media_document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True)
+    # What outside services said about this capture, each asked for by a person and logged before it went
+    # (app/services/capture_witness.py, ADR-0025): "time_proof" (an RFC 3161 token over the WARC's SHA-256),
+    # "archive" (a public web archive's own copy), "elsewhere" (a copy an archive already holds of a page that could
+    # not be kept), and "asked" (what the capture was started with, done once it is saved).
+    witnesses: Mapped[dict | None] = mapped_column(JSON, nullable=True)

@@ -553,6 +553,244 @@ export const zAppUserUpdatedOut = z.object({
 });
 
 /**
+ * AuthenticityAboutClaimIn
+ *
+ * A claim about the item itself (that it circulated, when, posted by whom), which it supports even if synthetic.
+ */
+export const zAuthenticityAboutClaimIn = z.object({
+  text: z.string().min(10).max(2000),
+});
+
+/**
+ * AuthenticityClaimOut
+ *
+ * A claim this item supports, and what a status would do to it: `outcome` is loses (no other support), keeps
+ * (`others` other sources still support it; `other` is the first), unchanged, or about (a claim about the item
+ * itself, which keeps its support).
+ */
+export const zAuthenticityClaimOut = z.object({
+  id: z.string(),
+  other: z.record(z.string(), z.unknown()).nullish(),
+  others: z.int(),
+  outcome: z.string(),
+  status: z.string(),
+  text: z.string(),
+});
+
+/**
+ * AuthenticityCompareOut
+ *
+ * A comparison with the case's own files, made on this computer.
+ */
+export const zAuthenticityCompareOut = z.object({
+  matches: z.array(z.record(z.string(), z.unknown())),
+  pool: z.int(),
+  text: z.string(),
+});
+
+/**
+ * AuthenticityDecisionIn
+ *
+ * A person's decision on whether a case file is real (ADR-0023): the status, what they checked, and why.
+ */
+export const zAuthenticityDecisionIn = z.object({
+  checked: z
+    .array(
+      z.enum([
+        'read_findings',
+        'looked_up_source',
+        'asked_poster',
+        'compared_copies',
+        'checked_place_time',
+      ]),
+    )
+    .optional(),
+  reason: z.string().max(4000).optional().default(''),
+  status: z.enum([
+    'verified_origin',
+    'unverified',
+    'likely_synthetic',
+    'confirmed_synthetic',
+    'disputed',
+  ]),
+});
+
+/**
+ * AuthenticityHistoryOut
+ *
+ * One append-only line: a finding (actor system) or a person's decision, consent or setting.
+ */
+export const zAuthenticityHistoryOut = z.object({
+  actor: z.string(),
+  at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  kind: z.string(),
+  local: z.boolean(),
+  method: z.string().nullish(),
+  person: z.string().nullish(),
+  text: z.string(),
+  tool: z.string().nullish(),
+  version: z.string().nullish(),
+});
+
+/**
+ * AuthenticityItemCardOut
+ *
+ * The item as the case holds it: what it is, who posted it, when it was captured or added, its file and fingerprint;
+ * for text, the opening of its text and the quotes taken from it.
+ */
+export const zAuthenticityItemCardOut = z.object({
+  added_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  captured_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  document_id: z.string(),
+  excerpt: z.string().nullish(),
+  filename: z.string(),
+  from_link: z.boolean(),
+  height: z.int().nullish(),
+  kind: z.string(),
+  note: z.string().nullish(),
+  outlet: z.string().nullish(),
+  posted_by: z.string().nullish(),
+  quotes: z.array(z.string()),
+  sha256: z.string(),
+  size: z.int().nullish(),
+  title: z.string(),
+  width: z.int().nullish(),
+  words: z.int().nullish(),
+});
+
+/**
+ * AuthenticityOptionOut
+ *
+ * One choice on the consent card: what it sends (`sends`, exactly), to whom, and why it is not offered when not.
+ */
+export const zAuthenticityOptionOut = z.object({
+  available: z.boolean(),
+  key: z.string(),
+  label: z.string(),
+  sends: z.string().nullish(),
+  to: z.string(),
+  why_not: z.string().nullish(),
+});
+
+/**
+ * AuthenticityOutsideIn
+ *
+ * One outside check, allowed once for this item: which of the consent card's choices.
+ */
+export const zAuthenticityOutsideIn = z.object({
+  option: z.enum(['tineye', 'lens', 'web']),
+});
+
+/**
+ * AuthenticityOutsideOut
+ *
+ * An outside check allowed once: the address for the browser to open, the service, exactly what it carries, and
+ * its row in the outbound log.
+ */
+export const zAuthenticityOutsideOut = z.object({
+  outbound_request_id: z.string(),
+  sent: z.string(),
+  service: z.string(),
+  url: z.string(),
+});
+
+/**
+ * AuthenticityPreviewOut
+ *
+ * What a status with a role does to the claims that lean on the item; `applied` when it is the item's own now.
+ */
+export const zAuthenticityPreviewOut = z.object({
+  applied: z.boolean(),
+  blocking: z.boolean(),
+  claims: z.array(zAuthenticityClaimOut),
+  derived: z.array(z.record(z.string(), z.unknown())),
+  headline: z.string(),
+  losing: z.int(),
+  restating: z.array(z.string()),
+  role: z.string(),
+  status: z.string(),
+  suggestion: z.string().nullish(),
+});
+
+/**
+ * AuthenticityOut
+ *
+ * Is it real? (mockup CHECK_3, ADR-0023): the item, the findings (provenance, source, hints), the status only a
+ * person sets with what they checked and why, what it does to claims, the outside checks, and the history.
+ */
+export const zAuthenticityOut = z.object({
+  checked: z.array(z.string()),
+  decided_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  decided_by: z.string().nullish(),
+  examined_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  findings: z.record(z.string(), z.unknown()),
+  history: z.array(zAuthenticityHistoryOut),
+  item: zAuthenticityItemCardOut,
+  outside: z.array(zAuthenticityOptionOut),
+  platform_label: z.string().nullish(),
+  preview: zAuthenticityPreviewOut,
+  reason: z.string().nullish(),
+  role: z.string(),
+  source_protected: z.boolean(),
+  status: z.string(),
+});
+
+/**
+ * AuthenticityStatusOut
+ *
+ * A case file's standing, for lists.
+ */
+export const zAuthenticityStatusOut = z.object({
+  decided_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  document_id: z.string(),
+  flagged: z.boolean(),
+  role: z.string(),
+  source_protected: z.boolean(),
+  status: z.string(),
+});
+
+/**
+ * AuthenticityUpdate
+ *
+ * What the item is for (evidence of events, or the subject of the story), whether it is source-protected, and the
+ * label a platform showed beside it (not part of the file). Only the fields given change.
+ */
+export const zAuthenticityUpdate = z.object({
+  platform_label: z.string().max(1000).nullish(),
+  role: z.enum(['events', 'subject']).nullish(),
+  source_protected: z.boolean().nullish(),
+});
+
+/**
  * BackgroundJobOut
  *
  * One piece of slow work and where it stands; the screen polls this.
@@ -662,6 +900,35 @@ export const zBasemapStatusOut = z.object({
 });
 
 /**
+ * BoardNoteIn
+ */
+export const zBoardNoteIn = z.object({
+  board: z.string().min(1).max(128),
+  id: z.string().min(1).max(64),
+  text: z.string().min(1).max(400),
+  x: z.number().gte(0).lte(1),
+  y: z.number().gte(0).lte(1),
+});
+
+/**
+ * BoardNoteOut
+ */
+export const zBoardNoteOut = z.object({
+  board: z.string(),
+  id: z.string(),
+  text: z.string(),
+  x: z.number(),
+  y: z.number(),
+});
+
+/**
+ * Body_check_evidence_pack
+ */
+export const zBodyCheckEvidencePack = z.object({
+  file: z.string(),
+});
+
+/**
  * Body_inspect_backup
  */
 export const zBodyInspectBackup = z.object({
@@ -694,6 +961,83 @@ export const zBodyUploadDocument = z.object({
   file: z.string(),
   investigation_id: z.string(),
   title: z.string().optional().default(''),
+});
+
+/**
+ * BuiltTimelineIn
+ *
+ * A person's own timeline: its name, and the case's event ids in the order they want to tell them.
+ */
+export const zBuiltTimelineIn = z.object({
+  items: z.array(z.string()).max(500).optional(),
+  name: z.string().min(1).max(120),
+});
+
+/**
+ * BuiltTimelineOut
+ */
+export const zBuiltTimelineOut = z.object({
+  id: z.string(),
+  items: z.array(z.string()),
+  name: z.string(),
+  owner: z.string(),
+  updated_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+});
+
+/**
+ * ByHandAddedOut
+ *
+ * What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties.
+ */
+export const zByHandAddedOut = z.object({
+  evidence_id: z.string().nullish(),
+  lead_id: z.string().nullish(),
+  parties: z.array(z.string()),
+  record_id: z.string(),
+  record_type: z.enum(['party', 'link', 'event']),
+});
+
+/**
+ * ByHandHitOut
+ *
+ * Something the case already holds, or that waits in Decide, like what is being added by hand.
+ */
+export const zByHandHitOut = z.object({
+  as: z.string().nullish(),
+  caption: z.string().nullish(),
+  id: z.string(),
+  kind: z.enum(['record', 'proposal', 'link', 'event']),
+  same: z.boolean().nullish(),
+  schema: z.string().nullish(),
+});
+
+/**
+ * ByHandPreviewOut
+ *
+ * Before adding by hand (ENTRY_1): what the case already holds, what waits in Decide, what a link would change.
+ */
+export const zByHandPreviewOut = z.object({
+  already: z.array(zByHandHitOut),
+  changes: z.array(z.string()),
+  waiting: z.array(zByHandHitOut),
+});
+
+/**
+ * ByHandSuggestionOut
+ *
+ * A record of the case for a blank in the sentence, and the name it was found under.
+ */
+export const zByHandSuggestionOut = z.object({
+  as: z.string(),
+  caption: z.string(),
+  country: z.string().nullish(),
+  id: z.string(),
+  matched: z.string(),
+  schema: z.string(),
 });
 
 /**
@@ -819,11 +1163,56 @@ export const zCanonicalStatementOut = z.object({
 });
 
 /**
+ * CaptureAllRequest
+ *
+ * Capturing several at once needs a reason; it goes on each item it captures (the custody log).
+ */
+export const zCaptureAllRequest = z.object({
+  reason: z.string().min(8).max(2000),
+});
+
+/**
+ * CaptureArchiveOut
+ *
+ * A public web archive asked about this page (ADR-0025): "saved" (it kept its own copy, at `url`), "found" (it
+ * already held one), "none" (it holds none) or "failed" (with the reason). Only the address was sent.
+ */
+export const zCaptureArchiveOut = z.object({
+  answered_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  archived_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  archived_status: z.string().nullish(),
+  asked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  by: z.string(),
+  reason: z.string().nullish(),
+  sent: z.string(),
+  service: z.string(),
+  state: z.enum(['saved', 'found', 'none', 'failed']),
+  url: z.string().nullish(),
+});
+
+/**
  * CaptureCreate
  *
- * A link to capture (ADR-0018): http or https, a public address.
+ * A link to capture (ADR-0018): http or https, a public address. The two switches (ADR-0025) ask outside
+ * witnesses once the page is kept: a time server signs its fingerprint, a public web archive keeps its own copy.
  */
 export const zCaptureCreate = z.object({
+  second_witness: z.boolean().optional().default(false),
+  time_proof: z.boolean().optional().default(false),
   url: z.string().min(1).max(4096),
 });
 
@@ -851,6 +1240,15 @@ export const zCaptureFileOut = z.object({
 });
 
 /**
+ * CaptureFollowIn
+ *
+ * Check a captured page again: never, daily or weekly (the first check is one interval from now).
+ */
+export const zCaptureFollowIn = z.object({
+  every: z.enum(['never', 'daily', 'weekly']),
+});
+
+/**
  * CaptureMessageOut
  *
  * A request line or status line with a few of its headers ([name, value] pairs).
@@ -870,6 +1268,47 @@ export const zCaptureMessageOut = z.object({
 export const zCaptureExchangeOut = z.object({
   request: zCaptureMessageOut.nullish(),
   response: zCaptureMessageOut.nullish(),
+});
+
+/**
+ * CaptureQuoteLiveOut
+ */
+export const zCaptureQuoteLiveOut = z.object({
+  checked: z.boolean(),
+  found: z.boolean(),
+  match: z.string().nullish(),
+  same_as_saved: z.boolean(),
+  version: z.int(),
+});
+
+/**
+ * CaptureQuoteSavedOut
+ *
+ * Where the quote stands in the saved copy now: held (same place), moved (found elsewhere).
+ */
+export const zCaptureQuoteSavedOut = z.object({
+  match: z.string().nullish(),
+  occurrences: z.int(),
+  place: z.string(),
+  prefix: z.string(),
+  state: z.enum(['held', 'moved', 'not anchored']),
+  suffix: z.string(),
+});
+
+/**
+ * CaptureQuoteOut
+ *
+ * A quote pinned from a captured page, found again (INTAKE_3): in the saved copy (`saved`, None when it cannot be
+ * found there) and, once the page was checked again, on the live page (`live`). `unanchored`: in the tray.
+ */
+export const zCaptureQuoteOut = z.object({
+  captured_version: z.int(),
+  characters: z.int(),
+  evidence_id: z.string(),
+  live: zCaptureQuoteLiveOut.nullish(),
+  quote: z.string(),
+  saved: zCaptureQuoteSavedOut.nullish(),
+  unanchored: z.boolean(),
 });
 
 /**
@@ -893,59 +1332,76 @@ export const zCaptureStageOut = z.object({
 });
 
 /**
- * CaptureOut
+ * CaptureTimeProofOut
  *
- * A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
- * not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).
+ * An RFC 3161 token over the capture's WARC SHA-256 (ADR-0025): `time` is the time server's clock; `check` says
+ * whether it was checked here (signature and chain to a bundled root, this fingerprint, this request's nonce).
  */
-export const zCaptureOut = z.object({
-  captured_at: z
+export const zCaptureTimeProofOut = z.object({
+  answered_at: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     )
     .nullish(),
-  case_record_id: z.string().nullish(),
-  collector: z.string().nullish(),
-  content_verified: z.string(),
-  displayed: zCaptureDisplayedOut,
-  document_id: z.string().nullish(),
-  exchange: zCaptureExchangeOut,
-  files: z.array(zCaptureFileOut),
-  final_url: z.string().nullish(),
-  finished_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullish(),
-  http_status: z.int().nullish(),
-  id: z.string(),
-  investigation_id: z.string(),
-  job: zBackgroundJobOut.nullish(),
-  job_id: z.string().nullish(),
-  media: z.record(z.string(), z.unknown()),
-  media_document_id: z.string().nullish(),
-  outcome: z.enum(['saved', 'not_seen', 'link_only']).nullish(),
-  reason: z.string().nullish(),
-  requested_at: z
+  asked_at: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
-  robots_disallowed: z.boolean().nullish(),
-  source_id: z.string().nullish(),
-  stages: z.array(zCaptureStageOut),
-  started_at: z
+  by: z.string(),
+  check: z.enum(['checked', 'not_checked', 'failed']).nullish(),
+  check_detail: z.string().nullish(),
+  fingerprint: z.string().nullish(),
+  of: z.string(),
+  policy: z.string().nullish(),
+  reason: z.string().nullish(),
+  sent: z.string(),
+  serial: z.string().nullish(),
+  server: z.string(),
+  signer: z.string().nullish(),
+  state: z.enum(['stamped', 'failed']),
+  time: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     )
     .nullish(),
-  status: z.enum(['queued', 'capturing', 'finished', 'failed']),
-  suite_outcome: z.enum(['OBTAINED', 'UNABLE_TO_OBTAIN']).nullish(),
-  tool: z.string().nullish(),
-  url: z.string(),
+  token: z.string().nullish(),
+});
+
+/**
+ * CaptureUpdate
+ *
+ * A link only's reason, when the person knows better than the reply.
+ */
+export const zCaptureUpdate = z.object({
+  reason_kind: z.enum(['dead_link', 'blocked', 'timed_out', 'tool_error']),
+});
+
+/**
+ * CaptureVersionOut
+ */
+export const zCaptureVersionOut = z.object({
+  capture_id: z.string().nullish(),
+  captured: z.boolean(),
+  lines_changed: z.int(),
+  number: z.int(),
+  seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  text_sha256: z.string(),
+});
+
+/**
+ * CaptureWitnessesOut
+ */
+export const zCaptureWitnessesOut = z.object({
+  archive: zCaptureArchiveOut.nullish(),
+  elsewhere: zCaptureArchiveOut.nullish(),
+  time_proof: zCaptureTimeProofOut.nullish(),
 });
 
 /**
@@ -1029,17 +1485,28 @@ export const zCaseLookupsPut = z.object({
 });
 
 /**
+ * CaseMoneyOtherOut
+ */
+export const zCaseMoneyOtherOut = z.object({
+  amount: z.number(),
+  currency: z.string(),
+  payments: z.int(),
+  starting_payers: z.int(),
+});
+
+/**
  * CaseMoneyOut
  *
  * Money traced, counted once where it starts (payments whose payer received
- * nothing in the case), and how many payments carry it.
+ * nothing in the case), how many payments carry it, and how many different payers
+ * it starts from; each other currency with its own figures.
  */
 export const zCaseMoneyOut = z.object({
   amount: z.number(),
   currency: z.string().nullable(),
-  from_sources: z.int().optional().default(0),
-  other_currencies: z.array(z.string()),
+  others: z.array(zCaseMoneyOtherOut),
   payments: z.int(),
+  starting_payers: z.int().optional().default(0),
 });
 
 /**
@@ -1625,6 +2092,28 @@ export const zClaimUpdate = z.object({
 });
 
 /**
+ * CleanIn
+ *
+ * The steps of a cleaned copy (Listen › Clean and cut): take out mains hum, reduce room noise, even out loudness.
+ */
+export const zCleanIn = z.object({
+  hum: z.boolean().optional().default(true),
+  loudness_target: z.number().gte(-30).lte(-10).nullish().default(-16),
+  noise: z.enum(['off', 'light', 'medium']).optional().default('medium'),
+});
+
+/**
+ * ClipCreate
+ *
+ * A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`.
+ */
+export const zClipCreate = z.object({
+  end: z.number().gt(0),
+  from_cleaned: z.boolean().optional().default(false),
+  start: z.number().gte(0),
+});
+
+/**
  * ClusterDecisionOut
  */
 export const zClusterDecisionOut = z.object({
@@ -1786,6 +2275,14 @@ export const zCollectionUpdate = z.object({
 export const zCollectionsOut = z.object({
   collections: z.array(zCollectionSummaryOut),
   investigation_id: z.string(),
+});
+
+/**
+ * CompareWordOut
+ */
+export const zCompareWordOut = z.object({
+  differs: z.boolean(),
+  w: z.string(),
 });
 
 /**
@@ -1987,6 +2484,34 @@ export const zContextGroupsOut = z.object({
   reporting: z.array(zContextItemOut),
   review: z.array(zContextItemOut),
   workflow: z.array(zContextItemOut),
+});
+
+/**
+ * CopyMemberOut
+ */
+export const zCopyMemberOut = z.object({
+  first_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  original: z.boolean(),
+  similarity: z.number().nullish(),
+  source: z.string(),
+  title: z.string(),
+});
+
+/**
+ * CopyGroupOut
+ *
+ * Items that restate one text: counted once; only the earliest is offered for capture.
+ */
+export const zCopyGroupOut = z.object({
+  count: z.int(),
+  id: z.string(),
+  members: z.array(zCopyMemberOut),
+  title: z.string(),
 });
 
 /**
@@ -2594,6 +3119,7 @@ export const zDecisionItemOut = z.object({
   question: z.string(),
   rank: z.int(),
   reason: z.string(),
+  unlocks: z.array(z.string()).optional().default([]),
 });
 
 /**
@@ -2610,6 +3136,17 @@ export const zCaseDecisionsOut = z.object({
 });
 
 /**
+ * DeckCreate
+ *
+ * A new deck (mockup DECK_1): blank, or made from the case's story tree (a slide per section, its claims as bullets
+ * with each claim cited).
+ */
+export const zDeckCreate = z.object({
+  source: z.enum(['blank', 'story']).optional().default('story'),
+  title: z.string().max(300).optional().default(''),
+});
+
+/**
  * DeckSlideIn
  *
  * One slide as the editor sends it back. The types are checked here so a
@@ -2622,6 +3159,7 @@ export const zDeckSlideIn = z.object({
   evidence: z.array(z.record(z.string(), z.unknown())).optional(),
   heading: z.string().nullish(),
   kind: z.string().nullish(),
+  made_with: z.record(z.string(), z.string()).optional(),
   notes: z.string().nullish(),
   prose: z.string().nullish(),
   visual: z.record(z.string(), z.unknown()).nullish(),
@@ -2795,6 +3333,35 @@ export const zDemoCaseOut = z.object({
 export const zDemoSeedOut = z.object({
   created: z.boolean(),
   investigation_id: z.string(),
+});
+
+/**
+ * DerivedFileOut
+ *
+ * A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
+ * `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when.
+ */
+export const zDerivedFileOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullish(),
+  document_id: z.string(),
+  filename: z.string().optional().default(''),
+  id: z.string(),
+  job_id: z.string().nullish(),
+  mime_type: z.string(),
+  model: z.string().nullish(),
+  model_sha256: z.string().nullish(),
+  operation: z.string(),
+  params: z.record(z.string(), z.unknown()),
+  parent_id: z.string().nullish(),
+  parent_sha256: z.string(),
+  sha256: z.string(),
+  size: z.int(),
+  tool: z.string(),
 });
 
 /**
@@ -3517,6 +4084,20 @@ export const zErrorOut = z.object({
 });
 
 /**
+ * EventIn
+ */
+export const zEventIn = z.object({
+  date: z.string(),
+  entity_ids: z.array(z.string()).optional().default([]),
+  precision: z
+    .enum(['day', 'month', 'year', 'estimated'])
+    .optional()
+    .default('day'),
+  title: z.string().min(1).max(500),
+  where: z.string().max(300).nullish(),
+});
+
+/**
  * EvidenceCreate
  */
 export const zEvidenceCreate = z.object({
@@ -3972,6 +4553,28 @@ export const zExtractionReviewOut = z.object({
 });
 
 /**
+ * FaceBoxOut
+ *
+ * Where the detector finds a face, as fractions of the picture, with its score. Never who.
+ */
+export const zFaceBoxOut = z.object({
+  h: z.number(),
+  score: z.number(),
+  w: z.number(),
+  x: z.number(),
+  y: z.number(),
+});
+
+/**
+ * FacesOut
+ */
+export const zFacesOut = z.object({
+  faces: z.array(zFaceBoxOut),
+  model: z.string(),
+  model_sha256: z.string(),
+});
+
+/**
  * FactWatchCreate
  */
 export const zFactWatchCreate = z.object({
@@ -4164,14 +4767,15 @@ export const zFlagIndicatorOut = z.object({
 });
 
 /**
- * FollowingCountsOut
+ * FollowingEgressOut
  */
-export const zFollowingCountsOut = z.object({
+export const zFollowingEgressOut = z.object({
   direct: z.int(),
-  monitors: z.int(),
+  no_monitor: z.int(),
+  public_server: z.int(),
+  sources: z.int(),
+  third_party: z.int(),
   tor: z.int(),
-  waiting: z.int(),
-  working: z.int(),
 });
 
 /**
@@ -4287,6 +4891,15 @@ export const zHealthOut = z.object({
 });
 
 /**
+ * HiddenDataOut
+ */
+export const zHiddenDataOut = z.object({
+  category: z.string(),
+  count: z.int(),
+  label: z.string(),
+});
+
+/**
  * HighlightSegmentOut
  *
  * A piece of a snippet; ``match`` marks the words the search found.
@@ -4325,6 +4938,15 @@ export const zCorpusSearchOut = z.object({
   results: z.array(zCorpusHitOut),
   state: z.enum(['ok', 'not_configured', 'no_collection', 'unreachable']),
   total: z.int(),
+});
+
+/**
+ * HumOut
+ */
+export const zHumOut = z.object({
+  above_db: z.number(),
+  harmonics: z.int(),
+  hz: z.int().nullish(),
 });
 
 /**
@@ -4576,6 +5198,7 @@ export const zInvestigationCreate = z.object({
 export const zInvestigationDeletionPreview = z.object({
   can_delete: z.boolean(),
   capture_file_count: z.int().optional().default(0),
+  derived_file_count: z.int().optional().default(0),
   document_file_summary: zDeletionFileSummary,
   document_files: z.array(zDeletionDocumentFile),
   investigation_id: z.string(),
@@ -4994,6 +5617,21 @@ export const zLookupSourceOut = z.object({
 });
 
 /**
+ * MailboxCreate
+ *
+ * A newsletter mailbox to follow (DECISIONS_LOG 11): a dedicated mailbox read over IMAP with TLS, and the one sender
+ * (an address, or @domain for everything from it) whose messages are queued.
+ */
+export const zMailboxCreate = z.object({
+  every_minutes: z.int().optional().default(60),
+  host: z.string().min(3).max(253),
+  password: z.string().min(1).max(1000),
+  port: z.int().gte(1).lte(65535).optional().default(993),
+  sender: z.string().min(3).max(320),
+  user: z.string().min(1).max(320),
+});
+
+/**
  * MappedEntityOut
  *
  * One entity or link a previewed row makes; a link names its two ends.
@@ -5317,131 +5955,55 @@ export const zMoneyCheckOut = z.object({
 });
 
 /**
- * MonitorCaptureAll
- *
- * Capturing many at once needs a reason, which goes on each item (EGS rule 8).
+ * MonitorCheckOut
  */
-export const zMonitorCaptureAll = z.object({
-  item_ids: z.array(z.string()).max(50).nullish(),
-  reason: z.string().min(3).max(500),
+export const zMonitorCheckOut = z.object({
+  seconds: z.number().nullish(),
+  state: z.enum(['ok', 'warn', 'bad', 'wait']),
+  status: z.int().nullish(),
+  text: z.string(),
 });
 
 /**
  * MonitorCreate
  *
- * An address to follow. `kind` is worked out from the address when left out.
+ * Something to follow (ADR-0022): a web address (a feed, sitemap, podcast or page; a page that names its feed is
+ * followed through the feed), a Bluesky handle (@name.bsky.social) or a Mastodon account (@name@server).
  */
 export const zMonitorCreate = z.object({
-  interval_minutes: z.int().gte(5).lte(10080).optional().default(30),
-  kind: z.enum(['feed', 'sitemap', 'page', 'podcast', 'youtube']).nullish(),
-  poll: z.boolean().optional().default(true),
+  every_minutes: z.int().nullish(),
   route: z.enum(['direct', 'tor']).optional().default('direct'),
-  title: z.string().max(300).nullish(),
-  url: z.string().min(1).max(4096),
-});
-
-/**
- * MonitorItemOut
- *
- * Something a monitor found. `flags`: edited (its entry changed after first seen), changed (a page's text changed),
- * gone. `displayed` is what the site said, as displayed and not verified.
- */
-export const zMonitorItemOut = z.object({
-  capture_blocked: z.string().nullish(),
-  capture_id: z.string().nullish(),
-  copies: z.int().optional().default(0),
-  copy_of: z.string().nullish(),
-  decided_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    )
-    .nullish(),
-  decided_by: z.string().nullish(),
-  displayed: z.record(z.string(), z.unknown()),
-  edits: z.int(),
-  first_seen_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  flags: z.array(z.string()),
-  id: z.string(),
-  last_seen_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  monitor_id: z.string(),
-  monitor_kind: z
-    .enum(['feed', 'sitemap', 'page', 'podcast', 'youtube'])
-    .nullish(),
-  monitor_title: z.string().nullish(),
-  reason: z.string().nullish(),
-  similarity: z.number().nullish(),
-  state: z.enum(['new', 'captured', 'skipped', 'recorded']),
-  title: z.string().nullish(),
-  url: z.string(),
-});
-
-/**
- * MonitorItemCaptureOut
- */
-export const zMonitorItemCaptureOut = z.object({
-  capture: zCaptureOut,
-  item: zMonitorItemOut,
-});
-
-/**
- * CaptureAllOut
- */
-export const zCaptureAllOut = z.object({
-  captured: z.array(zMonitorItemCaptureOut),
-  left: z.int(),
-});
-
-/**
- * MonitorItemSkip
- */
-export const zMonitorItemSkip = z.object({
-  reason: z.string().max(500).nullish(),
-});
-
-/**
- * MonitorPollOut
- */
-export const zMonitorPollOut = z.object({
-  at: z.string().nullish(),
-  items_new: z.int().optional().default(0),
-  items_seen: z.int().optional().default(0),
-  not_modified: z.boolean().optional().default(false),
-  seconds: z.number().nullish(),
+  target: z.string().min(1).max(4096),
 });
 
 /**
  * MonitorOut
  *
- * One address watched. `health`: waiting (not looked at yet), ok, moved (it redirects to `moved_to`), broken (see
- * `health_reason`), blocked (robots.txt or a login wall), paused.
+ * A source the case follows. `kind`: feed, sitemap, page, podcast, account (an open-protocol public account) or
+ * closed (a closed platform: no monitor). `health`: works, broken, moved (paused until a person accepts `moved_to`),
+ * paused, unchecked or closed. `leaves` says in words what each check sends and where.
  */
 export const zMonitorOut = z.object({
-  active: z.boolean(),
+  checks: z.array(zMonitorCheckOut),
   created_at: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     ),
   created_by: z.string().nullish(),
-  egress: z.string(),
-  failures: z.int(),
-  health: z.enum(['waiting', 'ok', 'moved', 'broken', 'blocked', 'paused']),
-  health_reason: z.string().nullish(),
-  host: z.string(),
-  http_status: z.int().nullish(),
+  every_minutes: z.int(),
+  health: z.enum(['works', 'broken', 'moved', 'paused', 'unchecked', 'closed']),
+  health_detail: z.string().nullish(),
   id: z.string(),
-  interval_minutes: z.int(),
-  investigation_id: z.string(),
-  kind: z.enum(['feed', 'sitemap', 'page', 'podcast', 'youtube']),
+  kind: z.enum([
+    'feed',
+    'sitemap',
+    'page',
+    'podcast',
+    'account',
+    'closed',
+    'mailbox',
+  ]),
   last_checked_at: z
     .string()
     .regex(
@@ -5454,31 +6016,108 @@ export const zMonitorOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     )
     .nullish(),
-  last_poll: zMonitorPollOut,
+  leaves: z.string(),
   moved_to: z.string().nullish(),
-  new_items: z.int(),
+  name: z.string(),
   next_check_at: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     )
     .nullish(),
+  platform: z.string().nullish(),
+  robots_allowed: z.boolean().nullish(),
   route: z.enum(['direct', 'tor']),
-  title: z.string().nullish(),
   url: z.string(),
-  versions: z.int(),
+  waiting: z.int(),
+});
+
+/**
+ * MonitorRiskOut
+ */
+export const zMonitorRiskOut = z.object({
+  text: z.string(),
+  tone: z.enum(['bad', 'amber', 'teal', '']),
+});
+
+/**
+ * MonitorItemOut
+ *
+ * One thing a monitor turned up, as the queue shows it. `state`: waiting, capturing, saved, not_saved, skipped,
+ * gone (a captured item whose address now answers 404 or 410) or removal_recorded.
+ */
+export const zMonitorItemOut = z.object({
+  capture_id: z.string().nullish(),
+  decision: z.record(z.string(), z.unknown()),
+  document_id: z.string().nullish(),
+  extra: z.record(z.string(), z.unknown()),
+  first_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  id: z.string(),
+  kind: z.string(),
+  monitor_id: z.string(),
+  platform: z.string().nullish(),
+  published_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  rank: z.int(),
+  risks: z.array(zMonitorRiskOut),
+  source: z.string(),
+  state: z.enum([
+    'waiting',
+    'capturing',
+    'saved',
+    'not_saved',
+    'skipped',
+    'gone',
+    'removal_recorded',
+    'copy',
+  ]),
+  summary: z.string(),
+  title: z.string(),
+  url: z.string().nullish(),
+});
+
+/**
+ * FollowingOut
+ *
+ * Everything the Following screen shows: the sources, the queue (most at risk first), copies of one story, and
+ * what leaves this computer.
+ */
+export const zFollowingOut = z.object({
+  captured: z.int(),
+  copies: z.array(zCopyGroupOut),
+  egress: zFollowingEgressOut,
+  followed: z.int(),
+  monitors: z.array(zMonitorOut),
+  queue: z.array(zMonitorItemOut),
+  skipped: z.int(),
+  waiting: z.int(),
+  working: z.int(),
 });
 
 /**
  * MonitorUpdate
  */
 export const zMonitorUpdate = z.object({
-  active: z.boolean().nullish(),
-  interval_minutes: z.int().gte(5).lte(10080).nullish(),
-  kind: z.enum(['feed', 'sitemap', 'page', 'podcast', 'youtube']).nullish(),
+  accept_move: z.boolean().nullish(),
+  every_minutes: z
+    .union([
+      z.literal(15),
+      z.literal(30),
+      z.literal(60),
+      z.literal(1440),
+      z.literal(10080),
+    ])
+    .nullish(),
+  paused: z.boolean().nullish(),
   route: z.enum(['direct', 'tor']).nullish(),
-  title: z.string().max(300).nullish(),
-  url: z.string().min(1).max(4096).nullish(),
 });
 
 /**
@@ -5493,6 +6132,51 @@ export const zMultiEnrichmentRequest = z.object({
  */
 export const zNameIn = z.object({
   name: z.string(),
+});
+
+/**
+ * NearestPlaceOut
+ */
+export const zNearestPlaceOut = z.object({
+  caption: z.string(),
+  entity_id: z.string(),
+  metres: z.int(),
+});
+
+/**
+ * NewParty
+ */
+export const zNewParty = z.object({
+  aliases: z.array(z.string()).optional().default([]),
+  caption: z.string().min(1).max(300),
+  country: z.string().max(80).nullish(),
+  schema: z.enum([
+    'Company',
+    'Person',
+    'Organization',
+    'PublicBody',
+    'LegalEntity',
+  ]),
+});
+
+/**
+ * End
+ *
+ * One end of a link: a record of the case, or a new party.
+ */
+export const zEnd = z.object({
+  entity_id: z.string().nullish(),
+  new: zNewParty.nullish(),
+});
+
+/**
+ * LinkIn
+ */
+export const zLinkIn = z.object({
+  properties: z.record(z.string(), z.array(z.string())).optional().default({}),
+  schema: z.string(),
+  source: zEnd,
+  target: zEnd,
 });
 
 /**
@@ -6075,6 +6759,82 @@ export const zOwnershipChainOut = z.object({
 });
 
 /**
+ * PackExhibitOut
+ *
+ * A changed or missing exhibit file, what rests on it, and the case's own file. `ours` and `theirs` are small
+ * pictures (data URLs) when the picture could be drawn again exactly as listed; `differs` is where they differ.
+ */
+export const zPackExhibitOut = z.object({
+  case_file: z.enum(['matches', 'does not match']).nullish(),
+  claims: z.array(z.string()),
+  differs: z.record(z.string(), z.number()).nullish(),
+  document: z.string().nullish(),
+  file: z.string(),
+  number: z.int(),
+  ours: z.string().nullish(),
+  redrawn: z.boolean(),
+  state: z.enum(['changed', 'missing', 'extra']),
+  theirs: z.string().nullish(),
+});
+
+/**
+ * PackFileOut
+ *
+ * One file of a pack someone sent back: as made, changed, missing, or not in the list; `about` names what a
+ * changed or missing custody page is about.
+ */
+export const zPackFileOut = z.object({
+  about: z.string().nullish(),
+  listed: z.string().nullish(),
+  name: z.string(),
+  now: z.string().nullish(),
+  state: z.enum(['as_made', 'changed', 'missing', 'extra']),
+});
+
+/**
+ * PackSignatureOut
+ *
+ * The pack's signature: none, invalid or valid; the key's fingerprint; whether it is this computer's key; whether it
+ * is the key the pack was made with (always true for a pack not made here).
+ */
+export const zPackSignatureOut = z.object({
+  as_made: z.boolean(),
+  fingerprint: z.string().nullish(),
+  ours: z.boolean(),
+  state: z.enum(['none', 'invalid', 'valid']),
+});
+
+/**
+ * PackCheckOut
+ *
+ * Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,
+ * for a pack not made in this case, with its own MANIFEST.sha256). Nothing of the pack is kept or sent.
+ */
+export const zPackCheckOut = z.object({
+  compared_with: z.string(),
+  counts: z.record(z.string(), z.int()),
+  draft: z.boolean().nullish(),
+  exhibits: z.array(zPackExhibitOut),
+  file: z.string(),
+  files: z.int(),
+  list_changed: z.boolean(),
+  made_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  made_by: z.string().nullish(),
+  made_here: z.boolean(),
+  made_in_other_case: z.string().nullish(),
+  pack_id: z.string().nullish(),
+  rows: z.array(zPackFileOut),
+  signature: zPackSignatureOut,
+  title: z.string().nullish(),
+  whole: z.boolean(),
+});
+
+/**
  * PacketFromIn
  *
  * Run again from a step of an earlier run (mockup AI_1, research AI §5): the same packet, new instructions.
@@ -6085,6 +6845,27 @@ export const zPacketFromIn = z.object({
 });
 
 /**
+ * PageVersionOut
+ *
+ * One version of a followed page's main text; `diff` lists the lines removed (-) and added (+) since the one before.
+ */
+export const zPageVersionOut = z.object({
+  capture_id: z.string().nullish(),
+  captured: z.boolean(),
+  diff: z.array(z.string()),
+  id: z.string(),
+  layout_changes: z.array(z.record(z.string(), z.unknown())),
+  lines_changed: z.int(),
+  number: z.int(),
+  seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  sha256: z.string(),
+});
+
+/**
  * PartyYearsOut
  *
  * The years a party's dated events and links touch (pointing at it lights them).
@@ -6092,6 +6873,33 @@ export const zPacketFromIn = z.object({
 export const zPartyYearsOut = z.object({
   entity_id: z.string(),
   years: z.array(z.int()),
+});
+
+/**
+ * PdfPageOut
+ */
+export const zPdfPageOut = z.object({
+  height: z.number(),
+  page: z.int(),
+  width: z.number(),
+});
+
+/**
+ * PdfaIssueOut
+ */
+export const zPdfaIssueOut = z.object({
+  clause: z.string().nullish(),
+  fixable: z.boolean(),
+  message: z.string().nullish(),
+});
+
+/**
+ * PdfaOut
+ */
+export const zPdfaOut = z.object({
+  compliant: z.boolean(),
+  declared: z.string().nullish(),
+  issues: z.array(zPdfaIssueOut),
 });
 
 /**
@@ -6145,6 +6953,19 @@ export const zPeekOut = z.object({
 });
 
 /**
+ * PhotoCopyIn
+ *
+ * A copy of a photo (Picture › Make a copy): which tool, its settings, and the copy it is made from (else the photo
+ * as shown). blur_faces {radius, boxes?}; strip_metadata {}; crop {box}; redact {box, reason}; turn {degrees}.
+ * A box is x, y, w, h as fractions of the picture.
+ */
+export const zPhotoCopyIn = z.object({
+  from_id: z.string().nullish(),
+  operation: z.enum(['blur_faces', 'strip_metadata', 'crop', 'redact', 'turn']),
+  params: z.record(z.string(), z.unknown()).optional(),
+});
+
+/**
  * PinIn
  */
 export const zPinIn = z.object({
@@ -6163,7 +6984,7 @@ export const zPinSetIn = z.object({
  *
  * An event on the investigation's timeline that happened at a place:
  * one about the place's own record ("place") or about a relationship
- * linking something to it ("link"). `first_day` and `last_day` are the
+ * linking something to it, or about a record linked to it ("link"). `first_day` and `last_day` are the
  * days its dates as recorded can mean; `exact` is false when a date is
  * known only to the month or year.
  */
@@ -6210,7 +7031,42 @@ export const zPlaceOut = z.object({
   latitude: z.number(),
   links: z.array(zPlaceLinkOut),
   longitude: z.number(),
+  placed_from: z.string().nullish(),
+  precision: z.string().nullish(),
   schema: z.string(),
+  sure: z
+    .enum(['document', 'approximate', 'not_yet'])
+    .optional()
+    .default('not_yet'),
+});
+
+/**
+ * PlaceProposalOut
+ */
+export const zPlaceProposalOut = z.object({
+  id: z.string(),
+  status: z.string(),
+});
+
+/**
+ * PhotoOut
+ *
+ * A photo as the Picture screen shows it: what the file claims about itself, how far its GPS is from the case's
+ * nearest place, and the machine's proposals.
+ */
+export const zPhotoOut = z.object({
+  claims: z.record(z.string(), z.unknown()),
+  date_tag: z.string().nullish(),
+  document_id: z.string(),
+  face_model_here: z.boolean(),
+  filename: z.string(),
+  height: z.int().nullish(),
+  kind: z.string(),
+  nearest_place: zNearestPlaceOut.nullish(),
+  place_proposal: zPlaceProposalOut.nullish(),
+  sha256: z.string(),
+  text: z.array(z.string()),
+  width: z.int().nullish(),
 });
 
 /**
@@ -6222,6 +7078,94 @@ export const zPlacesOut = z.object({
   investigation_id: z.string(),
   omitted: z.array(zOmittedPlaceOut),
   places: z.array(zPlaceOut),
+});
+
+/**
+ * PlatformChecksUpdate
+ *
+ * Turn the daily check on or off, the warning before a capture, or change a platform's test item (empty: back to
+ * the one the app ships with).
+ */
+export const zPlatformChecksUpdate = z.object({
+  daily: z.boolean().nullish(),
+  items: z.record(z.string(), z.string().nullable()).nullish(),
+  warn: z.boolean().nullish(),
+});
+
+/**
+ * PlatformDayOut
+ */
+export const zPlatformDayOut = z.object({
+  day: z.string(),
+  state: z.enum(['works', 'partly', 'broken']).nullish(),
+});
+
+/**
+ * PlatformForUrlOut
+ *
+ * The platform a pasted link is on and how it was at its last check (none when not one the app tries).
+ */
+export const zPlatformForUrlOut = z.object({
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  detail: z.string().nullish(),
+  key: z.string(),
+  name: z.string(),
+  state: z.enum(['works', 'partly', 'broken']).nullish(),
+});
+
+/**
+ * PlatformOut
+ *
+ * One platform the app saves from, tried on its public test item: today's state as a word, the last 14 days.
+ */
+export const zPlatformOut = z.object({
+  broken_since: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  days: z.array(zPlatformDayOut),
+  detail: z.string().nullish(),
+  key: z.string(),
+  missing: z.array(z.string()).optional().default([]),
+  name: z.string(),
+  route: z.string(),
+  saves: z.string(),
+  seconds: z.number().nullish(),
+  shipped_url: z.string(),
+  state: z.enum(['works', 'partly', 'broken']).nullish(),
+  test_url: z.string(),
+});
+
+/**
+ * PlatformChecksOut
+ *
+ * Does it work today? (WORKS_1): each platform, whether the daily check is on, whether a pasted link is warned about.
+ */
+export const zPlatformChecksOut = z.object({
+  checked: z.int(),
+  daily: z.boolean(),
+  last_checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  platforms: z.array(zPlatformOut),
+  warn: z.boolean(),
+  working: z.int(),
 });
 
 /**
@@ -6378,6 +7322,32 @@ export const zEntityMatchPreviewOut = z.object({
   provider_lead: zProviderLeadOut,
   schema: z.string(),
   strong_match: zEntityCandidateOut.nullable(),
+});
+
+/**
+ * PublisherCueOut
+ */
+export const zPublisherCueOut = z.object({
+  end: z.number(),
+  speaker: z.string().nullish(),
+  start: z.number(),
+  text: z.string(),
+});
+
+/**
+ * PublisherTranscriptOut
+ *
+ * The episode's own transcript as its publisher offers it (podcast:transcript), fetched with the episode and kept
+ * as it came: its address, type, SHA-256 and when it was fetched; `error` when it could not be read.
+ */
+export const zPublisherTranscriptOut = z.object({
+  bytes: z.int().nullish(),
+  cues: z.array(zPublisherCueOut).optional().default([]),
+  error: z.string().nullish(),
+  fetched_at: z.string().nullish(),
+  sha256: z.string().nullish(),
+  type: z.string().nullish(),
+  url: z.string(),
 });
 
 /**
@@ -6587,6 +7557,97 @@ export const zRecoverIn = z.object({
  */
 export const zRecoveryWordsOut = z.object({
   words: z.array(z.string()),
+});
+
+/**
+ * RedactBoxIn
+ *
+ * One box to redact: its page, its place in points from the page's top-left (left, top, right, bottom), its reason
+ * (kept in the trail), and whether a person drew it or accepted a proposal (phone, email, person).
+ */
+export const zRedactBoxIn = z.object({
+  kind: z
+    .enum(['drawn', 'phone', 'email', 'person'])
+    .optional()
+    .default('drawn'),
+  page: z.int().gte(1),
+  reason: z.string().min(1).max(300),
+  rect: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+});
+
+/**
+ * RedactCompareOut
+ *
+ * How a redacted copy differs from the case's file: the words each holds, the pages that changed, and the hidden
+ * data the copy still carries.
+ */
+export const zRedactCompareOut = z.object({
+  copy_id: z.string(),
+  hidden_left: z.array(zHiddenDataOut),
+  new_words: z.int(),
+  old_words: z.int(),
+  pages_changed: z.array(z.int()),
+});
+
+/**
+ * RedactIn
+ *
+ * A redacted copy of a PDF (Redact before sharing): the boxes, the hidden data to take out of the copy, whether to
+ * make it PDF/A-2b, and who it is for (it names the file).
+ */
+export const zRedactIn = z.object({
+  boxes: z.array(zRedactBoxIn).min(1).max(500),
+  made_for: z
+    .enum(['editor', 'lawyer', 'publication'])
+    .optional()
+    .default('editor'),
+  pdfa: z.boolean().optional().default(false),
+  remove: z
+    .array(
+      z.enum([
+        'metadata',
+        'attachments',
+        'comments',
+        'form-fields',
+        'hidden-text',
+        'hidden-layers',
+        'bookmarks',
+        'links-actions-scripts',
+        'private-data',
+      ]),
+    )
+    .optional(),
+});
+
+/**
+ * RedactProposalOut
+ *
+ * A box the machine proposes, never applied on its own: a phone number or email address found by pattern, or a
+ * person named in this case found in the text.
+ */
+export const zRedactProposalOut = z.object({
+  entity_id: z.string().nullish(),
+  id: z.string(),
+  kind: z.string(),
+  page: z.int(),
+  rect: z.array(z.number()),
+  text: z.string(),
+  why: z.string(),
+});
+
+/**
+ * RedactionOut
+ *
+ * A PDF as the Redact screen shows it: its pages in points, the proposed boxes, its hidden data, PDF/A now.
+ */
+export const zRedactionOut = z.object({
+  document_id: z.string(),
+  hidden: z.array(zHiddenDataOut),
+  pages: z.array(zPdfPageOut),
+  pdfa: zPdfaOut,
+  proposals: z.array(zRedactProposalOut),
+  sha256: z.string(),
+  tool: z.string(),
 });
 
 /**
@@ -6860,6 +7921,7 @@ export const zBackupPreviewOut = z.object({
   can_restore: z.boolean(),
   capture_file_count: z.int().optional().default(0),
   conflicts: z.array(zRestoreConflictOut),
+  derived_file_count: z.int().optional().default(0),
   document_file_count: z.int(),
   format: z.string(),
   investigation: zBackupInvestigationOut,
@@ -7308,6 +8370,15 @@ export const zSafetyBackupOut = z.object({
 });
 
 /**
+ * SafetyGuideOut
+ */
+export const zSafetyGuideOut = z.object({
+  publisher: z.string(),
+  title: z.string(),
+  url: z.string(),
+});
+
+/**
  * SafetyHousekeepingOut
  */
 export const zSafetyHousekeepingOut = z.object({
@@ -7330,6 +8401,30 @@ export const zSafetyServiceOut = z.object({
   state: z.enum(['off', 'ask_first', 'automatic', 'on_request', 'local']),
   state_note: z.string(),
   where: z.enum(['inside', 'outside']),
+});
+
+/**
+ * SafetySourceOut
+ */
+export const zSafetySourceOut = z.object({
+  publisher: z.string(),
+  title: z.string(),
+  url: z.string(),
+});
+
+/**
+ * SafetyQuestionOut
+ *
+ * A sign only the reporter can say. The answer stays in their browser; this server never receives it.
+ */
+export const zSafetyQuestionOut = z.object({
+  definition: z.string(),
+  id: z.string(),
+  innocent: z.array(z.string()),
+  name: z.string(),
+  question: z.string(),
+  source: zSafetySourceOut,
+  textbook: z.string(),
 });
 
 /**
@@ -7378,6 +8473,33 @@ export const zSafetyDataOut = z.object({
 });
 
 /**
+ * SafetyTraceOut
+ */
+export const zSafetyTraceOut = z.object({
+  document_id: z.string(),
+  filename: z.string(),
+  traces: z.array(z.string()),
+});
+
+/**
+ * SafetySignOut
+ *
+ * A safety sign from the case's records (catalogue/indicators/sa.yaml), shown apart from Red Flags. No level: the
+ * catalogue's Faint and Strong for safety are not set yet.
+ */
+export const zSafetySignOut = z.object({
+  definition: z.string(),
+  documents: z.array(zSafetyTraceOut).optional().default([]),
+  evidence: z.string(),
+  id: z.string(),
+  innocent: z.array(z.string()),
+  level: z.string().nullish(),
+  name: z.string(),
+  source: zSafetySourceOut,
+  textbook: z.string(),
+});
+
+/**
  * SameAnswerCandidateOut
  */
 export const zSameAnswerCandidateOut = z.object({
@@ -7400,26 +8522,6 @@ export const zSameAnswerOut = z.object({
   caption: z.string(),
   label: z.string().nullish(),
   scope: z.enum(['drop', 'case']),
-});
-
-/**
- * SameStoryOut
- *
- * One story seen from several sources: the earliest, and the copies counted once with it.
- */
-export const zSameStoryOut = z.object({
-  copies: z.array(zMonitorItemOut),
-  original: zMonitorItemOut,
-});
-
-/**
- * FollowingOut
- */
-export const zFollowingOut = z.object({
-  at_risk: z.array(zMonitorItemOut),
-  counts: zFollowingCountsOut,
-  monitors: z.array(zMonitorOut),
-  same_story: z.array(zSameStoryOut).optional().default([]),
 });
 
 /**
@@ -7656,6 +8758,21 @@ export const zSettingsStatusOut = z.object({
 });
 
 /**
+ * SigningKeyOut
+ *
+ * This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack.
+ */
+export const zSigningKeyOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  fingerprint: z.string().nullish(),
+});
+
+/**
  * SimilarDocumentOut
  */
 export const zSimilarDocumentOut = z.object({
@@ -7704,6 +8821,40 @@ export const zSlideDrawingOut = z.object({
 });
 
 /**
+ * SlideProblemOut
+ */
+export const zSlideProblemOut = z.object({
+  claim_id: z.string().nullish(),
+  fix: z.string().nullish(),
+  kind: z.string(),
+  line: z.int().nullish(),
+  text: z.string(),
+});
+
+/**
+ * SlideCheckOut
+ */
+export const zSlideCheckOut = z.object({
+  changed: z.boolean(),
+  draft: z.boolean(),
+  problems: z.array(zSlideProblemOut),
+  slide: z.int(),
+});
+
+/**
+ * DeckChecksOut
+ *
+ * Each slide's checks (DECK_1): a claim not yet shown (a Draft band), 7×7, a long run of text slides, and a cited
+ * claim whose status changed since the slide was made.
+ */
+export const zDeckChecksOut = z.object({
+  changed: z.array(z.int()),
+  deck_id: z.string(),
+  drafts: z.array(z.int()),
+  slides: z.array(zSlideCheckOut),
+});
+
+/**
  * SortOrder
  */
 export const zSortOrder = z.enum(['value_desc', 'value_asc', 'label', 'time']);
@@ -7717,6 +8868,34 @@ export const zSourceCreate = z.object({
   source_type: z.string().optional().default('web'),
   title: z.string(),
   url: z.string().nullish(),
+});
+
+/**
+ * SourceIn
+ */
+export const zSourceIn = z.object({
+  document_id: z.string().nullish(),
+  locator: z.string().max(200).nullish(),
+  mode: z.enum(['passage', 'record', 'none']),
+  notes: z.string().max(5000).nullish(),
+  quote: z.string().max(5000).nullish(),
+  source_type: z
+    .enum(['interview', 'public_record', 'document', 'web', 'other'])
+    .optional()
+    .default('interview'),
+  title: z.string().max(300).nullish(),
+  url: z.string().max(2000).nullish(),
+});
+
+/**
+ * EntryIn
+ */
+export const zEntryIn = z.object({
+  event: zEventIn.nullish(),
+  kind: z.enum(['party', 'link', 'event']),
+  link: zLinkIn.nullish(),
+  party: zNewParty.nullish(),
+  source: zSourceIn.nullish(),
 });
 
 /**
@@ -8369,6 +9548,44 @@ export const zSuiteCoverageOut = z.object({
 });
 
 /**
+ * SyncIn
+ *
+ * Another recording of the same event, to line up with this one by matching their sound.
+ */
+export const zSyncIn = z.object({
+  other_document_id: z.string().min(1).max(64),
+});
+
+/**
+ * SyncOut
+ *
+ * Where another recording lines up in this one: a positive offset means it started that many seconds later.
+ */
+export const zSyncOut = z.object({
+  accepted_at: z.string().nullish(),
+  accepted_by: z.string().nullish(),
+  confidence: z.number(),
+  distinct: z.number().nullish(),
+  offset_seconds: z.number().nullish(),
+  other_document_id: z.string(),
+  reliable: z.boolean(),
+});
+
+/**
+ * SoundOut
+ *
+ * A recording's sound: its length, any mains hum, its loudness, its latest cleaned copy, an accepted sync.
+ */
+export const zSoundOut = z.object({
+  cleaned_id: z.string().nullish(),
+  document_id: z.string(),
+  duration: z.number(),
+  hum: zHumOut,
+  loudness_lufs: z.number().nullish(),
+  sync: zSyncOut.nullish(),
+});
+
+/**
  * TableMappingIn
  *
  * A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,
@@ -8683,6 +9900,29 @@ export const zLeadTaskConversionOut = z.object({
 });
 
 /**
+ * TimelineBoardIn
+ *
+ * Where the cards sit on each board (as fractions of the board, so they keep their place at any width), the
+ * reporter's sticky notes, and the board's style: Rich (tacks, paper, string) or Clean.
+ */
+export const zTimelineBoardIn = z.object({
+  notes: z.array(zBoardNoteIn).max(200).optional(),
+  positions: z
+    .record(z.string(), z.record(z.string(), z.tuple([z.number(), z.number()])))
+    .optional(),
+  style: z.enum(['rich', 'clean']).optional().default('rich'),
+});
+
+/**
+ * TimelineBoardOut
+ */
+export const zTimelineBoardOut = z.object({
+  notes: z.array(zBoardNoteOut),
+  positions: z.record(z.string(), z.record(z.string(), z.array(z.number()))),
+  style: z.enum(['rich', 'clean']),
+});
+
+/**
  * TimelineClaimAdvisoryOut
  */
 export const zTimelineClaimAdvisoryOut = z.object({
@@ -8733,6 +9973,7 @@ export const zTimelineEventCreate = z.object({
   investigation_id: z.string(),
   lead_id: z.string().nullish(),
   origin: z.string().nullish(),
+  placeholder: z.boolean().optional().default(false),
   precision: z.string().optional().default('day'),
   relationship_entity_id: z.string().nullish(),
   source_id: z.string().nullish(),
@@ -8768,6 +10009,7 @@ export const zTimelineEventOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   kind: z.string(),
+  placeholder: z.boolean().optional().default(false),
   precision: z.string(),
   provenance: z.record(z.string(), z.unknown()),
   refs: z.record(z.string(), z.unknown()),
@@ -8821,6 +10063,7 @@ export const zTimelineEventRowOut = z.object({
   investigation_id: z.string(),
   lead_id: z.string().nullish(),
   origin: z.string().nullish(),
+  placeholder: z.boolean().optional().default(false),
   precision: z.string(),
   relationship_entity_id: z.string().nullish(),
   source_id: z.string().nullish(),
@@ -8838,6 +10081,53 @@ export const zTimelineItemOut = z.object({
 });
 
 /**
+ * TimelineLaneEventOut
+ *
+ * An event as Lanes draws it: the parties it is about (its lanes), where it comes from, its amount when it is a
+ * payment, and one mark for whether it is shown (app/services/timeline_lanes.py fact_of).
+ */
+export const zTimelineLaneEventOut = z.object({
+  amount: z.number().nullish(),
+  amount_eur: z.number().nullish(),
+  context: zTimelineContextOut.nullish(),
+  currency: z.string().nullish(),
+  date_end: z.string().nullish(),
+  date_start: z.string(),
+  description: z.string().nullish(),
+  fact: z.enum(['shown', 'not_yet', 'disputed', 'worked_out']),
+  fact_note: z.string().nullish(),
+  grade: z.string().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  kind: z.string(),
+  parties: z.array(z.string()),
+  placeholder: z.boolean().optional().default(false),
+  precision: z.string(),
+  prop: z.string().nullish(),
+  provenance: z.record(z.string(), z.unknown()),
+  refs: z.record(z.string(), z.unknown()),
+  schema: z.string().nullish(),
+  sort_key: z.string(),
+  source_key: z.string(),
+  source_label: z.string(),
+  synthetic: z.boolean(),
+  title: z.string(),
+  verification_status: z.string(),
+});
+
+/**
+ * TimelineNotPlacedOut
+ */
+export const zTimelineNotPlacedOut = z.object({
+  date: z.string(),
+  date_key: z.string(),
+  kind: z.string(),
+  precision: z.string(),
+  source_id: z.string(),
+  title: z.string(),
+});
+
+/**
  * TimelineOut
  */
 export const zTimelineOut = z.object({
@@ -8848,6 +10138,116 @@ export const zTimelineOut = z.object({
   returned: z.int(),
   total: z.int(),
   verification_counts: z.record(z.string(), z.int()),
+});
+
+/**
+ * TimelinePartyOut
+ */
+export const zTimelinePartyOut = z.object({
+  caption: z.string(),
+  country: z.string().nullish(),
+  events: z.int(),
+  id: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * TimelinePeriodIn
+ *
+ * A named stretch of the case's time (Timeline › Periods). Dates are a year, a month or a day.
+ */
+export const zTimelinePeriodIn = z.object({
+  date_end: z.string().min(4).max(32),
+  date_start: z.string().min(4).max(32),
+  name: z.string().min(1).max(120),
+  summary: z.string().max(4000).optional().default(''),
+});
+
+/**
+ * TimelinePeriodOut
+ */
+export const zTimelinePeriodOut = z.object({
+  date_end: z.string(),
+  date_start: z.string(),
+  id: z.string(),
+  made_by: z.string().nullish(),
+  name: z.string(),
+  summary: z.string(),
+});
+
+/**
+ * TimelineSequenceOut
+ *
+ * An event that comes before a step it should follow (app/services/sequence_rules.py).
+ */
+export const zTimelineSequenceOut = z.object({
+  after_id: z.string().nullish(),
+  basis: z.string(),
+  event_id: z.string(),
+  found_later_id: z.string().nullish(),
+  missing: z.string(),
+  rule: z.string(),
+  rule_name: z.string(),
+  say: z.string(),
+  steps: z.array(z.string()),
+  why: z.string(),
+});
+
+/**
+ * TimelineSpanOut
+ */
+export const zTimelineSpanOut = z.object({
+  busiest: z.string().nullish(),
+  first: z.string().nullish(),
+  last: z.string().nullish(),
+});
+
+/**
+ * TimelineStepOut
+ *
+ * One step of Replay: a Story claim, in the claim's own words, with the events that date it (or one event).
+ */
+export const zTimelineStepOut = z.object({
+  claim_id: z.string().nullish(),
+  claim_status: z.string().nullish(),
+  date_end: z.string().nullish(),
+  date_start: z.string(),
+  event_ids: z.array(z.string()),
+  key: z.string(),
+  precision: z.string(),
+  title: z.string(),
+  unresolved: z.boolean(),
+});
+
+/**
+ * TimelineUndatedOut
+ */
+export const zTimelineUndatedOut = z.object({
+  kind: z.string(),
+  source_id: z.string(),
+  title: z.string(),
+  why: z.string(),
+});
+
+/**
+ * TimelineLanesOut
+ */
+export const zTimelineLanesOut = z.object({
+  events: z.array(zTimelineLaneEventOut),
+  facts: z.record(z.string(), z.int()),
+  investigation_id: z.string(),
+  not_placed: z.array(zTimelineNotPlacedOut),
+  not_placed_total: z.int(),
+  opens_on: z.string().nullish(),
+  parties: z.array(zTimelinePartyOut),
+  periods: z.array(zTimelinePeriodOut),
+  sequence: z.array(zTimelineSequenceOut),
+  span: zTimelineSpanOut,
+  steps: z.array(zTimelineStepOut),
+  steps_from: z.enum(['story', 'events']),
+  steps_undated: z.int(),
+  undated: z.array(zTimelineUndatedOut),
+  undated_total: z.int(),
 });
 
 /**
@@ -8986,6 +10386,34 @@ export const zProvenanceTraceOut = z.object({
 });
 
 /**
+ * TranscriptCompareRowOut
+ *
+ * One of our segments beside the publisher's words for the same stretch of time; `differs` counts the words
+ * marked on both sides. Neither side is right by default.
+ */
+export const zTranscriptCompareRowOut = z.object({
+  differs: z.int(),
+  end: z.number(),
+  kind: z.enum(['speech', 'no_speech']),
+  no_speech_text: z.string().nullish(),
+  ours: z.array(zCompareWordOut),
+  segment_id: z.string(),
+  speaker: z.string().nullish(),
+  start: z.number(),
+  theirs: z.array(zCompareWordOut),
+});
+
+/**
+ * TranscriptPartOut
+ *
+ * A part of the episode as its feed names it (podcast:chapters).
+ */
+export const zTranscriptPartOut = z.object({
+  start: z.number(),
+  title: z.string(),
+});
+
+/**
  * TranscriptWordOut
  *
  * One word: its text, start and end in seconds, and the model's probability for it.
@@ -9012,25 +10440,6 @@ export const zTranscriptSegmentOut = z.object({
   start: z.number(),
   text: z.string(),
   words: z.array(zTranscriptWordOut),
-});
-
-/**
- * TranscriptOut
- *
- * A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
- * (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
- * the machine was unsure of.
- */
-export const zTranscriptOut = z.object({
-  document_id: z.string(),
-  duration: z.number(),
-  kind: z.enum(['audio', 'video']),
-  outline: z.array(z.number()),
-  outline_step: z.number(),
-  segments: z.array(zTranscriptSegmentOut),
-  streams: z.array(z.record(z.string(), z.unknown())),
-  transcript: z.record(z.string(), z.unknown()),
-  unsure_below: z.number(),
 });
 
 /**
@@ -9136,35 +10545,6 @@ export const zValidationIssueOut = z.object({
  */
 export const zValidationErrorOut = z.object({
   detail: z.array(zValidationIssueOut),
-});
-
-/**
- * VersionChangesOut
- */
-export const zVersionChangesOut = z.object({
-  added: z.array(z.string()),
-  more: z.int(),
-  removed: z.array(z.string()),
-});
-
-/**
- * MonitorVersionOut
- */
-export const zMonitorVersionOut = z.object({
-  capture_id: z.string().nullish(),
-  capture_saved: z.boolean().optional().default(false),
-  changes: zVersionChangesOut.nullish(),
-  id: z.string(),
-  lines_added: z.int(),
-  lines_removed: z.int(),
-  monitor_id: z.string(),
-  number: z.int(),
-  seen_at: z
-    .string()
-    .regex(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
-    ),
-  text_sha256: z.string(),
 });
 
 /**
@@ -9557,6 +10937,7 @@ export const zDeckSlideOut = z.object({
   evidence: z.array(zRecordRefOut),
   heading: z.string(),
   kind: z.enum(['title', 'statement', 'content', 'questions']),
+  made_with: z.record(z.string(), z.string()).optional().default({}),
   notes: z.string(),
   prose: z.string().optional().default(''),
   visual: z
@@ -9643,6 +11024,68 @@ export const zDeckOut = z.object({
  */
 export const zDecksOut = z.object({
   decks: z.array(zDeckOut),
+});
+
+/**
+ * VoiceName
+ *
+ * A person names a voice of a recording, as a party of the case (`entity_id`) or in words (`name`); both empty
+ * clears the name.
+ */
+export const zVoiceName = z.object({
+  entity_id: z.string().nullish(),
+  name: z.string().max(120).nullish(),
+});
+
+/**
+ * VoiceOut
+ *
+ * A voice the machine told apart in this recording (a guess), and the name a person gave it, if any.
+ */
+export const zVoiceOut = z.object({
+  entity_id: z.string().nullish(),
+  name: z.string().nullish(),
+  named_at: z.string().nullish(),
+  named_by: z.string().nullish(),
+  spoken: z.number(),
+  turns: z.int(),
+  voice: z.string(),
+});
+
+/**
+ * VoicesOut
+ *
+ * Who spoke when (ADR-0026): the voices, their turns as [start, end, voice], how they were found, every earlier
+ * name, and why there are none when there are none (`unavailable`).
+ */
+export const zVoicesOut = z.object({
+  found_by: z.record(z.string(), z.unknown()).nullish(),
+  history: z.array(z.record(z.string(), z.unknown())).optional().default([]),
+  turns: z.array(z.array(z.number())),
+  unavailable: z.string().nullish(),
+  voices: z.array(zVoiceOut),
+});
+
+/**
+ * TranscriptOut
+ *
+ * A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
+ * (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
+ * the machine was unsure of.
+ */
+export const zTranscriptOut = z.object({
+  document_id: z.string(),
+  duration: z.number(),
+  kind: z.enum(['audio', 'video']),
+  outline: z.array(z.number()),
+  outline_step: z.number(),
+  parts: z.array(zTranscriptPartOut).optional().default([]),
+  publisher: zPublisherTranscriptOut.nullish(),
+  segments: z.array(zTranscriptSegmentOut),
+  streams: z.array(z.record(z.string(), z.unknown())),
+  transcript: z.record(z.string(), z.unknown()),
+  unsure_below: z.number(),
+  voices: zVoicesOut.nullish(),
 });
 
 /**
@@ -9928,6 +11371,132 @@ export const zWireOut = z.object({
 });
 
 /**
+ * WordSegmentOut
+ */
+export const zWordSegmentOut = z.object({
+  op: z.enum(['same', 'del', 'ins']),
+  text: z.string(),
+});
+
+/**
+ * WordChangeOut
+ *
+ * A changed stretch of the page, word by word; `unchanged` counts the same lines between two changes.
+ */
+export const zWordChangeOut = z.object({
+  segments: z.array(zWordSegmentOut),
+  unchanged: z.int(),
+});
+
+/**
+ * CaptureFollowOut
+ *
+ * Checking a captured page again (INTAKE_3). `state`: unchecked, same, changed (since the capture), gone (now 404
+ * or 410), broken (could not be read), or for a link only, not_yet / answers (the address answers again: its page
+ * waits in Following for a person to capture). `every`: never, daily or weekly. `changes` compare the captured
+ * version with the latest, words only, as served.
+ */
+export const zCaptureFollowOut = z.object({
+  captured_text: z.string().nullish(),
+  changes: z.array(zWordChangeOut),
+  checks: z.array(zMonitorCheckOut),
+  every: z.enum(['never', 'daily', 'weekly']),
+  health: z.string(),
+  health_detail: z.string().nullish(),
+  item_id: z.string().nullish(),
+  last_checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  leaves: z.string(),
+  live_text: z.string().nullish(),
+  marked_changed: z.record(z.string(), z.unknown()).nullish(),
+  monitor_id: z.string(),
+  next_check_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  state: z.enum([
+    'unchecked',
+    'same',
+    'changed',
+    'gone',
+    'broken',
+    'not_yet',
+    'answers',
+  ]),
+  versions: z.array(zCaptureVersionOut),
+});
+
+/**
+ * CaptureOut
+ *
+ * A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
+ * not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why).
+ */
+export const zCaptureOut = z.object({
+  captured_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  case_record_id: z.string().nullish(),
+  collector: z.string().nullish(),
+  content_verified: z.string(),
+  displayed: zCaptureDisplayedOut,
+  document_id: z.string().nullish(),
+  exchange: zCaptureExchangeOut,
+  files: z.array(zCaptureFileOut),
+  final_url: z.string().nullish(),
+  finished_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  follow: zCaptureFollowOut.nullish(),
+  http_status: z.int().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  job: zBackgroundJobOut.nullish(),
+  job_id: z.string().nullish(),
+  media: z.record(z.string(), z.unknown()),
+  media_document_id: z.string().nullish(),
+  outcome: z.enum(['saved', 'not_seen', 'link_only']).nullish(),
+  reason: z.string().nullish(),
+  reason_kind: z
+    .enum(['dead_link', 'blocked', 'timed_out', 'tool_error'])
+    .nullish(),
+  reason_kind_by: z.string().nullish(),
+  requested_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  robots_disallowed: z.boolean().nullish(),
+  source_id: z.string().nullish(),
+  source_protected: z.boolean().optional().default(false),
+  stages: z.array(zCaptureStageOut),
+  started_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  status: z.enum(['queued', 'capturing', 'finished', 'failed']),
+  suite_outcome: z.enum(['OBTAINED', 'UNABLE_TO_OBTAIN']).nullish(),
+  time_server: z.string(),
+  tool: z.string().nullish(),
+  url: z.string(),
+  witnesses: zCaptureWitnessesOut,
+});
+
+/**
  * WriteupCreate
  */
 export const zWriteupCreate = z.object({
@@ -10077,6 +11646,17 @@ export const zWriteupsOut = z.object({
   writeups: z.array(zWriteupSummaryOut),
 });
 
+/**
+ * YourSafetyOut
+ */
+export const zYourSafetyOut = z.object({
+  guides: z.array(zSafetyGuideOut),
+  investigation_id: z.string(),
+  levels_set: z.boolean(),
+  questions: z.array(zSafetyQuestionOut),
+  signs: z.array(zSafetySignOut),
+});
+
 export const zGetAiAnalysisCandidateEndpointPath = z.object({
   candidate_id: z.string(),
 });
@@ -10209,10 +11789,59 @@ export const zGetCapturePath = z.object({
  */
 export const zGetCaptureResponse = zCaptureOut;
 
+export const zUpdateCaptureBody = zCaptureUpdate;
+
+export const zUpdateCapturePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateCaptureResponse = zCaptureOut;
+
+export const zCaptureLatestPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * The new capture finished before the reply (developer mode)
+ */
+export const zCaptureLatestResponse = zCaptureOut;
+
 export const zGetCaptureFilePath = z.object({
   capture_id: z.string(),
   name: z.string(),
 });
+
+export const zFollowCaptureBody = zCaptureFollowIn;
+
+export const zFollowCapturePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFollowCaptureResponse = zCaptureOut;
+
+export const zCaptureLookElsewherePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCaptureLookElsewhereResponse = zCaptureOut;
+
+export const zMarkCaptureChangedPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMarkCaptureChangedResponse = zCaptureOut;
 
 export const zCollectCaptureMediaPath = z.object({
   capture_id: z.string(),
@@ -10222,6 +11851,55 @@ export const zCollectCaptureMediaPath = z.object({
  * Already collected, or the collection finished before the reply (developer mode)
  */
 export const zCollectCaptureMediaResponse = zCaptureOut;
+
+export const zGetCaptureQuotesPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Response Get Capture Quotes
+ *
+ * Successful Response
+ */
+export const zGetCaptureQuotesResponse = z.array(zCaptureQuoteOut);
+
+export const zRefindCaptureQuotesPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Response Refind Capture Quotes
+ *
+ * Successful Response
+ */
+export const zRefindCaptureQuotesResponse = z.array(zCaptureQuoteOut);
+
+export const zRecheckCapturePath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRecheckCaptureResponse = zCaptureOut;
+
+export const zCaptureSecondWitnessPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCaptureSecondWitnessResponse = zCaptureOut;
+
+export const zCaptureTimeProofPath = z.object({
+  capture_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCaptureTimeProofResponse = zCaptureOut;
 
 export const zGetCaseRecordPath = z.object({
   case_record_id: z.string(),
@@ -10641,6 +12319,28 @@ export const zAddChartToDeckEndpointPath = z.object({
  */
 export const zAddChartToDeckEndpointResponse = zDeckOut;
 
+export const zDeckChecksEndpointPath = z.object({
+  deck_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeckChecksEndpointResponse = zDeckChecksOut;
+
+export const zExportDeckPdfPath = z.object({
+  deck_id: z.string(),
+});
+
+export const zExportDeckPdfQuery = z.object({
+  handout: z.boolean().optional().default(false),
+});
+
+/**
+ * The deck as a PDF on the theme's paper, printed on this computer
+ */
+export const zExportDeckPdfResponse = z.string();
+
 export const zExportDeckPptxPath = z.object({
   deck_id: z.string(),
 });
@@ -10698,6 +12398,29 @@ export const zLoadDemoCaseResponse = zDemoCaseProgressOut;
  */
 export const zSeedDemoResponse = zDemoSeedOut;
 
+export const zGetDerivedFilePath = z.object({
+  derived_file_id: z.string(),
+});
+
+/**
+ * The derived file as it was hashed
+ */
+export const zGetDerivedFileResponse = z.string();
+
+export const zGetCopyPagePath = z.object({
+  derived_file_id: z.string(),
+});
+
+export const zGetCopyPageQuery = z.object({
+  page: z.int().gte(1).optional().default(1),
+  width: z.int().gte(120).lte(1600).optional().default(600),
+});
+
+/**
+ * One page of a PDF copy drawn as a picture
+ */
+export const zGetCopyPageResponse = z.string();
+
 /**
  * Successful Response
  */
@@ -10718,6 +12441,97 @@ export const zGetDocumentPath = z.object({
  * Successful Response
  */
 export const zGetDocumentResponse = zDocumentDetailOut;
+
+export const zGetAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetAuthenticityResponse = zAuthenticityOut;
+
+export const zUpdateAuthenticityBody = zAuthenticityUpdate;
+
+export const zUpdateAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateAuthenticityResponse = zAuthenticityOut;
+
+export const zAddAboutClaimBody = zAuthenticityAboutClaimIn;
+
+export const zAddAboutClaimPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAddAboutClaimResponse = zAuthenticityOut;
+
+export const zCompareAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCompareAuthenticityResponse = zAuthenticityCompareOut;
+
+export const zDecideAuthenticityBody = zAuthenticityDecisionIn;
+
+export const zDecideAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDecideAuthenticityResponse = zAuthenticityOut;
+
+export const zExamineAgainPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zExamineAgainResponse = zAuthenticityOut;
+
+export const zOutsideAuthenticityBody = zAuthenticityOutsideIn;
+
+export const zOutsideAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zOutsideAuthenticityResponse = zAuthenticityOutsideOut;
+
+export const zPreviewAuthenticityPath = z.object({
+  document_id: z.string(),
+});
+
+export const zPreviewAuthenticityQuery = z.object({
+  status: z.enum([
+    'verified_origin',
+    'unverified',
+    'likely_synthetic',
+    'confirmed_synthetic',
+    'disputed',
+  ]),
+  role: z.enum(['events', 'subject']).nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPreviewAuthenticityResponse = zAuthenticityPreviewOut;
 
 export const zListDocumentCandidatesEndpointPath = z.object({
   document_id: z.string(),
@@ -10796,6 +12610,64 @@ export const zSyncOpenalephDocumentPath = z.object({
  */
 export const zSyncOpenalephDocumentResponse = zOpenAlephDocumentSyncOut;
 
+export const zListDerivedPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Response List Derived
+ *
+ * Successful Response
+ */
+export const zListDerivedResponse = z.array(zDerivedFileOut);
+
+/**
+ * Body
+ */
+export const zMakeCleanedCopyBody = zCleanIn.nullable();
+
+export const zMakeCleanedCopyPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeCleanedCopyResponse = zDerivedFileOut;
+
+export const zMakeClipBody = zClipCreate;
+
+export const zMakeClipPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeClipResponse = zDerivedFileOut;
+
+export const zMakePhotoCopyBody = zPhotoCopyIn;
+
+export const zMakePhotoCopyPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakePhotoCopyResponse = zDerivedFileOut;
+
+export const zMakeRedactedCopyBody = zRedactIn;
+
+export const zMakeRedactedCopyPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeRedactedCopyResponse = zDerivedFileOut;
+
 export const zGetDocumentEmailPath = z.object({
   document_id: z.string(),
 });
@@ -10804,6 +12676,15 @@ export const zGetDocumentEmailPath = z.object({
  * Successful Response
  */
 export const zGetDocumentEmailResponse = zDocumentEmailOut;
+
+export const zFindPhotoFacesPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFindPhotoFacesResponse = zFacesOut;
 
 export const zGetDocumentMediaPath = z.object({
   document_id: z.string(),
@@ -10848,12 +12729,21 @@ export const zGetDocumentPageImageQuery = z.object({
  */
 export const zGetDocumentPageImageResponse = z.string();
 
+export const zGetPhotoPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetPhotoResponse = zPhotoOut;
+
 export const zGetDocumentPicturePath = z.object({
   document_id: z.string(),
 });
 
 /**
- * The picture this document is, as uploaded (PNG or JPEG)
+ * The picture this document is, as uploaded (PNG or JPEG), or the viewable copy of a HEIC or RAW photo
  */
 export const zGetDocumentPictureResponse = z.string();
 
@@ -10865,6 +12755,28 @@ export const zRecheckHashPath = z.object({
  * Successful Response
  */
 export const zRecheckHashResponse = zHashRecheckOut;
+
+export const zGetRedactionPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetRedactionResponse = zRedactionOut;
+
+export const zCompareRedactedPath = z.object({
+  document_id: z.string(),
+});
+
+export const zCompareRedactedQuery = z.object({
+  copy_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCompareRedactedResponse = zRedactCompareOut;
 
 export const zGetSimilarDocumentsPath = z.object({
   document_id: z.string(),
@@ -10878,6 +12790,47 @@ export const zGetSimilarDocumentsQuery = z.object({
  * Successful Response
  */
 export const zGetSimilarDocumentsResponse = zSimilarDocumentsOut;
+
+export const zGetSoundPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSoundResponse = zSoundOut;
+
+export const zGetSpectrogramPath = z.object({
+  document_id: z.string(),
+});
+
+export const zGetSpectrogramQuery = z.object({
+  start: z.number().gte(0).optional().default(0),
+  end: z.number().gt(0).optional().default(60),
+  cleaned: z.boolean().optional().default(false),
+});
+
+export const zFindDocumentSyncBody = zSyncIn;
+
+export const zFindDocumentSyncPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFindDocumentSyncResponse = zSyncOut;
+
+export const zAcceptDocumentSyncBody = zSyncIn;
+
+export const zAcceptDocumentSyncPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAcceptDocumentSyncResponse = zSyncOut;
 
 export const zGetDocumentTablePath = z.object({
   document_id: z.string(),
@@ -10934,6 +12887,17 @@ export const zGetDocumentTranscriptPath = z.object({
  */
 export const zGetDocumentTranscriptResponse = zTranscriptOut;
 
+export const zCompareTranscriptsPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Response Compare Transcripts
+ *
+ * Successful Response
+ */
+export const zCompareTranscriptsResponse = z.array(zTranscriptCompareRowOut);
+
 export const zGetDocumentTranslationPath = z.object({
   document_id: z.string(),
 });
@@ -10942,6 +12906,27 @@ export const zGetDocumentTranslationPath = z.object({
  * Successful Response
  */
 export const zGetDocumentTranslationResponse = zDocumentTranslationOut;
+
+export const zFindVoicesPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFindVoicesResponse = zBackgroundJobOut;
+
+export const zNameVoiceBody = zVoiceName;
+
+export const zNameVoicePath = z.object({
+  document_id: z.string(),
+  voice: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zNameVoiceResponse = zVoicesOut;
 
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),
@@ -11555,6 +13540,98 @@ export const zInvestigationSuiteRunPath = z.object({
  */
 export const zInvestigationSuiteRunResponse = zAiReasoningRunOut;
 
+export const zListAuthenticityPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response List Authenticity
+ *
+ * Successful Response
+ */
+export const zListAuthenticityResponse = z.array(zAuthenticityStatusOut);
+
+export const zListBuiltTimelinesPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response List Built Timelines
+ *
+ * Successful Response
+ */
+export const zListBuiltTimelinesResponse = z.array(zBuiltTimelineOut);
+
+export const zCreateBuiltTimelineBody = zBuiltTimelineIn;
+
+export const zCreateBuiltTimelinePath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateBuiltTimelineResponse = zBuiltTimelineOut;
+
+export const zDeleteBuiltTimelinePath = z.object({
+  investigation_id: z.string(),
+  built_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteBuiltTimelineResponse = z.void();
+
+export const zUpdateBuiltTimelineBody = zBuiltTimelineIn;
+
+export const zUpdateBuiltTimelinePath = z.object({
+  investigation_id: z.string(),
+  built_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateBuiltTimelineResponse = zBuiltTimelineOut;
+
+export const zByHandAddBody = zEntryIn;
+
+export const zByHandAddPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zByHandAddResponse = zByHandAddedOut;
+
+export const zByHandPreviewBody = zEntryIn;
+
+export const zByHandPreviewPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zByHandPreviewResponse = zByHandPreviewOut;
+
+export const zByHandSuggestPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zByHandSuggestQuery = z.object({
+  q: z.string().max(200).optional().default(''),
+});
+
+/**
+ * Response By Hand Suggest
+ *
+ * Successful Response
+ */
+export const zByHandSuggestResponse = z.array(zByHandSuggestionOut);
+
 export const zGetCapturesPath = z.object({
   investigation_id: z.string(),
 });
@@ -11852,7 +13929,7 @@ export const zGetDecisionsQuery = z.object({
     ])
     .nullish(),
   order: z
-    .enum(['consequence', 'source', 'oldest'])
+    .enum(['consequence', 'source', 'oldest', 'unlocks'])
     .optional()
     .default('consequence'),
   offset: z.int().gte(0).optional().default(0),
@@ -11872,6 +13949,17 @@ export const zListDecksEndpointPath = z.object({
  * Successful Response
  */
 export const zListDecksEndpointResponse = zDecksOut;
+
+export const zCreateDeckEndpointBody = zDeckCreate;
+
+export const zCreateDeckEndpointPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateDeckEndpointResponse = zDeckOut;
 
 export const zInvestigationDeletionPreviewPath = z.object({
   investigation_id: z.string(),
@@ -11950,6 +14038,26 @@ export const zListInvestigationEvidenceQuery = z.object({
  */
 export const zListInvestigationEvidenceResponse = z.array(zEvidencePoolRow);
 
+export const zExportEvidencePackPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * The evidence pack: the write-up, its exhibits with fingerprints, custody, readiness, gaps
+ */
+export const zExportEvidencePackResponse = z.string();
+
+export const zCheckEvidencePackBody = zBodyCheckEvidencePack;
+
+export const zCheckEvidencePackPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCheckEvidencePackResponse = zPackCheckOut;
+
 export const zExportInvestigationPath = z.object({
   investigation_id: z.string(),
 });
@@ -11981,7 +14089,7 @@ export const zGetFollowingPath = z.object({
  */
 export const zGetFollowingResponse = zFollowingOut;
 
-export const zCaptureAllBody = zMonitorCaptureAll;
+export const zCaptureAllBody = zCaptureAllRequest;
 
 export const zCaptureAllPath = z.object({
   investigation_id: z.string(),
@@ -11990,7 +14098,7 @@ export const zCaptureAllPath = z.object({
 /**
  * Successful Response
  */
-export const zCaptureAllResponse = zCaptureAllOut;
+export const zCaptureAllResponse = zFollowingOut;
 
 export const zGetInvestigationGraphPath = z.object({
   investigation_id: z.string(),
@@ -12138,6 +14246,17 @@ export const zCreateMonitorPath = z.object({
  * Successful Response
  */
 export const zCreateMonitorResponse = zMonitorOut;
+
+export const zCreateMailboxMonitorBody = zMailboxCreate;
+
+export const zCreateMailboxMonitorPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateMailboxMonitorResponse = zMonitorOut;
 
 export const zGetNotesPath = z.object({
   investigation_id: z.string(),
@@ -12584,6 +14703,7 @@ export const zGetInvestigationTimelineQuery = z.object({
   kind: z.array(z.string()).nullish(),
   verification_status: z.array(z.string()).nullish(),
   include_record_activity: z.boolean().optional().default(false),
+  include_source_dates: z.boolean().optional().default(false),
   limit: z.int().gte(1).lte(500).nullish(),
   offset: z.int().gte(0).lte(2147483647).optional().default(0),
 });
@@ -12592,6 +14712,68 @@ export const zGetInvestigationTimelineQuery = z.object({
  * Successful Response
  */
 export const zGetInvestigationTimelineResponse = zTimelineOut;
+
+export const zGetTimelineBoardPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetTimelineBoardResponse = zTimelineBoardOut;
+
+export const zPutTimelineBoardBody = zTimelineBoardIn;
+
+export const zPutTimelineBoardPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPutTimelineBoardResponse = zTimelineBoardOut;
+
+export const zTimelineLanesViewPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zTimelineLanesViewResponse = zTimelineLanesOut;
+
+export const zCreateTimelinePeriodBody = zTimelinePeriodIn;
+
+export const zCreateTimelinePeriodPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateTimelinePeriodResponse = zTimelinePeriodOut;
+
+export const zDeleteTimelinePeriodPath = z.object({
+  investigation_id: z.string(),
+  period_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteTimelinePeriodResponse = z.void();
+
+export const zUpdateTimelinePeriodBody = zTimelinePeriodIn;
+
+export const zUpdateTimelinePeriodPath = z.object({
+  investigation_id: z.string(),
+  period_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateTimelinePeriodResponse = zTimelinePeriodOut;
 
 export const zGetInvestigationTypePath = z.object({
   investigation_id: z.string(),
@@ -12693,6 +14875,15 @@ export const zGetWirePath = z.object({
  */
 export const zGetWireResponse = zWireOut;
 
+export const zExportWriteupPdfPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * The story's write-up for reading, printed on this computer
+ */
+export const zExportWriteupPdfResponse = z.string();
+
 export const zListWriteupsEndpointPath = z.object({
   investigation_id: z.string(),
 });
@@ -12705,6 +14896,15 @@ export const zListWriteupsEndpointQuery = z.object({
  * Successful Response
  */
 export const zListWriteupsEndpointResponse = zWriteupsOut;
+
+export const zGetYourSafetyPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetYourSafetyResponse = zYourSafetyOut;
 
 export const zListJobsEndpointQuery = z.object({
   investigation_id: z.string().nullish(),
@@ -12902,9 +15102,7 @@ export const zCaptureItemPath = z.object({
 /**
  * Successful Response
  */
-export const zCaptureItemResponse = zMonitorItemCaptureOut;
-
-export const zRecordRemovalBody = zMonitorItemSkip;
+export const zCaptureItemResponse = zFollowingOut;
 
 export const zRecordRemovalPath = z.object({
   monitor_item_id: z.string(),
@@ -12913,9 +15111,7 @@ export const zRecordRemovalPath = z.object({
 /**
  * Successful Response
  */
-export const zRecordRemovalResponse = zMonitorItemOut;
-
-export const zSkipItemBody = zMonitorItemSkip;
+export const zRecordRemovalResponse = zFollowingOut;
 
 export const zSkipItemPath = z.object({
   monitor_item_id: z.string(),
@@ -12924,7 +15120,16 @@ export const zSkipItemPath = z.object({
 /**
  * Successful Response
  */
-export const zSkipItemResponse = zMonitorItemOut;
+export const zSkipItemResponse = zFollowingOut;
+
+export const zUndoItemPath = z.object({
+  monitor_item_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUndoItemResponse = zFollowingOut;
 
 export const zDeleteMonitorPath = z.object({
   monitor_id: z.string(),
@@ -12946,29 +15151,14 @@ export const zUpdateMonitorPath = z.object({
  */
 export const zUpdateMonitorResponse = zMonitorOut;
 
-export const zGetMonitorItemsPath = z.object({
-  monitor_id: z.string(),
-});
-
-export const zGetMonitorItemsQuery = z.object({
-  state: z.string().nullish(),
-});
-
-/**
- * Response Get Monitor Items
- *
- * Successful Response
- */
-export const zGetMonitorItemsResponse = z.array(zMonitorItemOut);
-
-export const zPollMonitorPath = z.object({
+export const zCheckMonitorPath = z.object({
   monitor_id: z.string(),
 });
 
 /**
  * Successful Response
  */
-export const zPollMonitorResponse = zMonitorOut;
+export const zCheckMonitorResponse = zMonitorOut;
 
 export const zGetVersionsPath = z.object({
   monitor_id: z.string(),
@@ -12979,7 +15169,7 @@ export const zGetVersionsPath = z.object({
  *
  * Successful Response
  */
-export const zGetVersionsResponse = z.array(zMonitorVersionOut);
+export const zGetVersionsResponse = z.array(zPageVersionOut);
 
 export const zRemoveNotePath = z.object({
   note_id: z.string(),
@@ -13009,6 +15199,38 @@ export const zMakeLeadFromNotePath = z.object({
  * Successful Response
  */
 export const zMakeLeadFromNoteResponse = zLeadOut;
+
+/**
+ * Successful Response
+ */
+export const zGetPlatformChecksResponse = zPlatformChecksOut;
+
+export const zChangePlatformChecksBody = zPlatformChecksUpdate;
+
+/**
+ * Successful Response
+ */
+export const zChangePlatformChecksResponse = zPlatformChecksOut;
+
+export const zPlatformForUrlQuery = z.object({
+  url: z.string().max(4000),
+});
+
+/**
+ * Response Platform For Url
+ *
+ * Successful Response
+ */
+export const zPlatformForUrlResponse = zPlatformForUrlOut.nullable();
+
+export const zRunPlatformChecksQuery = z.object({
+  platform: z.string().max(32).nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRunPlatformChecksResponse = zBackgroundJobOut;
 
 /**
  * Successful Response
@@ -13507,6 +15729,11 @@ export const zRotateAppUserTokenQuery = z.object({
  * Successful Response
  */
 export const zRotateAppUserTokenResponse = zAppUserTokenRotatedOut;
+
+/**
+ * Successful Response
+ */
+export const zGetSigningKeyResponse = zSigningKeyOut;
 
 /**
  * Successful Response

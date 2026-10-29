@@ -1,220 +1,70 @@
 'use client';
-// Investigation timeline: dated FollowTheMoney statements and source
-// metadata beside reporter-authored events, each marked with how sure the
-// reporter is. Moved out of app/page.tsx (Foundation Fixes fix 3); the
-// calls and their reply checks are generated from the API schema (fix 2).
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import dynamic from 'next/dynamic';
-import {useId, useState} from 'react';
-import type {ChangeEvent, ReactElement} from 'react';
+// Investigation timeline (mockups TIME_1–TIME_8; research §2.9): "What happened when, and how sure are we?" One event
+// store, several views switched from the top edge. Lanes is the working view and opens every case (DECISIONS_LOG 6);
+// the event list is its List view (L), and adding an event is N. Each event has one mark for whether it is shown; how
+// exact its date is is the band.
+import {useQuery} from '@tanstack/react-query';
+import {useState} from 'react';
+import type {ReactElement} from 'react';
 
-import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {timelineLanesViewOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {TimelineLanes} from './lanes';
+import {TimelinePeriods, inPeriod} from './periods';
+import {TimelineReplay} from './replay';
+import {TimelineStack} from './stack';
+import {BuildYourOwn} from './build-your-own';
+import {TimelineBoard} from './board';
+import {span} from './lanes-model';
 import {Reveal} from '../../components/ui/reveal';
-import {errorMessage} from '../../lib/api-client';
-import {getInvestigationTimelineOptions, getInvestigationTimelineQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
-import {createTimelineEventEndpoint, gradeTimelineEventEndpoint} from '../../lib/generated/sdk.gen';
-import type {TimelineEventOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {ChartFrame, FootStat, KeyRow, KeySection} from '../../components/charts/chart-frame';
-import {EVENT_KIND_ORDER, EVENT_STATUS, SWATCH, eventKind, eventStatus} from '../../lib/viz-tokens';
-import {dateWords} from '../../lib/dates';
-import {shownAsOf} from '../../lib/as-of';
 
-// ECharts needs a browser canvas, so the chart is loaded on demand and never
-// counts against the page's first load.
-const CaseTimeline = dynamic(() => import('../../components/charts/case-timeline').then(m => m.CaseTimeline),
-  {ssr: false, loading: () => <p className="muted p-4">Loading the timeline…</p>});
+export {EVENT_GRADES} from './lanes-model';
 
 type Props = {investigationId: string};
-
-// The suite's date precisions (backend app/ai/suite_vocab.py DATE_PRECISIONS) plus 'year'.
-const PRECISIONS = ['exact', 'day', 'month', 'year', 'range', 'before', 'after', 'estimated', 'unknown'];
-const STATUSES = ['asserted', 'verified', 'approximate', 'disputed', 'unresolved'];
-// How well an event is substantiated: Bellingcat's grading scale (ADR-0005,
-// line 5; backend app/services/timeline.py EVENT_GRADES, which these words
-// follow). The status above is about the date; the grade about the event.
-export const EVENT_GRADES: Record<string, string> = {
-  confirmed: 'enough evidence, from several verification techniques and at least three sources cross-referenced',
-  likely: 'several sources report it and most of the information can be verified, with minor contradictions',
-  weak: 'a single source says it happened',
-  unsubstantiated: 'no conclusion can be reached for lack of evidence',
-  unknown: 'what happened cannot be identified',
-};
-type Grade = 'confirmed' | 'likely' | 'weak' | 'unsubstantiated' | 'unknown';
-const UNGRADED = 'none';
-
-/** Bellingcat's grades with what each means, for a reveal on a grade choice. */
-const GRADES_DETAIL = <>{Object.entries(EVENT_GRADES).map(([g, meaning]) => <span key={g} className="rv-row"><b>{g}</b>: {meaning}</span>)}</>;
-
-function text(value: unknown): string | undefined {
-  return typeof value === 'string' ? value : undefined;
-}
+type View = 'lanes' | 'stack' | 'replay' | 'board' | 'periods';
+const VIEWS: Array<[View, string]> = [['lanes', 'Lanes'], ['stack', 'Stack'], ['replay', 'Replay'], ['board', 'Board'], ['periods', 'Periods']];
 
 export function TimelinePanel({investigationId}: Props): ReactElement {
-  const queryClient = useQueryClient();
-  const openProvenance = useWorkbenchStore(state => state.openProvenance);
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
-  const [precision, setPrecision] = useState('day');
-  const [status, setStatus] = useState('asserted');
-  const [grade, setGrade] = useState(UNGRADED);
-  const [problem, setProblem] = useState('');
-  const gradesId = useId();
-
-  const path = {investigation_id: investigationId};
-  const timeline = useQuery({...getInvestigationTimelineOptions({path}), enabled: Boolean(investigationId)});
-
-  const add = useMutation({
-    mutationFn: async () => (await createTimelineEventEndpoint({body: {
-      investigation_id: investigationId, title: title.trim(), date_start: date.trim(), precision, verification_status: status,
-      ...(grade !== UNGRADED ? {grade: grade as Grade} : {}),
-    }, throwOnError: true})).data,
-    onSuccess: async () => {
-      setTitle(''); setDate(''); setGrade(UNGRADED); setProblem('');
-      await queryClient.invalidateQueries({queryKey: getInvestigationTimelineQueryKey({path})});
-    },
-    onError: error => setProblem(errorMessage(error, 'Could not add the event')),
-  });
-  const regrade = useMutation({
-    mutationFn: async ({id, value}: {id: string; value: string}) => (await gradeTimelineEventEndpoint({
-      path: {timeline_event_id: id}, body: {grade: value === UNGRADED ? null : value as Grade}, throwOnError: true})).data,
-    onSuccess: async () => {
-      setProblem('');
-      await queryClient.invalidateQueries({queryKey: getInvestigationTimelineQueryKey({path})});
-    },
-    onError: error => setProblem(errorMessage(error, 'Could not grade the event')),
-  });
-
-  // The year slider (lib/as-of.ts): events that had not happened by then are left out.
-  const asOf = useWorkbenchStore(state => state.asOf);
-  const pointed = useWorkbenchStore(state => state.pointedParty);
-  const setPointed = useWorkbenchStore(state => state.setPointedParty);
-  const allEvents: TimelineEventOut[] = timeline.data?.events ?? [];
-  const events = allEvents.filter(e => shownAsOf({start: e.date_start}, asOf));
-  const partyOf = (e: TimelineEventOut) => text(e.refs.entity_id);
-  const counts = timeline.data?.verification_counts ?? {};
-
-  const kindsShown = [...EVENT_KIND_ORDER.filter(k => events.some(e => e.kind === k)), ...Array.from(new Set(events.map(e => e.kind))).filter(k => !EVENT_KIND_ORDER.includes(k))];
-  const statusesShown = Object.keys(EVENT_STATUS).filter(st => events.some(e => e.verification_status === st));
-  const fuzzyShown = events.some(e => !e.date_end && (e.precision === 'month' || e.precision === 'year'));
-  const rangeShown = events.some(e => e.date_end && Date.parse(e.date_end) > Date.parse(e.date_start));
-
-  const legend = <>
-    <KeySection title="Rows" channel="row and colour: what kind of event">
-      {kindsShown.map(k => <KeyRow key={k} swatch={<StatusMark colour={eventKind(k).colour} status="verified"/>}>{eventKind(k).name}</KeyRow>)}
-    </KeySection>
-    <KeySection title="How sure the date is" channel="the mark's fill and outline">
-      {statusesShown.map(st => <KeyRow key={st} swatch={<StatusMark colour={SWATCH.sage} status={st}/>}>{eventStatus(st).name}</KeyRow>)}
-    </KeySection>
-    {(fuzzyShown || rangeShown) && <KeySection title="Spans">
-      {fuzzyShown && <KeyRow swatch={<svg width="36" height="18"><rect x="1" y="1" width="34" height="16" rx="8" fill={SWATCH.sage} opacity=".22"/>
-        <circle cx="18" cy="9" r="5" fill={SWATCH.sage}/></svg>}>Known only to the month or year: the band covers it</KeyRow>}
-      {rangeShown && <KeyRow swatch={<svg width="36" height="12"><rect x="1" y="2" width="34" height="8" rx="4" fill={SWATCH.sage}/></svg>}>Runs from one date to another</KeyRow>}
-    </KeySection>}
-  </>;
-
-  return <Card className="card">
-    <CardHeader className="pb-3">
-      {/* Ony, 29 Oct: the card's explanation is revealed on its title. */}
-      <CardTitle><Reveal detail="Dates from the records, the sources and your own events, kept apart by where they come from.">Timeline</Reveal></CardTitle>
-    </CardHeader>
-    <CardContent>
-      {timeline.isError && <p className="muted">{errorMessage(timeline.error, 'Could not load the timeline')}</p>}
-      {asOf !== null && allEvents.length > 0 && events.length === 0 && <p className="muted">Nothing on the timeline had happened by {asOf}.</p>}
-      {events.length > 0 && <ChartFrame kind="timeline" title="What happened when"
-        rule={{label: 'Left to right by date:', text: 'one row per kind of event. A date known only to the month or year is a soft band over that month or year.'}}
-        legend={legend}
-        footer={<>
-          {/* The counts show; how to move along the chart is revealed on them. */}
-          <Reveal detail="Drag the bar under the chart, or scroll over it, to look at a stretch of time.">
-            <span>{Object.entries(counts).map(([k, v]) => <FootStat key={k} value={v}>{eventStatus(k).name.toLowerCase()}</FootStat>)}</span></Reveal>
-          {asOf !== null && <span>As of {asOf}: {allEvents.length - events.length} later {allEvents.length - events.length === 1 ? 'event' : 'events'} left out.</span>}
-        </>}>
-        <div style={{padding: '8px 8px 0'}}><CaseTimeline events={events} height={Math.max(220, 90 + kindsShown.length * 56)}/></div>
-      </ChartFrame>}
-      {events.length > 0 && <ol className="tl-list" aria-label="Events in date order">
-        {events.map(e => <li key={e.id} className={`tl-event${pointed && partyOf(e) === pointed ? ' tl-lit' : ''}`} style={{borderLeftColor: eventKind(e.kind).colour}}
-          onMouseEnter={() => { const party = partyOf(e); if (party) setPointed(party); }} onMouseLeave={() => { if (partyOf(e)) setPointed(null); }}>
-          {/* The event's kind (colour edge) and how sure its date is (the mark) are named on the mark, with its precision and
-              grade; where it comes from and what it links to are revealed on its title. The review warnings stay. */}
-          <div className="tl-when"><Reveal label={`${eventKind(e.kind).name}, ${eventStatus(e.verification_status).name}`} detail={<>
-            <b>{eventKind(e.kind).name}</b>
-            <span className="rv-row">{eventStatus(e.verification_status).name}{e.precision && e.precision !== 'day' ? ` · known to the ${e.precision}` : ''}</span>
-            {e.grade && <span className="rv-row">Graded {e.grade}: {EVENT_GRADES[e.grade]}</span>}</>}>
-            <StatusMark colour={eventKind(e.kind).colour} status={e.verification_status}/></Reveal>
-            <span>{dateWords(e.date_start, e.precision)}{e.date_end ? ` to ${dateWords(e.date_end, e.precision)}` : ''}</span></div>
-          <div className="tl-body">
-            {(() => {
-              const more = [
-                text(e.provenance.origin) && `Origin: ${text(e.provenance.origin)}`,
-                e.context?.claim && `Claim: ${e.context.claim.status} · confidence ${Math.round(e.context.claim.confidence * 100)}%`,
-                e.context?.evidence && `Evidence${text(e.context.evidence.locator) ? ` · ${text(e.context.evidence.locator)}` : ''}: ${text(e.context.evidence.quote) || 'linked evidence'}`,
-                e.context?.claim?.evidence_stances?.length ? `Evidence stance: ${e.context.claim.evidence_stances.map(x => String(x.stance)).join(', ')}` : null,
-              ].filter((x): x is string => Boolean(x));
-              return more.length ? <Reveal detail={<>{more.map(m => <span key={m} className="rv-row">{m}</span>)}</>}><b>{e.title}</b></Reveal> : <b>{e.title}</b>;
-            })()}
-            {e.grade && <Reveal detail={EVENT_GRADES[e.grade]}><small className="tl-grade">graded {e.grade}</small></Reveal>}
-            {e.description && <p>{e.description}</p>}
-            {e.context?.claim_advisory?.needs_review && <small className="tl-warn">Linked claim needs review; this event is kept.</small>}
-            {e.context?.relationship_advisory?.needs_review && <small className="tl-warn">The relationship&apos;s support needs review{e.context.relationship_advisory.has_independent_support ? '; independent support remains' : ''}.</small>}
-          </div>
-          <div className="tl-actions">
-            {/* Short grade words; what each means is revealed on the choice. */}
-            {e.kind === 'reporter_event' && <Reveal tabbable={false} describe={false} detail={GRADES_DETAIL}><Select value={e.grade ?? UNGRADED} onValueChange={value => regrade.mutate({id: e.id, value})}>
-              <SelectTrigger className="w-auto" aria-label={`Grade of ${e.title}`} aria-describedby={gradesId}><SelectValue/></SelectTrigger>
-              <SelectContent>
-                <SelectItem value={UNGRADED}>Not graded</SelectItem>
-                {Object.keys(EVENT_GRADES).map(value => <SelectItem key={value} value={value}>{value}</SelectItem>)}
-              </SelectContent>
-            </Select></Reveal>}
-            {text(e.provenance.source_url) && <a href={text(e.provenance.source_url)} target="_blank" rel="noreferrer">Open source</a>}
-            <Button size="sm" variant="outline" onClick={() => openProvenance({
-              title: e.title, kind: 'timeline', sourceId: text(e.refs.source_id), sourceUrl: text(e.provenance.source_url),
-              locator: text(e.provenance.locator), detail: e.description || e.date_start,
-            })}>Trace provenance</Button>
-          </div>
-        </li>)}
-      </ol>}
-      <details className="tl-add">
-        <summary>Add an event</summary>
-        <div className="searchrow">
-          <Input value={title} onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)} placeholder="Event title"/>
-          <Input value={date} onChange={(e: ChangeEvent<HTMLInputElement>) => setDate(e.target.value)} placeholder="YYYY-MM-DD, YYYY-MM, or YYYY"/>
-          <Select value={precision} onValueChange={setPrecision}>
-            <SelectTrigger className="w-auto" aria-label="Known to the"><SelectValue/></SelectTrigger>
-            <SelectContent>{PRECISIONS.map(value => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
-          </Select>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="w-auto" aria-label="How sure the date is"><SelectValue/></SelectTrigger>
-            <SelectContent>{STATUSES.map(value => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
-          </Select>
-          <Reveal tabbable={false} describe={false} detail={<>
-            <span className="rv-row">A reporter&apos;s event can be graded on Bellingcat&apos;s scale. The date&apos;s status says how sure the date is; the grade, how sure the event is.</span>
-            {GRADES_DETAIL}</>}><Select value={grade} onValueChange={setGrade}>
-            <SelectTrigger className="w-auto" aria-label="Grade" aria-describedby={gradesId}><SelectValue/></SelectTrigger>
-            <SelectContent>
-              <SelectItem value={UNGRADED}>Not graded</SelectItem>
-              {Object.keys(EVENT_GRADES).map(value => <SelectItem key={value} value={value}>{value}</SelectItem>)}
-            </SelectContent>
-          </Select></Reveal>
-          <Button onClick={() => add.mutate()} disabled={!investigationId || !title.trim() || !date.trim() || add.isPending}>Add event</Button>
-        </div>
-      </details>
-      {problem && <p className="muted">{problem}</p>}
-      <span id={gradesId} hidden>{Object.entries(EVENT_GRADES).map(([g, meaning]) => `${g}: ${meaning}.`).join(' ')}</span>
-    </CardContent>
-  </Card>;
-}
-
-/** An event's mark as the chart draws it: filled, half-filled, an empty or dashed ring, or filled with a red "!". */
-export function StatusMark({colour, status}: {colour: string; status: string}): ReactElement {
-  const look = eventStatus(status);
-  return <svg width="22" height="18" viewBox="0 0 22 18" aria-hidden style={{flex: '0 0 auto'}}>
-    <circle cx="9" cy="10" r="6" fill={look.fill === 'solid' ? colour : look.fill === 'half' ? `${colour}73` : SWATCH.card} stroke={colour} strokeWidth="2"
-      strokeDasharray={look.dashed ? '3 2' : undefined}/>
-    {look.contested && <><circle cx="16" cy="4.5" r="4.5" fill={SWATCH.brick}/><text x="16" y="7" fontSize="7" fontWeight="700" textAnchor="middle" fill={SWATCH.ink}>!</text></>}
-  </svg>;
+  // The same query each view reads: the count and why it opened where it did, said once at the top.
+  const lanes = useQuery({...timelineLanesViewOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  const [view, setView] = useState<View>('lanes');
+  const [mode, setMode] = useState<'record' | 'build'>('record');
+  // An event picked in another view, shown in Lanes (with a serial so picking the same one again still moves there).
+  const [focus, setFocus] = useState<{id: string; serial: number} | null>(null);
+  const show = (id: string) => { setFocus(f => ({id, serial: (f?.serial ?? 0) + 1})); setMode('record'); setView('lanes'); };
+  const setAsOf = useWorkbenchStore(st => st.setAsOf);
+  const n = lanes.data?.events.length ?? 0;
+  const LEDE: Record<View, string> = {
+    lanes: 'One lane per party. Each mark says whether the event is shown; its band says how exact the date is.',
+    stack: 'Each layer is a stretch of time holding the evidence dated in it. Scroll pushes the top layer out; empty stretches are skipped.',
+    replay: 'Replay walks the story in the order things happened. At each step you see only what was on the record by then.',
+    board: 'Each period gets a board: its documents, people, notes and payments, joined by string where the record joins them.',
+    periods: 'Each period you named, with your summary of it and its evidence.',
+  };
+  return <section className="tl2-panel" aria-labelledby="tl2-title">
+    <header className="tl2-head">
+      <div className="tl2-views" role="group" aria-label="The record or your own">
+        <button aria-pressed={mode === 'record'} onClick={() => setMode('record')}>The record</button>
+        <button aria-pressed={mode === 'build'} onClick={() => setMode('build')}>Build your own</button>
+      </div>
+      {/* The lede is how the view works: on the title, on hover, focus or click (Ony, 29 Oct). */}
+      <h2 id="tl2-title"><Reveal detail={mode === 'build' ? 'Pick the evidence, put it in the order you want to tell it, and leave placeholders for what you still need. The record’s own dates stay on every card.' : LEDE[view]}>
+        <span>{mode === 'build' ? 'Build your own timeline' : 'What happened when, and how sure are we?'}</span></Reveal></h2>
+      {mode === 'record' && <div className="tl2-views" role="tablist" aria-label="Timeline views">
+        {VIEWS.map(([k, w]) => <button key={k} role="tab" aria-selected={view === k} onClick={() => setView(k)}>{w}</button>)}
+      </div>}
+      {lanes.data && <p className="tl2-status"><Reveal detail={<>{lanes.data.span.busiest ? <span className="rv-row">{lanes.data.span.first}–{lanes.data.span.last} · busiest {lanes.data.span.busiest}</span> : null}
+        {lanes.data.opens_on && view === 'lanes' ? <span className="rv-row">Opened on the next unresolved event.</span> : null}
+        {!lanes.data.span.busiest && !(lanes.data.opens_on && view === 'lanes') ? 'Every event in the case, dated or not.' : null}</>}>
+        <span>{n} {n === 1 ? 'event' : 'events'}</span></Reveal></p>}
+    </header>
+    {mode === 'build' && lanes.data && <BuildYourOwn view={lanes.data} investigationId={investigationId} onShowInLanes={show}/>}
+    {mode === 'record' && view === 'lanes' && <TimelineLanes investigationId={investigationId} picked={focus}/>}
+    {mode === 'record' && view === 'stack' && lanes.data && <TimelineStack view={lanes.data} onShowInLanes={show}/>}
+    {mode === 'record' && view === 'replay' && lanes.data && <TimelineReplay view={lanes.data}
+      onShowInLanes={(id, step) => { setAsOf(new Date(span({date_start: step.date_start, date_end: step.date_end})[1]).getUTCFullYear()); show(id); }}/>}
+    {mode === 'record' && view === 'board' && lanes.data && <TimelineBoard view={lanes.data} investigationId={investigationId} onShowInLanes={show}/>}
+    {mode === 'record' && view === 'periods' && lanes.data && <TimelinePeriods view={lanes.data} investigationId={investigationId} onSelect={show}
+      onOpenLanes={p => { const first = inPeriod(lanes.data!.events, p)[0]; if (first) show(first.id); else setView('lanes'); }}/>}
+  </section>;
 }

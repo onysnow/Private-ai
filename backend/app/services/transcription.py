@@ -226,8 +226,24 @@ def read_media_document(db: Session, document_id: str, report: Callable[[int | N
                            outline_step=transcript.outline_step, transcript=transcript.about))
     db.commit()
     minutes = transcript.duration / 60
-    return (f"Transcribed on this computer: {len(spoken)} spoken part{'s' if len(spoken) != 1 else ''} in "
-            f"{minutes:.1f} min, {transcript.about['language']}")
+    message = (f"Transcribed on this computer: {len(spoken)} spoken part{'s' if len(spoken) != 1 else ''} in "
+               f"{minutes:.1f} min, {transcript.about['language']}")
+    # Who spoke when (ADR-0026), when the voice models are on this computer. Not finding voices never undoes the read.
+    from app.services import voices
+
+    if spoken and voices.available() is None:
+        report(95, "Listening for voices")
+        try:
+            message = f"{message}; {voices.find_in_document(db, doc.id, report)}"
+        except Exception as exc:
+            from app.jobs.records import JobStopped
+
+            if isinstance(exc, JobStopped):
+                raise
+            db.rollback()
+            logger.exception("finding voices failed for %s", document_id)
+            message = f"{message}; voices could not be told apart ({type(exc).__name__})"
+    return message
 
 
 def _fail(db: Session, document_id: str, message: str) -> None:

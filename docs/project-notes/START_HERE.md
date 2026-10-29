@@ -1,6 +1,20 @@
-# Start here (12 Oct 2026)
+# Start here (29 Oct 2026)
 
-**The work plan is `MOCKUP_BUILD_LIST.md`** (Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct (PR #58 into timeline-wip): table-row Decide cards, The Wire, the app-side suite gaps (data and API), Case home to HOME_1, the frame and Settings to HOME_2, the whole OnySnow Studios effect system brought in with the rain pane on the case title band (ADR-0009; frosted Glass panels still to do), The Drop and the reading room (INTAKE_1/2; History tab, per-file stream, web links and "already in the case" on reading-room cards still to do). Then SEE_2 Money, CHECK_2 Chain of Custody, ACT_1 Red Flags, ACT_2 Story, and AI_2 Before you run (Act › AI runs: the run settings in plain words, the plan, what leaves the computer, this case's default with a reason). SEE_1 waits on a Wire mockup Ony approves. AI_1 and the Knowledge catalogue and glossary are built. 23 Oct: Safety & data (KEEP_2) built with the outbound log (ADR-0015); its remaining parts are in MOCKUP_BUILD_LIST §9. Next: the "Your safety" panel, encrypted backups, then the website (§10, waits on Ony).
+**Where it stands, 29 Oct, late (PR #117, branch `claude/laughing-tesla-dstx1t`, which carries #116's branch
+`claude/native-module` merged in):** everything #116 built (below) plus, from #117, Ony's hover rule applied to every
+screen (sub-text on reveal, types as marks, statuses colour-only with Settings › Appearance › Status marks, key hints
+behind `?`, the AI mark), the style guide at `/style-guide`, and the site mockup for Illustrator
+(`docs/design/site-export/`, made by `tools/export_site_mockup.py`). Following is #116's (ADR-0022), with three fixes from
+#117's review: no direct capture of an item from a Tor-followed source, one claim per item, no capture of an older page
+version (a version counts as captured only once its capture saved the page).
+
+Built by #116, 29 Oct: the Timeline screens (Lanes, Stack, Replay, Board, Periods, Build your own) and Places
+(TIME/PLACE mockups); the three media screens, a photo's Picture (MEDIA_1), a recording's Clean and cut and Sync
+(MEDIA_2), a PDF's Redact before sharing (MEDIA_3); Add by hand, Check a pack, Does it work today?, the evidence pack as
+PDF; The Wire's redesign; the deck editor; Your safety; the newsletter mailbox (DECISIONS_LOG 9–15). Still to build:
+the storytold study, the website (§10), the UI simplification questions not covered by the hover rule.
+
+**The work plan is `MOCKUP_BUILD_LIST.md`** (12 Oct note, kept for history; Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct (PR #58 into timeline-wip): table-row Decide cards, The Wire, the app-side suite gaps (data and API), Case home to HOME_1, the frame and Settings to HOME_2, the whole OnySnow Studios effect system brought in with the rain pane on the case title band (ADR-0009; frosted Glass panels still to do), The Drop and the reading room (INTAKE_1/2; History tab, per-file stream, web links and "already in the case" on reading-room cards still to do). Then SEE_2 Money, CHECK_2 Chain of Custody, ACT_1 Red Flags, ACT_2 Story, and AI_2 Before you run (Act › AI runs: the run settings in plain words, the plan, what leaves the computer, this case's default with a reason). SEE_1 waits on a Wire mockup Ony approves. AI_1 and the Knowledge catalogue and glossary are built. 23 Oct: Safety & data (KEEP_2) built with the outbound log (ADR-0015); its remaining parts are in MOCKUP_BUILD_LIST §9. Next: the "Your safety" panel, encrypted backups, then the website (§10, waits on Ony).
 
 This is where the Workbench redesign stands, for a new session picking it up. The branch is
 `timeline-wip`.
@@ -8,8 +22,8 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
 ## How Ony wants to work
 - Commands for him to run: always one single line starting with the `cd` to the folder, joined
   with `&&` (he uses Command Prompt), e.g. `cd /d C:\Users\Wigi\Documents\Private-ai && git push origin timeline-wip-cloud:timeline-wip`.
-- Mockups first; he approves before the app changes. When he gives feedback, discuss the change
-  with him and edit only after he agrees.
+- Don't wait on him (29 Oct): decide each open question on what is best for the app, build it, and log the call
+  in DECISIONS_LOG.md. When he gives feedback on something built, change it as he says.
 - Execute instructions rather than acknowledging them. No unrequested recommendations. Never
   re-raise something he ruled out. No assumptions: say what was checked and what wasn't.
 - Don't announce your own honesty, rate your own point, announce a shortcut you declined, or
@@ -19,10 +33,11 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   alerts, numbers and icons. Sub-text (how many times something was read, timings in ms, explanations, secondary
   details) is revealed on hover or click, unless the context gives a reason to show it. Categorical facts (what type
   of thing something is) are inferred through the UI (a mark, shape, colour or position) and named on hover or
-  click. Applies to the whole app; build every new screen this way.
-  Ony's answers (29 Oct, `docs/research/ui-density/SUBTEXT_AND_TYPES.md`): statuses and flag levels are colour only
-  by default, the word on reveal, with an accessibility setting to add the shape or the word; key hints live behind
-  `?`; AI notices are the AI mark with the sentence on hover; the old panels are converted now, as they are.
+  click. Applies to the whole app; build every new screen this way. Ony's answers (29 Oct,
+  `docs/research/ui-density/SUBTEXT_AND_TYPES.md`): statuses and flag levels are colour only by default, the word on
+  reveal, with Settings › Appearance › Status marks to add the shape or the word; key hints live behind `?`; AI notices
+  are the AI mark with the sentence on hover; the old panels are converted too. The shared component is
+  `components/ui/reveal.tsx`; the style guide is `/style-guide`.
 - **Fill the space (29 Oct).** When a row, card or box has a lot of empty space above and below its content, make the
   text or icon bigger instead of leaving the space empty.
 - Approval mode is auto: proceed without stopping on routine steps.
@@ -60,12 +75,10 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   Disk encryption is left to Windows (BitLocker / Device encryption); the app only reports it,
   and the BitLocker reading is untested on a real Windows machine.
 
-- **Following (29 Oct, ADR-0021, mockup FOLLOW_1):** source intake Phase 3. Bring in › Following watches feeds,
-  sitemaps, podcasts, YouTube channel feeds and pages for a case, politely (conditional GET, robots.txt, Retry-After);
-  what it finds waits in an at-risk queue for a person to capture or skip. The first screen built to the 29 Oct rule
-  (sub-text on hover or click), with its shared component `components/ui/reveal.tsx`.
+## Decided without waiting
+Since 29 Oct Ony's open questions are decided on what is best for the app and logged in `DECISIONS_LOG.md`.
 
-## Waiting on Ony
+## Waiting on Ony (before 29 Oct; now decided and built in turn, see DECISIONS_LOG.md)
 - **See ("The Wire"):** the prototype is at https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3,
   with its source in `docs/design/see-the-wire/` and the design in `SEE_THE_WIRE_PROTOTYPE.md`.
   It awaits his approval before it is built.

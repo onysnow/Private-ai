@@ -24,19 +24,19 @@ from pypdf import PdfReader, PdfWriter
 
 W, H = 1440, 900
 
-STAGES = {
-    "/bring-in": ("Bring in", [("the-drop", "The Drop"), ("following", "Following"), ("investigation-search", "Search"),
-                               ("document-ingestion", "Library"), ("source-capture", "Sources & evidence"), ("connectors", "Connectors"),
-                               ("corpus", "OpenAleph corpus")]),
-    "/check": ("Check", [("claim-verification", "Claims"), ("to-check", "To check"), ("review-queue", "Connector findings"),
-                         ("chain-of-custody", "Chain of Custody")]),
-    "/see": ("See", [("the-wire", "The Wire"), ("relationship-graph", "Relationships"), ("timeline", "Timeline"),
-                     ("money-flows", "Money"), ("places", "Places")]),
-    "/act": ("Act", [("red-flags", "Red Flags"), ("story", "Story"), ("leads", "Leads"), ("chart-builder", "Charts"),
-                     ("ai-reasoning-panel", "AI drafts")]),
-    "/keep": ("Keep", [("safety-data", "Safety & data"), ("backup-restore", "Backup & restore"), ("deletion", "Delete"),
-                       ("access", "Access")]),
-}
+def stages() -> dict[str, tuple[str, list[tuple[str, str]]]]:
+    """The stages and their parts as the app lists them (frontend/lib/stages.ts), so a new part is exported too."""
+    import re
+
+    text = (Path(__file__).resolve().parents[1] / "frontend" / "lib" / "stages.ts").read_text(encoding="utf-8")
+    out: dict[str, tuple[str, list[tuple[str, str]]]] = {}
+    for block in re.split(r"\n\s*\{key: ", text)[1:]:
+        route = re.search(r"route: '([^']+)'", block)
+        name = re.search(r"name: '([^']+)'", block)
+        if route and name:
+            parts = re.findall(r"label: '([^']+)', anchor: '([^']+)'", block)
+            out[route.group(1)] = (name.group(1), [(anchor, label) for label, anchor in parts])
+    return out
 
 # Not part of a screen's design: the Next.js development badge, the first-visit hints over the edges, and the skip link
 # (it shows when the page takes focus).
@@ -46,7 +46,7 @@ QUIET = "nextjs-portal,.fr-hint,.fr-skip{display:none!important}"
 def screens(case: str) -> list[tuple[str, str]]:
     q = f"?inv={case}"
     out = [("Case home", f"/{q}"), ("Decide", f"/decide{q}")]
-    for route, (stage, parts) in STAGES.items():
+    for route, (stage, parts) in stages().items():
         out += [(f"{stage} › {label}", f"{route}{q}#{anchor}") for anchor, label in parts]
     out += [("Learn › Red Flags catalogue", f"/learn{q}"), ("Learn › Glossary", f"/glossary{q}"), ("Settings", f"/settings{q}"),
             ("About", "/about")]

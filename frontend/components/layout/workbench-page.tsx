@@ -115,7 +115,7 @@ export function StandingTiles({standing}: {standing: Standing}): ReactElement {
     <Tile name="Evidence" anchor="source-capture">
       <span className="wb-big"><b>{evidence.total}</b> {evidence.total === 1 ? 'record' : 'records'} · {evidence.sources} {evidence.sources === 1 ? 'source' : 'sources'}</span>
     </Tile>
-    <Tile name="Network" anchor="relationship-graph">
+    <Tile name="Network" anchor="the-wire">
       <span className="wb-big"><b>{network.parties}</b> parties · {network.links} links</span>
       <SureBar sure={network.sure}/><SureList sure={network.sure} names={{supported: 'supported', not_yet: 'not yet shown', disputed: 'contested'}}/>
     </Tile>
@@ -138,7 +138,7 @@ function partCount(standing: Standing, anchor: string): string | null {
   switch (anchor) {
     case 'document-ingestion': return String(standing.documents);
     case 'source-capture': return `${standing.evidence.sources} · ${standing.evidence.total}`;
-    case 'relationship-graph': return `${standing.network.parties} · ${standing.network.links}`;
+    case 'the-wire': return `${standing.network.parties} · ${standing.network.links}`;
     case 'timeline': return String(standing.timeline.total);
     case 'places': return String(standing.places);
     case 'leads': return String(standing.leads.open);

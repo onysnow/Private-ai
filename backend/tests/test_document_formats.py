@@ -78,11 +78,12 @@ def test_the_generated_list_matches_the_ingest_file_image_the_stack_runs():
 
 def test_openaleph_reads_everything_the_workbench_reads_and_more():
     recordings = {"mp3", "wav", "m4a", "aac", "ogg", "oga", "opus", "flac", "mp4", "m4v", "mov", "webm", "mkv"}
+    photos = {"heic", "heif", "dng", "cr2", "cr3", "nef", "nrw", "arw", "raf", "rw2", "pef", "orf"}
     assert LOCAL_EXTENSIONS == {"txt", "md", "csv", "html", "htm", "pdf", "docx", "png", "jpg", "jpeg",
-                                "eml", "mbox", "zip", "xlsx"} | recordings
-    # Recordings are transcribed on this computer whichever reader reads the rest (ADR-0020): OpenAleph does not
-    # transcribe, and its list leaves some of them out.
-    assert LOCAL_EXTENSIONS - recordings <= openaleph_formats.EXTENSIONS
+                                "eml", "mbox", "zip", "xlsx"} | recordings | photos
+    # Recordings are transcribed on this computer whichever reader reads the rest (ADR-0020), and HEIC and RAW photos
+    # are read through a viewable copy made here (ADR-0021): OpenAleph does not do either, and its list leaves some out.
+    assert LOCAL_EXTENSIONS - recordings - photos <= openaleph_formats.EXTENSIONS
     assert {"eml", "msg", "mbox", "pst", "zip", "7z", "tar", "xlsx", "pptx", "odt", "jpg", "tiff"} <= openaleph_formats.EXTENSIONS
     assert {"message/rfc822", "application/zip", "application/pdf"} <= openaleph_formats.MIME_TYPES
     # Formats whose auction IgnoreIngestor wins are stored by OpenAleph but never read.
@@ -116,8 +117,8 @@ def test_the_upload_check_follows_the_reader(fake, monkeypatch):
     with pytest.raises(UnsupportedFormat) as refused:
         check_upload("deck.pptx", DECK_MIME)
     assert str(refused.value) == (
-        "The Workbench's own reader reads .aac, .csv, .docx, .eml, .flac, .htm, .html, .jpeg, .jpg, .m4a, .m4v, .mbox, .md, .mkv, .mov, "
-        ".mp3, .mp4, .oga, .ogg, .opus, .pdf, .png, .txt, .wav, .webm, .xlsx, .zip files; "
+        "The Workbench's own reader reads .aac, .arw, .cr2, .cr3, .csv, .dng, .docx, .eml, .flac, .heic, .heif, .htm, .html, .jpeg, .jpg, .m4a, .m4v, .mbox, .md, "
+        ".mkv, .mov, .mp3, .mp4, .nef, .nrw, .oga, .ogg, .opus, .orf, .pdf, .pef, .png, .raf, .rw2, .txt, .wav, .webm, .xlsx, .zip files; "
         "it cannot read .pptx files, "
         "so this file was not uploaded. OpenAleph reads them, but this deployment does not read uploads with OpenAleph.")
     assert needs_openaleph("deck.pptx") and not needs_openaleph("memo.TXT")
@@ -137,8 +138,8 @@ def test_the_formats_route_lists_what_uploads_accept_now(fake, monkeypatch):
     monkeypatch.setattr(settings, "document_reader", "local")
     local = client.get("/api/document-formats").json()
     assert local["reader"] == "workbench" and local["mime_types"] == [] and local["openaleph_only_extensions"] == []
-    assert local["accept"] == (".aac,.csv,.docx,.eml,.flac,.htm,.html,.jpeg,.jpg,.m4a,.m4v,.mbox,.md,.mkv,.mov,.mp3,.mp4,.oga,.ogg,"
-                               ".opus,.pdf,.png,.txt,.wav,.webm,.xlsx,.zip")
+    assert local["accept"] == (".aac,.arw,.cr2,.cr3,.csv,.dng,.docx,.eml,.flac,.heic,.heif,.htm,.html,.jpeg,.jpg,.m4a,.m4v,.mbox,.md,"
+                               ".mkv,.mov,.mp3,.mp4,.nef,.nrw,.oga,.ogg,.opus,.orf,.pdf,.pef,.png,.raf,.rw2,.txt,.wav,.webm,.xlsx,.zip")
     assert local["ingest_file_image"] is None
     r.DocumentFormatsOut.model_validate(with_openaleph)
     r.DocumentFormatsOut.model_validate(local)

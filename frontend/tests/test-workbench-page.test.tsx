@@ -28,7 +28,7 @@ describe('Workbench page frame', () => {
     expect(within(rail).getAllByRole('link').filter(a => a.getAttribute('href')?.startsWith('#stage-')).map(a => a.textContent))
       .toEqual(['1Bring in', '2Check', '3See', '4Act', '5Keep']);
     expect(within(rail).getByRole('link', {name: /^Sources & evidence\s*2 · 4$/})).toHaveAttribute('href', '#source-capture');
-    expect(within(rail).getByRole('link', {name: /^Relationships\s*6 · 5$/})).toHaveAttribute('href', '#relationship-graph');
+    expect(within(rail).getByRole('link', {name: /^The Wire\s*6 · 5$/})).toHaveAttribute('href', '#the-wire');
     expect(within(rail).getByRole('link', {name: /^Leads\s*3$/})).toHaveAttribute('href', '#leads');
   });
 

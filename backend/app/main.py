@@ -44,7 +44,9 @@ from app.api.routes_case_home import router as case_home_router
 from app.api.routes_suite import router as suite_router
 from app.api.routes_captures import router as captures_router
 from app.api.routes_following import router as following_router
+from app.api.routes_timeline import router as timeline_router
 from app.api.routes_media import router as media_router
+from app.api.routes_authenticity import router as authenticity_router
 from app.api.routes_demo import router as demo_router
 from app.api.routes_session import router as session_router
 from app.api.routes_catalogue import router as catalogue_router
@@ -113,7 +115,9 @@ def register_domain_routers(app: FastAPI) -> None:
     app.include_router(suite_router)
     app.include_router(captures_router)
     app.include_router(following_router)
+    app.include_router(timeline_router)
     app.include_router(media_router)
+    app.include_router(authenticity_router)
     app.include_router(demo_router)
     app.include_router(session_router)
     app.include_router(catalogue_router)
@@ -297,8 +301,9 @@ def create_app(
     # resolved objects (mypy does not narrow Optional parameters inside nested defs).
     limits_policy = request_limits or RequestLimitPolicy(
         default_bytes=app_settings.max_api_request_bytes,
-        # Allow multipart framing overhead while preserving the stricter route-level file limit.
-        document_bytes=app_settings.max_document_bytes + (1024 * 1024),
+        # Allow multipart framing overhead while preserving the stricter route-level file limit. The upload route
+        # takes recordings and photos up to MAX_MEDIA_BYTES (ADR-0020, ADR-0021) and checks each file's own limit.
+        document_bytes=max(app_settings.max_document_bytes, app_settings.max_media_bytes) + (1024 * 1024),
         backup_bytes=app_settings.max_backup_bytes + (1024 * 1024),
     )
     audit_logger = audit or SecurityAuditLogger(app_settings.audit_log_file)

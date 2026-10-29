@@ -404,6 +404,12 @@
 .ch-happens dl > div { display: contents; }
 .ch-happens dt { font-weight: 650; white-space: nowrap; }
 .ch-happens dd { margin: 0; }
+.ch-unlocks { margin-top: 8px; padding-top: 8px; border-top: 1px dashed color-mix(in srgb, var(--accent-2) 45%, transparent); }
+.ch-unlocks p { margin: 0; font-size: 13px; font-weight: 650; } .ch-unlocks p small { font-weight: 400; color: var(--text-muted); }
+.ch-unlocks ul { margin: 4px 0 0; }
+/* What a Yes unlocks: the mark and how many on the row; what they are is in the row's reveal and on the card. */
+.dc-row .dc-unlocks { flex: none; color: var(--accent-1); font-size: 15px; line-height: 1; }
+.dc-row .dc-unlocks small { font: 600 11px var(--font-mono); margin-left: 2px; }
 .ch-happens-yes dt { color: var(--status-supported); } .ch-happens-no dt { color: var(--status-disputed); } .ch-happens-unsure dt { color: var(--status-unshown); }
 @media (prefers-reduced-motion: reduce) { .dc-last button, .dc-bulk-confirm { animation: cv-fade 120ms both; } }
 html[data-motion='calm'] .dc-last button, html[data-motion='calm'] .dc-bulk-confirm { animation: cv-fade 120ms both; }
@@ -415,10 +421,11 @@ html[data-motion='calm'] .dc-last button, html[data-motion='calm'] .dc-bulk-conf
 @media (max-width: 980px) {
   .cv-home-wrap { height: auto; overflow: visible; }
   .ch-home, .dc { height: auto; }
-  .ch-top { grid-template-columns: 1fr; grid-template-areas: 'name' 'tools' 'q' 'strip'; }
+  /* minmax(0, 1fr), not 1fr: a 1fr column never shrinks below its widest child, which pushed a phone's page sideways. */
+  .ch-top { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'name' 'tools' 'q' 'strip'; }
   .ch-top > .ch-search { justify-self: start; width: 100%; } .ch-top > .ch-tools { justify-self: end; }
   .ch-strip { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
-  .ch-grid, .dc, .ch-bottom { grid-template-columns: 1fr; }
+  .ch-grid, .dc, .ch-bottom { grid-template-columns: minmax(0, 1fr); }
   .ch-mod { flex: none; min-height: 220px; }
   .dc-empty { grid-column: auto; }
 }
@@ -556,6 +563,8 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .ch-show-all:focus-visible { outline: 2px solid var(--accent-1); border-radius: 4px; }
 .ch-change .ai-tag { align-self: flex-start; margin-top: 4px; }
 .ch-next-foot > span[aria-live] { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* A Textbook safety sign (Your safety, research §13): one slim line under the case's title band. */
+.ch-home:has(> .ys-notice) { grid-template-rows: auto auto minmax(0, 1fr) auto; }
 
 /* The frame's left handle carries its name in a reveal (components/frame/app-frame.tsx; Ony, 29 Oct). The reveal's
    span takes the handle's place so its card opens beside the handle. */

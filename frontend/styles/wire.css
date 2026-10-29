@@ -3,9 +3,13 @@
    slides in from the right. Chrome reads the theme's role tokens (themes.css); the kinds
    and link families keep the prototype's colours, each named in the key. */
 .tw { container: tw / inline-size; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; position: relative; height: 100%; min-height: 560px; overflow: hidden; border-radius: 16px; background: var(--ground); color: var(--text); font: 14px/1.45 var(--font-ui); }
-.tw::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+/* The grid sits far behind the map: it moves a sixth as far as the map when you pan or zoom (--gx, --gy, --gs, set by
+   the engine), and lamps behind it light its lines only (features/effects/grid-light.tsx). Both stop under Calm motion
+   and reduced motion. */
+.tw-grid { position: absolute; inset: 0; pointer-events: none; --g: 48px;
   background-image: linear-gradient(color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px);
-  background-size: 48px 48px; }
+  background-size: var(--gs, var(--g)) var(--gs, var(--g)); background-position: var(--gx, 0px) var(--gy, 0px); }
+.tw-grid-light { position: absolute; inset: 0; width: 100%; height: 100%; display: block; mix-blend-mode: screen; }
 .tw button, .tw input, .tw select { font: inherit; color: inherit; }
 .tw button { cursor: pointer; touch-action: manipulation; }
 .tw :focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
@@ -19,6 +23,22 @@
 
 .tw-glass { background: color-mix(in srgb, var(--surface-1) 86%, transparent); backdrop-filter: blur(10px); border: 1px solid color-mix(in srgb, var(--line) 35%, transparent);
   border-radius: 14px; box-shadow: var(--shadow-panel, 0 18px 40px rgb(5 12 22 / .45)); }
+/* The panel the pointer is in lights its edge where the pointer is (the grid lamps' pale blue), so the pointer is easy
+   to keep track of among the panels. */
+.tw-glass { position: relative; }
+.tw-glass::after { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; opacity: 0; transition: opacity .25s;
+  background: radial-gradient(160px circle at var(--mx, 50%) var(--my, 50%), var(--tw-light, #a9c3e6), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.tw-glass:hover::after, .tw-glass:focus-within::after { opacity: .85; }
+/* At rest each panel shows only what matters most; hovering it, or moving into it with the keyboard, shows the rest. */
+.tw-head:not(:hover):not(:focus-within) .tw-chosen { display: none; }
+.tw-head:not(:hover):not(:focus-within) .tw-rule { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.tw-trail:not(:hover):not(:focus-within) li:not(:last-child), .tw-trail:not(:hover):not(:focus-within) .tw-bnext { display: none; }
+.tw-key:not(:hover):not(:focus-within) .tw-key-sure .row, .tw-key:not(:hover):not(:focus-within) .tw-key-tags .tag,
+.tw-key:not(:hover):not(:focus-within) .tw-key-more { display: none; }
+.tw-key:not(:hover):not(:focus-within) .tw-key-tags { margin-top: 4px; }
+.tw-key:not(:hover):not(:focus-within) .tw-key-sure .cap span { display: none; }
+.tw-key:not(:hover):not(:focus-within) .tw-key-sure .cap::after { content: 'hover for the key'; font-weight: 400; letter-spacing: .04em; text-transform: none; color: var(--text-muted); }
 .tw-head { position: absolute; left: 16px; top: 14px; max-width: min(560px, calc(100% - 32px)); padding: 10px 16px; z-index: 5; }
 .tw-head h2 { margin: 0; font: 600 26px/1.1 var(--font-display); letter-spacing: -.01em; }
 .tw-head h2 i { font-weight: 400; color: var(--accent-1); }
@@ -90,6 +110,14 @@
 .tw-key summary::-webkit-details-marker { display: none; }
 .tw-key .row { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
 .tw-key svg { flex: none; }
+.tw-key-tags { margin-top: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.tw-key-tags .tag { display: inline-flex; align-items: center; gap: 5px; }
+.tw-key-tags .tag i { width: 10px; height: 10px; border-radius: 50%; border: 2.5px solid; box-shadow: 0 0 6px currentColor; }
+.tw .tw-tagring { pointer-events: none; }
+.tw .tw-tagring .glow { opacity: .85; animation: tw-tagglow 2.8s ease-in-out infinite; }
+@keyframes tw-tagglow { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+:root[data-motion="calm"] .tw .tw-tagring .glow { animation: none; }
+.tw.tw-tags-off .tw-tagring { display: none !important; }
 
 .tw-drawer { position: absolute; top: 72px; right: 124px; width: min(380px, calc(100% - 32px)); max-height: calc(100% - 200px); overflow: auto; z-index: 7; padding: 16px 18px 18px;
   transform: translateX(30px); opacity: 0; pointer-events: none; transition: transform .35s cubic-bezier(.3,.7,.2,1), opacity .25s; }
@@ -169,12 +197,52 @@
 .tw .terr-l { font-family: var(--font-display); font-style: italic; fill: var(--text); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
 .tw .terr-s { font-family: var(--font-mono); fill: var(--text-muted); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
 .tw .lbl { font-family: var(--font-ui); fill: var(--text); opacity: var(--lo, 1); paint-order: stroke; stroke: var(--ground); stroke-linejoin: round; pointer-events: none; }
+/* A dot's name chip. It grows out from behind the circle; on hover every part of it moves together: the chip slides
+   open, the name is uncovered as it goes (the mask slides with the chip), the link badge fades and slides in, the circle
+   swells a little and its rings brighten. */
+.tw .peek-bg, .tw .peek-reveal { transition: x .26s cubic-bezier(.2,.8,.2,1), width .26s cubic-bezier(.2,.8,.2,1), stroke-opacity .2s, fill .2s; }
+.tw .peek-bg { fill: color-mix(in srgb, var(--surface-1) 90%, transparent); stroke-width: 1.1; stroke-opacity: .55; }
+.tw .node.peek-open .peek-bg { stroke-opacity: 1; fill: color-mix(in srgb, var(--surface-2, #22364b) 96%, transparent); }
+.tw .peek-t { font: 500 11.5px var(--font-ui); fill: var(--text); pointer-events: none; transition: transform .26s cubic-bezier(.2,.8,.2,1); }
+.tw .peek-badge { opacity: 0; transition: opacity .2s .08s; pointer-events: none; }
+.tw .node.peek-open .peek-badge { opacity: 1; }
+.tw .peek-badge-bg { fill: color-mix(in srgb, var(--text) 8%, transparent); }
+.tw .peek-n { font: 600 10px var(--font-mono); fill: var(--text-muted); }
+.tw .peek-pill { cursor: pointer; }
+.tw .node .ring, .tw .node .ring + .kind-icon { transform-box: fill-box; transform-origin: center; transition: transform .26s cubic-bezier(.2,.8,.2,1); }
+.tw .node.peek-open .ring, .tw .node.peek-open .ring + .kind-icon { transform: scale(1.1); }
+.tw .node.peek-open > .halo { stroke-width: 3; }
+.tw .node.peek-open .tw-tagring .glow { opacity: 1; animation: none; }
 .tw .lens-sum { fill: var(--accent-1); }
 .tw .card-bg { fill: var(--surface-1); }
 .tw .card-t { font: 600 12.5px var(--font-ui); fill: var(--text); pointer-events: none; }
+.tw .kind-icon { pointer-events: none; }
 .tw .card-s { font: 500 10px var(--font-mono); fill: var(--text-muted); letter-spacing: .06em; pointer-events: none; }
-.tw .flag-n { font: 600 10.5px var(--font-mono); }
-.tw .sec { font-family: var(--font-mono); font-weight: 500; letter-spacing: .16em; fill: var(--text-muted); text-transform: uppercase; pointer-events: none; }
+.tw .flag-n { font: 700 11px var(--font-mono); pointer-events: none; }
+/* A flagged card: its outline glows in its level's colour; hovering the count's circle brightens it and shows the flags. */
+@property --glow { syntax: '<number>'; inherits: true; initial-value: .55; }
+/* The light round a flagged card: the grid lamps' pale blue (--tw-light, from the light engine), added to what is behind
+   it (screen), a wide soft spread over a tight bright core. How much light is the level; hover turns it up. */
+.tw .flag-glow { stroke: var(--tw-light, #a9c3e6); mix-blend-mode: screen; pointer-events: none; transition: opacity .2s, stroke-width .2s; --glow: .55; }
+.tw .flag-glow.wide { stroke-width: 10; opacity: calc(var(--glow) * .55); }
+.tw .flag-glow.core { stroke-width: 3; opacity: calc(var(--glow) * .9); }
+.tw .node.strong .flag-glow { --glow: .8; }
+.tw .node.textbook .flag-glow { --glow: 1; animation: tw-flag-breathe 2.6s ease-in-out infinite; }
+.tw .node.flagged:hover .flag-glow { --glow: 1; }
+.tw .node.flag-hot .flag-glow { --glow: 1.5; animation: none; }
+.tw .node.flag-hot .flag-glow.wide { stroke-width: 16; }
+.tw .flag-dot { cursor: help; }
+.tw .flag-disc { transition: transform .18s; transform-box: fill-box; transform-origin: center; }
+.tw .node.flag-hot .flag-disc { transform: scale(1.15); }
+@keyframes tw-flag-breathe { 0%, 100% { --glow: .7; } 50% { --glow: 1.15; } }
+:root[data-motion="calm"] .tw .node.textbook .flag-glow { animation: none; }
+.tw-tip .tip-flag { display: block; margin-top: 5px; line-height: 1.35; }
+.tw-tip .tip-flag i { font: 600 9.5px var(--font-mono); font-style: normal; letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; padding: 0 4px; border-radius: 3px; border: 1px solid; }
+.tw-tip .tip-flag i.faint { color: #E9AFA8; border-style: dashed; } .tw-tip .tip-flag i.strong { color: #F6966A; } .tw-tip .tip-flag i.textbook { color: #ffe9e4; background: #8E2420; border-color: #FF8070; }
+/* Around a party, where a party sits says how it is linked (owners left, what it owns right, money in above, money out
+   below), so the sector names are read, not decoration: the text colour, on a dark halo so lines never cross them. */
+.tw .sec { font-family: var(--font-mono); font-weight: 600; letter-spacing: .14em; fill: color-mix(in srgb, var(--text) 88%, #7FB7E0); text-transform: uppercase; pointer-events: none;
+  paint-order: stroke; stroke: var(--ground); stroke-linejoin: round; }
 .tw .node { cursor: pointer; }
 .tw .node:hover .ring { stroke-width: 2.6; }
 .tw .strand { fill: none; stroke-linecap: round; transition: opacity .3s; }
@@ -196,19 +264,36 @@
 .tw .elab.s-disputed .glyph { fill: #FF8070; }
 .tw .elab.s-worked rect { stroke-dasharray: 1 3; stroke-linecap: round; }
 .tw .elab:hover rect, .tw .elab.lit rect { stroke: var(--accent-1); }
+.tw .stub { cursor: pointer; }
+.tw .stub circle { fill: var(--surface-1); stroke-width: 1.4; }
+.tw .stub.s-unshown circle { stroke-dasharray: 3 2; }
+.tw .stub text { font: 700 10px var(--font-mono); fill: var(--text); }
+.tw .stub:hover circle { stroke: var(--accent-1); stroke-width: 2; }
 .tw .elab.lit rect:first-of-type { stroke-width: 2; }
 .tw g.lit .strand { stroke-width: 4px; }
 @keyframes tw-halo { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .15; transform: scale(1.35); } }
-.tw .more { cursor: pointer; }
-.tw .more rect { fill: var(--surface-1); stroke: var(--line); stroke-dasharray: 3 3; }
-.tw .more:hover rect { stroke: var(--accent-1); }
-.tw .more text { font: 500 11px var(--font-ui); fill: var(--text-muted); }
+/* "+N more": a folded stack of parties, told apart from link chips (rounded pills) and cards by its square tab,
+   amber edge, stacked dots and mono count; tied to its party by a dotted leader. */
+.tw .more { cursor: pointer; outline: none; }
+.tw .more-bg { fill: color-mix(in srgb, #E8A95B 13%, #0f1a26); stroke: #E8A95B; stroke-width: 1.2; transition: fill .15s; }
+.tw .more:hover .more-bg, .tw .more:focus-visible .more-bg { fill: color-mix(in srgb, #E8A95B 30%, #0f1a26); }
+.tw .more:focus-visible .more-bg { stroke-width: 2; }
+.tw .more-stack { stroke: #0f1a26; stroke-width: 1.2; }
+.tw .more-stack.s0 { fill: #7FB7E0; } .tw .more-stack.s1 { fill: #d4a152; } .tw .more-stack.s2 { fill: #baac91; }
+.tw .more text { font: 500 11px var(--font-ui); }
+.tw .more-n { font: 700 12px var(--font-mono); fill: #F3C887; }
+.tw .more-w { fill: var(--text-muted); letter-spacing: .04em; }
+.tw .more .more-f { display: none; }
+.tw .more:hover .more-f, .tw .more:focus-visible .more-f { display: inline; }
+.tw .more:hover .more-s, .tw .more:focus-visible .more-s { display: none; }
+.tw .more-lead { fill: none; stroke: #E8A95B; stroke-opacity: .4; stroke-linecap: round; pointer-events: none; }
 .tw .hop-bg { fill: var(--ground); }
 .tw .round-l { font: 600 11px var(--font-mono); letter-spacing: .06em; fill: #ffe9e4; }
 
 @media (prefers-reduced-motion: reduce) {
   .tw .pulse { display: none; }
-  .tw .halo, .tw .halo.textbook { animation: none; }
+  .tw .halo, .tw .halo.textbook, .tw .tw-tagring .glow, .tw .node.textbook .flag-glow { animation: none; }
+  .tw .peek-bg, .tw .peek-reveal, .tw .peek-badge, .tw .peek-t, .tw .node .ring { transition: none; }
   .tw-drawer, .tw-needle, .tw-map, .tw-wire { transition: none; }
 }
 /* Touch (the prototype's 21 Oct pass): fatter hit areas where the pointer is a finger. */
@@ -256,3 +341,21 @@
   .tw-rule { font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .tw-chosen { display: none; }
 }
+/* All links (features/the-wire/all-links.tsx): the old Relationships panel's list, evidence and add, in the Wire's slot. */
+.tw-links { position: absolute; top: 72px; right: 16px; width: min(520px, calc(100% - 32px)); max-height: calc(100% - 180px); overflow: auto; z-index: 8; padding: 16px 18px 18px; }
+.tw-links .x { position: absolute; right: 10px; top: 10px; width: 30px; height: 30px; border-radius: 8px; border: 0; background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); cursor: pointer; }
+.tw-links .kind { margin: 0 0 8px; font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.tw-links-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12.5px; }
+.tw-links-bar input[type="search"] { flex: 1; min-width: 160px; font: 13px var(--font-ui); color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; }
+.tw-links-note { font-size: 12.5px; color: var(--text-muted); }
+.tw-links-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; }
+.tw-links-list li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr); gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+.tw-links-list button { all: unset; cursor: pointer; font-size: 13px; overflow-wrap: anywhere; }
+.tw-links-list .node { font-weight: 600; }
+.tw-links-list .edge { color: var(--text-muted); font-size: 12px; }
+.tw-links-list button:hover, .tw-links-list button:focus-visible { color: var(--accent-1); text-decoration: underline; }
+.tw-links-detail { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+/* The relationship detail's own buttons keep their colours inside the Wire (the rule above makes buttons inherit). */
+.tw .tw-links button.bg-primary { color: var(--on-accent, #1c1208); }
+.tw .tw-links button.bg-destructive { color: hsl(var(--destructive-foreground)); }
+.tw .tw-links button.bg-secondary { color: hsl(var(--secondary-foreground)); }

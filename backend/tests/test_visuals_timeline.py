@@ -185,7 +185,8 @@ def test_events_in_order_reads_the_timeline_with_its_dates_as_recorded():
         assert [(o["reason"], o["detail"]) for o in again.omitted] == [("ends before it starts", "Lease signed: 2022-05-01 to 2022-03-01")]
 
         window = run_query(db, inv.id, QueryRef(name="events_in_order", params={"from": "2021", "to": "2023-12"}))
-        assert [r.start for r in window.rows] == ["2021-02", "2023-11-14", "2023-11-14"]
+        # The disputed payment is drawn once: the reporter's event of that day, not again from the payment's own date.
+        assert [r.start for r in window.rows] == ["2021-02", "2023-11-14"]
         disputed = run_query(db, inv.id, QueryRef(name="events_in_order", params={"status": "disputed"}))
         assert [r.label for r in disputed.rows] == ["Disputed $2.4M payment from Bellcastle to Meridian"]
 

@@ -636,6 +636,8 @@ def _normalize_slides(slides: list[Any] | None) -> list[dict]:
             "visual": normalize_visual(slide.get("visual")),
             # A slidedoc's prose, shown in place of the bullets (empty on a deck for presenting).
             "prose": str(slide.get("prose") or "")[:4000] if kind == "content" else "",
+            "made_with": {str(k)[:64]: str(v)[:32] for k, v in list((slide.get("made_with") or {}).items())[:50]}
+            if isinstance(slide.get("made_with"), dict) else {},
         })
     return normalized
 

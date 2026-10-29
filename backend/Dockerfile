@@ -16,7 +16,20 @@ ARG NEXT_PUBLIC_API_AUTH_TOKEN=
 ENV NEXT_PUBLIC_API_AUTH_TOKEN=${NEXT_PUBLIC_API_AUTH_TOKEN}
 RUN npm run build
 
-# --- Stage 2: the Workbench API ----------------------------------------------
+# --- Stage 2: the native module (ADR-0021) -------------------------------------
+# Code from the ArtCraft apps (FilmCraft, LightCraft, PdfCraft) compiled into one Python extension; only the wheel goes
+# into the API image, so it carries no Rust toolchain.
+FROM python:3.12-slim AS native-module
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates build-essential git \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain stable
+ENV PATH=/root/.cargo/bin:$PATH
+RUN pip install --no-cache-dir "maturin>=1.5,<2"
+COPY backend/native /native
+RUN cd /native && maturin build --release --locked --out /wheels
+
+# --- Stage 3: the Workbench API ----------------------------------------------
 FROM python:3.12-slim
 
 # PyMuPDF's integrated OCR requires Tesseract language data. Keep the location
@@ -46,6 +59,8 @@ RUN --mount=type=secret,id=authority_sdk_deploy_key \
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright-browsers
 RUN python -m playwright install --with-deps --only-shell chromium && rm -rf /var/lib/apt/lists/*
 COPY backend/ .
+COPY --from=native-module /wheels /tmp/native-wheels
+RUN pip install --no-cache-dir /tmp/native-wheels/*.whl && rm -rf /tmp/native-wheels
 # The transcription model (ADR-0020), fetched once here so a read never downloads it; outside /app like the browser.
 ARG TRANSCRIPTION_MODEL=small
 ENV TRANSCRIPTION_MODEL=${TRANSCRIPTION_MODEL} TRANSCRIPTION_MODEL_DIR=/opt/whisper-models
