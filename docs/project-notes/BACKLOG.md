@@ -25,6 +25,9 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
   data, alerts, numbers and icons show; sub-text is revealed on hover or click; a thing's type is inferred through the
   UI and named on hover or click. Research: list, for every screen, which text is which, and how each type is shown
   without words. New screens follow the rule from now on.
+  29 Oct: the inventory is `docs/research/ui-density/SUBTEXT_AND_TYPES.md` (36 sections, about 40 screens: what to keep,
+  sub-text to move with file:line, type words to turn into marks, exceptions, boxes to enlarge; a mark vocabulary, an
+  order of work and six open questions for Ony). Not yet converted: every screen but Following.
 
 ## Asked for: mockups first
 - **Login and account (19 Oct).** So decisions on this computer carry your name ("Accepted by Ony") rather than "a person": the app stores who decided from the signed-in account (built 19 Oct), but the local owner has no account. Mockups ACCOUNT_1–4 approved 19 Oct; tools researched in `docs/research/accounts-and-locking-tools.md`; Ony chose BitLocker for the disk plus small tools: ADR-0016, built 19 Oct (MOCKUP_BUILD_LIST.md, ACCOUNT_1–4).
