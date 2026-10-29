@@ -140,6 +140,10 @@ describe('The Wire', () => {
     expect(kestrel.querySelector('.card-bg')?.getAttribute('stroke')).toBe('#FF8070');
     expect(kestrel.querySelector('.flag-dot')?.getAttribute('aria-label')).toBe('2 open Red Flags, the strongest textbook');
     expect(kestrel.querySelector('.flag-dot .flag-n')?.textContent).toBe('2');
+    // The kind is the icon in the card's dot (SEE_1), not a word on the card.
+    expect(kestrel.querySelector('use.kind-icon')?.getAttribute('href')).toBe('#tw-k-company');
+    expect(document.getElementById('tw-k-company')?.tagName).toBe('symbol');
+    expect(kestrel.querySelector('.card-s')?.textContent).not.toMatch(/COMPANY/);
     // Hovering the circle brightens the glow and shows the flags themselves.
     fireEvent.pointerEnter(kestrel.querySelector('.flag-dot')!, {pointerType: 'mouse'});
     expect(kestrel.classList.contains('flag-hot')).toBe(true);

@@ -63,6 +63,9 @@ const KIND: Record<string, {fill: string; ring: string; name: string}> = {
   property: {fill: '#45271f', ring: '#bc9574', name: 'Property'}, account: {fill: '#393941', ring: '#a8a2b8', name: 'Bank account'},
   other: {fill: '#393941', ring: '#a89a7d', name: 'Other'},
 };
+/** The symbol (drawn by the-wire.tsx from components/network/party-icons) that shows each kind. */
+export const KIND_SYMBOL: Record<string, string> = {person: 'tw-k-person', company: 'tw-k-company', org: 'tw-k-org', vehicle: 'tw-k-vehicle',
+  property: 'tw-k-property', account: 'tw-k-account'};
 const FAM: Record<string, {c: string; n: string}> = {
   owns: {c: '#d4a152', n: 'Owns'}, runs: {c: '#baac91', n: 'Directs or works for'}, money: {c: '#c98a5e', n: 'Paid'}, other: {c: '#927e5d', n: 'Linked, kind not yet known'},
 };
@@ -138,6 +141,13 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     for (const k in a) e.setAttribute(k, String(a[k]));
     if (p) p.appendChild(e);
     return e;
+  };
+  // A party's kind as its icon (SEE_1: a building, a person, a house in the dot). The Lucide shapes are symbols The
+  // Wire draws once (KIND_SYMBOL); a kind with no icon of its own gets none, so no icon claims more than the record says.
+  const kindIcon = (kind: string, cx: number, cy: number, size: number, colour: string, parent: Element) => {
+    const sym = KIND_SYMBOL[kind];
+    if (!sym) return;
+    el('use', {href: `#${sym}`, x: cx - size / 2, y: cy - size / 2, width: size, height: size, color: colour, class: 'kind-icon'}, parent);
   };
   const cleanups: (() => void)[] = [];
   const on = <E extends Event>(target: EventTarget, type: string, fn: (e: E) => void, opts?: AddEventListenerOptions) => {
@@ -350,7 +360,10 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       for (let i = 2; i >= 0; i--) el('rect', {x: -58 + i * 5, y: -17 - i * 5, width: 116, height: 34, rx: 7, fill: K.fill, stroke: K.ring, 'stroke-width': 1.2, opacity: 1 - i * 0.22}, dot);
       el('text', {class: 'card-s', x: 0, y: 4, 'text-anchor': 'middle'}, dot);
     } else {
-      el('circle', {r: 4 + Math.sqrt(deg[id] || 0) * 2.6, fill: K.fill, stroke: K.ring, 'stroke-width': 1.6, class: 'ring'}, dot);
+      const r = 4 + Math.sqrt(deg[id] || 0) * 2.6;
+      el('circle', {r, fill: K.fill, stroke: K.ring, 'stroke-width': 1.6, class: 'ring'}, dot);
+      // The kind as its icon (SEE_1), where the dot is big enough to hold one.
+      if (r >= 8.5) kindIcon(E[id].kind, 0, 0, r * 1.15, K.ring, dot);
     }
     const lbl = el('text', {class: 'lbl', 'text-anchor': 'middle'}, g);
     const card = el('g', {}, g);
@@ -360,7 +373,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     // A flagged card's outline takes its level's colour over a glow (paintFlag); the glow sits behind the card.
     el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'flag-glow', fill: 'none', filter: 'url(#tw-flagglow)', style: 'display:none'}, card);
     el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4, 'data-ring': K.ring}, card);
-    el('circle', {cx: dx, cy: 0, r: 10, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5}, card);
+    el('circle', {cx: dx, cy: 0, r: 11, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5}, card);
+    if (!isChain) kindIcon(E[id].kind, dx, 0, 13, K.ring, card);
     el('text', {class: 'card-t', x: tx, y: -4}, card);
     el('text', {class: 'card-s', x: tx, y: 14}, card);
     const beads = el('g', {}, card);
@@ -400,11 +414,15 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     t.textContent = '';
     const all = wrapWords(e.short, 19), L = all.slice(0, 2);
     if (all.length > 2) L[1] = `${L[1].slice(0, 19)}…`;
-    L.forEach((s, i) => { const ts = el('tspan', {x: -52, dy: i ? 14 : (L.length > 1 ? -7 : 0)}, t); ts.textContent = s; });
+    // The kind is the icon in the dot; the second line is the jurisdiction, when there is one, and the name centres
+    // when there is not.
+    const x = t.getAttribute('x') ?? '-52', jur = (e.jur ?? '').toUpperCase();
+    t.setAttribute('y', String(jur ? -4 : 4));
+    L.forEach((s, i) => { const ts = el('tspan', {x, dy: i ? 14 : (L.length > 1 ? -7 : 0)}, t); ts.textContent = s; });
     const accts = rollAccounts ? D.entities.filter(a => a.holder === N.id) : [];
     const s = N.card.querySelector('.card-s')!;
     s.setAttribute('y', String(L.length > 1 ? 20 : 14));
-    s.textContent = `${(KIND[e.kind] ?? KIND.other).name}${e.jur ? ` · ${e.jur}` : ''}`.toUpperCase();
+    s.textContent = jur;
     N.beads.textContent = '';
     accts.forEach((_, i) => { el('circle', {cx: -78 + i * 13, cy: 33, r: 4.5, fill: KIND.account.fill, stroke: KIND.account.ring, 'stroke-width': 1.3}, N.beads); });
     if (accts.length) { const tx = el('text', {class: 'card-s', x: -78 + accts.length * 13, y: 36.5}, N.beads); tx.textContent = `${accts.length} ${accts.length > 1 ? 'ACCOUNTS' : 'ACCOUNT'}`; }
@@ -1379,7 +1397,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   /* key */
   (() => {
     let h = '';
-    for (const kk of ['person', 'company', 'org', 'property', 'vehicle']) h += `<div class="row"><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="${KIND[kk].fill}" stroke="${KIND[kk].ring}" stroke-width="1.6"/></svg>${KIND[kk].name}</div>`;
+    for (const kk of ['person', 'company', 'org', 'property', 'vehicle']) h += `<div class="row"><svg width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="${KIND[kk].fill}" stroke="${KIND[kk].ring}" stroke-width="1.3"/><use href="#${KIND_SYMBOL[kk]}" x="3.5" y="3.5" width="11" height="11" color="${KIND[kk].ring}"/></svg>${KIND[kk].name}</div>`;
     for (const f of ['owns', 'runs', 'money', 'other']) h += `<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="${FAM[f].c}" stroke-width="2.4" ${f === 'other' ? 'stroke-dasharray="5 4"' : ''}/></svg>${FAM[f].n}</div>`;
     h += '<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="#c98a5e" stroke-width="2"/><path d="M2 5H28" stroke="#ffd9a8" stroke-width="3.4" stroke-dasharray="1 9" stroke-linecap="round"/></svg>Lights run the way money went</div>';
     h += '<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="#c98a5e" stroke-width="1.2"/></svg>Thicker line, more money</div>';

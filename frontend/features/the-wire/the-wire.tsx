@@ -14,7 +14,10 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AllLinks} from './all-links';
 import {LinkPanel} from './link-panel';
-import {brighten, mountWire} from './wire-engine';
+import {KIND_SYMBOL, brighten, mountWire} from './wire-engine';
+import {KIND_ICON} from '../../components/network/party-icons';
+import {Wallet} from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 import {GridLight} from '../effects/grid-light';
 import {webglAvailable} from '../effects/webgl';
 import {currentAppearance, onAppearanceChange} from '../../lib/theme';
@@ -32,6 +35,11 @@ export function linkInfo(edges: RelationshipOut[]): LinkInfo {
   }
   return out;
 }
+
+// The Wire's kinds and the app's icon for each (org is the app's organisation; an account, held on its holder's card, a wallet).
+const KIND_SYMBOLS: [string, LucideIcon][] = [['person', KIND_ICON.person], ['company', KIND_ICON.company], ['org', KIND_ICON.organisation],
+  ['vehicle', KIND_ICON.vehicle], ['property', KIND_ICON.property], ['account', Wallet]]
+  .filter((k): k is [string, LucideIcon] => Boolean(k[1])).map(([k, Icon]) => [KIND_SYMBOL[k], Icon]);
 
 export function TheWire({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
   const query = useQuery({...getWireOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
@@ -106,6 +114,8 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
     <div className="tw-grid" ref={grid} aria-hidden="true">{gridLight && <GridLight grid={grid}/>}</div>
     <svg className="tw-map" role="img" aria-label="Map of the parties in this case and how they are linked">
       <defs>
+        {/* Each kind's icon (components/network/party-icons, Lucide), drawn once and placed by the engine (KIND_SYMBOL). */}
+        {KIND_SYMBOLS.map(([sym, Icon]) => <symbol key={sym} id={sym} viewBox="0 0 24 24"><Icon width={24} height={24} strokeWidth={2.2} color="currentColor"/></symbol>)}
         <filter id="tw-goo" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/>
           <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -10"/>

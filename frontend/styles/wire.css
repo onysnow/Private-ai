@@ -184,6 +184,7 @@
 .tw .lens-sum { fill: var(--accent-1); }
 .tw .card-bg { fill: var(--surface-1); }
 .tw .card-t { font: 600 12.5px var(--font-ui); fill: var(--text); pointer-events: none; }
+.tw .kind-icon { pointer-events: none; }
 .tw .card-s { font: 500 10px var(--font-mono); fill: var(--text-muted); letter-spacing: .06em; pointer-events: none; }
 .tw .flag-n { font: 700 11px var(--font-mono); pointer-events: none; }
 /* A flagged card: its outline glows in its level's colour; hovering the count's circle brightens it and shows the flags. */
