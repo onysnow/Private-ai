@@ -122,6 +122,10 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
     for lines are now silver. The chip liquid's colour range is narrower, more subtle.
   - Four options for the "owns" label without a chip (artifact for link labels): words on the line, a share mark at
     the owned end, a mark for the kind of link, the line says it (moving chevrons). Waiting for his pick.
+  - Shapes: the kind is told by the card's right end only; the left end (the badge) is the same for every kind but a
+    person. So organisations have a pointed right end and vessels a new one, a curved bow sweeping down and back.
+  - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
+    so the chips showed through to the lines. Fixed; the liquid's range is subtle but visible again.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
   circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
