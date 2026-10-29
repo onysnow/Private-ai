@@ -114,6 +114,8 @@ styling; give our icons that kind of animation and care without copying Nova's i
 hovered, in the chip's own colour as light. Red Flags: on faint (yellow) and strong (orange) the glow is only on the
 count's circle at the top right; a chip with a textbook flag carries a police siren: a red beam sweeping round its
 outline, the red light coming only from that moving beam, never from the whole outline (his correction, 29 Oct).
+Then (29 Oct): the same moving beam on strong (orange) and faint (yellow) cards too, dimmer and slower; and a flagged
+card's outline stays solid at every level, only its colour saying the level (faint is no longer dashed).
 - The second preview does that: today's chips with a spring, a sheen, words that roll up on "+N more" and link chips, a
   glow in the kind's colour on hover, each kind icon's own animation on hover, the flag circle lit on hover, and the
   textbook chip's red siren beam sweeping round its outline at rest (faster on hover). Faint is yellow there, outline and
