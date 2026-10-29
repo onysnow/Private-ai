@@ -66,7 +66,7 @@ def create_monitor(investigation_id: str, body: MonitorCreate, request: Request,
     return following.serialize_monitor(db, row)
 
 
-@router.patch("/monitors/{monitor_id}", response_model=MonitorOut, responses={404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}})
+@router.patch("/monitors/{monitor_id}", response_model=MonitorOut, responses={404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "Not a setting a monitor can have, or an address this computer will not visit"}})
 def update_monitor(monitor_id: str, body: MonitorUpdate, db: Session = Depends(get_db)) -> Any:
     """Change how often, the route, the name, pause or resume it, or accept the address it moved to."""
     row = _monitor(db, monitor_id)

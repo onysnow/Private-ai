@@ -63710,7 +63710,7 @@
                 }
               }
             },
-            "description": "Unprocessable Content"
+            "description": "Not a setting a monitor can have, or an address this computer will not visit"
           },
           "4XX": {
             "content": {

@@ -31308,7 +31308,7 @@ export type UpdateMonitorErrors = {
   /**
    * Response 422 Update Monitor
    *
-   * Unprocessable Content
+   * Not a setting a monitor can have, or an address this computer will not visit
    */
   422: ValidationErrorOut | ErrorOut;
   /**
