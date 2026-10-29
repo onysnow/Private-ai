@@ -126,6 +126,9 @@ import type {
   CompareAuthenticityData,
   CompareAuthenticityErrors,
   CompareAuthenticityResponses,
+  CompareRedactedData,
+  CompareRedactedErrors,
+  CompareRedactedResponses,
   CompareTranscriptsData,
   CompareTranscriptsErrors,
   CompareTranscriptsResponses,
@@ -405,6 +408,9 @@ import type {
   GetCollectionsData,
   GetCollectionsErrors,
   GetCollectionsResponses,
+  GetCopyPageData,
+  GetCopyPageErrors,
+  GetCopyPageResponses,
   GetCorpusInsightsData,
   GetCorpusInsightsErrors,
   GetCorpusInsightsResponses,
@@ -558,6 +564,9 @@ import type {
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceErrors,
   GetRecordProvenanceTraceResponses,
+  GetRedactionData,
+  GetRedactionErrors,
+  GetRedactionResponses,
   GetRedFlagsData,
   GetRedFlagsErrors,
   GetRedFlagsResponses,
@@ -882,6 +891,9 @@ import type {
   MakePhotoCopyData,
   MakePhotoCopyErrors,
   MakePhotoCopyResponses,
+  MakeRedactedCopyData,
+  MakeRedactedCopyErrors,
+  MakeRedactedCopyResponses,
   MarkAiRunThoughtData,
   MarkAiRunThoughtErrors,
   MarkAiRunThoughtResponses,
@@ -1316,6 +1328,9 @@ import {
   zCollectCaptureMediaResponse,
   zCompareAuthenticityPath,
   zCompareAuthenticityResponse,
+  zCompareRedactedPath,
+  zCompareRedactedQuery,
+  zCompareRedactedResponse,
   zCompareTranscriptsPath,
   zCompareTranscriptsResponse,
   zConnectorSearchBody,
@@ -1523,6 +1538,9 @@ import {
   zGetCollectionResponse,
   zGetCollectionsPath,
   zGetCollectionsResponse,
+  zGetCopyPagePath,
+  zGetCopyPageQuery,
+  zGetCopyPageResponse,
   zGetCorpusInsightsPath,
   zGetCorpusInsightsResponse,
   zGetCorpusStatusPath,
@@ -1628,6 +1646,8 @@ import {
   zGetRecordMarksResponse,
   zGetRecordProvenanceTraceQuery,
   zGetRecordProvenanceTraceResponse,
+  zGetRedactionPath,
+  zGetRedactionResponse,
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
   zGetRelationshipSourcesPath,
@@ -1872,6 +1892,9 @@ import {
   zMakePhotoCopyBody,
   zMakePhotoCopyPath,
   zMakePhotoCopyResponse,
+  zMakeRedactedCopyBody,
+  zMakeRedactedCopyPath,
+  zMakeRedactedCopyResponse,
   zMarkAiRunThoughtBody,
   zMarkAiRunThoughtPath,
   zMarkAiRunThoughtResponse,
@@ -4415,6 +4438,33 @@ export const getDerivedFile = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Copy Page
+ *
+ * One page of a redacted copy as PNG, for Compare.
+ */
+export const getCopyPage = <ThrowOnError extends boolean = false>(
+  options: Options<GetCopyPageData, ThrowOnError>,
+): RequestResult<GetCopyPageResponses, GetCopyPageErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCopyPageResponses,
+    GetCopyPageErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCopyPagePath,
+          query: zGetCopyPageQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCopyPageResponse.parseAsync(data),
+    url: '/api/derived-files/{derived_file_id}/page.png',
+    ...options,
+  });
+
+/**
  * Get Document Formats
  *
  * The kinds of file an upload accepts now: every format OpenAleph's
@@ -5116,6 +5166,43 @@ export const makePhotoCopy = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Make Redacted Copy
+ *
+ * A redacted copy: the content under each box removed for good, the hidden data asked for taken out, PDF/A-2b if
+ * asked, then checked: the saved copy must hold no text under any box. Each box's page, place and reason are kept in
+ * the trail, not the words under it. The case's file is unchanged.
+ */
+export const makeRedactedCopy = <ThrowOnError extends boolean = false>(
+  options: Options<MakeRedactedCopyData, ThrowOnError>,
+): RequestResult<
+  MakeRedactedCopyResponses,
+  MakeRedactedCopyErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MakeRedactedCopyResponses,
+    MakeRedactedCopyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMakeRedactedCopyBody,
+          path: zMakeRedactedCopyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakeRedactedCopyResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived/redacted',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Document Email
  *
  * An email document's headers (as OpenAleph read them) and its thread
@@ -5391,6 +5478,67 @@ export const recheckHash = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zRecheckHashResponse.parseAsync(data),
     url: '/api/documents/{document_id}/recheck-hash',
+    ...options,
+  });
+
+/**
+ * Get Redaction
+ *
+ * What Redact before sharing shows (mockup MEDIA_3): the pages in points, the boxes the machine proposes (phone
+ * numbers and emails by pattern, people named in this case), the hidden data the file carries, PDF/A-2b now. Read
+ * from a copy: the case's file is never opened for writing.
+ */
+export const getRedaction = <ThrowOnError extends boolean = false>(
+  options: Options<GetRedactionData, ThrowOnError>,
+): RequestResult<GetRedactionResponses, GetRedactionErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetRedactionResponses,
+    GetRedactionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetRedactionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRedactionResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/redaction',
+    ...options,
+  });
+
+/**
+ * Compare Redacted
+ *
+ * How a redacted copy differs from the case's file: the words each holds, the pages changed, the hidden data the
+ * copy still carries.
+ */
+export const compareRedacted = <ThrowOnError extends boolean = false>(
+  options: Options<CompareRedactedData, ThrowOnError>,
+): RequestResult<
+  CompareRedactedResponses,
+  CompareRedactedErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    CompareRedactedResponses,
+    CompareRedactedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCompareRedactedPath,
+          query: zCompareRedactedQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCompareRedactedResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/redaction/compare',
     ...options,
   });
 

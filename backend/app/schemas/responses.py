@@ -5298,6 +5298,63 @@ class SoundOut(ResponseModel):
     sync: SyncOut | None = None
 
 
+class PdfPageOut(ResponseModel):
+    page: int
+    width: float
+    height: float
+
+
+class RedactProposalOut(ResponseModel):
+    """A box the machine proposes, never applied on its own: a phone number or email address found by pattern, or a
+    person named in this case found in the text."""
+    id: str
+    kind: str
+    page: int
+    rect: list[float]
+    text: str
+    entity_id: str | None = None
+    why: str
+
+
+class HiddenDataOut(ResponseModel):
+    category: str
+    label: str
+    count: int
+
+
+class PdfaIssueOut(ResponseModel):
+    clause: str | None = None
+    message: str | None = None
+    fixable: bool
+
+
+class PdfaOut(ResponseModel):
+    compliant: bool
+    declared: str | None = None
+    issues: list[PdfaIssueOut]
+
+
+class RedactionOut(ResponseModel):
+    """A PDF as the Redact screen shows it: its pages in points, the proposed boxes, its hidden data, PDF/A now."""
+    document_id: str
+    sha256: str
+    pages: list[PdfPageOut]
+    proposals: list[RedactProposalOut]
+    hidden: list[HiddenDataOut]
+    pdfa: PdfaOut
+    tool: str
+
+
+class RedactCompareOut(ResponseModel):
+    """How a redacted copy differs from the case's file: the words each holds, the pages that changed, and the hidden
+    data the copy still carries."""
+    copy_id: str
+    old_words: int
+    new_words: int
+    pages_changed: list[int]
+    hidden_left: list[HiddenDataOut]
+
+
 class DerivedFileOut(ResponseModel):
     """A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
     `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when."""
@@ -5305,6 +5362,7 @@ class DerivedFileOut(ResponseModel):
     document_id: str
     parent_id: str | None = None
     parent_sha256: str
+    filename: str = ""
     sha256: str
     size: int
     mime_type: str

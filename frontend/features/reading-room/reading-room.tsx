@@ -42,6 +42,7 @@ import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/e
 import {proposerName} from './proposers';
 import {ListenRoom, isRecording} from './listen-room';
 import {PhotoRoom} from './photo-room';
+import {RedactRoom} from './redact-room';
 
 type Tab = 'text' | 'original' | 'translation' | 'details';
 type Span = {start: number; end: number; id: string; kind: string; status: string; primary: boolean};
@@ -364,7 +365,7 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
   </article>;
 }
 
-function Room({investigationId, documentId, startPage, onClose}: {investigationId: string; documentId: string; startPage: number | null; onClose: () => void}): ReactElement {
+function Room({investigationId, documentId, startPage, onClose, onRedact}: {investigationId: string; documentId: string; startPage: number | null; onClose: () => void; onRedact: () => void}): ReactElement {
   const queryClient = useQueryClient();
   const openDocument = useWorkbenchStore(state => state.openDocument);
   const openRealness = useWorkbenchStore(state => state.openRealness);
@@ -715,6 +716,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         Document {index + 1} of {tops0.length}
         <button type="button" disabled={index >= tops0.length - 1} onClick={() => openDocument(tops0[index + 1].id)} aria-label="Next document">›</button>
       </span>}
+      {/\.pdf$/i.test(doc?.filename ?? '') && <button type="button" className="rr-real" onClick={onRedact} aria-label="Redact before sharing" title="Redact before sharing: a copy with text truly removed">Redact</button>}
       <button type="button" className="rr-real" onClick={() => openRealness(documentId)}>Is it real?</button>
       <button type="button" className="rr-close" onClick={onClose} aria-label="Close the reading room">×</button>
     </header>
@@ -862,8 +864,11 @@ function Opened({investigationId, documentId, startPage, onClose}: {investigatio
   const doc = useQuery({...getDocumentOptions({path: {document_id: documentId}})}).data;
   const caseName = useQuery({...listInvestigationsOptions()}).data?.find(i => i.id === investigationId)?.name ?? 'Case';
   const [asText, setAsText] = useState(false);
+  const [redacting, setRedacting] = useState(false);
   if (doc && isRecording(doc)) return <ListenRoom doc={doc} caseName={caseName} decideHref={caseHref('/decide?kind=proposal', investigationId)} onClose={onClose}/>;
   // A photo opens on its Picture (mockup MEDIA_1); "Text in it" reads it here as any document.
   if (doc && isPicture(doc) && !asText) return <PhotoRoom doc={doc} caseName={caseName} onClose={onClose} onText={() => setAsText(true)}/>;
-  return <Room investigationId={investigationId} documentId={documentId} startPage={startPage} onClose={onClose}/>;
+  // A PDF's Redact before sharing (mockup MEDIA_3) opens from the reading room and returns to it.
+  if (doc && redacting) return <RedactRoom doc={doc} caseName={caseName} onClose={() => setRedacting(false)}/>;
+  return <Room investigationId={investigationId} documentId={documentId} startPage={startPage} onClose={onClose} onRedact={() => setRedacting(true)}/>;
 }

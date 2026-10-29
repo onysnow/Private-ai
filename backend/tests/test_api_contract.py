@@ -449,6 +449,8 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     pdf.close()
     minutes = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Board minutes"}, files={
         "file": ("minutes.pdf", pdf_bytes, "application/pdf")}))
+    redacted = ok(client.post(f"/api/documents/{minutes['id']}/derived/redacted", json={
+        "boxes": [{"page": 1, "rect": [40, 40, 300, 120], "reason": "a private person"}], "remove": ["metadata"]}))
     ledger = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Ledger"}, files={
         "file": ("ledger.csv", b"Payer,Payee,Amount\nMeridian Holdings Ltd,Bellcastle Trading Group,2400000\n", "text/csv")}))
     # A watched name and a document it was found in.
@@ -577,6 +579,11 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
                 ("POST", "/api/documents/{document_id}/derived/clip"),
                 ("POST", "/api/documents/{document_id}/derived/cleaned"))},
             ("GET", "/api/documents/{document_id}/page-image"): {"document_id": minutes["id"]},
+            ("GET", "/api/derived-files/{derived_file_id}/page.png"): {"derived_file_id": redacted["id"]},
+            **{(method, path): {"document_id": minutes["id"]} for method, path in (
+                ("GET", "/api/documents/{document_id}/redaction"),
+                ("GET", "/api/documents/{document_id}/redaction/compare"),
+                ("POST", "/api/documents/{document_id}/derived/redacted"))},
             **{(method, path): {"document_id": ledger["id"]} for method, path in (
                 ("GET", "/api/documents/{document_id}/table"),
                 ("POST", "/api/documents/{document_id}/table-mappings/preview"),
@@ -603,6 +610,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
         },
         queries={
             ("GET", "/api/platform-checks/for"): {"url": "https://www.instagram.com/p/abc/"},
+            ("GET", "/api/documents/{document_id}/redaction/compare"): {"copy_id": redacted["id"]},
             ("GET", "/api/entities/{entity_id}/merge-preview"): {"target_entity_id": bellcastle},
             ("GET", "/api/provenance/extraction-lineage"): {"record_type": "evidence", "record_id": accepted["accepted_record_id"]},
             ("GET", "/api/provenance/trace"): {"record_type": "claim", "record_id": claim["id"]},

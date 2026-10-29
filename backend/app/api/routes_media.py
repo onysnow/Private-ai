@@ -15,19 +15,22 @@ from app.db.session import get_db
 from app.core.authorization import scope_for_request
 from app.models.derived import DerivedFile
 from app.models.domain import Document, DocumentMedia, TranscriptSegment
-from app.schemas.api import CleanIn, ClipCreate, PhotoCopyIn, SyncIn, VoiceName
+from app.schemas.api import CleanIn, ClipCreate, PhotoCopyIn, RedactIn, SyncIn, VoiceName
 from app.schemas.responses import (
     BackgroundJobOut,
     DerivedFileOut,
     ErrorOut,
     FacesOut,
     PhotoOut,
+    RedactCompareOut,
+    RedactionOut,
     SoundOut,
     SyncOut,
     TranscriptCompareRowOut,
     TranscriptOut,
     ValidationErrorOut,
     VoicesOut,
+    file_response,
 )
 from app.services import derived_files, media_derived, publisher_transcript, voices
 from app.services.derived_files import CaseGone
@@ -334,3 +337,95 @@ def accept_document_sync(document_id: str, body: SyncIn, request: Request, db: S
         raise HTTPException(422, str(exc)) from exc
     except NativeUnavailable as exc:
         raise HTTPException(503, str(exc)) from exc
+
+
+def _pdf_document(db: Session, document_id: str) -> Document:
+    from app.services.pdf_redact import is_pdf
+
+    row = db.get(Document, document_id)
+    if row is None:
+        raise HTTPException(404, "Document not found")
+    if not is_pdf(row):
+        raise HTTPException(415, "This document is not a PDF")
+    return row
+
+
+def _redact_errors(fn: Any) -> Any:
+    from app.services.pdf_redact import RedactRefused
+
+    try:
+        return fn()
+    except RedactRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except CaseGone as exc:
+        raise HTTPException(404, str(exc)) from exc
+
+
+@router.get("/documents/{document_id}/redaction", response_model=RedactionOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ErrorOut, "description": "PdfCraft could not read the PDF"},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def get_redaction(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """What Redact before sharing shows (mockup MEDIA_3): the pages in points, the boxes the machine proposes (phone
+    numbers and emails by pattern, people named in this case), the hidden data the file carries, PDF/A-2b now. Read
+    from a copy: the case's file is never opened for writing."""
+    from app.services import pdf_redact
+
+    row = _pdf_document(db, document_id)
+    return _redact_errors(lambda: pdf_redact.redaction_view(db, row))
+
+
+@router.post("/documents/{document_id}/derived/redacted", response_model=DerivedFileOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The copy cannot be made as asked, or text was left under a box"},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def make_redacted_copy(document_id: str, body: RedactIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """A redacted copy: the content under each box removed for good, the hidden data asked for taken out, PDF/A-2b if
+    asked, then checked: the saved copy must hold no text under any box. Each box's page, place and reason are kept in
+    the trail, not the words under it. The case's file is unchanged."""
+    from app.services import pdf_redact
+
+    row = _pdf_document(db, document_id)
+    return _redact_errors(lambda: derived_files.serialize(pdf_redact.make_redacted(
+        db, row, boxes=[b.model_dump() for b in body.boxes], remove=list(body.remove), pdfa=body.pdfa,
+        made_for=body.made_for, actor=scope_for_request(request).actor_id)))
+
+
+def _redacted_copy(db: Session, derived_file_id: str) -> DerivedFile:
+    row = db.get(DerivedFile, derived_file_id)
+    if row is None:
+        raise HTTPException(404, "Derived file not found")
+    if row.mime_type != "application/pdf":
+        raise HTTPException(415, "This copy is not a PDF")
+    root = resolve_storage_root(settings.document_storage_dir).resolve()
+    if not Path(row.storage_path).resolve().is_relative_to(root) or not Path(row.storage_path).is_file():
+        raise HTTPException(404, "The file is missing from this computer")
+    return row
+
+
+@router.get("/derived-files/{derived_file_id}/page.png", response_class=Response, responses={
+    **file_response("image/png", "One page of a PDF copy drawn as a picture"),
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}, 503: {"model": ErrorOut}})
+def get_copy_page(derived_file_id: str, page: int = Query(1, ge=1), width: int = Query(600, ge=120, le=1600),
+                  db: Session = Depends(get_db)) -> Response:
+    """One page of a redacted copy as PNG, for Compare."""
+    from app.services import pdf_redact
+
+    row = _redacted_copy(db, derived_file_id)
+    png = _redact_errors(lambda: pdf_redact.copy_page_png(row, page, width))
+    return Response(png, media_type="image/png", headers={"Cache-Control": "private, max-age=3600"})
+
+
+@router.get("/documents/{document_id}/redaction/compare", response_model=RedactCompareOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}, 503: {"model": ErrorOut}})
+def compare_redacted(document_id: str, copy_id: str = Query(...), db: Session = Depends(get_db)) -> Any:
+    """How a redacted copy differs from the case's file: the words each holds, the pages changed, the hidden data the
+    copy still carries."""
+    from app.services import pdf_redact
+
+    row = _pdf_document(db, document_id)
+    copy = _redacted_copy(db, copy_id)
+    if copy.document_id != row.id:
+        raise HTTPException(404, "That copy is not one of this PDF's")
+    return _redact_errors(lambda: pdf_redact.compare(row, copy))

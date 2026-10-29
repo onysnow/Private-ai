@@ -1029,6 +1029,25 @@ class PhotoCopyIn(BaseModel):
     from_id: str | None = None
 
 
+class RedactBoxIn(BaseModel):
+    """One box to redact: its page, its place in points from the page's top-left (left, top, right, bottom), its reason
+    (kept in the trail), and whether a person drew it or accepted a proposal (phone, email, person)."""
+    page: int = Field(ge=1)
+    rect: list[float] = Field(min_length=4, max_length=4)
+    reason: str = Field(min_length=1, max_length=300)
+    kind: Literal["drawn", "phone", "email", "person"] = "drawn"
+
+
+class RedactIn(BaseModel):
+    """A redacted copy of a PDF (Redact before sharing): the boxes, the hidden data to take out of the copy, whether to
+    make it PDF/A-2b, and who it is for (it names the file)."""
+    boxes: list[RedactBoxIn] = Field(min_length=1, max_length=500)
+    remove: list[Literal["metadata", "attachments", "comments", "form-fields", "hidden-text", "hidden-layers", "bookmarks",
+                         "links-actions-scripts", "private-data"]] = Field(default_factory=list)
+    pdfa: bool = False
+    made_for: Literal["editor", "lawyer", "publication"] = "editor"
+
+
 class CleanIn(BaseModel):
     """The steps of a cleaned copy (Listen › Clean and cut): take out mains hum, reduce room noise, even out loudness."""
     hum: bool = True

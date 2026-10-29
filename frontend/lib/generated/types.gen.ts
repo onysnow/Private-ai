@@ -8126,6 +8126,10 @@ export type DerivedFileOut = {
    */
   document_id: string;
   /**
+   * Filename
+   */
+  filename?: string;
+  /**
    * Id
    */
   id: string;
@@ -12001,6 +12005,24 @@ export type HealthOut = {
    * Status
    */
   status: 'ok';
+};
+
+/**
+ * HiddenDataOut
+ */
+export type HiddenDataOut = {
+  /**
+   * Category
+   */
+  category: string;
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Label
+   */
+  label: string;
 };
 
 /**
@@ -15995,6 +16017,60 @@ export type PartyYearsOut = {
 };
 
 /**
+ * PdfPageOut
+ */
+export type PdfPageOut = {
+  /**
+   * Height
+   */
+  height: number;
+  /**
+   * Page
+   */
+  page: number;
+  /**
+   * Width
+   */
+  width: number;
+};
+
+/**
+ * PdfaIssueOut
+ */
+export type PdfaIssueOut = {
+  /**
+   * Clause
+   */
+  clause?: string | null;
+  /**
+   * Fixable
+   */
+  fixable: boolean;
+  /**
+   * Message
+   */
+  message?: string | null;
+};
+
+/**
+ * PdfaOut
+ */
+export type PdfaOut = {
+  /**
+   * Compliant
+   */
+  compliant: boolean;
+  /**
+   * Declared
+   */
+  declared?: string | null;
+  /**
+   * Issues
+   */
+  issues: Array<PdfaIssueOut>;
+};
+
+/**
  * PeekEventOut
  */
 export type PeekEventOut = {
@@ -17399,6 +17475,165 @@ export type RedFlagsOut = {
    * Stale
    */
   stale?: boolean;
+};
+
+/**
+ * RedactBoxIn
+ *
+ * One box to redact: its page, its place in points from the page's top-left (left, top, right, bottom), its reason
+ * (kept in the trail), and whether a person drew it or accepted a proposal (phone, email, person).
+ */
+export type RedactBoxIn = {
+  /**
+   * Kind
+   */
+  kind?: 'drawn' | 'phone' | 'email' | 'person';
+  /**
+   * Page
+   */
+  page: number;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Rect
+   */
+  rect: [number, number, number, number];
+};
+
+/**
+ * RedactCompareOut
+ *
+ * How a redacted copy differs from the case's file: the words each holds, the pages that changed, and the hidden
+ * data the copy still carries.
+ */
+export type RedactCompareOut = {
+  /**
+   * Copy Id
+   */
+  copy_id: string;
+  /**
+   * Hidden Left
+   */
+  hidden_left: Array<HiddenDataOut>;
+  /**
+   * New Words
+   */
+  new_words: number;
+  /**
+   * Old Words
+   */
+  old_words: number;
+  /**
+   * Pages Changed
+   */
+  pages_changed: Array<number>;
+};
+
+/**
+ * RedactIn
+ *
+ * A redacted copy of a PDF (Redact before sharing): the boxes, the hidden data to take out of the copy, whether to
+ * make it PDF/A-2b, and who it is for (it names the file).
+ */
+export type RedactIn = {
+  /**
+   * Boxes
+   */
+  boxes: Array<RedactBoxIn>;
+  /**
+   * Made For
+   */
+  made_for?: 'editor' | 'lawyer' | 'publication';
+  /**
+   * Pdfa
+   */
+  pdfa?: boolean;
+  /**
+   * Remove
+   */
+  remove?: Array<
+    | 'metadata'
+    | 'attachments'
+    | 'comments'
+    | 'form-fields'
+    | 'hidden-text'
+    | 'hidden-layers'
+    | 'bookmarks'
+    | 'links-actions-scripts'
+    | 'private-data'
+  >;
+};
+
+/**
+ * RedactProposalOut
+ *
+ * A box the machine proposes, never applied on its own: a phone number or email address found by pattern, or a
+ * person named in this case found in the text.
+ */
+export type RedactProposalOut = {
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Page
+   */
+  page: number;
+  /**
+   * Rect
+   */
+  rect: Array<number>;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Why
+   */
+  why: string;
+};
+
+/**
+ * RedactionOut
+ *
+ * A PDF as the Redact screen shows it: its pages in points, the proposed boxes, its hidden data, PDF/A now.
+ */
+export type RedactionOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Hidden
+   */
+  hidden: Array<HiddenDataOut>;
+  /**
+   * Pages
+   */
+  pages: Array<PdfPageOut>;
+  pdfa: PdfaOut;
+  /**
+   * Proposals
+   */
+  proposals: Array<RedactProposalOut>;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Tool
+   */
+  tool: string;
 };
 
 /**
@@ -26786,6 +27021,64 @@ export type GetDerivedFileResponses = {
 export type GetDerivedFileResponse =
   GetDerivedFileResponses[keyof GetDerivedFileResponses];
 
+export type GetCopyPageData = {
+  body?: never;
+  path: {
+    /**
+     * Derived File Id
+     */
+    derived_file_id: string;
+  };
+  query?: {
+    /**
+     * Page
+     */
+    page?: number;
+    /**
+     * Width
+     */
+    width?: number;
+  };
+  url: '/api/derived-files/{derived_file_id}/page.png';
+};
+
+export type GetCopyPageErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Get Copy Page
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCopyPageError = GetCopyPageErrors[keyof GetCopyPageErrors];
+
+export type GetCopyPageResponses = {
+  /**
+   * One page of a PDF copy drawn as a picture
+   */
+  200: Blob | File;
+};
+
+export type GetCopyPageResponse =
+  GetCopyPageResponses[keyof GetCopyPageResponses];
+
 export type GetDocumentFormatsData = {
   body?: never;
   path?: never;
@@ -27711,6 +28004,56 @@ export type MakePhotoCopyResponses = {
 export type MakePhotoCopyResponse =
   MakePhotoCopyResponses[keyof MakePhotoCopyResponses];
 
+export type MakeRedactedCopyData = {
+  body: RedactIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived/redacted';
+};
+
+export type MakeRedactedCopyErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Make Redacted Copy
+   *
+   * The copy cannot be made as asked, or text was left under a box
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeRedactedCopyError =
+  MakeRedactedCopyErrors[keyof MakeRedactedCopyErrors];
+
+export type MakeRedactedCopyResponses = {
+  /**
+   * Successful Response
+   */
+  201: DerivedFileOut;
+};
+
+export type MakeRedactedCopyResponse =
+  MakeRedactedCopyResponses[keyof MakeRedactedCopyResponses];
+
 export type GetDocumentEmailData = {
   body?: never;
   path: {
@@ -28076,6 +28419,108 @@ export type RecheckHashResponses = {
 
 export type RecheckHashResponse =
   RecheckHashResponses[keyof RecheckHashResponses];
+
+export type GetRedactionData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/redaction';
+};
+
+export type GetRedactionErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * PdfCraft could not read the PDF
+   */
+  422: ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetRedactionError = GetRedactionErrors[keyof GetRedactionErrors];
+
+export type GetRedactionResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedactionOut;
+};
+
+export type GetRedactionResponse =
+  GetRedactionResponses[keyof GetRedactionResponses];
+
+export type CompareRedactedData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query: {
+    /**
+     * Copy Id
+     */
+    copy_id: string;
+  };
+  url: '/api/documents/{document_id}/redaction/compare';
+};
+
+export type CompareRedactedErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Compare Redacted
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CompareRedactedError =
+  CompareRedactedErrors[keyof CompareRedactedErrors];
+
+export type CompareRedactedResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedactCompareOut;
+};
+
+export type CompareRedactedResponse =
+  CompareRedactedResponses[keyof CompareRedactedResponses];
 
 export type GetSimilarDocumentsData = {
   body?: never;

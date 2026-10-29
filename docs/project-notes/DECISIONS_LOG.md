@@ -139,3 +139,31 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   9. PdfCraft's OCR stays off until tried on a real computer; the app's own OCR reads PDFs as now.
 - **Why:** each call keeps the original untouchable and keeps the machine to proposals, as the research asks
   (media research §4.5, §6), and adds nothing that would make the app send or sign on a person's behalf unasked.
+
+## 8. Building the three media screens: what differs from the mockups (29 Oct)
+
+- **Questions:** details the mockups MEDIA_1–3 left open or drew in a way the app cannot do honestly.
+- **Calls:**
+  1. MEDIA_3 has no Sign tab: entry 7, call 8 keeps signing out of PDFs for now, and a tab that only says "not yet"
+     is an inert control. It comes back with a signing key.
+  2. Redact is a button in a PDF's reading room ("Redact", named "Redact before sharing"), not a screen of its own; it
+     returns to the reading room. Same as a photo's Picture and a recording's Listen (entry 7, call 3).
+  3. Proposed boxes: phone numbers and email addresses found by pattern, and people already named in the case (a
+     Person record) found in the text. Nothing guesses who is a public official: the mockup's "a councillor in public
+     office: usually kept" needs a record the app does not have, so a name says only "a person named in this case".
+  4. Accepting a proposal asks for its reason in a popover beside the box, with four common reasons to pick (source
+     protection, a private person, personal contact details, not in the story) or one's own words. The same words on the
+     same page are accepted together ("Hendry" × 2).
+  5. The trail keeps each box's page, place, kind and reason, never the words that were under it: the copy's trail
+     row must not leak what the copy removes.
+  6. "Hash checked" in the mockup's header is shown as "kept as uploaded · SHA-256 …": the screen does not re-hash the
+     file on opening, so it does not say it did.
+  7. The new file is named `<name>-redacted-for-<editor|lawyer|publication>-<day>.pdf` (the mockup's spaces and dots
+     are not kept in stored file names).
+  8. PDF/A is a tick in "Also remove from the copy"; the Archive tab lists the rules the original breaks and says how
+     many a PDF/A copy would still break (fonts that are not embedded cannot be fixed here).
+  9. MEDIA_2: the sync's strength is said in words from FilmCraft's own numbers (peak over the background, and over the
+     next best match), not as a percentage, which those numbers are not.
+- **Found in PdfCraft (for Ony, onysnow/pdfcraft):** `doc_remove_hidden` asked to remove a category the file does not
+  hold fails with "there are no redaction marks to apply", a message from another tool. The app now asks only for
+  categories the file holds.

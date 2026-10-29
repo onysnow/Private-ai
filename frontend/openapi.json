@@ -18265,6 +18265,11 @@
             "title": "Document Id",
             "type": "string"
           },
+          "filename": {
+            "default": "",
+            "title": "Filename",
+            "type": "string"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -24956,6 +24961,29 @@
           "status"
         ],
         "title": "HealthOut",
+        "type": "object"
+      },
+      "HiddenDataOut": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "label",
+          "count"
+        ],
+        "title": "HiddenDataOut",
         "type": "object"
       },
       "HighlightSegmentOut": {
@@ -31825,6 +31853,96 @@
         "title": "PartyYearsOut",
         "type": "object"
       },
+      "PdfPageOut": {
+        "properties": {
+          "height": {
+            "title": "Height",
+            "type": "number"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "width": {
+            "title": "Width",
+            "type": "number"
+          }
+        },
+        "required": [
+          "page",
+          "width",
+          "height"
+        ],
+        "title": "PdfPageOut",
+        "type": "object"
+      },
+      "PdfaIssueOut": {
+        "properties": {
+          "clause": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clause"
+          },
+          "fixable": {
+            "title": "Fixable",
+            "type": "boolean"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "required": [
+          "fixable"
+        ],
+        "title": "PdfaIssueOut",
+        "type": "object"
+      },
+      "PdfaOut": {
+        "properties": {
+          "compliant": {
+            "title": "Compliant",
+            "type": "boolean"
+          },
+          "declared": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/PdfaIssueOut"
+            },
+            "title": "Issues",
+            "type": "array"
+          }
+        },
+        "required": [
+          "compliant",
+          "issues"
+        ],
+        "title": "PdfaOut",
+        "type": "object"
+      },
       "PeekEventOut": {
         "properties": {
           "date": {
@@ -34186,6 +34304,246 @@
           "investigation_type"
         ],
         "title": "RedFlagsOut",
+        "type": "object"
+      },
+      "RedactBoxIn": {
+        "description": "One box to redact: its page, its place in points from the page's top-left (left, top, right, bottom), its reason\n(kept in the trail), and whether a person drew it or accepted a proposal (phone, email, person).",
+        "properties": {
+          "kind": {
+            "default": "drawn",
+            "enum": [
+              "drawn",
+              "phone",
+              "email",
+              "person"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "page": {
+            "minimum": 1.0,
+            "title": "Page",
+            "type": "integer"
+          },
+          "reason": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "rect": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 4,
+            "minItems": 4,
+            "title": "Rect",
+            "type": "array"
+          }
+        },
+        "required": [
+          "page",
+          "rect",
+          "reason"
+        ],
+        "title": "RedactBoxIn",
+        "type": "object"
+      },
+      "RedactCompareOut": {
+        "description": "How a redacted copy differs from the case's file: the words each holds, the pages that changed, and the hidden\ndata the copy still carries.",
+        "properties": {
+          "copy_id": {
+            "title": "Copy Id",
+            "type": "string"
+          },
+          "hidden_left": {
+            "items": {
+              "$ref": "#/components/schemas/HiddenDataOut"
+            },
+            "title": "Hidden Left",
+            "type": "array"
+          },
+          "new_words": {
+            "title": "New Words",
+            "type": "integer"
+          },
+          "old_words": {
+            "title": "Old Words",
+            "type": "integer"
+          },
+          "pages_changed": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Pages Changed",
+            "type": "array"
+          }
+        },
+        "required": [
+          "copy_id",
+          "old_words",
+          "new_words",
+          "pages_changed",
+          "hidden_left"
+        ],
+        "title": "RedactCompareOut",
+        "type": "object"
+      },
+      "RedactIn": {
+        "description": "A redacted copy of a PDF (Redact before sharing): the boxes, the hidden data to take out of the copy, whether to\nmake it PDF/A-2b, and who it is for (it names the file).",
+        "properties": {
+          "boxes": {
+            "items": {
+              "$ref": "#/components/schemas/RedactBoxIn"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Boxes",
+            "type": "array"
+          },
+          "made_for": {
+            "default": "editor",
+            "enum": [
+              "editor",
+              "lawyer",
+              "publication"
+            ],
+            "title": "Made For",
+            "type": "string"
+          },
+          "pdfa": {
+            "default": false,
+            "title": "Pdfa",
+            "type": "boolean"
+          },
+          "remove": {
+            "items": {
+              "enum": [
+                "metadata",
+                "attachments",
+                "comments",
+                "form-fields",
+                "hidden-text",
+                "hidden-layers",
+                "bookmarks",
+                "links-actions-scripts",
+                "private-data"
+              ],
+              "type": "string"
+            },
+            "title": "Remove",
+            "type": "array"
+          }
+        },
+        "required": [
+          "boxes"
+        ],
+        "title": "RedactIn",
+        "type": "object"
+      },
+      "RedactProposalOut": {
+        "description": "A box the machine proposes, never applied on its own: a phone number or email address found by pattern, or a\nperson named in this case found in the text.",
+        "properties": {
+          "entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "rect": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Rect",
+            "type": "array"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "page",
+          "rect",
+          "text",
+          "why"
+        ],
+        "title": "RedactProposalOut",
+        "type": "object"
+      },
+      "RedactionOut": {
+        "description": "A PDF as the Redact screen shows it: its pages in points, the proposed boxes, its hidden data, PDF/A now.",
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "hidden": {
+            "items": {
+              "$ref": "#/components/schemas/HiddenDataOut"
+            },
+            "title": "Hidden",
+            "type": "array"
+          },
+          "pages": {
+            "items": {
+              "$ref": "#/components/schemas/PdfPageOut"
+            },
+            "title": "Pages",
+            "type": "array"
+          },
+          "pdfa": {
+            "$ref": "#/components/schemas/PdfaOut"
+          },
+          "proposals": {
+            "items": {
+              "$ref": "#/components/schemas/RedactProposalOut"
+            },
+            "title": "Proposals",
+            "type": "array"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "tool": {
+            "title": "Tool",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "sha256",
+          "pages",
+          "proposals",
+          "hidden",
+          "pdfa",
+          "tool"
+        ],
+        "title": "RedactionOut",
         "type": "object"
       },
       "RelationshipAdvisoryOut": {
@@ -57014,6 +57372,118 @@
         "summary": "Get Derived File"
       }
     },
+    "/api/derived-files/{derived_file_id}/page.png": {
+      "get": {
+        "description": "One page of a redacted copy as PNG, for Compare.",
+        "operationId": "get_copy_page",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "derived_file_id",
+            "required": true,
+            "schema": {
+              "title": "Derived File Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "width",
+            "required": false,
+            "schema": {
+              "default": 600,
+              "maximum": 1600,
+              "minimum": 120,
+              "title": "Width",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "One page of a PDF copy drawn as a picture"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Get Copy Page"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Get Copy Page"
+      }
+    },
     "/api/document-formats": {
       "get": {
         "description": "The kinds of file an upload accepts now: every format OpenAleph's\ningest-file reads while OpenAleph reads uploads, else the Workbench's\nown reader's list. ``accept`` is ready for a file picker.",
@@ -58561,6 +59031,104 @@
         "summary": "Make Photo Copy"
       }
     },
+    "/api/documents/{document_id}/derived/redacted": {
+      "post": {
+        "description": "A redacted copy: the content under each box removed for good, the hidden data asked for taken out, PDF/A-2b if\nasked, then checked: the saved copy must hold no text under any box. Each box's page, place and reason are kept in\nthe trail, not the words under it. The case's file is unchanged.",
+        "operationId": "make_redacted_copy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedactIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DerivedFileOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Make Redacted Copy"
+                }
+              }
+            },
+            "description": "The copy cannot be made as asked, or text was left under a box"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The native module is not installed on this computer"
+          }
+        },
+        "summary": "Make Redacted Copy"
+      }
+    },
     "/api/documents/{document_id}/email": {
       "get": {
         "description": "An email document's headers (as OpenAleph read them) and its thread\nfrom OpenAleph, each message linked to its Workbench document when the\nWorkbench holds it. 404 for a document that is not an email.",
@@ -59122,6 +59690,183 @@
           }
         },
         "summary": "Recheck Hash"
+      }
+    },
+    "/api/documents/{document_id}/redaction": {
+      "get": {
+        "description": "What Redact before sharing shows (mockup MEDIA_3): the pages in points, the boxes the machine proposes (phone\nnumbers and emails by pattern, people named in this case), the hidden data the file carries, PDF/A-2b now. Read\nfrom a copy: the case's file is never opened for writing.",
+        "operationId": "get_redaction",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedactionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "PdfCraft could not read the PDF"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The native module is not installed on this computer"
+          }
+        },
+        "summary": "Get Redaction"
+      }
+    },
+    "/api/documents/{document_id}/redaction/compare": {
+      "get": {
+        "description": "How a redacted copy differs from the case's file: the words each holds, the pages changed, the hidden data the\ncopy still carries.",
+        "operationId": "compare_redacted",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "copy_id",
+            "required": true,
+            "schema": {
+              "title": "Copy Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedactCompareOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Compare Redacted"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Compare Redacted"
       }
     },
     "/api/documents/{document_id}/similar": {

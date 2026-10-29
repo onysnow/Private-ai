@@ -47,6 +47,7 @@ import {
   closeCase,
   collectCaptureMedia,
   compareAuthenticity,
+  compareRedacted,
   compareTranscripts,
   connectors,
   connectorSearch,
@@ -140,6 +141,7 @@ import {
   getClaimSources,
   getCollection,
   getCollections,
+  getCopyPage,
   getCorpusInsights,
   getCorpusStatus,
   getCorpusSync,
@@ -191,6 +193,7 @@ import {
   getPlatformChecks,
   getRecordMarks,
   getRecordProvenanceTrace,
+  getRedaction,
   getRedFlags,
   getRelationshipSources,
   getResearchSettings,
@@ -299,6 +302,7 @@ import {
   makeLeadFromNote,
   makeLeadFromRedFlag,
   makePhotoCopy,
+  makeRedactedCopy,
   markAiRunThought,
   markCaptureChanged,
   markRedFlagInnocent,
@@ -529,6 +533,9 @@ import type {
   CompareAuthenticityData,
   CompareAuthenticityError,
   CompareAuthenticityResponse,
+  CompareRedactedData,
+  CompareRedactedError,
+  CompareRedactedResponse,
   CompareTranscriptsData,
   CompareTranscriptsError,
   CompareTranscriptsResponse,
@@ -807,6 +814,9 @@ import type {
   GetCollectionsData,
   GetCollectionsError,
   GetCollectionsResponse,
+  GetCopyPageData,
+  GetCopyPageError,
+  GetCopyPageResponse,
   GetCorpusInsightsData,
   GetCorpusInsightsError,
   GetCorpusInsightsResponse,
@@ -960,6 +970,9 @@ import type {
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceError,
   GetRecordProvenanceTraceResponse,
+  GetRedactionData,
+  GetRedactionError,
+  GetRedactionResponse,
   GetRedFlagsData,
   GetRedFlagsError,
   GetRedFlagsResponse,
@@ -1283,6 +1296,9 @@ import type {
   MakePhotoCopyData,
   MakePhotoCopyError,
   MakePhotoCopyResponse,
+  MakeRedactedCopyData,
+  MakeRedactedCopyError,
+  MakeRedactedCopyResponse,
   MarkAiRunThoughtData,
   MarkAiRunThoughtError,
   MarkAiRunThoughtResponse,
@@ -3872,6 +3888,87 @@ export const getDerivedFileOptions = (options: Options<GetDerivedFileData>) =>
     queryKey: getDerivedFileQueryKey(options),
   });
 
+export const getCopyPageQueryKey = (options: Options<GetCopyPageData>) =>
+  createQueryKey('getCopyPage', options);
+
+/**
+ * Get Copy Page
+ *
+ * One page of a redacted copy as PNG, for Compare.
+ */
+export const getCopyPageOptions = (options: Options<GetCopyPageData>) =>
+  queryOptions<
+    GetCopyPageResponse,
+    GetCopyPageError,
+    GetCopyPageResponse,
+    ReturnType<typeof getCopyPageQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getCopyPage({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getCopyPageQueryKey(options),
+  });
+
+export const getCopyPageInfiniteQueryKey = (
+  options: Options<GetCopyPageData>,
+): QueryKey<Options<GetCopyPageData>> =>
+  createQueryKey('getCopyPage', options, true);
+
+/**
+ * Get Copy Page
+ *
+ * One page of a redacted copy as PNG, for Compare.
+ */
+export const getCopyPageInfiniteOptions = (
+  options: Options<GetCopyPageData>,
+) => {
+  const opts = infiniteQueryOptions<
+    GetCopyPageResponse,
+    GetCopyPageError,
+    InfiniteData<GetCopyPageResponse>,
+    QueryKey<Options<GetCopyPageData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetCopyPageData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetCopyPageData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  page: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getCopyPage({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getCopyPageInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
 export const getDocumentFormatsQueryKey = (
   options?: Options<GetDocumentFormatsData>,
 ) => createQueryKey('getDocumentFormats', options);
@@ -4515,6 +4612,37 @@ export const makePhotoCopyMutation = (
   return mutationOptions;
 };
 
+/**
+ * Make Redacted Copy
+ *
+ * A redacted copy: the content under each box removed for good, the hidden data asked for taken out, PDF/A-2b if
+ * asked, then checked: the saved copy must hold no text under any box. Each box's page, place and reason are kept in
+ * the trail, not the words under it. The case's file is unchanged.
+ */
+export const makeRedactedCopyMutation = (
+  options?: Partial<Options<MakeRedactedCopyData>>,
+): UseMutationOptions<
+  MakeRedactedCopyResponse,
+  MakeRedactedCopyError,
+  Options<MakeRedactedCopyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakeRedactedCopyResponse,
+    MakeRedactedCopyError,
+    Options<MakeRedactedCopyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makeRedactedCopy({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getDocumentEmailQueryKey = (
   options: Options<GetDocumentEmailData>,
 ) => createQueryKey('getDocumentEmail', options);
@@ -4846,6 +4974,64 @@ export const recheckHashMutation = (
   };
   return mutationOptions;
 };
+
+export const getRedactionQueryKey = (options: Options<GetRedactionData>) =>
+  createQueryKey('getRedaction', options);
+
+/**
+ * Get Redaction
+ *
+ * What Redact before sharing shows (mockup MEDIA_3): the pages in points, the boxes the machine proposes (phone
+ * numbers and emails by pattern, people named in this case), the hidden data the file carries, PDF/A-2b now. Read
+ * from a copy: the case's file is never opened for writing.
+ */
+export const getRedactionOptions = (options: Options<GetRedactionData>) =>
+  queryOptions<
+    GetRedactionResponse,
+    GetRedactionError,
+    GetRedactionResponse,
+    ReturnType<typeof getRedactionQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getRedaction({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getRedactionQueryKey(options),
+  });
+
+export const compareRedactedQueryKey = (
+  options: Options<CompareRedactedData>,
+) => createQueryKey('compareRedacted', options);
+
+/**
+ * Compare Redacted
+ *
+ * How a redacted copy differs from the case's file: the words each holds, the pages changed, the hidden data the
+ * copy still carries.
+ */
+export const compareRedactedOptions = (options: Options<CompareRedactedData>) =>
+  queryOptions<
+    CompareRedactedResponse,
+    CompareRedactedError,
+    CompareRedactedResponse,
+    ReturnType<typeof compareRedactedQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await compareRedacted({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: compareRedactedQueryKey(options),
+  });
 
 export const getSimilarDocumentsQueryKey = (
   options: Options<GetSimilarDocumentsData>,

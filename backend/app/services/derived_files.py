@@ -90,6 +90,6 @@ def latest(db: Session, document_id: str, operation: str) -> DerivedFile | None:
 
 def serialize(row: DerivedFile) -> dict[str, Any]:
     return {"id": row.id, "document_id": row.document_id, "parent_id": row.parent_id, "parent_sha256": row.parent_sha256,
-            "sha256": row.sha256, "size": row.size, "mime_type": row.mime_type, "operation": row.operation,
+            "filename": Path(row.storage_path).name.split("_", 1)[-1], "sha256": row.sha256, "size": row.size, "mime_type": row.mime_type, "operation": row.operation,
             "params": row.params or {}, "tool": row.tool, "model": row.model, "model_sha256": row.model_sha256,
             "job_id": row.job_id, "created_by": row.created_by, "created_at": row.created_at}

@@ -47,7 +47,7 @@ export function trailTree(rows: DerivedFileOut[]): Array<{row: DerivedFileOut; d
 
 const dms = (v: number) => v.toFixed(4);
 
-function useBlobUrl(key: string, url: string | null): string | null {
+export function useBlobUrl(key: string, url: string | null): string | null {
   const blob = useQuery({queryKey: ['photo-blob', key], queryFn: () => api.blob(url as string), enabled: Boolean(url), staleTime: Infinity, retry: false});
   const [href, setHref] = useState<string | null>(null);
   useEffect(() => {

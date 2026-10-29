@@ -3337,6 +3337,7 @@ export const zDerivedFileOut = z.object({
     ),
   created_by: z.string().nullish(),
   document_id: z.string(),
+  filename: z.string().optional().default(''),
   id: z.string(),
   job_id: z.string().nullish(),
   mime_type: z.string(),
@@ -4875,6 +4876,15 @@ export const zHashRecheckOut = z.object({
  */
 export const zHealthOut = z.object({
   status: z.literal('ok'),
+});
+
+/**
+ * HiddenDataOut
+ */
+export const zHiddenDataOut = z.object({
+  category: z.string(),
+  count: z.int(),
+  label: z.string(),
 });
 
 /**
@@ -6831,6 +6841,33 @@ export const zPartyYearsOut = z.object({
 });
 
 /**
+ * PdfPageOut
+ */
+export const zPdfPageOut = z.object({
+  height: z.number(),
+  page: z.int(),
+  width: z.number(),
+});
+
+/**
+ * PdfaIssueOut
+ */
+export const zPdfaIssueOut = z.object({
+  clause: z.string().nullish(),
+  fixable: z.boolean(),
+  message: z.string().nullish(),
+});
+
+/**
+ * PdfaOut
+ */
+export const zPdfaOut = z.object({
+  compliant: z.boolean(),
+  declared: z.string().nullish(),
+  issues: z.array(zPdfaIssueOut),
+});
+
+/**
  * PeekEventOut
  */
 export const zPeekEventOut = z.object({
@@ -7485,6 +7522,97 @@ export const zRecoverIn = z.object({
  */
 export const zRecoveryWordsOut = z.object({
   words: z.array(z.string()),
+});
+
+/**
+ * RedactBoxIn
+ *
+ * One box to redact: its page, its place in points from the page's top-left (left, top, right, bottom), its reason
+ * (kept in the trail), and whether a person drew it or accepted a proposal (phone, email, person).
+ */
+export const zRedactBoxIn = z.object({
+  kind: z
+    .enum(['drawn', 'phone', 'email', 'person'])
+    .optional()
+    .default('drawn'),
+  page: z.int().gte(1),
+  reason: z.string().min(1).max(300),
+  rect: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+});
+
+/**
+ * RedactCompareOut
+ *
+ * How a redacted copy differs from the case's file: the words each holds, the pages that changed, and the hidden
+ * data the copy still carries.
+ */
+export const zRedactCompareOut = z.object({
+  copy_id: z.string(),
+  hidden_left: z.array(zHiddenDataOut),
+  new_words: z.int(),
+  old_words: z.int(),
+  pages_changed: z.array(z.int()),
+});
+
+/**
+ * RedactIn
+ *
+ * A redacted copy of a PDF (Redact before sharing): the boxes, the hidden data to take out of the copy, whether to
+ * make it PDF/A-2b, and who it is for (it names the file).
+ */
+export const zRedactIn = z.object({
+  boxes: z.array(zRedactBoxIn).min(1).max(500),
+  made_for: z
+    .enum(['editor', 'lawyer', 'publication'])
+    .optional()
+    .default('editor'),
+  pdfa: z.boolean().optional().default(false),
+  remove: z
+    .array(
+      z.enum([
+        'metadata',
+        'attachments',
+        'comments',
+        'form-fields',
+        'hidden-text',
+        'hidden-layers',
+        'bookmarks',
+        'links-actions-scripts',
+        'private-data',
+      ]),
+    )
+    .optional(),
+});
+
+/**
+ * RedactProposalOut
+ *
+ * A box the machine proposes, never applied on its own: a phone number or email address found by pattern, or a
+ * person named in this case found in the text.
+ */
+export const zRedactProposalOut = z.object({
+  entity_id: z.string().nullish(),
+  id: z.string(),
+  kind: z.string(),
+  page: z.int(),
+  rect: z.array(z.number()),
+  text: z.string(),
+  why: z.string(),
+});
+
+/**
+ * RedactionOut
+ *
+ * A PDF as the Redact screen shows it: its pages in points, the proposed boxes, its hidden data, PDF/A now.
+ */
+export const zRedactionOut = z.object({
+  document_id: z.string(),
+  hidden: z.array(zHiddenDataOut),
+  pages: z.array(zPdfPageOut),
+  pdfa: zPdfaOut,
+  proposals: z.array(zRedactProposalOut),
+  sha256: z.string(),
+  tool: z.string(),
 });
 
 /**
@@ -12116,6 +12244,20 @@ export const zGetDerivedFilePath = z.object({
  */
 export const zGetDerivedFileResponse = z.string();
 
+export const zGetCopyPagePath = z.object({
+  derived_file_id: z.string(),
+});
+
+export const zGetCopyPageQuery = z.object({
+  page: z.int().gte(1).optional().default(1),
+  width: z.int().gte(120).lte(1600).optional().default(600),
+});
+
+/**
+ * One page of a PDF copy drawn as a picture
+ */
+export const zGetCopyPageResponse = z.string();
+
 /**
  * Successful Response
  */
@@ -12352,6 +12494,17 @@ export const zMakePhotoCopyPath = z.object({
  */
 export const zMakePhotoCopyResponse = zDerivedFileOut;
 
+export const zMakeRedactedCopyBody = zRedactIn;
+
+export const zMakeRedactedCopyPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakeRedactedCopyResponse = zDerivedFileOut;
+
 export const zGetDocumentEmailPath = z.object({
   document_id: z.string(),
 });
@@ -12439,6 +12592,28 @@ export const zRecheckHashPath = z.object({
  * Successful Response
  */
 export const zRecheckHashResponse = zHashRecheckOut;
+
+export const zGetRedactionPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetRedactionResponse = zRedactionOut;
+
+export const zCompareRedactedPath = z.object({
+  document_id: z.string(),
+});
+
+export const zCompareRedactedQuery = z.object({
+  copy_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCompareRedactedResponse = zRedactCompareOut;
 
 export const zGetSimilarDocumentsPath = z.object({
   document_id: z.string(),
