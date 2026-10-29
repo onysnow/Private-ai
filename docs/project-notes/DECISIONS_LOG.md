@@ -286,3 +286,17 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   theme with its colours, the fonts, and what a style never changes); the slide on screen takes the theme at once, and
   Save keeps it. The editor had drawn every deck in the default theme whatever it was saved with; it now draws the
   deck's own.
+
+## 16. The inspector slot, first step (29 Oct; entry 12, calls 11 and 12)
+
+- **Call:** one inspector slot at the right of every case page (`features/inspector/inspector-slot.tsx`, the store's
+  `inspector` trail). A party's dossier and a record's Chain of Custody open there, where you are:
+  - **Docked, not on top:** the page gives the slot its width, so it never covers the row or the map it came from.
+  - **Replace or follow:** opening from the page replaces what is there; a link followed inside the slot (a dossier's
+    "Trace relationship", another party) moves along a trail shown at the top.
+  - **Back and Esc:** Back or Esc goes one step back; from the first step Esc closes the slot.
+- **What it replaced:** "Open the dossier" used to carry you to Bring in, where the dossier sat inside the connectors
+  panel, and Chain of Custody was a drawer over the page. Both now open in the slot; the connectors panel's "Open
+  dossier" opens it there too.
+- **Not yet moved into the slot:** the older Red Flags panel's detail drawer, the AI plan and "one thought" drawers, the
+  Export sheet. The Wire's own drawer stays as approved. The rooms (Reading room, Watch the run) stay full screen.

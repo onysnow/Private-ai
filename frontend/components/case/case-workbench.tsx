@@ -49,7 +49,7 @@ import {DeletionPanel} from '../../features/deletion/deletion-panel';
 import {DocumentsPanel} from '../../features/documents/documents-panel';
 import {LeadsPanel} from '../../features/leads/leads-panel';
 import {PlacesPanel} from '../../features/places/places-panel';
-import {ProvenancePanel} from '../../features/provenance/provenance-panel';
+import {InspectorSlot} from '../../features/inspector/inspector-slot';
 import {withEnds} from '../../features/relationship-graph/graph';
 import {StageRail, StageSection, StandingTiles, useStanding} from '../layout/workbench-page';
 import {RedFlagsBoard} from '../../features/act/red-flags-board';
@@ -111,8 +111,9 @@ function investigationToOpen(rows: InvestigationOut[]): string {
 export {caseHref};
 
 /** Which stage holds what a request asks for. */
-const STAGE_OF_REQUEST: Record<'claim' | 'dossier' | 'relationship' | 'document' | 'flag' | 'check', StageKey> = {
-  claim: 'verify', check: 'verify', dossier: 'collect', document: 'collect', relationship: 'map', flag: 'report',
+// A party's dossier and a record's Chain of Custody open in the inspector slot, where you are (DECISIONS_LOG 16).
+const STAGE_OF_REQUEST: Record<'claim' | 'relationship' | 'document' | 'flag' | 'check', StageKey> = {
+  claim: 'verify', check: 'verify', document: 'collect', relationship: 'map', flag: 'report',
 };
 
 export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElement {
@@ -209,15 +210,6 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
   const investigation = investigations.find(i => i.id === inv);
   const investigationName = investigation?.name ?? '';
   useEffect(() => { useWorkbenchStore.getState().setInvestigationName(investigationName); }, [investigationName]);
-  const provenance = useWorkbenchStore(state => state.provenance);
-  const clearProvenance = useWorkbenchStore(state => state.clearProvenance);
-  // Esc closes the Chain of Custody drawer, as it closes the other sheets (BACKLOG P1: it ignored Esc).
-  useEffect(() => {
-    if (!provenance) return undefined;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !e.defaultPrevented) clearProvenance(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [provenance, clearProvenance]);
   const accessLabel = access.state === 'authenticated' ? 'API: session active' : access.state === 'local' ? 'API: local access' : access.state === 'needs_token' ? 'API: token needed'
     : access.state === 'remote_disabled' ? 'API: remote disabled' : access.state === 'error' ? 'API: connection error' : 'API: checking…';
   // Decide shows a server that does not answer as its own error state, alone, with a retry (BACKLOG P1:
@@ -333,10 +325,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
     </>}
   </>;
 
-  const drawer = <aside className="wb-drawer" hidden={!provenance} aria-label="Chain of Custody">
-    <button type="button" className="wb-drawer-close" onClick={clearProvenance} aria-label="Close Chain of Custody">×</button>
-    <PanelErrorBoundary name="Chain of Custody"><ProvenancePanel investigationId={inv}/></PanelErrorBoundary>
-  </aside>;
+  const drawer = <InspectorSlot investigationId={inv}/>;
 
   if (view === 'all') return <AllStages investigationName={investigationName} picker={investigations.length > 0 ? picker : null}
     accessLabel={accessLabel} accessMessage={access.message} onClear={access.state === 'authenticated' ? clearApiSession : null} drawer={drawer}>{body}</AllStages>;
