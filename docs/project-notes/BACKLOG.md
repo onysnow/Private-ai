@@ -101,6 +101,8 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   flag, "From <party> → <parties>", brightens its threads, pulses those parties and quiets the other flags. Flags that
   touch no other party hang in a column from the count on elbowed poles. A title over the party names the flags and
   says Esc closes. Pennants avoid parties, link labels and each other; one pushed off its thread keeps a dotted tether.
+- Then: no coloured glow on hover anywhere (cards, dots, "+N", link labels); the hover is the lift, the brighter
+  outline and the sheen. Kind icons larger (25px in a 38px badge) to fill the badge.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
   circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
