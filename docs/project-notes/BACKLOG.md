@@ -89,6 +89,11 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   the chip grows.
 - Then: the stack's discs are solid, one per kind among the hidden parties in that kind's colour, with a thin edge of
   ground between them; the chip's face is always opaque, so nothing shows through it or crosses the number.
+- Then he said everything was chip-shaped, with lots of outlines all the same thickness. Preview
+  UDRjkiQv5srKbMrxT5Y3L5: each kind its own silhouette, shared by its badge and its dot (person pill, company squared
+  card, organisation hexagonal ends, vessel pointed bow, property slanted end, bank account cut corner); outlines only
+  on parties, weighted by importance (centre 2.4, flagged 1.8, others and dots 1.1); link labels a filled tab with no
+  outline, card details just words. Waiting for his view.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
   circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
