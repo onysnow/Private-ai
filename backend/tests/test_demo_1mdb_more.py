@@ -219,7 +219,9 @@ def test_the_records_reach_the_screens(loaded):
     currencies = {t["currency"] for t in ledger["transactions"]}
     assert {"MYR", "GBP", "EUR", "CHF", "SGD", "USD"} <= currencies
     places = investigation_places(db, inv.id)
-    assert len(places["places"]) == 21 and not places["omitted"]
+    assert len(places["places"]) == 21
+    # The case's properties recorded without coordinates are named under "Can't be placed", never looked up.
+    assert places["omitted"] and all(o["reason"] == "no coordinates recorded; nothing is looked up" for o in places["omitted"])
     assert any(p["links"] for p in places["places"])
     statuses = Counter(c.status for c in db.scalars(select(Claim).where(Claim.investigation_id == inv.id)))
     assert statuses["confirmed"] and statuses["rejected"] and statuses["disputed"]
