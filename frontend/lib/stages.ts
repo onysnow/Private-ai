@@ -22,7 +22,7 @@ export const STAGES: Stage[] = [
     {label: 'Connectors', anchor: 'connectors'},
     {label: 'OpenAleph corpus', anchor: 'corpus'},
   ]},
-  {key: 'verify', route: '/check', n: 2, name: 'Check', line: 'Decide what the evidence shows. Every status shows a shape and a word: ✓ Supported, ✕ Disputed, ○ Not yet shown.', colour: SWATCH.sage, parts: [
+  {key: 'verify', route: '/check', n: 2, name: 'Check', line: 'Decide what the evidence shows. A status is its colour; point at it for its word (Settings › Appearance › Status marks adds the shape or the word).', colour: SWATCH.sage, parts: [
     {label: 'Claims', anchor: 'claim-verification'},
     {label: 'To check', anchor: 'to-check'},
     {label: 'Connector findings', anchor: 'review-queue'},

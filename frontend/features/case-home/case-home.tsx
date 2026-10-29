@@ -178,7 +178,7 @@ function StandingStrip({investigationId}: {investigationId: string}): ReactEleme
   const s = standing.data;
   // Each cell is its mark and its number; what the number counts is on hover or focus, and in the link's name.
   const cell = (key: string, big: ReactNode, small: string, href: string, mark?: ReactNode, tone = '') =>
-    <li key={key}><Reveal tabbable={false} describe={false} className="ch-num-rv" detail={small}><Link className={`ch-num ${tone}`} href={caseHref(href, investigationId)}>
+    <li key={key}><Reveal tabbable={false} describe={false} className="ch-num-rv" detail={small}><Link className={`ch-num ${tone}${typeof big === 'string' && big.length > 6 ? ' long' : ''}`} href={caseHref(href, investigationId)}>
       <b>{mark && <span aria-hidden="true" className="ch-num-mark">{mark}</span>}{big}</b><small className="sr-only">{small}</small>
     </Link></Reveal></li>;
   if (standing.isError) return <p className="ch-strip-error" role="alert">{errorMessage(standing.error, 'Could not count the case')} <button type="button" onClick={() => void standing.refetch()}>Retry</button></p>;

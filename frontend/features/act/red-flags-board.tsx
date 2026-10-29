@@ -39,8 +39,8 @@ type Levels = Record<'textbook' | 'strong' | 'faint', boolean>;
 
 /** A flag's level on this board: the shared status grammar's LevelChip (colour by default, the word on reveal;
  *  Settings › Appearance › Status marks adds the bars or the word). */
-function FlagMark({level, focusable = false}: {level: string; focusable?: boolean}): ReactElement {
-  if (level === 'textbook' || level === 'strong' || level === 'faint') return <LevelChip level={level as FlagLevel} focusable={focusable}/>;
+function FlagMark({level, focusable = false, showWord = false}: {level: string; focusable?: boolean; showWord?: boolean}): ReactElement {
+  if (level === 'textbook' || level === 'strong' || level === 'faint') return <LevelChip level={level as FlagLevel} focusable={focusable} showWord={showWord}/>;
   return <span className="rb-level">{LEVEL[level]?.name ?? level}</span>;
 }
 
@@ -413,7 +413,8 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
       <section className="rb-ladder" aria-label="Level ladder: what would raise it">
         <p className="rb-eyebrow">Level ladder · what would raise it</p>
         <ol>{ladder(flag).map(r => <li key={r.level} className={`rung rung-${r.state} rk-${r.level}`}>
-          <span className="rung-head"><FlagMark level={r.level}/>
+          {/* The ladder teaches the levels, so its rungs keep their words whatever Status marks says. */}
+          <span className="rung-head"><FlagMark level={r.level} showWord/>
             {/* A met rung's wording is on hover; the rungs still to reach keep theirs (what would raise it). */}
             {r.state === 'met' ? <Reveal detail={r.text}><b>✓ Met</b></Reveal>
               : r.state === 'needs' ? <Reveal detail="Only a person can decide these."><b>Needs {r.needs.length} fact{r.needs.length === 1 ? '' : 's'}</b></Reveal>
