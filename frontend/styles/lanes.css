@@ -230,3 +230,44 @@
 .rp-evidence button[aria-current="true"] { background: var(--surface-2); }
 .rp-evidence small { display: block; font: 500 10.5px var(--font-mono); color: var(--text-muted); }
 @media (prefers-reduced-motion: reduce) { .rp-card { transition: none; } }
+
+/* Timeline › Stack in depth (mockup TIME_2): plain CSS 3D. */
+.sk { outline: none; display: grid; grid-template-columns: 230px minmax(0, 1fr) 330px; gap: 14px; height: clamp(560px, calc(100vh - 230px), 780px); }
+@media (max-width: 1200px) { .sk { grid-template-columns: minmax(0, 1fr); height: auto; } .sk-layers { max-height: 300px; } }
+.sk-layers, .sk-stage, .sk-side { border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); padding: 14px 16px; min-width: 0; }
+.sk-layers, .sk-side { overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.sk-layers ol { list-style: none; margin: 0; padding: 0; }
+.sk-layers li button { all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 7px; cursor: pointer; font-size: 13px; }
+.sk-layers li button i { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex: none; }
+.sk-layers li button.fuzzy i { background: transparent; border: 1.5px dashed var(--text-muted); }
+.sk-layers li button span { margin-left: auto; font: 500 10.5px var(--font-mono); color: var(--text-muted); }
+.sk-layers li button[aria-current="true"] { background: var(--surface-2); box-shadow: inset 2px 0 0 var(--accent-1); }
+.sk-layers li button[aria-current="true"] i { background: var(--accent-1); }
+.sk-gap { display: block; padding-left: 24px; font: 500 10px var(--font-mono); color: var(--text-muted); }
+.sk-steps { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; border-radius: 9px; border: 1px solid var(--line, rgba(127,127,127,.3)); }
+.sk-steps button { border: 0; background: transparent; color: var(--text); font: 500 12.5px var(--font-ui); padding: 3px 9px; border-radius: 7px; cursor: pointer; }
+.sk-steps button[aria-pressed="true"] { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line, rgba(127,127,127,.35)); }
+.sk-steps button:disabled { opacity: .4; cursor: not-allowed; }
+.sk-stage { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.sk-depth { position: relative; flex: 1; perspective: 1100px; perspective-origin: 50% 0%; display: grid; align-items: end; justify-items: center; padding-top: 200px; }
+.sk-layer { display: block; grid-area: 1 / 1; width: min(640px, 96%); border-radius: 10px; padding: 12px 14px 16px; background: color-mix(in srgb, var(--surface-2) 80%, transparent);
+  box-shadow: 0 0 0 1px var(--line, rgba(127,127,127,.3)), 0 20px 40px rgba(0,0,0,.35); transition: transform var(--motion-story, 700ms) ease, opacity var(--motion-story, 700ms) ease; }
+.sk-layer.behind { min-height: 160px; }
+.sk-layer.fuzzy { box-shadow: 0 0 0 1px var(--text-muted), 0 20px 40px rgba(0,0,0,.35); outline: 1.5px dashed var(--text-muted); outline-offset: -6px; }
+.sk-layer.sk-front { position: relative; z-index: 20; background: var(--surface-2); animation: sk-in var(--motion-story, 700ms) ease; }
+@keyframes sk-in { from { transform: translateY(46px) translateZ(90px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sk-title { margin: 0 0 10px; font: 400 21px var(--font-display, var(--font-ui)); }
+.sk-title small { font: 500 10.5px var(--font-mono); color: var(--text-muted); margin-left: 6px; }
+.sk-cards { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-start; }
+.sk-card { all: unset; box-sizing: border-box; flex: 1 1 170px; max-width: 200px; display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 8px; border-top: 3px solid; background: var(--surface-1); cursor: pointer; }
+.sk-card[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--accent-1); }
+.sk-paper { display: block; min-height: 104px; padding: 7px 8px; border-radius: 4px; background: #efe9de; color: #2a241d; font: 12px/1.4 var(--font-reading, Georgia, serif); overflow: hidden; }
+.sk-paper small { display: block; font: 600 9px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #6b5f50; margin-bottom: 4px; }
+.sk-card b { font-weight: 500; font-size: 12.5px; }
+.sk-foot { display: inline-flex; gap: 5px; align-items: center; font: 500 10.5px var(--font-mono); color: var(--text-muted); }
+.sk-more { align-self: center; border: 1px dashed var(--line, rgba(127,127,127,.5)); background: transparent; color: var(--accent-1); border-radius: 8px; padding: 6px 10px; cursor: pointer; font: 600 12px var(--font-ui); }
+.sk-next { margin: 0; text-align: center; font: 500 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.sk-kind { font: 600 9.5px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; border: 1px solid currentColor; border-radius: 99px; padding: 2px 8px; }
+.sk-side h3 { margin: 0; font: 500 19px var(--font-ui); }
+.sk-quote { margin: 0; padding: 10px 12px; border-radius: 6px; background: #efe9de; color: #2a241d; font: 13.5px/1.5 var(--font-reading, Georgia, serif); }
+@media (prefers-reduced-motion: reduce) { .sk-layer { transition: none; } .sk-layer.sk-front { position: relative; z-index: 20; animation: none; } }

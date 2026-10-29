@@ -112,7 +112,7 @@ export function TimelineReplay({view, onShowInLanes}: Props): ReactElement {
         {records.map((e, i) => {
           const d = i - card;
           if (d < -1 || d > 3) return null;
-          return <button key={e.id} className={`rp-card${d === 0 ? ' top' : ''}`} style={{transform: `translateY(${d * -14}px) scale(${1 - Math.abs(d) * 0.05})`, zIndex: 10 - Math.abs(d), opacity: d < 0 ? 0 : 1 - d * 0.22}}
+          return <button key={e.id} className={`rp-card${d === 0 ? ' rp-front' : ''}`} style={{transform: `translateY(${d * -14}px) scale(${1 - Math.abs(d) * 0.05})`, zIndex: 10 - Math.abs(d), opacity: d < 0 ? 0 : 1 - d * 0.22}}
             onClick={() => setCard(i)} tabIndex={d === 0 ? 0 : -1} aria-label={`Evidence ${i + 1} of ${records.length}: ${e.title}`}>
             <span className="rp-from">{e.source_label}</span>
             <span className="rp-body">{quote(e) ? <>“{quote(e)}”</> : e.description || e.title}</span>

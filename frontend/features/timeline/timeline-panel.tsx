@@ -11,14 +11,15 @@ import {timelineLanesViewOptions} from '../../lib/generated/@tanstack/react-quer
 import {TimelineLanes} from './lanes';
 import {TimelinePeriods, inPeriod} from './periods';
 import {TimelineReplay} from './replay';
+import {TimelineStack} from './stack';
 import {span} from './lanes-model';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 export {EVENT_GRADES} from './lanes-model';
 
 type Props = {investigationId: string};
-type View = 'lanes' | 'replay' | 'periods';
-const VIEWS: Array<[View, string]> = [['lanes', 'Lanes'], ['replay', 'Replay'], ['periods', 'Periods']];
+type View = 'lanes' | 'stack' | 'replay' | 'periods';
+const VIEWS: Array<[View, string]> = [['lanes', 'Lanes'], ['stack', 'Stack'], ['replay', 'Replay'], ['periods', 'Periods']];
 
 export function TimelinePanel({investigationId}: Props): ReactElement {
   // The same query each view reads: the count and why it opened where it did, said once at the top.
@@ -31,6 +32,7 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
   const n = lanes.data?.events.length ?? 0;
   const LEDE: Record<View, string> = {
     lanes: 'One lane per party. Each mark says whether the event is shown; its band says how exact the date is.',
+    stack: 'Each layer is a stretch of time holding the evidence dated in it. Scroll pushes the top layer out; empty stretches are skipped.',
     replay: 'Replay walks the story in the order things happened. At each step you see only what was on the record by then.',
     periods: 'Each period you named, with your summary of it and its evidence.',
   };
@@ -45,6 +47,7 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
         {lanes.data.span.busiest ? ` · ${lanes.data.span.first}–${lanes.data.span.last} · busiest ${lanes.data.span.busiest}` : ''}</p>}
     </header>
     {view === 'lanes' && <TimelineLanes investigationId={investigationId} picked={focus}/>}
+    {view === 'stack' && lanes.data && <TimelineStack view={lanes.data} onShowInLanes={show}/>}
     {view === 'replay' && lanes.data && <TimelineReplay view={lanes.data}
       onShowInLanes={(id, step) => { setAsOf(new Date(span({date_start: step.date_start, date_end: step.date_end})[1]).getUTCFullYear()); show(id); }}/>}
     {view === 'periods' && lanes.data && <TimelinePeriods view={lanes.data} investigationId={investigationId} onSelect={show}
