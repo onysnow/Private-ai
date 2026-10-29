@@ -69,6 +69,11 @@ def strip_page_furniture(text: str, page_no: int | None = None) -> str:
 PAGE_PROGRESS: ContextVar[Callable[[int, int, bool], None] | None] = ContextVar("pdf_page_progress", default=None)
 
 
+# Told each page's text once it is read: (page number, text). The extract job counts what the
+# reader will propose from the pages read so far ("4 names and 2 claims found so far").
+PAGE_TEXT: ContextVar[Callable[[int, str], None] | None] = ContextVar("pdf_page_text", default=None)
+
+
 class ReadingStopped(Exception):
     """A person stopped the read; raised from the page callback, it ends the read."""
 
@@ -81,6 +86,15 @@ def _tell(page_no: int, total: int, ocr: bool) -> None:
         except ReadingStopped:
             raise
         except Exception:  # progress is a courtesy; it never stops a read
+            pass
+
+
+def _tell_text(page_no: int, text: str) -> None:
+    told = PAGE_TEXT.get()
+    if told is not None:
+        try:
+            told(page_no, text)
+        except Exception:  # a courtesy too
             pass
 
 
@@ -162,6 +176,7 @@ def extract_pdf_chunks(
                     "page_number": page_no,
                     "text": native,
                 })
+                _tell_text(page_no, native)
                 continue
 
             text = native
@@ -191,6 +206,7 @@ def extract_pdf_chunks(
                     native_pages += 1
                     locator = f"page {page_no}"
                 chunks.append({"locator": locator, "page_number": page_no, "text": text})
+                _tell_text(page_no, text)
             else:
                 blank_pages += 1
 

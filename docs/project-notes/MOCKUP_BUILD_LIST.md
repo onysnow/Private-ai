@@ -69,12 +69,12 @@ HOME_2 draws the Settings sidebar only; these four panes were drawn on 19 Oct an
 
 ## 2. Case home — mockup HOME_1 (redesign §04.1)
 
-Today: **built 12 Oct** except Bring in's "what it proposed so far". Built earlier: question, standing strip, Next up card with three keys and undo, Bring in /
+Today: **built 12 Oct**; Bring in's "what it found so far" 29 Oct. Built earlier: question, standing strip, Next up card with three keys and undo, Bring in /
 Check / See / Act modules, Since strip, year rail, Pointing-at bar.
 To finish:
 - [x] Top band (12 Oct; the top edge, still hidden until called): breadcrumb "Cases › case › Home"; **Switch case ⌘O** button (not a dropdown); centred ⌘K bar; bell with count; settings; **Hide screen**
 - [x] Next up (12 Oct: the page drawn with the passage marked, View full page, locator, scroll hint): the page thumbnail with the highlighted region and "View full page"; locator line in mono ("Minutes of the board · p. 4 · lines 18–21 · scanned, OCR"); "4 of 7 · scroll" with dots; the reason line ("From the Textbook Red Flag …"); no empty area for kinds without a passage
-- [x] Bring in module (12 Oct: real page progress from the reader; "what it proposed so far" still to do — proposals are made at the end of a read): the document being read now with real progress ("Reading with OCR · page 6 of 11"), what it proposed so far, rows with Read → / Review → / See →, a permanent drop target
+- [x] Bring in module (12 Oct: real page progress from the reader. 29 Oct: "· 4 names and 2 claims found so far" on the reading line, counted page by page with the proposals' own rules from the document's own part; the proposals are made at the end of the read, so it says "found", and the counts match what is proposed. The reader process now tells each page and its text back to the job through a queue: page progress and Stop had worked only with the reader in the API process, `app/services/document_reader.py`): the document being read now with real progress ("Reading with OCR · page 6 of 11"), what it proposed so far, rows with Read → / Review → / See →, a permanent drop target
 - [x] Check module (12 Oct): "2 of 22 · scroll", segmented status bar, disputed / not-yet-shown claim cards with their source line
 - [x] Act · Red Flags module (12 Oct: "lights 2018" from the flag's dated links): level-chip cards with parties joined by arrows, "lights 2017", the could-be-innocent box, faint flags on one row, "1 of 3 · scroll"
 - [x] See module (12 Oct): mini network with edge labels (year, ✓/×), shapes per kind (house for property), legend, "31 parties · 46 links"

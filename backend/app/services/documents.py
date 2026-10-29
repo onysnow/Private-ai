@@ -193,6 +193,36 @@ def _part_payloads(chunk: DocumentChunk, share: tuple[int, int], **kwargs: Any) 
         yield typ, payload, conf
 
 
+class FoundSoFar:
+    """What the reader will propose from the pages read so far, counted as a read goes (Case home's Bring in: "4 names
+    and 2 claims found so far"): the same proposals, one per name and per claim sentence, from the document's own
+    part. The proposals themselves are made once the whole file is read."""
+
+    def __init__(self, part: dict | None = None) -> None:
+        self.part = part
+        self.pages: list[dict] = []
+        self.seen: set[tuple[str, str]] = set()
+        self.counts = {'entity': 0, 'claim': 0}
+
+    def add(self, page_no: int, text: str) -> None:
+        self.pages.append({'locator': f'page {page_no}', 'text': text})
+        share = own_part(self.pages, self.part)[0][-1]
+        if share is None:
+            return
+        part = text[share[0]:share[1]]
+        for typ, payload, _conf in _candidate_payloads(_Part(part, None), include_entities=settings.enable_local_entity_suggestions):  # type: ignore[arg-type]
+            key = _once_key(typ, payload)
+            if typ in self.counts and key is not None and key not in self.seen:
+                self.seen.add(key)
+                self.counts[typ] += 1
+
+    def words(self) -> str:
+        """"4 names and 2 claims found so far", or "" before anything is found."""
+        parts = [f"{n} {one if n == 1 else many}" for n, one, many in
+                 ((self.counts['entity'], 'name', 'names'), (self.counts['claim'], 'claim', 'claims')) if n]
+        return f"{' and '.join(parts)} found so far" if parts else ""
+
+
 def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True,
                         existing: dict[str, tuple[str, str]] | None = None) -> Iterable[tuple[str, dict, float]]:
     """Proposals from one chunk. Each carries why its rule fired and how sure

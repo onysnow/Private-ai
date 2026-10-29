@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, NoReturn
+from typing import TYPE_CHECKING, Any, NoReturn
 
 from sqlalchemy.orm import Session
 
@@ -296,19 +296,42 @@ def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | Non
 
     report(5, "Reading the document")
     from app.jobs.records import JobStopped
-    from app.services.pdf_ocr import PAGE_PROGRESS, ReadingStopped
+    from app.models.domain import Source
+    from app.services.documents import FoundSoFar
+    from app.services.pdf_ocr import PAGE_PROGRESS, PAGE_TEXT, ReadingStopped
+
+    stored_doc = db.get(Document, document_id)
+    stored_source = db.get(Source, stored_doc.source_id) if stored_doc is not None else None
+    found = FoundSoFar(((stored_source.metadata_json or {}) if stored_source is not None else {}).get("part"))
+    where: dict[str, Any] = {}
+
+    def say() -> None:
+        words = f"Reading{' with OCR' if where['ocr'] else ''} · page {where['page']} of {where['total']}"
+        so_far = found.words()
+        report(5 + int(70 * where["page"] / max(where["total"], 1)), f"{words} · {so_far}" if so_far else words)
 
     def page_read(page_no: int, total: int, ocr: bool) -> None:
+        where.update(page=page_no, total=total, ocr=ocr)
         try:
-            report(5 + int(70 * page_no / max(total, 1)), f"Reading{' with OCR' if ocr else ''} · page {page_no} of {total}")
+            say()
         except JobStopped:
             raise ReadingStopped(STOPPED_READ) from None
 
+    def page_text(page_no: int, text: str) -> None:
+        found.add(page_no, text)
+        if where and found.words():
+            try:
+                say()
+            except JobStopped:
+                raise ReadingStopped(STOPPED_READ) from None
+
     token = PAGE_PROGRESS.set(page_read)
+    text_token = PAGE_TEXT.set(page_text)
     try:
         doc = db.get(Document, document_id) if resuming else extract_document(db, document_id)
     finally:
         PAGE_PROGRESS.reset(token)
+        PAGE_TEXT.reset(text_token)
     if doc is None:
         return "The document was deleted before it was read"
     if doc.extraction_status == "failed" and doc.extraction_error == STOPPED_READ:
