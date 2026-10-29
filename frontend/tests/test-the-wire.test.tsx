@@ -7,7 +7,7 @@ import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/reac
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TheWire, linkInfo} from '../features/the-wire/the-wire';
-import {brighten, fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
+import {brighten, clipWords, fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -109,6 +109,12 @@ describe('The Wire', () => {
     expect(info.u1).toEqual({sure: 'unshown', end: ''});
     expect(info.d1).toEqual({sure: 'shown', end: '2017-07-03'});
     expect(info.x1).toEqual({sure: 'disputed', end: ''});
+  });
+
+  it('cuts a long role at a word with an ellipsis, never mid-word', () => {
+    expect(clipWords('Owning entity in the Cook Islands trust structure', 32)).toBe('Owning entity in the Cook…');
+    expect(clipWords('Founder and chairman of the board', 32)).toBe('Founder and chairman of the…');
+    expect(clipWords('Director', 32)).toBe('Director');
   });
 
   it('writes each link as a sentence from the fixed verbs', () => {

@@ -201,7 +201,10 @@
 .tw-tip .tip-flag { display: block; margin-top: 5px; line-height: 1.35; }
 .tw-tip .tip-flag i { font: 600 9.5px var(--font-mono); font-style: normal; letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; padding: 0 4px; border-radius: 3px; border: 1px solid; }
 .tw-tip .tip-flag i.faint { color: #E9AFA8; border-style: dashed; } .tw-tip .tip-flag i.strong { color: #F6966A; } .tw-tip .tip-flag i.textbook { color: #ffe9e4; background: #8E2420; border-color: #FF8070; }
-.tw .sec { font-family: var(--font-mono); font-weight: 500; letter-spacing: .16em; fill: var(--text-muted); text-transform: uppercase; pointer-events: none; }
+/* Around a party, where a party sits says how it is linked (owners left, what it owns right, money in above, money out
+   below), so the sector names are read, not decoration: the text colour, on a dark halo so lines never cross them. */
+.tw .sec { font-family: var(--font-mono); font-weight: 600; letter-spacing: .14em; fill: color-mix(in srgb, var(--text) 88%, #7FB7E0); text-transform: uppercase; pointer-events: none;
+  paint-order: stroke; stroke: var(--ground); stroke-linejoin: round; }
 .tw .node { cursor: pointer; }
 .tw .node:hover .ring { stroke-width: 2.6; }
 .tw .strand { fill: none; stroke-linecap: round; transition: opacity .3s; }

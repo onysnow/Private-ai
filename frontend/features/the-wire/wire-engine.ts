@@ -110,6 +110,13 @@ const monthYear = (d: string): string => { const [y, m] = d.split('-'); return m
 
 /** A strand's sentence, from the fixed link verbs (research §2.2): "owns 60%", "director since 2017",
  * "paid 29,400 EUR · 3× Feb–Apr 2018", "bid for · 4 Mar 2019". It reads from the strand's first party to its second. */
+/** Text cut to `n` characters at a word, with an ellipsis when cut (the whole of it is on hover). */
+export const clipWords = (text: string, n: number): string => {
+  if (text.length <= n) return text;
+  const cut = text.slice(0, n - 1), at = cut.lastIndexOf(' ');
+  return `${(at > n * 0.5 ? cut.slice(0, at) : cut).replace(/[\s,;:·–-]+$/, '')}…`;
+};
+
 export function linkSentence(fam: string, links: WireLinkOut[], ended: string): string {
   const l0 = links[0];
   const n = links.length;
@@ -119,17 +126,17 @@ export function linkSentence(fam: string, links: WireLinkOut[], ended: string): 
     const span = !ds.length ? '' : ds[0].slice(0, 7) === ds[ds.length - 1].slice(0, 7) ? monthYear(ds[0])
       : ds[0].slice(0, 4) === ds[ds.length - 1].slice(0, 4) ? `${MONTHS[+ds[0].slice(5, 7) - 1] ?? ''}–${monthYear(ds[ds.length - 1])}`
         : `${monthYear(ds[0])}–${monthYear(ds[ds.length - 1])}`;
-    const why = n === 1 && l0.role ? ` “${l0.role.slice(0, 24)}”` : '';
+    const why = n === 1 && l0.role ? ` “${clipWords(l0.role, 24)}”` : '';
     return `paid ${sum ? fmtAmt(sum, l0.cur) : 'an amount not stated'}${why}${n > 1 ? ` · ${n}×` : ''}${span ? ` · ${span}` : ''}`;
   }
   const many = n > 1 ? ` · ×${n}` : '';
   const when = ended ? ` · ended ${monthYear(ended)}` : l0.date ? ` since ${l0.date.slice(0, 4)}` : '';
-  if (fam === 'owns') return `${l0.pct ? `owns ${l0.pct.replace(/%$/, '')}%` : l0.role ? l0.role.slice(0, 32) : 'owns'}${when}${many}`;
+  if (fam === 'owns') return `${l0.pct ? `owns ${l0.pct.replace(/%$/, '')}%` : l0.role ? clipWords(l0.role, 32) : 'owns'}${when}${many}`;
   if (fam === 'runs') {
-    const verb = l0.role ? l0.role.slice(0, 32) : l0.schema === 'Directorship' ? 'director' : l0.schema === 'Employment' ? 'works for' : 'member of';
+    const verb = l0.role ? clipWords(l0.role, 32) : l0.schema === 'Directorship' ? 'director' : l0.schema === 'Employment' ? 'works for' : 'member of';
     return `${verb}${when}${many}`;
   }
-  return `${l0.role ? l0.role.slice(0, 32) : 'linked'}${l0.date && !ended ? ` · ${fmtDate(l0.date)}` : ended ? ` · ended ${monthYear(ended)}` : ''}${many}`;
+  return `${l0.role ? clipWords(l0.role, 32) : 'linked'}${l0.date && !ended ? ` · ${fmtDate(l0.date)}` : ended ? ` · ended ${monthYear(ended)}` : ''}${many}`;
 }
 
 export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, info: LinkInfo = {}, partyTags: PartyTags = {}): () => void {
@@ -645,19 +652,22 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   let hopEls: {k: string; g: SVGGElement}[] = [];
   const overlap = (b: Box, list: Box[]) => list.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
 
-  // The grid is far behind the map: it follows the camera at a sixth of its travel, and its cells grow with the zoom
-  // (by its square root), so zoomed in the grid is closer and larger, zoomed all the way out it is small and far.
+  // The grid is far behind the map: it follows the camera at a sixth of its travel, and its cells grow with the zoom,
+  // so zoomed in the grid is close, large and soft, zoomed all the way out it is small, sharp and far.
   const gridEl = root.querySelector<HTMLElement>('.tw-grid');
   let gridKey = '';
   function moveGrid(): void {
     if (!gridEl) return;
-    const still = RM(), gs = still ? 48 : 48 * Math.sqrt(C.k);
+    // 24 px cells all the way out (15%), about 65 px at 63%, 75 px at 100%, 240 px at 400%; past about 50% the grid is
+    // close enough to the lens to fall slightly out of focus.
+    const still = RM(), gs = still ? 48 : 24 * Math.pow(C.k / 0.15, 0.7), blur = still ? 0 : Math.min(2.4, Math.max(0, (C.k - 0.5) * 1.1));
     const off = (v: number) => (still ? 0 : ((v % gs) + gs) % gs);
-    const key = `${off(-C.x * C.k / 6).toFixed(1)}|${off(-C.y * C.k / 6).toFixed(1)}|${gs.toFixed(2)}`;
+    const key = `${off(-C.x * C.k / 6).toFixed(1)}|${off(-C.y * C.k / 6).toFixed(1)}|${gs.toFixed(2)}|${blur.toFixed(2)}`;
     if (key === gridKey) return;
     gridKey = key;
-    const [gx, gy] = key.split('|');
+    const [gx, gy, , bl] = key.split('|');
     gridEl.style.setProperty('--gx', `${gx}px`); gridEl.style.setProperty('--gy', `${gy}px`); gridEl.style.setProperty('--gs', `${gs.toFixed(2)}px`);
+    gridEl.style.filter = Number(bl) > 0.05 ? `blur(${bl}px)` : '';
   }
 
   function render(): void {
@@ -802,11 +812,14 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       let ok: {wx: number; wy: number; b: Box} | null = null;
       for (const f of [0.6, 0.5, 0.7, 0.42, 0.8, 0.34]) {
         const wx = S.cx + Math.cos(S.a) * S.r * f * S.rx, wy = S.cy + Math.sin(S.a) * S.r * f, s = toScreen(wx, wy);
-        const w = (S.t.textContent ?? '').length * 7.6, b = {x0: s.x - w / 2, x1: s.x + w / 2, y0: s.y - 9, y1: s.y + 5};
+        const w = (S.t.textContent ?? '').length * 9.4, b = {x0: s.x - w / 2, x1: s.x + w / 2, y0: s.y - 11, y1: s.y + 6};
         if (!overlap(b, cardBoxes) && !overlap(b, secBoxes)) { ok = {wx, wy, b}; break; }
       }
       S.t.style.display = ok ? '' : 'none';
-      if (ok) { S.t.setAttribute('x', String(ok.wx)); S.t.setAttribute('y', String(ok.wy)); S.t.setAttribute('font-size', String(10.5 / C.k)); secBoxes.push(ok.b); }
+      if (ok) {
+        S.t.setAttribute('x', String(ok.wx)); S.t.setAttribute('y', String(ok.wy));
+        S.t.setAttribute('font-size', String(12 / C.k)); S.t.setAttribute('stroke-width', String(5 / C.k)); secBoxes.push(ok.b);
+      }
     }
     // "+N more" chips: beside their party, outward from the focus, at the first spot clear of every card, dot, its name
     // and link chip (they used to sit at a fixed offset, over the cards' names). A leader line keeps them tied to it.
@@ -865,10 +878,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const fsS = mode === 'case' ? 12 : 11.5;
     for (const c of cands) {
       const s = toScreen(c.d.x, c.d.y), r = (4 + Math.sqrt(deg[c.id]) * 2.6) * C.k, off = r + fsS + 2;
-      const w = E[c.id].short.length * fsS * 0.56;
-      // Under the dot first, then above it, then to its right or left: a party is not left nameless for a near miss.
-      const spots: {dx: number; dy: number; anchor: string}[] = [{dx: 0, dy: off, anchor: 'middle'}, {dx: 0, dy: -r - 6, anchor: 'middle'},
-        {dx: r + 6, dy: fsS * 0.35, anchor: 'start'}, {dx: -r - 6, dy: fsS * 0.35, anchor: 'end'}];
+      // Always under the dot, so every name sits in the same place; a long name is shortened (the whole of it is on
+      // hover), and one that has no room under its dot is left to hover rather than moved above or beside it.
+      const name = clipWords(E[c.id].short, 20);
+      const w = name.length * fsS * 0.56;
+      // Centred under it first, then under it starting at the dot or ending at it: always the same height under the dot.
+      const spots: {dx: number; dy: number; anchor: string}[] = [{dx: 0, dy: off, anchor: 'middle'}, {dx: -r, dy: off, anchor: 'start'}, {dx: r, dy: off, anchor: 'end'}];
       const box = (p: typeof spots[number]) => {
         const x0 = p.anchor === 'middle' ? s.x - w / 2 : p.anchor === 'start' ? s.x + p.dx : s.x + p.dx - w;
         return {x0: x0 - 3, x1: x0 + w + 3, y0: s.y + p.dy - fsS, y1: s.y + p.dy + 3};
@@ -879,7 +894,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       c.N.lbl.style.display = '';
       c.N.lbl.setAttribute('font-size', String(fsS / C.k)); c.N.lbl.setAttribute('stroke-width', String(4 / C.k));
       c.N.lbl.setAttribute('x', String(at.dx / C.k)); c.N.lbl.setAttribute('y', String((at.dy - 2) / C.k)); c.N.lbl.setAttribute('text-anchor', at.anchor);
-      c.N.lbl.textContent = E[c.id].short;
+      c.N.lbl.textContent = name;
     }
     return boxes;
   }
@@ -1752,9 +1767,22 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   Object.assign(C, fitBox(Object.values(T).filter(t => t.o), 120));
   mode = 'case';
   drawStatic(); render(); renderChrome(); drawTime();
+  // Link chips are sized from their text; measured before the web fonts arrive, the real text overflowed them.
+  let fontsLive = true;
+  document.fonts?.ready.then(() => {
+    if (!fontsLive) return;
+    for (const R of Object.values(edgeEls)) {
+      if (!R.lab) continue;
+      let tw = 0;
+      try { tw = R.lab.t.getComputedTextLength(); } catch { /* not laid out */ }
+      if (tw > 0) { sizePill(R.lab.g, tw + 14); R.lab.w = tw + 14; }
+    }
+    kick();
+  }).catch(() => undefined);
   const boot = window.setTimeout(() => { if (focus && deg[focus]) go('party', {id: focus, slow: true}); }, RM() ? 0 : 900);
 
   return () => {
+    fontsLive = false;
     window.clearTimeout(boot); window.clearTimeout(wireTimer);
     if (raf) cancelAnimationFrame(raf);
     if (playing) cancelAnimationFrame(playing);
