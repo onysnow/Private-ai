@@ -57,4 +57,13 @@ describe('timeline event grades', () => {
     await vi.waitFor(() => expect(api.lastBody('POST /api/timeline-events')).toMatchObject({title: 'Meridian registered', grade: 'weak'}));
     expect(within(document.body).queryByText('Could not add the event')).toBeNull();
   });
+
+  it('asks for the sources\' own dates only when the switch is on', async () => {
+    const api = mockApi({[TIMELINE]: timelineBody('inv-1', [event()])});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    await screen.findByText(/Villa searched/);
+    expect(api.lastUrl(TIMELINE).searchParams.get('include_source_dates')).toBeNull();
+    await userEvent.setup().click(screen.getByRole('checkbox', {name: /when each source was published or filed/}));
+    await vi.waitFor(() => expect(api.lastUrl(TIMELINE).searchParams.get('include_source_dates')).toBe('true'));
+  });
 });

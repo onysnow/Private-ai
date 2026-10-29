@@ -281,10 +281,14 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
     for record in held:
         for name in entity_names(record)[1:]:
             existing.setdefault(norm_name(name), (record.id, record.schema))
-    # A table already mapped to records (app/services/table_mappings.py) has its names from its
-    # columns: reading its cells again as running text would only add junk names.
+    # A table (CSV, TSV, XLSX) gets its names, links and payments from its columns, through a mapping
+    # (app/services/table_mappings.py), whether it is mapped yet or not: its cells read as running text
+    # make junk names, claims and one whole-block passage. Its text is still kept, so it can be searched.
+    from app.services.table_mappings import is_table
+
+    table = is_table(doc)
     mapped = db.scalar(select(TableMapping.id).where(TableMapping.document_id == doc.id).limit(1)) is not None
-    find_names = find_names and not mapped
+    find_names = find_names and not mapped and not table
     try:
         chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
         # One proposal per name (and per claim sentence) in a document, with every place it is
@@ -295,6 +299,8 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
             provenance = item.pop('provenance', None)
             chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
             db.add(chunk); db.flush()
+            if table:
+                continue
             for typ, payload, conf in _candidate_payloads(chunk, include_entities=find_names and settings.enable_local_entity_suggestions,
                                                           existing=existing):
                 if provenance:

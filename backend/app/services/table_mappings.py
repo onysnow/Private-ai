@@ -53,6 +53,7 @@ from normality import guess_encoding
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.time import utcnow_naive
 from app.models.domain import Document, ExtractionCandidate, TableMapping
 from app.services.relationships import RELATIONSHIP_SCHEMAS, payment_property_problem, validate_payment_properties
 
@@ -359,6 +360,14 @@ def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str
     db.add(mapping)
     db.flush()
     rows = map_rows(_engine(query, key_prefix=doc.id), table)
+    # Proposals read from the table's cells as running text (before tables were left out of that reading) are
+    # withdrawn: the mapping proposes what the rows make.
+    for stale in db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc.id,
+                                                              ExtractionCandidate.review_status == "proposed")):
+        if not (isinstance(stale.payload, dict) and stale.payload.get("mapping")):
+            stale.review_status = "rejected"
+            stale.reviewer_note = "Withdrawn: read from the table's cells as running text; the table's mapping proposes its records"
+            stale.reviewed_at = utcnow_naive()
 
     existing: dict[str, ExtractionCandidate] = {}
     for candidate in db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.document_id == doc.id)):

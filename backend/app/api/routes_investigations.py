@@ -471,15 +471,19 @@ def get_investigation_timeline(
     kind: list[str] | None = Query(default=None),
     verification_status: list[str] | None = Query(default=None),
     include_record_activity: bool = False,
+    include_source_dates: bool = False,
     limit: int | None = Query(default=None, ge=1, le=500),
     offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
+    """The case's events in date order. A source's own date (when a document was published or filed) is an event
+    only with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what
+    happened."""
     try:
         return investigation_timeline(
             db, investigation_id, kinds=set(kind or []) or None,
             verification_statuses=set(verification_status or []) or None,
-            include_record_activity=include_record_activity, limit=limit, offset=offset,
+            include_record_activity=include_record_activity, include_source_dates=include_source_dates, limit=limit, offset=offset,
         )
     except ValueError as exc:
         raise HTTPException(404, str(exc))

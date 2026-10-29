@@ -60,7 +60,9 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
   const [problem, setProblem] = useState('');
 
   const path = {investigation_id: investigationId};
-  const timeline = useQuery({...getInvestigationTimelineOptions({path}), enabled: Boolean(investigationId)});
+  // A source's own date says when a document was made, not what happened: shown only when asked for.
+  const [sourceDates, setSourceDates] = useState(false);
+  const timeline = useQuery({...getInvestigationTimelineOptions({path, query: sourceDates ? {include_source_dates: true} : undefined}), enabled: Boolean(investigationId)});
 
   const add = useMutation({
     mutationFn: async () => (await createTimelineEventEndpoint({body: {
@@ -117,6 +119,9 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
       <CardDescription>Dates from the records, the sources and your own events, kept apart by where they come from.</CardDescription>
     </CardHeader>
     <CardContent>
+      <label className="muted" style={{display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8}}>
+        <input type="checkbox" checked={sourceDates} onChange={e => setSourceDates(e.target.checked)}/>
+        Also show when each source was published or filed</label>
       {timeline.isError && <p className="muted">{errorMessage(timeline.error, 'Could not load the timeline')}</p>}
       {asOf !== null && allEvents.length > 0 && events.length === 0 && <p className="muted">Nothing on the timeline had happened by {asOf}.</p>}
       {events.length > 0 && <ChartFrame kind="timeline" title="What happened when"
@@ -139,7 +144,6 @@ export function TimelinePanel({investigationId}: Props): ReactElement {
             <small>{eventKind(e.kind).name} · {eventStatus(e.verification_status).name}{e.precision && e.precision !== 'day' ? ` · known to the ${e.precision}` : ''}
               {e.grade ? <> · <span title={EVENT_GRADES[e.grade]}>graded {e.grade}</span></> : null}</small>
             {e.description && <p>{e.description}</p>}
-            {text(e.provenance.origin) && <small>Origin: {text(e.provenance.origin)}</small>}
             {e.context?.claim && <small>Claim: {e.context.claim.status} · confidence {Math.round(e.context.claim.confidence * 100)}%</small>}
             {e.context?.claim_advisory?.needs_review && <small className="tl-warn">Linked claim needs review; this event is kept.</small>}
             {e.context?.relationship_advisory?.needs_review && <small className="tl-warn">The relationship&apos;s support needs review{e.context.relationship_advisory.has_independent_support ? '; independent support remains' : ''}.</small>}

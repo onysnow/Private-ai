@@ -9705,6 +9705,10 @@ export const addTag = <ThrowOnError extends boolean = false>(
 
 /**
  * Get Investigation Timeline
+ *
+ * The case's events in date order. A source's own date (when a document was published or filed) is an event
+ * only with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what
+ * happened.
  */
 export const getInvestigationTimeline = <ThrowOnError extends boolean = false>(
   options: Options<GetInvestigationTimelineData, ThrowOnError>,

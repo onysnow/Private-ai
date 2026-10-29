@@ -13430,6 +13430,7 @@ export const zGetInvestigationTimelineQuery = z.object({
   kind: z.array(z.string()).nullish(),
   verification_status: z.array(z.string()).nullish(),
   include_record_activity: z.boolean().optional().default(false),
+  include_source_dates: z.boolean().optional().default(false),
   limit: z.int().gte(1).lte(500).nullish(),
   offset: z.int().gte(0).lte(2147483647).optional().default(0),
 });

@@ -65276,6 +65276,7 @@
     },
     "/api/investigations/{investigation_id}/timeline": {
       "get": {
+        "description": "The case's events in date order. A source's own date (when a document was published or filed) is an event\nonly with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what\nhappened.",
         "operationId": "get_investigation_timeline",
         "parameters": [
           {
@@ -65332,6 +65333,16 @@
             "schema": {
               "default": false,
               "title": "Include Record Activity",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_source_dates",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Source Dates",
               "type": "boolean"
             }
           },

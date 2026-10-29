@@ -32260,6 +32260,10 @@ export type GetInvestigationTimelineData = {
      */
     include_record_activity?: boolean;
     /**
+     * Include Source Dates
+     */
+    include_source_dates?: boolean;
+    /**
      * Limit
      */
     limit?: number | null;

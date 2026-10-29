@@ -84,7 +84,7 @@ def test_each_place_carries_the_dated_events_at_it_from_the_timeline():
     assert places["Meridian registered office"]["events"] == []
     events = places["Villa Kyrenia"]["events"]
     assert [(e["title"], e["via"], e["first_day"], e["last_day"], e["exact"]) for e in events] == [
-        ("Meridian Holdings Ltd — Ownership → Villa Kyrenia — startDate", "link", "2021-02-01", "2021-02-28", False),
+        ("Meridian Holdings Ltd — Ownership → Villa Kyrenia", "link", "2021-02-01", "2021-02-28", False),
         ("Villa searched", "place", "2023-11-14", "2023-11-14", True),
     ]
     ownership = next(link for link in places["Villa Kyrenia"]["links"] if link["caption"] == "Meridian Holdings Ltd")

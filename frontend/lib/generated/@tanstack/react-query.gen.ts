@@ -9698,6 +9698,10 @@ export const getInvestigationTimelineQueryKey = (
 
 /**
  * Get Investigation Timeline
+ *
+ * The case's events in date order. A source's own date (when a document was published or filed) is an event
+ * only with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what
+ * happened.
  */
 export const getInvestigationTimelineOptions = (
   options: Options<GetInvestigationTimelineData>,
@@ -9727,6 +9731,10 @@ export const getInvestigationTimelineInfiniteQueryKey = (
 
 /**
  * Get Investigation Timeline
+ *
+ * The case's events in date order. A source's own date (when a document was published or filed) is an event
+ * only with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what
+ * happened.
  */
 export const getInvestigationTimelineInfiniteOptions = (
   options: Options<GetInvestigationTimelineData>,
