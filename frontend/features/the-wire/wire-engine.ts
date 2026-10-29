@@ -627,12 +627,13 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   let hopEls: {k: string; g: SVGGElement}[] = [];
   const overlap = (b: Box, list: Box[]) => list.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
 
-  // The grid is far behind the map: it follows the camera at a sixth of its travel and a fraction of its zoom.
+  // The grid is far behind the map: it follows the camera at a sixth of its travel, and its cells grow with the zoom
+  // (by its square root), so zoomed in the grid is closer and larger, zoomed all the way out it is small and far.
   const gridEl = root.querySelector<HTMLElement>('.tw-grid');
   let gridKey = '';
   function moveGrid(): void {
     if (!gridEl) return;
-    const still = RM(), gs = still ? 48 : 48 * Math.pow(C.k, 0.2);
+    const still = RM(), gs = still ? 48 : 48 * Math.sqrt(C.k);
     const off = (v: number) => (still ? 0 : ((v % gs) + gs) % gs);
     const key = `${off(-C.x * C.k / 6).toFixed(1)}|${off(-C.y * C.k / 6).toFixed(1)}|${gs.toFixed(2)}`;
     if (key === gridKey) return;
