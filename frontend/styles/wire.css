@@ -196,6 +196,11 @@
 .tw .elab.s-disputed .glyph { fill: #FF8070; }
 .tw .elab.s-worked rect { stroke-dasharray: 1 3; stroke-linecap: round; }
 .tw .elab:hover rect, .tw .elab.lit rect { stroke: var(--accent-1); }
+.tw .stub { cursor: pointer; }
+.tw .stub circle { fill: var(--surface-1); stroke-width: 1.4; }
+.tw .stub.s-unshown circle { stroke-dasharray: 3 2; }
+.tw .stub text { font: 700 10px var(--font-mono); fill: var(--text); }
+.tw .stub:hover circle { stroke: var(--accent-1); stroke-width: 2; }
 .tw .elab.lit rect:first-of-type { stroke-width: 2; }
 .tw g.lit .strand { stroke-width: 4px; }
 @keyframes tw-halo { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .15; transform: scale(1.35); } }

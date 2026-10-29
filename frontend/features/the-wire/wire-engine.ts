@@ -46,7 +46,9 @@ type NodeEl = {
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
 type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
-  mid?: {x: number; y: number}; q?: number[]; lab: {g: SVGGElement; w: number; t: SVGTextElement; body: SVGTSpanElement; ended: boolean} | null};
+  mid?: {x: number; y: number}; q?: number[]; lab: {g: SVGGElement; w: number; t: SVGTextElement; body: SVGTSpanElement; ended: boolean} | null;
+  // SEE_1's lettered stubs: a link longer than 40% of the view's diagonal is drawn as its two ends, each with the same letter.
+  stub: {a: SVGGElement; b: SVGGElement; on: boolean} | null};
 type Box = {x0: number; x1: number; y0: number; y1: number};
 type Pt = {x: number; y: number; in: boolean; d?: number};
 
@@ -614,14 +616,30 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       N.lbl.style.display = 'none';
       if (v === 1 && !(lens.on && mode === 'case' && d.in)) cands.push({id, N, d, pri: fscore(fl) * 10 + deg[id] + (mode === 'case' ? 0 : 100)});
     }
+    const stubbed: EdgeEl[] = [];
+    const longPx = Math.hypot(W, H) * 0.4;
     for (const k in edgeEls) {
       const R = edgeEls[k], a = P[R.S.s], b = P[R.S.t], na = node[R.S.s], nb = node[R.S.t];
       const vis = Boolean(na && nb && a && b) && na.cur.v > 0 && nb.cur.v > 0 && na.cur.o > 0.02 && nb.cur.o > 0.02 && R.want;
       R.g.style.display = vis ? '' : 'none';
-      if (!vis) continue;
+      if (R.stub) R.stub.on = false;
+      if (!vis) { if (R.stub) { R.stub.a.style.display = 'none'; R.stub.b.style.display = 'none'; } continue; }
       const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1, bend = R.bend * Math.min(80, len * 0.16);
       const mx = (a.x + b.x) / 2 - dy / len * bend, my = (a.y + b.y) / 2 + dx / len * bend;
-      const dd = `M${a.x},${a.y}Q${mx},${my} ${b.x},${b.y}`;
+      let dd = `M${a.x},${a.y}Q${mx},${my} ${b.x},${b.y}`;
+      // A link across most of the view is drawn as its two ends with one letter each (SEE_1), unless it is lit.
+      const sa = toScreen(a.x, a.y), sb = toScreen(b.x, b.y);
+      if (R.stub && longPx > 0 && Math.hypot(sb.x - sa.x, sb.y - sa.y) > longPx && !R.g.classList.contains('lit')) {
+        const t = Math.min(0.2, 46 / Math.hypot(sb.x - sa.x, sb.y - sa.y)), u = 1 - t;
+        const at = (f: number) => [(1 - f) * (1 - f) * a.x + 2 * (1 - f) * f * mx + f * f * b.x, (1 - f) * (1 - f) * a.y + 2 * (1 - f) * f * my + f * f * b.y];
+        const [e1x, e1y] = at(t), [s2x, s2y] = at(u);
+        dd = `M${a.x},${a.y}Q${a.x + (mx - a.x) * t},${a.y + (my - a.y) * t} ${e1x},${e1y}M${s2x},${s2y}Q${mx + (b.x - mx) * u},${my + (b.y - my) * u} ${b.x},${b.y}`;
+        R.stub.on = true;
+        R.stub.a.setAttribute('transform', `translate(${e1x},${e1y}) scale(${1 / C.k})`);
+        R.stub.b.setAttribute('transform', `translate(${s2x},${s2y}) scale(${1 / C.k})`);
+        stubbed.push(R);
+      }
+      if (R.stub) { R.stub.a.style.display = R.stub.on ? '' : 'none'; R.stub.b.style.display = R.stub.on ? '' : 'none'; }
       R.p.setAttribute('d', dd); R.h.setAttribute('d', dd);
       if (R.u) R.u.setAttribute('d', dd);
       if (R.d2) R.d2.setAttribute('d', dd);
@@ -645,6 +663,16 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       R.mid = {x: mx * 0.5 + (a.x + b.x) / 4, y: my * 0.5 + (a.y + b.y) / 4};
       R.q = [a.x, a.y, mx, my, b.x, b.y];
     }
+    // Letters in a steady order, so a link keeps its letter while the view moves.
+    stubbed.sort((p, o) => (p.S.s + p.S.t + p.S.fam).localeCompare(o.S.s + o.S.t + o.S.fam)).forEach((R, i) => {
+      const letter = String.fromCharCode(65 + (i % 26)) + (i >= 26 ? String(Math.floor(i / 26) + 1) : '');
+      const words = R.lab?.body.textContent || linkSentence(R.S.fam, R.S.links, '');
+      for (const g of [R.stub!.a, R.stub!.b]) {
+        g.style.opacity = R.g.style.opacity;
+        g.querySelector('text')!.textContent = letter;
+        g.querySelector('title')!.textContent = `${letter}: ${E[R.S.s]?.short ?? ''} ${words} ${E[R.S.t]?.short ?? ''}. A long link, drawn as its two ends; the other end has the letter ${letter}. Click to open every record on it.`;
+      }
+    });
     terrBoxes = [];
     for (const t of terrEls.slice().sort((a, b) => Number(b.big) - Number(a.big))) {
       const fs = t.big ? 17 : 14, s = toScreen(t.x, t.top), sy = s.y - 60 * C.k - 6, w = t.n * fs * 0.5;
@@ -762,7 +790,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       // The middle of the curve first, then further along it either way.
       const [ax, ay, mx, my, bx, by] = R.q!;
       let spot: {x: number; y: number; b: Box} | null = null;
-      for (const t of [0.5, 0.4, 0.6, 0.3, 0.7, 0.22, 0.78, 0.15, 0.85]) {
+      for (const t of R.stub?.on ? [0.14, 0.86, 0.2, 0.8] : [0.5, 0.4, 0.6, 0.3, 0.7, 0.22, 0.78, 0.15, 0.85]) {
         const u = 1 - t, x = u * u * ax + 2 * u * t * mx + t * t * bx, y = u * u * ay + 2 * u * t * my + t * t * by, s = toScreen(x, y);
         const b = {x0: s.x - L.w / 2 - 2, x1: s.x + L.w / 2 + 2, y0: s.y - 12, y1: s.y + 12};
         if (b.x0 >= 0 && b.x1 <= W && b.y0 >= top && b.y1 <= bottom && !overlap(b, placed)) { spot = {x, y, b}; break; }
@@ -836,7 +864,21 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
           on(lg, 'pointerleave', hideTip);
           lab = {g: lg, w: tw + 14, t, body, ended: false};
         }
-        edgeEls[`${key}#${i}`] = {g, p, u, h, d2, S: {...S, s, t}, w, bend, want, lab};
+        let stub: EdgeEl['stub'] = null;
+        if (mode === 'case' || mode === 'party') {
+          const badge = () => {
+            const sg = el('g', {class: `stub${S.sure ? ` s-${S.sure}` : ''}`, role: 'button', tabindex: -1, style: 'display:none'}, gLab);
+            el('circle', {r: 9, stroke: S.sure === 'disputed' ? DISPUTED : fam.c}, sg);
+            el('text', {y: 3.6, 'text-anchor': 'middle'}, sg);
+            el('title', {}, sg);
+            on<MouseEvent>(sg, 'click', ev => { ev.stopPropagation(); openWire(B.key); });
+            on<PointerEvent>(sg, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showLinkTip(ev, S); });
+            on(sg, 'pointerleave', hideTip);
+            return sg;
+          };
+          stub = {a: badge(), b: badge(), on: false};
+        }
+        edgeEls[`${key}#${i}`] = {g, p, u, h, d2, S: {...S, s, t}, w, bend, want, lab, stub};
         on<MouseEvent>(h, 'click', ev => { ev.stopPropagation(); openWire(B.key); });
         on<PointerEvent>(h, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showLinkTip(ev, S); });
         on(h, 'pointerleave', hideTip);
@@ -1213,11 +1255,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   const hideTip = () => tip.classList.remove('on');
   let litLink: string | null = null;
   function setLitLink(k: string | null): void {
-    if (litLink && edgeEls[litLink]) { edgeEls[litLink].g.classList.remove('lit'); edgeEls[litLink].lab?.g.classList.remove('lit'); }
+    if (litLink && edgeEls[litLink]) { edgeEls[litLink].g.classList.remove('lit'); edgeEls[litLink].lab?.g.classList.remove('lit'); kick(); }
     litLink = k && edgeEls[k] ? k : null;
     if (!litLink) { hideTip(); return; }
     const R = edgeEls[litLink];
     R.g.classList.add('lit'); R.lab?.g.classList.add('lit');
+    kick();  // a lit link is drawn whole, even when it is long enough to be drawn as two lettered ends
     const words = R.lab?.body.textContent ?? '';
     const sure = R.S.sure ? SURE[R.S.sure] : null;
     tip.innerHTML = `<b>${esc(E[R.S.s]?.short ?? '')} ${esc(words)} ${esc(E[R.S.t]?.short ?? '')}</b><span class="m">${sure ? `${esc(sure.g)} ${esc(sure.n)} · ` : ''}Enter opens every record on this link · J / K next, previous</span>`;
@@ -1244,6 +1287,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     k += `<div class="row"><svg width="34" height="10" aria-hidden="true"><path d="M2 5H32" stroke="${DISPUTED}" stroke-width="5"/><path d="M2 5H32" class="core" stroke-width="2"/></svg><b>${SURE.disputed.g}</b> disputed</div>`;
     k += `<div class="row">${line(`stroke-dasharray="${SURE.worked.dash}" stroke-linecap="round"`)}<b>${SURE.worked.g}</b> worked out by the app</div>`;
     k += `<div class="row">${line('stroke-opacity=".38"')}ended, drawn faint</div>`;
+    k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><path d="M1 7H8M26 7H33" stroke="#baac91" stroke-width="2"/><circle cx="12" cy="7" r="5" fill="none" stroke="#baac91"/><circle cx="22" cy="7" r="5" fill="none" stroke="#baac91"/></svg>a long link: its two ends, one letter</div>';
     k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><circle cx="17" cy="7" r="5.5" fill="#4e4234" stroke="#d4a152" stroke-width="1.4"/><circle cx="17" cy="7" r="6.6" fill="none" stroke="#F6966A" stroke-width="1.4" transform="scale(1)"/></svg>ring: open Red Flags, the badge their level and count</div>';
     q('.tw-key-sure').innerHTML = k;
   })();
