@@ -1266,6 +1266,469 @@ export type AssistantRunRequest = {
 };
 
 /**
+ * AuthenticityAboutClaimIn
+ *
+ * A claim about the item itself (that it circulated, when, posted by whom), which it supports even if synthetic.
+ */
+export type AuthenticityAboutClaimIn = {
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * AuthenticityClaimOut
+ *
+ * A claim this item supports, and what a status would do to it: `outcome` is loses (no other support), keeps
+ * (`others` other sources still support it; `other` is the first), unchanged, or about (a claim about the item
+ * itself, which keeps its support).
+ */
+export type AuthenticityClaimOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Other
+   */
+  other?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Others
+   */
+  others: number;
+  /**
+   * Outcome
+   */
+  outcome: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * AuthenticityCompareOut
+ *
+ * A comparison with the case's own files, made on this computer.
+ */
+export type AuthenticityCompareOut = {
+  /**
+   * Matches
+   */
+  matches: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Pool
+   */
+  pool: number;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * AuthenticityDecisionIn
+ *
+ * A person's decision on whether a case file is real (ADR-0023): the status, what they checked, and why.
+ */
+export type AuthenticityDecisionIn = {
+  /**
+   * Checked
+   */
+  checked?: Array<
+    | 'read_findings'
+    | 'looked_up_source'
+    | 'asked_poster'
+    | 'compared_copies'
+    | 'checked_place_time'
+  >;
+  /**
+   * Reason
+   */
+  reason?: string;
+  /**
+   * Status
+   */
+  status:
+    | 'verified_origin'
+    | 'unverified'
+    | 'likely_synthetic'
+    | 'confirmed_synthetic'
+    | 'disputed';
+};
+
+/**
+ * AuthenticityHistoryOut
+ *
+ * One append-only line: a finding (actor system) or a person's decision, consent or setting.
+ */
+export type AuthenticityHistoryOut = {
+  /**
+   * Actor
+   */
+  actor: string;
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Local
+   */
+  local: boolean;
+  /**
+   * Method
+   */
+  method?: string | null;
+  /**
+   * Person
+   */
+  person?: string | null;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Tool
+   */
+  tool?: string | null;
+  /**
+   * Version
+   */
+  version?: string | null;
+};
+
+/**
+ * AuthenticityItemCardOut
+ *
+ * The item as the case holds it: what it is, who posted it, when it was captured or added, its file and fingerprint;
+ * for text, the opening of its text and the quotes taken from it.
+ */
+export type AuthenticityItemCardOut = {
+  /**
+   * Added At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  added_at: string;
+  /**
+   * Captured At
+   */
+  captured_at?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Excerpt
+   */
+  excerpt?: string | null;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * From Link
+   */
+  from_link: boolean;
+  /**
+   * Height
+   */
+  height?: number | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Note
+   */
+  note?: string | null;
+  /**
+   * Outlet
+   */
+  outlet?: string | null;
+  /**
+   * Posted By
+   */
+  posted_by?: string | null;
+  /**
+   * Quotes
+   */
+  quotes: Array<string>;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Size
+   */
+  size?: number | null;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Width
+   */
+  width?: number | null;
+  /**
+   * Words
+   */
+  words?: number | null;
+};
+
+/**
+ * AuthenticityOptionOut
+ *
+ * One choice on the consent card: what it sends (`sends`, exactly), to whom, and why it is not offered when not.
+ */
+export type AuthenticityOptionOut = {
+  /**
+   * Available
+   */
+  available: boolean;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Sends
+   */
+  sends?: string | null;
+  /**
+   * To
+   */
+  to: string;
+  /**
+   * Why Not
+   */
+  why_not?: string | null;
+};
+
+/**
+ * AuthenticityOut
+ *
+ * Is it real? (mockup CHECK_3, ADR-0023): the item, the findings (provenance, source, hints), the status only a
+ * person sets with what they checked and why, what it does to claims, the outside checks, and the history.
+ */
+export type AuthenticityOut = {
+  /**
+   * Checked
+   */
+  checked: Array<string>;
+  /**
+   * Decided At
+   */
+  decided_at?: string | null;
+  /**
+   * Decided By
+   */
+  decided_by?: string | null;
+  /**
+   * Examined At
+   */
+  examined_at?: string | null;
+  /**
+   * Findings
+   */
+  findings: {
+    [key: string]: unknown;
+  };
+  /**
+   * History
+   */
+  history: Array<AuthenticityHistoryOut>;
+  item: AuthenticityItemCardOut;
+  /**
+   * Outside
+   */
+  outside: Array<AuthenticityOptionOut>;
+  /**
+   * Platform Label
+   */
+  platform_label?: string | null;
+  preview: AuthenticityPreviewOut;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Source Protected
+   */
+  source_protected: boolean;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
+ * AuthenticityOutsideIn
+ *
+ * One outside check, allowed once for this item: which of the consent card's choices.
+ */
+export type AuthenticityOutsideIn = {
+  /**
+   * Option
+   */
+  option: 'tineye' | 'lens' | 'web';
+};
+
+/**
+ * AuthenticityOutsideOut
+ *
+ * An outside check allowed once: the address for the browser to open, the service, exactly what it carries, and
+ * its row in the outbound log.
+ */
+export type AuthenticityOutsideOut = {
+  /**
+   * Outbound Request Id
+   */
+  outbound_request_id: string;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Service
+   */
+  service: string;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
+ * AuthenticityPreviewOut
+ *
+ * What a status with a role does to the claims that lean on the item; `applied` when it is the item's own now.
+ */
+export type AuthenticityPreviewOut = {
+  /**
+   * Applied
+   */
+  applied: boolean;
+  /**
+   * Blocking
+   */
+  blocking: boolean;
+  /**
+   * Claims
+   */
+  claims: Array<AuthenticityClaimOut>;
+  /**
+   * Derived
+   */
+  derived: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Headline
+   */
+  headline: string;
+  /**
+   * Losing
+   */
+  losing: number;
+  /**
+   * Restating
+   */
+  restating: Array<string>;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Status
+   */
+  status: string;
+  /**
+   * Suggestion
+   */
+  suggestion?: string | null;
+};
+
+/**
+ * AuthenticityStatusOut
+ *
+ * A case file's standing, for lists.
+ */
+export type AuthenticityStatusOut = {
+  /**
+   * Decided At
+   */
+  decided_at?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Flagged
+   */
+  flagged: boolean;
+  /**
+   * Role
+   */
+  role: string;
+  /**
+   * Source Protected
+   */
+  source_protected: boolean;
+  /**
+   * Status
+   */
+  status: string;
+};
+
+/**
+ * AuthenticityUpdate
+ *
+ * What the item is for (evidence of events, or the subject of the story), whether it is source-protected, and the
+ * label a platform showed beside it (not part of the file). Only the fields given change.
+ */
+export type AuthenticityUpdate = {
+  /**
+   * Platform Label
+   */
+  platform_label?: string | null;
+  /**
+   * Role
+   */
+  role?: 'events' | 'subject' | null;
+  /**
+   * Source Protected
+   */
+  source_protected?: boolean | null;
+};
+
+/**
  * BackgroundJobOut
  *
  * One piece of slow work and where it stands; the screen polls this.
@@ -1404,6 +1867,10 @@ export type BackupPreviewOut = {
    * Conflicts
    */
   conflicts: Array<RestoreConflictOut>;
+  /**
+   * Derived File Count
+   */
+  derived_file_count?: number;
   /**
    * Document File Count
    */
@@ -1547,6 +2014,68 @@ export type BasemapStatusOut = {
 };
 
 /**
+ * BoardNoteIn
+ */
+export type BoardNoteIn = {
+  /**
+   * Board
+   */
+  board: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * X
+   */
+  x: number;
+  /**
+   * Y
+   */
+  y: number;
+};
+
+/**
+ * BoardNoteOut
+ */
+export type BoardNoteOut = {
+  /**
+   * Board
+   */
+  board: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * X
+   */
+  x: number;
+  /**
+   * Y
+   */
+  y: number;
+};
+
+/**
+ * Body_check_evidence_pack
+ */
+export type BodyCheckEvidencePack = {
+  /**
+   * File
+   */
+  file: Blob | File;
+};
+
+/**
  * Body_inspect_backup
  */
 export type BodyInspectBackup = {
@@ -1612,6 +2141,162 @@ export type BodyUploadDocument = {
    * Title
    */
   title?: string;
+};
+
+/**
+ * BuiltTimelineIn
+ *
+ * A person's own timeline: its name, and the case's event ids in the order they want to tell them.
+ */
+export type BuiltTimelineIn = {
+  /**
+   * Items
+   */
+  items?: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * BuiltTimelineOut
+ */
+export type BuiltTimelineOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Items
+   */
+  items: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Owner
+   */
+  owner: string;
+  /**
+   * Updated At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  updated_at: string;
+};
+
+/**
+ * ByHandAddedOut
+ *
+ * What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties.
+ */
+export type ByHandAddedOut = {
+  /**
+   * Evidence Id
+   */
+  evidence_id?: string | null;
+  /**
+   * Lead Id
+   */
+  lead_id?: string | null;
+  /**
+   * Parties
+   */
+  parties: Array<string>;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: 'party' | 'link' | 'event';
+};
+
+/**
+ * ByHandHitOut
+ *
+ * Something the case already holds, or that waits in Decide, like what is being added by hand.
+ */
+export type ByHandHitOut = {
+  /**
+   * As
+   */
+  as?: string | null;
+  /**
+   * Caption
+   */
+  caption?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'record' | 'proposal' | 'link' | 'event';
+  /**
+   * Same
+   */
+  same?: boolean | null;
+  /**
+   * Schema
+   */
+  schema?: string | null;
+};
+
+/**
+ * ByHandPreviewOut
+ *
+ * Before adding by hand (ENTRY_1): what the case already holds, what waits in Decide, what a link would change.
+ */
+export type ByHandPreviewOut = {
+  /**
+   * Already
+   */
+  already: Array<ByHandHitOut>;
+  /**
+   * Changes
+   */
+  changes: Array<string>;
+  /**
+   * Waiting
+   */
+  waiting: Array<ByHandHitOut>;
+};
+
+/**
+ * ByHandSuggestionOut
+ *
+ * A record of the case for a blank in the sentence, and the name it was found under.
+ */
+export type ByHandSuggestionOut = {
+  /**
+   * As
+   */
+  as: string;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Country
+   */
+  country?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Matched
+   */
+  matched: string;
+  /**
+   * Schema
+   */
+  schema: string;
 };
 
 /**
@@ -1948,11 +2633,83 @@ export type CapabilitiesOut = {
 };
 
 /**
+ * CaptureAllRequest
+ *
+ * Capturing several at once needs a reason; it goes on each item it captures (the custody log).
+ */
+export type CaptureAllRequest = {
+  /**
+   * Reason
+   */
+  reason: string;
+};
+
+/**
+ * CaptureArchiveOut
+ *
+ * A public web archive asked about this page (ADR-0025): "saved" (it kept its own copy, at `url`), "found" (it
+ * already held one), "none" (it holds none) or "failed" (with the reason). Only the address was sent.
+ */
+export type CaptureArchiveOut = {
+  /**
+   * Answered At
+   */
+  answered_at?: string | null;
+  /**
+   * Archived At
+   */
+  archived_at?: string | null;
+  /**
+   * Archived Status
+   */
+  archived_status?: string | null;
+  /**
+   * Asked At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  asked_at: string;
+  /**
+   * By
+   */
+  by: string;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Service
+   */
+  service: string;
+  /**
+   * State
+   */
+  state: 'saved' | 'found' | 'none' | 'failed';
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
  * CaptureCreate
  *
- * A link to capture (ADR-0018): http or https, a public address.
+ * A link to capture (ADR-0018): http or https, a public address. The two switches (ADR-0025) ask outside
+ * witnesses once the page is kept: a time server signs its fingerprint, a public web archive keeps its own copy.
  */
 export type CaptureCreate = {
+  /**
+   * Second Witness
+   */
+  second_witness?: boolean;
+  /**
+   * Time Proof
+   */
+  time_proof?: boolean;
   /**
    * Url
    */
@@ -2011,6 +2768,98 @@ export type CaptureFileOut = {
    * Sha256
    */
   sha256: string;
+};
+
+/**
+ * CaptureFollowIn
+ *
+ * Check a captured page again: never, daily or weekly (the first check is one interval from now).
+ */
+export type CaptureFollowIn = {
+  /**
+   * Every
+   */
+  every: 'never' | 'daily' | 'weekly';
+};
+
+/**
+ * CaptureFollowOut
+ *
+ * Checking a captured page again (INTAKE_3). `state`: unchecked, same, changed (since the capture), gone (now 404
+ * or 410), broken (could not be read), or for a link only, not_yet / answers (the address answers again: its page
+ * waits in Following for a person to capture). `every`: never, daily or weekly. `changes` compare the captured
+ * version with the latest, words only, as served.
+ */
+export type CaptureFollowOut = {
+  /**
+   * Captured Text
+   */
+  captured_text?: string | null;
+  /**
+   * Changes
+   */
+  changes: Array<WordChangeOut>;
+  /**
+   * Checks
+   */
+  checks: Array<MonitorCheckOut>;
+  /**
+   * Every
+   */
+  every: 'never' | 'daily' | 'weekly';
+  /**
+   * Health
+   */
+  health: string;
+  /**
+   * Health Detail
+   */
+  health_detail?: string | null;
+  /**
+   * Item Id
+   */
+  item_id?: string | null;
+  /**
+   * Last Checked At
+   */
+  last_checked_at?: string | null;
+  /**
+   * Leaves
+   */
+  leaves: string;
+  /**
+   * Live Text
+   */
+  live_text?: string | null;
+  /**
+   * Marked Changed
+   */
+  marked_changed?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * Monitor Id
+   */
+  monitor_id: string;
+  /**
+   * Next Check At
+   */
+  next_check_at?: string | null;
+  /**
+   * State
+   */
+  state:
+    | 'unchecked'
+    | 'same'
+    | 'changed'
+    | 'gone'
+    | 'broken'
+    | 'not_yet'
+    | 'answers';
+  /**
+   * Versions
+   */
+  versions: Array<CaptureVersionOut>;
 };
 
 /**
@@ -2078,6 +2927,7 @@ export type CaptureOut = {
    * Finished At
    */
   finished_at?: string | null;
+  follow?: CaptureFollowOut | null;
   /**
    * Http Status
    */
@@ -2114,6 +2964,14 @@ export type CaptureOut = {
    */
   reason?: string | null;
   /**
+   * Reason Kind
+   */
+  reason_kind?: 'dead_link' | 'blocked' | 'timed_out' | 'tool_error' | null;
+  /**
+   * Reason Kind By
+   */
+  reason_kind_by?: string | null;
+  /**
    * Requested At
    *
    * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
@@ -2127,6 +2985,10 @@ export type CaptureOut = {
    * Source Id
    */
   source_id?: string | null;
+  /**
+   * Source Protected
+   */
+  source_protected?: boolean;
   /**
    * Stages
    */
@@ -2144,6 +3006,10 @@ export type CaptureOut = {
    */
   suite_outcome?: 'OBTAINED' | 'UNABLE_TO_OBTAIN' | null;
   /**
+   * Time Server
+   */
+  time_server: string;
+  /**
    * Tool
    */
   tool?: string | null;
@@ -2151,6 +3017,96 @@ export type CaptureOut = {
    * Url
    */
   url: string;
+  witnesses: CaptureWitnessesOut;
+};
+
+/**
+ * CaptureQuoteLiveOut
+ */
+export type CaptureQuoteLiveOut = {
+  /**
+   * Checked
+   */
+  checked: boolean;
+  /**
+   * Found
+   */
+  found: boolean;
+  /**
+   * Match
+   */
+  match?: string | null;
+  /**
+   * Same As Saved
+   */
+  same_as_saved: boolean;
+  /**
+   * Version
+   */
+  version: number;
+};
+
+/**
+ * CaptureQuoteOut
+ *
+ * A quote pinned from a captured page, found again (INTAKE_3): in the saved copy (`saved`, None when it cannot be
+ * found there) and, once the page was checked again, on the live page (`live`). `unanchored`: in the tray.
+ */
+export type CaptureQuoteOut = {
+  /**
+   * Captured Version
+   */
+  captured_version: number;
+  /**
+   * Characters
+   */
+  characters: number;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  live?: CaptureQuoteLiveOut | null;
+  /**
+   * Quote
+   */
+  quote: string;
+  saved?: CaptureQuoteSavedOut | null;
+  /**
+   * Unanchored
+   */
+  unanchored: boolean;
+};
+
+/**
+ * CaptureQuoteSavedOut
+ *
+ * Where the quote stands in the saved copy now: held (same place), moved (found elsewhere).
+ */
+export type CaptureQuoteSavedOut = {
+  /**
+   * Match
+   */
+  match?: string | null;
+  /**
+   * Occurrences
+   */
+  occurrences: number;
+  /**
+   * Place
+   */
+  place: string;
+  /**
+   * Prefix
+   */
+  prefix: string;
+  /**
+   * State
+   */
+  state: 'held' | 'moved' | 'not anchored';
+  /**
+   * Suffix
+   */
+  suffix: string;
 };
 
 /**
@@ -2182,6 +3138,134 @@ export type CaptureStageOut = {
    * State
    */
   state: 'done' | 'waiting' | 'stopped' | 'skipped';
+};
+
+/**
+ * CaptureTimeProofOut
+ *
+ * An RFC 3161 token over the capture's WARC SHA-256 (ADR-0025): `time` is the time server's clock; `check` says
+ * whether it was checked here (signature and chain to a bundled root, this fingerprint, this request's nonce).
+ */
+export type CaptureTimeProofOut = {
+  /**
+   * Answered At
+   */
+  answered_at?: string | null;
+  /**
+   * Asked At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  asked_at: string;
+  /**
+   * By
+   */
+  by: string;
+  /**
+   * Check
+   */
+  check?: 'checked' | 'not_checked' | 'failed' | null;
+  /**
+   * Check Detail
+   */
+  check_detail?: string | null;
+  /**
+   * Fingerprint
+   */
+  fingerprint?: string | null;
+  /**
+   * Of
+   */
+  of: string;
+  /**
+   * Policy
+   */
+  policy?: string | null;
+  /**
+   * Reason
+   */
+  reason?: string | null;
+  /**
+   * Sent
+   */
+  sent: string;
+  /**
+   * Serial
+   */
+  serial?: string | null;
+  /**
+   * Server
+   */
+  server: string;
+  /**
+   * Signer
+   */
+  signer?: string | null;
+  /**
+   * State
+   */
+  state: 'stamped' | 'failed';
+  /**
+   * Time
+   */
+  time?: string | null;
+  /**
+   * Token
+   */
+  token?: string | null;
+};
+
+/**
+ * CaptureUpdate
+ *
+ * A link only's reason, when the person knows better than the reply.
+ */
+export type CaptureUpdate = {
+  /**
+   * Reason Kind
+   */
+  reason_kind: 'dead_link' | 'blocked' | 'timed_out' | 'tool_error';
+};
+
+/**
+ * CaptureVersionOut
+ */
+export type CaptureVersionOut = {
+  /**
+   * Capture Id
+   */
+  capture_id?: string | null;
+  /**
+   * Captured
+   */
+  captured: boolean;
+  /**
+   * Lines Changed
+   */
+  lines_changed: number;
+  /**
+   * Number
+   */
+  number: number;
+  /**
+   * Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  seen_at: string;
+  /**
+   * Text Sha256
+   */
+  text_sha256: string;
+};
+
+/**
+ * CaptureWitnessesOut
+ */
+export type CaptureWitnessesOut = {
+  archive?: CaptureArchiveOut | null;
+  elsewhere?: CaptureArchiveOut | null;
+  time_proof?: CaptureTimeProofOut | null;
 };
 
 /**
@@ -2385,10 +3469,33 @@ export type CaseLookupsPut = {
 };
 
 /**
+ * CaseMoneyOtherOut
+ */
+export type CaseMoneyOtherOut = {
+  /**
+   * Amount
+   */
+  amount: number;
+  /**
+   * Currency
+   */
+  currency: string;
+  /**
+   * Payments
+   */
+  payments: number;
+  /**
+   * Starting Payers
+   */
+  starting_payers: number;
+};
+
+/**
  * CaseMoneyOut
  *
  * Money traced, counted once where it starts (payments whose payer received
- * nothing in the case), and how many payments carry it.
+ * nothing in the case), how many payments carry it, and how many different payers
+ * it starts from; each other currency with its own figures.
  */
 export type CaseMoneyOut = {
   /**
@@ -2400,17 +3507,17 @@ export type CaseMoneyOut = {
    */
   currency: string | null;
   /**
-   * From Sources
+   * Others
    */
-  from_sources?: number;
-  /**
-   * Other Currencies
-   */
-  other_currencies: Array<string>;
+  others: Array<CaseMoneyOtherOut>;
   /**
    * Payments
    */
   payments: number;
+  /**
+   * Starting Payers
+   */
+  starting_payers?: number;
 };
 
 /**
@@ -4079,6 +5186,46 @@ export type ClaimUpdate = {
 };
 
 /**
+ * CleanIn
+ *
+ * The steps of a cleaned copy (Listen › Clean and cut): take out mains hum, reduce room noise, even out loudness.
+ */
+export type CleanIn = {
+  /**
+   * Hum
+   */
+  hum?: boolean;
+  /**
+   * Loudness Target
+   */
+  loudness_target?: number | null;
+  /**
+   * Noise
+   */
+  noise?: 'off' | 'light' | 'medium';
+};
+
+/**
+ * ClipCreate
+ *
+ * A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`.
+ */
+export type ClipCreate = {
+  /**
+   * End
+   */
+  end: number;
+  /**
+   * From Cleaned
+   */
+  from_cleaned?: boolean;
+  /**
+   * Start
+   */
+  start: number;
+};
+
+/**
  * ClusterDecisionOut
  */
 export type ClusterDecisionOut = {
@@ -4370,6 +5517,20 @@ export type CollectionsOut = {
    * Investigation Id
    */
   investigation_id: string;
+};
+
+/**
+ * CompareWordOut
+ */
+export type CompareWordOut = {
+  /**
+   * Differs
+   */
+  differs: boolean;
+  /**
+   * W
+   */
+  w: string;
 };
 
 /**
@@ -4806,6 +5967,62 @@ export type ContextItemOut = {
    * Snippet
    */
   snippet: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * CopyGroupOut
+ *
+ * Items that restate one text: counted once; only the earliest is offered for capture.
+ */
+export type CopyGroupOut = {
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Members
+   */
+  members: Array<CopyMemberOut>;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
+ * CopyMemberOut
+ */
+export type CopyMemberOut = {
+  /**
+   * First Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  first_seen_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Original
+   */
+  original: boolean;
+  /**
+   * Similarity
+   */
+  similarity?: number | null;
+  /**
+   * Source
+   */
+  source: string;
   /**
    * Title
    */
@@ -6315,6 +7532,10 @@ export type DecisionItemOut = {
    * Reason
    */
   reason: string;
+  /**
+   * Unlocks
+   */
+  unlocks?: Array<string>;
 };
 
 /**
@@ -6365,6 +7586,48 @@ export type DecisionRowOut = {
    * Number
    */
   number: number;
+};
+
+/**
+ * DeckChecksOut
+ *
+ * Each slide's checks (DECK_1): a claim not yet shown (a Draft band), 7×7, a long run of text slides, and a cited
+ * claim whose status changed since the slide was made.
+ */
+export type DeckChecksOut = {
+  /**
+   * Changed
+   */
+  changed: Array<number>;
+  /**
+   * Deck Id
+   */
+  deck_id: string;
+  /**
+   * Drafts
+   */
+  drafts: Array<number>;
+  /**
+   * Slides
+   */
+  slides: Array<SlideCheckOut>;
+};
+
+/**
+ * DeckCreate
+ *
+ * A new deck (mockup DECK_1): blank, or made from the case's story tree (a slide per section, its claims as bullets
+ * with each claim cited).
+ */
+export type DeckCreate = {
+  /**
+   * Source
+   */
+  source?: 'blank' | 'story';
+  /**
+   * Title
+   */
+  title?: string;
 };
 
 /**
@@ -6444,6 +7707,12 @@ export type DeckSlideIn = {
    */
   kind?: string | null;
   /**
+   * Made With
+   */
+  made_with?: {
+    [key: string]: string;
+  };
+  /**
    * Notes
    */
   notes?: string | null;
@@ -6481,6 +7750,12 @@ export type DeckSlideOut = {
    * Kind
    */
   kind: 'title' | 'statement' | 'content' | 'questions';
+  /**
+   * Made With
+   */
+  made_with?: {
+    [key: string]: string;
+  };
   /**
    * Notes
    */
@@ -6881,6 +8156,83 @@ export type DemoSeedOut = {
    * Investigation Id
    */
   investigation_id: string;
+};
+
+/**
+ * DerivedFileOut
+ *
+ * A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
+ * `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when.
+ */
+export type DerivedFileOut = {
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Filename
+   */
+  filename?: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Job Id
+   */
+  job_id?: string | null;
+  /**
+   * Mime Type
+   */
+  mime_type: string;
+  /**
+   * Model
+   */
+  model?: string | null;
+  /**
+   * Model Sha256
+   */
+  model_sha256?: string | null;
+  /**
+   * Operation
+   */
+  operation: string;
+  /**
+   * Params
+   */
+  params: {
+    [key: string]: unknown;
+  };
+  /**
+   * Parent Id
+   */
+  parent_id?: string | null;
+  /**
+   * Parent Sha256
+   */
+  parent_sha256: string;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Size
+   */
+  size: number;
+  /**
+   * Tool
+   */
+  tool: string;
 };
 
 /**
@@ -8141,6 +9493,19 @@ export type EmailThreadMessageOut = {
 };
 
 /**
+ * End
+ *
+ * One end of a link: a record of the case, or a new party.
+ */
+export type End = {
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  new?: NewParty | null;
+};
+
+/**
  * EnrichmentClusterOut
  *
  * Findings from different providers that may describe one outside
@@ -8859,6 +10224,20 @@ export type EntityUpdate = {
 };
 
 /**
+ * EntryIn
+ */
+export type EntryIn = {
+  event?: EventIn | null;
+  /**
+   * Kind
+   */
+  kind: 'party' | 'link' | 'event';
+  link?: LinkIn | null;
+  party?: NewParty | null;
+  source?: SourceIn | null;
+};
+
+/**
  * ErrorOut
  *
  * Why a request was refused, in a sentence: the detail of an
@@ -8870,6 +10249,32 @@ export type ErrorOut = {
    * Detail
    */
   detail: string;
+};
+
+/**
+ * EventIn
+ */
+export type EventIn = {
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Entity Ids
+   */
+  entity_ids?: Array<string>;
+  /**
+   * Precision
+   */
+  precision?: 'day' | 'month' | 'year' | 'estimated';
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Where
+   */
+  where?: string | null;
 };
 
 /**
@@ -9849,6 +11254,52 @@ export type ExtractionReviewOut = {
 };
 
 /**
+ * FaceBoxOut
+ *
+ * Where the detector finds a face, as fractions of the picture, with its score. Never who.
+ */
+export type FaceBoxOut = {
+  /**
+   * H
+   */
+  h: number;
+  /**
+   * Score
+   */
+  score: number;
+  /**
+   * W
+   */
+  w: number;
+  /**
+   * X
+   */
+  x: number;
+  /**
+   * Y
+   */
+  y: number;
+};
+
+/**
+ * FacesOut
+ */
+export type FacesOut = {
+  /**
+   * Faces
+   */
+  faces: Array<FaceBoxOut>;
+  /**
+   * Model
+   */
+  model: string;
+  /**
+   * Model Sha256
+   */
+  model_sha256: string;
+};
+
+/**
  * FactWatchCreate
  */
 export type FactWatchCreate = {
@@ -10288,6 +11739,78 @@ export type FlagSourceOut = {
 };
 
 /**
+ * FollowingEgressOut
+ */
+export type FollowingEgressOut = {
+  /**
+   * Direct
+   */
+  direct: number;
+  /**
+   * No Monitor
+   */
+  no_monitor: number;
+  /**
+   * Public Server
+   */
+  public_server: number;
+  /**
+   * Sources
+   */
+  sources: number;
+  /**
+   * Third Party
+   */
+  third_party: number;
+  /**
+   * Tor
+   */
+  tor: number;
+};
+
+/**
+ * FollowingOut
+ *
+ * Everything the Following screen shows: the sources, the queue (most at risk first), copies of one story, and
+ * what leaves this computer.
+ */
+export type FollowingOut = {
+  /**
+   * Captured
+   */
+  captured: number;
+  /**
+   * Copies
+   */
+  copies: Array<CopyGroupOut>;
+  egress: FollowingEgressOut;
+  /**
+   * Followed
+   */
+  followed: number;
+  /**
+   * Monitors
+   */
+  monitors: Array<MonitorOut>;
+  /**
+   * Queue
+   */
+  queue: Array<MonitorItemOut>;
+  /**
+   * Skipped
+   */
+  skipped: number;
+  /**
+   * Waiting
+   */
+  waiting: number;
+  /**
+   * Working
+   */
+  working: number;
+};
+
+/**
  * FontPairOut
  *
  * A heading and body font; empty names mean "keep the theme's own".
@@ -10539,6 +12062,24 @@ export type HealthOut = {
 };
 
 /**
+ * HiddenDataOut
+ */
+export type HiddenDataOut = {
+  /**
+   * Category
+   */
+  category: string;
+  /**
+   * Count
+   */
+  count: number;
+  /**
+   * Label
+   */
+  label: string;
+};
+
+/**
  * HighlightSegmentOut
  *
  * A piece of a snippet; ``match`` marks the words the search found.
@@ -10552,6 +12093,24 @@ export type HighlightSegmentOut = {
    * Text
    */
   text: string;
+};
+
+/**
+ * HumOut
+ */
+export type HumOut = {
+  /**
+   * Above Db
+   */
+  above_db: number;
+  /**
+   * Harmonics
+   */
+  harmonics: number;
+  /**
+   * Hz
+   */
+  hz?: number | null;
 };
 
 /**
@@ -11177,6 +12736,10 @@ export type InvestigationDeletionPreview = {
    * Capture File Count
    */
   capture_file_count?: number;
+  /**
+   * Derived File Count
+   */
+  derived_file_count?: number;
   document_file_summary: DeletionFileSummary;
   /**
    * Document Files
@@ -12074,6 +13637,24 @@ export type LineageSourceOut = {
 };
 
 /**
+ * LinkIn
+ */
+export type LinkIn = {
+  /**
+   * Properties
+   */
+  properties?: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Schema
+   */
+  schema: string;
+  source: End;
+  target: End;
+};
+
+/**
  * LockReasonIn
  */
 export type LockReasonIn = {
@@ -12278,6 +13859,39 @@ export type LookupSourceOut = {
    * Mode
    */
   mode?: string | null;
+};
+
+/**
+ * MailboxCreate
+ *
+ * A newsletter mailbox to follow (DECISIONS_LOG 11): a dedicated mailbox read over IMAP with TLS, and the one sender
+ * (an address, or @domain for everything from it) whose messages are queued.
+ */
+export type MailboxCreate = {
+  /**
+   * Every Minutes
+   */
+  every_minutes?: number;
+  /**
+   * Host
+   */
+  host: string;
+  /**
+   * Password
+   */
+  password: string;
+  /**
+   * Port
+   */
+  port?: number;
+  /**
+   * Sender
+   */
+  sender: string;
+  /**
+   * User
+   */
+  user: string;
 };
 
 /**
@@ -12826,6 +14440,265 @@ export type MoneyChecksOut = {
 };
 
 /**
+ * MonitorCheckOut
+ */
+export type MonitorCheckOut = {
+  /**
+   * Seconds
+   */
+  seconds?: number | null;
+  /**
+   * State
+   */
+  state: 'ok' | 'warn' | 'bad' | 'wait';
+  /**
+   * Status
+   */
+  status?: number | null;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * MonitorCreate
+ *
+ * Something to follow (ADR-0022): a web address (a feed, sitemap, podcast or page; a page that names its feed is
+ * followed through the feed), a Bluesky handle (@name.bsky.social) or a Mastodon account (@name@server).
+ */
+export type MonitorCreate = {
+  /**
+   * Every Minutes
+   */
+  every_minutes?: number | null;
+  /**
+   * Route
+   */
+  route?: 'direct' | 'tor';
+  /**
+   * Target
+   */
+  target: string;
+};
+
+/**
+ * MonitorItemOut
+ *
+ * One thing a monitor turned up, as the queue shows it. `state`: waiting, capturing, saved, not_saved, skipped,
+ * gone (a captured item whose address now answers 404 or 410) or removal_recorded.
+ */
+export type MonitorItemOut = {
+  /**
+   * Capture Id
+   */
+  capture_id?: string | null;
+  /**
+   * Decision
+   */
+  decision: {
+    [key: string]: unknown;
+  };
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  /**
+   * Extra
+   */
+  extra: {
+    [key: string]: unknown;
+  };
+  /**
+   * First Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  first_seen_at: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Monitor Id
+   */
+  monitor_id: string;
+  /**
+   * Platform
+   */
+  platform?: string | null;
+  /**
+   * Published At
+   */
+  published_at?: string | null;
+  /**
+   * Rank
+   */
+  rank: number;
+  /**
+   * Risks
+   */
+  risks: Array<MonitorRiskOut>;
+  /**
+   * Source
+   */
+  source: string;
+  /**
+   * State
+   */
+  state:
+    | 'waiting'
+    | 'capturing'
+    | 'saved'
+    | 'not_saved'
+    | 'skipped'
+    | 'gone'
+    | 'removal_recorded'
+    | 'copy';
+  /**
+   * Summary
+   */
+  summary: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
+ * MonitorOut
+ *
+ * A source the case follows. `kind`: feed, sitemap, page, podcast, account (an open-protocol public account) or
+ * closed (a closed platform: no monitor). `health`: works, broken, moved (paused until a person accepts `moved_to`),
+ * paused, unchecked or closed. `leaves` says in words what each check sends and where.
+ */
+export type MonitorOut = {
+  /**
+   * Checks
+   */
+  checks: Array<MonitorCheckOut>;
+  /**
+   * Created At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  created_at: string;
+  /**
+   * Created By
+   */
+  created_by?: string | null;
+  /**
+   * Every Minutes
+   */
+  every_minutes: number;
+  /**
+   * Health
+   */
+  health: 'works' | 'broken' | 'moved' | 'paused' | 'unchecked' | 'closed';
+  /**
+   * Health Detail
+   */
+  health_detail?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind:
+    'feed' | 'sitemap' | 'page' | 'podcast' | 'account' | 'closed' | 'mailbox';
+  /**
+   * Last Checked At
+   */
+  last_checked_at?: string | null;
+  /**
+   * Last Ok At
+   */
+  last_ok_at?: string | null;
+  /**
+   * Leaves
+   */
+  leaves: string;
+  /**
+   * Moved To
+   */
+  moved_to?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Next Check At
+   */
+  next_check_at?: string | null;
+  /**
+   * Platform
+   */
+  platform?: string | null;
+  /**
+   * Robots Allowed
+   */
+  robots_allowed?: boolean | null;
+  /**
+   * Route
+   */
+  route: 'direct' | 'tor';
+  /**
+   * Url
+   */
+  url: string;
+  /**
+   * Waiting
+   */
+  waiting: number;
+};
+
+/**
+ * MonitorRiskOut
+ */
+export type MonitorRiskOut = {
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Tone
+   */
+  tone: 'bad' | 'amber' | 'teal' | '';
+};
+
+/**
+ * MonitorUpdate
+ */
+export type MonitorUpdate = {
+  /**
+   * Accept Move
+   */
+  accept_move?: boolean | null;
+  /**
+   * Every Minutes
+   */
+  every_minutes?: 15 | 30 | 60 | 1440 | 10080 | null;
+  /**
+   * Paused
+   */
+  paused?: boolean | null;
+  /**
+   * Route
+   */
+  route?: 'direct' | 'tor' | null;
+};
+
+/**
  * MultiEnrichmentRequest
  */
 export type MultiEnrichmentRequest = {
@@ -12843,6 +14716,46 @@ export type NameIn = {
    * Name
    */
   name: string;
+};
+
+/**
+ * NearestPlaceOut
+ */
+export type NearestPlaceOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Metres
+   */
+  metres: number;
+};
+
+/**
+ * NewParty
+ */
+export type NewParty = {
+  /**
+   * Aliases
+   */
+  aliases?: Array<string>;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Country
+   */
+  country?: string | null;
+  /**
+   * Schema
+   */
+  schema: 'Company' | 'Person' | 'Organization' | 'PublicBody' | 'LegalEntity';
 };
 
 /**
@@ -13935,6 +15848,183 @@ export type OwnershipChainOwnerOut = {
 };
 
 /**
+ * PackCheckOut
+ *
+ * Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,
+ * for a pack not made in this case, with its own MANIFEST.sha256). Nothing of the pack is kept or sent.
+ */
+export type PackCheckOut = {
+  /**
+   * Compared With
+   */
+  compared_with: string;
+  /**
+   * Counts
+   */
+  counts: {
+    [key: string]: number;
+  };
+  /**
+   * Draft
+   */
+  draft?: boolean | null;
+  /**
+   * Exhibits
+   */
+  exhibits: Array<PackExhibitOut>;
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Files
+   */
+  files: number;
+  /**
+   * List Changed
+   */
+  list_changed: boolean;
+  /**
+   * Made At
+   */
+  made_at?: string | null;
+  /**
+   * Made By
+   */
+  made_by?: string | null;
+  /**
+   * Made Here
+   */
+  made_here: boolean;
+  /**
+   * Made In Other Case
+   */
+  made_in_other_case?: string | null;
+  /**
+   * Pack Id
+   */
+  pack_id?: string | null;
+  /**
+   * Rows
+   */
+  rows: Array<PackFileOut>;
+  signature: PackSignatureOut;
+  /**
+   * Title
+   */
+  title?: string | null;
+  /**
+   * Whole
+   */
+  whole: boolean;
+};
+
+/**
+ * PackExhibitOut
+ *
+ * A changed or missing exhibit file, what rests on it, and the case's own file. `ours` and `theirs` are small
+ * pictures (data URLs) when the picture could be drawn again exactly as listed; `differs` is where they differ.
+ */
+export type PackExhibitOut = {
+  /**
+   * Case File
+   */
+  case_file?: 'matches' | 'does not match' | null;
+  /**
+   * Claims
+   */
+  claims: Array<string>;
+  /**
+   * Differs
+   */
+  differs?: {
+    [key: string]: number;
+  } | null;
+  /**
+   * Document
+   */
+  document?: string | null;
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Number
+   */
+  number: number;
+  /**
+   * Ours
+   */
+  ours?: string | null;
+  /**
+   * Redrawn
+   */
+  redrawn: boolean;
+  /**
+   * State
+   */
+  state: 'changed' | 'missing' | 'extra';
+  /**
+   * Theirs
+   */
+  theirs?: string | null;
+};
+
+/**
+ * PackFileOut
+ *
+ * One file of a pack someone sent back: as made, changed, missing, or not in the list; `about` names what a
+ * changed or missing custody page is about.
+ */
+export type PackFileOut = {
+  /**
+   * About
+   */
+  about?: string | null;
+  /**
+   * Listed
+   */
+  listed?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Now
+   */
+  now?: string | null;
+  /**
+   * State
+   */
+  state: 'as_made' | 'changed' | 'missing' | 'extra';
+};
+
+/**
+ * PackSignatureOut
+ *
+ * The pack's signature: none, invalid or valid; the key's fingerprint; whether it is this computer's key; whether it
+ * is the key the pack was made with (always true for a pack not made here).
+ */
+export type PackSignatureOut = {
+  /**
+   * As Made
+   */
+  as_made: boolean;
+  /**
+   * Fingerprint
+   */
+  fingerprint?: string | null;
+  /**
+   * Ours
+   */
+  ours: boolean;
+  /**
+   * State
+   */
+  state: 'none' | 'invalid' | 'valid';
+};
+
+/**
  * PacketFromIn
  *
  * Run again from a step of an earlier run (mockup AI_1, research AI §5): the same packet, new instructions.
@@ -13951,6 +16041,54 @@ export type PacketFromIn = {
 };
 
 /**
+ * PageVersionOut
+ *
+ * One version of a followed page's main text; `diff` lists the lines removed (-) and added (+) since the one before.
+ */
+export type PageVersionOut = {
+  /**
+   * Capture Id
+   */
+  capture_id?: string | null;
+  /**
+   * Captured
+   */
+  captured: boolean;
+  /**
+   * Diff
+   */
+  diff: Array<string>;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Layout Changes
+   */
+  layout_changes: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Lines Changed
+   */
+  lines_changed: number;
+  /**
+   * Number
+   */
+  number: number;
+  /**
+   * Seen At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  seen_at: string;
+  /**
+   * Sha256
+   */
+  sha256: string;
+};
+
+/**
  * PartyYearsOut
  *
  * The years a party's dated events and links touch (pointing at it lights them).
@@ -13964,6 +16102,60 @@ export type PartyYearsOut = {
    * Years
    */
   years: Array<number>;
+};
+
+/**
+ * PdfPageOut
+ */
+export type PdfPageOut = {
+  /**
+   * Height
+   */
+  height: number;
+  /**
+   * Page
+   */
+  page: number;
+  /**
+   * Width
+   */
+  width: number;
+};
+
+/**
+ * PdfaIssueOut
+ */
+export type PdfaIssueOut = {
+  /**
+   * Clause
+   */
+  clause?: string | null;
+  /**
+   * Fixable
+   */
+  fixable: boolean;
+  /**
+   * Message
+   */
+  message?: string | null;
+};
+
+/**
+ * PdfaOut
+ */
+export type PdfaOut = {
+  /**
+   * Compliant
+   */
+  compliant: boolean;
+  /**
+   * Declared
+   */
+  declared?: string | null;
+  /**
+   * Issues
+   */
+  issues: Array<PdfaIssueOut>;
 };
 
 /**
@@ -14060,6 +16252,83 @@ export type PeekOut = {
 };
 
 /**
+ * PhotoCopyIn
+ *
+ * A copy of a photo (Picture › Make a copy): which tool, its settings, and the copy it is made from (else the photo
+ * as shown). blur_faces {radius, boxes?}; strip_metadata {}; crop {box}; redact {box, reason}; turn {degrees}.
+ * A box is x, y, w, h as fractions of the picture.
+ */
+export type PhotoCopyIn = {
+  /**
+   * From Id
+   */
+  from_id?: string | null;
+  /**
+   * Operation
+   */
+  operation: 'blur_faces' | 'strip_metadata' | 'crop' | 'redact' | 'turn';
+  /**
+   * Params
+   */
+  params?: {
+    [key: string]: unknown;
+  };
+};
+
+/**
+ * PhotoOut
+ *
+ * A photo as the Picture screen shows it: what the file claims about itself, how far its GPS is from the case's
+ * nearest place, and the machine's proposals.
+ */
+export type PhotoOut = {
+  /**
+   * Claims
+   */
+  claims: {
+    [key: string]: unknown;
+  };
+  /**
+   * Date Tag
+   */
+  date_tag?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Face Model Here
+   */
+  face_model_here: boolean;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Height
+   */
+  height?: number | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  nearest_place?: NearestPlaceOut | null;
+  place_proposal?: PlaceProposalOut | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Text
+   */
+  text: Array<string>;
+  /**
+   * Width
+   */
+  width?: number | null;
+};
+
+/**
  * PinIn
  */
 export type PinIn = {
@@ -14084,7 +16353,7 @@ export type PinSetIn = {
  *
  * An event on the investigation's timeline that happened at a place:
  * one about the place's own record ("place") or about a relationship
- * linking something to it ("link"). `first_day` and `last_day` are the
+ * linking something to it, or about a record linked to it ("link"). `first_day` and `last_day` are the
  * days its dates as recorded can mean; `exact` is false when a date is
  * known only to the month or year.
  */
@@ -14207,9 +16476,35 @@ export type PlaceOut = {
    */
   longitude: number;
   /**
+   * Placed From
+   */
+  placed_from?: string | null;
+  /**
+   * Precision
+   */
+  precision?: string | null;
+  /**
    * Schema
    */
   schema: string;
+  /**
+   * Sure
+   */
+  sure?: 'document' | 'approximate' | 'not_yet';
+};
+
+/**
+ * PlaceProposalOut
+ */
+export type PlaceProposalOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Status
+   */
+  status: string;
 };
 
 /**
@@ -14230,6 +16525,163 @@ export type PlacesOut = {
    * Places
    */
   places: Array<PlaceOut>;
+};
+
+/**
+ * PlatformChecksOut
+ *
+ * Does it work today? (WORKS_1): each platform, whether the daily check is on, whether a pasted link is warned about.
+ */
+export type PlatformChecksOut = {
+  /**
+   * Checked
+   */
+  checked: number;
+  /**
+   * Daily
+   */
+  daily: boolean;
+  /**
+   * Last Checked At
+   */
+  last_checked_at?: string | null;
+  /**
+   * Platforms
+   */
+  platforms: Array<PlatformOut>;
+  /**
+   * Warn
+   */
+  warn: boolean;
+  /**
+   * Working
+   */
+  working: number;
+};
+
+/**
+ * PlatformChecksUpdate
+ *
+ * Turn the daily check on or off, the warning before a capture, or change a platform's test item (empty: back to
+ * the one the app ships with).
+ */
+export type PlatformChecksUpdate = {
+  /**
+   * Daily
+   */
+  daily?: boolean | null;
+  /**
+   * Items
+   */
+  items?: {
+    [key: string]: string | null;
+  } | null;
+  /**
+   * Warn
+   */
+  warn?: boolean | null;
+};
+
+/**
+ * PlatformDayOut
+ */
+export type PlatformDayOut = {
+  /**
+   * Day
+   */
+  day: string;
+  /**
+   * State
+   */
+  state?: 'works' | 'partly' | 'broken' | null;
+};
+
+/**
+ * PlatformForUrlOut
+ *
+ * The platform a pasted link is on and how it was at its last check (none when not one the app tries).
+ */
+export type PlatformForUrlOut = {
+  /**
+   * Checked At
+   */
+  checked_at?: string | null;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * State
+   */
+  state?: 'works' | 'partly' | 'broken' | null;
+};
+
+/**
+ * PlatformOut
+ *
+ * One platform the app saves from, tried on its public test item: today's state as a word, the last 14 days.
+ */
+export type PlatformOut = {
+  /**
+   * Broken Since
+   */
+  broken_since?: string | null;
+  /**
+   * Checked At
+   */
+  checked_at?: string | null;
+  /**
+   * Days
+   */
+  days: Array<PlatformDayOut>;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Missing
+   */
+  missing?: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Route
+   */
+  route: string;
+  /**
+   * Saves
+   */
+  saves: string;
+  /**
+   * Seconds
+   */
+  seconds?: number | null;
+  /**
+   * Shipped Url
+   */
+  shipped_url: string;
+  /**
+   * State
+   */
+  state?: 'works' | 'partly' | 'broken' | null;
+  /**
+   * Test Url
+   */
+  test_url: string;
 };
 
 /**
@@ -14574,6 +17026,65 @@ export type ProviderLeadOut = {
    * Provider Resolved Entity Id
    */
   provider_resolved_entity_id: string | null;
+};
+
+/**
+ * PublisherCueOut
+ */
+export type PublisherCueOut = {
+  /**
+   * End
+   */
+  end: number;
+  /**
+   * Speaker
+   */
+  speaker?: string | null;
+  /**
+   * Start
+   */
+  start: number;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
+ * PublisherTranscriptOut
+ *
+ * The episode's own transcript as its publisher offers it (podcast:transcript), fetched with the episode and kept
+ * as it came: its address, type, SHA-256 and when it was fetched; `error` when it could not be read.
+ */
+export type PublisherTranscriptOut = {
+  /**
+   * Bytes
+   */
+  bytes?: number | null;
+  /**
+   * Cues
+   */
+  cues?: Array<PublisherCueOut>;
+  /**
+   * Error
+   */
+  error?: string | null;
+  /**
+   * Fetched At
+   */
+  fetched_at?: string | null;
+  /**
+   * Sha256
+   */
+  sha256?: string | null;
+  /**
+   * Type
+   */
+  type?: string | null;
+  /**
+   * Url
+   */
+  url: string;
 };
 
 /**
@@ -15052,6 +17563,165 @@ export type RedFlagsOut = {
    * Stale
    */
   stale?: boolean;
+};
+
+/**
+ * RedactBoxIn
+ *
+ * One box to redact: its page, its place in points from the page's top-left (left, top, right, bottom), its reason
+ * (kept in the trail), and whether a person drew it or accepted a proposal (phone, email, person).
+ */
+export type RedactBoxIn = {
+  /**
+   * Kind
+   */
+  kind?: 'drawn' | 'phone' | 'email' | 'person';
+  /**
+   * Page
+   */
+  page: number;
+  /**
+   * Reason
+   */
+  reason: string;
+  /**
+   * Rect
+   */
+  rect: [number, number, number, number];
+};
+
+/**
+ * RedactCompareOut
+ *
+ * How a redacted copy differs from the case's file: the words each holds, the pages that changed, and the hidden
+ * data the copy still carries.
+ */
+export type RedactCompareOut = {
+  /**
+   * Copy Id
+   */
+  copy_id: string;
+  /**
+   * Hidden Left
+   */
+  hidden_left: Array<HiddenDataOut>;
+  /**
+   * New Words
+   */
+  new_words: number;
+  /**
+   * Old Words
+   */
+  old_words: number;
+  /**
+   * Pages Changed
+   */
+  pages_changed: Array<number>;
+};
+
+/**
+ * RedactIn
+ *
+ * A redacted copy of a PDF (Redact before sharing): the boxes, the hidden data to take out of the copy, whether to
+ * make it PDF/A-2b, and who it is for (it names the file).
+ */
+export type RedactIn = {
+  /**
+   * Boxes
+   */
+  boxes: Array<RedactBoxIn>;
+  /**
+   * Made For
+   */
+  made_for?: 'editor' | 'lawyer' | 'publication';
+  /**
+   * Pdfa
+   */
+  pdfa?: boolean;
+  /**
+   * Remove
+   */
+  remove?: Array<
+    | 'metadata'
+    | 'attachments'
+    | 'comments'
+    | 'form-fields'
+    | 'hidden-text'
+    | 'hidden-layers'
+    | 'bookmarks'
+    | 'links-actions-scripts'
+    | 'private-data'
+  >;
+};
+
+/**
+ * RedactProposalOut
+ *
+ * A box the machine proposes, never applied on its own: a phone number or email address found by pattern, or a
+ * person named in this case found in the text.
+ */
+export type RedactProposalOut = {
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Page
+   */
+  page: number;
+  /**
+   * Rect
+   */
+  rect: Array<number>;
+  /**
+   * Text
+   */
+  text: string;
+  /**
+   * Why
+   */
+  why: string;
+};
+
+/**
+ * RedactionOut
+ *
+ * A PDF as the Redact screen shows it: its pages in points, the proposed boxes, its hidden data, PDF/A now.
+ */
+export type RedactionOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Hidden
+   */
+  hidden: Array<HiddenDataOut>;
+  /**
+   * Pages
+   */
+  pages: Array<PdfPageOut>;
+  pdfa: PdfaOut;
+  /**
+   * Proposals
+   */
+  proposals: Array<RedactProposalOut>;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Tool
+   */
+  tool: string;
 };
 
 /**
@@ -16569,6 +19239,24 @@ export type SafetyDataOut = {
 };
 
 /**
+ * SafetyGuideOut
+ */
+export type SafetyGuideOut = {
+  /**
+   * Publisher
+   */
+  publisher: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url: string;
+};
+
+/**
  * SafetyHousekeepingOut
  */
 export type SafetyHousekeepingOut = {
@@ -16580,6 +19268,39 @@ export type SafetyHousekeepingOut = {
    * Stray Files
    */
   stray_files?: number | null;
+};
+
+/**
+ * SafetyQuestionOut
+ *
+ * A sign only the reporter can say. The answer stays in their browser; this server never receives it.
+ */
+export type SafetyQuestionOut = {
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Innocent
+   */
+  innocent: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Question
+   */
+  question: string;
+  source: SafetySourceOut;
+  /**
+   * Textbook
+   */
+  textbook: string;
 };
 
 /**
@@ -16624,6 +19345,66 @@ export type SafetyServiceOut = {
    * Where
    */
   where: 'inside' | 'outside';
+};
+
+/**
+ * SafetySignOut
+ *
+ * A safety sign from the case's records (catalogue/indicators/sa.yaml), shown apart from Red Flags. No level: the
+ * catalogue's Faint and Strong for safety are not set yet.
+ */
+export type SafetySignOut = {
+  /**
+   * Definition
+   */
+  definition: string;
+  /**
+   * Documents
+   */
+  documents?: Array<SafetyTraceOut>;
+  /**
+   * Evidence
+   */
+  evidence: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Innocent
+   */
+  innocent: Array<string>;
+  /**
+   * Level
+   */
+  level?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  source: SafetySourceOut;
+  /**
+   * Textbook
+   */
+  textbook: string;
+};
+
+/**
+ * SafetySourceOut
+ */
+export type SafetySourceOut = {
+  /**
+   * Publisher
+   */
+  publisher: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Url
+   */
+  url: string;
 };
 
 /**
@@ -16690,6 +19471,24 @@ export type SafetyTotalsOut = {
    * Services Reached
    */
   services_reached: number;
+};
+
+/**
+ * SafetyTraceOut
+ */
+export type SafetyTraceOut = {
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Traces
+   */
+  traces: Array<string>;
 };
 
 /**
@@ -17373,6 +20172,22 @@ export type SettingsStatusOut = {
 };
 
 /**
+ * SigningKeyOut
+ *
+ * This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack.
+ */
+export type SigningKeyOut = {
+  /**
+   * Created At
+   */
+  created_at?: string | null;
+  /**
+   * Fingerprint
+   */
+  fingerprint?: string | null;
+};
+
+/**
  * SimilarDocumentOut
  */
 export type SimilarDocumentOut = {
@@ -17445,6 +20260,28 @@ export type SkippedRowOut = {
 };
 
 /**
+ * SlideCheckOut
+ */
+export type SlideCheckOut = {
+  /**
+   * Changed
+   */
+  changed: boolean;
+  /**
+   * Draft
+   */
+  draft: boolean;
+  /**
+   * Problems
+   */
+  problems: Array<SlideProblemOut>;
+  /**
+   * Slide
+   */
+  slide: number;
+};
+
+/**
  * SlideDrawingOut
  *
  * What a deck slide shows for a chart kind PowerPoint cannot hold
@@ -17474,9 +20311,61 @@ export type SlideDrawingOut = {
 };
 
 /**
+ * SlideProblemOut
+ */
+export type SlideProblemOut = {
+  /**
+   * Claim Id
+   */
+  claim_id?: string | null;
+  /**
+   * Fix
+   */
+  fix?: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Line
+   */
+  line?: number | null;
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * SortOrder
  */
 export type SortOrder = 'value_desc' | 'value_asc' | 'label' | 'time';
+
+/**
+ * SoundOut
+ *
+ * A recording's sound: its length, any mains hum, its loudness, its latest cleaned copy, an accepted sync.
+ */
+export type SoundOut = {
+  /**
+   * Cleaned Id
+   */
+  cleaned_id?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Duration
+   */
+  duration: number;
+  hum: HumOut;
+  /**
+   * Loudness Lufs
+   */
+  loudness_lufs?: number | null;
+  sync?: SyncOut | null;
+};
 
 /**
  * SourceCreate
@@ -17500,6 +20389,44 @@ export type SourceCreate = {
    * Title
    */
   title: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
+ * SourceIn
+ */
+export type SourceIn = {
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Mode
+   */
+  mode: 'passage' | 'record' | 'none';
+  /**
+   * Notes
+   */
+  notes?: string | null;
+  /**
+   * Quote
+   */
+  quote?: string | null;
+  /**
+   * Source Type
+   */
+  source_type?: 'interview' | 'public_record' | 'document' | 'web' | 'other';
+  /**
+   * Title
+   */
+  title?: string | null;
   /**
    * Url
    */
@@ -18478,6 +21405,55 @@ export type SuiteUnmappedOut = {
 };
 
 /**
+ * SyncIn
+ *
+ * Another recording of the same event, to line up with this one by matching their sound.
+ */
+export type SyncIn = {
+  /**
+   * Other Document Id
+   */
+  other_document_id: string;
+};
+
+/**
+ * SyncOut
+ *
+ * Where another recording lines up in this one: a positive offset means it started that many seconds later.
+ */
+export type SyncOut = {
+  /**
+   * Accepted At
+   */
+  accepted_at?: string | null;
+  /**
+   * Accepted By
+   */
+  accepted_by?: string | null;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Distinct
+   */
+  distinct?: number | null;
+  /**
+   * Offset Seconds
+   */
+  offset_seconds?: number | null;
+  /**
+   * Other Document Id
+   */
+  other_document_id: string;
+  /**
+   * Reliable
+   */
+  reliable: boolean;
+  [key: string]: unknown;
+};
+
+/**
  * TableMappingIn
  *
  * A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,
@@ -18786,6 +21762,53 @@ export type TaskWorkflowEventOut = {
 };
 
 /**
+ * TimelineBoardIn
+ *
+ * Where the cards sit on each board (as fractions of the board, so they keep their place at any width), the
+ * reporter's sticky notes, and the board's style: Rich (tacks, paper, string) or Clean.
+ */
+export type TimelineBoardIn = {
+  /**
+   * Notes
+   */
+  notes?: Array<BoardNoteIn>;
+  /**
+   * Positions
+   */
+  positions?: {
+    [key: string]: {
+      [key: string]: [number, number];
+    };
+  };
+  /**
+   * Style
+   */
+  style?: 'rich' | 'clean';
+};
+
+/**
+ * TimelineBoardOut
+ */
+export type TimelineBoardOut = {
+  /**
+   * Notes
+   */
+  notes: Array<BoardNoteOut>;
+  /**
+   * Positions
+   */
+  positions: {
+    [key: string]: {
+      [key: string]: Array<number>;
+    };
+  };
+  /**
+   * Style
+   */
+  style: 'rich' | 'clean';
+};
+
+/**
  * TimelineClaimAdvisoryOut
  */
 export type TimelineClaimAdvisoryOut = {
@@ -18901,6 +21924,10 @@ export type TimelineEventCreate = {
    */
   origin?: string | null;
   /**
+   * Placeholder
+   */
+  placeholder?: boolean;
+  /**
    * Precision
    */
   precision?: string;
@@ -18972,6 +21999,10 @@ export type TimelineEventOut = {
    * Kind
    */
   kind: string;
+  /**
+   * Placeholder
+   */
+  placeholder?: boolean;
   /**
    * Precision
    */
@@ -19068,6 +22099,10 @@ export type TimelineEventRowOut = {
    */
   origin?: string | null;
   /**
+   * Placeholder
+   */
+  placeholder?: boolean;
+  /**
    * Precision
    */
   precision: string;
@@ -19108,6 +22143,216 @@ export type TimelineItemOut = {
 };
 
 /**
+ * TimelineLaneEventOut
+ *
+ * An event as Lanes draws it: the parties it is about (its lanes), where it comes from, its amount when it is a
+ * payment, and one mark for whether it is shown (app/services/timeline_lanes.py fact_of).
+ */
+export type TimelineLaneEventOut = {
+  /**
+   * Amount
+   */
+  amount?: number | null;
+  /**
+   * Amount Eur
+   */
+  amount_eur?: number | null;
+  context?: TimelineContextOut | null;
+  /**
+   * Currency
+   */
+  currency?: string | null;
+  /**
+   * Date End
+   */
+  date_end?: string | null;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Fact
+   */
+  fact: 'shown' | 'not_yet' | 'disputed' | 'worked_out';
+  /**
+   * Fact Note
+   */
+  fact_note?: string | null;
+  /**
+   * Grade
+   */
+  grade?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Parties
+   */
+  parties: Array<string>;
+  /**
+   * Placeholder
+   */
+  placeholder?: boolean;
+  /**
+   * Precision
+   */
+  precision: string;
+  /**
+   * Prop
+   */
+  prop?: string | null;
+  /**
+   * Provenance
+   */
+  provenance: {
+    [key: string]: unknown;
+  };
+  /**
+   * Refs
+   */
+  refs: {
+    [key: string]: unknown;
+  };
+  /**
+   * Schema
+   */
+  schema?: string | null;
+  /**
+   * Sort Key
+   */
+  sort_key: string;
+  /**
+   * Source Key
+   */
+  source_key: string;
+  /**
+   * Source Label
+   */
+  source_label: string;
+  /**
+   * Synthetic
+   */
+  synthetic: boolean;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Verification Status
+   */
+  verification_status: string;
+  [key: string]: unknown;
+};
+
+/**
+ * TimelineLanesOut
+ */
+export type TimelineLanesOut = {
+  /**
+   * Events
+   */
+  events: Array<TimelineLaneEventOut>;
+  /**
+   * Facts
+   */
+  facts: {
+    [key: string]: number;
+  };
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Not Placed
+   */
+  not_placed: Array<TimelineNotPlacedOut>;
+  /**
+   * Not Placed Total
+   */
+  not_placed_total: number;
+  /**
+   * Opens On
+   */
+  opens_on?: string | null;
+  /**
+   * Parties
+   */
+  parties: Array<TimelinePartyOut>;
+  /**
+   * Periods
+   */
+  periods: Array<TimelinePeriodOut>;
+  /**
+   * Sequence
+   */
+  sequence: Array<TimelineSequenceOut>;
+  span: TimelineSpanOut;
+  /**
+   * Steps
+   */
+  steps: Array<TimelineStepOut>;
+  /**
+   * Steps From
+   */
+  steps_from: 'story' | 'events';
+  /**
+   * Steps Undated
+   */
+  steps_undated: number;
+  /**
+   * Undated
+   */
+  undated: Array<TimelineUndatedOut>;
+  /**
+   * Undated Total
+   */
+  undated_total: number;
+};
+
+/**
+ * TimelineNotPlacedOut
+ */
+export type TimelineNotPlacedOut = {
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Date Key
+   */
+  date_key: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Precision
+   */
+  precision: string;
+  /**
+   * Source Id
+   */
+  source_id: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * TimelineOut
  */
 export type TimelineOut = {
@@ -19143,6 +22388,218 @@ export type TimelineOut = {
   verification_counts: {
     [key: string]: number;
   };
+};
+
+/**
+ * TimelinePartyOut
+ */
+export type TimelinePartyOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Country
+   */
+  country?: string | null;
+  /**
+   * Events
+   */
+  events: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * TimelinePeriodIn
+ *
+ * A named stretch of the case's time (Timeline › Periods). Dates are a year, a month or a day.
+ */
+export type TimelinePeriodIn = {
+  /**
+   * Date End
+   */
+  date_end: string;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Summary
+   */
+  summary?: string;
+};
+
+/**
+ * TimelinePeriodOut
+ */
+export type TimelinePeriodOut = {
+  /**
+   * Date End
+   */
+  date_end: string;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Made By
+   */
+  made_by?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Summary
+   */
+  summary: string;
+};
+
+/**
+ * TimelineSequenceOut
+ *
+ * An event that comes before a step it should follow (app/services/sequence_rules.py).
+ */
+export type TimelineSequenceOut = {
+  /**
+   * After Id
+   */
+  after_id?: string | null;
+  /**
+   * Basis
+   */
+  basis: string;
+  /**
+   * Event Id
+   */
+  event_id: string;
+  /**
+   * Found Later Id
+   */
+  found_later_id?: string | null;
+  /**
+   * Missing
+   */
+  missing: string;
+  /**
+   * Rule
+   */
+  rule: string;
+  /**
+   * Rule Name
+   */
+  rule_name: string;
+  /**
+   * Say
+   */
+  say: string;
+  /**
+   * Steps
+   */
+  steps: Array<string>;
+  /**
+   * Why
+   */
+  why: string;
+};
+
+/**
+ * TimelineSpanOut
+ */
+export type TimelineSpanOut = {
+  /**
+   * Busiest
+   */
+  busiest?: string | null;
+  /**
+   * First
+   */
+  first?: string | null;
+  /**
+   * Last
+   */
+  last?: string | null;
+};
+
+/**
+ * TimelineStepOut
+ *
+ * One step of Replay: a Story claim, in the claim's own words, with the events that date it (or one event).
+ */
+export type TimelineStepOut = {
+  /**
+   * Claim Id
+   */
+  claim_id?: string | null;
+  /**
+   * Claim Status
+   */
+  claim_status?: string | null;
+  /**
+   * Date End
+   */
+  date_end?: string | null;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Event Ids
+   */
+  event_ids: Array<string>;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Precision
+   */
+  precision: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Unresolved
+   */
+  unresolved: boolean;
+};
+
+/**
+ * TimelineUndatedOut
+ */
+export type TimelineUndatedOut = {
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Source Id
+   */
+  source_id: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Why
+   */
+  why: string;
 };
 
 /**
@@ -19363,6 +22820,51 @@ export type TraceLeadOut = {
 };
 
 /**
+ * TranscriptCompareRowOut
+ *
+ * One of our segments beside the publisher's words for the same stretch of time; `differs` counts the words
+ * marked on both sides. Neither side is right by default.
+ */
+export type TranscriptCompareRowOut = {
+  /**
+   * Differs
+   */
+  differs: number;
+  /**
+   * End
+   */
+  end: number;
+  /**
+   * Kind
+   */
+  kind: 'speech' | 'no_speech';
+  /**
+   * No Speech Text
+   */
+  no_speech_text?: string | null;
+  /**
+   * Ours
+   */
+  ours: Array<CompareWordOut>;
+  /**
+   * Segment Id
+   */
+  segment_id: string;
+  /**
+   * Speaker
+   */
+  speaker?: string | null;
+  /**
+   * Start
+   */
+  start: number;
+  /**
+   * Theirs
+   */
+  theirs: Array<CompareWordOut>;
+};
+
+/**
  * TranscriptOut
  *
  * A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
@@ -19391,6 +22893,11 @@ export type TranscriptOut = {
    */
   outline_step: number;
   /**
+   * Parts
+   */
+  parts?: Array<TranscriptPartOut>;
+  publisher?: PublisherTranscriptOut | null;
+  /**
    * Segments
    */
   segments: Array<TranscriptSegmentOut>;
@@ -19410,6 +22917,23 @@ export type TranscriptOut = {
    * Unsure Below
    */
   unsure_below: number;
+  voices?: VoicesOut | null;
+};
+
+/**
+ * TranscriptPartOut
+ *
+ * A part of the episode as its feed names it (podcast:chapters).
+ */
+export type TranscriptPartOut = {
+  /**
+   * Start
+   */
+  start: number;
+  /**
+   * Title
+   */
+  title: string;
 };
 
 /**
@@ -20170,6 +23694,92 @@ export type VisualStyleOut = {
 };
 
 /**
+ * VoiceName
+ *
+ * A person names a voice of a recording, as a party of the case (`entity_id`) or in words (`name`); both empty
+ * clears the name.
+ */
+export type VoiceName = {
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+};
+
+/**
+ * VoiceOut
+ *
+ * A voice the machine told apart in this recording (a guess), and the name a person gave it, if any.
+ */
+export type VoiceOut = {
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+  /**
+   * Named At
+   */
+  named_at?: string | null;
+  /**
+   * Named By
+   */
+  named_by?: string | null;
+  /**
+   * Spoken
+   */
+  spoken: number;
+  /**
+   * Turns
+   */
+  turns: number;
+  /**
+   * Voice
+   */
+  voice: string;
+};
+
+/**
+ * VoicesOut
+ *
+ * Who spoke when (ADR-0026): the voices, their turns as [start, end, voice], how they were found, every earlier
+ * name, and why there are none when there are none (`unavailable`).
+ */
+export type VoicesOut = {
+  /**
+   * Found By
+   */
+  found_by?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * History
+   */
+  history?: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Turns
+   */
+  turns: Array<Array<number>>;
+  /**
+   * Unavailable
+   */
+  unavailable?: string | null;
+  /**
+   * Voices
+   */
+  voices: Array<VoiceOut>;
+};
+
+/**
  * WatchlistCheckOut
  *
  * The watchlist after a check, and how many documents it newly turned up.
@@ -20626,6 +24236,36 @@ export type WireQuoteOut = {
 };
 
 /**
+ * WordChangeOut
+ *
+ * A changed stretch of the page, word by word; `unchanged` counts the same lines between two changes.
+ */
+export type WordChangeOut = {
+  /**
+   * Segments
+   */
+  segments: Array<WordSegmentOut>;
+  /**
+   * Unchanged
+   */
+  unchanged: number;
+};
+
+/**
+ * WordSegmentOut
+ */
+export type WordSegmentOut = {
+  /**
+   * Op
+   */
+  op: 'same' | 'del' | 'ins';
+  /**
+   * Text
+   */
+  text: string;
+};
+
+/**
  * WriteupCreate
  */
 export type WriteupCreate = {
@@ -20889,6 +24529,32 @@ export type WriteupsOut = {
    * Writeups
    */
   writeups: Array<WriteupSummaryOut>;
+};
+
+/**
+ * YourSafetyOut
+ */
+export type YourSafetyOut = {
+  /**
+   * Guides
+   */
+  guides: Array<SafetyGuideOut>;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Levels Set
+   */
+  levels_set: boolean;
+  /**
+   * Questions
+   */
+  questions: Array<SafetyQuestionOut>;
+  /**
+   * Signs
+   */
+  signs: Array<SafetySignOut>;
 };
 
 export type GetAiAnalysisCandidateEndpointData = {
@@ -21418,6 +25084,94 @@ export type GetCaptureResponses = {
 
 export type GetCaptureResponse = GetCaptureResponses[keyof GetCaptureResponses];
 
+export type UpdateCaptureData = {
+  body: CaptureUpdate;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}';
+};
+
+export type UpdateCaptureErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not a link-only capture
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateCaptureError = UpdateCaptureErrors[keyof UpdateCaptureErrors];
+
+export type UpdateCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type UpdateCaptureResponse =
+  UpdateCaptureResponses[keyof UpdateCaptureResponses];
+
+export type CaptureLatestData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/capture-latest';
+};
+
+export type CaptureLatestErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Capture Latest
+   *
+   * The input does not match the route, or the address cannot be captured
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureLatestError = CaptureLatestErrors[keyof CaptureLatestErrors];
+
+export type CaptureLatestResponses = {
+  /**
+   * The new capture finished before the reply (developer mode)
+   */
+  200: CaptureOut;
+  /**
+   * Successful Response
+   */
+  202: CaptureOut;
+};
+
+export type CaptureLatestResponse =
+  CaptureLatestResponses[keyof CaptureLatestResponses];
+
 export type GetCaptureFileData = {
   body?: never;
   path: {
@@ -21458,6 +25212,137 @@ export type GetCaptureFileResponses = {
    */
   200: unknown;
 };
+
+export type FollowCaptureData = {
+  body: CaptureFollowIn;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/follow';
+};
+
+export type FollowCaptureErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The page is still being captured
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FollowCaptureError = FollowCaptureErrors[keyof FollowCaptureErrors];
+
+export type FollowCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type FollowCaptureResponse =
+  FollowCaptureResponses[keyof FollowCaptureResponses];
+
+export type CaptureLookElsewhereData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/look-elsewhere';
+};
+
+export type CaptureLookElsewhereErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not asked: the capture is source-protected, or has nothing to send
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureLookElsewhereError =
+  CaptureLookElsewhereErrors[keyof CaptureLookElsewhereErrors];
+
+export type CaptureLookElsewhereResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type CaptureLookElsewhereResponse =
+  CaptureLookElsewhereResponses[keyof CaptureLookElsewhereResponses];
+
+export type MarkCaptureChangedData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/mark-changed';
+};
+
+export type MarkCaptureChangedErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The page has not changed since its capture
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MarkCaptureChangedError =
+  MarkCaptureChangedErrors[keyof MarkCaptureChangedErrors];
+
+export type MarkCaptureChangedResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type MarkCaptureChangedResponse =
+  MarkCaptureChangedResponses[keyof MarkCaptureChangedResponses];
 
 export type CollectCaptureMediaData = {
   body?: never;
@@ -21506,6 +25391,222 @@ export type CollectCaptureMediaResponses = {
 
 export type CollectCaptureMediaResponse =
   CollectCaptureMediaResponses[keyof CollectCaptureMediaResponses];
+
+export type GetCaptureQuotesData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/quotes';
+};
+
+export type GetCaptureQuotesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCaptureQuotesError =
+  GetCaptureQuotesErrors[keyof GetCaptureQuotesErrors];
+
+export type GetCaptureQuotesResponses = {
+  /**
+   * Response Get Capture Quotes
+   *
+   * Successful Response
+   */
+  200: Array<CaptureQuoteOut>;
+};
+
+export type GetCaptureQuotesResponse =
+  GetCaptureQuotesResponses[keyof GetCaptureQuotesResponses];
+
+export type RefindCaptureQuotesData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/quotes/refind';
+};
+
+export type RefindCaptureQuotesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RefindCaptureQuotesError =
+  RefindCaptureQuotesErrors[keyof RefindCaptureQuotesErrors];
+
+export type RefindCaptureQuotesResponses = {
+  /**
+   * Response Refind Capture Quotes
+   *
+   * Successful Response
+   */
+  200: Array<CaptureQuoteOut>;
+};
+
+export type RefindCaptureQuotesResponse =
+  RefindCaptureQuotesResponses[keyof RefindCaptureQuotesResponses];
+
+export type RecheckCaptureData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/recheck';
+};
+
+export type RecheckCaptureErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Still being captured, or the address moved
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecheckCaptureError =
+  RecheckCaptureErrors[keyof RecheckCaptureErrors];
+
+export type RecheckCaptureResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type RecheckCaptureResponse =
+  RecheckCaptureResponses[keyof RecheckCaptureResponses];
+
+export type CaptureSecondWitnessData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/second-witness';
+};
+
+export type CaptureSecondWitnessErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not asked: the capture is source-protected, or has nothing to send
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureSecondWitnessError =
+  CaptureSecondWitnessErrors[keyof CaptureSecondWitnessErrors];
+
+export type CaptureSecondWitnessResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type CaptureSecondWitnessResponse =
+  CaptureSecondWitnessResponses[keyof CaptureSecondWitnessResponses];
+
+export type CaptureTimeProofData = {
+  body?: never;
+  path: {
+    /**
+     * Capture Id
+     */
+    capture_id: string;
+  };
+  query?: never;
+  url: '/api/captures/{capture_id}/time-proof';
+};
+
+export type CaptureTimeProofErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not asked: the capture is source-protected, or has nothing to send
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureTimeProofError =
+  CaptureTimeProofErrors[keyof CaptureTimeProofErrors];
+
+export type CaptureTimeProofResponses = {
+  /**
+   * Successful Response
+   */
+  200: CaptureOut;
+};
+
+export type CaptureTimeProofResponse =
+  CaptureTimeProofResponses[keyof CaptureTimeProofResponses];
 
 export type GetCaseRecordData = {
   body?: never;
@@ -22940,6 +27041,94 @@ export type AddChartToDeckEndpointResponses = {
 export type AddChartToDeckEndpointResponse =
   AddChartToDeckEndpointResponses[keyof AddChartToDeckEndpointResponses];
 
+export type DeckChecksEndpointData = {
+  body?: never;
+  path: {
+    /**
+     * Deck Id
+     */
+    deck_id: string;
+  };
+  query?: never;
+  url: '/api/decks/{deck_id}/checks';
+};
+
+export type DeckChecksEndpointErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeckChecksEndpointError =
+  DeckChecksEndpointErrors[keyof DeckChecksEndpointErrors];
+
+export type DeckChecksEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  200: DeckChecksOut;
+};
+
+export type DeckChecksEndpointResponse =
+  DeckChecksEndpointResponses[keyof DeckChecksEndpointResponses];
+
+export type ExportDeckPdfData = {
+  body?: never;
+  path: {
+    /**
+     * Deck Id
+     */
+    deck_id: string;
+  };
+  query?: {
+    /**
+     * Handout
+     */
+    handout?: boolean;
+  };
+  url: '/api/decks/{deck_id}/export.pdf';
+};
+
+export type ExportDeckPdfErrors = {
+  /**
+   * No such deck
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The printing browser is not installed
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExportDeckPdfError = ExportDeckPdfErrors[keyof ExportDeckPdfErrors];
+
+export type ExportDeckPdfResponses = {
+  /**
+   * The deck as a PDF on the theme's paper, printed on this computer
+   */
+  200: Blob | File;
+};
+
+export type ExportDeckPdfResponse =
+  ExportDeckPdfResponses[keyof ExportDeckPdfResponses];
+
 export type ExportDeckPptxData = {
   body?: never;
   path: {
@@ -23171,6 +27360,104 @@ export type SeedDemoResponses = {
 
 export type SeedDemoResponse = SeedDemoResponses[keyof SeedDemoResponses];
 
+export type GetDerivedFileData = {
+  body?: never;
+  path: {
+    /**
+     * Derived File Id
+     */
+    derived_file_id: string;
+  };
+  query?: never;
+  url: '/api/derived-files/{derived_file_id}/file';
+};
+
+export type GetDerivedFileErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetDerivedFileError =
+  GetDerivedFileErrors[keyof GetDerivedFileErrors];
+
+export type GetDerivedFileResponses = {
+  /**
+   * The derived file as it was hashed
+   */
+  200: Blob | File;
+};
+
+export type GetDerivedFileResponse =
+  GetDerivedFileResponses[keyof GetDerivedFileResponses];
+
+export type GetCopyPageData = {
+  body?: never;
+  path: {
+    /**
+     * Derived File Id
+     */
+    derived_file_id: string;
+  };
+  query?: {
+    /**
+     * Page
+     */
+    page?: number;
+    /**
+     * Width
+     */
+    width?: number;
+  };
+  url: '/api/derived-files/{derived_file_id}/page.png';
+};
+
+export type GetCopyPageErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Get Copy Page
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetCopyPageError = GetCopyPageErrors[keyof GetCopyPageErrors];
+
+export type GetCopyPageResponses = {
+  /**
+   * One page of a PDF copy drawn as a picture
+   */
+  200: Blob | File;
+};
+
+export type GetCopyPageResponse =
+  GetCopyPageResponses[keyof GetCopyPageResponses];
+
 export type GetDocumentFormatsData = {
   body?: never;
   path?: never;
@@ -23281,6 +27568,350 @@ export type GetDocumentResponses = {
 
 export type GetDocumentResponse =
   GetDocumentResponses[keyof GetDocumentResponses];
+
+export type GetAuthenticityData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity';
+};
+
+export type GetAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetAuthenticityError =
+  GetAuthenticityErrors[keyof GetAuthenticityErrors];
+
+export type GetAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOut;
+};
+
+export type GetAuthenticityResponse =
+  GetAuthenticityResponses[keyof GetAuthenticityResponses];
+
+export type UpdateAuthenticityData = {
+  body: AuthenticityUpdate;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity';
+};
+
+export type UpdateAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateAuthenticityError =
+  UpdateAuthenticityErrors[keyof UpdateAuthenticityErrors];
+
+export type UpdateAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOut;
+};
+
+export type UpdateAuthenticityResponse =
+  UpdateAuthenticityResponses[keyof UpdateAuthenticityResponses];
+
+export type AddAboutClaimData = {
+  body: AuthenticityAboutClaimIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/about-claim';
+};
+
+export type AddAboutClaimErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AddAboutClaimError = AddAboutClaimErrors[keyof AddAboutClaimErrors];
+
+export type AddAboutClaimResponses = {
+  /**
+   * Successful Response
+   */
+  201: AuthenticityOut;
+};
+
+export type AddAboutClaimResponse =
+  AddAboutClaimResponses[keyof AddAboutClaimResponses];
+
+export type CompareAuthenticityData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/compare';
+};
+
+export type CompareAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CompareAuthenticityError =
+  CompareAuthenticityErrors[keyof CompareAuthenticityErrors];
+
+export type CompareAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityCompareOut;
+};
+
+export type CompareAuthenticityResponse =
+  CompareAuthenticityResponses[keyof CompareAuthenticityResponses];
+
+export type DecideAuthenticityData = {
+  body: AuthenticityDecisionIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/decision';
+};
+
+export type DecideAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The same status, nothing ticked, or no reason
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DecideAuthenticityError =
+  DecideAuthenticityErrors[keyof DecideAuthenticityErrors];
+
+export type DecideAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOut;
+};
+
+export type DecideAuthenticityResponse =
+  DecideAuthenticityResponses[keyof DecideAuthenticityResponses];
+
+export type ExamineAgainData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/examine';
+};
+
+export type ExamineAgainErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExamineAgainError = ExamineAgainErrors[keyof ExamineAgainErrors];
+
+export type ExamineAgainResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOut;
+};
+
+export type ExamineAgainResponse =
+  ExamineAgainResponses[keyof ExamineAgainResponses];
+
+export type OutsideAuthenticityData = {
+  body: AuthenticityOutsideIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/authenticity/outside';
+};
+
+export type OutsideAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Source-protected, or that check is not offered for this item
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type OutsideAuthenticityError =
+  OutsideAuthenticityErrors[keyof OutsideAuthenticityErrors];
+
+export type OutsideAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityOutsideOut;
+};
+
+export type OutsideAuthenticityResponse =
+  OutsideAuthenticityResponses[keyof OutsideAuthenticityResponses];
+
+export type PreviewAuthenticityData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query: {
+    /**
+     * Status
+     */
+    status:
+      | 'verified_origin'
+      | 'unverified'
+      | 'likely_synthetic'
+      | 'confirmed_synthetic'
+      | 'disputed';
+    /**
+     * Role
+     */
+    role?: 'events' | 'subject' | null;
+  };
+  url: '/api/documents/{document_id}/authenticity/preview';
+};
+
+export type PreviewAuthenticityErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not a status or role this screen knows
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PreviewAuthenticityError =
+  PreviewAuthenticityErrors[keyof PreviewAuthenticityErrors];
+
+export type PreviewAuthenticityResponses = {
+  /**
+   * Successful Response
+   */
+  200: AuthenticityPreviewOut;
+};
+
+export type PreviewAuthenticityResponse =
+  PreviewAuthenticityResponses[keyof PreviewAuthenticityResponses];
 
 export type ListDocumentCandidatesEndpointData = {
   body?: never;
@@ -23565,6 +28196,243 @@ export type SyncOpenalephDocumentResponses = {
 export type SyncOpenalephDocumentResponse =
   SyncOpenalephDocumentResponses[keyof SyncOpenalephDocumentResponses];
 
+export type ListDerivedData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived';
+};
+
+export type ListDerivedErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListDerivedError = ListDerivedErrors[keyof ListDerivedErrors];
+
+export type ListDerivedResponses = {
+  /**
+   * Response List Derived
+   *
+   * Successful Response
+   */
+  200: Array<DerivedFileOut>;
+};
+
+export type ListDerivedResponse =
+  ListDerivedResponses[keyof ListDerivedResponses];
+
+export type MakeCleanedCopyData = {
+  /**
+   * Body
+   */
+  body?: CleanIn | null;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived/cleaned';
+};
+
+export type MakeCleanedCopyErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Make Cleaned Copy
+   *
+   * Not a recording that has been read, or steps that cannot be used
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeCleanedCopyError =
+  MakeCleanedCopyErrors[keyof MakeCleanedCopyErrors];
+
+export type MakeCleanedCopyResponses = {
+  /**
+   * Successful Response
+   */
+  201: DerivedFileOut;
+};
+
+export type MakeCleanedCopyResponse =
+  MakeCleanedCopyResponses[keyof MakeCleanedCopyResponses];
+
+export type MakeClipData = {
+  body: ClipCreate;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived/clip';
+};
+
+export type MakeClipErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Make Clip
+   *
+   * The input does not match the route, or the part is outside the recording
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeClipError = MakeClipErrors[keyof MakeClipErrors];
+
+export type MakeClipResponses = {
+  /**
+   * Successful Response
+   */
+  201: DerivedFileOut;
+};
+
+export type MakeClipResponse = MakeClipResponses[keyof MakeClipResponses];
+
+export type MakePhotoCopyData = {
+  body: PhotoCopyIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived/photo';
+};
+
+export type MakePhotoCopyErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Make Photo Copy
+   *
+   * The copy cannot be made as asked, said why
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakePhotoCopyError = MakePhotoCopyErrors[keyof MakePhotoCopyErrors];
+
+export type MakePhotoCopyResponses = {
+  /**
+   * Successful Response
+   */
+  201: DerivedFileOut;
+};
+
+export type MakePhotoCopyResponse =
+  MakePhotoCopyResponses[keyof MakePhotoCopyResponses];
+
+export type MakeRedactedCopyData = {
+  body: RedactIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived/redacted';
+};
+
+export type MakeRedactedCopyErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Make Redacted Copy
+   *
+   * The copy cannot be made as asked, or text was left under a box
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakeRedactedCopyError =
+  MakeRedactedCopyErrors[keyof MakeRedactedCopyErrors];
+
+export type MakeRedactedCopyResponses = {
+  /**
+   * Successful Response
+   */
+  201: DerivedFileOut;
+};
+
+export type MakeRedactedCopyResponse =
+  MakeRedactedCopyResponses[keyof MakeRedactedCopyResponses];
+
 export type GetDocumentEmailData = {
   body?: never;
   path: {
@@ -23600,6 +28468,54 @@ export type GetDocumentEmailResponses = {
 
 export type GetDocumentEmailResponse =
   GetDocumentEmailResponses[keyof GetDocumentEmailResponses];
+
+export type FindPhotoFacesData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/faces';
+};
+
+export type FindPhotoFacesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FindPhotoFacesError =
+  FindPhotoFacesErrors[keyof FindPhotoFacesErrors];
+
+export type FindPhotoFacesResponses = {
+  /**
+   * Successful Response
+   */
+  200: FacesOut;
+};
+
+export type FindPhotoFacesResponse =
+  FindPhotoFacesResponses[keyof FindPhotoFacesResponses];
 
 export type GetDocumentMediaData = {
   body?: never;
@@ -23770,6 +28686,48 @@ export type GetDocumentPageImageResponses = {
 export type GetDocumentPageImageResponse =
   GetDocumentPageImageResponses[keyof GetDocumentPageImageResponses];
 
+export type GetPhotoData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/photo';
+};
+
+export type GetPhotoErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetPhotoError = GetPhotoErrors[keyof GetPhotoErrors];
+
+export type GetPhotoResponses = {
+  /**
+   * Successful Response
+   */
+  200: PhotoOut;
+};
+
+export type GetPhotoResponse = GetPhotoResponses[keyof GetPhotoResponses];
+
 export type GetDocumentPictureData = {
   body?: never;
   path: {
@@ -23798,7 +28756,7 @@ export type GetDocumentPictureError =
 
 export type GetDocumentPictureResponses = {
   /**
-   * The picture this document is, as uploaded (PNG or JPEG)
+   * The picture this document is, as uploaded (PNG or JPEG), or the viewable copy of a HEIC or RAW photo
    */
   200: Blob | File;
 };
@@ -23841,6 +28799,108 @@ export type RecheckHashResponses = {
 export type RecheckHashResponse =
   RecheckHashResponses[keyof RecheckHashResponses];
 
+export type GetRedactionData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/redaction';
+};
+
+export type GetRedactionErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * PdfCraft could not read the PDF
+   */
+  422: ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetRedactionError = GetRedactionErrors[keyof GetRedactionErrors];
+
+export type GetRedactionResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedactionOut;
+};
+
+export type GetRedactionResponse =
+  GetRedactionResponses[keyof GetRedactionResponses];
+
+export type CompareRedactedData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query: {
+    /**
+     * Copy Id
+     */
+    copy_id: string;
+  };
+  url: '/api/documents/{document_id}/redaction/compare';
+};
+
+export type CompareRedactedErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Compare Redacted
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CompareRedactedError =
+  CompareRedactedErrors[keyof CompareRedactedErrors];
+
+export type CompareRedactedResponses = {
+  /**
+   * Successful Response
+   */
+  200: RedactCompareOut;
+};
+
+export type CompareRedactedResponse =
+  CompareRedactedResponses[keyof CompareRedactedResponses];
+
 export type GetSimilarDocumentsData = {
   body?: never;
   path: {
@@ -23881,6 +28941,208 @@ export type GetSimilarDocumentsResponses = {
 
 export type GetSimilarDocumentsResponse =
   GetSimilarDocumentsResponses[keyof GetSimilarDocumentsResponses];
+
+export type GetSoundData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/sound';
+};
+
+export type GetSoundErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSoundError = GetSoundErrors[keyof GetSoundErrors];
+
+export type GetSoundResponses = {
+  /**
+   * Successful Response
+   */
+  200: SoundOut;
+};
+
+export type GetSoundResponse = GetSoundResponses[keyof GetSoundResponses];
+
+export type GetSpectrogramData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: {
+    /**
+     * Start
+     */
+    start?: number;
+    /**
+     * End
+     */
+    end?: number;
+    /**
+     * Cleaned
+     */
+    cleaned?: boolean;
+  };
+  url: '/api/documents/{document_id}/spectrogram.png';
+};
+
+export type GetSpectrogramErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Get Spectrogram
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSpectrogramError =
+  GetSpectrogramErrors[keyof GetSpectrogramErrors];
+
+export type GetSpectrogramResponses = {
+  /**
+   * A stretch of the recording as a spectrogram, 0 to 4 kHz
+   */
+  200: unknown;
+};
+
+export type FindDocumentSyncData = {
+  body: SyncIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/sync';
+};
+
+export type FindDocumentSyncErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Find Document Sync
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FindDocumentSyncError =
+  FindDocumentSyncErrors[keyof FindDocumentSyncErrors];
+
+export type FindDocumentSyncResponses = {
+  /**
+   * Successful Response
+   */
+  200: SyncOut;
+};
+
+export type FindDocumentSyncResponse =
+  FindDocumentSyncResponses[keyof FindDocumentSyncResponses];
+
+export type AcceptDocumentSyncData = {
+  body: SyncIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/sync/accept';
+};
+
+export type AcceptDocumentSyncErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Accept Document Sync
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AcceptDocumentSyncError =
+  AcceptDocumentSyncErrors[keyof AcceptDocumentSyncErrors];
+
+export type AcceptDocumentSyncResponses = {
+  /**
+   * Successful Response
+   */
+  200: SyncOut;
+};
+
+export type AcceptDocumentSyncResponse =
+  AcceptDocumentSyncResponses[keyof AcceptDocumentSyncResponses];
 
 export type GetDocumentTableData = {
   body?: never;
@@ -24077,6 +29339,52 @@ export type GetDocumentTranscriptResponses = {
 export type GetDocumentTranscriptResponse =
   GetDocumentTranscriptResponses[keyof GetDocumentTranscriptResponses];
 
+export type CompareTranscriptsData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/transcript/compare';
+};
+
+export type CompareTranscriptsErrors = {
+  /**
+   * No such document, or no publisher's transcript to compare with
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CompareTranscriptsError =
+  CompareTranscriptsErrors[keyof CompareTranscriptsErrors];
+
+export type CompareTranscriptsResponses = {
+  /**
+   * Response Compare Transcripts
+   *
+   * Successful Response
+   */
+  200: Array<TranscriptCompareRowOut>;
+};
+
+export type CompareTranscriptsResponse =
+  CompareTranscriptsResponses[keyof CompareTranscriptsResponses];
+
 export type GetDocumentTranslationData = {
   body?: never;
   path: {
@@ -24112,6 +29420,104 @@ export type GetDocumentTranslationResponses = {
 
 export type GetDocumentTranslationResponse =
   GetDocumentTranslationResponses[keyof GetDocumentTranslationResponses];
+
+export type FindVoicesData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/voices';
+};
+
+export type FindVoicesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not transcribed yet, or the voices are already being found
+   */
+  409: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The voice models are not on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FindVoicesError = FindVoicesErrors[keyof FindVoicesErrors];
+
+export type FindVoicesResponses = {
+  /**
+   * Successful Response
+   */
+  202: BackgroundJobOut;
+};
+
+export type FindVoicesResponse = FindVoicesResponses[keyof FindVoicesResponses];
+
+export type NameVoiceData = {
+  body: VoiceName;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+    /**
+     * Voice
+     */
+    voice: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/voices/{voice}';
+};
+
+export type NameVoiceErrors = {
+  /**
+   * No such recording or voice
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Name Voice
+   *
+   * The party is not in this case
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type NameVoiceError = NameVoiceErrors[keyof NameVoiceErrors];
+
+export type NameVoiceResponses = {
+  /**
+   * Successful Response
+   */
+  200: VoicesOut;
+};
+
+export type NameVoiceResponse = NameVoiceResponses[keyof NameVoiceResponses];
 
 export type EnrichmentSessionDetailData = {
   body?: never;
@@ -26278,6 +31684,335 @@ export type InvestigationSuiteRunResponses = {
 export type InvestigationSuiteRunResponse =
   InvestigationSuiteRunResponses[keyof InvestigationSuiteRunResponses];
 
+export type ListAuthenticityData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/authenticity';
+};
+
+export type ListAuthenticityErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListAuthenticityError =
+  ListAuthenticityErrors[keyof ListAuthenticityErrors];
+
+export type ListAuthenticityResponses = {
+  /**
+   * Response List Authenticity
+   *
+   * Successful Response
+   */
+  200: Array<AuthenticityStatusOut>;
+};
+
+export type ListAuthenticityResponse =
+  ListAuthenticityResponses[keyof ListAuthenticityResponses];
+
+export type ListBuiltTimelinesData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/built-timelines';
+};
+
+export type ListBuiltTimelinesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListBuiltTimelinesError =
+  ListBuiltTimelinesErrors[keyof ListBuiltTimelinesErrors];
+
+export type ListBuiltTimelinesResponses = {
+  /**
+   * Response List Built Timelines
+   *
+   * Successful Response
+   */
+  200: Array<BuiltTimelineOut>;
+};
+
+export type ListBuiltTimelinesResponse =
+  ListBuiltTimelinesResponses[keyof ListBuiltTimelinesResponses];
+
+export type CreateBuiltTimelineData = {
+  body: BuiltTimelineIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/built-timelines';
+};
+
+export type CreateBuiltTimelineErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Built Timeline
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateBuiltTimelineError =
+  CreateBuiltTimelineErrors[keyof CreateBuiltTimelineErrors];
+
+export type CreateBuiltTimelineResponses = {
+  /**
+   * Successful Response
+   */
+  201: BuiltTimelineOut;
+};
+
+export type CreateBuiltTimelineResponse =
+  CreateBuiltTimelineResponses[keyof CreateBuiltTimelineResponses];
+
+export type DeleteBuiltTimelineData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Built Id
+     */
+    built_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/built-timelines/{built_id}';
+};
+
+export type DeleteBuiltTimelineErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteBuiltTimelineError =
+  DeleteBuiltTimelineErrors[keyof DeleteBuiltTimelineErrors];
+
+export type DeleteBuiltTimelineResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteBuiltTimelineResponse =
+  DeleteBuiltTimelineResponses[keyof DeleteBuiltTimelineResponses];
+
+export type UpdateBuiltTimelineData = {
+  body: BuiltTimelineIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Built Id
+     */
+    built_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/built-timelines/{built_id}';
+};
+
+export type UpdateBuiltTimelineErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Update Built Timeline
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateBuiltTimelineError =
+  UpdateBuiltTimelineErrors[keyof UpdateBuiltTimelineErrors];
+
+export type UpdateBuiltTimelineResponses = {
+  /**
+   * Successful Response
+   */
+  200: BuiltTimelineOut;
+};
+
+export type UpdateBuiltTimelineResponse =
+  UpdateBuiltTimelineResponses[keyof UpdateBuiltTimelineResponses];
+
+export type ByHandAddData = {
+  body: EntryIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/by-hand';
+};
+
+export type ByHandAddErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 By Hand Add
+   *
+   * Something in it cannot be added, said why
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ByHandAddError = ByHandAddErrors[keyof ByHandAddErrors];
+
+export type ByHandAddResponses = {
+  /**
+   * Successful Response
+   */
+  201: ByHandAddedOut;
+};
+
+export type ByHandAddResponse = ByHandAddResponses[keyof ByHandAddResponses];
+
+export type ByHandPreviewData = {
+  body: EntryIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/by-hand/preview';
+};
+
+export type ByHandPreviewErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ByHandPreviewError = ByHandPreviewErrors[keyof ByHandPreviewErrors];
+
+export type ByHandPreviewResponses = {
+  /**
+   * Successful Response
+   */
+  200: ByHandPreviewOut;
+};
+
+export type ByHandPreviewResponse =
+  ByHandPreviewResponses[keyof ByHandPreviewResponses];
+
+export type ByHandSuggestData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Q
+     */
+    q?: string;
+  };
+  url: '/api/investigations/{investigation_id}/by-hand/suggest';
+};
+
+export type ByHandSuggestErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ByHandSuggestError = ByHandSuggestErrors[keyof ByHandSuggestErrors];
+
+export type ByHandSuggestResponses = {
+  /**
+   * Response By Hand Suggest
+   *
+   * Successful Response
+   */
+  200: Array<ByHandSuggestionOut>;
+};
+
+export type ByHandSuggestResponse =
+  ByHandSuggestResponses[keyof ByHandSuggestResponses];
+
 export type GetCapturesData = {
   body?: never;
   path: {
@@ -27248,7 +32983,7 @@ export type GetDecisionsData = {
     /**
      * Order
      */
-    order?: 'consequence' | 'source' | 'oldest';
+    order?: 'consequence' | 'source' | 'oldest' | 'unlocks';
     /**
      * Offset
      */
@@ -27319,6 +33054,46 @@ export type ListDecksEndpointResponses = {
 
 export type ListDecksEndpointResponse =
   ListDecksEndpointResponses[keyof ListDecksEndpointResponses];
+
+export type CreateDeckEndpointData = {
+  body: DeckCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/decks';
+};
+
+export type CreateDeckEndpointErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateDeckEndpointError =
+  CreateDeckEndpointErrors[keyof CreateDeckEndpointErrors];
+
+export type CreateDeckEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  201: DeckOut;
+};
+
+export type CreateDeckEndpointResponse =
+  CreateDeckEndpointResponses[keyof CreateDeckEndpointResponses];
 
 export type InvestigationDeletionPreviewData = {
   body?: never;
@@ -27569,6 +33344,88 @@ export type ListInvestigationEvidenceResponses = {
 export type ListInvestigationEvidenceResponse =
   ListInvestigationEvidenceResponses[keyof ListInvestigationEvidenceResponses];
 
+export type ExportEvidencePackData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/evidence-pack.zip';
+};
+
+export type ExportEvidencePackErrors = {
+  /**
+   * No story write-up to pack
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExportEvidencePackError =
+  ExportEvidencePackErrors[keyof ExportEvidencePackErrors];
+
+export type ExportEvidencePackResponses = {
+  /**
+   * The evidence pack: the write-up, its exhibits with fingerprints, custody, readiness, gaps
+   */
+  200: Blob | File;
+};
+
+export type ExportEvidencePackResponse =
+  ExportEvidencePackResponses[keyof ExportEvidencePackResponses];
+
+export type CheckEvidencePackData = {
+  body: BodyCheckEvidencePack;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/evidence-pack/check';
+};
+
+export type CheckEvidencePackErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Check Evidence Pack
+   *
+   * Not a .zip, or not an evidence pack
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CheckEvidencePackError =
+  CheckEvidencePackErrors[keyof CheckEvidencePackErrors];
+
+export type CheckEvidencePackResponses = {
+  /**
+   * Successful Response
+   */
+  200: PackCheckOut;
+};
+
+export type CheckEvidencePackResponse =
+  CheckEvidencePackResponses[keyof CheckEvidencePackResponses];
+
 export type ExportInvestigationData = {
   body?: never;
   path: {
@@ -27645,6 +33502,77 @@ export type GetInvestigationFinancialFlowsResponses = {
 
 export type GetInvestigationFinancialFlowsResponse =
   GetInvestigationFinancialFlowsResponses[keyof GetInvestigationFinancialFlowsResponses];
+
+export type GetFollowingData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/following';
+};
+
+export type GetFollowingErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetFollowingError = GetFollowingErrors[keyof GetFollowingErrors];
+
+export type GetFollowingResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type GetFollowingResponse =
+  GetFollowingResponses[keyof GetFollowingResponses];
+
+export type CaptureAllData = {
+  body: CaptureAllRequest;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/following/capture-all';
+};
+
+export type CaptureAllErrors = {
+  /**
+   * Response 422 Capture All
+   *
+   * No reason, or one too short
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureAllError = CaptureAllErrors[keyof CaptureAllErrors];
+
+export type CaptureAllResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type CaptureAllResponse = CaptureAllResponses[keyof CaptureAllResponses];
 
 export type GetInvestigationGraphData = {
   body?: never;
@@ -28069,6 +33997,89 @@ export type GetInvestigationMoneyChecksResponses = {
 
 export type GetInvestigationMoneyChecksResponse =
   GetInvestigationMoneyChecksResponses[keyof GetInvestigationMoneyChecksResponses];
+
+export type CreateMonitorData = {
+  body: MonitorCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/monitors';
+};
+
+export type CreateMonitorErrors = {
+  /**
+   * No such investigation
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Monitor
+   *
+   * The input does not match the route, or the address cannot be followed (the message says why)
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateMonitorError = CreateMonitorErrors[keyof CreateMonitorErrors];
+
+export type CreateMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorOut;
+};
+
+export type CreateMonitorResponse =
+  CreateMonitorResponses[keyof CreateMonitorResponses];
+
+export type CreateMailboxMonitorData = {
+  body: MailboxCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/monitors/mailbox';
+};
+
+export type CreateMailboxMonitorErrors = {
+  /**
+   * No such investigation
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Mailbox Monitor
+   *
+   * The mailbox or sender cannot be followed (the message says why)
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateMailboxMonitorError =
+  CreateMailboxMonitorErrors[keyof CreateMailboxMonitorErrors];
+
+export type CreateMailboxMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorOut;
+};
+
+export type CreateMailboxMonitorResponse =
+  CreateMailboxMonitorResponses[keyof CreateMailboxMonitorResponses];
 
 export type GetNotesData = {
   body?: never;
@@ -29483,6 +35494,10 @@ export type GetInvestigationTimelineData = {
      */
     include_record_activity?: boolean;
     /**
+     * Include Source Dates
+     */
+    include_source_dates?: boolean;
+    /**
      * Limit
      */
     limit?: number | null;
@@ -29517,6 +35532,258 @@ export type GetInvestigationTimelineResponses = {
 
 export type GetInvestigationTimelineResponse =
   GetInvestigationTimelineResponses[keyof GetInvestigationTimelineResponses];
+
+export type GetTimelineBoardData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/board';
+};
+
+export type GetTimelineBoardErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetTimelineBoardError =
+  GetTimelineBoardErrors[keyof GetTimelineBoardErrors];
+
+export type GetTimelineBoardResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelineBoardOut;
+};
+
+export type GetTimelineBoardResponse =
+  GetTimelineBoardResponses[keyof GetTimelineBoardResponses];
+
+export type PutTimelineBoardData = {
+  body: TimelineBoardIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/board';
+};
+
+export type PutTimelineBoardErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PutTimelineBoardError =
+  PutTimelineBoardErrors[keyof PutTimelineBoardErrors];
+
+export type PutTimelineBoardResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelineBoardOut;
+};
+
+export type PutTimelineBoardResponse =
+  PutTimelineBoardResponses[keyof PutTimelineBoardResponses];
+
+export type TimelineLanesViewData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/lanes';
+};
+
+export type TimelineLanesViewErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TimelineLanesViewError =
+  TimelineLanesViewErrors[keyof TimelineLanesViewErrors];
+
+export type TimelineLanesViewResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelineLanesOut;
+};
+
+export type TimelineLanesViewResponse =
+  TimelineLanesViewResponses[keyof TimelineLanesViewResponses];
+
+export type CreateTimelinePeriodData = {
+  body: TimelinePeriodIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/periods';
+};
+
+export type CreateTimelinePeriodErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Timeline Period
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateTimelinePeriodError =
+  CreateTimelinePeriodErrors[keyof CreateTimelinePeriodErrors];
+
+export type CreateTimelinePeriodResponses = {
+  /**
+   * Successful Response
+   */
+  201: TimelinePeriodOut;
+};
+
+export type CreateTimelinePeriodResponse =
+  CreateTimelinePeriodResponses[keyof CreateTimelinePeriodResponses];
+
+export type DeleteTimelinePeriodData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Period Id
+     */
+    period_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/periods/{period_id}';
+};
+
+export type DeleteTimelinePeriodErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteTimelinePeriodError =
+  DeleteTimelinePeriodErrors[keyof DeleteTimelinePeriodErrors];
+
+export type DeleteTimelinePeriodResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteTimelinePeriodResponse =
+  DeleteTimelinePeriodResponses[keyof DeleteTimelinePeriodResponses];
+
+export type UpdateTimelinePeriodData = {
+  body: TimelinePeriodIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Period Id
+     */
+    period_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/periods/{period_id}';
+};
+
+export type UpdateTimelinePeriodErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Update Timeline Period
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateTimelinePeriodError =
+  UpdateTimelinePeriodErrors[keyof UpdateTimelinePeriodErrors];
+
+export type UpdateTimelinePeriodResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelinePeriodOut;
+};
+
+export type UpdateTimelinePeriodResponse =
+  UpdateTimelinePeriodResponses[keyof UpdateTimelinePeriodResponses];
 
 export type GetInvestigationTypeData = {
   body?: never;
@@ -29880,6 +36147,50 @@ export type GetWireResponses = {
 
 export type GetWireResponse = GetWireResponses[keyof GetWireResponses];
 
+export type ExportWriteupPdfData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/writeup.pdf';
+};
+
+export type ExportWriteupPdfErrors = {
+  /**
+   * No story write-up
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The printing browser is not installed
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExportWriteupPdfError =
+  ExportWriteupPdfErrors[keyof ExportWriteupPdfErrors];
+
+export type ExportWriteupPdfResponses = {
+  /**
+   * The story's write-up for reading, printed on this computer
+   */
+  200: Blob | File;
+};
+
+export type ExportWriteupPdfResponse =
+  ExportWriteupPdfResponses[keyof ExportWriteupPdfResponses];
+
 export type ListWriteupsEndpointData = {
   body?: never;
   path: {
@@ -29920,6 +36231,45 @@ export type ListWriteupsEndpointResponses = {
 
 export type ListWriteupsEndpointResponse =
   ListWriteupsEndpointResponses[keyof ListWriteupsEndpointResponses];
+
+export type GetYourSafetyData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/your-safety';
+};
+
+export type GetYourSafetyErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetYourSafetyError = GetYourSafetyErrors[keyof GetYourSafetyErrors];
+
+export type GetYourSafetyResponses = {
+  /**
+   * Successful Response
+   */
+  200: YourSafetyOut;
+};
+
+export type GetYourSafetyResponse =
+  GetYourSafetyResponses[keyof GetYourSafetyResponses];
 
 export type ListJobsEndpointData = {
   body?: never;
@@ -30633,6 +36983,338 @@ export type NewRecoveryKeyResponses = {
 export type NewRecoveryKeyResponse =
   NewRecoveryKeyResponses[keyof NewRecoveryKeyResponses];
 
+export type CaptureItemData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/capture';
+};
+
+export type CaptureItemErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The item is not waiting
+   */
+  409: ErrorOut;
+  /**
+   * The address cannot be captured
+   */
+  422: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CaptureItemError = CaptureItemErrors[keyof CaptureItemErrors];
+
+export type CaptureItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type CaptureItemResponse =
+  CaptureItemResponses[keyof CaptureItemResponses];
+
+export type RecordRemovalData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/record-removal';
+};
+
+export type RecordRemovalErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RecordRemovalError = RecordRemovalErrors[keyof RecordRemovalErrors];
+
+export type RecordRemovalResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type RecordRemovalResponse =
+  RecordRemovalResponses[keyof RecordRemovalResponses];
+
+export type SkipItemData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/skip';
+};
+
+export type SkipItemErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SkipItemError = SkipItemErrors[keyof SkipItemErrors];
+
+export type SkipItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type SkipItemResponse = SkipItemResponses[keyof SkipItemResponses];
+
+export type UndoItemData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Item Id
+     */
+    monitor_item_id: string;
+  };
+  query?: never;
+  url: '/api/monitor-items/{monitor_item_id}/undo';
+};
+
+export type UndoItemErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UndoItemError = UndoItemErrors[keyof UndoItemErrors];
+
+export type UndoItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: FollowingOut;
+};
+
+export type UndoItemResponse = UndoItemResponses[keyof UndoItemResponses];
+
+export type DeleteMonitorData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Id
+     */
+    monitor_id: string;
+  };
+  query?: never;
+  url: '/api/monitors/{monitor_id}';
+};
+
+export type DeleteMonitorErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteMonitorError = DeleteMonitorErrors[keyof DeleteMonitorErrors];
+
+export type DeleteMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteMonitorResponse =
+  DeleteMonitorResponses[keyof DeleteMonitorResponses];
+
+export type UpdateMonitorData = {
+  body: MonitorUpdate;
+  path: {
+    /**
+     * Monitor Id
+     */
+    monitor_id: string;
+  };
+  query?: never;
+  url: '/api/monitors/{monitor_id}';
+};
+
+export type UpdateMonitorErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Conflict
+   */
+  409: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateMonitorError = UpdateMonitorErrors[keyof UpdateMonitorErrors];
+
+export type UpdateMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorOut;
+};
+
+export type UpdateMonitorResponse =
+  UpdateMonitorResponses[keyof UpdateMonitorResponses];
+
+export type CheckMonitorData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Id
+     */
+    monitor_id: string;
+  };
+  query?: never;
+  url: '/api/monitors/{monitor_id}/check';
+};
+
+export type CheckMonitorErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CheckMonitorError = CheckMonitorErrors[keyof CheckMonitorErrors];
+
+export type CheckMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorOut;
+};
+
+export type CheckMonitorResponse =
+  CheckMonitorResponses[keyof CheckMonitorResponses];
+
+export type GetVersionsData = {
+  body?: never;
+  path: {
+    /**
+     * Monitor Id
+     */
+    monitor_id: string;
+  };
+  query?: never;
+  url: '/api/monitors/{monitor_id}/versions';
+};
+
+export type GetVersionsErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetVersionsError = GetVersionsErrors[keyof GetVersionsErrors];
+
+export type GetVersionsResponses = {
+  /**
+   * Response Get Versions
+   *
+   * Successful Response
+   */
+  200: Array<PageVersionOut>;
+};
+
+export type GetVersionsResponse =
+  GetVersionsResponses[keyof GetVersionsResponses];
+
 export type RemoveNoteData = {
   body?: never;
   path: {
@@ -30736,6 +37418,146 @@ export type MakeLeadFromNoteResponses = {
 
 export type MakeLeadFromNoteResponse =
   MakeLeadFromNoteResponses[keyof MakeLeadFromNoteResponses];
+
+export type GetPlatformChecksData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/platform-checks';
+};
+
+export type GetPlatformChecksErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetPlatformChecksError =
+  GetPlatformChecksErrors[keyof GetPlatformChecksErrors];
+
+export type GetPlatformChecksResponses = {
+  /**
+   * Successful Response
+   */
+  200: PlatformChecksOut;
+};
+
+export type GetPlatformChecksResponse =
+  GetPlatformChecksResponses[keyof GetPlatformChecksResponses];
+
+export type ChangePlatformChecksData = {
+  body: PlatformChecksUpdate;
+  path?: never;
+  query?: never;
+  url: '/api/platform-checks';
+};
+
+export type ChangePlatformChecksErrors = {
+  /**
+   * Response 422 Change Platform Checks
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ChangePlatformChecksError =
+  ChangePlatformChecksErrors[keyof ChangePlatformChecksErrors];
+
+export type ChangePlatformChecksResponses = {
+  /**
+   * Successful Response
+   */
+  200: PlatformChecksOut;
+};
+
+export type ChangePlatformChecksResponse =
+  ChangePlatformChecksResponses[keyof ChangePlatformChecksResponses];
+
+export type PlatformForUrlData = {
+  body?: never;
+  path?: never;
+  query: {
+    /**
+     * Url
+     */
+    url: string;
+  };
+  url: '/api/platform-checks/for';
+};
+
+export type PlatformForUrlErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PlatformForUrlError =
+  PlatformForUrlErrors[keyof PlatformForUrlErrors];
+
+export type PlatformForUrlResponses = {
+  /**
+   * Response Platform For Url
+   *
+   * Successful Response
+   */
+  200: PlatformForUrlOut | null;
+};
+
+export type PlatformForUrlResponse =
+  PlatformForUrlResponses[keyof PlatformForUrlResponses];
+
+export type RunPlatformChecksData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Platform
+     */
+    platform?: string | null;
+  };
+  url: '/api/platform-checks/run';
+};
+
+export type RunPlatformChecksErrors = {
+  /**
+   * Response 422 Run Platform Checks
+   *
+   * No such platform
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RunPlatformChecksError =
+  RunPlatformChecksErrors[keyof RunPlatformChecksErrors];
+
+export type RunPlatformChecksResponses = {
+  /**
+   * Successful Response
+   */
+  202: BackgroundJobOut;
+};
+
+export type RunPlatformChecksResponse =
+  RunPlatformChecksResponses[keyof RunPlatformChecksResponses];
 
 export type PresentationStylesData = {
   body?: never;
@@ -32675,6 +39497,36 @@ export type RotateAppUserTokenResponses = {
 
 export type RotateAppUserTokenResponse =
   RotateAppUserTokenResponses[keyof RotateAppUserTokenResponses];
+
+export type GetSigningKeyData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/settings/signing-key';
+};
+
+export type GetSigningKeyErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSigningKeyError = GetSigningKeyErrors[keyof GetSigningKeyErrors];
+
+export type GetSigningKeyResponses = {
+  /**
+   * Successful Response
+   */
+  200: SigningKeyOut;
+};
+
+export type GetSigningKeyResponse =
+  GetSigningKeyResponses[keyof GetSigningKeyResponses];
 
 export type SettingsStatusData = {
   body?: never;

@@ -5,7 +5,7 @@ import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-libr
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {captureState, isWebAddress, laneSummary, sameLink} from '../features/the-drop/captures';
+import {captureState, isWebAddress, laneSummary, sameLink, timeProofWords} from '../features/the-drop/captures';
 import {TheDrop} from '../features/the-drop/the-drop';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -37,7 +37,7 @@ function capture(over: Partial<CaptureOut> = {}): CaptureOut {
     exchange: {request: {method: 'GET', target: '/2019/03/harbour-parcel', headers: [['accept-language', 'en-GB'], ['cookie', '(none)']]},
       response: {status: 'HTTP/1.1 200 OK', headers: [['content-type', 'text/html; charset=utf-8'], ['etag', '"7c1e-5a0"']]}},
     source_id: 's1', document_id: 'd1', case_record_id: 'r1', job_id: 'j1', content_verified: 'not done by this system', job: null,
-    media: {}, media_document_id: null,
+    media: {}, media_document_id: null, witnesses: {}, source_protected: false, time_server: 'freetsa.org',
     ...over,
   };
 }
@@ -211,5 +211,210 @@ describe('Links & captures', () => {
     expect(within(lane).getAllByRole('listitem')[0]).toHaveTextContent('Link checked… working');
     expect(screen.queryByRole('region', {name: 'Capture receipt'})).toBeNull();
     expect(screen.getByText(/Visiting the page once, from this computer, in a fresh browser with no stored cookies/)).toBeInTheDocument();
+  });
+});
+
+describe('Checking a captured page again (INTAKE_3)', () => {
+  const follow = (over: Partial<NonNullable<CaptureOut['follow']>> = {}): NonNullable<CaptureOut['follow']> => ({
+    monitor_id: 'm1', every: 'weekly', health: 'works', health_detail: null, last_checked_at: '2026-10-19T10:16:20', next_check_at: '2026-10-26T10:16:20',
+    checks: [{state: 'ok', text: 'Answered 200 in 0.8 s', status: 200, seconds: 0.8}, {state: 'warn', text: 'Text differs from the last version · 2 lines'}],
+    leaves: 'One request a week to fernhill-holdings.example. The site sees a visit from this computer\'s address. Only the page\'s main text is compared.',
+    state: 'changed', item_id: 'i2', marked_changed: null, captured_text: 'Fernhill Ltd is owned by Harbour Nominees Ltd.', live_text: 'Fernhill Ltd is a privately held company.',
+    versions: [{number: 1, seen_at: '2026-10-12T08:31:00', captured: true, capture_id: 'c1', text_sha256: 'a3f907c2'.padEnd(60, '0') + '5d1e', lines_changed: 0},
+      {number: 2, seen_at: '2026-10-19T10:16:20', captured: false, capture_id: null, text_sha256: 'f'.repeat(64), lines_changed: 2}],
+    changes: [{unchanged: 0, segments: [{op: 'same', text: 'Fernhill Ltd is '}, {op: 'del', text: 'owned by Harbour Nominees Ltd.'}, {op: 'ins', text: 'a privately held company.'}]}],
+    ...over,
+  });
+
+  it('shows a page changed since its capture word by word, and captures version 2 keeping both', async () => {
+    const changed = capture({follow: follow()});
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [changed],
+      'POST /api/captures/c1/capture-latest': {status: 202, body: capture({id: 'c2', status: 'queued', outcome: null})},
+      'POST /api/captures/c1/mark-changed': capture({follow: follow({marked_changed: {at: '2026-10-19T10:17:00', by: 'local-owner', state: 'changed', version: 2}})}),
+      'PUT /api/captures/c1/follow': capture({follow: follow({every: 'daily'})})});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const main = await screen.findByRole('region', {name: 'The chosen capture'});
+    expect(within(main).getByText('Changed since capture')).toBeInTheDocument();
+    const recheck = within(main).getByRole('region', {name: 'Re-check'});
+    expect(within(recheck).getAllByRole('listitem').map(li => li.textContent).slice(0, 4))
+      .toEqual(['Link checked✓', 'Page fetched✓ 0.8 s · 200', 'Text read✓', 'Compared with v1! 2 lines differ']);
+    expect(recheck).toHaveTextContent('Version 2 · seen 2026-10-19 10:16, not captured');
+    expect(recheck).toHaveTextContent('Nothing is saved until you say so.');
+    const what = within(main).getByRole('region', {name: 'What changed'});
+    expect(what.querySelector('del')).toHaveTextContent('owned by Harbour Nominees Ltd.');
+    expect(what.querySelector('ins')).toHaveTextContent('a privately held company.');
+    await user.click(within(what).getByRole('button', {name: 'Side by side'}));
+    expect(what).toHaveTextContent('Version 1 · captured');
+    await user.click(within(what).getByRole('button', {name: 'Mark source “changed”'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/mark-changed')).toHaveLength(1));
+    await user.click(within(what).getByRole('button', {name: 'Capture version 2 · keeps both'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/capture-latest')).toHaveLength(1));
+    const again = screen.getByRole('region', {name: 'Check again later'});
+    expect(within(again).getByRole('radio', {name: 'Weekly'})).toHaveAttribute('aria-checked', 'true');
+    await user.click(within(again).getByRole('radio', {name: 'Daily'}));
+    await waitFor(() => expect(api.calls('PUT /api/captures/c1/follow')).toHaveLength(1));
+    expect(api.calls('PUT /api/captures/c1/follow')[0].body).toEqual({every: 'daily'});
+    expect(captureState(changed)).toMatchObject({word: 'Changed since capture', tone: 'amber'});
+    expect(captureState(capture({follow: follow({state: 'gone'})}))).toMatchObject({word: 'Gone', tone: 'bad'});
+  });
+
+  it('re-checks a saved page from its receipt', async () => {
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture()],
+      'POST /api/captures/c1/recheck': capture({follow: follow({state: 'same', every: 'never', next_check_at: null, changes: [], versions: [follow().versions[0]]})})});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const receipt = await screen.findByRole('region', {name: 'Capture receipt'});
+    await user.click(within(receipt).getByRole('button', {name: 'Re-check now'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/recheck')).toHaveLength(1));
+  });
+
+  it('lets a person give a link only its reason and ask again in 7 days', async () => {
+    const only = capture({outcome: 'link_only', suite_outcome: 'UNABLE_TO_OBTAIN', reason: 'The site answered HTTP 404', files: [], document_id: null,
+      displayed: {}, http_status: 404, reason_kind: 'dead_link', stages: stages(['done', 'stopped', 'skipped', 'skipped', 'skipped', 'skipped', 'skipped'])});
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [only],
+      'PATCH /api/captures/c1': {...only, reason_kind: 'blocked', reason_kind_by: 'local-owner'},
+      'PUT /api/captures/c1/follow': {...only, follow: follow({state: 'unchecked', last_checked_at: null, versions: [], changes: []})}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const outcome = await screen.findByRole('region', {name: 'Link only'});
+    const reasons = within(outcome).getByRole('radiogroup', {name: 'Why it could not be kept'});
+    expect(within(reasons).getByRole('radio', {name: 'Dead link'})).toHaveAttribute('aria-checked', 'true');
+    expect(reasons).toHaveTextContent('read from the reply');
+    await user.click(within(reasons).getByRole('radio', {name: 'Blocked'}));
+    await waitFor(() => expect(api.calls('PATCH /api/captures/c1')[0]?.body).toEqual({reason_kind: 'blocked'}));
+    await user.click(within(outcome).getByRole('button', {name: 'Ask again in 7 days'}));
+    await waitFor(() => expect(api.calls('PUT /api/captures/c1/follow')[0]?.body).toEqual({every: 'weekly'}));
+  });
+});
+
+describe('Outside witnesses (INTAKE_3, ADR-0025)', () => {
+  const stamped = {state: 'stamped', server: 'https://freetsa.org/tsr', asked_at: '2026-10-19T10:14:10', answered_at: '2026-10-19T10:14:11', by: 'local-owner',
+    of: 'page.warc.gz', sent: HASH, token: 'timestamp.tsr', time: '2026-10-19T10:14:11', signer: 'www.freetsa.org', serial: '159801710', policy: '1.2.3.4.1',
+    fingerprint: HASH, check: 'checked', check_detail: 'Signed by a certificate that chains to the Free TSA root'} as const;
+
+  it('asks for the switches with the next capture only, and says what will leave', async () => {
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture()], 'GET /api/captures/c1/files/screenshot.png': {status: 200, body: 'png'},
+      'POST /api/investigations/inv-1/captures': {status: 202, body: capture({id: 'c2', status: 'queued', outcome: null})}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const leaves = await screen.findByRole('region', {name: 'What leaves this computer'});
+    expect(leaves).toHaveTextContent('Nothing third-party is contacted.');
+    await user.click(within(leaves).getByRole('switch', {name: /Second witness/}));
+    await user.click(within(leaves).getByRole('switch', {name: /Time proof/}));
+    expect(leaves).toHaveTextContent('2 outside services will be asked. The link goes to a public web archive. The 64-character fingerprint, not the page, goes to a time server.');
+    const paste = screen.getByRole('region', {name: 'Paste a link'});
+    await user.type(within(paste).getByLabelText('Web address to capture'), 'https://fernhill-holdings.example/about');
+    await user.click(within(paste).getByRole('button', {name: 'Capture'}));
+    await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/captures')).toHaveLength(1));
+    expect(api.calls('POST /api/investigations/inv-1/captures')[0].body).toEqual({url: 'https://fernhill-holdings.example/about', time_proof: true, second_witness: true});
+    // Per capture: off again for the next one.
+    await waitFor(() => expect(within(leaves).getByRole('switch', {name: /Time proof/})).not.toBeChecked());
+    expect(leaves).toHaveTextContent('Nothing third-party is contacted.');
+  });
+
+  it('asks a time server only after saying what goes, then shows the stamp and Trace', async () => {
+    let listed = [capture()];
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': () => listed, 'GET /api/captures/c1/files/screenshot.png': {status: 200, body: 'png'},
+      'POST /api/captures/c1/time-proof': () => { listed = [capture({witnesses: {time_proof: stamped}})]; return listed[0]; }});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const receipt = await screen.findByRole('region', {name: 'Capture receipt'});
+    expect(receipt).toHaveTextContent('Local clock only (10:14:05 UTC). Independent proof not asked for.');
+    expect(receipt).toHaveTextContent('Second witnessNot asked.');
+    await user.click(within(receipt).getByRole('button', {name: /Ask a time server/}));
+    expect(api.calls('POST /api/captures/c1/time-proof')).toHaveLength(0);
+    const ask = within(receipt).getByRole('group', {name: 'Ask a time server…'});
+    expect(ask).toHaveTextContent('Sends the 64-character fingerprint a3f9 07c2 5b81 d4e6 …9c2a 5d1e to freetsa.org. Not the page. Written in the outbound log before it goes.');
+    await user.click(within(ask).getByRole('button', {name: 'Send it'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/time-proof')).toHaveLength(1));
+    expect(await within(receipt).findByText('Stamped')).toBeInTheDocument();
+    expect(receipt).toHaveTextContent('RFC 3161 token, 10:14:11 UTC by www.freetsa.org. Sent: the fingerprint only.');
+    expect(receipt).toHaveTextContent('Checked here: its signature, its chain to the time server’s root, this fingerprint and this request.');
+    expect(receipt).not.toHaveTextContent('after the capture');  // asked with the capture: nothing more to say
+    expect(timeProofWords({...stamped, time: '2026-10-19T13:37:05'}, '2026-10-19T10:14:05').gap)
+      .toBe('Asked 3 h 23 min after the capture: it proves the kept file existed by then, not when the page was captured.');
+    await user.click(within(receipt).getByRole('button', {name: 'Trace'}));
+    expect(useWorkbenchStore.getState().provenance?.request).toMatchObject({kind: 'document', documentId: 'd1'});
+  });
+
+  it('shows the archive’s copy as the second witness, and sends nothing for a source-protected capture', async () => {
+    mockApi({...BASE, 'GET /api/captures/c1/files/screenshot.png': {status: 200, body: 'png'}, 'GET /api/investigations/inv-1/captures': [capture({
+      source_protected: true, witnesses: {archive: {state: 'saved', service: 'Internet Archive', asked_at: '2026-10-19T10:14:12', by: 'local-owner',
+        sent: 'https://www.marlow-courier.example/2019/03/harbour-parcel', url: 'https://web.archive.org/web/20261019101412/https://www.marlow-courier.example/2019/03/harbour-parcel',
+        archived_at: '2026-10-19T10:14:12'}}})]});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const receipt = await screen.findByRole('region', {name: 'Capture receipt'});
+    expect(receipt).toHaveTextContent('Internet Archive asked 10:14:12 UTC. Sent: the link only.');
+    expect(within(receipt).getByRole('link', {name: /Its copy, 2026-10-19 10:14/})).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(within(receipt).getByRole('button', {name: /Ask a time server/})).toBeDisabled();
+  });
+
+  it('looks for a copy elsewhere of a page not kept, and captures that copy', async () => {
+    const only = capture({outcome: 'link_only', suite_outcome: 'UNABLE_TO_OBTAIN', reason: 'The site answered HTTP 404', files: [], document_id: null,
+      displayed: {}, http_status: 404, stages: stages(['done', 'stopped', 'skipped', 'skipped', 'skipped', 'skipped', 'skipped'])});
+    const copy = 'https://web.archive.org/web/20190318094011/https://www.marlow-courier.example/2019/03/harbour-parcel';
+    let listed = [only];
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': () => listed,
+      'POST /api/captures/c1/look-elsewhere': () => { listed = [{...only, witnesses: {elsewhere: {state: 'found', service: 'Internet Archive', asked_at: '2026-10-19T10:20:00',
+        by: 'local-owner', sent: only.url, url: copy, archived_at: '2019-03-18T09:40:11', archived_status: '200'}}}]; return listed[0]; },
+      'POST /api/investigations/inv-1/captures': {status: 202, body: capture({id: 'c3', url: copy, status: 'queued', outcome: null})}});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const outcome = await screen.findByRole('region', {name: 'Link only'});
+    await user.click(within(outcome).getByRole('button', {name: /Look for a copy elsewhere/}));
+    const ask = within(outcome).getByRole('group', {name: 'Look for a copy elsewhere…'});
+    expect(ask).toHaveTextContent(`Sends the address, ${only.url}, to the Internet Archive’s lookup`);
+    await user.click(within(ask).getByRole('button', {name: 'Send it'}));
+    expect(await within(outcome).findByText(/holds a copy from 2019-03-18 09:40 \(the page answered 200 then\)/)).toBeInTheDocument();
+    await user.click(within(outcome).getByRole('button', {name: 'Capture that copy'}));
+    await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/captures')[0]?.body).toEqual({url: copy}));
+  });
+});
+
+describe('Pin a quote · finds itself again (INTAKE_3)', () => {
+  const quote = {evidence_id: 'e1', quote: 'Kestrel SA paid €4.2 million for the freehold', characters: 45, captured_version: 1, unanchored: false, live: null,
+    saved: {state: 'held', match: 'exact', occurrences: 1, prefix: '…seen by the Courier. ', suffix: ', the harbour authority confirmed', place: 'characters 1,204–1,249 of the page text'}} as const;
+
+  it('shows a quote found again in the saved copy, and a quote not on the live page in the tray', async () => {
+    const gone = {...quote, evidence_id: 'e2', quote: 'owned by Harbour Nominees Ltd (40%) and Kestrel SA (60%)', unanchored: true,
+      live: {checked: true, found: false, version: 2, same_as_saved: false, match: null}};
+    const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture()], 'GET /api/captures/c1/files/screenshot.png': {status: 200, body: 'png'},
+      'GET /api/captures/c1/quotes': [quote, gone], 'POST /api/captures/c1/quotes/refind': [quote]});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const pin = await screen.findByRole('region', {name: 'Pin a quote'});
+    expect(await within(pin).findByText(quote.quote)).toBeInTheDocument();
+    expect(pin).toHaveTextContent('45 characters');
+    expect(pin).toHaveTextContent('22 before · 33 after');
+    expect(pin).toHaveTextContent('characters 1,204–1,249 of the page text');
+    expect(pin).toHaveTextContent('Found again in the saved copy: exact match, 1 of 1.');
+    expect(within(pin).getByText('Unanchored · 1')).toBeInTheDocument();
+    await user.click(within(pin).getByRole('button', {name: 'Show'}));
+    expect(pin).toHaveTextContent('Not on the live page. Still found in version 1, the saved copy: exact match, 1 of 1.');
+    await user.click(within(pin).getByRole('button', {name: 'Re-read the page'}));
+    await waitFor(() => expect(api.calls('POST /api/captures/c1/quotes/refind')).toHaveLength(1));
+    await waitFor(() => expect(within(pin).queryByText('Unanchored · 1')).toBeNull());
+  });
+
+  it('says what to do when nothing is pinned yet', async () => {
+    mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture()], 'GET /api/captures/c1/files/screenshot.png': {status: 200, body: 'png'},
+      'GET /api/captures/c1/quotes': []});
+    render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /Links & captures/}));
+    const pin = await screen.findByRole('region', {name: 'Pin a quote'});
+    expect(await within(pin).findByText(/Nothing pinned from this page yet/)).toBeInTheDocument();
+    await user.click(within(pin).getByRole('button', {name: 'Pin a quote in the reading room'}));
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1'});
   });
 });

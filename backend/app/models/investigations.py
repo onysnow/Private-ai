@@ -62,4 +62,7 @@ class TimelineEvent(Base):
     lead_id: Mapped[str | None] = mapped_column(ForeignKey("leads.id"), nullable=True, index=True)
     dataset: Mapped[str] = mapped_column(String(255), default="reporter", index=True)
     origin: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # A placeholder ("Meeting with Fernhill, 2017?"): the reporter believes it happened and has no evidence yet. Drawn
+    # dashed on My timeline until a source, passage or claim is attached.
+    placeholder: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

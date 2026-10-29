@@ -36,7 +36,7 @@ TINY_PNG = bytes.fromhex(
     "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d4944415478da63f8cfc0f01f0005020203"
     "f1a2b9780000000049454e44ae426082"
 )
-LINK = "Meridian registered office — Other link → Villa Kyrenia — startDate"   # the timeline's title for the link's start
+LINK = "Meridian registered office — Other link → Villa Kyrenia"   # the timeline's title for the link, from its dates
 SPEC = {"kind": "map", "question": "place", "title": "The money ended up in a villa in Cyprus", "query": {"name": "places_on_map"}}
 
 

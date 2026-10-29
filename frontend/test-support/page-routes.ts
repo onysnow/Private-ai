@@ -217,6 +217,29 @@ export function timelineBody(investigationId: string, events: unknown[] = []): T
   };
 }
 
+/** A Lanes reply (the generated TimelineLanesOut shape). Events given in the plain timeline shape are filled in as
+ * Lanes draws them: no parties, typed in the app, and one mark derived as the backend does for a verified date
+ * (shown), a disputed one, or else not yet shown. */
+export function lanesBody(investigationId: string, events: unknown[] = [], extra: Record<string, unknown> = {}): Record<string, unknown> {
+  const filled: Array<Record<string, unknown>> = events.map(raw => {
+    const e = raw as Record<string, unknown>;
+    const fact = e.fact ?? (e.verification_status === 'verified' ? 'shown' : e.verification_status === 'disputed' ? 'disputed' : 'not_yet');
+    return {parties: [], source_key: 'you', source_label: 'Typed by you', fact, fact_note: null, placeholder: false, grade: null, ...e};
+  });
+  const facts: Record<string, number> = {};
+  for (const e of filled) facts[e.fact as string] = (facts[e.fact as string] ?? 0) + 1;
+  const years = filled.map(e => String(e.date_start).slice(0, 4)).sort();
+  return {
+    investigation_id: investigationId, events: filled, parties: [], periods: [], sequence: [],
+    steps: filled.map(e => ({key: e.id, title: e.title, claim_id: null, claim_status: null, event_ids: [e.id], date_start: e.date_start,
+      date_end: e.date_end ?? null, precision: e.precision, unresolved: e.fact !== 'shown'})), steps_from: 'events', steps_undated: 0,
+    not_placed: [], not_placed_total: 0, undated: [], undated_total: 0, facts,
+    span: {first: years[0] ?? null, last: years[years.length - 1] ?? null, busiest: years[0] ?? null},
+    opens_on: (filled.find(e => e.fact !== 'shown')?.id as string | undefined) ?? null,
+    ...extra,
+  };
+}
+
 export type LeadQueueBody = {investigation_id: string; total: number; counts: Record<string, number>; items: unknown[]};
 
 /** A lead queue reply in the generated LeadQueueOut shape, which the leads
@@ -308,7 +331,11 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/connector-findings`]: records.findings ?? [],
     [`GET ${base}/entities`]: records.entities ?? [],
     [`GET ${base}/graph`]: records.graph ?? emptyGraph(),
+    // The Wire (See; in the single-page view since it took over the Relationships panel).
+    [`GET ${base}/wire`]: {investigation_id: id, entities: [], links: [], events: []},
+    [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
     [`GET ${base}/timeline`]: timelineBody(id, records.events ?? []),
+    [`GET ${base}/timeline/lanes`]: lanesBody(id, records.events ?? []),
     [`GET ${base}/leads/queue`]: leadQueueBody(id, records.leads ?? []),
     [`GET ${base}/claims`]: records.claims ?? [],
     [`GET ${base}/evidence`]: records.evidence ?? [],
@@ -323,7 +350,6 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/places`]: placesBody(id),
     [`GET ${base}/tags`]: tagsBody(id),
     [`GET ${base}/collections`]: {investigation_id: id, collections: []},
-    [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
     [`GET ${base}/red-flags`]: {investigation_id: id, rules: [], flags: [], gone: []},
     [`GET ${base}/checks`]: {investigation_id: id, items: [], gone: []},
     // See › Money loads with the view (features/money): no payments yet.
@@ -404,7 +430,7 @@ export function emptyCaseHomeRoutes(investigationId: string): Record<string, unk
   return {
     [`GET ${base}/standing`]: {
       investigation_id: investigationId, claims: {total: 0, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, to_check: 0, missing: 0, to_decide: 0,
-      to_decide_by_kind: {}, money: {currency: null, amount: 0, payments: 0, from_sources: 0, other_currencies: []},
+      to_decide_by_kind: {}, money: {currency: null, amount: 0, payments: 0, starting_payers: 0, others: []},
       timeline: {events: 0, from: null, to: null, years: []}, documents: {total: 0, unread: 0, failed: 0}, sources: 0, evidence: 0,
       network: {parties: 0, links: 0}, flags: {open: 0, textbook: 0, strong: 0, faint: 0}, leads: {open: 0}, watchlist: {names: 0, new_hits: 0},
     },

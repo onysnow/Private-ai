@@ -30,6 +30,7 @@ from app.models.domain import (
     TimelineEvent, WatchlistEntry, WatchlistHit,
 )
 from app.services.relationships import RELATIONSHIP_SCHEMAS, investigation_relationships
+from app.services.unlocks import unlocks
 
 LEVEL_RANK = {"textbook": 3, "strong": 2, "faint": 1}
 CLAIM_SURE = {"supported": "supported", "confirmed": "supported", "disputed": "disputed", "rejected": "ruled_out",
@@ -66,11 +67,14 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
     # again at each layer (on the 1MDB case, $12.4B for about $4.6B moved).
     paid_to = {t["to_entity_id"] for t in ledger["transactions"]}
     by_currency: dict[str, list[float]] = {}
+    payers: dict[str, set[str]] = {}
     all_payments: dict[str, int] = {}
     for t in ledger["transactions"]:
         all_payments[t["currency"]] = all_payments.get(t["currency"], 0) + 1
         if t["from_entity_id"] not in paid_to:
             by_currency.setdefault(t["currency"], []).append(float(t["amount"]))
+            payers.setdefault(t["currency"], set()).add(t["from_entity_id"])
+    # The tile shows the currency most money starts in (by starting payments); the others are listed with theirs.
     currency = max(by_currency, key=lambda c: len(by_currency[c])) if by_currency else None
     waiting = decision_counts(db, inv)
     return {
@@ -83,8 +87,9 @@ def standing(db: Session, investigation_id: str) -> dict[str, Any]:
         "to_decide_by_kind": waiting,
         "money": {"currency": currency, "amount": round(sum(by_currency[currency]), 2) if currency else 0.0,
                   "payments": all_payments.get(currency, 0) if currency else 0,
-                  "from_sources": len(by_currency[currency]) if currency else 0,
-                  "other_currencies": sorted(c for c in by_currency if c != currency)},
+                  "starting_payers": len(payers[currency]) if currency else 0,
+                  "others": [{"currency": c, "amount": round(sum(by_currency[c]), 2), "payments": all_payments.get(c, 0),
+                              "starting_payers": len(payers[c])} for c in sorted(by_currency) if c != currency]},
         "timeline": {"events": sum(years.values()), "from": min(years) if years else None, "to": max(years) if years else None,
                      "years": [{"year": y, "events": years.get(y, 0), "flags": flag_year_counts.get(y, 0)}
                                for y in sorted(set(years) | set(flag_year_counts))]},
@@ -376,7 +381,11 @@ def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> Non
     row: ExtractionCandidate = item["_entity_row"]
     p = row.payload if isinstance(row.payload, dict) else {}
     caption = str(p.get("caption") or "").strip()
-    schema = str(p.get("suggested_schema") or "Thing")
+    # The name-finder's guess of a kind the text gave no sign of (it would say "Add “United States” as a Person?") is
+    # never shown as fact: the record is added as "kind not known" (FollowTheMoney's LegalEntity) until a person says.
+    unknown_kind = row.confidence < 0.5 or bool(p.get("schema_question"))
+    schema = "LegalEntity" if unknown_kind else str(p.get("suggested_schema") or "Thing")
+    kind_words = "a record, kind not known" if unknown_kind else f"a {schema}"
     path = f"/api/extraction-candidates/{row.id}/review"
     numbers = [n for n in p.get("rows") or [] if isinstance(n, int)]
     where, source = (f"in {_rows_phrase(numbers)}", "these rows") if numbers else ("in this passage", "this passage")
@@ -388,7 +397,14 @@ def _entity_question(item: dict[str, Any], strong: dict[str, Any] | None) -> Non
         item["choices"] = [_choice("yes", "Same record", path, {**base, "entity_identity_decision": "same"},
                                    f"{source.capitalize()} {'are' if numbers else 'is'} added to {other}; no new record."),
                            _choice("no", "A different one", path, {**base, "entity_identity_decision": "different"},
-                                   f"“{caption}” becomes a new {schema}, kept apart from {other}.")]
+                                   f"“{caption}” becomes {kind_words}, kept apart from {other}.")]
+    elif unknown_kind:
+        item["question"] = f"Add “{caption}” as a name? The text does not say what kind it is."
+        item["consequences"] = []
+        item["choices"] = [_choice("yes", "Add it, kind not known", path, {"decision": "accept", "entity_schema": schema},
+                                   f"Creates the record {caption} with {source} as its source, its kind “not known” "
+                                   "(person, company, place…) until you say on the record."),
+                           _choice("no", "Not a name", path, {"decision": "reject"}, REJECTED.format("no record is made"))]
     else:
         item["question"] = f"Add “{caption}” as a {schema}?"
         item["consequences"] = []
@@ -629,7 +645,11 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
     for k, read in readers.items():
         if kind in (None, k):
             items.extend(read(db, investigation_id))
-    if order == "oldest":
+    if order == "unlocks":
+        # Every item's dry run, to put what changes most first (app/services/unlocks.py).
+        unlocks(db, investigation_id, items)
+        items.sort(key=lambda i: (-i["unlock_score"], -i["rank"], i["created_at"]))
+    elif order == "oldest":
         items.sort(key=lambda i: i["created_at"])
     elif order == "source":
         items.sort(key=lambda i: (i["group"]["key"], -i["rank"], i["created_at"]))
@@ -637,6 +657,8 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
         items.sort(key=lambda i: (-i["rank"], i["created_at"]))
     total = len(items)
     page = items[offset:offset + limit]
+    if order != "unlocks":
+        unlocks(db, investigation_id, page)
     if any("_entity_row" in i for i in page):
         from app.services.documents import preview_entity_candidate_matches
 
@@ -652,6 +674,7 @@ def decisions(db: Session, investigation_id: str, *, kind: str | None = None, or
     for item in page:
         item.pop("_entity_row", None)
         item.pop("_payment_ends", None)
+        item.pop("unlock_score", None)
     return {"investigation_id": investigation_id, "counts": decision_counts(db, investigation_id), "total": total,
             "offset": offset, "items": page}
 

@@ -31,7 +31,8 @@ from app.models.domain import (
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
     Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
-    DocumentMedia, TranscriptSegment,
+    DocumentMedia, TranscriptSegment, DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion,
+    AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod, BuiltTimeline,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -51,7 +52,8 @@ MODEL_BY_TABLE = {
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
-        DocumentMedia, TranscriptSegment,
+        DocumentMedia, TranscriptSegment, DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion,
+        AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod, BuiltTimeline,
     ]
 }
 
@@ -73,6 +75,19 @@ RESTORE_ORDER = [
     "document_chunks", "extraction_candidates",
     # A recording's file facts and its transcript segments (ADR-0020); a segment points at its passage.
     "document_media", "transcript_segments",
+    # What a photo claims about itself, and the files made from case files with their edit trail (ADR-0021); a
+    # derived file may be made from another, so parents go first. Their files travel as derived_file_entries.
+    "document_photos", "derived_files",
+    # What the case follows (ADR-0022): its sources, the queue with each decision and bulk reason, page versions.
+    "monitors", "monitor_items", "page_versions",
+    # Is it real? (ADR-0023): each file's standing and its append-only history of findings and decisions.
+    "authenticity_items", "authenticity_checks",
+    # Each evidence pack's own list of files, kept when it was made (Check a pack).
+    "evidence_packs",
+    # The reporter's named periods of the timeline.
+    "timeline_periods",
+    # Each person's own built timelines (their order of the case's events).
+    "built_timelines",
     # Bulk imports and what happened to each file; an item points at its document.
     "ingestion_batches", "ingestion_batch_items",
     # Spreadsheet column mappings; the proposals they made are extraction candidates.
@@ -180,6 +195,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture, DocumentMedia, TranscriptSegment,
+        DocumentPhoto, DerivedFile, Monitor, MonitorItem, PageVersion, AuthenticityItem, AuthenticityCheck, EvidencePack, TimelinePeriod, BuiltTimeline,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -234,6 +250,11 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "outbound_requests": direct["outbound_requests"],
         "captures": direct["captures"],
         "document_media": direct["document_media"], "transcript_segments": direct["transcript_segments"],
+        "document_photos": direct["document_photos"], "derived_files": direct["derived_files"],
+        "monitors": direct["monitors"], "monitor_items": direct["monitor_items"], "page_versions": direct["page_versions"],
+        "authenticity_items": direct["authenticity_items"], "authenticity_checks": direct["authenticity_checks"],
+        "evidence_packs": direct["evidence_packs"],
+        "timeline_periods": direct["timeline_periods"], "built_timelines": direct["built_timelines"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
 
@@ -422,6 +443,20 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
                 else:
                     missing_captures.append({"capture_id": capture["id"], "name": kept["name"]})
 
+    derived_entries = []
+    missing_derived = []
+    if include_documents:
+        for kept in records.get("derived_files", []):
+            kept_path = Path(kept.get("storage_path") or "")
+            if kept_path.is_file():
+                raw = kept_path.read_bytes()
+                archive_path = f"derived/{kept['id']}/{_safe_name(kept_path.name)}"
+                file_payloads[archive_path] = raw
+                derived_entries.append({"derived_id": kept["id"], "archive_path": archive_path,
+                                        "sha256": hashlib.sha256(raw).hexdigest()})
+            else:
+                missing_derived.append({"derived_id": kept["id"], "operation": kept.get("operation")})
+
     manifest: dict[str, Any] = {
         "format": EXPORT_FORMAT,
         "version": EXPORT_VERSION,
@@ -433,6 +468,8 @@ def _build_investigation_export_snapshot(db: Session, investigation_id: str, inc
         "missing_document_files": missing_documents,
         "capture_files": capture_entries,
         "missing_capture_files": missing_captures,
+        "derived_file_entries": derived_entries,
+        "missing_derived_files": missing_derived,
         "lineage_integrity": _require_lineage_integrity(records),
         "checksums": {},
     }
@@ -583,6 +620,15 @@ def preview_investigation_restore(
             conflicts.append({"kind": "capture_file", "table": "captures", "id": str(entry["capture_id"]),
                               "message": f"Capture file destination already exists: {dest}"})
 
+    for entry, problem in _derived_file_entries(manifest, records):
+        if problem:
+            conflicts.append({"kind": "derived_file", "table": "derived_files", "id": str(entry.get("derived_id")), "message": problem})
+            continue
+        dest = _derived_destination(storage_root, investigation_id, records, entry)
+        if dest.exists():
+            conflicts.append({"kind": "derived_file", "table": "derived_files", "id": str(entry["derived_id"]),
+                              "message": f"Derived file destination already exists: {dest}"})
+
     # build_investigation_export lists the files it could not include as
     # "missing_document_files"; this read "missing_documents", which no backup
     # has, so the preview always said none were missing.
@@ -592,6 +638,10 @@ def preview_investigation_restore(
     if missing_captures:
         warnings.append(f"Backup is missing {len(missing_captures)} web capture file(s) that were unavailable when exported; "
                         "those captures are restored without them.")
+    missing_derived = list(manifest.get("missing_derived_files", []))
+    if missing_derived:
+        warnings.append(f"Backup is missing {len(missing_derived)} file(s) made from case files that were unavailable when "
+                        "exported; their edit-trail rows are restored, and the files can be made again.")
     if missing_documents:
         warnings.append(
             f"Backup references {len(missing_documents)} document file(s) that were unavailable when exported; metadata/extracted text can still be restored."
@@ -610,6 +660,7 @@ def preview_investigation_restore(
         "document_file_count": len(manifest.get("document_files", [])),
         "missing_document_count": len(missing_documents),
         "capture_file_count": len(manifest.get("capture_files", [])),
+        "derived_file_count": len(manifest.get("derived_file_entries", [])),
         "warnings": warnings,
         "conflicts": conflicts,
         "can_restore": len(conflicts) == 0,
@@ -633,6 +684,35 @@ def _capture_file_entries(manifest: dict[str, Any], records: dict[str, list[dict
         else:
             out.append((entry, None))
     return out
+
+
+def _derived_file_entries(manifest: dict[str, Any], records: dict[str, list[dict[str, Any]]]) -> list[tuple[dict[str, Any], str | None]]:
+    """The manifest's derived files, each with why it cannot be restored (None when it can). A backup is untrusted:
+    a file must belong to a derived_files row in this backup, of one of its documents, and match that row's SHA-256."""
+    rows = {row.get("id"): row for row in records.get("derived_files", [])}
+    documents = {row.get("id") for row in records.get("documents", [])}
+    out: list[tuple[dict[str, Any], str | None]] = []
+    for entry in manifest.get("derived_file_entries", []):
+        row = rows.get(entry.get("derived_id"))
+        name = Path(str(entry.get("archive_path") or "")).name
+        if row is None or row.get("document_id") not in documents:
+            out.append((entry, "Derived file is not one of this backup's derived files"))
+        elif not name or name != _safe_name(name):
+            out.append((entry, "Derived file has an unsafe name"))
+        elif entry.get("sha256") != row.get("sha256"):
+            # The edit trail keeps each file's hash from when it was made: bytes that differ are not that file.
+            out.append((entry, f"Derived file {name} does not match the SHA-256 its edit trail recorded"))
+        else:
+            out.append((entry, None))
+    return out
+
+
+def _derived_destination(storage_root: Path, investigation_id: str, records: dict[str, list[dict[str, Any]]],
+                         entry: dict[str, Any]) -> Path:
+    from app.services.derived_files import derived_folder
+
+    row = next(r for r in records.get("derived_files", []) if r.get("id") == entry["derived_id"])
+    return derived_folder(storage_root, investigation_id, str(row["document_id"])) / Path(str(entry["archive_path"])).name
 
 
 def _coerce_datetimes(model: type[Any], row: dict[str, Any]) -> dict[str, Any]:
@@ -671,6 +751,7 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
     document_storage_dir = resolve_storage_root(document_storage_dir)
     document_storage_dir.mkdir(parents=True, exist_ok=True)
     raw_locations: dict[str, str] = {}
+    derived_locations: dict[str, str] = {}
     staged_files: list[tuple[Path, Path]] = []
     created_files: list[Path] = []
 
@@ -710,6 +791,24 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                 staged.parent.mkdir(parents=True, exist_ok=True)
                 staged.write_bytes(raw)
                 staged_files.append((staged, dest))
+            # One file can stand behind several trail rows (the same copy asked for twice): install it once.
+            staged_derived: set[Path] = set()
+            for entry, _problem in _derived_file_entries(manifest, records):
+                derived_id = str(entry["derived_id"])
+                dest = _derived_destination(document_storage_dir, investigation_id, records, entry)
+                if dest.exists():
+                    raise ValueError(f"Restore destination appeared after preview: {dest}")
+                raw = zf.read(str(entry["archive_path"]))
+                if hashlib.sha256(raw).hexdigest() != entry["sha256"]:
+                    raise ValueError(f"Derived file checksum mismatch: {derived_id}")
+                derived_locations[derived_id] = str(dest)
+                if dest in staged_derived:
+                    continue  # the name carries the hash checked above, so it is the same bytes
+                staged_derived.add(dest)
+                staged = contained_path(stage_root, "derived", derived_id, dest.name)
+                staged.parent.mkdir(parents=True, exist_ok=True)
+                staged.write_bytes(raw)
+                staged_files.append((staged, dest))
 
         restored_counts: dict[str, int] = {}
         db.info["restoring"] = True
@@ -721,10 +820,15 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                     rows = _parents_first(rows)
                 elif table == "evidence":
                     rows = _parents_first(rows, "restates_evidence_id")
+                elif table == "derived_files":
+                    rows = _parents_first(rows, "parent_id")
                 for raw_row in rows:
                     row = dict(raw_row)
                     if table == "documents" and row["id"] in raw_locations:
                         row["storage_path"] = raw_locations[row["id"]]
+                    if table == "derived_files":
+                        # A file the backup did not carry keeps no path on this computer: it can be made again.
+                        row["storage_path"] = derived_locations.get(row["id"], "")
                     db.add(model(**_coerce_datetimes(model, row)))
                 if rows:
                     db.flush()

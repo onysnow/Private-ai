@@ -97,6 +97,18 @@ describe('ReadingRoom', () => {
     expect(within(again).getByText('Language not detected')).toBeInTheDocument();
   });
 
+  it('shows a proposal held back by the OCR quality gate, with why, and still lets a person decide it', async () => {
+    const note = 'Held back: read by OCR from a page only 38% legible (under 60%). Check it against the page before using it.';
+    routes({'GET /api/documents/d1': {...doc, chunks: [{...doc.chunks[0], locator: 'page 4 (OCR)', ocr_legibility: 38.2}]},
+      'GET /api/documents/d1/candidates': [{...name, review_status: 'held', reviewer_note: note}]});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    const card = await within(room).findByRole('article', {name: /Fernhill Ltd/});
+    expect(within(card).getByText('Held back · hard to read')).toBeInTheDocument();
+    expect(within(card).getByText(note)).toBeInTheDocument();
+    expect(within(card).getByRole('button', {name: /Accept/})).toBeInTheDocument();
+  });
+
   it('marks what was found, accepts a proposal with A after a moment to undo it, and sends it on closing', async () => {
     const api = routes({'POST /api/extraction-candidates/x1/review': {candidate: {...name, review_status: 'accepted'}, record: null}});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);

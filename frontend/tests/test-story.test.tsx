@@ -224,8 +224,11 @@ describe('StoryScreen beside the write-up', () => {
     expect(await within(pane).findByRole('list', {name: 'Versions, newest first'})).toBeInTheDocument();
   });
 
-  it('opens the Export sheet: publication stays disabled with its reason, and the checks list what is left', async () => {
-    mockApi({[`GET ${PATH}`]: WRITTEN, [NOTES]: {investigation_id: 'inv-1', notes: []}});
+  it('opens the Export sheet: publication stays disabled with its reason, the pack goes as a draft, and the checks list what is left', async () => {
+    const api = mockApi({[`GET ${PATH}`]: WRITTEN, [NOTES]: {investigation_id: 'inv-1', notes: []},
+      'GET /api/investigations/inv-1/evidence-pack.zip': {status: 200, body: 'zip'}});
+    (URL as unknown as {createObjectURL: () => string}).createObjectURL = () => 'blob:pack';
+    (URL as unknown as {revokeObjectURL: () => void}).revokeObjectURL = () => undefined;
     render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', {name: 'stub: text read'}));
@@ -235,7 +238,13 @@ describe('StoryScreen beside the write-up', () => {
     const sheet = screen.getByRole('dialog', {name: 'Export'});
     expect(within(sheet).getByRole('button', {name: 'Export the .docx'})).toBeDisabled();
     expect(within(sheet).getByText('○ 2 sentences need a source')).toBeInTheDocument();
-    expect(within(sheet).getByRole('button', {name: 'Export the pack'})).toBeDisabled();
+    // Open checks never stop the evidence pack: it is made as a draft, stamped on every page.
+    const pack = within(sheet).getByRole('button', {name: 'Export as draft'});
+    expect(pack).toBeEnabled();
+    expect(within(sheet).getByText(/every page is stamped “Export as draft”/)).toBeInTheDocument();
+    await user.click(pack);
+    await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/evidence-pack.zip')).toHaveLength(1));
+    expect(await within(sheet).findByText('Evidence pack downloaded, stamped as a draft.')).toBeInTheDocument();
     expect(within(sheet).getByRole('button', {name: 'Download the backup'})).toBeEnabled();
     const checks = within(sheet).getByRole('region', {name: 'Before it leaves this computer'});
     expect(checks).toHaveTextContent('2 sentences without a source');

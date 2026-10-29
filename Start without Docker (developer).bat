@@ -4,7 +4,7 @@ cd /d "%~dp0"
 title Journalism Workbench - developer mode (no Docker)
 
 set "PY="
-set "RUNTIME_MARKER=.venv\.journalism_dependencies_ready_1_26"
+set "RUNTIME_MARKER=.venv\.journalism_dependencies_ready_1_27"
 set "SETUP_LOG=journalism-workbench-setup.log"
 
 echo ============================================================
@@ -86,6 +86,10 @@ rem application before declaring setup complete.
 "%VPY%" -c "import fastapi,uvicorn,sqlalchemy,httpx,followthemoney,multipart,pypdf,docx,alembic,fitz,openaleph_client,playwright,warcio,faster_whisper" >nul 2>> "%SETUP_LOG%"
 if not %errorlevel%==0 goto :dependency_failed
 if not exist "%RUNTIME_MARKER%" type nul > "%RUNTIME_MARKER%"
+rem The native module (ADR-0021) is optional, so it is checked on every launch, outside the marker: installing Rust
+rem later and launching again builds it. Without it the app runs; HEIC and RAW photos then say what to run.
+"%VPY%" -c "import workbench_native" >nul 2>nul
+if errorlevel 1 if not exist ".venv\.native_build_failed" call :native_module
 
 if not exist "backend\.env" (
   echo DATABASE_URL=sqlite:///./journalism.db> backend\.env
@@ -173,3 +177,19 @@ exit /b 1
 echo Setup failed before dependency installation.
 pause
 exit /b 1
+
+:native_module
+rem The Workbench's native module (backend\native, ADR-0021): code from the ArtCraft apps, built here with Rust.
+rem It is optional: setup carries on without it, and a HEIC or RAW photo then says what to run.
+where cargo >nul 2>nul
+if errorlevel 1 (
+  echo Rust is not installed, so HEIC and RAW photos will not be read yet. Install it from https://rustup.rs and launch again.
+  exit /b 0
+)
+echo Building the native module; the first build takes several minutes...
+"%VPY%" -m pip install .\backend\native >> "%SETUP_LOG%" 2>&1
+if not errorlevel 1 exit /b 0
+rem A failed build is not retried on every launch (it takes minutes): "Repair developer setup" tries again.
+type nul > ".venv\.native_build_failed"
+echo The native module did not build; the app runs without it. Details are in %SETUP_LOG%; "Repair developer setup" tries again.
+exit /b 0

@@ -20,6 +20,7 @@ import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
 import {basemapStatusBody, placesBody} from '../test-support/page-routes';
+import {placeEventWhen} from '../features/places/places-timeline';
 
 type Handler = (event: {features?: {properties: Record<string, unknown>}[]}) => void;
 const {maps, protocols} = vi.hoisted(() => ({maps: [] as FakeMapInstance[], protocols: [] as string[]}));
@@ -68,6 +69,14 @@ const STATUS = basemapStatusBody(true);
 
 beforeEach(() => { maps.length = 0; strips.length = 0; connectGeneratedClient(new ApiClient('http://api.test')); useWorkbenchStore.setState({investigationId: 'inv-1', dossier: null}); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+
+describe('placeEventWhen', () => {
+  it('says a date at the precision it was recorded, never inventing a day', () => {
+    expect(placeEventWhen({date_start: '2009', date_end: '2013'})).toBe('2009 – 2013');
+    expect(placeEventWhen({date_start: '2014-05', date_end: null})).toBe('May 2014');
+    expect(placeEventWhen({date_start: '2014-05-03', date_end: '2014-05-03'})).toBe('3 May 2014');
+  });
+});
 
 describe('the base map style', () => {
   it('asks only this app for tiles, fonts and sprites, in the grayscale flavor, with every place named', () => {
@@ -136,34 +145,71 @@ describe('PlacesMap', () => {
 describe('PlacesPanel', () => {
   const wrap = (node: ReactElement) => render(<QueryProvider>{node}</QueryProvider>);
 
-  it('lists every place with where it is and what is linked, and draws them when a base map is installed', async () => {
-    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE, VILLA]), 'GET /api/basemap': STATUS});
+  it('lists every place, how sure it is, where it is and what is linked (List, L)', async () => {
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE, {...VILLA, sure: 'document', placed_from: 'Land registry'}])});
     wrap(<PlacesPanel investigationId="inv-1"/>);
-    const table = within(await screen.findByRole('table', {name: 'Places'}));
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: /^List/}));
+    const table = within(screen.getByRole('table', {name: 'Places'}));
     const rows = table.getAllByRole('row').slice(1).map(r => r.textContent);
-    expect(rows).toEqual(['Meridian registered office · Address1 Example Street, London · 51.5072° N, 0.1276° W—',
-      'Villa Kyrenia · RealEstate35.3364° N, 33.3199° E · CYAlaric Voss · Ownership']);
-    expect(await screen.findByRole('region', {name: /Map of 2 places/})).toBeInTheDocument();
-    expect(screen.getByText(/Map data © OpenStreetMap contributors \(ODbL\), Protomaps build 4\.15\.2 of 2026-10-03/)).toBeInTheDocument();
-    await userEvent.setup().click(table.getByRole('button', {name: 'Alaric Voss'}));
+    expect(rows).toEqual(['Meridian registered office · Addressnot yet shown1 Example Street, London · 51.5072° N, 0.1276° W—',
+      'Villa Kyrenia · RealEstateread from a document35.3364° N, 33.3199° E · CYAlaric Voss · Ownership']);
+    await user.click(table.getByRole('button', {name: 'Alaric Voss'}));
     expect(useWorkbenchStore.getState().dossier?.entityId).toBe('voss');
   });
 
-  it('lists the places without a map when no base map is installed, and says how to install one', async () => {
+  it('draws them on the base map when it is installed, and says how to install it when it is not', async () => {
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE, VILLA]), 'GET /api/basemap': STATUS});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    await userEvent.setup().click(await screen.findByRole('button', {name: 'On the base map'}));
+    expect(await screen.findByRole('region', {name: /Map of 2 places/})).toBeInTheDocument();
+    expect(screen.getByText(/Map data © OpenStreetMap contributors \(ODbL\), Protomaps build 4\.15\.2 of 2026-10-03/)).toBeInTheDocument();
+    cleanup();
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [VILLA], [{entity_id: 'x', caption: 'Typo address', schema: 'Address',
       reason: "the latitude 'abc' is not a number"}]), 'GET /api/basemap': basemapStatusBody(false)});
     wrap(<PlacesPanel investigationId="inv-1"/>);
+    await userEvent.setup().click(await screen.findByRole('button', {name: 'On the base map'}));
     expect(await screen.findByTestId('no-basemap')).toHaveTextContent('compose profile maps');
     expect(screen.queryByRole('region', {name: /Map of/})).toBeNull();
     expect(screen.getByText(/the latitude 'abc' is not a number/)).toBeInTheDocument();
   });
 
+  it('draws each place from its record with a ring for how sure it is, a far place on the edge, and an address holding several parties', async () => {
+    const near = (id: string, caption: string, lat: number, lon: number, extra: Partial<PlaceOut> = {}) => place(id, caption, lat, lon, {schema: 'Address', ...extra});
+    const fort = near('fort', '4 Fort Street', 50.351, -4.124, {links: [1, 2, 3].map(n => ({relationship_id: `f${n}`, schema: 'UnknownLink', direction: 'incoming', entity_id: `co${n}`, caption: `Company ${n}`, entity_schema: 'Company'}))});
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [
+      near('land', 'The harbour land', 50.35, -4.129, {sure: 'document'}), near('council', 'Council House', 50.353, -4.133),
+      near('fern', 'Fernhill Ltd', 50.357, -4.139, {sure: 'approximate', precision: 'town'}), fort, near('lux', 'Luxembourg office', 49.61, 6.13)])});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    expect(await screen.findByRole('img', {name: 'Places drawn from their records: 4 on this map, 1 off it'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'The harbour land, read from a document'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Fernhill Ltd, approximate (a town or wider)'})).toBeInTheDocument();
+    expect(screen.getByText('town only')).toBeInTheDocument();
+    expect(screen.getByText('3 parties at this address')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /^Luxembourg office, off this map, about \d+ km away$/})).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Council House, not yet shown'}));
+    expect(screen.getByRole('heading', {name: 'Council House'})).toBeInTheDocument();
+    expect(screen.getByText('its record, with no document behind the coordinates')).toBeInTheDocument();
+  });
+
   const dated = (id: string, title: string, first: string, last = first, extra: Record<string, unknown> = {}) => ({
     id, kind: 'reporter_event', title, date_start: first, date_end: last === first ? null : last, first_day: first, last_day: last,
-    exact: true, verification_status: 'verified', via: 'place', relationship_id: null, ...extra});
+    exact: true, verification_status: 'verified', via: 'place' as 'place' | 'link', relationship_id: null as string | null, ...extra});
   const OFFICE_DATED = {...OFFICE, events: [dated('e1', 'Office registered', '2019-03-04')]};
   const VILLA_DATED = {...VILLA, events: [dated('e2', 'Stake starts', '2021-02-01', '2021-02-28', {exact: false, via: 'link', relationship_id: 'r1'}),
     dated('e3', 'Villa searched', '2023-11-14')]};
+
+  it('draws a party\'s path hop by hop, dashed where its record is not verified', async () => {
+    const council = place('council', 'Council House', 50.353, -4.133, {links: [{relationship_id: 'c1', schema: 'UnknownLink', direction: 'incoming', entity_id: 'ross', caption: 'M. Ross', entity_schema: 'Person'}],
+      events: [dated('h1', 'Ross at the council', '2019-01-15', '2019-01-15', {via: 'link', relationship_id: 'c1'})]});
+    const land = place('land', 'The harbour land', 50.35, -4.129, {links: [{relationship_id: 'l1', schema: 'UnknownLink', direction: 'incoming', entity_id: 'ross', caption: 'M. Ross', entity_schema: 'Person'}],
+      events: [dated('h2', 'Ross walks the plot', '2019-08-14', '2019-08-14', {via: 'link', relationship_id: 'l1', verification_status: 'asserted'})]});
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [council, land])});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    await userEvent.setup().click(await screen.findByRole('button', {name: 'M. Ross'}));
+    expect(screen.getByText('Council House 15 Jan 2019 → The harbour land 14 Aug 2019 · dashed hops rest on records not yet verified')).toBeInTheDocument();
+    expect(document.querySelector('.pl-path path')).toHaveClass('dashed');
+  });
 
   it('draws a strip of the events at each place, and two dates keep the places with an event between them', async () => {
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, VILLA_DATED]), 'GET /api/basemap': STATUS});
@@ -182,31 +228,31 @@ describe('PlacesPanel', () => {
     const user = userEvent.setup();
     fireEvent.change(screen.getByLabelText('From'), {target: {value: '2021-01-01'}});
     fireEvent.change(screen.getByLabelText('To'), {target: {value: '2022-12-31'}});
-    expect(await screen.findByTestId('places-window')).toHaveTextContent('1 of 2 places have an event in this stretch of time');
-    const table = within(screen.getByRole('table', {name: 'Places'}));
-    expect(table.getAllByRole('row').slice(1).map(r => r.querySelector('th')?.textContent)).toEqual(['Villa Kyrenia · RealEstate']);
-    expect(maps[0].data.at(-1)).toMatchObject({features: [{properties: {entity_id: 'villa'}}]});
+    expect(await screen.findByTestId('places-window')).toHaveTextContent('Showing 1 of 2 places with events between 2021 and 2022');
     expect(screen.getByText(/Showing the places with an event between 1 Jan 2021 and 31 Dec 2022/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'On the base map'}));
+    await screen.findByRole('region', {name: /Map of 1 place/});
+    expect(maps.at(-1)!.options.style.sources).toBeDefined();
     // The strip shades the stretch and greys the events outside it.
     const shaded = strips.at(-1)!.option as {series: {markArea?: {data: {xAxis: number}[][]}}[]};
     expect(shaded.series[0].markArea?.data[0].map(end => end.xAxis)).toEqual([Date.UTC(2021, 0, 1), Date.UTC(2023, 0, 1) - 1]);
 
-    // All dates again.
-    await user.click(screen.getByRole('button', {name: 'All dates'}));
+    // Reset dates.
+    await user.click(screen.getByRole('button', {name: 'Reset dates'}));
     expect(screen.queryByTestId('places-window')).toBeNull();
-    expect(within(screen.getByRole('table', {name: 'Places'})).getAllByRole('row')).toHaveLength(3);
   });
 
-  it('picks a place on the strip: its record opens, and its dot and its row stand out', async () => {
+  it('picks a place on the strip: the panel tells it, and its dot stands out on the base map', async () => {
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, VILLA_DATED]), 'GET /api/basemap': STATUS});
     wrap(<PlacesPanel investigationId="inv-1"/>);
+    await userEvent.setup().click(await screen.findByRole('button', {name: 'On the base map'}));
     await screen.findByTestId('places-timeline');
     await screen.findByRole('region', {name: /Map of 2 places/});
     const strip = strips.at(-1)!;
     const mark = (strip.option as {series: {data: unknown[]}[]}).series[0].data[0];
     act(() => (strip.onEvents as Record<string, (p: unknown) => void>).click({data: mark}));
-    expect(useWorkbenchStore.getState().dossier?.entityId).toBe('office');
-    const dots = (maps[0].data.at(-1) as {features: {properties: {entity_id: string; dot: string; picked: boolean}}[]}).features;
+    expect(screen.getByRole('heading', {name: 'Meridian registered office'})).toBeInTheDocument();
+    const dots = (maps.at(-1)!.data.at(-1) as {features: {properties: {entity_id: string; dot: string; picked: boolean}}[]}).features;
     expect(dots.find(f => f.properties.entity_id === 'office')?.properties).toMatchObject({dot: dotName(10), picked: true});
     expect(dots.find(f => f.properties.entity_id === 'villa')?.properties).toMatchObject({dot: PLACE_DOT, picked: false});
   });
@@ -222,13 +268,13 @@ describe('PlacesPanel', () => {
   });
 
   it('says why there is no strip when no event is dated at any place', async () => {
-    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [VILLA]), 'GET /api/basemap': basemapStatusBody(false)});
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [VILLA])});
     wrap(<PlacesPanel investigationId="inv-1"/>);
     expect(await screen.findByTestId('places-timeline-empty')).toHaveTextContent('No event on the timeline is dated at these places');
   });
 
   it('says so when no record holds coordinates', async () => {
-    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1'), 'GET /api/basemap': STATUS});
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1')});
     wrap(<PlacesPanel investigationId="inv-1"/>);
     expect(await screen.findByText(/No record in this investigation holds both a latitude and a longitude/)).toBeInTheDocument();
   });

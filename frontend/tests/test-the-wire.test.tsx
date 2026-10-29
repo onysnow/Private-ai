@@ -7,7 +7,7 @@ import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/reac
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TheWire, linkInfo} from '../features/the-wire/the-wire';
-import {fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
+import {brighten, clipWords, fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -111,6 +111,12 @@ describe('The Wire', () => {
     expect(info.x1).toEqual({sure: 'disputed', end: ''});
   });
 
+  it('cuts a long role at a word with an ellipsis, never mid-word', () => {
+    expect(clipWords('Owning entity in the Cook Islands trust structure', 32)).toBe('Owning entity in the Cook…');
+    expect(clipWords('Founder and chairman of the board', 32)).toBe('Founder and chairman of the…');
+    expect(clipWords('Director', 32)).toBe('Director');
+  });
+
   it('writes each link as a sentence from the fixed verbs', () => {
     const l = (o: Record<string, unknown>) => ({id: 'x', s: 'a', t: 'b', schema: 'Payment', fam: 'money' as const, amount: 9800, cur: 'EUR', date: '', role: '', pct: '', ev: [], ...o});
     expect(linkSentence('money', [l({date: '2018-02-06'}), l({date: '2018-03-09'}), l({date: '2018-04-11'})], '')).toBe('paid 29,400 EUR · 3× · Feb–Apr 2018');
@@ -135,8 +141,23 @@ describe('The Wire', () => {
     expect(labels).toEqual(expect.arrayContaining(['✓ owns 100% since 2016', '? signs for', '✕ emailed about filing · 2 Nov 2018']));
     // The ended directorship says so, once the window passes its end.
     await waitFor(() => expect(labels.concat([...map.querySelectorAll('.elab text')].map(t => t.textContent))).toContain('✓ director · ended Jul 2017'));
-    // The flag badge gives the level in words with the count.
-    expect(map.textContent).toContain('TEXTBOOK · 2');
+    // A flagged card's outline takes its level; the count sits in a circle on its corner, named in words.
+    const kestrel = [...map.querySelectorAll('g.node')].find(g => g.classList.contains('textbook'))!;
+    expect(kestrel.querySelector('.card-bg')?.getAttribute('stroke')).toBe('#FF8070');
+    expect(kestrel.querySelector('.flag-dot')?.getAttribute('aria-label')).toBe('2 open Red Flags, the strongest textbook');
+    expect(kestrel.querySelector('.flag-dot .flag-n')?.textContent).toBe('2');
+    // The kind is the icon in the card's dot (SEE_1), not a word on the card.
+    expect(kestrel.querySelector('use.kind-icon')?.getAttribute('href')).toBe('#tw-k-company');
+    expect(document.getElementById('tw-k-company')?.tagName).toBe('symbol');
+    expect(kestrel.querySelector('.card-s')?.textContent).not.toMatch(/COMPANY/);
+    // Hovering the circle brightens the glow and shows the flags themselves.
+    fireEvent.pointerEnter(kestrel.querySelector('.flag-dot')!, {pointerType: 'mouse'});
+    expect(kestrel.classList.contains('flag-hot')).toBe(true);
+    const tip = document.querySelector('.tw-tip')!;
+    expect(tip.textContent).toContain('2 open Red Flags');
+    expect(tip.textContent).toContain('Circular ownership');
+    fireEvent.pointerLeave(kestrel.querySelector('.flag-dot')!);
+    expect(kestrel.classList.contains('flag-hot')).toBe(false);
     expect(screen.getByLabelText('Key').textContent).toMatch(/How sure.*always on.*shown.*not yet shown.*disputed.*worked out by the app.*ended, drawn faint/);
     expect(document.querySelector('.tw-counts')?.textContent).toBe('Showing all 4 links · 1 ended, drawn faint · 1 undated, always shown');
   });
@@ -276,5 +297,28 @@ describe('The Wire', () => {
     expect(bands()).toEqual(['Company', 'Person']);
     fireEvent.click(screen.getByRole('button', {name: 'Linked groups'}));
     expect(screen.getByText(/Each patch is a group/)).toBeInTheDocument();
+  });
+  it('draws your tags as a ring of arcs outside a tagged party, with a key, and hides them with Your tags', async () => {
+    const row = (record_id: string, name: string, colour: string, record_type = 'entity') => ({record_type, record_id, name, colour, tag_id: name});
+    mockApi({'GET /api/investigations/inv-1/wire': WIRE, 'GET /api/investigations/inv-1/record-tags': {investigation_id: 'inv-1',
+      rows: [row('a', 'Owner', '#7FB7E0'), row('a', 'Check again', '#E9AFA8'), row('b', 'Owner', '#7FB7E0'), row('l1', 'Owner', '#7FB7E0', 'relationship')]}});
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    await waitFor(() => expect(map.querySelectorAll('.tw-tagring').length).toBe(2));
+    // Meridian carries two tags, each its own arc of the one ring.
+    // Each arc is its swatch brightened, over a glowing copy.
+    const ring = map.querySelectorAll('.tw-tagring')[0];
+    expect(Array.from(ring.querySelectorAll('.sharp circle')).map(c => c.getAttribute('stroke'))).toEqual([brighten('#7FB7E0'), brighten('#E9AFA8')]);
+    expect(ring.querySelectorAll('.glow circle')).toHaveLength(2);
+    expect(brighten('#3e6181')).toBe('#9fb0c0');
+    const key = screen.getByLabelText('Key');
+    expect(key.textContent).toContain('Owner · 2');
+    expect(key.textContent).toContain('Check again · 1');
+    const toggle = screen.getByRole('button', {name: 'Your tags'});
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByLabelText('The Wire').classList.contains('tw-tags-off')).toBe(true);
+    expect(key.textContent).not.toContain('Owner');
   });
 });

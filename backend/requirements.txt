@@ -35,6 +35,16 @@ warcio==1.8.1
 faster-whisper==1.2.1
 # The video or audio on a captured page (ADR-0020, Phase 2c): yt-dlp (Unlicense), one item, logged out.
 yt-dlp==2026.8.19
+# Content credentials (C2PA) validated on this computer against the bundled trust lists (ADR-0023): c2pa-python
+# (MIT OR Apache-2.0).
+c2pa-python==0.38.0
+# A capture's time proof (ADR-0025): RFC 3161 requests and tokens checked against the bundled roots, Trail of Bits'
+# rfc3161-client (Apache-2.0).
+rfc3161-client==1.0.9
+# Voices in a recording (ADR-0026): sherpa-onnx (Apache-2.0) with sherpa-onnx-core, its runtime; the two model files
+# are fetched once at setup (python -m app.services.voices fetch).
+sherpa-onnx==2.0.1
+sherpa-onnx-core==2.0.1
 av==17.0.0
 openaleph-client==1.1.4
 # Background job queue on PostgreSQL (ADR-0004). Its schema is vendored in
@@ -59,3 +69,7 @@ mnemonic==0.21
 # needs git and read access to that repository: your own git login in developer mode,
 # the read-only deploy key in CI and in the Docker build (README.md, backend/Dockerfile).
 authority-suite-sdk @ git+https://github.com/onysnow/authority-suite-sdk@8b0bf4d88a7ec0a41b3de89cb9ae2c486af5347d
+# Following (ADR-0022, source intake Phase 3): feeds, podcasts and open-protocol accounts read with feedparser (BSD-2, with
+# feedparser-sgmllib, PSF-2.0), polled through the capture guard; socksio (MIT) lets httpx use a Tor the reporter runs.
+feedparser==6.0.14
+socksio==1.0.0

@@ -11,6 +11,7 @@ import {z} from 'zod';
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {StatusChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
+import {caseHref} from '../../lib/case-href';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {api} from '../../lib/api-instance';
 import {
@@ -204,6 +205,23 @@ export function ExportSheet({story, doc, onClose, onExportDocx}: {
       setStatus('Backup downloaded.');
     } catch (error) { setStatus(errorMessage(error, 'The backup did not download')); }
   };
+  const allOk = checks.every(c => c.ok);
+  const [packing, setPacking] = useState(false);
+  const pack = async () => {
+    setPacking(true);
+    setStatus('Making the evidence pack on this computer…');
+    try {
+      await save(await api.blob(`/api/investigations/${story.investigation_id}/evidence-pack.zip`),
+        `evidence-pack-${story.investigation_id.slice(0, 8)}${allOk ? '' : '-DRAFT'}.zip`);
+      setStatus(allOk ? 'Evidence pack downloaded.' : 'Evidence pack downloaded, stamped as a draft.');
+    } catch (error) { setStatus(errorMessage(error, 'The evidence pack did not download')); }
+    setPacking(false);
+  };
+  const pdf = async () => {
+    setStatus('Printing the write-up on this computer…');
+    try { await save(await api.blob(`/api/investigations/${story.investigation_id}/writeup.pdf`), `write-up-${story.investigation_id.slice(0, 8)}.pdf`); setStatus('Write-up PDF downloaded.'); }
+    catch (error) { setStatus(errorMessage(error, 'The PDF did not download')); }
+  };
   const docx = async () => {
     try { await onExportDocx(); setStatus('Write-up downloaded.'); } catch (error) { setStatus(errorMessage(error, 'The write-up did not download')); }
   };
@@ -214,10 +232,15 @@ export function ExportSheet({story, doc, onClose, onExportDocx}: {
         <li><b>Write-up for publication <small>.docx</small></b><span>The text with numbered citations and a Sources list naming each record.</span>
           <button type="button" disabled={Boolean(docxReason)} onClick={() => void docx()}>Export the .docx</button>
           {docxReason && <small className="sy-why">○ {docxReason}</small>}</li>
-        <li className="off"><b>Write-up for reading <small>PDF</small></b><span>The paper version of the current theme.</span>
-          <button type="button" disabled>Export as PDF</button><small className="sy-why">○ Not built yet</small></li>
-        <li className="off"><b>Evidence pack <small>.zip</small></b><span>The write-up, an exhibits list from its citations, each cited passage with its file’s fingerprint, and the readiness record.</span>
-          <button type="button" disabled>Export the pack</button><small className="sy-why">○ Not built yet</small></li>
+        <li><b>Write-up for reading <small>PDF</small></b><span>The write-up on paper, with each citation’s exhibit numbers; printed on this computer.</span>
+          <button type="button" disabled={!story.writeup_id} onClick={() => void pdf()}>Export as PDF</button>
+          {!story.writeup_id ? <small className="sy-why">○ Start the write-up first</small>
+            : !allOk && <small className="sy-why">○ Checks below are open: it is stamped “Export as draft”</small>}</li>
+        <li><b>Evidence pack <small>.zip</small></b><span>The write-up, an exhibits list from its citations, each cited passage with its file’s fingerprint, and the readiness record.</span>
+          <button type="button" disabled={!story.writeup_id || packing} onClick={() => void pack()}>{packing ? 'Making the pack…' : allOk ? 'Export the pack' : 'Export as draft'}</button>
+          {!story.writeup_id ? <small className="sy-why">○ Start the write-up first</small>
+            : !allOk && <small className="sy-why">○ Checks below are open: every page is stamped “Export as draft”</small>}
+          <a className="sy-why" href={caseHref('/check#check-a-pack', story.investigation_id)}>A pack sent back? Check it</a></li>
         <li><b>Backup <small>.jwbackup.zip</small></b><span>The whole case, for restoring on this or another computer; not for sharing.</span>
           <button type="button" onClick={() => void backup()}>Download the backup</button></li>
       </ul>

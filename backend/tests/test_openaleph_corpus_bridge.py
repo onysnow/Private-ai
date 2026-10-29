@@ -154,6 +154,8 @@ def test_openaleph_page_text_is_staged_for_human_review(tmp_path, monkeypatch):
             if (row.payload or {}).get("provenance", {}).get("provider") == "openaleph"
         ]
         assert len(candidates) == 2
+        # The query has no order, and Postgres returns rows in any order: page 1 first.
+        candidates.sort(key=lambda row: row.payload["provenance"]["provider_entity_id"])
         assert all(row.review_status == "proposed" for row in candidates)
         assert db.query(Evidence).count() == evidence_before
 

@@ -245,6 +245,15 @@ def contract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[
                               app_log_file=str(tmp_path / "app.jsonl"), audit_log_file=str(tmp_path / "audit.jsonl"),
                               api_auth_failure_state_file=""), bootstrap_schema=False)
     client = TestClient(app)
+    # The write-up PDF is printed by the capture browser: a machine whose Playwright browsers are not this package's
+    # own build names its headless shell, as the web-capture tests do (CI installs the package's own).
+    from pathlib import Path as _Path
+
+    from app.core.config import settings as _settings
+
+    shells = sorted(_Path("/opt/pw-browsers").glob("chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell"))
+    if not _settings.capture_browser_path and shells:
+        monkeypatch.setattr(_settings, "capture_browser_path", str(shells[-1]))
     seeded = _seed(app, client, monkeypatch, reasoning)
     schema = schemathesis.openapi.from_asgi("/openapi.json", app, config=_config(app))
     try:
@@ -357,6 +366,39 @@ def _watchlist_hit(entry_id: str, document_id: str) -> str:
         return row.id
 
 
+def _publisher_transcript(document_id: str) -> None:
+    """The recording's publisher offers its own transcript (app/services/publisher_transcript.py), as an episode
+    collected through Following would have it."""
+    from app.db.session import SessionLocal
+    from app.models.domain import Document, Source
+    from app.services import publisher_transcript
+
+    with SessionLocal() as db:
+        doc = db.get(Document, document_id)
+        source = db.get(Source, doc.source_id)
+        publisher_transcript.keep(db, source, "publisher_transcript", url="https://example.org/board-call.vtt", kind="text/vtt",
+                                  body=b"WEBVTT\n\n00:00:00.000 --> 00:00:02.000\nThe board met on Tuesday.\n")
+        db.commit()
+
+
+def _followed(inv: str) -> tuple[str, str]:
+    """A followed source and one item in its queue (app/services/following.py), written directly: a closed platform,
+    which is never checked, so no request leaves the test."""
+    from app.db.session import SessionLocal
+    from app.models.following import Monitor, MonitorItem
+
+    with SessionLocal() as db:
+        monitor = Monitor(investigation_id=inv, kind="closed", url="https://www.instagram.com/meridian.holdings",
+                          name="instagram.com · closed platform", every_minutes=0, health="closed")
+        db.add(monitor)
+        db.flush()
+        item = MonitorItem(investigation_id=inv, monitor_id=monitor.id, key="https://example.org/meridian-statement",
+                           url="https://example.org/meridian-statement", title="Statement on the Meridian transfer")
+        db.add(item)
+        db.commit()
+        return monitor.id, item.id
+
+
 def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, reasoning: Any) -> Seeded:
     """The demo investigation and one of everything else the API can read."""
     def ok(response: httpx.Response) -> Any:
@@ -407,6 +449,8 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     pdf.close()
     minutes = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Board minutes"}, files={
         "file": ("minutes.pdf", pdf_bytes, "application/pdf")}))
+    redacted = ok(client.post(f"/api/documents/{minutes['id']}/derived/redacted", json={
+        "boxes": [{"page": 1, "rect": [40, 40, 300, 120], "reason": "a private person"}], "remove": ["metadata"]}))
     ledger = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Ledger"}, files={
         "file": ("ledger.csv", b"Payer,Payee,Amount\nMeridian Holdings Ltd,Bellcastle Trading Group,2400000\n", "text/csv")}))
     # A watched name and a document it was found in.
@@ -485,9 +529,19 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     # A recording, transcribed by a stand-in for the model (app/services/transcription.py).
     recording = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Board call"}, files={
         "file": ("board-call.mp3", (Path(__file__).parent / "fixtures" / "media" / "harbour-talk.mp3").read_bytes(), "audio/mpeg")}))
+    _publisher_transcript(recording["id"])
+    # A part of it kept as its own file (app/services/media_derived.py), with its edit-trail row.
+    clip = ok(client.post(f"/api/documents/{recording['id']}/derived/clip", json={"start": 0, "end": 1}))
+
+    monitor_id, monitor_item_id = _followed(inv)
+    # A named period of the timeline (app/services/timeline_lanes.py).
+    period_id = client.post(f"/api/investigations/{inv}/timeline/periods",
+                            json={"name": "The money", "date_start": "2018", "date_end": "2018-12"}).json()["id"]
+    built_id = client.post(f"/api/investigations/{inv}/built-timelines", json={"name": "For the editor", "items": []}).json()["id"]
 
     return Seeded(
         ids={
+            "monitor_id": monitor_id, "monitor_item_id": monitor_item_id, "voice": "1", "period_id": period_id, "built_id": built_id,
             "fact_watch_id": fact_watch["id"], "saved_question_id": saved_question["id"], "channel": "phone",
             "section_id": story["sections"][0]["id"], "version_id": version["id"], "run_id": draft["job"]["id"],
             "investigation_id": inv, "entity_id": meridian, "claim_id": claim["id"], "lead_id": lead, "relationship_id": relationship,
@@ -500,6 +554,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
             "indicator_id": "BO-001", "case_id": "deripaska-en-rusal", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
             "check_id": _check_item(client), "case_record_id": case_record["id"], "thought_id": "CLM-0001", "capture_id": capture["id"],
+            "derived_file_id": clip["id"],
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={
@@ -514,9 +569,21 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
             ("GET", "/api/documents/{document_id}/email"): {"document_id": email},
             ("GET", "/api/documents/{document_id}/picture"): {"document_id": picture["id"]},
+            ("GET", "/api/documents/{document_id}/photo"): {"document_id": picture["id"]},
             ("GET", "/api/documents/{document_id}/media"): {"document_id": recording["id"]},
             ("GET", "/api/documents/{document_id}/transcript"): {"document_id": recording["id"]},
+            ("GET", "/api/documents/{document_id}/sound"): {"document_id": recording["id"]},
+            ("GET", "/api/documents/{document_id}/spectrogram.png"): {"document_id": recording["id"]},
+            **{(method, path): {"document_id": recording["id"]} for method, path in (
+                ("GET", "/api/documents/{document_id}/transcript/compare"),
+                ("POST", "/api/documents/{document_id}/derived/clip"),
+                ("POST", "/api/documents/{document_id}/derived/cleaned"))},
             ("GET", "/api/documents/{document_id}/page-image"): {"document_id": minutes["id"]},
+            ("GET", "/api/derived-files/{derived_file_id}/page.png"): {"derived_file_id": redacted["id"]},
+            **{(method, path): {"document_id": minutes["id"]} for method, path in (
+                ("GET", "/api/documents/{document_id}/redaction"),
+                ("GET", "/api/documents/{document_id}/redaction/compare"),
+                ("POST", "/api/documents/{document_id}/derived/redacted"))},
             **{(method, path): {"document_id": ledger["id"]} for method, path in (
                 ("GET", "/api/documents/{document_id}/table"),
                 ("POST", "/api/documents/{document_id}/table-mappings/preview"),
@@ -542,10 +609,13 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
                 "evidence_id": relationship_evidence["items"][0]["evidence_id"] if relationship_evidence.get("items") else payment["evidence"]["id"]},
         },
         queries={
+            ("GET", "/api/platform-checks/for"): {"url": "https://www.instagram.com/p/abc/"},
+            ("GET", "/api/documents/{document_id}/redaction/compare"): {"copy_id": redacted["id"]},
             ("GET", "/api/entities/{entity_id}/merge-preview"): {"target_entity_id": bellcastle},
             ("GET", "/api/provenance/extraction-lineage"): {"record_type": "evidence", "record_id": accepted["accepted_record_id"]},
             ("GET", "/api/provenance/trace"): {"record_type": "claim", "record_id": claim["id"]},
             ("GET", "/api/search"): {"q": "Meridian"},
+            ("GET", "/api/documents/{document_id}/authenticity/preview"): {"status": "likely_synthetic"},
             ("GET", "/api/catalogue/glossary/entry"): {"term": "Beneficial owner"},
             ("GET", "/api/investigations/{investigation_id}/marks"): {"record_type": "entity", "record_id": meridian},
             ("GET", "/api/investigations/{investigation_id}/peek"): {"record_type": "entity", "record_id": meridian},

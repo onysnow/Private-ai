@@ -24,6 +24,8 @@ describe('picture evidence', () => {
   it('knows a picture by its name', () => {
     expect(['hall.PNG', 'a.jpeg', 'b.jpg'].map(isPicture)).toEqual([true, true, true]);
     expect(['memo.pdf', 'scan.tiff', 'c.webp'].map(isPicture)).toEqual([false, false, false]);
+    // HEIC and camera RAW photos are shown through their viewable copy (ADR-0021).
+    expect(['IMG_1361.DNG', 'press.heic', 'B13A0729.cr2'].map(isPicture)).toEqual([true, true, true]);
   });
 
   it('shows the picture and saves its caption and the date it was taken', async () => {

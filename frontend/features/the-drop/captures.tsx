@@ -5,6 +5,12 @@
 // picture with its clock band, the SHA-256, each kept file, what the page displayed, "content verified: not done by
 // this system"); right, capture before use. A login wall is "not seen" and a page that could not be kept is "link only",
 // each with its reason: outcomes, not gaps. Captures run as jobs; the list follows them while one is running.
+// Check again later / Re-check now (app/services/capture_follow.py): a Following page monitor tied to the capture;
+// version 1 is the page as captured, a different live text is "changed since capture" (words only, as served), an
+// address that now answers 404 is "gone". A check keeps nothing as evidence: Capture version 2 is a new capture.
+// Outside witnesses (app/services/capture_witness.py, ADR-0025), each asked for by a person, said first and logged:
+// a time server signs the fingerprint (only the SHA-256 goes), a public web archive keeps its own copy (only the
+// address goes), and for a page not kept here, the archive says whether it holds a copy. None for a protected item.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import type {UseQueryResult} from '@tanstack/react-query';
 import {useEffect, useMemo, useState} from 'react';
@@ -12,9 +18,9 @@ import type {FormEvent, ReactElement} from 'react';
 
 import {api} from '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
-import {getCapturesOptions, getCapturesQueryKey, getDropQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
-import {collectCaptureMedia, createCapture} from '../../lib/generated/sdk.gen';
-import type {CaptureOut, CaptureStageOut, GetCapturesError} from '../../lib/generated/types.gen';
+import {getCaptureQuotesOptions, getCaptureQuotesQueryKey, getCapturesOptions, getCapturesQueryKey, getDropQueryKey, platformForUrlOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {captureLatest, captureLookElsewhere, captureSecondWitness, captureTimeProof, collectCaptureMedia, createCapture, followCapture, markCaptureChanged, recheckCapture, refindCaptureQuotes, updateCapture} from '../../lib/generated/sdk.gen';
+import type {CaptureArchiveOut, CaptureFollowOut, CaptureOut, CaptureQuoteOut, CaptureStageOut, CaptureTimeProofOut, GetCapturesError} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -50,6 +56,8 @@ const shortUrl = (url: string) => { try { const u = new URL(url); return `${u.ho
 export function captureState(c: CaptureOut): {word: string; tone: 'ok' | 'bad' | 'amber' | 'teal'; glyph: string} {
   if (c.status === 'failed') return {word: 'Stopped', tone: 'bad', glyph: '✕'};
   if (running(c)) return {word: c.status === 'queued' ? 'Waiting' : 'Capturing', tone: 'teal', glyph: '…'};
+  if (c.outcome === 'saved' && c.follow?.state === 'changed') return {word: 'Changed since capture', tone: 'amber', glyph: 'Δ'};
+  if (c.outcome === 'saved' && c.follow?.state === 'gone') return {word: 'Gone', tone: 'bad', glyph: '✕'};
   if (c.outcome === 'saved') return {word: 'Saved', tone: 'ok', glyph: '✓'};
   if (c.outcome === 'not_seen') return {word: 'Not seen', tone: 'amber', glyph: '○'};
   return {word: 'Link only', tone: 'bad', glyph: '!'};
@@ -179,14 +187,66 @@ function MediaPanel({capture, investigationId}: {capture: CaptureOut; investigat
   </section>;
 }
 
-function Receipt({capture}: {capture: CaptureOut}): ReactElement {
+/** Says exactly what would go and where, then asks once (INTAKE_3: outside services "ask first"). */
+function AskFirst({label, sends, onSend, protectedItem}: {label: string; sends: ReactElement; onSend: () => Promise<void>; protectedItem: boolean}): ReactElement {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  if (protectedItem) return <button type="button" className="cp-ask" disabled title="Source-protected: nothing is sent from here">{label} <span className="cp-chip dash">source-protected</span></button>;
+  if (!open) return <button type="button" className="cp-ask" onClick={() => setOpen(true)}>{label} <span className="cp-chip dash">asks first</span></button>;
+  return <span className="cp-confirm" role="group" aria-label={label}>
+    <span>{sends} Written in the outbound log before it goes.</span>
+    <span className="cp-acts" style={{marginLeft: 0}}>
+      <button type="button" className="p" disabled={busy} onClick={() => { setBusy(true); void onSend().finally(() => { setBusy(false); setOpen(false); }); }}>{busy ? 'Asking…' : 'Send it'}</button>
+      <button type="button" disabled={busy} onClick={() => setOpen(false)}>Cancel</button></span>
+  </span>;
+}
+
+/** How long after the capture, in words: "3 h 23 min", "2 days". */
+function later(minutes: number): string {
+  if (minutes >= 2 * 24 * 60) return `${Math.floor(minutes / (24 * 60))} days`;
+  const h = Math.floor(minutes / 60);
+  return h ? `${h} h ${minutes % 60} min` : `${minutes} min`;
+}
+
+/** The receipt's time proof line: the time server's clock, or this computer's alone (mockup INTAKE_3). A proof asked
+ *  for after the capture proves only that the file existed by then, and says so. */
+export function timeProofWords(proof: CaptureTimeProofOut | null | undefined, capturedAt?: string | null): {stamped: boolean; text: string; check?: string; gap?: string} {
+  if (proof?.state === 'stamped') {
+    const minutes = proof.time && capturedAt ? Math.round((apiTime(proof.time).getTime() - apiTime(capturedAt).getTime()) / 60000) : 0;
+    return {stamped: true, text: `RFC 3161 token, ${clock(proof.time)}${proof.signer ? ` by ${proof.signer}` : ''}. Sent: the fingerprint only.`,
+      check: proof.check === 'checked' ? 'Checked here: its signature, its chain to the time server’s root, this fingerprint and this request.'
+        : proof.check_detail ?? 'Not checked here.',
+      gap: minutes >= 2 ? `Asked ${later(minutes)} after the capture: it proves the kept file existed by then, not when the page was captured.` : undefined};
+  }
+  if (proof?.state === 'failed') return {stamped: false, text: `Not stamped: ${proof.reason ?? 'the time server did not answer'}`};
+  return {stamped: false, text: ''};
+}
+
+function Receipt({capture, investigationId}: {capture: CaptureOut; investigationId: string}): ReactElement {
   const openDocument = useWorkbenchStore(state => state.openDocument);
+  const openRealness = useWorkbenchStore(state => state.openRealness);
+  const openProvenance = useWorkbenchStore(state => state.openProvenance);
+  const act = useCaptureAction(investigationId);
   const [copied, setCopied] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState('');
+  const recheck = async () => {
+    setChecking(true);
+    setError(await act(() => recheckCapture({path: {capture_id: capture.id}, throwOnError: true}), 'Could not check the page again'));
+    setChecking(false);
+  };
   const warc = capture.files.find(f => f.name === 'page.warc.gz') ?? capture.files[0];
   const {author, published} = capture.displayed;
+  const proof = timeProofWords(capture.witnesses.time_proof, capture.captured_at);
+  const archive = capture.witnesses.archive;
+  const ask = async (run: () => Promise<unknown>, fallback: string) => setError(await act(run, fallback));
   return <section className="cp-panel" aria-label="Capture receipt">
     <div className="cp-cap">Capture receipt
-      <span className="cp-acts">{capture.document_id && <button type="button" className="p" onClick={() => openDocument(capture.document_id!)}>Open in reading room</button>}</span></div>
+      <span className="cp-acts">{capture.document_id && <button type="button" className="p" onClick={() => openDocument(capture.document_id!)}>Open in reading room</button>}
+        {(capture.media_document_id ?? capture.document_id) && <button type="button" onClick={() => openRealness((capture.media_document_id ?? capture.document_id)!)}>Is it real? →</button>}
+        <button type="button" disabled={checking} onClick={() => void recheck()}>{checking ? 'Checking…' : 'Re-check now'}</button>
+        {capture.document_id && <button type="button" onClick={() => openProvenance({title: captureTitle(capture), kind: 'document', documentId: capture.document_id!, sourceUrl: capture.final_url || capture.url})}>Trace</button>}</span></div>
+    {error && <p role="alert" className="cp-err">{error}</p>}
     <div className="cp-rcpt">
       <Shot capture={capture}/>
       <dl className="cp-kv">
@@ -196,7 +256,17 @@ function Receipt({capture}: {capture: CaptureOut}): ReactElement {
         <dt>Captured</dt><dd>{utc(capture.captured_at ?? capture.finished_at)} <small>by this computer’s clock</small></dd>
         <dt>Kept as</dt><dd className="cp-files">{capture.files.length ? capture.files.map(f => <div key={f.name}>
           <Download capture={capture} name={f.name}>{f.name}</Download> <em>{size(f.bytes)} · {f.role}</em></div>) : 'Nothing: no page came back'}</dd>
-        <dt>Time proof</dt><dd>Local clock only ({clock(capture.captured_at)}). <small>Independent proof not asked for.</small></dd>
+        <dt>Time proof</dt><dd>{proof.stamped ? <><span className="cp-chip ok">Stamped</span> {proof.text}<br/><small>{proof.check}</small>{proof.gap && <><br/><small><b>{proof.gap}</b></small></>}</>
+          : <>{proof.text ? <>{proof.text}. </> : <>Local clock only ({clock(capture.captured_at)}). <small>Independent proof not asked for.</small> </>}
+            {warc?.name === 'page.warc.gz' && <AskFirst label={proof.text ? 'Ask the time server again…' : 'Ask a time server…'} protectedItem={capture.source_protected ?? false}
+              sends={<>Sends the 64-character fingerprint <code>{spaced(warc.sha256)}</code> to {capture.time_server}. Not the page.</>}
+              onSend={() => ask(() => captureTimeProof({path: {capture_id: capture.id}, throwOnError: true}), 'Could not ask the time server')}/>}</>}</dd>
+        <dt>Second witness</dt><dd>{archive?.state === 'saved' ? <>{archive.service} asked {clock(archive.asked_at)}. Sent: the link only.{' '}
+          {archive.url && <a href={archive.url} target="_blank" rel="noopener noreferrer">Its copy{archive.archived_at ? `, ${utc(archive.archived_at).slice(0, 16)}` : ''} ↗</a>}</>
+          : <>{archive?.state === 'failed' ? <>Not kept by the archive: {archive.reason} </> : <small>Not asked. </small>}
+            <AskFirst label={archive ? 'Ask the archive again…' : 'Ask a public web archive…'} protectedItem={capture.source_protected ?? false}
+              sends={<>Sends this page’s address, <code>{capture.final_url || capture.url}</code>, to the Internet Archive, which visits the page itself and keeps its own copy. It will know this page interests someone.</>}
+              onSend={() => ask(() => captureSecondWitness({path: {capture_id: capture.id}, throwOnError: true}), 'Could not ask the archive')}/></>}</dd>
         {(author || published) && <><dt>Displayed</dt><dd>{author ? `By “${author}”` : ''}{author && published ? ' · ' : ''}{published ?? ''} <span className="cp-chip dash">as displayed, not verified</span></dd></>}
         <dt>Custody</dt><dd>{utc(capture.captured_at ?? capture.finished_at).slice(0, 16)} captured on this computer by {collectorName(capture)}; kept unaltered, in the case’s records.</dd>
       </dl>
@@ -205,24 +275,213 @@ function Receipt({capture}: {capture: CaptureOut}): ReactElement {
   </section>;
 }
 
-function Outcome({capture, onAddFile}: {capture: CaptureOut; onAddFile: () => void}): ReactElement {
+/** Calls one capture action, then reads the case's captures again; returns the error to show, if any. */
+function useCaptureAction(investigationId: string): (run: () => Promise<unknown>, fallback: string) => Promise<string> {
+  const queryClient = useQueryClient();
+  return async (run, fallback) => {
+    try {
+      await run();
+      await Promise.all([queryClient.invalidateQueries({queryKey: getCapturesQueryKey({path: {investigation_id: investigationId}})}),
+        queryClient.invalidateQueries({queryKey: getDropQueryKey({path: {investigation_id: investigationId}})})]);
+      return '';
+    } catch (e) { return errorMessage(e, fallback); }
+  };
+}
+
+const VERDICT: Record<string, string> = {first: '', same: 'same text', layout: 'layout only'};
+
+/** The re-check: one visit, the live page's main text compared with version 1 (mockup INTAKE_3, changed since capture). */
+function Recheck({capture, follow}: {capture: CaptureOut; follow: CaptureFollowOut}): ReactElement {
+  const asked = follow.checks[0];
+  const changed = follow.state === 'changed';
+  const gone = follow.state === 'gone' || follow.state === 'broken';
+  const latest = follow.versions[follow.versions.length - 1];
+  const differ = latest && latest.number > 1 ? latest.lines_changed : 0;
+  const box = (key: string, label: string, state: string, value: string) => <li key={key} className={`cp-st ${state}`}><span className="cp-k">{label}</span><span className="cp-v">{value}</span></li>;
+  const after = changed ? 'waiting' : 'skipped';
+  return <section className="cp-panel" aria-label="Re-check">
+    <p className="cp-cap">Re-check <span className="cp-r">{follow.last_checked_at ? `${utc(follow.last_checked_at)} · by this computer` : 'not checked yet'}</span></p>
+    {follow.last_checked_at && <ol className="cp-lane" aria-label="Re-check stages">
+      {box('checked', 'Link checked', 'done', '✓')}
+      {box('fetched', 'Page fetched', gone ? 'stopped' : 'done', asked?.status ? `${gone ? '✕' : '✓'} ${asked.seconds !== null && asked.seconds !== undefined ? `${asked.seconds.toFixed(1)} s · ` : ''}${asked.status}` : (gone ? '✕' : '✓'))}
+      {box('text', 'Text read', gone ? 'skipped' : 'done', gone ? 'not run' : '✓')}
+      {box('compared', 'Compared with v1', gone ? 'skipped' : changed ? 'warn' : 'done', gone ? 'not run' : changed ? `! ${differ} line${differ === 1 ? '' : 's'} differ` : `✓ ${VERDICT.same}`)}
+      {box('shot', 'Screenshot', after, changed ? 'waiting for you' : 'not needed')}
+      {box('warc', 'Archive (WARC)', after, changed ? 'waiting for you' : 'not needed')}
+      {box('hash', 'Fingerprint', after, changed ? 'waiting for you' : 'not needed')}
+    </ol>}
+    <ol className="cp-versions" aria-label="Versions">{follow.versions.map(v => <li key={v.number} className={v.captured ? 'ok' : 'amber'}>
+      <b>Version {v.number}</b> · {v.captured ? `captured ${utc(v.capture_id === capture.id ? (capture.captured_at ?? v.seen_at) : v.seen_at).slice(0, 16)}` : `seen ${utc(v.seen_at).slice(0, 16)}, not captured`}
+      <span>{v.captured ? <>Text fingerprint <code>{v.text_sha256.slice(0, 4)} {v.text_sha256.slice(4, 8)} …{v.text_sha256.slice(-4)}</code></> : 'Text fingerprint differs. Nothing is saved until you say so.'}</span>
+    </li>)}</ol>
+    {follow.state === 'gone' && <p className="cp-note"><b>Gone.</b> The address now answers {asked?.status}. The capture stays as evidence of what was there; mark the source so.</p>}
+    {follow.state === 'broken' && <p className="cp-note"><b>Not read.</b> {follow.health_detail}</p>}
+    {follow.state === 'same' && <p className="cp-note">The live page’s main text is the same as the captured version.</p>}
+  </section>;
+}
+
+function WhatChanged({capture, follow, investigationId, onPick}: {capture: CaptureOut; follow: CaptureFollowOut; investigationId: string; onPick: (id: string) => void}): ReactElement {
+  const act = useCaptureAction(investigationId);
+  const [error, setError] = useState('');
+  const [both, setBoth] = useState(false);
+  const latest = follow.versions[follow.versions.length - 1];
+  const marked = follow.marked_changed as {at?: string} | null | undefined;
+  const take = async () => {
+    let made = '';
+    setError(await act(async () => { made = (await captureLatest({path: {capture_id: capture.id}, throwOnError: true})).data.id; }, 'Could not capture the page'));
+    if (made) onPick(made);
+  };
+  return <section className="cp-panel" aria-label="What changed">
+    <p className="cp-cap">{follow.state === 'gone' ? 'What is left' : 'What changed'} <span className="cp-r">words only, as served</span></p>
+    {follow.state === 'changed' && (both
+      ? <div className="cp-both"><div><p className="cp-k">Version 1 · captured</p><pre>{follow.captured_text}</pre></div><div><p className="cp-k">Version {latest?.number} · live</p><pre>{follow.live_text}</pre></div></div>
+      : <div className="cp-diff">{follow.changes.map((block, i) => block.unchanged
+        ? <p key={i} className="cp-same">{block.unchanged} line{block.unchanged === 1 ? '' : 's'} unchanged</p>
+        : <p key={i}>{block.segments.map((s, j) => s.op === 'same' ? <span key={j}>{s.text}</span> : s.op === 'del' ? <del key={j}>{s.text}</del> : <ins key={j}>{s.text}</ins>)}</p>)}</div>)}
+    <p className="cp-note">A change is evidence too. Quotes from version 1 still match the saved copy; they do not match the live page.</p>
+    <div className="cp-acts" style={{marginLeft: 0}}>
+      {follow.state === 'changed' && <button type="button" className="p" onClick={() => void take()}>Capture version {latest?.number} · keeps both</button>}
+      <button type="button" disabled={Boolean(marked)} onClick={() => void act(() => markCaptureChanged({path: {capture_id: capture.id}, throwOnError: true}), 'Could not mark the source').then(setError)}>
+        {marked ? `Source marked “${follow.state === 'gone' ? 'gone' : 'changed'}” ✓` : `Mark source “${follow.state === 'gone' ? 'gone' : 'changed'}”`}</button>
+      {follow.state === 'changed' && <button type="button" aria-pressed={both} onClick={() => setBoth(b => !b)}>{both ? 'Changes only' : 'Side by side'}</button>}
+    </div>
+    {error && <p role="alert" className="cp-err">{error}</p>}
+  </section>;
+}
+
+/** Where a quote stands, in words (INTAKE_3): found again in the saved copy, and on the live page once it was checked. */
+export function quoteStanding(q: CaptureQuoteOut): {tone: 'ok' | 'amber' | 'bad'; text: string} {
+  const saved = q.saved;
+  const how = saved ? `${saved.match === 'exact' ? 'exact match' : saved.match === 'case' ? 'same words, other capitals' : 'same words, other spacing'}, ${saved.occurrences === 1 ? '1 of 1' : `1 of ${saved.occurrences}`}` : '';
+  if (!saved) return {tone: 'bad', text: 'Not found again in the saved copy. It stays in the tray, tied to the capture it was taken from.'};
+  if (q.live && !q.live.found) return {tone: 'amber', text: `Not on the live page. Still found in version ${q.captured_version}, the saved copy: ${how}.`};
+  if (q.live?.found && !q.live.same_as_saved) return {tone: 'ok', text: `Found again in the saved copy (${how}) and on the live page, version ${q.live.version}.`};
+  return {tone: 'ok', text: `Found again in the saved copy: ${how}.`};
+}
+
+function PinQuote({capture}: {capture: CaptureOut}): ReactElement {
+  const queryClient = useQueryClient();
+  const openDocument = useWorkbenchStore(state => state.openDocument);
+  const key = getCaptureQuotesQueryKey({path: {capture_id: capture.id}});
+  const found = useQuery({...getCaptureQuotesOptions({path: {capture_id: capture.id}}), enabled: capture.outcome === 'saved'});
+  const [showTray, setShowTray] = useState(false);
+  const [error, setError] = useState('');
+  const all = found.data ?? [];
+  const tray = all.filter(q => q.unanchored);
+  const shown = all.find(q => !q.unanchored) ?? all[0];
+  const reread = async () => {
+    setError('');
+    try { queryClient.setQueryData(key, (await refindCaptureQuotes({path: {capture_id: capture.id}, throwOnError: true})).data); }
+    catch (e) { setError(errorMessage(e, 'Could not read the page again')); }
+  };
+  return <section className="cp-card" aria-label="Pin a quote">
+    <p className="dp-eyebrow cp-row">Pin a quote <span>finds itself again</span></p>
+    {!shown ? <p className="dp-quiet">{capture.outcome === 'saved' ? 'Nothing pinned from this page yet. Choose words in the reading room: a quote keeps the words either side, so it finds itself again after every re-read.' : 'Nothing to pin. A quote needs a capture of the page first.'}</p>
+      : <>
+        <p className="cp-quote">{shown.saved?.prefix ? <span className="cp-ctx">…{shown.saved.prefix}</span> : null}<mark>{shown.quote}</mark>{shown.saved?.suffix ? <span className="cp-ctx">{shown.saved.suffix}…</span> : null}</p>
+        <dl className="cp-kv">
+          <dt>Exact</dt><dd>{shown.characters} characters</dd>
+          {shown.saved && <><dt>Around</dt><dd>{shown.saved.prefix.length} before · {shown.saved.suffix.length} after</dd>
+            <dt>Place</dt><dd>{shown.saved.place}</dd></>}
+        </dl>
+        {(() => { const s = quoteStanding(shown); return <p className={`cp-standing ${s.tone}`}><span className={`cp-glyph ${s.tone}`} aria-hidden="true">{s.tone === 'ok' ? '✓' : '!'}</span>{s.text}</p>; })()}
+      </>}
+    {capture.outcome === 'saved' && <div className="cp-acts" style={{marginLeft: 0}}>
+      <button type="button" onClick={() => void reread()}>Re-read the page</button>
+      {capture.document_id && <button type="button" onClick={() => openDocument(capture.document_id!)}>Pin a quote in the reading room</button>}
+      <small className="dp-quiet">Runs after every re-read.</small></div>}
+    {tray.length > 0 && <div className="cp-tray">
+      <p><span className="cp-chip amber">Unanchored · {tray.length}</span> A quote it cannot find again goes to a tray, never lost.</p>
+      <p className="dp-quiet">{tray.length} quote{tray.length === 1 ? '' : 's'} from {captureTitle(capture)} {tray.length === 1 ? 'no longer matches' : 'no longer match'} {tray.some(q => q.saved) ? 'the live page' : 'the saved copy'}.
+        <button type="button" className="cp-linkbtn" aria-expanded={showTray} onClick={() => setShowTray(s => !s)}>{showTray ? 'Hide' : 'Show'}</button></p>
+      {showTray && <ul className="cp-traylist">{tray.map(q => <li key={q.evidence_id}>“{q.quote}” <small>{quoteStanding(q).text}</small></li>)}</ul>}
+    </div>}
+    {error && <p role="alert" className="cp-err">{error}</p>}
+  </section>;
+}
+
+const AGAIN: [CaptureFollowOut['every'], string][] = [['never', 'Never'], ['weekly', 'Weekly'], ['daily', 'Daily']];
+
+function CheckAgain({capture, investigationId}: {capture: CaptureOut; investigationId: string}): ReactElement {
+  const act = useCaptureAction(investigationId);
+  const [error, setError] = useState('');
+  const every = capture.follow?.every ?? 'never';
+  const site = host(capture.final_url || capture.url);
+  return <section className="cp-card" aria-label="Check again later">
+    <p className="dp-eyebrow">Check again later</p>
+    <div className="cp-seg" role="radiogroup" aria-label="Check this page again">{AGAIN.map(([key, label]) =>
+      <button key={key} type="button" role="radio" aria-checked={every === key}
+        onClick={() => void act(() => followCapture({path: {capture_id: capture.id}, body: {every: key}, throwOnError: true}), 'Could not change when it is checked').then(setError)}>{label}</button>)}</div>
+    <p className="dp-quiet">A changed page is marked <b>changed since capture</b>; a removed one, <b>gone</b>. Both are kept as evidence. Each re-check is one visit to {site}.</p>
+    {capture.follow?.next_check_at && <p className="dp-quiet">Next check {utc(capture.follow.next_check_at).slice(0, 16)}.</p>}
+    {error && <p role="alert" className="cp-err">{error}</p>}
+  </section>;
+}
+
+const REASONS: [NonNullable<CaptureOut['reason_kind']>, string][] = [['dead_link', 'Dead link'], ['blocked', 'Blocked'], ['timed_out', 'Timed out'], ['tool_error', 'Tool error']];
+
+/** What the archive said it holds of a page not kept here; a copy it holds can be captured like any page. */
+function Elsewhere({found, investigationId, onPick}: {found?: CaptureArchiveOut | null; investigationId: string; onPick: (id: string) => void}): ReactElement | null {
+  const act = useCaptureAction(investigationId);
+  const [error, setError] = useState('');
+  if (!found) return null;
+  const take = async () => {
+    let made = '';
+    setError(await act(async () => { made = (await createCapture({path: {investigation_id: investigationId}, body: {url: found.url!}, throwOnError: true})).data.id; }, 'Could not capture that copy'));
+    if (made) onPick(made);
+  };
+  return <div className="cp-elsewhere" role="status">
+    {found.state === 'found' && found.url ? <>
+      <p><span className="cp-chip teal">Copy elsewhere</span> {found.service} holds a copy{found.archived_at ? ` from ${utc(found.archived_at).slice(0, 16)}` : ''}{found.archived_status ? ` (the page answered ${found.archived_status} then)` : ''}. Asked {utc(found.asked_at).slice(0, 16)}; it is the archive’s copy, not this computer’s.</p>
+      <div className="cp-acts" style={{marginLeft: 0}}><button type="button" className="p" onClick={() => void take()}>Capture that copy</button>
+        <a href={found.url} target="_blank" rel="noopener noreferrer">Open it ↗</a></div>
+    </> : found.state === 'none' ? <p>{found.service} holds no copy of this address (asked {utc(found.asked_at).slice(0, 16)}).</p>
+      : <p>Asked {utc(found.asked_at).slice(0, 16)}. Not answered: {found.reason}</p>}
+    {error && <p role="alert" className="cp-err">{error}</p>}
+  </div>;
+}
+
+function Outcome({capture, onAddFile, investigationId, onPick}: {capture: CaptureOut; onAddFile: () => void; investigationId: string; onPick: (id: string) => void}): ReactElement {
+  const act = useCaptureAction(investigationId);
+  const [error, setError] = useState('');
   const wall = capture.outcome === 'not_seen';
   return <section className="cp-panel" aria-label={wall ? 'Not seen' : 'Link only'}>
     <p className="cp-out"><span className={`cp-chip big ${wall ? 'amber' : 'bad'}`}>{wall ? 'Not seen' : capture.status === 'failed' ? 'Stopped' : 'Link only'}</span>
       <b>{wall ? 'A login wall, paywall or block was in the way' : 'Saved as a link, with the reason'}</b></p>
     <p>{capture.reason}</p>
+    {!wall && capture.status !== 'failed' && <div className="cp-seg" role="radiogroup" aria-label="Why it could not be kept">{REASONS.map(([key, label]) =>
+      <button key={key} type="button" role="radio" aria-checked={capture.reason_kind === key}
+        onClick={() => void act(() => updateCapture({path: {capture_id: capture.id}, body: {reason_kind: key}, throwOnError: true}), 'Could not set the reason').then(setError)}>{label}</button>)}
+      <small>{capture.reason_kind_by ? `set by ${capture.reason_kind_by === 'local-owner' ? 'you' : capture.reason_kind_by}` : 'read from the reply'}</small></div>}
     {wall ? <p>What was kept is what the site showed instead, marked <b>not seen</b>, never “shown”. This app signs in to nothing: no accounts, no stored cookies, no saved sessions.</p>
       : <p>That is an <b>outcome, not a gap</b>: it is logged with its reason and time. Nothing can be quoted from this link.</p>}
     <dl className="cp-kv">
       <dt>Kept</dt><dd>{capture.files.length ? <>The address, the time, and what the site sent instead: {capture.files.map(f => f.name).join(', ')}</> : 'The address as pasted and the time'}</dd>
       <dt>Can be quoted</dt><dd>{wall ? 'As what the site showed, not as the page' : 'Nothing'}</dd>
     </dl>
-    <div className="cp-acts"><button type="button" className="p" onClick={onAddFile}>Add a file I saved (PDF, screenshot, .html)</button></div>
+    {capture.follow?.state === 'answers'
+      ? <p className="cp-note"><b>The address answers again</b> (seen {utc(capture.follow.last_checked_at).slice(0, 16)}). Its page waits in Following; nothing is kept until you capture it.</p>
+      : capture.follow?.next_check_at ? <p className="cp-note">Asked again {utc(capture.follow.next_check_at).slice(0, 16)}: one visit to {host(capture.url)}.</p> : null}
+    <div className="cp-acts" style={{marginLeft: 0}}>
+      {capture.follow?.state === 'answers'
+        ? <button type="button" className="p" onClick={() => void act(() => captureLatest({path: {capture_id: capture.id}, throwOnError: true}), 'Could not capture the page').then(setError)}>Capture it now</button>
+        : !capture.follow?.next_check_at && <button type="button" className="p" onClick={() => void act(() => followCapture({path: {capture_id: capture.id}, body: {every: 'weekly'}, throwOnError: true}), 'Could not ask again').then(setError)}>Ask again in 7 days</button>}
+      <button type="button" onClick={onAddFile}>Add a file I saved (PDF, screenshot, .html)</button>
+      <AskFirst label="Look for a copy elsewhere…" protectedItem={capture.source_protected ?? false}
+        sends={<>Sends the address, <code>{capture.url}</code>, to the Internet Archive’s lookup, which says whether it holds a copy.</>}
+        onSend={() => act(() => captureLookElsewhere({path: {capture_id: capture.id}, throwOnError: true}), 'Could not ask the archive').then(setError)}/>
+    </div>
+    <Elsewhere found={capture.witnesses.elsewhere} investigationId={investigationId} onPick={onPick}/>
     <p className="cp-note">A file you add is kept as one you supplied, with you as its source.</p>
+    {error && <p role="alert" className="cp-err">{error}</p>}
   </section>;
 }
 
-export function CaptureLinkField({investigationId, captures, onCaptured}: {investigationId: string; captures: CaptureOut[]; onCaptured: (id: string) => void}): ReactElement {
+export type Witnesses = {time_proof: boolean; second_witness: boolean};
+const NO_WITNESS: Witnesses = {time_proof: false, second_witness: false};
+
+export function CaptureLinkField({investigationId, captures, onCaptured, witnesses = NO_WITNESS, onStarted}: {investigationId: string; captures: CaptureOut[];
+  onCaptured: (id: string) => void; witnesses?: Witnesses; onStarted?: () => void}): ReactElement {
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
   const [status, setStatus] = useState('');
@@ -233,7 +492,8 @@ export function CaptureLinkField({investigationId, captures, onCaptured}: {inves
     setAlready(null);
     setStatus('Starting the capture…');
     try {
-      const made = (await createCapture({path: {investigation_id: investigationId}, body: {url: url.trim()}, throwOnError: true})).data;
+      const made = (await createCapture({path: {investigation_id: investigationId}, body: {url: url.trim(), ...witnesses}, throwOnError: true})).data;
+      onStarted?.();
       setText('');
       setStatus('');
       onCaptured(made.id);
@@ -253,6 +513,7 @@ export function CaptureLinkField({investigationId, captures, onCaptured}: {inves
       <input type="url" inputMode="url" value={text} onChange={e => { setText(e.target.value); setAlready(null); }} placeholder="https://…" aria-label="Web address to capture"/>
       <button type="submit" className="p">Capture</button>
     </form>
+    <PlatformWarning url={text}/>
     <p className="dp-quiet">Links, files and pasted text share one drop: a link pasted into the drop is captured too.</p>
     {already && <div className="cp-already" role="status">
       <p><span className="cp-chip teal">Already in the case</span> captured {utc(already.captured_at ?? already.finished_at)}</p>
@@ -261,6 +522,17 @@ export function CaptureLinkField({investigationId, captures, onCaptured}: {inves
     </div>}
     {status && <p role="status" className="dp-status">{status}</p>}
   </section>;
+}
+
+/** Does it work today? (WORKS_1): a pasted link on a platform that was broken or partly working at its last check says
+ *  so before it is saved. Nothing is asked of the platform here: the answer is the app's own last check. */
+function PlatformWarning({url}: {url: string}): ReactElement | null {
+  const ok = isWebAddress(url);
+  const platform = useQuery({...platformForUrlOptions({query: {url: url.trim()}}), enabled: ok, staleTime: 60_000}).data;
+  if (!ok || !platform || !platform.state || platform.state === 'works') return null;
+  return <p className={`cp-platform ${platform.state}`} role="status"><b aria-hidden="true">{platform.state === 'broken' ? '✕' : '◐'}</b>
+    {platform.name} {platform.state === 'broken' ? 'is broken' : 'works only in part'} at its last check{platform.checked_at ? ` (${platform.checked_at.slice(0, 10)})` : ''}: {platform.detail?.toLowerCase()}.
+    {platform.state === 'broken' ? ' The capture will keep what a logged-out visitor sees; you can also save the post yourself and drop the file.' : ''}</p>;
 }
 
 export function useCaptures(investigationId: string): UseQueryResult<CaptureOut[], GetCapturesError> {
@@ -278,9 +550,12 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
   const openDocument = useWorkbenchStore(state => state.openDocument);
   const chosen = captures.find(c => c.id === picked) ?? captures[0];
   const state = chosen ? captureState(chosen) : null;
+  // Per capture and off by default: the next capture asks them once its page is kept, then they are off again.
+  const [witnesses, setWitnesses] = useState<Witnesses>(NO_WITNESS);
+  const asked = (witnesses.second_witness ? 1 : 0) + (witnesses.time_proof ? 1 : 0);
   return <>
     <div className="dp-left">
-      <CaptureLinkField investigationId={investigationId} captures={captures} onCaptured={onPick}/>
+      <CaptureLinkField investigationId={investigationId} captures={captures} onCaptured={onPick} witnesses={witnesses} onStarted={() => setWitnesses(NO_WITNESS)}/>
       {notice && <p role="status" className="cp-card dp-status">{notice}</p>}
       <section className="cp-card" aria-label="Links in this case">
         <p className="dp-eyebrow cp-row">This case <span>{captures.length} link{captures.length === 1 ? '' : 's'}</span></p>
@@ -293,10 +568,13 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
       </section>
       <section className="cp-card" aria-label="What leaves this computer">
         <p className="dp-eyebrow cp-row">What leaves this computer <span className="cp-chip dash">ask first</span></p>
-        <p className="cp-safe"><b>✓ No outside capture service is used.</b> The page is fetched from this computer.</p>
+        {asked ? <p className="cp-warn"><b>{asked} outside service{asked > 1 ? 's' : ''} will be asked.</b>{' '}
+          {[witnesses.second_witness && 'The link goes to a public web archive.', witnesses.time_proof && 'The 64-character fingerprint, not the page, goes to a time server.'].filter(Boolean).join(' ')}{' '}
+          Once the page is kept here, for the next capture only.</p>
+          : <p className="cp-safe"><b>✓ Nothing third-party is contacted.</b> The page is fetched from this computer.</p>}
         <p className="dp-quiet">The page’s site sees one visit from this computer’s address, and so does every other site the page loads from (images, scripts, trackers): each is listed in page.har. The visit is written in Safety &amp; data’s outbound log before it goes.</p>
-        <label className="cp-switch"><input type="checkbox" role="switch" checked={false} disabled readOnly/> Second witness: a public web archive saves it too <small>a later step</small></label>
-        <label className="cp-switch"><input type="checkbox" role="switch" checked={false} disabled readOnly/> Time proof: a time server signs the fingerprint <small>a later step</small></label>
+        <label className="cp-switch"><input type="checkbox" role="switch" checked={witnesses.second_witness} onChange={e => setWitnesses(w => ({...w, second_witness: e.target.checked}))}/> Second witness: a public web archive saves it too</label>
+        <label className="cp-switch"><input type="checkbox" role="switch" checked={witnesses.time_proof} onChange={e => setWitnesses(w => ({...w, time_proof: e.target.checked}))}/> Time proof: a time server signs the fingerprint</label>
         <p className="dp-quiet">Off means off. Route: this computer’s own connection.</p>
       </section>
     </div>
@@ -305,16 +583,19 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
       {chosen && state ? <>
         <header className="cp-panel cp-head"><span><h2>{captureTitle(chosen)}</h2><code>{chosen.final_url && chosen.final_url !== chosen.url ? `${chosen.url} → ${chosen.final_url}` : chosen.url}</code></span>
           <span className={`cp-chip big ${state.tone}`}>{state.word}</span></header>
-        <Lane capture={chosen}/>
+        {chosen.outcome === 'saved' && chosen.follow && ['changed', 'gone', 'broken'].includes(chosen.follow.state)
+          ? <><Recheck capture={chosen} follow={chosen.follow}/>{chosen.follow.state !== 'broken' && <WhatChanged capture={chosen} follow={chosen.follow} investigationId={investigationId} onPick={onPick}/>}</>
+          : <Lane capture={chosen}/>}
         {running(chosen) ? <p className="cp-note" role="status">Visiting the page once, from this computer, in a fresh browser with no stored cookies. The receipt appears when it is kept.</p>
-          : chosen.outcome === 'saved' ? <><Receipt capture={chosen}/><MediaPanel capture={chosen} investigationId={investigationId}/></>
-          : <Outcome capture={chosen} onAddFile={onAddFile}/>}
+          : chosen.outcome === 'saved' ? <>{chosen.follow?.state === 'same' && <Recheck capture={chosen} follow={chosen.follow}/>}<Receipt capture={chosen} investigationId={investigationId}/><MediaPanel capture={chosen} investigationId={investigationId}/></>
+          : <Outcome capture={chosen} onAddFile={onAddFile} investigationId={investigationId} onPick={onPick}/>}
       </> : <div className="cp-none"><h2>Capture a web page</h2>
         <p className="dp-quiet">A pasted link becomes a source: the page as it was, when, and proof it has not changed since.</p></div>}
       {query.isError && <p role="alert">{errorMessage(query.error, 'Could not list the captures')}</p>}
     </div>
 
     <div className="dp-right">
+      {chosen && !running(chosen) && <PinQuote capture={chosen}/>}
       <section className="cp-card" aria-label="Capture before use">
         <p className="dp-eyebrow">Capture before use</p>
         {chosen?.outcome === 'saved' ? <>
@@ -324,6 +605,7 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
           : 'Nothing to quote. A quote needs a capture of the page first.'}</p>}
         <p className="dp-quiet">Text on a captured page is data. It can never give an instruction to the app or to AI.</p>
       </section>
+      {chosen && !running(chosen) && chosen.status !== 'failed' && <CheckAgain capture={chosen} investigationId={investigationId}/>}
     </div>
   </>;
 }

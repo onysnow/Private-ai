@@ -23,7 +23,6 @@ import {connectorSearch, decideCrossProviderCluster, enrichEntity, enrichEntityM
 import type {EnrichmentClusterOut, EntityOut} from '../../lib/generated/types.gen';
 import {reportPayloadError} from '../../lib/report-error';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {DossierPanel} from '../dossier/dossier-panel';
 
 type Props = {
   investigationId: string;
@@ -150,7 +149,6 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
       </div>
       {enrichStatus && <p className="muted">{enrichStatus}</p>}
       <p className="muted">Multi-provider enrichment keeps one auditable session while each provider gets its own run, status, error, and result count. Successful providers are preserved if another provider fails.</p>
-      <DossierPanel investigationId={investigationId}/>
       {clusters.length > 0 && <div>
         <h4>Cross-provider candidates</h4>
         {clusters.map(c => <div className="candidate" key={c.cluster_key}>

@@ -12,9 +12,15 @@ import {
 } from './client';
 import { client } from './client.gen';
 import type {
+  AcceptDocumentSyncData,
+  AcceptDocumentSyncErrors,
+  AcceptDocumentSyncResponses,
   ActiveData,
   ActiveErrors,
   ActiveResponses,
+  AddAboutClaimData,
+  AddAboutClaimErrors,
+  AddAboutClaimResponses,
   AddChartToDeckEndpointData,
   AddChartToDeckEndpointErrors,
   AddChartToDeckEndpointResponses,
@@ -54,6 +60,15 @@ import type {
   AttachRelationshipEvidenceEndpointData,
   AttachRelationshipEvidenceEndpointErrors,
   AttachRelationshipEvidenceEndpointResponses,
+  ByHandAddData,
+  ByHandAddErrors,
+  ByHandAddResponses,
+  ByHandPreviewData,
+  ByHandPreviewErrors,
+  ByHandPreviewResponses,
+  ByHandSuggestData,
+  ByHandSuggestErrors,
+  ByHandSuggestResponses,
   CancelJobEndpointData,
   CancelJobEndpointErrors,
   CancelJobEndpointResponses,
@@ -63,12 +78,39 @@ import type {
   CapabilitiesData,
   CapabilitiesErrors,
   CapabilitiesResponses,
+  CaptureAllData,
+  CaptureAllErrors,
+  CaptureAllResponses,
+  CaptureItemData,
+  CaptureItemErrors,
+  CaptureItemResponses,
+  CaptureLatestData,
+  CaptureLatestErrors,
+  CaptureLatestResponses,
+  CaptureLookElsewhereData,
+  CaptureLookElsewhereErrors,
+  CaptureLookElsewhereResponses,
+  CaptureSecondWitnessData,
+  CaptureSecondWitnessErrors,
+  CaptureSecondWitnessResponses,
+  CaptureTimeProofData,
+  CaptureTimeProofErrors,
+  CaptureTimeProofResponses,
   ChangePassphraseData,
   ChangePassphraseErrors,
   ChangePassphraseResponses,
+  ChangePlatformChecksData,
+  ChangePlatformChecksErrors,
+  ChangePlatformChecksResponses,
   CheckConnectorKeyData,
   CheckConnectorKeyErrors,
   CheckConnectorKeyResponses,
+  CheckEvidencePackData,
+  CheckEvidencePackErrors,
+  CheckEvidencePackResponses,
+  CheckMonitorData,
+  CheckMonitorErrors,
+  CheckMonitorResponses,
   CheckWatchlistNowData,
   CheckWatchlistNowErrors,
   CheckWatchlistNowResponses,
@@ -81,6 +123,15 @@ import type {
   CollectCaptureMediaData,
   CollectCaptureMediaErrors,
   CollectCaptureMediaResponses,
+  CompareAuthenticityData,
+  CompareAuthenticityErrors,
+  CompareAuthenticityResponses,
+  CompareRedactedData,
+  CompareRedactedErrors,
+  CompareRedactedResponses,
+  CompareTranscriptsData,
+  CompareTranscriptsErrors,
+  CompareTranscriptsResponses,
   ConnectorsData,
   ConnectorSearchData,
   ConnectorSearchErrors,
@@ -93,6 +144,9 @@ import type {
   CreateAppUserData,
   CreateAppUserErrors,
   CreateAppUserResponses,
+  CreateBuiltTimelineData,
+  CreateBuiltTimelineErrors,
+  CreateBuiltTimelineResponses,
   CreateCanonicalRelationshipData,
   CreateCanonicalRelationshipErrors,
   CreateCanonicalRelationshipResponses,
@@ -108,6 +162,9 @@ import type {
   CreateClaimReviewData,
   CreateClaimReviewErrors,
   CreateClaimReviewResponses,
+  CreateDeckEndpointData,
+  CreateDeckEndpointErrors,
+  CreateDeckEndpointResponses,
   CreateEntityData,
   CreateEntityErrors,
   CreateEntityResponses,
@@ -129,6 +186,12 @@ import type {
   CreateLeadFromRelationshipContextData,
   CreateLeadFromRelationshipContextErrors,
   CreateLeadFromRelationshipContextResponses,
+  CreateMailboxMonitorData,
+  CreateMailboxMonitorErrors,
+  CreateMailboxMonitorResponses,
+  CreateMonitorData,
+  CreateMonitorErrors,
+  CreateMonitorResponses,
   CreateReportingTaskEndpointData,
   CreateReportingTaskEndpointErrors,
   CreateReportingTaskEndpointResponses,
@@ -138,12 +201,18 @@ import type {
   CreateTimelineEventEndpointData,
   CreateTimelineEventEndpointErrors,
   CreateTimelineEventEndpointResponses,
+  CreateTimelinePeriodData,
+  CreateTimelinePeriodErrors,
+  CreateTimelinePeriodResponses,
   CreateWatchData,
   CreateWatchErrors,
   CreateWatchResponses,
   CreateWriteupEndpointData,
   CreateWriteupEndpointErrors,
   CreateWriteupEndpointResponses,
+  DecideAuthenticityData,
+  DecideAuthenticityErrors,
+  DecideAuthenticityResponses,
   DecideCheckData,
   DecideCheckErrors,
   DecideCheckResponses,
@@ -159,6 +228,12 @@ import type {
   DecidePropertyConflictData,
   DecidePropertyConflictErrors,
   DecidePropertyConflictResponses,
+  DeckChecksEndpointData,
+  DeckChecksEndpointErrors,
+  DeckChecksEndpointResponses,
+  DeleteBuiltTimelineData,
+  DeleteBuiltTimelineErrors,
+  DeleteBuiltTimelineResponses,
   DeleteConnectorCredentialData,
   DeleteConnectorCredentialErrors,
   DeleteConnectorCredentialResponses,
@@ -168,12 +243,18 @@ import type {
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipErrors,
   DeleteInvestigationMembershipResponses,
+  DeleteMonitorData,
+  DeleteMonitorErrors,
+  DeleteMonitorResponses,
   DeleteSavedQuestionData,
   DeleteSavedQuestionErrors,
   DeleteSavedQuestionResponses,
   DeleteStorySectionData,
   DeleteStorySectionErrors,
   DeleteStorySectionResponses,
+  DeleteTimelinePeriodData,
+  DeleteTimelinePeriodErrors,
+  DeleteTimelinePeriodResponses,
   DeleteWatchData,
   DeleteWatchErrors,
   DeleteWatchResponses,
@@ -228,21 +309,36 @@ import type {
   EntityPostMergeReconciliationData,
   EntityPostMergeReconciliationErrors,
   EntityPostMergeReconciliationResponses,
+  ExamineAgainData,
+  ExamineAgainErrors,
+  ExamineAgainResponses,
   ExpandEntityInCorpusData,
   ExpandEntityInCorpusErrors,
   ExpandEntityInCorpusResponses,
+  ExportDeckPdfData,
+  ExportDeckPdfErrors,
+  ExportDeckPdfResponses,
   ExportDeckPptxData,
   ExportDeckPptxErrors,
   ExportDeckPptxResponses,
+  ExportEvidencePackData,
+  ExportEvidencePackErrors,
+  ExportEvidencePackResponses,
   ExportInvestigationData,
   ExportInvestigationErrors,
   ExportInvestigationResponses,
   ExportWriteupDocxData,
   ExportWriteupDocxErrors,
   ExportWriteupDocxResponses,
+  ExportWriteupPdfData,
+  ExportWriteupPdfErrors,
+  ExportWriteupPdfResponses,
   ExternalRelationshipCandidatesData,
   ExternalRelationshipCandidatesErrors,
   ExternalRelationshipCandidatesResponses,
+  FindDocumentSyncData,
+  FindDocumentSyncErrors,
+  FindDocumentSyncResponses,
   FindExtractionLineageEndpointData,
   FindExtractionLineageEndpointErrors,
   FindExtractionLineageEndpointResponses,
@@ -252,6 +348,15 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenErrors,
   FindOpenalephChildrenResponses,
+  FindPhotoFacesData,
+  FindPhotoFacesErrors,
+  FindPhotoFacesResponses,
+  FindVoicesData,
+  FindVoicesErrors,
+  FindVoicesResponses,
+  FollowCaptureData,
+  FollowCaptureErrors,
+  FollowCaptureResponses,
   Get1MdbData,
   Get1MdbErrors,
   Get1MdbResponses,
@@ -261,6 +366,9 @@ import type {
   GetAllRecordTagsData,
   GetAllRecordTagsErrors,
   GetAllRecordTagsResponses,
+  GetAuthenticityData,
+  GetAuthenticityErrors,
+  GetAuthenticityResponses,
   GetBasemapFontData,
   GetBasemapFontErrors,
   GetBasemapFontResponses,
@@ -278,6 +386,9 @@ import type {
   GetCaptureFileData,
   GetCaptureFileErrors,
   GetCaptureFileResponses,
+  GetCaptureQuotesData,
+  GetCaptureQuotesErrors,
+  GetCaptureQuotesResponses,
   GetCaptureResponses,
   GetCapturesData,
   GetCapturesErrors,
@@ -309,6 +420,9 @@ import type {
   GetCollectionsData,
   GetCollectionsErrors,
   GetCollectionsResponses,
+  GetCopyPageData,
+  GetCopyPageErrors,
+  GetCopyPageResponses,
   GetCorpusInsightsData,
   GetCorpusInsightsErrors,
   GetCorpusInsightsResponses,
@@ -327,6 +441,9 @@ import type {
   GetDemoCaseData,
   GetDemoCaseErrors,
   GetDemoCaseResponses,
+  GetDerivedFileData,
+  GetDerivedFileErrors,
+  GetDerivedFileResponses,
   GetDocumentData,
   GetDocumentEmailData,
   GetDocumentEmailErrors,
@@ -375,6 +492,9 @@ import type {
   GetExtractionOpenalephMatchesData,
   GetExtractionOpenalephMatchesErrors,
   GetExtractionOpenalephMatchesResponses,
+  GetFollowingData,
+  GetFollowingErrors,
+  GetFollowingResponses,
   GetGlossaryEntryData,
   GetGlossaryEntryErrors,
   GetGlossaryEntryResponses,
@@ -444,12 +564,21 @@ import type {
   GetPartyYearsData,
   GetPartyYearsErrors,
   GetPartyYearsResponses,
+  GetPhotoData,
+  GetPhotoErrors,
+  GetPhotoResponses,
+  GetPlatformChecksData,
+  GetPlatformChecksErrors,
+  GetPlatformChecksResponses,
   GetRecordMarksData,
   GetRecordMarksErrors,
   GetRecordMarksResponses,
   GetRecordProvenanceTraceData,
   GetRecordProvenanceTraceErrors,
   GetRecordProvenanceTraceResponses,
+  GetRedactionData,
+  GetRedactionErrors,
+  GetRedactionResponses,
   GetRedFlagsData,
   GetRedFlagsErrors,
   GetRedFlagsResponses,
@@ -477,12 +606,21 @@ import type {
   GetSecurityAuditSummaryData,
   GetSecurityAuditSummaryErrors,
   GetSecurityAuditSummaryResponses,
+  GetSigningKeyData,
+  GetSigningKeyErrors,
+  GetSigningKeyResponses,
   GetSimilarDocumentsData,
   GetSimilarDocumentsErrors,
   GetSimilarDocumentsResponses,
   GetSinceData,
   GetSinceErrors,
   GetSinceResponses,
+  GetSoundData,
+  GetSoundErrors,
+  GetSoundResponses,
+  GetSpectrogramData,
+  GetSpectrogramErrors,
+  GetSpectrogramResponses,
   GetStandingData,
   GetStandingErrors,
   GetStandingResponses,
@@ -504,6 +642,12 @@ import type {
   GetTagsData,
   GetTagsErrors,
   GetTagsResponses,
+  GetTimelineBoardData,
+  GetTimelineBoardErrors,
+  GetTimelineBoardResponses,
+  GetVersionsData,
+  GetVersionsErrors,
+  GetVersionsResponses,
   GetWatchlistData,
   GetWatchlistErrors,
   GetWatchlistResponses,
@@ -513,6 +657,9 @@ import type {
   GetWriteupEndpointData,
   GetWriteupEndpointErrors,
   GetWriteupEndpointResponses,
+  GetYourSafetyData,
+  GetYourSafetyErrors,
+  GetYourSafetyResponses,
   GradeTimelineEventEndpointData,
   GradeTimelineEventEndpointErrors,
   GradeTimelineEventEndpointResponses,
@@ -597,6 +744,12 @@ import type {
   ListAssessmentsData,
   ListAssessmentsErrors,
   ListAssessmentsResponses,
+  ListAuthenticityData,
+  ListAuthenticityErrors,
+  ListAuthenticityResponses,
+  ListBuiltTimelinesData,
+  ListBuiltTimelinesErrors,
+  ListBuiltTimelinesResponses,
   ListCaseRecordsData,
   ListCaseRecordsErrors,
   ListCaseRecordsResponses,
@@ -624,6 +777,9 @@ import type {
   ListDemoCasesData,
   ListDemoCasesErrors,
   ListDemoCasesResponses,
+  ListDerivedData,
+  ListDerivedErrors,
+  ListDerivedResponses,
   ListDocumentCandidatesEndpointData,
   ListDocumentCandidatesEndpointErrors,
   ListDocumentCandidatesEndpointResponses,
@@ -732,6 +888,12 @@ import type {
   LockingErrors,
   LockingResponses,
   LockResponses,
+  MakeCleanedCopyData,
+  MakeCleanedCopyErrors,
+  MakeCleanedCopyResponses,
+  MakeClipData,
+  MakeClipErrors,
+  MakeClipResponses,
   MakeLeadFromHitData,
   MakeLeadFromHitErrors,
   MakeLeadFromHitResponses,
@@ -741,9 +903,18 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagErrors,
   MakeLeadFromRedFlagResponses,
+  MakePhotoCopyData,
+  MakePhotoCopyErrors,
+  MakePhotoCopyResponses,
+  MakeRedactedCopyData,
+  MakeRedactedCopyErrors,
+  MakeRedactedCopyResponses,
   MarkAiRunThoughtData,
   MarkAiRunThoughtErrors,
   MarkAiRunThoughtResponses,
+  MarkCaptureChangedData,
+  MarkCaptureChangedErrors,
+  MarkCaptureChangedResponses,
   MarkRedFlagInnocentData,
   MarkRedFlagInnocentErrors,
   MarkRedFlagInnocentResponses,
@@ -756,6 +927,9 @@ import type {
   NameStoryVersionData,
   NameStoryVersionErrors,
   NameStoryVersionResponses,
+  NameVoiceData,
+  NameVoiceErrors,
+  NameVoiceResponses,
   NewRecoveryKeyData,
   NewRecoveryKeyErrors,
   NewRecoveryKeyResponses,
@@ -765,6 +939,9 @@ import type {
   OpenCaseData,
   OpenCaseErrors,
   OpenCaseResponses,
+  OutsideAuthenticityData,
+  OutsideAuthenticityErrors,
+  OutsideAuthenticityResponses,
   PatchClaimSuiteData,
   PatchClaimSuiteErrors,
   PatchClaimSuiteResponses,
@@ -786,9 +963,15 @@ import type {
   PlaceStoryClaimData,
   PlaceStoryClaimErrors,
   PlaceStoryClaimResponses,
+  PlatformForUrlData,
+  PlatformForUrlErrors,
+  PlatformForUrlResponses,
   PresentationStylesData,
   PresentationStylesErrors,
   PresentationStylesResponses,
+  PreviewAuthenticityData,
+  PreviewAuthenticityErrors,
+  PreviewAuthenticityResponses,
   PreviewBackupRestoreData,
   PreviewBackupRestoreErrors,
   PreviewBackupRestoreResponses,
@@ -831,15 +1014,27 @@ import type {
   PutResearchSettingsData,
   PutResearchSettingsErrors,
   PutResearchSettingsResponses,
+  PutTimelineBoardData,
+  PutTimelineBoardErrors,
+  PutTimelineBoardResponses,
+  RecheckCaptureData,
+  RecheckCaptureErrors,
+  RecheckCaptureResponses,
   RecheckHashData,
   RecheckHashErrors,
   RecheckHashResponses,
+  RecordRemovalData,
+  RecordRemovalErrors,
+  RecordRemovalResponses,
   RecordStoryGateData,
   RecordStoryGateErrors,
   RecordStoryGateResponses,
   RecoverData,
   RecoverErrors,
   RecoverResponses,
+  RefindCaptureQuotesData,
+  RefindCaptureQuotesErrors,
+  RefindCaptureQuotesResponses,
   RefreshOpenalephDocumentReviewData,
   RefreshOpenalephDocumentReviewErrors,
   RefreshOpenalephDocumentReviewResponses,
@@ -912,6 +1107,9 @@ import type {
   RotateAppUserTokenData,
   RotateAppUserTokenErrors,
   RotateAppUserTokenResponses,
+  RunPlatformChecksData,
+  RunPlatformChecksErrors,
+  RunPlatformChecksResponses,
   RunRedFlagsData,
   RunRedFlagsErrors,
   RunRedFlagsResponses,
@@ -966,6 +1164,9 @@ import type {
   SettingsStatusData,
   SettingsStatusErrors,
   SettingsStatusResponses,
+  SkipItemData,
+  SkipItemErrors,
+  SkipItemResponses,
   StartSessionData,
   StartSessionErrors,
   StartSessionResponses,
@@ -984,12 +1185,18 @@ import type {
   TestNotificationChannelData,
   TestNotificationChannelErrors,
   TestNotificationChannelResponses,
+  TimelineLanesViewData,
+  TimelineLanesViewErrors,
+  TimelineLanesViewResponses,
   TurnOffData,
   TurnOffErrors,
   TurnOffResponses,
   TurnOnData,
   TurnOnErrors,
   TurnOnResponses,
+  UndoItemData,
+  UndoItemErrors,
+  UndoItemResponses,
   UnlockData,
   UnlockErrors,
   UnlockPinData,
@@ -1002,6 +1209,15 @@ import type {
   UpdateAppUserData,
   UpdateAppUserErrors,
   UpdateAppUserResponses,
+  UpdateAuthenticityData,
+  UpdateAuthenticityErrors,
+  UpdateAuthenticityResponses,
+  UpdateBuiltTimelineData,
+  UpdateBuiltTimelineErrors,
+  UpdateBuiltTimelineResponses,
+  UpdateCaptureData,
+  UpdateCaptureErrors,
+  UpdateCaptureResponses,
   UpdateClaimEndpointData,
   UpdateClaimEndpointErrors,
   UpdateClaimEndpointResponses,
@@ -1014,12 +1230,18 @@ import type {
   UpdateLeadEndpointData,
   UpdateLeadEndpointErrors,
   UpdateLeadEndpointResponses,
+  UpdateMonitorData,
+  UpdateMonitorErrors,
+  UpdateMonitorResponses,
   UpdateReportingTaskEndpointData,
   UpdateReportingTaskEndpointErrors,
   UpdateReportingTaskEndpointResponses,
   UpdateStorySectionData,
   UpdateStorySectionErrors,
   UpdateStorySectionResponses,
+  UpdateTimelinePeriodData,
+  UpdateTimelinePeriodErrors,
+  UpdateTimelinePeriodResponses,
   UpdateWriteupEndpointData,
   UpdateWriteupEndpointErrors,
   UpdateWriteupEndpointResponses,
@@ -1028,7 +1250,13 @@ import type {
   UploadDocumentResponses,
 } from './types.gen';
 import {
+  zAcceptDocumentSyncBody,
+  zAcceptDocumentSyncPath,
+  zAcceptDocumentSyncResponse,
   zActiveResponse,
+  zAddAboutClaimBody,
+  zAddAboutClaimPath,
+  zAddAboutClaimResponse,
   zAddChartToDeckEndpointBody,
   zAddChartToDeckEndpointPath,
   zAddChartToDeckEndpointResponse,
@@ -1066,16 +1294,45 @@ import {
   zAttachRelationshipEvidenceEndpointBody,
   zAttachRelationshipEvidenceEndpointPath,
   zAttachRelationshipEvidenceEndpointResponse,
+  zByHandAddBody,
+  zByHandAddPath,
+  zByHandAddResponse,
+  zByHandPreviewBody,
+  zByHandPreviewPath,
+  zByHandPreviewResponse,
+  zByHandSuggestPath,
+  zByHandSuggestQuery,
+  zByHandSuggestResponse,
   zCancelJobEndpointPath,
   zCancelJobEndpointResponse,
   zCanonicalEntityResolutionBody,
   zCanonicalEntityResolutionPath,
   zCanonicalEntityResolutionResponse,
   zCapabilitiesResponse,
+  zCaptureAllBody,
+  zCaptureAllPath,
+  zCaptureAllResponse,
+  zCaptureItemPath,
+  zCaptureItemResponse,
+  zCaptureLatestPath,
+  zCaptureLatestResponse,
+  zCaptureLookElsewherePath,
+  zCaptureLookElsewhereResponse,
+  zCaptureSecondWitnessPath,
+  zCaptureSecondWitnessResponse,
+  zCaptureTimeProofPath,
+  zCaptureTimeProofResponse,
   zChangePassphraseBody,
   zChangePassphraseResponse,
+  zChangePlatformChecksBody,
+  zChangePlatformChecksResponse,
   zCheckConnectorKeyPath,
   zCheckConnectorKeyResponse,
+  zCheckEvidencePackBody,
+  zCheckEvidencePackPath,
+  zCheckEvidencePackResponse,
+  zCheckMonitorPath,
+  zCheckMonitorResponse,
   zCheckWatchlistNowPath,
   zCheckWatchlistNowResponse,
   zClearCaseLookupsPath,
@@ -1084,6 +1341,13 @@ import {
   zCloseCaseResponse,
   zCollectCaptureMediaPath,
   zCollectCaptureMediaResponse,
+  zCompareAuthenticityPath,
+  zCompareAuthenticityResponse,
+  zCompareRedactedPath,
+  zCompareRedactedQuery,
+  zCompareRedactedResponse,
+  zCompareTranscriptsPath,
+  zCompareTranscriptsResponse,
   zConnectorSearchBody,
   zConnectorSearchPath,
   zConnectorSearchResponse,
@@ -1093,6 +1357,9 @@ import {
   zConvertLeadEndpointResponse,
   zCreateAppUserBody,
   zCreateAppUserResponse,
+  zCreateBuiltTimelineBody,
+  zCreateBuiltTimelinePath,
+  zCreateBuiltTimelineResponse,
   zCreateCanonicalRelationshipBody,
   zCreateCanonicalRelationshipResponse,
   zCreateCaptureBody,
@@ -1106,6 +1373,9 @@ import {
   zCreateClaimReviewBody,
   zCreateClaimReviewPath,
   zCreateClaimReviewResponse,
+  zCreateDeckEndpointBody,
+  zCreateDeckEndpointPath,
+  zCreateDeckEndpointResponse,
   zCreateEntityBody,
   zCreateEntityResponse,
   zCreateEvidenceEndpointBody,
@@ -1122,16 +1392,28 @@ import {
   zCreateLeadEndpointResponse,
   zCreateLeadFromRelationshipContextPath,
   zCreateLeadFromRelationshipContextResponse,
+  zCreateMailboxMonitorBody,
+  zCreateMailboxMonitorPath,
+  zCreateMailboxMonitorResponse,
+  zCreateMonitorBody,
+  zCreateMonitorPath,
+  zCreateMonitorResponse,
   zCreateReportingTaskEndpointBody,
   zCreateReportingTaskEndpointResponse,
   zCreateSourceEndpointBody,
   zCreateSourceEndpointResponse,
   zCreateTimelineEventEndpointBody,
   zCreateTimelineEventEndpointResponse,
+  zCreateTimelinePeriodBody,
+  zCreateTimelinePeriodPath,
+  zCreateTimelinePeriodResponse,
   zCreateWatchBody,
   zCreateWatchResponse,
   zCreateWriteupEndpointBody,
   zCreateWriteupEndpointResponse,
+  zDecideAuthenticityBody,
+  zDecideAuthenticityPath,
+  zDecideAuthenticityResponse,
   zDecideCheckBody,
   zDecideCheckPath,
   zDecideCheckResponse,
@@ -1147,16 +1429,24 @@ import {
   zDecidePropertyConflictBody,
   zDecidePropertyConflictPath,
   zDecidePropertyConflictResponse,
+  zDeckChecksEndpointPath,
+  zDeckChecksEndpointResponse,
+  zDeleteBuiltTimelinePath,
+  zDeleteBuiltTimelineResponse,
   zDeleteConnectorCredentialPath,
   zDeleteConnectorCredentialResponse,
   zDeleteDeckEndpointPath,
   zDeleteDeckEndpointResponse,
   zDeleteInvestigationMembershipPath,
   zDeleteInvestigationMembershipResponse,
+  zDeleteMonitorPath,
+  zDeleteMonitorResponse,
   zDeleteSavedQuestionPath,
   zDeleteSavedQuestionResponse,
   zDeleteStorySectionPath,
   zDeleteStorySectionResponse,
+  zDeleteTimelinePeriodPath,
+  zDeleteTimelinePeriodResponse,
   zDeleteWatchPath,
   zDeleteWatchResponse,
   zDeleteWriteupEndpointPath,
@@ -1200,28 +1490,49 @@ import {
   zEntityMergePreviewResponse,
   zEntityPostMergeReconciliationPath,
   zEntityPostMergeReconciliationResponse,
+  zExamineAgainPath,
+  zExamineAgainResponse,
   zExpandEntityInCorpusPath,
   zExpandEntityInCorpusResponse,
+  zExportDeckPdfPath,
+  zExportDeckPdfQuery,
+  zExportDeckPdfResponse,
   zExportDeckPptxPath,
   zExportDeckPptxResponse,
+  zExportEvidencePackPath,
+  zExportEvidencePackResponse,
   zExportInvestigationPath,
   zExportInvestigationQuery,
   zExportInvestigationResponse,
   zExportWriteupDocxPath,
   zExportWriteupDocxResponse,
+  zExportWriteupPdfPath,
+  zExportWriteupPdfResponse,
   zExternalRelationshipCandidatesPath,
   zExternalRelationshipCandidatesResponse,
+  zFindDocumentSyncBody,
+  zFindDocumentSyncPath,
+  zFindDocumentSyncResponse,
   zFindExtractionLineageEndpointQuery,
   zFindExtractionLineageEndpointResponse,
   zFindingCandidatesPath,
   zFindingCandidatesResponse,
   zFindOpenalephChildrenPath,
   zFindOpenalephChildrenResponse,
+  zFindPhotoFacesPath,
+  zFindPhotoFacesResponse,
+  zFindVoicesPath,
+  zFindVoicesResponse,
+  zFollowCaptureBody,
+  zFollowCapturePath,
+  zFollowCaptureResponse,
   zGet1MdbResponse,
   zGetAiAnalysisCandidateEndpointPath,
   zGetAiAnalysisCandidateEndpointResponse,
   zGetAllRecordTagsPath,
   zGetAllRecordTagsResponse,
+  zGetAuthenticityPath,
+  zGetAuthenticityResponse,
   zGetBasemapFontPath,
   zGetBasemapFontResponse,
   zGetBasemapSpritePath,
@@ -1231,6 +1542,8 @@ import {
   zGetBasemapTileResponse,
   zGetCaptureFilePath,
   zGetCapturePath,
+  zGetCaptureQuotesPath,
+  zGetCaptureQuotesResponse,
   zGetCaptureResponse,
   zGetCapturesPath,
   zGetCapturesResponse,
@@ -1251,6 +1564,9 @@ import {
   zGetCollectionResponse,
   zGetCollectionsPath,
   zGetCollectionsResponse,
+  zGetCopyPagePath,
+  zGetCopyPageQuery,
+  zGetCopyPageResponse,
   zGetCorpusInsightsPath,
   zGetCorpusInsightsResponse,
   zGetCorpusStatusPath,
@@ -1264,6 +1580,8 @@ import {
   zGetDeckEndpointResponse,
   zGetDemoCasePath,
   zGetDemoCaseResponse,
+  zGetDerivedFilePath,
+  zGetDerivedFileResponse,
   zGetDocumentEmailPath,
   zGetDocumentEmailResponse,
   zGetDocumentFormatsResponse,
@@ -1297,6 +1615,8 @@ import {
   zGetExtractionEntityMatchesResponse,
   zGetExtractionOpenalephMatchesPath,
   zGetExtractionOpenalephMatchesResponse,
+  zGetFollowingPath,
+  zGetFollowingResponse,
   zGetGlossaryEntryQuery,
   zGetGlossaryEntryResponse,
   zGetIdentifierTargetsPath,
@@ -1344,11 +1664,16 @@ import {
   zGetOwnershipChainResponse,
   zGetPartyYearsPath,
   zGetPartyYearsResponse,
+  zGetPhotoPath,
+  zGetPhotoResponse,
+  zGetPlatformChecksResponse,
   zGetRecordMarksPath,
   zGetRecordMarksQuery,
   zGetRecordMarksResponse,
   zGetRecordProvenanceTraceQuery,
   zGetRecordProvenanceTraceResponse,
+  zGetRedactionPath,
+  zGetRedactionResponse,
   zGetRedFlagsPath,
   zGetRedFlagsResponse,
   zGetRelationshipSourcesPath,
@@ -1366,12 +1691,17 @@ import {
   zGetSecurityAuditRetentionPreviewQuery,
   zGetSecurityAuditRetentionPreviewResponse,
   zGetSecurityAuditSummaryResponse,
+  zGetSigningKeyResponse,
   zGetSimilarDocumentsPath,
   zGetSimilarDocumentsQuery,
   zGetSimilarDocumentsResponse,
   zGetSincePath,
   zGetSinceQuery,
   zGetSinceResponse,
+  zGetSoundPath,
+  zGetSoundResponse,
+  zGetSpectrogramPath,
+  zGetSpectrogramQuery,
   zGetStandingPath,
   zGetStandingResponse,
   zGetStoryPath,
@@ -1384,12 +1714,18 @@ import {
   zGetTaggedRecordsResponse,
   zGetTagsPath,
   zGetTagsResponse,
+  zGetTimelineBoardPath,
+  zGetTimelineBoardResponse,
+  zGetVersionsPath,
+  zGetVersionsResponse,
   zGetWatchlistPath,
   zGetWatchlistResponse,
   zGetWirePath,
   zGetWireResponse,
   zGetWriteupEndpointPath,
   zGetWriteupEndpointResponse,
+  zGetYourSafetyPath,
+  zGetYourSafetyResponse,
   zGradeTimelineEventEndpointBody,
   zGradeTimelineEventEndpointPath,
   zGradeTimelineEventEndpointResponse,
@@ -1461,6 +1797,10 @@ import {
   zListAreasResponse,
   zListAssessmentsPath,
   zListAssessmentsResponse,
+  zListAuthenticityPath,
+  zListAuthenticityResponse,
+  zListBuiltTimelinesPath,
+  zListBuiltTimelinesResponse,
   zListCaseRecordsPath,
   zListCaseRecordsQuery,
   zListCaseRecordsResponse,
@@ -1482,6 +1822,8 @@ import {
   zListDecksEndpointPath,
   zListDecksEndpointResponse,
   zListDemoCasesResponse,
+  zListDerivedPath,
+  zListDerivedResponse,
   zListDocumentCandidatesEndpointPath,
   zListDocumentCandidatesEndpointQuery,
   zListDocumentCandidatesEndpointResponse,
@@ -1563,15 +1905,29 @@ import {
   zLockingBody,
   zLockingResponse,
   zLockResponse,
+  zMakeCleanedCopyBody,
+  zMakeCleanedCopyPath,
+  zMakeCleanedCopyResponse,
+  zMakeClipBody,
+  zMakeClipPath,
+  zMakeClipResponse,
   zMakeLeadFromHitPath,
   zMakeLeadFromHitResponse,
   zMakeLeadFromNotePath,
   zMakeLeadFromNoteResponse,
   zMakeLeadFromRedFlagPath,
   zMakeLeadFromRedFlagResponse,
+  zMakePhotoCopyBody,
+  zMakePhotoCopyPath,
+  zMakePhotoCopyResponse,
+  zMakeRedactedCopyBody,
+  zMakeRedactedCopyPath,
+  zMakeRedactedCopyResponse,
   zMarkAiRunThoughtBody,
   zMarkAiRunThoughtPath,
   zMarkAiRunThoughtResponse,
+  zMarkCaptureChangedPath,
+  zMarkCaptureChangedResponse,
   zMarkRedFlagInnocentBody,
   zMarkRedFlagInnocentPath,
   zMarkRedFlagInnocentResponse,
@@ -1582,12 +1938,18 @@ import {
   zNameStoryVersionBody,
   zNameStoryVersionPath,
   zNameStoryVersionResponse,
+  zNameVoiceBody,
+  zNameVoicePath,
+  zNameVoiceResponse,
   zNewRecoveryKeyBody,
   zNewRecoveryKeyResponse,
   zOpenalephIntegrationStatusResponse,
   zOpenCaseBody,
   zOpenCasePath,
   zOpenCaseResponse,
+  zOutsideAuthenticityBody,
+  zOutsideAuthenticityPath,
+  zOutsideAuthenticityResponse,
   zPatchClaimSuiteBody,
   zPatchClaimSuitePath,
   zPatchClaimSuiteResponse,
@@ -1608,7 +1970,12 @@ import {
   zPlaceStoryClaimBody,
   zPlaceStoryClaimPath,
   zPlaceStoryClaimResponse,
+  zPlatformForUrlQuery,
+  zPlatformForUrlResponse,
   zPresentationStylesResponse,
+  zPreviewAuthenticityPath,
+  zPreviewAuthenticityQuery,
+  zPreviewAuthenticityResponse,
   zPreviewBackupRestoreBody,
   zPreviewBackupRestoreResponse,
   zPreviewTableMappingBody,
@@ -1646,13 +2013,22 @@ import {
   zPutNotificationPrefsResponse,
   zPutResearchSettingsBody,
   zPutResearchSettingsResponse,
+  zPutTimelineBoardBody,
+  zPutTimelineBoardPath,
+  zPutTimelineBoardResponse,
+  zRecheckCapturePath,
+  zRecheckCaptureResponse,
   zRecheckHashPath,
   zRecheckHashResponse,
+  zRecordRemovalPath,
+  zRecordRemovalResponse,
   zRecordStoryGateBody,
   zRecordStoryGatePath,
   zRecordStoryGateResponse,
   zRecoverBody,
   zRecoverResponse,
+  zRefindCaptureQuotesPath,
+  zRefindCaptureQuotesResponse,
   zRefreshOpenalephDocumentReviewPath,
   zRefreshOpenalephDocumentReviewResponse,
   zRelationshipSchemasResponse,
@@ -1711,6 +2087,8 @@ import {
   zRotateAppUserTokenPath,
   zRotateAppUserTokenQuery,
   zRotateAppUserTokenResponse,
+  zRunPlatformChecksQuery,
+  zRunPlatformChecksResponse,
   zRunRedFlagsPath,
   zRunRedFlagsResponse,
   zRunSavedQuestionPath,
@@ -1752,6 +2130,8 @@ import {
   zSetStoryThesisPath,
   zSetStoryThesisResponse,
   zSettingsStatusResponse,
+  zSkipItemPath,
+  zSkipItemResponse,
   zStartSessionResponse,
   zStartStoryWriteupPath,
   zStartStoryWriteupResponse,
@@ -1764,10 +2144,14 @@ import {
   zTagARecordResponse,
   zTestNotificationChannelPath,
   zTestNotificationChannelResponse,
+  zTimelineLanesViewPath,
+  zTimelineLanesViewResponse,
   zTurnOffBody,
   zTurnOffResponse,
   zTurnOnBody,
   zTurnOnResponse,
+  zUndoItemPath,
+  zUndoItemResponse,
   zUnlockBody,
   zUnlockPinBody,
   zUnlockPinResponse,
@@ -1778,6 +2162,15 @@ import {
   zUpdateAppUserBody,
   zUpdateAppUserPath,
   zUpdateAppUserResponse,
+  zUpdateAuthenticityBody,
+  zUpdateAuthenticityPath,
+  zUpdateAuthenticityResponse,
+  zUpdateBuiltTimelineBody,
+  zUpdateBuiltTimelinePath,
+  zUpdateBuiltTimelineResponse,
+  zUpdateCaptureBody,
+  zUpdateCapturePath,
+  zUpdateCaptureResponse,
   zUpdateClaimEndpointBody,
   zUpdateClaimEndpointPath,
   zUpdateClaimEndpointResponse,
@@ -1790,12 +2183,18 @@ import {
   zUpdateLeadEndpointBody,
   zUpdateLeadEndpointPath,
   zUpdateLeadEndpointResponse,
+  zUpdateMonitorBody,
+  zUpdateMonitorPath,
+  zUpdateMonitorResponse,
   zUpdateReportingTaskEndpointBody,
   zUpdateReportingTaskEndpointPath,
   zUpdateReportingTaskEndpointResponse,
   zUpdateStorySectionBody,
   zUpdateStorySectionPath,
   zUpdateStorySectionResponse,
+  zUpdateTimelinePeriodBody,
+  zUpdateTimelinePeriodPath,
+  zUpdateTimelinePeriodResponse,
   zUpdateWriteupEndpointBody,
   zUpdateWriteupEndpointPath,
   zUpdateWriteupEndpointResponse,
@@ -2295,6 +2694,64 @@ export const getCapture = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Update Capture
+ *
+ * Set a link only's reason (dead link, blocked, timed out, tool error) when the person knows better.
+ */
+export const updateCapture = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateCaptureData, ThrowOnError>,
+): RequestResult<UpdateCaptureResponses, UpdateCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    UpdateCaptureResponses,
+    UpdateCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateCaptureBody,
+          path: zUpdateCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateCaptureResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Capture Latest
+ *
+ * Capture the page as it is now, as a new capture: both stay in the case. Answers with the new capture.
+ */
+export const captureLatest = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureLatestData, ThrowOnError>,
+): RequestResult<CaptureLatestResponses, CaptureLatestErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CaptureLatestResponses,
+    CaptureLatestErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureLatestPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureLatestResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/capture-latest',
+    ...options,
+  });
+
+/**
  * Get Capture File
  *
  * One kept file, downloaded as it was hashed (its SHA-256 is on the capture), never shown inline: a kept page is
@@ -2317,6 +2774,100 @@ export const getCaptureFile = <ThrowOnError extends boolean = false>(
         })
         .parseAsync(data),
     url: '/api/captures/{capture_id}/files/{name}',
+    ...options,
+  });
+
+/**
+ * Follow Capture
+ *
+ * Check this capture's page again: never, daily or weekly (a Following page monitor tied to the capture; version 1
+ * is the page as captured). For a link only, weekly is "Ask again in 7 days".
+ */
+export const followCapture = <ThrowOnError extends boolean = false>(
+  options: Options<FollowCaptureData, ThrowOnError>,
+): RequestResult<FollowCaptureResponses, FollowCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).put<
+    FollowCaptureResponses,
+    FollowCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zFollowCaptureBody,
+          path: zFollowCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFollowCaptureResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/follow',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Capture Look Elsewhere
+ *
+ * For a page that could not be kept: ask a public web archive whether it holds a copy, and from when.
+ */
+export const captureLookElsewhere = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureLookElsewhereData, ThrowOnError>,
+): RequestResult<
+  CaptureLookElsewhereResponses,
+  CaptureLookElsewhereErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CaptureLookElsewhereResponses,
+    CaptureLookElsewhereErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureLookElsewherePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureLookElsewhereResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/look-elsewhere',
+    ...options,
+  });
+
+/**
+ * Mark Capture Changed
+ *
+ * Mark the capture's source "changed since capture", with who said so and which version they saw.
+ */
+export const markCaptureChanged = <ThrowOnError extends boolean = false>(
+  options: Options<MarkCaptureChangedData, ThrowOnError>,
+): RequestResult<
+  MarkCaptureChangedResponses,
+  MarkCaptureChangedErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MarkCaptureChangedResponses,
+    MarkCaptureChangedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zMarkCaptureChangedPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMarkCaptureChangedResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/mark-changed',
     ...options,
   });
 
@@ -2349,6 +2900,160 @@ export const collectCaptureMedia = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCollectCaptureMediaResponse.parseAsync(data),
     url: '/api/captures/{capture_id}/media',
+    ...options,
+  });
+
+/**
+ * Get Capture Quotes
+ *
+ * The quotes pinned from this captured page, each found again in the saved copy and (once the page
+ * was checked again) on the live page.
+ */
+export const getCaptureQuotes = <ThrowOnError extends boolean = false>(
+  options: Options<GetCaptureQuotesData, ThrowOnError>,
+): RequestResult<
+  GetCaptureQuotesResponses,
+  GetCaptureQuotesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetCaptureQuotesResponses,
+    GetCaptureQuotesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCaptureQuotesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCaptureQuotesResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/quotes',
+    ...options,
+  });
+
+/**
+ * Refind Capture Quotes
+ *
+ * Read the saved copy's quotes again: each is found again in the page's passages and its place kept.
+ */
+export const refindCaptureQuotes = <ThrowOnError extends boolean = false>(
+  options: Options<RefindCaptureQuotesData, ThrowOnError>,
+): RequestResult<
+  RefindCaptureQuotesResponses,
+  RefindCaptureQuotesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    RefindCaptureQuotesResponses,
+    RefindCaptureQuotesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRefindCaptureQuotesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRefindCaptureQuotesResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/quotes/refind',
+    ...options,
+  });
+
+/**
+ * Recheck Capture
+ *
+ * One visit now: the live page's main text compared with the last version. Nothing is kept as evidence; a
+ * different text is kept as a version, not captured.
+ */
+export const recheckCapture = <ThrowOnError extends boolean = false>(
+  options: Options<RecheckCaptureData, ThrowOnError>,
+): RequestResult<RecheckCaptureResponses, RecheckCaptureErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RecheckCaptureResponses,
+    RecheckCaptureErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRecheckCapturePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRecheckCaptureResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/recheck',
+    ...options,
+  });
+
+/**
+ * Capture Second Witness
+ *
+ * Ask a public web archive to visit the page and keep its own copy. Only the address is sent, logged first.
+ */
+export const captureSecondWitness = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureSecondWitnessData, ThrowOnError>,
+): RequestResult<
+  CaptureSecondWitnessResponses,
+  CaptureSecondWitnessErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CaptureSecondWitnessResponses,
+    CaptureSecondWitnessErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureSecondWitnessPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureSecondWitnessResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/second-witness',
+    ...options,
+  });
+
+/**
+ * Capture Time Proof
+ *
+ * Ask a time server to sign this capture's fingerprint (RFC 3161). Only the WARC's SHA-256 is sent, logged first;
+ * the token is kept beside the capture's files and checked here. A failure is kept on the capture with its reason.
+ */
+export const captureTimeProof = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureTimeProofData, ThrowOnError>,
+): RequestResult<
+  CaptureTimeProofResponses,
+  CaptureTimeProofErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CaptureTimeProofResponses,
+    CaptureTimeProofErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureTimeProofPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureTimeProofResponse.parseAsync(data),
+    url: '/api/captures/{capture_id}/time-proof',
     ...options,
   });
 
@@ -3545,6 +4250,64 @@ export const addChartToDeckEndpoint = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Deck Checks Endpoint
+ *
+ * Each slide's checks: a claim not yet shown, 7×7, a long run of text slides, a claim changed since made.
+ */
+export const deckChecksEndpoint = <ThrowOnError extends boolean = false>(
+  options: Options<DeckChecksEndpointData, ThrowOnError>,
+): RequestResult<
+  DeckChecksEndpointResponses,
+  DeckChecksEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    DeckChecksEndpointResponses,
+    DeckChecksEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeckChecksEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeckChecksEndpointResponse.parseAsync(data),
+    url: '/api/decks/{deck_id}/checks',
+    ...options,
+  });
+
+/**
+ * Export Deck Pdf
+ *
+ * Slides (one 16:9 page each) or, with `handout`, an A4 page per slide with its speaker notes.
+ */
+export const exportDeckPdf = <ThrowOnError extends boolean = false>(
+  options: Options<ExportDeckPdfData, ThrowOnError>,
+): RequestResult<ExportDeckPdfResponses, ExportDeckPdfErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ExportDeckPdfResponses,
+    ExportDeckPdfErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportDeckPdfPath,
+          query: zExportDeckPdfQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportDeckPdfResponse.parseAsync(data),
+    url: '/api/decks/{deck_id}/export.pdf',
+    ...options,
+  });
+
+/**
  * Export Deck Pptx
  */
 export const exportDeckPptx = <ThrowOnError extends boolean = false>(
@@ -3734,6 +4497,60 @@ export const seedDemo = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Derived File
+ *
+ * A file made from a case file, as it was kept and hashed (its SHA-256 is on its trail row).
+ */
+export const getDerivedFile = <ThrowOnError extends boolean = false>(
+  options: Options<GetDerivedFileData, ThrowOnError>,
+): RequestResult<GetDerivedFileResponses, GetDerivedFileErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetDerivedFileResponses,
+    GetDerivedFileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetDerivedFilePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetDerivedFileResponse.parseAsync(data),
+    url: '/api/derived-files/{derived_file_id}/file',
+    ...options,
+  });
+
+/**
+ * Get Copy Page
+ *
+ * One page of a redacted copy as PNG, for Compare.
+ */
+export const getCopyPage = <ThrowOnError extends boolean = false>(
+  options: Options<GetCopyPageData, ThrowOnError>,
+): RequestResult<GetCopyPageResponses, GetCopyPageErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetCopyPageResponses,
+    GetCopyPageErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetCopyPagePath,
+          query: zGetCopyPageQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetCopyPageResponse.parseAsync(data),
+    url: '/api/derived-files/{derived_file_id}/page.png',
+    ...options,
+  });
+
+/**
  * Get Document Formats
  *
  * The kinds of file an upload accepts now: every format OpenAleph's
@@ -3825,6 +4642,263 @@ export const getDocument = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}',
+    ...options,
+  });
+
+/**
+ * Get Authenticity
+ *
+ * The screen. The findings are recorded the first time it is opened, on this computer; nothing is sent.
+ */
+export const getAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<GetAuthenticityData, ThrowOnError>,
+): RequestResult<
+  GetAuthenticityResponses,
+  GetAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetAuthenticityResponses,
+    GetAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity',
+    ...options,
+  });
+
+/**
+ * Update Authenticity
+ *
+ * What the item is for, whether it is source-protected, and the platform's own label.
+ */
+export const updateAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateAuthenticityData, ThrowOnError>,
+): RequestResult<
+  UpdateAuthenticityResponses,
+  UpdateAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    UpdateAuthenticityResponses,
+    UpdateAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateAuthenticityBody,
+          path: zUpdateAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Add About Claim
+ *
+ * Add a claim about the item itself, supported by it whatever its status (the subject of the story).
+ */
+export const addAboutClaim = <ThrowOnError extends boolean = false>(
+  options: Options<AddAboutClaimData, ThrowOnError>,
+): RequestResult<AddAboutClaimResponses, AddAboutClaimErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    AddAboutClaimResponses,
+    AddAboutClaimErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAddAboutClaimBody,
+          path: zAddAboutClaimPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAddAboutClaimResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/about-claim',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Compare Authenticity
+ *
+ * Compare with the case's own files, on this computer. Allowed for a source-protected item too.
+ */
+export const compareAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<CompareAuthenticityData, ThrowOnError>,
+): RequestResult<
+  CompareAuthenticityResponses,
+  CompareAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CompareAuthenticityResponses,
+    CompareAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCompareAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCompareAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/compare',
+    ...options,
+  });
+
+/**
+ * Decide Authenticity
+ *
+ * Set the status. Only a person does, with what they checked and why; the history keeps every decision.
+ */
+export const decideAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<DecideAuthenticityData, ThrowOnError>,
+): RequestResult<
+  DecideAuthenticityResponses,
+  DecideAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    DecideAuthenticityResponses,
+    DecideAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDecideAuthenticityBody,
+          path: zDecideAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDecideAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/decision',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Examine Again
+ *
+ * Read the findings again (after a new trust list, or a new copy in the case). Each run is a line in the history.
+ */
+export const examineAgain = <ThrowOnError extends boolean = false>(
+  options: Options<ExamineAgainData, ThrowOnError>,
+): RequestResult<ExamineAgainResponses, ExamineAgainErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    ExamineAgainResponses,
+    ExamineAgainErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExamineAgainPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExamineAgainResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/examine',
+    ...options,
+  });
+
+/**
+ * Outside Authenticity
+ *
+ * Allowed once: logs exactly what goes, to whom and why, and gives the address for the browser to open. The app
+ * itself sends nothing. Refused for a source-protected item.
+ */
+export const outsideAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<OutsideAuthenticityData, ThrowOnError>,
+): RequestResult<
+  OutsideAuthenticityResponses,
+  OutsideAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    OutsideAuthenticityResponses,
+    OutsideAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zOutsideAuthenticityBody,
+          path: zOutsideAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zOutsideAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/outside',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Preview Authenticity
+ *
+ * What a status (and role) would do to the claims that lean on the item, before it is recorded.
+ */
+export const previewAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<PreviewAuthenticityData, ThrowOnError>,
+): RequestResult<
+  PreviewAuthenticityResponses,
+  PreviewAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    PreviewAuthenticityResponses,
+    PreviewAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zPreviewAuthenticityPath,
+          query: zPreviewAuthenticityQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPreviewAuthenticityResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/authenticity/preview',
     ...options,
   });
 
@@ -4052,6 +5126,169 @@ export const syncOpenalephDocument = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * List Derived
+ *
+ * Every file made from this document, oldest first, with its edit-trail row.
+ */
+export const listDerived = <ThrowOnError extends boolean = false>(
+  options: Options<ListDerivedData, ThrowOnError>,
+): RequestResult<ListDerivedResponses, ListDerivedErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ListDerivedResponses,
+    ListDerivedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListDerivedPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListDerivedResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived',
+    ...options,
+  });
+
+/**
+ * Make Cleaned Copy
+ *
+ * A 16 kHz mono copy for listening only: with no steps given, the hum taken out and light noise reduction; with
+ * steps, those (hum, room noise, loudness), its loudness before and after kept in the trail. The recording itself is
+ * not changed; the copy is a new file with its edit-trail row.
+ */
+export const makeCleanedCopy = <ThrowOnError extends boolean = false>(
+  options: Options<MakeCleanedCopyData, ThrowOnError>,
+): RequestResult<
+  MakeCleanedCopyResponses,
+  MakeCleanedCopyErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MakeCleanedCopyResponses,
+    MakeCleanedCopyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMakeCleanedCopyBody.optional(),
+          path: zMakeCleanedCopyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakeCleanedCopyResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived/cleaned',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Make Clip
+ *
+ * The part from `start` to `end` seconds kept as its own WAV file, cut from the original (or the cleaned copy).
+ */
+export const makeClip = <ThrowOnError extends boolean = false>(
+  options: Options<MakeClipData, ThrowOnError>,
+): RequestResult<MakeClipResponses, MakeClipErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    MakeClipResponses,
+    MakeClipErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMakeClipBody,
+          path: zMakeClipPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zMakeClipResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived/clip',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Make Photo Copy
+ *
+ * A copy of the photo with faces blurred, metadata removed, cropped, an area redacted (with its reason) or turned,
+ * made from the photo as shown or from another copy. The photo itself is never written.
+ */
+export const makePhotoCopy = <ThrowOnError extends boolean = false>(
+  options: Options<MakePhotoCopyData, ThrowOnError>,
+): RequestResult<MakePhotoCopyResponses, MakePhotoCopyErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    MakePhotoCopyResponses,
+    MakePhotoCopyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMakePhotoCopyBody,
+          path: zMakePhotoCopyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakePhotoCopyResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived/photo',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Make Redacted Copy
+ *
+ * A redacted copy: the content under each box removed for good, the hidden data asked for taken out, PDF/A-2b if
+ * asked, then checked: the saved copy must hold no text under any box. Each box's page, place and reason are kept in
+ * the trail, not the words under it. The case's file is unchanged.
+ */
+export const makeRedactedCopy = <ThrowOnError extends boolean = false>(
+  options: Options<MakeRedactedCopyData, ThrowOnError>,
+): RequestResult<
+  MakeRedactedCopyResponses,
+  MakeRedactedCopyErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    MakeRedactedCopyResponses,
+    MakeRedactedCopyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMakeRedactedCopyBody,
+          path: zMakeRedactedCopyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakeRedactedCopyResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived/redacted',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Document Email
  *
  * An email document's headers (as OpenAleph read them) and its thread
@@ -4081,6 +5318,34 @@ export const getDocumentEmail = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetDocumentEmailResponse.parseAsync(data),
     url: '/api/documents/{document_id}/email',
+    ...options,
+  });
+
+/**
+ * Find Photo Faces
+ *
+ * Where a detector finds faces in the photo as shown. Nothing names, matches or groups a face. The detector's
+ * model (232 KB) is fetched the first time, pinned and written to the outbound log.
+ */
+export const findPhotoFaces = <ThrowOnError extends boolean = false>(
+  options: Options<FindPhotoFacesData, ThrowOnError>,
+): RequestResult<FindPhotoFacesResponses, FindPhotoFacesErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    FindPhotoFacesResponses,
+    FindPhotoFacesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zFindPhotoFacesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindPhotoFacesResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/faces',
     ...options,
   });
 
@@ -4217,6 +5482,32 @@ export const getDocumentPageImage = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Photo
+ *
+ * What the photo claims about itself and what the machine proposes about it (mockup MEDIA_1).
+ */
+export const getPhoto = <ThrowOnError extends boolean = false>(
+  options: Options<GetPhotoData, ThrowOnError>,
+): RequestResult<GetPhotoResponses, GetPhotoErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetPhotoResponses,
+    GetPhotoErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetPhotoPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetPhotoResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/photo',
+    ...options,
+  });
+
+/**
  * Get Document Picture
  *
  * The picture a document is (app/services/image_reader.py), for the app to
@@ -4277,6 +5568,67 @@ export const recheckHash = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Get Redaction
+ *
+ * What Redact before sharing shows (mockup MEDIA_3): the pages in points, the boxes the machine proposes (phone
+ * numbers and emails by pattern, people named in this case), the hidden data the file carries, PDF/A-2b now. Read
+ * from a copy: the case's file is never opened for writing.
+ */
+export const getRedaction = <ThrowOnError extends boolean = false>(
+  options: Options<GetRedactionData, ThrowOnError>,
+): RequestResult<GetRedactionResponses, GetRedactionErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetRedactionResponses,
+    GetRedactionErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetRedactionPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetRedactionResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/redaction',
+    ...options,
+  });
+
+/**
+ * Compare Redacted
+ *
+ * How a redacted copy differs from the case's file: the words each holds, the pages changed, the hidden data the
+ * copy still carries.
+ */
+export const compareRedacted = <ThrowOnError extends boolean = false>(
+  options: Options<CompareRedactedData, ThrowOnError>,
+): RequestResult<
+  CompareRedactedResponses,
+  CompareRedactedErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    CompareRedactedResponses,
+    CompareRedactedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCompareRedactedPath,
+          query: zCompareRedactedQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCompareRedactedResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/redaction/compare',
+    ...options,
+  });
+
+/**
  * Get Similar Documents
  *
  * Documents of the same investigation whose text is like this one's,
@@ -4308,6 +5660,129 @@ export const getSimilarDocuments = <ThrowOnError extends boolean = false>(
       await zGetSimilarDocumentsResponse.parseAsync(data),
     url: '/api/documents/{document_id}/similar',
     ...options,
+  });
+
+/**
+ * Get Sound
+ *
+ * Whether mains hum is in the recording and at which frequency, its loudness, and any accepted sync.
+ */
+export const getSound = <ThrowOnError extends boolean = false>(
+  options: Options<GetSoundData, ThrowOnError>,
+): RequestResult<GetSoundResponses, GetSoundErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetSoundResponses,
+    GetSoundErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSoundPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetSoundResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/sound',
+    ...options,
+  });
+
+/**
+ * Get Spectrogram
+ *
+ * A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B).
+ */
+export const getSpectrogram = <ThrowOnError extends boolean = false>(
+  options: Options<GetSpectrogramData, ThrowOnError>,
+): RequestResult<GetSpectrogramResponses, GetSpectrogramErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetSpectrogramResponses,
+    GetSpectrogramErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSpectrogramPath,
+          query: zGetSpectrogramQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/documents/{document_id}/spectrogram.png',
+    ...options,
+  });
+
+/**
+ * Find Document Sync
+ *
+ * Where another recording of the same event lines up in this one, found by matching their sound. Nothing is kept
+ * until a person accepts it.
+ */
+export const findDocumentSync = <ThrowOnError extends boolean = false>(
+  options: Options<FindDocumentSyncData, ThrowOnError>,
+): RequestResult<
+  FindDocumentSyncResponses,
+  FindDocumentSyncErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    FindDocumentSyncResponses,
+    FindDocumentSyncErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zFindDocumentSyncBody,
+          path: zFindDocumentSyncPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindDocumentSyncResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/sync',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Accept Document Sync
+ *
+ * Accept the offset: it is found again here (not taken from the request) and kept beside the recording with who
+ * accepted it and when.
+ */
+export const acceptDocumentSync = <ThrowOnError extends boolean = false>(
+  options: Options<AcceptDocumentSyncData, ThrowOnError>,
+): RequestResult<
+  AcceptDocumentSyncResponses,
+  AcceptDocumentSyncErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AcceptDocumentSyncResponses,
+    AcceptDocumentSyncErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAcceptDocumentSyncBody,
+          path: zAcceptDocumentSyncPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAcceptDocumentSyncResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/sync/accept',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -4474,6 +5949,37 @@ export const getDocumentTranscript = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Compare Transcripts
+ *
+ * Our transcript beside the publisher's, part by part; the words that differ are marked on both sides.
+ */
+export const compareTranscripts = <ThrowOnError extends boolean = false>(
+  options: Options<CompareTranscriptsData, ThrowOnError>,
+): RequestResult<
+  CompareTranscriptsResponses,
+  CompareTranscriptsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    CompareTranscriptsResponses,
+    CompareTranscriptsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCompareTranscriptsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCompareTranscriptsResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/transcript/compare',
+    ...options,
+  });
+
+/**
  * Get Document Translation
  *
  * OpenAleph's machine translation of the document, page by page beside the
@@ -4503,6 +6009,66 @@ export const getDocumentTranslation = <ThrowOnError extends boolean = false>(
       await zGetDocumentTranslationResponse.parseAsync(data),
     url: '/api/documents/{document_id}/translation',
     ...options,
+  });
+
+/**
+ * Find Voices
+ *
+ * Tell the voices of a transcribed recording apart, on this computer (ADR-0026). Answers at once with the job.
+ * Names given earlier are cleared, and kept in the history.
+ */
+export const findVoices = <ThrowOnError extends boolean = false>(
+  options: Options<FindVoicesData, ThrowOnError>,
+): RequestResult<FindVoicesResponses, FindVoicesErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    FindVoicesResponses,
+    FindVoicesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zFindVoicesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindVoicesResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/voices',
+    ...options,
+  });
+
+/**
+ * Name Voice
+ *
+ * Name this voice (a person only; the machine never names a voice), or clear its name. The earlier name is kept
+ * in the history. Never applied to another recording.
+ */
+export const nameVoice = <ThrowOnError extends boolean = false>(
+  options: Options<NameVoiceData, ThrowOnError>,
+): RequestResult<NameVoiceResponses, NameVoiceErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    NameVoiceResponses,
+    NameVoiceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zNameVoiceBody,
+          path: zNameVoicePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zNameVoiceResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/voices/{voice}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -6326,6 +7892,259 @@ export const investigationSuiteRun = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * List Authenticity
+ *
+ * Each case file's standing that has been looked at or decided.
+ */
+export const listAuthenticity = <ThrowOnError extends boolean = false>(
+  options: Options<ListAuthenticityData, ThrowOnError>,
+): RequestResult<
+  ListAuthenticityResponses,
+  ListAuthenticityErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListAuthenticityResponses,
+    ListAuthenticityErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListAuthenticityPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListAuthenticityResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/authenticity',
+    ...options,
+  });
+
+/**
+ * List Built Timelines
+ *
+ * Your own timelines in this case (each person sees only theirs).
+ */
+export const listBuiltTimelines = <ThrowOnError extends boolean = false>(
+  options: Options<ListBuiltTimelinesData, ThrowOnError>,
+): RequestResult<
+  ListBuiltTimelinesResponses,
+  ListBuiltTimelinesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListBuiltTimelinesResponses,
+    ListBuiltTimelinesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListBuiltTimelinesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListBuiltTimelinesResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/built-timelines',
+    ...options,
+  });
+
+/**
+ * Create Built Timeline
+ *
+ * Start a timeline of your own.
+ */
+export const createBuiltTimeline = <ThrowOnError extends boolean = false>(
+  options: Options<CreateBuiltTimelineData, ThrowOnError>,
+): RequestResult<
+  CreateBuiltTimelineResponses,
+  CreateBuiltTimelineErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateBuiltTimelineResponses,
+    CreateBuiltTimelineErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateBuiltTimelineBody,
+          path: zCreateBuiltTimelinePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateBuiltTimelineResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/built-timelines',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Built Timeline
+ *
+ * Delete one of your timelines; the events in it stay as they are.
+ */
+export const deleteBuiltTimeline = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteBuiltTimelineData, ThrowOnError>,
+): RequestResult<
+  DeleteBuiltTimelineResponses,
+  DeleteBuiltTimelineErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteBuiltTimelineResponses,
+    DeleteBuiltTimelineErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteBuiltTimelinePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteBuiltTimelineResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/built-timelines/{built_id}',
+    ...options,
+  });
+
+/**
+ * Update Built Timeline
+ *
+ * Rename it, or change which events it tells and in what order.
+ */
+export const updateBuiltTimeline = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateBuiltTimelineData, ThrowOnError>,
+): RequestResult<
+  UpdateBuiltTimelineResponses,
+  UpdateBuiltTimelineErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateBuiltTimelineResponses,
+    UpdateBuiltTimelineErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateBuiltTimelineBody,
+          path: zUpdateBuiltTimelinePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateBuiltTimelineResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/built-timelines/{built_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * By Hand Add
+ *
+ * Add a party, a link or an event by hand, with where it comes from: a passage, a source with no file, or none yet
+ * (then a lead to find one). Who typed it is kept on the record and in its custody chain.
+ */
+export const byHandAdd = <ThrowOnError extends boolean = false>(
+  options: Options<ByHandAddData, ThrowOnError>,
+): RequestResult<ByHandAddResponses, ByHandAddErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    ByHandAddResponses,
+    ByHandAddErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zByHandAddBody,
+          path: zByHandAddPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zByHandAddResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/by-hand',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * By Hand Preview
+ *
+ * What the case already holds of it, what waits in Decide, and what a link would change. Nothing is written.
+ */
+export const byHandPreview = <ThrowOnError extends boolean = false>(
+  options: Options<ByHandPreviewData, ThrowOnError>,
+): RequestResult<ByHandPreviewResponses, ByHandPreviewErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    ByHandPreviewResponses,
+    ByHandPreviewErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zByHandPreviewBody,
+          path: zByHandPreviewPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zByHandPreviewResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/by-hand/preview',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * By Hand Suggest
+ *
+ * The case's parties whose names start with, then contain, what was typed in a blank.
+ */
+export const byHandSuggest = <ThrowOnError extends boolean = false>(
+  options: Options<ByHandSuggestData, ThrowOnError>,
+): RequestResult<ByHandSuggestResponses, ByHandSuggestErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ByHandSuggestResponses,
+    ByHandSuggestErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zByHandSuggestPath,
+          query: zByHandSuggestQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zByHandSuggestResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/by-hand/suggest',
+    ...options,
+  });
+
+/**
  * Get Captures
  *
  * The case's captures, newest first.
@@ -7109,6 +8928,42 @@ export const listDecksEndpoint = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Create Deck Endpoint
+ *
+ * A new deck without an AI draft (DECK_1): from the case's story tree (a slide per section, its claims cited) or
+ * blank.
+ */
+export const createDeckEndpoint = <ThrowOnError extends boolean = false>(
+  options: Options<CreateDeckEndpointData, ThrowOnError>,
+): RequestResult<
+  CreateDeckEndpointResponses,
+  CreateDeckEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateDeckEndpointResponses,
+    CreateDeckEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateDeckEndpointBody,
+          path: zCreateDeckEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateDeckEndpointResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/decks',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Investigation Deletion Preview
  */
 export const investigationDeletionPreview = <
@@ -7271,6 +9126,75 @@ export const listInvestigationEvidence = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Export Evidence Pack
+ *
+ * The story's evidence pack (app/services/evidence_pack.py), made on this computer. Stamped "Export as draft"
+ * while a check before an outward export is open; X-Pack-Draft, X-Pack-Exhibits and X-Pack-Gaps say so.
+ */
+export const exportEvidencePack = <ThrowOnError extends boolean = false>(
+  options: Options<ExportEvidencePackData, ThrowOnError>,
+): RequestResult<
+  ExportEvidencePackResponses,
+  ExportEvidencePackErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ExportEvidencePackResponses,
+    ExportEvidencePackErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportEvidencePackPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportEvidencePackResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/evidence-pack.zip',
+    ...options,
+  });
+
+/**
+ * Check Evidence Pack
+ *
+ * Check a pack someone sent back (CHECK_4): read here, in memory; every file's SHA-256 recomputed and compared
+ * with the list kept when the pack was made. Nothing of the pack is kept or sent anywhere.
+ */
+export const checkEvidencePack = <ThrowOnError extends boolean = false>(
+  options: Options<CheckEvidencePackData, ThrowOnError>,
+): RequestResult<
+  CheckEvidencePackResponses,
+  CheckEvidencePackErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CheckEvidencePackResponses,
+    CheckEvidencePackErrors,
+    ThrowOnError
+  >({
+    ...formDataBodySerializer,
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCheckEvidencePackBody,
+          path: zCheckEvidencePackPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCheckEvidencePackResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/evidence-pack/check',
+    ...options,
+    headers: {
+      'Content-Type': null,
+      ...options.headers,
+    },
+  });
+
+/**
  * Export Investigation
  */
 export const exportInvestigation = <ThrowOnError extends boolean = false>(
@@ -7330,6 +9254,66 @@ export const getInvestigationFinancialFlows = <
       await zGetInvestigationFinancialFlowsResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/financial-flows',
     ...options,
+  });
+
+/**
+ * Get Following
+ *
+ * The sources this case follows, the queue (most at risk first), copies of one story counted once, and what
+ * leaves this computer.
+ */
+export const getFollowing = <ThrowOnError extends boolean = false>(
+  options: Options<GetFollowingData, ThrowOnError>,
+): RequestResult<GetFollowingResponses, GetFollowingErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetFollowingResponses,
+    GetFollowingErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetFollowingPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetFollowingResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/following',
+    ...options,
+  });
+
+/**
+ * Capture All
+ *
+ * Capture everything waiting, at once. Needs a reason, kept on each item it captures; an item that cannot be
+ * captured stays waiting.
+ */
+export const captureAll = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureAllData, ThrowOnError>,
+): RequestResult<CaptureAllResponses, CaptureAllErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CaptureAllResponses,
+    CaptureAllErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCaptureAllBody,
+          path: zCaptureAllPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureAllResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/following/capture-all',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -7617,6 +9601,75 @@ export const getInvestigationMoneyChecks = <
       await zGetInvestigationMoneyChecksResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/money-checks',
     ...options,
+  });
+
+/**
+ * Create Monitor
+ *
+ * Follow something: the address is asked once to see what it is (a feed, sitemap, podcast or page; a page that
+ * names its feed is followed through the feed), then checked on its schedule. A closed platform becomes a row with
+ * no monitor. Nothing is kept until a person captures it.
+ */
+export const createMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<CreateMonitorData, ThrowOnError>,
+): RequestResult<CreateMonitorResponses, CreateMonitorErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CreateMonitorResponses,
+    CreateMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateMonitorBody,
+          path: zCreateMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateMonitorResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/monitors',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Create Mailbox Monitor
+ *
+ * Follow one sender's newsletters in a dedicated mailbox, read over IMAP with TLS and never marked read. The
+ * password is kept in its own file on this computer, not in the case or a backup.
+ */
+export const createMailboxMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<CreateMailboxMonitorData, ThrowOnError>,
+): RequestResult<
+  CreateMailboxMonitorResponses,
+  CreateMailboxMonitorErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateMailboxMonitorResponses,
+    CreateMailboxMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateMailboxMonitorBody,
+          path: zCreateMailboxMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateMailboxMonitorResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/monitors/mailbox',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -8648,6 +10701,10 @@ export const addTag = <ThrowOnError extends boolean = false>(
 
 /**
  * Get Investigation Timeline
+ *
+ * The case's events in date order. A source's own date (when a document was published or filed) is an event
+ * only with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what
+ * happened.
  */
 export const getInvestigationTimeline = <ThrowOnError extends boolean = false>(
   options: Options<GetInvestigationTimelineData, ThrowOnError>,
@@ -8673,6 +10730,205 @@ export const getInvestigationTimeline = <ThrowOnError extends boolean = false>(
       await zGetInvestigationTimelineResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/timeline',
     ...options,
+  });
+
+/**
+ * Get Timeline Board
+ *
+ * Where the Board's cards sit, its notes, and its style (Rich by default, DECISIONS_LOG 6, call 9).
+ */
+export const getTimelineBoard = <ThrowOnError extends boolean = false>(
+  options: Options<GetTimelineBoardData, ThrowOnError>,
+): RequestResult<
+  GetTimelineBoardResponses,
+  GetTimelineBoardErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetTimelineBoardResponses,
+    GetTimelineBoardErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetTimelineBoardPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTimelineBoardResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/board',
+    ...options,
+  });
+
+/**
+ * Put Timeline Board
+ *
+ * Keep where the cards were moved to, the notes, and the style. Kept with the case, so it travels in a backup.
+ */
+export const putTimelineBoard = <ThrowOnError extends boolean = false>(
+  options: Options<PutTimelineBoardData, ThrowOnError>,
+): RequestResult<
+  PutTimelineBoardResponses,
+  PutTimelineBoardErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    PutTimelineBoardResponses,
+    PutTimelineBoardErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zPutTimelineBoardBody,
+          path: zPutTimelineBoardPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPutTimelineBoardResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/board',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Timeline Lanes View
+ *
+ * The case's events as lanes: each with its parties, where it comes from and whether it is shown; the reporter's
+ * periods; the sequence checks; records not on the timeline yet; and sources with no date.
+ */
+export const timelineLanesView = <ThrowOnError extends boolean = false>(
+  options: Options<TimelineLanesViewData, ThrowOnError>,
+): RequestResult<
+  TimelineLanesViewResponses,
+  TimelineLanesViewErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    TimelineLanesViewResponses,
+    TimelineLanesViewErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zTimelineLanesViewPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zTimelineLanesViewResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/lanes',
+    ...options,
+  });
+
+/**
+ * Create Timeline Period
+ *
+ * Name a stretch of the case's time.
+ */
+export const createTimelinePeriod = <ThrowOnError extends boolean = false>(
+  options: Options<CreateTimelinePeriodData, ThrowOnError>,
+): RequestResult<
+  CreateTimelinePeriodResponses,
+  CreateTimelinePeriodErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateTimelinePeriodResponses,
+    CreateTimelinePeriodErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateTimelinePeriodBody,
+          path: zCreateTimelinePeriodPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateTimelinePeriodResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/periods',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Timeline Period
+ *
+ * Take a period away; its events stay.
+ */
+export const deleteTimelinePeriod = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteTimelinePeriodData, ThrowOnError>,
+): RequestResult<
+  DeleteTimelinePeriodResponses,
+  DeleteTimelinePeriodErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteTimelinePeriodResponses,
+    DeleteTimelinePeriodErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteTimelinePeriodPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteTimelinePeriodResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/periods/{period_id}',
+    ...options,
+  });
+
+/**
+ * Update Timeline Period
+ *
+ * Rename a period, move its dates, or change its summary.
+ */
+export const updateTimelinePeriod = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateTimelinePeriodData, ThrowOnError>,
+): RequestResult<
+  UpdateTimelinePeriodResponses,
+  UpdateTimelinePeriodErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateTimelinePeriodResponses,
+    UpdateTimelinePeriodErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateTimelinePeriodBody,
+          path: zUpdateTimelinePeriodPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateTimelinePeriodResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/periods/{period_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -9003,6 +11259,37 @@ export const getWire = <ThrowOnError extends boolean = false>(
   );
 
 /**
+ * Export Writeup Pdf
+ *
+ * The write-up as a PDF (Export sheet › Write-up for reading), stamped "Export as draft" while a check is open.
+ */
+export const exportWriteupPdf = <ThrowOnError extends boolean = false>(
+  options: Options<ExportWriteupPdfData, ThrowOnError>,
+): RequestResult<
+  ExportWriteupPdfResponses,
+  ExportWriteupPdfErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ExportWriteupPdfResponses,
+    ExportWriteupPdfErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportWriteupPdfPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportWriteupPdfResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/writeup.pdf',
+    ...options,
+  });
+
+/**
  * List Writeups Endpoint
  */
 export const listWriteupsEndpoint = <ThrowOnError extends boolean = false>(
@@ -9028,6 +11315,35 @@ export const listWriteupsEndpoint = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListWriteupsEndpointResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/writeups',
+    ...options,
+  });
+
+/**
+ * Get Your Safety
+ *
+ * Your safety: signs that the story raises the danger to the reporter or their sources, from the case's records,
+ * and the questions only the reporter can answer (their answers never reach this server). Shown apart from Red
+ * Flags; never blocks work.
+ */
+export const getYourSafety = <ThrowOnError extends boolean = false>(
+  options: Options<GetYourSafetyData, ThrowOnError>,
+): RequestResult<GetYourSafetyResponses, GetYourSafetyErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetYourSafetyResponses,
+    GetYourSafetyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetYourSafetyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetYourSafetyResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/your-safety',
     ...options,
   });
 
@@ -9625,6 +11941,224 @@ export const newRecoveryKey = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Capture Item
+ *
+ * Capture one item: a page through the ordinary web capture (ADR-0018), a podcast episode by fetching its audio
+ * file and transcribing it. Answers with the whole screen.
+ */
+export const captureItem = <ThrowOnError extends boolean = false>(
+  options: Options<CaptureItemData, ThrowOnError>,
+): RequestResult<CaptureItemResponses, CaptureItemErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CaptureItemResponses,
+    CaptureItemErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCaptureItemPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCaptureItemResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/capture',
+    ...options,
+  });
+
+/**
+ * Record Removal
+ *
+ * Record that something captured before is gone from its address (it answers 404 or 410), and when that was found.
+ */
+export const recordRemoval = <ThrowOnError extends boolean = false>(
+  options: Options<RecordRemovalData, ThrowOnError>,
+): RequestResult<RecordRemovalResponses, RecordRemovalErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    RecordRemovalResponses,
+    RecordRemovalErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zRecordRemovalPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRecordRemovalResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/record-removal',
+    ...options,
+  });
+
+/**
+ * Skip Item
+ */
+export const skipItem = <ThrowOnError extends boolean = false>(
+  options: Options<SkipItemData, ThrowOnError>,
+): RequestResult<SkipItemResponses, SkipItemErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    SkipItemResponses,
+    SkipItemErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zSkipItemPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zSkipItemResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/skip',
+    ...options,
+  });
+
+/**
+ * Undo Item
+ *
+ * Put a skipped item back in the queue.
+ */
+export const undoItem = <ThrowOnError extends boolean = false>(
+  options: Options<UndoItemData, ThrowOnError>,
+): RequestResult<UndoItemResponses, UndoItemErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    UndoItemResponses,
+    UndoItemErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zUndoItemPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zUndoItemResponse.parseAsync(data),
+    url: '/api/monitor-items/{monitor_item_id}/undo',
+    ...options,
+  });
+
+/**
+ * Delete Monitor
+ *
+ * Stop following. What was captured from it stays in the case; its queue and versions go.
+ */
+export const deleteMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteMonitorData, ThrowOnError>,
+): RequestResult<DeleteMonitorResponses, DeleteMonitorErrors, ThrowOnError> =>
+  (options.client ?? client).delete<
+    DeleteMonitorResponses,
+    DeleteMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteMonitorResponse.parseAsync(data),
+    url: '/api/monitors/{monitor_id}',
+    ...options,
+  });
+
+/**
+ * Update Monitor
+ *
+ * Change how often it is checked, its route (Direct or Tor), pause or resume it, or accept the address it moved
+ * to (a moved source is never followed by itself).
+ */
+export const updateMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateMonitorData, ThrowOnError>,
+): RequestResult<UpdateMonitorResponses, UpdateMonitorErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    UpdateMonitorResponses,
+    UpdateMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateMonitorBody,
+          path: zUpdateMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateMonitorResponse.parseAsync(data),
+    url: '/api/monitors/{monitor_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Check Monitor
+ *
+ * Check the source now instead of at its next time (the same polite, logged request).
+ */
+export const checkMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<CheckMonitorData, ThrowOnError>,
+): RequestResult<CheckMonitorResponses, CheckMonitorErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    CheckMonitorResponses,
+    CheckMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zCheckMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCheckMonitorResponse.parseAsync(data),
+    url: '/api/monitors/{monitor_id}/check',
+    ...options,
+  });
+
+/**
+ * Get Versions
+ *
+ * Every version of a followed page's main text, newest first, with what changed from the one before.
+ */
+export const getVersions = <ThrowOnError extends boolean = false>(
+  options: Options<GetVersionsData, ThrowOnError>,
+): RequestResult<GetVersionsResponses, GetVersionsErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetVersionsResponses,
+    GetVersionsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetVersionsPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetVersionsResponse.parseAsync(data),
+    url: '/api/monitors/{monitor_id}/versions',
+    ...options,
+  });
+
+/**
  * Remove Note
  *
  * Delete the note. A lead made from it stays.
@@ -9707,6 +12241,131 @@ export const makeLeadFromNote = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zMakeLeadFromNoteResponse.parseAsync(data),
     url: '/api/notes/{note_id}/lead',
+    ...options,
+  });
+
+/**
+ * Get Platform Checks
+ *
+ * Each platform the app saves from, tried on its public test item: today, the last 14 days, the settings.
+ */
+export const getPlatformChecks = <ThrowOnError extends boolean = false>(
+  options?: Options<GetPlatformChecksData, ThrowOnError>,
+): RequestResult<
+  GetPlatformChecksResponses,
+  GetPlatformChecksErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetPlatformChecksResponses,
+    GetPlatformChecksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetPlatformChecksResponse.parseAsync(data),
+    url: '/api/platform-checks',
+    ...options,
+  });
+
+/**
+ * Change Platform Checks
+ *
+ * Turn the daily check on or off, the warning before a capture, or change a test item.
+ */
+export const changePlatformChecks = <ThrowOnError extends boolean = false>(
+  options: Options<ChangePlatformChecksData, ThrowOnError>,
+): RequestResult<
+  ChangePlatformChecksResponses,
+  ChangePlatformChecksErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    ChangePlatformChecksResponses,
+    ChangePlatformChecksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zChangePlatformChecksBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zChangePlatformChecksResponse.parseAsync(data),
+    url: '/api/platform-checks',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Platform For Url
+ *
+ * The platform a pasted link is on, and how it was at its last check: none when it is not one the app tries, or
+ * the warning is off.
+ */
+export const platformForUrl = <ThrowOnError extends boolean = false>(
+  options: Options<PlatformForUrlData, ThrowOnError>,
+): RequestResult<PlatformForUrlResponses, PlatformForUrlErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    PlatformForUrlResponses,
+    PlatformForUrlErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zPlatformForUrlQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPlatformForUrlResponse.parseAsync(data),
+    url: '/api/platform-checks/for',
+    ...options,
+  });
+
+/**
+ * Run Platform Checks
+ *
+ * Try every platform now (or one), as a background job; each request goes in the outbound log.
+ */
+export const runPlatformChecks = <ThrowOnError extends boolean = false>(
+  options?: Options<RunPlatformChecksData, ThrowOnError>,
+): RequestResult<
+  RunPlatformChecksResponses,
+  RunPlatformChecksErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).post<
+    RunPlatformChecksResponses,
+    RunPlatformChecksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zRunPlatformChecksQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRunPlatformChecksResponse.parseAsync(data),
+    url: '/api/platform-checks/run',
     ...options,
   });
 
@@ -11345,6 +14004,33 @@ export const rotateAppUserToken = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zRotateAppUserTokenResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}/token/rotate',
+    ...options,
+  });
+
+/**
+ * Get Signing Key
+ *
+ * This computer's evidence-pack signing key: its fingerprint, to give out with a pack, and when it was made.
+ */
+export const getSigningKey = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSigningKeyData, ThrowOnError>,
+): RequestResult<GetSigningKeyResponses, GetSigningKeyErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    GetSigningKeyResponses,
+    GetSigningKeyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSigningKeyResponse.parseAsync(data),
+    url: '/api/settings/signing-key',
     ...options,
   });
 

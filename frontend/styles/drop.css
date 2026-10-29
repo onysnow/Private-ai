@@ -208,6 +208,13 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 :is(.cp-chip, .cp-glyph).amber { color: var(--accent-1); } :is(.cp-chip, .cp-glyph).teal { color: var(--accent-2); }
 .cp-safe { padding: 9px 10px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--status-supported) 50%, transparent); line-height: 1.45; }
 .cp-safe b { color: var(--status-supported); }
+.cp-warn { padding: 9px 10px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--accent-1) 55%, transparent); line-height: 1.45; }
+.cp-warn b { color: var(--accent-1); }
+.cp-ask { display: inline-flex; align-items: center; gap: 6px; }
+.cp-confirm { display: grid; gap: 6px; margin-top: 6px; padding: 8px 10px; border-radius: 10px; border: 1px dashed color-mix(in srgb, var(--accent-1) 55%, transparent); font-size: 12px; line-height: 1.45; }
+.cp-confirm code { overflow-wrap: anywhere; }
+.cp-elsewhere { margin-top: 10px; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line, color-mix(in srgb, currentColor 18%, transparent)); line-height: 1.45; }
+.cp-elsewhere p { margin: 0 0 6px; }
 .cp-card .dp-quiet { margin-top: 8px; }
 .cp-switch { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
 .cp-switch small { margin-left: auto; font: 500 10px var(--font-mono); white-space: nowrap; }
@@ -264,3 +271,42 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 @media (max-width: 1200px) { .dp { grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: 'tabs tabs' 'left line' 'right line' 'strip strip'; grid-template-rows: auto auto minmax(0, 1fr) auto; } }
 @media (max-width: 800px) { .dp { display: flex; flex-direction: column; height: auto; } }
 .dp-empty .cp-paste { margin-top: 12px; }
+
+/* Re-check, What changed, Check again later (INTAKE_3, app/services/capture_follow.py) */
+.cp-r { margin-left: auto; text-transform: none; letter-spacing: 0; color: var(--text-muted); }
+.cp-st.warn { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 12%, var(--surface-1)); }
+.cp-st.warn .cp-v { color: var(--accent-1); }
+.cp-versions { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cp-versions li { position: relative; padding-left: 20px; font-size: 12px; }
+.cp-versions li::before { content: ""; position: absolute; left: 2px; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--status-supported); }
+.cp-versions li.amber::before { background: var(--accent-1); }
+.cp-versions li span { display: block; color: var(--text-muted); }
+.cp-diff { border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; background: var(--surface-2); font: 14px/1.55 var(--font-read, Georgia, serif); }
+.cp-diff p { margin: 4px 0; }
+.cp-diff del { color: var(--status-disputed); background: color-mix(in srgb, var(--status-disputed) 14%, transparent); }
+.cp-diff ins { text-decoration: none; color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 14%, transparent); border-bottom: 1px dashed currentColor; }
+.cp-diff .cp-same { font: 500 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.cp-both { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cp-both pre { margin: 4px 0 0; white-space: pre-wrap; font: 12.5px/1.5 var(--font-read, Georgia, serif); max-height: 260px; overflow: auto; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; background: var(--surface-2); }
+.cp-seg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 4px; }
+.cp-seg button { all: unset; cursor: pointer; padding: 4px 12px; border-radius: 99px; border: 1px solid var(--line); font-size: 12px; color: var(--text); }
+.cp-seg button[aria-checked="true"] { border-color: var(--accent-1); color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 14%, transparent); }
+.cp-seg button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.cp-seg small { color: var(--text-muted); font-size: 11px; }
+.cp-acts button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 900px) { .cp-both { grid-template-columns: 1fr; } }
+
+/* Pin a quote · finds itself again (INTAKE_3, app/services/capture_quotes.py) */
+.cp-quote { font: 15px/1.5 var(--font-read, Georgia, serif); margin: 6px 0 8px; }
+.cp-quote mark { background: color-mix(in srgb, var(--accent-1) 22%, transparent); color: var(--text); border-bottom: 1px dashed var(--accent-1); }
+.cp-quote .cp-ctx { color: var(--text-muted); }
+.cp-standing { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; margin-top: 8px; }
+.cp-tray { margin-top: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.cp-tray p { margin: 4px 0; font-size: 12px; }
+.cp-linkbtn { all: unset; cursor: pointer; margin-left: 6px; padding: 1px 8px; border: 1px solid var(--line); border-radius: 7px; font-size: 11.5px; color: var(--text); }
+.cp-linkbtn:focus-visible { outline: 2px solid var(--accent-1); }
+.cp-traylist { margin: 6px 0 0; padding-left: 16px; font-size: 12px; }
+.cp-traylist small { display: block; color: var(--text-muted); }
+.cp-platform { margin: 6px 0 0; display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; }
+.cp-platform b { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; font: 600 10px var(--font-mono); }
+.cp-platform.broken b { color: var(--status-disputed); } .cp-platform.partly b { color: var(--accent-1); }

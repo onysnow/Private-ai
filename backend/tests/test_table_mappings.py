@@ -236,3 +236,32 @@ def test_a_mapped_table_is_not_read_again_by_the_text_name_finder(tmp_path, monk
         doc_id = doc.id
     entities = client.get(f"/api/documents/{doc_id}/candidates", params={"candidate_type": "entity"}).json()
     assert entities and all((row["payload"].get("rationale") or {}).get("rule") == "column_mapping" for row in entities)
+
+
+def test_a_table_not_yet_mapped_is_not_read_as_running_text_either(tmp_path, monkeypatch):
+    """A CSV read before anyone maps it (the usual order: the upload is read at once) proposes no names, claims or
+    passages from its cells joined as text; mapping it later withdraws any such proposal kept from before."""
+    from app.core.config import settings
+    from app.models.domain import ExtractionCandidate
+    from app.services.documents import extract_document, store_document
+    from app.services.table_mappings import run_mapping
+
+    monkeypatch.setattr(settings, "enable_local_entity_suggestions", True)
+    inv = _investigation()
+    with SessionLocal() as db:
+        doc = store_document(db, investigation_id=inv, title="ledger.csv", filename="ledger.csv", mime_type="text/csv",
+                             data=LEDGER, storage_dir=tmp_path)
+        read = extract_document(db, doc.id)
+        assert read is not None and read.extraction_status == "complete"
+        doc_id = doc.id
+        assert not db.query(ExtractionCandidate).filter(ExtractionCandidate.document_id == doc_id).count()
+        # One left from an older reading is withdrawn when the table is mapped.
+        db.add(ExtractionCandidate(investigation_id=inv, document_id=doc_id, candidate_type="entity",
+                                   payload={"caption": "Payer Payee Amount", "rationale": {"rule": "capitalized_name_sequence"}}, confidence=0.5))
+        db.commit()
+        run_mapping(db, db.get(Document, doc_id), PAYMENTS, sheet=None, created_by=None)
+        db.commit()
+        old = db.query(ExtractionCandidate).filter(ExtractionCandidate.document_id == doc_id,
+                                                   ExtractionCandidate.candidate_type == "entity").all()
+        assert {c.payload["caption"]: c.review_status for c in old}["Payer Payee Amount"] == "rejected"
+        assert all(c.review_status == "proposed" for c in old if c.payload["caption"] != "Payer Payee Amount")

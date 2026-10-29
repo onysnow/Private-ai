@@ -70,7 +70,8 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
   const [area, setArea] = useState('');
   const [indicator, setIndicator] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
-  const [filter, setFilter] = useState<ListFilter>('all');
+  // Learn opens on what the app computes (DECISIONS_LOG 12, call 10); an area with no rule opens on everything.
+  const [chosenFilter, setFilter] = useState<ListFilter | null>(null);
   const asked = useRef<{area: string; indicator: string} | null>(null);
 
   useEffect(() => {
@@ -92,6 +93,9 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
 
   const rowsQuery = useQuery({...listIndicatorsOptions({query: {area, limit: 3000}}), enabled: Boolean(area), staleTime: Infinity});
   const rows = useMemo(() => rowsQuery.data?.indicators ?? [], [rowsQuery.data]);
+  // An indicator opened by its address is never hidden by the default.
+  const chosenRow = rows.find(r => r.id === indicator);
+  const filter: ListFilter = chosenFilter ?? (rows.some(r => r.rule) && (!chosenRow || chosenRow.rule) ? 'computed' : 'all');
 
   // The indicator to open in a newly chosen area: the one asked for, else the strongest flag here, else the first.
   useEffect(() => {
@@ -114,7 +118,7 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
     return () => setTrailTail([]);
   }, [areaRow, indicator]);
 
-  const chooseArea = (key: string) => { if (key !== area) { setArea(key); setFilter('all'); setPreview(null); } };
+  const chooseArea = (key: string) => { if (key !== area) { setArea(key); setFilter(null); setPreview(null); } };
   const openIndicator = (id: string) => { const key = id.split('-')[0]; if (key !== area) { chooseArea(key); asked.current = {area: key, indicator: id}; } setIndicator(id); setPreview(null); };
   const totalIndicators = areas.reduce((n, a) => n + a.indicators, 0);
   const problem = areasQuery.isError ? errorMessage(areasQuery.error, 'Could not load the catalogue') : '';

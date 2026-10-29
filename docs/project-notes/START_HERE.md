@@ -1,6 +1,15 @@
-# Start here (12 Oct 2026)
+# Start here (29 Oct 2026)
 
-**The work plan is `MOCKUP_BUILD_LIST.md`** (Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct (PR #58 into timeline-wip): table-row Decide cards, The Wire, the app-side suite gaps (data and API), Case home to HOME_1, the frame and Settings to HOME_2, the whole OnySnow Studios effect system brought in with the rain pane on the case title band (ADR-0009; frosted Glass panels still to do), The Drop and the reading room (INTAKE_1/2; History tab, per-file stream, web links and "already in the case" on reading-room cards still to do). Then SEE_2 Money, CHECK_2 Chain of Custody, ACT_1 Red Flags, ACT_2 Story, and AI_2 Before you run (Act › AI runs: the run settings in plain words, the plan, what leaves the computer, this case's default with a reason). SEE_1 waits on a Wire mockup Ony approves. AI_1 and the Knowledge catalogue and glossary are built. 23 Oct: Safety & data (KEEP_2) built with the outbound log (ADR-0015); its remaining parts are in MOCKUP_BUILD_LIST §9. Next: the "Your safety" panel, encrypted backups, then the website (§10, waits on Ony).
+**Where it stands, 29 Oct (PR #116, branch `claude/native-module`):** Ony's open questions are now decided on what is
+best for the app and logged in `DECISIONS_LOG.md` (entries 1–8); screens are built from the mockups and the research
+without approval rounds. Built 29 Oct: the Timeline screens (Lanes, Stack, Replay, Board, Periods, Build your own) and
+Places (TIME/PLACE mockups); the three media screens, a photo's Picture (MEDIA_1), a recording's Clean and cut and Sync
+(MEDIA_2), a PDF's Redact before sharing (MEDIA_3); Add by hand, Check a pack, Does it work today?, the evidence pack as
+PDF. Still to build: the "Your safety" panel, The Wire (SEE_1), the deck editor (DECK_1/2), the UI simplification
+questions, the storytold study, the newsletter mailbox, the monitor list encrypted at rest, the website (§10).
+
+
+**The work plan is `MOCKUP_BUILD_LIST.md`** (12 Oct note, kept for history; Ony, 12 Oct: make the app look and work like the mockups). Done 12 Oct (PR #58 into timeline-wip): table-row Decide cards, The Wire, the app-side suite gaps (data and API), Case home to HOME_1, the frame and Settings to HOME_2, the whole OnySnow Studios effect system brought in with the rain pane on the case title band (ADR-0009; frosted Glass panels still to do), The Drop and the reading room (INTAKE_1/2; History tab, per-file stream, web links and "already in the case" on reading-room cards still to do). Then SEE_2 Money, CHECK_2 Chain of Custody, ACT_1 Red Flags, ACT_2 Story, and AI_2 Before you run (Act › AI runs: the run settings in plain words, the plan, what leaves the computer, this case's default with a reason). SEE_1 waits on a Wire mockup Ony approves. AI_1 and the Knowledge catalogue and glossary are built. 23 Oct: Safety & data (KEEP_2) built with the outbound log (ADR-0015); its remaining parts are in MOCKUP_BUILD_LIST §9. Next: the "Your safety" panel, encrypted backups, then the website (§10, waits on Ony).
 
 This is where the Workbench redesign stands, for a new session picking it up. The branch is
 `timeline-wip`.
@@ -50,7 +59,10 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   Disk encryption is left to Windows (BitLocker / Device encryption); the app only reports it,
   and the BitLocker reading is untested on a real Windows machine.
 
-## Waiting on Ony
+## Decided without waiting
+Since 29 Oct Ony's open questions are decided on what is best for the app and logged in `DECISIONS_LOG.md`.
+
+## Waiting on Ony (before 29 Oct; now decided and built in turn, see DECISIONS_LOG.md)
 - **See ("The Wire"):** the prototype is at https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3,
   with its source in `docs/design/see-the-wire/` and the design in `SEE_THE_WIRE_PROTOTYPE.md`.
   It awaits his approval before it is built.

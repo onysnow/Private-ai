@@ -141,6 +141,8 @@ class InvestigationDeletionPreview(ResponseModel):
     unsafe_paths: list[DeletionUnsafePath]
     # Files kept by web captures (ADR-0018), deleted with the case.
     capture_file_count: int = 0
+    # Files made from the case's files (ADR-0021), deleted with the case.
+    derived_file_count: int = 0
     can_delete: bool
     requires_confirmation: str
     openaleph_collection: DeletionCollectionOut | None
@@ -645,6 +647,8 @@ class TimelineEventOut(ResponseModel):
     verification_status: str
     # Bellingcat's grade, on a reporter's event once graded; null otherwise.
     grade: str | None = None
+    # A reporter's placeholder: believed, no evidence attached yet.
+    placeholder: bool = False
     synthetic: bool
     refs: dict[str, Any]
     provenance: dict[str, Any]
@@ -660,6 +664,131 @@ class TimelineOut(ResponseModel):
     total: int
     returned: int
     offset: int
+
+
+class TimelineLaneEventOut(TimelineEventOut):
+    """An event as Lanes draws it: the parties it is about (its lanes), where it comes from, its amount when it is a
+    payment, and one mark for whether it is shown (app/services/timeline_lanes.py fact_of)."""
+    model_config = ConfigDict(from_attributes=True, extra="allow", populate_by_name=True, serialize_by_alias=True)
+
+    parties: list[str]
+    schema_: str | None = Field(default=None, alias="schema")
+    prop: str | None = None
+    amount: float | None = None
+    currency: str | None = None
+    amount_eur: float | None = None
+    source_key: str
+    source_label: str
+    fact: Literal["shown", "not_yet", "disputed", "worked_out"]
+    fact_note: str | None = None
+
+
+class TimelinePartyOut(ResponseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    country: str | None = None
+    events: int
+
+
+class TimelinePeriodOut(ResponseModel):
+    id: str
+    name: str
+    date_start: str
+    date_end: str
+    summary: str
+    made_by: str | None = None
+
+
+class TimelineSequenceOut(ResponseModel):
+    """An event that comes before a step it should follow (app/services/sequence_rules.py)."""
+    event_id: str
+    rule: str
+    rule_name: str
+    missing: str
+    after_id: str | None = None
+    found_later_id: str | None = None
+    say: str
+    why: str
+    basis: str
+    steps: list[str]
+
+
+class TimelineNotPlacedOut(ResponseModel):
+    source_id: str
+    title: str
+    kind: str
+    date: str
+    precision: str
+    date_key: str
+
+
+class TimelineUndatedOut(ResponseModel):
+    source_id: str
+    title: str
+    kind: str
+    why: str
+
+
+class TimelineSpanOut(ResponseModel):
+    first: str | None = None
+    last: str | None = None
+    busiest: str | None = None
+
+
+class TimelineStepOut(ResponseModel):
+    """One step of Replay: a Story claim, in the claim's own words, with the events that date it (or one event)."""
+    key: str
+    title: str
+    claim_id: str | None = None
+    claim_status: str | None = None
+    event_ids: list[str]
+    date_start: str
+    date_end: str | None = None
+    precision: str
+    unresolved: bool
+
+
+class BuiltTimelineOut(ResponseModel):
+    id: str
+    name: str
+    owner: str
+    items: list[str]
+    updated_at: Timestamp
+
+
+class BoardNoteOut(ResponseModel):
+    id: str
+    board: str
+    text: str
+    x: float
+    y: float
+
+
+class TimelineBoardOut(ResponseModel):
+    style: Literal["rich", "clean"]
+    positions: dict[str, dict[str, list[float]]]
+    notes: list[BoardNoteOut]
+
+
+class TimelineLanesOut(ResponseModel):
+    investigation_id: str
+    events: list[TimelineLaneEventOut]
+    steps: list[TimelineStepOut]
+    steps_from: Literal["story", "events"]
+    steps_undated: int
+    parties: list[TimelinePartyOut]
+    periods: list[TimelinePeriodOut]
+    sequence: list[TimelineSequenceOut]
+    not_placed: list[TimelineNotPlacedOut]
+    not_placed_total: int
+    undated: list[TimelineUndatedOut]
+    undated_total: int
+    facts: dict[str, int]
+    span: TimelineSpanOut
+    opens_on: str | None = None
 
 
 class TimelineEventRowOut(ResponseModel):
@@ -682,6 +811,7 @@ class TimelineEventRowOut(ResponseModel):
     lead_id: str | None = None
     dataset: str
     origin: str | None = None
+    placeholder: bool = False
     created_at: Timestamp
 
 
@@ -1640,6 +1770,7 @@ class BackupPreviewOut(ResponseModel):
     document_file_count: int
     missing_document_count: int
     capture_file_count: int = 0
+    derived_file_count: int = 0
     warnings: list[str]
     conflicts: list[RestoreConflictOut]
     can_restore: bool
@@ -3457,6 +3588,32 @@ class DeckSlideOut(ResponseModel):
     visual: DeckVisualOut | None
     # A slidedoc's prose, shown in place of the bullets; empty on a deck for presenting.
     prose: str = ""
+    # Each cited claim's status when the slide was made: a slide whose claim has moved since says so.
+    made_with: dict[str, str] = {}
+
+
+class SlideProblemOut(ResponseModel):
+    kind: str
+    text: str
+    fix: str | None = None
+    claim_id: str | None = None
+    line: int | None = None
+
+
+class SlideCheckOut(ResponseModel):
+    slide: int
+    problems: list[SlideProblemOut]
+    draft: bool
+    changed: bool
+
+
+class DeckChecksOut(ResponseModel):
+    """Each slide's checks (DECK_1): a claim not yet shown (a Draft band), 7×7, a long run of text slides, and a cited
+    claim whose status changed since the slide was made."""
+    deck_id: str
+    slides: list[SlideCheckOut]
+    drafts: list[int]
+    changed: list[int]
 
 
 class DeckOut(ResponseModel):
@@ -3937,7 +4094,7 @@ class PlaceLinkOut(ResponseModel):
 class PlaceEventOut(ResponseModel):
     """An event on the investigation's timeline that happened at a place:
     one about the place's own record ("place") or about a relationship
-    linking something to it ("link"). `first_day` and `last_day` are the
+    linking something to it, or about a record linked to it ("link"). `first_day` and `last_day` are the
     days its dates as recorded can mean; `exact` is false when a date is
     known only to the month or year."""
     id: str
@@ -3963,6 +4120,13 @@ class PlaceOut(ResponseModel):
     longitude: float
     address: str | None = None
     country: str | None = None
+    # How exact the point is, as the record says ("building", "street", "city"): read from its notes'
+    # "Precision: …", which is where a place's precision is kept (FollowTheMoney's Address has no field for it).
+    precision: str | None = None
+    # How sure the place is (its ring on the map): read from a document, approximate (a town or wider), or not yet
+    # shown; and the document or source it was read from.
+    sure: Literal["document", "approximate", "not_yet"] = "not_yet"
+    placed_from: str | None = None
     links: list[PlaceLinkOut]
     events: list[PlaceEventOut] = Field(default_factory=list)
 
@@ -4637,14 +4801,22 @@ class CaseClaimCountsOut(ResponseModel):
     ruled_out: int
 
 
+class CaseMoneyOtherOut(ResponseModel):
+    currency: str
+    amount: float
+    payments: int
+    starting_payers: int
+
+
 class CaseMoneyOut(ResponseModel):
     """Money traced, counted once where it starts (payments whose payer received
-    nothing in the case), and how many payments carry it."""
+    nothing in the case), how many payments carry it, and how many different payers
+    it starts from; each other currency with its own figures."""
     currency: str | None
     amount: float
     payments: int
-    from_sources: int = 0
-    other_currencies: list[str]
+    starting_payers: int = 0
+    others: list[CaseMoneyOtherOut]
 
 
 class CaseYearOut(ResponseModel):
@@ -4793,6 +4965,7 @@ class DecisionItemOut(ResponseModel):
     open: DecisionLinkOut
     known: list[str] = []
     confidence_band: Literal["high", "medium", "low"] | None = None  # a document proposal's confidence, as a word
+    unlocks: list[str] = []  # what a Yes would change, from a dry run (app/services/unlocks.py)
 
 
 class CaseDecisionsOut(ResponseModel):
@@ -5034,6 +5207,360 @@ class TranscriptSegmentOut(ResponseModel):
     speaker: str | None = None
 
 
+class PublisherCueOut(ResponseModel):
+    start: float
+    end: float
+    text: str
+    speaker: str | None = None
+
+
+class PublisherTranscriptOut(ResponseModel):
+    """The episode's own transcript as its publisher offers it (podcast:transcript), fetched with the episode and kept
+    as it came: its address, type, SHA-256 and when it was fetched; `error` when it could not be read."""
+    url: str
+    type: str | None = None
+    sha256: str | None = None
+    bytes: int | None = None
+    fetched_at: str | None = None
+    error: str | None = None
+    cues: list[PublisherCueOut] = []
+
+
+class TranscriptPartOut(ResponseModel):
+    """A part of the episode as its feed names it (podcast:chapters)."""
+    start: float
+    title: str
+
+
+class CompareWordOut(ResponseModel):
+    w: str
+    differs: bool
+
+
+class TranscriptCompareRowOut(ResponseModel):
+    """One of our segments beside the publisher's words for the same stretch of time; `differs` counts the words
+    marked on both sides. Neither side is right by default."""
+    segment_id: str
+    start: float
+    end: float
+    kind: Literal["speech", "no_speech"]
+    speaker: str | None = None
+    ours: list[CompareWordOut]
+    theirs: list[CompareWordOut]
+    no_speech_text: str | None = None
+    differs: int
+
+
+class FaceBoxOut(ResponseModel):
+    """Where the detector finds a face, as fractions of the picture, with its score. Never who."""
+    x: float
+    y: float
+    w: float
+    h: float
+    score: float
+
+
+class FacesOut(ResponseModel):
+    faces: list[FaceBoxOut]
+    model: str
+    model_sha256: str
+
+
+class NearestPlaceOut(ResponseModel):
+    metres: int
+    entity_id: str
+    caption: str
+
+
+class PlaceProposalOut(ResponseModel):
+    id: str
+    status: str
+
+
+class PhotoOut(ResponseModel):
+    """A photo as the Picture screen shows it: what the file claims about itself, how far its GPS is from the case's
+    nearest place, and the machine's proposals."""
+    document_id: str
+    filename: str
+    sha256: str
+    kind: str
+    width: int | None = None
+    height: int | None = None
+    date_tag: str | None = None
+    claims: dict[str, Any]
+    nearest_place: NearestPlaceOut | None = None
+    place_proposal: PlaceProposalOut | None = None
+    text: list[str]
+    face_model_here: bool
+
+
+class HumOut(ResponseModel):
+    hz: int | None = None
+    harmonics: int
+    above_db: float
+
+
+class SyncOut(ResponseModel):
+    """Where another recording lines up in this one: a positive offset means it started that many seconds later."""
+    model_config = ConfigDict(from_attributes=True, extra="allow")
+
+    other_document_id: str
+    offset_seconds: float | None = None
+    # FilmCraft's find_offset: the peak's height over the background, and over the next best lag (reliable at 8 and 1.5).
+    confidence: float
+    distinct: float | None = None
+    reliable: bool
+    accepted_by: str | None = None
+    accepted_at: str | None = None
+
+
+class SoundOut(ResponseModel):
+    """A recording's sound: its length, any mains hum, its loudness, its latest cleaned copy, an accepted sync."""
+    document_id: str
+    duration: float
+    hum: HumOut
+    loudness_lufs: float | None = None
+    cleaned_id: str | None = None
+    sync: SyncOut | None = None
+
+
+class PdfPageOut(ResponseModel):
+    page: int
+    width: float
+    height: float
+
+
+class RedactProposalOut(ResponseModel):
+    """A box the machine proposes, never applied on its own: a phone number or email address found by pattern, or a
+    person named in this case found in the text."""
+    id: str
+    kind: str
+    page: int
+    rect: list[float]
+    text: str
+    entity_id: str | None = None
+    why: str
+
+
+class HiddenDataOut(ResponseModel):
+    category: str
+    label: str
+    count: int
+
+
+class PdfaIssueOut(ResponseModel):
+    clause: str | None = None
+    message: str | None = None
+    fixable: bool
+
+
+class PdfaOut(ResponseModel):
+    compliant: bool
+    declared: str | None = None
+    issues: list[PdfaIssueOut]
+
+
+class RedactionOut(ResponseModel):
+    """A PDF as the Redact screen shows it: its pages in points, the proposed boxes, its hidden data, PDF/A now."""
+    document_id: str
+    sha256: str
+    pages: list[PdfPageOut]
+    proposals: list[RedactProposalOut]
+    hidden: list[HiddenDataOut]
+    pdfa: PdfaOut
+    tool: str
+
+
+class RedactCompareOut(ResponseModel):
+    """How a redacted copy differs from the case's file: the words each holds, the pages that changed, and the hidden
+    data the copy still carries."""
+    copy_id: str
+    old_words: int
+    new_words: int
+    pages_changed: list[int]
+    hidden_left: list[HiddenDataOut]
+
+
+class DerivedFileOut(ResponseModel):
+    """A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
+    `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when."""
+    id: str
+    document_id: str
+    parent_id: str | None = None
+    parent_sha256: str
+    filename: str = ""
+    sha256: str
+    size: int
+    mime_type: str
+    operation: str
+    params: dict[str, Any]
+    tool: str
+    model: str | None = None
+    model_sha256: str | None = None
+    job_id: str | None = None
+    created_by: str | None = None
+    created_at: Timestamp
+
+
+class PackFileOut(ResponseModel):
+    """One file of a pack someone sent back: as made, changed, missing, or not in the list; `about` names what a
+    changed or missing custody page is about."""
+    name: str
+    state: Literal["as_made", "changed", "missing", "extra"]
+    listed: str | None = None
+    now: str | None = None
+    about: str | None = None
+
+
+class PackExhibitOut(ResponseModel):
+    """A changed or missing exhibit file, what rests on it, and the case's own file. `ours` and `theirs` are small
+    pictures (data URLs) when the picture could be drawn again exactly as listed; `differs` is where they differ."""
+    number: int
+    file: str
+    state: Literal["changed", "missing", "extra"]
+    document: str | None = None
+    case_file: Literal["matches", "does not match"] | None = None
+    claims: list[str]
+    ours: str | None = None
+    theirs: str | None = None
+    differs: dict[str, float] | None = None
+    redrawn: bool
+
+
+class ByHandHitOut(ResponseModel):
+    """Something the case already holds, or that waits in Decide, like what is being added by hand."""
+    kind: Literal["record", "proposal", "link", "event"]
+    id: str
+    caption: str | None = None
+    schema_: str | None = Field(default=None, alias="schema")
+    as_: str | None = Field(default=None, alias="as")
+    same: bool | None = None
+
+
+class ByHandPreviewOut(ResponseModel):
+    """Before adding by hand (ENTRY_1): what the case already holds, what waits in Decide, what a link would change."""
+    already: list[ByHandHitOut]
+    waiting: list[ByHandHitOut]
+    changes: list[str]
+
+
+class ByHandSuggestionOut(ResponseModel):
+    """A record of the case for a blank in the sentence, and the name it was found under."""
+    id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    matched: str
+    as_: str = Field(alias="as")
+    country: str | None = None
+
+
+class ByHandAddedOut(ResponseModel):
+    """What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties."""
+    record_type: Literal["party", "link", "event"]
+    record_id: str
+    evidence_id: str | None = None
+    lead_id: str | None = None
+    parties: list[str]
+
+
+class PlatformDayOut(ResponseModel):
+    day: str
+    state: Literal["works", "partly", "broken"] | None = None
+
+
+class PlatformOut(ResponseModel):
+    """One platform the app saves from, tried on its public test item: today's state as a word, the last 14 days."""
+    key: str
+    name: str
+    route: str
+    saves: str
+    test_url: str
+    shipped_url: str
+    state: Literal["works", "partly", "broken"] | None = None
+    detail: str | None = None
+    missing: list[str] = []
+    seconds: float | None = None
+    checked_at: Timestamp | None = None
+    broken_since: Timestamp | None = None
+    days: list[PlatformDayOut]
+
+
+class PlatformChecksOut(ResponseModel):
+    """Does it work today? (WORKS_1): each platform, whether the daily check is on, whether a pasted link is warned about."""
+    daily: bool
+    warn: bool
+    platforms: list[PlatformOut]
+    last_checked_at: Timestamp | None = None
+    working: int
+    checked: int
+
+
+class PlatformForUrlOut(ResponseModel):
+    """The platform a pasted link is on and how it was at its last check (none when not one the app tries)."""
+    key: str
+    name: str
+    state: Literal["works", "partly", "broken"] | None = None
+    detail: str | None = None
+    checked_at: Timestamp | None = None
+
+
+class SigningKeyOut(ResponseModel):
+    """This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack."""
+    fingerprint: str | None = None
+    created_at: Timestamp | None = None
+
+
+class PackSignatureOut(ResponseModel):
+    """The pack's signature: none, invalid or valid; the key's fingerprint; whether it is this computer's key; whether it
+    is the key the pack was made with (always true for a pack not made here)."""
+    state: Literal["none", "invalid", "valid"]
+    fingerprint: str | None = None
+    ours: bool
+    as_made: bool
+
+
+class PackCheckOut(ResponseModel):
+    """Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,
+    for a pack not made in this case, with its own MANIFEST.sha256). Nothing of the pack is kept or sent."""
+    file: str
+    files: int
+    pack_id: str | None = None
+    made_here: bool
+    made_in_other_case: str | None = None
+    made_at: Timestamp | None = None
+    made_by: str | None = None
+    title: str | None = None
+    draft: bool | None = None
+    compared_with: str
+    list_changed: bool
+    whole: bool
+    counts: dict[str, int]
+    rows: list[PackFileOut]
+    exhibits: list[PackExhibitOut]
+    signature: PackSignatureOut
+
+
+class VoiceOut(ResponseModel):
+    """A voice the machine told apart in this recording (a guess), and the name a person gave it, if any."""
+    voice: str
+    spoken: float
+    turns: int
+    name: str | None = None
+    entity_id: str | None = None
+    named_by: str | None = None
+    named_at: str | None = None
+
+
+class VoicesOut(ResponseModel):
+    """Who spoke when (ADR-0026): the voices, their turns as [start, end, voice], how they were found, every earlier
+    name, and why there are none when there are none (`unavailable`)."""
+    voices: list[VoiceOut]
+    turns: list[list[float]]
+    found_by: dict[str, Any] | None = None
+    history: list[dict[str, Any]] = []
+    unavailable: str | None = None
+
+
 class TranscriptOut(ResponseModel):
     """A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
     (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
@@ -5047,6 +5574,10 @@ class TranscriptOut(ResponseModel):
     transcript: dict[str, Any]
     unsure_below: float
     segments: list[TranscriptSegmentOut]
+    # From the episode's feed, when it came through Following: the publisher's own transcript, and its parts.
+    publisher: PublisherTranscriptOut | None = None
+    parts: list[TranscriptPartOut] = []
+    voices: VoicesOut | None = None
 
 
 # --- Web capture (app/services/web_capture.py, ADR-0018) ------------------------------------------------------------
@@ -5088,6 +5619,120 @@ class CaptureExchangeOut(ResponseModel):
     response: CaptureMessageOut | None = None
 
 
+class CaptureVersionOut(ResponseModel):
+    number: int
+    seen_at: Timestamp
+    captured: bool
+    capture_id: str | None = None
+    text_sha256: str
+    lines_changed: int
+
+
+class WordSegmentOut(ResponseModel):
+    op: Literal["same", "del", "ins"]
+    text: str
+
+
+class WordChangeOut(ResponseModel):
+    """A changed stretch of the page, word by word; `unchanged` counts the same lines between two changes."""
+    unchanged: int
+    segments: list[WordSegmentOut]
+
+
+class CaptureFollowOut(ResponseModel):
+    """Checking a captured page again (INTAKE_3). `state`: unchecked, same, changed (since the capture), gone (now 404
+    or 410), broken (could not be read), or for a link only, not_yet / answers (the address answers again: its page
+    waits in Following for a person to capture). `every`: never, daily or weekly. `changes` compare the captured
+    version with the latest, words only, as served."""
+    monitor_id: str
+    every: Literal["never", "daily", "weekly"]
+    health: str
+    health_detail: str | None = None
+    checks: list["MonitorCheckOut"]
+    last_checked_at: Timestamp | None = None
+    next_check_at: Timestamp | None = None
+    leaves: str
+    state: Literal["unchecked", "same", "changed", "gone", "broken", "not_yet", "answers"]
+    versions: list[CaptureVersionOut]
+    changes: list[WordChangeOut]
+    captured_text: str | None = None
+    live_text: str | None = None
+    item_id: str | None = None
+    marked_changed: dict[str, Any] | None = None
+
+
+class CaptureQuoteSavedOut(ResponseModel):
+    """Where the quote stands in the saved copy now: held (same place), moved (found elsewhere)."""
+    state: Literal["held", "moved", "not anchored"]
+    match: str | None = None
+    occurrences: int
+    prefix: str
+    suffix: str
+    place: str
+
+
+class CaptureQuoteLiveOut(ResponseModel):
+    checked: bool
+    found: bool
+    version: int
+    same_as_saved: bool
+    match: str | None = None
+
+
+class CaptureQuoteOut(ResponseModel):
+    """A quote pinned from a captured page, found again (INTAKE_3): in the saved copy (`saved`, None when it cannot be
+    found there) and, once the page was checked again, on the live page (`live`). `unanchored`: in the tray."""
+    evidence_id: str
+    quote: str
+    characters: int
+    saved: CaptureQuoteSavedOut | None = None
+    live: CaptureQuoteLiveOut | None = None
+    captured_version: int
+    unanchored: bool
+
+
+class CaptureTimeProofOut(ResponseModel):
+    """An RFC 3161 token over the capture's WARC SHA-256 (ADR-0025): `time` is the time server's clock; `check` says
+    whether it was checked here (signature and chain to a bundled root, this fingerprint, this request's nonce)."""
+    state: Literal["stamped", "failed"]
+    server: str
+    asked_at: Timestamp
+    by: str
+    of: str
+    sent: str
+    answered_at: Timestamp | None = None
+    reason: str | None = None
+    token: str | None = None
+    time: Timestamp | None = None
+    signer: str | None = None
+    serial: str | None = None
+    policy: str | None = None
+    fingerprint: str | None = None
+    check: Literal["checked", "not_checked", "failed"] | None = None
+    check_detail: str | None = None
+
+
+class CaptureArchiveOut(ResponseModel):
+    """A public web archive asked about this page (ADR-0025): "saved" (it kept its own copy, at `url`), "found" (it
+    already held one), "none" (it holds none) or "failed" (with the reason). Only the address was sent."""
+    state: Literal["saved", "found", "none", "failed"]
+    service: str
+    asked_at: Timestamp
+    by: str
+    sent: str
+    answered_at: Timestamp | None = None
+    reason: str | None = None
+    url: str | None = None
+    archived_at: Timestamp | None = None
+    archived_status: str | None = None
+
+
+class CaptureWitnessesOut(ResponseModel):
+    time_proof: CaptureTimeProofOut | None = None
+    archive: CaptureArchiveOut | None = None
+    elsewhere: CaptureArchiveOut | None = None
+
+
 class CaptureOut(ResponseModel):
     """A web page captured from a link: queued, capturing or finished; once finished, saved (the suite's OBTAINED),
     not_seen (a login wall or paywall answered) or link_only (the page could not be kept, `reason` says why)."""
@@ -5121,6 +5766,16 @@ class CaptureOut(ResponseModel):
     media: dict[str, Any]
     media_document_id: str | None = None
     job: BackgroundJobOut | None = None
+    # A link only's reason in one word, read from the reply or set by a person (`reason_kind_by`).
+    reason_kind: Literal["dead_link", "blocked", "timed_out", "tool_error"] | None = None
+    reason_kind_by: str | None = None
+    follow: CaptureFollowOut | None = None
+    # What outside services were asked about this capture (ADR-0025), and whether this one is source-protected (then
+    # nothing is sent from here).
+    witnesses: CaptureWitnessesOut
+    source_protected: bool = False
+    # The host a time proof would be asked of (CAPTURE_TIME_SERVER), so the screen can say where it goes first.
+    time_server: str
 
 
 # --- The Drop (app/services/drop.py) ---------------------------------------------------------
@@ -5729,6 +6384,57 @@ class OutboundRequestOut(ResponseModel):
     source: dict[str, Any] | None = None
 
 
+class SafetyGuideOut(ResponseModel):
+    title: str
+    publisher: str
+    url: str
+
+
+class SafetySourceOut(ResponseModel):
+    title: str
+    publisher: str
+    url: str
+
+
+class SafetyTraceOut(ResponseModel):
+    document_id: str
+    filename: str
+    traces: list[str]
+
+
+class SafetySignOut(ResponseModel):
+    """A safety sign from the case's records (catalogue/indicators/sa.yaml), shown apart from Red Flags. No level: the
+    catalogue's Faint and Strong for safety are not set yet."""
+    id: str
+    name: str
+    definition: str
+    innocent: list[str]
+    source: SafetySourceOut
+    textbook: str
+    evidence: str
+    level: str | None = None
+    documents: list[SafetyTraceOut] = []
+
+
+class SafetyQuestionOut(ResponseModel):
+    """A sign only the reporter can say. The answer stays in their browser; this server never receives it."""
+    id: str
+    name: str
+    definition: str
+    innocent: list[str]
+    source: SafetySourceOut
+    textbook: str
+    question: str
+
+
+class YourSafetyOut(ResponseModel):
+    investigation_id: str
+    signs: list[SafetySignOut]
+    questions: list[SafetyQuestionOut]
+    guides: list[SafetyGuideOut]
+    levels_set: bool
+
+
 class SafetyDataOut(ResponseModel):
     """Safety & data for a case: what lives where, what can reach outside, what has left, word for word (ADR-0015)."""
     period: Literal["today", "7d", "30d", "all"]
@@ -5774,3 +6480,243 @@ class SuiteCatalogOut(ResponseModel):
     """Every system, module and record of the suite, and which app runs use each module."""
     source: str | None
     systems: list[SuiteCatalogSystemOut]
+
+
+# --- Following (ADR-0022) -------------------------------------------------------------------------------------------
+
+class MonitorCheckOut(ResponseModel):
+    state: Literal["ok", "warn", "bad", "wait"]
+    text: str
+    # On the line for the request itself: the status the source answered and how long it took.
+    status: int | None = None
+    seconds: float | None = None
+
+
+class MonitorOut(ResponseModel):
+    """A source the case follows. `kind`: feed, sitemap, page, podcast, account (an open-protocol public account) or
+    closed (a closed platform: no monitor). `health`: works, broken, moved (paused until a person accepts `moved_to`),
+    paused, unchecked or closed. `leaves` says in words what each check sends and where."""
+    id: str
+    kind: Literal["feed", "sitemap", "page", "podcast", "account", "closed", "mailbox"]
+    platform: str | None = None
+    url: str
+    name: str
+    every_minutes: int
+    route: Literal["direct", "tor"]
+    health: Literal["works", "broken", "moved", "paused", "unchecked", "closed"]
+    health_detail: str | None = None
+    moved_to: str | None = None
+    checks: list[MonitorCheckOut]
+    last_checked_at: Timestamp | None = None
+    last_ok_at: Timestamp | None = None
+    next_check_at: Timestamp | None = None
+    robots_allowed: bool | None = None
+    waiting: int
+    leaves: str
+    created_by: str | None = None
+    created_at: Timestamp
+
+
+class MonitorRiskOut(ResponseModel):
+    tone: Literal["bad", "amber", "teal", ""]
+    text: str
+
+
+class MonitorItemOut(ResponseModel):
+    """One thing a monitor turned up, as the queue shows it. `state`: waiting, capturing, saved, not_saved, skipped,
+    gone (a captured item whose address now answers 404 or 410) or removal_recorded."""
+    id: str
+    monitor_id: str
+    kind: str
+    platform: str | None = None
+    title: str
+    url: str | None = None
+    summary: str
+    published_at: Timestamp | None = None
+    first_seen_at: Timestamp
+    state: Literal["waiting", "capturing", "saved", "not_saved", "skipped", "gone", "removal_recorded", "copy"]
+    risks: list[MonitorRiskOut]
+    rank: int
+    source: str
+    # What the source says besides: the episode's audio file and size, a transcript the publisher offers, the page
+    # version and how many lines changed.
+    extra: dict[str, Any]
+    capture_id: str | None = None
+    document_id: str | None = None
+    # Who captured, skipped or recorded it, when, and a bulk capture's reason.
+    decision: dict[str, Any]
+
+
+class CopyMemberOut(ResponseModel):
+    id: str
+    source: str
+    title: str
+    first_seen_at: Timestamp
+    original: bool
+    similarity: float | None = None
+
+
+class CopyGroupOut(ResponseModel):
+    """Items that restate one text: counted once; only the earliest is offered for capture."""
+    id: str
+    title: str
+    count: int
+    members: list[CopyMemberOut]
+
+
+class FollowingEgressOut(ResponseModel):
+    sources: int
+    third_party: int
+    direct: int
+    tor: int
+    public_server: int
+    no_monitor: int
+
+
+class FollowingOut(ResponseModel):
+    """Everything the Following screen shows: the sources, the queue (most at risk first), copies of one story, and
+    what leaves this computer."""
+    monitors: list[MonitorOut]
+    queue: list[MonitorItemOut]
+    waiting: int
+    captured: int
+    skipped: int
+    copies: list[CopyGroupOut]
+    egress: FollowingEgressOut
+    working: int
+    followed: int
+
+
+class PageVersionOut(ResponseModel):
+    """One version of a followed page's main text; `diff` lists the lines removed (-) and added (+) since the one before."""
+    id: str
+    number: int
+    seen_at: Timestamp
+    sha256: str
+    lines_changed: int
+    diff: list[str]
+    layout_changes: list[dict[str, Any]]
+    captured: bool
+    capture_id: str | None = None
+
+
+# CaptureFollowOut names MonitorCheckOut, which is defined further down (Following).
+CaptureFollowOut.model_rebuild()
+CaptureOut.model_rebuild()
+
+
+class AuthenticityItemCardOut(ResponseModel):
+    """The item as the case holds it: what it is, who posted it, when it was captured or added, its file and fingerprint;
+    for text, the opening of its text and the quotes taken from it."""
+    document_id: str
+    kind: str
+    title: str
+    posted_by: str | None = None
+    outlet: str | None = None
+    captured_at: Timestamp | None = None
+    added_at: Timestamp
+    from_link: bool
+    filename: str
+    size: int | None = None
+    width: int | None = None
+    height: int | None = None
+    sha256: str
+    note: str | None = None
+    excerpt: str | None = None
+    quotes: list[str]
+    words: int | None = None
+
+
+class AuthenticityClaimOut(ResponseModel):
+    """A claim this item supports, and what a status would do to it: `outcome` is loses (no other support), keeps
+    (`others` other sources still support it; `other` is the first), unchanged, or about (a claim about the item
+    itself, which keeps its support)."""
+    id: str
+    text: str
+    status: str
+    outcome: str
+    others: int
+    other: dict[str, Any] | None = None
+
+
+class AuthenticityPreviewOut(ResponseModel):
+    """What a status with a role does to the claims that lean on the item; `applied` when it is the item's own now."""
+    status: str
+    role: str
+    applied: bool
+    blocking: bool
+    headline: str
+    claims: list[AuthenticityClaimOut]
+    losing: int
+    derived: list[dict[str, Any]]
+    restating: list[str]
+    suggestion: str | None = None
+
+
+class AuthenticityOptionOut(ResponseModel):
+    """One choice on the consent card: what it sends (`sends`, exactly), to whom, and why it is not offered when not."""
+    key: str
+    label: str
+    to: str
+    sends: str | None = None
+    available: bool
+    why_not: str | None = None
+
+
+class AuthenticityHistoryOut(ResponseModel):
+    """One append-only line: a finding (actor system) or a person's decision, consent or setting."""
+    id: str
+    kind: str
+    actor: str
+    person: str | None = None
+    method: str | None = None
+    tool: str | None = None
+    version: str | None = None
+    local: bool
+    text: str
+    at: Timestamp
+
+
+class AuthenticityOut(ResponseModel):
+    """Is it real? (mockup CHECK_3, ADR-0023): the item, the findings (provenance, source, hints), the status only a
+    person sets with what they checked and why, what it does to claims, the outside checks, and the history."""
+    item: AuthenticityItemCardOut
+    status: str
+    role: str
+    source_protected: bool
+    decided_by: str | None = None
+    decided_at: Timestamp | None = None
+    reason: str | None = None
+    checked: list[str]
+    platform_label: str | None = None
+    findings: dict[str, Any]
+    examined_at: Timestamp | None = None
+    preview: AuthenticityPreviewOut
+    outside: list[AuthenticityOptionOut]
+    history: list[AuthenticityHistoryOut]
+
+
+class AuthenticityCompareOut(ResponseModel):
+    """A comparison with the case's own files, made on this computer."""
+    text: str
+    matches: list[dict[str, Any]]
+    pool: int
+
+
+class AuthenticityOutsideOut(ResponseModel):
+    """An outside check allowed once: the address for the browser to open, the service, exactly what it carries, and
+    its row in the outbound log."""
+    url: str
+    service: str
+    sent: str
+    outbound_request_id: str
+
+
+class AuthenticityStatusOut(ResponseModel):
+    """A case file's standing, for lists."""
+    document_id: str
+    status: str
+    role: str
+    source_protected: bool
+    decided_at: Timestamp | None = None
+    flagged: bool

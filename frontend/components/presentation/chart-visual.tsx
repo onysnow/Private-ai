@@ -40,7 +40,14 @@ export function fitScale(design: {width: number, height: number}, box: {width: n
 }
 
 /** Draws the checked option at its design size, scaled to the space it is given. */
-export function ScaledChart({visual, fill = false}: {visual: ChartVisual, fill?: boolean}): ReactElement {
+/** The data row a click on the chart landed on: by its name (a bar's category, a slice's label), else by its place. */
+export function pickedRow(visual: ChartVisual, params: unknown): ChartVisual['data']['rows'][number] | undefined {
+  const rows = visual.data?.rows ?? [];
+  const {name, dataIndex} = (params ?? {}) as {name?: unknown; dataIndex?: unknown};
+  return rows.find(r => typeof name === 'string' && r.label === name) ?? (typeof dataIndex === 'number' ? rows[dataIndex] : undefined);
+}
+
+export function ScaledChart({visual, fill = false, onPick}: {visual: ChartVisual, fill?: boolean, onPick?: (row: ChartVisual['data']['rows'][number]) => void}): ReactElement {
   const box = useRef<HTMLDivElement>(null);
   const [space, setSpace] = useState<{width: number, height: number}>({width: 0, height: 0});
   const design = designSize(visual);
@@ -66,7 +73,8 @@ export function ScaledChart({visual, fill = false}: {visual: ChartVisual, fill?:
         ? <ChartMap option={visual.option as Record<string, unknown>} width={design.width} height={design.height} ariaLabel={visual.text.alt_text}/>
         : visual.option && typeof visual.option === 'object' && 'pictures' in visual.option
           ? <ChartPictures option={visual.option as Record<string, unknown>} width={design.width} height={design.height} ariaLabel={visual.text.alt_text}/>
-          : <Chart option={visual.option as EChartsOption} height={design.height} ariaLabel={visual.text.alt_text} theme={null}/>}
+          : <Chart option={visual.option as EChartsOption} height={design.height} ariaLabel={visual.text.alt_text} theme={null}
+            onEvents={onPick ? {click: params => { const row = pickedRow(visual, params); if (row) onPick(row); }} : undefined}/>}
     </div>
   </div>;
 }
@@ -98,10 +106,11 @@ export function tableCells(rows: TableRow[], row: TableRow): {key: string, text:
 /** The chart with the words rule 13 asks for: its description, its source
  * line, and a data table where each value names how many records hold it up
  * (rule 16) and flags values that rest on a single record (rule 20). */
-export function ChartFigure({visual, renderCitations}: {visual: ChartVisual, renderCitations?: (refs: ChartVisual['data']['rows'][number]['record_refs']) => ReactElement | null}): ReactElement {
+export function ChartFigure({visual, renderCitations, onPick}: {visual: ChartVisual, renderCitations?: (refs: ChartVisual['data']['rows'][number]['record_refs']) => ReactElement | null,
+  onPick?: (row: ChartVisual['data']['rows'][number]) => void}): ReactElement {
   const table = visual.text.data_table;
   return <figure className="my-4" data-testid="chart-visual">
-    <ScaledChart visual={visual}/>
+    <ScaledChart visual={visual} onPick={onPick}/>
     <figcaption className="mt-2 text-xs" style={{color: '#7A6950'}}>{visual.text.source_line}</figcaption>
     <details className="mt-2 text-xs">
       <summary className="cursor-pointer select-none">Description and data table</summary>

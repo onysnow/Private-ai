@@ -23,7 +23,7 @@
 // at a link writes its kind. Clicking a party or a link opens it.
 import {BaseEdge, EdgeLabelRenderer, Handle, MarkerType, Position, ReactFlow, ReactFlowProvider, ViewportPortal, useReactFlow} from '@xyflow/react';
 import {Maximize2, Minus, Plus} from 'lucide-react';
-import type {Edge, EdgeProps, Node, NodeProps} from '@xyflow/react';
+import type {Edge, EdgeProps, Node, NodeProps, ReactFlowInstance} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import {createContext, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
@@ -310,7 +310,7 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
       {/* Drawn once the box's width is known, so the first fit is to the box's final height. */}
       {laying && <p className="muted p-4" role="status" aria-busy="true">Laying out the linked groups…</p>}
       {boxWidth > 0 && arranged && <ReactFlow key={`${arrangement}|${focus ?? ''}|${parties.length}|${links.length}`} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} colorMode="dark"
-        fitView fitViewOptions={{padding: 0.06, maxZoom: 1.2}} minZoom={0.15} maxZoom={2}
+        fitView fitViewOptions={OPENING_FIT} onInit={flow => void openAtTop(flow)} minZoom={0.15} maxZoom={2}
         nodesDraggable={false} nodesConnectable={false} nodesFocusable={false} edgesFocusable={false} elementsSelectable={false}
         onEdgeMouseEnter={(_event, edge) => setHover({party: null, link: edge.id})} onEdgeMouseLeave={() => setHover({party: null, link: null})}
         onEdgeClick={(_event, edge) => onLink?.(edge.id)}>
@@ -320,13 +320,27 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
   </ReactFlowProvider></HoverContext.Provider>;
 }
 
+/** How the drawing opens: fitted to its box, but never smaller than names can be read at (13 px names at 85% read
+ * at about 11 px). A drawing too tall for that opens at its top-left, to be scrolled; Fit shows all of it, smaller. */
+const OPENING_FIT = {padding: 0.06, maxZoom: 1.2, minZoom: 0.85};
+
+/** Fits the drawing for opening; when it is held at the reading size, shows its top (the top of the chain) first. */
+async function openAtTop(flow: Pick<ReactFlowInstance, 'fitView' | 'getViewport' | 'setViewport' | 'getNodes' | 'getNodesBounds'>): Promise<void> {
+  await flow.fitView(OPENING_FIT);
+  const view = flow.getViewport();
+  const nodes = flow.getNodes();
+  if (!nodes.length || view.zoom > OPENING_FIT.minZoom + 0.001) return;
+  const top = flow.getNodesBounds(nodes).y;
+  await flow.setViewport({x: view.x, y: 24 - top * view.zoom, zoom: view.zoom});
+}
+
 /** Fits the drawing again when its box changes height (React Flow fits it
  * once, when it first draws). */
 function FitWhenResized({height}: {height: number}): null {
   const flow = useReactFlow();
   useEffect(() => {
     // After React Flow has seen the new size (it measures with its own observer).
-    const timer = setTimeout(() => { void flow.fitView({padding: 0.06, maxZoom: 1.2}); }, 80);
+    const timer = setTimeout(() => { void openAtTop(flow); }, 80);
     return () => clearTimeout(timer);
   }, [height, flow]);
   return null;
@@ -340,6 +354,6 @@ function ZoomBar(): ReactElement {
   return <div className="net-zoom" role="group" aria-label="Zoom">
     <button type="button" className="cf-tool" onClick={() => void flow.zoomIn({duration: 150})} aria-label="Zoom in"><Plus size={14}/></button>
     <button type="button" className="cf-tool" onClick={() => void flow.zoomOut({duration: 150})} aria-label="Zoom out"><Minus size={14}/></button>
-    <button type="button" className="cf-tool" onClick={() => void flow.fitView({padding: 0.06, maxZoom: 1.2, duration: 200})}><Maximize2 size={13}/> Fit</button>
+    <button type="button" className="cf-tool" onClick={() => void flow.fitView({padding: 0.06, maxZoom: 1.2, duration: 200})} title="The whole drawing in the box, however small its names get"><Maximize2 size={13}/> Fit</button>
   </div>;
 }

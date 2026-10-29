@@ -19,9 +19,16 @@ from fastapi.testclient import TestClient
 
 from app.db.session import SessionLocal
 from app.main import app
-from app.models.domain import Document, RelationshipEdge, TimelineEvent
+from app.models.domain import (
+    Document,
+    DocumentChunk,
+    ExtractionCandidate,
+    RelationshipEdge,
+    TimelineEvent,
+)
 from app.patterns import engine
 from app.services import demo_cases
+from app.services.documents import extract_document, own_part
 from app.services.relationships import RELATIONSHIP_SCHEMAS
 
 client = TestClient(app)
@@ -108,6 +115,55 @@ def test_each_download_is_counted_for_the_loading_bar():
     state = demo_cases._states["vekselberg-shell-network"]
     assert (state["fetched"], state["to_fetch"]) == (len(docs), len(docs))
     demo_cases.set_state("vekselberg-shell-network", state="idle")
+
+
+def _pages(doc_id: str) -> list[dict]:
+    fixture = json.loads((FIXTURES / f"{doc_id}.json").read_text(encoding="utf-8"))
+    return [{"locator": f"page {n}", "page_number": int(n), "text": fixture["pages"][n]} for n in sorted(fixture["pages"], key=int)]
+
+
+@pytest.mark.parametrize("case_id", demo_cases.CASE_IDS)
+def test_a_document_printed_among_others_is_read_for_its_own_part_only(case_id):
+    """The Federal Register PDF of the OFAC notice begins with the end of a railway notice and ends with the start of a
+    meeting notice: the part named in the manifest covers every quote the case takes from it, and none of the others."""
+    for meta in demo_cases.manifest(case_id):
+        if not meta.get("part"):
+            continue
+        pages = _pages(meta["id"])
+        shares, not_found = own_part(pages, meta["part"])
+        assert not_found is None
+        own = {p["locator"]: p["text"][a:b] for p, share in zip(pages, shares) if share for a, b in [share]}
+        assert own["page 1"].startswith("DEPARTMENT OF THE TREASURY") and own["page 3"].endswith("[FR Doc. 2018–09147")
+        assert not any("CSX" in text or "Federal Advisory Committee" in text for text in own.values())
+        for q in _quotes(demo_cases.records(case_id)):
+            if q["doc"] == meta["id"]:
+                assert re.sub(r"\s+", " ", q["quote"]).strip() in own[q["locator"].split(",")[0]], q
+
+
+def test_proposals_come_from_the_documents_own_part_and_every_page_is_kept(tmp_path):
+    docs = [(meta, f"stand-in for {meta['id']}".encode()) for meta in demo_cases.manifest("deripaska-en-rusal")]
+    with SessionLocal() as db:
+        inv, _ = demo_cases.build(db, "deripaska-en-rusal", docs, storage_dir=tmp_path)
+        doc = db.query(Document).filter_by(investigation_id=inv.id, filename="fr-2018-09147-ofac-sdn-notice.pdf").one()
+        pages = _pages("fr-ofac-2018-09147")
+        extract_document(db, doc.id, text=(pages, []))
+        chunks = {c.id: c for c in db.query(DocumentChunk).filter_by(document_id=doc.id)}
+        assert sorted(c.text for c in chunks.values()) == sorted(p["text"] for p in pages)  # the whole file stays searchable
+        proposals = db.query(ExtractionCandidate).filter_by(document_id=doc.id).all()
+        assert proposals
+        said = " ".join(str(p.payload.get("caption") or p.payload.get("text") or p.payload.get("quote")) for p in proposals)
+        assert "CSX" not in said and "Federal Railroad" not in said and "Federal Advisory Committee" not in said
+        for p in proposals:  # each span still points into its page's text
+            span, text = p.payload["span"], chunks[p.chunk_id].text
+            found = text[span["start_char"]:span["end_char"]]
+            assert found == (p.payload.get("caption") or p.payload.get("text") or p.payload.get("quote")) or p.candidate_type == "entity", p.payload
+            assert span["start_char"] >= 0 and span["end_char"] <= len(text)
+
+
+def test_a_part_whose_start_is_not_found_reads_the_whole_file_and_says_so():
+    pages = [{"locator": "page 1", "text": "Nothing here starts the notice."}]
+    shares, not_found = own_part(pages, {"from": "DEPARTMENT OF THE TREASURY", "to": "[FR Doc."})
+    assert shares == [(0, len(pages[0]["text"]))] and "was not found" in not_found
 
 
 def _load(case_id: str, tmp_path: Path) -> dict:
@@ -246,3 +302,16 @@ def test_a_failed_load_lets_the_next_one_start(monkeypatch):
         demo_cases.set_state(case_id, state="idle")
     assert calls == ["us-v-anise-structuring", "vekselberg-shell-network"]
     assert not routes_demo._build_lock.locked() and routes_demo._building is None
+
+
+def test_an_allegation_is_testimony_and_an_authoritys_own_record_is_primary(tmp_path):
+    """A complaint's allegations alone never confirm a claim: Tier B (testimony to corroborate), the OFAC notice Tier A."""
+    from app.models.domain import Source
+
+    docs = [(meta, f"stand-in for {meta['id']}".encode()) for meta in demo_cases.manifest("vekselberg-shell-network")]
+    with SessionLocal() as db:
+        inv, _ = demo_cases.build(db, "vekselberg-shell-network", docs, storage_dir=tmp_path)
+        tiers = {d.filename: db.get(Source, d.source_id).source_tier for d in db.query(Document).filter_by(investigation_id=inv.id)}
+    admitted = {m["filename"]: m.get("admitted") for m, _ in docs}
+    assert tiers and all(tiers[name] == ("A" if admitted[name] else "B") for name in tiers), tiers
+    assert tiers["fr-2018-09147-ofac-sdn-notice.pdf"] == "A"

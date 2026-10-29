@@ -84,8 +84,68 @@ def test_each_place_carries_the_dated_events_at_it_from_the_timeline():
     assert places["Meridian registered office"]["events"] == []
     events = places["Villa Kyrenia"]["events"]
     assert [(e["title"], e["via"], e["first_day"], e["last_day"], e["exact"]) for e in events] == [
-        ("Meridian Holdings Ltd — Ownership → Villa Kyrenia — startDate", "link", "2021-02-01", "2021-02-28", False),
+        ("Meridian Holdings Ltd — Ownership → Villa Kyrenia", "link", "2021-02-01", "2021-02-28", False),
         ("Villa searched", "place", "2023-11-14", "2023-11-14", True),
     ]
     ownership = next(link for link in places["Villa Kyrenia"]["links"] if link["caption"] == "Meridian Holdings Ltd")
     assert events[0]["relationship_id"] == ownership["relationship_id"] and events[1]["relationship_id"] is None
+
+
+def test_a_property_s_events_reach_its_address_and_the_address_says_how_exact_it_is():
+    """Audit #12: a place made as an Address linked to the property at it (the 1MDB demo's places) gets the property's
+    events, through that link; a person linked to it does not bring theirs. The point's precision, as its notes record
+    it, is said."""
+    from app.models.domain import Entity
+    from app.schemas.api import EntityCreate, TimelineEventCreate
+    from app.services.entities import create_entity
+    from app.services.timeline import create_timeline_event
+
+    inv = client.post("/api/investigations", json={"name": "Spots"}).json()["id"]
+    with SessionLocal() as db:
+        address = create_entity(db, EntityCreate(investigation_id=inv, schema="Address", caption="15 West 63rd Street",
+                                                 properties={"full": ["15 West 63rd Street, New York"], "latitude": ["40.77"], "longitude": ["-73.98"],
+                                                             "notes": ["Precision: building. Geocoded from the public street address."]}))
+        flat = create_entity(db, EntityCreate(investigation_id=inv, schema="RealEstate", caption="Park Laurel unit"))
+        owner = create_entity(db, EntityCreate(investigation_id=inv, schema="Person", caption="A. Buyer"))
+        create_relationship(db, investigation_id=inv, schema="UnknownLink", source_entity_id=flat.id, target_entity_id=address.id, properties={})
+        create_relationship(db, investigation_id=inv, schema="UnknownLink", source_entity_id=owner.id, target_entity_id=address.id, properties={})
+        create_timeline_event(db, TimelineEventCreate(investigation_id=inv, title="Unit bought for $30.6m", date_start="2010-06", precision="month", entity_id=flat.id))
+        create_timeline_event(db, TimelineEventCreate(investigation_id=inv, title="Buyer flew to Macau", date_start="2011", precision="year", entity_id=owner.id))
+        assert db.get(Entity, address.id) is not None
+    place = client.get(f"/api/investigations/{inv}/places").json()["places"][0]
+    assert place["precision"] == "building"
+    assert [(e["title"], e["via"]) for e in place["events"]] == [("Unit bought for $30.6m", "link")]
+
+
+def test_each_place_says_how_sure_it_is_and_what_cannot_be_placed_says_why():
+    from app.models.domain import Source, Statement
+
+    with SessionLocal() as db:
+        inv = Investigation(name="Rings")
+        db.add(inv)
+        db.commit()
+
+        def entity(schema: str, caption: str, **props: list[str]) -> str:
+            return create_entity(db, EntityCreate(investigation_id=inv.id, schema=schema, caption=caption, properties=props)).id
+
+        registry = Source(investigation_id=inv.id, title="Land registry extract, p.1", source_type="document")
+        db.add(registry)
+        db.commit()
+        land = entity("RealEstate", "The harbour land", latitude=["50.1"], longitude=["-3.5"])
+        for st in db.query(Statement).filter(Statement.entity_id == land):
+            st.origin = f"source:{registry.id}"
+        db.commit()
+        entity("Address", "Fernhill Ltd, Marlow", latitude=["51.57"], longitude=["-0.77"], notes=["Precision: town."])
+        entity("Address", "Harbour Hotel?", latitude=["50.2"], longitude=["-3.6"])
+        entity("Address", "P.O. Box 118, Marlow", full=["P.O. Box 118, Marlow"])
+        entity("Address", "Near the old ferry ramp")
+        entity("Address", "From a photo", latitude=["0"], longitude=["0.0"])
+        inv_id = inv.id
+    body = client.get(f"/api/investigations/{inv_id}/places").json()
+    rings = {p["caption"]: (p["sure"], p["placed_from"]) for p in body["places"]}
+    assert rings == {"The harbour land": ("document", "Land registry extract, p.1"),
+                     "Fernhill Ltd, Marlow": ("approximate", None), "Harbour Hotel?": ("not_yet", None)}
+    assert {o["caption"]: o["reason"] for o in body["omitted"]} == {
+        "P.O. Box 118, Marlow": "a post box, not a place",
+        "Near the old ferry ramp": "no coordinates recorded; nothing is looked up",
+        "From a photo": "0, 0 is where a camera or a record with no fix puts a point, not a place"}

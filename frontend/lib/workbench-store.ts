@@ -29,6 +29,20 @@ export type ProvenanceRequest = {
  * view, which the graph may not hold); the claims panel knows only the id. */
 export type RelationshipRequest = {relationshipId: string; record?: RelationshipOut};
 
+/** What the inspector slot holds (DECISIONS_LOG 12, calls 11-12; research §7.5): one thing open at a time at the right,
+ * with the way it was reached as a trail. A party's dossier, or a record's Chain of Custody. */
+export type InspectorItem = {kind: 'dossier'; serial: number; entityId: string} | {kind: 'custody'; serial: number; request: ProvenanceRequest};
+
+// Whether the "open this" now being handled came from inside the slot: a link there moves along the trail; anything
+// opened from the page replaces it. The slot marks its own clicks and keys; the mark lasts for that event only.
+let fromSlot = false;
+export function markSlotInteraction(): void {
+  fromSlot = true;
+  window.setTimeout(() => { fromSlot = false; }, 0);
+}
+const MAX_TRAIL = 8;
+const placed = (trail: InspectorItem[], item: InspectorItem): InspectorItem[] => (fromSlot && trail.length ? [...trail, item].slice(-MAX_TRAIL) : [item]);
+
 type WorkbenchState = {
   investigationId: string;
   setInvestigationId: (id: string) => void;
@@ -46,6 +60,11 @@ type WorkbenchState = {
   provenance: {serial: number; request: ProvenanceRequest} | null;
   openProvenance: (request: ProvenanceRequest) => void;
   clearProvenance: () => void;
+  /** The inspector slot's trail, the last item showing; empty when the slot is closed. */
+  inspector: InspectorItem[];
+  /** One step back along the trail (Back, Esc); from the first item, closes the slot. */
+  inspectorBack: () => void;
+  closeInspector: () => void;
   /** The claim the verification workspace was last asked to open (from its
    * own list or from a dossier), with a serial so asking for the same claim
    * twice still reopens it. The workspace itself decides whether it holds
@@ -74,6 +93,11 @@ type WorkbenchState = {
   document: {serial: number; documentId: string; pageNumber: number | null} | null;
   openDocument: (documentId: string, pageNumber?: number | null) => void;
   closeDocument: () => void;
+  /** The case file whose "Is it real?" screen was last asked for (mockup CHECK_3): from a capture receipt, the
+   * reading room or the Check stage's list. */
+  realness: {serial: number; documentId: string} | null;
+  openRealness: (documentId: string) => void;
+  closeRealness: () => void;
   /** The Red Flag whose details were last asked for (a "To check" item's flag). */
   flag: {serial: number; flagId: string} | null;
   openFlag: (flagId: string) => void;
@@ -99,7 +123,7 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   investigationId: '',
   // A new case means a new trace, claim, dossier and relationship: nothing from the old one applies.
   setInvestigationId: id => set(state => (state.investigationId === id ? {investigationId: id}
-    : {investigationId: id, entityId: '', provenance: null, claim: null, dossier: null, relationship: null, document: null, flag: null, check: null, chain: null, aiRun: null, askCase: null, asOf: null, pointedParty: null})),
+    : {investigationId: id, entityId: '', provenance: null, inspector: [], claim: null, dossier: null, relationship: null, document: null, realness: null, flag: null, check: null, chain: null, aiRun: null, askCase: null, asOf: null, pointedParty: null})),
   investigationName: '',
   setInvestigationName: name => set(state => (state.investigationName === name ? state : {investigationName: name})),
   entityId: '',
@@ -109,20 +133,36 @@ export const useWorkbenchStore = create<WorkbenchState>(set => ({
   askCase: null,
   openAskCase: (question = '') => set({askCase: {serial: nextSerial(), question}}),
   provenance: null,
-  openProvenance: request => set({provenance: {serial: nextSerial(), request}}),
-  clearProvenance: () => set({provenance: null}),
+  openProvenance: request => set(state => {
+    const serial = nextSerial();
+    return {provenance: {serial, request}, inspector: placed(state.inspector, {kind: 'custody', serial, request})};
+  }),
+  clearProvenance: () => set(state => ({provenance: null, inspector: state.inspector.filter(i => i.kind !== 'custody')})),
+  inspector: [],
+  inspectorBack: () => set(state => {
+    const trail = state.inspector.slice(0, -1);
+    const custody = [...trail].reverse().find(i => i.kind === 'custody');
+    return {inspector: trail, provenance: custody?.kind === 'custody' ? {serial: custody.serial, request: custody.request} : null};
+  }),
+  closeInspector: () => set({inspector: [], provenance: null}),
   claim: null,
   openClaim: claimId => set({claim: {serial: nextSerial(), claimId}}),
   chain: null,
   openChain: claimId => set({chain: {serial: nextSerial(), claimId}}),
   dossier: null,
   // Opening a dossier also selects its entity, as clicking a graph node did.
-  openDossier: entityId => set({entityId, dossier: {serial: nextSerial(), entityId}}),
+  openDossier: entityId => set(state => {
+    const serial = nextSerial();
+    return {entityId, dossier: {serial, entityId}, inspector: placed(state.inspector, {kind: 'dossier', serial, entityId})};
+  }),
   relationship: null,
   openRelationship: request => set({relationship: {serial: nextSerial(), request}}),
   document: null,
   openDocument: (documentId, pageNumber = null) => set({document: {serial: nextSerial(), documentId, pageNumber}}),
   closeDocument: () => set({document: null}),
+  realness: null,
+  openRealness: documentId => set({realness: {serial: nextSerial(), documentId}}),
+  closeRealness: () => set({realness: null}),
   flag: null,
   openFlag: flagId => set({flag: {serial: nextSerial(), flagId}}),
   check: null,

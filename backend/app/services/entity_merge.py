@@ -134,6 +134,23 @@ def execute_entity_merge(db: Session, source: Entity, target: Entity, *, preview
             moved[name] = len(rows)
         source.merged_into_entity_id = target.id
         source.canonical_id = target.canonical_id or target.ftm_id
+        # The names the merged-away record was held under stay findable: each one the surviving record does not
+        # already hold becomes its alias, so a reading that meets the name finds this record, not a new one.
+        from sqlalchemy.orm.attributes import flag_modified
+
+        from app.services.resolution import _norm, entity_names
+
+        held = {_norm(n) for n in entity_names(target)}
+        props = dict(target.properties) if isinstance(target.properties, dict) else {}
+        aliases = list(props.get("alias") or [])
+        for name in entity_names(source):
+            if _norm(name) not in held:
+                aliases.append(name)
+                held.add(_norm(name))
+        if aliases != list(props.get("alias") or []):
+            props["alias"] = aliases
+            target.properties = props
+            flag_modified(target, "properties")
         audit = CanonicalEntityMergeAudit(
             investigation_id=source.investigation_id,
             source_entity_id=source.id,

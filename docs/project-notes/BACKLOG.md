@@ -12,6 +12,256 @@ The "approved" items below may be built straight away.
 
 6. **Done 19 Oct (first slice): Keep › Safety & data** (mockup KEEP-safety-and-data, ADR-0015): what lives on this computer and what left it, the outbound log word for word (CSV export), the last backup, the four Keep cards. Open: ADR-0015's five questions for Ony (the log in backups; AI calls as the question or the whole text; which OpenAleph calls to log; the default for outside lookups; when "last backup" is noted), Your safety panel, stray-file cleanup, encrypted backups.
 
+## After the whole site is built: show less at rest (Ony, 29 Oct)
+"When we finish the entire site, I want to go through and bury more details behind hoverable effects because there is way
+too much text many of the times. I also want the whole container to have a small effect when you're inside it to help
+keep track of the mouse amongst all the UI. And by default I will want only the most important pieces of data viewed
+when you're not hovering, have selected or in said container."
+- A pass over every screen once the build list is done, not now. At rest each container shows only its most important
+  data; hovering, selecting or being inside a container reveals the rest (DECISIONS_LOG 12's detail levels and the
+  research §7.4 ideas B "four depths" and D are the starting point).
+- Every container gets a small effect while the pointer is inside it, so the pointer is easy to keep track of.
+- Keep the floor (research §3): status, level and provenance stay visible at rest.
+- **The Wire done first (29 Oct):** its panels show only their first line at rest (the header's one line, the trail's
+  current party, the key's title) and open on hover or keyboard focus; the panel the pointer is in lights its edge at the
+  pointer, and over the map the pointer carries a small lamp on the grid. The rest of the site follows in the pass.
+
+## Later: animated presentations (Ony, 29 Oct)
+"At some point I would like the option to create animated presentations like the one I am pasting":
+https://framer.com/m/Chronical-Timeline-JMbe1o.js@IcxcWf1SSSwxMOG63dAo (Framer's "Chronical Timeline").
+- What that component is: a story you scroll through rather than click through. A sticky frame holds the current
+  item while the page scrolls. Each item has a year in large type, a section label ("01/ Section label"), a description
+  and a picture or video. The items are revealed and turned as you scroll, with parallax, and a smoothing setting eases
+  the scroll.
+- Where it would sit: beside DECK_1's slides and PDF (DECISIONS_LOG 15), an export or present mode that turns a deck, or a
+  case's timeline, into a scrolling animated story. The same citation rule applies: every line keeps its source, and a
+  line resting on a claim that isn't shown yet keeps its Draft mark.
+- Not started; it waits until Ony asks for it.
+
+## Later: expanding cards layout (Ony, 29 Oct)
+"Also I know that this style of animation and grid/layout could be used": Framer's "Expanding Cards"
+(https://framer.com/m/Expanded-Card-Tf0T.js@eQAyLIpgdsn5jzRZJ7tW).
+- What it is, from its code: five cards side by side in one 400px-high row. The open card takes the width and the
+  others close to narrow strips. Each card has a background picture under a dark overlay, a number, a title and a
+  paragraph; the title and paragraph show only on the open card. On phones the row turns into a column. Opening and
+  closing use one spring (stiffness 160, damping 30).
+- Places it fits, each with exactly the few items the layout wants:
+  - The case home: the five stages (Bring in, Check, See, Act, Keep, lib/stages.ts) as the five cards. The open one shows
+    the stage's line, its parts and where the case stands in it; the closed ones keep their number and stage colour.
+  - The See stage: its four drawings (The Wire, Timeline, Money, Places) as cards with a live thumbnail of each.
+  - Decks and the animated presentations above: a slide layout that compares up to five parties or sources.
+- Not started; a mockup comes first when Ony picks where.
+
+## The Wire previews: Ony's later corrections (29 Oct)
+In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYmbmf67wntahWt), after the entries below:
+- Dots are the card's own end circle, the same size (38px), with the card's name type; the flag count sits on the outline
+  at 45 degrees on the right end; the "+N more" leader meets the outline square on.
+- A dot's half-shown name: the pill stays whole and crisp, only the words fade at its end; hover grows the pill.
+- Kind icons: slow, eased, context-specific loops while hovered (person: a breath and a light circling the head;
+  company: a light rising floor by floor; organisation: a gleam along the columns; vessel: riding a swell; property: a
+  warm light behind the door; bank account: a coin sliding in). Leaving lets the loop finish its cycle and settle.
+- The chip liquid is scaled to each chip, as the Shader Button's fill is to the button: one or two broad soft bands
+  and a fine grain, each chip its own seed.
+- Every link line moves by family, and the families may change colour: owns (gold) a soft light gliding owner to owned,
+  directs or works for (now teal) small beads marching, paid (copper) the money lights as today, kind not yet known
+  (grey) a slow breath. Dashed still means not yet shown.
+- The blue and yellow arcs on a card are the Your tags ring (one arc per tag, in the tag's colour); the preview's details
+  now name the tags on hover.
+- Then: the person icon's loop is a small double nod (he didn't understand the circling light; he likes the others).
+- Strong and faint: the moving beam runs round the count's circle only; the textbook siren alone runs round the outline.
+- The owns line's gliding light is a much softer gradient (stacked, fading lengths, blurred), with no hard ends.
+- The Red Flag count opens on hover: the circle grows on the spring into a small card (how many, of which levels, the
+  strongest flag, "click to see every flag and who it touches"), opening towards the side with room. A click opens a
+  panel of every flag, each with the parties it touches as chips (a chip makes its party pulse on the map), and the
+  map dims to the party, those parties and the lines between them. Esc, the close button or a click on the map closes
+  it. The preview's flags are samples.
+- Then (his correction): a click shows the flags on the Wire, not in a panel. The map glides to frame the party and every
+  party its flags touch, the rest dims, and each flag is a curve in its level's colour from the flagged party to each
+  party it touches, drawing itself in, labelled once with the flag's words (whole flag on hover). Flags touching no
+  other party stack beside the card. Labels are placed so none overlaps a party or another label. Esc or a click on
+  empty map puts the Wire back.
+- While the count's box is open, the card's details and tag pins step aside (they clashed).
+- Your tags, redesigned (four options in artifact MF1DH391BFR9YsEFALLNQP; he picked A, pins on the bottom edge):
+  a small pin per tag on the card's bottom edge; hover drops them on the spring into a row of named pills, words
+  centred, under the details line. The ring round the kind circle is gone.
+- "+N more" is a perfect circle with a stack of discs fanned out behind its left side; on hover the discs slide into
+  it one after another and it opens leftwards (away from its leader) into "+N more parties", the words uncovered as
+  the chip grows.
+- Then: the stack's discs are solid, one per kind among the hidden parties in that kind's colour, with a thin edge of
+  ground between them; the chip's face is always opaque, so nothing shows through it or crosses the number.
+- Then he said everything was chip-shaped, with lots of outlines all the same thickness. Preview
+  UDRjkiQv5srKbMrxT5Y3L5: each kind its own silhouette, shared by its badge and its dot (person pill, company squared
+  card, organisation hexagonal ends, vessel pointed bow, property slanted end, bank account cut corner); outlines only
+  on parties, weighted by importance (centre 2.4, flagged 1.8, others and dots 1.1); link labels a filled tab with no
+  outline, card details just words. Waiting for his view.
+- Then he asked to redesign how the flags appear on the Wire (no hover, full text unreadable, no sense of where a flag
+  comes from). In the shapes preview: each flag is a numbered pennant in its level's colour on a thread that starts at
+  the count badge and ends in an arrow at the edge of the party it touches, with a light running along it from the flag
+  to the party; the pennants fly out of the count on the spring. Hovering a pennant opens it into a card with the whole
+  flag, "From <party> → <parties>", brightens its threads, pulses those parties and quiets the other flags. Flags that
+  touch no other party hang in a column from the count on elbowed poles. A title over the party names the flags and
+  says Esc closes. Pennants avoid parties, link labels and each other; one pushed off its thread keeps a dotted tether.
+- Then: no coloured glow on hover anywhere (cards, dots, "+N", link labels); the hover is the lift, the brighter
+  outline and the sheen. Kind icons larger (25px in a 38px badge) to fill the badge.
+- Then: every icon is centred on its own drawn bounds, not its 24-unit box (several lucide icons sit off-centre in
+  their box), and a card's badge circle is inset from the card's outline with an outline of its own in the kind's colour.
+- Then: the link label said only "Owns" (who owns what?) and its hover jumped. Now at rest it is a check, the verb and
+  an arrow pointing along the line from owner to owned; hover widens it evenly on the spring, uncovering the words, and
+  rolls up to the whole sentence ("Viktor Vekselberg owns 100% of Renova Group"); both lines are centred so nothing
+  jumps. Its tooltip says what the check means. Also fixed: the Red Flag box's invisible glow caught the pointer at
+  rest and opened the box over neighbouring labels.
+- Then (all in the previews):
+  - More connections: hovering a dot that has connections the map doesn't draw, or "+N", branches short fading paths
+    towards the most open side, one per hidden connection, each in its link family's colour and ending in a faint mark
+    of the other party's kind. Clicking moves that party to the middle and gathers all its connections round it (the
+    rest leave); "Back to <party>" steps back. The hidden connections in the preview are samples.
+  - The Red Flag hover box opens upwards, to the right when there is room, else to the left: count and level counts,
+    a bar of the levels in proportion, the first three flags one line each, "+N more · Click to show them on the Wire".
+  - Kind colours re-picked, clear of the flag levels and link families: person blue, company violet, organisation
+    stone, vessel sea-cyan, property rose, bank account green (he said banks green or gold is fine). Directs or works
+    for lines are now silver. The chip liquid's colour range is narrower, more subtle.
+  - Four options for the "owns" label without a chip (artifact for link labels): words on the line, a share mark at
+    the owned end, a mark for the kind of link, the line says it (moving chevrons). Waiting for his pick.
+  - Shapes: the kind is told by the card's right end only; the left end (the badge) is the same for every kind but a
+    person. So organisations have a pointed right end. Vessels: he disliked the curved bow; of five options (artifact
+    GVF8i1Y6mx36jw11DhrAr3) he picked the ticket, a round bite out of the right end, on cards and dots.
+  - A card's outline no longer changes with its Red Flags: always the kind's colour (a flag shows only in the count's
+    circle). Square badges are inset from the outline with an outline of their own, as the person's circle is.
+  - The shapes preview now has the chip liquid too (it never had it), clipped to each card's own shape, with the switch.
+  - Owns lines (his pick from the label options, D with C's mark): small arrows drift along every owns line from owner
+    to owned; where the share is known, a round mark mid-line shows it ("100%"); hovering the mark shows the sentence.
+  - Then: no dotted pulses on lines. Paid and directs lines carry a soft light that is a true gradient (fading tail,
+    bright head), moved a frame at a time and eased; the flag threads have no pulse. Owns: the mid-line mark holds a key
+    in a ring as long as the share (full ring = all of it, dashed = share not stated); hover draws the ring to the share,
+    slides the amount out of the mark and shows the sentence above. Hover previews always branch outwards (within 60
+    degrees of straight out from the map's middle, never across the dot's own name) and stay inside the map.
+  - Switch "Lines take the parties' colours": a one-way link (paid, owns) leaves in its own colour and turns into the
+    colour of the party it reaches; a link with no direction blends both parties' colours with its own in the middle.
+  - Five options for the dot's name tag (artifact for dot tags): the half-shown pill (now), name only, label below, a tab
+    off the badge, an initial flag on the dot. Waiting for his pick.
+
+## Standing preferences (Ony, 29 Oct)
+- Reveal on hover is the default treatment for most things: the least at rest, the detail on hover, unless he says
+  otherwise.
+- Gradients can say things (direction, from whom to whom, how much): keep an eye out for places to use them as the app
+  is built, and propose them.
+- No dashed line stands still. Every dashed or dotted line moves (marches along its direction), or isn't dashed.
+  Done in the three Wire previews: unconfirmed links, the unknown-share ring and the flag pennants' tethers now march.
+- Hovering "+N": the branching preview paths start from the "+N" circle itself, not from the card it hangs off, and
+  keep clear of the way the chip opens (leftwards). Done in the shapes preview.
+- With "Lines take the parties' colours" on, every line now starts in the colour of the party it leaves. A one-way
+  line (money, owns) turns into its own colour near the sender, then into the receiving party's colour. (Shapes
+  preview; also fixed the switch stopping working after a recentre.)
+- On hover, outlined kind icons turn solid: the body fills in the kind's colour and the details (door, windows, mast,
+  wallet fold) are cut out in the badge colour. Done in the shapes preview.
+- The dot's link count (all connections) and a card's "+N" (only those not drawn) mean different things, and he
+  couldn't tell. Options page for showing connections not drawn, the same on cards and dots (artifact Hidden
+  Connections): A the same "+N" everywhere, B pips (drawn vs not), C stubs that reach out. Waiting for his pick.
+- Solid on hover also covers the circles with numbers (flag counts, "+N") and the owns key mark: colours flip, the
+  circle fills in its colour and the number or key turns dark. Ship's solid version redrawn (cabin with portholes, a
+  deck line, no line through the hull). Bank account icon: the tipping flap and dropping coin replaced by the snap strap
+  easing out and back. The owns mark's reveal is sharper and quicker (no spring overshoot). Shapes preview.
+- Line thicknesses are inconsistent (about twelve values). Proposed: hairline 1 (leaders, tethers), regular 1.5 (every
+  outline, non-money lines, threads, icons drawn to 1.5 on screen), strong 2.5 (centre party, the share ring, a hovered
+  flag thread); money lines keep scaling with the amount. Waiting for his yes.
+- Redesign options for how much is owned (artifact Ownership Share): A thickness in the register's steps, B a small bar
+  on the line, C the line fills to the share, D ticks for the bands, E who owns the rest on hover (adds to any). And
+  five new name tabs for a dot, to the research (artifact Name Tag Options): A a tab that unfolds, B split-flap
+  letters, C typed in, D a folded corner, E squeezed and out of focus. Waiting for his picks.
+- Smaller fixes in the shapes preview: the vessel dot badge 4 wider on the right so the ship has even space all round;
+  the red-flag count reacts only when the count itself is hovered, not the whole chip; the red-flag box's words are
+  clipped to the box as it grows; the solid building's windows rest in the dark purple and still light up.
+- "Turns solid" means the whole badge inverts: the badge fills in the kind's colour, the icon goes solid in the badge's
+  dark, and its details are cut out in the light (the building's windows rest light and still light up). Shapes
+  preview, cards and dots.
+- What a connection not on the map means: three or more steps from the centre, or a direct connection left off for
+  room (each party shows at most 2 of its own, picked flags first; about 46 parties in all). Proposed hover: why
+  they're off ("2 more connections, left off to keep the map clear"), one line each (name, kind, the link in words,
+  flag count if any; top 3 then "and N more"), "Click to bring them onto the map". Short wording to pick: "2 not on the
+  map", "2 more", "2 off the map", "2 not shown yet". Waiting for him.
+- Name tab options redone: every tab comes out of the badge's ticket notch and shares its edge (no floating), shows the
+  name preview and the link count at rest, and when open says "3 links · 2 not on the map". E is now a shimmering
+  skeleton of the rest of the name instead of a blur. Waiting for his pick.
+- Research before designing more: how 2026 UI hints at more information, and how ownership share is shown (the
+  key-and-ring share mark is not good). Findings to discuss with him before any redesign.
+  - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
+    so the chips showed through to the lines. Fixed; the liquid's range is subtle but visible again.
+- Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
+  circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
+- The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
+  the kind's ring colour): bronze for a company, blue for a person, green for an organisation, rust for a vessel.
+All of it waits for his yes before the app changes.
+
+## Later: our own globe, with the Wire's links on it (Ony, 29 Oct)
+"I eventually want to be able to use this globe and make it our own. Then we will be able to map out the events,
+financial flows like that on the wire, but have it displayed on the globe":
+https://framer.com/m/TacticalGlobe3D-uVMtXj.js@UhPxNuaENi2YMvlzEzft (Framer's "TacticalGlobe3D").
+- What it is, from its code: a globe drawn in SVG with sphere maths of its own (an orthographic projection), no 3D
+  library. It uses the Natural Earth 110m country outlines (the world-atlas file, which it fetches from a CDN). Drag turns
+  it, it spins slowly when left alone, and it has an atmosphere, stars, a grid, country hover and markers with labels.
+- Making it our own means writing our own globe in that style, not copying the component: its code carries no licence.
+  Natural Earth is public domain, so the outlines can ship with the app, which also keeps the globe working offline
+  (nothing fetched from a CDN).
+- What it would show: the Wire's parties at their places, its links as arcs over the globe in the same family colours
+  and line styles (money arcs with the moving lights running the way the money went), and Timeline events as markers,
+  played through the time strip.
+- Where it sits: the Places screen already draws with MapLibre, which can show its map as a globe. Whether the globe is
+  that, or our own SVG globe in the Framer style, is a call to make with Ony at the mockup.
+- Not started; it waits until Ony asks for it.
+
+## Website titles that soak in like ink (Ony, 29 Oct)
+"For our product page, for titles I want to try using this animation/styling":
+https://framer.com/m/InkBleedComponent-DpjWv7.js@kqaA6CCQV2BFK6BSX295 (Framer's "Ink Bleed Text").
+- What it is, from its code: each word soaks in from soft, fibrous edges and dries into crisp type, using an SVG filter
+  per word (fractal noise pushing the edges about, plus a blur), 1.6 s a word with a 0.14 s stagger, started when it
+  scrolls into view; hovering wets it again.
+- Preview made with our own code (the component has no licence) on SITE_1's titles: on the site's dark ground, in a serif,
+  and on paper. It goes in the website (MOCKUP_BUILD_LIST §10) once Ony picks a version.
+
+## The Wire with a liquid shader in its backgrounds (Ony, 29 Oct)
+"Show me the wire where the backgrounds have this subtle shader effect":
+https://framer.com/m/Shader-Button-v12VJe.js@PhehsfTqnG7o5bWDuNUT (Framer's "Shader Button", whose fill is a moving
+"Liquid Gradient" shader).
+- He meant the chips' backgrounds, not the map ground (29 Oct). Preview made with our own shader: one slow
+  domain-warped liquid in the chips' blue drawn for the whole map, each chip showing the patch under it (so it flows on
+  from chip to chip and lifts with a hovered chip). In the app it would draw once a frame at half resolution, pause off
+  screen, and stay off under calm motion, Effects off and reduced motion. It waits for his yes.
+- He asked why the cards are rounded rectangles rather than chips: the app's cards have had 11px corners since they were
+  first drawn (PR #60), and only a dot's name is a full pill. The previews now draw cards as pills with perfect half
+  circle ends, the kind circle filling the left end flush with the outline (a tagged card's tag ring hugs that end
+  outside it); the app changes only on his yes.
+
+## Testimonial rotation (Ony, 29 Oct)
+Ony sent https://framer.com/m/Testimonial-Rotation-JRnz0w.js@VcEYXbVlwUb8LpYlJsb6 without a note.
+- What it is, from its code: one quote at a time, with an avatar, a name and a byline, changing every 6 s with a blur and
+  a slide, progress bars and arrows, pausing on hover, and still under reduced motion.
+- The natural home is the website. Not started; it waits for Ony to say where he wants it.
+
+## Iridiums, liquid metal (Ony, 29 Oct)
+Ony sent https://framer.com/m/Iridiums-cvu6Qo.js@zVtz2mLljephiv025VmE without a note.
+- What it is, from its code: a pale, iridescent liquid metal drawn in a shader. It is not a painted pattern. It builds a
+  photo studio (strip lights, a horizon, two softboxes, a floor) and a drifting liquid surface, then reflects the
+  studio in the surface at every pixel. The colour comes from each channel reflecting at a slightly different angle.
+  Its controls are angle, dispersion, exposure, Fresnel, grain, highlight, lights, polish, relief, scale, shadow, speed,
+  strips, tint and vignette.
+- It is the same idea as the OnySnow light engine (light from a modelled scene, not painted on), so a version of our own
+  would belong in onysnow-studios. Not started; it waits for Ony to say where he wants it.
+
+## The Wire's chips in Nova Glow's motion (Ony, 29 Oct)
+"This is how smooth I want the chips, and also how I want any glow animations. The styling is sharper": Framer's
+"Nova Glow Navigation" (https://framer.com/m/Nova-Glow-Navigation-zmwqc6.js@AeSS5plwSRxLlwjuE91J).
+His corrections to the first preview: keep the chips as they are (no recolouring, nothing removed) and only add the
+styling; give our icons that kind of animation and care without copying Nova's icon; glow only on the chip being
+hovered, in the chip's own colour as light. Red Flags: on faint (yellow) and strong (orange) the glow is only on the
+count's circle at the top right; a chip with a textbook flag carries a police siren: a red beam sweeping round its
+outline, the red light coming only from that moving beam, never from the whole outline (his correction, 29 Oct).
+Then (29 Oct): the same moving beam on strong (orange) and faint (yellow) cards too, dimmer and slower; and a flagged
+card's outline stays solid at every level, only its colour saying the level (faint is no longer dashed).
+- The second preview does that: today's chips with a spring, a sheen, words that roll up on "+N more" and link chips, a
+  glow in the kind's colour on hover, each kind icon's own animation on hover, the flag circle lit on hover, and the
+  textbook chip's red siren beam sweeping round its outline at rest (faster on hover). Faint is yellow there, outline and
+  circle. It waits for his yes before the app changes.
+
 ## Ony's standing requirement for every card
 Wherever a card appears (decision, dashboard widget, flag, timeline row, to-check item), it must:
 - let him infer the most important facts: who, what, how much, when, from where;
@@ -29,17 +279,19 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
   - stop stretching full-width text: use the width for different components side by side.
 - **Watchlist hits.** The bright yellow per-word highlights are unacceptable. Same full-width reading problem.
 - **Bring in › Sources & evidence.** It is only a capture form. Add a way to look through all 182 sources and 930 pieces of evidence and display them there.
-- **See › Timeline.** Impossible to read; redesign:
+- **See › Timeline.** Impossible to read; redesign (28 Oct: mockups TIME_1 and TIME_2 drawn, `docs/design/time-and-place-mockups/`, waiting for approval):
   - the axis starts in 1952 and crushes 2009–15;
   - labels overlap;
   - rows show raw property names ("incorporationDate") and `source:<uuid>` origins;
   - dates are shown twice;
   - ranges show invented days.
-- **See › Places.** The base map must come with the app automatically, not as a separate install step. Places need dated events (the timeline strip is empty) and precision (city vs exact).
+- **See › Places.** (28 Oct: mockup PLACE_1 drawn, waiting for approval.) The base map must come with the app automatically, not as a separate install step. Places need dated events (the timeline strip is empty) and precision (city vs exact).
 - ~~**See › Money.** The nav link and the "$6.87B" tile go to `#money-flows`, but See has no money view.~~ Fixed 12 Oct: See › Money (mockup SEE_2) is at `#money-flows`.
 - **Media suite.** Keep developing the mockups (research: `docs/research/media-suite/`). Then:
   - study the ArtCraft apps installed on Ony's PC and identify which parts of which apps cover each media type the Workbench handles;
     28 Oct: the code of all 22 craft repos is mapped to the build items in `docs/research/media-suite/CRAFT_REPOS.md`;
+    28 Oct: built and tried; what works is in the Workbench's native module (ADR-0021). Each use still needs its screen (mockup first): a photo's claims and the edit trail; redact, clean, blur, sync and clip from the reading view; PDF signing and PDF/A;
+    28 Oct: mockups MEDIA_1–3 drawn for these (`docs/design/media-mockups/`), waiting for approval;
   - define what a journalist needs to do with each media type (features, tools, goals);
   - plan the features;
   - add complementary features for this use;
@@ -61,62 +313,59 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
 ## Asked for: navigation
 - **Clicking a party anywhere jumps to Bring in** (the dossier lives in Connectors; `case-workbench.tsx` `STAGE_OF_REQUEST.dossier = 'collect'`). Proposed: open the dossier as a side panel over the current screen. Ony has not answered this yet.
 
-## Found by the data audit (11 Oct) — not yet discussed with Ony
-1. **"Add 'United States' as a Person?"** The name-finder's guess of the kind is shown as fact, and about 30 of 37 are wrong. The kind question asked in Review is never asked on the card (`case_home.py:266`, `entity_signals.py:116`).
-2. **Names already held as aliases are offered as new records**, e.g. "Jho Low" (9 of them). `resolution.py:68-71` only matches captions.
-3. **The CSV is read twice**: by the table mapping, and as one 3,793-character text block with junk names. Skip the text name-finder for table-mapped files.
-4. **Timeline entries from record dates:** raw titles ("— startDate"), raw origin ids, no amount, and duplicates of recorded events (`timeline.py:233-259`, `timeline-panel.tsx:141`).
-5. **Range dates show invented days** ("1 Jan 2009 to 1 Jan 2013"; `lib/dates.ts:4-11`).
-6. **The payments ledger drops `date_end`** (`financial_flows.py:91`). World View → Oceanco shows "—".
-7. **The Case home money tile hides the other currencies** (36 payments). "17 sources" means 17 starting payers. Failed documents are not counted.
-8. **The Case home flag cards join the parties with →** instead of showing the summary. The return leg of a cycle is lost.
-9. **BO-031 fires on one person's two bank accounts** (`shared_holder_link.py`).
-10. **OCR noise from photos becomes claims, names and evidence.** Add a quality gate.
-11. **94 "Source date" timeline events** (including photo dates) clutter the chronology.
-12. **Places have no events or precision.** Also:
-    - an inference claim is forced to Supported (`more.json:14195`);
-    - an editor's note in the .docx is read as content;
-    - a duplicate lead.
+## Found by the data audit (11 Oct) — Ony, 29 Oct: "Fix". Each checked against the code on 29 Oct, then fixed with tests
+1. ~~**"Add 'United States' as a Person?"**~~ Fixed 29 Oct: a name whose kind the text gives no sign of is offered as "Add it, kind not known" (LegalEntity), never as the guess; accepting one without a kind is refused (`case_home.py` `_entity_question`, `documents.py` `review_candidate`). Not done: a place or country kind among the choices (FollowTheMoney has none).
+2. ~~**Names already held as aliases are offered as new records.**~~ Already fixed before 29 Oct (every name and alias is matched, `resolution.py`). Fixed 29 Oct: a merge keeps the merged-away record's names as the survivor's aliases (`entity_merge.py`).
+3. ~~**The CSV is read twice.**~~ Fixed 29 Oct: a table (CSV, TSV, XLSX) is never read as running text for proposals, mapped or not; mapping one withdraws such proposals kept from before (`documents.py`, `table_mappings.py`).
+4. ~~**Timeline entries from record dates.**~~ Fixed 29 Oct: a link's dates make one event in words with its amount, start and end; a record's date reads "X: incorporation date"; a date already on the timeline for that record or a party of that link is not drawn again; no raw origin id (`timeline.py`, `timeline-panel.tsx`).
+5. ~~**Range dates show invented days.**~~ Fixed before 29 Oct in `lib/dates.ts`; the Places strip's tooltip fixed 29 Oct (`places-timeline.tsx`).
+6. ~~**The payments ledger drops `date_end`.**~~ Fixed before 29 Oct; 29 Oct: a payment known only by its end date reads "by" it, and the money strip and the Red Flags payment line keep the end.
+7. ~~**The Case home money tile.**~~ Fixed 29 Oct: "from N starting payers" (different payers), every other currency listed with its sum, documents that could not be read counted.
+8. ~~**The Case home flag cards join the parties with →.**~~ Fixed 29 Oct: the flag's summary at every level; a loop's summary keeps its way back.
+9. ~~**BO-031 fires on one person's two bank accounts.**~~ Already fixed before 29 Oct (detector version 2, only dealings between legal persons). It is the app's Red Flags engine, not the Authority Suite.
+10. ~~**OCR noise from photos becomes claims, names and evidence.**~~ Fixed 29 Oct: proposals read by OCR from a page under 60% legible (`OCR_LEGIBILITY_FLOOR`) are held back from Decide and wait in the reading room, "Held back · hard to read", decidable by eye (`handlers.py` `hold_illegible`).
+11. ~~**94 "Source date" timeline events.**~~ Fixed 29 Oct: a source's own date is an event only on request ("Also show when each source was published or filed"; `include_source_dates`).
+12. ~~**Places have no events or precision.**~~ Fixed 29 Oct: a property's events reach the address it is linked to, and a place says how exact it is ("exact to the building", from its notes). Also fixed in the demo data: the two inference claims are leads, not Confirmed and Supported; the converted .docx keeps its converter's note in its properties, not its text (its SHA-256 updated in `more.json`); the duplicate lead became next actions on the two leads it repeated.
 
 Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 
 ## Found by the browser walkthrough (11 Oct) — not yet discussed with Ony
 - **P1:**
   - ~~The Decide filter chips only look at the first 200 items, so "Missing 176" shows nothing.~~ Checked 12 Oct: the server filters by kind before paging.
-  - On an API error, Decide shows "Failed to fetch" beside "Nothing waits for you".
-  - Decide's "Open the document" goes to Bring in › Search.
-  - The Home mini-network's nodes can't be clicked with the mouse (an SVG overlay sits on them).
-  - The Home year strip changes only its label.
-  - Loading a demo failed 4 times ("Could not refresh instance '<Evidence…>'") while another case was being read.
-  - A flag level reads "To be set by Ony".
-  - The graph's "Linked groups" layout freezes the page for about 20 s.
-  - The Chain of Custody drawer ignores Esc.
-  - The upload's "Document title" is never saved.
-  - Times disagree (UTC vs local) and date formats are mixed.
+  - ~~On an API error, Decide shows "Failed to fetch" beside "Nothing waits for you".~~ Checked in code 28 Oct: a list that did not load says so alone, with a retry (`decide-screen.tsx`, `decideUnreachable`).
+  - ~~Decide's "Open the document" goes to Bring in › Search.~~ Fixed earlier: it opens the reader at the evidence's page (MOCKUP_BUILD_LIST §6).
+  - ~~The Home mini-network's nodes can't be clicked with the mouse (an SVG overlay sits on them).~~ Checked 28 Oct in Chromium on the Vekselberg demo: a mouse click at a node's centre points at the party ("Pointing at Arinter Management, Inc., lights 2016–18 everywhere").
+  - ~~The Home year strip changes only its label.~~ Checked 28 Oct in Chromium: a year sets the case's "as of" year ("· as of 2021") and the page's parts change with it.
+  - ~~Loading a demo failed 4 times ("Could not refresh instance '<Evidence…>'") while another case was being read.~~ Checked 28 Oct: one demo builds at a time (a second is refused with a 409 naming the one loading, shown on the loader), a half-made case is removed, and reading runs as jobs after the build; two demos started together: one loaded, the other was refused and loaded when asked again; none was left half-made. Not tried: a demo build while a large case is being read.
+  - ~~A flag level reads "To be set by Ony".~~ Checked in code 28 Oct: shown as "not set", never guessed (`knowledge/families.ts`, `patterns/engine.py`).
+  - The graph's "Linked groups" layout freezes the page for about 20 s. Not re-checked 28 Oct (needs the 1MDB-sized case).
+  - ~~The Chain of Custody drawer ignores Esc.~~ Fixed 28 Oct (`case-workbench.tsx`; `tests/test-custody-drawer.test.tsx`).
+  - The upload's "Document title" is never saved. Checked 28 Oct: it is saved as the document's source title (`store_document`), which is what the custody chain, the evidence pack and Is it real? show; the document lists still show the file name.
+  - ~~Times disagree (UTC vs local)~~: every screen reads API times through `lib/timestamps.ts` (`tests/test-api-times-on-screen.test.tsx` holds it); date formats still differ between screens.
 - **Inert controls:**
-  - Timeline marks (hover only) and legend items do nothing.
-  - Chart-builder bars do nothing.
-  - Party chips inside a flag's detail do nothing.
+  - Timeline marks (hover only) and legend items do nothing. Left for the Timeline rebuild (TIME_1/TIME_2, waiting for approval).
+  - ~~Chart-builder bars do nothing.~~ Fixed 28 Oct: a bar, slice or point traces the first record behind its value (`pickedRow`, `chart-builder-panel.tsx`).
+  - ~~Party chips inside a flag's detail do nothing.~~ Fixed 28 Oct: a party named in the open flag's picture filters the list to its flags, and again shows all (`red-flags-board.tsx`).
 - **Material types:**
   - CSV and XLSX make no payments unless mapped.
   - MP3, WAV and MP4 give a 415, and the demo's .mp3/.mov show "failed · 0 chunks" with no reason. (28 Oct: recordings are accepted and transcribed on this computer, ADR-0020; a read without the model fetched fails saying what to run.)
   - A web link isn't fetched or archived, and "not a url" is accepted. (28 Oct: a link is captured: page, screenshot with clock, HAR and WARC with SHA-256, read as a document; ADR-0018, The Drop › Links & captures. A source's address is checked as a web address, `app/services/sources.py`.)
   - The watchlist "Check now" needs OpenAleph.
-  - There is no form for manual entities, relationships or events.
+  - ~~There is no form for manual entities, relationships or events.~~ Fixed 29 Oct: See › Add by hand (mockup ENTRY_1) writes a party, link or event as a sentence, with where it comes from required.
 - **Data quality and counts:**
   - The 1MDB queue has about 15,000 items.
-  - Deripaska proposes a railway (CSX) claim from the whole Federal Register issue.
-  - The Home counts and the Next-up counts disagree.
+  - ~~Deripaska proposes a railway (CSX) claim from the whole Federal Register issue.~~ Fixed 29 Oct: the pinned PDF (83 FR 19138-19140) starts with the end of an FRA notice about CSX and ends with the start of a Treasury meeting notice. The manifest now names the OFAC notice's first and last words (`part`), and proposals come only from between them; every page is still kept and searchable, and the PDF is unchanged (`own_part` in `app/services/documents.py`). A demo loaded before this keeps its old proposals; loading it again after removing it reads the notice only.
+  - ~~The Home counts and the Next-up counts disagree.~~ Checked 29 Oct in Chromium on the Vekselberg demo: "984 to decide" on the strip, "1 of 984" on Next up.
 - **Layout:**
-  - At phone width, Home and Decide overflow and Red Flags collapses.
-  - The Leads board pushes the tabs off-screen.
-  - Graph nodes are unreadable at the default zoom.
-  - The "If you answer" box is clipped.
-  - Hydration warnings appear on several screens.
+  - ~~At phone width, Home and Decide overflow and Red Flags collapses.~~ Fixed 29 Oct: their one-column layout used `1fr`, which never shrinks below its widest child; now `minmax(0, 1fr)` (`styles/case.css`). Checked in Chromium at 390 px: no screen scrolls sideways; Red Flags already stacked.
+  - The Leads board pushes the tabs off-screen. Not reproduced 29 Oct on a case with 2 leads (tabs stay at 1440 and 390 px); not tried on a case with many.
+  - ~~Graph nodes are unreadable at the default zoom.~~ Fixed 29 Oct: the relationship network opens no smaller than 85% (13 px names read at about 11 px; they were about 6 px on the Vekselberg demo), at the top of the chain when the drawing is taller than its box; Fit still shows all of it (`network-view.tsx`). Checked in Chromium.
+  - ~~The "If you answer" box is clipped.~~ No such box any more (29 Oct: the words are not in the code).
+  - ~~Hydration warnings appear on several screens.~~ Checked 29 Oct in Chromium: none on Home, Decide, Bring in, Check, See, Act or Keep, at 1440 and 390 px.
 - **Hard to reach:**
-  - There is no way to start a second case from the UI.
-  - Graph legend chips don't show whether they filter.
-  - Batch import drops the case name.
+  - ~~There is no way to start a second case from the UI.~~ Fixed earlier: "+ Start a new case" in the case menu (`app-frame.tsx`).
+  - ~~Graph legend chips don't show whether they filter.~~ Fixed 29 Oct: a filter chip that is on carries a ✓ and one that is off is struck through, not only faded (`globals.css` `.cf-chip`); checked in Chromium on See › Relationships.
+  - Batch import drops the case name. Not reproduced 29 Oct: a batch is labelled from its files; what "the case name" meant is in the walkthrough's notes, which were in that session only.
 - **Not tested** (not installed in the cloud): base map, OpenAleph, AI drafts.
 - Screenshots and scripts: `/tmp/claude-0/walk/` (cloud session only).
 
@@ -142,3 +391,13 @@ Both PDFs are on Ony's PC (Documents\Private-ai-design); Ony pasted the text of 
 - **Approved 12 Oct, ahead of the order:** The Wire (See) and closing the app-side suite gaps.
 - **Decisions still Ony's (§12 table):** product name; edge panels on dwell or click only; Next up order; whether Textbook/safety notices may interrupt; Rain Noir rain default and photo; outside lookups default (automatic vs ask first); the seven Supported rules, the written override and the IPCC grid; whether watchlist hits and AI drafts live in Decide; unset Faint/Strong levels ("not set" vs hidden, per-case thresholds); every area's glossary definition; dotted worked-out links and money checks as Red Flags; stories per case, default gates, signed packs; social posting; "Paper Trail" vs "Run record"; website licence, price, telemetry, photos; backup passphrase.
 - **ADRs needed before packages (§12):** motion library, command palette, Rain Noir effects port, local fonts, virtualised list, TipTap, PDF and share-card rendering, AI run event store, evidence anchors and check results; optional d3-sankey, timeline library, C2PA, headless browser.
+- He found the options pages sloppy and not inventive, and that UI should be simple. All three rebuilt (same links):
+  - Name tab (Name Tag Options): one simple design in the Wire's look, with motion values taken from his Framer
+    references (Nova Glow Navigation, Expanded Card). The tab grows out of the badge and shows the name preview and the
+    link count; hover grows the same tab into a small card (name; kind · where; "3 links · 2 not on the map") and
+    shows the ones not on the map as faint names under it; click recentres.
+  - How much is owned (Ownership Share): only on the line or its mark, never on the owned card. A a key whose blade is
+    as long as the share, B line weight in the register's steps, C four strands, D the rest peels away.
+  - Connections not on the map (Hidden Connections): A ports in the outline, B the stack behind it, C into the fog,
+    D a lens onto the rest. Waiting for his picks.
+
