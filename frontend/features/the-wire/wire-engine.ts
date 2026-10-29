@@ -362,7 +362,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     el('text', {class: 'card-t', x: tx, y: -4}, card);
     el('text', {class: 'card-s', x: tx, y: 14}, card);
     const beads = el('g', {}, card);
-    const flag = el('g', {transform: 'translate(90,-27)'}, card);
+    const flag = el('g', {transform: 'translate(90,-27)'}, card); // the card's top right corner; the tab stands above it
     g.appendChild(halo); // over the card, so its ring round the kind dot shows
     // Your tags: one arc per tag, sharing a ring outside the flag ring (shown while the Your tags layer is on). Each arc
     // is its swatch brightened, over a blurred copy that breathes, so the ring reads as giving off light.
@@ -411,18 +411,18 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const n = nOpen(f);
     if (!n) return;
     const lvl = f.textbook ? 'textbook' : f.strong ? 'strong' : 'faint';
-    // Level in bars and in its word, then the count (SEE_1 "▮▮▮ TEXTBOOK · 2"); right-aligned on the card's corner.
+    // Level in bars and in its word, then the count (SEE_1 "▮▮▮ TEXTBOOK · 2"), on a tab standing on the card's top
+    // edge near its right corner, like a folder's tab: wholly above the card, so it never covers the name.
     const word = `${lvl.toUpperCase()} · ${n}`;
-    const w = 30 + word.length * 6.4;
-    const r = el('rect', {x: -w, y: -9, width: w, height: 18, rx: 5}, g);
-    if (lvl === 'textbook') { r.setAttribute('fill', '#8E2420'); r.setAttribute('stroke', '#FF8070'); } else {
-      r.setAttribute('fill', '#1E3448'); r.setAttribute('stroke', lvl === 'strong' ? '#F6966A' : '#E9AFA8');
-      if (lvl === 'faint') r.setAttribute('stroke-dasharray', '2.5 2');
-    }
+    const w = 32 + word.length * 6.4, x1 = -12, x0 = x1 - w, top = -19;
+    const edge = lvl === 'textbook' ? '#FF8070' : lvl === 'strong' ? '#F6966A' : '#E9AFA8';
+    el('path', {d: `M${x0 - 4},0 Q${x0},0 ${x0},-4 V${top + 5} Q${x0},${top} ${x0 + 5},${top} H${x1 - 5} Q${x1},${top} ${x1},${top + 5} V-4 Q${x1},0 ${x1 + 4},0 Z`,
+      class: `flag-tab ${lvl}`, fill: lvl === 'textbook' ? '#8E2420' : lvl === 'strong' ? '#3b383e' : '#393c48', stroke: edge, 'stroke-width': 1.3,
+      'stroke-dasharray': lvl === 'faint' ? '2.5 2' : 'none'}, g);
     const bars = lvl === 'textbook' ? 3 : lvl === 'strong' ? 2 : 1;
-    for (let i = 0; i < 3; i++) el('rect', {x: -w + 6 + i * 4, y: 3 - (i + 1) * 3.2, width: 2.6, height: (i + 1) * 3.2 + 2,
-      fill: i < bars ? (lvl === 'textbook' ? '#ffe9e4' : lvl === 'strong' ? '#F6966A' : '#E9AFA8') : 'rgb(245 236 218 / .2)'}, g);
-    const t = el('text', {x: -6, y: 4, 'text-anchor': 'end', class: 'flag-n', fill: lvl === 'textbook' ? '#ffe9e4' : '#F5ECDA'}, g);
+    for (let i = 0; i < 3; i++) el('rect', {x: x0 + 8 + i * 4, y: -6 - (i + 1) * 3.2, width: 2.6, height: (i + 1) * 3.2 + 2,
+      fill: i < bars ? (lvl === 'textbook' ? '#ffe9e4' : edge) : 'rgb(245 236 218 / .2)'}, g);
+    const t = el('text', {x: x1 - 7, y: -5.5, 'text-anchor': 'end', class: 'flag-n', fill: lvl === 'textbook' ? '#ffe9e4' : '#F5ECDA'}, g);
     t.textContent = word;
     const ti = el('title', {}, g);
     ti.textContent = `${n} open Red Flag${n > 1 ? 's' : ''}, the strongest ${lvl}`;
@@ -721,7 +721,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const N = node[id];
       if (N.cur.v === 2 && !N.isChain && N.cur.o > 0.5) {
         const s = toScreen(P[id].x, P[id].y);
-        cardBoxes.push({x0: s.x - (94 + (-70 - N.dx) * 2) * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - 32 * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
+        cardBoxes.push({x0: s.x - (94 + (-70 - N.dx) * 2) * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - (nOpen(flagsOf(id)) ? 48 : 32) * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
       }
     }
     const rtBoxes: Box[] = [];
