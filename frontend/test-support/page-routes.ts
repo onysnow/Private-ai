@@ -404,7 +404,7 @@ export function emptyCaseHomeRoutes(investigationId: string): Record<string, unk
   return {
     [`GET ${base}/standing`]: {
       investigation_id: investigationId, claims: {total: 0, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, to_check: 0, missing: 0, to_decide: 0,
-      to_decide_by_kind: {}, money: {currency: null, amount: 0, payments: 0, from_sources: 0, other_currencies: []},
+      to_decide_by_kind: {}, money: {currency: null, amount: 0, payments: 0, starting_payers: 0, others: []},
       timeline: {events: 0, from: null, to: null, years: []}, documents: {total: 0, unread: 0, failed: 0}, sources: 0, evidence: 0,
       network: {parties: 0, links: 0}, flags: {open: 0, textbook: 0, strong: 0, faint: 0}, leads: {open: 0}, watchlist: {names: 0, new_hits: 0},
     },
