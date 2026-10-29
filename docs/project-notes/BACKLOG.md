@@ -164,7 +164,13 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
 - Line thicknesses are inconsistent (about twelve values). Proposed: hairline 1 (leaders, tethers), regular 1.5 (every
   outline, non-money lines, threads, icons drawn to 1.5 on screen), strong 2.5 (centre party, the share ring, a hovered
   flag thread); money lines keep scaling with the amount. Waiting for his yes.
-- He asked for redesign options for how much is owned, and better options for the dot's name tab (to the research).
+- Redesign options for how much is owned (artifact Ownership Share): A thickness in the register's steps, B a small bar
+  on the line, C the line fills to the share, D ticks for the bands, E who owns the rest on hover (adds to any). And
+  five new name tabs for a dot, to the research (artifact Name Tag Options): A a tab that unfolds, B split-flap
+  letters, C typed in, D a folded corner, E squeezed and out of focus. Waiting for his picks.
+- Smaller fixes in the shapes preview: the vessel dot badge 4 wider on the right so the ship has even space all round;
+  the red-flag count reacts only when the count itself is hovered, not the whole chip; the red-flag box's words are
+  clipped to the box as it grows; the solid building's windows rest in the dark purple and still light up.
 - Research before designing more: how 2026 UI hints at more information, and how ownership share is shown (the
   key-and-ring share mark is not good). Findings to discuss with him before any redesign.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
