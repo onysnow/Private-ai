@@ -109,7 +109,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 - **Layout:**
   - ~~At phone width, Home and Decide overflow and Red Flags collapses.~~ Fixed 29 Oct: their one-column layout used `1fr`, which never shrinks below its widest child; now `minmax(0, 1fr)` (`styles/case.css`). Checked in Chromium at 390 px: no screen scrolls sideways; Red Flags already stacked.
   - The Leads board pushes the tabs off-screen. Not reproduced 29 Oct on a case with 2 leads (tabs stay at 1440 and 390 px); not tried on a case with many.
-  - Graph nodes are unreadable at the default zoom.
+  - ~~Graph nodes are unreadable at the default zoom.~~ Fixed 29 Oct: the relationship network opens no smaller than 85% (13 px names read at about 11 px; they were about 6 px on the Vekselberg demo), at the top of the chain when the drawing is taller than its box; Fit still shows all of it (`network-view.tsx`). Checked in Chromium.
   - ~~The "If you answer" box is clipped.~~ No such box any more (29 Oct: the words are not in the code).
   - ~~Hydration warnings appear on several screens.~~ Checked 29 Oct in Chromium: none on Home, Decide, Bring in, Check, See, Act or Keep, at 1440 and 390 px.
 - **Hard to reach:**
