@@ -147,6 +147,8 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   is built, and propose them.
 - No dashed line stands still. Every dashed or dotted line moves (marches along its direction), or isn't dashed.
   Done in the three Wire previews: unconfirmed links, the unknown-share ring and the flag pennants' tethers now march.
+- Hovering "+N": the branching preview paths start from the "+N" circle itself, not from the card it hangs off, and
+  keep clear of the way the chip opens (leftwards). Done in the shapes preview.
 - Research before designing more: how 2026 UI hints at more information, and how ownership share is shown (the
   key-and-ring share mark is not good). Findings to discuss with him before any redesign.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
