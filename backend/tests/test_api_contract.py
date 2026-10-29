@@ -567,6 +567,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             ("GET", "/api/extraction-candidates/{candidate_id}/identifier-targets"): {"candidate_id": identifier},
             ("GET", "/api/documents/{document_id}/email"): {"document_id": email},
             ("GET", "/api/documents/{document_id}/picture"): {"document_id": picture["id"]},
+            ("GET", "/api/documents/{document_id}/photo"): {"document_id": picture["id"]},
             ("GET", "/api/documents/{document_id}/media"): {"document_id": recording["id"]},
             ("GET", "/api/documents/{document_id}/transcript"): {"document_id": recording["id"]},
             **{(method, path): {"document_id": recording["id"]} for method, path in (

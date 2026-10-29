@@ -118,3 +118,24 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
 - **Where:** `app/services/timeline_lanes.py`, `app/services/sequence_rules.py`, `timeline_periods` table,
   `/investigations/{id}/timeline/lanes` and `/timeline/periods`, `features/timeline/lanes.tsx`, `lane-detail.tsx`,
   `lanes-model.ts`.
+
+## 7. Media tools: the nine open questions (29 Oct)
+
+- **Questions (media-mockups README):** faces; GPS as a place; a name; model downloads; C2PA on exports; cleaning up
+  derived files; a reason for each redaction; signing PDFs; PdfCraft's OCR.
+- **Calls:**
+  1. Faces: a detector only finds boxes; nothing names or matches a face, and there is no "same person" grouping.
+     "Blur faces for export" is offered first on a photo with faces, and a shared copy blurs them unless a person
+     unticks it; the original is never touched.
+  2. GPS in a photo becomes a place proposed in Decide (built with Places).
+  3. No name: the tools sit on each file's own page (a photo's Picture, a recording's Listen, a PDF's Redact).
+  4. Each model is fetched the first time it is needed, saying its size first, pinned to its SHA-256 and written to
+     the outbound log; nothing is fetched at first run. (The voices models keep their setup command as well.)
+  5. No C2PA for now: it needs a signing certificate the app does not have. A copy's edit trail is exported as a
+     custody manifest beside it, and evidence packs are signed (entry 3).
+  6. Derived files are never deleted automatically. A person can delete a copy that nothing uses; the original stays.
+  7. A redaction needs a reason, kept in the trail ("phone number of a private person").
+  8. No signing inside PDFs for now (it needs a certificate); a pack's signature covers what is sent.
+  9. PdfCraft's OCR stays off until tried on a real computer; the app's own OCR reads PDFs as now.
+- **Why:** each call keeps the original untouchable and keeps the machine to proposals, as the research asks
+  (media research §4.5, §6), and adds nothing that would make the app send or sign on a person's behalf unasked.

@@ -5225,6 +5225,49 @@ class TranscriptCompareRowOut(ResponseModel):
     differs: int
 
 
+class FaceBoxOut(ResponseModel):
+    """Where the detector finds a face, as fractions of the picture, with its score. Never who."""
+    x: float
+    y: float
+    w: float
+    h: float
+    score: float
+
+
+class FacesOut(ResponseModel):
+    faces: list[FaceBoxOut]
+    model: str
+    model_sha256: str
+
+
+class NearestPlaceOut(ResponseModel):
+    metres: int
+    entity_id: str
+    caption: str
+
+
+class PlaceProposalOut(ResponseModel):
+    id: str
+    status: str
+
+
+class PhotoOut(ResponseModel):
+    """A photo as the Picture screen shows it: what the file claims about itself, how far its GPS is from the case's
+    nearest place, and the machine's proposals."""
+    document_id: str
+    filename: str
+    sha256: str
+    kind: str
+    width: int | None = None
+    height: int | None = None
+    date_tag: str | None = None
+    claims: dict[str, Any]
+    nearest_place: NearestPlaceOut | None = None
+    place_proposal: PlaceProposalOut | None = None
+    text: list[str]
+    face_model_here: bool
+
+
 class DerivedFileOut(ResponseModel):
     """A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
     `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when."""

@@ -41,6 +41,7 @@ import {isPicture as isPictureFile} from '../documents/picture-evidence';
 import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/entity-identity';
 import {proposerName} from './proposers';
 import {ListenRoom, isRecording} from './listen-room';
+import {PhotoRoom} from './photo-room';
 
 type Tab = 'text' | 'original' | 'translation' | 'details';
 type Span = {start: number; end: number; id: string; kind: string; status: string; primary: boolean};
@@ -860,6 +861,9 @@ export function ReadingRoom({investigationId}: {investigationId: string}): React
 function Opened({investigationId, documentId, startPage, onClose}: {investigationId: string; documentId: string; startPage: number | null; onClose: () => void}): ReactElement {
   const doc = useQuery({...getDocumentOptions({path: {document_id: documentId}})}).data;
   const caseName = useQuery({...listInvestigationsOptions()}).data?.find(i => i.id === investigationId)?.name ?? 'Case';
+  const [asText, setAsText] = useState(false);
   if (doc && isRecording(doc)) return <ListenRoom doc={doc} caseName={caseName} decideHref={caseHref('/decide?kind=proposal', investigationId)} onClose={onClose}/>;
+  // A photo opens on its Picture (mockup MEDIA_1); "Text in it" reads it here as any document.
+  if (doc && isPicture(doc) && !asText) return <PhotoRoom doc={doc} caseName={caseName} onClose={onClose} onText={() => setAsText(true)}/>;
   return <Room investigationId={investigationId} documentId={documentId} startPage={startPage} onClose={onClose}/>;
 }

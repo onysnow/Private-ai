@@ -114,6 +114,7 @@ import {
   findExtractionLineageEndpoint,
   findingCandidates,
   findOpenalephChildren,
+  findPhotoFaces,
   findVoices,
   followCapture,
   get1Mdb,
@@ -184,6 +185,7 @@ import {
   getOrphanStoragePreview,
   getOwnershipChain,
   getPartyYears,
+  getPhoto,
   getPlatformChecks,
   getRecordMarks,
   getRecordProvenanceTrace,
@@ -292,6 +294,7 @@ import {
   makeLeadFromHit,
   makeLeadFromNote,
   makeLeadFromRedFlag,
+  makePhotoCopy,
   markAiRunThought,
   markCaptureChanged,
   markRedFlagInnocent,
@@ -723,6 +726,9 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenError,
   FindOpenalephChildrenResponse,
+  FindPhotoFacesData,
+  FindPhotoFacesError,
+  FindPhotoFacesResponse,
   FindVoicesData,
   FindVoicesError,
   FindVoicesResponse,
@@ -932,6 +938,9 @@ import type {
   GetPartyYearsData,
   GetPartyYearsError,
   GetPartyYearsResponse,
+  GetPhotoData,
+  GetPhotoError,
+  GetPhotoResponse,
   GetPlatformChecksData,
   GetPlatformChecksError,
   GetPlatformChecksResponse,
@@ -1256,6 +1265,9 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagError,
   MakeLeadFromRedFlagResponse,
+  MakePhotoCopyData,
+  MakePhotoCopyError,
+  MakePhotoCopyResponse,
   MarkAiRunThoughtData,
   MarkAiRunThoughtError,
   MarkAiRunThoughtResponse,
@@ -4457,6 +4469,36 @@ export const makeClipMutation = (
   return mutationOptions;
 };
 
+/**
+ * Make Photo Copy
+ *
+ * A copy of the photo with faces blurred, metadata removed, cropped, an area redacted (with its reason) or turned,
+ * made from the photo as shown or from another copy. The photo itself is never written.
+ */
+export const makePhotoCopyMutation = (
+  options?: Partial<Options<MakePhotoCopyData>>,
+): UseMutationOptions<
+  MakePhotoCopyResponse,
+  MakePhotoCopyError,
+  Options<MakePhotoCopyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    MakePhotoCopyResponse,
+    MakePhotoCopyError,
+    Options<MakePhotoCopyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await makePhotoCopy({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getDocumentEmailQueryKey = (
   options: Options<GetDocumentEmailData>,
 ) => createQueryKey('getDocumentEmail', options);
@@ -4488,6 +4530,36 @@ export const getDocumentEmailOptions = (
     },
     queryKey: getDocumentEmailQueryKey(options),
   });
+
+/**
+ * Find Photo Faces
+ *
+ * Where a detector finds faces in the photo as shown. Nothing names, matches or groups a face. The detector's
+ * model (232 KB) is fetched the first time, pinned and written to the outbound log.
+ */
+export const findPhotoFacesMutation = (
+  options?: Partial<Options<FindPhotoFacesData>>,
+): UseMutationOptions<
+  FindPhotoFacesResponse,
+  FindPhotoFacesError,
+  Options<FindPhotoFacesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FindPhotoFacesResponse,
+    FindPhotoFacesError,
+    Options<FindPhotoFacesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await findPhotoFaces({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getDocumentMediaQueryKey = (
   options: Options<GetDocumentMediaData>,
@@ -4670,6 +4742,33 @@ export const getDocumentPageImageInfiniteOptions = (
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const getPhotoQueryKey = (options: Options<GetPhotoData>) =>
+  createQueryKey('getPhoto', options);
+
+/**
+ * Get Photo
+ *
+ * What the photo claims about itself and what the machine proposes about it (mockup MEDIA_1).
+ */
+export const getPhotoOptions = (options: Options<GetPhotoData>) =>
+  queryOptions<
+    GetPhotoResponse,
+    GetPhotoError,
+    GetPhotoResponse,
+    ReturnType<typeof getPhotoQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPhoto({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPhotoQueryKey(options),
+  });
 
 export const getDocumentPictureQueryKey = (
   options: Options<GetDocumentPictureData>,

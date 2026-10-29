@@ -110,6 +110,13 @@ def stored_picture(storage_path: str, storage_root: Path) -> tuple[bytes, Pictur
     return data, picture_of(data)
 
 
+def is_picture_name(document: Document) -> bool:
+    """Whether a document is a picture the photo tools work on: a PNG or JPEG, or a HEIC or RAW photo."""
+    from app.services.photos import is_photo
+
+    return Path(document.filename or "").suffix.lower() in IMAGE_EXTENSIONS or is_photo(document.filename)
+
+
 def shown_path(db: Session, document: Document) -> str:
     """The file the app shows for a picture document: for a HEIC or RAW photo, its viewable copy (a derived file,
     app/services/photos.py) once the reading job has made it; for any other document, its own file."""

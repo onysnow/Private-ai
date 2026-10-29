@@ -11176,6 +11176,52 @@ export type ExtractionReviewOut = {
 };
 
 /**
+ * FaceBoxOut
+ *
+ * Where the detector finds a face, as fractions of the picture, with its score. Never who.
+ */
+export type FaceBoxOut = {
+  /**
+   * H
+   */
+  h: number;
+  /**
+   * Score
+   */
+  score: number;
+  /**
+   * W
+   */
+  w: number;
+  /**
+   * X
+   */
+  x: number;
+  /**
+   * Y
+   */
+  y: number;
+};
+
+/**
+ * FacesOut
+ */
+export type FacesOut = {
+  /**
+   * Faces
+   */
+  faces: Array<FaceBoxOut>;
+  /**
+   * Model
+   */
+  model: string;
+  /**
+   * Model Sha256
+   */
+  model_sha256: string;
+};
+
+/**
  * FactWatchCreate
  */
 export type FactWatchCreate = {
@@ -14525,6 +14571,24 @@ export type NameIn = {
 };
 
 /**
+ * NearestPlaceOut
+ */
+export type NearestPlaceOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Entity Id
+   */
+  entity_id: string;
+  /**
+   * Metres
+   */
+  metres: number;
+};
+
+/**
  * NewParty
  */
 export type NewParty = {
@@ -15986,6 +16050,83 @@ export type PeekOut = {
 };
 
 /**
+ * PhotoCopyIn
+ *
+ * A copy of a photo (Picture › Make a copy): which tool, its settings, and the copy it is made from (else the photo
+ * as shown). blur_faces {radius, boxes?}; strip_metadata {}; crop {box}; redact {box, reason}; turn {degrees}.
+ * A box is x, y, w, h as fractions of the picture.
+ */
+export type PhotoCopyIn = {
+  /**
+   * From Id
+   */
+  from_id?: string | null;
+  /**
+   * Operation
+   */
+  operation: 'blur_faces' | 'strip_metadata' | 'crop' | 'redact' | 'turn';
+  /**
+   * Params
+   */
+  params?: {
+    [key: string]: unknown;
+  };
+};
+
+/**
+ * PhotoOut
+ *
+ * A photo as the Picture screen shows it: what the file claims about itself, how far its GPS is from the case's
+ * nearest place, and the machine's proposals.
+ */
+export type PhotoOut = {
+  /**
+   * Claims
+   */
+  claims: {
+    [key: string]: unknown;
+  };
+  /**
+   * Date Tag
+   */
+  date_tag?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Face Model Here
+   */
+  face_model_here: boolean;
+  /**
+   * Filename
+   */
+  filename: string;
+  /**
+   * Height
+   */
+  height?: number | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  nearest_place?: NearestPlaceOut | null;
+  place_proposal?: PlaceProposalOut | null;
+  /**
+   * Sha256
+   */
+  sha256: string;
+  /**
+   * Text
+   */
+  text: Array<string>;
+  /**
+   * Width
+   */
+  width?: number | null;
+};
+
+/**
  * PinIn
  */
 export type PinIn = {
@@ -16148,6 +16289,20 @@ export type PlaceOut = {
    * Sure
    */
   sure?: 'document' | 'approximate' | 'not_yet';
+};
+
+/**
+ * PlaceProposalOut
+ */
+export type PlaceProposalOut = {
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Status
+   */
+  status: string;
 };
 
 /**
@@ -27389,6 +27544,55 @@ export type MakeClipResponses = {
 
 export type MakeClipResponse = MakeClipResponses[keyof MakeClipResponses];
 
+export type MakePhotoCopyData = {
+  body: PhotoCopyIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/derived/photo';
+};
+
+export type MakePhotoCopyErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Make Photo Copy
+   *
+   * The copy cannot be made as asked, said why
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type MakePhotoCopyError = MakePhotoCopyErrors[keyof MakePhotoCopyErrors];
+
+export type MakePhotoCopyResponses = {
+  /**
+   * Successful Response
+   */
+  201: DerivedFileOut;
+};
+
+export type MakePhotoCopyResponse =
+  MakePhotoCopyResponses[keyof MakePhotoCopyResponses];
+
 export type GetDocumentEmailData = {
   body?: never;
   path: {
@@ -27424,6 +27628,54 @@ export type GetDocumentEmailResponses = {
 
 export type GetDocumentEmailResponse =
   GetDocumentEmailResponses[keyof GetDocumentEmailResponses];
+
+export type FindPhotoFacesData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/faces';
+};
+
+export type FindPhotoFacesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorOut;
+  /**
+   * The native module is not installed on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FindPhotoFacesError =
+  FindPhotoFacesErrors[keyof FindPhotoFacesErrors];
+
+export type FindPhotoFacesResponses = {
+  /**
+   * Successful Response
+   */
+  200: FacesOut;
+};
+
+export type FindPhotoFacesResponse =
+  FindPhotoFacesResponses[keyof FindPhotoFacesResponses];
 
 export type GetDocumentMediaData = {
   body?: never;
@@ -27593,6 +27845,48 @@ export type GetDocumentPageImageResponses = {
 
 export type GetDocumentPageImageResponse =
   GetDocumentPageImageResponses[keyof GetDocumentPageImageResponses];
+
+export type GetPhotoData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/photo';
+};
+
+export type GetPhotoErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetPhotoError = GetPhotoErrors[keyof GetPhotoErrors];
+
+export type GetPhotoResponses = {
+  /**
+   * Successful Response
+   */
+  200: PhotoOut;
+};
+
+export type GetPhotoResponse = GetPhotoResponses[keyof GetPhotoResponses];
 
 export type GetDocumentPictureData = {
   body?: never;

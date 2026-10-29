@@ -23697,6 +23697,66 @@
         "title": "ExtractionReviewOut",
         "type": "object"
       },
+      "FaceBoxOut": {
+        "description": "Where the detector finds a face, as fractions of the picture, with its score. Never who.",
+        "properties": {
+          "h": {
+            "title": "H",
+            "type": "number"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "w": {
+            "title": "W",
+            "type": "number"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "w",
+          "h",
+          "score"
+        ],
+        "title": "FaceBoxOut",
+        "type": "object"
+      },
+      "FacesOut": {
+        "properties": {
+          "faces": {
+            "items": {
+              "$ref": "#/components/schemas/FaceBoxOut"
+            },
+            "title": "Faces",
+            "type": "array"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "model_sha256": {
+            "title": "Model Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "faces",
+          "model",
+          "model_sha256"
+        ],
+        "title": "FacesOut",
+        "type": "object"
+      },
       "FactWatchCreate": {
         "properties": {
           "record_id": {
@@ -29486,6 +29546,29 @@
         "title": "NameIn",
         "type": "object"
       },
+      "NearestPlaceOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "metres": {
+            "title": "Metres",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "metres",
+          "entity_id",
+          "caption"
+        ],
+        "title": "NearestPlaceOut",
+        "type": "object"
+      },
       "NewParty": {
         "properties": {
           "aliases": {
@@ -31817,6 +31900,144 @@
         "title": "PeekOut",
         "type": "object"
       },
+      "PhotoCopyIn": {
+        "description": "A copy of a photo (Picture › Make a copy): which tool, its settings, and the copy it is made from (else the photo\nas shown). blur_faces {radius, boxes?}; strip_metadata {}; crop {box}; redact {box, reason}; turn {degrees}.\nA box is x, y, w, h as fractions of the picture.",
+        "properties": {
+          "from_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Id"
+          },
+          "operation": {
+            "enum": [
+              "blur_faces",
+              "strip_metadata",
+              "crop",
+              "redact",
+              "turn"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          }
+        },
+        "required": [
+          "operation"
+        ],
+        "title": "PhotoCopyIn",
+        "type": "object"
+      },
+      "PhotoOut": {
+        "description": "A photo as the Picture screen shows it: what the file claims about itself, how far its GPS is from the case's\nnearest place, and the machine's proposals.",
+        "properties": {
+          "claims": {
+            "additionalProperties": true,
+            "title": "Claims",
+            "type": "object"
+          },
+          "date_tag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Tag"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "face_model_here": {
+            "title": "Face Model Here",
+            "type": "boolean"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "nearest_place": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NearestPlaceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "place_proposal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlaceProposalOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "text": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Text",
+            "type": "array"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          }
+        },
+        "required": [
+          "document_id",
+          "filename",
+          "sha256",
+          "kind",
+          "claims",
+          "text",
+          "face_model_here"
+        ],
+        "title": "PhotoOut",
+        "type": "object"
+      },
       "PinIn": {
         "properties": {
           "pin": {
@@ -32071,6 +32292,24 @@
           "links"
         ],
         "title": "PlaceOut",
+        "type": "object"
+      },
+      "PlaceProposalOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "PlaceProposalOut",
         "type": "object"
       },
       "PlacesOut": {
@@ -57994,6 +58233,104 @@
         "summary": "Make Clip"
       }
     },
+    "/api/documents/{document_id}/derived/photo": {
+      "post": {
+        "description": "A copy of the photo with faces blurred, metadata removed, cropped, an area redacted (with its reason) or turned,\nmade from the photo as shown or from another copy. The photo itself is never written.",
+        "operationId": "make_photo_copy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhotoCopyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DerivedFileOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Make Photo Copy"
+                }
+              }
+            },
+            "description": "The copy cannot be made as asked, said why"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The native module is not installed on this computer"
+          }
+        },
+        "summary": "Make Photo Copy"
+      }
+    },
     "/api/documents/{document_id}/email": {
       "get": {
         "description": "An email document's headers (as OpenAleph read them) and its thread\nfrom OpenAleph, each message linked to its Workbench document when the\nWorkbench holds it. 404 for a document that is not an email.",
@@ -58042,6 +58379,86 @@
           }
         },
         "summary": "Get Document Email"
+      }
+    },
+    "/api/documents/{document_id}/faces": {
+      "post": {
+        "description": "Where a detector finds faces in the photo as shown. Nothing names, matches or groups a face. The detector's\nmodel (232 KB) is fetched the first time, pinned and written to the outbound log.",
+        "operationId": "find_photo_faces",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The native module is not installed on this computer"
+          }
+        },
+        "summary": "Find Photo Faces"
       }
     },
     "/api/documents/{document_id}/media": {
@@ -58304,6 +58721,76 @@
           }
         },
         "summary": "Get Document Page Image"
+      }
+    },
+    "/api/documents/{document_id}/photo": {
+      "get": {
+        "description": "What the photo claims about itself and what the machine proposes about it (mockup MEDIA_1).",
+        "operationId": "get_photo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Photo"
       }
     },
     "/api/documents/{document_id}/picture": {

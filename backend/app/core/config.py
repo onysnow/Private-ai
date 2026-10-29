@@ -91,6 +91,8 @@ class Settings(BaseSettings):
     transcription_language: str = ""
     # Where the voice models are kept (ADR-0026; python -m app.services.voices fetch).
     voices_model_dir: str = "./data/models/voices"
+    # Where the face detector's model is kept (fetched the first time faces are looked for; DECISIONS_LOG 7, call 4).
+    faces_model_dir: str = "./data/models/faces"
     enable_pdf_ocr: bool = True
     pdf_ocr_language: str = "eng"
     pdf_ocr_dpi: int = 200

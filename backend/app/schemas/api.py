@@ -1018,3 +1018,12 @@ class TimelineBoardIn(BaseModel):
     style: Literal["rich", "clean"] = "rich"
     positions: dict[str, dict[str, tuple[float, float]]] = Field(default_factory=dict)
     notes: list[BoardNoteIn] = Field(default_factory=list, max_length=200)
+
+
+class PhotoCopyIn(BaseModel):
+    """A copy of a photo (Picture › Make a copy): which tool, its settings, and the copy it is made from (else the photo
+    as shown). blur_faces {radius, boxes?}; strip_metadata {}; crop {box}; redact {box, reason}; turn {degrees}.
+    A box is x, y, w, h as fractions of the picture."""
+    operation: Literal["blur_faces", "strip_metadata", "crop", "redact", "turn"]
+    params: dict[str, Any] = Field(default_factory=dict)
+    from_id: str | None = None

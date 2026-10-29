@@ -4529,6 +4529,28 @@ export const zExtractionReviewOut = z.object({
 });
 
 /**
+ * FaceBoxOut
+ *
+ * Where the detector finds a face, as fractions of the picture, with its score. Never who.
+ */
+export const zFaceBoxOut = z.object({
+  h: z.number(),
+  score: z.number(),
+  w: z.number(),
+  x: z.number(),
+  y: z.number(),
+});
+
+/**
+ * FacesOut
+ */
+export const zFacesOut = z.object({
+  faces: z.array(zFaceBoxOut),
+  model: z.string(),
+  model_sha256: z.string(),
+});
+
+/**
  * FactWatchCreate
  */
 export const zFactWatchCreate = z.object({
@@ -6048,6 +6070,15 @@ export const zNameIn = z.object({
 });
 
 /**
+ * NearestPlaceOut
+ */
+export const zNearestPlaceOut = z.object({
+  caption: z.string(),
+  entity_id: z.string(),
+  metres: z.int(),
+});
+
+/**
  * NewParty
  */
 export const zNewParty = z.object({
@@ -6830,6 +6861,19 @@ export const zPeekOut = z.object({
 });
 
 /**
+ * PhotoCopyIn
+ *
+ * A copy of a photo (Picture › Make a copy): which tool, its settings, and the copy it is made from (else the photo
+ * as shown). blur_faces {radius, boxes?}; strip_metadata {}; crop {box}; redact {box, reason}; turn {degrees}.
+ * A box is x, y, w, h as fractions of the picture.
+ */
+export const zPhotoCopyIn = z.object({
+  from_id: z.string().nullish(),
+  operation: z.enum(['blur_faces', 'strip_metadata', 'crop', 'redact', 'turn']),
+  params: z.record(z.string(), z.unknown()).optional(),
+});
+
+/**
  * PinIn
  */
 export const zPinIn = z.object({
@@ -6902,6 +6946,35 @@ export const zPlaceOut = z.object({
     .enum(['document', 'approximate', 'not_yet'])
     .optional()
     .default('not_yet'),
+});
+
+/**
+ * PlaceProposalOut
+ */
+export const zPlaceProposalOut = z.object({
+  id: z.string(),
+  status: z.string(),
+});
+
+/**
+ * PhotoOut
+ *
+ * A photo as the Picture screen shows it: what the file claims about itself, how far its GPS is from the case's
+ * nearest place, and the machine's proposals.
+ */
+export const zPhotoOut = z.object({
+  claims: z.record(z.string(), z.unknown()),
+  date_tag: z.string().nullish(),
+  document_id: z.string(),
+  face_model_here: z.boolean(),
+  filename: z.string(),
+  height: z.int().nullish(),
+  kind: z.string(),
+  nearest_place: zNearestPlaceOut.nullish(),
+  place_proposal: zPlaceProposalOut.nullish(),
+  sha256: z.string(),
+  text: z.array(z.string()),
+  width: z.int().nullish(),
 });
 
 /**
@@ -12205,6 +12278,17 @@ export const zMakeClipPath = z.object({
  */
 export const zMakeClipResponse = zDerivedFileOut;
 
+export const zMakePhotoCopyBody = zPhotoCopyIn;
+
+export const zMakePhotoCopyPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zMakePhotoCopyResponse = zDerivedFileOut;
+
 export const zGetDocumentEmailPath = z.object({
   document_id: z.string(),
 });
@@ -12213,6 +12297,15 @@ export const zGetDocumentEmailPath = z.object({
  * Successful Response
  */
 export const zGetDocumentEmailResponse = zDocumentEmailOut;
+
+export const zFindPhotoFacesPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFindPhotoFacesResponse = zFacesOut;
 
 export const zGetDocumentMediaPath = z.object({
   document_id: z.string(),
@@ -12256,6 +12349,15 @@ export const zGetDocumentPageImageQuery = z.object({
  * One page of the document drawn as a picture, the passage marked
  */
 export const zGetDocumentPageImageResponse = z.string();
+
+export const zGetPhotoPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetPhotoResponse = zPhotoOut;
 
 export const zGetDocumentPicturePath = z.object({
   document_id: z.string(),

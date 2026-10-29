@@ -15,11 +15,13 @@ from app.db.session import get_db
 from app.core.authorization import scope_for_request
 from app.models.derived import DerivedFile
 from app.models.domain import Document, DocumentMedia, TranscriptSegment
-from app.schemas.api import ClipCreate, VoiceName
+from app.schemas.api import ClipCreate, PhotoCopyIn, VoiceName
 from app.schemas.responses import (
     BackgroundJobOut,
     DerivedFileOut,
     ErrorOut,
+    FacesOut,
+    PhotoOut,
     TranscriptCompareRowOut,
     TranscriptOut,
     ValidationErrorOut,
@@ -200,3 +202,64 @@ def get_derived_file(derived_file_id: str, db: Session = Depends(get_db)) -> Any
     return FileResponse(path, media_type=row.mime_type, filename=path.name.split("_", 1)[-1], content_disposition_type="inline",
                         headers={"X-Content-SHA256": row.sha256, "X-Content-Type-Options": "nosniff",
                                  "Content-Security-Policy": "default-src 'none'"})
+
+
+def _picture_document(db: Session, document_id: str) -> Document:
+    from app.services.image_reader import is_picture_name
+
+    row = db.get(Document, document_id)
+    if row is None:
+        raise HTTPException(404, "Document not found")
+    if not is_picture_name(row):
+        raise HTTPException(415, "This document is not a photo or a picture")
+    return row
+
+
+@router.get("/documents/{document_id}/photo", response_model=PhotoOut, responses={404: {"model": ErrorOut}, 415: {"model": ErrorOut}})
+def get_photo(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """What the photo claims about itself and what the machine proposes about it (mockup MEDIA_1)."""
+    from app.services import photo_tools
+
+    return photo_tools.photo_view(db, _picture_document(db, document_id))
+
+
+@router.post("/documents/{document_id}/faces", response_model=FacesOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ErrorOut},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def find_photo_faces(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Where a detector finds faces in the photo as shown. Nothing names, matches or groups a face. The detector's
+    model (232 KB) is fetched the first time, pinned and written to the outbound log."""
+    from app.services import photo_tools
+
+    row = _picture_document(db, document_id)
+    try:
+        faces = photo_tools.find_faces(photo_tools.base_bytes(db, row, None))
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except photo_tools.ToolRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return {"faces": faces, "model": photo_tools.FACE_MODEL_NAME, "model_sha256": photo_tools.FACE_MODEL[2]}
+
+
+@router.post("/documents/{document_id}/derived/photo", response_model=DerivedFileOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The copy cannot be made as asked, said why"},
+    503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
+def make_photo_copy(document_id: str, body: PhotoCopyIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """A copy of the photo with faces blurred, metadata removed, cropped, an area redacted (with its reason) or turned,
+    made from the photo as shown or from another copy. The photo itself is never written."""
+    from app.services import photo_tools
+
+    row = _picture_document(db, document_id)
+    parent = db.get(DerivedFile, body.from_id) if body.from_id else None
+    if body.from_id and parent is None:
+        raise HTTPException(404, "No such copy")
+    try:
+        return derived_files.serialize(photo_tools.make_copy(db, row, body.operation, body.params, parent=parent,
+                                                             actor=scope_for_request(request).actor_id))
+    except photo_tools.ToolRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except CaseGone as exc:
+        raise HTTPException(404, str(exc)) from exc

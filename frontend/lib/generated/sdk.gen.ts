@@ -327,6 +327,9 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenErrors,
   FindOpenalephChildrenResponses,
+  FindPhotoFacesData,
+  FindPhotoFacesErrors,
+  FindPhotoFacesResponses,
   FindVoicesData,
   FindVoicesErrors,
   FindVoicesResponses,
@@ -537,6 +540,9 @@ import type {
   GetPartyYearsData,
   GetPartyYearsErrors,
   GetPartyYearsResponses,
+  GetPhotoData,
+  GetPhotoErrors,
+  GetPhotoResponses,
   GetPlatformChecksData,
   GetPlatformChecksErrors,
   GetPlatformChecksResponses,
@@ -861,6 +867,9 @@ import type {
   MakeLeadFromRedFlagData,
   MakeLeadFromRedFlagErrors,
   MakeLeadFromRedFlagResponses,
+  MakePhotoCopyData,
+  MakePhotoCopyErrors,
+  MakePhotoCopyResponses,
   MarkAiRunThoughtData,
   MarkAiRunThoughtErrors,
   MarkAiRunThoughtResponses,
@@ -1451,6 +1460,8 @@ import {
   zFindingCandidatesResponse,
   zFindOpenalephChildrenPath,
   zFindOpenalephChildrenResponse,
+  zFindPhotoFacesPath,
+  zFindPhotoFacesResponse,
   zFindVoicesPath,
   zFindVoicesResponse,
   zFollowCaptureBody,
@@ -1591,6 +1602,8 @@ import {
   zGetOwnershipChainResponse,
   zGetPartyYearsPath,
   zGetPartyYearsResponse,
+  zGetPhotoPath,
+  zGetPhotoResponse,
   zGetPlatformChecksResponse,
   zGetRecordMarksPath,
   zGetRecordMarksQuery,
@@ -1833,6 +1846,9 @@ import {
   zMakeLeadFromNoteResponse,
   zMakeLeadFromRedFlagPath,
   zMakeLeadFromRedFlagResponse,
+  zMakePhotoCopyBody,
+  zMakePhotoCopyPath,
+  zMakePhotoCopyResponse,
   zMarkAiRunThoughtBody,
   zMarkAiRunThoughtPath,
   zMarkAiRunThoughtResponse,
@@ -5040,6 +5056,38 @@ export const makeClip = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Make Photo Copy
+ *
+ * A copy of the photo with faces blurred, metadata removed, cropped, an area redacted (with its reason) or turned,
+ * made from the photo as shown or from another copy. The photo itself is never written.
+ */
+export const makePhotoCopy = <ThrowOnError extends boolean = false>(
+  options: Options<MakePhotoCopyData, ThrowOnError>,
+): RequestResult<MakePhotoCopyResponses, MakePhotoCopyErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    MakePhotoCopyResponses,
+    MakePhotoCopyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zMakePhotoCopyBody,
+          path: zMakePhotoCopyPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zMakePhotoCopyResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/derived/photo',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Get Document Email
  *
  * An email document's headers (as OpenAleph read them) and its thread
@@ -5069,6 +5117,34 @@ export const getDocumentEmail = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetDocumentEmailResponse.parseAsync(data),
     url: '/api/documents/{document_id}/email',
+    ...options,
+  });
+
+/**
+ * Find Photo Faces
+ *
+ * Where a detector finds faces in the photo as shown. Nothing names, matches or groups a face. The detector's
+ * model (232 KB) is fetched the first time, pinned and written to the outbound log.
+ */
+export const findPhotoFaces = <ThrowOnError extends boolean = false>(
+  options: Options<FindPhotoFacesData, ThrowOnError>,
+): RequestResult<FindPhotoFacesResponses, FindPhotoFacesErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    FindPhotoFacesResponses,
+    FindPhotoFacesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zFindPhotoFacesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindPhotoFacesResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/faces',
     ...options,
   });
 
@@ -5201,6 +5277,32 @@ export const getDocumentPageImage = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zGetDocumentPageImageResponse.parseAsync(data),
     url: '/api/documents/{document_id}/page-image',
+    ...options,
+  });
+
+/**
+ * Get Photo
+ *
+ * What the photo claims about itself and what the machine proposes about it (mockup MEDIA_1).
+ */
+export const getPhoto = <ThrowOnError extends boolean = false>(
+  options: Options<GetPhotoData, ThrowOnError>,
+): RequestResult<GetPhotoResponses, GetPhotoErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetPhotoResponses,
+    GetPhotoErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetPhotoPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetPhotoResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/photo',
     ...options,
   });
 
