@@ -8,17 +8,19 @@ from collections.abc import AsyncIterator
 from datetime import datetime
 from typing import Any, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
+from app.core.authorization import scope_for_request
 from app.db.session import SessionLocal, get_db
 from app.models.domain import Entity, Investigation
 from app.schemas.api import InvestigationUpdate
-from app.schemas.responses import SafetyDataOut, CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
+from app.schemas.responses import ByHandAddedOut, ByHandPreviewOut, ByHandSuggestionOut, ErrorOut, ValidationErrorOut, SafetyDataOut, CaseDecisionsOut, CaseSinceOut, CaseStandingOut, ClaimSourceLineOut, DropHistoryOut, DropOut, InvestigationOut, PartyYearsOut, WireOut
 from app.services import case_home, case_years, drop, safety_data, wire
+from app.services import manual_entry as manual_entry_types
 from app.services.investigations import update_investigation
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -146,3 +148,38 @@ def get_safety_data(investigation_id: str, period: Literal["today", "7d", "30d",
     """Safety & data (mockup KEEP_2): what lives where for this case, what can reach outside, what has left (ADR-0015)."""
     _case(db, investigation_id)
     return safety_data.safety_data(db, investigation_id, period)
+
+
+# --- Add by hand (mockup ENTRY_1, app/services/manual_entry.py) -------------------------------------------------------
+
+@router.get("/investigations/{investigation_id}/by-hand/suggest", response_model=list[ByHandSuggestionOut])
+def by_hand_suggest(investigation_id: str, q: str = Query("", max_length=200), db: Session = Depends(get_db)) -> Any:
+    """The case's parties whose names start with, then contain, what was typed in a blank."""
+    from app.services import manual_entry
+
+    _case(db, investigation_id)
+    return manual_entry.suggest(db, investigation_id, q)
+
+
+@router.post("/investigations/{investigation_id}/by-hand/preview", response_model=ByHandPreviewOut)
+def by_hand_preview(investigation_id: str, body: manual_entry_types.EntryIn, db: Session = Depends(get_db)) -> Any:
+    """What the case already holds of it, what waits in Decide, and what a link would change. Nothing is written."""
+    from app.services import manual_entry
+
+    _case(db, investigation_id)
+    return manual_entry.preview(db, investigation_id, body)
+
+
+@router.post("/investigations/{investigation_id}/by-hand", response_model=ByHandAddedOut, status_code=201, responses={
+    404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "Something in it cannot be added, said why"}})
+def by_hand_add(investigation_id: str, body: manual_entry_types.EntryIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Add a party, a link or an event by hand, with where it comes from: a passage, a source with no file, or none yet
+    (then a lead to find one). Who typed it is kept on the record and in its custody chain."""
+    from app.services import manual_entry
+
+    _case(db, investigation_id)
+    try:
+        return manual_entry.add(db, investigation_id, body, actor=scope_for_request(request).actor_id)
+    except ValueError as exc:
+        db.rollback()
+        raise HTTPException(422, str(exc)) from exc

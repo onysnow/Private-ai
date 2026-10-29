@@ -942,6 +942,58 @@ export const zBodyUploadDocument = z.object({
 });
 
 /**
+ * ByHandAddedOut
+ *
+ * What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties.
+ */
+export const zByHandAddedOut = z.object({
+  evidence_id: z.string().nullish(),
+  lead_id: z.string().nullish(),
+  parties: z.array(z.string()),
+  record_id: z.string(),
+  record_type: z.enum(['party', 'link', 'event']),
+});
+
+/**
+ * ByHandHitOut
+ *
+ * Something the case already holds, or that waits in Decide, like what is being added by hand.
+ */
+export const zByHandHitOut = z.object({
+  as: z.string().nullish(),
+  caption: z.string().nullish(),
+  id: z.string(),
+  kind: z.enum(['record', 'proposal', 'link', 'event']),
+  same: z.boolean().nullish(),
+  schema: z.string().nullish(),
+});
+
+/**
+ * ByHandPreviewOut
+ *
+ * Before adding by hand (ENTRY_1): what the case already holds, what waits in Decide, what a link would change.
+ */
+export const zByHandPreviewOut = z.object({
+  already: z.array(zByHandHitOut),
+  changes: z.array(z.string()),
+  waiting: z.array(zByHandHitOut),
+});
+
+/**
+ * ByHandSuggestionOut
+ *
+ * A record of the case for a blank in the sentence, and the name it was found under.
+ */
+export const zByHandSuggestionOut = z.object({
+  as: z.string(),
+  caption: z.string(),
+  country: z.string().nullish(),
+  id: z.string(),
+  matched: z.string(),
+  schema: z.string(),
+});
+
+/**
  * CannotRunOut
  *
  * A check that did not run on this case, and why (it needs records the case does not hold yet).
@@ -3961,6 +4013,20 @@ export const zErrorOut = z.object({
 });
 
 /**
+ * EventIn
+ */
+export const zEventIn = z.object({
+  date: z.string(),
+  entity_ids: z.array(z.string()).optional().default([]),
+  precision: z
+    .enum(['day', 'month', 'year', 'estimated'])
+    .optional()
+    .default('day'),
+  title: z.string().min(1).max(500),
+  where: z.string().max(300).nullish(),
+});
+
+/**
  * EvidenceCreate
  */
 export const zEvidenceCreate = z.object({
@@ -5932,6 +5998,42 @@ export const zMultiEnrichmentRequest = z.object({
  */
 export const zNameIn = z.object({
   name: z.string(),
+});
+
+/**
+ * NewParty
+ */
+export const zNewParty = z.object({
+  aliases: z.array(z.string()).optional().default([]),
+  caption: z.string().min(1).max(300),
+  country: z.string().max(80).nullish(),
+  schema: z.enum([
+    'Company',
+    'Person',
+    'Organization',
+    'PublicBody',
+    'LegalEntity',
+  ]),
+});
+
+/**
+ * End
+ *
+ * One end of a link: a record of the case, or a new party.
+ */
+export const zEnd = z.object({
+  entity_id: z.string().nullish(),
+  new: zNewParty.nullish(),
+});
+
+/**
+ * LinkIn
+ */
+export const zLinkIn = z.object({
+  properties: z.record(z.string(), z.array(z.string())).optional().default({}),
+  schema: z.string(),
+  source: zEnd,
+  target: zEnd,
 });
 
 /**
@@ -8276,6 +8378,34 @@ export const zSourceCreate = z.object({
   source_type: z.string().optional().default('web'),
   title: z.string(),
   url: z.string().nullish(),
+});
+
+/**
+ * SourceIn
+ */
+export const zSourceIn = z.object({
+  document_id: z.string().nullish(),
+  locator: z.string().max(200).nullish(),
+  mode: z.enum(['passage', 'record', 'none']),
+  notes: z.string().max(5000).nullish(),
+  quote: z.string().max(5000).nullish(),
+  source_type: z
+    .enum(['interview', 'public_record', 'document', 'web', 'other'])
+    .optional()
+    .default('interview'),
+  title: z.string().max(300).nullish(),
+  url: z.string().max(2000).nullish(),
+});
+
+/**
+ * EntryIn
+ */
+export const zEntryIn = z.object({
+  event: zEventIn.nullish(),
+  kind: z.enum(['party', 'link', 'event']),
+  link: zLinkIn.nullish(),
+  party: zNewParty.nullish(),
+  source: zSourceIn.nullish(),
 });
 
 /**
@@ -12553,6 +12683,43 @@ export const zListAuthenticityPath = z.object({
  * Successful Response
  */
 export const zListAuthenticityResponse = z.array(zAuthenticityStatusOut);
+
+export const zByHandAddBody = zEntryIn;
+
+export const zByHandAddPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zByHandAddResponse = zByHandAddedOut;
+
+export const zByHandPreviewBody = zEntryIn;
+
+export const zByHandPreviewPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zByHandPreviewResponse = zByHandPreviewOut;
+
+export const zByHandSuggestPath = z.object({
+  investigation_id: z.string(),
+});
+
+export const zByHandSuggestQuery = z.object({
+  q: z.string().max(200).optional().default(''),
+});
+
+/**
+ * Response By Hand Suggest
+ *
+ * Successful Response
+ */
+export const zByHandSuggestResponse = z.array(zByHandSuggestionOut);
 
 export const zGetCapturesPath = z.object({
   investigation_id: z.string(),

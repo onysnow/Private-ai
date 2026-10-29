@@ -24,6 +24,9 @@ import {
   analyzeOpenalephDocument,
   assessStatement,
   attachRelationshipEvidenceEndpoint,
+  byHandAdd,
+  byHandPreview,
+  byHandSuggest,
   cancelJobEndpoint,
   canonicalEntityResolution,
   capabilities,
@@ -436,6 +439,15 @@ import type {
   AttachRelationshipEvidenceEndpointData,
   AttachRelationshipEvidenceEndpointError,
   AttachRelationshipEvidenceEndpointResponse,
+  ByHandAddData,
+  ByHandAddError,
+  ByHandAddResponse,
+  ByHandPreviewData,
+  ByHandPreviewError,
+  ByHandPreviewResponse,
+  ByHandSuggestData,
+  ByHandSuggestError,
+  ByHandSuggestResponse,
   CancelJobEndpointData,
   CancelJobEndpointError,
   CancelJobEndpointResponse,
@@ -6730,6 +6742,92 @@ export const listAuthenticityOptions = (
       return data;
     },
     queryKey: listAuthenticityQueryKey(options),
+  });
+
+/**
+ * By Hand Add
+ *
+ * Add a party, a link or an event by hand, with where it comes from: a passage, a source with no file, or none yet
+ * (then a lead to find one). Who typed it is kept on the record and in its custody chain.
+ */
+export const byHandAddMutation = (
+  options?: Partial<Options<ByHandAddData>>,
+): UseMutationOptions<
+  ByHandAddResponse,
+  ByHandAddError,
+  Options<ByHandAddData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ByHandAddResponse,
+    ByHandAddError,
+    Options<ByHandAddData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await byHandAdd({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * By Hand Preview
+ *
+ * What the case already holds of it, what waits in Decide, and what a link would change. Nothing is written.
+ */
+export const byHandPreviewMutation = (
+  options?: Partial<Options<ByHandPreviewData>>,
+): UseMutationOptions<
+  ByHandPreviewResponse,
+  ByHandPreviewError,
+  Options<ByHandPreviewData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ByHandPreviewResponse,
+    ByHandPreviewError,
+    Options<ByHandPreviewData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await byHandPreview({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const byHandSuggestQueryKey = (options: Options<ByHandSuggestData>) =>
+  createQueryKey('byHandSuggest', options);
+
+/**
+ * By Hand Suggest
+ *
+ * The case's parties whose names start with, then contain, what was typed in a blank.
+ */
+export const byHandSuggestOptions = (options: Options<ByHandSuggestData>) =>
+  queryOptions<
+    ByHandSuggestResponse,
+    ByHandSuggestError,
+    ByHandSuggestResponse,
+    ReturnType<typeof byHandSuggestQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await byHandSuggest({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: byHandSuggestQueryKey(options),
   });
 
 export const getCapturesQueryKey = (options: Options<GetCapturesData>) =>

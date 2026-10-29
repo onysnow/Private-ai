@@ -50,9 +50,10 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   Disk encryption is left to Windows (BitLocker / Device encryption); the app only reports it,
   and the BitLocker reading is untested on a real Windows machine.
 
-## Waiting on Ony
-- **Add by hand, works today, check a pack (29 Oct):** mockups ENTRY_1, WORKS_1 and CHECK_4 in
-  `docs/design/entry-and-checks-mockups/` (open `index.html`), nine open questions in its README.
+## Decided without waiting
+Since 29 Oct Ony's open questions are decided on what is best for the app and logged in `DECISIONS_LOG.md`.
+
+## Waiting on Ony (before 29 Oct; now decided and built in turn, see DECISIONS_LOG.md)
 - **See ("The Wire"):** the prototype is at https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3,
   with its source in `docs/design/see-the-wire/` and the design in `SEE_THE_WIRE_PROTOTYPE.md`.
   It awaits his approval before it is built.

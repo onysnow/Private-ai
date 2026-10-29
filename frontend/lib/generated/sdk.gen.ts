@@ -57,6 +57,15 @@ import type {
   AttachRelationshipEvidenceEndpointData,
   AttachRelationshipEvidenceEndpointErrors,
   AttachRelationshipEvidenceEndpointResponses,
+  ByHandAddData,
+  ByHandAddErrors,
+  ByHandAddResponses,
+  ByHandPreviewData,
+  ByHandPreviewErrors,
+  ByHandPreviewResponses,
+  ByHandSuggestData,
+  ByHandSuggestErrors,
+  ByHandSuggestResponses,
   CancelJobEndpointData,
   CancelJobEndpointErrors,
   CancelJobEndpointResponses,
@@ -1192,6 +1201,15 @@ import {
   zAttachRelationshipEvidenceEndpointBody,
   zAttachRelationshipEvidenceEndpointPath,
   zAttachRelationshipEvidenceEndpointResponse,
+  zByHandAddBody,
+  zByHandAddPath,
+  zByHandAddResponse,
+  zByHandPreviewBody,
+  zByHandPreviewPath,
+  zByHandPreviewResponse,
+  zByHandSuggestPath,
+  zByHandSuggestQuery,
+  zByHandSuggestResponse,
   zCancelJobEndpointPath,
   zCancelJobEndpointResponse,
   zCanonicalEntityResolutionBody,
@@ -7340,6 +7358,96 @@ export const listAuthenticity = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListAuthenticityResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/authenticity',
+    ...options,
+  });
+
+/**
+ * By Hand Add
+ *
+ * Add a party, a link or an event by hand, with where it comes from: a passage, a source with no file, or none yet
+ * (then a lead to find one). Who typed it is kept on the record and in its custody chain.
+ */
+export const byHandAdd = <ThrowOnError extends boolean = false>(
+  options: Options<ByHandAddData, ThrowOnError>,
+): RequestResult<ByHandAddResponses, ByHandAddErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    ByHandAddResponses,
+    ByHandAddErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zByHandAddBody,
+          path: zByHandAddPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zByHandAddResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/by-hand',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * By Hand Preview
+ *
+ * What the case already holds of it, what waits in Decide, and what a link would change. Nothing is written.
+ */
+export const byHandPreview = <ThrowOnError extends boolean = false>(
+  options: Options<ByHandPreviewData, ThrowOnError>,
+): RequestResult<ByHandPreviewResponses, ByHandPreviewErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    ByHandPreviewResponses,
+    ByHandPreviewErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zByHandPreviewBody,
+          path: zByHandPreviewPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zByHandPreviewResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/by-hand/preview',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * By Hand Suggest
+ *
+ * The case's parties whose names start with, then contain, what was typed in a blank.
+ */
+export const byHandSuggest = <ThrowOnError extends boolean = false>(
+  options: Options<ByHandSuggestData, ThrowOnError>,
+): RequestResult<ByHandSuggestResponses, ByHandSuggestErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ByHandSuggestResponses,
+    ByHandSuggestErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zByHandSuggestPath,
+          query: zByHandSuggestQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zByHandSuggestResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/by-hand/suggest',
     ...options,
   });
 

@@ -2092,6 +2092,118 @@ export type BodyUploadDocument = {
 };
 
 /**
+ * ByHandAddedOut
+ *
+ * What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties.
+ */
+export type ByHandAddedOut = {
+  /**
+   * Evidence Id
+   */
+  evidence_id?: string | null;
+  /**
+   * Lead Id
+   */
+  lead_id?: string | null;
+  /**
+   * Parties
+   */
+  parties: Array<string>;
+  /**
+   * Record Id
+   */
+  record_id: string;
+  /**
+   * Record Type
+   */
+  record_type: 'party' | 'link' | 'event';
+};
+
+/**
+ * ByHandHitOut
+ *
+ * Something the case already holds, or that waits in Decide, like what is being added by hand.
+ */
+export type ByHandHitOut = {
+  /**
+   * As
+   */
+  as?: string | null;
+  /**
+   * Caption
+   */
+  caption?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Kind
+   */
+  kind: 'record' | 'proposal' | 'link' | 'event';
+  /**
+   * Same
+   */
+  same?: boolean | null;
+  /**
+   * Schema
+   */
+  schema?: string | null;
+};
+
+/**
+ * ByHandPreviewOut
+ *
+ * Before adding by hand (ENTRY_1): what the case already holds, what waits in Decide, what a link would change.
+ */
+export type ByHandPreviewOut = {
+  /**
+   * Already
+   */
+  already: Array<ByHandHitOut>;
+  /**
+   * Changes
+   */
+  changes: Array<string>;
+  /**
+   * Waiting
+   */
+  waiting: Array<ByHandHitOut>;
+};
+
+/**
+ * ByHandSuggestionOut
+ *
+ * A record of the case for a blank in the sentence, and the name it was found under.
+ */
+export type ByHandSuggestionOut = {
+  /**
+   * As
+   */
+  as: string;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Country
+   */
+  country?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Matched
+   */
+  matched: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
  * CannotRunOut
  *
  * A check that did not run on this case, and why (it needs records the case does not hold yet).
@@ -9207,6 +9319,19 @@ export type EmailThreadMessageOut = {
 };
 
 /**
+ * End
+ *
+ * One end of a link: a record of the case, or a new party.
+ */
+export type End = {
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  new?: NewParty | null;
+};
+
+/**
  * EnrichmentClusterOut
  *
  * Findings from different providers that may describe one outside
@@ -9925,6 +10050,20 @@ export type EntityUpdate = {
 };
 
 /**
+ * EntryIn
+ */
+export type EntryIn = {
+  event?: EventIn | null;
+  /**
+   * Kind
+   */
+  kind: 'party' | 'link' | 'event';
+  link?: LinkIn | null;
+  party?: NewParty | null;
+  source?: SourceIn | null;
+};
+
+/**
  * ErrorOut
  *
  * Why a request was refused, in a sentence: the detail of an
@@ -9936,6 +10075,32 @@ export type ErrorOut = {
    * Detail
    */
   detail: string;
+};
+
+/**
+ * EventIn
+ */
+export type EventIn = {
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Entity Ids
+   */
+  entity_ids?: Array<string>;
+  /**
+   * Precision
+   */
+  precision?: 'day' | 'month' | 'year' | 'estimated';
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Where
+   */
+  where?: string | null;
 };
 
 /**
@@ -13216,6 +13381,24 @@ export type LineageSourceOut = {
 };
 
 /**
+ * LinkIn
+ */
+export type LinkIn = {
+  /**
+   * Properties
+   */
+  properties?: {
+    [key: string]: Array<string>;
+  };
+  /**
+   * Schema
+   */
+  schema: string;
+  source: End;
+  target: End;
+};
+
+/**
  * LockReasonIn
  */
 export type LockReasonIn = {
@@ -14243,6 +14426,28 @@ export type NameIn = {
    * Name
    */
   name: string;
+};
+
+/**
+ * NewParty
+ */
+export type NewParty = {
+  /**
+   * Aliases
+   */
+  aliases?: Array<string>;
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Country
+   */
+  country?: string | null;
+  /**
+   * Schema
+   */
+  schema: 'Company' | 'Person' | 'Organization' | 'PublicBody' | 'LegalEntity';
 };
 
 /**
@@ -19204,6 +19409,44 @@ export type SourceCreate = {
    * Title
    */
   title: string;
+  /**
+   * Url
+   */
+  url?: string | null;
+};
+
+/**
+ * SourceIn
+ */
+export type SourceIn = {
+  /**
+   * Document Id
+   */
+  document_id?: string | null;
+  /**
+   * Locator
+   */
+  locator?: string | null;
+  /**
+   * Mode
+   */
+  mode: 'passage' | 'record' | 'none';
+  /**
+   * Notes
+   */
+  notes?: string | null;
+  /**
+   * Quote
+   */
+  quote?: string | null;
+  /**
+   * Source Type
+   */
+  source_type?: 'interview' | 'public_record' | 'document' | 'web' | 'other';
+  /**
+   * Title
+   */
+  title?: string | null;
   /**
    * Url
    */
@@ -29298,6 +29541,123 @@ export type ListAuthenticityResponses = {
 
 export type ListAuthenticityResponse =
   ListAuthenticityResponses[keyof ListAuthenticityResponses];
+
+export type ByHandAddData = {
+  body: EntryIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/by-hand';
+};
+
+export type ByHandAddErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 By Hand Add
+   *
+   * Something in it cannot be added, said why
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ByHandAddError = ByHandAddErrors[keyof ByHandAddErrors];
+
+export type ByHandAddResponses = {
+  /**
+   * Successful Response
+   */
+  201: ByHandAddedOut;
+};
+
+export type ByHandAddResponse = ByHandAddResponses[keyof ByHandAddResponses];
+
+export type ByHandPreviewData = {
+  body: EntryIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/by-hand/preview';
+};
+
+export type ByHandPreviewErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ByHandPreviewError = ByHandPreviewErrors[keyof ByHandPreviewErrors];
+
+export type ByHandPreviewResponses = {
+  /**
+   * Successful Response
+   */
+  200: ByHandPreviewOut;
+};
+
+export type ByHandPreviewResponse =
+  ByHandPreviewResponses[keyof ByHandPreviewResponses];
+
+export type ByHandSuggestData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: {
+    /**
+     * Q
+     */
+    q?: string;
+  };
+  url: '/api/investigations/{investigation_id}/by-hand/suggest';
+};
+
+export type ByHandSuggestErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ByHandSuggestError = ByHandSuggestErrors[keyof ByHandSuggestErrors];
+
+export type ByHandSuggestResponses = {
+  /**
+   * Response By Hand Suggest
+   *
+   * Successful Response
+   */
+  200: Array<ByHandSuggestionOut>;
+};
+
+export type ByHandSuggestResponse =
+  ByHandSuggestResponses[keyof ByHandSuggestResponses];
 
 export type GetCapturesData = {
   body?: never;

@@ -35,6 +35,7 @@ export const STAGES: Stage[] = [
     {label: 'Timeline', anchor: 'timeline'},
     {label: 'Money', anchor: 'money-flows'},
     {label: 'Places', anchor: 'places'},
+    {label: 'Add by hand', anchor: 'add-by-hand'},
   ]},
   {key: 'report', route: '/act', n: 4, name: 'Act', line: 'What to chase next, and what to publish from.', colour: SWATCH.copper, parts: [
     {label: 'Red Flags', anchor: 'red-flags'},

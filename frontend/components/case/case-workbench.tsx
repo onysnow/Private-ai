@@ -39,6 +39,7 @@ import {Following} from '../../features/following/following';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
 import {IsItReal, RealnessList} from '../../features/is-it-real/is-it-real';
 import {CheckAPack} from '../../features/pack-check/check-a-pack';
+import {AddByHand} from '../../features/by-hand/add-by-hand';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
@@ -309,6 +310,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
           <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary></>},
         {anchor: 'timeline', label: 'Timeline', render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'places', label: 'Places', render: () => <PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'add-by-hand', label: 'Add by hand', render: () => <PanelErrorBoundary name="Add by hand"><AddByHand investigationId={inv}/></PanelErrorBoundary>},
       ])}
       {screen('report', [
         {anchor: 'red-flags', label: 'Red Flags', fill: true, render: () => <PanelErrorBoundary name="Red Flags"><RedFlagsBoard investigationId={inv}/></PanelErrorBoundary>},

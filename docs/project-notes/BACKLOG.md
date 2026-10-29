@@ -101,7 +101,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
   - MP3, WAV and MP4 give a 415, and the demo's .mp3/.mov show "failed · 0 chunks" with no reason. (28 Oct: recordings are accepted and transcribed on this computer, ADR-0020; a read without the model fetched fails saying what to run.)
   - A web link isn't fetched or archived, and "not a url" is accepted. (28 Oct: a link is captured: page, screenshot with clock, HAR and WARC with SHA-256, read as a document; ADR-0018, The Drop › Links & captures. A source's address is checked as a web address, `app/services/sources.py`.)
   - The watchlist "Check now" needs OpenAleph.
-  - There is no form for manual entities, relationships or events.
+  - ~~There is no form for manual entities, relationships or events.~~ Fixed 29 Oct: See › Add by hand (mockup ENTRY_1) writes a party, link or event as a sentence, with where it comes from required.
 - **Data quality and counts:**
   - The 1MDB queue has about 15,000 items.
   - ~~Deripaska proposes a railway (CSX) claim from the whole Federal Register issue.~~ Fixed 29 Oct: the pinned PDF (83 FR 19138-19140) starts with the end of an FRA notice about CSX and ends with the start of a Treasury meeting notice. The manifest now names the OFAC notice's first and last words (`part`), and proposals come only from between them; every page is still kept and searchable, and the PDF is unchanged (`own_part` in `app/services/documents.py`). A demo loaded before this keeps its old proposals; loading it again after removing it reads the notice only.

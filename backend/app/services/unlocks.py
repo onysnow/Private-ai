@@ -69,7 +69,7 @@ def _survivor(db: Session, entity_id: str | None) -> str | None:
     return None
 
 
-class _Links:
+class Links:
     """The case graph once, and each link proposal's dry run against it."""
 
     def __init__(self, db: Session, inv: str) -> None:
@@ -109,10 +109,14 @@ class _Links:
             source, target = _survivor(self.db, p.get("source_entity_id")), _survivor(self.db, p.get("target_entity_id"))
             if not source or not target:
                 return []
-        props = {k: [str(v) for v in (vs if isinstance(vs, list) else [vs])] for k, vs in (p.get("properties") or {}).items()}
-        graph = case_graph.CaseGraph(parties={**self.graph.parties, **{party.id: party for party in added}},
-                                     links=[*self.graph.links, case_graph.Link(f"proposal:{row.id}", str(p.get("schema") or ""),
-                                                                               source, target, props, "unsupported")])
+        return self.run_link(str(p.get("schema") or ""), source, target, p.get("properties") or {}, added, f"proposal:{row.id}")
+
+    def run_link(self, schema: str, source: str, target: str, properties: dict[str, Any],
+                 added: list[case_graph.Party] | None = None, link_id: str = "new-link") -> list[dict[str, Any]]:
+        """The Red Flags a link not yet in the case would raise or lift, as the rules would read it unreviewed."""
+        props = {k: [str(v) for v in (vs if isinstance(vs, list) else [vs])] for k, vs in properties.items()}
+        graph = case_graph.CaseGraph(parties={**self.graph.parties, **{party.id: party for party in added or []}},
+                                     links=[*self.graph.links, case_graph.Link(link_id, schema, source, target, props, "unsupported")])
         out = []
         for fp, (indicator, level) in _flags(graph).items():
             was = self.before.get(fp)
@@ -148,13 +152,13 @@ def unlocks(db: Session, inv: str, items: list[dict[str, Any]]) -> None:
     """Sets ``unlocks`` (what a Yes would change, in words) and ``unlock_score`` on each item."""
     ids = [i["id"] for i in items if i["kind"] == "proposal"]
     rows = {r.id: r for r in db.scalars(select(ExtractionCandidate).where(ExtractionCandidate.id.in_(ids)))} if ids else {}
-    links: _Links | None = None
+    links: Links | None = None
     claims: dict[str, list[dict[str, Any]]] = {}
     for item in items:
         found: list[dict[str, Any]] = []
         row = rows.get(item["id"]) if item["kind"] == "proposal" else None
         if row is not None and row.candidate_type == "relationship":
-            links = links or _Links(db, inv)
+            links = links or Links(db, inv)
             found = links.run(row)
         elif row is not None and row.candidate_type == "claim":
             found = _claim(db, row, claims)

@@ -3679,6 +3679,207 @@
         "title": "BulkIn",
         "type": "object"
       },
+      "ByHandAddedOut": {
+        "description": "What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties.",
+        "properties": {
+          "evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Id"
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
+          },
+          "parties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "enum": [
+              "party",
+              "link",
+              "event"
+            ],
+            "title": "Record Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_type",
+          "record_id",
+          "parties"
+        ],
+        "title": "ByHandAddedOut",
+        "type": "object"
+      },
+      "ByHandHitOut": {
+        "description": "Something the case already holds, or that waits in Decide, like what is being added by hand.",
+        "properties": {
+          "as": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "record",
+              "proposal",
+              "link",
+              "event"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "same": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Same"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "title": "ByHandHitOut",
+        "type": "object"
+      },
+      "ByHandPreviewOut": {
+        "description": "Before adding by hand (ENTRY_1): what the case already holds, what waits in Decide, what a link would change.",
+        "properties": {
+          "already": {
+            "items": {
+              "$ref": "#/components/schemas/ByHandHitOut"
+            },
+            "title": "Already",
+            "type": "array"
+          },
+          "changes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "waiting": {
+            "items": {
+              "$ref": "#/components/schemas/ByHandHitOut"
+            },
+            "title": "Waiting",
+            "type": "array"
+          }
+        },
+        "required": [
+          "already",
+          "waiting",
+          "changes"
+        ],
+        "title": "ByHandPreviewOut",
+        "type": "object"
+      },
+      "ByHandSuggestionOut": {
+        "description": "A record of the case for a blank in the sentence, and the name it was found under.",
+        "properties": {
+          "as": {
+            "title": "As",
+            "type": "string"
+          },
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "matched": {
+            "title": "Matched",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "caption",
+          "schema",
+          "matched",
+          "as"
+        ],
+        "title": "ByHandSuggestionOut",
+        "type": "object"
+      },
       "CannotRunOut": {
         "description": "A check that did not run on this case, and why (it needs records the case does not hold yet).",
         "properties": {
@@ -20092,6 +20293,34 @@
         "title": "EmailThreadMessageOut",
         "type": "object"
       },
+      "End": {
+        "description": "One end of a link: a record of the case, or a new party.",
+        "properties": {
+          "entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Id"
+          },
+          "new": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NewParty"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "End",
+        "type": "object"
+      },
       "EnrichmentClusterOut": {
         "description": "Findings from different providers that may describe one outside\nentity, with the reasons for each pairing and the latest reporter decision.",
         "properties": {
@@ -21308,6 +21537,64 @@
         "title": "EntityUpdate",
         "type": "object"
       },
+      "EntryIn": {
+        "properties": {
+          "event": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EventIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "enum": [
+              "party",
+              "link",
+              "event"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LinkIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "party": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NewParty"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "EntryIn",
+        "type": "object"
+      },
       "ErrorOut": {
         "description": "Why a request was refused, in a sentence: the detail of an\nHTTPException, or of one of the checks every request passes first (access,\nrequest size; app/main.py api_access_guard, app/core/access.py).",
         "properties": {
@@ -21320,6 +21607,57 @@
           "detail"
         ],
         "title": "ErrorOut",
+        "type": "object"
+      },
+      "EventIn": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "entity_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Entity Ids",
+            "type": "array"
+          },
+          "precision": {
+            "default": "day",
+            "enum": [
+              "day",
+              "month",
+              "year",
+              "estimated"
+            ],
+            "title": "Precision",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "where": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Where"
+          }
+        },
+        "required": [
+          "title",
+          "date"
+        ],
+        "title": "EventIn",
         "type": "object"
       },
       "EvidenceCreate": {
@@ -27149,6 +27487,38 @@
         "title": "LineageSourceOut",
         "type": "object"
       },
+      "LinkIn": {
+        "properties": {
+          "properties": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "default": {},
+            "title": "Properties",
+            "type": "object"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/End"
+          },
+          "target": {
+            "$ref": "#/components/schemas/End"
+          }
+        },
+        "required": [
+          "schema",
+          "source",
+          "target"
+        ],
+        "title": "LinkIn",
+        "type": "object"
+      },
       "LockReasonIn": {
         "properties": {
           "reason": {
@@ -28976,6 +29346,53 @@
           "name"
         ],
         "title": "NameIn",
+        "type": "object"
+      },
+      "NewParty": {
+        "properties": {
+          "aliases": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Aliases",
+            "type": "array"
+          },
+          "caption": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Caption",
+            "type": "string"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "schema": {
+            "enum": [
+              "Company",
+              "Person",
+              "Organization",
+              "PublicBody",
+              "LegalEntity"
+            ],
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "caption",
+          "schema"
+        ],
+        "title": "NewParty",
         "type": "object"
       },
       "NoteCreate": {
@@ -37232,6 +37649,107 @@
           "title"
         ],
         "title": "SourceCreate",
+        "type": "object"
+      },
+      "SourceIn": {
+        "properties": {
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "locator": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locator"
+          },
+          "mode": {
+            "enum": [
+              "passage",
+              "record",
+              "none"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "source_type": {
+            "default": "interview",
+            "enum": [
+              "interview",
+              "public_record",
+              "document",
+              "web",
+              "other"
+            ],
+            "title": "Source Type",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "title": "SourceIn",
         "type": "object"
       },
       "SourceOut": {
@@ -60710,6 +61228,209 @@
           }
         },
         "summary": "List Authenticity"
+      }
+    },
+    "/api/investigations/{investigation_id}/by-hand": {
+      "post": {
+        "description": "Add a party, a link or an event by hand, with where it comes from: a passage, a source with no file, or none yet\n(then a lead to find one). Who typed it is kept on the record and in its custody chain.",
+        "operationId": "by_hand_add",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ByHandAddedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 By Hand Add"
+                }
+              }
+            },
+            "description": "Something in it cannot be added, said why"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "By Hand Add"
+      }
+    },
+    "/api/investigations/{investigation_id}/by-hand/preview": {
+      "post": {
+        "description": "What the case already holds of it, what waits in Decide, and what a link would change. Nothing is written.",
+        "operationId": "by_hand_preview",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ByHandPreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "By Hand Preview"
+      }
+    },
+    "/api/investigations/{investigation_id}/by-hand/suggest": {
+      "get": {
+        "description": "The case's parties whose names start with, then contain, what was typed in a blank.",
+        "operationId": "by_hand_suggest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 200,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ByHandSuggestionOut"
+                  },
+                  "title": "Response By Hand Suggest",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "By Hand Suggest"
       }
     },
     "/api/investigations/{investigation_id}/captures": {

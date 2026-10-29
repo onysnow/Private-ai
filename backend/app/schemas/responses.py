@@ -5138,6 +5138,42 @@ class PackExhibitOut(ResponseModel):
     redrawn: bool
 
 
+class ByHandHitOut(ResponseModel):
+    """Something the case already holds, or that waits in Decide, like what is being added by hand."""
+    kind: Literal["record", "proposal", "link", "event"]
+    id: str
+    caption: str | None = None
+    schema_: str | None = Field(default=None, alias="schema")
+    as_: str | None = Field(default=None, alias="as")
+    same: bool | None = None
+
+
+class ByHandPreviewOut(ResponseModel):
+    """Before adding by hand (ENTRY_1): what the case already holds, what waits in Decide, what a link would change."""
+    already: list[ByHandHitOut]
+    waiting: list[ByHandHitOut]
+    changes: list[str]
+
+
+class ByHandSuggestionOut(ResponseModel):
+    """A record of the case for a blank in the sentence, and the name it was found under."""
+    id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    matched: str
+    as_: str = Field(alias="as")
+    country: str | None = None
+
+
+class ByHandAddedOut(ResponseModel):
+    """What adding by hand made: the record, its evidence (none without a source), the lead to find one, new parties."""
+    record_type: Literal["party", "link", "event"]
+    record_id: str
+    evidence_id: str | None = None
+    lead_id: str | None = None
+    parties: list[str]
+
+
 class SigningKeyOut(ResponseModel):
     """This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack."""
     fingerprint: str | None = None

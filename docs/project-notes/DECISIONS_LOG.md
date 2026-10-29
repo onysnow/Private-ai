@@ -46,3 +46,20 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   without the app. Wrapping the key with the app-lock passphrase would mean asking for it on every pack.
 - **Where:** `app/services/print_pdf.py`, `pack_signing.py`, `evidence_pack.py`, `pack_check.py`; migration
   `a1c5e9f3d207`.
+
+## 4. Add by hand: one sheet, a source required, where it opens (29 Oct)
+
+- **Questions (ENTRY_1 README):** one sheet with three kinds, or three forms? Allow "I know it, no source yet"? Where
+  does it open from?
+- **Call:** one sheet with A party / A link / An event, each written as a sentence with blanks. Where it comes from is
+  required: a passage (the words must be found in the document as it was read), a source with no file (kept as a
+  Source and its note), or no source yet, which is allowed but opens a lead "Find a source for …" and has no evidence,
+  so it never counts toward Supported. It lives in See › Add by hand, so ⌘K finds it as "See › Add by hand". Before
+  anything is written: the dry run of the Red Flag rules for a link, what the case already holds under that name or
+  between those parties, and what waits in Decide. Everything that could refuse the entry is checked before anything
+  is written, so a refusal leaves nothing half made.
+- **Why:** reporters do know things no document says (a call, a register seen in person), and a blocked form would push
+  them to work outside the app; marking it Not yet shown with a lead keeps the rule that nothing unsourced is
+  Supported. A link's dry run is the same rules as Decide's "by what it unlocks".
+- **Where:** `app/services/manual_entry.py`, `/investigations/{id}/by-hand` (+ `/preview`, `/suggest`),
+  `features/by-hand/add-by-hand.tsx`.
