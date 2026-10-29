@@ -110,7 +110,7 @@ def get_monitor_items(monitor_id: str, state: str | None = None, db: Session = D
     return [following.serialize_item(r, monitor) for r in db.scalars(query.limit(500)).all()]
 
 
-async def _capture_item(db: Session, request: Request, item: MonitorItem, reason: str | None) -> MonitorItemCaptureOut:
+async def _capture_item(db: Session, request: Request, item: MonitorItem, reason: str | None) -> dict[str, Any]:
     capture = await start_capture(db, request, item.investigation_id, item.url)
     item = db.get(MonitorItem, item.id) or item
     item.state, item.capture_id = "captured", capture.id
