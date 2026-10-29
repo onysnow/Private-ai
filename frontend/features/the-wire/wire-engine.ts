@@ -1522,7 +1522,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   (() => {
     let h = '';
     for (const kk of ['person', 'company', 'org', 'property', 'vehicle']) h += `<div class="row"><svg width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="${KIND[kk].fill}" stroke="${KIND[kk].ring}" stroke-width="1.3"/><use href="#${KIND_SYMBOL[kk]}" x="3.5" y="3.5" width="11" height="11" color="${KIND[kk].ring}"/></svg>${KIND[kk].name}</div>`;
-    for (const f of ['owns', 'runs', 'money', 'other']) h += `<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="${FAM[f].c}" stroke-width="2.4" ${f === 'other' ? 'stroke-dasharray="5 4"' : ''}/></svg>${FAM[f].n}</div>`;
+    for (const f of ['owns', 'runs', 'money', 'other']) h += `<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="${FAM[f].c}" stroke-width="2.4" /></svg>${FAM[f].n}</div>`;
     h += '<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="#c98a5e" stroke-width="2"/><path d="M2 5H28" stroke="#ffd9a8" stroke-width="3.4" stroke-dasharray="1 9" stroke-linecap="round"/></svg>Lights run the way money went</div>';
     h += '<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="#c98a5e" stroke-width="1.2"/></svg>Thicker line, more money</div>';
     h += '<div class="row"><svg width="30" height="12" aria-hidden="true"><circle cx="5" cy="6" r="4" fill="#393941" stroke="#a8a2b8"/><circle cx="16" cy="6" r="4" fill="#393941" stroke="#a8a2b8"/></svg>Accounts, kept on their holder</div>';
