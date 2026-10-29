@@ -54,11 +54,15 @@ https://framer.com/m/Chronical-Timeline-JMbe1o.js@IcxcWf1SSSwxMOG63dAo (Framer's
 
 ## The Wire's chips in Nova Glow's motion (Ony, 29 Oct)
 "This is how smooth I want the chips, and also how I want any glow animations. The styling is sharper": Framer's
-"Nova Glow Navigation" (https://framer.com/m/Nova-Glow-Navigation-zmwqc6.js@AeSS5plwSRxLlwjuE91J). The preview he is
-looking at takes from it a spring (bounce .25, .45 s), dark glass chips with a hairline of light on their top edge, a
-comet of light running round edges (on strong and textbook flags and the Wire's top panel), a sheen crossing a chip on
-hover, the labels rolling up into their fuller wording, and the logo's orbit as the focus party's mark. Glows stay the
-light engine's 16,000 K blue. It waits for his yes before the app changes.
+"Nova Glow Navigation" (https://framer.com/m/Nova-Glow-Navigation-zmwqc6.js@AeSS5plwSRxLlwjuE91J).
+His corrections to the first preview: keep the chips as they are (no recolouring, nothing removed) and only add the
+styling; give our icons that kind of animation and care without copying Nova's icon; glow only on the chip being
+hovered, in the chip's own colour as light. Red Flags: on faint (yellow) and strong (orange) the glow is only on the
+count's circle at the top right; a chip with a textbook flag glows whole, red, pulsing like a siren.
+- The second preview does that: today's chips with a spring, a sheen, words that roll up on "+N more" and link chips, a
+  glow in the kind's colour on hover, each kind icon's own animation on hover, the flag circle lit on hover, and the
+  textbook chip pulsing red with a beam round its outline at rest (faster on hover). Faint is yellow there, outline and
+  circle. It waits for his yes before the app changes.
 
 ## Ony's standing requirement for every card
 Wherever a card appears (decision, dashboard widget, flag, timeline row, to-check item), it must:
