@@ -44,7 +44,7 @@ type Strand = {fam: string; s: string; t: string; links: WireLinkOut[]; sum: num
 type Bundle = {key: string; a: string; b: string; links: WireLinkOut[]; strands: Record<string, Strand>};
 type Chain = {id: string; mids: string[]; ends: string[]; open: boolean};
 type NodeEl = {
-  id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
+  id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dx: number; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
 type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
@@ -75,6 +75,13 @@ const DISPUTED = '#FF8070';
 const TERR = ['#2E4D67', '#2f4f44', '#4d3d2c', '#4f3036', '#3d3858', '#3b4f5e', '#55402b', '#2d4a52', '#4a3f55', '#34503c'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+/** A tag swatch lifted towards white, so a dark swatch still glows on the night background. */
+export const brighten = (hex: string, by = 0.5): string => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  return `#${[16, 8, 0].map(sh => Math.round(((n >> sh) & 255) + (255 - ((n >> sh) & 255)) * by).toString(16).padStart(2, '0')).join('')}`;
+};
 export const esc = (text: unknown): string => String(text ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!));
 export const fmtAmt = (a: number | null | undefined, c: string): string => {
   if (a == null) return '';
@@ -347,26 +354,30 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     }
     const lbl = el('text', {class: 'lbl', 'text-anchor': 'middle'}, g);
     const card = el('g', {}, g);
-    el('rect', {x: -90, y: -27, width: 180, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4}, card);
-    el('circle', {cx: -70, cy: 0, r: 10, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5}, card);
-    el('text', {class: 'card-t', x: -52, y: -4}, card);
-    el('text', {class: 'card-s', x: -52, y: 14}, card);
+    // A tagged party's card is wider on the left, so its tag ring clears the card's edge and its name.
+    const own = isChain ? [] : partyTags[id] ?? [];
+    const pad = own.length ? 14 : 0, dx = -70 - pad / 2, tx = -52 + pad / 3;
+    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4}, card);
+    el('circle', {cx: dx, cy: 0, r: 10, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5}, card);
+    el('text', {class: 'card-t', x: tx, y: -4}, card);
+    el('text', {class: 'card-s', x: tx, y: 14}, card);
     const beads = el('g', {}, card);
     const flag = el('g', {transform: 'translate(90,-27)'}, card);
     g.appendChild(halo); // over the card, so its ring round the kind dot shows
-    // Your tags: one arc per tag, sharing a ring outside the flag ring (shown while the Your tags layer is on).
-    const own = isChain ? [] : partyTags[id] ?? [];
+    // Your tags: one arc per tag, sharing a ring outside the flag ring (shown while the Your tags layer is on). Each arc
+    // is its swatch brightened, over a blurred copy that breathes, so the ring reads as giving off light.
     let tags: SVGGElement | null = null;
     if (own.length) {
       tags = el('g', {class: 'tw-tagring'}, g);
-      // A pale edge under the arcs, so a dark swatch still reads on the night background.
-      el('circle', {fill: 'none', stroke: '#f4ead8', 'stroke-opacity': 0.35, 'stroke-width': 5.5}, tags);
-      const seg = 100 / own.length;
-      own.forEach((t, i) => el('circle', {fill: 'none', stroke: t.colour, 'stroke-width': 3.5, pathLength: 100,
-        'stroke-dasharray': `${Math.max(seg - (own.length > 1 ? 4 : 0), 1)} ${100 - seg + (own.length > 1 ? 4 : 0)}`, 'stroke-dashoffset': -i * seg,
-        transform: 'rotate(-90)'}, tags!));
+      const seg = 100 / own.length, gap = own.length > 1 ? 5 : 0;
+      const arc = (layer: SVGGElement, colour: string, i: number, width: number) => el('circle', {fill: 'none', stroke: colour, 'stroke-width': width,
+        'stroke-linecap': own.length > 1 ? 'round' : 'butt', pathLength: 100, 'stroke-dasharray': `${Math.max(seg - gap, 1)} ${100 - seg + gap}`,
+        'stroke-dashoffset': -i * seg, transform: 'rotate(-90)'}, layer);
+      const glow = el('g', {class: 'glow', filter: 'url(#tw-tagglow)'}, tags);
+      const sharp = el('g', {class: 'sharp'}, tags);
+      own.forEach((t, i) => { const c = brighten(t.colour); arc(glow, c, i, 7); arc(sharp, c, i, 2.8); });
     }
-    const N: NodeEl = {id, g, halo, tags, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
+    const N: NodeEl = {id, g, halo, tags, dx, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
     on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); onNodeClick(id); });
     on<PointerEvent>(g, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showTip(ev, id); });
     on(g, 'pointerleave', hideTip);
@@ -626,12 +637,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       }
       // On a card the ring sits round the card's kind dot; on a dot, round the dot.
       N.halo.setAttribute('r', String(v === 2 && !N.isChain ? 14 * cs : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 5));
-      N.halo.setAttribute('cx', String(v === 2 && !N.isChain ? -70 * cs : 0));
+      N.halo.setAttribute('cx', String(v === 2 && !N.isChain ? N.dx * cs : 0));
       if (N.tags) {
         N.tags.style.display = v > 0 ? '' : 'none';
-        const r = v === 2 ? 14 * cs + 5 : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 9;
-        N.tags.setAttribute('transform', v === 2 ? `translate(${-70 * cs},0)` : '');
-        for (const c of Array.from(N.tags.children)) c.setAttribute('r', String(r));
+        const r = v === 2 ? 18.5 * cs : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 9;
+        N.tags.setAttribute('transform', v === 2 ? `translate(${N.dx * cs},0)` : '');
+        for (const c of Array.from(N.tags.querySelectorAll('circle'))) c.setAttribute('r', String(r));
       }
       N.lbl.style.display = 'none';
       if (v === 1 && !(lens.on && mode === 'case' && d.in)) cands.push({id, N, d, pri: fscore(fl) * 10 + deg[id] + (mode === 'case' ? 0 : 100)});
@@ -710,7 +721,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const N = node[id];
       if (N.cur.v === 2 && !N.isChain && N.cur.o > 0.5) {
         const s = toScreen(P[id].x, P[id].y);
-        cardBoxes.push({x0: s.x - 94 * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - 32 * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
+        cardBoxes.push({x0: s.x - (94 + (-70 - N.dx) * 2) * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - 32 * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
       }
     }
     const rtBoxes: Box[] = [];

@@ -14,7 +14,7 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AllLinks} from './all-links';
 import {LinkPanel} from './link-panel';
-import {mountWire} from './wire-engine';
+import {brighten, mountWire} from './wire-engine';
 import type {LinkInfo, LinkSure, OpenLink, PartyTags} from './wire-engine';
 
 const SURE_OF = {supported: 'shown', unsupported: 'unshown', contested: 'disputed'} as const satisfies Record<string, LinkSure>;
@@ -95,6 +95,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
           <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/>
           <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -10"/>
         </filter>
+        <filter id="tw-tagglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/></feMerge></filter>
         <radialGradient id="tw-glow"><stop offset="0" stopColor="#E8A95B" stopOpacity=".35"/><stop offset="1" stopColor="#E8A95B" stopOpacity="0"/></radialGradient>
       </defs>
       <g className="tw-cam">
@@ -163,7 +164,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
       <div className="tw-key-sure"/>
       {tagsOn && tagKey.length > 0 && <div className="tw-key-tags" aria-label="Your tags, a ring outside the dot">
         <span className="cap">Your tags</span>
-        {tagKey.map(t => <span key={t.name} className="tag" title={`${t.parties} ${t.parties === 1 ? 'party' : 'parties'}`}><i style={{borderColor: t.colour}}/>{t.name} · {t.parties}</span>)}
+        {tagKey.map(t => <span key={t.name} className="tag" title={`${t.parties} ${t.parties === 1 ? 'party' : 'parties'}`}><i style={{borderColor: brighten(t.colour), color: brighten(t.colour)}}/>{t.name} · {t.parties}</span>)}
       </div>}
       <details className="tw-key-more">
         <summary>Kinds and colours ▾</summary>

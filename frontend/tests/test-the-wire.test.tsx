@@ -7,7 +7,7 @@ import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/reac
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TheWire, linkInfo} from '../features/the-wire/the-wire';
-import {fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
+import {brighten, fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -285,7 +285,11 @@ describe('The Wire', () => {
     const map = await screen.findByRole('img', {name: /Map of the parties/});
     await waitFor(() => expect(map.querySelectorAll('.tw-tagring').length).toBe(2));
     // Meridian carries two tags, each its own arc of the one ring.
-    expect(Array.from(map.querySelectorAll('.tw-tagring')[0].children).slice(1).map(c => c.getAttribute('stroke'))).toEqual(['#7FB7E0', '#E9AFA8']);
+    // Each arc is its swatch brightened, over a glowing copy.
+    const ring = map.querySelectorAll('.tw-tagring')[0];
+    expect(Array.from(ring.querySelectorAll('.sharp circle')).map(c => c.getAttribute('stroke'))).toEqual([brighten('#7FB7E0'), brighten('#E9AFA8')]);
+    expect(ring.querySelectorAll('.glow circle')).toHaveLength(2);
+    expect(brighten('#3e6181')).toBe('#9fb0c0');
     const key = screen.getByLabelText('Key');
     expect(key.textContent).toContain('Owner · 2');
     expect(key.textContent).toContain('Check again · 1');
