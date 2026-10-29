@@ -84,6 +84,9 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
 - Your tags, redesigned (four options in artifact MF1DH391BFR9YsEFALLNQP; he picked A, pins on the bottom edge):
   a small pin per tag on the card's bottom edge; hover drops them on the spring into a row of named pills, words
   centred, under the details line. The ring round the kind circle is gone.
+- "+N more" is a perfect circle with a stack of discs fanned out behind its left side; on hover the discs slide into
+  it one after another and it opens leftwards (away from its leader) into "+N more parties", the words uncovered as
+  the chip grows.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
   the kind's ring colour): bronze for a company, blue for a person, green for an organisation, rust for a vessel.
 All of it waits for his yes before the app changes.
