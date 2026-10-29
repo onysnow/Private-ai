@@ -21382,6 +21382,18 @@ export type TimelineLanesOut = {
   sequence: Array<TimelineSequenceOut>;
   span: TimelineSpanOut;
   /**
+   * Steps
+   */
+  steps: Array<TimelineStepOut>;
+  /**
+   * Steps From
+   */
+  steps_from: 'story' | 'events';
+  /**
+   * Steps Undated
+   */
+  steps_undated: number;
+  /**
    * Undated
    */
   undated: Array<TimelineUndatedOut>;
@@ -21603,6 +21615,50 @@ export type TimelineSpanOut = {
    * Last
    */
   last?: string | null;
+};
+
+/**
+ * TimelineStepOut
+ *
+ * One step of Replay: a Story claim, in the claim's own words, with the events that date it (or one event).
+ */
+export type TimelineStepOut = {
+  /**
+   * Claim Id
+   */
+  claim_id?: string | null;
+  /**
+   * Claim Status
+   */
+  claim_status?: string | null;
+  /**
+   * Date End
+   */
+  date_end?: string | null;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Event Ids
+   */
+  event_ids: Array<string>;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Precision
+   */
+  precision: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Unresolved
+   */
+  unresolved: boolean;
 };
 
 /**

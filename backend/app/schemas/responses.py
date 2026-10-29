@@ -738,9 +738,25 @@ class TimelineSpanOut(ResponseModel):
     busiest: str | None = None
 
 
+class TimelineStepOut(ResponseModel):
+    """One step of Replay: a Story claim, in the claim's own words, with the events that date it (or one event)."""
+    key: str
+    title: str
+    claim_id: str | None = None
+    claim_status: str | None = None
+    event_ids: list[str]
+    date_start: str
+    date_end: str | None = None
+    precision: str
+    unresolved: bool
+
+
 class TimelineLanesOut(ResponseModel):
     investigation_id: str
     events: list[TimelineLaneEventOut]
+    steps: list[TimelineStepOut]
+    steps_from: Literal["story", "events"]
+    steps_undated: int
     parties: list[TimelinePartyOut]
     periods: list[TimelinePeriodOut]
     sequence: list[TimelineSequenceOut]

@@ -5,7 +5,7 @@ award); named periods; documents not on the timeline yet and sources with no dat
 from __future__ import annotations
 
 from app.db.session import SessionLocal
-from app.models.domain import Source
+from app.models.domain import Claim, Source
 from tests.test_red_flags import _inv, _link, _party, client, ok
 
 
@@ -117,3 +117,27 @@ def test_named_periods_are_kept_changed_and_taken_away():
     assert client.delete(f"/api/investigations/{other}/timeline/periods/{period['id']}").status_code == 404
     assert client.delete(f"/api/investigations/{inv}/timeline/periods/{period['id']}").status_code == 204
     assert _lanes(inv)["periods"] == []
+
+
+def test_replay_steps_are_the_story_claims_in_the_order_things_happened():
+    inv = _inv("Replay")
+    assert _lanes(inv)["steps"] == [] and _lanes(inv)["steps_from"] == "events"
+    early = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "Kestrel SA is set up"}))["id"]
+    with SessionLocal() as db:  # as if reviewed Supported (the review itself is tested with the Done rules)
+        db.get(Claim, early).status = "supported"
+        db.commit()
+    late = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "A deposit, with no award recorded", "status": "unverified"}))["id"]
+    bare = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "Nothing dates this"}))["id"]
+    story = ok(client.post(f"/api/investigations/{inv}/story/sections", json={"title": "The money"}))
+    section = story["sections"][0]["id"]
+    for claim in (late, early, bare):  # placed in the story out of date order
+        ok(client.post(f"/api/investigations/{inv}/story/sections/{section}/claims", json={"claim_id": claim}))
+    _event(inv, "Deposit email", "2019-05", precision="month", claim_id=late)
+    _event(inv, "Registered", "2016-03-01", claim_id=early, grade="confirmed")
+    _event(inv, "Director appointed", "2017-07-03", claim_id=early, grade="likely")
+    view = _lanes(inv)
+    assert view["steps_from"] == "story" and view["steps_undated"] == 1
+    assert [(s["title"], s["date_start"], s["date_end"], s["unresolved"]) for s in view["steps"]] == [
+        ("Kestrel SA is set up", "2016-03-01", "2017-07-03", False),
+        ("A deposit, with no award recorded", "2019-05", None, True)]
+    assert len(view["steps"][0]["event_ids"]) == 2

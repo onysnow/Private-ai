@@ -9740,6 +9740,23 @@ export const zTimelineSpanOut = z.object({
 });
 
 /**
+ * TimelineStepOut
+ *
+ * One step of Replay: a Story claim, in the claim's own words, with the events that date it (or one event).
+ */
+export const zTimelineStepOut = z.object({
+  claim_id: z.string().nullish(),
+  claim_status: z.string().nullish(),
+  date_end: z.string().nullish(),
+  date_start: z.string(),
+  event_ids: z.array(z.string()),
+  key: z.string(),
+  precision: z.string(),
+  title: z.string(),
+  unresolved: z.boolean(),
+});
+
+/**
  * TimelineUndatedOut
  */
 export const zTimelineUndatedOut = z.object({
@@ -9763,6 +9780,9 @@ export const zTimelineLanesOut = z.object({
   periods: z.array(zTimelinePeriodOut),
   sequence: z.array(zTimelineSequenceOut),
   span: zTimelineSpanOut,
+  steps: z.array(zTimelineStepOut),
+  steps_from: z.enum(['story', 'events']),
+  steps_undated: z.int(),
   undated: z.array(zTimelineUndatedOut),
   undated_total: z.int(),
 });

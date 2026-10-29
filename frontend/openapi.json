@@ -41029,6 +41029,25 @@
           "span": {
             "$ref": "#/components/schemas/TimelineSpanOut"
           },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineStepOut"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "steps_from": {
+            "enum": [
+              "story",
+              "events"
+            ],
+            "title": "Steps From",
+            "type": "string"
+          },
+          "steps_undated": {
+            "title": "Steps Undated",
+            "type": "integer"
+          },
           "undated": {
             "items": {
               "$ref": "#/components/schemas/TimelineUndatedOut"
@@ -41044,6 +41063,9 @@
         "required": [
           "investigation_id",
           "events",
+          "steps",
+          "steps_from",
+          "steps_undated",
           "parties",
           "periods",
           "sequence",
@@ -41377,6 +41399,81 @@
           }
         },
         "title": "TimelineSpanOut",
+        "type": "object"
+      },
+      "TimelineStepOut": {
+        "description": "One step of Replay: a Story claim, in the claim's own words, with the events that date it (or one event).",
+        "properties": {
+          "claim_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Claim Id"
+          },
+          "claim_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Claim Status"
+          },
+          "date_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date End"
+          },
+          "date_start": {
+            "title": "Date Start",
+            "type": "string"
+          },
+          "event_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "precision": {
+            "title": "Precision",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "unresolved": {
+            "title": "Unresolved",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "title",
+          "event_ids",
+          "date_start",
+          "precision",
+          "unresolved"
+        ],
+        "title": "TimelineStepOut",
         "type": "object"
       },
       "TimelineUndatedOut": {

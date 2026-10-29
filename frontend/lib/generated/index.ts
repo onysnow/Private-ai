@@ -2943,6 +2943,7 @@ export type {
   TimelinePeriodOut,
   TimelineSequenceOut,
   TimelineSpanOut,
+  TimelineStepOut,
   TimelineUndatedOut,
   TimelineVisualOut,
   ToCheckItemOut,

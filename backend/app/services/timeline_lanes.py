@@ -20,11 +20,16 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.domain import (
+    Claim,
+    ClaimEvidenceLink,
     Entity,
     Evidence,
     RelationshipEdge,
     Source,
     Statement,
+    Story,
+    StoryClaim,
+    StorySection,
     TimelineEvent,
     TimelinePeriod,
 )
@@ -166,9 +171,11 @@ def lanes(db: Session, investigation_id: str) -> dict[str, Any]:
     dated = [e for e in out_events if e.get("date_start")]
     years = Counter(str(e["date_start"])[:4] for e in dated)
     unresolved = [e for e in out_events if e["fact"] != "shown" and not e.get("placeholder")]
+    steps, steps_from, steps_undated = replay_steps(db, investigation_id, out_events)
     return {
         "investigation_id": investigation_id,
         "events": out_events,
+        "steps": steps, "steps_from": steps_from, "steps_undated": steps_undated,
         "parties": party_rows,
         "periods": periods,
         "sequence": sequence_rules.check(out_events),
@@ -179,6 +186,49 @@ def lanes(db: Session, investigation_id: str) -> dict[str, Any]:
                  "busiest": years.most_common(1)[0][0] if years else None},
         "opens_on": unresolved[0]["id"] if unresolved else None,
     }
+
+
+def replay_steps(db: Session, investigation_id: str, events: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], str, int]:
+    """Replay's steps (mockup TIME_4): the Story's claims in the order things happened, each with the events that date
+    it (the events that point at the claim, or at a passage linked to it). Nothing is generated: a step's words are the
+    claim's own. A claim nothing dates is left out and counted. With no Story yet, each dated event is a step. Returns
+    the steps, where they come from ("story" or "events"), and how many claims had no date."""
+    dated = [e for e in events if e.get("date_start") and not e.get("placeholder")]
+    story = db.scalar(select(Story).where(Story.investigation_id == investigation_id))
+    placed: list[Claim] = []
+    if story is not None:
+        rows = db.execute(select(StoryClaim, StorySection).join(StorySection, StoryClaim.section_id == StorySection.id)
+                          .where(StorySection.story_id == story.id).order_by(StorySection.position, StoryClaim.position)).all()
+        seen: set[str] = set()
+        for story_claim, _section in rows:
+            claim = db.get(Claim, story_claim.claim_id)
+            if claim is not None and claim.id not in seen:
+                seen.add(claim.id)
+                placed.append(claim)
+    if not placed:
+        return ([{"key": e["id"], "title": e["title"], "claim_id": None, "claim_status": None, "event_ids": [e["id"]],
+                  "date_start": e["date_start"], "date_end": e.get("date_end"), "precision": e["precision"],
+                  "unresolved": e["fact"] != "shown"} for e in dated], "events", 0)
+    links: dict[str, set[str]] = {}
+    for link in db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id.in_([c.id for c in placed]))):
+        links.setdefault(link.claim_id, set()).add(link.evidence_id)
+    steps, undated = [], 0
+    for claim in placed:
+        evidence = links.get(claim.id, set())
+        mine = [e for e in dated if (e.get("refs") or {}).get("claim_id") == claim.id
+                or (e.get("refs") or {}).get("evidence_id") in evidence]
+        if not mine:
+            undated += 1
+            continue
+        mine.sort(key=lambda e: e["sort_key"])
+        last = max(mine, key=lambda e: str(e.get("date_end") or e["date_start"]))
+        steps.append({"key": claim.id, "title": claim.text, "claim_id": claim.id, "claim_status": claim.status,
+                      "event_ids": [e["id"] for e in mine], "date_start": mine[0]["date_start"],
+                      "date_end": (last.get("date_end") or last["date_start"]) if len(mine) > 1 or last.get("date_end") else None,
+                      "precision": mine[0]["precision"],
+                      "unresolved": claim.status not in ("supported", "confirmed") or any(e["fact"] != "shown" for e in mine)})
+    steps.sort(key=lambda st: (sequence_rules._span({"date_start": st["date_start"]})[0], st["title"]))
+    return steps, "story", undated
 
 
 def save_period(db: Session, investigation_id: str, *, name: str, date_start: str, date_end: str, summary: str = "",

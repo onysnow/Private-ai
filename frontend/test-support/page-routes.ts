@@ -231,6 +231,8 @@ export function lanesBody(investigationId: string, events: unknown[] = [], extra
   const years = filled.map(e => String(e.date_start).slice(0, 4)).sort();
   return {
     investigation_id: investigationId, events: filled, parties: [], periods: [], sequence: [],
+    steps: filled.map(e => ({key: e.id, title: e.title, claim_id: null, claim_status: null, event_ids: [e.id], date_start: e.date_start,
+      date_end: e.date_end ?? null, precision: e.precision, unresolved: e.fact !== 'shown'})), steps_from: 'events', steps_undated: 0,
     not_placed: [], not_placed_total: 0, undated: [], undated_total: 0, facts,
     span: {first: years[0] ?? null, last: years[years.length - 1] ?? null, busiest: years[0] ?? null},
     opens_on: (filled.find(e => e.fact !== 'shown')?.id as string | undefined) ?? null,
