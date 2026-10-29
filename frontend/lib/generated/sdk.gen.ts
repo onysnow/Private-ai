@@ -288,6 +288,9 @@ import type {
   ExportWriteupDocxData,
   ExportWriteupDocxErrors,
   ExportWriteupDocxResponses,
+  ExportWriteupPdfData,
+  ExportWriteupPdfErrors,
+  ExportWriteupPdfResponses,
   ExternalRelationshipCandidatesData,
   ExternalRelationshipCandidatesErrors,
   ExternalRelationshipCandidatesResponses,
@@ -543,6 +546,9 @@ import type {
   GetSecurityAuditSummaryData,
   GetSecurityAuditSummaryErrors,
   GetSecurityAuditSummaryResponses,
+  GetSigningKeyData,
+  GetSigningKeyErrors,
+  GetSigningKeyResponses,
   GetSimilarDocumentsData,
   GetSimilarDocumentsErrors,
   GetSimilarDocumentsResponses,
@@ -1363,6 +1369,8 @@ import {
   zExportInvestigationResponse,
   zExportWriteupDocxPath,
   zExportWriteupDocxResponse,
+  zExportWriteupPdfPath,
+  zExportWriteupPdfResponse,
   zExternalRelationshipCandidatesPath,
   zExternalRelationshipCandidatesResponse,
   zFindExtractionLineageEndpointQuery,
@@ -1533,6 +1541,7 @@ import {
   zGetSecurityAuditRetentionPreviewQuery,
   zGetSecurityAuditRetentionPreviewResponse,
   zGetSecurityAuditSummaryResponse,
+  zGetSigningKeyResponse,
   zGetSimilarDocumentsPath,
   zGetSimilarDocumentsQuery,
   zGetSimilarDocumentsResponse,
@@ -10178,6 +10187,37 @@ export const getWire = <ThrowOnError extends boolean = false>(
   );
 
 /**
+ * Export Writeup Pdf
+ *
+ * The write-up as a PDF (Export sheet › Write-up for reading), stamped "Export as draft" while a check is open.
+ */
+export const exportWriteupPdf = <ThrowOnError extends boolean = false>(
+  options: Options<ExportWriteupPdfData, ThrowOnError>,
+): RequestResult<
+  ExportWriteupPdfResponses,
+  ExportWriteupPdfErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ExportWriteupPdfResponses,
+    ExportWriteupPdfErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportWriteupPdfPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportWriteupPdfResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/writeup.pdf',
+    ...options,
+  });
+
+/**
  * List Writeups Endpoint
  */
 export const listWriteupsEndpoint = <ThrowOnError extends boolean = false>(
@@ -12738,6 +12778,33 @@ export const rotateAppUserToken = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zRotateAppUserTokenResponse.parseAsync(data),
     url: '/api/settings/security/users/{user_id}/token/rotate',
+    ...options,
+  });
+
+/**
+ * Get Signing Key
+ *
+ * This computer's evidence-pack signing key: its fingerprint, to give out with a pack, and when it was made.
+ */
+export const getSigningKey = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSigningKeyData, ThrowOnError>,
+): RequestResult<GetSigningKeyResponses, GetSigningKeyErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    GetSigningKeyResponses,
+    GetSigningKeyErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSigningKeyResponse.parseAsync(data),
+    url: '/api/settings/signing-key',
     ...options,
   });
 

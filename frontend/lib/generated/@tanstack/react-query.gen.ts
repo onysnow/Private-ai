@@ -101,6 +101,7 @@ import {
   exportEvidencePack,
   exportInvestigation,
   exportWriteupDocx,
+  exportWriteupPdf,
   externalRelationshipCandidates,
   findExtractionLineageEndpoint,
   findingCandidates,
@@ -186,6 +187,7 @@ import {
   getSecurityAudit,
   getSecurityAuditRetentionPreview,
   getSecurityAuditSummary,
+  getSigningKey,
   getSimilarDocuments,
   getSince,
   getStanding,
@@ -665,6 +667,9 @@ import type {
   ExportWriteupDocxData,
   ExportWriteupDocxError,
   ExportWriteupDocxResponse,
+  ExportWriteupPdfData,
+  ExportWriteupPdfError,
+  ExportWriteupPdfResponse,
   ExternalRelationshipCandidatesData,
   ExternalRelationshipCandidatesError,
   ExternalRelationshipCandidatesResponse,
@@ -919,6 +924,9 @@ import type {
   GetSecurityAuditSummaryData,
   GetSecurityAuditSummaryError,
   GetSecurityAuditSummaryResponse,
+  GetSigningKeyData,
+  GetSigningKeyError,
+  GetSigningKeyResponse,
   GetSimilarDocumentsData,
   GetSimilarDocumentsError,
   GetSimilarDocumentsResponse,
@@ -10177,6 +10185,36 @@ export const getWireOptions = (options: Options<GetWireData>) =>
     queryKey: getWireQueryKey(options),
   });
 
+export const exportWriteupPdfQueryKey = (
+  options: Options<ExportWriteupPdfData>,
+) => createQueryKey('exportWriteupPdf', options);
+
+/**
+ * Export Writeup Pdf
+ *
+ * The write-up as a PDF (Export sheet › Write-up for reading), stamped "Export as draft" while a check is open.
+ */
+export const exportWriteupPdfOptions = (
+  options: Options<ExportWriteupPdfData>,
+) =>
+  queryOptions<
+    ExportWriteupPdfResponse,
+    ExportWriteupPdfError,
+    ExportWriteupPdfResponse,
+    ReturnType<typeof exportWriteupPdfQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await exportWriteupPdf({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: exportWriteupPdfQueryKey(options),
+  });
+
 export const listWriteupsEndpointQueryKey = (
   options: Options<ListWriteupsEndpointData>,
 ) => createQueryKey('listWriteupsEndpoint', options);
@@ -12590,6 +12628,33 @@ export const rotateAppUserTokenMutation = (
   };
   return mutationOptions;
 };
+
+export const getSigningKeyQueryKey = (options?: Options<GetSigningKeyData>) =>
+  createQueryKey('getSigningKey', options);
+
+/**
+ * Get Signing Key
+ *
+ * This computer's evidence-pack signing key: its fingerprint, to give out with a pack, and when it was made.
+ */
+export const getSigningKeyOptions = (options?: Options<GetSigningKeyData>) =>
+  queryOptions<
+    GetSigningKeyResponse,
+    GetSigningKeyError,
+    GetSigningKeyResponse,
+    ReturnType<typeof getSigningKeyQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSigningKey({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSigningKeyQueryKey(options),
+  });
 
 export const settingsStatusQueryKey = (options?: Options<SettingsStatusData>) =>
   createQueryKey('settingsStatus', options);

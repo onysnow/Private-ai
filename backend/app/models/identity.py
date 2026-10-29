@@ -51,6 +51,10 @@ class LocalProfile(Base):
     passphrase_set_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     recovery_set_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     disk_answer: Mapped[str | None] = mapped_column(String(16), nullable=True)  # the reporter's own answer when the app cannot tell
+    # The key evidence packs are signed with (app/services/pack_signing.py): Ed25519, raw, base64; made at the first pack.
+    signing_public: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    signing_secret: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    signing_created_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, onupdate=utcnow_naive)
 

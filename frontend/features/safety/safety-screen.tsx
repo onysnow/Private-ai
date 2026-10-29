@@ -16,7 +16,7 @@ import type {ReactElement} from 'react';
 import {hideScreen} from '../../components/frame/app-frame';
 import '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
-import {getSafetyDataOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getSafetyDataOptions, getSigningKeyOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {OutboundRequestOut, SafetyDataOut, SafetyServiceOut, SafetyStoreOut} from '../../lib/generated/types.gen';
 import {apiTime, shortStamp} from '../../lib/timestamps';
 
@@ -62,6 +62,16 @@ function storeFigure(s: SafetyStoreOut): string {
 const ofService = (id: string) => (r: OutboundRequestOut) => (id === 'ai' ? r.service.startsWith('ai') : r.service === id);
 
 const inBackups = (s: SafetyStoreOut): string => (s.in_backups === true ? 'In every backup ✓' : s.in_backups === false ? 'Not in backups' : '');
+
+/** The key this computer signs evidence packs with: its fingerprint, to read out to whoever receives a pack. */
+function SigningKey(): ReactElement {
+  const key = useQuery(getSigningKeyOptions()).data;
+  return <article className="sd-card" aria-label="Pack signing key">
+    <p className="sd-eyebrow">Pack signing key</p>
+    <h3>{key?.fingerprint ? <code>{key.fingerprint}</code> : 'Made with the first evidence pack'}</h3>
+    <p>Each evidence pack’s list of files is signed with this computer’s key. Give this fingerprint to whoever receives a pack, so they can tell it was yours. The key never leaves this computer and is not in a case backup.</p>
+  </article>;
+}
 
 export function SafetyScreen({investigationId, caseName, active = true}: {investigationId: string; caseName?: string; active?: boolean}): ReactElement {
   const [period, setPeriod] = useState<Period>('7d');
@@ -235,6 +245,7 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
           <p>{data.housekeeping.stray_bytes ? `${bytesInWords(data.housekeeping.stray_bytes)} no document points to. ` : ''}Kept until you decide.</p>
           <button type="button" className="sd-btn" onClick={() => go('access')}>Look at them</button>
         </article>
+        <SigningKey/>
         <article className="sd-card sd-danger">
           <p className="sd-eyebrow">Delete this case</p>
           <h3>Remove from this computer</h3>

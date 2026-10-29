@@ -29,3 +29,20 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   throw away a useful check of wholeness.
 - **Where:** `app/models/evidence_pack.py`, `app/services/pack_check.py`, `POST /investigations/{id}/evidence-pack/check`,
   `features/pack-check/check-a-pack.tsx`.
+
+## 3. Evidence pack as PDF, and signing it (29 Oct)
+
+- **Questions (ADR-0024, research §11):** which PDF renderer? Should packs be signed, with what key, and who keeps it?
+- **Call:** PDFs are printed by the headless Chromium the app already ships for web capture, with scripts off and
+  every request refused (no new package). The pack holds `evidence-pack.pdf` (the write-up, then each exhibit on its
+  own page with its picture), and the Export sheet's "Write-up for reading" now prints the write-up alone. Packs are
+  signed: one Ed25519 key per computer, made with the first pack and kept in the local profile (protected at rest by
+  the disk's encryption, ADR-0016), never in a case backup. The pack carries `MANIFEST.sha256.sig` and
+  `PUBLIC_KEY.pem`; VERIFY.txt gives the stock OpenSSL command; Keep › Safety & data shows the key's fingerprint to
+  give out; Check a pack says whether a signature is valid, whose key it is, and whether it is the key the pack was
+  made with.
+- **Why:** a signature makes "the pack is whole" into "the pack is whole and came from this computer", which is what
+  a lawyer asks; a per-computer key needs no setup from the reporter, and a standard Ed25519 signature can be checked
+  without the app. Wrapping the key with the app-lock passphrase would mean asking for it on every pack.
+- **Where:** `app/services/print_pdf.py`, `pack_signing.py`, `evidence_pack.py`, `pack_check.py`; migration
+  `a1c5e9f3d207`.

@@ -40,3 +40,6 @@
 .pk-acts { display: flex; flex-wrap: wrap; gap: 8px; }
 .pk-acts button { height: 30px; padding: 0 13px; border-radius: 8px; border: 1px solid var(--line, rgba(127,127,127,.35)); background: transparent; color: var(--text); font: 600 12px var(--font-ui); cursor: pointer; }
 .pk-acts button:hover { border-color: var(--accent-1); }
+.pk-sig { margin: 8px 0 0; display: flex; gap: 8px; font-size: 12.5px; }
+.pk-sig b { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; font: 600 10px var(--font-mono); }
+.pk-sig.valid b { color: var(--status-supported); } .pk-sig.invalid { color: var(--status-disputed); }

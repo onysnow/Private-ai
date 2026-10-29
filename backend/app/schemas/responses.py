@@ -5138,6 +5138,21 @@ class PackExhibitOut(ResponseModel):
     redrawn: bool
 
 
+class SigningKeyOut(ResponseModel):
+    """This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack."""
+    fingerprint: str | None = None
+    created_at: Timestamp | None = None
+
+
+class PackSignatureOut(ResponseModel):
+    """The pack's signature: none, invalid or valid; the key's fingerprint; whether it is this computer's key; whether it
+    is the key the pack was made with (always true for a pack not made here)."""
+    state: Literal["none", "invalid", "valid"]
+    fingerprint: str | None = None
+    ours: bool
+    as_made: bool
+
+
 class PackCheckOut(ResponseModel):
     """Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,
     for a pack not made in this case, with its own MANIFEST.sha256). Nothing of the pack is kept or sent."""
@@ -5156,7 +5171,7 @@ class PackCheckOut(ResponseModel):
     counts: dict[str, int]
     rows: list[PackFileOut]
     exhibits: list[PackExhibitOut]
-    signed: bool
+    signature: PackSignatureOut
 
 
 class VoiceOut(ResponseModel):

@@ -6547,6 +6547,19 @@ export const zPackFileOut = z.object({
 });
 
 /**
+ * PackSignatureOut
+ *
+ * The pack's signature: none, invalid or valid; the key's fingerprint; whether it is this computer's key; whether it
+ * is the key the pack was made with (always true for a pack not made here).
+ */
+export const zPackSignatureOut = z.object({
+  as_made: z.boolean(),
+  fingerprint: z.string().nullish(),
+  ours: z.boolean(),
+  state: z.enum(['none', 'invalid', 'valid']),
+});
+
+/**
  * PackCheckOut
  *
  * Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,
@@ -6571,7 +6584,7 @@ export const zPackCheckOut = z.object({
   made_in_other_case: z.string().nullish(),
   pack_id: z.string().nullish(),
   rows: z.array(zPackFileOut),
-  signed: z.boolean(),
+  signature: zPackSignatureOut,
   title: z.string().nullish(),
   whole: z.boolean(),
 });
@@ -8184,6 +8197,21 @@ export const zSettingsStatusOut = z.object({
   limits: zSettingsLimitsOut,
   restore_api_enabled: z.boolean(),
   security: zSecurityAlertsOut,
+});
+
+/**
+ * SigningKeyOut
+ *
+ * This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack.
+ */
+export const zSigningKeyOut = z.object({
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  fingerprint: z.string().nullish(),
 });
 
 /**
@@ -13685,6 +13713,15 @@ export const zGetWirePath = z.object({
  */
 export const zGetWireResponse = zWireOut;
 
+export const zExportWriteupPdfPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * The story's write-up for reading, printed on this computer
+ */
+export const zExportWriteupPdfResponse = z.string();
+
 export const zListWriteupsEndpointPath = z.object({
   investigation_id: z.string(),
 });
@@ -14489,6 +14526,11 @@ export const zRotateAppUserTokenQuery = z.object({
  * Successful Response
  */
 export const zRotateAppUserTokenResponse = zAppUserTokenRotatedOut;
+
+/**
+ * Successful Response
+ */
+export const zGetSigningKeyResponse = zSigningKeyOut;
 
 /**
  * Successful Response

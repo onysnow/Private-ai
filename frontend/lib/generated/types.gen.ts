@@ -15395,10 +15395,7 @@ export type PackCheckOut = {
    * Rows
    */
   rows: Array<PackFileOut>;
-  /**
-   * Signed
-   */
-  signed: boolean;
+  signature: PackSignatureOut;
   /**
    * Title
    */
@@ -15487,6 +15484,31 @@ export type PackFileOut = {
    * State
    */
   state: 'as_made' | 'changed' | 'missing' | 'extra';
+};
+
+/**
+ * PackSignatureOut
+ *
+ * The pack's signature: none, invalid or valid; the key's fingerprint; whether it is this computer's key; whether it
+ * is the key the pack was made with (always true for a pack not made here).
+ */
+export type PackSignatureOut = {
+  /**
+   * As Made
+   */
+  as_made: boolean;
+  /**
+   * Fingerprint
+   */
+  fingerprint?: string | null;
+  /**
+   * Ours
+   */
+  ours: boolean;
+  /**
+   * State
+   */
+  state: 'none' | 'invalid' | 'valid';
 };
 
 /**
@@ -19036,6 +19058,22 @@ export type SettingsStatusOut = {
    */
   restore_api_enabled: boolean;
   security: SecurityAlertsOut;
+};
+
+/**
+ * SigningKeyOut
+ *
+ * This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack.
+ */
+export type SigningKeyOut = {
+  /**
+   * Created At
+   */
+  created_at?: string | null;
+  /**
+   * Fingerprint
+   */
+  fingerprint?: string | null;
 };
 
 /**
@@ -33061,6 +33099,50 @@ export type GetWireResponses = {
 
 export type GetWireResponse = GetWireResponses[keyof GetWireResponses];
 
+export type ExportWriteupPdfData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/writeup.pdf';
+};
+
+export type ExportWriteupPdfErrors = {
+  /**
+   * No story write-up
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The printing browser is not installed
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExportWriteupPdfError =
+  ExportWriteupPdfErrors[keyof ExportWriteupPdfErrors];
+
+export type ExportWriteupPdfResponses = {
+  /**
+   * The story's write-up for reading, printed on this computer
+   */
+  200: Blob | File;
+};
+
+export type ExportWriteupPdfResponse =
+  ExportWriteupPdfResponses[keyof ExportWriteupPdfResponses];
+
 export type ListWriteupsEndpointData = {
   body?: never;
   path: {
@@ -36188,6 +36270,36 @@ export type RotateAppUserTokenResponses = {
 
 export type RotateAppUserTokenResponse =
   RotateAppUserTokenResponses[keyof RotateAppUserTokenResponses];
+
+export type GetSigningKeyData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/settings/signing-key';
+};
+
+export type GetSigningKeyErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSigningKeyError = GetSigningKeyErrors[keyof GetSigningKeyErrors];
+
+export type GetSigningKeyResponses = {
+  /**
+   * Successful Response
+   */
+  200: SigningKeyOut;
+};
+
+export type GetSigningKeyResponse =
+  GetSigningKeyResponses[keyof GetSigningKeyResponses];
 
 export type SettingsStatusData = {
   body?: never;

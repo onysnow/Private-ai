@@ -217,6 +217,11 @@ export function ExportSheet({story, doc, onClose, onExportDocx}: {
     } catch (error) { setStatus(errorMessage(error, 'The evidence pack did not download')); }
     setPacking(false);
   };
+  const pdf = async () => {
+    setStatus('Printing the write-up on this computer…');
+    try { await save(await api.blob(`/api/investigations/${story.investigation_id}/writeup.pdf`), `write-up-${story.investigation_id.slice(0, 8)}.pdf`); setStatus('Write-up PDF downloaded.'); }
+    catch (error) { setStatus(errorMessage(error, 'The PDF did not download')); }
+  };
   const docx = async () => {
     try { await onExportDocx(); setStatus('Write-up downloaded.'); } catch (error) { setStatus(errorMessage(error, 'The write-up did not download')); }
   };
@@ -227,8 +232,10 @@ export function ExportSheet({story, doc, onClose, onExportDocx}: {
         <li><b>Write-up for publication <small>.docx</small></b><span>The text with numbered citations and a Sources list naming each record.</span>
           <button type="button" disabled={Boolean(docxReason)} onClick={() => void docx()}>Export the .docx</button>
           {docxReason && <small className="sy-why">○ {docxReason}</small>}</li>
-        <li className="off"><b>Write-up for reading <small>PDF</small></b><span>The paper version of the current theme.</span>
-          <button type="button" disabled>Export as PDF</button><small className="sy-why">○ Not built yet</small></li>
+        <li><b>Write-up for reading <small>PDF</small></b><span>The write-up on paper, with each citation’s exhibit numbers; printed on this computer.</span>
+          <button type="button" disabled={!story.writeup_id} onClick={() => void pdf()}>Export as PDF</button>
+          {!story.writeup_id ? <small className="sy-why">○ Start the write-up first</small>
+            : !allOk && <small className="sy-why">○ Checks below are open: it is stamped “Export as draft”</small>}</li>
         <li><b>Evidence pack <small>.zip</small></b><span>The write-up, an exhibits list from its citations, each cited passage with its file’s fingerprint, and the readiness record.</span>
           <button type="button" disabled={!story.writeup_id || packing} onClick={() => void pack()}>{packing ? 'Making the pack…' : allOk ? 'Export the pack' : 'Export as draft'}</button>
           {!story.writeup_id ? <small className="sy-why">○ Start the write-up first</small>

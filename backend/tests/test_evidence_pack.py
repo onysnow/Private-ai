@@ -8,13 +8,34 @@ import hashlib
 import io
 import zipfile
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.db.session import SessionLocal
 from app.main import app
-from app.models.domain import Claim, ClaimEvidenceLink, Document, DocumentChunk, Evidence, Source
+from app.models.domain import (
+    Claim,
+    ClaimEvidenceLink,
+    Document,
+    DocumentChunk,
+    Evidence,
+    Source,
+)
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def printing_browser(monkeypatch):
+    """The PDF is printed by the capture browser; a machine whose Playwright browsers are not this package's own build
+    names its headless shell, as the web-capture tests do."""
+    from pathlib import Path
+
+    from app.core.config import settings
+
+    shells = sorted(Path("/opt/pw-browsers").glob("chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell"))
+    if not settings.capture_browser_path and shells:
+        monkeypatch.setattr(settings, "capture_browser_path", str(shells[-1]))
 PAGE = "Fernhill Ltd. Harbour Nominees Limited, being forty per cent (40%) of the issued share capital, from 14 March 2018."
 QUOTE = "Harbour Nominees Limited, being forty per cent (40%)"
 
@@ -109,7 +130,6 @@ def test_a_picture_goes_as_a_viewing_copy_without_its_metadata_and_a_protected_o
     from PIL import Image
 
     from app.core.config import settings
-
     from app.models.domain import AuthenticityItem
     from app.services.evidence_pack import viewing_copy
 
@@ -139,3 +159,28 @@ def test_a_picture_goes_as_a_viewing_copy_without_its_metadata_and_a_protected_o
         db.commit()
     _r, z = _open(inv)
     assert "exhibits/001/picture.jpg" not in z.namelist() and "Source-protected" in z.read("exhibits/001/exhibit.html").decode()
+
+
+def test_the_pack_holds_one_pdf_of_the_write_up_and_its_exhibits(tmp_path):
+    inv, claim_id, _path = _case(tmp_path)
+    _write(inv, claim_id)
+    r, z = _open(inv)
+    pdf = z.read("evidence-pack.pdf")
+    assert pdf.startswith(b"%PDF") and "evidence-pack.pdf" in z.read("MANIFEST.sha256").decode()
+    import fitz
+
+    with fitz.open(stream=pdf, filetype="pdf") as doc:
+        text = " ".join(page.get_text() for page in doc)
+        assert doc.page_count >= 2  # the write-up, then exhibit 1 on a page of its own
+    assert "Harbour Nominees held forty per cent" in text and "Exhibit 1" in text and QUOTE in " ".join(text.split())
+
+
+def test_the_write_up_for_reading_is_a_pdf_and_the_key_has_a_fingerprint(tmp_path):
+    inv, claim_id, _path = _case(tmp_path)
+    assert client.get(f"/api/investigations/{inv}/writeup.pdf").status_code == 404
+    _write(inv, claim_id)
+    r = client.get(f"/api/investigations/{inv}/writeup.pdf")
+    assert r.status_code == 200 and r.content.startswith(b"%PDF") and r.headers["content-type"] == "application/pdf"
+    _open(inv)
+    key = client.get("/api/settings/signing-key").json()
+    assert len(key["fingerprint"].split()) == 8 and key["created_at"]

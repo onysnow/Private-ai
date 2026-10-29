@@ -11,7 +11,7 @@ from PIL import Image
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.models.domain import Document, EvidencePack
-from tests.test_evidence_pack import _case, _open, _write, client
+from tests.test_evidence_pack import _case, _open, _write, client, printing_browser  # noqa: F401 (autouse fixture)
 
 
 def _repack(z: zipfile.ZipFile, change: dict[str, bytes | None], prefix: str = "") -> bytes:
@@ -57,8 +57,8 @@ def test_a_pack_as_made_is_whole_and_its_list_is_the_one_kept_here(tmp_path):
         assert kept.manifest == z.read("MANIFEST.sha256").decode() and kept.exhibits[0]["number"] == 1
     out = _check(inv, r.content)
     assert out["whole"] and out["made_here"] and out["compared_with"] == "the list kept here when it was made"
-    assert out["counts"] == {"as_made": len(z.namelist()) - 1, "changed": 0, "missing": 0, "extra": 0}
-    assert out["pack_id"] == kept.id and not out["signed"]
+    assert out["counts"] == {"as_made": len(z.namelist()) - 3, "changed": 0, "missing": 0, "extra": 0}  # not the list and its signature
+    assert out["pack_id"] == kept.id and out["signature"] == {"state": "valid", "fingerprint": kept.key_fingerprint, "ours": True, "as_made": True}
     # Zipped again inside a folder, it is the same pack.
     assert _check(inv, _repack(z, {}, prefix="from-the-lawyer/"))["whole"]
 
@@ -116,3 +116,25 @@ def _zip(files: dict[str, bytes]) -> bytes:
         for name, data in files.items():
             z.writestr(name, data)
     return out.getvalue()
+
+
+def test_the_list_is_signed_with_this_computers_key_and_a_wrong_signature_is_said(tmp_path):
+    import subprocess
+
+    inv, claim_id, _path = _case(tmp_path)
+    _write(inv, claim_id)
+    _r, z = _open(inv)
+    assert {"MANIFEST.sha256.sig", "PUBLIC_KEY.pem"} <= set(z.namelist())
+    assert "MANIFEST.sha256.sig" not in z.read("MANIFEST.sha256").decode()
+    # Anyone can check it with stock OpenSSL, as VERIFY.txt says.
+    for name in ("MANIFEST.sha256", "MANIFEST.sha256.sig", "PUBLIC_KEY.pem"):
+        (tmp_path / name).write_bytes(z.read(name))
+    said = subprocess.run(["openssl", "pkeyutl", "-verify", "-pubin", "-inkey", "PUBLIC_KEY.pem", "-rawin", "-in", "MANIFEST.sha256",
+                           "-sigfile", "MANIFEST.sha256.sig"], cwd=tmp_path, capture_output=True, text=True)
+    assert "Signature Verified Successfully" in said.stdout, said.stdout + said.stderr
+    # A list changed after signing no longer verifies.
+    bad = _check(inv, _repack(z, {"MANIFEST.sha256": z.read("MANIFEST.sha256") + b"0" * 64 + b"  notes.txt\n"}))
+    assert bad["signature"]["state"] == "invalid" and not bad["whole"]
+    # The same key signs every pack made on this computer.
+    _r2, z2 = _open(inv)
+    assert z2.read("PUBLIC_KEY.pem") == z.read("PUBLIC_KEY.pem")

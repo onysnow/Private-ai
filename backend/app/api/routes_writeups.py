@@ -15,7 +15,7 @@ from app.db.session import get_db
 from app.models.domain import Investigation, Writeup
 from app.schemas.api import ChartToSave, WriteupCreate, WriteupUpdate
 from app.services.saved_charts import ChartRefused, add_chart_to_writeup
-from app.schemas.responses import ErrorOut, ValidationErrorOut, DeletedOut, PackCheckOut, WriteupOut, WriteupsOut, file_response
+from app.schemas.responses import ErrorOut, ValidationErrorOut, DeletedOut, PackCheckOut, SigningKeyOut, WriteupOut, WriteupsOut, file_response
 from app.services.assistant_context import describe_record_refs
 from app.services.writeups import create_writeup, delete_writeup, list_writeups, render_writeup_docx, serialize_writeup, update_writeup
 
@@ -132,6 +132,32 @@ async def check_evidence_pack(investigation_id: str, file: UploadFile = File(...
         return check(db, investigation_id, data, file.filename or "")
     except PackRefused as exc:
         raise HTTPException(422, str(exc)) from exc
+
+
+@router.get("/investigations/{investigation_id}/writeup.pdf", response_class=Response, responses={
+    **file_response("application/pdf", "The story's write-up for reading, printed on this computer"),
+    404: {"model": ErrorOut, "description": "No story write-up"}, 503: {"model": ErrorOut, "description": "The printing browser is not installed"}})
+def export_writeup_pdf(investigation_id: str, db: Session = Depends(get_db)) -> Response:
+    """The write-up as a PDF (Export sheet › Write-up for reading), stamped "Export as draft" while a check is open."""
+    from app.services.evidence_pack import NoStory, writeup_pdf
+    from app.services.print_pdf import PdfUnavailable
+
+    try:
+        data, _title = writeup_pdf(db, investigation_id)
+    except NoStory as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except PdfUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    return Response(content=data, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="write-up-{investigation_id[:8]}.pdf"'})
+
+
+@router.get("/settings/signing-key", response_model=SigningKeyOut)
+def get_signing_key(db: Session = Depends(get_db)) -> Any:
+    """This computer's evidence-pack signing key: its fingerprint, to give out with a pack, and when it was made."""
+    from app.services.pack_signing import public
+
+    return public(db)
 
 
 @router.get("/investigations/{investigation_id}/evidence-pack.zip", response_class=Response, responses={

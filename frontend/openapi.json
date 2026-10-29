@@ -30773,9 +30773,8 @@
             "title": "Rows",
             "type": "array"
           },
-          "signed": {
-            "title": "Signed",
-            "type": "boolean"
+          "signature": {
+            "$ref": "#/components/schemas/PackSignatureOut"
           },
           "title": {
             "anyOf": [
@@ -30803,7 +30802,7 @@
           "counts",
           "rows",
           "exhibits",
-          "signed"
+          "signature"
         ],
         "title": "PackCheckOut",
         "type": "object"
@@ -30968,6 +30967,46 @@
           "state"
         ],
         "title": "PackFileOut",
+        "type": "object"
+      },
+      "PackSignatureOut": {
+        "description": "The pack's signature: none, invalid or valid; the key's fingerprint; whether it is this computer's key; whether it\nis the key the pack was made with (always true for a pack not made here).",
+        "properties": {
+          "as_made": {
+            "title": "As Made",
+            "type": "boolean"
+          },
+          "fingerprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fingerprint"
+          },
+          "ours": {
+            "title": "Ours",
+            "type": "boolean"
+          },
+          "state": {
+            "enum": [
+              "none",
+              "invalid",
+              "valid"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "ours",
+          "as_made"
+        ],
+        "title": "PackSignatureOut",
         "type": "object"
       },
       "PacketFromIn": {
@@ -36936,6 +36975,37 @@
           "connectors"
         ],
         "title": "SettingsStatusOut",
+        "type": "object"
+      },
+      "SigningKeyOut": {
+        "description": "This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack.",
+        "properties": {
+          "created_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "fingerprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fingerprint"
+          }
+        },
+        "title": "SigningKeyOut",
         "type": "object"
       },
       "SimilarDocumentOut": {
@@ -66732,6 +66802,77 @@
         "summary": "Get Wire"
       }
     },
+    "/api/investigations/{investigation_id}/writeup.pdf": {
+      "get": {
+        "description": "The write-up as a PDF (Export sheet › Write-up for reading), stamped \"Export as draft\" while a check is open.",
+        "operationId": "export_writeup_pdf",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The story's write-up for reading, printed on this computer"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No story write-up"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The printing browser is not installed"
+          }
+        },
+        "summary": "Export Writeup Pdf"
+      }
+    },
     "/api/investigations/{investigation_id}/writeups": {
       "get": {
         "operationId": "list_writeups_endpoint",
@@ -71628,6 +71769,45 @@
           }
         },
         "summary": "Rotate App User Token"
+      }
+    },
+    "/api/settings/signing-key": {
+      "get": {
+        "description": "This computer's evidence-pack signing key: its fingerprint, to give out with a pack, and when it was made.",
+        "operationId": "get_signing_key",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SigningKeyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Signing Key"
       }
     },
     "/api/settings/status": {

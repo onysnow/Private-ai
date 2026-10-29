@@ -11,12 +11,14 @@ not put in the pack; their fingerprints are, so a reader can ask for an original
 
 from __future__ import annotations
 
+import base64
 import csv
 import hashlib
 import html
 import io
 import json
 import logging
+import re
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -227,6 +229,40 @@ def _exhibit_files(db: Session, ex: dict[str, Any], draft: bool, storage_root: P
     return files, row, gaps
 
 
+def writeup_pdf(db: Session, investigation_id: str) -> tuple[bytes, str]:
+    """The story's write-up for reading, as a PDF printed here: the same page as the pack's index.html, with each
+    citation's exhibit numbers. Raises NoStory when there is no write-up."""
+    from app.services.print_pdf import html_to_pdf
+
+    story = story_of(db, investigation_id)
+    writeup = db.get(Writeup, story.writeup_id) if story is not None and story.writeup_id else None
+    if writeup is None:
+        raise NoStory("Start the story's write-up first.")
+    draft = not all(c["ok"] for c in preflight(story_tree(db, investigation_id)))
+    _exhibits_, behind, _gaps = _exhibits(db, extract_cited_refs(writeup.content_json or {}))
+    return html_to_pdf(_render_html(writeup.content_json or {}, behind, writeup.title, draft)), writeup.title
+
+
+def _body(page: bytes) -> str:
+    m = re.search(r"<body[^>]*>(.*)</body>", page.decode("utf-8", "replace"), re.S)
+    return m.group(1) if m else ""
+
+
+def pack_pdf(files: dict[str, bytes], title: str) -> bytes:
+    """The write-up and every exhibit as one PDF, each exhibit on a new page with its picture, printed here."""
+    from app.services.print_pdf import html_to_pdf
+
+    parts = [_body(files["index.html"])]
+    for name in sorted(n for n in files if re.match(r"^exhibits/\d{3}/exhibit\.html$", n)):
+        folder = name.rsplit("/", 1)[0]
+        body = _body(files[name])
+        for pic, mime in (("page.png", "image/png"), ("picture.jpg", "image/jpeg")):
+            if f"{folder}/{pic}" in files:
+                body = body.replace(f'src="{pic}"', f'src="data:{mime};base64,{base64.b64encode(files[f"{folder}/{pic}"]).decode()}"')
+        parts.append('<section style="page-break-before:always">' + body + "</section>")
+    return html_to_pdf(_page(title, "".join(parts)))
+
+
 def viewing_copy(data: bytes) -> bytes:
     """A picture drawn again as a plain JPEG: no EXIF, XMP, GPS, camera serial or content credentials leave in a pack.
     The original's SHA-256 stays in the exhibit, for anyone who is given the original to check."""
@@ -323,6 +359,13 @@ def build_pack(db: Session, investigation_id: str, *, actor: str | None = None) 
         files[f"custody/{claim_id}.txt"] = (f"Claim: {chain['claim']['text']}\nStatus: {chain['claim']['status']}\n\n"
                                             f"Done rules for Supported\n{done}\n\nChain of custody (UTC)\n{log}\n").encode()
 
+    made_pdf = False
+    try:
+        files["evidence-pack.pdf"] = pack_pdf(files, writeup.title)
+        made_pdf = True
+    except Exception as exc:  # the PDF is a reading copy beside the HTML: its absence is a gap, never a failed pack
+        logger.warning("evidence pack: no PDF (%s)", exc)
+        gaps.append(f"The PDF could not be made here ({exc}); index.html and the exhibits hold the same pages.")
     readiness = {"pack_id": pack_id, "made": made.isoformat(), "story": tree["thesis"], "write_up": writeup.title,
                  "gates": [{"label": g["label"], "state": g["state"], "detail": g["detail"]} for g in tree["gates"]],
                  "recorded": (story.gates if story else {}),
@@ -346,7 +389,9 @@ def build_pack(db: Session, investigation_id: str, *, actor: str | None = None) 
         "  custody/          the chain of custody of each cited claim, with its Done rules",
         "  readiness.json    the gates, who decided and when",
         f"  gaps.txt          {len(gaps)} gap(s)",
+        "  evidence-pack.pdf the write-up and every exhibit as one PDF, for reading and printing",
         "  MANIFEST.sha256   every file's SHA-256; VERIFY.txt says how to check them",
+        "  MANIFEST.sha256.sig and PUBLIC_KEY.pem   the list signed with this computer's key",
         "",
         "Original files are not in the pack. Their SHA-256 is: ask for an original and check it against exhibits.csv.",
         "A picture is shown as a viewing copy, drawn again with its metadata removed (no GPS, camera serial or credentials).",
@@ -359,17 +404,26 @@ def build_pack(db: Session, investigation_id: str, *, actor: str | None = None) 
                            "  sha256sum -c MANIFEST.sha256        (Linux)\n"
                            "  shasum -a 256 -c MANIFEST.sha256    (macOS)\n"
                            "Every line should say OK. On Windows: certutil -hashfile <file> SHA256, and compare.\n"
-                           "The manifest itself is not signed: it shows the pack is whole, not who made it.\n").encode()
+                           "The list is signed with the key of the computer that made the pack. To check the signature:\n"
+                           "  openssl pkeyutl -verify -pubin -inkey PUBLIC_KEY.pem -rawin -in MANIFEST.sha256 -sigfile MANIFEST.sha256.sig\n"
+                           "It should say Signature Verified Successfully. It shows who made the pack only as far as you know the key\n"
+                           "is theirs: ask them for its fingerprint (the Workbench shows it in Settings) and compare.\n").encode()
     listed = {name: hashlib.sha256(data).hexdigest() for name, data in sorted(files.items())}
     files["MANIFEST.sha256"] = "".join(f"{sha}  {name}\n" for name, sha in listed.items()).encode()
+    from app.services.pack_signing import sign
+
+    signature, pem, key_fingerprint = sign(db, files["MANIFEST.sha256"])
+    files["MANIFEST.sha256.sig"] = signature
+    files["PUBLIC_KEY.pem"] = pem
     db.add(EvidencePack(id=pack_id, investigation_id=investigation_id, title=writeup.title, draft=draft, made_by=actor,
                         manifest=files["MANIFEST.sha256"].decode(), manifest_sha256=hashlib.sha256(files["MANIFEST.sha256"]).hexdigest(),
-                        files=listed, exhibits=kept, created_at=utcnow_naive()))
+                        files=listed, exhibits=kept, created_at=utcnow_naive(), key_fingerprint=key_fingerprint, pdf=made_pdf))
     db.commit()
 
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for name, data in sorted(files.items()):
             zf.writestr(name, data)
-    summary = {"exhibits": len(rows), "gaps": len(gaps), "draft": draft, "files": len(files), "pack_id": pack_id}
+    summary = {"exhibits": len(rows), "gaps": len(gaps), "draft": draft, "files": len(files), "pack_id": pack_id,
+               "pdf": made_pdf, "key_fingerprint": key_fingerprint}
     return out.getvalue(), summary

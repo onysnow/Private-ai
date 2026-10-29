@@ -17,7 +17,7 @@ const B = 'b'.repeat(64);
 const RESULT: PackCheckOut = {
   file: 'kestrel-pack.zip', files: 5, pack_id: 'pack-1234abcd', made_here: true, made_in_other_case: null, made_at: '2026-10-28T17:44:00',
   made_by: 'local-owner', title: 'Who owns the harbour land', draft: false, compared_with: 'the list kept here when it was made',
-  list_changed: false, whole: false, counts: {as_made: 2, changed: 1, missing: 1, extra: 1}, signed: false,
+  list_changed: false, whole: false, counts: {as_made: 2, changed: 1, missing: 1, extra: 1},
   rows: [
     {name: 'index.html', state: 'as_made', listed: A, now: A},
     {name: 'exhibits/007/page.png', state: 'changed', listed: A, now: B},
@@ -25,6 +25,7 @@ const RESULT: PackCheckOut = {
     {name: 'notes.txt', state: 'extra', listed: null, now: B},
     {name: 'VERIFY.txt', state: 'as_made', listed: A, now: A},
   ],
+  signature: {state: 'valid', fingerprint: '1a2b 3c4d 5e6f 7a8b 9c0d 1e2f 3a4b 5c6d', ours: true, as_made: true},
   exhibits: [{number: 7, file: 'page.png', state: 'changed', document: 'statement.pdf', case_file: 'matches',
     claims: ['Fernhill paid Loop Two €29,400 in March 2019'], ours: 'data:image/png;base64,AA==', theirs: 'data:image/png;base64,AA==',
     differs: {left: 0.1, top: 0.5, width: 0.8, height: 0.1}, redrawn: true}],
@@ -43,6 +44,7 @@ describe('Check a pack', () => {
     const result = await screen.findByRole('region', {name: 'Result'});
     expect(result).toHaveTextContent('✕ Not as it was made');
     expect(result).toHaveTextContent('compared with the list kept here when it was made');
+    expect(result).toHaveTextContent('Signed with this computer’s key (1a2b 3c4d 5e6f 7a8b 9c0d 1e2f 3a4b 5c6d).');
     const files = screen.getByRole('region', {name: 'Every file against the list'});
     const rows = within(files).getAllByRole('listitem');
     expect(rows[0]).toHaveTextContent('exhibits/007/page.png');  // what is not as made comes first

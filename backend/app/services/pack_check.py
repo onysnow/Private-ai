@@ -28,6 +28,7 @@ from app.services.security import resolve_storage_root
 MAX_FILES = 5000
 MAX_UNPACKED = 1024 * 1024 * 1024  # a zip that would unpack past this is refused, not read
 THUMB = 420
+SIGNATURE_FILES = ("MANIFEST.sha256.sig", "PUBLIC_KEY.pem")
 NOISE = 40  # grey levels of difference that JPEG compression alone can make
 
 
@@ -130,7 +131,7 @@ def check(db: Session, investigation_id: str, data: bytes, filename: str = "") -
             continue
         now = hashlib.sha256(members[name]).hexdigest()
         rows.append({"name": name, "state": "as_made" if now == listed else "changed", "listed": listed, "now": now})
-    for name in sorted(set(members) - set(authority) - {"MANIFEST.sha256"}):
+    for name in sorted(set(members) - set(authority) - {"MANIFEST.sha256", *SIGNATURE_FILES}):
         rows.append({"name": name, "state": "extra", "listed": None, "now": hashlib.sha256(members[name]).hexdigest()})
     counts = {k: sum(r["state"] == k for r in rows) for k in ("as_made", "changed", "missing", "extra")}
     list_changed = record is not None and members["MANIFEST.sha256"].decode("utf-8", "replace") != record.manifest
@@ -174,5 +175,15 @@ def check(db: Session, investigation_id: str, data: bytes, filename: str = "") -
         "title": record.title if record is not None else None, "draft": record.draft if record is not None else None,
         "compared_with": "the list kept here when it was made" if record is not None else "the pack's own MANIFEST.sha256",
         "list_changed": list_changed, "whole": whole, "counts": counts, "rows": rows, "exhibits": exhibits,
-        "signed": False,
+        "signature": _signature(db, members, record),
     }
+
+
+def _signature(db: Session, members: dict[str, bytes], record: EvidencePack | None) -> dict[str, Any]:
+    """Whether the pack's list carries a valid signature, with which key, and whether that key is this computer's (and,
+    for a pack made here, the one it was made with)."""
+    from app.services.pack_signing import verify
+
+    out = verify(db, members["MANIFEST.sha256"], members.get("MANIFEST.sha256.sig"), members.get("PUBLIC_KEY.pem"))
+    out["as_made"] = record is None or not record.key_fingerprint or out.get("fingerprint") == record.key_fingerprint
+    return out

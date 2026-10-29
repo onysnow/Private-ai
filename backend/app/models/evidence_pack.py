@@ -26,4 +26,7 @@ class EvidencePack(Base):
     manifest_sha256: Mapped[str] = mapped_column(String(64))
     files: Mapped[dict] = mapped_column(JSON, default=dict)
     exhibits: Mapped[list] = mapped_column(JSON, default=list)
+    # The fingerprint of the key it was signed with, and whether it went out as a PDF too.
+    key_fingerprint: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    pdf: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive, index=True)

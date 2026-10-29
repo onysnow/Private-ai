@@ -37,3 +37,9 @@ and whether packs are signed with a local key.
 
 - A reader can check every sentence: citation → exhibit → page → fingerprint, and the manifest checks the pack.
 - A large case makes a large pack in one request; progress steps can come later if packs grow slow.
+
+## Later (29 Oct 2026)
+
+The pack is also a PDF and its list is signed (DECISIONS_LOG 3): `evidence-pack.pdf`, `MANIFEST.sha256.sig` and
+`PUBLIC_KEY.pem`. Each pack made is recorded (`evidence_packs`) so Check a pack can compare one sent back with the
+list made here.

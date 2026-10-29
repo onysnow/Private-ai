@@ -245,6 +245,15 @@ def contract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[
                               app_log_file=str(tmp_path / "app.jsonl"), audit_log_file=str(tmp_path / "audit.jsonl"),
                               api_auth_failure_state_file=""), bootstrap_schema=False)
     client = TestClient(app)
+    # The write-up PDF is printed by the capture browser: a machine whose Playwright browsers are not this package's
+    # own build names its headless shell, as the web-capture tests do (CI installs the package's own).
+    from pathlib import Path as _Path
+
+    from app.core.config import settings as _settings
+
+    shells = sorted(_Path("/opt/pw-browsers").glob("chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell"))
+    if not _settings.capture_browser_path and shells:
+        monkeypatch.setattr(_settings, "capture_browser_path", str(shells[-1]))
     seeded = _seed(app, client, monkeypatch, reasoning)
     schema = schemathesis.openapi.from_asgi("/openapi.json", app, config=_config(app))
     try:

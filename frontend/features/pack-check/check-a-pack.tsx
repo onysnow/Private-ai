@@ -105,7 +105,13 @@ export function CheckAPack({investigationId}: {investigationId: string}): ReactE
             ? `Made by ${by(result.made_by)} for this case on ${result.made_at?.slice(0, 16).replace('T', ' ')} UTC${result.draft ? ', as a draft' : ''}: compared with the list kept here when it was made.`
             : result.made_in_other_case ? `Made on this computer for another case (${result.made_in_other_case}): compared with its own list only. Open that case to check it against the list kept there.`
             : 'Not made in this case: compared with its own list, which shows it is whole but not that nobody made a new list after changing it.'}
-            {result.list_changed ? ' The pack’s own list was changed after it was made.' : ''} Not signed.</p>
+            {result.list_changed ? ' The pack’s own list was changed after it was made.' : ''}</p>
+          <p className={`pk-sig ${result.signature.state}`}><b aria-hidden="true">{result.signature.state === 'valid' ? '✓' : result.signature.state === 'invalid' ? '✕' : '○'}</b>
+            {result.signature.state === 'none' ? 'Not signed.'
+              : result.signature.state === 'invalid' ? `The signature does not match the list${result.signature.fingerprint ? ` (key ${result.signature.fingerprint})` : ''}: the list was changed after signing, or the signature is not for it.`
+              : result.signature.ours ? `Signed with this computer’s key (${result.signature.fingerprint}).`
+              : `Signed with another key, ${result.signature.fingerprint}: ask its owner to read you its fingerprint.`}
+            {result.signature.state === 'valid' && !result.signature.as_made ? ' Not the key this pack was made with.' : ''}</p>
         </section>
         {result.exhibits.map(e => <Exhibit key={`${e.number}-${e.file}`} e={e}/>)}
         <div className="pk-acts"><button type="button" onClick={exportCheck}>Export this check (for an editor or lawyer)</button></div>
