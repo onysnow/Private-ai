@@ -87,8 +87,9 @@ https://framer.com/m/Shader-Button-v12VJe.js@PhehsfTqnG7o5bWDuNUT (Framer's "Sha
   from chip to chip and lifts with a hovered chip). In the app it would draw once a frame at half resolution, pause off
   screen, and stay off under calm motion, Effects off and reduced motion. It waits for his yes.
 - He asked why the cards are rounded rectangles rather than chips: the app's cards have had 11px corners since they were
-  first drawn (PR #60), and only a dot's name is a full pill. The previews now draw cards as pills; the app changes only
-  on his yes.
+  first drawn (PR #60), and only a dot's name is a full pill. The previews now draw cards as pills with perfect half
+  circle ends, the kind circle filling the left end flush with the outline (a tagged card's tag ring hugs that end
+  outside it); the app changes only on his yes.
 
 ## Testimonial rotation (Ony, 29 Oct)
 Ony sent https://framer.com/m/Testimonial-Rotation-JRnz0w.js@VcEYXbVlwUb8LpYlJsb6 without a note.
