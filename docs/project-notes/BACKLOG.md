@@ -171,6 +171,14 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
 - Smaller fixes in the shapes preview: the vessel dot badge 4 wider on the right so the ship has even space all round;
   the red-flag count reacts only when the count itself is hovered, not the whole chip; the red-flag box's words are
   clipped to the box as it grows; the solid building's windows rest in the dark purple and still light up.
+- "Turns solid" means the whole badge inverts: the badge fills in the kind's colour, the icon goes solid in the badge's
+  dark, and its details are cut out in the light (the building's windows rest light and still light up). Shapes
+  preview, cards and dots.
+- What a connection not on the map means: three or more steps from the centre, or a direct connection left off for
+  room (each party shows at most 2 of its own, picked flags first; about 46 parties in all). Proposed hover: why
+  they're off ("2 more connections, left off to keep the map clear"), one line each (name, kind, the link in words,
+  flag count if any; top 3 then "and N more"), "Click to bring them onto the map". Short wording to pick: "2 not on the
+  map", "2 more", "2 off the map", "2 not shown yet". Waiting for him.
 - Research before designing more: how 2026 UI hints at more information, and how ownership share is shown (the
   key-and-ring share mark is not good). Findings to discuss with him before any redesign.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
