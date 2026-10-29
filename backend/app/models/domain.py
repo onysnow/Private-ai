@@ -30,6 +30,7 @@ from app.models.derived import DerivedFile, DocumentPhoto
 from app.models.authenticity import AuthenticityCheck, AuthenticityItem
 from app.models.evidence_pack import EvidencePack
 from app.models.platform_check import PlatformCheck
+from app.models.timeline_period import TimelinePeriod
 from app.models.following import Monitor, MonitorItem, PageVersion
 from app.models.media import DocumentMedia, TranscriptSegment
 from app.models.claims import (
@@ -136,6 +137,7 @@ __all__ = [
     "AuthenticityCheck",
     "EvidencePack",
     "PlatformCheck",
+    "TimelinePeriod",
     "AuthenticityItem",
     "CaseRecord",
     "Capture",

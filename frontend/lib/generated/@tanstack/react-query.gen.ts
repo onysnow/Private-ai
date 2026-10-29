@@ -67,6 +67,7 @@ import {
   createReportingTaskEndpoint,
   createSourceEndpoint,
   createTimelineEventEndpoint,
+  createTimelinePeriod,
   createWatch,
   createWriteupEndpoint,
   decideAuthenticity,
@@ -81,6 +82,7 @@ import {
   deleteMonitor,
   deleteSavedQuestion,
   deleteStorySection,
+  deleteTimelinePeriod,
   deleteWatch,
   deleteWriteupEndpoint,
   diskAnswer,
@@ -378,6 +380,7 @@ import {
   syncOpenalephDocument,
   tagARecord,
   testNotificationChannel,
+  timelineLanesView,
   turnOff,
   turnOn,
   undoItem,
@@ -394,6 +397,7 @@ import {
   updateMonitor,
   updateReportingTaskEndpoint,
   updateStorySection,
+  updateTimelinePeriod,
   updateWriteupEndpoint,
   uploadDocument,
 } from '../sdk.gen';
@@ -572,6 +576,9 @@ import type {
   CreateTimelineEventEndpointData,
   CreateTimelineEventEndpointError,
   CreateTimelineEventEndpointResponse,
+  CreateTimelinePeriodData,
+  CreateTimelinePeriodError,
+  CreateTimelinePeriodResponse,
   CreateWatchData,
   CreateWatchError,
   CreateWatchResponse,
@@ -614,6 +621,9 @@ import type {
   DeleteStorySectionData,
   DeleteStorySectionError,
   DeleteStorySectionResponse,
+  DeleteTimelinePeriodData,
+  DeleteTimelinePeriodError,
+  DeleteTimelinePeriodResponse,
   DeleteWatchData,
   DeleteWatchError,
   DeleteWatchResponse,
@@ -1500,6 +1510,9 @@ import type {
   TestNotificationChannelData,
   TestNotificationChannelError,
   TestNotificationChannelResponse,
+  TimelineLanesViewData,
+  TimelineLanesViewError,
+  TimelineLanesViewResponse,
   TurnOffData,
   TurnOffError,
   TurnOffResponse,
@@ -1548,6 +1561,9 @@ import type {
   UpdateStorySectionData,
   UpdateStorySectionError,
   UpdateStorySectionResponse,
+  UpdateTimelinePeriodData,
+  UpdateTimelinePeriodError,
+  UpdateTimelinePeriodResponse,
   UpdateWriteupEndpointData,
   UpdateWriteupEndpointError,
   UpdateWriteupEndpointResponse,
@@ -10002,6 +10018,124 @@ export const getInvestigationTimelineInfiniteOptions = (
     },
   );
   return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const timelineLanesViewQueryKey = (
+  options: Options<TimelineLanesViewData>,
+) => createQueryKey('timelineLanesView', options);
+
+/**
+ * Timeline Lanes View
+ *
+ * The case's events as lanes: each with its parties, where it comes from and whether it is shown; the reporter's
+ * periods; the sequence checks; records not on the timeline yet; and sources with no date.
+ */
+export const timelineLanesViewOptions = (
+  options: Options<TimelineLanesViewData>,
+) =>
+  queryOptions<
+    TimelineLanesViewResponse,
+    TimelineLanesViewError,
+    TimelineLanesViewResponse,
+    ReturnType<typeof timelineLanesViewQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await timelineLanesView({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: timelineLanesViewQueryKey(options),
+  });
+
+/**
+ * Create Timeline Period
+ *
+ * Name a stretch of the case's time.
+ */
+export const createTimelinePeriodMutation = (
+  options?: Partial<Options<CreateTimelinePeriodData>>,
+): UseMutationOptions<
+  CreateTimelinePeriodResponse,
+  CreateTimelinePeriodError,
+  Options<CreateTimelinePeriodData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateTimelinePeriodResponse,
+    CreateTimelinePeriodError,
+    Options<CreateTimelinePeriodData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createTimelinePeriod({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete Timeline Period
+ *
+ * Take a period away; its events stay.
+ */
+export const deleteTimelinePeriodMutation = (
+  options?: Partial<Options<DeleteTimelinePeriodData>>,
+): UseMutationOptions<
+  DeleteTimelinePeriodResponse,
+  DeleteTimelinePeriodError,
+  Options<DeleteTimelinePeriodData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteTimelinePeriodResponse,
+    DeleteTimelinePeriodError,
+    Options<DeleteTimelinePeriodData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteTimelinePeriod({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update Timeline Period
+ *
+ * Rename a period, move its dates, or change its summary.
+ */
+export const updateTimelinePeriodMutation = (
+  options?: Partial<Options<UpdateTimelinePeriodData>>,
+): UseMutationOptions<
+  UpdateTimelinePeriodResponse,
+  UpdateTimelinePeriodError,
+  Options<UpdateTimelinePeriodData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateTimelinePeriodResponse,
+    UpdateTimelinePeriodError,
+    Options<UpdateTimelinePeriodData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateTimelinePeriod({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const getInvestigationTypeQueryKey = (

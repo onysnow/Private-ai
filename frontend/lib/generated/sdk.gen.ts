@@ -186,6 +186,9 @@ import type {
   CreateTimelineEventEndpointData,
   CreateTimelineEventEndpointErrors,
   CreateTimelineEventEndpointResponses,
+  CreateTimelinePeriodData,
+  CreateTimelinePeriodErrors,
+  CreateTimelinePeriodResponses,
   CreateWatchData,
   CreateWatchErrors,
   CreateWatchResponses,
@@ -228,6 +231,9 @@ import type {
   DeleteStorySectionData,
   DeleteStorySectionErrors,
   DeleteStorySectionResponses,
+  DeleteTimelinePeriodData,
+  DeleteTimelinePeriodErrors,
+  DeleteTimelinePeriodResponses,
   DeleteWatchData,
   DeleteWatchErrors,
   DeleteWatchResponses,
@@ -1116,6 +1122,9 @@ import type {
   TestNotificationChannelData,
   TestNotificationChannelErrors,
   TestNotificationChannelResponses,
+  TimelineLanesViewData,
+  TimelineLanesViewErrors,
+  TimelineLanesViewResponses,
   TurnOffData,
   TurnOffErrors,
   TurnOffResponses,
@@ -1164,6 +1173,9 @@ import type {
   UpdateStorySectionData,
   UpdateStorySectionErrors,
   UpdateStorySectionResponses,
+  UpdateTimelinePeriodData,
+  UpdateTimelinePeriodErrors,
+  UpdateTimelinePeriodResponses,
   UpdateWriteupEndpointData,
   UpdateWriteupEndpointErrors,
   UpdateWriteupEndpointResponses,
@@ -1311,6 +1323,9 @@ import {
   zCreateSourceEndpointResponse,
   zCreateTimelineEventEndpointBody,
   zCreateTimelineEventEndpointResponse,
+  zCreateTimelinePeriodBody,
+  zCreateTimelinePeriodPath,
+  zCreateTimelinePeriodResponse,
   zCreateWatchBody,
   zCreateWatchResponse,
   zCreateWriteupEndpointBody,
@@ -1345,6 +1360,8 @@ import {
   zDeleteSavedQuestionResponse,
   zDeleteStorySectionPath,
   zDeleteStorySectionResponse,
+  zDeleteTimelinePeriodPath,
+  zDeleteTimelinePeriodResponse,
   zDeleteWatchPath,
   zDeleteWatchResponse,
   zDeleteWriteupEndpointPath,
@@ -2007,6 +2024,8 @@ import {
   zTagARecordResponse,
   zTestNotificationChannelPath,
   zTestNotificationChannelResponse,
+  zTimelineLanesViewPath,
+  zTimelineLanesViewResponse,
   zTurnOffBody,
   zTurnOffResponse,
   zTurnOnBody,
@@ -2050,6 +2069,9 @@ import {
   zUpdateStorySectionBody,
   zUpdateStorySectionPath,
   zUpdateStorySectionResponse,
+  zUpdateTimelinePeriodBody,
+  zUpdateTimelinePeriodPath,
+  zUpdateTimelinePeriodResponse,
   zUpdateWriteupEndpointBody,
   zUpdateWriteupEndpointPath,
   zUpdateWriteupEndpointResponse,
@@ -9984,6 +10006,139 @@ export const getInvestigationTimeline = <ThrowOnError extends boolean = false>(
       await zGetInvestigationTimelineResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/timeline',
     ...options,
+  });
+
+/**
+ * Timeline Lanes View
+ *
+ * The case's events as lanes: each with its parties, where it comes from and whether it is shown; the reporter's
+ * periods; the sequence checks; records not on the timeline yet; and sources with no date.
+ */
+export const timelineLanesView = <ThrowOnError extends boolean = false>(
+  options: Options<TimelineLanesViewData, ThrowOnError>,
+): RequestResult<
+  TimelineLanesViewResponses,
+  TimelineLanesViewErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    TimelineLanesViewResponses,
+    TimelineLanesViewErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zTimelineLanesViewPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zTimelineLanesViewResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/lanes',
+    ...options,
+  });
+
+/**
+ * Create Timeline Period
+ *
+ * Name a stretch of the case's time.
+ */
+export const createTimelinePeriod = <ThrowOnError extends boolean = false>(
+  options: Options<CreateTimelinePeriodData, ThrowOnError>,
+): RequestResult<
+  CreateTimelinePeriodResponses,
+  CreateTimelinePeriodErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateTimelinePeriodResponses,
+    CreateTimelinePeriodErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateTimelinePeriodBody,
+          path: zCreateTimelinePeriodPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateTimelinePeriodResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/periods',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete Timeline Period
+ *
+ * Take a period away; its events stay.
+ */
+export const deleteTimelinePeriod = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteTimelinePeriodData, ThrowOnError>,
+): RequestResult<
+  DeleteTimelinePeriodResponses,
+  DeleteTimelinePeriodErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteTimelinePeriodResponses,
+    DeleteTimelinePeriodErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeleteTimelinePeriodPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeleteTimelinePeriodResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/periods/{period_id}',
+    ...options,
+  });
+
+/**
+ * Update Timeline Period
+ *
+ * Rename a period, move its dates, or change its summary.
+ */
+export const updateTimelinePeriod = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateTimelinePeriodData, ThrowOnError>,
+): RequestResult<
+  UpdateTimelinePeriodResponses,
+  UpdateTimelinePeriodErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateTimelinePeriodResponses,
+    UpdateTimelinePeriodErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateTimelinePeriodBody,
+          path: zUpdateTimelinePeriodPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateTimelinePeriodResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/timeline/periods/{period_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

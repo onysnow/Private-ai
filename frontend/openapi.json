@@ -40368,6 +40368,11 @@
             ],
             "title": "Origin"
           },
+          "placeholder": {
+            "default": false,
+            "title": "Placeholder",
+            "type": "boolean"
+          },
           "precision": {
             "default": "day",
             "title": "Precision",
@@ -40503,6 +40508,11 @@
           "kind": {
             "title": "Kind",
             "type": "string"
+          },
+          "placeholder": {
+            "default": false,
+            "title": "Placeholder",
+            "type": "boolean"
           },
           "precision": {
             "title": "Precision",
@@ -40664,6 +40674,11 @@
             ],
             "title": "Origin"
           },
+          "placeholder": {
+            "default": false,
+            "title": "Placeholder",
+            "type": "boolean"
+          },
           "precision": {
             "title": "Precision",
             "type": "string"
@@ -40738,6 +40753,348 @@
         "title": "TimelineItemOut",
         "type": "object"
       },
+      "TimelineLaneEventOut": {
+        "additionalProperties": true,
+        "description": "An event as Lanes draws it: the parties it is about (its lanes), where it comes from, its amount when it is a\npayment, and one mark for whether it is shown (app/services/timeline_lanes.py fact_of).",
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "amount_eur": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Eur"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TimelineContextOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "date_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date End"
+          },
+          "date_start": {
+            "title": "Date Start",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "fact": {
+            "enum": [
+              "shown",
+              "not_yet",
+              "disputed",
+              "worked_out"
+            ],
+            "title": "Fact",
+            "type": "string"
+          },
+          "fact_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fact Note"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grade"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "parties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "placeholder": {
+            "default": false,
+            "title": "Placeholder",
+            "type": "boolean"
+          },
+          "precision": {
+            "title": "Precision",
+            "type": "string"
+          },
+          "prop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prop"
+          },
+          "provenance": {
+            "additionalProperties": true,
+            "title": "Provenance",
+            "type": "object"
+          },
+          "refs": {
+            "additionalProperties": true,
+            "title": "Refs",
+            "type": "object"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          },
+          "sort_key": {
+            "title": "Sort Key",
+            "type": "string"
+          },
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "source_label": {
+            "title": "Source Label",
+            "type": "string"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "verification_status": {
+            "title": "Verification Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "investigation_id",
+          "title",
+          "date_start",
+          "precision",
+          "verification_status",
+          "synthetic",
+          "refs",
+          "provenance",
+          "sort_key",
+          "parties",
+          "source_key",
+          "source_label",
+          "fact"
+        ],
+        "title": "TimelineLaneEventOut",
+        "type": "object"
+      },
+      "TimelineLanesOut": {
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineLaneEventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "facts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Facts",
+            "type": "object"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "not_placed": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineNotPlacedOut"
+            },
+            "title": "Not Placed",
+            "type": "array"
+          },
+          "not_placed_total": {
+            "title": "Not Placed Total",
+            "type": "integer"
+          },
+          "opens_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opens On"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/TimelinePartyOut"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "periods": {
+            "items": {
+              "$ref": "#/components/schemas/TimelinePeriodOut"
+            },
+            "title": "Periods",
+            "type": "array"
+          },
+          "sequence": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineSequenceOut"
+            },
+            "title": "Sequence",
+            "type": "array"
+          },
+          "span": {
+            "$ref": "#/components/schemas/TimelineSpanOut"
+          },
+          "undated": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineUndatedOut"
+            },
+            "title": "Undated",
+            "type": "array"
+          },
+          "undated_total": {
+            "title": "Undated Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "events",
+          "parties",
+          "periods",
+          "sequence",
+          "not_placed",
+          "not_placed_total",
+          "undated",
+          "undated_total",
+          "facts",
+          "span"
+        ],
+        "title": "TimelineLanesOut",
+        "type": "object"
+      },
+      "TimelineNotPlacedOut": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "date_key": {
+            "title": "Date Key",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "precision": {
+            "title": "Precision",
+            "type": "string"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "title",
+          "kind",
+          "date",
+          "precision",
+          "date_key"
+        ],
+        "title": "TimelineNotPlacedOut",
+        "type": "object"
+      },
       "TimelineOut": {
         "properties": {
           "counts": {
@@ -40788,6 +41145,266 @@
           "offset"
         ],
         "title": "TimelineOut",
+        "type": "object"
+      },
+      "TimelinePartyOut": {
+        "properties": {
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "events": {
+            "title": "Events",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "schema": {
+            "title": "Schema",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "caption",
+          "schema",
+          "events"
+        ],
+        "title": "TimelinePartyOut",
+        "type": "object"
+      },
+      "TimelinePeriodIn": {
+        "description": "A named stretch of the case's time (Timeline › Periods). Dates are a year, a month or a day.",
+        "properties": {
+          "date_end": {
+            "maxLength": 32,
+            "minLength": 4,
+            "title": "Date End",
+            "type": "string"
+          },
+          "date_start": {
+            "maxLength": 32,
+            "minLength": 4,
+            "title": "Date Start",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "maxLength": 4000,
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "date_start",
+          "date_end"
+        ],
+        "title": "TimelinePeriodIn",
+        "type": "object"
+      },
+      "TimelinePeriodOut": {
+        "properties": {
+          "date_end": {
+            "title": "Date End",
+            "type": "string"
+          },
+          "date_start": {
+            "title": "Date Start",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "made_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made By"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "date_start",
+          "date_end",
+          "summary"
+        ],
+        "title": "TimelinePeriodOut",
+        "type": "object"
+      },
+      "TimelineSequenceOut": {
+        "description": "An event that comes before a step it should follow (app/services/sequence_rules.py).",
+        "properties": {
+          "after_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After Id"
+          },
+          "basis": {
+            "title": "Basis",
+            "type": "string"
+          },
+          "event_id": {
+            "title": "Event Id",
+            "type": "string"
+          },
+          "found_later_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Found Later Id"
+          },
+          "missing": {
+            "title": "Missing",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "rule_name": {
+            "title": "Rule Name",
+            "type": "string"
+          },
+          "say": {
+            "title": "Say",
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "event_id",
+          "rule",
+          "rule_name",
+          "missing",
+          "say",
+          "why",
+          "basis",
+          "steps"
+        ],
+        "title": "TimelineSequenceOut",
+        "type": "object"
+      },
+      "TimelineSpanOut": {
+        "properties": {
+          "busiest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Busiest"
+          },
+          "first": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First"
+          },
+          "last": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last"
+          }
+        },
+        "title": "TimelineSpanOut",
+        "type": "object"
+      },
+      "TimelineUndatedOut": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "source_id": {
+            "title": "Source Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "title",
+          "kind",
+          "why"
+        ],
+        "title": "TimelineUndatedOut",
         "type": "object"
       },
       "TimelineVisualOut": {
@@ -67273,6 +67890,291 @@
           }
         },
         "summary": "Get Investigation Timeline"
+      }
+    },
+    "/api/investigations/{investigation_id}/timeline/lanes": {
+      "get": {
+        "description": "The case's events as lanes: each with its parties, where it comes from and whether it is shown; the reporter's\nperiods; the sequence checks; records not on the timeline yet; and sources with no date.",
+        "operationId": "timeline_lanes_view",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineLanesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Timeline Lanes View"
+      }
+    },
+    "/api/investigations/{investigation_id}/timeline/periods": {
+      "post": {
+        "description": "Name a stretch of the case's time.",
+        "operationId": "create_timeline_period",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimelinePeriodIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelinePeriodOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Create Timeline Period"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Create Timeline Period"
+      }
+    },
+    "/api/investigations/{investigation_id}/timeline/periods/{period_id}": {
+      "delete": {
+        "description": "Take a period away; its events stay.",
+        "operationId": "delete_timeline_period",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "period_id",
+            "required": true,
+            "schema": {
+              "title": "Period Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Delete Timeline Period"
+      },
+      "put": {
+        "description": "Rename a period, move its dates, or change its summary.",
+        "operationId": "update_timeline_period",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "period_id",
+            "required": true,
+            "schema": {
+              "title": "Period Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimelinePeriodIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelinePeriodOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Update Timeline Period"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Update Timeline Period"
       }
     },
     "/api/investigations/{investigation_id}/type": {

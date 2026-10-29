@@ -189,6 +189,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         DerivedFile,
         Monitor,
         MonitorItem,
+        TimelinePeriod,
     )
 
     direct = {
@@ -223,6 +224,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "derived_file_id": (DerivedFile, "investigation_id"),
         "monitor_id": (Monitor, "investigation_id"),
         "monitor_item_id": (MonitorItem, "investigation_id"),
+        "period_id": (TimelinePeriod, "investigation_id"),
     }
     if key in direct:
         model, attr = direct[key]

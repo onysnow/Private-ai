@@ -647,6 +647,8 @@ class TimelineEventOut(ResponseModel):
     verification_status: str
     # Bellingcat's grade, on a reporter's event once graded; null otherwise.
     grade: str | None = None
+    # A reporter's placeholder: believed, no evidence attached yet.
+    placeholder: bool = False
     synthetic: bool
     refs: dict[str, Any]
     provenance: dict[str, Any]
@@ -662,6 +664,93 @@ class TimelineOut(ResponseModel):
     total: int
     returned: int
     offset: int
+
+
+class TimelineLaneEventOut(TimelineEventOut):
+    """An event as Lanes draws it: the parties it is about (its lanes), where it comes from, its amount when it is a
+    payment, and one mark for whether it is shown (app/services/timeline_lanes.py fact_of)."""
+    model_config = ConfigDict(from_attributes=True, extra="allow", populate_by_name=True, serialize_by_alias=True)
+
+    parties: list[str]
+    schema_: str | None = Field(default=None, alias="schema")
+    prop: str | None = None
+    amount: float | None = None
+    currency: str | None = None
+    amount_eur: float | None = None
+    source_key: str
+    source_label: str
+    fact: Literal["shown", "not_yet", "disputed", "worked_out"]
+    fact_note: str | None = None
+
+
+class TimelinePartyOut(ResponseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
+
+    id: str
+    caption: str
+    schema_: str = Field(alias="schema")
+    country: str | None = None
+    events: int
+
+
+class TimelinePeriodOut(ResponseModel):
+    id: str
+    name: str
+    date_start: str
+    date_end: str
+    summary: str
+    made_by: str | None = None
+
+
+class TimelineSequenceOut(ResponseModel):
+    """An event that comes before a step it should follow (app/services/sequence_rules.py)."""
+    event_id: str
+    rule: str
+    rule_name: str
+    missing: str
+    after_id: str | None = None
+    found_later_id: str | None = None
+    say: str
+    why: str
+    basis: str
+    steps: list[str]
+
+
+class TimelineNotPlacedOut(ResponseModel):
+    source_id: str
+    title: str
+    kind: str
+    date: str
+    precision: str
+    date_key: str
+
+
+class TimelineUndatedOut(ResponseModel):
+    source_id: str
+    title: str
+    kind: str
+    why: str
+
+
+class TimelineSpanOut(ResponseModel):
+    first: str | None = None
+    last: str | None = None
+    busiest: str | None = None
+
+
+class TimelineLanesOut(ResponseModel):
+    investigation_id: str
+    events: list[TimelineLaneEventOut]
+    parties: list[TimelinePartyOut]
+    periods: list[TimelinePeriodOut]
+    sequence: list[TimelineSequenceOut]
+    not_placed: list[TimelineNotPlacedOut]
+    not_placed_total: int
+    undated: list[TimelineUndatedOut]
+    undated_total: int
+    facts: dict[str, int]
+    span: TimelineSpanOut
+    opens_on: str | None = None
 
 
 class TimelineEventRowOut(ResponseModel):
@@ -684,6 +773,7 @@ class TimelineEventRowOut(ResponseModel):
     lead_id: str | None = None
     dataset: str
     origin: str | None = None
+    placeholder: bool = False
     created_at: Timestamp
 
 

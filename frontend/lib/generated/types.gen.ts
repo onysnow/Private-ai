@@ -21005,6 +21005,10 @@ export type TimelineEventCreate = {
    */
   origin?: string | null;
   /**
+   * Placeholder
+   */
+  placeholder?: boolean;
+  /**
    * Precision
    */
   precision?: string;
@@ -21076,6 +21080,10 @@ export type TimelineEventOut = {
    * Kind
    */
   kind: string;
+  /**
+   * Placeholder
+   */
+  placeholder?: boolean;
   /**
    * Precision
    */
@@ -21172,6 +21180,10 @@ export type TimelineEventRowOut = {
    */
   origin?: string | null;
   /**
+   * Placeholder
+   */
+  placeholder?: boolean;
+  /**
    * Precision
    */
   precision: string;
@@ -21212,6 +21224,204 @@ export type TimelineItemOut = {
 };
 
 /**
+ * TimelineLaneEventOut
+ *
+ * An event as Lanes draws it: the parties it is about (its lanes), where it comes from, its amount when it is a
+ * payment, and one mark for whether it is shown (app/services/timeline_lanes.py fact_of).
+ */
+export type TimelineLaneEventOut = {
+  /**
+   * Amount
+   */
+  amount?: number | null;
+  /**
+   * Amount Eur
+   */
+  amount_eur?: number | null;
+  context?: TimelineContextOut | null;
+  /**
+   * Currency
+   */
+  currency?: string | null;
+  /**
+   * Date End
+   */
+  date_end?: string | null;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Description
+   */
+  description?: string | null;
+  /**
+   * Fact
+   */
+  fact: 'shown' | 'not_yet' | 'disputed' | 'worked_out';
+  /**
+   * Fact Note
+   */
+  fact_note?: string | null;
+  /**
+   * Grade
+   */
+  grade?: string | null;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Parties
+   */
+  parties: Array<string>;
+  /**
+   * Placeholder
+   */
+  placeholder?: boolean;
+  /**
+   * Precision
+   */
+  precision: string;
+  /**
+   * Prop
+   */
+  prop?: string | null;
+  /**
+   * Provenance
+   */
+  provenance: {
+    [key: string]: unknown;
+  };
+  /**
+   * Refs
+   */
+  refs: {
+    [key: string]: unknown;
+  };
+  /**
+   * Schema
+   */
+  schema?: string | null;
+  /**
+   * Sort Key
+   */
+  sort_key: string;
+  /**
+   * Source Key
+   */
+  source_key: string;
+  /**
+   * Source Label
+   */
+  source_label: string;
+  /**
+   * Synthetic
+   */
+  synthetic: boolean;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Verification Status
+   */
+  verification_status: string;
+  [key: string]: unknown;
+};
+
+/**
+ * TimelineLanesOut
+ */
+export type TimelineLanesOut = {
+  /**
+   * Events
+   */
+  events: Array<TimelineLaneEventOut>;
+  /**
+   * Facts
+   */
+  facts: {
+    [key: string]: number;
+  };
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Not Placed
+   */
+  not_placed: Array<TimelineNotPlacedOut>;
+  /**
+   * Not Placed Total
+   */
+  not_placed_total: number;
+  /**
+   * Opens On
+   */
+  opens_on?: string | null;
+  /**
+   * Parties
+   */
+  parties: Array<TimelinePartyOut>;
+  /**
+   * Periods
+   */
+  periods: Array<TimelinePeriodOut>;
+  /**
+   * Sequence
+   */
+  sequence: Array<TimelineSequenceOut>;
+  span: TimelineSpanOut;
+  /**
+   * Undated
+   */
+  undated: Array<TimelineUndatedOut>;
+  /**
+   * Undated Total
+   */
+  undated_total: number;
+};
+
+/**
+ * TimelineNotPlacedOut
+ */
+export type TimelineNotPlacedOut = {
+  /**
+   * Date
+   */
+  date: string;
+  /**
+   * Date Key
+   */
+  date_key: string;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Precision
+   */
+  precision: string;
+  /**
+   * Source Id
+   */
+  source_id: string;
+  /**
+   * Title
+   */
+  title: string;
+};
+
+/**
  * TimelineOut
  */
 export type TimelineOut = {
@@ -21247,6 +21457,174 @@ export type TimelineOut = {
   verification_counts: {
     [key: string]: number;
   };
+};
+
+/**
+ * TimelinePartyOut
+ */
+export type TimelinePartyOut = {
+  /**
+   * Caption
+   */
+  caption: string;
+  /**
+   * Country
+   */
+  country?: string | null;
+  /**
+   * Events
+   */
+  events: number;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Schema
+   */
+  schema: string;
+};
+
+/**
+ * TimelinePeriodIn
+ *
+ * A named stretch of the case's time (Timeline › Periods). Dates are a year, a month or a day.
+ */
+export type TimelinePeriodIn = {
+  /**
+   * Date End
+   */
+  date_end: string;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Summary
+   */
+  summary?: string;
+};
+
+/**
+ * TimelinePeriodOut
+ */
+export type TimelinePeriodOut = {
+  /**
+   * Date End
+   */
+  date_end: string;
+  /**
+   * Date Start
+   */
+  date_start: string;
+  /**
+   * Id
+   */
+  id: string;
+  /**
+   * Made By
+   */
+  made_by?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Summary
+   */
+  summary: string;
+};
+
+/**
+ * TimelineSequenceOut
+ *
+ * An event that comes before a step it should follow (app/services/sequence_rules.py).
+ */
+export type TimelineSequenceOut = {
+  /**
+   * After Id
+   */
+  after_id?: string | null;
+  /**
+   * Basis
+   */
+  basis: string;
+  /**
+   * Event Id
+   */
+  event_id: string;
+  /**
+   * Found Later Id
+   */
+  found_later_id?: string | null;
+  /**
+   * Missing
+   */
+  missing: string;
+  /**
+   * Rule
+   */
+  rule: string;
+  /**
+   * Rule Name
+   */
+  rule_name: string;
+  /**
+   * Say
+   */
+  say: string;
+  /**
+   * Steps
+   */
+  steps: Array<string>;
+  /**
+   * Why
+   */
+  why: string;
+};
+
+/**
+ * TimelineSpanOut
+ */
+export type TimelineSpanOut = {
+  /**
+   * Busiest
+   */
+  busiest?: string | null;
+  /**
+   * First
+   */
+  first?: string | null;
+  /**
+   * Last
+   */
+  last?: string | null;
+};
+
+/**
+ * TimelineUndatedOut
+ */
+export type TimelineUndatedOut = {
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Source Id
+   */
+  source_id: string;
+  /**
+   * Title
+   */
+  title: string;
+  /**
+   * Why
+   */
+  why: string;
 };
 
 /**
@@ -33253,6 +33631,178 @@ export type GetInvestigationTimelineResponses = {
 
 export type GetInvestigationTimelineResponse =
   GetInvestigationTimelineResponses[keyof GetInvestigationTimelineResponses];
+
+export type TimelineLanesViewData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/lanes';
+};
+
+export type TimelineLanesViewErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type TimelineLanesViewError =
+  TimelineLanesViewErrors[keyof TimelineLanesViewErrors];
+
+export type TimelineLanesViewResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelineLanesOut;
+};
+
+export type TimelineLanesViewResponse =
+  TimelineLanesViewResponses[keyof TimelineLanesViewResponses];
+
+export type CreateTimelinePeriodData = {
+  body: TimelinePeriodIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/periods';
+};
+
+export type CreateTimelinePeriodErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Timeline Period
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateTimelinePeriodError =
+  CreateTimelinePeriodErrors[keyof CreateTimelinePeriodErrors];
+
+export type CreateTimelinePeriodResponses = {
+  /**
+   * Successful Response
+   */
+  201: TimelinePeriodOut;
+};
+
+export type CreateTimelinePeriodResponse =
+  CreateTimelinePeriodResponses[keyof CreateTimelinePeriodResponses];
+
+export type DeleteTimelinePeriodData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Period Id
+     */
+    period_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/periods/{period_id}';
+};
+
+export type DeleteTimelinePeriodErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeleteTimelinePeriodError =
+  DeleteTimelinePeriodErrors[keyof DeleteTimelinePeriodErrors];
+
+export type DeleteTimelinePeriodResponses = {
+  /**
+   * Successful Response
+   */
+  204: void;
+};
+
+export type DeleteTimelinePeriodResponse =
+  DeleteTimelinePeriodResponses[keyof DeleteTimelinePeriodResponses];
+
+export type UpdateTimelinePeriodData = {
+  body: TimelinePeriodIn;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+    /**
+     * Period Id
+     */
+    period_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/timeline/periods/{period_id}';
+};
+
+export type UpdateTimelinePeriodErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Update Timeline Period
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateTimelinePeriodError =
+  UpdateTimelinePeriodErrors[keyof UpdateTimelinePeriodErrors];
+
+export type UpdateTimelinePeriodResponses = {
+  /**
+   * Successful Response
+   */
+  200: TimelinePeriodOut;
+};
+
+export type UpdateTimelinePeriodResponse =
+  UpdateTimelinePeriodResponses[keyof UpdateTimelinePeriodResponses];
 
 export type GetInvestigationTypeData = {
   body?: never;

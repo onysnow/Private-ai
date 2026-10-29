@@ -16,7 +16,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
-import {corpusSearchBody, tagsBody} from '../test-support/page-routes';
+import {corpusSearchBody, lanesBody, tagsBody} from '../test-support/page-routes';
 
 vi.mock('next/dynamic', () => ({
   // The timeline chart needs a canvas; the panel's own list is what these tests check.
@@ -104,52 +104,34 @@ const event = {
     claim_advisory: {needs_review: true, status: 'disputed', message: 'review'}, relationship_advisory: null},
   sort_key: '2024-04-01',
 };
-const timelineBody = (events: unknown[]) => ({investigation_id: 'inv-1', events, counts: {reporter_event: events.length}, verification_counts: {asserted: events.length}, total: events.length, returned: events.length, offset: 0});
 
 describe('TimelinePanel', () => {
-  it('loads the timeline, shows what each event links to, adds an event, and asks for a trace', async () => {
-    const stored = {id: 'ev-2', investigation_id: 'inv-1', title: 'Filing', description: null, date_start: '2024-03', date_end: null,
-      precision: 'month', verification_status: 'verified', entity_id: null, relationship_entity_id: null, source_id: null, evidence_id: null,
-      claim_id: null, lead_id: null, dataset: 'reporter', origin: null, created_at: '2026-10-02T00:00:00'};
-    let events: unknown[] = [event];
-    const api = mockApi({
-      'GET /api/investigations/inv-1/timeline': () => timelineBody(events),
-      'POST /api/timeline-events': () => { events = [...events, {...event, ...stored, kind: 'reporter_event', synthetic: false, refs: {}, provenance: {}, context: null, sort_key: '2024-03-01'}]; return {status: 201, body: stored}; },
-    });
+  it('opens on the next unresolved event, says what it links to, and opens its source', async () => {
+    mockApi({'GET /api/investigations/inv-1/timeline/lanes': lanesBody('inv-1', [event])});
     wrap(<TimelinePanel investigationId="inv-1"/>);
-    await screen.findByText('Board meeting', {selector: 'b'});
+    await screen.findByRole('heading', {name: 'Board meeting'});
+    expect(screen.getByText('Opened here because it is the next event nobody has resolved.')).toBeInTheDocument();
+    expect(screen.getByText('Its claim needs review; this event is kept.')).toBeInTheDocument();
+    expect(screen.getByText('Minutes filed')).toBeInTheDocument();
     expect(screen.getByText('1 Apr 2024')).toBeInTheDocument();
-    expect(screen.getByText('asserted, not yet verified').parentElement).toHaveTextContent('1 asserted, not yet verified');
-    expect(screen.getByText('Claim: disputed · confidence 45%')).toBeInTheDocument();
-    expect(screen.getByText('Linked claim needs review; this event is kept.')).toBeInTheDocument();
-    expect(screen.getByText('Evidence stance: supports')).toBeInTheDocument();
-    expect(screen.getByTestId('timeline-chart')).toBeInTheDocument();
 
-    const user = userEvent.setup();
-    expect(screen.getByRole('button', {name: 'Add event'})).toBeDisabled();
-    await user.type(screen.getByPlaceholderText('Event title'), 'Filing');
-    await user.type(screen.getByPlaceholderText('YYYY-MM-DD, YYYY-MM, or YYYY'), '2024-03');
-    await user.click(screen.getByRole('button', {name: 'Add event'}));
-    await screen.findByText('Filing', {selector: 'b'});
-    expect(screen.getByText('Mar 2024')).toBeInTheDocument();
-    expect(api.lastBody('POST /api/timeline-events')).toEqual({investigation_id: 'inv-1', title: 'Filing', date_start: '2024-03', precision: 'day', verification_status: 'asserted'});
-    expect(api.calls('GET /api/investigations/inv-1/timeline')).toHaveLength(2);
-    expect(screen.getByPlaceholderText('Event title')).toHaveValue('');
-
-    await user.click(screen.getAllByRole('button', {name: 'Trace provenance'})[0]);
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Open the source'}));
     expect(useWorkbenchStore.getState().provenance?.request).toEqual({title: 'Board meeting', kind: 'timeline', sourceId: 'src-1', sourceUrl: 'https://example.test/minutes', locator: undefined, detail: 'Minutes filed'});
   });
 
   it('shows the server\'s reason when an event is refused', async () => {
     mockApi({
-      'GET /api/investigations/inv-1/timeline': timelineBody([]),
+      'GET /api/investigations/inv-1/timeline/lanes': lanesBody('inv-1', [event]),
       'POST /api/timeline-events': {status: 400, body: {detail: 'date_start must be ISO year, month, or date'}},
     });
     wrap(<TimelinePanel investigationId="inv-1"/>);
+    await screen.findByRole('heading', {name: 'Board meeting'});
     const user = userEvent.setup();
-    await user.type(screen.getByPlaceholderText('Event title'), 'Filing');
-    await user.type(screen.getByPlaceholderText('YYYY-MM-DD, YYYY-MM, or YYYY'), 'last spring');
-    await user.click(screen.getByRole('button', {name: 'Add event'}));
+    screen.getByLabelText('Timeline lanes').focus();
+    await user.keyboard('n');
+    await user.type(screen.getByLabelText('What happened'), 'Filing');
+    await user.type(screen.getByLabelText('When'), '2024-03');
+    await user.click(screen.getByRole('button', {name: 'Add'}));
     await screen.findByText(/date_start must be ISO year, month, or date/);
   });
 });

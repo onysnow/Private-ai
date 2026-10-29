@@ -166,6 +166,8 @@ class TimelineEventCreate(BaseModel):
     lead_id: str | None = None
     dataset: str = "reporter"
     origin: str | None = None
+    # A placeholder: believed, with no evidence yet (drawn dashed on My timeline).
+    placeholder: bool = False
 
 class ConnectorSearchRequest(BaseModel):
     investigation_id: str
@@ -986,3 +988,11 @@ class AuthenticityOutsideIn(BaseModel):
 class AuthenticityAboutClaimIn(BaseModel):
     """A claim about the item itself (that it circulated, when, posted by whom), which it supports even if synthetic."""
     text: str = Field(min_length=10, max_length=2000)
+
+
+class TimelinePeriodIn(BaseModel):
+    """A named stretch of the case's time (Timeline › Periods). Dates are a year, a month or a day."""
+    name: str = Field(min_length=1, max_length=120)
+    date_start: str = Field(min_length=4, max_length=32)
+    date_end: str = Field(min_length=4, max_length=32)
+    summary: str = Field(default="", max_length=4000)

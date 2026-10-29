@@ -1,30 +1,27 @@
 // @vitest-environment jsdom
-// Grading a reporter's timeline event on Bellingcat's scale
-// (features/timeline/timeline-panel.tsx; backend app/services/timeline.py
-// EVENT_GRADES): the grade can be set when the event is added and changed
-// later, and each graded event says its grade, with what it means.
-import {cleanup, render, screen, within} from '@testing-library/react';
+// Grading a reporter's timeline event on Bellingcat's scale (features/timeline/lane-detail.tsx; backend
+// app/services/timeline.py EVENT_GRADES), and adding one with N: the date is typed in words and its precision set from
+// them. A source's own date is not an event: it waits in the "Not on the timeline yet" strip.
+import {cleanup, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-
-vi.mock('../components/charts/chart', () => ({Chart: () => <div data-testid="chart-stub"/>}));
 
 import {EVENT_GRADES, TimelinePanel} from '../features/timeline/timeline-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {mockApi} from '../test-support/mock-api';
-import {timelineBody} from '../test-support/page-routes';
+import {lanesBody} from '../test-support/page-routes';
 
-const TIMELINE = 'GET /api/investigations/inv-1/timeline';
+const LANES = 'GET /api/investigations/inv-1/timeline/lanes';
 const event = (extra: Record<string, unknown> = {}) => ({
   id: 'ev-1', kind: 'reporter_event', investigation_id: 'inv-1', title: 'Villa searched', description: null, date_start: '2023-11-14', date_end: null,
-  precision: 'day', verification_status: 'verified', grade: null, synthetic: false, refs: {}, provenance: {dataset: 'reporter'}, context: null,
+  precision: 'day', verification_status: 'asserted', grade: null, synthetic: false, refs: {}, provenance: {dataset: 'reporter'}, context: null,
   sort_key: '2023-11-14', ...extra});
 
 const row = (extra: Record<string, unknown> = {}) => ({
   id: 'ev-1', investigation_id: 'inv-1', title: 'Villa searched', description: null, date_start: '2023-11-14', date_end: null, precision: 'day',
-  verification_status: 'verified', grade: null, dataset: 'reporter', origin: null, created_at: '2026-10-03T00:00:00', ...extra});
+  verification_status: 'asserted', grade: null, dataset: 'reporter', origin: null, placeholder: false, created_at: '2026-10-03T00:00:00', ...extra});
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
@@ -34,36 +31,48 @@ describe('timeline event grades', () => {
     expect(Object.keys(EVENT_GRADES)).toEqual(['confirmed', 'likely', 'weak', 'unsubstantiated', 'unknown']);
   });
 
-  it('grades a reporter\'s event, shows the grade with its meaning, and sends a grade with a new event', async () => {
-    const api = mockApi({[TIMELINE]: timelineBody('inv-1', [event()])});
+  it('grades a reporter\'s event in the panel, and a likely grade makes its mark shown', async () => {
+    const api = mockApi({[LANES]: lanesBody('inv-1', [event()])});
     render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
-    await screen.findByText(/Villa searched/);
-    api.add({'PATCH /api/timeline-events/ev-1': row({grade: 'likely'}), [TIMELINE]: timelineBody('inv-1', [event({grade: 'likely'})])});
+    await screen.findByRole('heading', {name: 'Villa searched'});
+    api.add({'PATCH /api/timeline-events/ev-1': row({grade: 'likely'}),
+      [LANES]: lanesBody('inv-1', [event({grade: 'likely', fact: 'shown', fact_note: 'Graded likely'})])});
     const user = userEvent.setup();
-    screen.getByRole('combobox', {name: 'Grade of Villa searched'}).focus();
-    await user.keyboard('{ArrowDown}');
-    await user.click(await screen.findByRole('option', {name: /^likely: several sources report it/}));
-    const graded = await screen.findByText('graded likely');
-    expect(graded).toHaveAttribute('title', EVENT_GRADES.likely);
+    await user.selectOptions(screen.getByRole('combobox', {name: 'Grade (Bellingcat)'}), 'likely');
     expect(api.lastBody('PATCH /api/timeline-events/ev-1')).toEqual({grade: 'likely'});
-
-    api.add({'POST /api/timeline-events': row({id: 'ev-2', title: 'Meridian registered', grade: 'weak'})});
-    await user.type(screen.getByPlaceholderText('Event title'), 'Meridian registered');
-    await user.type(screen.getByPlaceholderText('YYYY-MM-DD, YYYY-MM, or YYYY'), '2019-03-04');
-    screen.getByRole('combobox', {name: 'Grade'}).focus();
-    await user.keyboard('{ArrowDown}');
-    await user.click(await screen.findByRole('option', {name: 'weak'}));
-    await user.click(screen.getByRole('button', {name: 'Add event'}));
-    await vi.waitFor(() => expect(api.lastBody('POST /api/timeline-events')).toMatchObject({title: 'Meridian registered', grade: 'weak'}));
-    expect(within(document.body).queryByText('Could not add the event')).toBeNull();
+    expect(await screen.findByText('Graded likely')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: '14 Nov 2023: Villa searched, shown'})).toBeInTheDocument();
   });
 
-  it('asks for the sources\' own dates only when the switch is on', async () => {
-    const api = mockApi({[TIMELINE]: timelineBody('inv-1', [event()])});
+  it('adds an event with N, reading "spring 2019" as a range of months, and can mark it a placeholder', async () => {
+    const api = mockApi({[LANES]: lanesBody('inv-1', [event()]),
+      'POST /api/timeline-events': row({id: 'ev-2', title: 'Meeting with the lawyer', date_start: '2019-03', date_end: '2019-05', precision: 'range', placeholder: true})});
     render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
-    await screen.findByText(/Villa searched/);
-    expect(api.lastUrl(TIMELINE).searchParams.get('include_source_dates')).toBeNull();
-    await userEvent.setup().click(screen.getByRole('checkbox', {name: /when each source was published or filed/}));
-    await vi.waitFor(() => expect(api.lastUrl(TIMELINE).searchParams.get('include_source_dates')).toBe('true'));
+    await screen.findByRole('heading', {name: 'Villa searched'});
+    const user = userEvent.setup();
+    screen.getByLabelText('Timeline lanes').focus();
+    await user.keyboard('n');
+    await user.type(screen.getByLabelText('What happened'), 'Meeting with the lawyer');
+    await user.type(screen.getByLabelText('When'), 'spring 2019');
+    expect(screen.getByText('Read as Mar 2019 to May 2019: spring: a range of months')).toBeInTheDocument();
+    await user.click(screen.getByLabelText(/A placeholder/));
+    await user.click(screen.getByRole('button', {name: 'Add'}));
+    await vi.waitFor(() => expect(api.lastBody('POST /api/timeline-events')).toEqual({
+      investigation_id: 'inv-1', verification_status: 'asserted', title: 'Meeting with the lawyer',
+      date_start: '2019-03', date_end: '2019-05', precision: 'range', placeholder: true}));
+    expect(await screen.findByText('On your timeline: Meeting with the lawyer')).toBeInTheDocument();
+  });
+
+  it('will not add a date it cannot read', async () => {
+    mockApi({[LANES]: lanesBody('inv-1', [event()])});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    await screen.findByRole('heading', {name: 'Villa searched'});
+    const user = userEvent.setup();
+    screen.getByLabelText('Timeline lanes').focus();
+    await user.keyboard('n');
+    await user.type(screen.getByLabelText('What happened'), 'Filing');
+    await user.type(screen.getByLabelText('When'), 'last spring');
+    expect(screen.getByText(/Not a date it can read/)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Add'})).toBeDisabled();
   });
 });

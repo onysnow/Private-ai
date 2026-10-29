@@ -178,6 +178,7 @@ def _manual_event(db: Session, row: TimelineEvent) -> dict:
         "precision": row.precision,
         "verification_status": row.verification_status,
         "grade": row.grade,
+        "placeholder": bool(row.placeholder),
         "synthetic": False,
         "refs": {
             "entity_id": row.entity_id,
@@ -379,6 +380,7 @@ def investigation_timeline(
         event.setdefault("context", None)
         # Only a reporter's event can be graded (Bellingcat's scale); the key is on every event.
         event.setdefault("grade", None)
+        event.setdefault("placeholder", False)
         counts[event["kind"]] = counts.get(event["kind"], 0) + 1
         status_counts[event["verification_status"]] = status_counts.get(event["verification_status"], 0) + 1
     total = len(events)

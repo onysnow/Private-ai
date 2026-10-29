@@ -9510,6 +9510,7 @@ export const zTimelineEventCreate = z.object({
   investigation_id: z.string(),
   lead_id: z.string().nullish(),
   origin: z.string().nullish(),
+  placeholder: z.boolean().optional().default(false),
   precision: z.string().optional().default('day'),
   relationship_entity_id: z.string().nullish(),
   source_id: z.string().nullish(),
@@ -9545,6 +9546,7 @@ export const zTimelineEventOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   kind: z.string(),
+  placeholder: z.boolean().optional().default(false),
   precision: z.string(),
   provenance: z.record(z.string(), z.unknown()),
   refs: z.record(z.string(), z.unknown()),
@@ -9598,6 +9600,7 @@ export const zTimelineEventRowOut = z.object({
   investigation_id: z.string(),
   lead_id: z.string().nullish(),
   origin: z.string().nullish(),
+  placeholder: z.boolean().optional().default(false),
   precision: z.string(),
   relationship_entity_id: z.string().nullish(),
   source_id: z.string().nullish(),
@@ -9615,6 +9618,53 @@ export const zTimelineItemOut = z.object({
 });
 
 /**
+ * TimelineLaneEventOut
+ *
+ * An event as Lanes draws it: the parties it is about (its lanes), where it comes from, its amount when it is a
+ * payment, and one mark for whether it is shown (app/services/timeline_lanes.py fact_of).
+ */
+export const zTimelineLaneEventOut = z.object({
+  amount: z.number().nullish(),
+  amount_eur: z.number().nullish(),
+  context: zTimelineContextOut.nullish(),
+  currency: z.string().nullish(),
+  date_end: z.string().nullish(),
+  date_start: z.string(),
+  description: z.string().nullish(),
+  fact: z.enum(['shown', 'not_yet', 'disputed', 'worked_out']),
+  fact_note: z.string().nullish(),
+  grade: z.string().nullish(),
+  id: z.string(),
+  investigation_id: z.string(),
+  kind: z.string(),
+  parties: z.array(z.string()),
+  placeholder: z.boolean().optional().default(false),
+  precision: z.string(),
+  prop: z.string().nullish(),
+  provenance: z.record(z.string(), z.unknown()),
+  refs: z.record(z.string(), z.unknown()),
+  schema: z.string().nullish(),
+  sort_key: z.string(),
+  source_key: z.string(),
+  source_label: z.string(),
+  synthetic: z.boolean(),
+  title: z.string(),
+  verification_status: z.string(),
+});
+
+/**
+ * TimelineNotPlacedOut
+ */
+export const zTimelineNotPlacedOut = z.object({
+  date: z.string(),
+  date_key: z.string(),
+  kind: z.string(),
+  precision: z.string(),
+  source_id: z.string(),
+  title: z.string(),
+});
+
+/**
  * TimelineOut
  */
 export const zTimelineOut = z.object({
@@ -9625,6 +9675,96 @@ export const zTimelineOut = z.object({
   returned: z.int(),
   total: z.int(),
   verification_counts: z.record(z.string(), z.int()),
+});
+
+/**
+ * TimelinePartyOut
+ */
+export const zTimelinePartyOut = z.object({
+  caption: z.string(),
+  country: z.string().nullish(),
+  events: z.int(),
+  id: z.string(),
+  schema: z.string(),
+});
+
+/**
+ * TimelinePeriodIn
+ *
+ * A named stretch of the case's time (Timeline › Periods). Dates are a year, a month or a day.
+ */
+export const zTimelinePeriodIn = z.object({
+  date_end: z.string().min(4).max(32),
+  date_start: z.string().min(4).max(32),
+  name: z.string().min(1).max(120),
+  summary: z.string().max(4000).optional().default(''),
+});
+
+/**
+ * TimelinePeriodOut
+ */
+export const zTimelinePeriodOut = z.object({
+  date_end: z.string(),
+  date_start: z.string(),
+  id: z.string(),
+  made_by: z.string().nullish(),
+  name: z.string(),
+  summary: z.string(),
+});
+
+/**
+ * TimelineSequenceOut
+ *
+ * An event that comes before a step it should follow (app/services/sequence_rules.py).
+ */
+export const zTimelineSequenceOut = z.object({
+  after_id: z.string().nullish(),
+  basis: z.string(),
+  event_id: z.string(),
+  found_later_id: z.string().nullish(),
+  missing: z.string(),
+  rule: z.string(),
+  rule_name: z.string(),
+  say: z.string(),
+  steps: z.array(z.string()),
+  why: z.string(),
+});
+
+/**
+ * TimelineSpanOut
+ */
+export const zTimelineSpanOut = z.object({
+  busiest: z.string().nullish(),
+  first: z.string().nullish(),
+  last: z.string().nullish(),
+});
+
+/**
+ * TimelineUndatedOut
+ */
+export const zTimelineUndatedOut = z.object({
+  kind: z.string(),
+  source_id: z.string(),
+  title: z.string(),
+  why: z.string(),
+});
+
+/**
+ * TimelineLanesOut
+ */
+export const zTimelineLanesOut = z.object({
+  events: z.array(zTimelineLaneEventOut),
+  facts: z.record(z.string(), z.int()),
+  investigation_id: z.string(),
+  not_placed: z.array(zTimelineNotPlacedOut),
+  not_placed_total: z.int(),
+  opens_on: z.string().nullish(),
+  parties: z.array(zTimelinePartyOut),
+  periods: z.array(zTimelinePeriodOut),
+  sequence: z.array(zTimelineSequenceOut),
+  span: zTimelineSpanOut,
+  undated: z.array(zTimelineUndatedOut),
+  undated_total: z.int(),
 });
 
 /**
@@ -13867,6 +14007,48 @@ export const zGetInvestigationTimelineQuery = z.object({
  * Successful Response
  */
 export const zGetInvestigationTimelineResponse = zTimelineOut;
+
+export const zTimelineLanesViewPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zTimelineLanesViewResponse = zTimelineLanesOut;
+
+export const zCreateTimelinePeriodBody = zTimelinePeriodIn;
+
+export const zCreateTimelinePeriodPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateTimelinePeriodResponse = zTimelinePeriodOut;
+
+export const zDeleteTimelinePeriodPath = z.object({
+  investigation_id: z.string(),
+  period_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteTimelinePeriodResponse = z.void();
+
+export const zUpdateTimelinePeriodBody = zTimelinePeriodIn;
+
+export const zUpdateTimelinePeriodPath = z.object({
+  investigation_id: z.string(),
+  period_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateTimelinePeriodResponse = zTimelinePeriodOut;
 
 export const zGetInvestigationTypePath = z.object({
   investigation_id: z.string(),

@@ -77,3 +77,36 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   unasked; a reporter who relies on saving from them turns it on in one click. Shipped items mean it works with no setup.
 - **Where:** `app/services/platform_checks.py`, `platform_checks` table, `/platform-checks` routes, the daily task in
   `app/jobs/schedule.py`, `features/following/works-today.tsx`, the warning in `features/the-drop/captures.tsx`.
+
+## 6. Timeline and Places: the eleven open questions (29 Oct)
+
+- **Questions (time-and-place-mockups README):** which view opens; keep all seven views; out-of-order as a lead on its
+  own; lanes by source too; how to build Stack; geocoding; places off the map; GPS in photos; Money row and flags on by
+  default; Board Rich or Clean, movable cards; Replay stops; a built timeline per person or shared.
+- **Calls:**
+  1. Lanes opens every case; it is the working view. Curve folds into Lanes' year zoom, Slider into Replay. Kept:
+     Lanes, Stack, Build your own, Replay, Periods, Board.
+  2. An out-of-order pair is said (banner, arrow, "no award recorded"), never a lead on its own: Make a lead is a button.
+  3. Lanes by party, kind, source and how sure: all four.
+  4. Stack in plain CSS 3D, no library: five cards a layer and "+n more".
+  5. No geocoding: nothing is looked up, and the key says so.
+  6. Places off the map are edge markers with their direction and distance.
+  7. GPS in a photo's own metadata becomes a proposed place in Decide, never a place by itself.
+  8. Money row and flag brackets on by default, each with its key (M, F).
+  9. Board Rich by default, Clean one switch away; cards can be moved and the string follows.
+  10. Replay stops at each unresolved event, with a switch to play straight through.
+  11. A built timeline is per person; it can be made a deck's outline later.
+- **Also decided while building Lanes:** one mark per event (shown ✓, not yet ?, disputed !, worked out ƒ) from the
+  grade, the claim, the date's status and the source's tier (a Tier A source shows it, as in call 1 above); the source
+  dates switch is gone: a document's own date waits in "Not on the timeline yet" to be placed, since it says when the
+  document was made, not what happened; a case with more than seven parties shows its busiest seven lanes and "+n
+  more"; a record more than ten years before the rest is a stub at the left ("‹ 1957 · 1 earlier"); the sequence rules
+  are two (a public contract: tender → bid → award → contract → payment, from the Open Contracting Data Standard's
+  stages; a company's life: formed → director → payment) and only a needed step that is missing is said, and only when
+  the scene is set (an earlier step is recorded, or the step itself only later); two dates that overlap are never
+  said to be out of order.
+- **Why:** the research (§2.9) names Lanes the working view and the checker the innovation; a lead made by the app
+  alone would fill the queue with what the reporter has not looked at. Everything else follows the drawn mockups.
+- **Where:** `app/services/timeline_lanes.py`, `app/services/sequence_rules.py`, `timeline_periods` table,
+  `/investigations/{id}/timeline/lanes` and `/timeline/periods`, `features/timeline/lanes.tsx`, `lane-detail.tsx`,
+  `lanes-model.ts`.
