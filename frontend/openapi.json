@@ -17404,6 +17404,66 @@
         "title": "DecisionRowOut",
         "type": "object"
       },
+      "DeckChecksOut": {
+        "description": "Each slide's checks (DECK_1): a claim not yet shown (a Draft band), 7×7, a long run of text slides, and a cited\nclaim whose status changed since the slide was made.",
+        "properties": {
+          "changed": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Changed",
+            "type": "array"
+          },
+          "deck_id": {
+            "title": "Deck Id",
+            "type": "string"
+          },
+          "drafts": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Drafts",
+            "type": "array"
+          },
+          "slides": {
+            "items": {
+              "$ref": "#/components/schemas/SlideCheckOut"
+            },
+            "title": "Slides",
+            "type": "array"
+          }
+        },
+        "required": [
+          "deck_id",
+          "slides",
+          "drafts",
+          "changed"
+        ],
+        "title": "DeckChecksOut",
+        "type": "object"
+      },
+      "DeckCreate": {
+        "description": "A new deck (mockup DECK_1): blank, or made from the case's story tree (a slide per section, its claims as bullets\nwith each claim cited).",
+        "properties": {
+          "source": {
+            "default": "story",
+            "enum": [
+              "blank",
+              "story"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 300,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "title": "DeckCreate",
+        "type": "object"
+      },
       "DeckOut": {
         "description": "A presentation deck. Every key is always sent, so the nullable ones have no default.",
         "properties": {
@@ -17523,6 +17583,13 @@
             ],
             "title": "Kind"
           },
+          "made_with": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Made With",
+            "type": "object"
+          },
           "notes": {
             "anyOf": [
               {
@@ -17591,6 +17658,14 @@
             ],
             "title": "Kind",
             "type": "string"
+          },
+          "made_with": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Made With",
+            "type": "object"
           },
           "notes": {
             "title": "Notes",
@@ -38920,6 +38995,37 @@
         "title": "SkippedRowOut",
         "type": "object"
       },
+      "SlideCheckOut": {
+        "properties": {
+          "changed": {
+            "title": "Changed",
+            "type": "boolean"
+          },
+          "draft": {
+            "title": "Draft",
+            "type": "boolean"
+          },
+          "problems": {
+            "items": {
+              "$ref": "#/components/schemas/SlideProblemOut"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "slide": {
+            "title": "Slide",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "slide",
+          "problems",
+          "draft",
+          "changed"
+        ],
+        "title": "SlideCheckOut",
+        "type": "object"
+      },
       "SlideDrawingOut": {
         "description": "What a deck slide shows for a chart kind PowerPoint cannot hold\nnatively (app/services/decks.py _slide_drawing): the drawing at the\nslide's own scale, or its parts as ranked bars with ``note`` saying why.\n``option`` is null only when not even the bars can be drawn.",
         "properties": {
@@ -38961,6 +39067,57 @@
           "height"
         ],
         "title": "SlideDrawingOut",
+        "type": "object"
+      },
+      "SlideProblemOut": {
+        "properties": {
+          "claim_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Claim Id"
+          },
+          "fix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fix"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "text"
+        ],
+        "title": "SlideProblemOut",
         "type": "object"
       },
       "SortOrder": {
@@ -57273,6 +57430,66 @@
         "summary": "Add Chart To Deck Endpoint"
       }
     },
+    "/api/decks/{deck_id}/checks": {
+      "get": {
+        "description": "Each slide's checks: a claim not yet shown, 7×7, a long run of text slides, a claim changed since made.",
+        "operationId": "deck_checks_endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deck_id",
+            "required": true,
+            "schema": {
+              "title": "Deck Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckChecksOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Deck Checks Endpoint"
+      }
+    },
     "/api/decks/{deck_id}/export.pptx": {
       "get": {
         "operationId": "export_deck_pptx",
@@ -66742,6 +66959,74 @@
           }
         },
         "summary": "List Decks Endpoint"
+      },
+      "post": {
+        "description": "A new deck without an AI draft (DECK_1): from the case's story tree (a slide per section, its claims cited) or\nblank.",
+        "operationId": "create_deck_endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeckCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Create Deck Endpoint"
       }
     },
     "/api/investigations/{investigation_id}/deletion-preview": {

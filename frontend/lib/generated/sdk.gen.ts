@@ -162,6 +162,9 @@ import type {
   CreateClaimReviewData,
   CreateClaimReviewErrors,
   CreateClaimReviewResponses,
+  CreateDeckEndpointData,
+  CreateDeckEndpointErrors,
+  CreateDeckEndpointResponses,
   CreateEntityData,
   CreateEntityErrors,
   CreateEntityResponses,
@@ -225,6 +228,9 @@ import type {
   DecidePropertyConflictData,
   DecidePropertyConflictErrors,
   DecidePropertyConflictResponses,
+  DeckChecksEndpointData,
+  DeckChecksEndpointErrors,
+  DeckChecksEndpointResponses,
   DeleteBuiltTimelineData,
   DeleteBuiltTimelineErrors,
   DeleteBuiltTimelineResponses,
@@ -1364,6 +1370,9 @@ import {
   zCreateClaimReviewBody,
   zCreateClaimReviewPath,
   zCreateClaimReviewResponse,
+  zCreateDeckEndpointBody,
+  zCreateDeckEndpointPath,
+  zCreateDeckEndpointResponse,
   zCreateEntityBody,
   zCreateEntityResponse,
   zCreateEvidenceEndpointBody,
@@ -1417,6 +1426,8 @@ import {
   zDecidePropertyConflictBody,
   zDecidePropertyConflictPath,
   zDecidePropertyConflictResponse,
+  zDeckChecksEndpointPath,
+  zDeckChecksEndpointResponse,
   zDeleteBuiltTimelinePath,
   zDeleteBuiltTimelineResponse,
   zDeleteConnectorCredentialPath,
@@ -4230,6 +4241,37 @@ export const addChartToDeckEndpoint = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Deck Checks Endpoint
+ *
+ * Each slide's checks: a claim not yet shown, 7×7, a long run of text slides, a claim changed since made.
+ */
+export const deckChecksEndpoint = <ThrowOnError extends boolean = false>(
+  options: Options<DeckChecksEndpointData, ThrowOnError>,
+): RequestResult<
+  DeckChecksEndpointResponses,
+  DeckChecksEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    DeckChecksEndpointResponses,
+    DeckChecksEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zDeckChecksEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDeckChecksEndpointResponse.parseAsync(data),
+    url: '/api/decks/{deck_id}/checks',
+    ...options,
   });
 
 /**
@@ -8850,6 +8892,42 @@ export const listDecksEndpoint = <ThrowOnError extends boolean = false>(
       await zListDecksEndpointResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/decks',
     ...options,
+  });
+
+/**
+ * Create Deck Endpoint
+ *
+ * A new deck without an AI draft (DECK_1): from the case's story tree (a slide per section, its claims cited) or
+ * blank.
+ */
+export const createDeckEndpoint = <ThrowOnError extends boolean = false>(
+  options: Options<CreateDeckEndpointData, ThrowOnError>,
+): RequestResult<
+  CreateDeckEndpointResponses,
+  CreateDeckEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateDeckEndpointResponses,
+    CreateDeckEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateDeckEndpointBody,
+          path: zCreateDeckEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateDeckEndpointResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/decks',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

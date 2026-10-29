@@ -241,3 +241,18 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   14. Case switcher, New case, Inbox and the shortcut list become modes of the command bar.
   15, 16. The Awwwards list and North Star's working panel need Ony (links, a login); the study continues from the
       public material until he sends them.
+
+## 13. The deck editor: the five questions (29 Oct)
+
+- **Questions:** `docs/design/deck-mockups/README.md`.
+- **Calls:**
+  1. A deck with a Draft slide is warned, not blocked, before Present: the bar names each slide and why, as drawn.
+     Exporting it carries the Draft band on those slides.
+  2. Export to PDF as well as .pptx, through the native module when DeckCraft's PDF export is in it; until then .pptx
+     only, and the PDF button is not shown (no inert control).
+  3. Keep Side by side (slidedoc and presenting): it is how a reporter checks that the slidedoc says what the talk
+     says.
+  4. Presenter and audience: one window first, with a key (S) to swap what it shows; a second screen is offered only
+     where the browser's window-management permission is granted, never asked for at start.
+  5. Keep "If they ask": it is folded to one line per source until the presenter opens it, so it does not compete
+     with the notes.

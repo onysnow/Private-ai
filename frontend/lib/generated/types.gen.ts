@@ -7589,6 +7589,48 @@ export type DecisionRowOut = {
 };
 
 /**
+ * DeckChecksOut
+ *
+ * Each slide's checks (DECK_1): a claim not yet shown (a Draft band), 7×7, a long run of text slides, and a cited
+ * claim whose status changed since the slide was made.
+ */
+export type DeckChecksOut = {
+  /**
+   * Changed
+   */
+  changed: Array<number>;
+  /**
+   * Deck Id
+   */
+  deck_id: string;
+  /**
+   * Drafts
+   */
+  drafts: Array<number>;
+  /**
+   * Slides
+   */
+  slides: Array<SlideCheckOut>;
+};
+
+/**
+ * DeckCreate
+ *
+ * A new deck (mockup DECK_1): blank, or made from the case's story tree (a slide per section, its claims as bullets
+ * with each claim cited).
+ */
+export type DeckCreate = {
+  /**
+   * Source
+   */
+  source?: 'blank' | 'story';
+  /**
+   * Title
+   */
+  title?: string;
+};
+
+/**
  * DeckOut
  *
  * A presentation deck. Every key is always sent, so the nullable ones have no default.
@@ -7665,6 +7707,12 @@ export type DeckSlideIn = {
    */
   kind?: string | null;
   /**
+   * Made With
+   */
+  made_with?: {
+    [key: string]: string;
+  };
+  /**
    * Notes
    */
   notes?: string | null;
@@ -7702,6 +7750,12 @@ export type DeckSlideOut = {
    * Kind
    */
   kind: 'title' | 'statement' | 'content' | 'questions';
+  /**
+   * Made With
+   */
+  made_with?: {
+    [key: string]: string;
+  };
   /**
    * Notes
    */
@@ -20206,6 +20260,28 @@ export type SkippedRowOut = {
 };
 
 /**
+ * SlideCheckOut
+ */
+export type SlideCheckOut = {
+  /**
+   * Changed
+   */
+  changed: boolean;
+  /**
+   * Draft
+   */
+  draft: boolean;
+  /**
+   * Problems
+   */
+  problems: Array<SlideProblemOut>;
+  /**
+   * Slide
+   */
+  slide: number;
+};
+
+/**
  * SlideDrawingOut
  *
  * What a deck slide shows for a chart kind PowerPoint cannot hold
@@ -20232,6 +20308,32 @@ export type SlideDrawingOut = {
    * Width
    */
   width: number;
+};
+
+/**
+ * SlideProblemOut
+ */
+export type SlideProblemOut = {
+  /**
+   * Claim Id
+   */
+  claim_id?: string | null;
+  /**
+   * Fix
+   */
+  fix?: string | null;
+  /**
+   * Kind
+   */
+  kind: string;
+  /**
+   * Line
+   */
+  line?: number | null;
+  /**
+   * Text
+   */
+  text: string;
 };
 
 /**
@@ -26939,6 +27041,46 @@ export type AddChartToDeckEndpointResponses = {
 export type AddChartToDeckEndpointResponse =
   AddChartToDeckEndpointResponses[keyof AddChartToDeckEndpointResponses];
 
+export type DeckChecksEndpointData = {
+  body?: never;
+  path: {
+    /**
+     * Deck Id
+     */
+    deck_id: string;
+  };
+  query?: never;
+  url: '/api/decks/{deck_id}/checks';
+};
+
+export type DeckChecksEndpointErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DeckChecksEndpointError =
+  DeckChecksEndpointErrors[keyof DeckChecksEndpointErrors];
+
+export type DeckChecksEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  200: DeckChecksOut;
+};
+
+export type DeckChecksEndpointResponse =
+  DeckChecksEndpointResponses[keyof DeckChecksEndpointResponses];
+
 export type ExportDeckPptxData = {
   body?: never;
   path: {
@@ -32864,6 +33006,46 @@ export type ListDecksEndpointResponses = {
 
 export type ListDecksEndpointResponse =
   ListDecksEndpointResponses[keyof ListDecksEndpointResponses];
+
+export type CreateDeckEndpointData = {
+  body: DeckCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/decks';
+};
+
+export type CreateDeckEndpointErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateDeckEndpointError =
+  CreateDeckEndpointErrors[keyof CreateDeckEndpointErrors];
+
+export type CreateDeckEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  201: DeckOut;
+};
+
+export type CreateDeckEndpointResponse =
+  CreateDeckEndpointResponses[keyof CreateDeckEndpointResponses];
 
 export type InvestigationDeletionPreviewData = {
   body?: never;

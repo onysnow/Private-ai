@@ -3136,6 +3136,17 @@ export const zCaseDecisionsOut = z.object({
 });
 
 /**
+ * DeckCreate
+ *
+ * A new deck (mockup DECK_1): blank, or made from the case's story tree (a slide per section, its claims as bullets
+ * with each claim cited).
+ */
+export const zDeckCreate = z.object({
+  source: z.enum(['blank', 'story']).optional().default('story'),
+  title: z.string().max(300).optional().default(''),
+});
+
+/**
  * DeckSlideIn
  *
  * One slide as the editor sends it back. The types are checked here so a
@@ -3148,6 +3159,7 @@ export const zDeckSlideIn = z.object({
   evidence: z.array(z.record(z.string(), z.unknown())).optional(),
   heading: z.string().nullish(),
   kind: z.string().nullish(),
+  made_with: z.record(z.string(), z.string()).optional(),
   notes: z.string().nullish(),
   prose: z.string().nullish(),
   visual: z.record(z.string(), z.unknown()).nullish(),
@@ -8809,6 +8821,40 @@ export const zSlideDrawingOut = z.object({
 });
 
 /**
+ * SlideProblemOut
+ */
+export const zSlideProblemOut = z.object({
+  claim_id: z.string().nullish(),
+  fix: z.string().nullish(),
+  kind: z.string(),
+  line: z.int().nullish(),
+  text: z.string(),
+});
+
+/**
+ * SlideCheckOut
+ */
+export const zSlideCheckOut = z.object({
+  changed: z.boolean(),
+  draft: z.boolean(),
+  problems: z.array(zSlideProblemOut),
+  slide: z.int(),
+});
+
+/**
+ * DeckChecksOut
+ *
+ * Each slide's checks (DECK_1): a claim not yet shown (a Draft band), 7×7, a long run of text slides, and a cited
+ * claim whose status changed since the slide was made.
+ */
+export const zDeckChecksOut = z.object({
+  changed: z.array(z.int()),
+  deck_id: z.string(),
+  drafts: z.array(z.int()),
+  slides: z.array(zSlideCheckOut),
+});
+
+/**
  * SortOrder
  */
 export const zSortOrder = z.enum(['value_desc', 'value_asc', 'label', 'time']);
@@ -10891,6 +10937,7 @@ export const zDeckSlideOut = z.object({
   evidence: z.array(zRecordRefOut),
   heading: z.string(),
   kind: z.enum(['title', 'statement', 'content', 'questions']),
+  made_with: z.record(z.string(), z.string()).optional().default({}),
   notes: z.string(),
   prose: z.string().optional().default(''),
   visual: z
@@ -12271,6 +12318,15 @@ export const zAddChartToDeckEndpointPath = z.object({
  * Successful Response
  */
 export const zAddChartToDeckEndpointResponse = zDeckOut;
+
+export const zDeckChecksEndpointPath = z.object({
+  deck_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeckChecksEndpointResponse = zDeckChecksOut;
 
 export const zExportDeckPptxPath = z.object({
   deck_id: z.string(),
@@ -13880,6 +13936,17 @@ export const zListDecksEndpointPath = z.object({
  * Successful Response
  */
 export const zListDecksEndpointResponse = zDecksOut;
+
+export const zCreateDeckEndpointBody = zDeckCreate;
+
+export const zCreateDeckEndpointPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateDeckEndpointResponse = zDeckOut;
 
 export const zInvestigationDeletionPreviewPath = z.object({
   investigation_id: z.string(),

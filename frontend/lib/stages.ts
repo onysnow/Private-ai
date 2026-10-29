@@ -42,6 +42,7 @@ export const STAGES: Stage[] = [
     {label: 'Story', anchor: 'story'},
     {label: 'Leads', anchor: 'leads'},
     {label: 'Charts', anchor: 'chart-builder'},
+    {label: 'Decks', anchor: 'decks'},
     {label: 'AI drafts', anchor: 'ai-reasoning-panel'},
   ]},
   {key: 'keep', route: '/keep', n: 5, name: 'Keep', line: 'Take the investigation with you, or remove it.', colour: SWATCH.taupe, parts: [

@@ -579,6 +579,14 @@ class DeckSlideIn(BaseModel):
     notes: str | None = None
     visual: dict[str, Any] | None = None
     prose: str | None = None   # a slidedoc's prose (app/services/presentation.py deck_kind)
+    made_with: dict[str, str] = Field(default_factory=dict)  # each cited claim's status when the slide was made
+
+
+class DeckCreate(BaseModel):
+    """A new deck (mockup DECK_1): blank, or made from the case's story tree (a slide per section, its claims as bullets
+    with each claim cited)."""
+    title: str = Field(default="", max_length=300)
+    source: Literal["blank", "story"] = "story"
 
 
 class DeckUpdate(BaseModel):

@@ -59,6 +59,7 @@ import {
   createCaseRecord,
   createClaimEndpoint,
   createClaimReview,
+  createDeckEndpoint,
   createEntity,
   createEvidenceEndpoint,
   createExtractedRelationshipProposal,
@@ -80,6 +81,7 @@ import {
   decideEntityPostMergeReconciliation,
   decideInvestigationCrossReference,
   decidePropertyConflict,
+  deckChecksEndpoint,
   deleteBuiltTimeline,
   deleteConnectorCredential,
   deleteDeckEndpoint,
@@ -571,6 +573,9 @@ import type {
   CreateClaimReviewData,
   CreateClaimReviewError,
   CreateClaimReviewResponse,
+  CreateDeckEndpointData,
+  CreateDeckEndpointError,
+  CreateDeckEndpointResponse,
   CreateEntityData,
   CreateEntityError,
   CreateEntityResponse,
@@ -634,6 +639,9 @@ import type {
   DecidePropertyConflictData,
   DecidePropertyConflictError,
   DecidePropertyConflictResponse,
+  DeckChecksEndpointData,
+  DeckChecksEndpointError,
+  DeckChecksEndpointResponse,
   DeleteBuiltTimelineData,
   DeleteBuiltTimelineError,
   DeleteBuiltTimelineResponse,
@@ -3670,6 +3678,36 @@ export const addChartToDeckEndpointMutation = (
   };
   return mutationOptions;
 };
+
+export const deckChecksEndpointQueryKey = (
+  options: Options<DeckChecksEndpointData>,
+) => createQueryKey('deckChecksEndpoint', options);
+
+/**
+ * Deck Checks Endpoint
+ *
+ * Each slide's checks: a claim not yet shown, 7×7, a long run of text slides, a claim changed since made.
+ */
+export const deckChecksEndpointOptions = (
+  options: Options<DeckChecksEndpointData>,
+) =>
+  queryOptions<
+    DeckChecksEndpointResponse,
+    DeckChecksEndpointError,
+    DeckChecksEndpointResponse,
+    ReturnType<typeof deckChecksEndpointQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await deckChecksEndpoint({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: deckChecksEndpointQueryKey(options),
+  });
 
 export const exportDeckPptxQueryKey = (options: Options<ExportDeckPptxData>) =>
   createQueryKey('exportDeckPptx', options);
@@ -8483,6 +8521,36 @@ export const listDecksEndpointOptions = (
     },
     queryKey: listDecksEndpointQueryKey(options),
   });
+
+/**
+ * Create Deck Endpoint
+ *
+ * A new deck without an AI draft (DECK_1): from the case's story tree (a slide per section, its claims cited) or
+ * blank.
+ */
+export const createDeckEndpointMutation = (
+  options?: Partial<Options<CreateDeckEndpointData>>,
+): UseMutationOptions<
+  CreateDeckEndpointResponse,
+  CreateDeckEndpointError,
+  Options<CreateDeckEndpointData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateDeckEndpointResponse,
+    CreateDeckEndpointError,
+    Options<CreateDeckEndpointData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createDeckEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const investigationDeletionPreviewQueryKey = (
   options: Options<InvestigationDeletionPreviewData>,

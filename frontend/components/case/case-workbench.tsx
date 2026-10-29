@@ -41,6 +41,7 @@ import {IsItReal, RealnessList} from '../../features/is-it-real/is-it-real';
 import {CheckAPack} from '../../features/pack-check/check-a-pack';
 import {AddByHand} from '../../features/by-hand/add-by-hand';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
+import {DecksScreen} from '../../features/decks/deck-editor';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
 import {CorpusPanel} from '../../features/corpus/corpus-panel';
@@ -317,6 +318,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'story', label: 'Story', render: () => <PanelErrorBoundary name="Story"><StoryScreen investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
         {anchor: 'leads', label: 'Leads', render: () => <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'chart-builder', label: 'Charts', render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'decks', label: 'Decks', fill: true, render: () => <PanelErrorBoundary name="Decks"><DecksScreen investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'ai-runs', label: 'AI runs', render: () => <PanelErrorBoundary name="AI runs"><BeforeYouRun investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
         {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},
       ])}

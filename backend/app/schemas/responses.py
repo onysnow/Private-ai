@@ -3588,6 +3588,32 @@ class DeckSlideOut(ResponseModel):
     visual: DeckVisualOut | None
     # A slidedoc's prose, shown in place of the bullets; empty on a deck for presenting.
     prose: str = ""
+    # Each cited claim's status when the slide was made: a slide whose claim has moved since says so.
+    made_with: dict[str, str] = {}
+
+
+class SlideProblemOut(ResponseModel):
+    kind: str
+    text: str
+    fix: str | None = None
+    claim_id: str | None = None
+    line: int | None = None
+
+
+class SlideCheckOut(ResponseModel):
+    slide: int
+    problems: list[SlideProblemOut]
+    draft: bool
+    changed: bool
+
+
+class DeckChecksOut(ResponseModel):
+    """Each slide's checks (DECK_1): a claim not yet shown (a Draft band), 7×7, a long run of text slides, and a cited
+    claim whose status changed since the slide was made."""
+    deck_id: str
+    slides: list[SlideCheckOut]
+    drafts: list[int]
+    changed: list[int]
 
 
 class DeckOut(ResponseModel):
