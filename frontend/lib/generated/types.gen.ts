@@ -16067,6 +16067,163 @@ export type PlacesOut = {
 };
 
 /**
+ * PlatformChecksOut
+ *
+ * Does it work today? (WORKS_1): each platform, whether the daily check is on, whether a pasted link is warned about.
+ */
+export type PlatformChecksOut = {
+  /**
+   * Checked
+   */
+  checked: number;
+  /**
+   * Daily
+   */
+  daily: boolean;
+  /**
+   * Last Checked At
+   */
+  last_checked_at?: string | null;
+  /**
+   * Platforms
+   */
+  platforms: Array<PlatformOut>;
+  /**
+   * Warn
+   */
+  warn: boolean;
+  /**
+   * Working
+   */
+  working: number;
+};
+
+/**
+ * PlatformChecksUpdate
+ *
+ * Turn the daily check on or off, the warning before a capture, or change a platform's test item (empty: back to
+ * the one the app ships with).
+ */
+export type PlatformChecksUpdate = {
+  /**
+   * Daily
+   */
+  daily?: boolean | null;
+  /**
+   * Items
+   */
+  items?: {
+    [key: string]: string | null;
+  } | null;
+  /**
+   * Warn
+   */
+  warn?: boolean | null;
+};
+
+/**
+ * PlatformDayOut
+ */
+export type PlatformDayOut = {
+  /**
+   * Day
+   */
+  day: string;
+  /**
+   * State
+   */
+  state?: 'works' | 'partly' | 'broken' | null;
+};
+
+/**
+ * PlatformForUrlOut
+ *
+ * The platform a pasted link is on and how it was at its last check (none when not one the app tries).
+ */
+export type PlatformForUrlOut = {
+  /**
+   * Checked At
+   */
+  checked_at?: string | null;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * State
+   */
+  state?: 'works' | 'partly' | 'broken' | null;
+};
+
+/**
+ * PlatformOut
+ *
+ * One platform the app saves from, tried on its public test item: today's state as a word, the last 14 days.
+ */
+export type PlatformOut = {
+  /**
+   * Broken Since
+   */
+  broken_since?: string | null;
+  /**
+   * Checked At
+   */
+  checked_at?: string | null;
+  /**
+   * Days
+   */
+  days: Array<PlatformDayOut>;
+  /**
+   * Detail
+   */
+  detail?: string | null;
+  /**
+   * Key
+   */
+  key: string;
+  /**
+   * Missing
+   */
+  missing?: Array<string>;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Route
+   */
+  route: string;
+  /**
+   * Saves
+   */
+  saves: string;
+  /**
+   * Seconds
+   */
+  seconds?: number | null;
+  /**
+   * Shipped Url
+   */
+  shipped_url: string;
+  /**
+   * State
+   */
+  state?: 'works' | 'partly' | 'broken' | null;
+  /**
+   * Test Url
+   */
+  test_url: string;
+};
+
+/**
  * PlatformsOut
  */
 export type PlatformsOut = {
@@ -34691,6 +34848,146 @@ export type MakeLeadFromNoteResponses = {
 
 export type MakeLeadFromNoteResponse =
   MakeLeadFromNoteResponses[keyof MakeLeadFromNoteResponses];
+
+export type GetPlatformChecksData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api/platform-checks';
+};
+
+export type GetPlatformChecksErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetPlatformChecksError =
+  GetPlatformChecksErrors[keyof GetPlatformChecksErrors];
+
+export type GetPlatformChecksResponses = {
+  /**
+   * Successful Response
+   */
+  200: PlatformChecksOut;
+};
+
+export type GetPlatformChecksResponse =
+  GetPlatformChecksResponses[keyof GetPlatformChecksResponses];
+
+export type ChangePlatformChecksData = {
+  body: PlatformChecksUpdate;
+  path?: never;
+  query?: never;
+  url: '/api/platform-checks';
+};
+
+export type ChangePlatformChecksErrors = {
+  /**
+   * Response 422 Change Platform Checks
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ChangePlatformChecksError =
+  ChangePlatformChecksErrors[keyof ChangePlatformChecksErrors];
+
+export type ChangePlatformChecksResponses = {
+  /**
+   * Successful Response
+   */
+  200: PlatformChecksOut;
+};
+
+export type ChangePlatformChecksResponse =
+  ChangePlatformChecksResponses[keyof ChangePlatformChecksResponses];
+
+export type PlatformForUrlData = {
+  body?: never;
+  path?: never;
+  query: {
+    /**
+     * Url
+     */
+    url: string;
+  };
+  url: '/api/platform-checks/for';
+};
+
+export type PlatformForUrlErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type PlatformForUrlError =
+  PlatformForUrlErrors[keyof PlatformForUrlErrors];
+
+export type PlatformForUrlResponses = {
+  /**
+   * Response Platform For Url
+   *
+   * Successful Response
+   */
+  200: PlatformForUrlOut | null;
+};
+
+export type PlatformForUrlResponse =
+  PlatformForUrlResponses[keyof PlatformForUrlResponses];
+
+export type RunPlatformChecksData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Platform
+     */
+    platform?: string | null;
+  };
+  url: '/api/platform-checks/run';
+};
+
+export type RunPlatformChecksErrors = {
+  /**
+   * Response 422 Run Platform Checks
+   *
+   * No such platform
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type RunPlatformChecksError =
+  RunPlatformChecksErrors[keyof RunPlatformChecksErrors];
+
+export type RunPlatformChecksResponses = {
+  /**
+   * Successful Response
+   */
+  202: BackgroundJobOut;
+};
+
+export type RunPlatformChecksResponse =
+  RunPlatformChecksResponses[keyof RunPlatformChecksResponses];
 
 export type PresentationStylesData = {
   body?: never;

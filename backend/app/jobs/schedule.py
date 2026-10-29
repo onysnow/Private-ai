@@ -56,7 +56,15 @@ def _check_monitors(db: Session) -> object:
     return check_due(db)
 
 
+def _check_platforms(db: Session) -> object:
+    from app.services.platform_checks import daily
+
+    return daily(db)
+
+
 TASKS: list[Scheduled] = [
+    # Does it work today? (WORKS_1): once a day, only when a person turned it on.
+    Scheduled("check_platforms", timedelta(days=1), _check_platforms),
     # Following (ADR-0022): each monitor keeps its own schedule; this asks which are due, every minute.
     Scheduled("check_monitors", timedelta(minutes=1), _check_monitors),
     Scheduled("deliver_notifications", timedelta(minutes=1), _deliver_notifications),

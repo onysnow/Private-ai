@@ -96,6 +96,9 @@ import type {
   ChangePassphraseData,
   ChangePassphraseErrors,
   ChangePassphraseResponses,
+  ChangePlatformChecksData,
+  ChangePlatformChecksErrors,
+  ChangePlatformChecksResponses,
   CheckConnectorKeyData,
   CheckConnectorKeyErrors,
   CheckConnectorKeyResponses,
@@ -522,6 +525,9 @@ import type {
   GetPartyYearsData,
   GetPartyYearsErrors,
   GetPartyYearsResponses,
+  GetPlatformChecksData,
+  GetPlatformChecksErrors,
+  GetPlatformChecksResponses,
   GetRecordMarksData,
   GetRecordMarksErrors,
   GetRecordMarksResponses,
@@ -891,6 +897,9 @@ import type {
   PlaceStoryClaimData,
   PlaceStoryClaimErrors,
   PlaceStoryClaimResponses,
+  PlatformForUrlData,
+  PlatformForUrlErrors,
+  PlatformForUrlResponses,
   PresentationStylesData,
   PresentationStylesErrors,
   PresentationStylesResponses,
@@ -1029,6 +1038,9 @@ import type {
   RotateAppUserTokenData,
   RotateAppUserTokenErrors,
   RotateAppUserTokenResponses,
+  RunPlatformChecksData,
+  RunPlatformChecksErrors,
+  RunPlatformChecksResponses,
   RunRedFlagsData,
   RunRedFlagsErrors,
   RunRedFlagsResponses,
@@ -1231,6 +1243,8 @@ import {
   zCaptureTimeProofResponse,
   zChangePassphraseBody,
   zChangePassphraseResponse,
+  zChangePlatformChecksBody,
+  zChangePlatformChecksResponse,
   zCheckConnectorKeyPath,
   zCheckConnectorKeyResponse,
   zCheckEvidencePackBody,
@@ -1537,6 +1551,7 @@ import {
   zGetOwnershipChainResponse,
   zGetPartyYearsPath,
   zGetPartyYearsResponse,
+  zGetPlatformChecksResponse,
   zGetRecordMarksPath,
   zGetRecordMarksQuery,
   zGetRecordMarksResponse,
@@ -1821,6 +1836,8 @@ import {
   zPlaceStoryClaimBody,
   zPlaceStoryClaimPath,
   zPlaceStoryClaimResponse,
+  zPlatformForUrlQuery,
+  zPlatformForUrlResponse,
   zPresentationStylesResponse,
   zPreviewAuthenticityPath,
   zPreviewAuthenticityQuery,
@@ -1933,6 +1950,8 @@ import {
   zRotateAppUserTokenPath,
   zRotateAppUserTokenQuery,
   zRotateAppUserTokenResponse,
+  zRunPlatformChecksQuery,
+  zRunPlatformChecksResponse,
   zRunRedFlagsPath,
   zRunRedFlagsResponse,
   zRunSavedQuestionPath,
@@ -11248,6 +11267,131 @@ export const makeLeadFromNote = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zMakeLeadFromNoteResponse.parseAsync(data),
     url: '/api/notes/{note_id}/lead',
+    ...options,
+  });
+
+/**
+ * Get Platform Checks
+ *
+ * Each platform the app saves from, tried on its public test item: today, the last 14 days, the settings.
+ */
+export const getPlatformChecks = <ThrowOnError extends boolean = false>(
+  options?: Options<GetPlatformChecksData, ThrowOnError>,
+): RequestResult<
+  GetPlatformChecksResponses,
+  GetPlatformChecksErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    GetPlatformChecksResponses,
+    GetPlatformChecksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetPlatformChecksResponse.parseAsync(data),
+    url: '/api/platform-checks',
+    ...options,
+  });
+
+/**
+ * Change Platform Checks
+ *
+ * Turn the daily check on or off, the warning before a capture, or change a test item.
+ */
+export const changePlatformChecks = <ThrowOnError extends boolean = false>(
+  options: Options<ChangePlatformChecksData, ThrowOnError>,
+): RequestResult<
+  ChangePlatformChecksResponses,
+  ChangePlatformChecksErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    ChangePlatformChecksResponses,
+    ChangePlatformChecksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zChangePlatformChecksBody,
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zChangePlatformChecksResponse.parseAsync(data),
+    url: '/api/platform-checks',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Platform For Url
+ *
+ * The platform a pasted link is on, and how it was at its last check: none when it is not one the app tries, or
+ * the warning is off.
+ */
+export const platformForUrl = <ThrowOnError extends boolean = false>(
+  options: Options<PlatformForUrlData, ThrowOnError>,
+): RequestResult<PlatformForUrlResponses, PlatformForUrlErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    PlatformForUrlResponses,
+    PlatformForUrlErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zPlatformForUrlQuery,
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zPlatformForUrlResponse.parseAsync(data),
+    url: '/api/platform-checks/for',
+    ...options,
+  });
+
+/**
+ * Run Platform Checks
+ *
+ * Try every platform now (or one), as a background job; each request goes in the outbound log.
+ */
+export const runPlatformChecks = <ThrowOnError extends boolean = false>(
+  options?: Options<RunPlatformChecksData, ThrowOnError>,
+): RequestResult<
+  RunPlatformChecksResponses,
+  RunPlatformChecksErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).post<
+    RunPlatformChecksResponses,
+    RunPlatformChecksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: z.never().optional(),
+          query: zRunPlatformChecksQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zRunPlatformChecksResponse.parseAsync(data),
+    url: '/api/platform-checks/run',
     ...options,
   });
 

@@ -37,6 +37,7 @@ import {
   captureSecondWitness,
   captureTimeProof,
   changePassphrase,
+  changePlatformChecks,
   checkConnectorKey,
   checkEvidencePack,
   checkMonitor,
@@ -179,6 +180,7 @@ import {
   getOrphanStoragePreview,
   getOwnershipChain,
   getPartyYears,
+  getPlatformChecks,
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedFlags,
@@ -303,6 +305,7 @@ import {
   patchSourceSuite,
   peekAtRecord,
   placeStoryClaim,
+  platformForUrl,
   presentationStyles,
   previewAuthenticity,
   previewBackupRestore,
@@ -349,6 +352,7 @@ import {
   reviewRelationshipEvidenceEndpoint,
   revokeAppUserToken,
   rotateAppUserToken,
+  runPlatformChecks,
   runRedFlags,
   runSavedQuestion,
   runTableMapping,
@@ -478,6 +482,9 @@ import type {
   ChangePassphraseData,
   ChangePassphraseError,
   ChangePassphraseResponse,
+  ChangePlatformChecksData,
+  ChangePlatformChecksError,
+  ChangePlatformChecksResponse,
   CheckConnectorKeyData,
   CheckConnectorKeyError,
   CheckConnectorKeyResponse,
@@ -903,6 +910,9 @@ import type {
   GetPartyYearsData,
   GetPartyYearsError,
   GetPartyYearsResponse,
+  GetPlatformChecksData,
+  GetPlatformChecksError,
+  GetPlatformChecksResponse,
   GetRecordMarksData,
   GetRecordMarksError,
   GetRecordMarksResponse,
@@ -1271,6 +1281,9 @@ import type {
   PlaceStoryClaimData,
   PlaceStoryClaimError,
   PlaceStoryClaimResponse,
+  PlatformForUrlData,
+  PlatformForUrlError,
+  PlatformForUrlResponse,
   PresentationStylesData,
   PresentationStylesError,
   PresentationStylesResponse,
@@ -1409,6 +1422,9 @@ import type {
   RotateAppUserTokenData,
   RotateAppUserTokenError,
   RotateAppUserTokenResponse,
+  RunPlatformChecksData,
+  RunPlatformChecksError,
+  RunPlatformChecksResponse,
   RunRedFlagsData,
   RunRedFlagsError,
   RunRedFlagsResponse,
@@ -11188,6 +11204,122 @@ export const makeLeadFromNoteMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await makeLeadFromNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getPlatformChecksQueryKey = (
+  options?: Options<GetPlatformChecksData>,
+) => createQueryKey('getPlatformChecks', options);
+
+/**
+ * Get Platform Checks
+ *
+ * Each platform the app saves from, tried on its public test item: today, the last 14 days, the settings.
+ */
+export const getPlatformChecksOptions = (
+  options?: Options<GetPlatformChecksData>,
+) =>
+  queryOptions<
+    GetPlatformChecksResponse,
+    GetPlatformChecksError,
+    GetPlatformChecksResponse,
+    ReturnType<typeof getPlatformChecksQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPlatformChecks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPlatformChecksQueryKey(options),
+  });
+
+/**
+ * Change Platform Checks
+ *
+ * Turn the daily check on or off, the warning before a capture, or change a test item.
+ */
+export const changePlatformChecksMutation = (
+  options?: Partial<Options<ChangePlatformChecksData>>,
+): UseMutationOptions<
+  ChangePlatformChecksResponse,
+  ChangePlatformChecksError,
+  Options<ChangePlatformChecksData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ChangePlatformChecksResponse,
+    ChangePlatformChecksError,
+    Options<ChangePlatformChecksData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await changePlatformChecks({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const platformForUrlQueryKey = (options: Options<PlatformForUrlData>) =>
+  createQueryKey('platformForUrl', options);
+
+/**
+ * Platform For Url
+ *
+ * The platform a pasted link is on, and how it was at its last check: none when it is not one the app tries, or
+ * the warning is off.
+ */
+export const platformForUrlOptions = (options: Options<PlatformForUrlData>) =>
+  queryOptions<
+    PlatformForUrlResponse,
+    PlatformForUrlError,
+    PlatformForUrlResponse,
+    ReturnType<typeof platformForUrlQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await platformForUrl({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: platformForUrlQueryKey(options),
+  });
+
+/**
+ * Run Platform Checks
+ *
+ * Try every platform now (or one), as a background job; each request goes in the outbound log.
+ */
+export const runPlatformChecksMutation = (
+  options?: Partial<Options<RunPlatformChecksData>>,
+): UseMutationOptions<
+  RunPlatformChecksResponse,
+  RunPlatformChecksError,
+  Options<RunPlatformChecksData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RunPlatformChecksResponse,
+    RunPlatformChecksError,
+    Options<RunPlatformChecksData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await runPlatformChecks({
         ...options,
         ...fnOptions,
         throwOnError: true,

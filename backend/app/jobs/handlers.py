@@ -648,6 +648,19 @@ def capture_media_job(db: Session, job: BackgroundJob, report: Report) -> dict:
 
 FOLLOW_AUDIO = "follow_audio"
 FIND_VOICES = "find_voices"
+CHECK_PLATFORMS = "check_platforms"
+
+
+def check_platforms_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Does it work today? (WORKS_1): try each platform's public test item now, on a person's request."""
+    from app.services.platform_checks import BY_KEY, check, check_all
+
+    only = (job.payload or {}).get("platform")
+    if only in BY_KEY:
+        row = check(db, only, actor="you")
+        return {"message": f"{BY_KEY[only].name}: {row.detail}", "result": {"platform": only, "state": row.state}}
+    n = check_all(db, actor="you", report=report)
+    return {"message": f"{n} platforms tried", "result": {"platforms": n}}
 
 
 def find_voices_job(db: Session, job: BackgroundJob, report: Report) -> dict:
@@ -685,6 +698,7 @@ HANDLERS: dict[str, Handler] = {
     WEB_CAPTURE: web_capture_job,
     FOLLOW_AUDIO: follow_audio_job,
     FIND_VOICES: find_voices_job,
+    CHECK_PLATFORMS: check_platforms_job,
     CAPTURE_MEDIA: capture_media_job,
     OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,

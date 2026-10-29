@@ -307,3 +307,6 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 .cp-linkbtn:focus-visible { outline: 2px solid var(--accent-1); }
 .cp-traylist { margin: 6px 0 0; padding-left: 16px; font-size: 12px; }
 .cp-traylist small { display: block; color: var(--text-muted); }
+.cp-platform { margin: 6px 0 0; display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; }
+.cp-platform b { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; font: 600 10px var(--font-mono); }
+.cp-platform.broken b { color: var(--status-disputed); } .cp-platform.partly b { color: var(--accent-1); }

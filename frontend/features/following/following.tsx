@@ -18,13 +18,14 @@ import {getFollowingOptions, getFollowingQueryKey, getVersionsOptions} from '../
 import {captureAll, captureItem, checkMonitor, createMonitor, deleteMonitor, recordRemoval, skipItem, undoItem, updateMonitor} from '../../lib/generated/sdk.gen';
 import type {FollowingOut, MonitorItemOut, MonitorOut, PageVersionOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
+import {WorksToday} from './works-today';
 
 const TAG: Record<MonitorOut['kind'], string> = {feed: 'FEED', sitemap: 'MAP', page: 'PAGE', podcast: 'POD', account: 'OPEN', closed: 'LINK'};
 const EVERY: [number, string][] = [[15, '15 min'], [30, '30 min'], [60, 'hourly'], [1440, 'daily'], [10080, 'weekly']];
 const everyWord = (m: number) => EVERY.find(([n]) => n === m)?.[1] ?? `${m} min`;
 const BULK_REASONS = ['Account is deleting posts', 'Page is being edited now', 'Too many in the same hour'];
 const MARK = {ok: '✓', warn: '!', bad: '✕', wait: '·'} as const;
-type Tab = 'sources' | 'risk' | 'changes' | 'history';
+type Tab = 'sources' | 'risk' | 'changes' | 'history' | 'works';
 
 const hhmm = (iso?: string | null) => (iso ? apiTime(iso).toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'}) : '');
 function when(iso?: string | null): string {
@@ -236,10 +237,11 @@ export function Following({investigationId, active = true}: {investigationId: st
   const e = data.egress;
   return <section className="fl" aria-label="Following">
     <nav className="fl-tabs" aria-label="Following">
-      {([['sources', 'Sources'], ['risk', 'At risk'], ['changes', 'Changes'], ['history', 'History']] as [Tab, string][]).map(([t, label]) =>
+      {([['sources', 'Sources'], ['risk', 'At risk'], ['changes', 'Changes'], ['history', 'History'], ['works', 'Works today']] as [Tab, string][]).map(([t, label]) =>
         <button key={t} type="button" className={tab === t ? 'on' : ''} aria-current={tab === t ? 'page' : undefined} onClick={() => setTab(t)}>{label}</button>)}
       <span className="fl-live"><i aria-hidden="true"/>{data.working} of {data.followed} working today</span>
     </nav>
+    {tab === 'works' ? <div className="fl-works"><WorksToday/></div> : <>
     <header className="fl-title"><h1>Following</h1><p>The app watches. A person captures. No account logins anywhere.</p>
       <button type="button" className="fl-btn" aria-expanded={adding} onClick={() => setAdding(a => !a)}>+ Follow something</button></header>
 
@@ -299,5 +301,6 @@ export function Following({investigationId, active = true}: {investigationId: st
         <p className="fl-note">Each site sees a visit from this computer&apos;s address, unless its route is Tor. The list of what you follow is never sent. Every request is in the outbound log.</p>
       </section>
     </div>
+    </>}
   </section>;
 }

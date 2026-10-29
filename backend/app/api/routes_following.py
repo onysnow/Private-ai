@@ -3,7 +3,7 @@ does with it. The service is app/services/following.py; routes stay thin."""
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
@@ -15,8 +15,17 @@ from app.jobs.handlers import FOLLOW_AUDIO, WEB_CAPTURE
 from app.jobs.records import create_job
 from app.jobs.runner import job_runner
 from app.models.following import Monitor, MonitorItem
-from app.schemas.api import CaptureAllRequest, MonitorCreate, MonitorUpdate
-from app.schemas.responses import ErrorOut, FollowingOut, MonitorOut, PageVersionOut, ValidationErrorOut
+from app.schemas.api import CaptureAllRequest, MonitorCreate, MonitorUpdate, PlatformChecksUpdate
+from app.schemas.responses import (
+    BackgroundJobOut,
+    ErrorOut,
+    FollowingOut,
+    MonitorOut,
+    PageVersionOut,
+    PlatformChecksOut,
+    PlatformForUrlOut,
+    ValidationErrorOut,
+)
 from app.services import following
 from app.services.web_capture import CaptureRefused, request_capture
 
@@ -207,3 +216,52 @@ def record_removal(monitor_item_id: str, request: Request, db: Session = Depends
     except following.FollowRefused as exc:
         raise HTTPException(409, str(exc)) from exc
     return following.overview(db, item.investigation_id)
+
+
+# --- Does it work today? (mockup WORKS_1, app/services/platform_checks.py) --------------------------------------------
+
+@router.get("/platform-checks", response_model=PlatformChecksOut)
+def get_platform_checks(db: Session = Depends(get_db)) -> Any:
+    """Each platform the app saves from, tried on its public test item: today, the last 14 days, the settings."""
+    from app.services import platform_checks
+
+    return platform_checks.overview(db)
+
+
+@router.patch("/platform-checks", response_model=PlatformChecksOut, responses={422: {"model": ValidationErrorOut | ErrorOut}})
+def change_platform_checks(body: PlatformChecksUpdate, db: Session = Depends(get_db)) -> Any:
+    """Turn the daily check on or off, the warning before a capture, or change a test item."""
+    from app.services import platform_checks
+
+    try:
+        platform_checks.change(db, daily=body.daily, warn=body.warn, items=body.items)
+    except (ValueError, CaptureRefused) as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return platform_checks.overview(db)
+
+
+@router.post("/platform-checks/run", response_model=BackgroundJobOut, status_code=202,
+             responses={422: {"model": ValidationErrorOut | ErrorOut, "description": "No such platform"}})
+async def run_platform_checks(request: Request, platform: str | None = Query(None, max_length=32), db: Session = Depends(get_db)) -> Any:
+    """Try every platform now (or one), as a background job; each request goes in the outbound log."""
+    from app.jobs.handlers import CHECK_PLATFORMS
+    from app.jobs.records import serialize_job
+    from app.models.domain import BackgroundJob
+    from app.services.platform_checks import BY_KEY
+
+    if platform is not None and platform not in BY_KEY:
+        raise HTTPException(422, f"No platform called {platform}")
+    job = create_job(db, kind=CHECK_PLATFORMS, subject_type="platforms", subject_id=platform or "all", runner=job_runner(request).mode,
+                     payload={"platform": platform}, message="Waiting to try the platforms")
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    return serialize_job(db.get(BackgroundJob, job.id) or job)
+
+
+@router.get("/platform-checks/for", response_model=PlatformForUrlOut | None)
+def platform_for_url(url: str = Query(..., max_length=4000), db: Session = Depends(get_db)) -> Any:
+    """The platform a pasted link is on, and how it was at its last check: none when it is not one the app tries, or
+    the warning is off."""
+    from app.services import platform_checks
+
+    return platform_checks.for_url(db, url)

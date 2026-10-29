@@ -115,3 +115,35 @@
   .fl { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "title" "mid" "left" "right"; }
   .fl-title { flex-wrap: wrap; }
 }
+
+/* Does it work today? (mockup WORKS_1) */
+.wt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 14px; align-items: start; }
+@media (max-width: 980px) { .wt { grid-template-columns: minmax(0, 1fr); } }
+.wt-title { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.wt-title h1 { margin: 0; font: 300 30px/1.1 var(--font-display); }
+.wt-title p { margin: 0; flex: 1 1 360px; color: var(--text-muted); font-size: 13px; }
+.wt-list ul { list-style: none; margin: 0; padding: 0; }
+.wt-row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 170px 96px minmax(150px, 1fr) minmax(0, 1fr) 46px; gap: 12px; align-items: center; padding: 9px 10px; border-bottom: 1px solid var(--line, rgba(127,127,127,.15)); font-size: 12.5px; }
+.wt-row.sel { background: var(--surface-2); border-radius: 9px; }
+.wt-head { cursor: default; font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+@media (max-width: 760px) { .wt-row { grid-template-columns: 1fr auto; } .wt-days, .wt-saves, .wt-secs, .wt-head span:nth-child(n+3) { display: none; } }
+.wt-name b { display: block; font-weight: 600; } .wt-name small { font: 500 10px var(--font-mono); color: var(--text-muted); }
+.wt-state { font: 600 11px var(--font-mono); letter-spacing: .04em; padding: 3px 8px; border-radius: 99px; border: 1px solid currentColor; text-align: center; white-space: nowrap; }
+.wt-state.works { color: var(--status-supported); } .wt-state.partly { color: var(--accent-1); } .wt-state.broken { color: var(--status-disputed); } .wt-state.none { color: var(--text-muted); border-style: dashed; }
+.wt-days { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; }
+.wt-days i, .wt-key i { display: block; height: 16px; border-radius: 3px; border: 1px solid color-mix(in srgb, var(--status-supported) 50%, transparent); background: color-mix(in srgb, var(--status-supported) 16%, transparent); }
+.wt-days i.partly, .wt-key i.partly { border-color: color-mix(in srgb, var(--accent-1) 70%, transparent); background: linear-gradient(to top, color-mix(in srgb, var(--accent-1) 55%, transparent) 0 50%, transparent 50%); }
+.wt-days i.broken, .wt-key i.broken { border-color: color-mix(in srgb, var(--status-disputed) 60%, transparent); background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--status-disputed) 40%, transparent) 0 2px, transparent 2px 5px); }
+.wt-days i.none, .wt-key i.none { border-style: dashed; border-color: var(--line, rgba(127,127,127,.35)); background: transparent; }
+.wt-saves { color: var(--text-muted); } .wt-secs { color: var(--text-muted); font: 11px var(--font-mono); text-align: right; }
+.wt-key { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 0; font-size: 11.5px; color: var(--text-muted); }
+.wt-key span { display: inline-flex; gap: 6px; align-items: center; } .wt-key i { width: 14px; }
+.wt-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.wt-hot { border: 1px solid color-mix(in srgb, var(--status-disputed) 55%, transparent); }
+.wt-kv { display: grid; grid-template-columns: 86px 1fr; gap: 6px 10px; margin: 8px 0; font-size: 12px; }
+.wt-kv dt { font: 500 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.wt-kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.wt-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.wt-acts form { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; } .wt-acts input { flex: 1 1 200px; min-width: 0; }
+.wt-switch { display: flex; gap: 8px; align-items: center; font-size: 12.5px; margin-top: 6px; }
+.fl-works { grid-column: 1 / -1; min-width: 0; }

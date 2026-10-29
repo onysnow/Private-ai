@@ -917,6 +917,14 @@ class VoiceName(BaseModel):
     entity_id: str | None = None
 
 
+class PlatformChecksUpdate(BaseModel):
+    """Turn the daily check on or off, the warning before a capture, or change a platform's test item (empty: back to
+    the one the app ships with)."""
+    daily: bool | None = None
+    warn: bool | None = None
+    items: dict[str, str | None] | None = None
+
+
 class ClipCreate(BaseModel):
     """A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`."""
     start: float = Field(ge=0)

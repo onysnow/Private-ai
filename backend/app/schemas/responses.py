@@ -5174,6 +5174,47 @@ class ByHandAddedOut(ResponseModel):
     parties: list[str]
 
 
+class PlatformDayOut(ResponseModel):
+    day: str
+    state: Literal["works", "partly", "broken"] | None = None
+
+
+class PlatformOut(ResponseModel):
+    """One platform the app saves from, tried on its public test item: today's state as a word, the last 14 days."""
+    key: str
+    name: str
+    route: str
+    saves: str
+    test_url: str
+    shipped_url: str
+    state: Literal["works", "partly", "broken"] | None = None
+    detail: str | None = None
+    missing: list[str] = []
+    seconds: float | None = None
+    checked_at: Timestamp | None = None
+    broken_since: Timestamp | None = None
+    days: list[PlatformDayOut]
+
+
+class PlatformChecksOut(ResponseModel):
+    """Does it work today? (WORKS_1): each platform, whether the daily check is on, whether a pasted link is warned about."""
+    daily: bool
+    warn: bool
+    platforms: list[PlatformOut]
+    last_checked_at: Timestamp | None = None
+    working: int
+    checked: int
+
+
+class PlatformForUrlOut(ResponseModel):
+    """The platform a pasted link is on and how it was at its last check (none when not one the app tries)."""
+    key: str
+    name: str
+    state: Literal["works", "partly", "broken"] | None = None
+    detail: str | None = None
+    checked_at: Timestamp | None = None
+
+
 class SigningKeyOut(ResponseModel):
     """This computer's evidence-pack signing key (Ed25519): its fingerprint and when it was made; none before the first pack."""
     fingerprint: str | None = None

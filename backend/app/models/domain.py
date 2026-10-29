@@ -29,6 +29,7 @@ from app.models.captures import Capture
 from app.models.derived import DerivedFile, DocumentPhoto
 from app.models.authenticity import AuthenticityCheck, AuthenticityItem
 from app.models.evidence_pack import EvidencePack
+from app.models.platform_check import PlatformCheck
 from app.models.following import Monitor, MonitorItem, PageVersion
 from app.models.media import DocumentMedia, TranscriptSegment
 from app.models.claims import (
@@ -134,6 +135,7 @@ from app.models.corpus import (
 __all__ = [
     "AuthenticityCheck",
     "EvidencePack",
+    "PlatformCheck",
     "AuthenticityItem",
     "CaseRecord",
     "Capture",

@@ -6864,6 +6864,94 @@ export const zPlacesOut = z.object({
 });
 
 /**
+ * PlatformChecksUpdate
+ *
+ * Turn the daily check on or off, the warning before a capture, or change a platform's test item (empty: back to
+ * the one the app ships with).
+ */
+export const zPlatformChecksUpdate = z.object({
+  daily: z.boolean().nullish(),
+  items: z.record(z.string(), z.string().nullable()).nullish(),
+  warn: z.boolean().nullish(),
+});
+
+/**
+ * PlatformDayOut
+ */
+export const zPlatformDayOut = z.object({
+  day: z.string(),
+  state: z.enum(['works', 'partly', 'broken']).nullish(),
+});
+
+/**
+ * PlatformForUrlOut
+ *
+ * The platform a pasted link is on and how it was at its last check (none when not one the app tries).
+ */
+export const zPlatformForUrlOut = z.object({
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  detail: z.string().nullish(),
+  key: z.string(),
+  name: z.string(),
+  state: z.enum(['works', 'partly', 'broken']).nullish(),
+});
+
+/**
+ * PlatformOut
+ *
+ * One platform the app saves from, tried on its public test item: today's state as a word, the last 14 days.
+ */
+export const zPlatformOut = z.object({
+  broken_since: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  days: z.array(zPlatformDayOut),
+  detail: z.string().nullish(),
+  key: z.string(),
+  missing: z.array(z.string()).optional().default([]),
+  name: z.string(),
+  route: z.string(),
+  saves: z.string(),
+  seconds: z.number().nullish(),
+  shipped_url: z.string(),
+  state: z.enum(['works', 'partly', 'broken']).nullish(),
+  test_url: z.string(),
+});
+
+/**
+ * PlatformChecksOut
+ *
+ * Does it work today? (WORKS_1): each platform, whether the daily check is on, whether a pasted link is warned about.
+ */
+export const zPlatformChecksOut = z.object({
+  checked: z.int(),
+  daily: z.boolean(),
+  last_checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  platforms: z.array(zPlatformOut),
+  warn: z.boolean(),
+  working: z.int(),
+});
+
+/**
  * PlatformsOut
  */
 export const zPlatformsOut = z.object({
@@ -14195,6 +14283,38 @@ export const zMakeLeadFromNotePath = z.object({
  * Successful Response
  */
 export const zMakeLeadFromNoteResponse = zLeadOut;
+
+/**
+ * Successful Response
+ */
+export const zGetPlatformChecksResponse = zPlatformChecksOut;
+
+export const zChangePlatformChecksBody = zPlatformChecksUpdate;
+
+/**
+ * Successful Response
+ */
+export const zChangePlatformChecksResponse = zPlatformChecksOut;
+
+export const zPlatformForUrlQuery = z.object({
+  url: z.string().max(4000),
+});
+
+/**
+ * Response Platform For Url
+ *
+ * Successful Response
+ */
+export const zPlatformForUrlResponse = zPlatformForUrlOut.nullable();
+
+export const zRunPlatformChecksQuery = z.object({
+  platform: z.string().max(32).nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zRunPlatformChecksResponse = zBackgroundJobOut;
 
 /**
  * Successful Response

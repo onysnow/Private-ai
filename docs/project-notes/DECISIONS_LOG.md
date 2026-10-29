@@ -63,3 +63,17 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   Supported. A link's dry run is the same rules as Decide's "by what it unlocks".
 - **Where:** `app/services/manual_entry.py`, `/investigations/{id}/by-hand` (+ `/preview`, `/suggest`),
   `features/by-hand/add-by-hand.tsx`.
+
+## 5. Does it work today?: off by default, shipped test items, under Following (29 Oct)
+
+- **Questions (WORKS_1 README):** on by default? Who picks the test items? Where does it live?
+- **Call:** off by default, turned on with one switch ("Check once a day"); "Check all now" and "Try it now" work any
+  time. Ten platforms ship with a public test item each (an official account or a long-lived post), and a person can
+  change any of them and go back. It lives in Bring in › Following › Works today. A pasted link on a platform that was
+  broken or partly working at its last check is warned about in The Drop, from the app's own last check (nothing is
+  asked of the platform then); the warning can be turned off. Each try uses the tool a real save uses (yt-dlp without
+  downloading, the capture browser, the open-protocol reader), through the same guard, and goes in the outbound log.
+- **Why:** ten requests a day from the reporter's own address to platforms is exactly what this app avoids doing
+  unasked; a reporter who relies on saving from them turns it on in one click. Shipped items mean it works with no setup.
+- **Where:** `app/services/platform_checks.py`, `platform_checks` table, `/platform-checks` routes, the daily task in
+  `app/jobs/schedule.py`, `features/following/works-today.tsx`, the warning in `features/the-drop/captures.tsx`.

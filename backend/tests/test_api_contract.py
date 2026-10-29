@@ -595,6 +595,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
                 "evidence_id": relationship_evidence["items"][0]["evidence_id"] if relationship_evidence.get("items") else payment["evidence"]["id"]},
         },
         queries={
+            ("GET", "/api/platform-checks/for"): {"url": "https://www.instagram.com/p/abc/"},
             ("GET", "/api/entities/{entity_id}/merge-preview"): {"target_entity_id": bellcastle},
             ("GET", "/api/provenance/extraction-lineage"): {"record_type": "evidence", "record_id": accepted["accepted_record_id"]},
             ("GET", "/api/provenance/trace"): {"record_type": "claim", "record_id": claim["id"]},

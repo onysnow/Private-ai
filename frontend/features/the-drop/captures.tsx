@@ -18,7 +18,7 @@ import type {FormEvent, ReactElement} from 'react';
 
 import {api} from '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
-import {getCaptureQuotesOptions, getCaptureQuotesQueryKey, getCapturesOptions, getCapturesQueryKey, getDropQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {getCaptureQuotesOptions, getCaptureQuotesQueryKey, getCapturesOptions, getCapturesQueryKey, getDropQueryKey, platformForUrlOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {captureLatest, captureLookElsewhere, captureSecondWitness, captureTimeProof, collectCaptureMedia, createCapture, followCapture, markCaptureChanged, recheckCapture, refindCaptureQuotes, updateCapture} from '../../lib/generated/sdk.gen';
 import type {CaptureArchiveOut, CaptureFollowOut, CaptureOut, CaptureQuoteOut, CaptureStageOut, CaptureTimeProofOut, GetCapturesError} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
@@ -513,6 +513,7 @@ export function CaptureLinkField({investigationId, captures, onCaptured, witness
       <input type="url" inputMode="url" value={text} onChange={e => { setText(e.target.value); setAlready(null); }} placeholder="https://…" aria-label="Web address to capture"/>
       <button type="submit" className="p">Capture</button>
     </form>
+    <PlatformWarning url={text}/>
     <p className="dp-quiet">Links, files and pasted text share one drop: a link pasted into the drop is captured too.</p>
     {already && <div className="cp-already" role="status">
       <p><span className="cp-chip teal">Already in the case</span> captured {utc(already.captured_at ?? already.finished_at)}</p>
@@ -521,6 +522,17 @@ export function CaptureLinkField({investigationId, captures, onCaptured, witness
     </div>}
     {status && <p role="status" className="dp-status">{status}</p>}
   </section>;
+}
+
+/** Does it work today? (WORKS_1): a pasted link on a platform that was broken or partly working at its last check says
+ *  so before it is saved. Nothing is asked of the platform here: the answer is the app's own last check. */
+function PlatformWarning({url}: {url: string}): ReactElement | null {
+  const ok = isWebAddress(url);
+  const platform = useQuery({...platformForUrlOptions({query: {url: url.trim()}}), enabled: ok, staleTime: 60_000}).data;
+  if (!ok || !platform || !platform.state || platform.state === 'works') return null;
+  return <p className={`cp-platform ${platform.state}`} role="status"><b aria-hidden="true">{platform.state === 'broken' ? '✕' : '◐'}</b>
+    {platform.name} {platform.state === 'broken' ? 'is broken' : 'works only in part'} at its last check{platform.checked_at ? ` (${platform.checked_at.slice(0, 10)})` : ''}: {platform.detail?.toLowerCase()}.
+    {platform.state === 'broken' ? ' The capture will keep what a logged-out visitor sees; you can also save the post yourself and drop the file.' : ''}</p>;
 }
 
 export function useCaptures(investigationId: string): UseQueryResult<CaptureOut[], GetCapturesError> {
