@@ -141,4 +141,22 @@ describe('Following', () => {
     expect(api.calls('POST /api/investigations/inv-1/monitors')[0].body).toEqual(
       {url: 'https://www.marlow-courier.example/feed.xml', interval_minutes: 60, route: 'tor', poll: true});
   });
+
+  it('says why an item cannot be captured, and does not capture it', async () => {
+    const api = mockApi({'GET /api/investigations/inv-1/following': following({at_risk: [item({capture_blocked: 'This source is followed through Tor.'})]}),
+      'GET /api/monitors/m1/versions': []});
+    render(<QueryProvider><FollowingScreen investigationId="inv-1"/></QueryProvider>);
+    const capture = await screen.findByRole('button', {name: 'Capture'});
+    expect(capture).toHaveAttribute('aria-disabled', 'true');
+    expect(capture).toHaveAccessibleDescription('This source is followed through Tor.');
+    await userEvent.click(capture);
+    expect(api.calls('POST /api/monitor-items/i1/capture')).toHaveLength(0);
+  });
+});
+
+describe('Reveal around a control', () => {
+  it('gives the control itself the description, since it is the one that takes focus', () => {
+    render(<Reveal tabbable={false} detail="Sent through the Tor running on this computer"><button type="button">Tor</button></Reveal>);
+    expect(screen.getByRole('button', {name: 'Tor'})).toHaveAccessibleDescription('Sent through the Tor running on this computer');
+  });
 });

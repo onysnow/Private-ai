@@ -187,7 +187,9 @@ function Item({item, kind, investigationId}: {item: MonitorItemOut; kind?: Kind;
       {status && <p role="status" className="fl-status">{status}</p>}
     </div>
     <div className="fl-acts">
-      <button type="button" className="p" onClick={() => void run('Capturing…', () => captureItem({path: {monitor_item_id: item.id}, throwOnError: true}))}>Capture</button>
+      {item.capture_blocked
+        ? <Reveal tabbable={false} detail={item.capture_blocked}><button type="button" className="p" aria-disabled="true">Capture</button></Reveal>
+        : <button type="button" className="p" onClick={() => void run('Capturing…', () => captureItem({path: {monitor_item_id: item.id}, throwOnError: true}))}>Capture</button>}
       <button type="button" onClick={() => void run('Skipping…', () => skipItem({path: {monitor_item_id: item.id}, body: {}, throwOnError: true}))}>Skip</button>
     </div>
   </li>;
@@ -221,7 +223,7 @@ function CaptureAll({investigationId, count}: {investigationId: string; count: n
 }
 
 function Versions({m}: {m: MonitorOut}): ReactElement {
-  const query = useQuery({...getVersionsOptions({path: {monitor_id: m.id}}), enabled: m.kind === 'page'});
+  const query = useQuery({...getVersionsOptions({path: {monitor_id: m.id}}), enabled: m.kind === 'page', refetchInterval: 30_000});
   const [shown, setShown] = useState<string | null>(null);
   const versions: MonitorVersionOut[] = query.data ?? [];
   if (m.kind !== 'page') return <Reveal detail={`Only a watched page has versions. A ${KIND_NAME[m.kind][0].toLowerCase()}’s entries are in the queue.`}>
@@ -229,9 +231,9 @@ function Versions({m}: {m: MonitorOut}): ReactElement {
   if (!versions.length) return <p className="fl-quiet">{query.isPending ? 'Looking…' : 'No version yet'}</p>;
   return <ol className="fl-versions">{versions.map(v => <li key={v.id}>
     <Reveal tabbable={false} detail={<><span className="rv-row">Seen {time(v.seen_at)}</span><span className="rv-row rv-mono">SHA-256 {v.text_sha256.slice(0, 12)}…</span>
-      <span className="rv-row">{v.capture_id ? 'Captured' : 'Seen, not captured'}</span></>}>
+      <span className="rv-row">{v.capture_saved ? 'Captured' : v.capture_id ? 'Capture asked for, not saved yet' : 'Seen, not captured'}</span></>}>
       <button type="button" className={`fl-version${shown === v.id ? ' on' : ''}`} aria-expanded={shown === v.id} onClick={() => setShown(shown === v.id ? null : v.id)}>
-        <span className={`fl-dot${v.capture_id ? ' kept' : ''}`} aria-hidden="true"/>
+        <span className={`fl-dot${v.capture_saved ? ' kept' : ''}`} aria-hidden="true"/>
         <b>v{v.number}</b>{v.number > 1 && <span className="fl-delta">+{v.lines_added} −{v.lines_removed}</span>}
       </button>
     </Reveal>

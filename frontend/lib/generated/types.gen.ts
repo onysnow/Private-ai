@@ -12944,6 +12944,10 @@ export type MonitorItemCaptureOut = {
  */
 export type MonitorItemOut = {
   /**
+   * Capture Blocked
+   */
+  capture_blocked?: string | null;
+  /**
    * Capture Id
    */
   capture_id?: string | null;
@@ -13164,6 +13168,10 @@ export type MonitorUpdate = {
    */
   interval_minutes?: number | null;
   /**
+   * Kind
+   */
+  kind?: 'feed' | 'sitemap' | 'page' | 'podcast' | 'youtube' | null;
+  /**
    * Route
    */
   route?: 'direct' | 'tor' | null;
@@ -13185,6 +13193,10 @@ export type MonitorVersionOut = {
    * Capture Id
    */
   capture_id?: string | null;
+  /**
+   * Capture Saved
+   */
+  capture_saved?: boolean;
   changes?: VersionChangesOut | null;
   /**
    * Id
@@ -31180,7 +31192,7 @@ export type CaptureItemErrors = {
    */
   404: ErrorOut;
   /**
-   * Already captured or skipped
+   * Already captured or skipped, from a source followed through Tor, or a page version that is gone
    */
   409: ErrorOut;
   /**

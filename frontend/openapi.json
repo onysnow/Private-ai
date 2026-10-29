@@ -26740,6 +26740,17 @@
       "MonitorItemOut": {
         "description": "Something a monitor found. `flags`: edited (its entry changed after first seen), changed (a page's text changed),\ngone. `displayed` is what the site said, as displayed and not verified.",
         "properties": {
+          "capture_blocked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Blocked"
+          },
           "capture_id": {
             "anyOf": [
               {
@@ -27175,6 +27186,24 @@
             ],
             "title": "Interval Minutes"
           },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "feed",
+                  "sitemap",
+                  "page",
+                  "podcast",
+                  "youtube"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
           "route": {
             "anyOf": [
               {
@@ -27231,6 +27260,11 @@
               }
             ],
             "title": "Capture Id"
+          },
+          "capture_saved": {
+            "default": false,
+            "title": "Capture Saved",
+            "type": "boolean"
           },
           "changes": {
             "anyOf": [
@@ -63483,7 +63517,7 @@
                 }
               }
             },
-            "description": "Already captured or skipped"
+            "description": "Already captured or skipped, from a source followed through Tor, or a page version that is gone"
           },
           "422": {
             "content": {

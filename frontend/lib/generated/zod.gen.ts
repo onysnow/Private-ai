@@ -5347,6 +5347,7 @@ export const zMonitorCreate = z.object({
  * gone. `displayed` is what the site said, as displayed and not verified.
  */
 export const zMonitorItemOut = z.object({
+  capture_blocked: z.string().nullish(),
   capture_id: z.string().nullish(),
   decided_at: z
     .string()
@@ -5480,6 +5481,7 @@ export const zFollowingOut = z.object({
 export const zMonitorUpdate = z.object({
   active: z.boolean().nullish(),
   interval_minutes: z.int().gte(5).lte(10080).nullish(),
+  kind: z.enum(['feed', 'sitemap', 'page', 'podcast', 'youtube']).nullish(),
   route: z.enum(['direct', 'tor']).nullish(),
   title: z.string().max(300).nullish(),
   url: z.string().min(1).max(4096).nullish(),
@@ -9136,6 +9138,7 @@ export const zVersionChangesOut = z.object({
  */
 export const zMonitorVersionOut = z.object({
   capture_id: z.string().nullish(),
+  capture_saved: z.boolean().optional().default(false),
   changes: zVersionChangesOut.nullish(),
   id: z.string(),
   lines_added: z.int(),

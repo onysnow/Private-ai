@@ -4,7 +4,7 @@
 // page. Hover opens it after a short dwell and it stays while the pointer moves into it; focus opens it at once; a click
 // on a mark that is not itself a control pins it open until a second click, Esc or a click elsewhere. Screen readers get
 // the same words with the mark, through aria-describedby, so nothing is hidden from them.
-import {useCallback, useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore} from 'react';
+import {cloneElement, isValidElement, useCallback, useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 import {createPortal} from 'react-dom';
 
@@ -58,13 +58,14 @@ export function Reveal({detail, children, tabbable = true, className, label}: Pr
   return <>
     <span ref={ref} className={`rv${tabbable ? ' rv-mark' : ''}${mine ? ' rv-open' : ''}${className ? ` ${className}` : ''}`}
       tabIndex={tabbable ? 0 : undefined} role={tabbable && label ? 'img' : undefined} aria-label={tabbable ? label : undefined}
-      aria-describedby={`${id}-detail`} aria-expanded={tabbable ? mine : undefined}
+      aria-describedby={tabbable ? `${id}-detail` : undefined} aria-expanded={tabbable ? mine : undefined}
       onMouseEnter={() => (mine ? keepOpen() : show(false))} onMouseLeave={closeSoon}
       onFocus={() => { if (!mine) show(true); }}
       onBlur={e => { if (!(e.relatedTarget instanceof Node && document.getElementById('rv-card')?.contains(e.relatedTarget))) { if (!open?.pinned) closeSoon(); } }}
       onClick={tabbable ? () => (mine && card?.pinned ? set(null) : show(true, true)) : undefined}
       onKeyDown={tabbable ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (mine && card?.pinned) set(null); else show(true, true); } } : undefined}>
-      {children}
+      {/* A control inside the mark takes focus itself: it carries the description, which is not inherited. */}
+      {!tabbable && isValidElement<{'aria-describedby'?: string}>(children) ? cloneElement(children, {'aria-describedby': `${id}-detail`}) : children}
     </span>
     <span id={`${id}-detail`} hidden>{detail}</span>
     {mine && typeof document !== 'undefined' && createPortal(<Card anchor={card!.anchor} pinned={card!.pinned}>{detail}</Card>, document.body)}

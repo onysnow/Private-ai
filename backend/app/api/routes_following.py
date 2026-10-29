@@ -4,7 +4,7 @@ through: capture an item, or skip it. The app never captures by itself."""
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
@@ -110,30 +110,56 @@ def get_monitor_items(monitor_id: str, state: str | None = None, db: Session = D
     return [following.serialize_item(r, monitor) for r in db.scalars(query.limit(500)).all()]
 
 
+class _NotCaptured(Exception):
+    def __init__(self, status: int, reason: str) -> None:
+        super().__init__(reason)
+        self.status, self.reason = status, reason
+
+
+def _claim(db: Session, item_id: str, state: str) -> bool:
+    """Take the item out of the queue in one statement, so two requests cannot both act on it (a double click, a
+    Capture all overlapping a Skip): only the one whose update finds it still new goes ahead."""
+    done = db.execute(update(MonitorItem).where(MonitorItem.id == item_id, MonitorItem.state == "new").values(state=state))
+    db.commit()
+    return getattr(done, "rowcount", 0) == 1
+
+
 async def _capture_item(db: Session, request: Request, item: MonitorItem, reason: str | None) -> dict[str, Any]:
-    capture = await start_capture(db, request, item.investigation_id, item.url)
+    monitor = db.get(Monitor, item.monitor_id)
+    blocked = following.capture_blocker(db, item, monitor)
+    if blocked:
+        raise _NotCaptured(409, blocked)
+    if not _claim(db, item.id, "captured"):
+        raise _NotCaptured(409, "This item was already captured or skipped")
+    try:
+        capture = await start_capture(db, request, item.investigation_id, item.url)
+    except Exception:
+        db.rollback()
+        db.execute(update(MonitorItem).where(MonitorItem.id == item.id, MonitorItem.capture_id.is_(None)).values(state="new"))
+        db.commit()
+        raise
     item = db.get(MonitorItem, item.id) or item
-    item.state, item.capture_id = "captured", capture.id
+    item.capture_id = capture.id
     item.decided_by, item.decided_at, item.reason = scope_for_request(request).actor_id, utcnow_naive(), reason
     number = (item.displayed or {}).get("version")
-    if number:
+    if number:  # the page's latest version (capture_blocker refused an older one); kept once the capture saves it
         version = db.scalars(select(MonitorVersion).where(MonitorVersion.monitor_id == item.monitor_id, MonitorVersion.number == number)).first()
         if version is not None:
             version.capture_id = capture.id
     db.commit()
-    return {"item": following.serialize_item(item, db.get(Monitor, item.monitor_id)), "capture": capture_out(db, capture)}
+    return {"item": following.serialize_item(item, monitor), "capture": capture_out(db, capture)}
 
 
 @router.post("/monitor-items/{monitor_item_id}/capture", response_model=MonitorItemCaptureOut, responses={
-    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Already captured or skipped"},
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut, "description": "Already captured or skipped, from a source followed through Tor, or a page version that is gone"},
     422: {"model": ValidationErrorOut | ErrorOut, "description": "An address this computer will not visit"}})
 async def capture_item(monitor_item_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
     """A person captures what a monitor found: the same capture as pasting the link (ADR-0018)."""
     item = _item(db, monitor_item_id)
-    if item.state != "new":
-        raise HTTPException(409, f"This item was already {item.state}")
     try:
         return await _capture_item(db, request, item, None)
+    except _NotCaptured as exc:
+        raise HTTPException(exc.status, exc.reason) from exc
     except CaptureRefused as exc:
         raise HTTPException(422, str(exc)) from exc
 
@@ -142,9 +168,10 @@ async def capture_item(monitor_item_id: str, request: Request, db: Session = Dep
 def skip_item(monitor_item_id: str, body: MonitorItemSkip, request: Request, db: Session = Depends(get_db)) -> Any:
     """Leave it uncaptured. It stays in the monitor's history, out of the queue."""
     item = _item(db, monitor_item_id)
-    if item.state != "new":
-        raise HTTPException(409, f"This item was already {item.state}")
-    item.state, item.reason = "skipped", (body.reason or "").strip() or None
+    if not _claim(db, item.id, "skipped"):
+        raise HTTPException(409, "This item was already captured or skipped")
+    db.refresh(item)
+    item.reason = (body.reason or "").strip() or None
     item.decided_by, item.decided_at = scope_for_request(request).actor_id, utcnow_naive()
     db.commit()
     return following.serialize_item(item, db.get(Monitor, item.monitor_id))
@@ -161,7 +188,7 @@ async def capture_all(investigation_id: str, body: MonitorCaptureAll, request: R
     done: list[Any] = []
     for item in waiting[:MAX_CAPTURE_ALL]:
         try:
-            done.append(await _capture_item(db, request, item, body.reason.strip()))
-        except CaptureRefused:
+            done.append(await _capture_item(db, request, item, body.reason))
+        except (CaptureRefused, _NotCaptured):
             continue
     return {"captured": done, "left": max(0, len(waiting) - len(done))}

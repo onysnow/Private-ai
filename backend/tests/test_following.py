@@ -363,6 +363,7 @@ def test_capturing_many_needs_a_reason_and_puts_it_on_each(site, monkeypatch):
     m = _follow(site)
     url = f"/api/investigations/{m['investigation_id']}/following/capture-all"
     assert client.post(url, json={"reason": ""}).status_code == 422
+    assert client.post(url, json={"reason": "   "}).status_code == 422  # spaces are not a reason
     done = client.post(url, json={"reason": "Both are named in the Kestrel story"}).json()
     assert len(done["captured"]) == 2 and done["left"] == 0 and len(made) == 2
     assert {c["item"]["reason"] for c in done["captured"]} == {"Both are named in the Kestrel story"}
@@ -374,7 +375,8 @@ def test_a_captured_page_version_is_linked_to_its_capture(site, monkeypatch):
     m = _follow(site, "/about")
     item = client.get(f"/api/investigations/{m['investigation_id']}/following").json()["at_risk"][0]
     cap = client.post(f"/api/monitor-items/{item['id']}/capture").json()["capture"]
-    assert client.get(f"/api/monitors/{m['id']}/versions").json()[0]["capture_id"] == cap["id"]
+    version = client.get(f"/api/monitors/{m['id']}/versions").json()[0]
+    assert version["capture_id"] == cap["id"] and version["capture_saved"] is True
 
 
 def test_pausing_changing_and_stopping_a_monitor(site):
@@ -435,3 +437,98 @@ def test_what_is_followed_travels_in_a_backup_and_a_restored_case_sends_nothing_
         assert following.poll_due(db) == {"polled": 0}
     assert len(site.hits) == hits_before
     assert client.get(f"/api/investigations/{inv}/following").json()["monitors"][0]["health"] == "paused"
+
+
+# --- Review fixes (PR #117) -----------------------------------------------------------------------------------------
+
+def test_an_item_from_a_source_followed_through_tor_is_not_captured_directly(site, monkeypatch):
+    made = _fake_capture(monkeypatch)
+    site.routes["/feed.xml"] = {"body": RSS}
+    m = _follow(site)
+    client.patch(f"/api/monitors/{m['id']}", json={"route": "tor"})
+    item = client.get(f"/api/investigations/{m['investigation_id']}/following").json()["at_risk"][0]
+    assert "through Tor" in item["capture_blocked"]
+    r = client.post(f"/api/monitor-items/{item['id']}/capture")
+    assert r.status_code == 409 and "through Tor" in r.json()["detail"] and made == []
+    done = client.post(f"/api/investigations/{m['investigation_id']}/following/capture-all", json={"reason": "All of them"}).json()
+    assert done["captured"] == [] and done["left"] == 2 and made == []
+    assert client.get(f"/api/monitors/{m['id']}/items?state=new").json()[0]["state"] == "new"  # still waiting
+
+
+def test_an_older_version_of_a_page_cannot_be_captured(site, monkeypatch):
+    made = _fake_capture(monkeypatch)
+    site.routes["/about"] = {"body": b"<html><body><main><p>Owners: A and B</p></main></body></html>", "type": "text/html"}
+    m = _follow(site, "/about")
+    site.routes["/about"] = {"body": b"<html><body><main><p>Owners: A</p></main></body></html>", "type": "text/html"}
+    client.post(f"/api/monitors/{m['id']}/poll")
+    waiting = {i["displayed"]["version"]: i for i in client.get(f"/api/investigations/{m['investigation_id']}/following").json()["at_risk"]}
+    assert "version 2 now" in waiting[1]["capture_blocked"] and waiting[2]["capture_blocked"] is None
+    assert client.post(f"/api/monitor-items/{waiting[1]['id']}/capture").status_code == 409 and made == []
+
+
+def test_a_capture_that_fails_to_start_puts_the_item_back(site, monkeypatch):
+    from app.api import routes_following
+
+    async def refuse(db, request, investigation_id, url):
+        raise web_capture.CaptureRefused("refused")
+
+    monkeypatch.setattr(routes_following, "start_capture", refuse)
+    site.routes["/feed.xml"] = {"body": RSS}
+    m = _follow(site)
+    item = client.get(f"/api/investigations/{m['investigation_id']}/following").json()["at_risk"][0]
+    assert client.post(f"/api/monitor-items/{item['id']}/capture").status_code == 422
+    assert client.post(f"/api/monitor-items/{item['id']}/skip", json={}).json()["state"] == "skipped"
+    assert client.post(f"/api/monitor-items/{item['id']}/skip", json={}).status_code == 409
+
+
+def test_a_wait_the_site_asks_for_is_kept_in_full(site):
+    site.routes["/slow.xml"] = {"status": 503, "headers": {"Retry-After": str(48 * 3600)}}
+    m = _follow(site, "/slow.xml")
+    with SessionLocal() as db:
+        row = db.get(Monitor, m["id"])
+        assert row.next_check_at - row.last_checked_at >= timedelta(hours=48)
+
+
+def test_robots_txt_behind_a_redirect_is_followed_and_obeyed(site):
+    site.routes["/robots.txt"] = {"status": 301, "headers": {"Location": "/rules.txt"}}
+    site.routes["/rules.txt"] = {"body": b"User-agent: *\nDisallow: /feed.xml\n", "type": "text/plain"}
+    site.routes["/feed.xml"] = {"body": RSS}
+    m = _follow(site)
+    assert m["health"] == "blocked" and "/feed.xml" not in [p for p, _ in site.hits]
+
+
+def test_a_redirect_into_a_place_robots_txt_forbids_is_not_followed(site):
+    site.routes["/feed"] = {"status": 301, "headers": {"Location": "/private/feed.xml"}}
+    site.routes["/private/feed.xml"] = {"body": RSS}
+    m = _follow(site, "/feed")
+    assert m["health"] == "blocked" and "/private/feed.xml" not in [p for p, _ in site.hits]
+
+
+def test_an_address_read_as_a_page_that_answers_with_a_feed_is_followed_as_a_feed(site):
+    site.routes["/updates.xml"] = {"body": RSS}
+    m = _follow(site, "/updates.xml")
+    assert m["kind"] == "feed" and m["new_items"] == 2 and m["versions"] == 0
+    assert client.patch(f"/api/monitors/{m['id']}", json={"kind": "page"}).json()["kind"] == "page"
+
+
+def test_an_entry_whose_link_changed_is_captured_where_it_is_now(site):
+    site.routes["/feed.xml"] = {"body": RSS}
+    m = _follow(site)
+    site.routes["/feed.xml"] = {"body": RSS.replace(b"https://marlow.example/a<", b"https://marlow.example/a-moved<")}
+    client.post(f"/api/monitors/{m['id']}/poll")
+    urls = {i["url"] for i in client.get(f"/api/monitors/{m['id']}/items").json()}
+    assert "https://marlow.example/a-moved" in urls and "https://marlow.example/a" not in urls
+
+
+def test_an_answer_too_large_is_a_health_not_an_error(site, monkeypatch):
+    monkeypatch.setattr(settings, "follow_max_megabytes", 0)
+    site.routes["/feed.xml"] = {"body": RSS}
+    m = _follow(site)
+    assert m["health"] == "broken" and "larger than" in m["health_reason"] and m["failures"] == 1
+
+
+def test_a_site_that_trickles_its_answer_is_cut_off(site, monkeypatch):
+    monkeypatch.setattr(settings, "follow_timeout_seconds", 0.0)
+    site.routes["/feed.xml"] = {"body": RSS}
+    with pytest.raises(following.FetchFailed):
+        following.guarded_get(site.base + "/feed.xml")

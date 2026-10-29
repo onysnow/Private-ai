@@ -49,7 +49,7 @@
 .fl-acts button, .fl-all button { all: unset; cursor: pointer; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); font-size: 14px; font-weight: 600; }
 .fl-acts button.p, .fl-all button.p { background: var(--accent-1); border-color: var(--accent-1); color: var(--ground); }
 .fl-acts button.danger { color: var(--status-disputed); }
-.fl-acts button:disabled, .fl-risk button:disabled { opacity: .45; cursor: default; }
+.fl-acts button:disabled, .fl-risk button:disabled, .fl-acts button[aria-disabled='true'] { opacity: .45; cursor: default; }
 .fl-egress { font: 13px var(--font-mono); color: var(--accent-2); align-self: flex-start; }
 .fl-form input, .fl-all input { box-sizing: border-box; width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: 13px var(--font-ui); }
 
@@ -64,7 +64,7 @@
 .fl-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 10px; background: var(--surface-2); }
 .fl-item-main { min-width: 0; display: grid; gap: 6px; }
 .fl-item-title { margin: 0; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16.5px; line-height: 1.35; }
-.fl-item-title .rv:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fl-item-title .rv-mark { min-width: 0; overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .fl-alerts { margin: 0; display: flex; gap: 6px; flex-wrap: wrap; }
 .fl-flag { padding: 2px 9px; border-radius: 999px; border: 1px solid currentColor; font: 600 12px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
 .fl-flag.amber { color: var(--accent-1); }
@@ -83,8 +83,9 @@
 .fl-out { display: flex; flex-wrap: wrap; gap: 18px; font-size: 15px; color: var(--text-muted); }
 .fl-out b { color: var(--text); font: 600 24px var(--font-mono); margin-right: 5px; }
 @media (max-width: 1000px) {
-  .fl { height: auto; overflow: visible; padding: 4px 16px 18px; }
-  .fl-grid { grid-template-columns: minmax(0, 1fr); }
+  /* Still the height of its section, which hides overflow: the page scrolls inside itself. */
+  .fl { overflow-y: auto; padding: 4px 16px 18px; }
+  .fl-grid { flex: none; grid-template-columns: minmax(0, 1fr); }
   .fl-col { overflow: visible; }
   .fl-risk { flex-wrap: wrap; gap: 10px; }
   .fl-all { margin-left: 0; flex-wrap: wrap; }

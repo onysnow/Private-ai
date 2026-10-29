@@ -5833,6 +5833,8 @@ class MonitorItemOut(ResponseModel):
     capture_id: str | None = None
     first_seen_at: Timestamp
     last_seen_at: Timestamp
+    # Why Capture is not offered for this item (a source followed through Tor, a page version that is gone), or null.
+    capture_blocked: str | None = None
 
 
 class FollowingCountsOut(ResponseModel):
@@ -5864,6 +5866,7 @@ class MonitorVersionOut(ResponseModel):
     lines_removed: int
     seen_at: Timestamp
     capture_id: str | None = None
+    capture_saved: bool = False
     changes: VersionChangesOut | None = None
 
 

@@ -1,6 +1,6 @@
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from app.visuals.spec import VisualSpec
 
@@ -925,6 +925,7 @@ class MonitorUpdate(BaseModel):
     title: str | None = Field(default=None, max_length=300)
     active: bool | None = None
     url: str | None = Field(default=None, min_length=1, max_length=4096)  # to accept where it moved to
+    kind: Literal["feed", "sitemap", "page", "podcast", "youtube"] | None = None  # when the address was read as the wrong kind
 
 
 class MonitorItemSkip(BaseModel):
@@ -933,5 +934,6 @@ class MonitorItemSkip(BaseModel):
 
 class MonitorCaptureAll(BaseModel):
     """Capturing many at once needs a reason, which goes on each item (EGS rule 8)."""
-    reason: str = Field(min_length=3, max_length=500)
+    # Spaces at either end are not a reason: they are taken off before the length is checked.
+    reason: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=500)]
     item_ids: list[str] | None = Field(default=None, max_length=50)  # none: every item waiting, up to 50

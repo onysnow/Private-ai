@@ -28,12 +28,12 @@ from urllib.robotparser import RobotFileParser
 
 import httpx
 from lxml import etree
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.time import utcnow_naive
-from app.models.domain import Investigation, Monitor, MonitorItem, MonitorVersion
+from app.models.domain import Capture, Investigation, Monitor, MonitorItem, MonitorVersion
 from app.services import web_capture
 from app.services.html_reader import html_blocks
 
@@ -47,6 +47,7 @@ USER_AGENT = f"{USER_AGENT_TOKEN}/1.0 (following; one visit from a reporter's ow
 MAX_ITEMS_PER_POLL = 2000
 MAX_VERSION_TEXT = 200_000
 MAX_BACKOFF = timedelta(hours=24)
+MAX_SITE_WAIT = timedelta(days=30)
 ROBOTS_KEEP = timedelta(hours=1)
 # Each at-risk flag's weight in the queue's order: gone first, then edited, then a changed page, then plain new.
 RISK = {"gone": 3, "edited": 2, "changed": 1}
@@ -88,20 +89,14 @@ def _network_reason(exc: BaseException, route: str) -> str:
     return "the request failed"
 
 
-_pace_lock = threading.Lock()
-_last_request: dict[str, float] = {}
+_hosts_lock = threading.Lock()
+_host_locks: dict[str, threading.Lock] = {}
+_last_finished: dict[str, float] = {}
 
 
-def _pace(host: str) -> None:
-    """One request to a host at a time, a pause between two (settings.follow_host_gap_seconds)."""
-    gap = settings.follow_host_gap_seconds
-    if gap <= 0:
-        return
-    with _pace_lock:
-        wait = _last_request.get(host, 0.0) + gap - time.monotonic()
-        if wait > 0:
-            time.sleep(wait)
-        _last_request[host] = time.monotonic()
+def _host_lock(host: str) -> threading.Lock:
+    with _hosts_lock:
+        return _host_locks.setdefault(host, threading.Lock())
 
 
 def _netloc_for_ip(ip: str, port: int | None, scheme: str) -> str:
@@ -120,9 +115,24 @@ def guarded_get(url: str, headers: dict[str, str] | None = None, *, route: str =
     parts = urlsplit(url)
     host = (parts.hostname or "").rstrip(".").lower()
     sent = {"User-Agent": USER_AGENT, "Accept": "*/*", "Accept-Encoding": "gzip, deflate", **(headers or {})}
+    # One request to a host at a time, held until its answer is read, and a pause after it before the next one.
+    with _host_lock(host):
+        gap = settings.follow_host_gap_seconds
+        wait = _last_finished.get(host, 0.0) + gap - time.monotonic() if gap > 0 else 0
+        if wait > 0:
+            time.sleep(wait)
+        try:
+            return _get(url, parts, host, sent, route)
+        finally:
+            _last_finished[host] = time.monotonic()
+
+
+def _get(url: str, parts: Any, host: str, sent: dict[str, str], route: str) -> Fetched:
     limit = settings.follow_max_megabytes * 1024 * 1024
     timeout = settings.follow_timeout_seconds
-    _pace(host)
+    # The client's timeout covers each wait for data; this covers the whole answer, so a site that trickles bytes
+    # cannot hold the scheduler up.
+    deadline = time.monotonic() + timeout * 2
     try:
         if route == "tor":
             client = httpx.Client(proxy=settings.tor_socks_url, timeout=timeout, follow_redirects=False)
@@ -142,6 +152,8 @@ def guarded_get(url: str, headers: dict[str, str] | None = None, *, route: str =
                 total = 0
                 truncated = False
                 for chunk in response.iter_bytes():
+                    if time.monotonic() > deadline:
+                        raise FetchFailed("it took too long to answer")
                     total += len(chunk)
                     if total > limit:
                         truncated = True
@@ -171,9 +183,21 @@ def _robots_for(url: str, route: str, fetch: Callable[..., Fetched], now: dateti
         return kept[1], kept[2]
     parser: RobotFileParser | None = None
     problem: str | None = None
-    # A site that cannot be reached at all raises FetchFailed to the poll, which records it as unreachable.
-    got = fetch(f"{key[0]}/robots.txt", {"Accept": "text/plain"}, route=route)
-    if got.status == 200:
+    # A site that cannot be reached at all raises FetchFailed to the poll, which records it as unreachable. Redirects
+    # are followed, up to five (RFC 9309), each through the same guarded request; rules that cannot be reached that
+    # way mean the site is not polled.
+    address = f"{key[0]}/robots.txt"
+    got = fetch(address, {"Accept": "text/plain"}, route=route)
+    for _ in range(5):
+        if got.status not in (301, 302, 303, 307, 308):
+            break
+        address = _absolute(address, got.headers.get("location"))
+        if not address:
+            break
+        got = fetch(address, {"Accept": "text/plain"}, route=route)
+    if got.status in (301, 302, 303, 307, 308):
+        problem = "robots.txt redirects and its rules could not be read, so the site is not polled for now"
+    elif got.status == 200:
         parser = RobotFileParser()
         parser.parse(got.body.decode("utf-8", "replace").splitlines())
     elif got.status in (401, 403) or got.status >= 500:
@@ -314,6 +338,17 @@ def _decoded(got: Fetched) -> str:
         return got.body.decode("utf-8", "replace")
 
 
+def _xml_kind(got: Fetched) -> str | None:
+    """feed or sitemap when the answer is one, else None."""
+    for kind, parse in (("feed", parse_feed), ("sitemap", parse_sitemap)):
+        try:
+            parse(got.body, got.url)
+            return kind
+        except ValueError:
+            continue
+    return None
+
+
 def looks_like_html(got: Fetched) -> bool:
     head = got.body[:2048].lstrip().lower()
     return head.startswith((b"<!doctype html", b"<html")) or "text/html" in got.headers.get("content-type", "")
@@ -365,10 +400,13 @@ def create_monitor(db: Session, investigation_id: str, url: str, *, kind: str | 
 
 
 def update_monitor(db: Session, row: Monitor, changes: dict[str, Any]) -> Monitor:
-    """Interval, route, title, paused or resumed, and the address (to accept where it moved to)."""
+    """Kind, interval, route, title, paused or resumed, and the address (to accept where it moved to)."""
     interval = int(changes.get("interval_minutes") or row.interval_minutes)  # a null leaves it as it is
     route = changes.get("route") or row.route
-    _check_settings(row.kind, interval, route)
+    kind = changes.get("kind") or row.kind
+    _check_settings(kind, interval, route)
+    if kind != row.kind:  # read afresh as the new kind: the last answer's ETag must not hide it
+        row.kind, row.etag, row.last_modified, row.next_check_at = kind, None, None, utcnow_naive()
     if changes.get("url") and changes["url"].strip() != row.url:
         new = changes["url"].strip()
         try:
@@ -391,9 +429,10 @@ def update_monitor(db: Session, row: Monitor, changes: dict[str, Any]) -> Monito
 
 def delete_monitor(db: Session, row: Monitor) -> None:
     """Stop following. What the monitor found goes with it; captures a person made from it stay, they are the case's."""
-    for model in (MonitorItem, MonitorVersion):
-        for r in db.scalars(select(model).where(model.monitor_id == row.id)).all():
-            db.delete(r)
+    # In this order, flushed: the items and versions point at the monitor, and PostgreSQL checks each delete.
+    db.execute(delete(MonitorItem).where(MonitorItem.monitor_id == row.id))
+    db.execute(delete(MonitorVersion).where(MonitorVersion.monitor_id == row.id))
+    db.flush()
     db.delete(row)
     db.commit()
 
@@ -409,7 +448,8 @@ def _schedule(row: Monitor, now: datetime, *, ok: bool, wait: timedelta | None =
         row.failures += 1
         delay = min(every * (2 ** min(row.failures, 6)), MAX_BACKOFF)
     if wait is not None:
-        delay = max(delay, min(wait, MAX_BACKOFF))
+        # The site's own wait is kept in full (only the app's backoff is capped), short of an absurd one.
+        delay = max(delay, min(wait, MAX_SITE_WAIT))
     row.next_check_at = now + delay
 
 
@@ -454,6 +494,8 @@ def _record_entries(db: Session, row: Monitor, entries: list[dict[str, Any]], no
             out.new += 1
             continue
         item.last_seen_at = now
+        if item.state == "new" and e["url"] != item.url:  # the publisher moved the entry: capture where it is now
+            item.url = e["url"]
         if item.content_hash != digest:
             item.content_hash, item.title, item.displayed = digest, e["title"] or item.title, displayed
             item.edits += 1
@@ -528,17 +570,28 @@ def poll_monitor(db: Session, row: Monitor, *, now: datetime | None = None, fetc
             elif got.status in (301, 302, 303, 307, 308):
                 target = _absolute(row.url, got.headers.get("location"))
                 same = target and (urlsplit(target).hostname or "").removeprefix("www.") == (urlsplit(row.url).hostname or "").removeprefix("www.")
-                if same:  # http to https, a trailing slash: the same site answers there
-                    got = fetch(target, conditional, route=row.route)
-                    row.http_status = got.status
+                if same:  # http to https, a trailing slash: the same site answers there, under its own robots.txt
+                    there, there_problem = _robots_for(target, row.route, fetch, now)
+                    if there_problem is not None:
+                        health, reason, ok = "blocked", there_problem, False
+                    elif there is not None and not there.can_fetch(USER_AGENT_TOKEN, target):
+                        health, reason, ok = "blocked", "The address redirects to one the site's robots.txt asks robots not to fetch, so it is not followed", False
+                    else:
+                        got = fetch(target, conditional, route=row.route)
+                        row.http_status = got.status
+                        wait = _retry_after(got.headers, now)
+                        outcome.not_modified = got.status == 304
                 else:
                     health, ok = "moved", False
                     row.moved_to = target or None
                     reason = f"The address now points to {target}" if target else "The address redirects, and the new one is not usable"
             if health == "ok" and got.status == 200:
-                if got.truncated:
-                    raise ValueError(f"it is larger than {settings.follow_max_megabytes} MB")
                 try:
+                    if got.truncated:
+                        raise ValueError(f"it is larger than {settings.follow_max_megabytes} MB")
+                    if row.kind == "page" and not looks_like_html(got):
+                        # An address that read as a page but answers with a feed or a sitemap is followed as one.
+                        row.kind = _xml_kind(got) or row.kind
                     if row.kind == "page":
                         outcome = _record_page(db, row, got, now)
                     else:
@@ -628,13 +681,29 @@ def _risk(item: MonitorItem) -> int:
     return sum(RISK.get(f, 0) for f in item.flags or []) + min(item.edits, 3)
 
 
-def serialize_item(row: MonitorItem, monitor: Monitor | None = None) -> dict[str, Any]:
+def capture_blocker(db: Session, item: MonitorItem, monitor: Monitor | None) -> str | None:
+    """Why this item cannot be captured from here, or None. A capture is a direct visit from this computer (ADR-0018),
+    so an item from a source followed through Tor is not captured that way: the route chosen to hide the reporter's
+    address would be dropped. An older version of a watched page cannot be captured: the page shows a newer one now."""
+    if monitor is not None and monitor.route == "tor":
+        return ("This source is followed through Tor. A capture visits the page directly from this computer, and "
+                "capturing through Tor is not built yet, so it is not started from here")
+    number = (item.displayed or {}).get("version")
+    if number:
+        latest = db.scalar(select(MonitorVersion.number).where(MonitorVersion.monitor_id == item.monitor_id)
+                           .order_by(MonitorVersion.number.desc()).limit(1))
+        if latest is not None and number < latest:
+            return f"The page has changed since this version: it shows version {latest} now, and only the page as it is can be captured"
+    return None
+
+
+def serialize_item(row: MonitorItem, monitor: Monitor | None = None, blocked: str | None = None) -> dict[str, Any]:
     return {
         "id": row.id, "monitor_id": row.monitor_id, "monitor_kind": monitor.kind if monitor else None,
         "monitor_title": (monitor.title or host_of(monitor)) if monitor else None, "url": row.url, "title": row.title,
         "displayed": row.displayed or {}, "edits": row.edits, "flags": list(row.flags or []), "state": row.state,
         "reason": row.reason, "decided_by": row.decided_by, "decided_at": row.decided_at, "capture_id": row.capture_id,
-        "first_seen_at": row.first_seen_at, "last_seen_at": row.last_seen_at,
+        "first_seen_at": row.first_seen_at, "last_seen_at": row.last_seen_at, "capture_blocked": blocked,
     }
 
 
@@ -646,7 +715,7 @@ def overview(db: Session, investigation_id: str) -> dict[str, Any]:
     out = [serialize_monitor(db, m) for m in monitors]
     return {
         "monitors": out,
-        "at_risk": [serialize_item(i, by_id.get(i.monitor_id)) for i in waiting],
+        "at_risk": [serialize_item(i, by_id.get(i.monitor_id), capture_blocker(db, i, by_id.get(i.monitor_id))) for i in waiting],
         "counts": {"monitors": len(out), "working": sum(1 for m in out if m["health"] == "ok"), "waiting": len(waiting),
                    "direct": sum(1 for m in monitors if m.route == "direct" and m.active), "tor": sum(1 for m in monitors if m.route == "tor" and m.active)},
     }
@@ -665,9 +734,11 @@ def version_changes(db: Session, row: MonitorVersion, limit: int = 60) -> dict[s
 
 
 def serialize_version(db: Session, row: MonitorVersion, *, with_changes: bool = False) -> dict[str, Any]:
+    # A capture was asked for while this version was the page's latest; it counts as kept only once it saved the page.
+    capture = db.get(Capture, row.capture_id) if row.capture_id else None
     out = {"id": row.id, "monitor_id": row.monitor_id, "number": row.number, "text_sha256": row.text_sha256,
            "lines_added": row.lines_added, "lines_removed": row.lines_removed, "seen_at": row.seen_at, "capture_id": row.capture_id,
-           "changes": None}
+           "capture_saved": capture is not None and capture.outcome == "saved", "changes": None}
     if with_changes:
         out["changes"] = version_changes(db, row)
     return out

@@ -24,7 +24,9 @@ robots.txt (4); no legal review needed for Following as scoped (11).
 - **A poll is polite:** a conditional GET (If-None-Match, If-Modified-Since); robots.txt read, kept an hour and obeyed
   (a 5xx or 401/403 on robots.txt means do not poll for now, RFC 9309); one request to a host at a time with a pause
   between (`FOLLOW_HOST_GAP_SECONDS`, 2 s); jitter of ±10% on the interval; Retry-After honoured; after a failure the
-  wait doubles, up to a day. A same-site redirect (http to https, a trailing slash) is followed; one to another site
+  wait doubles, up to a day; a wait the site asks for is kept in full (up to 30 days). robots.txt behind a redirect
+  is followed (up to five), and a same-site redirect is checked against its own robots.txt before it is fetched. An
+  address read as a page that answers with a feed or a sitemap is followed as one; the kind can be changed. A same-site redirect (http to https, a trailing slash) is followed; one to another site
   marks the monitor "moved" and a person accepts the new address. 401/402/403/407 is "blocked" (the app never logs in).
 - **Where a request goes:** the same rule as a capture (ADR-0018). Direct: the host is looked up once, every address
   must be public, and the connection goes to that address with the name kept for the Host header and the certificate
@@ -34,7 +36,11 @@ robots.txt (4); no legal review needed for Following as scoped (11).
 - **Items, not captures.** A poll never keeps a page. Each new entry, sitemap address or page version is an item in the
   queue; an entry whose text changed after it was first seen is flagged "edited" and counted. A person captures one
   (the same capture as a pasted link) or skips it with an optional reason. Capturing several at once needs a reason,
-  which goes on each item, at most 50 a time.
+  which goes on each item, at most 50 a time. An item is taken out of the queue in one database statement before
+  its capture starts, so two requests cannot both act on it. A capture is a direct visit (ADR-0018), so an item from a
+  source followed through Tor is not captured from here: the route chosen to hide the reporter's address would be
+  dropped. Capturing through Tor waits for the capture guard to speak SOCKS. An older version of a watched page is not
+  captured either (the page shows a newer one); a version counts as kept only once its capture saved the page.
 - **Outbound log** (ADR-0015): each poll is a line before it goes, service "following", the address as the value, the
   route in the reason; marked failed when the site cannot be reached.
 - **Scheduler** (`app/jobs/schedule.py`): `follow_sources` every minute polls the monitors that are due, at most
