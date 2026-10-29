@@ -125,6 +125,9 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   - Shapes: the kind is told by the card's right end only; the left end (the badge) is the same for every kind but a
     person. So organisations have a pointed right end. Vessels: he disliked the curved bow; of five options (artifact
     GVF8i1Y6mx36jw11DhrAr3) he picked the ticket, a round bite out of the right end, on cards and dots.
+  - A card's outline no longer changes with its Red Flags: always the kind's colour (a flag shows only in the count's
+    circle). Square badges are inset from the outline with an outline of their own, as the person's circle is.
+  - The shapes preview now has the chip liquid too (it never had it), clipped to each card's own shape, with the switch.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
     so the chips showed through to the lines. Fixed; the liquid's range is subtle but visible again.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
