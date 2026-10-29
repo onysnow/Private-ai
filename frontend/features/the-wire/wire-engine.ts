@@ -870,7 +870,6 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       M.g.setAttribute('transform', `translate(${wx},${wy}) scale(${1 / C.k})`);
       M.lead.setAttribute('d', `M${at.x},${at.y}L${wx},${wy}`);
       M.lead.setAttribute('stroke-width', String(1.2 / C.k));
-      M.lead.setAttribute('stroke-dasharray', `${2 / C.k} ${4 / C.k}`);
     }
     secBoxes.push(...moreBoxes);
     for (const h of hopEls) {
@@ -1119,7 +1118,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       }
       for (const m of I.more) {
         // A folded stack: a leader back to its party, then a tab with three stacked dots and the count.
-        const lead = el('path', {class: 'more-lead'}, gM);
+        // The leader is drawn with the sector rings, under the links, cards and chips, so it never crosses one.
+        const lead = el('path', {class: 'more-lead'}, gS);
         const g = el('g', {class: 'more', transform: `translate(${m.x},${m.y})`, role: 'button', tabindex: 0, 'aria-label': `Show ${m.n} more linked to ${E[m.p].short}`}, gM);
         const w = 80 + String(m.n).length * 8, ws = 40 + String(m.n).length * 8;
         // At rest a condensed tab (three stacked dots and the count); on hover or keyboard focus it opens to the full chip.

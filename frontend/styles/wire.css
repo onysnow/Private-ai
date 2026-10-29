@@ -248,7 +248,7 @@
 .tw .more .more-f { display: none; }
 .tw .more:hover .more-f, .tw .more:focus-visible .more-f { display: inline; }
 .tw .more:hover .more-s, .tw .more:focus-visible .more-s { display: none; }
-.tw .more-lead { fill: none; stroke: #E8A95B; stroke-opacity: .55; pointer-events: none; }
+.tw .more-lead { fill: none; stroke: #E8A95B; stroke-opacity: .4; stroke-linecap: round; pointer-events: none; }
 .tw .hop-bg { fill: var(--ground); }
 .tw .round-l { font: 600 11px var(--font-mono); letter-spacing: .06em; fill: #ffe9e4; }
 
