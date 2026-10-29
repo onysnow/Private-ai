@@ -179,6 +179,9 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   they're off ("2 more connections, left off to keep the map clear"), one line each (name, kind, the link in words,
   flag count if any; top 3 then "and N more"), "Click to bring them onto the map". Short wording to pick: "2 not on the
   map", "2 more", "2 off the map", "2 not shown yet". Waiting for him.
+- Name tab options redone: every tab comes out of the badge's ticket notch and shares its edge (no floating), shows the
+  name preview and the link count at rest, and when open says "3 links · 2 not on the map". E is now a shimmering
+  skeleton of the rest of the name instead of a blur. Waiting for his pick.
 - Research before designing more: how 2026 UI hints at more information, and how ownership share is shown (the
   key-and-ring share mark is not good). Findings to discuss with him before any redesign.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
