@@ -110,6 +110,18 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   rolls up to the whole sentence ("Viktor Vekselberg owns 100% of Renova Group"); both lines are centred so nothing
   jumps. Its tooltip says what the check means. Also fixed: the Red Flag box's invisible glow caught the pointer at
   rest and opened the box over neighbouring labels.
+- Then (all in the previews):
+  - More connections: hovering a dot that has connections the map doesn't draw, or "+N", branches short fading paths
+    towards the most open side, one per hidden connection, each in its link family's colour and ending in a faint mark
+    of the other party's kind. Clicking moves that party to the middle and gathers all its connections round it (the
+    rest leave); "Back to <party>" steps back. The hidden connections in the preview are samples.
+  - The Red Flag hover box opens upwards, to the right when there is room, else to the left: count and level counts,
+    a bar of the levels in proportion, the first three flags one line each, "+N more · Click to show them on the Wire".
+  - Kind colours re-picked, clear of the flag levels and link families: person blue, company violet, organisation
+    stone, vessel sea-cyan, property rose, bank account green (he said banks green or gold is fine). Directs or works
+    for lines are now silver. The chip liquid's colour range is narrower, more subtle.
+  - Four options for the "owns" label without a chip (artifact for link labels): words on the line, a share mark at
+    the owned end, a mark for the kind of link, the line says it (moving chevrons). Waiting for his pick.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
   circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
