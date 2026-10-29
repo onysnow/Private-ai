@@ -378,7 +378,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     } else {
       // Its name is a chip that grows out from behind the circle (placeLabels, revealName).
       const pg = el('g', {class: 'peek-pill', style: 'display:none'}, dot);
-      pill = {g: pg, bg: el('rect', {class: 'peek-bg', y: -12, height: 24, rx: 12, stroke: K.ring}, pg), t: el('text', {class: 'peek-t', y: 4}, pg)};
+      pill = {g: pg, bg: el('rect', {class: 'peek-bg', y: -DOT_R, height: DOT_R * 2, rx: DOT_R, stroke: K.ring}, pg), t: el('text', {class: 'peek-t', y: 4}, pg)};
       // A party drawn as a dot is the card's own circle with its kind's icon, the same size on screen as on a card.
       el('circle', {r: DOT_R, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5, class: 'ring'}, dot);
       kindIcon(E[id].kind, 0, 0, 13, K.ring, dot);
@@ -717,6 +717,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       N.g.style.display = o < 0.02 ? 'none' : '';
       N.dust.style.display = v === 0 ? '' : 'none';
       N.dot.style.display = v === 1 || (v === 2 && N.isChain) ? '' : 'none';
+      // On a dot, the flag ring and the tag ring sit under the circle and its name chip; on a card, over the card.
+      if (!N.isChain) {
+        const under = v === 1, rings = [N.halo, N.tags].filter((x): x is SVGCircleElement | SVGGElement => Boolean(x));
+        if (under && rings[0].nextSibling !== (rings[1] ?? N.dot)) for (const r of rings) N.g.insertBefore(r, N.dot);
+        else if (!under && N.g.lastChild !== rings[rings.length - 1]) for (const r of rings) N.g.appendChild(r);
+      }
       if (!N.isChain) N.dot.setAttribute('transform', `scale(${cs})`);
       N.card.style.display = v === 2 && !N.isChain ? '' : 'none';
       if (v === 2) N.card.setAttribute('transform', `scale(${cs})`);
@@ -924,7 +930,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     try { tw = P.t.getComputedTextLength() || tw; } catch { /* not laid out (tests) */ }
     const inner = DOT_R + 7, reach = inner + tw + 12;
     P.t.setAttribute('x', String(dir * inner)); P.t.setAttribute('text-anchor', dir > 0 ? 'start' : 'end');
-    const x = dir > 0 ? -DOT_R - 2 : -reach, w = reach + DOT_R + 2;
+    // From the circle's centre outward: the chip's rounded end is wholly behind the circle, so none of it shows round it.
+    const x = dir > 0 ? 0 : -reach, w = reach;
     P.bg.setAttribute('x', String(x)); P.bg.setAttribute('width', String(w));
     P.bg.style.setProperty('x', `${x}px`); P.bg.style.setProperty('width', `${w}px`);
     N.g.classList.toggle('peek-open', full);
