@@ -38,6 +38,20 @@ https://framer.com/m/Chronical-Timeline-JMbe1o.js@IcxcWf1SSSwxMOG63dAo (Framer's
   line resting on a claim that isn't shown yet keeps its Draft mark.
 - Not started; it waits until Ony asks for it.
 
+## Later: expanding cards layout (Ony, 29 Oct)
+"Also I know that this style of animation and grid/layout could be used": Framer's "Expanding Cards"
+(https://framer.com/m/Expanded-Card-Tf0T.js@eQAyLIpgdsn5jzRZJ7tW).
+- What it is, from its code: five cards side by side in one 400px-high row. The open card takes the width and the
+  others close to narrow strips. Each card has a background picture under a dark overlay, a number, a title and a
+  paragraph; the title and paragraph show only on the open card. On phones the row turns into a column. Opening and
+  closing use one spring (stiffness 160, damping 30).
+- Places it fits, each with exactly the few items the layout wants:
+  - The case home: the five stages (Bring in, Check, See, Act, Keep, lib/stages.ts) as the five cards. The open one shows
+    the stage's line, its parts and where the case stands in it; the closed ones keep their number and stage colour.
+  - The See stage: its four drawings (The Wire, Timeline, Money, Places) as cards with a live thumbnail of each.
+  - Decks and the animated presentations above: a slide layout that compares up to five parties or sources.
+- Not started; a mockup comes first when Ony picks where.
+
 ## The Wire's chips in Nova Glow's motion (Ony, 29 Oct)
 "This is how smooth I want the chips, and also how I want any glow animations. The styling is sharper": Framer's
 "Nova Glow Navigation" (https://framer.com/m/Nova-Glow-Navigation-zmwqc6.js@AeSS5plwSRxLlwjuE91J). The preview he is
