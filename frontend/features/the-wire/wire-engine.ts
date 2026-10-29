@@ -21,6 +21,8 @@ import {onScreen} from '../../lib/on-screen';
 export type LinkSure = 'shown' | 'unshown' | 'disputed' | 'worked';
 /** Per link id: how sure it is, and its end date when the record gives one (an ended link is drawn faint). */
 export type LinkInfo = Record<string, {sure: LinkSure; end: string}>;
+/** The reporter's own tags on parties (entity id → its tags), drawn as a ring of coloured arcs outside the dot. */
+export type PartyTags = Record<string, {name: string; colour: string}[]>;
 
 /** The link the "One link" altitude has open, for the link panel: its two parties (an account drawn on its holder
  * counts as the holder's side) and every record between them. */
@@ -42,7 +44,7 @@ type Strand = {fam: string; s: string; t: string; links: WireLinkOut[]; sum: num
 type Bundle = {key: string; a: string; b: string; links: WireLinkOut[]; strands: Record<string, Strand>};
 type Chain = {id: string; mids: string[]; ends: string[]; open: boolean};
 type NodeEl = {
-  id: string; g: SVGGElement; halo: SVGCircleElement; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
+  id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
 type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
@@ -120,7 +122,7 @@ export function linkSentence(fam: string, links: WireLinkOut[], ended: string): 
   return `${l0.role ? l0.role.slice(0, 32) : 'linked'}${l0.date && !ended ? ` · ${fmtDate(l0.date)}` : ended ? ` · ended ${monthYear(ended)}` : ''}${many}`;
 }
 
-export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, info: LinkInfo = {}): () => void {
+export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, info: LinkInfo = {}, partyTags: PartyTags = {}): () => void {
   // Calm (Appearance) and the system's reduced motion both stop the camera and the nodes travelling.
   const RM = () => document.documentElement.dataset.motion === 'calm' || (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
   const q = <T extends Element>(s: string): T => root.querySelector(s) as T;
@@ -352,7 +354,19 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const beads = el('g', {}, card);
     const flag = el('g', {transform: 'translate(90,-27)'}, card);
     g.appendChild(halo); // over the card, so its ring round the kind dot shows
-    const N: NodeEl = {id, g, halo, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
+    // Your tags: one arc per tag, sharing a ring outside the flag ring (shown while the Your tags layer is on).
+    const own = isChain ? [] : partyTags[id] ?? [];
+    let tags: SVGGElement | null = null;
+    if (own.length) {
+      tags = el('g', {class: 'tw-tagring'}, g);
+      // A pale edge under the arcs, so a dark swatch still reads on the night background.
+      el('circle', {fill: 'none', stroke: '#f4ead8', 'stroke-opacity': 0.35, 'stroke-width': 5.5}, tags);
+      const seg = 100 / own.length;
+      own.forEach((t, i) => el('circle', {fill: 'none', stroke: t.colour, 'stroke-width': 3.5, pathLength: 100,
+        'stroke-dasharray': `${Math.max(seg - (own.length > 1 ? 4 : 0), 1)} ${100 - seg + (own.length > 1 ? 4 : 0)}`, 'stroke-dashoffset': -i * seg,
+        transform: 'rotate(-90)'}, tags!));
+    }
+    const N: NodeEl = {id, g, halo, tags, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
     on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); onNodeClick(id); });
     on<PointerEvent>(g, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showTip(ev, id); });
     on(g, 'pointerleave', hideTip);
@@ -613,6 +627,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       // On a card the ring sits round the card's kind dot; on a dot, round the dot.
       N.halo.setAttribute('r', String(v === 2 && !N.isChain ? 14 * cs : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 5));
       N.halo.setAttribute('cx', String(v === 2 && !N.isChain ? -70 * cs : 0));
+      if (N.tags) {
+        N.tags.style.display = v > 0 ? '' : 'none';
+        const r = v === 2 ? 14 * cs + 5 : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 9;
+        N.tags.setAttribute('transform', v === 2 ? `translate(${-70 * cs},0)` : '');
+        for (const c of Array.from(N.tags.children)) c.setAttribute('r', String(r));
+      }
       N.lbl.style.display = 'none';
       if (v === 1 && !(lens.on && mode === 'case' && d.in)) cands.push({id, N, d, pri: fscore(fl) * 10 + deg[id] + (mode === 'case' ? 0 : 100)});
     }

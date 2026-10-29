@@ -277,4 +277,23 @@ describe('The Wire', () => {
     fireEvent.click(screen.getByRole('button', {name: 'Linked groups'}));
     expect(screen.getByText(/Each patch is a group/)).toBeInTheDocument();
   });
+  it('draws your tags as a ring of arcs outside a tagged party, with a key, and hides them with Your tags', async () => {
+    const row = (record_id: string, name: string, colour: string, record_type = 'entity') => ({record_type, record_id, name, colour, tag_id: name});
+    mockApi({'GET /api/investigations/inv-1/wire': WIRE, 'GET /api/investigations/inv-1/record-tags': {investigation_id: 'inv-1',
+      rows: [row('a', 'Owner', '#7FB7E0'), row('a', 'Check again', '#E9AFA8'), row('b', 'Owner', '#7FB7E0'), row('l1', 'Owner', '#7FB7E0', 'relationship')]}});
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    await waitFor(() => expect(map.querySelectorAll('.tw-tagring').length).toBe(2));
+    // Meridian carries two tags, each its own arc of the one ring.
+    expect(Array.from(map.querySelectorAll('.tw-tagring')[0].children).slice(1).map(c => c.getAttribute('stroke'))).toEqual(['#7FB7E0', '#E9AFA8']);
+    const key = screen.getByLabelText('Key');
+    expect(key.textContent).toContain('Owner · 2');
+    expect(key.textContent).toContain('Check again · 1');
+    const toggle = screen.getByRole('button', {name: 'Your tags'});
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByLabelText('The Wire').classList.contains('tw-tags-off')).toBe(true);
+    expect(key.textContent).not.toContain('Owner');
+  });
 });

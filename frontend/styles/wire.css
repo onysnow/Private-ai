@@ -90,6 +90,11 @@
 .tw-key summary::-webkit-details-marker { display: none; }
 .tw-key .row { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
 .tw-key svg { flex: none; }
+.tw-key-tags { margin-top: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.tw-key-tags .tag { display: inline-flex; align-items: center; gap: 5px; }
+.tw-key-tags .tag i { width: 10px; height: 10px; border-radius: 50%; border: 2.5px solid; box-shadow: 0 0 0 1px rgba(244,234,216,.35); }
+.tw .tw-tagring { pointer-events: none; }
+.tw.tw-tags-off .tw-tagring { display: none !important; }
 
 .tw-drawer { position: absolute; top: 72px; right: 124px; width: min(380px, calc(100% - 32px)); max-height: calc(100% - 200px); overflow: auto; z-index: 7; padding: 16px 18px 18px;
   transform: translateX(30px); opacity: 0; pointer-events: none; transition: transform .35s cubic-bezier(.3,.7,.2,1), opacity .25s; }

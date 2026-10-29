@@ -7,7 +7,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
-import {getInvestigationGraphOptions, getWireOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getAllRecordTagsOptions, getInvestigationGraphOptions, getWireOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {RelationshipOut} from '../../lib/generated/types.gen';
 import {certaintyOf} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -15,7 +15,7 @@ import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AllLinks} from './all-links';
 import {LinkPanel} from './link-panel';
 import {mountWire} from './wire-engine';
-import type {LinkInfo, LinkSure, OpenLink} from './wire-engine';
+import type {LinkInfo, LinkSure, OpenLink, PartyTags} from './wire-engine';
 
 const SURE_OF = {supported: 'shown', unsupported: 'unshown', contested: 'disputed'} as const satisfies Record<string, LinkSure>;
 
@@ -36,6 +36,23 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
   const graph = useQuery({...getInvestigationGraphOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const info = useMemo(() => linkInfo(graph.data?.edges ?? []), [graph.data]);
   const infoReady = !graph.isPending || !investigationId;
+  // Your tags on parties (the old network's tag layer): a ring of coloured arcs outside each tagged party's dot.
+  const recordTags = useQuery({...getAllRecordTagsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const partyTags = useMemo(() => {
+    const out: PartyTags = {};
+    for (const row of recordTags?.rows ?? []) if (row.record_type === 'entity') (out[row.record_id] ??= []).push({name: row.name, colour: row.colour});
+    return out;
+  }, [recordTags]);
+  const tagKey = useMemo(() => {
+    const seen = new Map<string, {name: string; colour: string; parties: number}>();
+    for (const list of Object.values(partyTags)) for (const t of list) {
+      const k = seen.get(t.name) ?? {...t, parties: 0};
+      k.parties += 1;
+      seen.set(t.name, k);
+    }
+    return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [partyTags]);
+  const [tagsOn, setTagsOn] = useState(true);
   // The parties' Red Flags are as the rules last left them: when the records have changed since, this runs them once
   // and the run refetches the Wire.
   useRedFlagsQuery(investigationId);
@@ -63,15 +80,15 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
       openFlag,
       openLink: setLink,
       traceEvidence: (evidenceId, title) => openProvenance({title, kind: 'evidence', acceptedRecordType: 'evidence', acceptedRecordId: evidenceId}),
-    }, info);
-  }, [data, info, infoReady, openDossier, openFlag, openProvenance]);
+    }, info, partyTags);
+  }, [data, info, infoReady, openDossier, openFlag, openProvenance, partyTags]);
 
   if ((query.isPending || !infoReady) && investigationId) return <div className="tw tw-state" aria-busy="true"><p>Laying out the case…</p></div>;
   if (query.isError) return <div className="tw tw-state" role="alert"><p>{errorMessage(query.error, 'The Wire could not load the case')}</p>
     <button type="button" onClick={() => query.refetch()}>Try again</button></div>;
   if (!data || !data.entities.length) return <div className="tw tw-state"><p>No parties in this case yet. Records you accept in Decide appear here.</p></div>;
 
-  return <div className="tw" ref={root} aria-label="The Wire">
+  return <div className={tagsOn ? 'tw' : 'tw tw-tags-off'} ref={root} aria-label="The Wire">
     <svg className="tw-map" role="img" aria-label="Map of the parties in this case and how they are linked">
       <defs>
         <filter id="tw-goo" x="-20%" y="-20%" width="140%" height="140%">
@@ -113,6 +130,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
       <button type="button" className="tw-tool tw-bpath" aria-pressed="false">Follow the money <kbd>F</kbd></button>
       <button type="button" className="tw-tool tw-bgroup" aria-pressed="true">Accounts in holders</button>
       <button type="button" className="tw-tool" aria-pressed={allLinks} onClick={() => setAllLinks(a => !a)}>All links · {graph.data?.edges.length ?? 0}</button>
+      {tagKey.length > 0 && <button type="button" className="tw-tool" aria-pressed={tagsOn} onClick={() => setTagsOn(on => !on)}>Your tags</button>}
     </div>
 
     <div className="tw-pathbox tw-glass">
@@ -143,6 +161,10 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
 
     <aside className="tw-key tw-glass" aria-label="Key">
       <div className="tw-key-sure"/>
+      {tagsOn && tagKey.length > 0 && <div className="tw-key-tags" aria-label="Your tags, a ring outside the dot">
+        <span className="cap">Your tags</span>
+        {tagKey.map(t => <span key={t.name} className="tag" title={`${t.parties} ${t.parties === 1 ? 'party' : 'parties'}`}><i style={{borderColor: t.colour}}/>{t.name} · {t.parties}</span>)}
+      </div>}
       <details className="tw-key-more">
         <summary>Kinds and colours ▾</summary>
         <div className="tw-key-body"/>

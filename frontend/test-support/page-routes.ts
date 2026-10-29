@@ -333,6 +333,7 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/graph`]: records.graph ?? emptyGraph(),
     // The Wire (See; in the single-page view since it took over the Relationships panel).
     [`GET ${base}/wire`]: {investigation_id: id, entities: [], links: [], events: []},
+    [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
     [`GET ${base}/timeline`]: timelineBody(id, records.events ?? []),
     [`GET ${base}/timeline/lanes`]: lanesBody(id, records.events ?? []),
     [`GET ${base}/leads/queue`]: leadQueueBody(id, records.leads ?? []),

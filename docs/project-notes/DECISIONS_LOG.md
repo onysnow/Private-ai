@@ -263,8 +263,10 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   evidence and assessments are The Wire's "All links" panel (`features/the-wire/all-links.tsx`). Its add forms are not
   carried over: See › Add by hand adds a party or a link, payments included, and asks where it comes from, which the
   old forms did not. A request to open a relationship (a party's dossier, Claims) opens The Wire with All links.
-- **What went with it:** the old network drawing's "Your tags" layer (the reporter's tags on parties as a filter).
-  Tags are still kept and shown where they are made; the Wire does not draw them. `features/relationship-graph/graph.tsx`
-  is no longer mounted anywhere; its helpers stay in use.
+- **Your tags came back as a layer** (Ony: "And yes"): the reporter's tags on parties are drawn on The Wire as a ring
+  outside the dot (on a card, round its kind dot), one coloured arc per tag over a pale edge so the dark swatches read on
+  the night background. On by default, as the old layer was; the "Your tags" button hides them, and the key lists each
+  tag with how many parties carry it. Tags on links are not drawn (the old layer did not either).
+  `features/relationship-graph/graph.tsx` is no longer mounted anywhere; its helpers stay in use.
 - **Found on the way:** inside the Wire, the theme's filled buttons drew light text on amber (the Wire's buttons inherit
   colour); the links panel now gives them dark text.
