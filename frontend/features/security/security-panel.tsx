@@ -12,9 +12,11 @@ import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
+import {Reveal} from '@/components/ui/reveal';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {errorMessage} from '../../lib/api-client';
+import {bytesInWords} from '../safety/safety-screen';
 import {describeRequest, wasRefused} from '../../lib/audit-words';
 import {shortStamp} from '../../lib/timestamps';
 import {settingsStatusQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
@@ -162,22 +164,29 @@ export function SecurityPanel({settingsStatus, providers, part = 'all'}: Props):
   const security = settingsStatus.security;
   const busiest = security.remote_hosts[0];
 
-  const statusLines = <>
-    <div><small>Environment: {settingsStatus.environment}</small></div>
-    <div><small>Database: {settingsStatus.database}</small></div>
-    <div><small>Document storage: {settingsStatus.document_storage_dir}</small></div>
-    <div><small>Entity extraction owner: {settingsStatus.document_extraction.entity_extraction_owner === 'openaleph_ftm_analyze'
+  // The server's status as one row of names; each value (paths, origins, sources) is revealed on its name. The
+  // access-denial line stays written out when it needs attention (an alert); otherwise its count shows.
+  const configured = Object.values(settingsStatus.connectors).filter(c => c.configured).length;
+  const statusItems: [string, string][] = [
+    ['Environment', `Environment: ${settingsStatus.environment}`],
+    ['Database', `Database: ${settingsStatus.database}`],
+    ['Document storage', `Document storage: ${settingsStatus.document_storage_dir}`],
+    ['Entity extraction', `Entity extraction owner: ${settingsStatus.document_extraction.entity_extraction_owner === 'openaleph_ftm_analyze'
       ? `OpenAleph / ftm-analyze (the Workbench's own name-finder only for documents OpenAleph did not analyse${settingsStatus.document_extraction.local_entity_suggestions_enabled ? '' : '; switched off'})`
-      : `Workbench's own name-finder${settingsStatus.document_extraction.local_entity_suggestions_enabled ? '' : ' (switched off)'}`}</small></div>
-    <div><small>Allowed browser origins: {settingsStatus.cors_allowed_origins.join(', ') || 'none'}</small></div>
-    <div><small>Connector credentials: {Object.entries(settingsStatus.connectors).map(([name, status]) => `${providerLabel(name)}: ${status.configured ? 'configured' : 'not configured'} (${status.source || 'unknown source'})`).join(' · ')}</small></div>
-    <div><small>Restore API: {settingsStatus.restore_api_enabled ? 'enabled' : 'disabled by default'}</small></div>
-    <div><small>API access: {settingsStatus.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} · token configured: {settingsStatus.access.token_configured ? 'yes' : 'no'}</small></div>
-    <div data-testid="security-alerts"><small>{security.needs_attention ? '⚠ ' : ''}Access denials in the last {security.window_hours}h: {security.total_denials}{security.by_event.auth_rate_limited ? ` · ${security.by_event.auth_rate_limited} lockout(s)` : ''}{busiest ? ` · busiest remote host ${busiest.client_host} (${busiest.count})` : ''}{security.needs_attention ? ' — worth a look at the audit log' : ''}</small></div>
+      : `Workbench's own name-finder${settingsStatus.document_extraction.local_entity_suggestions_enabled ? '' : ' (switched off)'}`}`],
+    ['Browser origins', `Allowed browser origins: ${settingsStatus.cors_allowed_origins.join(', ') || 'none'}`],
+    [`Credentials ${configured}/${Object.keys(settingsStatus.connectors).length}`, `Connector credentials: ${Object.entries(settingsStatus.connectors).map(([name, status]) => `${providerLabel(name)}: ${status.configured ? 'configured' : 'not configured'} (${status.source || 'unknown source'})`).join(' · ')}`],
+    [`${settingsStatus.restore_api_enabled ? '✓' : '✕'} Restore API`, `Restore API: ${settingsStatus.restore_api_enabled ? 'enabled' : 'disabled by default'}`],
+    [settingsStatus.access.mode === 'local_only' ? '⌂ Local only' : '↗ Shared access', `API access: ${settingsStatus.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} · token configured: ${settingsStatus.access.token_configured ? 'yes' : 'no'}`],
+  ];
+  const denials = `Access denials in the last ${security.window_hours}h: ${security.total_denials}${security.by_event.auth_rate_limited ? ` · ${security.by_event.auth_rate_limited} lockout(s)` : ''}${busiest ? ` · busiest remote host ${busiest.client_host} (${busiest.count})` : ''}`;
+  const statusLines = <>
+    <div className="sec-status">{statusItems.map(([name, value]) => <Reveal key={name} detail={value}><small className="sec-chip">{name}</small></Reveal>)}</div>
+    <div data-testid="security-alerts">{security.needs_attention ? <small>⚠ {denials} — worth a look at the audit log</small>
+      : <Reveal detail={denials}><small>{security.total_denials} denied · {security.window_hours}h</small></Reveal>}</div>
   </>;
   const keys = <>
-    <h4>Connector credentials</h4>
-    <p className="muted">Credentials are local-only. The API reports status but never returns the saved secret.</p>
+    <h4><Reveal detail="Credentials are local-only. The API reports status but never returns the saved secret."><span>Connector credentials</span></Reveal></h4>
     <Select value={credentialProvider} onValueChange={setCredentialProvider}>
       <SelectTrigger className="w-auto"><SelectValue/></SelectTrigger>
       <SelectContent>{providers.map(p => <SelectItem value={p} key={p}>{providerLabel(p)}</SelectItem>)}</SelectContent>
@@ -192,15 +201,16 @@ export function SecurityPanel({settingsStatus, providers, part = 'all'}: Props):
     <h4>Unreferenced document files</h4>
     <Button onClick={previewOrphans}>Preview retained orphan files</Button>
     {orphanPreview && <div>
-      <small>{orphanPreview.orphan_file_count} file(s) · {orphanPreview.orphan_bytes} bytes · policy: retain by default</small>
-      {orphanPreview.orphan_files.slice(0, 20).map(x => <div key={x.relative_path}><small>{x.relative_path} — {x.size_bytes} bytes</small></div>)}
-      {orphanPreview.orphan_file_count > 20 && <small>Showing first 20.</small>}
+      {/* The count and size show; the policy and each path are revealed on them. */}
+      <Reveal detail={<><span className="rv-row">Policy: retain by default</span>{orphanPreview.orphan_files.slice(0, 20).map(x => <span key={x.relative_path} className="rv-row rv-mono">{x.relative_path} — {x.size_bytes} bytes</span>)}
+        {orphanPreview.orphan_file_count > 20 && <span className="rv-row">Showing first 20.</span>}</>}>
+        <small>{orphanPreview.orphan_file_count} file(s) · {bytesInWords(orphanPreview.orphan_bytes)}</small></Reveal>
       {orphanPreview.unsafe_document_references.length > 0 && <div><b>Unsafe database paths detected: {orphanPreview.unsafe_document_references.length}</b></div>}
     </div>}
     {orphanStatus && <div><small>{orphanStatus}</small></div>}
     <hr/>
-    <h4>Security audit metadata</h4>
-    <p className="muted">Local audit entries contain request metadata only—never request bodies, evidence text, connector secrets, or bearer tokens. Retention mutation is restricted to the local machine.</p>
+    <h4><Reveal detail="Local audit entries contain request metadata only—never request bodies, evidence text, connector secrets, or bearer tokens. Retention mutation is restricted to the local machine.">
+      <span>Security audit metadata</span></Reveal></h4>
     <Button onClick={loadSecurityAudit}>Load recent security events</Button>
     <Button onClick={previewAuditRetention}>Preview 90-day retention</Button>
     {securityAuditRetention && <div>
@@ -211,16 +221,20 @@ export function SecurityPanel({settingsStatus, providers, part = 'all'}: Props):
       </div>}
     </div>}
     {securityAuditSummary && <div>
-      <small>{securityAuditSummary.total_records} valid event(s) · {securityAuditSummary.local_records} local · {securityAuditSummary.remote_records} remote · {securityAuditSummary.malformed_lines} malformed retained</small>
-      <div><small>Methods: {Object.entries(securityAuditSummary.by_method).map(([k, v]) => `${k} ${v}`).join(' · ') || 'none'}</small></div>
-      <div><small>Status: {Object.entries(securityAuditSummary.by_status).map(([k, v]) => `${k} ${v}`).join(' · ') || 'none'}</small></div>
+      {/* The counts show; the breakdown by method and status is revealed on them. */}
+      <Reveal detail={<><span className="rv-row">Methods: {Object.entries(securityAuditSummary.by_method).map(([k, v]) => `${k} ${v}`).join(' · ') || 'none'}</span>
+        <span className="rv-row">Status: {Object.entries(securityAuditSummary.by_status).map(([k, v]) => `${k} ${v}`).join(' · ') || 'none'}</span></>}>
+        <small>{securityAuditSummary.total_records} valid event(s) · {securityAuditSummary.local_records} local · {securityAuditSummary.remote_records} remote · {securityAuditSummary.malformed_lines} malformed retained</small></Reveal>
     </div>}
     {securityAudit && <div>
       <div><label><input type="checkbox" checked={refusedOnly} onChange={e => setRefusedOnly(e.target.checked)}/> <small>Refused only</small></label>{' '}
         <label><input type="checkbox" checked={technical} onChange={e => setTechnical(e.target.checked)}/> <small>Technical</small></label></div>
       {securityAudit.records.filter(x => !refusedOnly || wasRefused(x.event, x.status_code)).map(x => {
         const refused = wasRefused(x.event, x.status_code);
-        return <div key={x.request_id}><small>{shortStamp(x.timestamp)} · {x.local_request ? 'this computer' : `another device${x.client_host ? ` (${x.client_host})` : ''}`} · {describeRequest(x.method, x.path)} · {refused ? '✕ refused' : '✓ allowed'}
+        // The verdict and the request show; when and from where are revealed on the request.
+        return <div key={x.request_id}><small><b className={refused ? 'sec-refused' : undefined}>{refused ? '✕' : '✓'}</b>{' '}
+          <Reveal detail={`${shortStamp(x.timestamp)} · ${x.local_request ? 'this computer' : `another device${x.client_host ? ` (${x.client_host})` : ''}`} · ${refused ? 'refused' : 'allowed'}`}>
+            <span>{describeRequest(x.method, x.path)}</span></Reveal>
           {technical && <code> · {x.method} {x.path} · {x.status_code} · {x.event}</code>}</small></div>;
       })}
       {securityAudit.has_more && <Button onClick={loadOlderSecurityAudit}>Load 100 older events</Button>}

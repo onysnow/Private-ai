@@ -110,15 +110,21 @@ describe('Case home', () => {
     expect(within(strip).getByRole('link', {name: /3\s*claims disputed/})).toHaveAttribute('href', '/check?inv=inv-1#claim-verification');
     expect(within(strip).getByRole('link', {name: /2\s*to decide/})).toHaveAttribute('href', '/decide?inv=inv-1');
     expect(within(strip).getByText('€29,400')).toBeInTheDocument();
+    // What a number counts is in its link's name and on hover, not written under it (Ony, 29 Oct).
+    expect(within(strip).getByText('claims disputed')).toHaveClass('sr-only');
     const card = await screen.findByTestId('decision-card');
-    expect(within(card).getByText('From the Textbook Red Flag Circular ownership')).toBeInTheDocument();
+    // Why it is asked is on the question, on hover or focus: in the page for screen readers, not on screen.
+    expect(within(card).getByText('From the Textbook Red Flag Circular ownership').closest('[hidden]')).not.toBeNull();
     expect(within(card).getByText('nominee arrangement', {selector: 'mark'})).toBeInTheDocument();
     expect(within(card).getByRole('button', {name: /Shows it/})).toHaveAttribute('aria-keyshortcuts', 'S');
     await userEvent.setup().click(await within(card).findByRole('button', {name: /View full page/}));
     expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1', pageNumber: 4});
     expect(await screen.findByText('AI draft to review')).toBeInTheDocument();
     expect(screen.getByText('Kestrel SA bought the harbour land in 2020 with its own funds.')).toBeInTheDocument();
-    expect(await screen.findByText('1 source for · 2 against · Harbour Gazette, land register')).toBeInTheDocument();
+    // A claim shows its sources as numbers; their names are in the claim's reveal.
+    expect((await screen.findByText('1 source for · 2 against · Harbour Gazette, land register')).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('✓ 1')).toBeInTheDocument();
+    expect(screen.getByText('✕ 2')).toBeInTheDocument();
   });
 
   it('focuses a module with 1–4 and steps inside it with J / K', async () => {
@@ -162,9 +168,10 @@ describe('Case home', () => {
     useWorkbenchStore.setState({pointedParty: 'e1'});
     wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
     const rail = await screen.findByRole('navigation', {name: 'Years in the case'});
-    expect(await within(rail).findByLabelText('9 events, 1 Red Flag')).toBeInTheDocument();
+    // The count is the bar under the year and the flag its red underline; both are named for screen readers and on hover.
+    expect(await within(rail).findByRole('button', {name: /2017\s*9 events, 1 Red Flag/})).toBeInTheDocument();
     expect(within(rail).getByRole('button', {name: /2017/})).toHaveClass('flagged');
-    expect(await screen.findByText('lights 2017–18 everywhere')).toBeInTheDocument();
+    expect((await screen.findByText('lights 2017–18 everywhere')).closest('[hidden]')).not.toBeNull();
     await waitFor(() => expect(within(rail).getByRole('button', {name: /2018/})).toHaveClass('lit'));
     expect(within(rail).getByRole('button', {name: /2016/})).not.toHaveClass('lit');
   });
@@ -187,7 +194,8 @@ describe('Case home', () => {
         started_at: '2026-10-12T00:00:01', finished_at: null, updated_at: '2026-10-12T00:00:02'}],
     });
     wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
-    expect(await screen.findByText('Reading with OCR · page 6 of 11')).toBeInTheDocument();
+    // The reading job's words are on the file, on hover or focus; the progress bar shows.
+    expect((await screen.findByText('Reading with OCR · page 6 of 11')).closest('[hidden]')).not.toBeNull();
     expect(screen.getByRole('progressbar', {name: 'Reading'})).toHaveAttribute('aria-valuenow', '43');
   });
 
@@ -278,7 +286,7 @@ describe('Decide', () => {
     wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
     const queue = await screen.findByRole('complementary', {name: 'To decide'});
     expect(await within(queue).findByText('filing.pdf')).toBeInTheDocument();
-    expect(within(queue).getByText(/pages read: 1 of 3/)).toBeInTheDocument();
+    expect(within(queue).getByRole('img', {name: 'Pages read: 1 of 3'})).toBeInTheDocument();
     const happens = await screen.findByLabelText('What happens');
     expect(within(happens).getByText('Creates the claim as Not yet shown, with this passage linked as supporting evidence.')).toBeInTheDocument();
     expect(within(happens).getByText('Marked rejected, with your reason; no claim is made.')).toBeInTheDocument();

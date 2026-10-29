@@ -68,12 +68,12 @@ describe('CorpusPanel', () => {
   it('shows the corpus sync line and the cross-references waiting for review', async () => {
     const api = await renderPanel();
     expect(screen.getByText(/Last push: succeeded, .* — Sent 3 record\(s\)/)).toBeInTheDocument();
-    expect(screen.getByText('Pending: 1 to send · 0 to remove · 0 judgement(s) · 12 record(s) in Harbour contracts')).toBeInTheDocument();
+    expect(screen.getByText('Pending: 1 to send · 0 to remove · 0 judgement(s) · 12 record(s) in Harbour contracts').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     expect(screen.getByText(/Last cross-reference run: succeeded, .* — 4 match\(es\), 1 new, 1 possible duplicate\(s\) · 1 waiting for review/)).toBeInTheDocument();
     expect(screen.getByText('No background worker runs here: changes reach OpenAleph on “Sync now”.')).toBeInTheDocument();
-    expect(screen.getByText('(Company) in Port authority')).toBeInTheDocument();
+    expect(screen.getByText('(Company) in Port authority').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     expect(screen.getByText('Score 98% · regression-v1')).toBeInTheDocument();
-    expect(screen.getByText('Identifier (100%): 09876543 ↔ 09876543')).toBeInTheDocument();
+    expect(screen.getByText('Identifier (100%): 09876543 ↔ 09876543').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     expect(screen.getByRole('link', {name: 'Open in OpenAleph'})).toHaveAttribute('href', 'http://openaleph.test/entities/theirs.sig');
     expect(api.unmatched()).toEqual([]);
   });

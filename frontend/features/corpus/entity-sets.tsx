@@ -10,7 +10,11 @@ import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
+import {GitFork, List, CalendarRange} from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
+
 import {Input} from '@/components/ui/input';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   listCorpusEntitySetsOptions, listCorpusEntitySetsQueryKey, listEntitiesOptions, sendCorpusEntitySetMutation,
@@ -19,6 +23,7 @@ import type {EntitySetSentOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 
 const KIND_NAME: Record<string, string> = {diagram: 'Diagram', timeline: 'Timeline', list: 'List'};
+const KIND_ICON: Record<string, LucideIcon> = {diagram: GitFork, timeline: CalendarRange, list: List};
 
 /** What happened, in plain words. */
 export function sentSummary(reply: EntitySetSentOut): string {
@@ -54,8 +59,7 @@ export function EntitySets({investigationId}: {investigationId: string}): ReactE
 
   const shown = (entities.data ?? []).filter(e => e.caption.toLowerCase().includes(filter.trim().toLowerCase()));
   return <div className="candidate" aria-label="Diagrams, timelines and lists in OpenAleph">
-    <b>Diagrams, timelines and lists in OpenAleph</b>
-    <p className="muted">Made from the confirmed records the sync sent to the investigation&apos;s collection. Sending again updates the same one; where you moved things in OpenAleph&apos;s diagram stays.</p>
+    <Reveal detail="Made from the confirmed records the sync sent to the investigation's collection. Sending again updates the same one; where you moved things in OpenAleph's diagram stays."><b>Diagrams, timelines and lists in OpenAleph</b></Reveal>
     <div className="actions">
       <Button variant="outline" onClick={() => void sendSet('diagram')} disabled={send.isPending}>Send the relationships as a diagram</Button>
       <Button variant="outline" onClick={() => void sendSet('timeline')} disabled={send.isPending}>Send the dated records as a timeline</Button>
@@ -79,8 +83,10 @@ export function EntitySets({investigationId}: {investigationId: string}): ReactE
     {sets.isError && <p className="muted">{errorMessage(sets.error, 'Could not load what was sent')}</p>}
     {(sets.data ?? []).length > 0 && <ul aria-label="Sent to OpenAleph">
       {(sets.data ?? []).map(row => <li key={row.id}>
-        <a href={row.url} target="_blank" rel="noreferrer">{KIND_NAME[row.kind]}: {row.label}</a>{' '}
-        <small>· {row.items} record(s) · sent {apiTime(row.sent_at).toLocaleString()}</small>
+        {/* Its kind is its icon; the count and when it was sent are on hover. */}
+        {(() => { const Icon = KIND_ICON[row.kind]; return <Reveal label={KIND_NAME[row.kind]} detail={<><b>{KIND_NAME[row.kind]}</b> · {row.items} record(s) · sent {apiTime(row.sent_at).toLocaleString()}</>}>
+          {Icon ? <Icon size={14} aria-hidden="true"/> : <span aria-hidden="true">·</span>}</Reveal>; })()}{' '}
+        <a href={row.url} target="_blank" rel="noreferrer" aria-label={`${KIND_NAME[row.kind]}: ${row.label}`}>{row.label}</a>
       </li>)}
     </ul>}
     {status && <p className="muted" role="status">{status}</p>}

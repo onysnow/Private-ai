@@ -91,7 +91,7 @@ async function renderWithDocuments(documents: unknown[] = [docFixture()]) {
 describe('DocumentsPanel upload and review', () => {
   it('lists the documents with their counts and disables Upload & extract until a file is chosen', async () => {
     await renderWithDocuments();
-    expect(screen.getByText('extracted · 12 chunks · entity: 2')).toBeInTheDocument();
+    expect(screen.getByText('extracted · 12 chunks · entity: 2').closest('[hidden]')).not.toBeNull();  // sub-text: on hover, still read with its mark
     expect(screen.getByRole('button', {name: 'Upload & extract'})).toBeDisabled();
     expect(screen.getByRole('link', {name: 'Open review queue for this investigation'})).toHaveAttribute('href', '/review?inv=inv-1');
   });
@@ -241,7 +241,7 @@ describe('DocumentsPanel upload and review', () => {
     api.add({[CANDIDATES]: [candidateFixture({explanation}), candidateFixture({id: 'cand-0', review_status: 'rejected', reviewer_note: 'Not a name', payload: {caption: 'Minutes Of'}})]});
     await user.click(screen.getByRole('button', {name: 'Review history'}));
     await screen.findByText('Loaded 2 extraction proposal/review record(s).');
-    expect(screen.getByText('Reporter note: Not a name')).toBeInTheDocument();
+    expect(screen.getByText('Reporter note: Not a name').closest('[hidden]')).not.toBeNull();  // sub-text: on hover, still read with its mark
     const url = api.lastUrl(CANDIDATES);
     expect(url.searchParams.get('status')).toBeNull();
     expect(url.searchParams.get('explain')).toBe('true');

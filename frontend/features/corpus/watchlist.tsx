@@ -14,6 +14,7 @@ import {z} from 'zod';
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {
@@ -48,7 +49,7 @@ export function lastCheck(entry: WatchlistEntryOut): string {
 function Hit({hit, onOpen, onLead, onDismiss, busy}: {hit: WatchlistHitOut; onOpen: () => void; onLead: () => void;
   onDismiss: () => void; busy: boolean}): ReactElement {
   return <li>
-    <b>{hit.title}</b>{hit.page_number ? <small> · page {hit.page_number}</small> : null}
+    {hit.page_number ? <Reveal detail={`· page ${hit.page_number}`}><b>{hit.title}</b></Reveal> : <b>{hit.title}</b>}
     {hit.highlights.slice(0, 2).map((pieces, index) => <Snippet key={index} pieces={pieces}/>)}
     <div className="actions">
       {hit.document_id && <Button variant="link" onClick={onOpen}>Open document</Button>}
@@ -107,8 +108,7 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
 
   const entries = watchlist.data?.entries ?? [];
   return <div className="candidate">
-    <b>Watchlist</b>
-    <p className="muted">Names searched in this investigation&apos;s documents whenever OpenAleph reads a new one. Each document a name turns up in shows here once.</p>
+    <Reveal detail="Names searched in this investigation's documents whenever OpenAleph reads a new one. Each document a name turns up in shows here once."><b>Watchlist</b></Reveal>
     <Form {...form}><form onSubmit={submit} className="actions" aria-label="Watch a name" noValidate>
       <FormField control={form.control} name="query" render={({field}) => <FormItemBare>
         <FormControl><Input {...field} aria-label="Name or search to watch" placeholder="A name, or a search like “Jane Doe” OR Zanzibar"/></FormControl>
@@ -126,9 +126,12 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
       const open = entry.hits.filter(hit => hit.status === 'new');
       return <div className="statement" key={entry.id}>
         <div>
-          <b>{entry.query}</b>{entry.note && <small> · {entry.note}</small>}
-          <div><small>{lastCheck(entry)}</small></div>
-          <div><small>{entry.hits.length === 0 ? 'Not found in any document yet.' : `Found in ${entry.hits.length} document(s), ${open.length} to decide.`}</small></div>
+          {/* The counts show; the note and the last check are on hover. A check that failed stays on screen. */}
+          <Reveal detail={<>{entry.note && <span className="rv-row">{entry.note}</span>}<span className="rv-row">{lastCheck(entry)}</span>
+            <span className="rv-row">{entry.hits.length === 0 ? 'Not found in any document yet.' : `Found in ${entry.hits.length} document(s), ${open.length} to decide.`}</span></>}>
+            <b>{entry.query}</b></Reveal>
+          {' '}<small><b>{entry.hits.length}</b>{open.length > 0 && <> · <b>{open.length}</b> to decide</>}</small>
+          {entry.checked_at && entry.check_state !== 'ok' && <div><small className="co-warn">{lastCheck(entry)}</small></div>}
         </div>
         {entry.hits.length > 0 && <ul aria-label={`Where “${entry.query}” was found`}>
           {entry.hits.map(hit => <Hit key={hit.id} hit={hit} busy={busy} onOpen={() => openDocument(hit.document_id as string, hit.page_number)}

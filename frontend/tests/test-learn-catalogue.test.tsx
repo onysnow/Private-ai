@@ -88,17 +88,24 @@ describe('Learn › Red Flags catalogue', () => {
     expect(await within(mapBox).findByRole('option', {name: 'Hidden ownership and shell companies, 3 indicators, 1 fire in this case', selected: true})).toBeInTheDocument();
     expect(within(mapBox).getByRole('option', {name: 'Safety of investigators, 1 indicators, 0 fire in this case'})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: '3 areas · 6 indicators'})).toBeInTheDocument();
+    // How to use the map is on its title, not under it.
+    expect(screen.getByText(/Scroll over the map/).closest('[hidden]')).not.toBeNull();
 
     // The area card: scope, how its indicators are checked, and the case's flags in it.
     const card = screen.getByRole('article', {name: 'Hidden ownership and shell companies, the area'});
-    expect(card).toHaveTextContent('Hiding who really owns a company. 1 checkable from your records, 2 after lookups, 0 only by a person.');
-    expect(within(card).getByRole('button', {name: /Strong BO-007/})).toBeInTheDocument();
+    // The area's summary is on its name (a reveal, not on screen); how its indicators are checked shows as shapes and counts.
+    expect(within(card).getByText('Hiding who really owns a company.').closest('[hidden]')).not.toBeNull();
+    expect(within(card).getByRole('img', {name: '1 checked from your records'})).toBeInTheDocument();
+    expect(within(card).getByRole('img', {name: '2 checked after outside lookups'})).toBeInTheDocument();
+    expect(within(card).getByRole('img', {name: '0 checked only a person'})).toBeInTheDocument();
+    expect(within(card).getByRole('button', {name: /Strong.*BO-007/})).toBeInTheDocument();
 
     // The list: counted filters, glyph plus words for screen readers, the case's level inline, pending dashed.
     const list = await screen.findByRole('listbox', {name: 'Indicators in Hidden ownership and shell companies'});
     expect(await screen.findByRole('button', {name: 'All 3'})).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', {name: 'Fire here 1'})).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: '⇄ Lookups 2'})).toBeInTheDocument();
+    // How it is checked is a shape and a count; the word is the button's name and its reveal.
+    expect(screen.getByRole('button', {name: 'Lookups 2'})).toBeInTheDocument();
     const selected = within(list).getByRole('option', {selected: true});
     expect(selected).toHaveTextContent('BO-007');
     expect(selected).toHaveTextContent('Strong');
@@ -127,7 +134,7 @@ describe('Learn › Red Flags catalogue', () => {
     expect(within(page).getByRole('button', {name: 'Check this in my case'})).toHaveAccessibleDescription('No rule checks this on records yet: it is checked after outside lookups.');
     // All sources: the unconfirmed quote is dashed words, not an error.
     await userEvent.setup().click(within(page).getByRole('button', {name: '2 sources'}));
-    expect(within(page).getByText('○ not yet confirmed')).toHaveClass('kc-dashed');
+    expect(page.querySelector('.kc-dashed')).toHaveTextContent('○ not yet confirmed');
 
     expect(tails.at(-1)).toEqual([{label: 'Learn', href: '/learn'}, {label: 'Red Flags catalogue', href: '/learn'}, {label: 'Hidden ownership'}, {label: 'BO-007'}]);
     await waitFor(() => expect(useWorkbenchStore.getState().investigationName).toBe('Harbour land'));
@@ -146,7 +153,7 @@ describe('Learn › Red Flags catalogue', () => {
     // The strongest flag in the newly chosen area opens.
     await waitFor(() => expect(window.location.search).toContain('area=ML'));
     await waitFor(() => expect(window.location.search).toContain('indicator=ML-021'));
-    await userEvent.setup().click(screen.getByRole('button', {name: '◉ Person 0'}));
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Person 0'}));
     expect(screen.getByText(/No indicator in Money laundering is checked only by a person/)).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('button', {name: 'Clear'}));
     expect(screen.getByRole('button', {name: 'All 2'})).toHaveAttribute('aria-pressed', 'true');

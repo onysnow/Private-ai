@@ -20,10 +20,12 @@
 // Calm motion and reduced motion make these instant (styles/themes.css), and a log under the line says
 // what was read or could not be, which a screen reader also hears.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {File as FileIcon, Folder} from 'lucide-react';
 import Link from 'next/link';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {ChangeEvent, DragEvent, FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {ApiHttpError, errorMessage} from '../../lib/api-client';
 import {caseHref} from '../../lib/case-href';
 import {getCapturesQueryKey, getDropHistoryOptions, getDropHistoryQueryKey, getDropOptions, getDropQueryKey, listDocumentsOptions, listInvestigationsOptions, settingsStatusOptions} from '../../lib/generated/@tanstack/react-query.gen';
@@ -37,6 +39,7 @@ import {PagePicture} from '../case-home/decision-card';
 import {batchLabel, upload} from '../documents/documents-panel';
 import {useDropStream} from './drop-stream';
 import {CaptureLinkField, Captures, isWebAddress, sameLink, useCaptures} from './captures';
+import {FingerprintMark, ProposalKindIcon} from './kind-marks';
 
 const MARK: Record<DropStageOut['state'], string> = {done: '✓', active: '◐', waiting: '·', stopped: '✕', needs_you: '!', skipped: '–'};
 const WORD: Record<DropStageOut['state'], string> = {done: 'done', active: 'working', waiting: 'waiting', stopped: 'stopped', needs_you: 'needs you', skipped: 'not needed'};
@@ -109,7 +112,7 @@ function WaitingCell({lane, actions}: {lane: DropLaneOut; actions: Actions}): Re
   if (lane.retry_job_id) return <button type="button" tabIndex={-1} className="dp-act" onClick={e => { e.stopPropagation(); actions.retry(lane); }}>Try again</button>;
   if (lane.stalled_minutes !== null && lane.stalled_minutes !== undefined) return <button type="button" tabIndex={-1} className="dp-act dp-check"
     onClick={e => { e.stopPropagation(); actions.pick(lane.document_id); }}>Check</button>;
-  if (lane.waiting) return <span className="dp-wait"><b>{lane.waiting}</b><span className="dp-chip">Proposed</span></span>;
+  if (lane.waiting) return <span className="dp-wait" aria-label={`${lane.waiting} proposed`}><b>{lane.waiting}</b></span>;
   if (lane.in_progress) return <span className="dp-soon">{lane.stages.some(s => s.state === 'active') ? 'reading' : 'soon'}</span>;
   return <span className="dp-soon" aria-label="Nothing waits">–</span>;
 }
@@ -135,20 +138,25 @@ function Lane({lane, on, onPick, actions, tab, fresh, depth = 0}: {lane: DropLan
   return <>
     <div role="row" data-row={id} aria-selected={on === id} onClick={() => onPick(id)} onMouseEnter={() => actions.hover(id)}
       className={`dp-lane${on === id ? ' on' : ''}${lane.problem ? ' problem' : ''}${depth ? ' inside' : ''}${arrived ? ' dp-arrive' : ''}`}>
-      <span role="rowheader" tabIndex={tab(id, 0)} className="dp-file" title={lane.filename}><b>{depth ? <span aria-hidden="true">↳ </span> : null}{lane.filename}</b>
-        <small className={lane.problem ? 'bad' : lane.issues.length || lane.stalled_minutes ? 'warn' : ''}>
-          {lane.problem ? '✕ ' : lane.stalled_minutes ? `${STALLED_MARK} ` : lane.issues.length ? '⚠ ' : ''}{lane.note}</small></span>
+      {/* The file's note (how it was read, why it stopped) is sub-text: on hover or focus of its name. Its mark stays. */}
+      <Reveal tabbable={false} detail={<><b>{lane.filename}</b><span className="rv-row">{lane.note}</span></>}>
+        <span role="rowheader" tabIndex={tab(id, 0)} className="dp-file"><b>{depth ? <span aria-hidden="true">↳ </span> : null}
+          {lane.problem ? <i className="dp-file-mark bad" aria-hidden="true">✕</i> : lane.stalled_minutes ? <i className="dp-file-mark warn" aria-hidden="true">{STALLED_MARK}</i>
+            : lane.issues.length ? <i className="dp-file-mark warn" aria-hidden="true">⚠</i> : null}{lane.filename}</b></span>
+      </Reveal>
       {lane.stages.map((s, i) => {
         const stalled = isStalled(lane, s);
-        return <span key={s.key} role="gridcell" tabIndex={tab(id, i + 1)} aria-label={boxName(lane, s)} title={`${s.label}: ${stalled ? STALLED_WORD : WORD[s.state]}${s.detail ? ` · ${s.detail}` : ''}`}
-          className={`dp-stage dp-${s.state}${stalled ? ' dp-stalled' : ''}`}>
-          <Mark key={stalled ? 'stalled' : s.state} step={drawn.current}>{stalled ? STALLED_MARK : MARK[s.state]}</Mark><small aria-hidden="true">{stalled ? `${lane.stalled_minutes} min` : boxDetail(s)}</small></span>;
+        return <Reveal key={s.key} tabbable={false} describe={false} detail={<><b>{s.label}</b> · {stalled ? STALLED_WORD : WORD[s.state]}{s.detail ? <span className="rv-row">{s.detail}</span> : null}</>}>
+          <span role="gridcell" tabIndex={tab(id, i + 1)} aria-label={boxName(lane, s)} className={`dp-stage dp-${s.state}${stalled ? ' dp-stalled' : ''}`}>
+            <Mark key={stalled ? 'stalled' : s.state} step={drawn.current}>{stalled ? STALLED_MARK : MARK[s.state]}</Mark><small aria-hidden="true">{stalled ? `${lane.stalled_minutes} min` : boxDetail(s)}</small></span>
+        </Reveal>;
       })}
       <span role="gridcell" tabIndex={tab(id, 8)} className="dp-waiting-cell"><WaitingCell lane={lane} actions={actions}/></span>
     </div>
     {folded ? <div role="row" data-row={`fold:${id}`} className="dp-fold">
       <span role="gridcell" aria-colspan={9} tabIndex={tab(`fold:${id}`, 0)}>
-        <span><b>{read} of {kids.length} read</b>{reading ? ` · ${reading} reading` : ''}{kids.length - read - reading ? ` · ${kids.length - read - reading} waiting` : ''}</span>
+        <Reveal detail={`${read} of ${kids.length} read${reading ? ` · ${reading} reading` : ''}${kids.length - read - reading ? ` · ${kids.length - read - reading} waiting` : ''}`}>
+          <b>{read} of {kids.length} read</b></Reveal>
         <i className="dp-fold-bar" aria-hidden="true"><i style={{width: `${(100 * read) / kids.length}%`}}/></i>
         <button type="button" tabIndex={-1} onClick={() => setAll(true)}>Show all {kids.length}</button>
       </span>
@@ -187,10 +195,14 @@ function DropHistory({investigationId, onShow}: {investigationId: string; onShow
   return <ol className="dp-history" aria-label="Every drop, newest first">{drops.map(d => {
     const found = Object.entries(d.proposals).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${c} ${kindWord(k, c)}`).join(', ');
     return <li key={d.id}>
-      <header><b>{d.label}</b><time dateTime={String(d.created_at)}>{apiTime(d.created_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</time>
-        {d.one_at_a_time && <span className="dp-chip">One at a time</span>}</header>
-      <p className="dp-quiet">{[n(d.files, 'file saved', 'files saved'), d.files_inside ? `${d.files_inside} inside them` : '', d.duplicates ? `${d.duplicates} already in the case` : '',
-        d.refused ? `${d.refused} not taken` : ''].filter(Boolean).join(' · ')}</p>
+      <header><Reveal detail={<time dateTime={String(d.created_at)}>{apiTime(d.created_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</time>}><b>{d.label}</b></Reveal>
+        {d.one_at_a_time && <Reveal label="One at a time" detail="One at a time: the files were brought in singly, each read before the next."><FileIcon size={13} aria-hidden="true"/></Reveal>}</header>
+      <ul className="dp-counts" aria-label="What was brought in">
+        <li>{n(d.files, 'file saved', 'files saved')}</li>
+        {d.files_inside > 0 && <li><Reveal detail={`${d.files_inside} inside them`}><span>+{d.files_inside}</span></Reveal></li>}
+        {d.duplicates > 0 && <li><Reveal detail={`${d.duplicates} already in the case`}><i className="dp-stage dp-same" aria-hidden="true">=</i>{d.duplicates}</Reveal></li>}
+        {d.refused > 0 && <li><Reveal detail={`${d.refused} not taken`}><i className="dp-stage dp-stopped" aria-hidden="true">✕</i>{d.refused}</Reveal></li>}
+      </ul>
       <ul className="dp-produced" aria-label="What it produced">
         <li><i className="dp-stage dp-done" aria-hidden="true">✓</i>{d.read} read</li>
         {d.problems > 0 && <li><i className="dp-stage dp-stopped" aria-hidden="true">✕</i>{d.problems} could not be read</li>}
@@ -236,7 +248,6 @@ export function laneNews(lane: DropLaneOut): string {
 function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: string}): ReactElement {
   const queryClient = useQueryClient();
   const [stopping, setStopping] = useState('');
-  const [copied, setCopied] = useState(false);
   const reading = lane.stages.some(s => s.key === 'read' && (s.state === 'active' || s.state === 'waiting'));
   const stop = async () => {
     if (!lane.job_id) return;
@@ -254,27 +265,30 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
   const waiting = Object.values(r.waiting).reduce((a, b) => a + b, 0);
   const proposers = byProposer(r.by_proposer ?? []);
   const verdict = lane.problem ? ['Not read', 'bad'] : reading ? ['Reading', ''] : lane.issues.length ? ['Read, with notes', 'warn'] : ['Read cleanly', 'good'];
-  const copy = () => { void navigator.clipboard?.writeText(r.fingerprint).then(() => setCopied(true)); };
   return <section className="dp-card dp-receipt" aria-label={`Read receipt: ${lane.filename}`}>
     <p className="dp-eyebrow">Read receipt</p>
     <div className="dp-receipt-top">
       <span className="dp-receipt-thumb"><Thumb lane={lane} width={60}/></span>
-      <span><h3>{lane.filename.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ')}</h3><code>{lane.filename}</code>
-        <span className={`dp-verdict ${verdict[1]}`}>{verdict[1] === 'good' ? '✓ ' : verdict[1] === 'bad' ? '✕ ' : ''}{verdict[0]}</span></span>
+      <span><Reveal detail={<code className="rv-mono">{lane.filename}</code>}><h3>{lane.filename.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ')}</h3></Reveal>
+        {/* The verdict is its mark; its words on hover. "Reading" has no mark and keeps its word. */}
+        {verdict[1] ? <Reveal label={verdict[0]} detail={verdict[0]}><span className={`dp-verdict mark ${verdict[1]}`} aria-hidden="true">{verdict[1] === 'good' ? '✓' : verdict[1] === 'bad' ? '✕' : '⚠'}</span></Reveal>
+          : <span className="dp-verdict">{verdict[0]}</span>}</span>
     </div>
     <dl>
-      <div><dt>Fingerprint</dt><dd><code title={r.fingerprint}>SHA-256 {r.fingerprint.slice(0, 6)}…{r.fingerprint.slice(-4)}</code>
-        <button type="button" className="dp-copy" onClick={copy} aria-label="Copy the fingerprint">{copied ? '✓' : '⧉'}</button></dd></div>
-      {r.pages !== null && r.pages !== undefined && <div><dt>Pages</dt><dd>{r.pages}{r.how_read ? ` · ${r.how_read}` : ''}</dd></div>}
-      <div><dt>Read</dt><dd>{r.how_read ? `${r.how_read}${lane.seconds !== null && lane.seconds !== undefined ? ` · ${lane.seconds} s` : ''}` : lane.problem ? 'Not read' : 'Not yet'}</dd></div>
+      <div><dt>Fingerprint</dt><dd><FingerprintMark hash={r.fingerprint}/></dd></div>
+      {r.pages !== null && r.pages !== undefined && <div><dt>Pages</dt><dd>{r.pages}</dd></div>}
+      <div><dt>Read</dt><dd>{r.how_read ? (lane.seconds !== null && lane.seconds !== undefined
+        ? <Reveal detail={`${r.how_read} · ${lane.seconds} s`}>{r.how_read}</Reveal> : r.how_read) : lane.problem ? 'Not read' : 'Not yet'}</dd></div>
       <div><dt>Passages</dt><dd>{r.passages}</dd></div>
       {r.files_inside > 0 && <div><dt>Files inside</dt><dd>{r.files_inside}</dd></div>}
-      <div><dt>Proposals</dt><dd>{found || 'Nothing yet'}{waiting ? <> · <b>{waiting} wait</b></> : null}</dd></div>
-      {proposers.length > 0 && <div title="An accept you corrected first counts as accepted: corrections are not recorded apart.">
-        <dt>By proposer</dt><dd><ul className="dp-proposers" aria-label="What each proposer's proposals came to">{proposers.map(p => <li key={p.name}>
-          {p.name}: {p.accepted} of {p.accepted + p.rejected} accepted{p.waiting ? ` · ${p.waiting} wait${p.waiting === 1 ? 's' : ''}` : ''}</li>)}</ul></dd></div>}
-      <div><dt>Watchlist</dt><dd>{r.watchlist_hits ? `${r.watchlist_hits} hit${r.watchlist_hits === 1 ? '' : 's'}` : 'No watched names'}</dd></div>
-      {r.flags_fed.length > 0 && <div><dt>Feeds</dt><dd>{r.flags_fed.join(', ')}</dd></div>}
+      {/* What each proposer's proposals came to is on hover of the proposals (research §05 "revision rate"). */}
+      <div><dt>Proposals</dt><dd>{proposers.length > 0 ? <Reveal detail={<><ul className="dp-proposers" aria-label="What each proposer's proposals came to">{proposers.map(p => <li key={p.name}>
+          {p.name}: {p.accepted} of {p.accepted + p.rejected} accepted{p.waiting ? ` · ${p.waiting} wait${p.waiting === 1 ? 's' : ''}` : ''}</li>)}</ul>
+          <span className="rv-row">An accept you corrected first counts as accepted: corrections are not recorded apart.</span></>}>{found || 'Nothing yet'}</Reveal>
+        : found || 'Nothing yet'}{waiting ? <> · <b>{waiting} wait</b></> : null}</dd></div>
+      {r.watchlist_hits > 0 && <div><dt>Watchlist</dt><dd><i aria-hidden="true">◉ </i>{r.watchlist_hits} hit{r.watchlist_hits === 1 ? '' : 's'}</dd></div>}
+      {r.flags_fed.length > 0 && <div><dt>Feeds</dt><dd><Reveal detail={<>Feeds the Red Flag indicator{r.flags_fed.length === 1 ? '' : 's'} <span className="rv-mono">{r.flags_fed.join(', ')}</span></>}>
+        <span>⚑ {r.flags_fed.length}</span></Reveal></dd></div>}
     </dl>
     {lane.issues.length > 0 && <ul className="dp-issues">{lane.issues.map(i => <li key={i}>{i}</li>)}</ul>}
     {lane.stalled_minutes !== null && lane.stalled_minutes !== undefined && <p className="dp-stall" role="note"><i aria-hidden="true">{STALLED_MARK}</i>
@@ -308,9 +322,9 @@ function Totals({data, tab}: {data: DropOut; tab: TabStop}): ReactElement {
   const clean = data.lanes.filter(l => !l.problem && !l.issues.length && !l.in_progress).length;
   return <div role="row" data-row="totals" className="dp-totals" aria-label="All files, stage by stage">
     <span role="rowheader" tabIndex={tab('totals', 0)} className="dp-file"><b>All {data.totals.files} files</b><small>{clean} read cleanly</small></span>
-    {data.stages.map((s, i) => <span key={s.key} role="gridcell" tabIndex={tab('totals', i + 1)} className="dp-total" aria-label={`${s.label}: ${by[s.key] ?? 0} of ${data.totals.files}`}
-      title={`${s.label}: ${by[s.key] ?? 0} of ${data.totals.files}`}>
-      <i style={{height: `${Math.max(3, (22 * (by[s.key] ?? 0)) / most)}px`}}/><small>{by[s.key] ?? 0}</small></span>)}
+    {data.stages.map((s, i) => <Reveal key={s.key} tabbable={false} describe={false} detail={`${s.label}: ${by[s.key] ?? 0} of ${data.totals.files}`}>
+      <span role="gridcell" tabIndex={tab('totals', i + 1)} className="dp-total" aria-label={`${s.label}: ${by[s.key] ?? 0} of ${data.totals.files}`}>
+        <i style={{height: `${Math.max(3, (22 * (by[s.key] ?? 0)) / most)}px`}}/><small>{by[s.key] ?? 0}</small></span></Reveal>)}
     <span role="gridcell" tabIndex={tab('totals', 8)}/>
   </div>;
 }
@@ -566,8 +580,9 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
     aria-label="Drop files here, or paste text. Enter chooses files">
     <span className="dp-arrow" aria-hidden="true">↓</span>
     <p><b>Drop files, a folder, or paste text or a link</b></p>
-    <p className="dp-quiet">or press <kbd>O</kbd> to <button type="button" className="dp-link" onClick={() => files.current?.click()}>choose files</button>
-      {' · '}<button type="button" className="dp-link" onClick={() => folder.current?.click()}>a folder</button></p>
+    <p className="dp-pickers">
+      <Reveal tabbable={false} detail="Choose files (O)"><button type="button" className="dp-pick" onClick={() => files.current?.click()} aria-label="Choose files"><FileIcon size={16} aria-hidden="true"/></button></Reveal>
+      <Reveal tabbable={false} detail="Choose a folder"><button type="button" className="dp-pick" onClick={() => folder.current?.click()} aria-label="Choose a folder"><Folder size={16} aria-hidden="true"/></button></Reveal></p>
     {pickers}
     {status && <p role="status" className="dp-status">{status}</p>}
   </div>;
@@ -591,8 +606,8 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
       <button type="button" className={tab === 'links' ? 'on' : ''} aria-current={tab === 'links' ? 'page' : undefined} onClick={() => setTab('links')}>Links &amp; captures <small>{captures.length}</small></button>
       <Link href={caseHref('/bring-in#document-ingestion', investigationId)}>Library <small>{every.length}</small></Link>
       <button type="button" className={tab === 'history' ? 'on' : ''} aria-current={tab === 'history' ? 'page' : undefined} onClick={() => setTab('history')}>History</button>
-      {t!.unread > 0 && <span className="dp-live"><i aria-hidden="true"/>Reading · {t!.unread} file{t!.unread === 1 ? '' : 's'}
-        {stream === 'reconnecting' ? <small> · reconnecting</small> : stream === 'polling' ? <small> · checking every 2 s</small> : null}</span>}
+      {t!.unread > 0 && <Reveal className="dp-live" detail={stream === 'reconnecting' ? 'Reconnecting to the reader' : stream === 'polling' ? 'Checking every 2 s' : 'Following each file as it is read'}>
+        <i aria-hidden="true"/>Reading · {t!.unread} file{t!.unread === 1 ? '' : 's'}</Reveal>}
     </nav>
 
     {tab === 'links' ? <>{pickers}<Captures investigationId={investigationId} picked={pickedCapture} onPick={id => { setPickedCapture(id); setStatus(''); }} onAddFile={() => files.current?.click()} notice={status}/></> : <>
@@ -601,8 +616,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
       {duplicates.length > 0 && <section className="dp-card dp-dupes" aria-label="Already in the case">
         <p className="dp-eyebrow">Already in the case</p>
         <ul>{duplicates.map(d => <li key={`${d.file.name}:${d.existingId}`}>
-          <p><i className="dp-stage dp-same" aria-hidden="true">=</i><b>{d.file.name}</b></p>
-          <p className="dp-quiet">Already in the case as {d.existingName || 'a document'} · same fingerprint</p>
+          <p><Reveal label="Already in the case" detail={`Already in the case as ${d.existingName || 'a document'} · same fingerprint`}><i className="dp-stage dp-same" aria-hidden="true">=</i></Reveal><b>{d.file.name}</b></p>
           <div className="dp-actions">
             <button type="button" className="p" onClick={() => { setTab('line'); setShown(null); setPicked(d.existingId); }}>Open that one</button>
             <button type="button" onClick={() => void keepSecondCopy(d)}>Keep a second copy</button>
@@ -611,30 +625,27 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
         </li>)}</ul>
       </section>}
       <section className="dp-card" aria-label="This drop">
-        <p className="dp-eyebrow">This drop</p>
-        {t!.started_at && <p className="dp-quiet">Since {apiTime(t!.started_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</p>}
+        {t!.started_at ? <Reveal className="dp-eyebrow" detail={`Since ${apiTime(t!.started_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}`}>This drop</Reveal>
+          : <p className="dp-eyebrow">This drop</p>}
         <dl>
-          <div><dt>Files</dt><dd>{t!.files} dropped{t!.files_inside ? ` · ${t!.files_inside} inside` : ''}</dd></div>
-          {ocr && <div><dt>OCR language</dt><dd>{ocr.pdf_ocr_enabled ? language : 'OCR off'}</dd></div>}
+          <div><dt>Files</dt><dd>{t!.files}{t!.files_inside ? ` · ${t!.files_inside} inside` : ''}</dd></div>
+          {ocr && <div><dt>OCR</dt><dd>{ocr.pdf_ocr_enabled ? <Reveal detail={`OCR language: ${language}`}>On</Reveal> : 'Off'}</dd></div>}
         </dl>
-        <p className="dp-local">Nothing leaves this computer{byOpenAleph ? ': OpenAleph runs here.' : ': every file is read here.'}</p>
+        {/* What leaves this computer stays on screen (the floor); how is on hover. */}
+        <Reveal className="dp-local" detail={byOpenAleph ? 'OpenAleph runs here.' : 'Every file is read here.'}><span aria-hidden="true">⌂ </span>Nothing leaves this computer</Reveal>
       </section>
       {shownLane && <Receipt key={shownLane.document_id} lane={shownLane} investigationId={investigationId}/>}
-      <section className="dp-card" aria-label="What happens next">
-        <p className="dp-eyebrow">What happens next</p>
-        <p className="dp-quiet">Accepted names and claims join the case. Nothing is added until you accept it.</p>
-      </section>
     </div>
 
     {tab === 'history' ? <div className="dp-line" role="region" aria-label="History">
-      <header className="dp-line-head"><h2>History</h2><span className="dp-quiet">Every drop, newest first, and what it brought in.</span></header>
+      <header className="dp-line-head"><Reveal detail="Every drop, newest first, and what it brought in."><h2>History</h2></Reveal></header>
       <DropHistory investigationId={investigationId} onShow={d => { setShown({label: d.label, ids: d.document_ids}); setOnly(false); setTab('line'); }}/>
     </div> : <div className="dp-line" role="region" aria-label="Digestion line">
       <header className="dp-line-head">
-        <h2>Digestion line</h2><span className="dp-quiet">Each file, step by step. Arrows move through the line; J and K through files.</span>
+        <Reveal detail="Each file, step by step. Arrows move through the line; J and K through files."><h2>Digestion line</h2></Reveal>
         {shown ? <span className="dp-all dp-shown">One drop: {shown.label} <button type="button" className="dp-link" onClick={() => setShown(null)}>Show all {t!.files}</button></span>
           : <span className="dp-all">All {t!.files}</span>}
-        <button type="button" className={`dp-filter${only ? ' on' : ''}`} aria-pressed={only} onClick={() => setOnly(o => !o)}>Problems & in progress <kbd>F</kbd></button>
+        <Reveal tabbable={false} detail="Shows only files that could not be read and files still being read (F)."><button type="button" className={`dp-filter${only ? ' on' : ''}`} aria-pressed={only} onClick={() => setOnly(o => !o)}>Problems & in progress</button></Reveal>
       </header>
       <div ref={gridRef} role="grid" aria-label="Files, stage by stage" aria-colcount={9} className="dp-grid" onKeyDown={onGridKey} onFocus={onGridFocus}
         onMouseLeave={() => setHovered(null)}>
@@ -648,38 +659,41 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
         {!lanes.length && <div role="row" data-row="none" className="dp-quiet"><span role="gridcell" aria-colspan={9} tabIndex={tabStop('none', 0)}>No problems, and nothing still being read.</span></div>}
         <Totals data={data} tab={tabStop}/>
       </div>
+      {/* The marks' key, and who proposes, are on hover; that a drop uses no AI stays on screen (AI marking). */}
       <footer className="dp-legend">
-        {(['done', 'active', 'waiting', 'needs_you', 'stopped'] as const).map(s => <span key={s}><i className={`dp-stage dp-${s}`} aria-hidden="true">{MARK[s]}</i>{WORD[s]}</span>)}
-        <span><i className="dp-stage dp-stalled" aria-hidden="true">{STALLED_MARK}</i>{STALLED_WORD}</span>
-        <span className="dp-by">Proposed by: {byOpenAleph ? 'OpenAleph' : 'the Workbench’s name-finder (rules)'} · <span className="ai-tag">AI</span> none in a drop</span>
+        <Reveal label="What the marks mean" detail={<>{(['done', 'active', 'waiting', 'needs_you', 'stopped'] as const).map(s => <span key={s} className="rv-row">{MARK[s]} {WORD[s]}</span>)}
+          <span className="rv-row">{STALLED_MARK} {STALLED_WORD}</span></>}><span className="dp-key" aria-hidden="true">✓ ◐ · ! ✕ ⧗</span></Reveal>
+        <Reveal className="dp-by" detail={`Proposed by ${byOpenAleph ? 'OpenAleph' : 'the Workbench’s name-finder (rules)'}. No AI is used in a drop.`}>
+          <span className="dp-noai"><b aria-hidden="true">ƒ</b>no <span className="ai-tag">AI</span></span></Reveal>
       </footer>
       <ol className="dp-log" aria-live="polite" aria-label="What changed on the line">{news.map(n => <li key={n.key}>{n.text}</li>)}</ol>
     </div>}
 
     <div className="dp-right">
       <section className="dp-card dp-ready" aria-label="Ready for you">
-        <p className="dp-eyebrow">Ready for you</p>
-        <p className="dp-big">{ready}</p>
-        <p className="dp-quiet">proposal{ready === 1 ? '' : 's'} waiting{data.ready_from ? `, from ${data.ready_from} document${data.ready_from === 1 ? '' : 's'}` : ''}</p>
+        <Reveal className="dp-eyebrow" detail="Accepted names and claims join the case. Nothing is added until you accept it.">Ready for you</Reveal>
+        <Reveal detail={`proposal${ready === 1 ? '' : 's'} waiting${data.ready_from ? `, from ${data.ready_from} document${data.ready_from === 1 ? '' : 's'}` : ''}`}><p className="dp-big">{ready}</p></Reveal>
         {ready > 0 && <ul>{Object.entries(data.ready_for_you).sort((a, b) => b[1] - a[1]).map(([k, n]) => <li key={k}>
-          <Link href={caseHref('/decide?kind=proposal', investigationId)} aria-label={`${n} ${kindWord(k, n)} proposed`}><span className="dp-chip">Proposed</span><span>{KindTitle(k)}</span><b>{n}</b></Link></li>)}</ul>}
-        {(data.ready_unsure ?? 0) > 0 && <p className="dp-unsure">{data.ready_unsure} {data.ready_unsure === 1 ? 'is' : 'are'} medium or low and ask{data.ready_unsure === 1 ? 's' : ''} a question</p>}
+          <Reveal tabbable={false} describe={false} detail={KindTitle(k)}>
+            <Link href={caseHref('/decide?kind=proposal', investigationId)} aria-label={`${n} ${kindWord(k, n)} proposed`}><ProposalKindIcon kind={k}/><b>{n}</b></Link></Reveal></li>)}</ul>}
+        {(data.ready_unsure ?? 0) > 0 && <Reveal detail={`${data.ready_unsure} ${data.ready_unsure === 1 ? 'is' : 'are'} medium or low and ask${data.ready_unsure === 1 ? 's' : ''} a question`}>
+          <span className="dp-unsure-chip"><span aria-hidden="true">?</span>{data.ready_unsure}</span></Reveal>}
       </section>
       <section className="dp-card" aria-label="Problems first">
         <p className="dp-eyebrow">Problems first</p>
         {problems.length ? <ol className="dp-problems">{problems.slice(0, 6).map((p, i) => <li key={p.document_id}>
           <span className="dp-n">{i + 1}</span><i className={`dp-stage ${p.problem ? 'dp-stopped' : stalledLane(p) ? 'dp-stalled' : 'dp-needs_you'}`} aria-hidden="true">{p.problem ? '✕' : stalledLane(p) ? STALLED_MARK : '!'}</i>
-          <button type="button" onClick={() => setPicked(p.document_id)}><b>{p.filename}</b><small>{p.note}</small></button></li>)}</ol>
+          <Reveal tabbable={false} detail={p.note}><button type="button" onClick={() => setPicked(p.document_id)}><b>{p.filename}</b></button></Reveal></li>)}</ol>
           : <p className="dp-quiet">No problems in this drop.</p>}
       </section>
       {data.watchlist && data.watchlist.hits > 0 && <p className="dp-watch"><i aria-hidden="true">◉</i><b>{data.watchlist.hits} watchlist hit{data.watchlist.hits === 1 ? '' : 's'}</b> · {data.watchlist.names.slice(0, 3).join(', ')}</p>}
       {firstToRead && <button type="button" className="dp-cta" onClick={() => openDocument(firstToRead.document_id)}>
-        Open the reading room{problems.length ? ' — problems first' : ''}<kbd aria-hidden="true">⏎</kbd></button>}
+        Open the reading room{problems.length ? ' — problems first' : ''}</button>}
     </div>
 
     <nav className="dp-strip" aria-label="Files in this drop">
-      <ol>{strip.map(l => <li key={l.document_id}><button type="button" className={strip[at]?.document_id === l.document_id ? 'on' : ''} title={l.filename}
-        aria-label={l.filename} onClick={() => setPicked(l.document_id)}><Thumb lane={l} width={44}/></button></li>)}</ol>
+      <ol>{strip.map(l => <li key={l.document_id}><Reveal tabbable={false} describe={false} detail={l.filename}><button type="button" className={strip[at]?.document_id === l.document_id ? 'on' : ''}
+        aria-label={l.filename} onClick={() => setPicked(l.document_id)}><Thumb lane={l} width={44}/></button></Reveal></li>)}</ol>
       <span className="dp-count">{at + 1} / {strip.length}</span>
     </nav>
     </>}

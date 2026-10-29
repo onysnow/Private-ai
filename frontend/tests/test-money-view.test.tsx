@@ -145,12 +145,16 @@ describe('MoneyView', () => {
   it('loads with the view, keeps each currency apart, and labels each band and party', async () => {
     mockApi(routes);
     wrap(<MoneyView investigationId="inv-1"/>);
-    expect(await screen.findByText('Euro payments only. The 1 sterling payment is kept apart and never added to these.')).toBeInTheDocument();
+    // "EUR only" shows; the sentence is revealed on it (Ony, 29 Oct), in the page for screen readers.
+    expect((await screen.findByText('Euro payments only. The 1 sterling payment is kept apart and never added to these.')).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('EUR only').closest('.rv')).toHaveAccessibleDescription('Euro payments only. The 1 sterling payment is kept apart and never added to these.');
     expect(screen.getByRole('tab', {name: 'EUR · 5'})).toHaveAttribute('aria-selected', 'true');
     const list = screen.getByRole('list', {name: 'The payments, in order'});
     expect(within(list).getByText('Fernhill Ltd to Kestrel SA: 3 × €9,800 (not yet shown)')).toBeInTheDocument();
     expect(within(list).getByText('Kestrel SA to Harbour Council: €1,250,000 · land price (shown)')).toBeInTheDocument();
-    expect(screen.getByText('= what left Kestrel SA minus what came in')).toBeInTheDocument();
+    // The worked-out sum's explanation is revealed on its line, and each check mark is named on reveal.
+    expect(screen.getByText('= what left Kestrel SA minus what came in', {exact: false}).closest('[hidden]')).not.toBeNull();
+    expect(screen.getAllByRole('img', {name: 'Grey hole'}).length).toBeGreaterThan(0);
     expect(screen.getByText(/Not charted: 1 payment missing something/)).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('tab', {name: 'GBP · 1'}));
     expect(screen.getByText('Sterling payments only. The 5 euro payments are kept apart and never added to these.')).toBeInTheDocument();
@@ -162,8 +166,10 @@ describe('MoneyView', () => {
     const grey = await screen.findByRole('article', {name: 'Grey hole: Kestrel SA'});
     expect(grey).toHaveTextContent('€29,400 recorded in, €1,430,000 out: €1,400,600 has no recorded source.');
     expect(grey).toHaveTextContent('Could be innocent: a bank loan, or money from the owners, that the case does not hold yet.');
-    expect(screen.getByRole('article', {name: 'Miracle: none found'})).toBeInTheDocument();
-    expect(screen.getByRole('article', {name: 'Round trip: none found'})).toHaveTextContent('No euro chain returns to its payer.');
+    // The four checks in a row: hollow when none was found, each named on reveal.
+    expect(screen.getByRole('img', {name: 'Miracle: none found'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'Round trip: none found'})).toHaveAccessibleDescription(/No euro chain returns to its payer\./);
+    expect(within(grey).getByText('Lead idea:', {exact: false}).closest('[hidden]')).not.toBeNull();
     await userEvent.setup().click(within(grey).getByRole('button', {name: 'Make a lead'}));
     await waitFor(() => expect(api.calls('POST /api/leads')).toHaveLength(1));
     expect(api.lastBody('POST /api/leads')).toMatchObject({investigation_id: 'inv-1', title: 'Grey hole: Kestrel SA (EUR)'});

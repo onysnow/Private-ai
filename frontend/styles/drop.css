@@ -264,3 +264,79 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 @media (max-width: 1200px) { .dp { grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: 'tabs tabs' 'left line' 'right line' 'strip strip'; grid-template-rows: auto auto minmax(0, 1fr) auto; } }
 @media (max-width: 800px) { .dp { display: flex; flex-direction: column; height: auto; } }
 .dp-empty .cp-paste { margin-top: 12px; }
+
+/* Marks for a thing's type and for a fingerprint (features/the-drop/kind-marks.tsx), shared by the Bring in screens. */
+.km-party { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid; vertical-align: -4px; }
+.km-party i { font-style: normal; font-weight: 700; }
+.km-kind { display: inline-grid; place-items: center; width: 18px; height: 18px; color: var(--accent-2); vertical-align: -4px; }
+.km-fp { display: inline-flex; align-items: center; gap: 4px; color: var(--accent-2); vertical-align: middle; }
+.km-copy { all: unset; cursor: pointer; padding: 0 5px; border: 1px solid var(--line); border-radius: 6px; font: 500 10px var(--font-mono); color: var(--accent-2); }
+.km-copy:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.km-more { color: var(--text-muted); font: 500 11px var(--font-mono); }
+.km-icons { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.km-icons > .rv { display: inline-flex; align-items: center; gap: 4px; }
+
+/* The Drop, converted to the 29 Oct rule: sub-text on hover, marks bigger where the box has room. */
+.dp-lane > .rv, .dp-totals > .rv { display: flex; min-width: 0; }
+.dp-lane > .rv > [role='gridcell'], .dp-lane > .rv > [role='rowheader'], .dp-totals > .rv > [role='gridcell'] { flex: 1; min-width: 0; }
+.dp-file .dp-file-mark { font-style: normal; margin-right: 5px; }
+.dp-file .dp-file-mark.bad { color: var(--status-disputed); } .dp-file .dp-file-mark.warn { color: var(--accent-1); }
+.dp-stage i { font-size: 14.5px; }
+.dp-history .dp-stage, .dp-produced .dp-stage, .dp-dupes .dp-stage, .dp-problems .dp-stage, .dp-legend .dp-stage { font-size: 11px; }
+.dp-history .dp-stage i, .dp-problems .dp-stage i { font-size: 11px; }
+.dp-pick { all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 34px; height: 30px; border-radius: 8px; border: 1px solid var(--line); color: var(--accent-2); }
+.dp-pick:hover { border-color: var(--accent-1); }
+.dp-pick:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.dp-pickers { display: flex; gap: 8px; margin-top: 4px; }
+.dp-key { all: unset; cursor: help; font: 500 11px var(--font-mono); color: var(--text-muted); }
+.dp-noai { display: inline-flex; align-items: center; gap: 6px; }
+.dp-noai b { font: 600 13px var(--font-mono); color: var(--accent-2); }
+.dp-unsure-chip { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 2px 9px; border-radius: 99px; border: 1px solid var(--accent-1); color: var(--accent-1); font: 600 12px var(--font-mono); }
+.dp-ready a .km-kind { width: 20px; height: 20px; }
+.dp-counts { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; padding: 0; list-style: none; }
+.dp-counts li { display: inline-flex; align-items: center; gap: 4px; }
+.dp-history header .rv-mark b { font-size: 13px; }
+.dp-verdict.mark { padding: 0; width: 22px; height: 22px; display: inline-grid; place-items: center; font-size: 12px; letter-spacing: 0; }
+.dp-ready ul { flex-direction: row; flex-wrap: wrap; gap: 6px 14px; }
+.dp-ready a { gap: 5px; font-size: 15px; }
+.dp-ready a b { font-size: 15px; }
+/* Links & captures, converted to the 29 Oct rule. */
+.cp-marks { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 !important; }
+.cp-egress { font: 500 11.5px var(--font-mono); color: var(--accent-2); }
+.cp-glyph.big { flex: 0 0 30px; width: 30px; height: 30px; font-size: 15px; }
+.cp-cap .cp-glyph { flex: 0 0 20px; width: 20px; height: 20px; font-size: 11px; }
+.cp-st .cp-v { font-size: 15px; }
+.cp-displayed { border-bottom: 1px dashed var(--text-muted); }
+.cp-safe.rv, .rv > .cp-safe { display: block; }
+.cp-list li > .rv { display: block; }
+.cp-li b { font-size: 13.5px; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.cp-head code { display: inline; }
+/* Library (features/documents/documents-panel.tsx), converted as it is: the Drop's stage marks for a file's reading state. */
+.lib-read { display: inline-grid !important; place-items: center; width: 20px; min-height: 20px !important; padding: 0 !important; font-style: normal; font-size: 12px; vertical-align: middle; }
+.lib-proposed { border-left: 2px dashed var(--text-muted); padding-left: 8px; margin-top: 4px; }
+/* Sources & evidence (features/source-capture/source-capture-panel.tsx): the source type as icon buttons. */
+.sc-types { display: inline-flex; gap: 4px; }
+.sc-types button { all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); color: var(--text-muted); }
+.sc-types button.on { border-color: var(--accent-1); color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 12%, transparent); }
+.sc-types button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.sc-counts span { display: inline-flex; align-items: center; gap: 4px; margin-right: 10px; }
+/* Connectors and the Dossier, converted as they are. */
+.ds-state { display: inline-grid; place-items: center; min-width: 16px; font-weight: 700; color: var(--accent-2); }
+.ds-line { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; }
+.ds-dup { padding: 0 6px; border-radius: 99px; border: 1px solid var(--line); font-family: var(--font-mono); }
+.ds-counts { margin: 4px 0; font: 500 12px var(--font-mono); color: var(--text-muted); }
+.ds-counts b { color: var(--text); font-size: 13.5px; }
+.cn-runs .rv { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; }
+.cn-run i { font-style: normal; }
+.cn-run.ok i { color: var(--status-supported); } .cn-run.bad i { color: var(--status-disputed); } .cn-run.quiet i { color: var(--text-muted); }
+/* OpenAleph corpus (features/corpus/*), converted as it is. */
+.co-sync { margin: 4px 0; font-size: 13px; }
+.co-sync b { font-size: 14px; }
+.co-score { display: inline-block; width: 60px; height: 5px; border-radius: 3px; background: var(--surface-3); overflow: hidden; vertical-align: middle; }
+.co-score i { display: block; height: 100%; background: var(--accent-2); }
+.co-warn { color: var(--accent-1); }
+.co-stages { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-direction: column; gap: 4px; }
+.co-stages .rv { display: inline-flex; align-items: center; gap: 8px; }
+.co-bar { display: inline-flex; width: 120px; height: 6px; border-radius: 3px; overflow: hidden; background: var(--surface-3); }
+.co-bar i { display: block; height: 100%; }
+.co-bar .done { background: var(--status-supported); } .co-bar .run { background: var(--accent-2); } .co-bar .wait { background: var(--surface-2); } .co-bar .fail { background: var(--status-disputed); }

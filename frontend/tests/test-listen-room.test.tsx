@@ -78,7 +78,9 @@ describe('Listen & read', () => {
     mockApi(ROUTES);
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
     const transcript = await screen.findByRole('main', {name: 'Transcript'});
-    expect(await within(transcript).findByText(/faster-whisper 1.2.1 · small · run on this computer/)).toBeInTheDocument();
+    // Where it ran stays on screen; the tool, model and time are on hover (Ony, 29 Oct).
+    expect((await within(transcript).findByText(/faster-whisper 1.2.1 · small · run on this computer/)).closest('[hidden]')).not.toBeNull();
+    expect(within(transcript).getByText('⌂ on this computer')).toBeVisible();
     const silence = within(transcript).getByRole('group', {name: 'No speech, 0:05.8 to 0:12.4'});
     expect(silence).toHaveTextContent('No speech was found from 0:05.8 to 0:12.4. Words here may be invented by the model. They are kept apart and never used as evidence.');
     expect(within(silence).queryByRole('button', {name: /Pin/})).toBeNull();

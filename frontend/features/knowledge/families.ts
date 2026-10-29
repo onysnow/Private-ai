@@ -31,7 +31,8 @@ export function shortAreaName(name: string): string {
   return name.split(/,| and /)[0].trim() || name;
 }
 
-/** How an indicator can be checked, as a shape and a word (never colour alone). */
+/** How an indicator can be checked, as a shape and a word (never colour alone). On screen the shape shows and the word
+ *  is revealed (HowGlyph in indicator-list.tsx); "only a person" draws a person, as ◉ is the watchlist's mark. */
 export const HOW_CHECKED: Record<'records' | 'lookups' | 'person', {glyph: string; word: string; long: string}> = {
   records: {glyph: '◫', word: 'Records', long: 'from your records'},
   lookups: {glyph: '⇄', word: 'Lookups', long: 'after outside lookups'},

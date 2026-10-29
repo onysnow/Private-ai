@@ -17,6 +17,8 @@ import type {ReactElement} from 'react';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {FamilyMark, PartyMark} from '../../components/network/marks';
+import {Reveal} from '../../components/ui/reveal';
 import {
   externalRelationshipCandidatesOptions, findingCandidatesOptions, getEntityDossierQueryKey, getInvestigationGraphQueryKey, listAssessmentsOptions,
   listAssessmentsQueryKey, listConnectorFindingsOptions, listConnectorFindingsQueryKey, listEntitiesQueryKey, listEntityStatementHistoryOptions,
@@ -30,6 +32,23 @@ type Props = {investigationId: string};
 
 const RELATIONSHIP_SCHEMAS = new Set(['Ownership', 'Directorship', 'Membership', 'Employment', 'Payment', 'UnknownLink']);
 const isRelationshipFinding = (f: ConnectorFindingOut): boolean => RELATIONSHIP_SCHEMAS.has(f.schema || '');
+
+/** A finding's review state as a shape (○ not reviewed, ✓ accepted, ✕ rejected, ? to follow up); the word on reveal. */
+const REVIEW: Record<string, {mark: string; tone: string}> = {
+  unreviewed: {mark: '○', tone: 'unshown'}, accepted: {mark: '✓', tone: 'supported'}, rejected: {mark: '✕', tone: 'disputed'}, needs_followup: {mark: '?', tone: 'unshown'},
+};
+const TONE_COLOUR: Record<string, string> = {supported: 'var(--status-supported)', disputed: 'var(--status-disputed)', unshown: 'var(--status-unshown)'};
+function ReviewMark({status}: {status: string}): ReactElement {
+  const r = REVIEW[status] ?? {mark: '○', tone: 'unshown'};
+  const word = status.replace(/_/g, ' ');
+  return <Reveal label={word} detail={<b>{word}</b>}><span aria-hidden="true" style={{color: TONE_COLOUR[r.tone], fontWeight: 700, fontSize: 16}}>{r.mark}</span></Reveal>;
+}
+
+/** What kind of record a finding is: a party's icon, or a link's line (components/network/marks.tsx). */
+function FindingKind({schema}: {schema?: string | null}): ReactElement {
+  if (schema && RELATIONSHIP_SCHEMAS.has(schema)) return <FamilyMark schema={schema}/>;
+  return <PartyMark schema={schema || 'lead'} kind={schema ? undefined : 'other'}/>;
+}
 
 /** The values a finding asserts, as the provider sent them: each property's list of values. */
 function propertyValues(properties: Record<string, unknown>): [string, string[]][] {
@@ -146,7 +165,8 @@ export function ReviewQueuePanel({investigationId}: Props): ReactElement {
             {findings.map(f => <TableRow key={f.id}>
               <TableCell><strong>{f.caption}</strong></TableCell>
               <TableCell>{f.provider}</TableCell>
-              <TableCell>{f.schema || 'lead'} · {f.review_status}</TableCell>
+              {/* The kind is the icon or line, the review state its shape; both named on reveal. */}
+              <TableCell><span className="inline-flex items-center gap-3"><FindingKind schema={f.schema}/><ReviewMark status={f.review_status}/></span></TableCell>
               <TableCell><Button size="sm" variant="outline" onClick={() => inspect(f)}>Inspect</Button></TableCell>
             </TableRow>)}
           </TableBody>
@@ -158,8 +178,10 @@ export function ReviewQueuePanel({investigationId}: Props): ReactElement {
       {!selected ? <p className="muted">Choose a finding.</p> : externalRel ? <>
         <h2>{selected.caption}</h2>
         <div className="candidate">
-          <b>{externalRel.schema} relationship</b>
-          <div>{externalRel.source_prop}: {externalRel.source_external_id} → {externalRel.target_prop}: {externalRel.target_external_id}</div>
+          {/* The outside records' raw ids are revealed on the relationship's title. */}
+          <b className="inline-flex items-center gap-2"><FamilyMark schema={externalRel.schema}/>
+            <Reveal detail={<span className="rv-mono">{externalRel.source_prop}: {externalRel.source_external_id} → {externalRel.target_prop}: {externalRel.target_external_id}</span>}>
+              {externalRel.schema} relationship</Reveal></b>
           <div>{externalRel.source_candidates[0]?.caption || 'No canonical source match'} → {externalRel.target_candidates[0]?.caption || 'No canonical target match'}</div>
           {externalRel.source_candidates[0] && externalRel.target_candidates[0] ? <div>
             <Button onClick={() => reviewExternalRel('supported')}>Supported</Button>
@@ -171,7 +193,9 @@ export function ReviewQueuePanel({investigationId}: Props): ReactElement {
       </> : <>
         <h2>{selected.caption}</h2>
         {bestMatch && <div className="candidate">
-          Best entity match: <b>{bestMatch.caption}</b> ({Math.round(bestMatch.score * 100)}%) <Button onClick={() => decide('positive', bestMatch.entity_id)}>Same entity</Button><Button onClick={() => decide('negative', bestMatch.entity_id)}>Different</Button><Button onClick={() => decide('unsure', bestMatch.entity_id)}>Unsure</Button>
+          Best entity match: <b>{bestMatch.caption}</b>{' '}
+          <span className="inline-flex items-center gap-1"><span aria-hidden="true" style={{display: 'inline-block', width: 40, height: 4, borderRadius: 2, background: 'var(--line)', overflow: 'hidden'}}>
+            <i style={{display: 'block', height: '100%', width: `${Math.round(bestMatch.score * 100)}%`, background: 'var(--accent-1)'}}/></span>({Math.round(bestMatch.score * 100)}%)</span> <Button onClick={() => decide('positive', bestMatch.entity_id)}>Same entity</Button><Button onClick={() => decide('negative', bestMatch.entity_id)}>Different</Button><Button onClick={() => decide('unsure', bestMatch.entity_id)}>Unsure</Button>
         </div>}
         {propertyValues(selected.properties).flatMap(([p, vals]) => vals.map(v => {
           const promotion = promotionFor(p, v);
@@ -193,12 +217,17 @@ export function ReviewQueuePanel({investigationId}: Props): ReactElement {
           <div>
             <b>{row.prop}</b>
             <div>{row.value}</div>
-            <small>{row.canonical ? 'Canonical' : 'External only'} · {row.support_count} support · {row.conflict_count} conflict{row.latest_status ? ` · latest ${row.latest_status}` : ''}</small>
+            {/* Counts and a canonical mark show; the words, datasets and providers are revealed. */}
+            <Reveal detail={`${row.canonical ? 'Canonical' : 'External only'} · ${row.support_count} support · ${row.conflict_count} conflict${row.latest_status ? ` · latest ${row.latest_status}` : ''}`}>
+              <small className="inline-flex items-center gap-2"><span aria-hidden="true" style={{color: row.canonical ? 'var(--status-supported)' : 'var(--text-muted)'}}>{row.canonical ? '◆' : '◇'}</span>
+                <span aria-hidden="true">✓ {row.support_count}</span><span aria-hidden="true" style={{color: row.conflict_count ? 'var(--status-disputed)' : undefined}}>✕ {row.conflict_count}</span></small></Reveal>
           </div>
           <div>
-            {row.canonical_statements.map(s => <div key={s.id}><small>canonical · {s.dataset}{s.origin ? ' · source linked' : ''}</small></div>)}
+            {row.canonical_statements.map(s => <div key={s.id}><Reveal detail={`canonical · ${s.dataset}${s.origin ? ' · source linked' : ''}`}>
+              <small><span aria-hidden="true" style={{color: 'var(--status-supported)'}}>◆</span> canonical</small></Reveal></div>)}
             {row.external_assessments.map(a => <div key={a.assessment_id}>
-              <small>{a.status} · {a.provider || 'external'}{a.dataset ? ` · ${a.dataset}` : ''}{a.promoted ? ' · promoted' : ''}</small>
+              <Reveal detail={`${a.status} · ${a.provider || 'external'}${a.dataset ? ` · ${a.dataset}` : ''}${a.promoted ? ' · promoted' : ''}`}>
+                <small>{a.status}{a.promoted ? ' ↑' : ''}</small></Reveal>
               {a.source_url && <div><a href={a.source_url} target="_blank" rel="noreferrer">source</a></div>}
             </div>)}
           </div>

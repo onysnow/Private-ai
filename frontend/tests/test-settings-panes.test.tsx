@@ -118,7 +118,8 @@ describe('Settings › Outside lookups', () => {
     await user.type(screen.getByLabelText('Why this case is different'), 'source protection');
     await user.click(screen.getByRole('button', {name: 'Save for this case'}));
     expect(api.lastBody('PUT /api/investigations/inv-1/lookups')).toEqual({modes: {opensanctions: 'off'}, reason: 'source protection'});
-    expect(await screen.findByText('“source protection” · ', {exact: false})).toBeInTheDocument();
+    // The reason shows; when it was set is revealed on it.
+    expect((await screen.findByText('“source protection”')).closest('.rv')).toHaveAccessibleDescription(/^Set /);
   });
 });
 

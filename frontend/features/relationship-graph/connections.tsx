@@ -7,6 +7,8 @@ import {useQuery} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
+import {FamilyGlyph} from '../../components/network/marks';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {howAreTheyConnectedOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {ChainOut} from '../../lib/generated/types.gen';
@@ -53,18 +55,25 @@ export function Connections({investigationId, parties, chain, onChain}: Props): 
     {asked && result.isFetching && <p className="muted">Looking for chains…</p>}
     {asked && result.isError && <p className="muted">{errorMessage(result.error, 'Could not look for chains')}</p>}
     {asked && result.data && <>
+      {/* The count shows; how the chains are ordered and what to do with them is revealed on it. */}
       <p className="nc-sum">{result.data.total === 0
         ? `No chain of up to ${result.data.max_len} links joins ${name(asked.from)} and ${name(asked.to)}.`
-        : `${result.data.total} ${result.data.total === 1 ? 'chain' : 'chains'} of up to ${result.data.max_len} links, shortest first${result.data.truncated ? `; the first ${result.data.chains.length} are shown` : ''}. Choose one to light it in the network.`}</p>
+        : <Reveal detail={`${result.data.total} ${result.data.total === 1 ? 'chain' : 'chains'} of up to ${result.data.max_len} links, shortest first${result.data.truncated ? `; the first ${result.data.chains.length} are shown` : ''}. Choose one to light it in the network.`}>
+          <span>{result.data.truncated ? `${result.data.chains.length} of ${result.data.total}` : result.data.total} {result.data.total === 1 ? 'chain' : 'chains'}</span></Reveal>}</p>
       <ol className="nc-list">
         {result.data.chains.map(c => <li key={key(c)}>
           <button type="button" className={`nc-chain${chain && key(chain) === key(c) ? ' on' : ''}`} aria-pressed={Boolean(chain && key(chain) === key(c))}
             onClick={() => onChain(chain && key(chain) === key(c) ? null : c)}>
             <span className="nc-steps">{c.parties.map((p, i) => <span key={p.id}>
+              {/* Each link is its family's line (its schema is read out); its direction is the arrow. */}
               {i > 0 && <span className="nc-link" style={{borderColor: CERTAINTY[c.links[i - 1].certainty].dash ? SWATCH.taupe : SWATCH.sage}}>
-                {c.links[i - 1].from === p.id ? '←' : ''} {c.links[i - 1].schema} {c.links[i - 1].from === p.id ? '' : '→'}</span>}
+                {c.links[i - 1].from === p.id ? '←' : ''} <FamilyGlyph schema={c.links[i - 1].schema} width={20}/><span className="sr-only">{c.links[i - 1].schema}</span> {c.links[i - 1].from === p.id ? '' : '→'}</span>}
               <b>{p.name}</b></span>)}</span>
-            <small>{c.links.length} {c.links.length === 1 ? 'link' : 'links'} · {WEAKEST[c.weakest]}</small>
+            {/* The count shows; the weakest link is drawn in its line pattern, its words read out and revealed. */}
+            <small><Reveal tabbable={false} describe={false} detail={WEAKEST[c.weakest]}><span>{c.links.length} {c.links.length === 1 ? 'link' : 'links'}{' '}
+              <svg aria-hidden="true" width="22" height="8" style={{verticalAlign: 'middle'}}><line x1="1" y1="4" x2="21" y2="4" stroke={c.weakest === 'contested' ? SWATCH.brick : c.weakest === 'supported' ? SWATCH.sage : SWATCH.taupe}
+                strokeWidth="2.5" strokeDasharray={CERTAINTY[c.weakest as keyof typeof CERTAINTY]?.dash}/></svg></span></Reveal>
+              <span className="sr-only"> · {WEAKEST[c.weakest]}</span></small>
           </button>
         </li>)}
       </ol>

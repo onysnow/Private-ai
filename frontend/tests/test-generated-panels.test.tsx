@@ -132,7 +132,9 @@ describe('SourceCapturePanel', () => {
     await user.type(screen.getByPlaceholderText('Exact quote / excerpt'), '$2.4M wired');
     await user.click(save);
 
-    await screen.findByText('Saved evidence ev-1. It is now available for claim review.');
+    // "Saved" shows; the record's ID is on hover (Ony, 29 Oct: raw IDs are sub-text).
+    expect(await screen.findByText('Saved')).toBeVisible();
+    expect(screen.getByText('Saved evidence ev-1').closest('[hidden]')).not.toBeNull();
     expect(onSaved).toHaveBeenCalledTimes(1);
     expect(screen.getByPlaceholderText('Source title')).toHaveValue('');
     expect(await sentJson(fetchMock.mock.calls[0])).toEqual(
@@ -144,7 +146,7 @@ describe('SourceCapturePanel', () => {
     const user = userEvent.setup();
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(json({detail: 'Investigation not found'}, 404)));
     wrap(<SourceCapturePanel investigationId="inv-1" sourceCount={2} evidenceCount={5} onSaved={vi.fn()}/>);
-    expect(screen.getByText('2 source(s) · 5 evidence record(s) in this investigation.')).toBeInTheDocument();
+    expect(screen.getByText('2 source(s) · 5 evidence record(s) in this investigation.').closest('[hidden]')).not.toBeNull();
     await user.type(screen.getByPlaceholderText('Source title'), 'Wire log');
     await user.type(screen.getByPlaceholderText('Exact quote / excerpt'), 'quote');
     await user.click(screen.getByRole('button', {name: 'Save source + evidence'}));

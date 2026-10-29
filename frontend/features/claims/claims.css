@@ -15,11 +15,6 @@
 .cl-row > .st-disputed, .cl-head .st-disputed { border-style: double; border-width: 3px; }
 .cl-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .cl-head .st { display: inline-flex; gap: 5px; align-items: center; font: 600 11.5px/1.2 var(--font-ui); padding: 3px 8px; }
-.cl-mark { display: inline-block; margin-right: 3px; }
-.cl-mark-supported { color: var(--status-supported); }
-.cl-mark-disputed { color: var(--status-disputed); }
-.cl-mark-unshown { color: var(--status-unshown); }
-.cl-mark-ruled_out { color: var(--text-muted); }
 
 /* Calm and reduced motion: no slide on hover, the colour change only, at once. */
 html[data-motion='calm'] .finding.cl-row { transition: none; }
@@ -29,3 +24,17 @@ html[data-motion='calm'] .finding.cl-row:hover, html[data-motion='calm'] .findin
   .finding.cl-row:hover, .finding.cl-row:focus-visible { transform: none; }
 }
 .cl-head h4 { margin: 0; }
+
+/* Ony's rule of 29 Oct: the row shows the status colour, the claim and its confidence as a bar and a number; the
+   grade words are revealed. Stance is drawn as Chain of Custody's line (components/network/marks.tsx). */
+.cl-row-wrap { display: block; }
+.cl-conf { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.cl-bar { display: inline-block; width: 56px; height: 4px; border-radius: 2px; background: var(--surface-3, var(--line)); overflow: hidden; }
+.cl-bar i { display: block; height: 100%; background: var(--accent-1); }
+.cl-counts { display: inline-flex; gap: 14px; align-items: center; font-size: 15px; font-variant-numeric: tabular-nums; }
+.cl-counts > span { display: inline-flex; gap: 5px; align-items: center; }
+.cl-balance { display: grid; gap: 4px; }
+.cl-rel, .cl-ev-head, .cl-move { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cl-ev { border-left: 3px solid var(--status-supported); }
+.cl-ev-contradicts { border-left: 3px dashed var(--status-disputed); }
+.cl-ev-context { border-left: 3px dotted var(--text-muted); }

@@ -6,6 +6,7 @@ import {useState} from 'react';
 import type {FormEvent, ReactElement} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {useLockStore} from '../../lib/app-lock';
 import {investigationDecidersOptions, listAppUsersOptions, listAppUsersQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
@@ -22,6 +23,12 @@ export const ROLES: Record<Role | 'owner', {shape: string; word: string; does: s
   reporter: {shape: '●', word: 'Reporter', does: 'reads, decides, writes'},
   viewer: {shape: '○', word: 'Viewer', does: 'reads only, decides nothing'},
 };
+
+/** A role as its shape; the word and what it may do are revealed on it. */
+function RoleMark({role, extra}: {role: Role | 'owner'; extra?: string}): ReactElement {
+  const r = ROLES[role];
+  return <Reveal label={r.word} detail={<><b>{r.word}</b> · {extra ?? r.does}</>}><span className="lk-role" aria-hidden="true">{r.shape}</span></Reveal>;
+}
 
 function day(at: string | null | undefined): string {
   return at ? new Date(at).toLocaleDateString(undefined, {day: 'numeric', month: 'short'}) : '';
@@ -86,35 +93,35 @@ export function PeoplePane({investigationId, caseName, networkOn, onAccess}: {
   return <div className="lk-settings">
     <div style={{display: 'grid', gap: 14}}>
       <div className="lk-panel">
-        <p className="lk-eyebrow">Who can reach {caseName || 'this case'} · roles by shape and word: ◆ owner · ■ admin · ● reporter · ○ viewer</p>
+        {/* A role is its shape (◆ owner · ■ admin · ● reporter · ○ viewer); its word and what it may do are revealed on it. */}
+        <p className="lk-eyebrow">Who can reach {caseName || 'this case'}</p>
         <table className="lk-table">
           <thead><tr><th>Person</th><th>Role here</th><th>How they get in</th><th>Last seen</th></tr></thead>
           <tbody>
             <tr>
-              <td><div className="lk-who"><span className="lk-av me">{initials(myName)}</span><span><b>{myName || 'You'}</b> <span className="lk-muted">you</span>
-                <small>{myName ? `signs as “${myName}”` : 'no name yet: decisions read “a person”'}</small></span></div></td>
-              <td>{ROLES.owner.shape} {ROLES.owner.word}<small>{ROLES.owner.does}</small></td>
-              <td>This computer<small>{protectedApp ? 'passphrase' : 'nothing to unlock'}</small></td>
-              <td>now<small>The owner can’t be removed.</small></td>
+              <td><div className="lk-who"><span className="lk-av me">{initials(myName)}</span><span><Reveal detail={myName ? `Signs as “${myName}”` : 'No name yet: decisions read “a person”'}><b>{myName || 'You'}</b></Reveal> <span className="lk-muted">you</span></span></div></td>
+              <td><RoleMark role="owner"/></td>
+              <td><Reveal detail={protectedApp ? 'Opens with the passphrase' : 'Nothing to unlock'}><span>This computer</span></Reveal></td>
+              <td><Reveal detail="The owner can’t be removed."><span>now</span></Reveal></td>
             </tr>
             {here.map(u => {
               const r = roleHere(u, investigationId)!;
               const expired = u.token_status === 'expired';
               return <tr key={u.id}>
-                <td><div className="lk-who"><span className="lk-av">{initials(u.display_name)}</span><span><b>{u.display_name}</b>
-                  <small>signs as “{u.display_name}”</small></span></div></td>
+                <td><div className="lk-who"><span className="lk-av">{initials(u.display_name)}</span><span><Reveal detail={`Signs as “${u.display_name}”`}><b>{u.display_name}</b></Reveal></span></div></td>
                 <td>
-                  {u.global_role === 'admin' ? <>{ROLES.admin.shape} {ROLES.admin.word}<small>every case</small></>
-                    : <select className="lk-input" style={{padding: '6px 8px', width: 'auto'}} aria-label={`Role of ${u.display_name}`} value={r}
+                  {u.global_role === 'admin' ? <RoleMark role="admin" extra="every case"/>
+                    : <Reveal tabbable={false} detail={ROLES[r].does}><select className="lk-input" style={{padding: '6px 8px', width: 'auto'}} aria-label={`Role of ${u.display_name}`} value={r}
                       onChange={e => void act(() => putInvestigationMembership({path: {user_id: u.id, investigation_id: investigationId},
                         body: {role: e.target.value}, throwOnError: true}))}>
                       {(['reporter', 'viewer', 'admin'] as Role[]).map(k => <option key={k} value={k}>{ROLES[k].shape} {ROLES[k].word}</option>)}
-                    </select>}
-                  <small>{ROLES[r].does}</small>
+                    </select></Reveal>}
                 </td>
-                <td>{u.token_status === 'active' || expired ? <>Key <span className="lk-mono">••••{u.token_hint ?? ''}</span>
-                  <small>{expired ? `expired ${day(u.token_expires_at)}` : u.token_expires_at ? `expires ${day(u.token_expires_at)}` : 'does not expire'}</small></>
-                  : <>No key<small>turned off</small></>}</td>
+                {/* An expired key says so; otherwise when it expires is revealed on it. */}
+                <td>{u.token_status === 'active' || expired ? <><Reveal detail={expired ? `Expired ${day(u.token_expires_at)}` : u.token_expires_at ? `Expires ${day(u.token_expires_at)}` : 'Does not expire'}>
+                  <span>Key <span className="lk-mono">••••{u.token_hint ?? ''}</span></span></Reveal>
+                  {expired && <small className="lk-err">expired {day(u.token_expires_at)}</small>}</>
+                  : <Reveal detail="Turned off"><span>No key</span></Reveal>}</td>
                 <td>{ago(u.token_last_used_at)}
                   <div className="lk-acts" style={{marginTop: 6}}>
                     <button type="button" className="ap-btn" onClick={() => void act(async () => {
@@ -153,15 +160,16 @@ export function PeoplePane({investigationId, caseName, networkOn, onAccess}: {
       <input className="lk-input" style={{marginTop: 10, font: '400 20px var(--font-display)'}} value={name} onChange={e => setName(e.target.value)}
         placeholder="Their name, as it goes on their work" aria-label="Their name"/>
       <div className="lk-roles" role="radiogroup" aria-label="Role in this case">
-        {(['reporter', 'viewer', 'admin'] as Role[]).map(k => <button key={k} type="button" role="radio" aria-checked={role === k}
+        {/* What each role may do is revealed on it. */}
+        {(['reporter', 'viewer', 'admin'] as Role[]).map(k => <Reveal key={k} tabbable={false} detail={k === 'viewer' ? 'Reads only. Good for an editor or a lawyer.'
+          : k === 'reporter' ? 'Reads, accepts and rejects, writes the story.' : 'Everything a reporter can, plus deleting and restoring this case.'}>
+          <button type="button" role="radio" aria-checked={role === k}
           className={`lk-opt${role === k ? ' on' : ''}`} style={{marginTop: 0}} onClick={() => setRole(k)}>
-          <span aria-hidden="true">{ROLES[k].shape}</span><span><b>{ROLES[k].word}</b><span className="lk-muted" style={{display: 'block'}}>
-            {k === 'viewer' ? 'Reads only. Good for an editor or a lawyer.' : k === 'reporter' ? 'Reads, accepts and rejects, writes the story.'
-              : 'Everything a reporter can, plus deleting and restoring this case.'}</span></span>
-        </button>)}
+          <span aria-hidden="true">{ROLES[k].shape}</span><span><b>{ROLES[k].word}</b></span>
+        </button></Reveal>)}
       </div>
       <div className="lk-row" style={{borderTop: 0}}>
-        <span>Key lasts<small>renew from their row</small></span>
+        <span><Reveal detail="Renew from their row."><span>Key lasts</span></Reveal></span>
         <span className="ap-seg" role="radiogroup" aria-label="Key lasts">
           {([30, 90] as const).map(d => <button key={d} type="button" role="radio" aria-checked={days === d} className={days === d ? 'on' : ''}
             onClick={() => setDays(d)}>{d} days</button>)}

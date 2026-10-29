@@ -8,6 +8,7 @@ import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   addPushSubscriptionMutation, getNotificationPrefsQueryKey, putNotificationChannelMutation, removePushSubscriptionMutation,
@@ -112,9 +113,9 @@ export function OutsideChannels({prefs}: {prefs: NotificationPrefsOut}): ReactEl
     <div className="ap-pane-head"><h2 id="nt-outside">Outside the app</h2><span>the kind and how many; never a name, a case or a quote</span></div>
 
     <div className="st-route st-channel">
-      <span className="st-route-what"><b>Email</b>
-        <small>{prefs.server.email ? 'A Textbook Red Flag as it happens, or once a day what is waiting (after 07:00 UTC).'
-          : 'This server has no mail account. Whoever runs it sets NOTIFY_MAIL_URL (a mailtos:// address) in its environment file.'}</small></span>
+      {/* What a channel sends is revealed on its name; a channel the server cannot use says so, written out. */}
+      <span className="st-route-what">{prefs.server.email ? <Reveal detail="A Textbook Red Flag as it happens, or once a day what is waiting (after 07:00 UTC)."><b>Email</b></Reveal>
+        : <><b>Email</b><small>This server has no mail account. Whoever runs it sets NOTIFY_MAIL_URL (a mailtos:// address) in its environment file.</small></>}</span>
       {prefs.server.email && <>
         <input aria-label="Your email address" type="email" className="st-input st-channel-input" placeholder="you@newsroom.org" autoComplete="email" value={address}
             onChange={e => setAddress(e.target.value)} disabled={busy === 'email'}/>
@@ -137,10 +138,10 @@ export function OutsideChannels({prefs}: {prefs: NotificationPrefsOut}): ReactEl
     </div>
 
     <div className="st-route st-channel">
-      <span className="st-route-what"><b>This browser, even when the Workbench is closed</b>
-        <small>{prefs.server.webpush
-          ? `Web Push, through the browser maker’s push service. ${prefs.push_devices ? `${prefs.push_devices} browser${prefs.push_devices === 1 ? '' : 's'} signed up.` : 'No browser signed up yet.'}`
-          : 'This server cannot send Web Push yet. Whoever runs it sets NOTIFY_PUSH_SUBJECT (mailto: or https:) in its environment file.'}</small></span>
+      <span className="st-route-what">{prefs.server.webpush ? <><Reveal detail="Web Push, through the browser maker’s push service."><b>This browser, even when the Workbench is closed</b></Reveal>
+        <small>{prefs.push_devices ? `${prefs.push_devices} browser${prefs.push_devices === 1 ? '' : 's'} signed up` : 'No browser signed up yet'}</small></>
+        : <><b>This browser, even when the Workbench is closed</b>
+        <small>This server cannot send Web Push yet. Whoever runs it sets NOTIFY_PUSH_SUBJECT (mailto: or https:) in its environment file.</small></>}</span>
       {prefs.server.webpush && seg('webpush', ['off', 'interrupts'], !prefs.server.webpush_key)}
       {foot('webpush')}
     </div>

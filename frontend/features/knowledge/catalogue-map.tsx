@@ -8,22 +8,15 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import type {CatalogueAreaOut, CatalogueMapOut} from '../../lib/generated/types.gen';
-import {LevelMark} from '../act/red-flags-board';
 import type {CaseLayer} from './case-layer';
 import {strongest} from './case-layer';
-import {readingOrder} from './families';
+import {HOW_CHECKED, readingOrder} from './families';
+import {FlagLevelChip, HowGlyph} from './indicator-list';
 import {MAP_H, MAP_W, layoutMap} from './map-layout';
 
-const HINT_KEY = 'pai:catalogue-wheel-hint';
 const WHEEL_STEP_MS = 140;
-
-function hintsLeft(): number {
-  try { return 3 - Number(window.localStorage.getItem(HINT_KEY) ?? 0); } catch { return 0; }
-}
-function countHint(): void {
-  try { window.localStorage.setItem(HINT_KEY, String(Number(window.localStorage.getItem(HINT_KEY) ?? 0) + 1)); } catch { /* private window */ }
-}
 
 export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndicator, onShowTable}: {
   areas: CatalogueAreaOut[]; map: CatalogueMapOut | undefined; layer: CaseLayer; selected: string;
@@ -35,7 +28,6 @@ export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndic
   const order = useMemo(() => readingOrder(areas.map(a => a.key)), [areas]);
   const [hover, setHover] = useState<string | null>(null);
   const [hoverAt, setHoverAt] = useState<{left: number; top: number; right: boolean; w: number}>({left: 0, top: 0, right: false, w: 0});
-  const [hint, setHint] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const last = useRef(0);
 
@@ -48,7 +40,6 @@ export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndic
     if (next) onSelect(next);
   };
 
-  useEffect(() => { if (hintsLeft() > 0) { setHint(true); countHint(); } }, []);
   // The wheel over the map steps through the areas (VIZ B: "grids and matrices: the wheel moves the lit row"). A
   // non-passive listener, so the page under it does not scroll at the same time.
   useEffect(() => {
@@ -85,9 +76,9 @@ export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndic
 
   return <section className="kc-panel kc-map" aria-label="Catalogue map">
     <p className="kc-eyebrow">Catalogue map</p>
-    <h2 className="kc-title">{areas.length} areas · {total.toLocaleString('en-GB')} indicators</h2>
-    <p className="kc-sub">Scroll over the map to step through areas · click to open · lines show “may also point to”.
-      {hint && <span className="kc-hint"> Scroll to step.</span>}</p>
+    {/* How to use the map is on its title, on hover or focus (Ony, 29 Oct). */}
+    <h2 className="kc-title"><Reveal detail="Scroll over the map to step through the areas, or use the arrow keys; click to open one. Lines show “may also point to”.">
+      {areas.length} areas · {total.toLocaleString('en-GB')} indicators</Reveal></h2>
     <ul className="kc-legend" aria-label="Key">
       <li><i className="kc-key-size" aria-hidden="true"/>size = indicators</li>
       <li><i className="kc-key-fires" aria-hidden="true"/>fires in this case</li>
@@ -147,13 +138,20 @@ function AreaCard({area, counts, layer, onOpenIndicator}: {
 }): ReactElement | null {
   if (!area) return null;
   const here = [...layer.flags.entries()].filter(([id]) => id.startsWith(`${area.key}-`)).map(([id, fl]) => ({id, flag: strongest(fl)!}));
+  // The area's summary is on its name; how its indicators are checked shows as shapes and counts (Ony, 29 Oct).
   return <article className="kc-area-card" aria-label={`${area.name}, the area`}>
-    <header><h3>{area.name}</h3><span className="kc-mono">{area.key} · {area.indicators}</span></header>
-    <p>{area.summary}{counts && <> {counts.records} checkable from your records, {counts.lookups} after lookups, {counts.person} only by a person.</>}</p>
+    <header><h3><Reveal detail={area.summary}>{area.name}</Reveal></h3><span className="kc-mono">{area.key} · {area.indicators}</span></header>
+    {counts && <ul className="kc-how-counts" aria-label="How its indicators are checked">
+      {(['records', 'lookups', 'person'] as const).map(k => <li key={k}>
+        <Reveal label={`${counts[k]} checked ${HOW_CHECKED[k].long}`} detail={<>{counts[k]} checked <b>{HOW_CHECKED[k].long}</b></>}>
+          <span className="kc-how-count"><HowGlyph how={k}/><b>{counts[k]}</b></span></Reveal></li>)}
+    </ul>}
     {layer.error ? <p className="kc-error">Could not read this case’s Red Flags, so its flags are not shown here.</p> : layer.investigationId ? (here.length > 0
       ? <div className="kc-incase"><span className="kc-eyebrow">In this case</span>
-        {here.map(h => <button type="button" key={h.id} className="kc-flag" onClick={() => onOpenIndicator(h.id)}><LevelMark level={h.flag.level}/> <span className="kc-mono">{h.id}</span></button>)}</div>
-      : <p className="kc-quiet">No indicator in this area fires in this case.{counts ? ` That is not the same as nothing wrong: ${counts.rules} of ${area.indicators} have a rule that runs on records.` : ''}</p>)
+        {here.map(h => <button type="button" key={h.id} className="kc-flag" onClick={() => onOpenIndicator(h.id)}><FlagLevelChip level={h.flag.level}/> <span className="kc-mono">{h.id}</span></button>)}</div>
+      // A flag is never a finding, and no flag is not a clean bill: this stays on screen, shorter (floor 2 and 11).
+      : <p className="kc-quiet">None fires in this case; that is not the same as nothing wrong.{counts ? <> <Reveal detail={`${counts.rules} of ${area.indicators} indicators here have a rule that runs on records; the rest need lookups or a person.`}>
+        <b>{counts.rules} of {area.indicators}</b> run on records.</Reveal></> : null}</p>)
       : <p className="kc-quiet">Open a case to see its flags in this area.</p>}
   </article>;
 }

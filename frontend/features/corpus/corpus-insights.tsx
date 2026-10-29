@@ -11,6 +11,7 @@ import {useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   createLeadEndpointMutation, getCorpusInsightsOptions, getCorpusInsightsQueryKey, listLeadsQueryKey,
@@ -49,8 +50,7 @@ export function CorpusInsights({investigationId}: {investigationId: string}): Re
   };
 
   return <div className="candidate">
-    <b>What stands out in the corpus</b>
-    <p className="muted">The names OpenAleph&apos;s analysis found most often across this investigation&apos;s documents, and what they are mentioned alongside.</p>
+    <Reveal detail="The names OpenAleph's analysis found most often across this investigation's documents, and what they are mentioned alongside."><b>What stands out in the corpus</b></Reveal>
     {!open ? <Button onClick={() => setOpen(true)} disabled={!investigationId}>Show what stands out</Button> : <>
       {insights.isPending && <p className="muted">Asking OpenAleph…</p>}
       {insights.isError && <p className="muted">{errorMessage(insights.error, 'Could not load what stands out')}</p>}
@@ -60,8 +60,8 @@ export function CorpusInsights({investigationId}: {investigationId: string}): Re
         <h5>{group.label}</h5>
         <ul aria-label={group.label}>
           {group.terms.map(term => <li key={term.lead_key}>
-            <b>{term.name}</b> <small>· {term.documents} document(s)</small>
-            {term.alongside.length > 0 && <div><small>Alongside: {term.alongside.map(a => `${a.name} (${a.documents})`).join(', ')}</small></div>}
+            {term.alongside.length > 0 ? <Reveal detail={`Alongside: ${term.alongside.map(a => `${a.name} (${a.documents})`).join(', ')}`}><b>{term.name}</b></Reveal> : <b>{term.name}</b>}
+            {' '}<Reveal detail={`${term.documents} document(s)`}><small><b>{term.documents}</b></small></Reveal>
             <div className="actions">
               {term.record_id
                 ? <Button variant="link" onClick={() => openDossier(term.record_id as string)}>Open dossier</Button>

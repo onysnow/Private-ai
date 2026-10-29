@@ -11,6 +11,7 @@ import Link from 'next/link';
 import {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement, ReactNode} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {getGlossaryEntryOptions, listAreasOptions, listTermHintsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {CatalogueAreaOut, GlossaryHintOut} from '../../lib/generated/types.gen';
@@ -185,9 +186,13 @@ export function GlossaryScreen({tabs}: {tabs?: ReactNode}): ReactElement {
                 className={`kg-row${i === active ? ' active' : ''}${h.term === pinnedHint?.term ? ' on' : ''}`} style={{top: i * ROW_H, height: ROW_H}}
                 onClick={() => { setActive(i); pin(h.term); }}
                 onPointerEnter={() => { clearTimer(); timer.current = window.setTimeout(() => setHover(h.term), DWELL_MS); }}>
+                {/* A row is its term; the first sentence opens in the card on point (and is read with the row), and its areas
+                    are a dot each, named on hover (Ony, 29 Oct). */}
                 <span className="kg-term">{h.term}</span>
-                <span className="kg-first">{firstSentence(h.definition)}</span>
-                <span className="kg-areas" aria-label={`Areas: ${h.areas.map(a => areaName.get(a) ?? a).join(', ')}`}>{h.areas.slice(0, 3).join(' · ')}{h.areas.length > 3 ? ' …' : ''}</span>
+                <span className="kg-first sr-only">{firstSentence(h.definition)}</span>
+                <Reveal tabbable={false} describe={false} detail={h.areas.map(a => <span key={a} className="rv-row">{areaName.get(a) ?? a}</span>)}>
+                  <span className="kg-areas" aria-label={`Areas: ${h.areas.map(a => areaName.get(a) ?? a).join(', ')}`}>
+                    {h.areas.slice(0, 4).map(a => <i key={a} aria-hidden="true"/>)}{h.areas.length > 4 && <small aria-hidden="true">+{h.areas.length - 4}</small>}</span></Reveal>
               </div>;
             })}
           </div>
@@ -235,13 +240,12 @@ function TermCard({term, hint, areaName, onOpen, known}: {
   return <article className="kc-panel kg-card" aria-labelledby="kg-card-title" key={term}>
     <p className="kc-eyebrow">{areas.map(a => areaName.get(a) ?? a).join(' · ')}</p>
     <h2 id="kg-card-title" className="kc-ind-name">{hint.term}</h2>
-    {areas.length > 1 && <>
-      <p className="kc-small">Defined in {defs.size || hint.definitions} {(defs.size || hint.definitions) === 1 ? 'area' : 'areas'}{areas.length > (defs.size || hint.definitions) ? `, listed in ${areas.length}` : ''}</p>
+    {/* How many areas define it is sub-text: on the area tabs, on hover, and read with them (Ony, 29 Oct). */}
+    {areas.length > 1 && <Reveal tabbable={false} className="kg-tabs-rv" detail={<>Defined in {defs.size || hint.definitions} {(defs.size || hint.definitions) === 1 ? 'area' : 'areas'}{areas.length > (defs.size || hint.definitions) ? `, listed in ${areas.length}` : ''}</>}>
       <div className="kg-tabs" role="tablist" aria-label="Each area's definition">
         {areas.map(a => <button type="button" key={a} role="tab" aria-selected={a === current} className={a === current ? 'on' : ''} onClick={() => setTab(a)}>
           {areaName.get(a) ?? a}{defs.has(a) || !e ? '' : ' ○'}</button>)}
-      </div>
-    </>}
+      </div></Reveal>}
     <div role={areas.length > 1 ? 'tabpanel' : undefined} className="kg-def">
       {e && !defs.has(current) ? <p className="kc-dashed-box">No definition yet in {areaName.get(current) ?? current}.</p>
         : <p className="kc-def"><GlossaryText text={defs.get(current)?.definition ?? hint.definition} skip={hint.term}/></p>}

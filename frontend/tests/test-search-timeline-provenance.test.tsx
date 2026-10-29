@@ -56,7 +56,7 @@ describe('SearchPanel', () => {
 
     await screen.findByRole('option', {name: /Kestrelwood Holdings/});
     expect(screen.getByRole('button', {name: /Outside findings/, expanded: true})).toBeInTheDocument();
-    expect(screen.getByText('External connector result; treat as a lead until reviewed and promoted.')).toBeInTheDocument();
+    expect(screen.getByText('External connector result; treat as a lead until reviewed and promoted.').closest('[hidden]')).not.toBeNull();
     expect(screen.getAllByRole('button', {name: 'Trace provenance'})).toHaveLength(1);
     const url = api.lastUrl('GET /api/search');
     expect(url.searchParams.get('q')).toBe('Kestrelwood');
@@ -120,9 +120,10 @@ describe('TimelinePanel', () => {
     await screen.findByText('Board meeting', {selector: 'b'});
     expect(screen.getByText('1 Apr 2024')).toBeInTheDocument();
     expect(screen.getByText('asserted, not yet verified').parentElement).toHaveTextContent('1 asserted, not yet verified');
-    expect(screen.getByText('Claim: disputed · confidence 45%')).toBeInTheDocument();
-    expect(screen.getByText('Linked claim needs review; this event is kept.')).toBeInTheDocument();
-    expect(screen.getByText('Evidence stance: supports')).toBeInTheDocument();
+    // What the event links to is revealed on its title; the review warning stays on screen (Ony, 29 Oct).
+    expect(screen.getByText('Claim: disputed · confidence 45%').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('Linked claim needs review; this event is kept.')).toBeVisible();
+    expect(screen.getByText('Evidence stance: supports').closest('[hidden]')).not.toBeNull();
     expect(screen.getByTestId('timeline-chart')).toBeInTheDocument();
 
     const user = userEvent.setup();
@@ -186,8 +187,10 @@ describe('ProvenancePanel', () => {
     expect(screen.getByText('Board minutes')).toBeInTheDocument();
     expect(screen.getAllByText('page 7').length).toBeGreaterThan(0);
     expect(screen.getByText('Connected investigative trace')).toBeInTheDocument();
-    expect(screen.getByText('evidence · 1 evidence link(s) · 1 claim link(s) · 0 relationship(s) · 1 lead link(s)')).toBeInTheDocument();
-    expect(screen.getByText('disputed: Jane was appointed')).toBeInTheDocument();
+    expect(screen.getByText('evidence · 1 evidence link(s) · 1 claim link(s) · 0 relationship(s) · 1 lead link(s)').closest('[hidden]')).not.toBeNull();
+    // A claim's status is its chip (colour, the word revealed); the trace's counts are revealed on its title (Ony, 29 Oct).
+    expect(screen.getByText('Jane was appointed', {exact: false})).toBeInTheDocument();
+    expect(screen.getAllByText('Disputed').some(el => el.closest('.st-disputed'))).toBe(true);
     expect(screen.getByText('Check the minutes')).toBeInTheDocument();
     expect(screen.getByText('Document extraction lineage')).toBeInTheDocument();
     expect(screen.getByText(/OCR-derived text/)).toBeInTheDocument();
@@ -210,7 +213,7 @@ describe('ProvenancePanel', () => {
 
     useWorkbenchStore.getState().openProvenance({title: 'Kestrelwood', kind: 'entity', entityId: 'ent-1'});
     await screen.findByText('Review / promotion history');
-    expect(screen.getByText('Canonical · 1 support · 0 conflict · latest accepted')).toBeInTheDocument();
+    expect(screen.getByText('Canonical · 1 support · 0 conflict · latest accepted').closest('[hidden]')).not.toBeNull();
     expect(screen.getByText('accepted · aleph · promoted')).toBeInTheDocument();
   });
 

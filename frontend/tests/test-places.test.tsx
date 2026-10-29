@@ -141,8 +141,12 @@ describe('PlacesPanel', () => {
     wrap(<PlacesPanel investigationId="inv-1"/>);
     const table = within(await screen.findByRole('table', {name: 'Places'}));
     const rows = table.getAllByRole('row').slice(1).map(r => r.textContent);
-    expect(rows).toEqual(['Meridian registered office · Address1 Example Street, London · 51.5072° N, 0.1276° W—',
-      'Villa Kyrenia · RealEstate35.3364° N, 33.3199° E · CYAlaric Voss · Ownership']);
+    // A place's kind is its icon and a link's family its line, each named on reveal; the coordinates are revealed on
+    // the address (Ony, 29 Oct). The words are in the page for screen readers.
+    expect(rows).toEqual(['Other recordAddressMeridian registered office1 Example Street, London51.5072° N, 0.1276° W—',
+      'Property or other assetRealEstateVilla Kyrenia35.3364° N, 33.3199° E · CYOwnershipOwnsAlaric Voss']);
+    expect(screen.getByText('51.5072° N, 0.1276° W').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('img', {name: 'Property or other asset (RealEstate)'})).toBeInTheDocument();
     expect(await screen.findByRole('region', {name: /Map of 2 places/})).toBeInTheDocument();
     expect(screen.getByText(/Map data © OpenStreetMap contributors \(ODbL\), Protomaps build 4\.15\.2 of 2026-10-03/)).toBeInTheDocument();
     await userEvent.setup().click(table.getByRole('button', {name: 'Alaric Voss'}));
@@ -184,7 +188,7 @@ describe('PlacesPanel', () => {
     fireEvent.change(screen.getByLabelText('To'), {target: {value: '2022-12-31'}});
     expect(await screen.findByTestId('places-window')).toHaveTextContent('1 of 2 places have an event in this stretch of time');
     const table = within(screen.getByRole('table', {name: 'Places'}));
-    expect(table.getAllByRole('row').slice(1).map(r => r.querySelector('th')?.textContent)).toEqual(['Villa Kyrenia · RealEstate']);
+    expect(table.getAllByRole('row').slice(1).map(r => r.querySelector('th button')?.textContent)).toEqual(['Villa Kyrenia']);
     expect(maps[0].data.at(-1)).toMatchObject({features: [{properties: {entity_id: 'villa'}}]});
     expect(screen.getByText(/Showing the places with an event between 1 Jan 2021 and 31 Dec 2022/)).toBeInTheDocument();
     // The strip shades the stretch and greys the events outside it.

@@ -75,7 +75,11 @@ describe('How are these two connected?', () => {
     await waitFor(() => expect(api.lastUrl('GET /api/investigations/inv-1/paths').searchParams.get('from')).toBe('a'));
     expect(api.lastUrl('GET /api/investigations/inv-1/paths').searchParams.get('to')).toBe('v');
     const option = await screen.findByRole('button', {name: /Alaric Voss.*Directorship.*Meridian.*Ownership.*MV Fair Tern/});
-    expect(screen.getByText('2 links · at least one link not yet supported')).toBeInTheDocument();
+    // The count shows; the weakest link is its line, its words read with the chain and revealed (Ony, 29 Oct).
+    expect(option).toHaveTextContent('2 links');
+    expect(option).toHaveAccessibleName(/2 links\s*· at least one link not yet supported/);
+    expect(screen.getByText('1 chain')).toBeInTheDocument();
+    expect(screen.getByText(/shortest first\. Choose one to light it in the network\./).closest('[hidden]')).not.toBeNull();
     await user.click(option);
     expect(onChain).toHaveBeenCalledWith(chain);
   });

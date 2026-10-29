@@ -12,7 +12,8 @@ import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
 import {QueryProvider} from '../../lib/query-client';
 import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 import {AppearancePanel, lookName, useAppearance} from '../../features/appearance/appearance-panel';
-import {KeptLine, SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
+import {HelpRow, KeptLine, SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
+import {Reveal} from '../../components/ui/reveal';
 import {NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
 import {SecurityPanel} from '../../features/security/security-panel';
 import {KeysPane} from '../../features/settings/keys-pane';
@@ -280,34 +281,39 @@ function Settings(): ReactElement {
       <button type="button" className="ap-btn st-open-inbox" onClick={() => window.dispatchEvent(new Event(OPEN_INBOX_EVENT))}>Open the inbox</button>
     </>,
     keyboard: <div className={card}>
-      <label className="ap-switch"><span><b>Single-key shortcuts</b><small>[ opens the steps, ] the tools, ? the list of keys. They never fire while you type.</small></span>
-        <input type="checkbox" role="switch" checked={keysOn} onChange={e => { setSingleKeys(e.target.checked); setKeysOn(e.target.checked); }}/><i aria-hidden="true"/></label>
-      <p className="mt-3 text-sm text-muted-foreground">Keys with ⌘ or Ctrl always work: ⌘K search and commands, ⌘O switch case, ⌘⇧H hide the screen.</p>
+      <HelpRow help={<><span className="rv-row">[ opens the steps, ] the tools, ? the list of keys. They never fire while you type.</span>
+        <span className="rv-row">Keys with ⌘ or Ctrl always work: ⌘K search and commands, ⌘O switch case, ⌘⇧H hide the screen.</span></>}>
+        <label className="ap-switch"><span><b>Single-key shortcuts</b><small className="st-sr">[ opens the steps, ] the tools, ? the list of keys. They never fire while you type.
+          Keys with ⌘ or Ctrl always work: ⌘K search and commands, ⌘O switch case, ⌘⇧H hide the screen.</small></span>
+        <input type="checkbox" role="switch" checked={keysOn} onChange={e => { setSingleKeys(e.target.checked); setKeysOn(e.target.checked); }}/><i aria-hidden="true"/></label></HelpRow>
     </div>,
     name: <NamePane/>,
     safety: <LockingPane/>,
     people: inv ? <PeoplePane investigationId={inv} caseName={caseName} networkOn={status ? status.access.mode !== 'local_only' : false}
       onAccess={() => go('access')}/> : <p className="text-sm text-muted-foreground">Open or start a case to see who can reach it.</p>,
     'new-case': <div className={card}>
-      <p className="text-sm">A new case starts with its name and the question it answers, what kind of case it is, and what you have so far. The same setup opens from the case switcher (⌘O).</p>
-      <button type="button" className="ap-btn p mt-4" onClick={() => window.dispatchEvent(new Event(NEW_CASE_EVENT))}>Start a new case</button>
+      <Reveal tabbable={false} detail="A new case starts with its name and the question it answers, what kind of case it is, and what you have so far. The same setup opens from the case switcher (⌘O).">
+        <button type="button" className="ap-btn p" onClick={() => window.dispatchEvent(new Event(NEW_CASE_EVENT))}>Start a new case</button></Reveal>
     </div>,
     lookups: <LookupsPane investigationId={inv} caseName={caseName} providers={providers}/>,
     ai: <ResearchPane
       model={<>
-        <p className="st-line">{describeAiStatus(status?.ai)}</p>
-        {status?.ai?.model && <p className="st-line">Model: <code>{status.ai.model}</code>{whereModelRuns(status.ai)}
-          {status.ai.remote_endpoint_allowed ? ' · remote endpoints allowed (AI_ALLOW_REMOTE_ENDPOINT is on)' : ''}</p>}
+        {/* A blocking state (off, no provider, no key) stays written out; once ready, its sentence is revealed on the model. */}
+        {!describeAiStatus(status?.ai).startsWith('Ready:') && <p className="st-line">{describeAiStatus(status?.ai)}</p>}
+        {status?.ai?.model && <p className="st-line"><Reveal detail={describeAiStatus(status.ai)}><span>Model: <code>{status.ai.model}</code></span></Reveal>{whereModelRuns(status.ai)}
+          {status.ai.remote_endpoint_allowed ? <> · <Reveal detail="AI_ALLOW_REMOTE_ENDPOINT is on."><span>remote endpoints allowed</span></Reveal></> : ''}</p>}
       </>}
       rules={status?.ai?.authority_suite?.present ? <>
+        {/* The rules' name shows; their version, source and the tier floor are revealed on it. */}
         <p className="st-line" data-testid="authority-suite">
-          Rules the AI works under: the Authority System Suite{status.ai.authority_suite.source ? <> (<code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code>)</> : null}, TAS v{status.ai.authority_suite.tas_version ?? '?'}.
-          Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.
+          Rules the AI works under: <Reveal detail={<>{status.ai.authority_suite.source ? <>Source <code>{status.ai.authority_suite.source.replace(/^.*@/, '')}</code> · </> : null}TAS v{status.ai.authority_suite.tas_version ?? '?'}.
+          Default source floor: tier {status.ai.authority_suite.control_surface?.flags?.source_tier_floor?.default ?? 'D'}; tier C never counts toward corroboration.</>}>
+            <span>the Authority System Suite</span></Reveal>
         </p>
         <SuiteCoverage/>
       </> : <p className="st-hint">The Authority System Suite is not in this build.</p>}/>,
     levels: <div className={card}>
-      <p className="text-sm">Every Red Flag has three levels. The rules that set them are written down per indicator, with the numbers they come from.</p>
+      <p className="text-sm"><Reveal detail="Every Red Flag has three levels. The rules that set them are written down per indicator, with the numbers they come from."><span>Three levels</span></Reveal></p>
       <dl className="st-levels">{(['faint', 'strong', 'textbook'] as const).map(l => <div key={l}><dt><LevelChip level={l} showWord/></dt><dd>{LEVEL_WORDS[l].meaning}</dd></div>)}</dl>
       <Link href="/glossary" className="mt-3 inline-block text-sm text-primary hover:underline">Each indicator’s levels in the Glossary</Link>
     </div>,
@@ -321,23 +327,17 @@ function Settings(): ReactElement {
 
       <div className="mt-8 rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
-          Small real cases for the red flags
+          <Reveal detail="Three closed public cases, each loaded as its own investigation, that show red flags the 1MDB case does not: deposits just under $10,000, long chains of shell companies, and one address shared by unlinked companies.">
+            <span>Small real cases for the red flags</span></Reveal>
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Three closed public cases, each loaded as its own investigation, that show red flags the 1MDB case does not:
-          deposits just under $10,000, long chains of shell companies, and one address shared by unlinked companies.
-        </p>
         <DemoCasesLoader/>
       </div>
 
       <div className="mt-8 rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
-          Demo mode
+          <Reveal detail="A dedicated “Demo Investigation” with sample entities, relationships, claims, evidence, leads, and a timeline, so you can try every feature -- including the relationship graph -- without touching real work.">
+            <span>Demo mode</span></Reveal>
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          A dedicated &ldquo;Demo Investigation&rdquo; with sample entities, relationships, claims, evidence, leads, and a
-          timeline, so you can try every feature -- including the relationship graph -- without touching real work.
-        </p>
 
         {demoChecked && (
           <div className="mt-3 rounded-md border border-border bg-background px-3 py-2 text-sm text-muted-foreground">
@@ -357,21 +357,17 @@ function Settings(): ReactElement {
           </button>
 
           {demoInv && (
+            <Reveal tabbable={false} detail={hideDemo ? 'Hidden from investigation pickers in this browser only. The data itself is untouched -- use “Delete demo data” below to remove it for good.'
+              : 'Hides it from investigation pickers in this browser only; the data itself is untouched.'}>
             <button
               type="button"
               onClick={toggleHideDemo}
               className="rounded-md border border-border px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
             >
               {hideDemo ? 'Show demo investigation' : 'Hide demo investigation'}
-            </button>
+            </button></Reveal>
           )}
         </div>
-        {hideDemo && (
-          <p className="mt-2 text-xs text-muted-foreground">
-            Hidden from investigation pickers in this browser only. The data itself is untouched -- use &ldquo;Delete demo
-            data&rdquo; below to remove it for good.
-          </p>
-        )}
 
         {demoInv && (
           <div className="mt-5 border-t border-border pt-4">
@@ -468,14 +464,11 @@ function Settings(): ReactElement {
           </button>
         )}
 
-        <div className="mt-4 text-xs text-muted-foreground">
-          <div>API base URL: {API}</div>
-          {status && (
-            <div className="mt-1">
-              Access mode: {status.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} ·
-              token configured on backend: {status.access.token_configured ? 'yes' : 'no'}
-            </div>
-          )}
+        {/* The access mode as a mark (⌂ local only, ↗ shared); the API's address and the token state are revealed on it. */}
+        <div className="mt-4 text-sm text-muted-foreground">
+          <Reveal detail={<><span className="rv-row rv-mono">API base URL: {API}</span>{status && <span className="rv-row">Access mode: {status.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} ·
+              token configured on backend: {status.access.token_configured ? 'yes' : 'no'}</span>}</>}>
+            <span>{!status ? 'API' : status.access.mode === 'local_only' ? '⌂ Local only' : '↗ Shared with remote clients'}</span></Reveal>
         </div>
       </div>,
     keys: <KeysPane/>,
@@ -500,13 +493,10 @@ function Settings(): ReactElement {
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           Operator console
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The backend console is loopback-only by design -- no bearer token grants remote access to it. Open it from{' '}
-          <code>localhost</code> or <code>127.0.0.1</code> directly.
-        </p>
-        <a href="/console/" className="mt-3 inline-block text-sm text-primary hover:underline">
-          Open console
-        </a>
+        <Reveal tabbable={false} detail="The backend console is loopback-only by design -- no bearer token grants remote access to it. Open it from localhost or 127.0.0.1 directly.">
+          <a href="/console/" className="mt-3 inline-block text-sm text-primary hover:underline">
+            Open console
+          </a></Reveal>
       </div></div>}
       </div>
     </div>

@@ -8,6 +8,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
+import {Reveal} from '../../components/ui/reveal';
 import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormRootError} from '../../components/ui/form';
@@ -60,15 +61,17 @@ function KeyCard({s, onChanged}: {s: LookupSourceOut; onChanged: () => void}): R
   }, 'Could not save the key.', {credential: 'credential'});
   const st = state(s);
   return <section className="ap-pane st-key" aria-labelledby={`key-${s.key}`}>
-    <div className="st-key-top"><b id={`key-${s.key}`}>{s.label}</b><span className={`st-state st-state-${st.cls}`}>{st.words}</span></div>
-    {s.key_saved && <p className="st-slot">Key saved · never shown again</p>}
+    <div className="st-key-top"><b id={`key-${s.key}`}>{s.label}</b>{st.cls === 'bad' ? <span className={`st-state st-state-${st.cls}`}>{st.words}</span>
+      : <Reveal detail={st.line}><span className={`st-state st-state-${st.cls}`}>{st.words}</span></Reveal>}</div>
+    {s.key_saved && <p className="st-slot"><Reveal label="Key saved" detail="Key saved · never shown again"><span aria-hidden="true">✓ ⚿</span></Reveal></p>}
     <dl className="st-dl">
       <dt>Goes to</dt><dd>{s.host || s.label}, with each lookup</dd>
       <dt>Unlocks</dt><dd>{s.kind}</dd>
       <dt>Last used</dt><dd>{s.last ? `${when(s.last.at)} · ${s.last.case}` : 'never'}</dd>
       <dt>Used by</dt><dd>{s.cases_this_month} case{s.cases_this_month === 1 ? '' : 's'} this month</dd>
     </dl>
-    <p className={`st-hint${st.cls === 'bad' ? ' st-warn' : ''}`}>{st.line}</p>
+    {/* The key's state line stays when something is wrong; otherwise it is revealed on the state. */}
+    {st.cls === 'bad' ? <p className="st-hint st-warn">{st.line}</p> : null}
     {open ? <Form {...form}>
       <form onSubmit={onSubmit} noValidate className="st-form">
         <FormField control={form.control} name="credential" render={({field}) => <FormItem>
@@ -84,8 +87,9 @@ function KeyCard({s, onChanged}: {s: LookupSourceOut; onChanged: () => void}): R
       </form>
     </Form> : <div className="st-acts">
       <button type="button" className={`ap-btn${st.cls === 'bad' ? ' p' : ''}`} onClick={() => setOpen(true)}>Replace</button>
-      <button type="button" className="ap-btn" disabled={check.isPending} title="Asks the source whether it accepts the key. No search is sent, and no name."
-        onClick={() => check.mutate({path: {provider: s.key}})}>{check.isPending ? 'Checking…' : 'Check the key'}</button>
+      <Reveal tabbable={false} detail="Asks the source whether it accepts the key. No search is sent, and no name.">
+        <button type="button" className="ap-btn" disabled={check.isPending}
+        onClick={() => check.mutate({path: {provider: s.key}})}>{check.isPending ? 'Checking…' : 'Check the key'}</button></Reveal>
       {removing ? <>
         <span className="st-hint">Remove the {s.label} key?</span>
         <button type="button" className="ap-btn" disabled={remove.isPending} onClick={() => remove.mutate({path: {provider: s.key}})}>Remove it</button>

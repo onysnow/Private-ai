@@ -8,7 +8,10 @@
 import {useQuery} from '@tanstack/react-query';
 import type {ReactElement} from 'react';
 
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {FamilyMark, StanceMark} from '../../components/network/marks';
+import {StatusChip, type ClaimStatus} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {listSourcesOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {
@@ -104,14 +107,15 @@ export function ProvenancePanel({investigationId}: Props): ReactElement {
 
   return <Card className="card">
     <CardHeader className="pb-3">
-      <CardTitle>Chain of Custody</CardTitle>
-      <CardDescription>One place to follow a record back through source, document, exact chunk/page, extraction proposal, reporter decision, accepted record, supporting evidence, and entity review/promotion history without changing canonical status.</CardDescription>
+      {/* Ony, 29 Oct: the drawer's explanation is revealed on its title. */}
+      <CardTitle><Reveal detail="One place to follow a record back through source, document, exact chunk/page, extraction proposal, reporter decision, accepted record, supporting evidence, and entity review/promotion history without changing canonical status.">
+        Chain of Custody</Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       {!request ? <p className="muted">Use “Trace provenance” from search, timeline, claims, dossiers, graph statements, or the evidence pool.</p> : <div className="candidate">
-        <b>{request.title}</b> <small>{request.kind}</small>
+        <b><Reveal detail={request.kind}>{request.title}</Reveal></b>
         {request.detail && <div>{request.detail}</div>}
-        {loaded?.source && <div><b>Source:</b> {loaded.source.title} <small>· {loaded.source.source_type}</small></div>}
+        {loaded?.source && <div><b>Source:</b> <Reveal detail={loaded.source.source_type}>{loaded.source.title}</Reveal></div>}
         {loaded?.locator && <div><b>Exact locator:</b> {loaded.locator}</div>}
         {loaded?.url && <div><a href={loaded.url} target="_blank" rel="noreferrer">Open originating source</a></div>}
         {status && <p className="muted">{status}</p>}
@@ -120,16 +124,18 @@ export function ProvenancePanel({investigationId}: Props): ReactElement {
         {loaded && loaded.evidence.length > 0 && <div>
           <h4>Evidence from this source</h4>
           {loaded.evidence.map(e => <div key={e.id} className="statement">
-            <div>{e.quote || e.notes || 'Evidence record'}{e.locator && <div><small>Locator: {e.locator}</small></div>}</div>
+            {e.locator ? <Reveal detail={`Locator: ${e.locator}`}><div>{e.quote || e.notes || 'Evidence record'}</div></Reveal> : <div>{e.quote || e.notes || 'Evidence record'}</div>}
           </div>)}
         </div>}
         {loaded && loaded.history.length > 0 && <div>
           <h4>Review / promotion history</h4>
           {loaded.history.map(row => <div className="ledgerRow" key={`${row.prop}::${row.value}`}>
+            {/* Counts and a canonical mark show; the words, providers and datasets are revealed. */}
             <div><b>{row.prop}</b><div>{row.value}</div>
-              <small>{row.canonical ? 'Canonical' : 'External only'} · {row.support_count} support · {row.conflict_count} conflict{row.latest_status ? ` · latest ${row.latest_status}` : ''}</small></div>
+              <Reveal detail={`${row.canonical ? 'Canonical' : 'External only'} · ${row.support_count} support · ${row.conflict_count} conflict${row.latest_status ? ` · latest ${row.latest_status}` : ''}`}>
+                <small><span aria-hidden="true">{row.canonical ? '◆' : '◇'} ✓ {row.support_count} ✕ {row.conflict_count}</span></small></Reveal></div>
             <div>{row.external_assessments.map(a => <div key={a.assessment_id}>
-              <small>{a.status} · {a.provider || 'external'}{a.dataset ? ` · ${a.dataset}` : ''}{a.promoted ? ' · promoted' : ''}</small>
+              <Reveal detail={`${a.status} · ${a.provider || 'external'}${a.dataset ? ` · ${a.dataset}` : ''}${a.promoted ? ' · promoted' : ''}`}><small>{a.status}{a.promoted ? ' ↑' : ''}</small></Reveal>
             </div>)}</div>
           </div>)}
         </div>}
@@ -138,22 +144,28 @@ export function ProvenancePanel({investigationId}: Props): ReactElement {
   </Card>;
 }
 
+const CLAIM_SHAPE: Record<string, ClaimStatus> = {supported: 'supported', confirmed: 'supported', disputed: 'disputed', rejected: 'ruled_out'};
+const word = (w: string) => w.charAt(0).toUpperCase() + w.slice(1);
+
 function ConnectedTrace({trace}: {trace: ProvenanceTraceOut}): ReactElement {
   return <div className="candidate">
-    <h4>Connected investigative trace</h4>
-    <small>{trace.record_type} · {trace.evidence_links.length} evidence link(s) · {trace.claim_links.length} claim link(s) · {trace.relationships.length} relationship(s) · {trace.lead_links.length} lead link(s)</small>
+    {/* The counts are revealed on the section title; a link's stance is its line, a claim's status its chip, a
+        relationship's family its line, each named on reveal; locators and notes are revealed on the quote. */}
+    <h4><Reveal detail={`${trace.record_type} · ${trace.evidence_links.length} evidence link(s) · ${trace.claim_links.length} claim link(s) · ${trace.relationships.length} relationship(s) · ${trace.lead_links.length} lead link(s)`}>
+      Connected investigative trace</Reveal></h4>
     {trace.evidence_links.map((x, i) => <div className="statement" key={`e-${x.link_id || i}`}>
-      <div><b>{x.stance}</b>
-        {x.evidence && <div>{x.evidence.quote || x.evidence.notes || 'Evidence record'}{x.evidence.locator && <small> · {x.evidence.locator}</small>}</div>}
+      <div><StanceMark stance={x.stance}/>
+        {x.evidence && <Reveal detail={[x.evidence.locator, x.note && `Reporter note: ${x.note}`].filter(Boolean).join(' · ') || 'No locator'}>
+          <div>{x.evidence.quote || x.evidence.notes || 'Evidence record'}</div></Reveal>}
         {x.source && <small>{x.source.title}{x.source.url && <> · <a href={x.source.url} target="_blank" rel="noreferrer">source</a></>}</small>}
-        {x.note && <div><small>Reporter note: {x.note}</small></div>}
       </div>
     </div>)}
     {trace.claim_links.map(x => <div className="statement" key={x.link_id}>
-      <div><b>{x.stance}</b>{x.claim && <div>{x.claim.status}: {x.claim.text}</div>}{x.note && <small>Reporter note: {x.note}</small>}</div>
+      <div><StanceMark stance={x.stance}/>{x.claim && <div><StatusChip status={CLAIM_SHAPE[x.claim.status] ?? 'unshown'} label={word(x.claim.status)} focusable/> {x.claim.text}</div>}
+        {x.note && <Reveal detail={`Reporter note: ${x.note}`}><small>note</small></Reveal>}</div>
     </div>)}
     {trace.relationships.map(r => <div className="statement" key={r.id}>
-      <div><b>{r.schema}</b>: {r.source?.caption ?? '?'} → {r.target?.caption ?? '?'}</div>
+      <div><FamilyMark schema={r.schema}/> {r.source?.caption ?? '?'} → {r.target?.caption ?? '?'}</div>
     </div>)}
     {trace.lead_links.map(x => <div className="statement" key={x.link_id}>
       <div><b>Lead:</b> {x.lead.title} <small>· {x.lead.status}{x.lead.provider ? ` · ${x.lead.provider}` : ''}</small>
@@ -168,14 +180,17 @@ function Lineage({lineage}: {lineage: ExtractionLineageOut}): ReactElement {
   const shown = [payload.caption, payload.text, payload.quote].find(value => typeof value === 'string') as string | undefined;
   return <div className="candidate">
     <h4>Document extraction lineage</h4>
-    {lineage.document && <div><b>Document:</b> {lineage.document.filename} <small>· {lineage.document.extraction_status}</small>
-      <div><small>SHA-256: {lineage.document.sha256}</small></div></div>}
-    {lineage.chunk && <div><b>Exact chunk:</b> {lineage.chunk.locator}{lineage.chunk.page_number != null && <span> · page {lineage.chunk.page_number}</span>} <small>· {lineage.chunk.extraction_method === 'ocr' ? 'OCR-derived text' : 'native extraction'}</small>
+    {/* The fingerprint, the extraction's status and method, times and ids are revealed on the marks and names. */}
+    {lineage.document && <div><b>Document:</b> <Reveal detail={lineage.document.extraction_status}>{lineage.document.filename}</Reveal>{' '}
+      <Reveal label="SHA-256 fingerprint" detail={<span className="rv-mono">SHA-256: {lineage.document.sha256}</span>}><span aria-hidden="true">#</span></Reveal></div>}
+    {lineage.chunk && <div><b>Exact chunk:</b> {lineage.chunk.locator}{lineage.chunk.page_number != null && <span> · page {lineage.chunk.page_number}</span>}{' '}
+      {lineage.chunk.extraction_method === 'ocr' ? <Reveal detail="OCR-derived text: the words were read from a picture of the page."><small>OCR</small></Reveal>
+        : <Reveal detail="native extraction"><small aria-hidden="true">✓</small></Reveal>}
       <div>{lineage.chunk.text}</div></div>}
-    <div><b>Extraction proposal:</b> {lineage.candidate.candidate_type} · {Math.round(lineage.candidate.confidence * 100)}% extractor confidence
+    <div><b>Extraction proposal:</b> {lineage.candidate.candidate_type} · {Math.round(lineage.candidate.confidence * 100)}%
       <div>{shown || ''}</div></div>
-    <div><b>Reporter review:</b> {lineage.candidate.review_status}{lineage.candidate.reviewed_at && <small> · {lineage.candidate.reviewed_at}</small>}
+    <div><b>Reporter review:</b> {lineage.candidate.reviewed_at ? <Reveal detail={lineage.candidate.reviewed_at}>{lineage.candidate.review_status}</Reveal> : lineage.candidate.review_status}
       {lineage.candidate.reviewer_note && <div><small>{lineage.candidate.reviewer_note}</small></div>}</div>
-    {lineage.candidate.accepted_record_type && lineage.candidate.accepted_record_id && <div><b>Accepted record:</b> {lineage.candidate.accepted_record_type} · {lineage.candidate.accepted_record_id}</div>}
+    {lineage.candidate.accepted_record_type && lineage.candidate.accepted_record_id && <div><b>Accepted record:</b> <Reveal detail={<span className="rv-mono">{lineage.candidate.accepted_record_id}</span>}>{lineage.candidate.accepted_record_type}</Reveal></div>}
   </div>;
 }

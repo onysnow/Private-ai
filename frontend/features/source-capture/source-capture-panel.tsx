@@ -4,13 +4,15 @@
 // (Foundation Fixes fix 3); its calls and reply checks are generated from
 // the API schema (fix 2).
 import {useMutation, useQueryClient} from '@tanstack/react-query';
+import {AtSign, Circle, FileText, Globe, Landmark, MessageCircle} from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {listInvestigationEvidenceQueryKey, listSourcesQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {createEvidenceEndpoint, createSourceEndpoint} from '../../lib/generated/sdk.gen';
@@ -23,9 +25,10 @@ type Props = {
   onSaved?: () => Promise<void> | void;
 };
 
-const SOURCE_TYPES: [string, string][] = [
-  ['web', 'Web'], ['document', 'Document'], ['interview', 'Interview'],
-  ['public_record', 'Public record'], ['social', 'Social'], ['other', 'Other'],
+/** Each type of source as an icon (globe, page, speech, seal, at-sign, dot), named on hover or focus (Ony, 29 Oct). */
+export const SOURCE_TYPES: [string, string, LucideIcon][] = [
+  ['web', 'Web page', Globe], ['document', 'Document', FileText], ['interview', 'Interview', MessageCircle],
+  ['public_record', 'Public record', Landmark], ['social', 'Social post', AtSign], ['other', 'Other', Circle],
 ];
 
 export function SourceCapturePanel({investigationId, sourceCount, evidenceCount, onSaved}: Props): ReactElement {
@@ -66,7 +69,7 @@ export function SourceCapturePanel({investigationId, sourceCount, evidenceCount,
       setStatus('Saving source and evidence…');
       const evidence = await save.mutateAsync();
       setTitle(''); setUrl(''); setQuote(''); setLocator(''); setNotes('');
-      setStatus(`Saved evidence ${evidence.id}. It is now available for claim review.`);
+      setStatus(`Saved evidence ${evidence.id}`);
       const path = {investigation_id: investigationId};
       await Promise.all([
         queryClient.invalidateQueries({queryKey: listSourcesQueryKey({path})}),
@@ -80,17 +83,17 @@ export function SourceCapturePanel({investigationId, sourceCount, evidenceCount,
 
   return <Card className="card">
     <CardHeader className="pb-3">
-      <CardTitle>Source & exact evidence capture</CardTitle>
-      <CardDescription>Create a reporter-controlled source and a provenance-preserving evidence record. Evidence remains separate from claims until you explicitly attach it as support, contradiction, or context.</CardDescription>
+      <CardTitle><Reveal detail="Create a reporter-controlled source and a provenance-preserving evidence record. Evidence remains separate from claims until you explicitly attach it as support, contradiction, or context.">
+        Source & exact evidence capture</Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       <div className="searchrow">
         <Input value={title} onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)} placeholder="Source title"/>
         <Input value={url} onChange={(e: ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)} placeholder="Source URL (optional)"/>
-        <Select value={sourceType} onValueChange={setSourceType}>
-          <SelectTrigger className="w-auto"><SelectValue/></SelectTrigger>
-          <SelectContent>{SOURCE_TYPES.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent>
-        </Select>
+        <div className="sc-types" role="radiogroup" aria-label="Type of source">{SOURCE_TYPES.map(([value, label, Icon]) =>
+          <Reveal key={value} tabbable={false} describe={false} detail={label}>
+            <button type="button" role="radio" aria-checked={sourceType === value} aria-label={label} className={sourceType === value ? 'on' : ''}
+              onClick={() => setSourceType(value)}><Icon size={16} aria-hidden="true"/></button></Reveal>)}</div>
       </div>
       <div className="searchrow">
         <Input value={locator} onChange={(e: ChangeEvent<HTMLInputElement>) => setLocator(e.target.value)} placeholder="Exact locator — page, paragraph, timestamp, section…"/>
@@ -98,8 +101,12 @@ export function SourceCapturePanel({investigationId, sourceCount, evidenceCount,
         <Input value={notes} onChange={(e: ChangeEvent<HTMLInputElement>) => setNotes(e.target.value)} placeholder="Reporter note (optional)"/>
         <Button onClick={capture} disabled={!investigationId || !title.trim() || !hasEvidence}>Save source + evidence</Button>
       </div>
-      {status && <p className="muted">{status}</p>}
-      <p className="muted">{sourceCount} source(s) · {evidenceCount} evidence record(s) in this investigation.</p>
+      {/* A saved record's ID is sub-text: "Saved" shows, the ID on hover. */}
+      {status && (status.startsWith('Saved evidence ')
+        ? <p className="muted"><Reveal detail={<><span className="rv-row rv-mono">{status}</span><span className="rv-row">It is now available for claim review.</span></>}>Saved</Reveal></p>
+        : <p className="muted">{status}</p>)}
+      <p className="muted sc-counts"><Reveal detail={`${sourceCount} source(s) · ${evidenceCount} evidence record(s) in this investigation.`}>
+        <span><Globe size={13} aria-hidden="true"/> {sourceCount}</span> <span><FileText size={13} aria-hidden="true"/> {evidenceCount}</span></Reveal></p>
     </CardContent>
   </Card>;
 }

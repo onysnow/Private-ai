@@ -89,7 +89,9 @@ describe('Safety & data', () => {
     show();
     const log = await screen.findByRole('list', {name: 'Requests, newest first'});
     expect(within(log).getByText('Harbour Nominees Ltd')).toBeTruthy();
-    expect(within(log).getByText(/automatic · ✕ failed on the way/)).toBeTruthy();
+    // A failure stays on the row; how it was started is revealed on the value.
+    expect(within(log).getByText('✕ failed on the way')).toBeVisible();
+    expect(within(log).getByText('✕ failed on the way').closest('li')!.querySelector('.rv')).toHaveAccessibleDescription(/ · automatic/);
   });
 
   it('asks the server again for another period, and filters the log to a service', async () => {
@@ -175,8 +177,10 @@ describe('Safety & data', () => {
 
   it('gives the last backup\'s kept size and checksum, offers Restore when it is on, and hides the screen', async () => {
     show({backup: {last_backup_at: '2026-10-25T10:00:00', encrypted: true, restore_enabled: true, bytes: 1_400_000_000, sha256: 'ab'.repeat(32)}});
-    const kept = await screen.findByText('1.4 GB · ✓ checksum kept');
-    expect(kept).toHaveAttribute('title', `SHA-256 ${'ab'.repeat(32)}`);
+    const kept = await screen.findByText('✓ checksum kept');
+    expect(kept.closest('.sd-kept')).toHaveTextContent(/^1\.4 GB · ✓ checksum kept/);
+    // The hash is revealed on the check, not a browser tooltip.
+    expect(kept.closest('.rv')).toHaveAccessibleDescription(`SHA-256 ${'ab'.repeat(32)}`);
     fireEvent.click(screen.getByRole('button', {name: 'Restore…'}));
     expect(window.location.hash).toBe('#backup-restore');
     const heard = vi.fn();

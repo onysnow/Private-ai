@@ -10,6 +10,7 @@ import {useQuery} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
 import type {ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {getCorpusStatusOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {CorpusStageOut, CorpusStatusOut} from '../../lib/generated/types.gen';
 
@@ -56,7 +57,14 @@ export function CorpusStatus({investigationId, watch, onIdle, pollMs = CORPUS_ST
   if (status?.state === 'working') {
     return <div className="candidate" role="status" aria-label="OpenAleph progress">
       <b>OpenAleph is working on this investigation’s files</b>
-      <ul>{status.stages.map(stage => <li key={stage.queue}>{stage.label}: {stageLine(stage)}</li>)}</ul>
+      {/* Each stage is a small stacked bar (done, in progress, waiting, failed); its numbers on hover. Failures show. */}
+      <ul className="co-stages">{status.stages.map(stage => {
+        const total = Math.max(1, stage.pending + stage.running + stage.finished + stage.failed);
+        return <li key={stage.queue}><Reveal detail={`${stage.label}: ${stageLine(stage)}`}><span>{stage.label}</span>
+          <span className="co-bar" aria-hidden="true"><i className="done" style={{flexGrow: stage.finished}}/><i className="run" style={{flexGrow: stage.running}}/>
+            <i className="wait" style={{flexGrow: stage.pending}}/><i className="fail" style={{flexGrow: stage.failed}}/></span>
+          <small>{stage.finished}/{total}</small></Reveal>{stage.failed > 0 && <small className="co-warn"> · {stage.failed} failed</small>}</li>;
+      })}</ul>
     </div>;
   }
   if (watch && status?.state === 'unreachable') {

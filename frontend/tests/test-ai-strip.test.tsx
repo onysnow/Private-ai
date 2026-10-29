@@ -47,7 +47,9 @@ describe('AiStrip', () => {
         ev(3, {kind: 'RULE', node: 'tas/class', self_reported: true, status: 'partial'}), ev(4, {node: 'gate:citation', parent: 3, status: 'bad'})]},
     });
     render(<QueryProvider><AiStrip investigationId="inv-1"/></QueryProvider>);
-    const strip = await screen.findByRole('button', {name: /AI: 1 draft waiting for review · last run \d\d:\d\d/});
+    // "AI · 1 waiting" shows; the drafts and the last run's time are revealed on it.
+    const strip = await screen.findByRole('button', {name: /^AI · 1 waiting/});
+    expect(strip).toHaveAccessibleDescription(/^1 AI draft waiting for review · last run \d\d:\d\d/);
     expect(await screen.findByLabelText('last run: 1 verified, 0 in between, 1 stopped, 0 findings')).toBeInTheDocument();
     await userEvent.setup().click(strip);
     expect(useWorkbenchStore.getState().aiRun?.runId).toBe('run-1');

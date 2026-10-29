@@ -60,8 +60,10 @@ async function inspectCompany(api: ReturnType<typeof mockApi>) {
 describe('ReviewQueuePanel', () => {
   it('lists the findings with their provider and status, and asks for one to be chosen', async () => {
     await renderPanel();
-    expect(screen.getByText('Company · unreviewed')).toBeInTheDocument();
-    expect(screen.getByText('Ownership · unreviewed')).toBeInTheDocument();
+    // Ony's rule of 29 Oct: a finding's kind is its party icon or link line, its review state a shape; each is named on reveal.
+    expect(screen.getByRole('img', {name: 'Company'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'Ownership: Owns'})).toBeInTheDocument();
+    expect(screen.getAllByRole('img', {name: 'unreviewed'})).toHaveLength(2);
     expect(screen.getByText('Choose a finding.')).toBeInTheDocument();
     expect(screen.getByText('Choose a matched canonical entity to inspect provenance.')).toBeInTheDocument();
   });
@@ -76,8 +78,8 @@ describe('ReviewQueuePanel', () => {
     expect(screen.getByText('us-in', {selector: 'span'})).toBeInTheDocument();
     expect(screen.getByText('123 Main St', {selector: 'span'})).toBeInTheDocument();
     expect(screen.getAllByRole('button', {name: 'Accept'})).toHaveLength(2);
-    await screen.findByText('External only · 1 support · 0 conflict · latest accepted');
-    expect(screen.getByText('accepted · aleph · registry')).toBeInTheDocument();
+    expect((await screen.findByText('External only · 1 support · 0 conflict · latest accepted')).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('accepted · aleph · registry').closest('[hidden]')).not.toBeNull();
     expect(screen.getByRole('link', {name: 'source'})).toHaveAttribute('href', 'https://aleph.example/aleph-1');
     expect(api.calls(CANDIDATES)).toHaveLength(1);
     expect(api.calls(ASSESSMENTS)).toHaveLength(1);
@@ -95,7 +97,7 @@ describe('ReviewQueuePanel', () => {
     api.add({[FINDINGS]: [findingFixture({review_status: 'accepted'}), ownershipFinding]});
     await userEvent.setup().click(screen.getByRole('button', {name: 'Same entity'}));
 
-    await screen.findByText('Company · accepted');
+    await screen.findByRole('img', {name: 'accepted'});
     expect(api.lastBody(resolution)).toEqual({decision: 'positive', entity_id: 'ent-1', confidence: 0.9});
     expect(api.calls(FINDINGS)).toHaveLength(2);
     // The entities and the graph are marked stale too; nothing on screen shows them.
@@ -149,7 +151,7 @@ describe('ReviewQueuePanel', () => {
     const user = userEvent.setup();
     await user.click(screen.getAllByRole('button', {name: 'Inspect'})[1]);
     await screen.findByText('Ownership relationship');
-    expect(screen.getByText('owner: aleph-3 → asset: aleph-1')).toBeInTheDocument();
+    expect(screen.getByText('owner: aleph-3 → asset: aleph-1').closest('[hidden]')).not.toBeNull();
     expect(screen.getByText('Jane Doe → Kestrelwood Holdings Ltd')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Promote relationship'})).not.toBeInTheDocument();
     // A relationship finding has no entity ledger.

@@ -81,7 +81,8 @@ async function renderOpen(routes: Routes = {}, dossier: unknown = fullDossier())
 describe('DossierPanel', () => {
   it('opens on request with the dossier, its duplicate candidates and its reconciliation, and shows every part', async () => {
     const api = await renderOpen();
-    expect(screen.getByText('Company · 5 statements · 1 relationships · 1 claims · 1 evidence · 1 leads · 1 external findings')).toBeInTheDocument();
+    expect(screen.getByText('Company · 5 statements · 1 relationships · 1 claims · 1 evidence · 1 leads · 1 external findings').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('Merge audit: ent-2 → ent-1', {exact: false}).closest('[hidden]')).not.toBeNull();  // raw IDs only on hover
     expect(screen.getByText((_, node) => node?.textContent === ' · 1 merged alias(es) · 1 reporter identity decision(s) · 1 unresolved', {selector: 'small'})).toBeInTheDocument();
     expect(screen.getByText('Alias: Kestrelwood Holdings LLC', {exact: false})).toBeInTheDocument();
     expect(screen.getByText('same: Kestrelwood Holdings LLC', {exact: false})).toBeInTheDocument();
@@ -89,11 +90,13 @@ describe('DossierPanel', () => {
     expect(screen.getByText('1 external finding(s) need review.')).toBeInTheDocument();
     expect(screen.getByText('No unresolved multi-value property conflicts detected.')).toBeInTheDocument();
     expect(screen.getByText('Ownership: Kestrelwood Holdings Ltd → MV Fair Tern', {exact: false})).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'supported: Kestrelwood owns the vessel.'})).toBeInTheDocument();
-    expect(screen.getByText('active: Ask the registry', {exact: false})).toBeInTheDocument();
-    expect(screen.getByText('todo: File the request', {exact: false})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Supported Kestrelwood owns the vessel.'})).toBeInTheDocument();
+    // A status is its shape; its word is the mark's name and on hover (Ony, 29 Oct).
+    expect(screen.getByRole('img', {name: 'active'}).parentElement).toHaveTextContent('Ask the registry');
+    expect(screen.getByRole('img', {name: 'todo'}).parentElement).toHaveTextContent('File the request');
     expect(screen.getByText('2024-03-02: Vessel registered', {exact: false})).toBeInTheDocument();
-    expect(screen.getByText('needs_followup: Kestrelwood Holdings', {exact: false})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'verified'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'needs_followup'}).parentElement).toHaveTextContent('Kestrelwood Holdings');
     expect(screen.getByText('Registry filing: Owner: Kestrelwood Holdings Ltd (p.2)', {exact: false})).toBeInTheDocument();
     expect(useWorkbenchStore.getState().entityId).toBe('ent-1');
     expect(api.calls(DOSSIER)).toHaveLength(1);
@@ -105,7 +108,7 @@ describe('DossierPanel', () => {
   it('asks the other panels for what it cannot show itself: a claim, a relationship, a trace', async () => {
     await renderOpen();
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', {name: 'supported: Kestrelwood owns the vessel.'}));
+    await user.click(screen.getByRole('button', {name: 'Supported Kestrelwood owns the vessel.'}));
     expect(useWorkbenchStore.getState().claim).toMatchObject({claimId: 'claim-1'});
 
     await user.click(screen.getByRole('button', {name: 'Review relationship evidence'}));

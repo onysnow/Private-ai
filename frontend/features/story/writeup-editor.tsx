@@ -16,6 +16,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {FocusEvent, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactElement} from 'react';
 
+import {StatusChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
 import {apiTime} from '../../lib/timestamps';
 import {
@@ -205,7 +206,7 @@ export function WriteupEditor({investigationId, writeupId, claims, onDoc, onOpen
     </div>
     {picking && <ul className="wu-picker" aria-label="Cite a claim of the story">
       {claims.length ? claims.map(c => <li key={c.id}><button type="button" onClick={() => cite(c)}>
-        <span className="wu-n">{c.n}</span><span>{c.text}</span><small className={`st-word st-${c.state}`}>{c.state === 'shown' ? '✓ shown' : c.state === 'disputed' ? '✕ disputed' : '○ not yet shown'}</small></button></li>)
+        <span className="wu-n">{c.n}</span><span>{c.text}</span><StatusChip status={c.state === 'shown' ? 'supported' : c.state === 'disputed' ? 'disputed' : c.state === 'ruled_out' ? 'ruled_out' : 'unshown'}/></button></li>)
         : <li className="wu-none">Put a claim under a section of the story first; then it can be cited here.</li>}
     </ul>}
     {q.isError && <p role="alert" className="wu-none">{errorMessage(q.error, 'Could not open the write-up')}</p>}

@@ -82,7 +82,7 @@ describe('RelationshipGraphPanel', () => {
     api.add({[RELATIONSHIPS]: relationshipFixture(), [GRAPH]: emptyGraph([relationshipFixture()])});
     await userEvent.setup().click(addButton);
 
-    await screen.findByText('Ownership', {selector: '.relEdge'});
+    await screen.findByLabelText('Ownership', {selector: '.relEdge'});
     expect(screen.getByRole('button', {name: 'Kestrelwood Holdings Ltd'})).toBeInTheDocument();
     expect(api.lastBody(RELATIONSHIPS)).toEqual({investigation_id: 'inv-1', schema: 'Ownership', source_entity_id: 'ent-1', target_entity_id: 'ent-2', properties: {}, dataset: 'reporter', evidence_id: null});
     expect(api.calls(GRAPH)).toHaveLength(2);
@@ -141,7 +141,7 @@ describe('RelationshipGraphPanel', () => {
     await userEvent.setup().click(screen.getByRole('button', {name: 'Directs, works for or belongs to · 1'}));
     expect(screen.queryByTestId('graph-edge-rel-2')).not.toBeInTheDocument();
     expect(screen.getByTestId('graph-edge-rel-1')).toBeInTheDocument();
-    expect(screen.getByText('Directorship', {selector: '.relEdge'})).toBeInTheDocument();
+    expect(screen.getByLabelText('Directorship', {selector: '.relEdge'})).toBeInTheDocument();
 
     api.add({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}});
     await userEvent.setup().click(screen.getByTestId('graph-edge-rel-1'));
@@ -185,7 +185,7 @@ describe('RelationshipGraphPanel', () => {
 
   it('opens a relationship on another panel\'s request: by id from its own edges, or the record it was handed', async () => {
     const api = await renderPanel({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}, 'GET /api/relationships/rel-7/evidence-reviews': {relationship_id: 'rel-7', reviews: []}}, {edges: [relationshipFixture()]});
-    await screen.findByText('Ownership', {selector: '.relEdge'});
+    await screen.findByLabelText('Ownership', {selector: '.relEdge'});
     useWorkbenchStore.getState().openRelationship({relationshipId: 'rel-1'});
     await screen.findByText('Kestrelwood Holdings Ltd → Jane Doe');
 
@@ -204,7 +204,7 @@ describe('RelationshipGraphPanel', () => {
   it('attaches pool evidence to the opened relationship and keeps the graph\'s copy of the edge in step', async () => {
     const attach = 'POST /api/relationships/rel-1/evidence';
     const api = await renderPanel({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}}, {edges: [relationshipFixture()], evidence: [poolRow]});
-    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
+    await userEvent.setup().click(await screen.findByLabelText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Attach exact evidence');
     const attachButton = screen.getByRole('button', {name: 'Attach evidence'});
     expect(attachButton).toBeDisabled();
@@ -230,7 +230,7 @@ describe('RelationshipGraphPanel', () => {
   it('requires a rationale before an evidence assessment, then records it and reads the history again', async () => {
     const review = 'POST /api/relationships/rel-1/evidence/ev-1/reviews';
     const api = await renderPanel({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}}, {edges: [attached()], evidence: [poolRow]});
-    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
+    await userEvent.setup().click(await screen.findByLabelText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Approved 3/3, signed by CFO.', {exact: false});
     expect(screen.getByText('No relationship-evidence assessments recorded yet.')).toBeInTheDocument();
     const supports = screen.getByRole('button', {name: 'Supports'});
@@ -248,7 +248,9 @@ describe('RelationshipGraphPanel', () => {
 
     await screen.findByText('Recorded supports assessment. Canonical relationship preserved.');
     expect(api.lastBody(review)).toEqual({stance: 'supports', rationale: 'Board minutes directly confirm the ownership stake.'});
-    expect(screen.getByText('Latest assessment: supports · Board minutes directly confirm the ownership stake.')).toBeInTheDocument();
+    // The latest assessment's stance is its line, named on reveal; the rationale shows.
+    expect(screen.getAllByRole('img', {name: 'Supports'}).length).toBeGreaterThan(0);
+    expect(screen.getByText('Board minutes directly confirm the ownership stake.', {selector: 'small'})).toBeInTheDocument();
     expect(screen.getByText('Board minutes directly confirm the ownership stake.', {selector: 'div'})).toBeInTheDocument();
     expect(api.calls(EVIDENCE_REVIEWS)).toHaveLength(2);
     expect(screen.getByPlaceholderText('Required rationale before recording an evidence assessment')).toHaveValue('');
@@ -261,8 +263,8 @@ describe('RelationshipGraphPanel', () => {
       advisory: {needs_review: false, support_state: 'independent_support', has_independent_support: true, healthy_supporting_evidence_count: 1, challenged_supporting_evidence_count: 0, disputed_claim_count: 0, rejected_claim_count: 0, claim_dependencies: [], presentation_aggregate: true},
     });
     await renderPanel({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}}, {edges: [compact]});
-    expect(await screen.findByText('Ownership · preferred (+1 duplicate)', {selector: '.relEdge'})).toBeInTheDocument();
-    await userEvent.setup().click(screen.getByText('Ownership · preferred (+1 duplicate)', {selector: '.relEdge'}));
+    expect(await screen.findByLabelText('Ownership · preferred (+1 duplicate)', {selector: '.relEdge'})).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByLabelText('Ownership · preferred (+1 duplicate)', {selector: '.relEdge'}));
     await screen.findByText('Reviewed duplicate provenance inventory:');
     expect(screen.getByText('2 preserved relationship records · 1 exact evidence records · presentation only; no records were merged.', {exact: false})).toBeInTheDocument();
     expect(screen.queryByText('Attach exact evidence')).not.toBeInTheDocument();
@@ -275,13 +277,13 @@ describe('RelationshipGraphPanel', () => {
 
   it('shows every duplicate copy when asked, reading the expanded graph', async () => {
     const api = await renderPanel({}, {edges: [relationshipFixture()]});
-    await screen.findByText('Ownership', {selector: '.relEdge'});
+    await screen.findByLabelText('Ownership', {selector: '.relEdge'});
     api.add({[GRAPH]: ({url}: RouteCall) => (url.searchParams.get('include_reconciled_duplicates') === 'true'
       ? emptyGraph([relationshipFixture(), relationshipFixture({id: 'rel-2', reconciliation: {decision_id: 'rd-1', decision: 'duplicate', preferred_record_id: 'rel-1', secondary_record_id: 'rel-2', rationale: null, is_preferred: false, suppressed_duplicate: true, suppressed_duplicate_ids: [], suppressed_duplicate_count: 0}})])
       : emptyGraph([relationshipFixture()]))});
     await userEvent.setup().click(screen.getByRole('checkbox', {name: 'Reviewed duplicate copies'}));
 
-    await screen.findByText('Ownership · duplicate copy', {selector: '.relEdge'});
+    await screen.findByLabelText('Ownership · duplicate copy', {selector: '.relEdge'});
     expect(api.calls(GRAPH)).toHaveLength(2);
     expect(api.lastUrl(GRAPH).searchParams.get('include_reconciled_duplicates')).toBe('true');
   });
@@ -305,7 +307,7 @@ describe('RelationshipGraphPanel', () => {
       [leadRoute]: {id: 'lead-2', investigation_id: 'inv-1', title: 'Kestrelwood Holdings Ltd → Jane Doe', detail: null, provider: null, provider_record_id: null, kind: 'question', status: 'unreviewed', priority: 'normal', owner: null, next_action: null, created_at: '2026-10-01T00:00:00', links: [], tasks: [], history: [], triage: {needs_attention: false, attention_score: 0, stance_counts: {supports: 0, contradicts: 0, context: 0}, linked_claim_count: 0, disputed_claim_count: 0, relationship_evidence_review_counts: {}, reasons: []}},
       'GET /api/investigations/inv-1/leads/queue': leadQueueBody('inv-1'),
     }, {edges: [relationshipFixture()]});
-    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
+    await userEvent.setup().click(await screen.findByLabelText('Ownership', {selector: '.relEdge'}));
     await userEvent.setup().click(await screen.findByRole('button', {name: 'Create reporting lead from relationship'}));
     await waitFor(() => expect(api.calls(leadRoute)).toHaveLength(1));
     expect(api.unmatched()).toEqual([]);
@@ -313,7 +315,7 @@ describe('RelationshipGraphPanel', () => {
 
   it('closes the opened relationship when the case changes', async () => {
     const api = await renderPanel({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}, 'GET /api/investigations/inv-2/entities': [], 'GET /api/investigations/inv-2/graph': emptyGraph(), 'GET /api/investigations/inv-2/evidence': []}, {edges: [relationshipFixture()]});
-    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
+    await userEvent.setup().click(await screen.findByLabelText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Kestrelwood Holdings Ltd → Jane Doe');
 
     cleanup();

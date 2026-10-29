@@ -22,6 +22,13 @@ export const KIND_LABEL: Record<DecisionKind, string> = {
   to_check: 'To check', missing: 'Missing', proposal: 'Proposals', match: 'Matches', outside: 'Outside', ai: 'AI drafts', watchlist: 'Watchlist',
 };
 
+/** Each kind's mark (the decision-kind vocabulary Inbox and Case home reuse) and, for its reveal, what it is. */
+export const KIND_ICON: Record<DecisionKind, string> = {to_check: '?', missing: '∅', proposal: '◇', match: '⇄', outside: '◎', ai: 'AI', watchlist: '◉'};
+export const KIND_MEANING: Record<DecisionKind, string> = {
+  to_check: 'A check only a person can make.', missing: 'A value the records do not hold yet.', proposal: 'Something read from a document, waiting for you.',
+  match: 'Two records that may be the same.', outside: 'A finding from outside records, to review.', ai: 'Drafted by AI, to review.', watchlist: 'A name on your watchlist turned up.',
+};
+
 /** Kinds whose endpoint keeps a note with the answer (checks, extraction review, cross-references, AI review). */
 export const TAKES_NOTE = new Set<DecisionKind>(['to_check', 'missing', 'proposal', 'match', 'ai']);
 

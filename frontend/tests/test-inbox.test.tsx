@@ -37,9 +37,14 @@ describe('Inbox', () => {
     expect(await within(needs).findByText('Does page 4 show the nominee?')).toBeInTheDocument();
     const user = userEvent.setup();
     const row = within(needs).getByText('Does page 4 show the nominee?').closest('li')!;
+    // Who sent a row is on hover or focus; its kind is Decide's mark.
+    expect(within(row).getByText('Red Flags').closest('[hidden]')).not.toBeNull();
+    expect(row.querySelector('.dc-kind-to_check')).not.toBeNull();
     await user.click(within(row).getByRole('button', {name: 'Snooze a day'}));
     expect(within(needs).queryByText('Does page 4 show the nominee?')).not.toBeInTheDocument();
-    expect(screen.getByText('1 snoozed on this computer; each comes back by itself.')).toBeInTheDocument();
+    // The count shows; what snoozing means is on hover or focus (Ony, 29 Oct).
+    expect(screen.getByText('1 snoozed')).toBeInTheDocument();
+    expect(screen.getByText('Snoozed on this computer; each comes back by itself.').closest('[hidden]')).not.toBeNull();
     expect(screen.getByRole('tab', {name: /Needs you/})).toHaveTextContent('1');
     await user.click(screen.getByRole('tab', {name: /Everything else/}));
     expect(await screen.findByText('3 documents added this week')).toBeInTheDocument();
@@ -53,7 +58,8 @@ describe('Inbox rows from Settings › Notifications', () => {
       'POST /api/watches/wa1/seen': {id: 'wa1'},
     });
     render(<QueryProvider><Inbox open onClose={vi.fn()}/></QueryProvider>);
-    expect(await screen.findByText('Lead → Disputed')).toBeInTheDocument();
+    // A watched fact's change is the news itself: it stays on screen.
+    expect((await screen.findByText('Lead → Disputed')).closest('[hidden]')).toBeNull();
     await userEvent.setup().click(screen.getByRole('button', {name: 'Seen'}));
     expect(api.calls('POST /api/watches/wa1/seen')).toHaveLength(1);
     expect(screen.getByRole('link', {name: 'Choose what goes where'})).toHaveAttribute('href', '/settings#notifications');

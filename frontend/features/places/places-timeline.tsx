@@ -18,6 +18,7 @@ import type {ChangeEvent, ReactElement} from 'react';
 import {Chart} from '../../components/charts/chart';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
+import {Reveal} from '../../components/ui/reveal';
 import type {PlaceEventOut, PlaceOut} from '../../lib/generated/types.gen';
 import {DAY_MS, dayText, eventWindow, eventsExtent, isoDay} from '../../lib/place-times';
 import type {TimeWindow} from '../../lib/place-times';
@@ -119,14 +120,15 @@ export function PlacesTimeline({places, picked, timeWindow, onWindow, onPick}: P
   return <div data-testid="places-timeline">
     <Chart option={option} height={AXIS_PX + dated * ROW_PX} onEvents={onEvents}
       ariaLabel={`Timeline of ${dated} place${dated === 1 ? '' : 's'} with dated events, from ${dayText(extent.from)} to ${dayText(extent.to - DAY_MS)}`}/>
+    <Reveal tabbable={false} describe={false} className="block" detail="Set a From or a To date to show only the places with an event in that stretch of time.">
     <div className="searchrow" role="group" aria-label="Show the places with an event between two dates">
       <label className="text-sm">From <Input type="date" className="w-auto" value={shownFrom} min={first} max={last} onChange={change('from')}/></label>
       <label className="text-sm">To <Input type="date" className="w-auto" value={shownTo} min={first} max={last} onChange={change('to')}/></label>
       {timeWindow && <Button variant="link" size="sm" onClick={() => onWindow(null)}>All dates</Button>}
-    </div>
+    </div></Reveal>
     <p className="muted text-sm" aria-live="polite">
       {timeWindow ? `Showing the places with an event between ${dayText(timeWindow.from)} and ${dayText(timeWindow.to - DAY_MS)}.`
-        : 'All places. Set a From or a To date to show only the places with an event in that stretch of time.'}
+        : <>All places<span className="sr-only">. Set a From or a To date to show only the places with an event in that stretch of time.</span></>}
     </p>
   </div>;
 }

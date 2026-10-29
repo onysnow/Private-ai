@@ -71,11 +71,12 @@ async function renderPanel(leads: unknown[] = [leadFixture()], routes: Record<st
 describe('LeadsPanel', () => {
   it('shows the queue with every lead, resolved ones included, and its triage state', async () => {
     const api = await renderPanel();
-    expect(screen.getByText('high')).toBeInTheDocument();
-    expect(screen.getByText((_, node) => node?.textContent === 'reporter lead · ⚠ evidence conflict score 2')).toBeInTheDocument();
+    // Priority is the card's edge, named on reveal of the title; the conflict score stays (an alert).
+    expect(screen.getByRole('button', {name: 'Who approved this contract?'})).toHaveAccessibleDescription('high priority');
+    expect(screen.getByText('⚠ evidence conflict score 2')).toBeVisible();
     expect(screen.getByText('Needs evidence review:')).toBeInTheDocument();
     expect(screen.getByText('unresolved contradiction', {exact: false})).toBeInTheDocument();
-    expect(screen.getByText('Owner: A. Reporter')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'Owner: A. Reporter'})).toHaveTextContent('AR');
     expect(screen.getByRole('combobox', {name: 'Move "Who approved this contract?"'})).toBeInTheDocument();
     expect(api.lastUrl(QUEUE).searchParams.get('unresolved_only')).toBe('false');
     expect(api.unmatched()).toEqual([]);
@@ -151,8 +152,9 @@ describe('LeadsPanel', () => {
       expect(api.calls('GET /api/investigations/inv-1/claims')).toHaveLength(2);
     });
     expect(api.lastBody('POST /api/leads/lead-1/convert')).toEqual({kind: 'claim'});
-    await screen.findByText('0% confidence');
-    expect(screen.getByText('0% confidence').closest('button')).toHaveClass('cl-unshown');
+    // The claim row's confidence words are revealed on it (features/claims/claims-panel.tsx).
+    await waitFor(() => expect(document.querySelector('button.cl-row')).toHaveAccessibleDescription(/^0% confidence/));
+    expect(document.querySelector('button.cl-row')).toHaveClass('cl-unshown');
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -165,13 +167,14 @@ describe('LeadsPanel', () => {
     });
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: 'Make task'}));
-    await screen.findByText('Call the clerk · todo · 1 event(s)');
+    // The task shows its dot and title; status and events are revealed on it.
+    expect((await screen.findByText(/Call the clerk/)).closest('.rv')).toHaveAccessibleDescription('todo · 1 event(s)');
     expect(api.lastBody('POST /api/leads/lead-1/convert')).toEqual({kind: 'task'});
 
     const done = {...task, status: 'done', history: [{id: 'tw-2', from_status: 'todo', to_status: 'done', note: 'Task marked done in Next.js workbench', created_at: '2026-10-02T00:00:00', lead_provenance: null}, ...task.history]};
     api.add({'PATCH /api/reporting-tasks/task-1': done, [QUEUE]: leadQueueBody('inv-1', [leadFixture({status: 'active', tasks: [done]})])});
     await user.click(screen.getByRole('button', {name: 'Done'}));
-    await screen.findByText('Call the clerk · done · 2 event(s)');
+    await waitFor(() => expect(screen.getByText(/Call the clerk/).closest('.rv')).toHaveAccessibleDescription('done · 2 event(s)'));
     expect(api.lastBody('PATCH /api/reporting-tasks/task-1')).toEqual({status: 'done'});
     expect(screen.queryByRole('button', {name: 'In progress'})).not.toBeInTheDocument();
     expect(api.calls(QUEUE)).toHaveLength(3);

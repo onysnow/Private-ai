@@ -5,6 +5,8 @@ import {useState} from 'react';
 import type {FormEvent, ReactElement, ReactNode} from 'react';
 
 import {hideScreen} from '../../components/frame/app-frame';
+import {Reveal} from '../../components/ui/reveal';
+import {HelpRow} from '../settings/settings-index';
 import {errorMessage} from '../../lib/api-client';
 import {lockNow, useLockStore} from '../../lib/app-lock';
 import type {LockStateOut} from '../../lib/generated/types.gen';
@@ -121,24 +123,25 @@ export function LockingPane(): ReactElement {
       {on && <div className="lk-panel">
         <p className="lk-eyebrow">When the app locks</p>
         <div className="lk-row">
-          <span>When I walk away<small>No key or click for this long. Unsaved writing is kept.</small></span>
+          <span><Reveal detail="No key or click for this long. Unsaved writing is kept."><span>When I walk away</span></Reveal></span>
           <span className="ap-seg" role="radiogroup" aria-label="Lock after">
             {IDLE.map(([m, label]) => <button key={m} type="button" role="radio" aria-checked={(state.idle_minutes ?? 10) === m}
               className={(state.idle_minutes ?? 10) === m ? 'on' : ''} onClick={() => void put({idle_minutes: m})}>{label}</button>)}
           </span>
         </div>
-        <label className="ap-switch lk-row"><span>When I press Hide screen<small>The cover comes down and the app locks behind it.</small></span>
-          <input type="checkbox" role="switch" checked={Boolean(state.lock_on_hide)} onChange={e => void put({lock_on_hide: e.target.checked})}/><i aria-hidden="true"/></label>
-        <label className="ap-switch lk-row"><span>When the laptop sleeps or the lid closes<small>Only while the app is open in this browser.</small></span>
-          <input type="checkbox" role="switch" checked={Boolean(state.lock_on_sleep)} onChange={e => void put({lock_on_sleep: e.target.checked})}/><i aria-hidden="true"/></label>
+        <HelpRow help="The cover comes down and the app locks behind it."><label className="ap-switch lk-row"><span>When I press Hide screen<small className="st-sr">The cover comes down and the app locks behind it.</small></span>
+          <input type="checkbox" role="switch" checked={Boolean(state.lock_on_hide)} onChange={e => void put({lock_on_hide: e.target.checked})}/><i aria-hidden="true"/></label></HelpRow>
+        <HelpRow help="Only while the app is open in this browser."><label className="ap-switch lk-row"><span>When the laptop sleeps or the lid closes<small className="st-sr">Only while the app is open in this browser.</small></span>
+          <input type="checkbox" role="switch" checked={Boolean(state.lock_on_sleep)} onChange={e => void put({lock_on_sleep: e.target.checked})}/><i aria-hidden="true"/></label></HelpRow>
       </div>}
 
       {on && <div className="lk-panel">
         <p className="lk-eyebrow">Reopening after a lock</p>
-        <label className="ap-switch lk-row"><span>Quick PIN<small>Reopens after an idle lock or Hide screen in the same session. After a restart the passphrase is
+        <HelpRow help="Reopens after an idle lock or Hide screen in the same session. After a restart the passphrase is needed. 3 wrong tries and only the passphrase works.">
+        <label className="ap-switch lk-row"><span>Quick PIN<small className="st-sr">Reopens after an idle lock or Hide screen in the same session. After a restart the passphrase is
           needed. 3 wrong tries and only the passphrase works.</small></span>
           <input type="checkbox" role="switch" checked={Boolean(state.quick_pin)} disabled={!state.pin_set && !state.quick_pin}
-            onChange={e => void put({quick_pin: e.target.checked})}/><i aria-hidden="true"/></label>
+            onChange={e => void put({quick_pin: e.target.checked})}/><i aria-hidden="true"/></label></HelpRow>
         {asking !== 'pin' && <button type="button" className="ap-btn" onClick={() => setAsking('pin')}>{state.pin_set ? 'Change the PIN' : 'Set a PIN'}</button>}
         {asking === 'pin' && <Ask label="Keep this PIN" onCancel={() => setAsking('')} fields={[{name: 'p', label: 'PIN, 4 to 8 digits', kind: 'pin'}]}
           submit={async v => {
@@ -149,12 +152,14 @@ export function LockingPane(): ReactElement {
       </div>}
 
       <div className="lk-panel">
-        <p className="lk-eyebrow">Cases locked on their own</p>
-        <p className="lk-muted" style={{marginTop: 6}}>A locked case is absent from every list, search and count until you open it with its own passphrase; opening the app does not open it.
-          Its documents on disk are protected by the disk encryption, not by this.</p>
+        <p className="lk-eyebrow"><Reveal detail="A locked case is absent from every list, search and count until you open it with its own passphrase; opening the app does not open it.">
+          <span>Cases locked on their own</span></Reveal></p>
+        {/* The caveat stays: it says what this lock does not protect. */}
+        <p className="lk-muted" style={{marginTop: 6}}>Its documents on disk are protected by the disk encryption, not by this.</p>
         {(state.locked_cases ?? []).map(c => <div key={c.id} className="lk-case">
           <span className={`lk-icon${c.open ? '' : ' on'}`} aria-hidden="true">{c.open ? '◌' : '■'}</span>
-          <span><b>{c.name}</b><small className="lk-muted" style={{display: 'block'}}>{c.open ? 'open in this browser until the app locks' : 'own passphrase · its name shows here only to you'}</small></span>
+          {/* Open or locked is the mark (◌ / ■); what that means is revealed on the name. */}
+          <span><Reveal detail={c.open ? 'Open in this browser until the app locks.' : 'Own passphrase · its name shows here only to you.'}><b>{c.name}</b></Reveal></span>
           <span className="lk-acts">
             {c.open
               ? <button type="button" className="ap-btn" onClick={async () => set((await closeCase({path: {investigation_id: c.id}, throwOnError: true})).data)}>Close it</button>
@@ -176,7 +181,7 @@ export function LockingPane(): ReactElement {
           {cases === null ? <p className="lk-muted">Loading the cases…</p> : cases.filter(c => !lockedIds.has(c.id)).map(c =>
             <button key={c.id} type="button" className="lk-case" style={{width: '100%', textAlign: 'left', cursor: 'pointer', color: 'inherit', font: 'inherit'}}
               onClick={() => setAsking(`lock:${c.id}`)}>
-              <span className="lk-icon" aria-hidden="true">◌</span><span><b>{c.name}</b><small className="lk-muted" style={{display: 'block'}}>opens with the app</small></span>
+              <span className="lk-icon" aria-hidden="true">◌</span><span><b>{c.name}</b><small className="st-sr">opens with the app</small></span>
               <span className="lk-muted">Lock this case…</span>
             </button>)}
           <span><button type="button" className="ap-btn" onClick={() => setAsking('')}>Cancel</button></span>
@@ -193,9 +198,8 @@ export function LockingPane(): ReactElement {
       </div>
       {error && <p className="lk-err" role="alert">{error}</p>}
       <div className="lk-panel">
-        <p className="text-sm">Hide screen covers everything at once with a plain page, for when someone walks up. ⌘⇧H from anywhere, or the button on Case home;
-          your place is kept until you ask for it back.{on && state.lock_on_hide ? ' The app locks behind it.' : ''}</p>
-        <button type="button" className="ap-btn mt-4" onClick={hideScreen}>Hide the screen now</button>
+        <Reveal tabbable={false} detail={`Hide screen covers everything at once with a plain page, for when someone walks up. ⌘⇧H from anywhere, or the button on Case home; your place is kept until you ask for it back.${on && state.lock_on_hide ? ' The app locks behind it.' : ''}`}>
+          <button type="button" className="ap-btn" onClick={hideScreen}>Hide the screen now</button></Reveal>
       </div>
     </div>
 

@@ -19,6 +19,8 @@ import {useRouter} from 'next/navigation';
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 
+import {StatusChip} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
 import {caseHref} from '../../lib/case-href';
@@ -39,6 +41,7 @@ import {DocumentTranslation} from '../documents/document-translation';
 import {needsSchemaAnswer} from '../documents/schema-question';
 import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/entity-identity';
 import {proposerName} from './proposers';
+import {FingerprintMark, PartyMark, ProposalKindMark} from '../the-drop/kind-marks';
 import {ListenRoom, isRecording} from './listen-room';
 
 type Tab = 'text' | 'original' | 'translation' | 'details';
@@ -190,11 +193,13 @@ function Why({candidateId}: {candidateId: string}): ReactElement {
   return <div className="rr-why"><p>{why.data.summary}</p>{why.data.parts.slice(0, 3).map(p => <p key={p.id}><b>{p.label}:</b> {p.reasoning.join(' ')}</p>)}</div>;
 }
 
-function Dots({confidence}: {confidence: number}): ReactElement | null {
+/** How sure, as dots and its band; the percentage and who proposed it where are on hover or focus (Ony, 29 Oct). */
+function Dots({confidence, detail}: {confidence: number; detail?: ReactNode}): ReactElement | null {
   const band = confidenceBand(confidence);
-  if (!band) return null;
+  if (!band) return detail ? <Reveal detail={detail}><span className="rr-dots">·</span></Reveal> : null;
   const n = band === 'high' ? 3 : band === 'medium' ? 2 : 1;
-  return <span className="rr-dots" title={`${Math.round(confidence * 100)}%`}><i aria-hidden="true">{'●'.repeat(n)}{'○'.repeat(3 - n)}</i>{band.charAt(0).toUpperCase() + band.slice(1)}</span>;
+  return <Reveal detail={<><b>{Math.round(confidence * 100)}%</b>{detail ? <span className="rv-row">{detail}</span> : null}</>}>
+    <span className="rr-dots"><i aria-hidden="true">{'●'.repeat(n)}{'○'.repeat(3 - n)}</i>{band.charAt(0).toUpperCase() + band.slice(1)}</span></Reveal>;
 }
 
 /** The card's one question, in its own words, with numbered answers. */
@@ -230,8 +235,9 @@ function Question({c, answer, setAnswer, active, onAcceptFirst}: {c: ExtractionC
         const facts = matches.data?.matches.find(m => m.entity_id === o.entityId)?.facts;
         const reason = sameReason(caption, o.caption, o.why);
         return <div key={o.entityId} className="rr-match">
-        <span className="rr-known" aria-label={`Already in the case: ${o.caption}`}><b>{o.caption}</b>
-          <small>{SCHEMA_WORD[o.schema] ?? o.schema}{typeof facts === 'number' ? ` · ${facts} fact${facts === 1 ? '' : 's'} in the case` : ''}</small>
+        <span className="rr-known" aria-label={`Already in the case: ${o.caption}`}><b><PartyMark schema={o.schema} tabbable={false}/> {o.caption}</b>
+          <Reveal tabbable={false} detail={`${SCHEMA_WORD[o.schema] ?? o.schema}${typeof facts === 'number' ? ` · ${facts} fact${facts === 1 ? '' : 's'} in the case` : ''}`}>
+            {typeof facts === 'number' ? <small>{facts} fact{facts === 1 ? '' : 's'}</small> : null}</Reveal>
           <small className={o.why.startsWith('the same name') ? 'rr-agree' : 'rr-near'}><span aria-hidden="true">{o.why.startsWith('the same name') ? '✓ ' : '≈ '}</span>{reason}</small></span>
         <button type="button" aria-pressed={answer.identity?.kind === 'same' && answer.identity.entityId === o.entityId}
           onClick={() => setAnswer({...answer, identity: {kind: 'same', entityId: o.entityId}})}>Same as this {!body || answer.schema ? <kbd>{i + 1}</kbd> : null}</button>
@@ -325,14 +331,17 @@ function Card({c, focus, lit, locator, held, answer, setAnswer, onFocus, onLight
     ? answer.schema ?? String((c.payload as {suggested_schema?: unknown}).suggested_schema ?? '') : '';
   return <article id={`rr-card-${c.id}`} className={`rr-card rr-${c.candidate_type}${focus ? ' on' : ''}${lit ? ' lit' : ''}${open ? '' : ' done'}`}
     aria-label={`${kind}: ${proposalText(c)}`} onClick={onFocus} onMouseEnter={() => onLight(true)} onMouseLeave={() => onLight(false)}>
+    {/* The card's kind is its icon; a waiting proposal is the default and needs no word (its dashed edge says it);
+        accepted and rejected are shapes, their words on hover. */}
     <header>
-      <b>{kind}</b>
-      {c.review_status === 'proposed' ? <span className="rr-chip">Proposed</span> : <span className={`rr-chip ${c.review_status}`}>{c.review_status === 'accepted' ? '✓ Accepted' : '✕ Rejected'}</span>}
-      <Dots confidence={c.confidence}/>
-      <small>{proposerOf(c)} · {locator}</small>
+      <ProposalKindMark kind={c.candidate_type} detail={kind}/>
+      {c.review_status !== 'proposed' && <Reveal label={c.review_status === 'accepted' ? 'Accepted' : 'Rejected'} detail={c.review_status === 'accepted' ? 'Accepted' : 'Rejected'}>
+        <span className={`rr-chip ${c.review_status}`} aria-hidden="true">{c.review_status === 'accepted' ? '✓' : '✕'}</span></Reveal>}
+      <Dots confidence={c.confidence} detail={`${proposerOf(c)} · ${locator}`}/>
     </header>
     {editing ? <input className="rr-edit" aria-label="Edit the name" value={caption} onChange={e => setCaption(e.target.value)} onClick={e => e.stopPropagation()}/>
-      : <p className="rr-card-text">{caption}{schema && schema !== 'LegalEntity' ? <small className="rr-card-kind"> · {SCHEMA_WORD[schema] ?? schema}</small> : null}</p>}
+      : <p className="rr-card-text">{schema && schema !== 'LegalEntity' ? <><PartyMark schema={schema}/>{' '}</> : null}{caption}
+        {schema && schema !== 'LegalEntity' ? <span className="st-sr"> · {SCHEMA_WORD[schema] ?? schema}</span> : null}</p>}
     {held ? <p className="rr-held" role="status">{held.decision === 'accept' ? '✓ Accepted' : '✕ Rejected'}: saved in a moment.
       <button type="button" onClick={e => { e.stopPropagation(); onUndo(); }}>Undo <kbd>U</kbd></button></p>
       : open ? <>
@@ -727,12 +736,13 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
           <div className="rr-paper-scroll" onMouseUp={readSelection} onKeyUp={e => { if (e.shiftKey) readSelection(); }}>
             <p className="rr-chips">
               {paged && <span>Page {current} of {pages.length}</span>}
-              {pageChunks.length > 0 && <span title={ocr && legibility === undefined ? 'The reader has not measured this page yet, or could not.' : undefined}>
-                {ocr ? `Read by OCR · ${legibility !== undefined ? `${Math.round(legibility)}% legible` : 'legibility not measured'}` : 'Read from the file’s own text'}</span>}
-              <span className="rr-lang" title={languages.length ? 'Detected by OpenAleph when it read the document'
-                : 'The app’s own reader does not detect a language; OpenAleph has not read this document'}>
-                {languages.length ? languages.map(l => l.name).join(' · ') : 'Language not detected'}</span>
-              {paged && <small>p. {current}</small>}
+              {/* How the page was read is a mark with its number; the language a code; the words on hover (Ony, 29 Oct). */}
+              {pageChunks.length > 0 && <Reveal detail={<><span className="rv-row">{ocr ? `Read by OCR · ${legibility !== undefined ? `${Math.round(legibility)}% legible` : 'legibility not measured'}` : 'Read from the file’s own text'}</span>
+                {ocr && legibility === undefined && <span className="rv-row">The reader has not measured this page yet, or could not.</span>}</>}>
+                <span>{ocr ? <>OCR{legibility !== undefined ? <> · <b>{Math.round(legibility)}%</b></> : ' · ?'}</> : 'TXT'}</span></Reveal>}
+              <Reveal detail={<><span className="rv-row">{languages.length ? languages.map(l => l.name).join(' · ') : 'Language not detected'}</span>
+                <span className="rv-row">{languages.length ? 'Detected by OpenAleph when it read the document' : 'The app’s own reader does not detect a language; OpenAleph has not read this document'}</span></>}>
+                <span className="rr-lang">{languages.length ? languages.map(l => l.code.slice(0, 2).toUpperCase()).join(' · ') : '–'}</span></Reveal>
             </p>
             <h2 className="rr-doc-title">{title}</h2>
             {pageChunks.map((ch, i) => <div key={ch.id} className="rr-para">
@@ -741,7 +751,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
                 <Marked text={ch.text} spans={byChunk.get(ch.id) ?? []} find={find} focus={focus} lit={lit} onFocus={setFocus} onLight={setLit}/></p>
             </div>)}
             {!chunks.length && <p className="rr-quiet">{doc ? 'No text was read from this document.' : 'Opening…'}</p>}
-            {(doc?.extraction_issues ?? []).map(issue => <p key={issue} className="rr-issue"><span className="st st-unshown"><span aria-hidden="true">○</span>Note</span> {issue}</p>)}
+            {(doc?.extraction_issues ?? []).map(issue => <p key={issue} className="rr-issue"><span className="rr-note-mark" aria-label="Note">✎</span> {issue}</p>)}
           </div>
         </div>
         : tab === 'original' ? <div className="rr-orig-wrap">{paged
@@ -749,7 +759,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
         : tab === 'translation' ? <div className="rr-orig-wrap"><DocumentTranslation documentId={documentId}/></div>
         : <dl className="rr-details">
           <div><dt>File</dt><dd>{doc?.filename}</dd></div>
-          <div><dt>Fingerprint</dt><dd><code>{doc?.sha256}</code></dd></div>
+          <div><dt>Fingerprint</dt><dd>{doc?.sha256 ? <FingerprintMark hash={doc.sha256}/> : '–'}</dd></div>
           <div><dt>Read</dt><dd>{readWord(doc?.extraction_status)}{doc?.extraction_error ? ` · ${doc.extraction_error}` : ''}</dd></div>
           <div><dt>Passages</dt><dd>{chunks.length}</dd></div>
           {(doc?.extraction_issues ?? []).map(i => <div key={i}><dt>Note</dt><dd>{i}</dd></div>)}
@@ -777,17 +787,18 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
           <p className="rr-eyebrow">Evidence clip <span className="rr-quiet">saved in a moment</span>
             <button type="button" className="rr-undo" onClick={undoKeep}>Undo <kbd>U</kbd></button></p>
           <div className="rr-clip-body"><blockquote><span className="rr-ctx">…{heldClip.before}</span><mark>{heldClip.quote}</mark><span className="rr-ctx">{heldClip.after}…</span></blockquote></div>
-          <p className="rr-clip-meta">{heldClip.anchor} · {heldClip.checked ? <span className="rr-ok">✓ the words are in the stored text</span> : <span className="rr-bad">✕ the words differ from the stored text</span>}</p>
+          <p className="rr-clip-meta">{heldClip.checked ? <Reveal detail={<><span className="rv-row">{heldClip.anchor}</span><span className="rv-row">✓ the words are in the stored text</span></>}><span className="rr-ok">✓</span></Reveal>
+            : <>{heldClip.anchor} · <span className="rr-bad">✕ the words differ from the stored text</span></>}</p>
         </section>}
         {pageClips.map(cl => <section key={cl.evidenceId || cl.anchor} className="rr-clip" aria-label="Evidence clip">
-          <p className="rr-eyebrow">Evidence clip <span className="rr-quiet">saved just now</span>
-            <span className="st st-unshown"><span aria-hidden="true">○</span>Not yet shown</span></p>
+          <p className="rr-eyebrow"><Reveal detail="Saved just now">Evidence clip</Reveal> <StatusChip status="unshown" focusable/></p>
           <div className="rr-clip-body">
             <blockquote><span className="rr-ctx">…{cl.before}</span><mark>{cl.quote}</mark><span className="rr-ctx">{cl.after}…</span></blockquote>
             {isPdf && cl.page ? <span className="rr-clip-scan"><PagePicture documentId={documentId} page={cl.page} passage={cl.quote} width={160} alt={`Page ${cl.page}, the words marked`}/></span> : null}
           </div>
-          <p className="rr-clip-meta">{cl.anchor} · <code title={cl.fingerprint}>SHA-256 {cl.fingerprint.slice(0, 6)}…{cl.fingerprint.slice(-4)}</code>{' '}
-            {cl.checked ? <span className="rr-ok">✓ the words are in the stored text</span> : <span className="rr-bad">✕ the words differ from the stored text</span>}</p>
+          {/* Where the words are and the file's fingerprint are on hover; the check shows, and a failed check says so. */}
+          <p className="rr-clip-meta">{cl.checked ? <Reveal detail={<><span className="rv-row">{cl.anchor}</span><span className="rv-row">✓ the words are in the stored text</span></>}><span className="rr-ok">✓</span></Reveal>
+            : <>{cl.anchor} · <span className="rr-bad">✕ the words differ from the stored text</span></>}{' '}<FingerprintMark hash={cl.fingerprint}/></p>
         </section>)}
         {shownCards.map(c => <Card key={c.id} c={c} focus={focus === c.id} lit={lit === c.id} locator={locatorOf(c)} held={held?.c.id === c.id ? held : null}
           answer={answers[c.id] ?? {}} setAnswer={a => setAnswers(prev => ({...prev, [c.id]: a}))} onFocus={() => setFocus(c.id)}
@@ -810,7 +821,7 @@ function Room({investigationId, documentId, startPage, onClose}: {investigationI
       <button type="button" onClick={() => keep('check')}>To check <kbd>X</kbd></button>
       <button type="button" onClick={() => setTagMenu(m => !m)} aria-expanded={tagMenu}>Tag <kbd>T</kbd></button>
       {tagMenu && <span className="rr-tags">{(tags?.tags ?? []).length ? (tags?.tags ?? []).map(t => <button key={t.id} type="button" onClick={() => void tag(t.id)}>{t.name}</button>)
-        : <small>No tags yet; make them in Keep.</small>}</span>}
+        : <Reveal detail="No tags yet; make them in Keep."><small>0 tags</small></Reveal>}</span>}
     </div>}
 
     <footer className="rr-foot">

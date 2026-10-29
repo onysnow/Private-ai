@@ -12,6 +12,7 @@ import {useRef, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent, ReactElement, ReactNode} from 'react';
 
 import type {LeadCard} from '../../components/leads-kanban-board';
+import {Reveal} from '../../components/ui/reveal';
 
 export type Horizon = 'now' | 'next' | 'later';
 export type HorizonLead = LeadCard & {horizon?: Horizon | null; history?: {to_status: string; note?: string | null; created_at: string}[]};
@@ -80,16 +81,20 @@ function Card({lead, actions, onKeyMove}: {lead: HorizonLead; actions: Actions; 
       <b className="flex-1 text-sm font-medium leading-snug">{lead.title}</b>
       <Menu lead={lead} actions={actions}/>
     </div>
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
-      <span className="uppercase tracking-wide">{lead.priority}</span>
-      <span aria-label={`Status: ${word}`}><span aria-hidden="true">{status}</span> {word}</span>
-      {lead.owner && <span title={lead.owner} aria-label={`Owner: ${lead.owner}`} className="rounded-full border px-1.5">{initials(lead.owner)}</span>}
-      {lead.provider && <span>from {lead.provider.replace(/_/g, ' ')}</span>}
+    {/* The priority is the left edge (thick urgent, medium high, dashed low) and the status a glyph: both named on reveal. */}
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-muted-foreground">
+      <Reveal tabbable={false} describe={false} detail={<><b>{word}</b> · {lead.priority} priority</>}>
+        <span aria-label={`Status: ${word}`}><span aria-hidden="true">{status}</span></span></Reveal>
+      {lead.owner && <Reveal tabbable={false} describe={false} detail={lead.owner}>
+        <span aria-label={`Owner: ${lead.owner}`} className="rounded-full border px-1.5 text-[11px]">{initials(lead.owner)}</span></Reveal>}
+      {lead.provider && <Reveal tabbable={false} describe={false} detail={`From ${lead.provider.replace(/_/g, ' ')}`}>
+        <span aria-label={`From ${lead.provider.replace(/_/g, ' ')}`}>↗</span></Reveal>}
     </div>
-    {forLink?.label && <div className="text-xs"><span className="text-muted-foreground">For:</span> {forLink.label}</div>}
+    {forLink?.label && <div className="text-xs"><Reveal tabbable={false} describe={false} detail="For"><span className="text-muted-foreground" aria-label="For:">↳</span></Reveal> {forLink.label}</div>}
     {(lead.tasks.length > 0 || counts.supports + counts.contradicts > 0) && <div className="flex flex-wrap items-center gap-x-3 text-xs text-muted-foreground">
       {lead.tasks.length > 0 && <span aria-label={`Tasks: ${lead.tasks.map(t => `${t.title ?? 'task'} ${(t.status ?? 'todo').replace('_', ' ')}`).join(', ')}`}>
-        {lead.tasks.map(t => <span key={t.id} aria-hidden="true" title={`${t.title ?? 'Task'} · ${(t.status ?? 'todo').replace('_', ' ')}`}>{TASK_DOT[t.status ?? 'todo'] ?? '○'}</span>)}</span>}
+        {lead.tasks.map(t => <Reveal key={t.id} tabbable={false} describe={false} detail={`${t.title ?? 'Task'} · ${(t.status ?? 'todo').replace('_', ' ')}`}>
+          <span aria-hidden="true">{TASK_DOT[t.status ?? 'todo'] ?? '○'}</span></Reveal>)}</span>}
       {counts.supports + counts.contradicts > 0 && <span aria-label={`${counts.supports} supporting, ${counts.contradicts} contradicting`}>✓ {counts.supports} · ✕ {counts.contradicts}</span>}
     </div>}
   </article>;
@@ -129,7 +134,7 @@ export function LeadsHorizons({leads, onMove, onStatus, onConvert}: {leads: Hori
 
   return <div className="grid gap-3" aria-label="Leads by when to chase them">
     <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-      <span>Drag a card between horizons, or focus it and press <kbd>M</kbd> then <kbd>1</kbd> Now · <kbd>2</kbd> Next · <kbd>3</kbd> Later · <kbd>0</kbd> inbox.</span>
+      <Reveal label="How to move a lead" detail="Drag a card between horizons, or focus it and press M then 1 Now · 2 Next · 3 Later · 0 inbox."><span aria-hidden="true">⇄</span></Reveal>
       <button type="button" className="rounded border px-2 py-0.5" aria-pressed={done} onClick={() => setDone(d => !d)}>Done ({finished.length})</button>
     </div>
     <p className="sr-only" aria-live="polite">{said}</p>
@@ -140,8 +145,8 @@ export function LeadsHorizons({leads, onMove, onStatus, onConvert}: {leads: Hori
         const note = l.history?.find(h => h.to_status === l.status)?.note;
         const reason = note && !/in Next\.js workbench$/.test(note) ? note : null;
         return <li key={l.id} className="flex flex-wrap items-baseline gap-2 rounded border bg-card px-2.5 py-1.5 text-sm">
-          <span className="text-xs text-muted-foreground"><span aria-hidden="true">{mark}</span> {word}</span><b className="font-medium">{l.title}</b>
-          {reason && <span className="text-xs text-muted-foreground">· {reason}</span>}
+          <Reveal label={word} detail={word}><span className="text-xs text-muted-foreground" aria-hidden="true">{mark}</span></Reveal>
+          {reason ? <Reveal detail={reason}><b className="font-medium">{l.title}</b></Reveal> : <b className="font-medium">{l.title}</b>}
           <button type="button" className="ml-auto text-xs underline" onClick={() => onStatus(l.id, 'active')}>Reopen</button>
         </li>;
       }) : <li className="text-sm text-muted-foreground">Nothing finished yet.</li>}

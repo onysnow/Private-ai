@@ -25,6 +25,7 @@
 // reader can find both.
 import {useId} from 'react';
 import type {ReactElement, ReactNode} from 'react';
+import {Reveal} from '../ui/reveal';
 
 export type FrameRule = {
   /** The arrangement's name, e.g. "Arranged by control:". */
@@ -118,9 +119,13 @@ export function Segmented<T extends string>({label, options, value, onChange}: {
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); move(1); }
       if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') { event.preventDefault(); move(-1); }
     }}>
-    {options.map(option => <button key={option.value} type="button" role="radio" aria-checked={option.value === value} title={option.title}
-      tabIndex={option.value === value ? 0 : -1}
-      className={option.value === value ? 'on' : undefined} onClick={() => onChange(option.value)}>{option.label}</button>)}
+    {options.map(option => {
+      const button = <button key={option.value} type="button" role="radio" aria-checked={option.value === value}
+        tabIndex={option.value === value ? 0 : -1}
+        className={option.value === value ? 'on' : undefined} onClick={() => onChange(option.value)}>{option.label}</button>;
+      // What an option means is revealed on it (hover or focus), no longer a browser tooltip.
+      return option.title ? <Reveal key={option.value} tabbable={false} detail={option.title}>{button}</Reveal> : button;
+    })}
   </div>;
 }
 

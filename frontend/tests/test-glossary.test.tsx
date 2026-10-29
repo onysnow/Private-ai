@@ -96,7 +96,9 @@ describe('Glossary', () => {
     await user.click(within(screen.getByRole('listbox', {name: 'Terms'})).getByRole('option', {name: /Nominee/}));
     const card = await screen.findByRole('article');
     expect(within(card).getByRole('heading', {level: 2, name: 'Nominee'})).toBeInTheDocument();
-    expect(within(card).getByText(/Defined in 2 areas, listed in 3/)).toBeInTheDocument();
+    // How many areas define it is on the area tabs, on hover or focus, not on screen.
+    expect(within(card).getByText(/Defined in 2 areas, listed in 3/).closest('[hidden]')).not.toBeNull();
+    expect(within(card).getByRole('tablist')).toHaveAccessibleDescription('Defined in 2 areas, listed in 3');
     const tabs = await within(card).findAllByRole('tab');
     expect(tabs.map(t => t.textContent)).toEqual(['Hidden ownership and shell companies', 'Money laundering', 'Terrorist financing ○']);
     await user.click(tabs[1]);

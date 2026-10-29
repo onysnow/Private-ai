@@ -7,10 +7,14 @@
 // to tag, note or collect. Outside findings stay leads until reviewed. The
 // call and its reply check are generated from the API schema.
 import {keepPreviousData, useQuery} from '@tanstack/react-query';
+import {ChevronDown, ChevronRight, StickyNote} from 'lucide-react';
 import {Fragment, useEffect, useMemo, useRef, useState} from 'react';
 import type {ChangeEvent, KeyboardEvent, ReactElement, ReactNode} from 'react';
 
 import {Checkbox} from '@/components/ui/checkbox';
+import {StatusChip} from '../../components/status';
+import type {ClaimStatus} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {peekAtRecordOptions, searchWorkbenchOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {SearchHitOut, SearchWorkbenchData} from '../../lib/generated/types.gen';
@@ -24,6 +28,7 @@ import type {ProvenanceRequest} from '../../lib/workbench-store';
 import {MarksPanel, TagChip} from '../marks/marks-panel';
 import {useMarks} from '../marks/use-marks';
 import type {MarkRecordType, MarkTarget} from '../marks/use-marks';
+import {PartyMark} from '../the-drop/kind-marks';
 import {CorpusResults} from './corpus-results';
 
 type Props = {
@@ -72,9 +77,10 @@ export function Highlight({value, words}: {value: string; words: string[]}): Rea
   return <>{parts.map((part, i) => i % 2 ? <mark key={i}>{part}</mark> : <Fragment key={i}>{part}</Fragment>)}</>;
 }
 
+/** How sure a record is, in the app's one status grammar (components/status.tsx): colour, the word on hover. */
+const SURE_STATUS: Record<Sure, ClaimStatus> = {supported: 'supported', not_yet: 'unshown', disputed: 'disputed', rejected: 'ruled_out'};
 function SurePill({sure}: {sure: Sure}): ReactElement {
-  const look = SURE[sure];
-  return <span className="sv-pill" style={{background: look.fill, color: look.text}}>{look.mark} {look.name}</span>;
+  return <StatusChip status={SURE_STATUS[sure]} label={SURE[sure].name} focusable/>;
 }
 
 function FacetRow({colour, label, count, max, on, onClick}: {colour: string; label: ReactNode; count: number; max: number; on: boolean;
@@ -140,31 +146,35 @@ function ResultCard({hit, words, selected, onSelect, onTrace, onMark, peek}: {hi
     onMouseEnter={() => { timer.current = setTimeout(() => setHover(true), 350); }}
     onMouseLeave={() => { if (timer.current) clearTimeout(timer.current); setHover(false); }}>
     <div className="sv-body">
-      <div className="t"><Highlight value={hit.title} words={words}/></div>
+      {/* The kind of record is the card's edge colour (and its group); its name, where it was found and why it matched
+          are on hover or focus of the title (Ony, 29 Oct). */}
+      <div className="t"><Reveal detail={<>
+        <b style={{color: kind.edge}}>{TYPE_LABEL[hit.type] ?? hit.type}</b>
+        {text(hit.provenance.locator) && <span className="rv-row sv-why">At {text(hit.provenance.locator)}</span>}
+        {hit.matched_fields && hit.matched_fields.length > 0 && <span className="rv-row sv-why">Matched on {hit.matched_fields.slice(0, 3).join(', ')}</span>}
+        {outside && <span className="rv-row sv-why">External connector result; treat as a lead until reviewed and promoted.</span>}
+      </>}><Highlight value={hit.title} words={words}/></Reveal></div>
       <div className="sv-meta">
-        <span className="kl" style={{color: kind.edge}}>{TYPE_LABEL[hit.type] ?? hit.type}</span>
         {hit.sure && <SurePill sure={hit.sure}/>}
         {hit.date && <span>{hit.date}</span>}
-        {hit.parties?.map(p => <span key={p.id} className="sv-pd"><i style={{borderColor: PARTY[partyKind(p.schema)].ring}}/>{p.name}</span>)}
+        {hit.parties?.map(p => <span key={p.id} className="sv-pd"><PartyMark schema={p.schema}/>{p.name}</span>)}
       </div>
       {hit.snippet && hit.snippet !== hit.title && <div className="sv-sn"><Highlight value={hit.snippet} words={words}/></div>}
-      {text(hit.provenance.locator) && <div className="sv-why">At {text(hit.provenance.locator)}</div>}
-      {hit.matched_fields && hit.matched_fields.length > 0 && <div className="sv-why">Matched on {hit.matched_fields.slice(0, 3).join(', ')}</div>}
-      {outside && <div className="sv-why">External connector result; treat as a lead until reviewed and promoted.</div>}
       {((hit.tags?.length ?? 0) > 0 || (hit.note_count ?? 0) > 0) && <div className="sv-tags">
         {hit.tags?.map(t => <TagChip key={t.id} name={t.name} colour={t.colour}/>)}
-        {(hit.note_count ?? 0) > 0 && <span className="sv-notec">{hit.note_count} {hit.note_count === 1 ? 'note' : 'notes'}</span>}
+        {(hit.note_count ?? 0) > 0 && <Reveal detail={`${hit.note_count} ${hit.note_count === 1 ? 'note' : 'notes'}`}>
+          <span className="sv-notec"><StickyNote size={12} aria-hidden="true"/> {hit.note_count}</span></Reveal>}
       </div>}
     </div>
     <div className="sv-acts">
       {!outside && <button type="button" className="sv-btn" aria-label="Trace provenance" onClick={e => { e.stopPropagation(); onTrace(); }}>Trace</button>}
       {markable && <>
-        <button type="button" className="sv-ab" aria-label="Tag" title="Tag (T)" onClick={e => { e.stopPropagation(); onMark('tags'); }}>T</button>
-        <button type="button" className="sv-ab" aria-label="Add a note" title="Note (N)" onClick={e => { e.stopPropagation(); onMark('notes'); }}>N</button>
-        <button type="button" className="sv-ab" aria-label="Add to a collection" title="Collect (C)" onClick={e => { e.stopPropagation(); onMark('collections'); }}>C</button>
+        <Reveal tabbable={false} describe={false} detail="Tag (T)"><button type="button" className="sv-ab" aria-label="Tag" onClick={e => { e.stopPropagation(); onMark('tags'); }}>T</button></Reveal>
+        <Reveal tabbable={false} describe={false} detail="Note (N)"><button type="button" className="sv-ab" aria-label="Add a note" onClick={e => { e.stopPropagation(); onMark('notes'); }}>N</button></Reveal>
+        <Reveal tabbable={false} describe={false} detail="Collect (C)"><button type="button" className="sv-ab" aria-label="Add to a collection" onClick={e => { e.stopPropagation(); onMark('collections'); }}>C</button></Reveal>
       </>}
-      {text(hit.provenance.source_url) && <a className="sv-ab" href={text(hit.provenance.source_url)} target="_blank" rel="noreferrer"
-        aria-label="Open source" title="Open source" onClick={e => e.stopPropagation()}>↗</a>}
+      {text(hit.provenance.source_url) && <Reveal tabbable={false} detail={<span className="rv-mono">{text(hit.provenance.source_url)}</span>}>
+        <a className="sv-ab" href={text(hit.provenance.source_url)} target="_blank" rel="noreferrer" aria-label="Open source" onClick={e => e.stopPropagation()}>↗</a></Reveal>}
     </div>
     {hover && peek}
   </div>;
@@ -262,18 +272,19 @@ export function SearchPanel({investigationId}: Props): ReactElement {
         <input ref={inputRef} value={draft} onChange={(e: ChangeEvent<HTMLInputElement>) => setDraft(e.target.value)}
           onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') submit(); }} placeholder="Search this investigation…"
           aria-label="Search this investigation"/>
-        <kbd>⌘K</kbd>
       </label>
       <button type="button" className="sv-btn p" onClick={submit}>Search records</button>
-      <label className="sv-check"><Checkbox checked={includeReconciledDuplicates}
-        onCheckedChange={(checked: boolean | 'indeterminate') => setIncludeReconciledDuplicates(checked === true)}/> Include reviewed duplicate copies</label>
+      <Reveal tabbable={false} describe={false} detail="Include reviewed duplicate copies: records a person has already marked as copies of another.">
+        <label className="sv-check"><Checkbox checked={includeReconciledDuplicates} aria-label="Include reviewed duplicate copies"
+          onCheckedChange={(checked: boolean | 'indeterminate') => setIncludeReconciledDuplicates(checked === true)}/> Duplicates</label></Reveal>
     </div>
     {search.isError && <p className="sv-error">{errorMessage(search.error, 'Search failed')}</p>}
     {submitted && search.data && <div className="sv-wrap">
       <Facets facets={facets} filters={filters} setFilters={f => { setFilters(f); setSelected(null); }} tagNames={marks.tags}/>
       <div className="sv-results" role="listbox" aria-label="Results" tabIndex={0} onKeyDown={onListKey}>
         <div className="sv-rhead"><h2>“{submitted.q}”</h2>
-          <span>{total} {total === 1 ? 'result' : 'results'}{total !== allFound ? ` of ${allFound}, filtered` : ''} · one card per record</span></div>
+          <Reveal detail={`${total} ${total === 1 ? 'result' : 'results'}${total !== allFound ? ` of ${allFound}, filtered` : ''} · one card per record`}>
+            <span>{total} {total === 1 ? 'result' : 'results'}</span></Reveal></div>
         {!results.length && <p className="sv-muted">Nothing found{Object.values(filters).some(Boolean) ? ' with these filters' : ''}.</p>}
         {KIND_ORDER.map(kind => {
           const rows = results.filter(r => r.kind === kind);
@@ -282,7 +293,7 @@ export function SearchPanel({investigationId}: Props): ReactElement {
           return <div className="sv-grp" key={kind}>
             <button type="button" className="sv-gh" style={{borderColor: KIND[kind].edge, color: KIND[kind].edge}} aria-expanded={!isFolded}
               onClick={() => setFolded(prev => { const next = new Set(prev); if (next.has(kind)) next.delete(kind); else next.add(kind); return next; })}>
-              <b>{KIND[kind].plural}</b><span>{rows.length}</span><i>{isFolded ? 'show' : 'fold'}</i>
+              <b>{KIND[kind].plural}</b><span>{rows.length}</span><i aria-hidden="true">{isFolded ? <ChevronRight size={14}/> : <ChevronDown size={14}/>}</i>
             </button>
             {!isFolded && rows.map(r => <ResultCard key={key(r)} hit={r} words={words} selected={selected === key(r)}
               onSelect={() => setSelected(key(r))} onTrace={() => openProvenance(provenanceRequestForHit(r))}

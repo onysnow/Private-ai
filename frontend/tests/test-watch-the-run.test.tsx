@@ -80,7 +80,9 @@ describe('WatchTheRun', () => {
     expect(within(map as unknown as HTMLElement).getByText('1 of 7 routed')).toBeInTheDocument();
     expect(within(map as unknown as HTMLElement).getByText('+ 12 modules')).toBeInTheDocument();
     expect(within(screen.getByRole('list', {name: 'Key'})).getAllByRole('listitem')).toHaveLength(6);
-    await waitFor(() => expect(screen.getByText('Run record').parentElement?.textContent).toMatch(/\d+/));
+    await waitFor(() => expect(screen.getByText('Run record').closest('div')?.textContent).toMatch(/\d+/));
+    // What each ledger is waits in a reveal on its name.
+    expect(screen.getByText('Run record').closest('.rv')).toHaveAccessibleDescription('Append-only, hashed.');
     expect(screen.getByText('Judgement ledger')).toBeInTheDocument();
     expect(screen.getByText(/tas\/10 runs apart, never inside the run/)).toBeInTheDocument();
   });
@@ -160,10 +162,11 @@ describe('WatchTheRun', () => {
     expect(within(drawer).getByText(/one thought, input to output/i)).toBeInTheDocument();
     expect(within(drawer).getByText('AI · CLM-0001')).toBeInTheDocument();
     for (const chip of ['tier floor D', "devil's advocate on"]) expect(within(drawer).getByText(chip)).toBeInTheDocument();
-    expect(within(drawer).getByText('model says')).toBeInTheDocument();
+    // "The model says" is the plum AI mark, the sentence on reveal.
+    expect(within(drawer).getByRole('img', {name: 'About AI results'})).toHaveAccessibleDescription('The model says this: no check confirms it.');
     expect(within(drawer).getByText(/model: likely/)).toBeInTheDocument();
     expect(within(drawer).queryByText(/capped/)).toBeNull();
-    expect(within(drawer).getByText(/Accept and reject apply to the whole answer; Keep, Correct and Reject above decide this claim; To check marks this thought only/)).toBeInTheDocument();
+    expect(within(drawer).getByRole('button', {name: '✓ Accept'})).toHaveAccessibleDescription(/Accept and reject apply to the whole answer; Keep, Correct and Reject above decide this claim; To check marks this thought only/);
     await user.click(within(drawer).getByRole('button', {name: 'Close the trace'}));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -336,7 +339,8 @@ describe('WatchTheRun, deciding one claim', () => {
     const drawer = screen.getByRole('dialog');
     const words = await within(drawer).findByText('Kestrel SA controlled Fernhill Ltd.', {selector: '.cr-text'});
     expect(words).toHaveClass('grounded', 'ai');
-    expect(words.getAttribute('title')).toMatch(/Rests on document:doc-41-r, in the packet/);
+    // Where the words rest is revealed on them, and read with them.
+    expect(words.closest('.rv')?.parentElement).toHaveTextContent(/grounded in 1 record \(document:doc-41-r/);
     expect(within(drawer).getByLabelText('Key for the claim underlines')).toBeInTheDocument();
 
     await user.click(within(drawer).getByRole('button', {name: '✓ Keep'}));

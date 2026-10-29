@@ -86,15 +86,19 @@ describe('ReadingRoom', () => {
     routes({'GET /api/documents/d1': scanned});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
     const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
-    expect(await within(room).findByText('Read by OCR · 91% legible')).toBeInTheDocument();
-    expect(within(room).getByText('English · French')).toHaveAttribute('title', 'Detected by OpenAleph when it read the document');
+    // The page shows a mark with its number and the language codes; the words are on hover (Ony, 29 Oct).
+    expect(await within(room).findByText('91%')).toBeVisible();
+    expect(within(room).getByText('EN · FR')).toBeVisible();
+    expect(within(room).getByText('Read by OCR · 91% legible').closest('[hidden]')).not.toBeNull();
+    expect(within(room).getByText('English · French').closest('[hidden]')).not.toBeNull();
+    expect(within(room).getByText('Detected by OpenAleph when it read the document').closest('[hidden]')).not.toBeNull();
     cleanup();
 
     routes({'GET /api/documents/d1': {...doc, chunks: [{...doc.chunks[0], locator: 'page 4 (OCR)'}]}});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
     const again = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
-    expect(await within(again).findByText('Read by OCR · legibility not measured')).toBeInTheDocument();
-    expect(within(again).getByText('Language not detected')).toBeInTheDocument();
+    expect((await within(again).findByText('Read by OCR · legibility not measured')).closest('[hidden]')).not.toBeNull();
+    expect(within(again).getByText('Language not detected').closest('[hidden]')).not.toBeNull();
   });
 
   it('marks what was found, accepts a proposal with A after a moment to undo it, and sends it on closing', async () => {
@@ -104,7 +108,7 @@ describe('ReadingRoom', () => {
     expect(await within(room).findByText('Fernhill Ltd', {selector: '.rr-span'})).toBeInTheDocument();
     expect(within(room).getByRole('button', {name: /^Page 4/})).toHaveAttribute('aria-current', 'true');
     const card = within(room).getByRole('article', {name: 'Name: Fernhill Ltd'});
-    expect(within(card).getByText('Name-finder (rules) · p.4 ¶1')).toBeInTheDocument();
+    expect(within(card).getByText('Name-finder (rules) · p.4 ¶1').closest('[hidden]')).not.toBeNull();  // on hover of the dots
     expect(within(card).getByText('High')).toBeInTheDocument();
     await waitFor(() => expect(within(card).getByRole('button', {name: /Accept/})).toBeEnabled());
     await userEvent.setup().click(card);

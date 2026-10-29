@@ -63,7 +63,8 @@ describe('SecurityPanel', () => {
       connectors: {aleph: credentialStatus, opensanctions: {...credentialStatus, configured: false, source: 'none', local_store_present: false}},
       security: {...status.security, total_denials: 25, needs_attention: true, by_event: {...status.security.by_event, auth_rate_limited: 2}, remote_hosts: [{client_host: '203.0.113.9', count: 20}]},
     });
-    expect(screen.getByText('Environment: production')).toBeInTheDocument();
+    // Each value is revealed on its name (in the page for screen readers, read with the name).
+    expect(screen.getByText('Environment').closest('.rv')).toHaveAccessibleDescription('Environment: production');
     expect(screen.getByText('Database: postgresql://***@db/journalism')).toBeInTheDocument();
     expect(screen.getByText("Entity extraction owner: Workbench's own name-finder (switched off)")).toBeInTheDocument();
     expect(screen.getByText('Allowed browser origins: https://workbench.example')).toBeInTheDocument();
@@ -130,8 +131,10 @@ describe('SecurityPanel', () => {
     }});
     await userEvent.setup().click(screen.getByRole('button', {name: 'Preview retained orphan files'}));
     await screen.findByText('Found 1 unreferenced file(s). They are retained; cleanup is not automatic.');
-    expect(screen.getByText('1 file(s) · 6 bytes · policy: retain by default')).toBeInTheDocument();
-    expect(screen.getByText('stray.bin — 6 bytes')).toBeInTheDocument();
+    // The count and size show; the policy and each path are revealed on them.
+    expect(screen.getByText('1 file(s) · 6 B')).toBeVisible();
+    expect(screen.getByText('stray.bin — 6 bytes').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('Policy: retain by default').closest('[hidden]')).not.toBeNull();
     expect(screen.getByText('Unsafe database paths detected: 1')).toBeInTheDocument();
     expect(api.calls(orphans)).toHaveLength(1);
   });
@@ -142,14 +145,14 @@ describe('SecurityPanel', () => {
     await userEvent.setup().click(screen.getByRole('button', {name: 'Load recent security events'}));
 
     await screen.findByText('Loaded 1 of 150 security event(s).');
-    expect(screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · this computer · opened a page of the app · ✓ allowed$/.test(node?.textContent ?? ''), {selector: 'small'})).toBeInTheDocument();
+    expect(screen.getByText((_, node) => /^✓ opened a page of the app2026-09-2\d \d\d:\d\d · this computer · allowed$/.test(node?.textContent ?? ''), {selector: 'small'})).toBeInTheDocument();
     expect(screen.getByText((_, node) => node?.textContent === '150 valid event(s) · 140 local · 10 remote · 0 malformed retained', {selector: 'small'})).toBeInTheDocument();
     expect(screen.getByText('Methods: GET 100 · POST 50')).toBeInTheDocument();
     expect(screen.getByText('Showing 1 of 150 matching event(s).')).toBeInTheDocument();
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Load 100 older events'}));
     await screen.findByText('Showing 2 of 150 matching event(s).');
-    expect(screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · another device.* · opened a page of the app · ✕ refused$/.test(node?.textContent ?? ''), {selector: 'small'})).toBeInTheDocument();
+    expect(screen.getByText((_, node) => /^✕ opened a page of the app2026-09-2\d \d\d:\d\d · another device.* · refused$/.test(node?.textContent ?? ''), {selector: 'small'})).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Load 100 older events'})).not.toBeInTheDocument();
     expect(api.calls(AUDIT).map(page)).toEqual([{limit: '100', offset: '0'}, {limit: '100', offset: '100'}]);
     expect(api.calls(SUMMARY)).toHaveLength(1);
@@ -189,7 +192,7 @@ describe('SecurityPanel', () => {
     await screen.findByText('Loaded 0 of 100 security event(s).');
     expect(api.lastBody(RETENTION)).toEqual({keep_days: 90, max_records: 5000, confirmation: 'PRUNE SECURITY AUDIT'});
     expect(screen.getByPlaceholderText('Type PRUNE SECURITY AUDIT')).toHaveValue('');
-    expect(screen.getByText((_, node) => node?.textContent === '100 valid event(s) · 90 local · 10 remote · 0 malformed retained')).toBeInTheDocument();
+    expect(screen.getByText((_, node) => node?.textContent === '100 valid event(s) · 90 local · 10 remote · 0 malformed retained', {selector: 'small'})).toBeInTheDocument();
     expect(api.calls(AUDIT)).toHaveLength(1);
     expect(api.unmatched()).toEqual([]);
   });

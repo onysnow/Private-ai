@@ -15,8 +15,9 @@ import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   getCorpusSyncOptions, getCorpusSyncQueryKey, listInvestigationCrossReferencesOptions, listInvestigationCrossReferencesQueryKey,
@@ -25,6 +26,7 @@ import {decideInvestigationCrossReference, syncCorpusNow} from '../../lib/genera
 import type {CorpusSyncOut, CrossReferenceOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {PartyMark} from '../the-drop/kind-marks';
 import {CorpusInsights} from './corpus-insights';
 import {EntitySets} from './entity-sets';
 import {Watchlist} from './watchlist';
@@ -57,6 +59,15 @@ export function corpusSyncSummary(sync: CorpusSyncOut): string[] {
     lines.push(`Failures: ${sync.consecutive_failures} in a row${sync.failures[0] ? ` — latest ${sync.failures[0].operation}: ${sync.failures[0].error}` : ''}`);
   }
   return lines;
+}
+
+/** The sync's health as Following's shapes (● worked, ✕ failing, ○ never pushed, ◐ under way), named on hover. */
+function syncHealth(sync: CorpusSyncOut): {glyph: string; word: string; tone: string} {
+  if (!sync.enabled) return {glyph: '⊘', word: 'Not set up', tone: 'quiet'};
+  if (sync.consecutive_failures > 0 || sync.push.status === 'failed') return {glyph: '✕', word: 'Failing', tone: 'bad'};
+  if (sync.push.status === 'never') return {glyph: '○', word: 'Never sent', tone: 'quiet'};
+  if (sync.push.status === 'succeeded') return {glyph: '●', word: 'Works', tone: 'ok'};
+  return {glyph: '◐', word: sync.push.status, tone: 'quiet'};
 }
 
 export function CorpusPanel({investigationId}: Props): ReactElement {
@@ -103,18 +114,31 @@ export function CorpusPanel({investigationId}: Props): ReactElement {
 
   return <Card className="card" id="corpus">
     <CardHeader className="pb-3">
-      <CardTitle>OpenAleph corpus</CardTitle>
-      <CardDescription>Confirmed entities and relationships are copied to the investigation&apos;s OpenAleph collection, which cross-references them with everything OpenAleph holds. A match is only a proposal until a reporter decides.</CardDescription>
+      <CardTitle><Reveal detail="Confirmed entities and relationships are copied to the investigation's OpenAleph collection, which cross-references them with everything OpenAleph holds. A match is only a proposal until a reporter decides.">OpenAleph corpus</Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       <div className="candidate">
         <b>Corpus sync</b>
         {syncQuery.isError && <p className="muted">{errorMessage(syncQuery.error, 'Could not load the corpus sync line')}</p>}
-        {sync && corpusSyncSummary(sync).map(line => <div key={line}><small>{line}</small></div>)}
+        {/* The sync is a health mark and what is still to send; the push, pending and cross-reference lines are on hover.
+            Failures and errors stay on screen (alerts), and so does why it cannot sync. */}
+        {sync && (() => {
+          const lines = corpusSyncSummary(sync);
+          if (!sync.enabled) return <div><small>{lines[0]}</small></div>;
+          const h = syncHealth(sync);
+          return <>
+            <div className="co-sync"><Reveal detail={<><b>{h.word}</b>{lines.filter(l => !l.startsWith('Failures:')).map(line => <span className="rv-row" key={line}>{line}</span>)}</>}>
+              <span className={`cn-run ${h.tone}`}><i aria-hidden="true">{h.glyph}</i></span> <b>{sync.pending.to_send}</b> to send
+              {sync.cross_reference.open > 0 && <> · <b>{sync.cross_reference.open}</b> to review</>}</Reveal></div>
+            {lines.filter(l => l.startsWith('Failures:')).map(line => <div key={line}><small>{line}</small></div>)}
+          </>;
+        })()}
         {sync?.push.error && <div><small>Last error: {sync.push.error}</small></div>}
         {sync?.cross_reference.error && <div><small>Cross-referencing error: {sync.cross_reference.error}</small></div>}
-        {sync && !sync.background && sync.enabled && <p className="muted">No background worker runs here: changes reach OpenAleph on “Sync now”.</p>}
-        <Button onClick={() => void syncNow()} disabled={!sync?.enabled || syncing}>{syncing ? 'Syncing…' : 'Sync now'}</Button>
+        {sync && !sync.background && sync.enabled
+          ? <Reveal tabbable={false} detail="No background worker runs here: changes reach OpenAleph on “Sync now”.">
+            <Button onClick={() => void syncNow()} disabled={!sync?.enabled || syncing}>{syncing ? 'Syncing…' : 'Sync now'}</Button></Reveal>
+          : <Button onClick={() => void syncNow()} disabled={!sync?.enabled || syncing}>{syncing ? 'Syncing…' : 'Sync now'}</Button>}
       </div>
       {status && <p className="muted">{status}</p>}
       <CorpusInsights investigationId={investigationId}/>
@@ -124,11 +148,12 @@ export function CorpusPanel({investigationId}: Props): ReactElement {
       {xrefQuery.isError && <p className="muted">{errorMessage(xrefQuery.error, 'Could not load the cross-references')}</p>}
       {crossReferences.length === 0 ? <p className="muted">No cross-reference waits for review.</p> : crossReferences.map(row => <div className="statement" key={row.id}>
         <div>
-          <b>{row.entity.caption}</b> <small>({row.entity.schema})</small> ↔ <b>{row.match.caption}</b> <small>({row.match.schema}) in {row.match.collection_label ?? 'another collection'}</small>
-          <div><small>Score {Math.round(row.score * 100)}%{row.method ? ` · ${row.method}` : ''}</small></div>
-          {row.matched_properties.length > 0 && <ul>{row.matched_properties.map(p => <li key={p.property_type}>
-            <small>{p.label} ({Math.round(p.score * 100)}%): {p.ours.join(', ')} ↔ {p.theirs.join(', ')}</small>
-          </li>)}</ul>}
+          {/* Each side's kind is its party icon; where the match lives, the method and each property's score are on hover. */}
+          <PartyMark schema={row.entity.schema}/> <b>{row.entity.caption}</b> ↔ <PartyMark schema={row.match.schema}/>{' '}
+          <Reveal detail={`(${row.match.schema}) in ${row.match.collection_label ?? 'another collection'}`}><b>{row.match.caption}</b></Reveal>
+          <div><Reveal detail={<><span className="rv-row">{`Score ${Math.round(row.score * 100)}%${row.method ? ` · ${row.method}` : ''}`}</span>
+            {row.matched_properties.map(p => <span className="rv-row" key={p.property_type}>{`${p.label} (${Math.round(p.score * 100)}%): ${p.ours.join(', ')} ↔ ${p.theirs.join(', ')}`}</span>)}</>}>
+            <span className="co-score"><i style={{width: `${Math.round(row.score * 100)}%`}}/></span> <b>{Math.round(row.score * 100)}%</b></Reveal></div>
           <div><a href={row.match.url} target="_blank" rel="noreferrer">Open in OpenAleph</a> · <Button variant="link" onClick={() => openDossier(row.entity.id)}>Open dossier</Button></div>
         </div>
         <Input aria-label={`Note on ${row.match.caption}`} value={notes[row.id] ?? ''} placeholder="Note (optional)"

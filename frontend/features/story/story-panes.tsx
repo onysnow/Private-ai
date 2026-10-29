@@ -10,6 +10,7 @@ import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {StatusChip} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {api} from '../../lib/api-instance';
@@ -39,7 +40,6 @@ function Pane({title, onClose, children, label}: {title: ReactNode; onClose: () 
   return <aside className="sy-pane" aria-label={label} ref={ref} tabIndex={-1}>
     <header><b>{title}</b><button type="button" className="sy-x" aria-label={`Close ${label.toLowerCase()}`} onClick={onClose}>×</button></header>
     {children}
-    <small className="sy-pane-esc"><kbd>Esc</kbd> closes</small>
   </aside>;
 }
 
@@ -50,13 +50,17 @@ export function PassagePane({claim, onClose}: {claim: CitableClaim | undefined; 
       <p className="sy-pane-claim"><StatusChip status={STATE_CHIP[claim.state]}/> {claim.text}</p>
       {(claim.evidence ?? []).length ? <ol className="sy-passages">
         {(claim.evidence ?? []).map(e => <li key={e.id} className={e.stance === 'contradicts' ? 'against' : ''}>
-          <small>{e.stance === 'contradicts' ? '✕ against · ' : e.stance === 'supports' ? '✓ supports · ' : 'context · '}{e.label}{e.locator ? ` · ${e.locator}` : ''}</small>
+          <small><Reveal label={STANCE[e.stance]?.word ?? 'Context only'} detail={STANCE[e.stance]?.word ?? 'Context only'}><span className="sy-stance" aria-hidden="true">{STANCE[e.stance]?.mark ?? '·'}</span></Reveal>{' '}
+            {e.locator ? <Reveal detail={e.locator}><span>{e.label}</span></Reveal> : e.label}</small>
           {e.quote ? <blockquote>{e.quote}</blockquote> : <p className="sy-quiet">No words quoted from this passage yet.</p>}
         </li>)}
       </ol> : <p className="sy-quiet">No passage linked to this claim yet.</p>}
     </>}
   </Pane>;
 }
+
+const STANCE: Record<string, {mark: string; word: string}> = {supports: {mark: '✓', word: 'Supports'}, contradicts: {mark: '✕', word: 'Against the claim'},
+  context: {mark: '·', word: 'Context only'}};
 
 const KIND_WORD: Record<WriteupVersionOut['kind'], string> = {named: 'named', auto: 'automatic', before_restore: 'kept before a restore'};
 
@@ -89,7 +93,7 @@ export function VersionsPane({investigationId, writeupId, onClose, onRestored}: 
   if (viewing) {
     return <Pane label="Version history" title={current ? label(current) : 'Version'} onClose={onClose}>
       <button type="button" className="sy-link" onClick={() => { setViewing(null); setAsking(false); }}>← All versions</button>
-      {current && <p className="sy-quiet">{KIND_WORD[current.kind]} · {when(current.created_at)} · {current.word_count} words · read-only</p>}
+      {current && <p className="sy-quiet"><Reveal detail={`${KIND_WORD[current.kind]} · ${when(current.created_at)} · ${current.word_count} words`}><span>read-only</span></Reveal></p>}
       {one.isError && <p role="alert" className="sy-quiet">{errorMessage(one.error, 'Could not read this version')}</p>}
       {one.data ? <div className="sy-version-text"><VersionText content={one.data.content_json}/></div> : !one.isError && <p className="sy-quiet">Reading…</p>}
       {asking ? <div className="sy-confirm" role="group" aria-label="Restore this version?">
@@ -113,13 +117,15 @@ export function VersionsPane({investigationId, writeupId, onClose, onRestored}: 
       <FormRootError className="field-msg"/>
     </form></Form>
     {list.isError && <p role="alert" className="sy-quiet">{errorMessage(list.error, 'Could not read the versions')}</p>}
-    <p className="sy-quiet">Kept on their own while you write, at most one every ten minutes; named ones stay.</p>
+    <p className="sy-quiet"><Reveal detail="Kept on their own while you write, at most one every ten minutes; named ones stay."><span>Versions</span></Reveal></p>
     <ol className="sy-versions" aria-label="Versions, newest first">
       {versions.length ? versions.map(v => <li key={v.id} className={`v-${v.kind}`}>
-        <button type="button" onClick={() => setViewing(v.id)} aria-label={`Read ${label(v)}`}>
-          <span className="v-mark" aria-hidden="true">{v.kind === 'named' ? '◆' : v.kind === 'auto' ? '◇' : '↶'}</span>
-          <span><b>{label(v)}</b><small>{KIND_WORD[v.kind]} · {when(v.created_at)} · {v.word_count} words</small></span>
-        </button></li>) : list.data && <li className="sy-quiet">No versions yet.</li>}
+        {/* The kind is the mark (◆ named, ◇ kept by itself, ↶ kept before a restore); kind, time and words on reveal. */}
+        <Reveal tabbable={false} detail={`${KIND_WORD[v.kind]} · ${when(v.created_at)} · ${v.word_count} words`}>
+          <button type="button" onClick={() => setViewing(v.id)} aria-label={`Read ${label(v)}`}>
+            <span className="v-mark" aria-hidden="true">{v.kind === 'named' ? '◆' : v.kind === 'auto' ? '◇' : '↶'}</span>
+            <span><b>{label(v)}</b></span>
+          </button></Reveal></li>) : list.data && <li className="sy-quiet">No versions yet.</li>}
     </ol>
   </Pane>;
 }
@@ -151,8 +157,8 @@ export function NotesTab({investigationId, storyId}: {investigationId: string; s
     {problem && <p role="alert" className="sy-quiet">{errorMessage(problem, 'Could not change the notes')}</p>}
     <ol className="sy-note-list" aria-label="Notes on the story">
       {(notes.data?.notes ?? []).map((n: NoteOut) => <li key={n.id}>
-        <p>{n.text}</p>
-        <small>{when(n.created_at)}{n.lead_id ? ' · made a lead' : ''}</small>
+        <Reveal detail={when(n.created_at)}><p>{n.text}</p></Reveal>
+        {n.lead_id && <small>made a lead</small>}
         {deleting === n.id ? <span className="sy-confirm-inline">Delete this note? <button type="button" onClick={() => removeM.mutate({path: {note_id: n.id}})}>Delete</button>
           <button type="button" onClick={() => setDeleting(null)}>Keep</button></span>
           : <button type="button" className="sy-link" onClick={() => setDeleting(n.id)} aria-label={`Delete the note “${n.text.slice(0, 40)}”`}>Delete</button>}
@@ -211,14 +217,16 @@ export function ExportSheet({story, doc, onClose, onExportDocx}: {
     <div className="sy-sheet" role="dialog" aria-modal="true" aria-label="Export" ref={ref}>
       <header><b>Export</b><button type="button" className="sy-x" aria-label="Close the Export sheet" onClick={onClose}>×</button></header>
       <ul className="sy-formats">
-        <li><b>Write-up for publication <small>.docx</small></b><span>The text with numbered citations and a Sources list naming each record.</span>
+        {/* Each format's name shows; what it holds is revealed on it. A format not built yet is a disabled button with the reason on it. */}
+        <li><Reveal detail="The text with numbered citations and a Sources list naming each record."><b>Write-up for publication <small>.docx</small></b></Reveal>
           <button type="button" disabled={Boolean(docxReason)} onClick={() => void docx()}>Export the .docx</button>
           {docxReason && <small className="sy-why">○ {docxReason}</small>}</li>
-        <li className="off"><b>Write-up for reading <small>PDF</small></b><span>The paper version of the current theme.</span>
-          <button type="button" disabled>Export as PDF</button><small className="sy-why">○ Not built yet</small></li>
-        <li className="off"><b>Evidence pack <small>.zip</small></b><span>The write-up, an exhibits list from its citations, each cited passage with its file’s fingerprint, and the readiness record.</span>
-          <button type="button" disabled>Export the pack</button><small className="sy-why">○ Not built yet</small></li>
-        <li><b>Backup <small>.jwbackup.zip</small></b><span>The whole case, for restoring on this or another computer; not for sharing.</span>
+        <li className="off"><Reveal detail="The paper version of the current theme."><b>Write-up for reading <small>PDF</small></b></Reveal>
+          <Reveal tabbable={false} detail="Not built yet."><button type="button" disabled>Export as PDF</button></Reveal></li>
+        <li className="off"><Reveal detail="The write-up, an exhibits list from its citations, each cited passage with its file’s fingerprint, and the readiness record.">
+          <b>Evidence pack <small>.zip</small></b></Reveal>
+          <Reveal tabbable={false} detail="Not built yet."><button type="button" disabled>Export the pack</button></Reveal></li>
+        <li><Reveal detail="The whole case, for restoring on this or another computer; not for sharing."><b>Backup <small>.jwbackup.zip</small></b></Reveal>
           <button type="button" onClick={() => void backup()}>Download the backup</button></li>
       </ul>
       <section aria-label="Before it leaves this computer">

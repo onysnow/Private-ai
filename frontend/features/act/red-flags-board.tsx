@@ -17,6 +17,9 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 import {z} from 'zod';
 
+import {LevelChip, StatusChip} from '@/components/status';
+import type {ClaimStatus, FlagLevel} from '@/components/status';
+import {Reveal} from '@/components/ui/reveal';
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {caseHref} from '../../lib/case-href';
 import {errorMessage} from '../../lib/api-client';
@@ -34,10 +37,11 @@ import {WatchButton} from '../inbox/watch-button';
 type Kind = {key: string; name: string; level: string; flags: RedFlagOut[]; weight: number};
 type Levels = Record<'textbook' | 'strong' | 'faint', boolean>;
 
-/** The level as a shape and a word, never colour alone: ▮▮▮ Textbook, ▮▮▯ Strong, ▮▯▯ Faint. */
-export function LevelMark({level}: {level: string}): ReactElement {
-  const bars = level === 'textbook' ? '▮▮▮' : level === 'strong' ? '▮▮▯' : '▮▯▯';
-  return <span className={`rb-level rb-level-${level}`}><i aria-hidden="true">{bars}</i>{LEVEL[level]?.name ?? level}</span>;
+/** A flag's level on this board: the shared status grammar's LevelChip (colour by default, the word on reveal;
+ *  Settings › Appearance › Status marks adds the bars or the word). */
+function FlagMark({level, focusable = false}: {level: string; focusable?: boolean}): ReactElement {
+  if (level === 'textbook' || level === 'strong' || level === 'faint') return <LevelChip level={level as FlagLevel} focusable={focusable}/>;
+  return <span className="rb-level">{LEVEL[level]?.name ?? level}</span>;
 }
 
 const isAside = (f: RedFlagOut) => f.status === 'dismissed';
@@ -143,8 +147,11 @@ function WhatChanged({changes, since, ready, onLight}: {changes: Change[]; since
   const fresh = changes.filter(c => c.kind === 'new').length;
   const stopped = changes.length - fresh;
   const day = new Date(utcTime(since));
-  const line = (c: Change & {n: number}) => <><b className={`rb-change-word ch-${c.kind}`}>{c.kind === 'new' ? '✚ New' : '− No longer fires'}</b>{' '}
-    <span className="rb-id">{c.flag.indicator_id}</span> {c.flag.indicator?.name ?? c.flag.indicator_id}{c.n > 1 && <span className="rb-mono"> ×{c.n}</span>}</>;
+  // The change is its shape (✚ new, − no longer fires); the word and the indicator's code are revealed on it.
+  const line = (c: Change & {n: number}) => <><Reveal label={c.kind === 'new' ? 'New' : 'No longer fires'}
+    detail={<><b>{c.kind === 'new' ? 'New' : 'No longer fires'}</b> · <span className="rv-mono">{c.flag.indicator_id}</span></>}>
+    <b className={`rb-change-word ch-${c.kind}`} aria-hidden="true">{c.kind === 'new' ? '✚' : '−'}</b></Reveal>{' '}
+    {c.flag.indicator?.name ?? c.flag.indicator_id}{c.n > 1 && <span className="rb-mono"> ×{c.n}</span>}</>;
   return <div className={`rb-changed${current ? ' playing' : ''}`} role="group" aria-label="What changed since your last visit">
     <span className="rb-changed-head">Since your last visit · {day.getUTCDate()} {day.toLocaleString('en-GB', {month: 'short', timeZone: 'UTC'})}:
       {' '}{fresh > 0 && <>{fresh} new</>}{fresh > 0 && stopped > 0 && ' · '}{stopped > 0 && <>{stopped} no longer fire{stopped === 1 ? 's' : ''}</>}</span>
@@ -289,25 +296,30 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
     <header className="rb-top">
       {type && <InvestigationType kind={type} flagsByArea={flagsByArea(live)} onSet={setAreas}/>}
       <div className="rb-runline">
-        {rules.length > 0 && ranAt && <p className="rb-coverage" title={rules.map(r => r.name).join('\n')}>
-          <b>{rules.length - cannot.length} of {rules.length}</b> record rules ran{cannot.length > 0 && <> · <span className="rb-warn">{cannot.length} need data</span></>}</p>}
+        {rules.length > 0 && ranAt && <p className="rb-coverage"><Reveal detail={<>{rules.map(r => <span key={r.indicator_id} className="rv-row">{r.name}</span>)}</>}>
+          <span><b>{rules.length - cannot.length} of {rules.length}</b> record rules ran</span></Reveal>{cannot.length > 0 && <> · <span className="rb-warn">{cannot.length} need data</span></>}</p>}
         <span className="rb-run">
           <button type="button" onClick={runNow} disabled={running || !investigationId} aria-busy={running}>{running ? 'Running the rules…' : 'Run the rules'}</button>
-          <small>{ranAt ? <>ran <time dateTime={ranAt} title={new Date(utcTime(ranAt)).toLocaleString('en-GB')}>{agoText(ranAt)}</time>{query.data?.stale && !running && ' · the records changed since'}</> : running ? 'first run' : 'not run yet'}</small>
+          {/* When they ran is on hover; that the records changed since (the results may be out of date) stays as an amber dot. */}
+          {ranAt ? <Reveal label={query.data?.stale && !running ? 'The records changed since the rules ran' : 'When the rules ran'}
+            detail={<>ran <time dateTime={ranAt}>{agoText(ranAt)}</time> · {new Date(utcTime(ranAt)).toLocaleString('en-GB')}{query.data?.stale && !running && ' · the records changed since'}</>}>
+            <span className={`rb-ran${query.data?.stale && !running ? ' stale' : ''}`} aria-hidden="true">{query.data?.stale && !running ? '●' : '◷'}</span></Reveal>
+            : <small>{running ? 'first run' : 'not run yet'}</small>}
           {run.isError && <small role="alert" className="rb-warn">{errorMessage(run.error, 'Could not run the rules')}</small>}
         </span>
       </div>
       <div className="rb-filters" role="group" aria-label="Show">
-        {(['textbook', 'strong', 'faint'] as const).map(l => <button key={l} type="button" aria-pressed={!aside && levels[l]} className={`rb-chip rk-${l}${!aside && levels[l] ? ' on' : ''}`}
-          onClick={() => { setAside(false); setLevels(v => ({...v, [l]: !v[l]})); setPicked(null); }}><LevelMark level={l}/> {count(l)}</button>)}
+        {(['textbook', 'strong', 'faint'] as const).map(l => <button key={l} type="button" aria-pressed={!aside && levels[l]} aria-label={`${LEVEL[l].name} ${count(l)}`} className={`rb-chip rk-${l}${!aside && levels[l] ? ' on' : ''}`}
+          onClick={() => { setAside(false); setLevels(v => ({...v, [l]: !v[l]})); setPicked(null); }}><FlagMark level={l}/> {count(l)}</button>)}
         <button type="button" aria-pressed={aside} className={`rb-chip${aside ? ' on' : ''}`} onClick={() => { setAside(a => !a); setPicked(null); }}>Set aside {flags.length - live.length}</button>
         <button type="button" aria-pressed={goneOpen} className={`rb-chip${goneOpen ? ' on' : ''}`} onClick={() => setGoneOpen(v => !v)} disabled={!gone.length}>No longer fire {gone.length}</button>
-        <label className="rb-select"><span>Area:</span><select value={area} onChange={e => setArea(e.target.value)} aria-label="Area">
+        <label className="rb-select"><Reveal tabbable={false} describe={false} detail="Area"><span className="rb-select-icon" aria-hidden="true">◫</span></Reveal><select value={area} onChange={e => setArea(e.target.value)} aria-label="Area">
           <option value="">all</option>{areas.map(([k, n]) => <option key={k} value={k}>{n}</option>)}</select></label>
-        <label className="rb-select"><span>Party:</span><select value={party} onChange={e => setParty(e.target.value)} aria-label="Party">
+        <label className="rb-select"><Reveal tabbable={false} describe={false} detail="Party"><span className="rb-select-icon" aria-hidden="true">◍</span></Reveal><select value={party} onChange={e => setParty(e.target.value)} aria-label="Party">
           <option value="">all</option>{carriers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-        <button type="button" aria-pressed={onlyNew} className={`rb-chip${onlyNew ? ' on' : ''}`} onClick={() => setOnlyNew(v => !v)} disabled={since === null}
-          title={since === null ? 'First visit to Red Flags on this computer' : undefined}>New since last visit {newCount}</button>
+        {since === null ? <Reveal tabbable={false} detail="First visit to Red Flags on this computer">
+          <button type="button" aria-pressed={false} className="rb-chip" disabled>New since last visit {newCount}</button></Reveal>
+          : <button type="button" aria-pressed={onlyNew} className={`rb-chip${onlyNew ? ' on' : ''}`} onClick={() => setOnlyNew(v => !v)}>New since last visit {newCount}</button>}
         <span className="rb-count-reset"><b>{shown.length} of {live.length + (aside ? flags.length - live.length : 0)}</b> flags{filtered && <> · <button type="button" onClick={reset}>Reset</button></>}</span>
       </div>
       {since !== null && <WhatChanged changes={changes} since={since} ready={!running && !waiting} onLight={onLight}/>}
@@ -318,7 +330,7 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
 
     <div className="rb-cols">
       <div className="rb-list-col">
-        <p className="rb-eyebrow">Ranked · level, then weight <span aria-hidden="true">J / K</span></p>
+        <p className="rb-eyebrow"><Reveal detail="By level, then weight."><span>Ranked</span></Reveal></p>
         {query.isError && <p role="alert" className="rb-quiet">{errorMessage(query.error, 'Could not read the Red Flags')}</p>}
         {problem && <p role="alert" className="rb-quiet">{problem}</p>}
         <div className="rb-list" ref={listRef} role="listbox" aria-label="Red Flags, ranked" aria-activedescendant={kind ? `rb-${kind.key}` : undefined}
@@ -333,15 +345,17 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
                 className={`rb-row level-${k.level}${k.key === kind?.key ? ' on' : ''}${k.key === previewKind?.key ? ' peek' : ''}${k.key === litKey ? ' lit' : ''}`}
                 style={{animationDelay: `${Math.min(i, STAGGER_MAX) * STAGGER_MS}ms`}}
                 onClick={() => { setHover(null); pick(k.key); }} onMouseEnter={() => setHover(k.key)}
-                aria-label={`Rank ${i + 1}, ${LEVEL[k.level]?.name ?? k.level}, ${k.name}${k.flags.length > 1 ? `, ${k.flags.length} found` : ''}, ${first.parties.slice(0, 2).map(p => p.name).join(' and ')}${first.parties.length > 2 ? ` and ${first.parties.length - 2} more` : ''}`}>
+                aria-label={`Rank ${i + 1}, ${LEVEL[k.level]?.name ?? k.level}, ${k.name}${k.flags.length > 1 ? `, ${k.flags.length} found` : ''}, ${first.parties.slice(0, 2).map(p => p.name).join(' and ')}${first.parties.length > 2 ? ` and ${first.parties.length - 2} more` : ''}${fresh ? ', new since your last visit' : ''}${unshownLinks > 0 ? `, rests on ${unshownLinks} link${unshownLinks === 1 ? '' : 's'} not yet shown` : ''}`}>
                 <span className="rb-rank">{i + 1}</span>
                 <span className="rb-row-body">
-                  <span className="rb-row-top"><LevelMark level={k.level}/><span className="rb-id">{first.indicator_id}</span>{fresh && <i className="rb-new" title="New since your last visit"/>}
+                  <span className="rb-row-top"><FlagMark level={k.level}/>{fresh && <Reveal tabbable={false} describe={false} detail="New since your last visit"><i className="rb-new"/></Reveal>}
                     {k.flags.length > 1 && <span className="rb-count">{k.flags.length} found</span>}</span>
-                  <span className="rb-name">{k.name}</span>
+                  {/* The indicator's code is on hover of the name; the open flag carries it too. */}
+                  <Reveal tabbable={false} describe={false} detail={<span className="rv-mono">{first.indicator_id}</span>}><span className="rb-name">{k.name}</span></Reveal>
                   <span className="rb-parties">{first.parties.slice(0, 2).map(p => <span key={p.id} className="rb-party">{p.name}</span>)}
                     {first.parties.length > 2 && <span className="rb-more">+{first.parties.length - 2}</span>}</span>
-                  {unshownLinks > 0 && <span className="rb-rests">○ rests on {unshownLinks} link{unshownLinks === 1 ? '' : 's'} not yet shown</span>}
+                  {unshownLinks > 0 && <Reveal tabbable={false} describe={false} detail={`Rests on ${unshownLinks} link${unshownLinks === 1 ? '' : 's'} not yet shown`}>
+                    <span className="rb-rests">○ {unshownLinks}</span></Reveal>}
                 </span>
               </button>;
             })}
@@ -380,9 +394,12 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
   const payments = flag.links.length > 0 && (flag.facts as {family?: string})?.family === 'count_in_band';
   const moneyFlag = flag.indicator_id.startsWith('ML') || payments;
   return <>
-    {preview && <p className="rb-peek-note">Preview · click the row to open it; move off the list to go back</p>}
+    {preview && <p className="rb-peek-note"><Reveal detail="Click the row to open it; move off the list to go back."><span>Preview</span></Reveal></p>}
     <div className="rb-open-head">
-      <span><LevelMark level={flag.level}/> <span className="rb-mono">{flag.indicator_id} · {ind?.area_name ?? ''} · rule v{flag.rule_version} · first seen {first.getUTCDate()} {first.toLocaleString('en-GB', {month: 'short', timeZone: 'UTC'})}</span></span>
+      <span><FlagMark level={flag.level} focusable={!preview}/> <Reveal label="About this flag" detail={<><span className="rv-row rv-mono">{flag.indicator_id}</span>
+        {ind?.area_name && <span className="rv-row">{ind.area_name}</span>}
+        <span className="rv-row">rule v{flag.rule_version} · first seen {first.getUTCDate()} {first.toLocaleString('en-GB', {month: 'short', timeZone: 'UTC'})}</span></>}>
+        <span className="rb-info" aria-hidden="true">ⓘ</span></Reveal></span>
       {kind.flags.length > 1 && !preview && <span className="rb-step" role="group" aria-label="Flags of this kind">
         <button type="button" onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0} aria-label="Previous of this kind">‹</button>
         <span><b>{Math.min(step, kind.flags.length - 1) + 1}</b> of {kind.flags.length}</span>
@@ -396,15 +413,18 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
       <section className="rb-ladder" aria-label="Level ladder: what would raise it">
         <p className="rb-eyebrow">Level ladder · what would raise it</p>
         <ol>{ladder(flag).map(r => <li key={r.level} className={`rung rung-${r.state} rk-${r.level}`}>
-          <span className="rung-head"><LevelMark level={r.level}/>
-            <b>{r.state === 'met' ? '✓ Met' : r.state === 'not_set' ? 'Not set' : r.state === 'needs' ? `Needs ${r.needs.length} fact${r.needs.length === 1 ? '' : 's'}` : 'Next'}</b></span>
-          <span className="rung-text">{r.text}</span>
+          <span className="rung-head"><FlagMark level={r.level}/>
+            {/* A met rung's wording is on hover; the rungs still to reach keep theirs (what would raise it). */}
+            {r.state === 'met' ? <Reveal detail={r.text}><b>✓ Met</b></Reveal>
+              : r.state === 'needs' ? <Reveal detail="Only a person can decide these."><b>Needs {r.needs.length} fact{r.needs.length === 1 ? '' : 's'}</b></Reveal>
+              : <b>{r.state === 'not_set' ? 'Not set' : 'Next'}</b>}</span>
+          {r.state !== 'met' && <span className="rung-text">{r.text}</span>}
           {r.needs.length > 0 && <><ul>{r.needs.map(n => <li key={n}>○ {n}</li>)}</ul>
-            <small>Only a person can decide these · <Link href={caseHref('/check#to-check', investigationId)}>open them in To check</Link></small></>}
+            <small><Link href={caseHref('/check#to-check', investigationId)}>Open them in To check</Link></small></>}
         </li>)}</ol>
       </section>
       <div className="rb-side">
-        {ind?.levels.threshold_note && <p className="rb-about"><b>About the numbers.</b> {ind.levels.threshold_note}</p>}
+        {ind?.levels.threshold_note && <p className="rb-about"><Reveal detail={<><b>About the numbers.</b> {ind.levels.threshold_note}</>}><span>ⓘ About the numbers</span></Reveal></p>}
         <div className="rb-acts">
           {flag.status === 'open' ? <>
             <button type="button" className="primary" onClick={() => void onLead()}>Add to leads <kbd>A</kbd></button>
@@ -425,8 +445,8 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
           </> : <p className="rb-quiet">Made a lead.</p>}
           <WatchButton investigationId={investigationId} recordType="red_flag" recordId={flag.id} className=""/>
           {moneyFlag && <Link className="rb-link-btn" href={caseHref('/see#money-flows', investigationId)}>Show in money flows</Link>}
-          <button type="button" disabled title={flag.level === 'faint' ? 'Faint flags can’t headline a share card.' : 'Sharing is not built yet.'}>Share</button>
-          <small>{flag.level === 'faint' ? 'Faint flags can’t headline a share card.' : 'Share cards are not built yet.'}</small>
+          <Reveal tabbable={false} detail={flag.level === 'faint' ? 'Faint flags can’t headline a share card.' : 'Share cards are not built yet.'}>
+            <button type="button" disabled>Share</button></Reveal>
         </div>
       </div>
     </div>
@@ -449,7 +469,7 @@ function Picture({flag, investigationId}: {flag: RedFlagOut; investigationId: st
     const facts = flag.facts as {kind?: string; value?: string; spellings?: string[]};
     const others = (facts.spellings ?? []).filter(v => v !== facts.value);
     return <figure className="rb-picture rb-shared" aria-label={`${names.join(' and ')} share the ${facts.kind ?? 'detail'} ${facts.value ?? ''}`}>
-      <figcaption><span>What they share</span><small>no link joins them in the records</small></figcaption>
+      <figcaption><Reveal detail="No link joins them in the records."><span>What they share</span></Reveal></figcaption>
       <p className="rb-shared-row">{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> · </i>}<b>{n}</b></span>)}</p>
       <p className="rb-shared-value"><small>{facts.kind ?? 'detail'}</small> “{facts.value}”{others.length > 0 && <i> also written “{others.join('”, “')}”</i>}</p>
     </figure>;
@@ -459,7 +479,8 @@ function Picture({flag, investigationId}: {flag: RedFlagOut; investigationId: st
     <p>{names.map((n, i) => <span key={i}><b>{n}</b> → </span>)}<b>{names[0]}</b> ↺</p>
   </figure>;
   return <figure className="rb-picture rb-chain" aria-label={`The parties it rests on: ${names.join(', ')}`}>
-    <figcaption><span>The parties it rests on</span>{unshown(flag) > 0 && <small>○ {unshown(flag)} link{unshown(flag) === 1 ? '' : 's'} not yet shown</small>}</figcaption>
+    <figcaption><span>The parties it rests on</span>{unshown(flag) > 0 && <Reveal detail={`${unshown(flag)} link${unshown(flag) === 1 ? '' : 's'} not yet shown`}>
+      <small className="rb-rests">○ {unshown(flag)}</small></Reveal>}</figcaption>
     <p>{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}<b>{n}</b></span>)}</p>
   </figure>;
 }
@@ -499,7 +520,8 @@ export function monthTicks(t0: number, t1: number): {t: number; label: string; y
   return out.filter((_, i) => i % every === 0);
 }
 
-const CERTAINTY_WORD: Record<FinancialTransactionOut['certainty'], string> = {shown: '✓ Shown', not_yet_shown: '○ Not yet shown', disputed: '✕ Disputed'};
+const CERTAINTY_WORD: Record<FinancialTransactionOut['certainty'], string> = {shown: 'Shown', not_yet_shown: 'Not yet shown', disputed: 'Disputed'};
+const CERTAINTY_STATUS: Record<FinancialTransactionOut['certainty'], ClaimStatus> = {shown: 'supported', not_yet_shown: 'unshown', disputed: 'disputed'};
 
 /** The payments in the band, by date. Scrolling over the picture steps through them (one notch, one payment; the
  * arrow keys do the same when it has focus); the payment in focus is ringed and named under the picture. */
@@ -536,7 +558,8 @@ function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
   };
   return <figure className="rb-picture rb-payments" ref={ref} tabIndex={pays.length > 1 ? 0 : undefined} onKeyDown={pays.length > 1 ? onKey : undefined}
     aria-label={pays.length > 1 ? 'The payments it rests on: scroll over, or use the arrow keys, to step through them' : undefined} {...wheel}>
-    <figcaption><span>The payments it rests on</span><small>{pays.length > 1 ? <>scroll over to step through · <b>{at + 1}</b> of {pays.length} shown</> : `${pays.length} shown`}</small></figcaption>
+    <figcaption><span>The payments it rests on</span>{pays.length > 1 ? <Reveal detail="Scroll over the picture, or use the arrow keys, to step through them.">
+      <small><b>{at + 1}</b> of {pays.length} shown</small></Reveal> : <small>{pays.length} shown</small>}</figcaption>
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${pays.length} payments between ${sign}9,000 and ${sign}10,000, by date`}>
       <rect x={L} y={y(10000)} width={W - L - R} height={y(9000) - y(10000)} className="rb-band"/>
       <text x={L + 4} y={y(10000) + 12} className="rb-band-label">{sign}9,000–{sign}10,000 band</text>
@@ -556,13 +579,21 @@ function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
       })}
     </svg>
     <p className="rb-pay-focus" aria-live="polite"><b>{sign}{cur.amount.toLocaleString('en-GB')}{sign ? '' : ` ${currency}`}</b> on {day(cur.dateTime!)} · {cur.from} → {cur.to}
-      {' '}<span className={`rb-pay-word c-${cur.certainty}`}>{CERTAINTY_WORD[cur.certainty]}</span>{cur.evidence ? <i> · {cur.evidence}</i> : null}</p>
+      {' '}<StatusChip status={CERTAINTY_STATUS[cur.certainty]} label={cur.evidence ? `${CERTAINTY_WORD[cur.certainty]} · ${cur.evidence}` : CERTAINTY_WORD[cur.certainty]} focusable/></p>
   </figure>;
 }
 
 // What ruled an innocent explanation out, as the backend takes it (FlagInnocent: note up to 2000).
 const ruleOutSchema = z.object({note: z.string().trim().min(1, 'Write what ruled it out.').max(2000, 'Keep it under 2,000 characters.')});
 type RuleOutValues = z.infer<typeof ruleOutSchema>;
+
+const CHECK_STATE: Record<string, {mark: string; word: string}> = {open: {mark: '○', word: 'Open'}, shows: {mark: '✓', word: 'Shows it'},
+  does_not: {mark: '✕', word: 'Does not'}, unclear: {mark: '?', word: 'Unclear'}};
+/** A check on what the records can't show: its shape, the word on reveal. */
+function CheckState({status}: {status: string}): ReactElement {
+  const c = CHECK_STATE[status] ?? CHECK_STATE.unclear;
+  return <Reveal label={c.word} detail={c.word}><span className={`rb-state st-${status}`} aria-hidden="true">{c.mark}</span></Reveal>;
+}
 
 const INNOCENT_WORD: Record<FlagInnocentOut['state'], string> = {not_looked_at: 'Not looked at', ruled_out: 'Ruled out', could_apply: 'Could apply'};
 
@@ -581,12 +612,11 @@ function BeforeYouCallIt({flag, investigationId, ranAt}: {flag: RedFlagOut; inve
     <section aria-label="Could be innocent">
       <p className="rb-eyebrow">Could be innocent · {checked} of {items.length} checked</p>
       <ul className="rb-innocent">{items.map(i => <li key={i.text} className={`inn-${i.state}`}>
-        <span className="inn-mark" aria-hidden="true">{i.state === 'ruled_out' ? '✓' : i.state === 'could_apply' ? '!' : '○'}</span>
+        {/* The state is the mark (✓ ruled out, ! could apply, ○ not looked at); its word and the note are revealed on it. */}
+        <Reveal label={INNOCENT_WORD[i.state]} detail={<><b>{INNOCENT_WORD[i.state]}</b>{i.note && i.state !== 'not_looked_at' ? `: ${i.note}` : ''}</>}>
+          <span className="inn-mark" aria-hidden="true">{i.state === 'ruled_out' ? '✓' : i.state === 'could_apply' ? '!' : '○'}</span></Reveal>
         <span className="inn-body">
           <span>{i.text}</span>
-          {i.state === 'not_looked_at' && <small>Not looked at</small>}
-          {i.state === 'ruled_out' && <small><i>Ruled out{i.note ? `: ${i.note}` : ''}</i></small>}
-          {i.state === 'could_apply' && <small>Could apply{i.note ? `: ${i.note}` : ''}</small>}
           {ruling === i.text ? <Form {...ruleOut}><form className="inn-why" noValidate onSubmit={submitWith(ruleOut, async ({note}) => {
             // The failure shows in this form, so not again under the list.
             try { await mark.mutateAsync({path: {flag_id: flag.id}, body: {text: i.text, state: 'ruled_out', note}}); } catch (error) { mark.reset(); throw error; }
@@ -608,15 +638,16 @@ function BeforeYouCallIt({flag, investigationId, ranAt}: {flag: RedFlagOut; inve
     </section>
     {(checks.length > 0 || flag.not_shown.length > 0) && <section aria-label="The records can't show">
       <p className="rb-eyebrow">The records can’t show</p>
-      <ul className="rb-cant">{checks.length ? checks.map(c => <li key={c.id}><span>{c.question}</span>
-        <span className={`rb-state st-${c.status}`}>{c.status === 'open' ? '○ Open' : c.status === 'shows' ? '✓ Shows it' : c.status === 'does_not' ? '✕ Does not' : '? Unclear'}</span></li>)
-        : flag.not_shown.map(n => <li key={n}><span>{n}</span><span className="rb-state st-open">○ Open</span></li>)}</ul>
+      <ul className="rb-cant">{checks.length ? checks.map(c => <li key={c.id}><span>{c.question}</span><CheckState status={c.status}/></li>)
+        : flag.not_shown.map(n => <li key={n}><span>{n}</span><CheckState status="open"/></li>)}</ul>
     </section>}
     {sources.length > 0 && <section aria-label="Documented in">
       <p className="rb-eyebrow">Documented in · {sources.length} source{sources.length === 1 ? '' : 's'}</p>
-      {sources.map((s, i) => <blockquote key={i} className="rb-quote"><p>“{s.quote}”</p>
-        <footer>{s.publisher}, {s.title}{s.locator ? `, ${s.locator}` : ''} {s.url && <a href={s.url} target="_blank" rel="noreferrer">↗</a>}</footer></blockquote>)}
+      {/* Publisher and title show; the quote and the locator are revealed on them. */}
+      {sources.map((s, i) => <div key={i} className="rb-quote"><Reveal detail={<><span className="rv-row">“{s.quote}”</span>{s.locator && <span className="rv-row">{s.locator}</span>}</>}>
+        <span>{s.publisher}, {s.title}</span></Reveal> {s.url && <a href={s.url} target="_blank" rel="noreferrer" aria-label={`Open ${s.title}`}>↗</a>}</div>)}
     </section>}
-    <p className="rb-foot">A flag is a lead, not a finding. Verify before any publication.{ranAt && <> · Rules ran {agoText(ranAt)}</>}</p>
+    <p className="rb-foot">A flag is a lead, not a finding. Verify before any publication.{ranAt && <> <Reveal label="When the rules ran" detail={`Rules ran ${agoText(ranAt)}`}>
+      <span aria-hidden="true">◷</span></Reveal></>}</p>
   </>;
 }

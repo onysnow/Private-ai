@@ -408,3 +408,16 @@ html[data-motion='calm'] .wr-plan { animation: none; }
 .br-saved-mode { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
 .br-saved-mode small { flex: 1 1 260px; color: var(--text-muted); font-size: 12px; }
 @media (max-width: 560px) { .br-saved li { grid-template-columns: minmax(0, 1fr); } .br-saved li .br-quiet, .br-saved li small { grid-row: auto; grid-column: 1; justify-self: start; } }
+/* 29 Oct rule: help, timings and logs on reveal; what is left is drawn larger. */
+.br-row > .rv { min-width: 0; }
+.br-label { font-size: 13.5px; }
+.br-sysrow { font-size: 12.5px; padding: 3px 9px; }
+.br-floor { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; font: 600 11px var(--font-mono); color: var(--flag-strong); box-shadow: inset 0 0 0 1px currentColor; }
+.br-lookups { font-size: 14px; }
+.rv-card .br-echo { max-height: 220px; background: none; padding: 0; }
+.br-echo-count b { color: var(--flag-strong); }
+.br-plan li b { font-size: 13.5px; }
+.wr-log li > .rv, .wr-steptime-rv { display: block; min-width: 0; }
+.wr-ledgers div { font-size: 13px; padding: 6px 8px; }
+.wr-stepaxis { justify-content: center; font-size: 11px; }
+.wr-transport .rv small { font-size: 12px; }

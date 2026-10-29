@@ -5,15 +5,19 @@
 import {useQuery} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useEffect, useRef, useState} from 'react';
-import type {ReactElement} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 
+import {PartyGlyph} from '../../components/network/marks';
 import {AiTag, LevelChip} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
+import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {api} from '../../lib/api-instance';
 import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
-import {NO_REASONS, markTerms} from './use-decisions';
+import {KIND_ICON, KIND_LABEL, KIND_MEANING, NO_REASONS, markTerms} from './use-decisions';
+import type {DecisionKind} from './use-decisions';
 
 const MARK: Record<DecisionChoiceOut['key'], string> = {yes: '✓', no: '✕', unsure: '○'};
 export const KEYS = {home: {yes: 's', no: 'd', unsure: 'u'}, decide: {yes: '1', no: '2', unsure: '3'}} as const;
@@ -39,6 +43,14 @@ export function RowCells({rows, compact = false}: {rows: NonNullable<NonNullable
   </div>;
 }
 
+/** A decision's kind as its mark (Decide's vocabulary), named on hover, focus or click. `bare` draws the mark alone,
+ *  for a control that names the kind itself and wears the reveal. */
+export function KindMark({kind, tabbable = true, bare = false, extra}: {kind: DecisionKind; tabbable?: boolean; bare?: boolean; extra?: ReactNode}): ReactElement {
+  const glyph = <span className={`dc-kind dc-kind-${kind}`} aria-hidden="true">{KIND_ICON[kind]}</span>;
+  if (bare) return glyph;
+  return <Reveal tabbable={tabbable} label={KIND_LABEL[kind]} detail={<><b>{KIND_LABEL[kind]}</b><span className="rv-row">{KIND_MEANING[kind]}</span>{extra}</>}>{glyph}</Reveal>;
+}
+
 export function PartyChips({parties}: {parties: DecisionItemOut['parties']}): ReactElement | null {
   const pointed = useWorkbenchStore(state => state.pointedParty);
   const point = useWorkbenchStore(state => state.setPointedParty);
@@ -58,10 +70,12 @@ export function PartyChips({parties}: {parties: DecisionItemOut['parties']}): Re
   if (!parties.length) return null;
   return <ul className="ch-parties" aria-label="Parties">
     {parties.map(p => <li key={p.id}>
-      <button type="button" className={`ch-party${pointed === p.id ? ' on' : ''}`} onMouseEnter={() => reach(p.id)}
-        onFocus={() => reach(p.id)} onClick={() => press(p.id)} aria-pressed={pointed === p.id}>
-        <span aria-hidden="true" className="ch-party-kind">{(p.schema || 'T')[0]}</span>{p.name}
-      </button>
+      {/* The party's kind is its icon, named on hover or focus (Ony, 29 Oct). */}
+      <Reveal tabbable={false} detail={<><b>{PARTY[partyKind(p.schema)].name}</b>{p.schema ? <span className="rv-row rv-mono">{p.schema}</span> : null}</>}>
+        <button type="button" className={`ch-party${pointed === p.id ? ' on' : ''}`} onMouseEnter={() => reach(p.id)}
+          onFocus={() => reach(p.id)} onClick={() => press(p.id)} aria-pressed={pointed === p.id}>
+          <PartyGlyph kind={partyKind(p.schema)} size={14}/>{p.name}
+        </button></Reveal>
     </li>)}
   </ul>;
 }
@@ -143,13 +157,21 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
   const inv = useWorkbenchStore(state => state.investigationId);
   // On Case home the page sits beside the question (mockup HOME_1); Decide shows it in its own pane.
   const page = keys === 'home' && ev?.document_id && /\.pdf$/i.test(ev.filename ?? '') && ev.excerpt ? pageOf(ev.locator) : null;
+  // Where the passage sits (file · page · scanned) is sub-text: on the passage, on hover or focus (Ony, 29 Oct).
+  const locator = ev ? [ev.filename, ev.locator, /OCR/i.test(ev.locator ?? '') ? 'scanned, OCR' : null].filter(Boolean).join(' · ') : '';
+  // Why it is asked is sub-text too: on the question. Who proposed it stays as its mark (the AI mark), the level as its bars.
+  const question = <h3 className="ch-question">{item.reason
+    ? <Reveal detail={<>{item.actor_kind !== 'ai' && item.actor ? <b>{item.actor}</b> : null}<span className="rv-row">{item.reason}</span></>}>{item.question}</Reveal>
+    : item.question}</h3>;
   const words = <>
     {ev?.rows?.length ? <RowCells rows={ev.rows} compact/>
-      : ev?.excerpt ? <blockquote className="ch-excerpt"><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></blockquote>
+      : ev?.excerpt ? <blockquote className="ch-excerpt">{locator
+        ? <Reveal detail={<span className="rv-mono">{locator}</span>}><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></Reveal>
+        : <Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/>}</blockquote>
       : <p className="ch-proposal">{item.proposal}</p>}
     {/* No passage to show here (an AI draft, a missing record): the thing itself is one click away. */}
     {keys === 'home' && !ev && item.choices.length > 0 && <Link className="ch-source-link" href={caseHref(item.open.href, inv)}>{item.open.label} <span aria-hidden="true">↗</span></Link>}
-    {ev && <p className="ch-locator">{[ev.filename, ev.locator, /OCR/i.test(ev.locator ?? '') ? 'scanned, OCR' : null].filter(Boolean).join(' · ')}</p>}
+    {ev && !ev.excerpt && locator && <p className="ch-locator"><Reveal detail={<span className="rv-mono">{locator}</span>}><span>{ev.filename || 'Source'}</span></Reveal></p>}
     <PartyChips parties={item.parties}/>
   </>;
   const extras = <>
@@ -157,16 +179,15 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
     {showWhatHappens && <WhatHappens item={item}/>}
   </>;
   return <article className={`ch-card ch-kind-${item.kind}`} aria-label={`${item.question} (${position} of ${total})`} data-testid="decision-card">
-    <p className="ch-why">
-      {item.actor_kind === 'ai' ? <AiTag/> : keys === 'decide' ? <span className="ch-actor">{item.actor}</span> : null}
-      {keys === 'decide' && item.level && <LevelChip level={item.level}/>}
-      <span>{item.reason}</span>
-    </p>
+    {(item.actor_kind === 'ai' || (keys === 'decide' && item.level)) && <p className="ch-why">
+      {item.actor_kind === 'ai' && <AiTag/>}
+      {keys === 'decide' && item.level && <LevelChip level={item.level} focusable/>}
+    </p>}
     {page !== null && ev?.document_id ? <div className="ch-card-body ch-split">
       <PageThumb documentId={ev.document_id} page={page} passage={ev.excerpt!.trim()}/>
-      <div className="ch-split-words"><h3 className="ch-question">{item.question}</h3>{words}{extras}</div>
+      <div className="ch-split-words">{question}{words}{extras}</div>
     </div> : <>
-      <h3 className="ch-question">{item.question}</h3>
+      {question}
       <div className="ch-card-body">{words}{extras}</div>
     </>}
     {item.choices.length > 0 ? <>

@@ -14,7 +14,9 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {NotificationPrefsOut} from '../../lib/generated/types.gen';
 
+import {Reveal} from '../../components/ui/reveal';
 import {OutsideChannels} from './outside-channels';
+import {HelpRow} from './settings-index';
 
 type Route = 'interrupt' | 'needs' | 'else' | 'off';
 const ROUTE_WORDS: Record<Route, string> = {interrupt: 'Interrupt', needs: 'Needs you', else: 'Everything else', off: 'Off'};
@@ -73,7 +75,8 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
 
   return <div className="ap-two">
     <section className="ap-pane" aria-labelledby="nt-routes">
-      <div className="ap-pane-head"><h2 id="nt-routes">Where each kind goes</h2><span>the bell’s two tabs, the top band, or nowhere</span>
+      <div className="ap-pane-head"><h2 id="nt-routes"><Reveal detail={<><span className="rv-row">The bell’s two tabs, the top band, or nowhere.</span>
+        <span className="rv-row">Interrupt is one notice in the top band, in the alarm colour, shown once and never repeated. Only a Textbook Red Flag may interrupt.</span></>}><span>Where each kind goes</span></Reveal></h2>
         <button type="button" className="st-link" onClick={() => put({routes: Object.fromEntries(p.kinds.map(k => [k.key, k.default as Route]))})}>Reset to defaults</button></div>
       {p.kinds.map(k => {
         const routes: Route[] = k.can_interrupt ? ['interrupt', 'needs', 'else', 'off'] : ['needs', 'else', 'off'];
@@ -87,30 +90,31 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
         </div>;
       })}
       {problem && <p className="st-problem" role="alert">{problem}</p>}
-      <p className="st-hint">Interrupt is one notice in the top band, in the alarm colour, shown once and never repeated. Only a Textbook Red Flag may interrupt.</p>
     </section>
 
     <div className="st-col">
       <section className="ap-pane" aria-labelledby="nt-week">
-        <div className="ap-pane-head"><h2 id="nt-week">Last week, with these choices</h2><span>{caseName}</span></div>
+        <div className="ap-pane-head"><h2 id="nt-week"><Reveal detail="Counted from what this case raised in the last seven days. Change a route and the numbers move, so you see what you would have been told before you choose.">
+          <span>Last week, with these choices</span></Reveal></h2><span>{caseName}</span></div>
         {!investigationId ? <p className="st-hint">Open a case to replay its week.</p>
           : !week ? <p className="st-wait">Counting…</p>
           : <div className="st-bins">{BINS.map(b => <div key={b.route} className={`st-bin st-bin-${b.route}`}><b>{bins[b.route]}</b><span>{b.words}</span></div>)}</div>}
-        <p className="st-hint">Counted from what this case raised in the last seven days. Change a route and the numbers move, so you see what you would have been told before you choose.</p>
       </section>
 
       <section className="ap-pane" aria-labelledby="nt-when">
         <div className="ap-pane-head"><h2 id="nt-when">When it tells you</h2></div>
-        <label className="ap-switch"><span><b>Quiet while reading</b><small>In the reader, Chain of Custody and Decide, an interrupt waits until you leave. The bell still counts.</small></span>
-          <input type="checkbox" role="switch" checked={p.quiet_while_reading} onChange={e => put({quiet_while_reading: e.target.checked})}/><i aria-hidden="true"/></label>
-        <label className="ap-switch"><span><b>Desktop notification</b><small>When the Workbench is in the background, an interrupt also tells this computer: the kind only, no names and no text.</small></span>
+        <HelpRow help="In the reader, Chain of Custody and Decide, an interrupt waits until you leave. The bell still counts.">
+        <label className="ap-switch"><span><b>Quiet while reading</b><small className="st-sr">In the reader, Chain of Custody and Decide, an interrupt waits until you leave. The bell still counts.</small></span>
+          <input type="checkbox" role="switch" checked={p.quiet_while_reading} onChange={e => put({quiet_while_reading: e.target.checked})}/><i aria-hidden="true"/></label></HelpRow>
+        <HelpRow help="When the Workbench is in the background, an interrupt also tells this computer: the kind only, no names and no text.">
+        <label className="ap-switch"><span><b>Desktop notification</b><small className="st-sr">When the Workbench is in the background, an interrupt also tells this computer: the kind only, no names and no text.</small></span>
           <input type="checkbox" role="switch" checked={p.desktop} onChange={async e => {
             const on = e.target.checked;
             if (on) { const why = await allowDesktop(); if (why) { setProblem(why); return; } }
             put({desktop: on});
-          }}/><i aria-hidden="true"/></label>
+          }}/><i aria-hidden="true"/></label></HelpRow>
         <div className="st-route">
-          <span className="st-route-what"><b>Remind me to back up</b><small>When a case has new material and no full backup for this long. Only a backup with the files counts.</small></span>
+          <span className="st-route-what"><Reveal detail="When a case has new material and no full backup for this long. Only a backup with the files counts."><b>Remind me to back up</b></Reveal></span>
           <span className="ap-seg" role="radiogroup" aria-label="Remind me to back up">
             {BACKUP_DAYS.map(b => <button key={b.days} type="button" role="radio" aria-checked={p.backup_days === b.days} className={p.backup_days === b.days ? 'on' : ''}
               onClick={() => p.backup_days !== b.days && put({backup_days: b.days})}>{b.words}</button>)}
@@ -121,13 +125,14 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
       <OutsideChannels prefs={p}/>
 
       <section className="ap-pane" aria-labelledby="nt-watch">
-        <div className="ap-pane-head"><h2 id="nt-watch">Watches on facts</h2><span>told when a fact changes</span></div>
+        <div className="ap-pane-head"><h2 id="nt-watch"><Reveal detail="Told when a fact changes."><span>Watches on facts</span></Reveal></h2></div>
         {!investigationId ? <p className="st-hint">Open a case to see what you watch in it.</p>
           : watches.isPending ? <p className="st-wait">Looking…</p>
           : !watches.data?.length ? <p className="st-hint">Nothing watched in this case. Watch a claim from its card, or a Red Flag from its page.</p>
           : <ul className="st-list">{watches.data.map(w => <li key={w.id} className="st-route">
-            <span className="st-route-what"><b>{w.label}</b>
-              <small>{w.record_type === 'claim' ? 'Claim' : 'Red Flag'} · {w.changed ? `${w.baseline_words} → ${w.value_words}` : `now ${w.value_words}`}</small></span>
+            {/* What kind of fact it is is revealed on its name; the change (or the value now) shows. */}
+            <span className="st-route-what"><Reveal detail={w.record_type === 'claim' ? 'Claim' : 'Red Flag'}><b>{w.label}</b></Reveal>
+              <small>{w.changed ? `${w.baseline_words} → ${w.value_words}` : `now ${w.value_words}`}</small></span>
             <button type="button" className="ap-btn" disabled={stop.isPending} onClick={() => stop.mutate({path: {fact_watch_id: w.id}})}>Stop</button>
           </li>)}</ul>}
       </section>

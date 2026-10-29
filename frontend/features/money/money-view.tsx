@@ -11,9 +11,10 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import type {ReactElement} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 
-import {LevelChip} from '../../components/status';
+import {LevelChip, StatusChip, type ClaimStatus} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {
@@ -30,8 +31,9 @@ const FinancialFlowSankey = dynamic(() => import('../../components/charts/financ
   {ssr: false, loading: () => <p className="mn-muted">Drawing the flow…</p>});
 
 type Layout = 'columns' | 'flow' | 'ledger';
-const CERTAINTY: Record<Certainty, {mark: string; word: string}> = {
-  shown: {mark: '✓', word: 'Shown'}, not_yet_shown: {mark: '○', word: 'Not yet shown'}, disputed: {mark: '✕', word: 'Disputed'},
+const CERTAINTY: Record<Certainty, {mark: string; word: string; status: ClaimStatus}> = {
+  shown: {mark: '✓', word: 'Shown', status: 'supported'}, not_yet_shown: {mark: '○', word: 'Not yet shown', status: 'unshown'},
+  disputed: {mark: '✕', word: 'Disputed', status: 'disputed'},
 };
 const KIND: Record<CheckMark, {icon: string; word: string; line: string}> = {
   grey_hole: {icon: '◐', word: 'Grey hole', line: 'more out than in'},
@@ -151,6 +153,9 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
     return () => window.removeEventListener('keydown', onKey);
   }, [active, txs, row, traced.length]);
 
+  // Marks drawn in the picture that are revealed on hover, focus or click: an HTML layer over the SVG, placed in the
+  // picture's own units (Ony, 29 Oct; an SVG <title> reaches neither keyboard nor touch).
+  const hot: Array<{key: string; x: number; y: number; w: number; h: number; label: string; detail: ReactNode}> = [];
   const toggle = (ids: string[]) => setTraced(now => ids.every(id => now.includes(id)) ? now.filter(id => !ids.includes(id)) : [...new Set([...now, ...ids])]);
   const status = ledgerQ.isError ? errorMessage(ledgerQ.error, 'Could not read the ledger') : ledgerQ.isPending ? 'Reading the ledger…' : '';
 
@@ -158,9 +163,10 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
     <header className="mn-head">
       <div className="mn-titles">
         <h2>Where did the money go, and where does it appear or vanish?</h2>
-        {currency && <p>{others.length
+        {/* "EUR only" stays: it keeps a total from being misread; the sentence is revealed on it. */}
+        {currency && <p><Reveal detail={others.length
           ? `${currencyName(currency)} payments only. The ${others.map(([c, n]) => `${n} ${currencyName(c).toLowerCase()} payment${n === 1 ? '' : 's'}`).join(' and ')} ${others.reduce((s, [, n]) => s + n, 0) === 1 ? 'is' : 'are'} kept apart and never added to these.`
-          : `${currencyName(currency)} payments: the only currency in this case's ledger.`}
+          : `${currencyName(currency)} payments: the only currency in this case's ledger.`}><span className="mn-only">{currency} only</span></Reveal>
           {asOf !== null && <span className="mn-chip">As of end of {asOf} <button type="button" aria-label={`Clear: as of end of ${asOf}`} onClick={() => setAsOf(null)}>✕</button></span>}</p>}
       </div>
       <div className="mn-controls">
@@ -174,8 +180,8 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
         </div>
         <div className="mn-traced" aria-live="polite">
           <span>Traced so far</span>
-          <b>{currency ? amountText(tracedTotal.reduce((s, p) => s + p.amount, 0), currency) : '—'}</b>
-          <small>{tracedTotal.length} payment{tracedTotal.length === 1 ? '' : 's'}</small>
+          <Reveal detail={`${tracedTotal.length} payment${tracedTotal.length === 1 ? '' : 's'}`}>
+            <b>{currency ? amountText(tracedTotal.reduce((s, p) => s + p.amount, 0), currency) : '—'}</b></Reveal>
           <button type="button" onClick={() => setTraced([])} disabled={!traced.length}>Clear</button>
         </div>
       </div>
@@ -191,6 +197,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
     {currency && payments.length > 0 && <div className="mn-body">
       <div className="mn-main">
         {view === 'columns' && picture && <figure className="mn-figure" ref={figureRef}>
+          <div className="mn-svg-wrap">
           <svg viewBox={`0 0 ${picture.width} ${picture.height}`} role="img" aria-label={`Money in ${currency}, from where it comes to where it goes`}>
             <defs>
               <pattern id="mn-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -231,7 +238,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
               const lines: Array<[string, string]> = // [words, 'sum'] or, in the first column, [name, its sum on the same line]
                 n.others ? (first ? [[n.name, `${amountText(n.amountOut, currency)} · ${count} payments`]] : [])
                 : n.ghost
-                ? [[n.name, ''], [`ƒ ${amountText(n.amountOut, currency)} · worked out`, 'sum'], [`= what left ${owner?.name ?? 'it'} minus what came in`, 'sum']]
+                ? [[n.name, ''], [`ƒ ${amountText(n.amountOut, currency)} · worked out`, 'sum']]
                 : first ? [[n.name, `${amountText(n.amountOut, currency)} · ${count} payment${count === 1 ? '' : 's'}${n.marks.includes('miracle') && n.h > 24 ? ' · nothing seen coming in' : ''}`]]
                 : last && picture.crowded ? [[n.name, `${amountText(n.amountIn, currency)} in`]] // one line each in a crowded column
                 : last ? [[n.name, ''], [n.marks.includes('black_hole') ? `${amountText(n.amountIn, currency)} in · ${amountText(0, currency)} out`
@@ -241,24 +248,37 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
               const markAt = (i: number) => first ? {x: n.x - 14 - i * 20, y: n.y + Math.min(n.h / 2, 10)}
                 : last && lines.length === 1 ? {x: lx + lines[0][0].length * 7.4 + lines[0][1].length * 6.6 + 22 + i * 20, y: ly - 4}
                 : last ? {x: lx + lines[1][0].length * 6.6 + 14 + i * 20, y: ly + 10} : {x: n.x + 6 + i * 20, y: n.y - 14};
+              // The worked-out sum's "=" explanation is revealed on its line; each check mark is named on reveal.
+              if (n.ghost) hot.push({key: `f:${n.id}`, x: lx, y: ly + 14 - 11, w: lines[1][0].length * 6.6, h: 15, label: lines[1][0],
+                detail: <><b>{lines[1][0]}</b><span className="rv-row">= what left {owner?.name ?? 'it'} minus what came in</span></>});
+              n.marks.forEach((m, i) => { const at = markAt(i); hot.push({key: `m:${n.id}:${m}`, x: at.x - 9, y: at.y - 9, w: 18, h: 18, label: KIND[m].word,
+                detail: <><b>{KIND[m].word}</b><span className="rv-row">{KIND[m].line}</span></>}); });
               return <g key={n.id} className={`mn-node${n.ghost ? ' ghost' : ''}${n.others ? ' others' : ''}`}>
                 <rect x={n.x} y={n.y} width={12} height={n.h} rx={2} fill={n.ghost ? 'url(#mn-hatch)' : undefined}/>
                 {n.ghost && <rect x={n.x} y={n.y} width={picture.nodes.find(x => `ghost:${x.id}` === n.id)!.x - n.x} height={n.h} className="mn-ghost-box"/>}
                 {n.marks.map((m, i) => { const at = markAt(i); return <g key={m} className={`mn-mark mn-mark-${m}`} transform={`translate(${at.x} ${at.y})`}>
-                  <title>{KIND[m].word}: {KIND[m].line}</title><circle r={8}/><text y={4} textAnchor="middle">{KIND[m].icon}</text></g>; })}
+                  <circle r={8}/><text y={4} textAnchor="middle">{KIND[m].icon}</text></g>; })}
                 {lines.map(([words, cls], i) => <text key={i} x={lx} y={ly + i * 14} className={cls === 'sum' ? 'mn-node-sum' : 'mn-node-name'}>{words}
                   {cls && cls !== 'sum' && <tspan className="mn-node-sum" dx={8}>{cls}</tspan>}</text>)}
               </g>;
             })}
           </svg>
+          {hot.map(h => <span key={h.key} className="mn-hot" style={{left: `${(h.x / picture.width) * 100}%`, top: `${(h.y / picture.height) * 100}%`,
+            width: `${(h.w / picture.width) * 100}%`, height: `${(h.h / picture.height) * 100}%`}}>
+            <Reveal className="mn-hot-rv" label={h.label} detail={h.detail}><span/></Reveal></span>)}
+          </div>
           <ul className="sr-only" aria-label="The payments, in order">
             {picture.bands.filter(b => b.certainty !== 'worked_out').map(b => <li key={b.key}>{bandWords(b, picture)}</li>)}
           </ul>
           <figcaption>
-            <span>Scroll over the flow to replay it in date order · drawn up to {drawnTo ? day(drawnTo.slice(0, 7)) : '—'}{upTo !== null && <> · <button type="button" className="mn-link" onClick={() => setUpTo(null)}>all</button></>} · click a band to add it to “Traced so far” · <kbd>L</kbd> list view</span>
-            <span className="mn-key"><i className="k-shown"/>shown <i className="k-unshown"/>not yet shown{payments.some(p => p.certainty === 'disputed') && <><i className="k-disputed"/>disputed</>} <i className="k-worked"/>ƒ worked out{picture.folded && <> <i className="k-others"/>others, folded</>}</span>
-            {picture.folded && <span className="mn-fold">The {TOP_FLOWS} largest of {picture.flows} flows are drawn; others ({picture.folded.flows}) holds the
-              other {picture.folded.payments} payments, {amountText(picture.folded.amount, currency)}. Totals count every payment. <button type="button" className="mn-link" onClick={() => setAllFlows(true)}>Show all {picture.flows} flows</button></span>}
+            {/* The state ("to Mar 2016") and the counts show; how to use the picture, and its key, are revealed. */}
+            <span><Reveal detail={<><span className="rv-row">Scroll over the flow to replay it in date order.</span>
+              <span className="rv-row">Click a band to add it to “Traced so far”.</span><span className="rv-row">Key: <kbd>L</kbd> list view</span></>}>
+              <span>To {drawnTo ? day(drawnTo.slice(0, 7)) : '—'}</span></Reveal>{upTo !== null && <> · <button type="button" className="mn-link" onClick={() => setUpTo(null)}>all</button></>}</span>
+            <Reveal detail={<span className="mn-key"><i className="k-shown"/>shown <i className="k-unshown"/>not yet shown{payments.some(p => p.certainty === 'disputed') && <><i className="k-disputed"/>disputed</>} <i className="k-worked"/>ƒ worked out{picture.folded && <> <i className="k-others"/>others, folded</>}</span>}>
+              <span className="mn-key-mark">Key</span></Reveal>
+            {picture.folded && <span className="mn-fold"><Reveal detail={`The ${TOP_FLOWS} largest of ${picture.flows} flows are drawn; others (${picture.folded.flows}) holds the other ${picture.folded.payments} payments, ${amountText(picture.folded.amount, currency)}. Totals count every payment.`}>
+              <span>{TOP_FLOWS} of {picture.flows} flows</span></Reveal> <button type="button" className="mn-link" onClick={() => setAllFlows(true)}>Show all {picture.flows} flows</button></span>}
             {allFlows && picture.flows > TOP_FLOWS && <span className="mn-fold">All {picture.flows} flows are drawn. <button type="button" className="mn-link" onClick={() => { setAllFlows(false); setPointed(null); }}>Fold to the {TOP_FLOWS} largest</button></span>}
           </figcaption>
         </figure>}
@@ -319,6 +339,13 @@ function chips(bands: ReturnType<typeof layout>['bands'], avoid: Array<{x: numbe
   });
 }
 
+/** A check's kind as its icon; its name and line are revealed. */
+function CheckIcon({kind}: {kind: CheckMark}): ReactElement {
+  const k = KIND[kind];
+  return <Reveal label={k.word} detail={<><b>{k.word}</b><span className="rv-row">{k.line}</span></>}>
+    <span className="mn-check-icon" aria-hidden="true">{k.icon}</span></Reveal>;
+}
+
 function currencyName(c: string): string {
   return ({EUR: 'Euro', USD: 'Dollar', GBP: 'Sterling'} as Record<string, string>)[c] ?? c;
 }
@@ -354,14 +381,16 @@ function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
         return <tr key={t.id} className={`${on ? 'lit' : ''}${flagged.has(t.id) ? ' flagged' : ''}${traced.has(t.id) ? ' traced' : ''}`} onMouseEnter={() => onLight(t.id, from + i)}
           aria-current={on ? 'true' : undefined}>
           <td>{day(t.dateTime ?? null)}{t.dateEnd ? ` to ${day(t.dateEnd)}` : ''}</td><td>{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-          <td><span className={`mn-sure mn-sure-${t.certainty}`}><span aria-hidden="true">{c.mark}</span> {c.word}</span></td>
+          <td><StatusChip status={c.status} label={c.word}/></td>
           <td>{t.locator ?? <span className="mn-muted">none attached</span>}</td>
           {full && <td>{t.statedPurpose ?? <span className="mn-muted">none stated</span>}</td>}
         </tr>;
       })}</tbody>
     </table>
-    {!full && txs.length > shown.length && <p className="mn-muted">{txs.length - shown.length} more rows{from > 0 ? ` (${from} above)` : ''}
-      {hidden > 0 ? `, ${hidden} of them lit` : ''} · <kbd>J</kbd> / <kbd>K</kbd> moves the lit row, and the same band lights above</p>}
+    {!full && txs.length > shown.length && <p className="mn-muted"><Reveal detail={<>
+      <span className="rv-row">{txs.length - shown.length} more rows{from > 0 ? ` (${from} above)` : ''}{hidden > 0 ? `, ${hidden} of them lit` : ''}</span>
+      <span className="rv-row">Keys: <kbd>J</kbd> / <kbd>K</kbd> move the lit row, and the same band lights above</span></>}>
+      <span>{txs.length - shown.length} more</span></Reveal></p>}
   </div>;
 }
 
@@ -399,7 +428,7 @@ function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[
         className={`mn-bar mn-bar-${t.certainty}${lit.has(t.id) ? ' lit' : ''}`}><title>{day(t.dateTime ?? null)} · {t.from} → {t.to} · {amountText(t.amount, currency)}</title></rect>)}
       {dated.filter(t => t.amount >= 10 * (line ?? 10000)).map(t => <text key={`v${t.id}`} x={x(time(t.dateTime!)) + 6} y={H - B - h(t.amount) + 8} className="mn-bar-value">{amountText(t.amount, currency)}</text>)}
     </svg>
-    <p className="mn-muted mn-axis-note">bar height: amount, log scale (stated on the axis){flags.length ? '' : ` · no structuring flag on these ${currency} payments`}</p>
+    <p className="mn-muted mn-axis-note"><Reveal detail={`Bar height: amount, on a log scale${flags.length ? '' : ` · no structuring flag on these ${currency} payments`}`}><span>log scale</span></Reveal></p>
   </figure>;
 }
 
@@ -437,41 +466,42 @@ function ChecksPanel({investigationId, currency, checks, ranAt, asOf, error}: {
       onSuccess: () => { setKept(m => ({...m, [key]: true})); setKeepProblem(''); },
       onError: e => setKeepProblem(errorMessage(e, 'Could not add it to To check')),
     });
+    // The check's kind is its icon, named with its line on reveal; the lead idea is revealed on Make a lead. Could be
+    // innocent stays (an indicator, never a finding).
     return <article key={key} className={`mn-check mn-check-${c.kind}`} aria-label={title}>
-      <header><span className="mn-check-icon" aria-hidden="true">{k.icon}</span><span><small>{k.word} · {k.line}</small><b>{c.party}</b></span></header>
+      <header><CheckIcon kind={c.kind}/><b>{c.party}</b></header>
       <p>{numbers}</p>
       <p><b>Could be innocent:</b> {c.innocent}.</p>
       <div className="mn-check-acts">
-        <button type="button" disabled={made[key] || lead.isPending} onClick={() => makeLead(key, `${title} (${currency})`, `${numbers} Could be innocent: ${c.innocent}. Lead idea: ${c.lead_idea}.`)}>
-          {made[key] ? 'Lead made ✓' : 'Make a lead'}</button>
+        <Reveal tabbable={false} detail={`Lead idea: ${c.lead_idea}`}><button type="button" disabled={made[key] || lead.isPending} onClick={() => makeLead(key, `${title} (${currency})`, `${numbers} Could be innocent: ${c.innocent}. Lead idea: ${c.lead_idea}.`)}>
+          {made[key] ? 'Lead made ✓' : 'Make a lead'}</button></Reveal>
         <button type="button" disabled={inToCheck || keep.isPending} onClick={addToCheck}>{inToCheck ? 'In To check ✓' : 'Add to To check'}</button>
       </div>
-      <p className="mn-idea">Lead idea: {c.lead_idea} →</p>
     </article>;
   };
   return <aside className="mn-checks" aria-label="Does the money add up?">
     <p className="mn-eyebrow">Does the money add up? · 4 checks</p>
     <h3>Where money appears or vanishes</h3>
-    <p className="mn-muted">Worked out by the app <i>ƒ</i> from the {currencyName(currency).toLowerCase()} ledger only. Each one is a question to chase, not a finding.</p>
+    {/* Kept once: each check is a question to chase, not a finding. How it was worked out is revealed on the ƒ. */}
+    <p className="mn-muted"><Reveal label="Worked out by the app" detail={`Worked out by the app from the ${currencyName(currency).toLowerCase()} ledger only.`}><i aria-hidden="true">ƒ</i></Reveal> Each one is a question to chase, not a finding.</p>
     {error && <p className="mn-muted">{error}</p>}
     {keepProblem && <p className="mn-muted" role="alert">{keepProblem}</p>}
     {!checks && !error && <p className="mn-muted">Running the checks…</p>}
     {checks && <>
+      {/* The four checks in a row: filled when something was found, hollow when not, each named on reveal. */}
+      <p className="mn-check-row" aria-label="What the checks found">{(['grey_hole', 'miracle', 'black_hole', 'round_trip'] as const).map(k => {
+        const n = k === 'round_trip' ? checks.round_trips.length : found.filter(c => c.kind === k).length;
+        return <Reveal key={k} label={`${KIND[k].word}: ${n ? `${n} found` : 'none found'}`} detail={<><b>{KIND[k].word}: {n ? `${n} found` : 'none found'}</b>
+          <span className="rv-row">{KIND[k].line}</span>{k === 'round_trip' && !n && <span className="rv-row">No {currencyName(currency).toLowerCase()} chain returns to its payer.</span>}</>}>
+          <span className={`mn-check-icon mn-icon-${k}${n ? ' found' : ''}`} aria-hidden="true">{KIND[k].icon}</span></Reveal>;
+      })}</p>
       {shown.map((c, i) => card(c, `${c.kind}:${c.party_id}:${i}`))}
-      {(['grey_hole', 'miracle', 'black_hole'] as const).filter(k => !found.some(c => c.kind === k)).map(k =>
-        <article key={k} className="mn-check none" aria-label={`${KIND[k].word}: none found`}>
-          <header><span className="mn-check-icon" aria-hidden="true">{KIND[k].icon}</span><span><small>{KIND[k].word} · {KIND[k].line}</small><b>None found</b></span></header>
-        </article>)}
       {found.length > firstOfKind.length && <button type="button" className="mn-more" onClick={() => setMore(m => !m)}>
         {more ? 'Show one of each' : `${found.length - firstOfKind.length} more ›`}</button>}
-      {checks.round_trips.length ? checks.round_trips.map((t, i) => card(t, `rt:${i}`))
-        : <article className="mn-check mn-check-round_trip none" aria-label="Round trip: none found">
-          <header><span className="mn-check-icon" aria-hidden="true">{KIND.round_trip.icon}</span>
-            <span><small>Round trip · {KIND.round_trip.line}</small><b>✓ None found</b></span></header>
-          <p>No {currencyName(currency).toLowerCase()} chain returns to its payer.</p>
-        </article>}
+      {checks.round_trips.map((t, i) => card(t, `rt:${i}`))}
     </>}
-    {ranAt && <p className="mn-ran">Checks re-run when the ledger or the year changes · last run {ran(ranAt)} · <button type="button" className="mn-link" aria-expanded={how} onClick={() => setHow(h => !h)}>How these work</button></p>}
+    {ranAt && <p className="mn-ran"><Reveal tabbable={false} detail={`Checks re-run when the ledger or the year changes · last run ${ran(ranAt)}`}>
+      <button type="button" className="mn-link" aria-expanded={how} onClick={() => setHow(h => !h)}>How these work</button></Reveal></p>}
     {how && <ul className="mn-how">
       <li><b>Grey hole:</b> a party sent more than the case shows it received; the difference is worked out, never a payment.</li>
       <li><b>Miracle:</b> a party sent money and nothing is recorded coming in.</li>

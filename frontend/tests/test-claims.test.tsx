@@ -79,7 +79,8 @@ describe('ClaimsPanel', () => {
     expect(await screen.findByText(/robust evidence, high agreement\.$/)).toBeInTheDocument();
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toEqual({status: 'unverified', confidence: 0.4, rationale: 'Two independent filings agree.',
       evidence_grade: 'robust', agreement_grade: 'high'});
-    expect(screen.getByText('40% confidence · robust evidence, high agreement')).toBeInTheDocument();
+    // The row shows the confidence as a number; its words and the grade are revealed (in the page for screen readers).
+    expect(screen.getByText('40% confidence · robust evidence, high agreement').closest('[hidden]')).not.toBeNull();
     expect(screen.getByText(/not graded → robust evidence, high agreement/)).toBeInTheDocument();
   });
 
@@ -118,7 +119,8 @@ describe('ClaimsPanel', () => {
 
   it('lists the claims and disables Add unverified claim until text is entered', async () => {
     await renderPanel();
-    expect(screen.getByText('40% confidence')).toBeInTheDocument();
+    expect(screen.getByText('40%')).toBeVisible();
+    expect(screen.getByText('40% confidence').closest('[hidden]')).not.toBeNull();
     expect(screen.getByText('Choose a claim to inspect its evidence and verification state.')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Add unverified claim'})).toBeDisabled();
   });
@@ -137,7 +139,7 @@ describe('ClaimsPanel', () => {
     await screen.findByRole('heading', {name: 'The vendor was paid twice.', level: 4});
     expect(screen.getByText('No evidence is linked to this claim yet.')).toBeInTheDocument();
     expect(screen.getByText('No reporter review has been recorded yet.')).toBeInTheDocument();
-    expect(screen.getByText('0 supporting · 0 contradicting · 0 context')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '0 supporting · 0 contradicting · 0 context'})).toBeInTheDocument();
     expect(api.lastBody('POST /api/claims')).toEqual({investigation_id: 'inv-1', text: 'The vendor was paid twice.', status: 'unverified', confidence: 0});
     expect(api.calls(CLAIMS)).toHaveLength(2);
     expect(api.calls('GET /api/claims/claim-2/review-workspace')).toHaveLength(1);
@@ -178,7 +180,7 @@ describe('ClaimsPanel', () => {
     await screen.findByText('Recorded immutable review: confirmed at 90% confidence.');
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toEqual({status: 'confirmed', confidence: 0.4, rationale: 'Board minutes confirm the date directly.'});
     // The reply is what the screen shows now: the list, the history, and no further request.
-    expect(screen.getByText('90% confidence')).toBeInTheDocument();
+    expect(screen.getByText('90%')).toBeInTheDocument();
     expect(screen.getAllByText('Confirmed')[0].closest('.st')).toHaveClass('st-supported');
     expect(screen.getByText('unverified → confirmed')).toBeInTheDocument();
     expect(screen.getByText('Board minutes confirm the date directly.')).toBeInTheDocument();
@@ -208,8 +210,9 @@ describe('ClaimsPanel', () => {
     await screen.findByText('Linked evidence as supports.');
     expect(api.lastBody('POST /api/claims/claim-1/evidence')).toEqual({evidence_id: 'ev-1', stance: 'supports', note: 'Signed copy'});
     expect(api.calls(WORKSPACE)).toHaveLength(2);
-    expect(screen.getByText('1 supporting · 0 contradicting · 0 context')).toBeInTheDocument();
-    expect(screen.getByText('Reporter note: Signed copy')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '1 supporting · 0 contradicting · 0 context'})).toBeInTheDocument();
+    expect(screen.getByText('Reporter note: Signed copy').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('img', {name: 'Supports'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Supports ✓'})).toBeDisabled();
     expect(screen.getByRole('button', {name: 'Contradicts'})).toBeEnabled();
     expect(screen.getByPlaceholderText('Optional reporter note for the next evidence link')).toHaveValue('');
@@ -229,7 +232,8 @@ describe('ClaimsPanel', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText('Jane Doe → Kestrelwood Holdings');
-    expect(screen.getByText('Directorship · 1 linked evidence record(s)')).toBeInTheDocument();
+    expect(screen.getByText('Directorship · 1 linked evidence record(s)').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('img', {name: 'Directorship: Directs, works for or belongs to'})).toBeInTheDocument();
     expect(screen.getByText('Relationship rel-9')).toBeInTheDocument();
     expect(screen.getByText('FollowTheMoney relationship · 2 linked evidence record(s)')).toBeInTheDocument();
 
@@ -276,8 +280,11 @@ describe('ClaimsPanel', () => {
     await user.click(await screen.findByRole('option', {name: 'supported'}));
     const done = await screen.findByTestId('claim-done');
     expect(done).toHaveTextContent('Supported means');
-    expect(done).toHaveTextContent('✕At least one supporting item is linked');
-    expect(done).toHaveTextContent('cannot be checked here');
+    // A publication gate: the rules stay on screen; each rule's state is its shape, named (with its detail) on reveal.
+    expect(within(done).getByText('At least one supporting item is linked')).toBeVisible();
+    expect(within(done).getByRole('img', {name: 'Not met'})).toHaveTextContent('✕');
+    expect(within(done).getByRole('img', {name: 'Cannot be checked here'})).toHaveAccessibleDescription(/No supporting item has a stored file\./);
+    expect(within(done).getByText('No supporting item has a stored file.').closest('[hidden]')).not.toBeNull();
     await user.type(screen.getByPlaceholderText('Required rationale for this review'), 'Two editors read it.');
     expect(screen.getByRole('button', {name: 'Supported — 1 check left'})).toBeDisabled();
     await user.type(screen.getByPlaceholderText(/Some true facts have one source/), 'The registry is the only record.');

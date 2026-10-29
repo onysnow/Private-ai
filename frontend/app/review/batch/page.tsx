@@ -6,7 +6,8 @@ import Link from 'next/link';
 import {useRouter, useSearchParams} from 'next/navigation';
 import {errorMessage} from '../../../lib/api-client';
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Reveal} from '@/components/ui/reveal';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {nestDocuments} from '../../../features/documents/document-tree';
@@ -198,8 +199,7 @@ function TriageTable<T extends Row & JobState>({title, subtitle, rows: nested, s
       {rows.length > 0 && (
         <Card className="card">
           <CardHeader className="pb-3">
-            <CardTitle>Documents in this batch</CardTitle>
-            <CardDescription>Review every document one at a time with full context, or jump straight to the ones that need attention.</CardDescription>
+            <CardTitle><Reveal detail="Review every document one at a time with full context, or jump straight to the ones that need attention."><span>Documents in this batch</span></Reveal></CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center gap-2">

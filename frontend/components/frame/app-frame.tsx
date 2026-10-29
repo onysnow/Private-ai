@@ -14,6 +14,7 @@ import {usePathname, useRouter} from 'next/navigation';
 import {useQuery} from '@tanstack/react-query';
 
 import {Dialog, DialogContent, DialogDescription, DialogTitle} from '@/components/ui/dialog';
+import {Reveal} from '../ui/reveal';
 import {TryingBar} from '../../features/appearance/appearance-panel';
 import {BoardEffects} from '../../features/effects/board-effects';
 import {STAGES, hrefOfAnchor} from '../../lib/stages';
@@ -248,25 +249,24 @@ function CommandPalette({open, onOpenChange}: {open: boolean; onOpenChange: (ope
           <div className="fr-palette-group">{g}</div>
           {items.map((c, i) => c.group !== g ? null : <div key={c.id} id={`fr-cmd-${c.id}`} role="option" aria-selected={i === active}
             className={`fr-cmd${i === active ? ' on' : ''}`} onMouseEnter={() => setActive(i)} onClick={() => pick(i)}>
-            <span>{c.label}</span>{c.hint && <small>{c.hint}</small>}
+            <span>{c.label}</span>{c.hint && i === active && <small>{c.hint}</small>}
           </div>)}
         </div>)}
         {!items.length && <p className="fr-palette-empty">Nothing matches. Type words from a place, a command or a record.</p>}
       </div>
-      <div className="fr-palette-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open · <kbd>Esc</kbd> close</div>
     </DialogContent>
   </Dialog>;
 }
 
 function ShortcutsHelp({open, onOpenChange}: {open: boolean; onOpenChange: (open: boolean) => void}): ReactElement {
   const rows: [string, string][] = [['⌘K / Ctrl K', 'Search the case, or go anywhere'], ['⌘O / Ctrl O', 'Switch case'], ['⌘⇧H / Ctrl Shift H or ⇧Esc', 'Hide the screen'], ['[', 'Open or close the steps (left edge)'], [']', 'Open or close the tools (top edge)'],
-    ['Alt →  /  Alt ←', 'Open or close the steps'], ['Alt ↓  /  Alt ↑', 'Open or close the tools'], ['G then H', 'Go to the case home'],
+    ['Alt →  /  Alt ←', 'Open or close the steps'], ['Alt ↓  /  Alt ↑', 'Open or close the tools'], ['G then H', 'Go to the case home'], ['↑ / ↓, Enter', 'Command palette and case switcher: move, open'],
     ['1 – 4', 'Case home: go to a module'], ['J / K', 'Case home and Decide: step through the list'], ['Enter', 'Case home: open the focused module whole-screen'],
     ['S / D / U', 'Case home: answer Next up (shows it, does not, unclear)'], ['1 / 2 / 3', 'Decide: answer the card'], ['Z', 'Undo the last answer'],
     ['O', 'Decide: open the source · The Drop: choose files'],
     ['J / K', 'The Drop and the Reading room: move through the list'], ['Enter', 'The Drop: open the file in the reading room'], ['F', 'The Drop: problems and files in progress only'],
     ['A / R', 'Reading room: accept or reject'], ['1 – 4', 'Reading room: answer the card'], ['E', 'Reading room: keep as evidence (clip)'], ['U', 'Reading room: undo'],
-    ['Space', 'Listen room: play or pause'], ['← / →', 'Listen room: 5 seconds back or on'], ['P', 'Listen room: pin a line'], ['H', 'Listen room: I heard this'],
+    ['J / K', 'Learn: move through the indicators'], ['Space · ← / →', 'Learn, cards: turn the card · move'], ['Space', 'Listen room: play or pause'], ['← / →', 'Listen room: 5 seconds back or on'], ['P', 'Listen room: pin a line'], ['H', 'Listen room: I heard this'],
     ['?', 'This list'], ['Esc', 'Close what is open']];
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="fr-help">
@@ -311,12 +311,11 @@ function CaseSwitcher({open, onOpenChange, onNewCase}: {open: boolean; onOpenCha
         {shown.map((c, i) => <div key={c.id} id={`fr-case-${c.id}`} role="option" aria-selected={i === active} className={`fr-cmd${i === active ? ' on' : ''}`}
           onMouseEnter={() => setActive(i)} onClick={() => pick(c.id)}>
           <span>{c.name}{c.id === current ? ' · open now' : ''}</span>
-          {(c.question || placeOf[c.id]) && <small>{[c.question, placeOf[c.id] && `last at ${placeOf[c.id].label.split(' › ').slice(2).join(' › ') || 'Home'}`].filter(Boolean).join(' · ')}</small>}
+          {i === active && (c.question || placeOf[c.id]) && <small>{[c.question, placeOf[c.id] && `last at ${placeOf[c.id].label.split(' › ').slice(2).join(' › ') || 'Home'}`].filter(Boolean).join(' · ')}</small>}
         </div>)}
         {!shown.length && <p className="fr-palette-empty">{cases.length ? 'No case matches.' : 'No cases yet.'}</p>}
       </div>
       <button type="button" className="fr-new-case" onClick={() => { onOpenChange(false); onNewCase(); }}>+ Start a new case</button>
-      <div className="fr-palette-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open · <kbd>Esc</kbd> close</div>
     </DialogContent>
   </Dialog>;
 }
@@ -325,7 +324,7 @@ function CaseSwitcher({open, onOpenChange, onNewCase}: {open: boolean; onOpenCha
 function Bell({onOpen}: {onOpen: () => void}): ReactElement {
   const waiting = useNeedsYouCount();
   return <button type="button" className="fr-tool fr-bell" aria-label={`Inbox: ${waiting} need${waiting === 1 ? 's' : ''} you`} onClick={onOpen}>
-    <span aria-hidden="true">🔔</span>{waiting > 0 && <b className="fr-count">{waiting > 99 ? '99+' : waiting}</b>}
+    <svg className="fr-bell-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"><path d="M6 17h12l-1.6-2.2V10a4.4 4.4 0 0 0-8.8 0v4.8z M10 19.5a2 2 0 0 0 4 0"/></svg>{waiting > 0 && <b className="fr-count">{waiting > 99 ? '99+' : waiting}</b>}
   </button>;
 }
 
@@ -410,22 +409,24 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   return <div className={`fr${pins.left ? ' pin-left' : ''}${pins.top ? ' pin-top' : ''}`}>
     <a href="#fr-main" className="fr-skip">Skip to the content</a>
     <nav className="fr-crumbs" aria-label="You are here">
-      <button type="button" className="fr-crumb-home" onClick={() => setLeft(o => !o)} aria-expanded={left} aria-controls="fr-left" title="Steps and pages ( [ )">
-        <span aria-hidden="true">≡</span><span className="sr-only">Steps and pages</span>
-      </button>
-      <ol>{trail.map((t, i) => <li key={i}>{t.label === 'Cases' && i === 0 ? <button type="button" className="fr-crumb-cases" onClick={() => setCases(true)} title="Switch case (⌘O)">Cases</button>
+      <Reveal tabbable={false} detail={<>Steps and pages <kbd>[</kbd></>}>
+        <button type="button" className="fr-crumb-home" onClick={() => setLeft(o => !o)} aria-expanded={left} aria-controls="fr-left">
+          <span aria-hidden="true">≡</span><span className="sr-only">Steps and pages</span>
+        </button></Reveal>
+      <ol>{trail.map((t, i) => <li key={i}>{t.label === 'Cases' && i === 0 ? <Reveal tabbable={false} detail={<>Switch case <kbd>⌘O</kbd></>}><button type="button" className="fr-crumb-cases" onClick={() => setCases(true)}>Cases</button></Reveal>
         : t.href && i < trail.length - 1 ? <Link href={caseHref(t.href)}>{t.label}</Link> : <span aria-current={i === trail.length - 1 ? 'page' : undefined}>{t.label}</span>}</li>)}</ol>
     </nav>
 
     {/* Left edge: where to go. */}
-    <button type="button" className={`fr-handle fr-handle-left${left ? ' on' : ''}`} aria-label="Open steps and pages" aria-expanded={left} aria-controls="fr-left" onClick={() => setLeft(o => !o)}/>
-    {!left && <span className="fr-edge-label" aria-hidden="true">▸ Case · Steps</span>}
+    <Reveal tabbable={false} className="fr-handle-rv" detail={<><b>Case · Steps</b><span className="rv-row">The case’s steps and the app’s pages <kbd>[</kbd></span></>}>
+      <button type="button" className={`fr-handle fr-handle-left${left ? ' on' : ''}`} aria-label="Open steps and pages" aria-expanded={left} aria-controls="fr-left" onClick={() => setLeft(o => !o)}/>
+    </Reveal>
     {fresh && !left && <span className={`fr-hint fr-hint-left${hintShown ? '' : ' gone'}`} aria-hidden="true">Steps and pages <kbd>[</kbd></span>}
     {fresh && !top && <span className={`fr-hint fr-hint-top${hintShown ? '' : ' gone'}`} aria-hidden="true">Tools <kbd>]</kbd></span>}
     <aside id="fr-left" className={`fr-left${left ? ' open' : ''}`} aria-label="Steps and pages" aria-hidden={!left} onMouseLeave={() => setLeft(false)} inert={!left ? true : undefined}>
       <div className="fr-left-head"><b>Journalism Workbench</b>
-        <span><button type="button" className={`fr-pin${pins.left ? ' on' : ''}`} aria-pressed={pins.left} onClick={() => pin('left')}
-          title={pins.left ? 'Let it hide again' : 'Keep it open on this computer'}>{pins.left ? 'Pinned' : 'Pin'}</button>
+        <span><Reveal tabbable={false} detail={pins.left ? 'Let it hide again' : 'Keep it open on this computer'}>
+          <button type="button" className={`fr-pin${pins.left ? ' on' : ''}`} aria-pressed={pins.left} onClick={() => pin('left')}>{pins.left ? 'Pinned' : 'Pin'}</button></Reveal>
         <button type="button" className="fr-x" onClick={() => { setLeft(false); if (pins.left) pin('left'); }} aria-label="Close">×</button></span></div>
       {places.length > 1 && <div className="fr-places"><p>Where you have been</p>
         <ul>{places.slice(1).map(p => <li key={p.href}><Link href={p.href}>{p.label}</Link></li>)}</ul></div>}
@@ -442,14 +443,15 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     {/* Top edge: tools. */}
     <button type="button" className={`fr-handle fr-handle-top${top ? ' on' : ''}`} aria-label="Open tools" aria-expanded={top} aria-controls="fr-top" onClick={() => setTop(o => !o)}/>
     <div id="fr-top" className={`fr-top${top ? ' open' : ''}`} role="toolbar" aria-label="Tools" aria-hidden={!top} onMouseLeave={() => setTop(false)} inert={!top ? true : undefined}>
-      <button type="button" className="fr-tool" onClick={() => { setTop(false); setCases(true); }}>Switch case <kbd>⌘O</kbd></button>
+      <Reveal tabbable={false} detail={<kbd>⌘O</kbd>}><button type="button" className="fr-tool" onClick={() => { setTop(false); setCases(true); }}>Switch case</button></Reveal>
       <button type="button" className="fr-tool wide" onClick={() => { setTop(false); setPalette(true); }}>Search the case, or type a command… <kbd>⌘K</kbd></button>
       <Bell onOpen={() => { setTop(false); setInbox(true); }}/>
-      <Link href="/settings" className="fr-tool" aria-label="Settings" title="Settings"><span aria-hidden="true">⚙</span></Link>
+      <Reveal tabbable={false} detail="Settings"><Link href="/settings" className="fr-tool" aria-label="Settings"><span aria-hidden="true">⚙</span></Link></Reveal>
       <button type="button" className="fr-tool" onClick={() => { setTop(false); setHelp(true); }}>Keys <kbd>?</kbd></button>
-      <button type="button" className="fr-tool" onClick={() => { setTop(false); hideScreen(); }} title="Cover the screen at once (⌘⇧H or ⇧Esc)">Hide screen</button>
-      <button type="button" className={`fr-tool fr-pin${pins.top ? ' on' : ''}`} aria-pressed={pins.top} onClick={() => pin('top')}
-        title={pins.top ? 'Let it hide again' : 'Keep it open on this computer'}>{pins.top ? 'Pinned' : 'Pin'}</button>
+      <Reveal tabbable={false} detail={<>Cover the screen at once <kbd>⌘⇧H</kbd> or <kbd>⇧Esc</kbd></>}>
+        <button type="button" className="fr-tool" onClick={() => { setTop(false); hideScreen(); }}>Hide screen</button></Reveal>
+      <Reveal tabbable={false} detail={pins.top ? 'Let it hide again' : 'Keep it open on this computer'}>
+        <button type="button" className={`fr-tool fr-pin${pins.top ? ' on' : ''}`} aria-pressed={pins.top} onClick={() => pin('top')}>{pins.top ? 'Pinned' : 'Pin'}</button></Reveal>
     </div>
 
     <div id="fr-main" className="fr-main">{children}</div>
@@ -461,7 +463,7 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     <Dialog open={newCase} onOpenChange={setNewCase}>
       <DialogContent className="fr-new">
         <DialogTitle>Start a case</DialogTitle>
-        <DialogDescription>Its name and question, what kind of case it is, and what you have so far.</DialogDescription>
+        <DialogDescription className="sr-only">Its name and question, what kind of case it is, and what you have so far.</DialogDescription>
         <NewCaseSetup onCreated={() => setNewCase(false)}/>
       </DialogContent>
     </Dialog>

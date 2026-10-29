@@ -12,12 +12,14 @@ import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, KeyboardEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Slider} from '@/components/ui/slider';
-import {STATUS_WORDS, StatusChip} from '../../components/status';
+import {FamilyMark, StanceGlyph, StanceMark} from '../../components/network/marks';
+import {StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   getClaimReviewWorkspaceOptions, getClaimReviewWorkspaceQueryKey, listClaimsOptions, listClaimsQueryKey, listInvestigationEvidenceOptions,
@@ -48,6 +50,7 @@ const CLAIM_STATUSES = ['lead', 'unverified', 'supported', 'confirmed', 'dispute
 const EVIDENCE_GRADES = ['limited', 'medium', 'robust'] as const;
 const AGREEMENT_GRADES = ['low', 'medium', 'high'] as const;
 const UNGRADED = 'none';
+const STANCE_BUTTON: Record<Stance, string> = {supports: 'Supports', contradicts: 'Contradicts', context: 'Context'};
 
 // The status grammar (docs/handoff/02_RULES.md): each claim status takes the shape of the state it stands for, so
 // every status shows a shape and its own word, never colour alone. The same mapping as the case home's Check module.
@@ -62,11 +65,7 @@ function ClaimStatusChip({status}: {status: string}): ReactElement {
   return <StatusChip status={shapeOf(status)} label={statusWord(status)}/>;
 }
 
-/** A status in running text: its mark, then its word. */
-function StatusMarked({status}: {status: string}): ReactElement {
-  const shape = shapeOf(status);
-  return <><span aria-hidden="true" className={`cl-mark cl-mark-${shape}`}>{STATUS_WORDS[shape].mark}</span>{status}</>;
-}
+const DONE_WORD = {met: 'Met', not_met: 'Not met', unknown: 'Cannot be checked here'} as const;
 
 /** A grade in words: "medium evidence, high agreement", or null when the claim has none. */
 export function gradeText(claim: {evidence_grade?: string | null; agreement_grade?: string | null}): string | null {
@@ -189,8 +188,9 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
 
   return <Card className="card" id="claim-verification">
     <CardHeader className="pb-3">
-      <CardTitle>Claim verification workspace</CardTitle>
-      <CardDescription>Claims stay separate from source material. Review the exact linked evidence, preserve whether each item supports, contradicts, or only contextualizes the claim, then explicitly set verification status and confidence.</CardDescription>
+      {/* Ony, 29 Oct: the card's explanation is revealed on its title. */}
+      <CardTitle><Reveal detail="Claims stay separate from source material. Review the exact linked evidence, preserve whether each item supports, contradicts, or only contextualizes the claim, then explicitly set verification status and confidence.">
+        Claim verification workspace</Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       <div className="searchrow">
@@ -201,11 +201,15 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
       {claimsQuery.isError && <p className="muted">{errorMessage(claimsQuery.error, 'Could not load the claims')}</p>}
       <div className="twocol">
         <div>
-          {claims.length === 0 ? <p className="muted">No claims yet.</p> : claims.map(c => <button type="button" className={`finding cl-row cl-${shapeOf(c.status)}`} key={c.id} onClick={() => openClaim(c.id)}
-            aria-current={c.id === selectedId ? 'true' : undefined}>
-            <ClaimStatusChip status={c.status}/>
-            <strong>{c.text}</strong><small>{Math.round(c.confidence * 100)}% confidence{gradeText(c) ? ` · ${gradeText(c)}` : ''}</small>
-          </button>)}
+          {/* The confidence is a number and shows; its words and the IPCC grade are revealed on the row. */}
+          {claims.length === 0 ? <p className="muted">No claims yet.</p> : claims.map(c => <Reveal key={c.id} tabbable={false} className="cl-row-wrap"
+            detail={`${Math.round(c.confidence * 100)}% confidence${gradeText(c) ? ` · ${gradeText(c)}` : ''}`}>
+            <button type="button" className={`finding cl-row cl-${shapeOf(c.status)}`} onClick={() => openClaim(c.id)}
+              aria-current={c.id === selectedId ? 'true' : undefined}>
+              <ClaimStatusChip status={c.status}/>
+              <strong>{c.text}</strong><small className="cl-conf"><span className="cl-bar" aria-hidden="true"><i style={{width: `${Math.round(c.confidence * 100)}%`}}/></span>
+                {Math.round(c.confidence * 100)}%</small>
+            </button></Reveal>)}
         </div>
         <div>
           {!selectedClaim ? <p className="muted">Choose a claim to inspect its evidence and verification state.</p> : <>
@@ -241,8 +245,10 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
             {done && <div className="done-list" data-testid="claim-done">
               <b>{claimStatus === 'confirmed' ? 'Confirmed' : 'Supported'} means</b>
               <ul>{done.rules.map(r => <li key={r.key} className={`done-${r.state}`}>
-                <span aria-hidden="true">{r.state === 'met' ? '✓' : r.state === 'not_met' ? '✕' : '○'}</span>
-                <span><b>{r.label}</b> <small>{r.state === 'unknown' ? 'cannot be checked here: ' : ''}{r.detail}</small></span>
+                {/* A publication gate: the rules stay; each rule's long detail is revealed on its shape. */}
+                <Reveal label={DONE_WORD[r.state]} detail={<><b>{DONE_WORD[r.state]}</b><span className="rv-row">{r.detail}</span></>}>
+                  <span aria-hidden="true">{r.state === 'met' ? '✓' : r.state === 'not_met' ? '✕' : '○'}</span></Reveal>
+                <span><b>{r.label}</b></span>
               </li>)}</ul>
               {!done.met && <label className="done-override">Mark it anyway, because…
                 <Input value={overrideReason} onChange={(e: ChangeEvent<HTMLInputElement>) => setOverrideReason(e.target.value)}
@@ -250,39 +256,49 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
             </div>}
             {statusLine && <p className="muted">{statusLine}</p>}
             {workspace && <>
-              <div className="candidate">
-                <b>Evidence balance</b>
-                <div>{workspace.stance_counts.supports} supporting · {workspace.stance_counts.contradicts} contradicting · {workspace.stance_counts.context} context</div>
-                <div>From {workspace.source_count ?? 0} source{workspace.source_count === 1 ? '' : 's'}</div>
-                <small>Grade the claim on the IPCC grid from this: evidence is limited, medium or robust by its type, amount, quality and
-                  consistency; agreement is low, medium or high by how far the evidence agrees.</small>
+              <div className="candidate cl-balance">
+                <Reveal detail="Grade the claim on the IPCC grid from this: evidence is limited, medium or robust by its type, amount, quality and consistency; agreement is low, medium or high by how far the evidence agrees."><b>Evidence balance</b></Reveal>
+                {/* Counts by stance, each drawn in its stance's line; the words are read with them and revealed. */}
+                <Reveal label={`${workspace.stance_counts.supports} supporting · ${workspace.stance_counts.contradicts} contradicting · ${workspace.stance_counts.context} context`} describe={false}
+                  detail={`${workspace.stance_counts.supports} supporting · ${workspace.stance_counts.contradicts} contradicting · ${workspace.stance_counts.context} context`}>
+                  <span className="cl-counts" aria-hidden="true">
+                    {(['supports', 'contradicts', 'context'] as const).map(k => <span key={k}><StanceGlyph stance={k}/> <b>{workspace.stance_counts[k]}</b></span>)}</span></Reveal>
+                <div className="cl-sources">From {workspace.source_count ?? 0} source{workspace.source_count === 1 ? '' : 's'}</div>
               </div>
               <h4>Dependent canonical relationships</h4>
-              {workspace.dependent_relationships.length === 0 ? <p className="muted">No canonical relationship currently depends on this claim&apos;s linked evidence.</p> : workspace.dependent_relationships.map(dep => {
+              {workspace.dependent_relationships.length === 0 ? <p className="muted"><Reveal detail="No canonical relationship currently depends on this claim's linked evidence.">None</Reveal></p> : workspace.dependent_relationships.map(dep => {
                 const rel = relationships.find(r => r.id === dep.id);
                 const trace = () => openProvenance({title: selectedClaim.text, kind: 'claim-dependent relationship', traceRecordType: 'relationship', acceptedRecordId: dep.id});
                 return <div className="candidate" key={dep.id}>
-                  <b>{rel ? `${rel.source.caption} → ${rel.target.caption}` : `Relationship ${dep.id}`}</b>
-                  <div>{rel?.schema || 'FollowTheMoney relationship'} · {dep.evidence_ids.length} linked evidence record(s)</div>
+                  <b className="cl-rel"><FamilyMark schema={rel?.schema}/>
+                    <Reveal detail={`${rel?.schema || 'FollowTheMoney relationship'} · ${dep.evidence_ids.length} linked evidence record(s)`}>
+                      {rel ? `${rel.source.caption} → ${rel.target.caption}` : `Relationship ${dep.id}`}</Reveal></b>
                   <Button onClick={() => rel ? onInspectRelationship(rel.id) : trace()}>Inspect relationship</Button>
                   <Button onClick={trace}>Trace relationship</Button>
                 </div>;
               })}
               <h4>Immutable review history</h4>
+              {/* The status shapes and the rationale show; the words, confidences, grades and time are revealed on the rationale. */}
               {workspace.review_history.length === 0 ? <p className="muted">No reporter review has been recorded yet.</p> : workspace.review_history.map(event => <div className="statement" key={event.id}>
-                <b><StatusMarked status={event.from_status}/> → <StatusMarked status={event.to_status}/></b> · {Math.round(event.from_confidence * 100)}% → {Math.round(event.to_confidence * 100)}%
-                {(event.to_evidence_grade || event.from_evidence_grade) && <span> · {gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
-                <div>{event.rationale}</div>
+                <b className="cl-move"><ClaimStatusChip status={event.from_status}/> → <ClaimStatusChip status={event.to_status}/></b>
+                <Reveal detail={<>
+                  <span className="rv-row">{event.from_status} → {event.to_status}</span>
+                  <span className="rv-row">{Math.round(event.from_confidence * 100)}% → {Math.round(event.to_confidence * 100)}%</span>
+                  {(event.to_evidence_grade || event.from_evidence_grade) && <span className="rv-row">{gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
+                  {event.created_at && <span className="rv-row">{apiTime(event.created_at).toLocaleString()}</span>}
+                </>}><div>{event.rationale}</div></Reveal>
                 {event.override_reason && <div className="done-overridden">Marked without: {(event.unmet_rules ?? []).join(', ')}. Reason: {event.override_reason}</div>}
-                {event.created_at && <small>{apiTime(event.created_at).toLocaleString()}</small>}
               </div>)}
             </>}
             <h4>Linked evidence</h4>
-            {claimEvidence.length === 0 ? <p className="muted">No evidence is linked to this claim yet.</p> : claimEvidence.map(row => <div className="candidate" key={row.id}>
-              <b>{row.stance}</b>{row.source?.title && <span> · {row.source.title}</span>}
-              <div>{row.evidence?.quote || row.evidence?.notes || 'Evidence record'}</div>
-              {row.evidence?.locator && <small>Exact locator: {row.evidence.locator}</small>}
-              {row.note && <div><small>Reporter note: {row.note}</small></div>}
+            {/* Each link's stance is its line (Chain of Custody's styles), named on reveal; locator and note on the quote. */}
+            {claimEvidence.length === 0 ? <p className="muted">No evidence is linked to this claim yet.</p> : claimEvidence.map(row => <div className={`candidate cl-ev cl-ev-${row.stance}`} key={row.id}>
+              <b className="cl-ev-head"><StanceMark stance={row.stance}/>{row.source?.title && <span>{row.source.title}</span>}</b>
+              {row.evidence?.locator || row.note ? <Reveal detail={<>
+                {row.evidence?.locator && <span className="rv-row">Exact locator: {row.evidence.locator}</span>}
+                {row.note && <span className="rv-row">Reporter note: {row.note}</span>}
+              </>}><div>{row.evidence?.quote || row.evidence?.notes || 'Evidence record'}</div></Reveal>
+                : <div>{row.evidence?.quote || row.evidence?.notes || 'Evidence record'}</div>}
               {row.source?.url && <div><a href={row.source.url} target="_blank" rel="noreferrer">Open source</a></div>}
               <Button onClick={() => openProvenance({
                 title: selectedClaim.text, kind: `claim evidence: ${row.stance}`, sourceId: row.evidence?.source_id, sourceUrl: row.source?.url ?? undefined,
@@ -290,13 +306,13 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                 acceptedRecordType: 'evidence', acceptedRecordId: row.evidence?.id,
               })}>Trace provenance</Button>
             </div>)}
-            <h4>Investigation evidence pool</h4>
-            <p className="muted">Attach accepted evidence without changing the claim&apos;s verification status automatically. The backend rejects cross-investigation links and treats an identical claim/evidence/stance link idempotently.</p>
+            <h4><Reveal detail="Attach accepted evidence without changing the claim's verification status automatically. The backend rejects cross-investigation links and treats an identical claim/evidence/stance link idempotently.">
+              Investigation evidence pool</Reveal></h4>
             <Input value={evidenceNote} onChange={(e: ChangeEvent<HTMLInputElement>) => setEvidenceNote(e.target.value)} placeholder="Optional reporter note for the next evidence link"/>
             {evidencePool.length === 0 ? <p className="muted">No evidence records are available in this investigation yet.</p> : evidencePool.map(row => <div className="candidate" key={row.evidence.id}>
               <b>{row.source.title}</b>
-              <div>{row.evidence.quote || row.evidence.notes || 'Evidence record'}</div>
-              {row.evidence.locator && <small>Exact locator: {row.evidence.locator}</small>}
+              {row.evidence.locator ? <Reveal detail={`Exact locator: ${row.evidence.locator}`}><div>{row.evidence.quote || row.evidence.notes || 'Evidence record'}</div></Reveal>
+                : <div>{row.evidence.quote || row.evidence.notes || 'Evidence record'}</div>}
               {row.source.url && <div><a href={row.source.url} target="_blank" rel="noreferrer">Open source</a></div>}
               <Button onClick={() => openProvenance({
                 title: row.source.title, kind: 'evidence pool', sourceId: row.source.id, sourceUrl: row.source.url ?? undefined,
@@ -304,9 +320,9 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                 acceptedRecordType: 'evidence', acceptedRecordId: row.evidence.id,
               })}>Trace provenance</Button>
               <div>
-                <Button disabled={hasLink(row.evidence.id, 'supports')} onClick={() => attachEvidence(row, 'supports')}>Supports{hasLink(row.evidence.id, 'supports') ? ' ✓' : ''}</Button>
-                <Button disabled={hasLink(row.evidence.id, 'contradicts')} onClick={() => attachEvidence(row, 'contradicts')}>Contradicts{hasLink(row.evidence.id, 'contradicts') ? ' ✓' : ''}</Button>
-                <Button disabled={hasLink(row.evidence.id, 'context')} onClick={() => attachEvidence(row, 'context')}>Context{hasLink(row.evidence.id, 'context') ? ' ✓' : ''}</Button>
+                {/* Actions keep their words; each also carries its stance's line. */}
+                {(['supports', 'contradicts', 'context'] as const).map(k => <Button key={k} disabled={hasLink(row.evidence.id, k)} onClick={() => attachEvidence(row, k)}>
+                  <StanceGlyph stance={k}/>{STANCE_BUTTON[k]}{hasLink(row.evidence.id, k) ? ' ✓' : ''}</Button>)}
               </div>
             </div>)}
           </>}

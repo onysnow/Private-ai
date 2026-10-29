@@ -105,7 +105,8 @@ describe('BackupPanel last backup', () => {
     mockApi({[CASES]: caseRow({at: '2026-10-16T12:00:00Z', bytes: 1_400_000_000, sha256: 'ab', documents_included: true})});
     wrap(<BackupPanel investigationId="inv-1" onRestored={vi.fn()}/>);
     expect(await screen.findByText('Last backup 3 days ago')).toBeInTheDocument();
-    expect(screen.getByText('Last backup 3 days ago').parentElement).toHaveTextContent('Last backup 3 days ago · 1.4 GB · ✓ checksum');
+    // When, and the ✓ checksum, show; the size is revealed on the check.
+    expect(screen.getByText('✓ checksum').closest('.rv')).toHaveAccessibleDescription(/^1\.4 GB · checksum kept/);
     vi.useRealTimers();
   });
 
@@ -131,7 +132,7 @@ describe('BackupPanel preview and restore', () => {
 
     await screen.findByText('Kestrelwood filings');
     expect(screen.getByText('6 records · 1 stored document file(s) · 0 missing raw file(s)')).toBeInTheDocument();
-    expect(screen.getByText('Lineage: valid · Restore API: enabled')).toBeInTheDocument();
+    expect(screen.getByText('✓ lineage · ✓ restore').closest('.rv')).toHaveAccessibleDescription('Lineage: valid · Restore API: enabled');
     expect(screen.getByText('Preview passed. Review the details before restoring.')).toBeInTheDocument();
     expect(screen.getByText('Warning: Backup is 3 days old.')).toBeInTheDocument();
     expect(screen.getByLabelText(CONFIRMATION)).toBeInTheDocument();
@@ -156,7 +157,7 @@ describe('BackupPanel preview and restore', () => {
 
     await screen.findByText('Restore blocked by 1 conflict(s).');
     expect(screen.getByText('entities / ent-9 — entities record already exists', {exact: false})).toBeInTheDocument();
-    expect(screen.getByText('Lineage: not declared/invalid · Restore API: enabled')).toBeInTheDocument();
+    expect(screen.getByText('✕ lineage · ✓ restore').closest('.rv')).toHaveAccessibleDescription('Lineage: not declared/invalid · Restore API: enabled');
     expect(screen.queryByLabelText(CONFIRMATION)).not.toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Restore investigation'})).toBeDisabled();
     expect(api.calls(RESTORE)).toHaveLength(0);

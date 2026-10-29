@@ -10,6 +10,7 @@ import {useEffect, useState} from 'react';
 
 import {STATUS_WORDS, LEVEL_WORDS} from '../../components/status';
 import {Reveal} from '../../components/ui/reveal';
+import {HelpRow} from '../settings/settings-index';
 import {clearHeroPhoto, loadHeroPhoto, onHeroPhotoChange, saveHeroPhoto, type HeroPhoto} from '../../lib/hero-photo';
 import {webglAvailable} from '../effects/webgl';
 import {ThemeCompare, type Look} from './theme-compare';
@@ -89,6 +90,8 @@ export function TryingBar(): ReactElement | null {
 }
 
 const EFFECTS: {id: Effects; name: string}[] = [{id: 'full', name: 'Full'}, {id: 'light', name: 'Light'}, {id: 'off', name: 'Off'}];
+const EFFECT_LINE: Record<Effects, string> = {full: 'Full: the theme’s board effects, moving. On battery they run as Light until the computer is charging.',
+  light: 'Light: the same effects, standing still.', off: 'Off: a plain board.'};
 
 /** The named effects, from the OnySnow Studios effect system (vendor/onysnow-effects, ADR-0009). */
 const NAMED: {id: NamedEffect | null; name: string; line: string; themes: ThemeId[]}[] = [
@@ -122,12 +125,14 @@ export function contrastGrade(ratio: string): string {
   return n >= 7 ? 'AAA' : n >= 4.5 ? 'AA' : 'below AA';
 }
 
+/** A switch; its line is revealed on the row, unless the switch is off-limits, when the line says why and stays. */
 function Switch({on, label, line, disabled, onChange}: {on: boolean; label: string; line: string; disabled?: boolean; onChange: (on: boolean) => void}): ReactElement {
-  return <label className={`ap-switch${disabled ? ' off' : ''}`}>
-    <span><b>{label}</b><small>{line}</small></span>
+  const row = <label className={`ap-switch${disabled ? ' off' : ''}`}>
+    <span><b>{label}</b><small className={disabled ? undefined : 'st-sr'}>{line}</small></span>
     <input type="checkbox" role="switch" checked={on} disabled={disabled} onChange={e => onChange(e.target.checked)}/>
     <i aria-hidden="true"/>
   </label>;
+  return disabled ? row : <HelpRow help={line}>{row}</HelpRow>;
 }
 
 /** The photograph behind Rain Noir's glass: the reporter's own, kept in this browser, decoration only. */
@@ -205,7 +210,7 @@ export function AppearancePanel(): ReactElement {
   return <section className="ap" aria-label="Appearance">
     <div className="ap-two">
       <div className="ap-pane">
-        <header className="ap-pane-head"><h2>Theme</h2><span>colours, fonts, shadows, motion speed</span><em>Point at a card to preview ›</em></header>
+        <header className="ap-pane-head"><h2><Reveal detail="Colours, fonts, shadows, motion speed. Point at a card to preview it."><span>Theme</span></Reveal></h2></header>
         <div className="ap-cards" role="radiogroup" aria-label="Themes: arrows preview, Enter tries, K keeps" onMouseLeave={() => setPointed(null)}
           onKeyDown={e => {
             const cards = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('[role=radio]'));
@@ -264,11 +269,11 @@ export function AppearancePanel(): ReactElement {
             else keepAppearance({});
           }}/>}
 
-        <header className="ap-pane-head"><h2>Effects</h2><span>only on the board behind panels, never over text</span></header>
+        <header className="ap-pane-head"><h2><Reveal detail="Only on the board behind panels, never over text."><span>Effects</span></Reveal></h2></header>
+        {/* What each setting does is revealed on it. */}
         <div className="ap-seg" role="radiogroup" aria-label="Effects">
-          {EFFECTS.map(e => <button key={e.id} type="button" role="radio" aria-checked={now.effects === e.id} className={now.effects === e.id ? 'on' : ''}
-            onClick={() => keepAppearance({effects: e.id})}>{e.name}</button>)}
-          <span>{now.effects === 'light' ? 'Light: the same effects, standing still.' : now.effects === 'off' ? 'Off: a plain board.' : 'Full: the theme’s board effects, moving. On battery they run as Light until the computer is charging.'}</span>
+          {EFFECTS.map(e => <Reveal key={e.id} tabbable={false} detail={EFFECT_LINE[e.id]}><button type="button" role="radio" aria-checked={now.effects === e.id} className={now.effects === e.id ? 'on' : ''}
+            onClick={() => keepAppearance({effects: e.id})}>{e.name}</button></Reveal>)}
         </div>
         <div className="ap-switches">
           {NAMED.map(n => {
@@ -294,19 +299,19 @@ export function AppearancePanel(): ReactElement {
 
       <div className="ap-pane">
         <ThemeCompare before={lookOf(keptOption)} after={after} afterWord={lookingWord}/>
-        <p className="ap-note">Drag the divider, or use ← → while it is focused. The preview is your real case, not a sample.</p>
+        <p className="ap-note"><Reveal label="About the preview" detail="Drag the divider, or use ← → while it is focused. The preview is your real case, not a sample."><span aria-hidden="true">ⓘ</span></Reveal></p>
         <dl className="ap-facts" aria-label={`${after.name ?? info.name} in four facts`}>
           <div><dt>{passes ? '✓ Passes every check' : '✕ Fails a contrast check'}</dt><dd>Lowest text pair {lowest} · {contrastGrade(lowest)}</dd></div>
           <div><dt>Calm zones untouched</dt><dd>{info.calm}</dd></div>
           <div><dt>Fonts on this computer</dt><dd>{info.fonts}</dd></div>
           <div><dt>Cost on this laptop</dt><dd>{info.cost}</dd></div>
         </dl>
-        <header className="ap-pane-head"><h2>Format</h2><span>how home is laid out · chosen apart from theme</span></header>
+        <header className="ap-pane-head"><h2><Reveal detail="How home is laid out · chosen apart from theme."><span>Format</span></Reveal></h2></header>
         <div className="ap-formats" role="radiogroup" aria-label="Format">
-          {FORMATS.map(f => <button key={f.id} type="button" role="radio" aria-checked={now.format === f.id} disabled={!f.ready} title={f.line}
+          {FORMATS.map(f => <Reveal key={f.id} tabbable={false} detail={f.line}><button type="button" role="radio" aria-checked={now.format === f.id} disabled={!f.ready}
             className={`ap-fmt${now.format === f.id ? ' on' : ''}`} onClick={() => keepAppearance({format: f.id})}>
-            <FormatThumb id={f.id}/><b>{f.name}</b><small>{f.ready ? f.line.split(';')[0] : 'Planned'}</small>
-          </button>)}
+            <FormatThumb id={f.id}/><b>{f.name}</b>{!f.ready && <small>Planned</small>}
+          </button></Reveal>)}
         </div>
       </div>
     </div>

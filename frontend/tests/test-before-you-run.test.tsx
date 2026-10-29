@@ -81,8 +81,10 @@ describe('BeforeYouRun', () => {
     expect(within(first).getByText('document: Register extract, 2017')).toBeInTheDocument();
     const region = screen.getByRole('region', {name: 'The plan'});
     expect(within(region).getByText('QAS · RAS · DAS')).toBeInTheDocument();
-    expect(within(region).getAllByText(/not expected/)).toHaveLength(1);
-    expect(screen.getByText('under a minute on this machine')).toBeInTheDocument();
+    // The systems not expected are one chip; "not expected" and why each would run are revealed on it.
+    expect(within(region).getByText('QAS · RAS · DAS').closest('.rv')).toHaveAccessibleDescription(/^Not expected · /);
+    // Time is revealed on the model, with size and limits.
+    expect(screen.getByText(/under a minute on this machine/).closest('[hidden]')).not.toBeNull();
     expect(runTime([])).toBe('not measured yet: no run has finished here');
     expect(runTime([1.2, 3.6])).toBe('about 1–4 min on this machine');
     expect(runTime([2.1, 1.9])).toBe('about 2 min on this machine');
@@ -96,10 +98,12 @@ describe('BeforeYouRun', () => {
     await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
     await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
     const region = await screen.findByRole('region', {name: 'The plan'});
-    expect(await within(region).findByText('3 Tier E records left out by the tier floor · leads only')).toBeInTheDocument();
-    expect(within(region).getByText('1 Tier F record left out by the tier floor · leads only')).toBeInTheDocument();
+    // A count chip per tier; the words are revealed on it.
+    expect(await within(region).findByText('3 Tier E')).toBeInTheDocument();
+    expect(within(region).getByText('3 Tier E').closest('.rv')).toHaveAccessibleDescription(/^3 Tier E records left out by the tier floor · leads only/);
+    expect(within(region).getByText('1 Tier F').closest('.rv')).toHaveAccessibleDescription(/^1 Tier F record left out by the tier floor · leads only/);
     const where = screen.getByRole('region', {name: 'Where it runs, what it costs'});
-    expect(within(where).getByText(/Runs make no outside lookups yet/)).toBeInTheDocument();
+    expect(within(where).getByRole('img', {name: 'About outside lookups'})).toHaveAccessibleDescription(/Runs make no outside lookups yet/);
     expect(within(where).queryByText(/stop and ask/)).not.toBeInTheDocument();
   });
 
@@ -184,7 +188,7 @@ describe('BeforeYouRun', () => {
     expect(within(where).getByText(/outside leads in the packet on → off/)).toBeInTheDocument();
 
     // Fixed steps always run; a step a setting adds can be added and removed here.
-    expect(within(plan).getAllByTitle('This step always runs')).toHaveLength(4);
+    expect(within(plan).getAllByText('always').filter(el => el.closest('.rv')?.getAttribute('aria-describedby'))).toHaveLength(4);
     await user.click(within(plan).getByRole('button', {name: '+ Devil’s advocate'}));
     expect(screen.getByRole('switch', {name: 'Devil’s advocate, on, changed from off'})).toBeInTheDocument();
     await user.click(await within(plan).findByRole('button', {name: 'Remove the step: Devil’s advocate on the lead theory'}));

@@ -84,8 +84,11 @@ describe('Chain of Custody', () => {
     const done = within(claim).getByLabelText('Done for Supported');
     expect(done).toHaveTextContent('Done for Supported · 1 left');
     expect(within(done).getByLabelText('Every contradicting item has a written answer: met. 1 answered')).toHaveTextContent('✓ against answered');
-    expect(within(done).getByLabelText('Every supporting item has an exact locator: not met. 1 without a page, paragraph or timestamp.'))
-      .toHaveTextContent('✕ each says wherewaits on: 1 without a page, paragraph or timestamp.');
+    // The rule's short name shows; its full wording and what it waits on are revealed on it (Ony, 29 Oct).
+    const unmet = within(done).getByLabelText('Every supporting item has an exact locator: not met. 1 without a page, paragraph or timestamp.');
+    expect(unmet).toHaveTextContent('✕ each says where');
+    expect(within(unmet).getByText('each says where')).toHaveAccessibleDescription('Every supporting item has an exact locatorwaits on: 1 without a page, paragraph or timestamp.');
+    expect(within(unmet).getByText(/waits on: 1 without a page/).closest('[hidden]')).not.toBeNull();
     expect(within(done).getAllByRole('listitem')).toHaveLength(6);
     expect(screen.getByRole('article', {name: 'AI step'})).toHaveTextContent('Case synthesis draft quoted this claim');
     // The passage opens first in the detail panel, with its words lit.
@@ -97,6 +100,14 @@ describe('Chain of Custody', () => {
     expect(detail).toHaveTextContent('Fernhill_share_transfer_2018.pdf · lines 14\u2060–\u206022');
     expect(detail).toHaveTextContent('exact quote + 27 characters before, 32 after, offsets 27–79');
     expect(detail).toHaveTextContent('Name-finder · entity · 0.78 · accepted by Ony');
+    // The file and lines, the anchor's words and the hash are revealed, not on screen until asked.
+    expect(within(detail).getByText(/a3f9 07c2 … 5d1e/).closest('[hidden]')).not.toBeNull();
+    expect(within(detail).getByText(/offsets 27–79/).closest('[hidden]')).not.toBeNull();
+    expect(within(detail).getByText('✓ re-checked when opened')).toBeVisible();
+    // A card's who and when are revealed on it; the column says its kind.
+    const file = screen.getByRole('button', {name: /^File: Fernhill/});
+    expect(file).toHaveAccessibleDescription('uploaded by Ony · 02 Oct 09:14 · uploaded by Ony · 2 Oct 09:14');
+    expect(within(file).queryByText('File')).toBeNull();
     expect(screen.getByRole('button', {name: /^Passage: Passage · page 3/})).toHaveTextContent('Passage · p.3 l.14\u2060–\u206022');
     // The card shows the words around the stored anchor, lit (offsets 27–79 of the passage).
     expect(screen.getByRole('button', {name: /^Passage: Passage · page 3/}).querySelector('mark')).toHaveTextContent('Harbour Nominees Limited, being forty per cent (40%)');

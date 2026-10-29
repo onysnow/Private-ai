@@ -9,6 +9,7 @@ import Link from 'next/link';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 // Connects the generated client to the shared ApiClient, as every page that calls the API does.
 import '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
@@ -128,7 +129,9 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
         {(['map', 'table', 'cards'] as const).map(v => <button type="button" key={v} aria-pressed={view === v} className={view === v ? 'on' : ''}
           onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>)}
       </div>
-      <button type="button" className="kc-practise" disabled aria-describedby="kc-practise-why">⟲ Practise</button>
+      {/* Why Practise is off is on the button, on hover, as well as for screen readers (Ony, 29 Oct). */}
+      <Reveal tabbable={false} describe={false} detail="Practise (spaced review of flip cards) is not built yet.">
+        <button type="button" className="kc-practise" disabled aria-describedby="kc-practise-why">⟲ Practise</button></Reveal>
       <span id="kc-practise-why" className="sr-only">Practise (spaced review of flip cards) is not built yet.</span>
     </header>
     {problem && <p className="kc-error" role="alert">{problem}</p>}

@@ -122,8 +122,8 @@ describe('ChartBuilderPanel', () => {
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     expect(screen.getByRole('combobox', {name: 'Data'})).toHaveTextContent('Payments by party · 5 payments');
     const chartKinds = within(screen.getByRole('group', {name: 'Chart kind'}));
-    expect(chartKinds.getAllByRole('button').map(b => b.textContent)).toEqual(['100% bar (suggested)', 'Donut', 'Treemap']);
-    expect(chartKinds.getByRole('button', {name: '100% bar (suggested)'})).toHaveAttribute('aria-pressed', 'true');
+    expect(chartKinds.getAllByRole('button').map(b => b.textContent)).toEqual(['100% bar (suggested) ★', 'Donut', 'Treemap']);
+    expect(chartKinds.getByRole('button', {name: /^100% bar\s*\(suggested\)/})).toHaveAttribute('aria-pressed', 'true');
 
     // Data with no records yet is listed but cannot be chosen.
     await user.click(screen.getByRole('combobox', {name: 'Data'}));
@@ -132,7 +132,7 @@ describe('ChartBuilderPanel', () => {
 
     await user.click(screen.getByRole('button', {name: 'Distribution'}));
     expect(screen.getByRole('combobox', {name: 'Data'})).toHaveTextContent('Payment amounts');
-    expect(within(screen.getByRole('group', {name: 'Chart kind'})).getAllByRole('button').map(b => b.textContent)).toEqual(['Histogram (suggested)']);
+    expect(within(screen.getByRole('group', {name: 'Chart kind'})).getAllByRole('button').map(b => b.textContent)).toEqual(['Histogram (suggested) ★']);
   });
 
   it('previews the chart with its check report, and each value traces to its records', async () => {

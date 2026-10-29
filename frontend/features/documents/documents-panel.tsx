@@ -13,10 +13,11 @@ import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ExtractionExplanationView} from '../../components/extraction-explanation';
+import {Reveal} from '../../components/ui/reveal';
 import {ApiHttpError, errorMessage, isAbortError} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
@@ -44,6 +45,11 @@ import {isPicture, PictureEvidence} from './picture-evidence';
 import {DocumentTranslation} from './document-translation';
 import {IdentifierOwner} from './identifier-owner';
 import {SchemaQuestion} from './schema-question';
+import {ProposalKindMark} from '../the-drop/kind-marks';
+
+/** A document's reading state as The Drop's stage marks (features/the-drop/the-drop.tsx), named on hover. */
+const READ_MARK: Record<string, [string, string]> = {complete: ['✓', 'done'], extracted: ['✓', 'done'], failed: ['✕', 'stopped'],
+  queued: ['·', 'waiting'], extracting: ['◐', 'active']};
 
 type Props = {investigationId: string};
 
@@ -426,10 +432,10 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
 
   return <Card className="card" id="document-ingestion">
     <CardHeader className="pb-3">
-      <CardTitle>Document ingestion & extraction</CardTitle>
-      <CardDescription>{formats?.reader === 'openaleph'
+      {/* How the reader works is on hover or focus of the title (Ony, 29 Oct: old panels converted as they are). */}
+      <CardTitle><Reveal detail={`${formats?.reader === 'openaleph'
         ? `OpenAleph reads every upload: PDFs and office documents, email, archives, spreadsheets, images and more (${formats.extensions.length} kinds of file). The Workbench's own reader takes over for PDF, DOCX, text, Markdown, CSV and HTML when OpenAleph cannot. `
-        : 'PDF, DOCX, text, Markdown, CSV and HTML are extracted into locator-preserving chunks. '}All entity/claim/evidence suggestions remain proposals until you accept them.</CardDescription>
+        : 'PDF, DOCX, text, Markdown, CSV and HTML are extracted into locator-preserving chunks. '}All entity/claim/evidence suggestions remain proposals until you accept them.`}>Document ingestion & extraction</Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       <div className="searchrow">
@@ -442,26 +448,34 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       {documentsQuery.isError && <p className="muted">{errorMessage(documentsQuery.error, 'Could not load the documents')}</p>}
       {investigationId && <CorpusStatus investigationId={investigationId} watch={filesBeingRead} onIdle={reloadDocuments}/>}
       <hr/>
-      <h4>Bulk import</h4>
-      <p className="muted">Select several files to import them one at a time with visible progress, then review every proposal, issue, and question document by document before anything is accepted.</p>
+      <h4><Reveal detail="Select several files to import them one at a time with visible progress, then review every proposal, issue, and question document by document before anything is accepted.">Bulk import</Reveal></h4>
       <div className="searchrow">
         <Input type="file" accept={accept} multiple onChange={(e: ChangeEvent<HTMLInputElement>) => setBulkFiles(Array.from(e.target.files || []))} disabled={bulkImporting}/>
         <Button onClick={uploadBulk} disabled={bulkFiles.length === 0 || bulkImporting}>{bulkImporting ? 'Importing…' : `Import ${bulkFiles.length} document(s)`}</Button>
       </div>
       {bulkImporting && bulkProgress && <p className="muted">Importing {Math.min(bulkProgress.done + 1, bulkProgress.total)} of {bulkProgress.total}: {bulkProgress.currentName}</p>}
       {bulkStatus && <p className="muted">{bulkStatus}</p>}
-      {investigationId && <p className="muted"><Link href={`/review?inv=${encodeURIComponent(investigationId)}`}>Open review queue for this investigation</Link> -- resumes reviewing every document here that still has unreviewed proposals, not only a just-imported batch.</p>}
+      {investigationId && <p className="muted"><Reveal tabbable={false} detail="Resumes reviewing every document here that still has unreviewed proposals, not only a just-imported batch.">
+        <Link href={`/review?inv=${encodeURIComponent(investigationId)}`}>Open review queue for this investigation</Link></Reveal></p>}
       {nestDocuments(documents).map(({document: d, depth, parent}) => {
         const oa = openAleph[d.id];
         const container = Boolean(d.openaleph_schema && CONTAINER_SCHEMATA.includes(d.openaleph_schema));
         return <div className="candidate" key={d.id} id={`document-${d.id}`} data-testid={`document-${d.id}`} aria-current={opened === d.id ? 'true' : undefined}
           style={depth ? {marginLeft: `${depth * 1.5}rem`} : undefined}>
-          {parent && <div><small>Inside {parent.filename}</small></div>}
-          <b>{d.title || d.filename}</b>{d.title && d.title !== d.filename && <small> {d.filename}</small>} <small>{d.extraction_status} · {d.chunk_count} chunks · {Object.entries(d.candidate_counts || {}).map(([k, v]) => `${k}: ${v}`).join(' · ')}</small>
-          {oa && <div>
-            <small>OpenAleph: {oa.sync?.status || 'not synchronized'}{oa.sync?.provider_record_id ? ` · provider document ${oa.sync.provider_record_id}` : ''} · {oa.provider_candidate_pending_review} awaiting review · {oa.provider_candidate_accepted} accepted · {oa.provider_candidate_rejected} rejected</small>
+          {/* The file inside another is the indent and ↳; its reading state is a Drop stage mark; the file name, the
+              counts and the OpenAleph line are on hover (Ony, 29 Oct). */}
+          {parent && <Reveal label={`Inside ${parent.filename}`} detail={`Inside ${parent.filename}`}><span aria-hidden="true">↳ </span></Reveal>}
+          {(() => {
+            const [mark, state] = READ_MARK[d.extraction_status] ?? ['·', 'waiting'];
+            return <Reveal label={d.extraction_status} detail={d.extraction_status}><i className={`dp-stage dp-${state} lib-read`} aria-hidden="true">{mark}</i></Reveal>;
+          })()}
+          {' '}<Reveal detail={<>{d.title && d.title !== d.filename && <span className="rv-row rv-mono">{d.filename}</span>}
+            <span className="rv-row">{d.extraction_status} · {d.chunk_count} chunks · {Object.entries(d.candidate_counts || {}).map(([k, v]) => `${k}: ${v}`).join(' · ')}</span></>}>
+            <b>{d.title || d.filename}</b></Reveal>
+          {oa && <>{' '}<Reveal label="OpenAleph" detail={<span className="rv-row">OpenAleph: {oa.sync?.status || 'not synchronized'}{oa.sync?.provider_record_id ? ` · provider document ${oa.sync.provider_record_id}` : ''} · {oa.provider_candidate_pending_review} awaiting review · {oa.provider_candidate_accepted} accepted · {oa.provider_candidate_rejected} rejected</span>}>
+            <span className="km-more" aria-hidden="true">OA{oa.provider_candidate_pending_review ? ` · ${oa.provider_candidate_pending_review}` : ''}</span></Reveal>
             {oa.sync?.error && <div><small>{oa.sync.error}</small></div>}
-          </div>}
+          </>}
           <div>
             <Button onClick={() => loadCandidates(d.id)}>Review proposals</Button>
             <Button onClick={() => loadCandidates(d.id, 'all')}>Review history</Button>
@@ -488,17 +502,20 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         </div>;
       })}
       {candidates.map(c => <div className="candidate" key={c.id}>
-        <b>{c.candidate_type} proposal</b> <small>· {c.review_status} · {Math.round(c.confidence * 100)}%</small>
-        <div>{shownText(c) || ''}</div>
-        {text(c.payload.locator) && <small>{text(c.payload.locator)}</small>}
+        {/* The proposal's kind is its icon; its status is a mark (dashed while proposed); its confidence and locator are on hover. */}
+        <ProposalKindMark kind={c.candidate_type} detail={<><b>{c.candidate_type} proposal</b> · {c.review_status} · {Math.round(c.confidence * 100)}%
+          {text(c.payload.locator) && <span className="rv-row">{text(c.payload.locator)}</span>}</>}/>
+        {c.review_status !== 'proposed' && <Reveal label={c.review_status} detail={c.review_status}><b aria-hidden="true">{c.review_status === 'accepted' ? ' ✓' : c.review_status === 'rejected' ? ' ✕' : ' ·'}</b></Reveal>}
+        <div className={c.review_status === 'proposed' ? 'lib-proposed' : undefined}>{shownText(c) || ''}</div>
         {c.explanation && <ExtractionExplanationView explanation={c.explanation}/>}
         {c.candidate_type === 'relationship' && (c.payload.source_candidate_id
-          ? <div><small>From a column mapping, {text(c.payload.locator)} · accepted after both its ends · Canonical relationship: {c.review_status === 'accepted' ? 'yes' : 'no'}</small></div>
+          ? <div><Reveal detail={`From a column mapping, ${text(c.payload.locator) ?? ''} · accepted after both its ends · Canonical relationship: ${c.review_status === 'accepted' ? 'yes' : 'no'}`}>
+            <small aria-hidden="true">⊞ column mapping</small></Reveal></div>
           : <div>
-            <small>Machine suggestion: no · Reporter staged: yes · Canonical relationship: {c.review_status === 'accepted' ? 'yes' : 'no'}</small>
-            <div>{String(c.payload.schema || 'Relationship')}: {entityCaption(c.payload.source_entity_id, 'source')} → {entityCaption(c.payload.target_entity_id, 'target')}</div>
+            <Reveal detail={`Machine suggestion: no · Reporter staged: yes · Canonical relationship: ${c.review_status === 'accepted' ? 'yes' : 'no'}`}>
+              {String(c.payload.schema || 'Relationship')}: {entityCaption(c.payload.source_entity_id, 'source')} → {entityCaption(c.payload.target_entity_id, 'target')}</Reveal>
           </div>)}
-        {c.reviewer_note && <div><small>Reporter note: {c.reviewer_note}</small></div>}
+        {c.reviewer_note && <div><Reveal label="Reporter note" detail={`Reporter note: ${c.reviewer_note}`}><span aria-hidden="true">✎</span></Reveal></div>}
         {c.review_status === 'proposed' && c.payload.schema_question === true &&
           <SchemaQuestion candidate={c} answer={schemaAnswers[c.id]} onAnswer={choice => setSchemaAnswers(cur => ({...cur, [c.id]: choice}))}/>}
         {c.review_status === 'proposed' && c.candidate_type === 'identifier' &&
@@ -520,8 +537,8 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         </div>
       </div>)}
       {relationshipClaimCandidate && <div className="candidate">
-        <h4>Stage relationship from reviewed claim</h4>
-        <p className="muted">The claim and its exact evidence are already reporter-reviewed. Selecting endpoints here only creates a relationship proposal; a second acceptance is required before a canonical graph edge exists.</p>
+        <h4><Reveal detail={<><span className="rv-row">The claim and its exact evidence are already reporter-reviewed. Selecting endpoints here only creates a relationship proposal; a second acceptance is required before a canonical graph edge exists.</span>
+          <span className="rv-row">State: reviewed evidence → unverified/reporter-controlled claim → staged relationship proposal → separate canonicalization.</span></>}>Stage relationship from reviewed claim</Reveal></h4>
         <div>{text(relationshipClaimCandidate.payload.text) || 'Reviewed extracted claim'}</div>
         <div className="searchrow">
           <Input value={relSchema} onChange={(e: ChangeEvent<HTMLInputElement>) => setRelSchema(e.target.value)} placeholder="FollowTheMoney relationship schema"/>
@@ -536,7 +553,6 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
           <Button onClick={stageRelationship} disabled={!relSchema || !relSource || !relTarget}>Stage proposal</Button>
           <Button onClick={() => setRelationshipClaimCandidate(null)}>Cancel</Button>
         </div>
-        <small>State: reviewed evidence → unverified/reporter-controlled claim → staged relationship proposal → separate canonicalization.</small>
       </div>}
     </CardContent>
   </Card>;

@@ -52,7 +52,7 @@ describe('Reading progress for the corpus', () => {
     const onIdle = vi.fn();
     wrap(<CorpusStatus investigationId="inv-1" watch={false} onIdle={onIdle} pollMs={20}/>);
     const box = await screen.findByRole('status', {name: 'OpenAleph progress'});
-    expect(within(box).getByText('Reading files: 1 waiting · 1 in progress · 6 done · 1 failed')).toBeInTheDocument();
+    expect(within(box).getByText('Reading files: 1 waiting · 1 in progress · 6 done · 1 failed').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     expect(within(box).getByText('Finding names: 2 waiting · 0 in progress · 0 done')).toBeInTheDocument();
 
     api.add({[STATUS]: corpusStatusBody('inv-1', {collection_id: '7'})});

@@ -15,6 +15,7 @@ import {
   getAiAnalysisCandidateEndpointOptions, getAiAnalysisCandidateEndpointQueryKey, reviewAiAnalysisCandidateEndpointMutation, reviewAiClaimEndpointMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {AiNotice} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import type {AiAnalysisCandidateOut} from '../../lib/generated/types.gen';
 import {acceptedByAPerson, decisionWords, REJECT_REASONS, reviewItems} from './claim-review';
 import type {Decision, ReviewItem} from './claim-review';
@@ -35,10 +36,11 @@ export function DecisionShape({decision}: {decision: string | null | undefined})
 
 /** The underline key: grounded solid, guessed dashed, plum while no person has accepted the words. */
 export function UnderlineKey(): ReactElement {
+  // The three underlines show; what each means is revealed on it.
   return <p className="cr-key" aria-label="Key for the claim underlines">
-    <span><u className="cr-text grounded">grounded</u> cites a record in the packet</span>
-    <span><u className="cr-text guessed">guessed</u> no record says it</span>
-    <span><u className="cr-text grounded ai">plum</u> AI words no person has accepted</span>
+    <Reveal detail="Grounded: cites a record in the packet."><u className="cr-text grounded">grounded</u></Reveal>
+    <Reveal detail="Guessed: no record says it."><u className="cr-text guessed">guessed</u></Reveal>
+    <Reveal detail="Plum: AI words no person has accepted."><u className="cr-text grounded ai">plum</u></Reveal>
   </p>;
 }
 
@@ -47,12 +49,13 @@ export function ClaimText({item, reviewStatus}: {item: ReviewItem; reviewStatus:
   const d = item.decision?.decision;
   const ground = item.grounded.length ? 'grounded' : 'guessed';
   const hover = item.grounded.length ? `Rests on ${refWords(item)}, in the packet the run was checked against` : 'No record in the packet says this: the model’s own words';
-  const said = item.grounded.length ? `, grounded in ${item.grounded.length} record${item.grounded.length === 1 ? '' : 's'}` : ', guessed: no record cited';
+  const said = item.grounded.length ? `, grounded in ${item.grounded.length} record${item.grounded.length === 1 ? '' : 's'} (${refWords(item)})` : ', guessed: no record cited';
   if (d === 'correct' && item.decision?.text) return <span className="cr-claim">
     <span className="cr-text mine">{item.decision.text}</span><span className="sr-only">, corrected by you; the model wrote: </span>
-    {' '}<s className="cr-was" title="The model’s words, kept beside yours">{item.text}</s></span>;
+    {' '}<Reveal tabbable={false} describe={false} detail="The model’s words, kept beside yours"><s className="cr-was">{item.text}</s></Reveal></span>;
   const plum = !acceptedByAPerson(item, reviewStatus) && d !== 'reject';
-  const text = <span className={`cr-text ${ground}${plum ? ' ai' : ''}`} title={hover}>{item.text}</span>;
+  // Where the words rest is revealed on them (and read with them, below).
+  const text = <Reveal tabbable={false} describe={false} detail={hover}><span className={`cr-text ${ground}${plum ? ' ai' : ''}`}>{item.text}</span></Reveal>;
   return <span className="cr-claim">{d === 'reject' ? <del>{text}</del> : text}<span className="sr-only">{said}{d === 'reject' ? ', rejected by you' : plum ? ', AI words not yet accepted' : ''}</span></span>;
 }
 
@@ -167,11 +170,10 @@ export function ReviewSheet({candidateId, header, onBack, onSaved, active = true
                 aria-label={`${i.id}, ${[words(i.classification) || (likely ? 'unclassified' : ''), i.confidenceTerm ? words(i.confidenceTerm).toLowerCase() : likely ? 'no likelihood given' : ''].filter(Boolean).join(', ')}, ${i.grounded.length} source${i.grounded.length === 1 ? '' : 's'}, ${decisionWords(i.decision)}`}>
                 <DecisionShape decision={i.decision?.decision}/><span className="cr-id">{i.id}</span>
                 <span className="cr-row-text"><ClaimText item={i} reviewStatus={candidate?.review_status}/></span>
-                <small>{words(i.classification)}{i.confidenceTerm ? ` · ${words(i.confidenceTerm).toLowerCase()}` : ''}</small>
                 <b>{i.decision ? decisionWords(i.decision).split(' · ')[0] : 'waits'}</b></button></li>)}
           </ol>
           {item && candidate && <div className="cr-detail" aria-label={`${item.id} in full`} role="region">
-            <p className="br-eyebrow">{item.id}{words(item.classification) || likely ? ` · ${words(item.classification) || 'unclassified'}` : ''} <span className="br-chip ai">model says</span></p>
+            <p className="br-eyebrow">{item.id} <AiNotice>{`The model says${words(item.classification) || likely ? ` it is ${(words(item.classification) || 'unclassified').toLowerCase()}` : ' this'}: no check confirms it.`}</AiNotice></p>
             <p className="cr-big"><ClaimText item={item} reviewStatus={candidate.review_status}/></p>
             <dl className="br-facts">
               {(likely || item.confidenceTerm) && <><dt>Likelihood</dt><dd>{item.confidenceTerm ? `model: ${words(item.confidenceTerm).toLowerCase()}` : 'not given (old format)'}</dd></>}
@@ -181,7 +183,6 @@ export function ReviewSheet({candidateId, header, onBack, onSaved, active = true
               })}</ul> : 'no record: the model’s own words'}</dd>
             </dl>
             <ClaimDecision candidate={candidate} item={item} onSaved={onSaved}/>
-            <small className="cr-keys">J / K move · A keep · E correct · R reject</small>
           </div>}
         </div>
       </>}

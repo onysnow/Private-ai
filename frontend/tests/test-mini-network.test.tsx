@@ -53,9 +53,15 @@ describe('MiniNetwork', () => {
     ]), nodes: [node('Meridian'), node('Bellcastle'), node('Harbour plot', 'RealEstate')]}});
     render(<QueryProvider><MiniNetwork investigationId="inv-1"/></QueryProvider>);
     expect(await screen.findByText('owns 2017 ✓')).toBeInTheDocument();
-    expect(screen.getByText('owns 2019 ×')).toBeInTheDocument();
+    expect(screen.getByText('owns 2019 ✕')).toBeInTheDocument();
     // The parties with a link, against every party in the case (counted on the server).
     expect(await screen.findByText('3 linked · 11 in the case')).toBeInTheDocument();
+    // A party's kind is its icon, named for screen readers and on hover (Ony, 29 Oct), not a shape of its own.
+    expect(screen.getByRole('button', {name: 'Harbour plot, Property or other asset, 1 links'})).toBeInTheDocument();
+    // The key to the lines and the count's explanation are reveals: in the page, not on screen.
+    expect(screen.getByRole('img', {name: 'Key to the lines'})).toBeInTheDocument();
+    expect(screen.getByText(/The six most linked are drawn\./).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('not yet shown').closest('[hidden]')).not.toBeNull();
   });
 
   it('counts only the linked parties until the case total arrives', async () => {
@@ -77,7 +83,7 @@ describe('MiniNetwork', () => {
 
   it('keeps a party lit when it is clicked after the pointer reached it, and a second click turns it off', async () => {
     twoLinks();
-    const party = await screen.findByRole('button', {name: 'Bellcastle, 2 links'});
+    const party = await screen.findByRole('button', {name: 'Bellcastle, Company, 2 links'});
     fireEvent.mouseEnter(party);
     fireEvent.click(party);
     expect(useWorkbenchStore.getState().pointedParty).toBe('Bellcastle');
@@ -85,7 +91,7 @@ describe('MiniNetwork', () => {
     fireEvent.click(party);
     expect(useWorkbenchStore.getState().pointedParty).toBeNull();
     // From the keyboard: focus points, Enter keeps it, Enter again turns it off.
-    const other = screen.getByRole('button', {name: 'Orrin, 1 links'});
+    const other = screen.getByRole('button', {name: 'Orrin, Company, 1 links'});
     fireEvent.focus(other);
     fireEvent.keyDown(other, {key: 'Enter'});
     expect(useWorkbenchStore.getState().pointedParty).toBe('Orrin');

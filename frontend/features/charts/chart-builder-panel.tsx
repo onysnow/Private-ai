@@ -22,7 +22,8 @@ import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Reveal} from '@/components/ui/reveal';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {chartFromPreview, isChartKind, kindName} from '../../components/presentation/chart-data';
@@ -134,8 +135,8 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
 
   return <Card className="card">
     <CardHeader className="pb-3">
-      <CardTitle>Chart builder</CardTitle>
-      <CardDescription>Make a chart from this investigation&apos;s records without the AI: choose the question it answers, then the data. The Workbench supplies every number, draws the chart and checks it against the design rules.</CardDescription>
+      <CardTitle><Reveal detail="Make a chart from this investigation’s records without the AI: choose the question it answers, then the data. The Workbench supplies every number, draws the chart and checks it against the design rules.">
+        <span>Chart builder</span></Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       {!open ? <Button onClick={() => setOpen(true)} disabled={!investigationId}>Build a chart</Button> : <>
@@ -145,15 +146,15 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
           <fieldset>
             <legend>1. What should the chart answer?</legend>
             <div className="searchrow" role="group" aria-label="Question">
-              {questions.map(q => <Button key={q.id} variant={q.id === questionId ? 'default' : 'outline'} aria-pressed={q.id === questionId}
-                disabled={!q.drawn_kinds.length} title={q.drawn_kinds.length ? q.description : `${q.description} Not drawn yet.`}
-                onClick={() => chooseQuestion(q.id)}>{q.label}</Button>)}
+              {/* What each question means is revealed on its button. */}
+              {questions.map(q => <Reveal key={q.id} tabbable={false} detail={q.drawn_kinds.length ? q.description : `${q.description} Not drawn yet.`}>
+                <Button variant={q.id === questionId ? 'default' : 'outline'} aria-pressed={q.id === questionId}
+                disabled={!q.drawn_kinds.length} onClick={() => chooseQuestion(q.id)}>{q.label}</Button></Reveal>)}
             </div>
-            {question && <p className="muted">{question.description}</p>}
           </fieldset>
 
           {question && <fieldset>
-            <legend>2. Which data answers it?</legend>
+            <legend>{query ? <Reveal detail={query.description}><span>2. Which data answers it?</span></Reveal> : '2. Which data answers it?'}</legend>
             {queries.length === 0 ? <p className="muted">No data in the catalogue answers this question yet.</p> : <div className="searchrow">
               <Select value={queryName} onValueChange={name => chooseQuery(name)}>
                 <SelectTrigger className="w-auto" aria-label="Data"><SelectValue placeholder="Choose the data"/></SelectTrigger>
@@ -163,32 +164,35 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
               </Select>
               {query && (query.picks ?? []).length > 1 && ['before', 'after'].map(key => <Select key={key} value={params[key] ?? ''}
                 onValueChange={value => setParam(key, value)}>
-                <SelectTrigger className="w-auto" aria-label={PARAM_LABELS[key]} title={query.params[key]?.description}><SelectValue/></SelectTrigger>
+                <Reveal tabbable={false} detail={query.params[key]?.description ?? PARAM_LABELS[key]}><SelectTrigger className="w-auto" aria-label={PARAM_LABELS[key]}><SelectValue/></SelectTrigger></Reveal>
                 <SelectContent>{(query.picks ?? []).map(pick => <SelectItem key={pick.evidence_id} value={pick.evidence_id}>
                   {pick.caption} · taken {pick.taken}</SelectItem>)}</SelectContent>
               </Select>)}
               {query && !(query.picks ?? []).length && Object.entries(query.params).map(([key, param]) => param.choices?.length
                 ? <Select key={key} value={params[key] ?? param.default ?? ''} onValueChange={value => setParam(key, value)}>
-                  <SelectTrigger className="w-auto" aria-label={PARAM_LABELS[key] ?? key} title={param.description}><SelectValue/></SelectTrigger>
+                  <Reveal tabbable={false} detail={param.description}><SelectTrigger className="w-auto" aria-label={PARAM_LABELS[key] ?? key}><SelectValue/></SelectTrigger></Reveal>
                   <SelectContent>{param.choices.map(choice => <SelectItem key={choice} value={choice}>{choice}</SelectItem>)}</SelectContent>
                 </Select>
                 : query.currencies.length > 1 && <Select key={key} value={params[key] ?? QUERY_DEFAULT} onValueChange={value => setParam(key, value)}>
-                  <SelectTrigger className="w-auto" aria-label={PARAM_LABELS[key] ?? key} title={param.description}><SelectValue/></SelectTrigger>
+                  <Reveal tabbable={false} detail={param.description}><SelectTrigger className="w-auto" aria-label={PARAM_LABELS[key] ?? key}><SelectValue/></SelectTrigger></Reveal>
                   <SelectContent>
                     <SelectItem value={QUERY_DEFAULT}>Currency with the most payments</SelectItem>
                     {query.currencies.map(code => <SelectItem key={code} value={code}>{code}</SelectItem>)}
                   </SelectContent>
                 </Select>)}
             </div>}
-            {query && <p className="muted">{query.description}</p>}
           </fieldset>}
 
           {query && <fieldset>
             <legend>3. Which chart?</legend>
             {kinds.length === 0 ? <p className="muted">None of this question&apos;s charts can draw this data.</p>
               : <div className="searchrow" role="group" aria-label="Chart kind">
-                {kinds.map((k, index) => <Button key={k} variant={k === kind ? 'default' : 'outline'} aria-pressed={k === kind}
-                  onClick={() => { setKind(k); preview.reset(); }}>{kindName(k)}{index === 0 ? ' (suggested)' : ''}</Button>)}
+                {/* The suggested kind carries a star, named on reveal. */}
+                {kinds.map((k, index) => {
+                  const button = <Button key={k} variant={k === kind ? 'default' : 'outline'} aria-pressed={k === kind}
+                    onClick={() => { setKind(k); preview.reset(); }}>{kindName(k)}{index === 0 && <><span className="sr-only"> (suggested)</span><span aria-hidden="true"> ★</span></>}</Button>;
+                  return index === 0 ? <Reveal key={k} tabbable={false} describe={false} detail="Suggested for this data">{button}</Reveal> : button;
+                })}
               </div>}
             <div className="searchrow">
               <Input value={title} aria-label="Title" placeholder="A sentence that states the finding, e.g. Meridian received most of the money"
@@ -201,13 +205,13 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
           {report && <CheckReportView report={report} kindName={kindName(kind)}/>}
           {drawn && <ChartFrame kind="built-chart" title={drawnTitle} question={`${kindName(drawn.spec.kind as string)}, drawn from this investigation's records and checked against the design rules.`}
             rule={{label: 'What it shows:', text: drawn.text.description}}
-            footer={<><span>{drawn.text.source_line}</span><span>Numbered buttons in the data table trace each value to its record.</span></>}>
+            footer={<><span>{drawn.text.source_line}</span><Reveal label="Tracing a value" detail="Numbered buttons in the data table trace each value to its record."><span aria-hidden="true">ⓘ</span></Reveal></>}>
             <div style={{padding: '12px 16px'}}>
             <ChartFigure visual={drawn} renderCitations={refs => <span>{refs.map((ref, index) => {
             const request = traceRequest(ref, `${drawnTitle}: record ${index + 1}`);
             return request
-              ? <Button key={`${ref.record_type}:${ref.record_id}`} size="sm" variant="outline" title={`Trace this ${ref.record_type.replace('_', ' ')}`}
-                onClick={() => openProvenance(request)}>{index + 1}</Button>
+              ? <Reveal key={`${ref.record_type}:${ref.record_id}`} tabbable={false} detail={`Trace this ${ref.record_type.replace('_', ' ')}`}>
+                <Button size="sm" variant="outline" onClick={() => openProvenance(request)}>{index + 1}</Button></Reveal>
               : <span key={`${ref.record_type}:${ref.record_id}`}>{index + 1} </span>;
           })}</span>}/>
             </div>

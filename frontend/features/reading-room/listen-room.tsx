@@ -10,12 +10,14 @@ import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
 import {getDocumentTranscriptOptions, listDocumentCandidatesEndpointOptions, listDocumentCandidatesEndpointQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {createEvidenceEndpoint} from '../../lib/generated/sdk.gen';
 import type {DocumentDetailOut, TranscriptOut, TranscriptSegmentOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {FingerprintMark} from '../the-drop/kind-marks';
 
 const STEP = 5;
 /** The stretch of the recording the detailed outline shows at once. */
@@ -94,8 +96,10 @@ function Outline({t, now, duration, pinned, onSeek}: {t: TranscriptOut; now: num
       <rect x={(from / duration) * 1000} y={0} width={(span / duration) * 1000} height={10} rx={4} className="lr-ovw-win"/>
       <rect x={(now / duration) * 1000 - 1} y={0} width={2} height={10} className="lr-ovw-ph"/>
     </svg>
-    <p className="lr-wf-cap">Whole file {clock(duration, false)} · showing {clock(from, false)}–{clock(to, false)}
-      <span><i className="lr-key pin"/>pinned quote <i className="lr-key unsure"/>machine unsure <i className="lr-key ns"/>no speech</span></p>
+    {/* The window shows; the whole length and the marks' key are on hover (Ony, 29 Oct). */}
+    <p className="lr-wf-cap"><Reveal detail={<><span className="rv-row">Whole file {clock(duration, false)} · showing {clock(from, false)}–{clock(to, false)}</span>
+      <span className="rv-row"><i className="lr-key pin"/>pinned quote <i className="lr-key unsure"/>machine unsure <i className="lr-key ns"/>no speech</span></>}>
+      {clock(from, false)}–{clock(to, false)}</Reveal></p>
     <svg className="lr-wave" viewBox="0 0 1000 120" preserveAspectRatio="none" role="slider" tabIndex={-1} aria-label="Position in the recording"
       aria-valuemin={0} aria-valuemax={Math.round(duration)} aria-valuenow={Math.round(now)} aria-valuetext={clock(now)}
       onPointerDown={e => seekFrom(e, from, span)}>
@@ -275,28 +279,30 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
           <div><dt>Spoken parts</dt><dd>{spoken.length}</dd></div>
           <div><dt>No speech</dt><dd>{silent.length}</dd></div>
           <div><dt>Machine unsure</dt><dd>{unsureCount} word{unsureCount === 1 ? '' : 's'}</dd></div>
-          <div><dt>Language</dt><dd>{about.language ? `${about.language} · ${Math.round((about.language_probability ?? 0) * 100)}%` : '–'}</dd></div>
+          <div><dt>Language</dt><dd>{about.language ? <Reveal detail={`${about.language} · ${Math.round((about.language_probability ?? 0) * 100)}%`}>
+            {about.language.length <= 3 ? about.language.toUpperCase() : about.language}</Reveal> : '–'}</dd></div>
         </dl>
         {waiting > 0 && <p className="lr-note"><a href={decideHref}>{waiting} proposal{waiting === 1 ? '' : 's'} from this transcript</a> wait in Decide.</p>}
       </section>
       <section className="lr-panel">
-        <p className="lr-cap">Voices</p>
-        <p className="lr-note">Speakers are not told apart yet: that needs a speaker model, a later step. When it comes, its lanes are guesses and the names are yours.</p>
+        <p className="lr-cap"><Reveal detail="Speakers are not told apart yet: that needs a speaker model, a later step. When it comes, its lanes are guesses and the names are yours.">Voices</Reveal></p>
       </section>
     </aside>
 
     <main className="lr-read" aria-label="Transcript">
       {tab === 'details' ? <dl className="rr-details">
         <div><dt>File</dt><dd>{doc.filename}</dd></div>
-        <div><dt>Fingerprint</dt><dd><code>{doc.sha256}</code></dd></div>
-        <div><dt>Streams</dt><dd>{(t?.streams ?? []).map((s, i) => <span key={i}>{String(s.type)} · {String(s.codec ?? '')}{s.sample_rate ? ` · ${String(s.sample_rate)} Hz` : ''}{s.width ? ` · ${String(s.width)}×${String(s.height)}` : ''}<br/></span>)}</dd></div>
-        <div><dt>Transcribed</dt><dd>{about.tool} · {about.model} · on this computer{about.ran_at ? ` · ${about.ran_at.slice(0, 16).replace('T', ' ')} UTC` : ''}</dd></div>
+        <div><dt>Fingerprint</dt><dd><FingerprintMark hash={doc.sha256}/></dd></div>
+        <div><dt>Streams</dt><dd><Reveal detail={<>{(t?.streams ?? []).map((s, i) => <span className="rv-row" key={i}>{String(s.type)} · {String(s.codec ?? '')}{s.sample_rate ? ` · ${String(s.sample_rate)} Hz` : ''}{s.width ? ` · ${String(s.width)}×${String(s.height)}` : ''}</span>)}</>}>
+          {(t?.streams ?? []).map(s => String(s.type)).join(' · ') || '–'}</Reveal></dd></div>
+        {/* Where it was transcribed stays on screen (what leaves this computer); the tool, model and time are on hover. */}
+        <div><dt>Transcribed</dt><dd><Reveal detail={`${about.tool} · ${about.model} · on this computer${about.ran_at ? ` · ${about.ran_at.slice(0, 16).replace('T', ' ')} UTC` : ''}`}>⌂ on this computer</Reveal></dd></div>
         {(doc.extraction_issues ?? []).map(i => <div key={i}><dt>Note</dt><dd>{i}</dd></div>)}
       </dl> : <>
         <div className="lr-rbar">
           <span className="lr-seg"><span aria-current="true">Our transcription</span></span>
-          <p className="lr-meta">{about.tool} · {about.model} · run on this computer{about.ran_at ? ` ${about.ran_at.slice(0, 16).replace('T', ' ')} UTC` : ''}
-            {about.language ? ` · ${about.language} ${Math.round((about.language_probability ?? 0) * 100)}%` : ''}</p>
+          <p className="lr-meta"><Reveal detail={`${about.tool} · ${about.model} · run on this computer${about.ran_at ? ` ${about.ran_at.slice(0, 16).replace('T', ' ')} UTC` : ''}${about.language ? ` · ${about.language} ${Math.round((about.language_probability ?? 0) * 100)}%` : ''}`}>
+            ⌂ on this computer</Reveal></p>
         </div>
         <div ref={lines} className="lr-lines" onMouseUp={pinSelection}>
           {doc.extraction_status !== 'complete' ? <p className="rr-quiet">{doc.extraction_status === 'failed' ? `Not transcribed: ${doc.extraction_error ?? ''}` : 'Being transcribed on this computer…'}</p>
@@ -327,11 +333,9 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
         <p className="lr-cap">Pinned quote {pinned && <span className={`lr-chip ${saved ? 'ok' : heard ? 'teal' : 'amber'}`}>
           {saved ? 'Saved · heard by you' : heard ? 'Heard by you' : 'Transcribed · not yet heard'}</span>}</p>
         {pinned ? <>
-          <blockquote className="lr-quote">“{pinned.text}”</blockquote>
-          <dl className="lr-kv">
-            <dt>Place</dt><dd><code>media:#{placeOf(pinned)}</code></dd>
-            <dt>From</dt><dd>{doc.filename} · the original, as uploaded</dd>
-          </dl>
+          {/* Where the quote sits and which file it plays from are on hover of the quote. */}
+          <Reveal detail={<><span className="rv-row">Place <code>media:#{placeOf(pinned)}</code></span><span className="rv-row">From {doc.filename} · the original, as uploaded</span></>}>
+            <blockquote className="lr-quote">“{pinned.text}”</blockquote></Reveal>
           <ol className="lr-steps" aria-label="Before it is evidence">
             <li className="ok">1 Machine ✓</li>
             <li className={heard ? 'ok' : 'cur'}>2 Heard by you{heard ? ' ✓' : ''}</li>
@@ -344,16 +348,18 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
               title={playedThrough ? undefined : 'Play the part through first'}>I heard this <kbd>H</kbd></button>
           </div>
           <div className="lr-acts">
-            <button type="button" className="p" onClick={() => void save()} disabled={!heard || Boolean(saved)}>Save as evidence <kbd>E</kbd></button>
+            <Reveal tabbable={false} detail="Evidence stays locked until you have heard the part yourself. Machines can invent words.">
+              <button type="button" className="p" onClick={() => void save()} disabled={!heard || Boolean(saved)}>Save as evidence <kbd>E</kbd></button></Reveal>
           </div>
-          <p className="lr-note">Evidence stays locked until you have heard the part yourself. Machines can invent words.</p>
-        </> : <p className="lr-note">Pin a line with its Pin button or <kbd>P</kbd> while it plays, or choose words in it. A quote from a recording is saved only once you have heard it.</p>}
+          {/* A blocking state stays on screen: while the part is not yet heard, why Save is locked shows. */}
+          {!heard && <p className="lr-note">Evidence stays locked until you have heard the part yourself. Machines can invent words.</p>}
+        </> : <p className="lr-note"><Reveal detail={<>Pin a line with its Pin button or <kbd>P</kbd> while it plays, or choose words in it. A quote from a recording is saved only once you have heard it.</>}>Nothing pinned</Reveal></p>}
         {status && <p role="status" className="lr-status">{status}</p>}
       </section>
       <section className="lr-panel" aria-label="Files">
         <p className="lr-cap">Files <span>original kept unaltered</span></p>
-        <div className="lr-file orig"><span className="lr-chip teal">Original</span> <b>{doc.filename}</b><small>SHA-256 {doc.sha256.slice(0, 4)} {doc.sha256.slice(4, 8)} …{doc.sha256.slice(-4)}</small></div>
-        <p className="lr-note">The transcript was made from a 16 kHz copy decoded in memory; no derived file is kept. Quotes play from the original.</p>
+        <div className="lr-file orig"><Reveal detail="The transcript was made from a 16 kHz copy decoded in memory; no derived file is kept. Quotes play from the original.">
+          <span className="lr-chip teal">Original</span></Reveal> <b>{doc.filename}</b> <FingerprintMark hash={doc.sha256}/></div>
       </section>
     </aside>
 

@@ -15,6 +15,7 @@ import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {StatusChip} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {
@@ -139,9 +140,10 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
     {problem && <p role="alert" className="sy-quiet">{errorMessage(problem, 'Could not save that')}</p>}
     <div className="sy-body">
       <div className="sy-left">
-        <header className="sy-left-head"><p className="sy-eyebrow">What the story needs <small>thesis → sections → claims → evidence · a branch is as strong as its weakest claim</small></p>
+        <header className="sy-left-head"><p className="sy-eyebrow"><Reveal detail="Thesis → sections → claims → evidence. A branch is as strong as its weakest claim."><span>What the story needs</span></Reveal></p>
           <button type="button" className="sy-btn" aria-pressed={outline} onClick={() => setOutline(v => !v)}><kbd>L</kbd> list view</button></header>
-        {story.critical.length > 0 && <p className="sy-critical"><b>Critical path</b> Blocked by: {story.critical.map(x => x.text).join(' · ')} <small>({story.critical[0].section})</small></p>}
+        {story.critical.length > 0 && <p className="sy-critical"><b>Critical path</b> <Reveal detail={`In the section “${story.critical[0].section}”`}>
+          <span>Blocked by: {story.critical.map(x => x.text).join(' · ')}</span></Reveal></p>}
         {!story.thesis ? <Form {...thesisForm}><form className="sy-thesis-form" noValidate onSubmit={submitWith(thesisForm, async ({thesis}) => {
           await thesisM.mutateAsync({path, body: {thesis}});
         }, 'Could not set the thesis')}>
@@ -176,8 +178,9 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
         <div className="sy-tabs" role="tablist" aria-label="Write-up">
           <button type="button" role="tab" aria-selected={tab === 'write'} className={tab === 'write' ? 'on' : ''} onClick={() => setTab('write')}>Write-up</button>
           <button type="button" role="tab" aria-selected={tab === 'cited'} className={tab === 'cited' ? 'on' : ''} onClick={() => setTab('cited')}>Cited · {cited.length}</button>
-          <button type="button" role="tab" aria-selected={tab === 'notes'} className={tab === 'notes' ? 'on' : ''} disabled={!story.id}
-            title={story.id ? undefined : 'Write the thesis first: notes sit on the story'} onClick={() => setTab('notes')}>Notes{notes.data ? ` · ${notes.data.notes.length}` : ''}</button>
+          {story.id ? <button type="button" role="tab" aria-selected={tab === 'notes'} className={tab === 'notes' ? 'on' : ''}
+            onClick={() => setTab('notes')}>Notes{notes.data ? ` · ${notes.data.notes.length}` : ''}</button>
+            : <Reveal tabbable={false} detail="Write the thesis first: notes sit on the story."><button type="button" role="tab" aria-selected={false} disabled>Notes</button></Reveal>}
           <span className={`sy-export${ready ? ' ready' : ''}`}>
             <button type="button" disabled={!story.writeup_id} aria-haspopup="dialog" onClick={() => setExporting(true)}>Export for publication</button>
             <small>{!story.writeup_id ? 'Start the write-up first' : story.sentences.total === 0 ? 'Nothing written yet'
@@ -186,13 +189,13 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
         </div>
         {tab === 'notes' && story.id ? <NotesTab investigationId={investigationId} storyId={story.id}/> : !story.writeup_id ? <div className="sy-start">
           <p>No write-up yet.</p>
-          <button type="button" className="primary" disabled={!story.thesis} onClick={() => writeM.mutate({path})}>Start the write-up</button>
-          {!story.thesis && <small>Write the thesis first: the write-up is told from it.</small>}
+          {story.thesis ? <button type="button" className="primary" onClick={() => writeM.mutate({path})}>Start the write-up</button>
+            : <Reveal tabbable={false} detail="Write the thesis first: the write-up is told from it."><button type="button" className="primary" disabled>Start the write-up</button></Reveal>}
         </div> : null}
         {story.writeup_id && <>
           <div hidden={tab !== 'write'}>
-            <p className="sy-doc-meta">Draft for the editor · {story.version ? <>version “{story.version.name}”</> : 'no named version yet'}
-              <button type="button" className="sy-link" aria-expanded={pane?.kind === 'versions'} onClick={() => setPane(p => (p?.kind === 'versions' ? null : {kind: 'versions'}))}>Version history</button></p>
+            <p className="sy-doc-meta"><Reveal tabbable={false} detail={<>Draft for the editor · {story.version ? <>version “{story.version.name}”</> : 'no named version yet'}</>}>
+              <button type="button" className="sy-link" aria-expanded={pane?.kind === 'versions'} onClick={() => setPane(p => (p?.kind === 'versions' ? null : {kind: 'versions'}))}>Version history</button></Reveal></p>
             <WriteupEditor investigationId={investigationId} writeupId={story.writeup_id} claims={claims} onDoc={setDoc} reloadKey={reloadKey}
               onOpenPassage={id => setPane({kind: 'passage', claimId: id})} onPointClaim={setLit}/>
           </div>
@@ -203,7 +206,10 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
           <footer className="sy-foot">
             <span><b>Exhibits</b> {cited.length} record{cited.length === 1 ? '' : 's'}</span>
             <span><b>AI use</b> {doc?.aiDrafted ?? 0} of {doc?.paragraphs ?? 0} paragraph{doc?.paragraphs === 1 ? '' : 's'} drafted with AI</span>
-            <span className="sy-key"><i className="k-uncited"/>no source <i className="k-disputed"/>rests on a disputed claim <i className="k-unshown"/>rests on a claim not yet shown <i className="k-ai"/>AI wording</span>
+            {/* The key to the marks in the text: one mark, the key revealed on it. */}
+            <Reveal label="Key to the marks in the text" detail={<span className="sy-key"><span className="rv-row"><i className="k-uncited"/>no source</span>
+              <span className="rv-row"><i className="k-disputed"/>rests on a disputed claim</span><span className="rv-row"><i className="k-unshown"/>rests on a claim not yet shown</span>
+              <span className="rv-row"><i className="k-ai"/>AI wording</span></span>}><span className="sy-key-mark" aria-hidden="true"><i className="k-uncited"/><i className="k-disputed"/><i className="k-unshown"/><i className="k-ai"/></span></Reveal>
           </footer>
         </>}
       </div>
@@ -266,22 +272,27 @@ function Tree({story, lit, setLit, byId, canDrag, gates, onRemove, onPlace}: {
         <div className={`sy-section st-${s.status}`} data-node={`s:${s.id}`} role="treeitem" aria-level={2} aria-selected={lit === s.id}
           aria-label={`Section ${i + 1}: ${s.title}, ${s.shown} of ${s.total} shown`} onMouseEnter={() => setLit(s.id)} onMouseLeave={() => setLit(null)}>
           <b>{i + 1} · {s.title}</b>
-          <span className="sy-bar" aria-hidden="true"><i style={{width: `${s.total ? (s.shown / s.total) * 100 : 0}%`}}/></span>
-          <small>{s.total ? `${s.shown} of ${s.total} shown` : 'no claim yet'}</small>
+          {s.total ? <Reveal tabbable={false} describe={false} detail={`${s.shown} of ${s.total} shown`}>
+            <span className="sy-bar" aria-hidden="true"><i style={{width: `${(s.shown / s.total) * 100}%`}}/></span></Reveal>
+            : <small>no claim yet</small>}
         </div>
         <div className="sy-claims">
           {s.claims.map(cl => <article key={cl.id} className={`sy-claim st-${cl.state}${story.critical.some(x => x.claim_id === cl.id) ? ' critical' : ''}${lit === cl.id ? ' lit' : ''}`} data-node={`c:${cl.id}`}
-            role="treeitem" aria-level={3} aria-selected={lit === cl.id} aria-label={`Claim, ${cl.state === 'shown' ? 'shown' : cl.state === 'disputed' ? 'disputed' : 'not yet shown'}, ${cl.text}`}
+            role="treeitem" aria-level={3} aria-selected={lit === cl.id} aria-label={`Claim, ${cl.state === 'shown' ? 'shown' : cl.state === 'disputed' ? 'disputed' : 'not yet shown'}, ${cl.text}${story.critical.some(x => x.claim_id === cl.id) ? ', on the critical path' : ''}`}
             onMouseEnter={() => setLit(cl.id)} onMouseLeave={() => setLit(null)} draggable={canDrag}
-            title={canDrag ? 'Drag into the write-up to cite it there' : undefined}
             onDragStart={e => { e.dataTransfer.setData(CLAIM_DRAG, cl.id); e.dataTransfer.effectAllowed = 'copy'; }}>
-            <span className="sy-claim-top"><StatusChip status={STATE_CHIP[cl.state]}/><span className="wu-n" title="Its number in the write-up">{byId.get(cl.id)?.n}</span>
-              {story.critical.some(x => x.claim_id === cl.id) && <span className="sy-cp">Critical path</span>}
+            <span className="sy-claim-top"><StatusChip status={STATE_CHIP[cl.state]}/>
+              <Reveal tabbable={false} describe={false} detail={canDrag ? 'Its number in the write-up. Drag the claim into the write-up to cite it there.' : 'Its number in the write-up.'}>
+                <span className="wu-n">{byId.get(cl.id)?.n}</span></Reveal>
+              {/* The critical path is the claim's thicker outline; its name is on the mark. */}
+              {story.critical.some(x => x.claim_id === cl.id) && <Reveal tabbable={false} describe={false} detail="Critical path: the story is blocked until this claim is shown.">
+                <span className="sy-cp" aria-hidden="true">▲</span></Reveal>}
               <button type="button" className="sy-x" aria-label={`Take “${cl.text}” out of this section`} onClick={() => onRemove(s.id, cl.id)}>×</button></span>
             <b>{cl.text}</b>
-            <span className="sy-ev">{cl.evidence.length ? cl.evidence.map(e => <span key={e.id} className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>
-              {e.label}{e.locator ? ` · ${e.locator}` : ''}</span>) : <span className="sy-ev-chip empty">no evidence linked</span>}
-              {cl.single_source && <span className="sy-single" title="Rests on one record: mark it as single-source in the text">one source</span>}</span>
+            <span className="sy-ev">{cl.evidence.length ? cl.evidence.map(e => e.locator
+              ? <Reveal key={e.id} tabbable={false} describe={false} detail={e.locator}><span className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>{e.label}</span></Reveal>
+              : <span key={e.id} className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>{e.label}</span>) : <span className="sy-ev-chip empty">no evidence linked</span>}
+              {cl.single_source && <Reveal tabbable={false} describe={false} detail="Rests on one record: mark it as single-source in the text."><span className="sy-single">one source</span></Reveal>}</span>
           </article>)}
           {story.unplaced.length > 0 && <label className="sy-place">
             <select value="" aria-label={`Put a claim under “${s.title}”`} onChange={e => e.target.value && onPlace(s.id, e.target.value)}>
@@ -331,7 +342,7 @@ function Gates({story, onGate, onClear, onReady}: {story: StoryOut; onGate: (gat
     <p className="sy-eyebrow">Gates · {story.gates_passed} of {story.gates.length} passed</p>
     <ul>{story.gates.map(g => <li key={g.key} className={`gate g-${g.state}`}>
       <span className="gate-mark" aria-hidden="true">{GATE_MARK[g.state]}</span>
-      <span><b>{g.label}</b><small>{g.detail}</small>
+      <span><Reveal detail={g.detail}><b>{g.label}</b></Reveal>
         {(g.key === 'right_of_reply' || g.key === 'legal_read') && (editing === g.key
           ? <GateForm gate={g.key as Gate} onGate={onGate} onClose={() => setEditing(null)}/> : <span className="gate-acts">
             <button type="button" onClick={() => setEditing(g.key as Gate)}>{g.state === 'passed' ? 'Change' : 'Record'}</button>
@@ -345,8 +356,8 @@ function Gates({story, onGate, onClear, onReady}: {story: StoryOut; onGate: (gat
           <FormControl><input {...field} aria-label="Decided by" placeholder="Decided by" disabled={!story.can_ready}/></FormControl>
           <FormMessage className={NEXT_LINE}/></FormItemBare>}/>
         <FormRootError className={NEXT_LINE}/>
-        <button type="submit" disabled={!story.can_ready}>Ready to run</button>
-        {!story.can_ready && <small>Only when every gate has passed.</small>}
+        {story.can_ready ? <button type="submit">Ready to run</button>
+          : <Reveal tabbable={false} detail="Only when every gate has passed."><button type="submit" disabled>Ready to run</button></Reveal>}
       </form></Form>}
   </section>;
 }

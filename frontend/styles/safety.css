@@ -96,8 +96,21 @@ html[data-motion='calm'] .sd-pulse .sd-line { animation: none; border-top-color:
 .sd[data-checking] .sd-tiles dd, .sd[data-checking] .sd-count { opacity: .6; }
 @media (max-width: 1100px) { .sd { height: 100%; overflow: auto; } .sd-grid { grid-template-columns: 1fr; } .sd-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sd-diagram { grid-template-columns: 1fr; gap: 10px; } }
 
-.sd-box > span:not(.sd-state) { display: none; }
-.sd-service:hover .sd-box > span:not(.sd-state), .sd-box:focus-visible > span:not(.sd-state) { display: block; }
+/* What each service is now sits in its hover card (keyboard and touch reach it too), not in a CSS-only hover. */
 .sd-services { align-content: start; }
 .sd-map { overflow: hidden; }
 @media (max-width: 1100px) { .sd-map { overflow: visible; } .sd-rows { max-height: 60vh; } }
+
+/* 29 Oct rule: locations, modes and log details on reveal; the marks and figures left are drawn larger. */
+.sd-store { grid-template-columns: 26px minmax(0, 1fr); column-gap: 8px; align-items: center; }
+.sd-store > .sd-mark { grid-row: 1 / span 3; font-size: 18px; text-align: center; }
+.sd-mark-ai { font: 700 12px var(--font-mono); color: var(--ai-mark); border: 1.5px solid var(--ai-mark); border-radius: 6px; padding: 1px 3px; }
+.sd-inbk { color: var(--text-muted); }
+.sd-state { justify-self: start; width: 20px; height: 20px; padding: 0; display: inline-grid; place-items: center; font: 700 12px var(--font-mono); letter-spacing: 0; }
+.sd-failed { color: var(--status-disputed); font-weight: 600; }
+.sd-card h3 { font-size: 18px; }
+.sd-foot { font-size: 14px; }
+/* Access › server status: one row of names, each value on reveal. */
+.sec-status { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.sec-chip { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 12.5px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
+.sec-refused { color: var(--status-disputed); }

@@ -18,7 +18,11 @@ import {narrowed, narrowedList} from '../../lib/narrow';
 import {SchemaQuestion, needsSchemaAnswer} from '../../features/documents/schema-question';
 import {QueryProvider} from '../../lib/query-client';
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Reveal} from '@/components/ui/reveal';
+
+/** A proposal's kind as a mark, named on reveal. */
+const KIND_MARK: Record<string, string> = {entity: '◍', claim: '○', evidence: '“', relationship: '⟷', event: '◷', identifier: '@'};
 
 // Split-pane source highlighting (design doc Phase 1). Every extraction
 // candidate already carries chunk_id + payload.span (exact character
@@ -238,10 +242,8 @@ function ReviewPageInner(): ReactElement {
         <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         <Card className="card lg:sticky lg:top-4 lg:max-h-[80vh] lg:overflow-y-auto" data-testid="source-pane">
           <CardHeader className="pb-3">
-            <CardTitle>Source text</CardTitle>
-            <CardDescription>
-              {activeCandidate ? 'Highlighted span matches the proposal you are focused on.' : 'Hover or focus a proposal on the right to see its exact source span here.'}
-            </CardDescription>
+            <CardTitle><Reveal detail={activeCandidate ? 'Highlighted span matches the proposal you are focused on.' : 'Hover or focus a proposal on the right to see its exact source span here.'}>
+              <span>Source text</span></Reveal></CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             {(current.doc.chunks || []).length === 0 && <p className="muted">No extracted source text is available for this document.</p>}
@@ -252,7 +254,9 @@ function ReviewPageInner(): ReactElement {
                 data-testid={`chunk-${chunk.id}`}
                 className={`rounded border p-2 whitespace-pre-wrap ${activeCandidate?.chunk_id === chunk.id ? 'border-accent' : 'border-transparent'}`}
               >
-                <div className="text-xs muted mb-1">{chunk.locator}</div>
+                {/* Where the chunk sits is revealed on its mark. */}
+                <Reveal tabbable={false} describe={false} detail={chunk.locator}><span className="text-xs muted mr-1" aria-hidden="true">¶</span></Reveal>
+                <span className="sr-only">{chunk.locator}: </span>
                 {renderChunkBody(chunk, activeCandidate)}
               </div>
             ))}
@@ -261,8 +265,8 @@ function ReviewPageInner(): ReactElement {
 
         <Card className="card">
           <CardHeader className="pb-3">
-            <CardTitle>{current.doc.filename}</CardTitle>
-            <CardDescription>{current.doc.extraction_status} · {current.doc.chunk_count} chunk(s) · {current.accepted} accepted · {current.rejected} rejected this session</CardDescription>
+            <CardTitle><Reveal detail={`${current.doc.extraction_status} · ${current.doc.chunk_count} chunk(s)`}><span>{current.doc.filename}</span></Reveal></CardTitle>
+            <p className="text-sm muted">{current.accepted} accepted · {current.rejected} rejected this session</p>
           </CardHeader>
           <CardContent className="space-y-4">
             {hasIssues && (
@@ -278,8 +282,8 @@ function ReviewPageInner(): ReactElement {
             {current.candidates.length === 0 && !hasIssues && <p className="muted">Nothing left to review in this document.</p>}
             {current.candidates.length === 0 && hasIssues && <p className="muted">No proposals were generated from what could be parsed.</p>}
 
-            {current.candidates.length > 0 && <p className="muted text-xs" data-testid="review-keys">
-              Keys: ↑ ↓ (or J K) move between proposals · A accepts · R rejects</p>}
+            {current.candidates.length > 0 && <p className="muted text-xs"><Reveal label="Keys" detail="Keys: ↑ ↓ (or J K) move between proposals · A accepts · R rejects">
+              <span aria-hidden="true" data-testid="review-keys">⌨</span></Reveal></p>}
             {current.candidates.map(c => {
               const clarify = needsSchemaAnswer(c);
               const answered = answers[c.id];
@@ -301,10 +305,12 @@ function ReviewPageInner(): ReactElement {
                   onFocus={() => setActiveCandidateId(c.id)}
                   onBlur={() => setActiveCandidateId(cur => (cur === c.id ? null : cur))}
                 >
-                  <b>{c.candidate_type} proposal</b> <small data-band={confidenceBand(c.confidence) ?? undefined}
-                    className={BAND_CLASS[confidenceBand(c.confidence) ?? 'high']}>· {confidenceLabel(c.confidence)}</small>
-                  <div>{c.payload.caption || c.payload.text || c.payload.quote || ''}</div>
-                  {c.payload.locator && <small>{c.payload.locator}</small>}
+                  {/* The kind is a mark, named on reveal; the locator is revealed on the text. */}
+                  <Reveal label={`${c.candidate_type} proposal`} detail={`${c.candidate_type} proposal`}><b aria-hidden="true">{KIND_MARK[c.candidate_type] ?? c.candidate_type.charAt(0).toUpperCase()}</b></Reveal>{' '}
+                  <small data-band={confidenceBand(c.confidence) ?? undefined}
+                    className={BAND_CLASS[confidenceBand(c.confidence) ?? 'high']}>{confidenceLabel(c.confidence)}</small>
+                  {c.payload.locator ? <Reveal tabbable={false} detail={String(c.payload.locator)}><div>{c.payload.caption || c.payload.text || c.payload.quote || ''}</div></Reveal>
+                    : <div>{c.payload.caption || c.payload.text || c.payload.quote || ''}</div>}
                   {c.explanation && <ExtractionExplanationView explanation={c.explanation} />}
                   {clarify && <SchemaQuestion candidate={c} answer={answered} onAnswer={choice => setAnswers(a => ({...a, [c.id]: choice}))}/>}
                   {identifier

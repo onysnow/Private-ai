@@ -47,7 +47,7 @@ describe('CorpusInsights', () => {
 
     const people = within(await screen.findByRole('list', {name: 'People'}));
     expect(people.getByText('Alaric Voss')).toBeInTheDocument();
-    expect(people.getByText('Alongside: Meridian Holdings Ltd (3), Limassol (2)')).toBeInTheDocument();
+    expect(people.getByText('Alongside: Meridian Holdings Ltd (3), Limassol (2)').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     await user.click(within(screen.getByRole('list', {name: 'Companies'})).getByRole('button', {name: 'Open dossier'}));
     expect(useWorkbenchStore.getState().entityId).toBe('ent-1');
 

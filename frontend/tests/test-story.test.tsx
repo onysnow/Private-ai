@@ -95,9 +95,14 @@ describe('StoryScreen', () => {
     expect(screen.getByLabelText('Readiness')).toHaveTextContent('1 of 3 claims shown · 1 disputed · 1 not yet shown · 5 gates open');
     const tree = screen.getByRole('tree', {name: 'What the story needs'});
     expect(within(tree).getByRole('treeitem', {name: 'Section 1: Who bought the land, 1 of 2 shown'})).toBeInTheDocument();
-    expect(within(tree).getByRole('treeitem', {name: 'Claim, not yet shown, The sale was not put out to tender'})).toHaveTextContent('Critical path');
+    // The critical path is the claim's outline and a ▲ mark, named on reveal (and in the claim's name).
+    const critical = within(tree).getByRole('treeitem', {name: 'Claim, not yet shown, The sale was not put out to tender, on the critical path'});
+    expect(critical).toHaveClass('critical');
+    expect(critical.querySelector('.sy-cp')).toHaveTextContent('▲');
     expect(screen.getByText(/Blocked by: The sale was not put out to tender/)).toBeInTheDocument();
-    expect(within(tree).getByText('Land registry · title ML-2017')).toBeInTheDocument();
+    // The evidence chip shows its label; the locator waits in a reveal.
+    expect(within(tree).getByText('Land registry')).toBeVisible();
+    expect(within(tree).queryByText(/title ML-2017/)).toBeNull();
     const gates = screen.getByRole('region', {name: 'Gates'});
     expect(within(gates).getByText('Gates · 0 of 5 passed')).toBeInTheDocument();
     expect(within(gates).getByRole('button', {name: 'Ready to run'})).toBeDisabled();
@@ -159,7 +164,9 @@ describe('StoryScreen beside the write-up', () => {
     const pane = screen.getByRole('complementary', {name: 'The passage'});
     expect(pane).toHaveTextContent('Citation 1');
     expect(pane).toHaveTextContent('Fernhill Ltd bought the harbour land in November 2017');
-    expect(within(pane).getByText('✓ supports · Land registry · title ML-2017')).toBeInTheDocument();
+    // The stance is the ✓ mark, named on reveal; the label shows and the locator is on its reveal.
+    expect(within(pane).getByRole('img', {name: 'Supports'})).toHaveTextContent('✓');
+    expect(within(pane).getByText('Land registry').closest('.rv')).toHaveAccessibleDescription('title ML-2017');
     expect(within(pane).getByText('transferred to Fernhill Ltd')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('complementary', {name: 'The passage'})).not.toBeInTheDocument();
@@ -168,7 +175,7 @@ describe('StoryScreen beside the write-up', () => {
   it('lets a claim of the tree be dragged into the write-up once it is started', async () => {
     mockApi({[`GET ${PATH}`]: WRITTEN, [NOTES]: {investigation_id: 'inv-1', notes: []}});
     render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
-    const item = await screen.findByRole('treeitem', {name: 'Claim, not yet shown, The sale was not put out to tender'});
+    const item = await screen.findByRole('treeitem', {name: 'Claim, not yet shown, The sale was not put out to tender, on the critical path'});
     expect(item).toHaveAttribute('draggable', 'true');
     const setData = vi.fn();
     fireEvent.dragStart(item, {dataTransfer: {setData, effectAllowed: 'all'}});
@@ -202,12 +209,15 @@ describe('StoryScreen beside the write-up', () => {
       [`POST ${PATH}/versions/v1/restore`]: WRITEUP});
     render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
     const user = userEvent.setup();
-    expect(await screen.findByText(/version “Before legal read”/)).toBeInTheDocument();
+    // Which version the draft is waits in the reveal on Version history.
+    expect(await screen.findByRole('button', {name: 'Version history'})).toHaveAccessibleDescription(/version “Before legal read”/);
     await user.click(screen.getByRole('button', {name: 'Version history'}));
     const pane = screen.getByRole('complementary', {name: 'Version history'});
     const list = await within(pane).findByRole('list', {name: 'Versions, newest first'});
     expect(within(list).getAllByRole('button').map(b => b.textContent)).toEqual([
-      expect.stringContaining('Before legal read'), expect.stringMatching(/^◇Automatic · .*automatic · .* · 180 words$/)]);
+      expect.stringContaining('Before legal read'), expect.stringMatching(/^◇Automatic · /)]);
+    // Kind, time and words are revealed on the version.
+    expect(within(list).getAllByRole('button')[1]).toHaveAccessibleDescription(/^automatic · .* · 180 words$/);
     await user.type(within(pane).getByLabelText('Name the text as it stands'), 'After the lawyer');
     await user.click(within(pane).getByRole('button', {name: 'Keep'}));
     await waitFor(() => expect(api.lastBody(`POST ${PATH}/versions`)).toEqual({name: 'After the lawyer'}));

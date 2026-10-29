@@ -260,3 +260,27 @@ html[data-motion='calm'] .kc-flip.flipped .kc-face.front { opacity: 0; }
 .kc-dashed-box { margin: 0; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; font-size: 13px; color: var(--text-muted); }
 .kg-ul { margin: 0; padding-left: 16px; font-size: 12.5px; color: var(--text-muted); display: grid; gap: 3px; }
 .kg-chips { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Ony's rule of 29 Oct (components/ui/reveal.tsx): an indicator's id, how it is checked and the area's summary are in
+   reveals; how it is checked shows as its shape (◫ records, ⇄ lookups, a person). The list's rows lose the id column,
+   so the name grows into the room. */
+.kc-row { grid-template-columns: minmax(0, 1fr) 20px; font-size: 13.5px; align-items: center; }
+.kc-row-name .lv { margin-left: 4px; }
+.kc-how-glyph { display: inline-grid; place-items: center; min-width: 1em; font: 600 13px var(--font-mono); line-height: 1; vertical-align: -1px; }
+.kc-how .kc-how-glyph { font-size: 14px; }
+.kc-chip .kc-how-glyph { font-size: 13px; }
+.kc-count { font: 500 12px var(--font-mono); color: var(--text-muted); white-space: nowrap; }
+.kc-how-counts { list-style: none; margin: 0; padding: 0; display: flex; gap: 16px; }
+.kc-how-count { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); }
+.kc-how-count b { font: 650 17px var(--font-display); color: var(--text); font-variant-numeric: tabular-nums; }
+.kc-area-card h3 { font-size: 16px; }
+.kc-actions .rv > button:disabled, .kc-top .rv > button:disabled { pointer-events: none; }
+
+/* Glossary rows: the term grows into the room the first sentence left (it opens in the card on point); a term's areas
+   are a dot each, named on hover. */
+.kg-row { grid-template-columns: minmax(0, 1fr) auto; }
+.kg-term { font-size: 15px; }
+.kg-areas { display: inline-flex; align-items: center; gap: 4px; }
+.kg-areas i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); opacity: .75; }
+.kg-areas small { font: 10.5px var(--font-mono); color: var(--text-muted); }
+.rv.kg-tabs-rv { display: block; }

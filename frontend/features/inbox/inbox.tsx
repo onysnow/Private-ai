@@ -10,11 +10,15 @@ import {useCallback, useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {AiTag, LevelChip} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {caseHref} from '../../lib/case-href';
 import {getInboxOptions, getInboxQueryKey, seeWatchMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {InboxOut, InboxRowOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
+import {KindMark} from '../case-home/decision-card';
+import {KIND_LABEL} from '../case-home/use-decisions';
+import type {DecisionKind} from '../case-home/use-decisions';
 
 const SNOOZE_KEY = 'pai:snoozed';
 const DAY_MS = 86_400_000;
@@ -80,13 +84,21 @@ function Row({r, inv, onClose, onSnooze}: {r: InboxRowOut; inv: string; onClose:
   const seen = useMutation({...seeWatchMutation(),
     onSuccess: () => queryClient.invalidateQueries({queryKey: getInboxQueryKey({path: {investigation_id: inv}})})});
   const watchId = r.kind === 'watch' ? r.key.split(':')[1] : null;
+  // A row is its title with its marks (Decide's kind mark, the AI mark, the level's bars); who sent it and why are on
+  // hover or focus (Ony, 29 Oct). A watched fact's change is the news itself, so it stays on screen.
+  const kind = r.kind in KIND_LABEL ? r.kind as DecisionKind : null;
+  const reason = r.reason && r.reason !== r.actor ? r.reason : '';
+  const keepReason = r.kind === 'watch' && reason;
+  const detail = [r.actor_kind !== 'ai' ? r.actor : '', kind ? KIND_LABEL[kind] : '', keepReason ? '' : reason].filter(Boolean);
+  const marks = r.actor_kind === 'ai' || kind || r.level;
+  const row = <Link href={caseHref(r.href, inv)} onClick={onClose} className="ib-row">
+    {marks && <span className="ib-why">{r.actor_kind === 'ai' ? <AiTag/> : kind ? <KindMark kind={kind} bare/> : null}
+      {r.level && <LevelChip level={r.level as 'faint' | 'strong' | 'textbook'}/>}</span>}
+    <b>{r.title}</b>
+    {keepReason && <small className="ib-reason">{reason}</small>}
+  </Link>;
   return <li>
-    <Link href={caseHref(r.href, inv)} onClick={onClose} className="ib-row">
-      <span className="ib-why">{r.actor_kind === 'ai' ? <AiTag/> : r.actor ? <small>{r.actor}</small> : null}
-        {r.level && <LevelChip level={r.level as 'faint' | 'strong' | 'textbook'}/>}</span>
-      <b>{r.title}</b>
-      {r.reason && r.reason !== r.actor && <small className="ib-reason">{r.reason}</small>}
-    </Link>
+    {detail.length ? <Reveal tabbable={false} detail={<>{detail.map((d, i) => i === 0 ? <b key={d}>{d}</b> : <span key={d} className="rv-row">{d}</span>)}</>}>{row}</Reveal> : row}
     <span className="ib-acts">
       {watchId && <button type="button" className="ib-seen" disabled={seen.isPending}
         onClick={() => seen.mutate({path: {fact_watch_id: watchId}})}>Seen</button>}
@@ -126,7 +138,7 @@ export function Inbox({open, onClose}: {open: boolean; onClose: () => void}): Re
           : list.slice(0, 40).map(r => <Row key={r.key} r={r} inv={inv} onClose={onClose} onSnooze={ms => snooze(r.key, ms)}/>)}
       </ul>}
     <footer className="ib-quiet">
-      {hidden > 0 && <span>{hidden} snoozed on this computer; each comes back by itself. </span>}
+      {hidden > 0 && <><Reveal detail="Snoozed on this computer; each comes back by itself."><span>{hidden} snoozed</span></Reveal> · </>}
       <Link href="/settings#notifications" onClick={onClose}>Choose what goes where</Link>
     </footer>
   </section>;

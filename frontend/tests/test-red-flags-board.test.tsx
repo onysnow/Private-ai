@@ -36,6 +36,8 @@ const body = (fs: unknown[]) => ({investigation_id: 'inv-1', rules: [{indicator_
   cannot_run: [], ran_at: '2026-10-10T00:00:00', stale: false, flags: fs, gone: [], investigation_type: {set_by: 'app', areas: [], suggested: []}});
 const routes = {'GET /api/investigations/inv-1/red-flags': body(flags),
   'GET /api/investigations/inv-1/financial-flows': {investigation_id: 'inv-1', transactions: [], incomplete: [], currencies: [], flow_type_rule: '', duplicate_rule: ''}};
+/** The text a sighted reader sees: without what waits in a reveal (the hidden words read with each mark). */
+const seen = (el: Element) => { const c = el.cloneNode(true) as Element; c.querySelectorAll('[hidden]').forEach(h => h.remove()); return (c.textContent ?? '').replace(/\s+/g, ' ').trim(); };
 const renderBoard = () => render(<QueryProvider><RedFlagsBoard investigationId="inv-1"/></QueryProvider>);
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); useWorkbenchStore.setState({investigationId: 'inv-1', flag: null}); window.localStorage.clear(); });
@@ -58,8 +60,11 @@ describe('RedFlagsBoard', () => {
     const list = await screen.findByRole('listbox', {name: 'Red Flags, ranked'});
     const rows = await within(list).findAllByRole('option');
     expect(rows[0]).toHaveAccessibleName('Rank 1, Textbook, Circular ownership, Kestrel SA');
-    expect(rows[1]).toHaveAccessibleName('Rank 2, Faint, Structuring below reporting thresholds, Harbour Nominees and Fernhill Ltd and 1 more');
-    expect(rows[1]).toHaveTextContent('○ rests on 1 link not yet shown');
+    expect(rows[1]).toHaveAccessibleName('Rank 2, Faint, Structuring below reporting thresholds, Harbour Nominees and Fernhill Ltd and 1 more, rests on 1 link not yet shown');
+    // The mark and its count show; the words wait in a reveal, and the indicator's code is no longer on the row.
+    expect(rows[1].querySelector('.rb-rests')).toHaveTextContent('○ 1');
+    expect(seen(rows[1])).not.toContain('not yet shown');
+    expect(seen(rows[1])).not.toContain('ML-021');
     expect(screen.getByRole('button', {name: 'Kestrel SA: 2 flags'})).toBeInTheDocument();
     expect(document.querySelector('.rb-count-reset')).toHaveTextContent('2 of 2 flags');
     expect(document.querySelector('.rb-coverage')).toHaveTextContent('2 of 2 record rules ran');
@@ -84,7 +89,9 @@ describe('RedFlagsBoard', () => {
     const before = await screen.findByRole('complementary', {name: 'Before you call it'});
     expect(await within(before).findByText('Could be innocent · 0 of 2 checked')).toBeInTheDocument();
     expect(within(before).getByText('whether the money was cash')).toBeInTheDocument();
-    expect(within(before).getByText(/complexity that makes no commercial sense/)).toBeInTheDocument();
+    // The source's quote is revealed on its publisher and title.
+    expect(within(before).getByText(/complexity that makes no commercial sense/).closest('[hidden]')).not.toBeNull();
+    expect(within(before).getByText('FATF, Concealment of Beneficial Ownership')).toBeVisible();
     const user = userEvent.setup();
     await user.click(within(before).getAllByRole('button', {name: 'Rule out…'})[0]);
     const input = within(before).getByRole('textbox', {name: 'What ruled out: Group cross-holdings'});
@@ -98,7 +105,8 @@ describe('RedFlagsBoard', () => {
     await waitFor(() => expect(api.calls('POST /api/red-flags/f2/innocent')).toHaveLength(1));
     expect(api.lastBody('POST /api/red-flags/f2/innocent')).toEqual({text: 'Group cross-holdings', state: 'ruled_out', note: 'No cross-holdings in the filings'});
     expect(await within(before).findByText('Could be innocent · 1 of 2 checked')).toBeInTheDocument();
-    expect(within(before).getByText('Ruled out: No cross-holdings in the filings')).toBeInTheDocument();
+    // The state is the ✓ mark; its word and the note are revealed on it.
+    expect(within(before).getByRole('img', {name: 'Ruled out'})).toHaveAccessibleDescription('Ruled out: No cross-holdings in the filings');
   });
 
   it('A adds the open flag to leads; X asks why before setting it aside; a money flag links to the money view', async () => {
@@ -198,7 +206,9 @@ describe('reading never writes', () => {
     const rows = await within(screen.getByRole('listbox')).findAllByRole('option');
     expect(rows).toHaveLength(2);
     expect(api.calls('POST /api/investigations/inv-1/red-flags/run')).toHaveLength(1);
-    expect(document.querySelector('.rb-run')).toHaveTextContent(/Run the rules\s*ran \d+ days ago/);
+    // When they ran is on reveal of the clock mark.
+    expect(within(document.querySelector<HTMLElement>('.rb-run')!).getByRole('img', {name: 'When the rules ran'})).toHaveAccessibleDescription(/^ran \d+ days ago/);
+    expect(seen(document.querySelector('.rb-run')!)).toBe('Run the rules◷');
   });
 
   it('does not run the rules when nothing changed since they ran, and runs them on demand with "Run the rules"', async () => {
@@ -206,7 +216,7 @@ describe('reading never writes', () => {
     renderBoard();
     await within(await screen.findByRole('listbox')).findAllByRole('option');
     expect(api.calls('POST /api/investigations/inv-1/red-flags/run')).toHaveLength(0);
-    expect(screen.getByRole('complementary', {name: 'Before you call it'})).toHaveTextContent(/Rules ran \d+ days ago/);
+    expect(within(screen.getByRole('complementary', {name: 'Before you call it'})).getByRole('img', {name: 'When the rules ran'})).toHaveAccessibleDescription(/Rules ran \d+ days ago/);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Run the rules'}));
     await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/red-flags/run')).toHaveLength(1));
     expect(await screen.findByText('just now')).toBeInTheDocument();
@@ -220,7 +230,8 @@ describe('reading never writes', () => {
     await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/red-flags/run')).toHaveLength(1));
     await new Promise(r => setTimeout(r, 50));
     expect(api.calls('POST /api/investigations/inv-1/red-flags/run')).toHaveLength(1);
-    expect(await screen.findByText(/the records changed since/)).toBeInTheDocument();
+    // The amber dot stays on screen: the results may be out of date.
+    expect(await screen.findByRole('img', {name: 'The records changed since the rules ran'})).toHaveAccessibleDescription(/the records changed since/);
   });
 
   it('says why when the rules cannot be run (a reader), and keeps showing the stored flags', async () => {
@@ -242,7 +253,8 @@ describe('hover-preview', () => {
     fireEvent.mouseEnter(rows[1]);
     const peek = screen.getByRole('region', {name: 'Preview of a Red Flag'});
     expect(within(peek).getByRole('heading', {name: 'Structuring below reporting thresholds'})).toBeInTheDocument();
-    expect(peek).toHaveTextContent(/Preview · click the row to open it/);
+    expect(peek.querySelector('.rb-peek-note .rv')).toHaveAccessibleDescription('Click the row to open it; move off the list to go back.');
+    expect(seen(peek.querySelector('.rb-peek-note')!)).toBe('Preview');
     expect(rows[0]).toHaveAttribute('aria-selected', 'true');
     expect(rows[1]).toHaveAttribute('aria-selected', 'false');
     fireEvent.mouseLeave(screen.getByRole('listbox'));
@@ -272,15 +284,16 @@ describe('scroll over the picture', () => {
         transactions: [pay('p1', 9400, '2019-03-12', 'shown'), pay('p2', 9850, '2019-04-26', 'shown'), pay('p3', 9600, '2019-05-23', 'not_yet_shown')]}});
     renderBoard();
     const picture = await screen.findByRole('figure', {name: /scroll over, or use the arrow keys/});
-    expect(picture).toHaveTextContent('scroll over to step through · 1 of 3 shown');
-    expect(picture.querySelector('.rb-pay-focus')).toHaveTextContent('$9,400 on 12 Mar 2019 · Harbour Nominees → Fernhill Ltd ✓ Shown');
+    expect(seen(picture.querySelector('figcaption')!)).toBe('The payments it rests on1 of 3 shown');
+    expect(picture.querySelector('figcaption')).toHaveTextContent(/Scroll over the picture, or use the arrow keys/);
+    expect(picture.querySelector('.rb-pay-focus')).toHaveTextContent('$9,400 on 12 Mar 2019 · Harbour Nominees → Fernhill Ltd ✓Shown');
     fireEvent.pointerEnter(picture);
     const now = Date.now();
     const clock = vi.spyOn(Date, 'now').mockReturnValue(now + 1000); // past the dwell
     fireEvent.wheel(picture, {deltaY: 100});
     expect(picture).toHaveTextContent('2 of 3 shown');
     fireEvent.wheel(picture, {deltaY: 100});
-    expect(picture.querySelector('.rb-pay-focus')).toHaveTextContent('$9,600 on 23 May 2019 · Harbour Nominees → Fernhill Ltd ○ Not yet shown · bank statement p.3');
+    expect(picture.querySelector('.rb-pay-focus')).toHaveTextContent('$9,600 on 23 May 2019 · Harbour Nominees → Fernhill Ltd ○Not yet shown · bank statement p.3');
     expect(picture.querySelectorAll('.rb-pay.focus')).toHaveLength(1);
     fireEvent.wheel(picture, {deltaY: 100});
     expect(picture).toHaveTextContent('3 of 3 shown');
@@ -305,10 +318,11 @@ describe('what changed since the last visit', () => {
     renderBoard();
     const strip = await screen.findByRole('group', {name: 'What changed since your last visit'});
     expect(strip).toHaveTextContent('Since your last visit · 10 Oct: 1 new · 1 no longer fires');
-    await waitFor(() => expect(strip).toHaveTextContent('1 of 2 ✚ New BO-001 Circular ownership'));
+    await waitFor(() => expect(seen(strip)).toContain('1 of 2 ✚ Circular ownership'));
     // The row is lit by the board after the strip's step renders (an effect), so wait for it too.
     await waitFor(() => expect(document.querySelector('.rb-row.lit')).toHaveAccessibleName(/Circular ownership/));
-    await waitFor(() => expect(strip).toHaveTextContent('2 of 2 − No longer fires BO-032 Unrelated parties share an address'), {timeout: 3000});
+    await waitFor(() => expect(seen(strip)).toContain('2 of 2 − Unrelated parties share an address'), {timeout: 3000});
+    expect(within(strip).getByRole('img', {name: 'No longer fires'})).toHaveAccessibleDescription('No longer fires · BO-032');
     await waitFor(() => expect(within(strip).getByRole('button', {name: 'Replay'})).toBeInTheDocument(), {timeout: 3000});
     expect(document.querySelector('.rb-row.lit')).toBeNull();
   });
@@ -322,7 +336,7 @@ describe('what changed since the last visit', () => {
       const strip = await screen.findByRole('group', {name: 'What changed since your last visit'});
       expect(strip).toHaveTextContent('Since your last visit · 8 Oct: 2 new');
       expect(strip.querySelectorAll('.rb-changed-all li')).toHaveLength(1);
-      expect(strip).toHaveTextContent('✚ New ML-021 Structuring below reporting thresholds ×2');
+      expect(seen(strip)).toContain('✚ Structuring below reporting thresholds ×2');
     } finally { delete document.documentElement.dataset.motion; }
   });
 
@@ -334,7 +348,7 @@ describe('what changed since the last visit', () => {
       renderBoard();
       const strip = await screen.findByRole('group', {name: 'What changed since your last visit'});
       expect(strip.querySelectorAll('.rb-changed-all li')).toHaveLength(1);
-      expect(strip).toHaveTextContent('− No longer fires BO-032');
+      expect(within(strip).getByRole('img', {name: 'No longer fires'})).toHaveAccessibleDescription('No longer fires · BO-032');
       expect(strip).not.toHaveTextContent('1 of 1');
     } finally { delete document.documentElement.dataset.motion; }
   });

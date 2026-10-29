@@ -9,7 +9,8 @@ import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Reveal} from '@/components/ui/reveal';
 import {Input} from '@/components/ui/input';
 import {errorMessage} from '../../lib/api-client';
 import {investigationDeletionPreview, removeInvestigation} from '../../lib/generated/sdk.gen';
@@ -75,8 +76,8 @@ export function DeletionPanel({investigationId, onDeleted}: Props): ReactElement
 
   return <Card className="card">
     <CardHeader className="pb-3">
-      <CardTitle>Local investigation deletion</CardTitle>
-      <CardDescription>Preview first. Shared document files are preserved; investigation-owned files and database records are removed together with rollback protection.</CardDescription>
+      <CardTitle><Reveal detail="Preview first. Shared document files are preserved; investigation-owned files and database records are removed together with rollback protection.">
+        <span>Local investigation deletion</span></Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       <Button onClick={runPreview} disabled={!investigationId}>Preview deletion</Button>

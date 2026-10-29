@@ -60,8 +60,10 @@ describe('Documents in the corpus', () => {
     expect(within(group).getByText('Zanzibar', {selector: 'mark'})).toBeInTheDocument();
     // OpenAleph's text is shown as text, never as markup.
     expect(within(group).getByText('<b>transfer</b>', {exact: false})).toBeInTheDocument();
-    expect(within(group).getByText('page 2 · Page', {exact: false})).toBeInTheDocument();
-    expect(within(group).getByText('In OpenAleph, not uploaded to this investigation.')).toBeInTheDocument();
+    // The page and the document's kind are on hover of its icon; so is where an OpenAleph-only document lives.
+    expect(within(group).getByRole('img', {name: 'Page'})).toBeInTheDocument();
+    expect(within(group).getByText('page 2 · Page', {exact: false}).closest('[hidden]')).not.toBeNull();
+    expect(within(group).getByText('In OpenAleph, not uploaded to this investigation.').closest('[hidden]')).not.toBeNull();
     expect(api.lastUrl(CORPUS).searchParams.get('q')).toBe('Zanzibar');
 
     await user.click(within(group).getByRole('button', {name: 'Open document'}));

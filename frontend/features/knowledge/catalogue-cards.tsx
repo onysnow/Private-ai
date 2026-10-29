@@ -33,7 +33,6 @@ export function CatalogueCards({area, rows, indicator, onOpenIndicator}: {
         <span className="kc-face front" aria-hidden={flipped}>
           <span className="kc-eyebrow">Which sign is this?</span>
           <span className="kc-card-text">{ind ? ind.definition : '…'}</span>
-          <span className="kc-small">Space to turn · ← → to move</span>
         </span>
         <span className="kc-face back" aria-hidden={!flipped}>
           <span className="kc-eyebrow">{row.id}</span>

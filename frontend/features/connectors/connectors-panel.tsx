@@ -16,6 +16,7 @@ import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Reveal} from '../../components/ui/reveal';
 import {
   enrichmentSessionClustersOptions, enrichmentSessionClustersQueryKey, listConnectorFindingsQueryKey, listEntitiesOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
@@ -36,6 +37,12 @@ type Props = {
 // One empty list while the entities load, so the effect below sees the same value.
 const NO_ENTITIES: EntityOut[] = [];
 
+/** A provider run's health as Following's shapes (features/following/following-screen.tsx HEALTH): ● worked, ✕ failed,
+ *  ○ anything else; the word on hover. */
+const runGlyph = (status: string): [string, string] => (['ok', 'completed', 'succeeded'].includes(status) ? ['●', 'ok'] : status === 'failed' ? ['✕', 'bad'] : ['○', 'quiet']);
+type Run = {provider: string; status: string; result_count?: number | null};
+const DECISION_MARK: Record<string, string> = {positive: '✓', negative: '✕', unsure: '○'};
+
 export function ConnectorsPanel({investigationId, providers, picker}: Props): ReactElement {
   const queryClient = useQueryClient();
   const entityId = useWorkbenchStore(state => state.entityId);
@@ -46,6 +53,8 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
   const [enrichStatus, setEnrichStatus] = useState('');
   // The session whose clusters are shown; its clusters are a query keyed by it.
   const [clusterSession, setClusterSession] = useState('');
+  // The last all-provider session's runs, drawn as one health mark each.
+  const [runs, setRuns] = useState<Run[]>([]);
 
   const entitiesQuery = useQuery({...listEntitiesOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const entities = entitiesQuery.data ?? NO_ENTITIES;
@@ -63,7 +72,7 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
 
   // A new case starts without a running enrichment or its clusters.
   const enrichmentSerial = useRef(0);
-  useEffect(() => { enrichmentSerial.current += 1; setEnrichStatus(''); setClusterSession(''); }, [investigationId]);
+  useEffect(() => { enrichmentSerial.current += 1; setEnrichStatus(''); setClusterSession(''); setRuns([]); }, [investigationId]);
 
   const reloadFindings = () => queryClient.invalidateQueries({queryKey: listConnectorFindingsQueryKey({path: {investigation_id: investigationId}})});
 
@@ -80,6 +89,7 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
   const enrich = async () => {
     if (!entityId) return;
     setEnrichStatus(`Running ${provider}…`);
+    setRuns([]);
     try {
       const rows = (await enrichEntity({path: {entity_id: entityId, provider}, throwOnError: true})).data;
       setEnrichStatus(`${provider}: ${rows.length} finding(s)`);
@@ -98,6 +108,7 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
     const current = () => enrichmentSerial.current === serial;
     setEnrichStatus('Running all configured connectors…');
     setClusterSession('');
+    setRuns([]);
     try {
       const session = (await enrichEntityMulti({path: {entity_id: entityId}, body: {providers}, throwOnError: true})).data;
       if (!current()) return;
@@ -106,6 +117,7 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
       await queryClient.fetchQuery(enrichmentSessionClustersOptions({path: {session_id: session.id}}));
       if (!current()) return;
       setEnrichStatus(`${session.status} · ${summary}`);
+      setRuns(session.runs);
       setClusterSession(session.id);
       await reloadFindings();
     } catch (error) {
@@ -146,23 +158,27 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
         </Select>
         <Button onClick={() => openDossier(entityId)} disabled={!entityId}>Open dossier</Button>
         <Button onClick={enrich} disabled={!entityId}>Enrich with {provider}</Button>
-        <Button onClick={enrichAll} disabled={!entityId}>Enrich all providers</Button>
+        <Reveal tabbable={false} detail="Multi-provider enrichment keeps one auditable session while each provider gets its own run, status, error, and result count. Successful providers are preserved if another provider fails.">
+          <Button onClick={enrichAll} disabled={!entityId}>Enrich all providers</Button></Reveal>
       </div>
-      {enrichStatus && <p className="muted">{enrichStatus}</p>}
-      <p className="muted">Multi-provider enrichment keeps one auditable session while each provider gets its own run, status, error, and result count. Successful providers are preserved if another provider fails.</p>
+      {/* After a session, each provider is a health mark with its count; the session's full line is on hover. */}
+      {enrichStatus && (runs.length ? <p className="muted cn-runs"><Reveal detail={enrichStatus}>{runs.map(r => {
+        const [glyph, tone] = runGlyph(r.status);
+        return <span key={r.provider} className={`cn-run ${tone}`}><i aria-hidden="true">{glyph}</i> {r.provider}{r.result_count ? ` ${r.result_count}` : ''}</span>;
+      })}</Reveal></p> : <p className="muted">{enrichStatus}</p>)}
       <DossierPanel investigationId={investigationId}/>
       {clusters.length > 0 && <div>
         <h4>Cross-provider candidates</h4>
         {clusters.map(c => <div className="candidate" key={c.cluster_key}>
-          <b>{Math.round(c.score * 100)}% possible same outside entity</b>
+          <Reveal detail={(c.pairs[0]?.reasons ?? []).map(r => `${r.kind}: ${r.detail}`).join(' · ') || 'No reasons recorded'}><b>{Math.round(c.score * 100)}% possible same outside entity</b></Reveal>
           <div>{c.findings.map(f => <div key={f.id}>{f.provider}: {f.caption}</div>)}</div>
-          <small>{(c.pairs[0]?.reasons ?? []).map(r => `${r.kind}: ${r.detail}`).join(' · ')}</small>
           <div>
             <Button onClick={() => decideCluster(c, 'positive')}>Same external entity</Button>
             <Button onClick={() => decideCluster(c, 'negative')}>Different</Button>
             <Button onClick={() => decideCluster(c, 'unsure')}>Unsure</Button>
           </div>
-          {c.decision && <small>Latest decision: {c.decision.decision}</small>}
+          {c.decision && <Reveal label={`Latest decision: ${c.decision.decision}`} detail={`Latest decision: ${c.decision.decision}`}>
+            <b aria-hidden="true">{DECISION_MARK[c.decision.decision] ?? '·'}</b></Reveal>}
         </div>)}
       </div>}
     </CardContent>

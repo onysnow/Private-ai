@@ -11,6 +11,7 @@ import {useState} from 'react';
 import type {ReactElement} from 'react';
 import {z} from 'zod';
 
+import {Reveal} from '../../components/ui/reveal';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormRootError} from '../../components/ui/form';
 import {errorMessage} from '../../lib/api-client';
 import {apiTime} from '../../lib/timestamps';
@@ -73,19 +74,19 @@ function ThisCase({inv, caseName, data}: {inv: string; caseName: string; data: L
     <div className="ap-pane-head"><h2 id="lk-case">This case</h2><span>{caseName}</span></div>
     {own && !editing ? <>
       <p className="st-line">{Object.entries(own.modes).map(([p, m]) => `${data.sources.find(s => s.key === p)?.label ?? p}: ${MODE_WORDS[m as Mode]}`).join(' · ')}</p>
-      {own.reason && <p className="st-hint">“{own.reason}” · {when(own.set_at)}</p>}
+      {own.reason && <p className="st-hint"><Reveal detail={`Set ${when(own.set_at)}`}><span>“{own.reason}”</span></Reveal></p>}
       <div className="st-acts">
         <button type="button" className="ap-btn" onClick={() => setEditing(true)}>Change</button>
         <button type="button" className="ap-btn" disabled={clear.isPending} onClick={() => clear.mutate({path: {investigation_id: inv}})}>Make it match the defaults</button>
       </div>
       {clear.isError && <p className="st-problem" role="alert">{errorMessage(clear.error, 'Could not change it.')}</p>}
     </> : !editing ? <>
-      <p className="st-hint">Follows the defaults above. A case can differ, for example a source you must not leave traces with.</p>
-      <div className="st-acts"><button type="button" className="ap-btn" onClick={() => setEditing(true)}>Set this case’s own</button></div>
+      <div className="st-acts"><Reveal tabbable={false} detail="Follows the defaults above. A case can differ, for example a source you must not leave traces with.">
+        <button type="button" className="ap-btn" onClick={() => setEditing(true)}>Set this case’s own</button></Reveal></div>
     </> : <Form {...form}>
       <form onSubmit={onSubmit} noValidate className="st-form">
         {data.sources.map(s => <div key={s.key} className="st-route">
-          <span className="st-route-what"><b>{s.label}</b><small>default {MODE_WORDS[s.default as Mode]}</small></span>
+          <span className="st-route-what"><Reveal detail={`Default: ${MODE_WORDS[s.default as Mode]}`}><b>{s.label}</b></Reveal></span>
           <Seg label={`${s.label} in this case`} value={draft[s.key]} onPick={m => setDraft(d => ({...d, [s.key]: m}))}/>
         </div>)}
         <FormField control={form.control} name="reason" render={({field}) => <FormItem>
@@ -123,11 +124,11 @@ export function LookupsPane({investigationId, caseName, providers}: {investigati
     </section>
     <div className="ap-two">
       <section className="ap-pane" aria-labelledby="lk-src">
-        <div className="ap-pane-head"><h2 id="lk-src">Each source</h2><span>the mode new cases start with</span></div>
+        <div className="ap-pane-head"><h2 id="lk-src"><Reveal detail="The mode new cases start with."><span>Each source</span></Reveal></h2></div>
         {d.sources.map(s => {
           const mode = (s.mode ?? s.default) as Mode;
           return <div key={s.key} className="st-src">
-            <div className="st-src-top"><b>{s.label}</b><span>{s.kind}</span>
+            <div className="st-src-top"><Reveal detail={s.kind}><b>{s.label}</b></Reveal>
               <Seg label={`${s.label} for new cases`} value={s.default as Mode} disabled={!d.can_change_defaults || defaults.isPending}
                 onPick={m => defaults.mutate({body: {defaults: {[s.key]: m}}, query: investigationId ? {investigation_id: investigationId} : {}})}/></div>
             <p className="st-wire" aria-label="What is sent"><i>Your case</i><s aria-hidden="true">──</s><i className="st-wire-what">a party’s name</i><s aria-hidden="true">──▶</s><i>{s.host || s.label}</i></p>
@@ -145,7 +146,7 @@ export function LookupsPane({investigationId, caseName, providers}: {investigati
       <div className="st-col">
         {investigationId ? <ThisCase key={investigationId} inv={investigationId} caseName={caseName} data={d}/> : null}
         <section className="ap-pane" aria-labelledby="lk-diff">
-          <div className="ap-pane-head"><h2 id="lk-diff">Other cases that differ</h2><span>only what is different</span></div>
+          <div className="ap-pane-head"><h2 id="lk-diff"><Reveal detail="Only what is different."><span>Other cases that differ</span></Reveal></h2></div>
           {!others.length ? <p className="st-hint">None: every other case follows the defaults.</p>
             : <ul className="st-list">{others.map(c => <li key={c.investigation_id} className="st-route">
               <span className="st-route-what"><b>{c.name}</b><small>{Object.entries(c.modes).map(([p, m]) => `${d.sources.find(s => s.key === p)?.label ?? p}: ${MODE_WORDS[m as Mode]}`).join(' · ')}{c.reason ? ` · “${c.reason}”` : ''}</small></span>
@@ -156,14 +157,16 @@ export function LookupsPane({investigationId, caseName, providers}: {investigati
           <div className="ap-pane-head"><h2 id="lk-week">Sent this week</h2><span>{d.week.length} request{d.week.length === 1 ? '' : 's'} left this server</span></div>
           {!d.week.length ? <p className="st-hint">Nothing was sent outside this week.</p>
             : <ul className="st-list">{d.week.slice(0, 12).map(r => <li key={r.id} className="st-route">
-              <span className="st-route-what"><b className={r.kind === 'lookup' ? 'st-mono' : ''}>{r.kind === 'lookup' ? `“${r.sent}”` : r.sent}</b>
-                <small>{KIND_WORDS[r.kind] ?? r.kind} · {d.sources.find(s => s.key === r.service)?.label ?? r.service} · {r.destination}{r.case ? ` · ${r.case}` : ''} · {when(r.at)}{OUTCOME_WORDS[r.outcome] ?? ''}</small></span>
+              {/* What was sent shows, and a failure; the kind, service, destination, case and time are revealed on it. */}
+              <span className="st-route-what"><Reveal detail={`${KIND_WORDS[r.kind] ?? r.kind} · ${d.sources.find(s => s.key === r.service)?.label ?? r.service} · ${r.destination}${r.case ? ` · ${r.case}` : ''} · ${when(r.at)}`}>
+                <b className={r.kind === 'lookup' ? 'st-mono' : ''}>{r.kind === 'lookup' ? `“${r.sent}”` : r.sent}</b></Reveal>
+                {OUTCOME_WORDS[r.outcome] ? <small className="st-problem">{OUTCOME_WORDS[r.outcome].replace(/^ · /, '')}</small> : null}</span>
             </li>)}</ul>}
         </section>
       </div>
     </div>
     {investigationId && <section className="ap-pane" aria-labelledby="lk-now">
-      <div className="ap-pane-head"><h2 id="lk-now">Look a name up now</h2><span>sent only when you press Search</span></div>
+      <div className="ap-pane-head"><h2 id="lk-now"><Reveal detail="Sent only when you press Search."><span>Look a name up now</span></Reveal></h2></div>
       <ConnectorsPanel investigationId={investigationId} providers={providers}/>
     </section>}
   </div>;

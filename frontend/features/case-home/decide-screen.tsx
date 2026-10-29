@@ -8,17 +8,22 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {LevelChip} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {apiTime} from '../../lib/timestamps';
 import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
-import {DecisionCard, Excerpt, PartyChips, RowCells, pageOf} from './decision-card';
-import {HOLD_MS, KIND_LABEL, acceptsInBulk, undoBlocked, useDecisions} from './use-decisions';
+import {DecisionCard, Excerpt, KindMark, PartyChips, RowCells, pageOf} from './decision-card';
+import {HOLD_MS, KIND_LABEL, KIND_MEANING, acceptsInBulk, undoBlocked, useDecisions} from './use-decisions';
 import type {DecisionKind, DecisionOrder} from './use-decisions';
 
-const KIND_ICON: Record<DecisionKind, string> = {to_check: '?', missing: '∅', proposal: '◇', match: '⇄', outside: '◎', ai: 'AI', watchlist: '◉'};
+const ORDER: Record<DecisionOrder, [string, string]> = {
+  source: ['Source', 'By source: read a document once, decide all it holds.'],
+  consequence: ['Impact', 'By what it changes most.'],
+  oldest: ['Oldest', 'Oldest first.'],
+};
 const SHAPE: Record<DecisionChoiceOut['key'], string> = {yes: '✓', no: '✕', unsure: '○'};
 
 function age(iso: string): string {
@@ -48,7 +53,7 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
     {ev ? <>
       <header className="dc-doc">
         <div className="dc-doc-icon" aria-hidden="true"><i/><i/><i/></div>
-        <div><b>{ev.filename || 'Document'}</b><span>{ev.locator || 'no locator'}</span></div>
+        <div><b>{ev.filename || 'Document'}</b>{ev.locator && <span>{ev.locator}</span>}</div>
         {ev.document_id && <div className="dc-doc-actions">
           <button type="button" onClick={() => openProvenance({title: ev.filename || 'Document', kind: 'document', documentId: ev.document_id!, locator: ev.locator || undefined})}>Trace</button>
           <button type="button" onClick={() => openDocument(ev.document_id!, pageOf(ev.locator))}>Open the document</button>
@@ -56,16 +61,18 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
       </header>
       <div className="dc-read">
         {ev.rows?.length ? <RowCells rows={ev.rows}/>
-          : ev.excerpt ? <p><Excerpt text={ev.excerpt} terms={ev.terms}/></p> : <p className="ch-quiet">No passage is stored with this item.</p>}
-        {ev.terms.length > 0 && <p className="dc-legend"><mark>words</mark> this rests on</p>}
+          : ev.excerpt ? <p>{ev.terms.length > 0
+            ? <Reveal detail={<><mark>Marked words</mark> are what this rests on.</>}><Excerpt text={ev.excerpt} terms={ev.terms}/></Reveal>
+            : <Excerpt text={ev.excerpt} terms={ev.terms}/>}</p> : <p className="ch-quiet">No passage is stored with this item.</p>}
       </div>
     </> : <div className="dc-read dc-noevidence">
-      <p className="ch-eyebrow">{KIND_LABEL[item.kind]}</p>
+      <p className="ch-eyebrow"><KindMark kind={item.kind}/></p>
       <p className="dc-proposal">{item.proposal}</p>
       <PartyChips parties={item.parties}/>
       {item.kind === 'missing'
-        ? <p className="ch-quiet">{item.reason}. When the value is filled in where the record lives, this goes by itself. <Link href={caseHref(item.open.href, inv)}>{item.open.label} →</Link></p>
-        : <p className="ch-quiet">This kind has no passage to show. <Link href={caseHref(item.open.href, inv)}>{item.open.label} →</Link></p>}
+        ? <p className="ch-quiet">{item.reason}. <Reveal tabbable={false} detail="When the value is filled in where the record lives, this goes by itself.">
+          <Link href={caseHref(item.open.href, inv)}>{item.open.label} →</Link></Reveal></p>
+        : <p className="ch-quiet"><Reveal tabbable={false} detail="This kind has no passage to show."><Link href={caseHref(item.open.href, inv)}>{item.open.label} →</Link></Reveal></p>}
     </div>}
   </section>;
 }
@@ -153,21 +160,22 @@ export function DecideScreen({investigationId, investigationName, active = true,
 
   return <div className="dc" data-calm-zone="" aria-label="Decide">
     <aside className="dc-queue" aria-label="To decide">
-      <h1>To decide</h1>
-      <p className="ch-quiet">{investigationName ? `${investigationName} · ` : ''}only you can decide these</p>
+      <h1><Reveal detail={<>{investigationName ? <b>{investigationName}</b> : null}<span className="rv-row">Only you can decide these.</span></>}>To decide</Reveal></h1>
       <div className="dc-chips" role="group" aria-label="Show">
         <button type="button" className={!kind ? 'on' : ''} aria-pressed={!kind} onClick={() => setKind(undefined)}>All {loading || failure ? '…' : total}</button>
-        {kinds.filter(k => counts[k]).map(k => <button key={k} type="button" className={kind === k ? 'on' : ''} aria-pressed={kind === k}
-          onClick={() => setKind(kind === k ? undefined : k)}>{KIND_LABEL[k]} {counts[k]}</button>)}
+        {/* A kind is its mark, named on hover or focus; the button's name keeps the word for screen readers. */}
+        {kinds.filter(k => counts[k]).map(k => <Reveal key={k} tabbable={false} describe={false} detail={<><b>{KIND_LABEL[k]}</b><span className="rv-row">{KIND_MEANING[k]}</span></>}>
+          <button type="button" className={`dc-chip${kind === k ? ' on' : ''}`} aria-pressed={kind === k}
+            onClick={() => setKind(kind === k ? undefined : k)}><KindMark kind={k} bare/><span className="sr-only">{KIND_LABEL[k]}</span>{' '}{counts[k]}</button></Reveal>)}
       </div>
       <label className="dc-order">Order
-        <select value={order} onChange={e => setOrder(e.target.value as DecisionOrder)}>
-          <option value="source">by source (read once, decide all)</option>
-          <option value="consequence">by what it changes most</option>
-          <option value="oldest">oldest first</option>
-        </select>
+        <Reveal tabbable={false} detail={ORDER[order][1]}>
+          <select value={order} onChange={e => setOrder(e.target.value as DecisionOrder)}>
+            {(Object.keys(ORDER) as DecisionOrder[]).map(o => <option key={o} value={o}>{ORDER[o][0]}</option>)}
+          </select></Reveal>
       </label>
-      {(all.query.data?.total ?? 0) > (all.query.data?.items.length ?? 0) && <p className="ch-quiet">Showing the first {all.query.data?.items.length} of {all.query.data?.total}; each one you decide makes room for the next.</p>}
+      {(all.query.data?.total ?? 0) > (all.query.data?.items.length ?? 0) && <p className="ch-quiet">
+        <Reveal detail="Showing the first ones; each one you decide makes room for the next.">{all.query.data?.items.length} of {all.query.data?.total}</Reveal></p>}
       <div className="dc-list">
         {loading && <p className="dc-loading" aria-busy="true">Gathering what waits for you…</p>}
         {all.query.isError && items.length > 0 && <p className="dc-stale" role="alert">Could not refresh: {loadError(all.query.error)} <button type="button" onClick={() => { void all.query.refetch(); }}>Retry</button></p>}
@@ -175,10 +183,12 @@ export function DecideScreen({investigationId, investigationName, active = true,
           const high = g.label ? g.items.filter(acceptsInBulk) : [];
           return <div key={g.key} className="dc-group">
           {g.label && <div className="dc-group-head">
-            <p className="dc-group-name"><span className="dc-group-label">{g.label}</span><span>{g.items.length} left</span></p>
-            {(g.group.pages ?? 0) > 0 && <p className="dc-pages" title="Pages of this document with something to decide, and how many have nothing left">
-              <span className="dc-pages-bar" aria-hidden="true">{Array.from({length: Math.min(g.group.pages ?? 0, 24)}, (_, n) => <i key={n} className={n < (g.group.pages_read ?? 0) ? 'read' : ''}/>)}</span>
-              pages read: {g.group.pages_read ?? 0} of {g.group.pages}</p>}
+            <p className="dc-group-name"><span className="dc-group-label">{g.label}</span><span aria-label={`${g.items.length} left`}>{g.items.length}</span></p>
+            {(g.group.pages ?? 0) > 0 && <p className="dc-pages">
+              <Reveal label={`Pages read: ${g.group.pages_read ?? 0} of ${g.group.pages}`} detail={<><b>Pages read: {g.group.pages_read ?? 0} of {g.group.pages}</b>
+                <span className="rv-row">Pages of this document with something to decide; filled ones have nothing left.</span></>}>
+                <span className="dc-pages-bar" aria-hidden="true">{Array.from({length: Math.min(g.group.pages ?? 0, 24)}, (_, n) => <i key={n} className={n < (g.group.pages_read ?? 0) ? 'read' : ''}/>)}</span>
+              </Reveal></p>}
             {high.length >= 2 && bulk !== g.key && <button type="button" className="dc-bulk" onClick={() => setBulk(g.key)}>✓ Accept all {high.length} high</button>}
           </div>}
           {bulk === g.key && <div className="dc-bulk-confirm" role="group" aria-label={`Accept all ${high.length} high`}>
@@ -187,12 +197,14 @@ export function DecideScreen({investigationId, investigationName, active = true,
             <div><button type="button" className="dc-bulk-go" onClick={() => acceptGroup(high)}>Accept {high.length}</button>
               <button type="button" onClick={() => setBulk(null)}>Cancel</button></div>
           </div>}
+          {/* A row is its kind mark, its question and its level; who proposed it, the kind's name and its age are on hover or focus. */}
           <ul>{g.items.map(i => <li key={i.id}>
-            <button type="button" className={`dc-row${item?.id === i.id ? ' on' : ''}`} aria-current={item?.id === i.id ? 'true' : undefined} onClick={() => setSelected(i.id)}>
-              <span className={`dc-kind dc-kind-${i.kind}`} aria-hidden="true" title={KIND_LABEL[i.kind]}>{KIND_ICON[i.kind]}</span>
-              <span className="dc-row-text"><span>{i.question}</span>
-                <small>{i.actor_kind === 'ai' ? 'AI draft' : i.actor}{i.kind === 'ai' ? '' : ` · ${KIND_LABEL[i.kind].toLowerCase()}`} · {age(i.created_at)}{i.level ? ' · ' : ''}{i.level && <LevelChip level={i.level}/>}</small></span>
-            </button>
+            <Reveal tabbable={false} detail={<><b>{KIND_LABEL[i.kind]}</b><span className="rv-row">{i.actor_kind === 'ai' ? 'AI draft' : i.actor} · {age(i.created_at)} ago</span></>}>
+              <button type="button" className={`dc-row${item?.id === i.id ? ' on' : ''}`} aria-current={item?.id === i.id ? 'true' : undefined} onClick={() => setSelected(i.id)}>
+                <KindMark kind={i.kind} bare/>
+                <span className="dc-row-text"><span>{i.question}</span></span>
+                {i.level && <LevelChip level={i.level}/>}
+              </button></Reveal>
           </li>)}</ul>
         </div>;
         })}
@@ -203,7 +215,7 @@ export function DecideScreen({investigationId, investigationName, active = true,
       <EvidencePane item={item}/>
       <section className="dc-card" aria-label="Your decision">
         {/* The card's own line names an AI proposer with its AI draft tag; the eyebrow does not repeat it. */}
-        <p className="ch-eyebrow">{KIND_LABEL[item.kind]} · {index + 1} of {items.length}</p>
+        <p className="ch-eyebrow"><KindMark kind={item.kind}/></p>
         <DecisionCard item={item} position={index + 1} total={items.length} keys="decide" active={active} onDecide={onDecide}/>
         {item.choices.length === 0 && <Link className="dc-elsewhere" href={caseHref(item.open.href, investigationId)}>{item.open.label} ↗</Link>}
       </section>
@@ -222,22 +234,23 @@ export function DecideScreen({investigationId, investigationName, active = true,
     </section>}
 
     <footer className="dc-bar">
-      <span><b>{items.length ? index + 1 : 0}</b> of {items.length}</span>
+      <Reveal detail={`Each answer waits ${HOLD_MS / 1000} s, so you can undo it.`}><span><b>{items.length ? index + 1 : 0}</b> of {items.length}</span></Reveal>
       <span className="dc-session" aria-label="This session">✓ {session.yes} · ✕ {session.no} · ○ {session.unsure}</span>
       <span className="dc-last" role="group" aria-label="Last 10">LAST 10 {all.decided.slice(0, 10).map(d => {
         // Each of the last ten answers can be taken back where that is possible; the others say why not.
         const blocked = undoBlocked(d);
         const words = `${d.choice.label}: ${d.item.question}`;
-        return <button key={d.item.id} type="button" className={`dc-last-${d.choice.key} dc-${d.state}`} aria-disabled={blocked ? 'true' : undefined}
-          aria-label={blocked ? `${words} — ${blocked}` : `Undo ${words}`} title={blocked ? `${words}\n${blocked}` : `${words}\nClick to undo`}
-          onClick={() => { if (!blocked && all.undo(d.item.id)) setSelected(d.item.id); }}>{SHAPE[d.choice.key]}</button>;
+        return <Reveal key={d.item.id} tabbable={false} describe={false} detail={<><b>{words}</b><span className="rv-row">{blocked ?? 'Click to undo'}</span></>}>
+          <button type="button" className={`dc-last-${d.choice.key} dc-${d.state}`} aria-disabled={blocked ? 'true' : undefined}
+            aria-label={blocked ? `${words} — ${blocked}` : `Undo ${words}`}
+            onClick={() => { if (!blocked && all.undo(d.item.id)) setSelected(d.item.id); }}>{SHAPE[d.choice.key]}</button></Reveal>;
       })}</span>
       <span className="dc-toast" aria-live="polite">
         {failed ? <>Could not save “{failed.choice.label}”: {failed.error}. Your choice is kept. <button type="button" onClick={() => all.retry(failed.item.id)}>Retry</button> <button type="button" onClick={() => all.undo(failed.item.id)}>Drop it</button></>
           : all.undoError ? all.undoError
           : batch.length ? <><b>✓ Accepted {batch.length}</b> · {batch[0].item.group.label} <button type="button" onClick={() => all.undoBatch(batch[0].batch!)}>Undo all {batch.length} <kbd>Z</kbd></button></>
           : all.held ? <><b>{SHAPE[all.held.choice.key]} {all.held.choice.label}</b> · {all.held.item.question.slice(0, 60)} <button type="button" onClick={() => all.undo()}>Undo <kbd>Z</kbd></button></>
-          : `Each answer waits ${HOLD_MS / 1000} s, so you can undo it.`}
+          : null}
       </span>
     </footer>
   </div>;

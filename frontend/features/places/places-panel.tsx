@@ -14,7 +14,9 @@ import {useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {FamilyMark, PartyMark} from '../../components/network/marks';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {getBasemapStatusOptions, getInvestigationPlacesOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {PlaceOut} from '../../lib/generated/types.gen';
@@ -55,8 +57,8 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
   const linked = all.reduce((n, p) => n + p.links.length, 0);
   return <Card>
     <CardHeader>
-      <CardTitle>Places</CardTitle>
-      <CardDescription>Records that say where they are, and what is linked to them.</CardDescription>
+      {/* Ony, 29 Oct: the card's explanation is revealed on its title. */}
+      <CardTitle><Reveal detail="Records that say where they are, and what is linked to them.">Places</Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       {placesQuery.isError && <p className="muted">{errorMessage(placesQuery.error, 'Could not read the places')}</p>}
@@ -77,7 +79,9 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
           <FootStat value={places.length === all.length ? all.length : `${places.length} of ${all.length}`}>places</FootStat>
           <FootStat value={linked}>links to them</FootStat>
           {omitted.length > 0 && <FootStat value={omitted.length}>records with unusable coordinates, listed below</FootStat>}
-          {status?.available && <span>Map data © OpenStreetMap contributors (ODbL), Protomaps build {status.version}{status.built ? ` of ${status.built.slice(0, 10)}` : ''}.</span>}
+          {/* The licence asks for the attribution on the map: it stays; the build is revealed on it. */}
+          {status?.available && <Reveal detail={`Map data © OpenStreetMap contributors (ODbL), Protomaps build ${status.version}${status.built ? ` of ${status.built.slice(0, 10)}` : ''}.`}>
+            <span>© OpenStreetMap contributors</span></Reveal>}
         </>}>
         {status?.available && <PlacesMap status={status} places={places} onPlace={pick} picked={picked}/>}
         {status && !status.available && <p className="muted p-4" data-testid="no-basemap">
@@ -90,12 +94,14 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
       {places.length > 0 && <table className="oc-table" aria-label="Places">
         <thead><tr><th scope="col">Place</th><th scope="col">Where</th><th scope="col">Linked</th></tr></thead>
         <tbody>{places.map(place => <tr key={place.entity_id}>
-          <th scope="row"><Button variant="link" size="sm" onClick={() => pick(place.entity_id)}>{place.caption}</Button>
-            <small> · {place.schema}</small></th>
-          <td>{place.address ? `${place.address} · ` : ''}{coordinates(place)}{place.country ? ` · ${place.country.toUpperCase()}` : ''}</td>
-          <td>{place.links.length === 0 ? '—' : place.links.map(link => <div key={`${link.relationship_id}-${link.direction}`}>
+          {/* A place's kind is its party icon, a link's its family line, each named on reveal; the coordinates are revealed
+              on the address (shown when there is no address). */}
+          <th scope="row"><span className="inline-flex items-center gap-1"><PartyMark schema={place.schema} size={14}/>
+            <Button variant="link" size="sm" onClick={() => pick(place.entity_id)}>{place.caption}</Button></span></th>
+          <td>{place.address ? <Reveal detail={coordinates(place)}><span>{place.address}</span></Reveal> : coordinates(place)}{place.country ? ` · ${place.country.toUpperCase()}` : ''}</td>
+          <td>{place.links.length === 0 ? '—' : place.links.map(link => <div key={`${link.relationship_id}-${link.direction}`} className="inline-flex items-center gap-1">
+            <FamilyMark schema={link.schema}/>
             <Button variant="link" size="sm" onClick={() => openDossier(link.entity_id)}>{link.caption}</Button>
-            <small> · {link.schema}</small>
           </div>)}</td>
         </tr>)}</tbody>
       </table>}

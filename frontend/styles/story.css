@@ -220,3 +220,10 @@
 
 @media (prefers-reduced-motion: reduce) { .wu-hover, .sy-pane, .sy-sheet { animation: none; } }
 html[data-motion='calm'] .wu-hover, html[data-motion='calm'] .sy-pane, html[data-motion='calm'] .sy-sheet { animation: none; }
+/* 29 Oct rule: sub-text on reveal. */
+.sy-key-mark { display: inline-flex; gap: 6px; align-items: center; padding: 2px 4px; }
+.sy-key-mark i, .rv-card .sy-key i { display: inline-block; width: 18px; height: 0; vertical-align: middle; margin-right: 6px; }
+.rv-card .sy-key { display: grid; gap: 4px; }
+.sy-cp { font-size: 12px; letter-spacing: 0; }
+.sy-formats .rv, .sy-formats .rv b { color: var(--text); }
+.sy-stance { font-weight: 700; }

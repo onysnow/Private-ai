@@ -18,6 +18,10 @@ import {Button} from '@/components/ui/button';
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import type {EntityFormSubmitPayload} from '../../components/entity-form';
+import {StatusChip} from '../../components/status';
+import type {ClaimStatus} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
+import {LINK, linkFamily} from '../../lib/viz-tokens';
 import {entityPropertyAdditions} from '../../lib/entity-schema';
 import {
   entityDuplicateCandidatesOptions, entityDuplicateCandidatesQueryKey, entityPostMergeReconciliationOptions, entityPostMergeReconciliationQueryKey,
@@ -32,6 +36,7 @@ import {invalidateInvestigationData} from '../../lib/investigation-queries';
 import {reportPayloadError} from '../../lib/report-error';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {leadQueueKey} from '../leads/leads-panel';
+import {PartyMark} from '../the-drop/kind-marks';
 import {CorpusExpand} from './corpus-expand';
 import {DuplicateCandidates} from './duplicate-candidates';
 import type {DuplicateDecision} from './duplicate-candidates';
@@ -48,6 +53,20 @@ type Props = {investigationId: string};
 
 /** How a relationship's attached evidence was reviewed, counted by stance.
  * A compact graph edge carries an aggregate advisory without these counts. */
+/** A claim's status in the app's one grammar (components/status.tsx). */
+const CLAIM_STATUS: Record<string, ClaimStatus> = {
+  supported: 'supported', confirmed: 'supported', verified: 'supported', disputed: 'disputed', rejected: 'ruled_out', lead: 'unshown', unverified: 'unshown',
+};
+/** The status of a lead, task, dated event or outside finding as a shape; its word on hover (Ony, 29 Oct). The shapes
+ *  follow Leads (features/leads/leads-horizons.tsx) and The Drop: ✓ done, ◐ under way, ○ not started, ✕ blocked. */
+const STATE_MARK: Record<string, string> = {
+  unreviewed: '◌', active: '●', blocked: '✕', resolved: '✓', rejected: '⊘', todo: '○', in_progress: '◐', done: '✓', cancelled: '–',
+  verified: '✓', confirmed: '✓', unverified: '○', disputed: '✕', accepted: '✓', needs_followup: '!', dismissed: '–',
+};
+function StateMark({state}: {state: string}): ReactElement {
+  return <Reveal label={state} detail={state.replace(/_/g, ' ')}><span className="ds-state" aria-hidden="true">{STATE_MARK[state] ?? '·'}</span></Reveal>;
+}
+
 function evidenceReviewCounts(r: EntityRelationshipOut): string | null {
   if (r.advisory.presentation_aggregate) return null;
   return Object.entries(r.advisory.relationship_evidence_review_counts).filter(([, count]) => Number(count) > 0).map(([stance, count]) => `${stance} ${count}`).join(' · ');
@@ -225,35 +244,44 @@ export function DossierPanel({investigationId}: Props): ReactElement | null {
 
   return <>
     <div className="candidate">
-      <h4>{entity.caption} dossier</h4>
-      <Button variant="outline" onClick={() => setEditingEntity(v => !v)}>{editingEntity ? 'Cancel edit' : 'Edit entity'}</Button>
+      <h4><PartyMark schema={entity.schema}/> {entity.caption} dossier
+        {dossier.alias_resolution && <> <Reveal label="Merged alias" detail={<><b>Merged alias:</b> {dossier.alias_resolution.requested_caption} now resolves to this canonical entity. Historical merge records are preserved.</>}>
+          <span className="ds-state" aria-hidden="true">⇢</span></Reveal></>}</h4>
+      <Reveal tabbable={false} detail="Caption can be changed freely. A new property value is added alongside any existing value for that property, never in place of it -- resolve disagreements between values with the property-conflict actions below.">
+        <Button variant="outline" onClick={() => setEditingEntity(v => !v)}>{editingEntity ? 'Cancel edit' : 'Edit entity'}</Button></Reveal>
       {editingEntity && <div className="candidate">
-        <p className="muted">Caption can be changed freely. A new property value is added alongside any existing value for that property, never in place of it -- resolve disagreements between values with the property-conflict actions below.</p>
         <EntityForm entity={entity} onSubmit={updateEntityManually} onCancel={() => setEditingEntity(false)}/>
       </div>}
-      {dossier.alias_resolution && <p className="muted"><b>Merged alias:</b> {dossier.alias_resolution.requested_caption} now resolves to this canonical entity. Historical merge records are preserved.</p>}
-      <small>{entity.schema} · {summary.statement_count} statements · {summary.relationship_count} relationships · {summary.claim_count} claims · {summary.evidence_count} evidence · {summary.lead_count} leads · {summary.external_finding_count} external findings</small>
+      {/* The counts are numbers with small marks; their words on hover. */}
+      <p className="ds-counts"><Reveal detail={`${entity.schema} · ${summary.statement_count} statements · ${summary.relationship_count} relationships · ${summary.claim_count} claims · ${summary.evidence_count} evidence · ${summary.lead_count} leads · ${summary.external_finding_count} external findings`}>
+        <span aria-hidden="true"><b>{summary.statement_count}</b> ≡ <b>{summary.relationship_count}</b> ⟷ <b>{summary.claim_count}</b> ○ <b>{summary.evidence_count}</b> “ <b>{summary.lead_count}</b> ? <b>{summary.external_finding_count}</b> ↗</span></Reveal></p>
       <div>
-        <b>Identity / merge history</b>
+        {/* Aliases, decisions and merge audits (with their raw IDs) are on hover of the history's title. */}
+        <Reveal detail={<>
+          {identity.aliases.map(a => <span className="rv-row" key={a.id}>Alias: {a.caption} <small>· {a.schema || 'entity'} · preserved record <span className="rv-mono">{a.id}</span></small></span>)}
+          {identity.canonical_decisions.slice(0, 8).map(d => <span className="rv-row" key={d.id}>{d.decision}: {d.other_entity?.caption || 'unknown entity'} <small>· {Math.round(d.confidence * 100)}% reporter confidence{d.rationale ? ` · ${d.rationale}` : ''}</small></span>)}
+          {identity.merge_audits.slice(0, 8).map(m => <span className="rv-row rv-mono" key={m.id}>Merge audit: {m.source_entity_id} → {m.target_entity_id}{m.rationale && <small> · {m.rationale}</small>}</span>)}
+          <span className="rv-row">Identity decisions are reporter-reviewed judgments, not facts inferred by connectors. Merge audits and alias records remain preserved.</span>
+        </>}><b>Identity / merge history</b></Reveal>
         <small> · {identity.aliases.length} merged alias(es) · {identity.canonical_decisions.length} reporter identity decision(s){identity.unresolved_decision_count > 0 ? ` · ${identity.unresolved_decision_count} unresolved` : ''}</small>
-        {identity.aliases.map(a => <div key={a.id}>Alias: {a.caption} <small>· {a.schema || 'entity'} · preserved record {a.id}</small></div>)}
-        {identity.canonical_decisions.slice(0, 8).map(d => <div key={d.id}>{d.decision}: {d.other_entity?.caption || 'unknown entity'} <small>· {Math.round(d.confidence * 100)}% reporter confidence{d.rationale ? ` · ${d.rationale}` : ''}</small></div>)}
-        {identity.merge_audits.slice(0, 8).map(m => <div key={m.id}>Merge audit: {m.source_entity_id} → {m.target_entity_id}{m.rationale && <small> · {m.rationale}</small>}</div>)}
-        <p className="muted">Identity decisions are reporter-reviewed judgments, not facts inferred by connectors. Merge audits and alias records remain preserved.</p>
       </div>
       {summary.unresolved_external_count > 0 && <p><b>{summary.unresolved_external_count} external finding(s) need review.</b></p>}
       <PropertyConflicts conflicts={dossier.property_conflicts} onDecide={pending => { setPendingConflict(pending); setConflictRationale(''); }}/>
       <div>
         <b>Relationships</b>
-        {summary.relationship_suppressed_duplicate_count > 0 && <small> · {summary.relationship_count} preferred edge(s) shown; {summary.relationship_suppressed_duplicate_count} reviewed duplicate edge(s) collapsed. Expand them in the relationship graph.</small>}
+        {summary.relationship_suppressed_duplicate_count > 0 && <> <Reveal detail={`${summary.relationship_count} preferred edge(s) shown; ${summary.relationship_suppressed_duplicate_count} reviewed duplicate edge(s) collapsed. Expand them in the relationship graph.`}>
+          <small className="ds-dup">+{summary.relationship_suppressed_duplicate_count}</small></Reveal></>}
         {dossier.relationships.slice(0, 8).map(r => {
           const counts = evidenceReviewCounts(r);
           return <div className="statement" key={r.id}>
             <div>
-              {r.schema}: {r.source?.caption} → {r.target?.caption}
+              {/* The link's family is its line colour; the schema word is on hover. */}
+              <Reveal detail={`${r.schema}: ${r.source?.caption ?? ''} → ${r.target?.caption ?? ''}`}>
+                <i className="ds-line" style={{background: LINK[linkFamily(r.schema)].colour}} aria-hidden="true"/> {r.source?.caption} → {r.target?.caption}</Reveal>
               {r.advisory.needs_review && <small> · ⚠ review needed{r.advisory.has_independent_support ? ' · independent support remains' : ''}</small>}
-              {counts !== null && <small> · evidence: {counts}</small>}
-              {r.reconciliation?.is_preferred && r.reconciliation.suppressed_duplicate_count > 0 && <small> · preferred presentation for {r.reconciliation.suppressed_duplicate_count} reviewed duplicate edge(s)</small>}
+              {counts !== null && counts !== '' && <> <Reveal detail={`evidence: ${counts}`}><small>{counts.replace(/supports? /g, '✓').replace(/contradicts? /g, '✕').replace(/context /g, '◌')}</small></Reveal></>}
+              {r.reconciliation?.is_preferred && r.reconciliation.suppressed_duplicate_count > 0 && <> <Reveal detail={`preferred presentation for ${r.reconciliation.suppressed_duplicate_count} reviewed duplicate edge(s)`}>
+                <small className="ds-dup">+{r.reconciliation.suppressed_duplicate_count}</small></Reveal></>}
             </div>
             <div className="actions">
               <Button onClick={() => openRelationship({relationshipId: r.id, record: r})}>Review relationship evidence</Button>
@@ -264,11 +292,13 @@ export function DossierPanel({investigationId}: Props): ReactElement | null {
         })}
       </div>
       <OwnershipChain key={`chain-${entity.id}`} entityId={entity.id} onParty={openDossier}/>
-      <div><b>Claims</b>{dossier.claims.slice(0, 8).map(x => <div key={x.claim.id}><Button onClick={() => openClaim(x.claim.id)}>{x.claim.status}: {x.claim.text}</Button></div>)}</div>
-      <div><b>Leads / questions</b>{dossier.leads.slice(0, 8).map(x => <div key={x.lead.id}>{x.lead.status}: {x.lead.title}{x.lead.provider && <small> · {x.lead.provider}</small>}</div>)}</div>
-      <div><b>Reporting tasks</b>{dossier.tasks.slice(0, 8).map(t => <div key={t.id}>{t.status}: {t.title}{t.priority && <small> · {t.priority}</small>}{t.owner && <small> · {t.owner}</small>}</div>)}</div>
-      <div><b>Timeline</b>{dossier.timeline.slice(0, 8).map(e => <div key={e.id}>{e.date_start}: {e.title}<small> · {e.verification_status}</small></div>)}</div>
-      <div><b>External / Aleph leads</b>{dossier.external.findings.slice(0, 8).map(f => <div key={f.id}>{f.review_status || 'unreviewed'}: {f.caption || f.id}{f.provider && <small> · {f.provider}</small>}</div>)}</div>
+      <div><b>Claims</b>{dossier.claims.slice(0, 8).map(x => <div key={x.claim.id}><Button onClick={() => openClaim(x.claim.id)}>
+        {CLAIM_STATUS[x.claim.status] ? <StatusChip status={CLAIM_STATUS[x.claim.status]}/> : `${x.claim.status}:`} {x.claim.text}</Button></div>)}</div>
+      <div><b>Leads / questions</b>{dossier.leads.slice(0, 8).map(x => <div key={x.lead.id}><StateMark state={x.lead.status}/> {x.lead.title}{x.lead.provider && <small> · {x.lead.provider}</small>}</div>)}</div>
+      <div><b>Reporting tasks</b>{dossier.tasks.slice(0, 8).map(t => <div key={t.id}><StateMark state={t.status}/> {t.title}
+        {(t.priority || t.owner) && <> <Reveal detail={[t.priority, t.owner].filter(Boolean).join(' · ')}><small aria-hidden="true">{t.owner ?? t.priority}</small></Reveal></>}</div>)}</div>
+      <div><b>Timeline</b>{dossier.timeline.slice(0, 8).map(e => <div key={e.id}>{e.date_start}: {e.title} <StateMark state={e.verification_status}/></div>)}</div>
+      <div><b>External / Aleph leads</b>{dossier.external.findings.slice(0, 8).map(f => <div key={f.id}><StateMark state={f.review_status || 'unreviewed'}/> {f.caption || f.id}{f.provider && <small> · {f.provider}</small>}</div>)}</div>
       <CorpusExpand key={entity.id} entityId={entity.id}/>
       <div>
         <b>Evidence</b>

@@ -40,11 +40,13 @@ describe('timeline event grades', () => {
     await screen.findByText(/Villa searched/);
     api.add({'PATCH /api/timeline-events/ev-1': row({grade: 'likely'}), [TIMELINE]: timelineBody('inv-1', [event({grade: 'likely'})])});
     const user = userEvent.setup();
+    // Short grade words in the choice; what each means is revealed (Ony, 29 Oct), and read with the choice.
+    expect(screen.getByRole('combobox', {name: 'Grade of Villa searched'})).toHaveAccessibleDescription(/likely: several sources report it/);
     screen.getByRole('combobox', {name: 'Grade of Villa searched'}).focus();
     await user.keyboard('{ArrowDown}');
-    await user.click(await screen.findByRole('option', {name: /^likely: several sources report it/}));
+    await user.click(await screen.findByRole('option', {name: 'likely'}));
     const graded = await screen.findByText('graded likely');
-    expect(graded).toHaveAttribute('title', EVENT_GRADES.likely);
+    expect(graded.closest('.rv')).toHaveAccessibleDescription(EVENT_GRADES.likely);
     expect(api.lastBody('PATCH /api/timeline-events/ev-1')).toEqual({grade: 'likely'});
 
     api.add({'POST /api/timeline-events': row({id: 'ev-2', title: 'Meridian registered', grade: 'weak'})});

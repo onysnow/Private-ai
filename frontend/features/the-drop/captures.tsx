@@ -10,6 +10,7 @@ import type {UseQueryResult} from '@tanstack/react-query';
 import {useEffect, useMemo, useState} from 'react';
 import type {FormEvent, ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {api} from '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
 import {getCapturesOptions, getCapturesQueryKey, getDropQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
@@ -17,6 +18,7 @@ import {collectCaptureMedia, createCapture} from '../../lib/generated/sdk.gen';
 import type {CaptureOut, CaptureStageOut, GetCapturesError} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {FingerprintMark} from './kind-marks';
 
 /** One http or https address with a host and no spaces: what the link field and a paste into the drop capture. */
 export function isWebAddress(text: string): boolean {
@@ -75,16 +77,17 @@ const utc = (iso?: string | null) => iso ? `${apiTime(iso).toISOString().replace
 const clock = (iso?: string | null) => iso ? `${apiTime(iso).toISOString().slice(11, 19)} UTC` : '–';
 const size = (n: number) => n < 1024 ? `${n} B` : n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`;
 const collectorName = (c: CaptureOut) => (!c.collector || c.collector === 'local-owner' ? 'you' : c.collector);
-const spaced = (hash: string) => `${hash.slice(0, 16).replace(/(.{4})(?=.)/g, '$1 ')} …${hash.slice(-8, -4)} ${hash.slice(-4)}`;
 
 function Stage({stage, live, refused}: {stage: CaptureStageOut; live: boolean; refused?: number | null}): ReactElement {
   // The site answered with an error (404, 403): the page itself was not fetched, whatever was kept of the reply.
   if (refused && stage.key === 'fetched') return <li className="cp-st stopped"><span className="cp-k">{stage.label}</span><span className="cp-v">✕ {refused}</span></li>;
   const state = live ? 'live' : stage.state;
-  const mark = {done: '✓ ', stopped: '✕ ', live: '… ', waiting: '', skipped: ''}[state];
+  const mark = {done: '✓', stopped: '✕', live: '…', waiting: '', skipped: '–'}[state];
   const value = stage.state === 'done' && stage.seconds !== null && stage.seconds !== undefined ? `${stage.seconds.toFixed(1)} s`
     : stage.state === 'skipped' ? 'not run' : stage.state === 'stopped' ? 'stopped' : live ? 'working' : '';
-  return <li className={`cp-st ${state}`}><span className="cp-k">{stage.label}</span><span className="cp-v">{mark}{value}</span></li>;
+  // The stage's mark shows; its seconds (or "not run") are on hover.
+  return <li className={`cp-st ${state}`}><span className="cp-k">{stage.label}</span>
+    {value ? <Reveal className="cp-v" detail={value}><span aria-hidden="true">{mark}</span></Reveal> : <span className="cp-v">{mark}</span>}</li>;
 }
 
 function Download({capture, name, children}: {capture: CaptureOut; name: string; children: ReactElement | string}): ReactElement {
@@ -124,22 +127,33 @@ function Lane({capture}: {capture: CaptureOut}): ReactElement {
   const sent = capture.exchange.request;
   const back = capture.exchange.response;
   return <section className="cp-panel" aria-label="Capture lane">
-    <p className="cp-cap">Capture lane <span className={`cp-chip ${running(capture) ? 'teal' : capture.stages.some(s => s.state === 'stopped') ? 'bad' : 'teal'}`}>{laneSummary(capture)}</span></p>
+    {(() => {
+      const stopped = !running(capture) && (capture.stages.some(s => s.state === 'stopped') || (capture.outcome !== 'saved' && (capture.http_status ?? 0) >= 400));
+      const glyph = running(capture) ? '…' : stopped ? '✕' : '✓';
+      return <p className="cp-cap">Capture lane <Reveal label={laneSummary(capture)} detail={laneSummary(capture)}>
+        <span className={`cp-glyph ${running(capture) ? 'teal' : stopped ? 'bad' : 'ok'}`} aria-hidden="true">{glyph}</span></Reveal></p>;
+    })()}
     <ol className="cp-lane" aria-label="Capture stages">{capture.stages.map((s, i) => <Stage key={s.key} stage={s} live={i === firstWaiting} refused={capture.outcome !== 'saved' && (capture.http_status ?? 0) >= 400 ? capture.http_status : null}/>)}</ol>
-    <dl className="cp-facts">
-      <div><dt>Tool</dt><dd>{capture.tool?.replace('Journalism Workbench web capture: ', '') || '–'}</dd></div>
-      <div><dt>Collector</dt><dd>{collectorName(capture)} · this computer</dd></div>
-      <div><dt>Signed in?</dt><dd>No · a fresh browser, no stored cookies</dd></div>
-      <div><dt>Started</dt><dd>{utc(capture.started_at ?? capture.requested_at)}</dd></div>
-      <div><dt>Ended</dt><dd>{utc(capture.finished_at)}</dd></div>
-      <div><dt>Clock shown in capture</dt><dd>{clock(capture.captured_at)}</dd></div>
-    </dl>
-    {(sent || back) && <div className="cp-hdrs">
-      <p><span>What was sent</span><span>What came back · as served, not verified</span></p>
-      <div>{sent && <><b>{sent.method}</b> {sent.target}{sent.headers.map(([k, v]) => <span key={k}><br/><b>{k}:</b> {v}</span>)}</>}</div>
-      <div>{back && <><b>{back.status}</b>{back.headers.map(([k, v]) => <span key={k}><br/><b>{k}:</b> {v}</span>)}</>}</div>
-    </div>}
-    {capture.robots_disallowed && <p className="cp-note">The site’s robots.txt asks robots not to fetch this page. A one-off capture notes it and goes ahead.</p>}
+    {/* Who captured it with what and when, and the headers, are custody facts kept one hover away; that no login was
+        used stays on screen, an editor relies on it. */}
+    <p className="cp-marks">
+      <Reveal detail="Signed in? No · a fresh browser, no stored cookies"><span className="cp-chip ok">no login</span></Reveal>
+      <Reveal label="Who, with what, when" detail={<>
+        <span className="rv-row">Tool <b>{capture.tool?.replace('Journalism Workbench web capture: ', '') || '–'}</b></span>
+        <span className="rv-row">Collector <b>{collectorName(capture)} · this computer</b></span>
+        <span className="rv-row">Started <b>{utc(capture.started_at ?? capture.requested_at)}</b></span>
+        <span className="rv-row">Ended <b>{utc(capture.finished_at)}</b></span>
+        <span className="rv-row">Clock shown in capture <b>{clock(capture.captured_at)}</b></span>
+      </>}><span className="cp-chip dash" aria-hidden="true">who · when</span></Reveal>
+      {(sent || back) && <Reveal label="Headers sent and received" detail={<>
+        <span className="rv-row"><b>What was sent</b></span>
+        <span className="rv-row rv-mono">{sent && <><b>{sent.method}</b> {sent.target}{sent.headers.map(([k, v]) => <span key={k}><br/><b>{k}:</b> {v}</span>)}</>}</span>
+        <span className="rv-row"><b>What came back</b> · as served, not verified</span>
+        <span className="rv-row rv-mono">{back && <><b>{back.status}</b>{back.headers.map(([k, v]) => <span key={k}><br/><b>{k}:</b> {v}</span>)}</>}</span>
+      </>}><span className="cp-chip dash" aria-hidden="true">headers</span></Reveal>}
+      {capture.robots_disallowed && <Reveal detail="The site’s robots.txt asks robots not to fetch this page. A one-off capture notes it and goes ahead.">
+        <span className="cp-chip amber">robots.txt</span></Reveal>}
+    </p>
   </section>;
 }
 
@@ -165,15 +179,18 @@ function MediaPanel({capture, investigationId}: {capture: CaptureOut; investigat
   return <section className="cp-panel" aria-label="Video or audio on this page">
     <p className="cp-cap">Video or audio on this page</p>
     {media.status === 'collected' ? <>
-      <p><b>{media.title}</b></p>
-      <p className="cp-note">{[media.platform, media.account].filter(Boolean).join(' · ')}{length}{media.uploaded ? ` · uploaded ${media.uploaded}` : ''}</p>
-      <p className="cp-note">Collected {media.route}; kept with this capture as {capture.files.filter(f => f.name.startsWith('media.')).map(f => f.name).join(' and ')}, and transcribed on this computer.</p>
+      <p><Reveal detail={<>
+        <span className="rv-row">{[media.platform, media.account].filter(Boolean).join(' · ')}{length}{media.uploaded ? ` · uploaded ${media.uploaded}` : ''}</span>
+        <span className="rv-row">Collected {media.route}; kept with this capture as {capture.files.filter(f => f.name.startsWith('media.')).map(f => f.name).join(' and ')}, and transcribed on this computer.</span>
+      </>}><b>{media.title}</b></Reveal></p>
       {capture.media_document_id && <div className="cp-acts"><button type="button" className="p" onClick={() => openDocument(capture.media_document_id!)}>Listen &amp; read</button></div>}
     </> : media.status === 'collecting' ? <p className="cp-note" role="status">Looking for the video or audio, then collecting it, logged out…</p>
       : <>
         {media.status === 'failed' && <p className="cp-note"><b>Not collected.</b> {media.reason}</p>}
-        <p className="cp-note">One item, logged out, with no cookies. The page’s site sees one more visit from this computer, written in the outbound log first.</p>
-        <div className="cp-acts"><button type="button" onClick={() => void collect()}>{media.status === 'failed' ? 'Try again' : 'Collect the video or audio'}</button></div>
+        <div className="cp-acts"><button type="button" onClick={() => void collect()}>{media.status === 'failed' ? 'Try again' : 'Collect the video or audio'}</button>
+          {/* What leaves this computer stays on screen, beside the button; the sentence on hover. */}
+          <Reveal className="cp-egress" detail="One item, logged out, with no cookies. The page’s site sees one more visit from this computer, written in the outbound log first.">
+            <span>↗ 1 visit · logged out</span></Reveal></div>
       </>}
     {error && <p role="alert" className="cp-err">{error}</p>}
   </section>;
@@ -181,7 +198,6 @@ function MediaPanel({capture, investigationId}: {capture: CaptureOut; investigat
 
 function Receipt({capture}: {capture: CaptureOut}): ReactElement {
   const openDocument = useWorkbenchStore(state => state.openDocument);
-  const [copied, setCopied] = useState(false);
   const warc = capture.files.find(f => f.name === 'page.warc.gz') ?? capture.files[0];
   const {author, published} = capture.displayed;
   return <section className="cp-panel" aria-label="Capture receipt">
@@ -190,18 +206,18 @@ function Receipt({capture}: {capture: CaptureOut}): ReactElement {
     <div className="cp-rcpt">
       <Shot capture={capture}/>
       <dl className="cp-kv">
-        {warc && <><dt>SHA-256</dt><dd><code title={warc.sha256}>{spaced(warc.sha256)}</code>
-          <button type="button" className="cp-copy" onClick={() => void navigator.clipboard?.writeText(warc.sha256).then(() => setCopied(true))}
-            aria-label={`Copy the SHA-256 of ${warc.name}`}>{copied ? 'copied' : 'copy'}</button> <small>of {warc.name}</small></dd></>}
-        <dt>Captured</dt><dd>{utc(capture.captured_at ?? capture.finished_at)} <small>by this computer’s clock</small></dd>
+        {warc && <><dt>SHA-256</dt><dd><FingerprintMark hash={warc.sha256} of={warc.name}/></dd></>}
+        <dt>Captured</dt><dd><Reveal detail={<><span className="rv-row">By this computer’s clock.</span>
+          <span className="rv-row">{utc(capture.captured_at ?? capture.finished_at).slice(0, 16)} captured on this computer by {collectorName(capture)}; kept unaltered, in the case’s records.</span></>}>
+          {utc(capture.captured_at ?? capture.finished_at)}</Reveal></dd>
         <dt>Kept as</dt><dd className="cp-files">{capture.files.length ? capture.files.map(f => <div key={f.name}>
-          <Download capture={capture} name={f.name}>{f.name}</Download> <em>{size(f.bytes)} · {f.role}</em></div>) : 'Nothing: no page came back'}</dd>
-        <dt>Time proof</dt><dd>Local clock only ({clock(capture.captured_at)}). <small>Independent proof not asked for.</small></dd>
-        {(author || published) && <><dt>Displayed</dt><dd>{author ? `By “${author}”` : ''}{author && published ? ' · ' : ''}{published ?? ''} <span className="cp-chip dash">as displayed, not verified</span></dd></>}
-        <dt>Custody</dt><dd>{utc(capture.captured_at ?? capture.finished_at).slice(0, 16)} captured on this computer by {collectorName(capture)}; kept unaltered, in the case’s records.</dd>
+          <Reveal tabbable={false} detail={`${size(f.bytes)} · ${f.role}`}><Download capture={capture} name={f.name}>{f.name}</Download></Reveal></div>) : 'Nothing: no page came back'}</dd>
+        <dt>Time proof</dt><dd><Reveal detail={`Local clock only (${clock(capture.captured_at)}). Independent proof not asked for.`}>Local clock only</Reveal></dd>
+        {(author || published) && <><dt>Displayed</dt><dd><Reveal detail="as displayed, not verified"><span className="cp-displayed">{author ? `By “${author}”` : ''}{author && published ? ' · ' : ''}{published ?? ''}</span></Reveal></dd></>}
       </dl>
     </div>
-    <p className="cp-cv"><b>Content verified</b><span><strong>{capture.content_verified}.</strong> A capture shows what was at the address, not that it is genuine.</span></p>
+    {/* A custody statement: the verdict stays on screen; what a capture shows is on hover. */}
+    <p className="cp-cv"><b>Content verified</b><Reveal detail="A capture shows what was at the address, not that it is genuine."><strong>{capture.content_verified}.</strong></Reveal></p>
   </section>;
 }
 
@@ -209,16 +225,17 @@ function Outcome({capture, onAddFile}: {capture: CaptureOut; onAddFile: () => vo
   const wall = capture.outcome === 'not_seen';
   return <section className="cp-panel" aria-label={wall ? 'Not seen' : 'Link only'}>
     <p className="cp-out"><span className={`cp-chip big ${wall ? 'amber' : 'bad'}`}>{wall ? 'Not seen' : capture.status === 'failed' ? 'Stopped' : 'Link only'}</span>
-      <b>{wall ? 'A login wall, paywall or block was in the way' : 'Saved as a link, with the reason'}</b></p>
+      <Reveal detail={wall ? <>What was kept is what the site showed instead, marked <b>not seen</b>, never “shown”. This app signs in to nothing: no accounts, no stored cookies, no saved sessions.</>
+        : <>That is an <b>outcome, not a gap</b>: it is logged with its reason and time.</>}>
+        <b>{wall ? 'A login wall, paywall or block was in the way' : 'Saved as a link, with the reason'}</b></Reveal></p>
     <p>{capture.reason}</p>
-    {wall ? <p>What was kept is what the site showed instead, marked <b>not seen</b>, never “shown”. This app signs in to nothing: no accounts, no stored cookies, no saved sessions.</p>
-      : <p>That is an <b>outcome, not a gap</b>: it is logged with its reason and time. Nothing can be quoted from this link.</p>}
+    {!wall && <p>Nothing can be quoted from this link.</p>}
     <dl className="cp-kv">
       <dt>Kept</dt><dd>{capture.files.length ? <>The address, the time, and what the site sent instead: {capture.files.map(f => f.name).join(', ')}</> : 'The address as pasted and the time'}</dd>
       <dt>Can be quoted</dt><dd>{wall ? 'As what the site showed, not as the page' : 'Nothing'}</dd>
     </dl>
-    <div className="cp-acts"><button type="button" className="p" onClick={onAddFile}>Add a file I saved (PDF, screenshot, .html)</button></div>
-    <p className="cp-note">A file you add is kept as one you supplied, with you as its source.</p>
+    <div className="cp-acts"><Reveal tabbable={false} detail="A file you add is kept as one you supplied, with you as its source.">
+      <button type="button" className="p" onClick={onAddFile}>Add a file I saved (PDF, screenshot, .html)</button></Reveal></div>
   </section>;
 }
 
@@ -248,14 +265,13 @@ export function CaptureLinkField({investigationId, captures, onCaptured}: {inves
     void capture(text);
   };
   return <section className="cp-card cp-paste" aria-label="Paste a link">
-    <p className="dp-eyebrow">Paste a link</p>
+    <Reveal className="dp-eyebrow" detail="Links, files and pasted text share one drop: a link pasted into the drop is captured too.">Paste a link</Reveal>
     <form className="cp-linkfield" onSubmit={submit}>
       <input type="url" inputMode="url" value={text} onChange={e => { setText(e.target.value); setAlready(null); }} placeholder="https://…" aria-label="Web address to capture"/>
       <button type="submit" className="p">Capture</button>
     </form>
-    <p className="dp-quiet">Links, files and pasted text share one drop: a link pasted into the drop is captured too.</p>
     {already && <div className="cp-already" role="status">
-      <p><span className="cp-chip teal">Already in the case</span> captured {utc(already.captured_at ?? already.finished_at)}</p>
+      <p><Reveal detail={`captured ${utc(already.captured_at ?? already.finished_at)}`}><span className="cp-chip teal">Already in the case</span></Reveal></p>
       <div className="cp-acts"><button type="button" className="p" onClick={() => { onCaptured(already.id); setAlready(null); setText(''); }}>Open that one</button>
         <button type="button" onClick={() => void capture(text || already.url, true)}>Capture again as a new version</button></div>
     </div>}
@@ -285,44 +301,48 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
       <section className="cp-card" aria-label="Links in this case">
         <p className="dp-eyebrow cp-row">This case <span>{captures.length} link{captures.length === 1 ? '' : 's'}</span></p>
         {captures.length ? <ul className="cp-list">{captures.map(c => { const s = captureState(c); return <li key={c.id}>
+          {/* The outcome is its glyph; its word and the address are on hover or focus. */}
+          <Reveal tabbable={false} detail={<><b>{s.word}</b><span className="rv-row rv-mono">{shortUrl(c.url)}</span></>}>
           <button type="button" aria-pressed={c.id === chosen?.id} className={c.id === chosen?.id ? 'on' : ''} onClick={() => onPick(c.id)}>
             <span className={`cp-glyph ${s.tone}`} aria-hidden="true">{s.glyph}</span>
-            <span className="cp-li"><b>{captureTitle(c)}</b><span><span className={`cp-chip ${s.tone}`}>{s.word}</span><small>{shortUrl(c.url)}</small></span></span>
-          </button></li>; })}</ul>
+            <span className="cp-li"><b>{captureTitle(c)}</b></span>
+          </button></Reveal></li>; })}</ul>
           : <p className="dp-quiet">{query.isPending ? 'Looking…' : 'No links yet. Paste one above.'}</p>}
       </section>
       <section className="cp-card" aria-label="What leaves this computer">
         <p className="dp-eyebrow cp-row">What leaves this computer <span className="cp-chip dash">ask first</span></p>
-        <p className="cp-safe"><b>✓ No outside capture service is used.</b> The page is fetched from this computer.</p>
-        <p className="dp-quiet">The page’s site sees one visit from this computer’s address, and so does every other site the page loads from (images, scripts, trackers): each is listed in page.har. The visit is written in Safety &amp; data’s outbound log before it goes.</p>
-        <label className="cp-switch"><input type="checkbox" role="switch" checked={false} disabled readOnly/> Second witness: a public web archive saves it too <small>a later step</small></label>
-        <label className="cp-switch"><input type="checkbox" role="switch" checked={false} disabled readOnly/> Time proof: a time server signs the fingerprint <small>a later step</small></label>
-        <p className="dp-quiet">Off means off. Route: this computer’s own connection.</p>
+        <Reveal detail={<><span className="rv-row">The page is fetched from this computer.</span><span className="rv-row">The page’s site sees one visit from this computer’s address, and so does every other site the page loads from (images, scripts, trackers): each is listed in page.har. The visit is written in Safety &amp; data’s outbound log before it goes.</span></>}>
+          <p className="cp-safe"><b>✓ No outside capture service is used.</b></p></Reveal>
+        <p className="cp-marks">
+          <Reveal className="cp-egress" detail="Off means off. Route: this computer’s own connection."><span>↗ 1 visit · direct</span></Reveal>
+          <Reveal detail={<><span className="rv-row">A later step, off for now:</span><span className="rv-row">Second witness: a public web archive saves it too.</span>
+            <span className="rv-row">Time proof: a time server signs the fingerprint.</span></>}><span className="cp-chip dash">later</span></Reveal>
+        </p>
       </section>
     </div>
 
     <div className="dp-line cp-main" role="region" aria-label="The chosen capture">
       {chosen && state ? <>
-        <header className="cp-panel cp-head"><span><h2>{captureTitle(chosen)}</h2><code>{chosen.final_url && chosen.final_url !== chosen.url ? `${chosen.url} → ${chosen.final_url}` : chosen.url}</code></span>
-          <span className={`cp-chip big ${state.tone}`}>{state.word}</span></header>
+        <header className="cp-panel cp-head"><span><h2>{captureTitle(chosen)}</h2>
+          <Reveal detail={<span className="rv-mono">{chosen.final_url && chosen.final_url !== chosen.url ? `${chosen.url} → ${chosen.final_url}` : chosen.url}</span>}><code>{host(chosen.final_url || chosen.url)}</code></Reveal></span>
+          <Reveal label={state.word} detail={state.word}><span className={`cp-glyph big ${state.tone}`} aria-hidden="true">{state.glyph}</span></Reveal></header>
         <Lane capture={chosen}/>
-        {running(chosen) ? <p className="cp-note" role="status">Visiting the page once, from this computer, in a fresh browser with no stored cookies. The receipt appears when it is kept.</p>
+        {running(chosen) ? <p className="cp-note" role="status"><Reveal detail="Visiting the page once, from this computer, in a fresh browser with no stored cookies. The receipt appears when it is kept.">Capturing…</Reveal></p>
           : chosen.outcome === 'saved' ? <><Receipt capture={chosen}/><MediaPanel capture={chosen} investigationId={investigationId}/></>
           : <Outcome capture={chosen} onAddFile={onAddFile}/>}
-      </> : <div className="cp-none"><h2>Capture a web page</h2>
-        <p className="dp-quiet">A pasted link becomes a source: the page as it was, when, and proof it has not changed since.</p></div>}
+      </> : <div className="cp-none"><Reveal detail="A pasted link becomes a source: the page as it was, when, and proof it has not changed since."><h2>Capture a web page</h2></Reveal></div>}
       {query.isError && <p role="alert">{errorMessage(query.error, 'Could not list the captures')}</p>}
     </div>
 
     <div className="dp-right">
       <section className="cp-card" aria-label="Capture before use">
-        <p className="dp-eyebrow">Capture before use</p>
+        <Reveal className="dp-eyebrow" detail="Text on a captured page is data. It can never give an instruction to the app or to AI.">Capture before use</Reveal>
         {chosen?.outcome === 'saved' ? <>
-          <p className="cp-safe"><b>✓ Capture exists ({clock(chosen.captured_at)}).</b> You can quote this page: quotes are made in the reading room, from the captured copy, never the live page.</p>
+          <Reveal detail="You can quote this page: quotes are made in the reading room, from the captured copy, never the live page.">
+            <p className="cp-safe"><b>✓ Capture exists ({clock(chosen.captured_at)}).</b></p></Reveal>
           {chosen.document_id && <div className="cp-acts"><button type="button" className="p" onClick={() => openDocument(chosen.document_id!)}>Quote it in the reading room</button></div>}
         </> : <p className="dp-quiet">{chosen && running(chosen) ? 'A quote can be made once the capture is kept.'
           : 'Nothing to quote. A quote needs a capture of the page first.'}</p>}
-        <p className="dp-quiet">Text on a captured page is data. It can never give an instruction to the app or to AI.</p>
       </section>
     </div>
   </>;

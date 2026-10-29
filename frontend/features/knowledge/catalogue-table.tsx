@@ -4,14 +4,20 @@
 // each family a small table of its areas with how many indicators each holds, how they are checked and how many
 // fire in the open case. Opening an area lays its indicators out as cells under it; a cell opens in panel C.
 import {useQuery} from '@tanstack/react-query';
-import type {ReactElement} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 
 import {listIndicatorsOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {Reveal} from '../../components/ui/reveal';
 import type {CatalogueAreaOut, CatalogueMapOut} from '../../lib/generated/types.gen';
-import {LevelMark} from '../act/red-flags-board';
 import type {CaseLayer} from './case-layer';
 import {strongest} from './case-layer';
 import {FAMILIES, HOW_CHECKED} from './families';
+import {FlagLevelChip, HowGlyph} from './indicator-list';
+
+/** A column head that is a mark: the word for screen readers, and on hover or focus (Ony, 29 Oct). */
+function MarkHead({mark, word}: {mark: ReactNode; word: string}): ReactElement {
+  return <th scope="col"><Reveal describe={false} detail={word}><span aria-hidden="true">{mark}</span><span className="sr-only">{word}</span></Reveal></th>;
+}
 
 export function CatalogueTable({areas, map, layer, selected, onSelect, indicator, onOpenIndicator}: {
   areas: CatalogueAreaOut[]; map: CatalogueMapOut | undefined; layer: CaseLayer; selected: string; onSelect: (key: string) => void;
@@ -27,10 +33,8 @@ export function CatalogueTable({areas, map, layer, selected, onSelect, indicator
       {families.map(f => <section key={f.key} className={`kc-fam-col${f.key === 'safety' ? ' safety' : ''}`} aria-label={f.name}>
         <h3>{f.name} <span className="kc-mono">[{f.areas.reduce((n, k) => n + (byKey.get(k)?.indicators ?? 0), 0)}]</span></h3>
         <table>
-          <thead><tr><th scope="col">Area</th><th scope="col" title="Indicators">n</th>
-            <th scope="col"><span aria-hidden="true">{HOW_CHECKED.records.glyph}</span><span className="sr-only">From your records</span></th>
-            <th scope="col"><span aria-hidden="true">{HOW_CHECKED.lookups.glyph}</span><span className="sr-only">After outside lookups</span></th>
-            <th scope="col"><span aria-hidden="true">{HOW_CHECKED.person.glyph}</span><span className="sr-only">Only a person</span></th>
+          <thead><tr><th scope="col">Area</th><MarkHead mark="n" word="Indicators"/>
+            {(['records', 'lookups', 'person'] as const).map(k => <MarkHead key={k} mark={<HowGlyph how={k}/>} word={`Checked ${HOW_CHECKED[k].long}`}/>)}
             {layer.investigationId && <th scope="col">Fire</th>}</tr></thead>
           <tbody>{f.areas.filter(k => byKey.has(k)).map(k => {
             const a = byKey.get(k)!;
@@ -58,8 +62,8 @@ function AreaCells({area, layer, indicator, onOpenIndicator}: {area: string; lay
   if (query.isError) return <p className="kc-error">Could not load the indicators.</p>;
   return <ul className="kc-cells">{query.data.indicators.map(r => {
     const fired = strongest(layer.flags.get(r.id));
-    return <li key={r.id}><button type="button" className={`kc-cell${r.id === indicator ? ' on' : ''}`} onClick={() => onOpenIndicator(r.id)} title={r.name}>
-      <span className="kc-mono">{r.id}</span> <span aria-hidden="true">{HOW_CHECKED[r.checkable].glyph}</span> {r.name}{fired && <> <LevelMark level={fired.level}/></>}
+    return <li key={r.id}><button type="button" className={`kc-cell${r.id === indicator ? ' on' : ''}`} onClick={() => onOpenIndicator(r.id)}>
+      <span className="kc-mono">{r.id}</span> <HowGlyph how={r.checkable}/><span className="sr-only">checked {HOW_CHECKED[r.checkable].long}</span> {r.name}{fired && <> <FlagLevelChip level={fired.level}/></>}
     </button></li>;
   })}</ul>;
 }

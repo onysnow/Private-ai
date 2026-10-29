@@ -177,7 +177,7 @@ describe('Home FollowTheMoney relationship graph', () => {
 
     api.add({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}});
 
-    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
+    await userEvent.setup().click(await screen.findByLabelText('Ownership', {selector: '.relEdge'}));
 
     await screen.findByText('Kestrelwood Holdings Ltd → Jane Doe');
     // The base fixture has no evidence attachments yet, so the
@@ -195,7 +195,7 @@ describe('Home FollowTheMoney relationship graph', () => {
     const attach = 'POST /api/relationships/rel-1/evidence';
 
     api.add({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}});
-    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
+    await userEvent.setup().click(await screen.findByLabelText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Attach exact evidence');
 
     const attachButton = screen.getByRole('button', {name: 'Attach evidence'});
@@ -267,7 +267,7 @@ describe('Home FollowTheMoney relationship graph', () => {
     const review = 'POST /api/relationships/rel-1/evidence/ev-1/reviews';
 
     api.add({[EVIDENCE_REVIEWS]: {relationship_id: 'rel-1', reviews: []}});
-    await userEvent.setup().click(await screen.findByText('Ownership', {selector: '.relEdge'}));
+    await userEvent.setup().click(await screen.findByLabelText('Ownership', {selector: '.relEdge'}));
     await screen.findByText('Approved 3/3, signed by CFO.', {exact: false});
 
     const supportsButton = screen.getByRole('button', {name: 'Supports'});

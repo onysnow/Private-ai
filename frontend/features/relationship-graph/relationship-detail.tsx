@@ -11,6 +11,8 @@ import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {FamilyMark, StanceMark} from '../../components/network/marks';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   getInvestigationGraphQueryKey, listRelationshipEvidenceReviewsOptions, listRelationshipEvidenceReviewsQueryKey,
@@ -104,16 +106,18 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
   const reconciled = edge.reconciliation;
 
   return <div className="candidate">
-    <b>{title}</b>
-    <div>{edge.schema}{edge.properties.role?.[0] ? ` · ${edge.properties.role[0]}` : ''}{edge.advisory.needs_review ? ` · ⚠ claim review needed${edge.advisory.has_independent_support ? ' · independent support remains' : ''}` : ''}</div>
-    <small>FtM relationship: {edge.ftm_id} · {edge.provenance.statement_count || 0} provenance statements{reconciled?.is_preferred && reconciled.suppressed_duplicate_count > 0 ? ` · preferred presentation; ${reconciled.suppressed_duplicate_count} reviewed duplicate edge(s) collapsed` : reconciled?.suppressed_duplicate ? ` · reviewed duplicate copy; preferred edge ${reconciled.preferred_record_id}` : ''}</small>
+    {/* The record's id, statement count and duplicate state are revealed on the title; its family is its line; a claim
+        that needs review is an alert and shows. */}
+    <b><Reveal detail={<span className="rv-mono">FtM relationship: {edge.ftm_id} · {edge.provenance.statement_count || 0} provenance statements{reconciled?.is_preferred && reconciled.suppressed_duplicate_count > 0 ? ` · preferred presentation; ${reconciled.suppressed_duplicate_count} reviewed duplicate edge(s) collapsed` : reconciled?.suppressed_duplicate ? ` · reviewed duplicate copy; preferred edge ${reconciled.preferred_record_id}` : ''}</span>}>{title}</Reveal></b>
+    <div className="relKind"><FamilyMark schema={edge.schema}/>{edge.properties.role?.[0] ? <span>{edge.properties.role[0]}</span> : null}
+      {edge.advisory.needs_review && <span className="relAlert">⚠ claim review needed{edge.advisory.has_independent_support ? <Reveal detail="Independent support remains."> · <span>support remains</span></Reveal> : ''}</span>}</div>
     <div>
       <Button onClick={() => void createLead()}>Create reporting lead from relationship</Button>
       <Button onClick={() => openProvenance({title, kind: 'relationship claims + provenance', traceRecordType: 'relationship', acceptedRecordId: edge.id})}>Trace relationship + claims</Button>
     </div>
     {edge.aggregate_provenance && <div>
-      <b>Reviewed duplicate provenance inventory:</b>
-      <small> {edge.aggregate_provenance.underlying_relationship_count} preserved relationship records · {edge.aggregate_provenance.evidence_count} exact evidence records · presentation only; no records were merged.</small>
+      <b><Reveal detail={`${edge.aggregate_provenance.underlying_relationship_count} preserved relationship records · ${edge.aggregate_provenance.evidence_count} exact evidence records · presentation only; no records were merged.`}>
+        Reviewed duplicate provenance inventory:</Reveal></b>
       {edge.aggregate_provenance.evidence.map(ev => <div className="statement" key={ev.id}>
         <b>{ev.source?.title || 'Evidence'}</b>{ev.locator ? ` · ${ev.locator}` : ''}
         <div>{ev.quote || ev.notes || 'Evidence record'}</div>
@@ -124,7 +128,7 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
       </div>)}
     </div>}
     {!edge.aggregate_provenance && <div className="candidate">
-      <b>Attach exact evidence</b>
+      <b><Reveal detail="Only evidence from this investigation is offered. Existing attachments are excluded.">Attach exact evidence</Reveal></b>
       <div className="relationshipForm">
         <Select value={attachId} onValueChange={setAttachId}>
           <SelectTrigger className="w-auto"><SelectValue placeholder="Choose investigation evidence…"/></SelectTrigger>
@@ -133,7 +137,6 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
         <input value={attachNote} onChange={(e: ChangeEvent<HTMLInputElement>) => setAttachNote(e.target.value)} placeholder="Attachment note (optional)"/>
         <Button disabled={!attachId} onClick={() => void attachEvidence()}>Attach evidence</Button>
       </div>
-      <small>Only evidence from this investigation is offered. Existing attachments are excluded.</small>
     </div>}
     {!edge.aggregate_provenance && attachments.map(att => {
       const evidence = att.evidence;
@@ -141,7 +144,8 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
       return <div className="statement" key={att.attachment_id}>
         <div>
           <b>Exact evidence:</b> {evidence.quote || evidence.notes || 'Evidence record'}{evidence.locator ? ` (${evidence.locator})` : ''}
-          {att.latest_review && <div><small>Latest assessment: {String(att.latest_review.stance || 'reviewed')} · {String(att.latest_review.rationale || '')}</small></div>}
+          {att.latest_review && <div className="relKind"><StanceMark stance={String(att.latest_review.stance || 'unresolved')}/>
+            <small>{String(att.latest_review.rationale || '')}</small></div>}
           <Button onClick={() => openProvenance({
             title, kind: 'relationship evidence', sourceId: evidence.source?.id, sourceUrl: evidence.source?.url ?? undefined, locator: evidence.locator ?? undefined,
             detail: evidence.quote || evidence.notes || undefined, acceptedRecordType: 'evidence', acceptedRecordId: evidence.id,
@@ -158,13 +162,14 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
       {statusLine && <p className="muted">{statusLine}</p>}
       <h4>Immutable assessment history</h4>
       {reviews.length === 0 ? <p className="muted">No relationship-evidence assessments recorded yet.</p> : reviews.map(review => <div className="statement" key={review.id}>
-        <b>{review.stance}</b> · evidence {review.evidence_id}
-        <div>{review.rationale}</div>
-        <small>{apiTime(review.created_at).toLocaleString()}</small>
+        {/* The stance is its line; the evidence id and the time are revealed on the rationale. */}
+        <StanceMark stance={review.stance}/>
+        <Reveal detail={<><span className="rv-row rv-mono">evidence {review.evidence_id}</span><span className="rv-row">{apiTime(review.created_at).toLocaleString()}</span></>}>
+          <div>{review.rationale}</div></Reveal>
       </div>)}
     </div>}
     {edge.statements.map(st => <div key={st.id}>
-      <b>{st.prop}</b>: {st.value}<small> · {st.dataset}{st.origin ? ` · ${st.origin}` : ''}</small> <Button onClick={() => openProvenance({title, kind: 'relationship statement', sourceId: st.origin ?? undefined, detail: `${st.prop}: ${st.value}`})}>Trace provenance</Button>
+      <Reveal detail={`${st.dataset}${st.origin ? ` · ${st.origin}` : ''}`}><span><b>{st.prop}</b>: {st.value}</span></Reveal> <Button onClick={() => openProvenance({title, kind: 'relationship statement', sourceId: st.origin ?? undefined, detail: `${st.prop}: ${st.value}`})}>Trace provenance</Button>
     </div>)}
   </div>;
 }

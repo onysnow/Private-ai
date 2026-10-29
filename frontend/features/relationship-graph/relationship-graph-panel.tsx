@@ -21,6 +21,8 @@ import {Checkbox} from '@/components/ui/checkbox';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Table, TableBody, TableCell, TableRow} from '@/components/ui/table';
 import type {EntityFormSubmitPayload} from '../../components/entity-form';
+import {FamilyGlyph} from '../../components/network/marks';
+import {Reveal} from '../../components/ui/reveal';
 import {
   getInvestigationFinancialFlowsQueryKey, getInvestigationMoneyChecksQueryKey, getInvestigationGraphOptions, getInvestigationGraphQueryKey, listEntitiesOptions, listEntitiesQueryKey,
   getAllRecordTagsOptions, listInvestigationEvidenceOptions,
@@ -33,6 +35,7 @@ import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {Graph, withEnds} from './graph';
 import type {GraphEdge} from './graph';
 import {RelationshipDetail} from './relationship-detail';
+import './relationships.css';
 
 // The entity form is loaded on demand so it stays out of the page's first load.
 const EntityForm = dynamic(() => import('../../components/entity-form').then(m => m.EntityForm), {ssr: false, loading: () => <p className="muted">Loading form…</p>});
@@ -161,6 +164,7 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
   };
 
   const toggleDuplicates = (checked: boolean) => { setIncludeDuplicates(checked); setEdge(null); };
+  const folded = reconciliation.suppressed_duplicate_count;
 
   // One row of the relationship list: schema, role, the review advisory, and how the duplicate view places the edge.
   const edgeLabel = (r: GraphEdge) => `${r.schema}${r.properties.role?.[0] ? ` · ${r.properties.role[0]}` : ''}`
@@ -168,17 +172,17 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
     + (r.reconciliation?.is_preferred && r.reconciliation.suppressed_duplicate_count > 0 ? ` · preferred (+${r.reconciliation.suppressed_duplicate_count} duplicate)` : r.reconciliation?.suppressed_duplicate ? ' · duplicate copy' : '');
 
   return <section className="card graphCard" id="relationship-graph">
-    <h3>Relationships</h3>
-    <p className="muted">Every link is a FollowTheMoney relationship record. Reviewed duplicates are folded into the preferred record unless you show them; the originals stay traceable.</p>
+    {/* Ony, 29 Oct: the panel's explanation is revealed on its title. */}
+    <h3><Reveal detail="Every link is a FollowTheMoney relationship record. Reviewed duplicates are folded into the preferred record unless you show them; the originals stay traceable.">Relationships</Reveal></h3>
     <Graph key={investigationId} investigationId={investigationId} partyTags={partyTags} partyFlags={partyFlags} relationships={relationships} entities={entities} onNode={openDossier} onEdge={openEdge}
       extraTools={<label className="cf-chip" style={{cursor: 'pointer'}}><Checkbox checked={includeDuplicates}
         onCheckedChange={(checked: boolean | 'indeterminate') => toggleDuplicates(checked === true)}/> Reviewed duplicate copies</label>}
-      footnote={reconciliation.suppressed_duplicate_count > 0 ? `${reconciliation.visible_edge_count} links shown from ${reconciliation.underlying_edge_count} records; ${reconciliation.suppressed_duplicate_count} reviewed duplicate${reconciliation.suppressed_duplicate_count === 1 ? '' : 's'} folded into the preferred record.` : undefined}/>
+      footnote={folded > 0 ? <Reveal detail={`${reconciliation.visible_edge_count} links shown from ${reconciliation.underlying_edge_count} records; ${folded} reviewed duplicate${folded === 1 ? '' : 's'} folded into the preferred record.`}>
+        <span>{reconciliation.visible_edge_count} of {reconciliation.underlying_edge_count} records</span></Reveal> : undefined}/>
     {edge && <RelationshipDetail key={opened} investigationId={investigationId} edge={edge} evidencePool={evidencePool} onUpdated={setEdge}/>}
     <details className="candidate">
       <summary>Add to the network: a party or a relationship</summary>
-      <h4>A party</h4>
-      <p className="muted">Creates a reporter-entered canonical entity in this investigation (dataset: reporter).</p>
+      <h4><Reveal detail="Creates a reporter-entered canonical entity in this investigation (dataset: reporter).">A party</Reveal></h4>
       <EntityForm onSubmit={createEntityManually}/>
       <h4>A relationship</h4>
     <div className="relationshipForm">
@@ -213,7 +217,13 @@ export function RelationshipGraphPanel({investigationId}: Props): ReactElement {
       {relationships.length === 0 ? <p className="muted">No canonical relationships yet.</p> : <Table><TableBody>
         {relationships.map(r => <TableRow className="relationshipRow" key={r.id}>
           <TableCell><Button className="relNode" onClick={() => openDossier(r.source.id)}>{r.source.caption}</Button></TableCell>
-          <TableCell><span className="relEdge" onClick={() => openEdge(r)}>{edgeLabel(r)}</span></TableCell>
+          {/* The link's family is its line, its role shows, a challenged claim is an alert; the rest is revealed. */}
+          <TableCell><Reveal tabbable={false} describe={false} detail={edgeLabel(r)}><button type="button" className="relEdge" aria-label={edgeLabel(r)} onClick={() => openEdge(r)}>
+            <FamilyGlyph schema={r.schema}/>{r.properties.role?.[0] && <span>{r.properties.role[0]}</span>}
+            {r.advisory.needs_review && <span className="relAlert">⚠ challenged claim</span>}
+            {r.reconciliation?.is_preferred && r.reconciliation.suppressed_duplicate_count > 0 ? <span className="relDup">+{r.reconciliation.suppressed_duplicate_count}</span>
+              : r.reconciliation?.suppressed_duplicate ? <span className="relDup">copy</span> : null}
+          </button></Reveal></TableCell>
           <TableCell><Button className="relNode" onClick={() => openDossier(r.target.id)}>{r.target.caption}</Button></TableCell>
         </TableRow>)}
       </TableBody></Table>}

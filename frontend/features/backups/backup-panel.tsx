@@ -10,7 +10,8 @@ import {useState} from 'react';
 import type {ChangeEvent, ReactElement, ReactNode} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Reveal} from '@/components/ui/reveal';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Input} from '@/components/ui/input';
 import {agoText} from '../act/red-flags-board';
@@ -138,17 +139,18 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
 
   return <Card className="card" id="backup-restore">
     <CardHeader className="pb-3">
-      <CardTitle>Portable investigation backup & restore</CardTitle>
-      <CardDescription>Export FollowTheMoney JSONL, evidence and claim provenance, leads/tasks, timeline, extracted document text, review decisions, and stored source files in one checksum-verified archive.</CardDescription>
+      <CardTitle><Reveal detail="Export FollowTheMoney JSONL, evidence and claim provenance, leads/tasks, timeline, extracted document text, review decisions, and stored source files in one checksum-verified archive.">
+        <span>Portable investigation backup & restore</span></Reveal></CardTitle>
     </CardHeader>
     <CardContent>
       {investigationId && <p className="backup-last" aria-live="polite">{last
-        ? <><b>Last backup {agoText(last.at)}</b> · {sizeWords(last.bytes)} · ✓ checksum{last.encrypted ? ' · encrypted' : ''}{last.documents_included ? '' : ' · without the stored files'}</>
+        ? <><b>Last backup {agoText(last.at)}</b> · <Reveal detail={`${sizeWords(last.bytes)} · checksum kept${last.encrypted ? ' · encrypted' : ' · not encrypted'}`}><span>✓ checksum</span></Reveal>
+          {last.documents_included ? '' : ' · without the stored files'}</>
         : <b>No backup of this case yet</b>}</p>}
       <Button onClick={downloadBackup} disabled={!investigationId}>Download backup</Button>
       <hr/>
-      <h4>Restore safely</h4>
-      <p className="muted">Restore is preview-first and never merges into an existing investigation. The preview checks archive integrity, every restored record ID, provenance lineage, and destination document paths before mutation.</p>
+      <h4><Reveal detail="Restore is preview-first and never merges into an existing investigation. The preview checks archive integrity, every restored record ID, provenance lineage, and destination document paths before mutation.">
+        <span>Restore safely</span></Reveal></h4>
       <Input type="file" accept=".zip,.jwbackup.zip,application/zip" onChange={chooseFile}/>
       {askSecret && <Input type="password" autoComplete="off" value={secret} onChange={e => setSecret(e.target.value)}
         aria-label="Passphrase or recovery words" placeholder="This backup is encrypted: its passphrase, or the 12 recovery words"/>}
@@ -156,7 +158,9 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       {preview && <div className="candidate">
         <b>{preview.investigation.name}</b>
         <div>{Object.values(preview.record_counts).reduce((a, b) => a + b, 0)} records · {preview.document_file_count} stored document file(s) · {preview.missing_document_count} missing raw file(s)</div>
-        <div>Lineage: {preview.lineage_integrity && preview.lineage_integrity.valid === true ? 'valid' : 'not declared/invalid'} · Restore API: {preview.restore_api_enabled ? 'enabled' : 'disabled'}</div>
+        {/* Lineage and the restore API as ✓ / ✕ marks; their words are revealed on them. */}
+        <div><Reveal detail={`Lineage: ${preview.lineage_integrity && preview.lineage_integrity.valid === true ? 'valid' : 'not declared/invalid'} · Restore API: ${preview.restore_api_enabled ? 'enabled' : 'disabled'}`}>
+          <span>{preview.lineage_integrity && preview.lineage_integrity.valid === true ? '✓' : '✕'} lineage · {preview.restore_api_enabled ? '✓' : '✕'} restore</span></Reveal></div>
         {preview.warnings.map((w, i) => <div key={i}><small>Warning: {w}</small></div>)}
         {preview.conflicts.map((c, i) => <div key={i}><small><b>Conflict:</b> {c.table} / {c.id} — {c.message}</small></div>)}
         {preview.can_restore && <label><Checkbox checked={confirmed} onCheckedChange={(checked: boolean | 'indeterminate') => setConfirmed(checked === true)}/> I understand this creates a separate investigation and will not merge with existing records.</label>}

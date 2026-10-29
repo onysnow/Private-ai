@@ -48,7 +48,8 @@ describe('RedFlagsPanel', () => {
     const card = await screen.findByRole('article', {name: 'Red Flag: Circular ownership'});
     expect(screen.getByText('1 of 2 checks ran')).toBeInTheDocument();
     expect(screen.getByText(/Needs Payment records; none in this case yet\./)).toBeInTheDocument();
-    expect(within(card).getByText('Textbook · it meets the published definition or threshold')).toBeInTheDocument();
+    // The level is the shared chip: its colour on screen, word and meaning revealed (and read with it).
+    expect(card.querySelector('.rf-band .lv-textbook')).toHaveTextContent('Textbook · it meets the published definition or threshold');
     expect(card).toHaveClass('level-textbook');
     expect(within(card).getByText(/Group cross-holdings or treasury shares/)).toBeInTheDocument();
     expect(within(card).getByText(/whether there was a business reason/)).toBeInTheDocument();
@@ -111,7 +112,8 @@ describe('RedFlagsPanel', () => {
     });
     wrap(<RedFlagsPanel investigationId="inv-1"/>);
     const type = await screen.findByRole('group', {name: 'Type of investigation'});
-    expect(type).toHaveTextContent('TypeHidden ownership and shell companies— chosen by the appwhy?Change');
+    // Who chose it is the ƒ mark, named on reveal.
+    expect(within(type).getByRole('img', {name: 'Chosen by the app'})).toHaveTextContent('ƒ');
     // "why?" shows the app's reasons without opening the picker.
     const whyUser = userEvent.setup();
     await whyUser.click(within(type).getByRole('button', {name: 'why?'}));
@@ -127,7 +129,8 @@ describe('RedFlagsPanel', () => {
     expect(bo).toHaveAttribute('aria-pressed', 'true');
     expect(bo).toHaveTextContent('Circular ownership (BO-001)');
     const ml = await within(type).findByRole('button', {name: /Money laundering/});
-    expect(ml).toHaveTextContent('Moving criminal money so it looks clean.79 indicators · 1 Red Flag fired here');
+    expect(ml).toHaveTextContent('Money laundering79 indicators · 1 Red Flag fired here');
+    expect(ml).toHaveAccessibleDescription('Moving criminal money so it looks clean.');
     expect(within(type).queryByRole('button', {name: /Safety of investigators/})).toBeNull();
     await user.type(within(type).getByLabelText('Search areas'), 'nothing like this');
     expect(within(type).getByText('No area matches.')).toBeInTheDocument();
@@ -137,7 +140,7 @@ describe('RedFlagsPanel', () => {
     await user.click(within(type).getByRole('button', {name: /Money laundering/}));
     await user.click(within(type).getByRole('button', {name: 'Save'}));
     await waitFor(() => expect(api.lastBody('PUT /api/investigations/inv-1/type')).toEqual({areas: ['ML']}));
-    expect(await within(type).findByText('— chosen by you')).toBeInTheDocument();
+    expect(await within(type).findByRole('img', {name: 'Chosen by you'})).toBeInTheDocument();
     await waitFor(() => expect(headings()).toEqual(['Red Flags', 'Money laundering', 'Circular payments', 'This may also point to', 'Hidden ownership and shell companies', 'Circular ownership']));
   });
 });

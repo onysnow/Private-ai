@@ -174,9 +174,10 @@ describe('AiReasoningPanel', () => {
     await user.click(screen.getByRole('button', {name: 'Open'}));
     const detail = await screen.findByTestId('ai-candidate-detail');
     expect(within(detail).getByText('CLM-0001')).toBeInTheDocument();
-    expect(within(detail).getByText(/Supports: evidence:ev-1/)).toBeInTheDocument();
+    // Counts show (✓ 1 · ✕ 0); which records, and the claim's class and confidence, wait in reveals.
+    expect(within(detail).getByText(/Supports: evidence:ev-1/).closest('[hidden]')).not.toBeNull();
     expect(within(detail).getByText('GAP-0001 · Is there an independent corroborating source? — needs the executed copy (bears on CLM-0001)')).toBeInTheDocument();
-    expect(within(detail).getByText('Corroborated fact · Very likely · confidence High')).toBeInTheDocument();
+    expect(within(detail).getByText('Corroborated fact · Very likely · confidence High').closest('[hidden]')).not.toBeNull();
     expect(within(detail).getByText('Most likely way this is wrong:').parentElement).toHaveTextContent('could be a draft that was never executed');
     expect(within(detail).getByTestId('right-of-reply')).toHaveTextContent('Ada North · on CLM-0001: That she signed the agreement.');
     expect(within(detail).getByTestId('right-of-reply')).toHaveTextContent('the AI never does');

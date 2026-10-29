@@ -1,0 +1,11 @@
+/* To check (features/to-check/to-check-panel.tsx), to Ony's rule of 29 Oct: an item's kind is its icon, its decision
+   a shape (✓ shows it, ✕ does not, ? unclear), each named on reveal. The card's base look is in app/globals.css. */
+.tc-head { align-items: center; }
+.tc-icon { display: block; color: var(--text-muted); }
+.tc-from { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.tc-more { font-variant-numeric: tabular-nums; }
+.tc-decided { display: flex; gap: 8px; align-items: baseline; }
+.tc-mark { font-weight: 700; font-size: 15px; }
+.tc-mark-shows { color: var(--status-supported); }
+.tc-mark-does_not { color: var(--status-disputed); }
+.tc-mark-unclear { color: var(--status-unshown); }

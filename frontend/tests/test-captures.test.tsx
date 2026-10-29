@@ -85,7 +85,11 @@ describe('Links & captures', () => {
     expect(await within(main).findByRole('heading', {name: 'Harbour parcel sold to Kestrel SA'})).toBeInTheDocument();
     const lane = within(main).getByRole('region', {name: 'Capture lane'});
     expect(within(lane).getByText('Done · 7.0 s')).toBeInTheDocument();
-    expect(within(lane).getAllByRole('listitem').map(li => li.textContent)).toEqual(LABELS.map(([, label]) => `${label}✓ 1.0 s`));
+    // Each stage shows its mark; its seconds are on hover (in the page for screen readers, hidden until asked).
+    expect(within(lane).getAllByRole('listitem').map(li => li.textContent)).toEqual(LABELS.map(([, label]) => `${label}✓1.0 s`));
+    expect(within(lane).getAllByText('1.0 s').every(el => el.closest('[hidden]'))).toBe(true);
+    expect(within(lane).getByText('you · this computer').closest('[hidden]')).not.toBeNull();
+    expect(within(lane).getByText('no login')).toBeVisible();
     expect(within(lane).getByText('you · this computer')).toBeInTheDocument();
     expect(within(lane).getByText('2026-10-19 10:14:02 UTC')).toBeInTheDocument();
     expect(within(lane).getByText('10:14:05 UTC')).toBeInTheDocument();
@@ -93,11 +97,15 @@ describe('Links & captures', () => {
     expect(lane).toHaveTextContent('HTTP/1.1 200 OK');
 
     const receipt = within(main).getByRole('region', {name: 'Capture receipt'});
-    expect(within(receipt).getByText('a3f9 07c2 5b81 d4e6 …9c2a 5d1e')).toBeInTheDocument();
+    // The fingerprint is an icon with a copy button; the hash is on hover.
+    expect(within(receipt).getByText(HASH).closest('[hidden]')).not.toBeNull();
+    expect(within(receipt).getByRole('button', {name: 'Copy the fingerprint'})).toBeInTheDocument();
     expect(within(receipt).getByRole('button', {name: 'page.warc.gz'})).toBeInTheDocument();
     expect(within(receipt).getByText('2.3 MB · WARC 1.1 archive of the visit')).toBeInTheDocument();
     expect(within(receipt).getByText('as displayed, not verified')).toBeInTheDocument();
-    expect(receipt).toHaveTextContent('Content verifiednot done by this system. A capture shows what was at the address, not that it is genuine.');
+    // The custody verdict stays on screen; what a capture shows is on hover.
+    expect(within(receipt).getByText('not done by this system.')).toBeVisible();
+    expect(within(receipt).getByText('A capture shows what was at the address, not that it is genuine.').closest('[hidden]')).not.toBeNull();
     const user = userEvent.setup();
     await user.click(within(receipt).getByRole('button', {name: 'Open in reading room'}));
     expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1'});
@@ -208,7 +216,7 @@ describe('Links & captures', () => {
     await user.click(await screen.findByRole('button', {name: /Links & captures/}));
     const lane = await screen.findByRole('region', {name: 'Capture lane'});
     expect(within(lane).getByText('Capturing')).toBeInTheDocument();
-    expect(within(lane).getAllByRole('listitem')[0]).toHaveTextContent('Link checked… working');
+    expect(within(lane).getAllByRole('listitem')[0]).toHaveTextContent('Link checked…working');
     expect(screen.queryByRole('region', {name: 'Capture receipt'})).toBeNull();
     expect(screen.getByText(/Visiting the page once, from this computer, in a fresh browser with no stored cookies/)).toBeInTheDocument();
   });
