@@ -259,8 +259,13 @@ def _picture(db: Session, doc: Document, page: int | None, quote: str, storage_r
         return None
 
 
-def build_pack(db: Session, investigation_id: str) -> tuple[bytes, dict[str, Any]]:
-    """The pack's bytes and a summary (exhibits, gaps, draft). Raises NoStory when there is no write-up to pack."""
+def build_pack(db: Session, investigation_id: str, *, actor: str | None = None) -> tuple[bytes, dict[str, Any]]:
+    """The pack's bytes and a summary (exhibits, gaps, draft). Raises NoStory when there is no write-up to pack. Each
+    pack is recorded with its own list of files (EvidencePack), so one sent back can be checked against it."""
+    from app.core.time import utcnow_naive
+    from app.models.base import uid
+    from app.models.evidence_pack import EvidencePack
+
     story = story_of(db, investigation_id)
     writeup = db.get(Writeup, story.writeup_id) if story is not None and story.writeup_id else None
     if writeup is None:
@@ -273,6 +278,7 @@ def build_pack(db: Session, investigation_id: str) -> tuple[bytes, dict[str, Any
     exhibits, behind, gaps = _exhibits(db, refs)
     storage_root = resolve_storage_root(settings.document_storage_dir)
     made = datetime.now(timezone.utc)
+    pack_id = uid()
     files: dict[str, bytes] = {}
 
     files["index.html"] = _render_html(writeup.content_json or {}, behind, writeup.title, draft).encode()
@@ -288,12 +294,18 @@ def build_pack(db: Session, investigation_id: str) -> tuple[bytes, dict[str, Any
         gaps.append("The .docx could not be made; index.html holds the same write-up.")
 
     rows = []
+    kept: list[dict[str, Any]] = []
     for ex in exhibits:
         ex_files, row, ex_gaps = _exhibit_files(db, ex, draft, storage_root)
         rows.append(row)
         gaps.extend(ex_gaps)
         for name, data in ex_files.items():
             files[f"exhibits/{ex['number']:03d}/{name}"] = data
+        ev = ex["evidence"]
+        doc = _document_of(db, ev, db.get(Source, ev.source_id) if ev.source_id else None)
+        kept.append({"number": ex["number"], "evidence_id": ev.id, "document_id": doc.id if doc else None, "page": row["page"] or None,
+                     "quote": ev.quote or "", "picture": next((n for n in ex_files if n in ("page.png", "picture.jpg")), None),
+                     "claims": [c["id"] for c in ex["claims"]]})
     table = io.StringIO()
     fields = ["exhibit", "quote", "locator", "page", "source", "source_url", "file", "sha256", "fingerprint_now", "added", "is_it_real", "claims"]
     writer = csv.DictWriter(table, fieldnames=fields)
@@ -311,7 +323,7 @@ def build_pack(db: Session, investigation_id: str) -> tuple[bytes, dict[str, Any
         files[f"custody/{claim_id}.txt"] = (f"Claim: {chain['claim']['text']}\nStatus: {chain['claim']['status']}\n\n"
                                             f"Done rules for Supported\n{done}\n\nChain of custody (UTC)\n{log}\n").encode()
 
-    readiness = {"made": made.isoformat(), "story": tree["thesis"], "write_up": writeup.title,
+    readiness = {"pack_id": pack_id, "made": made.isoformat(), "story": tree["thesis"], "write_up": writeup.title,
                  "gates": [{"label": g["label"], "state": g["state"], "detail": g["detail"]} for g in tree["gates"]],
                  "recorded": (story.gates if story else {}),
                  "ready": {"by": story.ready_by, "at": story.ready_at.isoformat() if story and story.ready_at else None} if story else None,
@@ -321,7 +333,7 @@ def build_pack(db: Session, investigation_id: str) -> tuple[bytes, dict[str, Any
     files["README.txt"] = "\n".join([
         f"Evidence pack: {writeup.title}",
         f"Case: {inv.name if inv else investigation_id}",
-        f"Made: {made:%Y-%m-%d %H:%M} UTC, on this computer, by the Journalism Workbench.",
+        f"Made: {made:%Y-%m-%d %H:%M} UTC, on this computer, by the Journalism Workbench. Pack {pack_id}.",
         "",
         "EXPORT AS DRAFT: checks before an outward export are still open:" if draft else "Every check before an outward export passed:",
         *[f"  {'✓' if c['ok'] else '○'} {c['text']}" for c in checks],
@@ -348,11 +360,16 @@ def build_pack(db: Session, investigation_id: str) -> tuple[bytes, dict[str, Any
                            "  shasum -a 256 -c MANIFEST.sha256    (macOS)\n"
                            "Every line should say OK. On Windows: certutil -hashfile <file> SHA256, and compare.\n"
                            "The manifest itself is not signed: it shows the pack is whole, not who made it.\n").encode()
-    files["MANIFEST.sha256"] = "".join(f"{hashlib.sha256(data).hexdigest()}  {name}\n" for name, data in sorted(files.items())).encode()
+    listed = {name: hashlib.sha256(data).hexdigest() for name, data in sorted(files.items())}
+    files["MANIFEST.sha256"] = "".join(f"{sha}  {name}\n" for name, sha in listed.items()).encode()
+    db.add(EvidencePack(id=pack_id, investigation_id=investigation_id, title=writeup.title, draft=draft, made_by=actor,
+                        manifest=files["MANIFEST.sha256"].decode(), manifest_sha256=hashlib.sha256(files["MANIFEST.sha256"]).hexdigest(),
+                        files=listed, exhibits=kept, created_at=utcnow_naive()))
+    db.commit()
 
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for name, data in sorted(files.items()):
             zf.writestr(name, data)
-    summary = {"exhibits": len(rows), "gaps": len(gaps), "draft": draft, "files": len(files)}
+    summary = {"exhibits": len(rows), "gaps": len(gaps), "draft": draft, "files": len(files), "pack_id": pack_id}
     return out.getvalue(), summary

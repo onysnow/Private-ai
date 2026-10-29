@@ -5113,6 +5113,52 @@ class DerivedFileOut(ResponseModel):
     created_at: Timestamp
 
 
+class PackFileOut(ResponseModel):
+    """One file of a pack someone sent back: as made, changed, missing, or not in the list; `about` names what a
+    changed or missing custody page is about."""
+    name: str
+    state: Literal["as_made", "changed", "missing", "extra"]
+    listed: str | None = None
+    now: str | None = None
+    about: str | None = None
+
+
+class PackExhibitOut(ResponseModel):
+    """A changed or missing exhibit file, what rests on it, and the case's own file. `ours` and `theirs` are small
+    pictures (data URLs) when the picture could be drawn again exactly as listed; `differs` is where they differ."""
+    number: int
+    file: str
+    state: Literal["changed", "missing", "extra"]
+    document: str | None = None
+    case_file: Literal["matches", "does not match"] | None = None
+    claims: list[str]
+    ours: str | None = None
+    theirs: str | None = None
+    differs: dict[str, float] | None = None
+    redrawn: bool
+
+
+class PackCheckOut(ResponseModel):
+    """Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,
+    for a pack not made in this case, with its own MANIFEST.sha256). Nothing of the pack is kept or sent."""
+    file: str
+    files: int
+    pack_id: str | None = None
+    made_here: bool
+    made_in_other_case: str | None = None
+    made_at: Timestamp | None = None
+    made_by: str | None = None
+    title: str | None = None
+    draft: bool | None = None
+    compared_with: str
+    list_changed: bool
+    whole: bool
+    counts: dict[str, int]
+    rows: list[PackFileOut]
+    exhibits: list[PackExhibitOut]
+    signed: bool
+
+
 class VoiceOut(ResponseModel):
     """A voice the machine told apart in this recording (a guess), and the name a person gave it, if any."""
     voice: str

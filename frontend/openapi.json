@@ -3482,6 +3482,20 @@
         "title": "BasemapStatusOut",
         "type": "object"
       },
+      "Body_check_evidence_pack": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_check_evidence_pack",
+        "type": "object"
+      },
       "Body_inspect_backup": {
         "properties": {
           "file": {
@@ -30656,6 +30670,304 @@
           "direct"
         ],
         "title": "OwnershipChainOwnerOut",
+        "type": "object"
+      },
+      "PackCheckOut": {
+        "description": "Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,\nfor a pack not made in this case, with its own MANIFEST.sha256). Nothing of the pack is kept or sent.",
+        "properties": {
+          "compared_with": {
+            "title": "Compared With",
+            "type": "string"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "draft": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft"
+          },
+          "exhibits": {
+            "items": {
+              "$ref": "#/components/schemas/PackExhibitOut"
+            },
+            "title": "Exhibits",
+            "type": "array"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "files": {
+            "title": "Files",
+            "type": "integer"
+          },
+          "list_changed": {
+            "title": "List Changed",
+            "type": "boolean"
+          },
+          "made_at": {
+            "anyOf": [
+              {
+                "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made At"
+          },
+          "made_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made By"
+          },
+          "made_here": {
+            "title": "Made Here",
+            "type": "boolean"
+          },
+          "made_in_other_case": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made In Other Case"
+          },
+          "pack_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack Id"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/PackFileOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "signed": {
+            "title": "Signed",
+            "type": "boolean"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "whole": {
+            "title": "Whole",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "file",
+          "files",
+          "made_here",
+          "compared_with",
+          "list_changed",
+          "whole",
+          "counts",
+          "rows",
+          "exhibits",
+          "signed"
+        ],
+        "title": "PackCheckOut",
+        "type": "object"
+      },
+      "PackExhibitOut": {
+        "description": "A changed or missing exhibit file, what rests on it, and the case's own file. `ours` and `theirs` are small\npictures (data URLs) when the picture could be drawn again exactly as listed; `differs` is where they differ.",
+        "properties": {
+          "case_file": {
+            "anyOf": [
+              {
+                "enum": [
+                  "matches",
+                  "does not match"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Case File"
+          },
+          "claims": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Claims",
+            "type": "array"
+          },
+          "differs": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Differs"
+          },
+          "document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "ours": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ours"
+          },
+          "redrawn": {
+            "title": "Redrawn",
+            "type": "boolean"
+          },
+          "state": {
+            "enum": [
+              "changed",
+              "missing",
+              "extra"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "theirs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Theirs"
+          }
+        },
+        "required": [
+          "number",
+          "file",
+          "state",
+          "claims",
+          "redrawn"
+        ],
+        "title": "PackExhibitOut",
+        "type": "object"
+      },
+      "PackFileOut": {
+        "description": "One file of a pack someone sent back: as made, changed, missing, or not in the list; `about` names what a\nchanged or missing custody page is about.",
+        "properties": {
+          "about": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "About"
+          },
+          "listed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Listed"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "now": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Now"
+          },
+          "state": {
+            "enum": [
+              "as_made",
+              "changed",
+              "missing",
+              "extra"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "state"
+        ],
+        "title": "PackFileOut",
         "type": "object"
       },
       "PacketFromIn": {
@@ -62439,6 +62751,84 @@
           }
         },
         "summary": "Export Evidence Pack"
+      }
+    },
+    "/api/investigations/{investigation_id}/evidence-pack/check": {
+      "post": {
+        "description": "Check a pack someone sent back (CHECK_4): read here, in memory; every file's SHA-256 recomputed and compared\nwith the list kept when the pack was made. Nothing of the pack is kept or sent anywhere.",
+        "operationId": "check_evidence_pack",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_check_evidence_pack"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackCheckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Check Evidence Pack"
+                }
+              }
+            },
+            "description": "Not a .zip, or not an evidence pack"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Check Evidence Pack"
       }
     },
     "/api/investigations/{investigation_id}/export": {

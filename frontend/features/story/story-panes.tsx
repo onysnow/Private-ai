@@ -11,6 +11,7 @@ import {z} from 'zod';
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {StatusChip} from '../../components/status';
 import {errorMessage} from '../../lib/api-client';
+import {caseHref} from '../../lib/case-href';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {api} from '../../lib/api-instance';
 import {
@@ -231,7 +232,8 @@ export function ExportSheet({story, doc, onClose, onExportDocx}: {
         <li><b>Evidence pack <small>.zip</small></b><span>The write-up, an exhibits list from its citations, each cited passage with its file’s fingerprint, and the readiness record.</span>
           <button type="button" disabled={!story.writeup_id || packing} onClick={() => void pack()}>{packing ? 'Making the pack…' : allOk ? 'Export the pack' : 'Export as draft'}</button>
           {!story.writeup_id ? <small className="sy-why">○ Start the write-up first</small>
-            : !allOk && <small className="sy-why">○ Checks below are open: every page is stamped “Export as draft”</small>}</li>
+            : !allOk && <small className="sy-why">○ Checks below are open: every page is stamped “Export as draft”</small>}
+          <a className="sy-why" href={caseHref('/check#check-a-pack', story.investigation_id)}>A pack sent back? Check it</a></li>
         <li><b>Backup <small>.jwbackup.zip</small></b><span>The whole case, for restoring on this or another computer; not for sharing.</span>
           <button type="button" onClick={() => void backup()}>Download the backup</button></li>
       </ul>

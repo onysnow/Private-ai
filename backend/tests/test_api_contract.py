@@ -526,7 +526,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
 
     return Seeded(
         ids={
-            "monitor_id": monitor_id, "monitor_item_id": monitor_item_id,
+            "monitor_id": monitor_id, "monitor_item_id": monitor_item_id, "voice": "1",
             "fact_watch_id": fact_watch["id"], "saved_question_id": saved_question["id"], "channel": "phone",
             "section_id": story["sections"][0]["id"], "version_id": version["id"], "run_id": draft["job"]["id"],
             "investigation_id": inv, "entity_id": meridian, "claim_id": claim["id"], "lead_id": lead, "relationship_id": relationship,

@@ -900,6 +900,13 @@ export const zBasemapStatusOut = z.object({
 });
 
 /**
+ * Body_check_evidence_pack
+ */
+export const zBodyCheckEvidencePack = z.object({
+  file: z.string(),
+});
+
+/**
  * Body_inspect_backup
  */
 export const zBodyInspectBackup = z.object({
@@ -6504,6 +6511,69 @@ export const zOwnershipChainOut = z.object({
   nodes: z.array(zOwnershipChainNodeOut),
   owners: z.array(zOwnershipChainOwnerOut),
   truncated: z.boolean(),
+});
+
+/**
+ * PackExhibitOut
+ *
+ * A changed or missing exhibit file, what rests on it, and the case's own file. `ours` and `theirs` are small
+ * pictures (data URLs) when the picture could be drawn again exactly as listed; `differs` is where they differ.
+ */
+export const zPackExhibitOut = z.object({
+  case_file: z.enum(['matches', 'does not match']).nullish(),
+  claims: z.array(z.string()),
+  differs: z.record(z.string(), z.number()).nullish(),
+  document: z.string().nullish(),
+  file: z.string(),
+  number: z.int(),
+  ours: z.string().nullish(),
+  redrawn: z.boolean(),
+  state: z.enum(['changed', 'missing', 'extra']),
+  theirs: z.string().nullish(),
+});
+
+/**
+ * PackFileOut
+ *
+ * One file of a pack someone sent back: as made, changed, missing, or not in the list; `about` names what a
+ * changed or missing custody page is about.
+ */
+export const zPackFileOut = z.object({
+  about: z.string().nullish(),
+  listed: z.string().nullish(),
+  name: z.string(),
+  now: z.string().nullish(),
+  state: z.enum(['as_made', 'changed', 'missing', 'extra']),
+});
+
+/**
+ * PackCheckOut
+ *
+ * Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,
+ * for a pack not made in this case, with its own MANIFEST.sha256). Nothing of the pack is kept or sent.
+ */
+export const zPackCheckOut = z.object({
+  compared_with: z.string(),
+  counts: z.record(z.string(), z.int()),
+  draft: z.boolean().nullish(),
+  exhibits: z.array(zPackExhibitOut),
+  file: z.string(),
+  files: z.int(),
+  list_changed: z.boolean(),
+  made_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  made_by: z.string().nullish(),
+  made_here: z.boolean(),
+  made_in_other_case: z.string().nullish(),
+  pack_id: z.string().nullish(),
+  rows: z.array(zPackFileOut),
+  signed: z.boolean(),
+  title: z.string().nullish(),
+  whole: z.boolean(),
 });
 
 /**
@@ -12859,6 +12929,17 @@ export const zExportEvidencePackPath = z.object({
  * The evidence pack: the write-up, its exhibits with fingerprints, custody, readiness, gaps
  */
 export const zExportEvidencePackResponse = z.string();
+
+export const zCheckEvidencePackBody = zBodyCheckEvidencePack;
+
+export const zCheckEvidencePackPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCheckEvidencePackResponse = zPackCheckOut;
 
 export const zExportInvestigationPath = z.object({
   investigation_id: z.string(),

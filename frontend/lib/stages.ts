@@ -27,6 +27,7 @@ export const STAGES: Stage[] = [
     {label: 'Connector findings', anchor: 'review-queue'},
     {label: 'Is it real?', anchor: 'is-it-real'},
     {label: 'Chain of Custody', anchor: 'chain-of-custody'},
+    {label: 'Check a pack', anchor: 'check-a-pack'},
   ]},
   {key: 'map', route: '/see', n: 3, name: 'See', line: 'The reviewed records drawn four ways. Each chart says its rule and has its own key.', colour: SWATCH.amber, parts: [
     {label: 'The Wire', anchor: 'the-wire'},

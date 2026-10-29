@@ -15,3 +15,17 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   so the Done rules need no special case; a person can still change any source's tier.
 - **Where:** `demo_cases.py`, `demo_1mdb.py` (source_tier from each document's `admitted`). Demos loaded before this
   keep their old tiers until loaded again.
+
+## 2. Check a pack: which packs, where it lives (29 Oct)
+
+- **Questions (CHECK_4 README):** check packs made by someone else's Workbench too? Where does it live?
+- **Call:** any pack with a MANIFEST.sha256 can be checked. A pack made in this case is compared with the list kept
+  here when it was made (a new `evidence_packs` row per pack, found by the pack id inside it), so a list someone
+  redid after changing a file is caught; any other pack is compared with its own list, and the screen says that this
+  shows only that it is whole. It lives in Check › Check a pack, with a link from the Export sheet's Evidence pack.
+  A changed exhibit picture is drawn again from the case's own file and the band that differs is marked, only when
+  the redrawing gives exactly the bytes listed.
+- **Why:** the check is only worth something if it cannot be fooled by a new manifest; refusing other packs would
+  throw away a useful check of wholeness.
+- **Where:** `app/models/evidence_pack.py`, `app/services/pack_check.py`, `POST /investigations/{id}/evidence-pack/check`,
+  `features/pack-check/check-a-pack.tsx`.

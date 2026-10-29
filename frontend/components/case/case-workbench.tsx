@@ -38,6 +38,7 @@ import {TheDrop} from '../../features/the-drop/the-drop';
 import {Following} from '../../features/following/following';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
 import {IsItReal, RealnessList} from '../../features/is-it-real/is-it-real';
+import {CheckAPack} from '../../features/pack-check/check-a-pack';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
@@ -299,6 +300,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'review-queue', label: 'Connector findings', render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'is-it-real', label: 'Is it real?', render: () => <PanelErrorBoundary name="Is it real?"><RealnessList investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'chain-of-custody', label: 'Chain of Custody', render: () => <PanelErrorBoundary name="Chain of Custody (full)"><ChainOfCustody investigationId={inv} active={view === 'verify'}/></PanelErrorBoundary>},
+        {anchor: 'check-a-pack', label: 'Check a pack', render: () => <PanelErrorBoundary name="Check a pack"><CheckAPack investigationId={inv}/></PanelErrorBoundary>},
       ])}
       {screen('map', [
         {anchor: 'the-wire', label: 'The Wire', fill: true, render: () => <PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},

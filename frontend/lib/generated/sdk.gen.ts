@@ -90,6 +90,9 @@ import type {
   CheckConnectorKeyData,
   CheckConnectorKeyErrors,
   CheckConnectorKeyResponses,
+  CheckEvidencePackData,
+  CheckEvidencePackErrors,
+  CheckEvidencePackResponses,
   CheckMonitorData,
   CheckMonitorErrors,
   CheckMonitorResponses,
@@ -1206,6 +1209,9 @@ import {
   zChangePassphraseResponse,
   zCheckConnectorKeyPath,
   zCheckConnectorKeyResponse,
+  zCheckEvidencePackBody,
+  zCheckEvidencePackPath,
+  zCheckEvidencePackResponse,
   zCheckMonitorPath,
   zCheckMonitorResponse,
   zCheckWatchlistNowPath,
@@ -8303,6 +8309,43 @@ export const exportEvidencePack = <ThrowOnError extends boolean = false>(
       await zExportEvidencePackResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/evidence-pack.zip',
     ...options,
+  });
+
+/**
+ * Check Evidence Pack
+ *
+ * Check a pack someone sent back (CHECK_4): read here, in memory; every file's SHA-256 recomputed and compared
+ * with the list kept when the pack was made. Nothing of the pack is kept or sent anywhere.
+ */
+export const checkEvidencePack = <ThrowOnError extends boolean = false>(
+  options: Options<CheckEvidencePackData, ThrowOnError>,
+): RequestResult<
+  CheckEvidencePackResponses,
+  CheckEvidencePackErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CheckEvidencePackResponses,
+    CheckEvidencePackErrors,
+    ThrowOnError
+  >({
+    ...formDataBodySerializer,
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCheckEvidencePackBody,
+          path: zCheckEvidencePackPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCheckEvidencePackResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/evidence-pack/check',
+    ...options,
+    headers: {
+      'Content-Type': null,
+      ...options.headers,
+    },
   });
 
 /**

@@ -35,6 +35,7 @@ import {
   captureTimeProof,
   changePassphrase,
   checkConnectorKey,
+  checkEvidencePack,
   checkMonitor,
   checkWatchlistNow,
   clearCaseLookups,
@@ -466,6 +467,9 @@ import type {
   CheckConnectorKeyData,
   CheckConnectorKeyError,
   CheckConnectorKeyResponse,
+  CheckEvidencePackData,
+  CheckEvidencePackError,
+  CheckEvidencePackResponse,
   CheckMonitorData,
   CheckMonitorError,
   CheckMonitorResponse,
@@ -8070,6 +8074,36 @@ export const exportEvidencePackOptions = (
     },
     queryKey: exportEvidencePackQueryKey(options),
   });
+
+/**
+ * Check Evidence Pack
+ *
+ * Check a pack someone sent back (CHECK_4): read here, in memory; every file's SHA-256 recomputed and compared
+ * with the list kept when the pack was made. Nothing of the pack is kept or sent anywhere.
+ */
+export const checkEvidencePackMutation = (
+  options?: Partial<Options<CheckEvidencePackData>>,
+): UseMutationOptions<
+  CheckEvidencePackResponse,
+  CheckEvidencePackError,
+  Options<CheckEvidencePackData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CheckEvidencePackResponse,
+    CheckEvidencePackError,
+    Options<CheckEvidencePackData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await checkEvidencePack({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const exportInvestigationQueryKey = (
   options: Options<ExportInvestigationData>,

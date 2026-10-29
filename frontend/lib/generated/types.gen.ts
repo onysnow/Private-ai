@@ -2014,6 +2014,16 @@ export type BasemapStatusOut = {
 };
 
 /**
+ * Body_check_evidence_pack
+ */
+export type BodyCheckEvidencePack = {
+  /**
+   * File
+   */
+  file: Blob | File;
+};
+
+/**
  * Body_inspect_backup
  */
 export type BodyInspectBackup = {
@@ -15322,6 +15332,161 @@ export type OwnershipChainOwnerOut = {
    * Paths
    */
   paths: number;
+};
+
+/**
+ * PackCheckOut
+ *
+ * Check a pack (CHECK_4): every file recomputed here and compared with the list kept when the pack was made (or,
+ * for a pack not made in this case, with its own MANIFEST.sha256). Nothing of the pack is kept or sent.
+ */
+export type PackCheckOut = {
+  /**
+   * Compared With
+   */
+  compared_with: string;
+  /**
+   * Counts
+   */
+  counts: {
+    [key: string]: number;
+  };
+  /**
+   * Draft
+   */
+  draft?: boolean | null;
+  /**
+   * Exhibits
+   */
+  exhibits: Array<PackExhibitOut>;
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Files
+   */
+  files: number;
+  /**
+   * List Changed
+   */
+  list_changed: boolean;
+  /**
+   * Made At
+   */
+  made_at?: string | null;
+  /**
+   * Made By
+   */
+  made_by?: string | null;
+  /**
+   * Made Here
+   */
+  made_here: boolean;
+  /**
+   * Made In Other Case
+   */
+  made_in_other_case?: string | null;
+  /**
+   * Pack Id
+   */
+  pack_id?: string | null;
+  /**
+   * Rows
+   */
+  rows: Array<PackFileOut>;
+  /**
+   * Signed
+   */
+  signed: boolean;
+  /**
+   * Title
+   */
+  title?: string | null;
+  /**
+   * Whole
+   */
+  whole: boolean;
+};
+
+/**
+ * PackExhibitOut
+ *
+ * A changed or missing exhibit file, what rests on it, and the case's own file. `ours` and `theirs` are small
+ * pictures (data URLs) when the picture could be drawn again exactly as listed; `differs` is where they differ.
+ */
+export type PackExhibitOut = {
+  /**
+   * Case File
+   */
+  case_file?: 'matches' | 'does not match' | null;
+  /**
+   * Claims
+   */
+  claims: Array<string>;
+  /**
+   * Differs
+   */
+  differs?: {
+    [key: string]: number;
+  } | null;
+  /**
+   * Document
+   */
+  document?: string | null;
+  /**
+   * File
+   */
+  file: string;
+  /**
+   * Number
+   */
+  number: number;
+  /**
+   * Ours
+   */
+  ours?: string | null;
+  /**
+   * Redrawn
+   */
+  redrawn: boolean;
+  /**
+   * State
+   */
+  state: 'changed' | 'missing' | 'extra';
+  /**
+   * Theirs
+   */
+  theirs?: string | null;
+};
+
+/**
+ * PackFileOut
+ *
+ * One file of a pack someone sent back: as made, changed, missing, or not in the list; `about` names what a
+ * changed or missing custody page is about.
+ */
+export type PackFileOut = {
+  /**
+   * About
+   */
+  about?: string | null;
+  /**
+   * Listed
+   */
+  listed?: string | null;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Now
+   */
+  now?: string | null;
+  /**
+   * State
+   */
+  state: 'as_made' | 'changed' | 'missing' | 'extra';
 };
 
 /**
@@ -30426,6 +30591,48 @@ export type ExportEvidencePackResponses = {
 
 export type ExportEvidencePackResponse =
   ExportEvidencePackResponses[keyof ExportEvidencePackResponses];
+
+export type CheckEvidencePackData = {
+  body: BodyCheckEvidencePack;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/evidence-pack/check';
+};
+
+export type CheckEvidencePackErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Check Evidence Pack
+   *
+   * Not a .zip, or not an evidence pack
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CheckEvidencePackError =
+  CheckEvidencePackErrors[keyof CheckEvidencePackErrors];
+
+export type CheckEvidencePackResponses = {
+  /**
+   * Successful Response
+   */
+  200: PackCheckOut;
+};
+
+export type CheckEvidencePackResponse =
+  CheckEvidencePackResponses[keyof CheckEvidencePackResponses];
 
 export type ExportInvestigationData = {
   body?: never;
