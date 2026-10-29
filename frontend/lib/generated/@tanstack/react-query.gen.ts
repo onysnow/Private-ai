@@ -9,6 +9,7 @@ import {
 
 import { client } from '../client.gen';
 import {
+  acceptDocumentSync,
   active,
   addAboutClaim,
   addChartToDeckEndpoint,
@@ -111,6 +112,7 @@ import {
   exportWriteupDocx,
   exportWriteupPdf,
   externalRelationshipCandidates,
+  findDocumentSync,
   findExtractionLineageEndpoint,
   findingCandidates,
   findOpenalephChildren,
@@ -201,6 +203,8 @@ import {
   getSigningKey,
   getSimilarDocuments,
   getSince,
+  getSound,
+  getSpectrogram,
   getStanding,
   getStory,
   getStoryVersion,
@@ -411,6 +415,9 @@ import {
   uploadDocument,
 } from '../sdk.gen';
 import type {
+  AcceptDocumentSyncData,
+  AcceptDocumentSyncError,
+  AcceptDocumentSyncResponse,
   ActiveData,
   ActiveError,
   ActiveResponse,
@@ -717,6 +724,9 @@ import type {
   ExternalRelationshipCandidatesData,
   ExternalRelationshipCandidatesError,
   ExternalRelationshipCandidatesResponse,
+  FindDocumentSyncData,
+  FindDocumentSyncError,
+  FindDocumentSyncResponse,
   FindExtractionLineageEndpointData,
   FindExtractionLineageEndpointError,
   FindExtractionLineageEndpointResponse,
@@ -986,6 +996,11 @@ import type {
   GetSinceData,
   GetSinceError,
   GetSinceResponse,
+  GetSoundData,
+  GetSoundError,
+  GetSoundResponse,
+  GetSpectrogramData,
+  GetSpectrogramError,
   GetStandingData,
   GetStandingError,
   GetStandingResponse,
@@ -4413,8 +4428,9 @@ export const listDerivedOptions = (options: Options<ListDerivedData>) =>
 /**
  * Make Cleaned Copy
  *
- * A 16 kHz mono copy with the hum taken out and light noise reduction, for listening only. The recording itself
- * is not changed; the copy is a new file with its edit-trail row.
+ * A 16 kHz mono copy for listening only: with no steps given, the hum taken out and light noise reduction; with
+ * steps, those (hum, room noise, loudness), its loudness before and after kept in the trail. The recording itself is
+ * not changed; the copy is a new file with its edit-trail row.
  */
 export const makeCleanedCopyMutation = (
   options?: Partial<Options<MakeCleanedCopyData>>,
@@ -4863,6 +4879,174 @@ export const getSimilarDocumentsOptions = (
     },
     queryKey: getSimilarDocumentsQueryKey(options),
   });
+
+export const getSoundQueryKey = (options: Options<GetSoundData>) =>
+  createQueryKey('getSound', options);
+
+/**
+ * Get Sound
+ *
+ * Whether mains hum is in the recording and at which frequency, its loudness, and any accepted sync.
+ */
+export const getSoundOptions = (options: Options<GetSoundData>) =>
+  queryOptions<
+    GetSoundResponse,
+    GetSoundError,
+    GetSoundResponse,
+    ReturnType<typeof getSoundQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSound({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSoundQueryKey(options),
+  });
+
+export const getSpectrogramQueryKey = (options: Options<GetSpectrogramData>) =>
+  createQueryKey('getSpectrogram', options);
+
+/**
+ * Get Spectrogram
+ *
+ * A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B).
+ */
+export const getSpectrogramOptions = (options: Options<GetSpectrogramData>) =>
+  queryOptions<
+    unknown,
+    GetSpectrogramError,
+    unknown,
+    ReturnType<typeof getSpectrogramQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSpectrogram({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSpectrogramQueryKey(options),
+  });
+
+export const getSpectrogramInfiniteQueryKey = (
+  options: Options<GetSpectrogramData>,
+): QueryKey<Options<GetSpectrogramData>> =>
+  createQueryKey('getSpectrogram', options, true);
+
+/**
+ * Get Spectrogram
+ *
+ * A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B).
+ */
+export const getSpectrogramInfiniteOptions = (
+  options: Options<GetSpectrogramData>,
+) => {
+  const opts = infiniteQueryOptions<
+    unknown,
+    GetSpectrogramError,
+    InfiniteData<unknown>,
+    QueryKey<Options<GetSpectrogramData>>,
+    | number
+    | Pick<
+        QueryKey<Options<GetSpectrogramData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<GetSpectrogramData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getSpectrogram({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: getSpectrogramInfiniteQueryKey(options),
+    },
+  );
+  return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Find Document Sync
+ *
+ * Where another recording of the same event lines up in this one, found by matching their sound. Nothing is kept
+ * until a person accepts it.
+ */
+export const findDocumentSyncMutation = (
+  options?: Partial<Options<FindDocumentSyncData>>,
+): UseMutationOptions<
+  FindDocumentSyncResponse,
+  FindDocumentSyncError,
+  Options<FindDocumentSyncData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FindDocumentSyncResponse,
+    FindDocumentSyncError,
+    Options<FindDocumentSyncData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await findDocumentSync({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Accept Document Sync
+ *
+ * Accept the offset: it is found again here (not taken from the request) and kept beside the recording with who
+ * accepted it and when.
+ */
+export const acceptDocumentSyncMutation = (
+  options?: Partial<Options<AcceptDocumentSyncData>>,
+): UseMutationOptions<
+  AcceptDocumentSyncResponse,
+  AcceptDocumentSyncError,
+  Options<AcceptDocumentSyncData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AcceptDocumentSyncResponse,
+    AcceptDocumentSyncError,
+    Options<AcceptDocumentSyncData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await acceptDocumentSync({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getDocumentTableQueryKey = (
   options: Options<GetDocumentTableData>,

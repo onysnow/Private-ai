@@ -12,6 +12,9 @@ import {
 } from './client';
 import { client } from './client.gen';
 import type {
+  AcceptDocumentSyncData,
+  AcceptDocumentSyncErrors,
+  AcceptDocumentSyncResponses,
   ActiveData,
   ActiveErrors,
   ActiveResponses,
@@ -318,6 +321,9 @@ import type {
   ExternalRelationshipCandidatesData,
   ExternalRelationshipCandidatesErrors,
   ExternalRelationshipCandidatesResponses,
+  FindDocumentSyncData,
+  FindDocumentSyncErrors,
+  FindDocumentSyncResponses,
   FindExtractionLineageEndpointData,
   FindExtractionLineageEndpointErrors,
   FindExtractionLineageEndpointResponses,
@@ -588,6 +594,12 @@ import type {
   GetSinceData,
   GetSinceErrors,
   GetSinceResponses,
+  GetSoundData,
+  GetSoundErrors,
+  GetSoundResponses,
+  GetSpectrogramData,
+  GetSpectrogramErrors,
+  GetSpectrogramResponses,
   GetStandingData,
   GetStandingErrors,
   GetStandingResponses,
@@ -1211,6 +1223,9 @@ import type {
   UploadDocumentResponses,
 } from './types.gen';
 import {
+  zAcceptDocumentSyncBody,
+  zAcceptDocumentSyncPath,
+  zAcceptDocumentSyncResponse,
   zActiveResponse,
   zAddAboutClaimBody,
   zAddAboutClaimPath,
@@ -1454,6 +1469,9 @@ import {
   zExportWriteupPdfResponse,
   zExternalRelationshipCandidatesPath,
   zExternalRelationshipCandidatesResponse,
+  zFindDocumentSyncBody,
+  zFindDocumentSyncPath,
+  zFindDocumentSyncResponse,
   zFindExtractionLineageEndpointQuery,
   zFindExtractionLineageEndpointResponse,
   zFindingCandidatesPath,
@@ -1634,6 +1652,10 @@ import {
   zGetSincePath,
   zGetSinceQuery,
   zGetSinceResponse,
+  zGetSoundPath,
+  zGetSoundResponse,
+  zGetSpectrogramPath,
+  zGetSpectrogramQuery,
   zGetStandingPath,
   zGetStandingResponse,
   zGetStoryPath,
@@ -1835,6 +1857,7 @@ import {
   zLockingBody,
   zLockingResponse,
   zLockResponse,
+  zMakeCleanedCopyBody,
   zMakeCleanedCopyPath,
   zMakeCleanedCopyResponse,
   zMakeClipBody,
@@ -4996,8 +5019,9 @@ export const listDerived = <ThrowOnError extends boolean = false>(
 /**
  * Make Cleaned Copy
  *
- * A 16 kHz mono copy with the hum taken out and light noise reduction, for listening only. The recording itself
- * is not changed; the copy is a new file with its edit-trail row.
+ * A 16 kHz mono copy for listening only: with no steps given, the hum taken out and light noise reduction; with
+ * steps, those (hum, room noise, loudness), its loudness before and after kept in the trail. The recording itself is
+ * not changed; the copy is a new file with its edit-trail row.
  */
 export const makeCleanedCopy = <ThrowOnError extends boolean = false>(
   options: Options<MakeCleanedCopyData, ThrowOnError>,
@@ -5014,7 +5038,7 @@ export const makeCleanedCopy = <ThrowOnError extends boolean = false>(
     requestValidator: async (data) =>
       await z
         .object({
-          body: z.never().optional(),
+          body: zMakeCleanedCopyBody.optional(),
           path: zMakeCleanedCopyPath,
           query: z.never().optional(),
         })
@@ -5023,6 +5047,10 @@ export const makeCleanedCopy = <ThrowOnError extends boolean = false>(
       await zMakeCleanedCopyResponse.parseAsync(data),
     url: '/api/documents/{document_id}/derived/cleaned',
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
@@ -5398,6 +5426,129 @@ export const getSimilarDocuments = <ThrowOnError extends boolean = false>(
       await zGetSimilarDocumentsResponse.parseAsync(data),
     url: '/api/documents/{document_id}/similar',
     ...options,
+  });
+
+/**
+ * Get Sound
+ *
+ * Whether mains hum is in the recording and at which frequency, its loudness, and any accepted sync.
+ */
+export const getSound = <ThrowOnError extends boolean = false>(
+  options: Options<GetSoundData, ThrowOnError>,
+): RequestResult<GetSoundResponses, GetSoundErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetSoundResponses,
+    GetSoundErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSoundPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) => await zGetSoundResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/sound',
+    ...options,
+  });
+
+/**
+ * Get Spectrogram
+ *
+ * A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B).
+ */
+export const getSpectrogram = <ThrowOnError extends boolean = false>(
+  options: Options<GetSpectrogramData, ThrowOnError>,
+): RequestResult<GetSpectrogramResponses, GetSpectrogramErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetSpectrogramResponses,
+    GetSpectrogramErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetSpectrogramPath,
+          query: zGetSpectrogramQuery.optional(),
+        })
+        .parseAsync(data),
+    url: '/api/documents/{document_id}/spectrogram.png',
+    ...options,
+  });
+
+/**
+ * Find Document Sync
+ *
+ * Where another recording of the same event lines up in this one, found by matching their sound. Nothing is kept
+ * until a person accepts it.
+ */
+export const findDocumentSync = <ThrowOnError extends boolean = false>(
+  options: Options<FindDocumentSyncData, ThrowOnError>,
+): RequestResult<
+  FindDocumentSyncResponses,
+  FindDocumentSyncErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    FindDocumentSyncResponses,
+    FindDocumentSyncErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zFindDocumentSyncBody,
+          path: zFindDocumentSyncPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindDocumentSyncResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/sync',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Accept Document Sync
+ *
+ * Accept the offset: it is found again here (not taken from the request) and kept beside the recording with who
+ * accepted it and when.
+ */
+export const acceptDocumentSync = <ThrowOnError extends boolean = false>(
+  options: Options<AcceptDocumentSyncData, ThrowOnError>,
+): RequestResult<
+  AcceptDocumentSyncResponses,
+  AcceptDocumentSyncErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AcceptDocumentSyncResponses,
+    AcceptDocumentSyncErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAcceptDocumentSyncBody,
+          path: zAcceptDocumentSyncPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAcceptDocumentSyncResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/sync/accept',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

@@ -5186,6 +5186,26 @@ export type ClaimUpdate = {
 };
 
 /**
+ * CleanIn
+ *
+ * The steps of a cleaned copy (Listen › Clean and cut): take out mains hum, reduce room noise, even out loudness.
+ */
+export type CleanIn = {
+  /**
+   * Hum
+   */
+  hum?: boolean;
+  /**
+   * Loudness Target
+   */
+  loudness_target?: number | null;
+  /**
+   * Noise
+   */
+  noise?: 'off' | 'light' | 'medium';
+};
+
+/**
  * ClipCreate
  *
  * A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`.
@@ -11997,6 +12017,24 @@ export type HighlightSegmentOut = {
    * Text
    */
   text: string;
+};
+
+/**
+ * HumOut
+ */
+export type HumOut = {
+  /**
+   * Above Db
+   */
+  above_db: number;
+  /**
+   * Harmonics
+   */
+  harmonics: number;
+  /**
+   * Hz
+   */
+  hz?: number | null;
 };
 
 /**
@@ -19804,6 +19842,32 @@ export type SlideDrawingOut = {
 export type SortOrder = 'value_desc' | 'value_asc' | 'label' | 'time';
 
 /**
+ * SoundOut
+ *
+ * A recording's sound: its length, any mains hum, its loudness, its latest cleaned copy, an accepted sync.
+ */
+export type SoundOut = {
+  /**
+   * Cleaned Id
+   */
+  cleaned_id?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Duration
+   */
+  duration: number;
+  hum: HumOut;
+  /**
+   * Loudness Lufs
+   */
+  loudness_lufs?: number | null;
+  sync?: SyncOut | null;
+};
+
+/**
  * SourceCreate
  */
 export type SourceCreate = {
@@ -20838,6 +20902,55 @@ export type SuiteUnmappedOut = {
    * Vocabulary
    */
   vocabulary: string;
+};
+
+/**
+ * SyncIn
+ *
+ * Another recording of the same event, to line up with this one by matching their sound.
+ */
+export type SyncIn = {
+  /**
+   * Other Document Id
+   */
+  other_document_id: string;
+};
+
+/**
+ * SyncOut
+ *
+ * Where another recording lines up in this one: a positive offset means it started that many seconds later.
+ */
+export type SyncOut = {
+  /**
+   * Accepted At
+   */
+  accepted_at?: string | null;
+  /**
+   * Accepted By
+   */
+  accepted_by?: string | null;
+  /**
+   * Confidence
+   */
+  confidence: number;
+  /**
+   * Distinct
+   */
+  distinct?: number | null;
+  /**
+   * Offset Seconds
+   */
+  offset_seconds?: number | null;
+  /**
+   * Other Document Id
+   */
+  other_document_id: string;
+  /**
+   * Reliable
+   */
+  reliable: boolean;
+  [key: string]: unknown;
 };
 
 /**
@@ -27453,7 +27566,10 @@ export type ListDerivedResponse =
   ListDerivedResponses[keyof ListDerivedResponses];
 
 export type MakeCleanedCopyData = {
-  body?: never;
+  /**
+   * Body
+   */
+  body?: CleanIn | null;
   path: {
     /**
      * Document Id
@@ -27474,9 +27590,11 @@ export type MakeCleanedCopyErrors = {
    */
   415: ErrorOut;
   /**
-   * Not a recording that has been read
+   * Response 422 Make Cleaned Copy
+   *
+   * Not a recording that has been read, or steps that cannot be used
    */
-  422: ErrorOut;
+  422: ValidationErrorOut | ErrorOut;
   /**
    * The native module is not installed on this computer
    */
@@ -27999,6 +28117,208 @@ export type GetSimilarDocumentsResponses = {
 
 export type GetSimilarDocumentsResponse =
   GetSimilarDocumentsResponses[keyof GetSimilarDocumentsResponses];
+
+export type GetSoundData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/sound';
+};
+
+export type GetSoundErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Unprocessable Entity
+   */
+  422: ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSoundError = GetSoundErrors[keyof GetSoundErrors];
+
+export type GetSoundResponses = {
+  /**
+   * Successful Response
+   */
+  200: SoundOut;
+};
+
+export type GetSoundResponse = GetSoundResponses[keyof GetSoundResponses];
+
+export type GetSpectrogramData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: {
+    /**
+     * Start
+     */
+    start?: number;
+    /**
+     * End
+     */
+    end?: number;
+    /**
+     * Cleaned
+     */
+    cleaned?: boolean;
+  };
+  url: '/api/documents/{document_id}/spectrogram.png';
+};
+
+export type GetSpectrogramErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Get Spectrogram
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetSpectrogramError =
+  GetSpectrogramErrors[keyof GetSpectrogramErrors];
+
+export type GetSpectrogramResponses = {
+  /**
+   * A stretch of the recording as a spectrogram, 0 to 4 kHz
+   */
+  200: unknown;
+};
+
+export type FindDocumentSyncData = {
+  body: SyncIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/sync';
+};
+
+export type FindDocumentSyncErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Find Document Sync
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FindDocumentSyncError =
+  FindDocumentSyncErrors[keyof FindDocumentSyncErrors];
+
+export type FindDocumentSyncResponses = {
+  /**
+   * Successful Response
+   */
+  200: SyncOut;
+};
+
+export type FindDocumentSyncResponse =
+  FindDocumentSyncResponses[keyof FindDocumentSyncResponses];
+
+export type AcceptDocumentSyncData = {
+  body: SyncIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/sync/accept';
+};
+
+export type AcceptDocumentSyncErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Accept Document Sync
+   *
+   * Unprocessable Entity
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Service Unavailable
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AcceptDocumentSyncError =
+  AcceptDocumentSyncErrors[keyof AcceptDocumentSyncErrors];
+
+export type AcceptDocumentSyncResponses = {
+  /**
+   * Successful Response
+   */
+  200: SyncOut;
+};
+
+export type AcceptDocumentSyncResponse =
+  AcceptDocumentSyncResponses[keyof AcceptDocumentSyncResponses];
 
 export type GetDocumentTableData = {
   body?: never;

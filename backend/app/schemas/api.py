@@ -1027,3 +1027,15 @@ class PhotoCopyIn(BaseModel):
     operation: Literal["blur_faces", "strip_metadata", "crop", "redact", "turn"]
     params: dict[str, Any] = Field(default_factory=dict)
     from_id: str | None = None
+
+
+class CleanIn(BaseModel):
+    """The steps of a cleaned copy (Listen › Clean and cut): take out mains hum, reduce room noise, even out loudness."""
+    hum: bool = True
+    noise: Literal["off", "light", "medium"] = "medium"
+    loudness_target: float | None = Field(default=-16.0, ge=-30, le=-10)
+
+
+class SyncIn(BaseModel):
+    """Another recording of the same event, to line up with this one by matching their sound."""
+    other_document_id: str = Field(min_length=1, max_length=64)

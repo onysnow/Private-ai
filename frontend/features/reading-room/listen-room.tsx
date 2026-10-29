@@ -22,6 +22,7 @@ import {createEvidenceEndpoint, findVoices, makeCleanedCopy, makeClip, nameVoice
 import type {DerivedFileOut, DocumentDetailOut, TranscriptCompareRowOut, TranscriptOut, TranscriptSegmentOut, VoiceOut,
   VoicesOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {CleanAndCut, SyncPanel} from './sound-tools';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 const STEP = 5;
@@ -199,8 +200,13 @@ export function derivedLine(d: DerivedFileOut): {name: string; note: string; rig
     return {name: `clip_${(p.start ?? 0).toFixed(1)}-${(p.end ?? 0).toFixed(1)}.wav`, right: `${len.toFixed(1)} s`,
       note: `The part ${clock(p.start ?? 0)}–${clock(p.end ?? 0)}, cut from ${p.from ?? 'the original'}. Quotes play from the original.`};
   }
-  if (d.operation === 'speech_cleaned') return {name: 'speech-cleaned.wav', right: mb(d.size),
-    note: `${(p.sample_rate ?? 16000) / 1000} kHz mono, hum taken out, light noise reduction. For listening only.`};
+  if (d.operation === 'speech_cleaned') {
+    const chain = (d.params as {chain?: Array<{effect: string; hz?: number; level?: string; target_lufs?: number}>}).chain ?? [];
+    const said = chain.map(c => c.effect === 'dehum' ? `hum${c.hz ? ` at ${c.hz} Hz` : ''} taken out` : c.effect === 'denoise' ? `${c.level ?? 'light'} noise reduction`
+      : c.effect === 'loudness' ? `loudness evened to ${c.target_lufs} LUFS` : c.effect).join(', ');
+    return {name: 'speech-cleaned.wav', right: mb(d.size),
+      note: `${(p.sample_rate ?? 16000) / 1000} kHz mono, ${said || 'hum taken out, light noise reduction'}. For listening only.`};
+  }
   return {name: d.operation, right: mb(d.size), note: d.tool};
 }
 
@@ -259,7 +265,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
   const player = useRef<HTMLMediaElement | null>(null);
   const [now, setNow] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [tab, setTab] = useState<'listen' | 'original' | 'derived' | 'details'>('listen');
+  const [tab, setTab] = useState<'listen' | 'clean' | 'sync' | 'original' | 'derived' | 'details'>('listen');
   const [which, setWhich] = useState<'ours' | 'publisher' | 'compare'>('ours');
   const derived = useQuery({...listDerivedOptions({path: {document_id: doc.id}})});
   const files = derived.data ?? [];
@@ -400,8 +406,10 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
       <nav className="rr-crumbs" aria-label="You are here"><span>{caseName}</span><span>Bring in</span><span>Reading room</span><b>{title}</b></nav>
       <div role="tablist" aria-label="Views of this recording" className="rr-tabs">
         <button type="button" role="tab" aria-selected={tab === 'listen'} onClick={() => setTab('listen')}>Listen &amp; read</button>
+        <button type="button" role="tab" aria-selected={tab === 'clean'} onClick={() => setTab('clean')}>Clean and cut</button>
+        <button type="button" role="tab" aria-selected={tab === 'sync'} onClick={() => setTab('sync')}>Sync</button>
         <button type="button" role="tab" aria-selected={tab === 'original'} onClick={() => setTab('original')}>Original</button>
-        <button type="button" role="tab" aria-selected={tab === 'derived'} onClick={() => setTab('derived')}>Derived files{files.length ? ` · ${files.length}` : ''}</button>
+        <button type="button" role="tab" aria-selected={tab === 'derived'} onClick={() => setTab('derived')}>Edit trail{files.length ? ` · ${files.length}` : ''}</button>
         <button type="button" role="tab" aria-selected={tab === 'details'} onClick={() => setTab('details')}>Details</button>
       </div>
       <span className="rr-find-box"><input type="search" className="rr-find-input" aria-label="Find in this recording" placeholder="Find in this recording" value={find}
@@ -440,7 +448,9 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
     </aside>
 
     <main className="lr-read" aria-label="Transcript">
-      {tab === 'original' ? <section className="lr-orig" aria-label="The original">
+      {tab === 'clean' ? <CleanAndCut doc={doc} duration={duration} files={files} onStatus={setStatus}/>
+      : tab === 'sync' ? <SyncPanel doc={doc} investigationId={doc.investigation_id}/>
+      : tab === 'original' ? <section className="lr-orig" aria-label="The original">
         <p className="lr-cap">The original <span>as uploaded, never changed</span></p>
         <dl className="rr-details">
           <div><dt>File</dt><dd>{doc.filename}</dd></div>
@@ -450,7 +460,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
         </dl>
         {src && <audio controls preload="metadata" src={src} aria-label={`Play the original, ${doc.filename}`}/>}
       </section>
-      : tab === 'derived' ? <section className="lr-derived" aria-label="Derived files">
+      : tab === 'derived' ? <section className="lr-derived" aria-label="Edit trail">
         <p className="lr-cap">Made from this recording <span>each a new file, with its edit trail</span></p>
         <div className="lr-file orig"><span className="lr-chip teal">Original</span> <b>{doc.filename}</b><small>SHA-256 {fingerprint(doc.sha256)} · never changed</small></div>
         {files.length ? <ol className="lr-tree">{files.map(f => { const line = derivedLine(f); return <li key={f.id} className="lr-file der">
@@ -547,7 +557,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
         <div className="lr-file orig"><span className="lr-chip teal">Original</span> <b>{doc.filename}</b><small>SHA-256 {fingerprint(doc.sha256)}</small></div>
         {files.map(f => { const line = derivedLine(f); return <div key={f.id} className="lr-file der"><span className="lr-chip plum">Derived</span> <b>{line.name}</b><em>{line.right}</em><small>{line.note}</small></div>; })}
         {!files.length && <p className="lr-note">The transcript was made from a 16 kHz copy decoded in memory. Quotes play from the original.</p>}
-        <div className="lr-acts"><button type="button" onClick={() => setTab('derived')}>{files.length ? 'Derived files' : 'Make a cleaned copy…'}</button></div>
+        <div className="lr-acts"><button type="button" onClick={() => setTab('derived')}>{files.length ? 'Edit trail' : 'Make a cleaned copy…'}</button></div>
       </section>
     </aside>
 

@@ -9060,6 +9060,42 @@
         "title": "ClaimUpdate",
         "type": "object"
       },
+      "CleanIn": {
+        "description": "The steps of a cleaned copy (Listen › Clean and cut): take out mains hum, reduce room noise, even out loudness.",
+        "properties": {
+          "hum": {
+            "default": true,
+            "title": "Hum",
+            "type": "boolean"
+          },
+          "loudness_target": {
+            "anyOf": [
+              {
+                "maximum": -10.0,
+                "minimum": -30.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": -16.0,
+            "title": "Loudness Target"
+          },
+          "noise": {
+            "default": "medium",
+            "enum": [
+              "off",
+              "light",
+              "medium"
+            ],
+            "title": "Noise",
+            "type": "string"
+          }
+        },
+        "title": "CleanIn",
+        "type": "object"
+      },
       "ClipCreate": {
         "description": "A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`.",
         "properties": {
@@ -24941,6 +24977,35 @@
         "title": "HighlightSegmentOut",
         "type": "object"
       },
+      "HumOut": {
+        "properties": {
+          "above_db": {
+            "title": "Above Db",
+            "type": "number"
+          },
+          "harmonics": {
+            "title": "Harmonics",
+            "type": "integer"
+          },
+          "hz": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hz"
+          }
+        },
+        "required": [
+          "harmonics",
+          "above_db"
+        ],
+        "title": "HumOut",
+        "type": "object"
+      },
       "HypothesisTestRequest": {
         "properties": {
           "changes": {
@@ -38317,6 +38382,61 @@
         "title": "SortOrder",
         "type": "string"
       },
+      "SoundOut": {
+        "description": "A recording's sound: its length, any mains hum, its loudness, its latest cleaned copy, an accepted sync.",
+        "properties": {
+          "cleaned_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cleaned Id"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "duration": {
+            "title": "Duration",
+            "type": "number"
+          },
+          "hum": {
+            "$ref": "#/components/schemas/HumOut"
+          },
+          "loudness_lufs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loudness Lufs"
+          },
+          "sync": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SyncOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "document_id",
+          "duration",
+          "hum"
+        ],
+        "title": "SoundOut",
+        "type": "object"
+      },
       "SourceCreate": {
         "properties": {
           "investigation_id": {
@@ -40052,6 +40172,91 @@
           "value"
         ],
         "title": "SuiteUnmappedOut",
+        "type": "object"
+      },
+      "SyncIn": {
+        "description": "Another recording of the same event, to line up with this one by matching their sound.",
+        "properties": {
+          "other_document_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Other Document Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "other_document_id"
+        ],
+        "title": "SyncIn",
+        "type": "object"
+      },
+      "SyncOut": {
+        "additionalProperties": true,
+        "description": "Where another recording lines up in this one: a positive offset means it started that many seconds later.",
+        "properties": {
+          "accepted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted At"
+          },
+          "accepted_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted By"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "distinct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distinct"
+          },
+          "offset_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offset Seconds"
+          },
+          "other_document_id": {
+            "title": "Other Document Id",
+            "type": "string"
+          },
+          "reliable": {
+            "title": "Reliable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "other_document_id",
+          "confidence",
+          "reliable"
+        ],
+        "title": "SyncOut",
         "type": "object"
       },
       "TableMappingIn": {
@@ -58067,7 +58272,7 @@
     },
     "/api/documents/{document_id}/derived/cleaned": {
       "post": {
-        "description": "A 16 kHz mono copy with the hum taken out and light noise reduction, for listening only. The recording itself\nis not changed; the copy is a new file with its edit-trail row.",
+        "description": "A 16 kHz mono copy for listening only: with no steps given, the hum taken out and light noise reduction; with\nsteps, those (hum, room noise, loudness), its loudness before and after kept in the trail. The recording itself is\nnot changed; the copy is a new file with its edit-trail row.",
         "operationId": "make_cleaned_copy",
         "parameters": [
           {
@@ -58080,6 +58285,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CleanIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "content": {
@@ -58115,11 +58337,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorOut"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Make Cleaned Copy"
                 }
               }
             },
-            "description": "Not a recording that has been read"
+            "description": "Not a recording that has been read, or steps that cannot be used"
           },
           "4XX": {
             "content": {
@@ -58954,6 +59184,388 @@
           }
         },
         "summary": "Get Similar Documents"
+      }
+    },
+    "/api/documents/{document_id}/sound": {
+      "get": {
+        "description": "Whether mains hum is in the recording and at which frequency, its loudness, and any accepted sync.",
+        "operationId": "get_sound",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Get Sound"
+      }
+    },
+    "/api/documents/{document_id}/spectrogram.png": {
+      "get": {
+        "description": "A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B).",
+        "operationId": "get_spectrogram",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Start",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "required": false,
+            "schema": {
+              "default": 60,
+              "exclusiveMinimum": 0,
+              "title": "End",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cleaned",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Cleaned",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {}
+            },
+            "description": "A stretch of the recording as a spectrogram, 0 to 4 kHz"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Get Spectrogram"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Spectrogram"
+      }
+    },
+    "/api/documents/{document_id}/sync": {
+      "post": {
+        "description": "Where another recording of the same event lines up in this one, found by matching their sound. Nothing is kept\nuntil a person accepts it.",
+        "operationId": "find_document_sync",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Find Document Sync"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Find Document Sync"
+      }
+    },
+    "/api/documents/{document_id}/sync/accept": {
+      "post": {
+        "description": "Accept the offset: it is found again here (not taken from the request) and kept beside the recording with who\naccepted it and when.",
+        "operationId": "accept_document_sync",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Accept Document Sync"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Accept Document Sync"
       }
     },
     "/api/documents/{document_id}/table": {

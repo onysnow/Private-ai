@@ -5268,6 +5268,36 @@ class PhotoOut(ResponseModel):
     face_model_here: bool
 
 
+class HumOut(ResponseModel):
+    hz: int | None = None
+    harmonics: int
+    above_db: float
+
+
+class SyncOut(ResponseModel):
+    """Where another recording lines up in this one: a positive offset means it started that many seconds later."""
+    model_config = ConfigDict(from_attributes=True, extra="allow")
+
+    other_document_id: str
+    offset_seconds: float | None = None
+    # FilmCraft's find_offset: the peak's height over the background, and over the next best lag (reliable at 8 and 1.5).
+    confidence: float
+    distinct: float | None = None
+    reliable: bool
+    accepted_by: str | None = None
+    accepted_at: str | None = None
+
+
+class SoundOut(ResponseModel):
+    """A recording's sound: its length, any mains hum, its loudness, its latest cleaned copy, an accepted sync."""
+    document_id: str
+    duration: float
+    hum: HumOut
+    loudness_lufs: float | None = None
+    cleaned_id: str | None = None
+    sync: SyncOut | None = None
+
+
 class DerivedFileOut(ResponseModel):
     """A file made from a case file (ADR-0021), with its edit-trail row: what it was made from (`parent_sha256`, and
     `parent_id` when made from another derived file), the operation and every setting, the tool, who asked and when."""

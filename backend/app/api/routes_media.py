@@ -4,7 +4,7 @@ segment, words, their times and how sure the machine was, and the parts with no 
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,13 +15,15 @@ from app.db.session import get_db
 from app.core.authorization import scope_for_request
 from app.models.derived import DerivedFile
 from app.models.domain import Document, DocumentMedia, TranscriptSegment
-from app.schemas.api import ClipCreate, PhotoCopyIn, VoiceName
+from app.schemas.api import CleanIn, ClipCreate, PhotoCopyIn, SyncIn, VoiceName
 from app.schemas.responses import (
     BackgroundJobOut,
     DerivedFileOut,
     ErrorOut,
     FacesOut,
     PhotoOut,
+    SoundOut,
+    SyncOut,
     TranscriptCompareRowOut,
     TranscriptOut,
     ValidationErrorOut,
@@ -122,13 +124,19 @@ def _made(fn: Any) -> Any:
 
 
 @router.post("/documents/{document_id}/derived/cleaned", response_model=DerivedFileOut, status_code=201, responses={
-    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ErrorOut, "description": "Not a recording that has been read"},
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "Not a recording that has been read, or steps that cannot be used"},
     503: {"model": ErrorOut, "description": "The native module is not installed on this computer"}})
-def make_cleaned_copy(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
-    """A 16 kHz mono copy with the hum taken out and light noise reduction, for listening only. The recording itself
-    is not changed; the copy is a new file with its edit-trail row."""
+def make_cleaned_copy(document_id: str, request: Request, body: CleanIn | None = None, db: Session = Depends(get_db)) -> Any:
+    """A 16 kHz mono copy for listening only: with no steps given, the hum taken out and light noise reduction; with
+    steps, those (hum, room noise, loudness), its loudness before and after kept in the trail. The recording itself is
+    not changed; the copy is a new file with its edit-trail row."""
+    from app.services import media_sound
+
     row = _recording(db, document_id)
-    return _made(lambda: media_derived.cleaned_copy(db, row, actor=scope_for_request(request).actor_id))
+    actor = scope_for_request(request).actor_id
+    if body is None:
+        return _made(lambda: media_derived.cleaned_copy(db, row, actor=actor))
+    return _made(lambda: media_sound.clean(db, row, hum=body.hum, noise=body.noise, loudness_target=body.loudness_target, actor=actor))
 
 
 @router.post("/documents/{document_id}/derived/clip", response_model=DerivedFileOut, status_code=201, responses={
@@ -263,3 +271,66 @@ def make_photo_copy(document_id: str, body: PhotoCopyIn, request: Request, db: S
         raise HTTPException(503, str(exc)) from exc
     except CaseGone as exc:
         raise HTTPException(404, str(exc)) from exc
+
+
+@router.get("/documents/{document_id}/sound", response_model=SoundOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ErrorOut}, 503: {"model": ErrorOut}})
+def get_sound(document_id: str, db: Session = Depends(get_db)) -> Any:
+    """Whether mains hum is in the recording and at which frequency, its loudness, and any accepted sync."""
+    from app.services import media_sound
+
+    row = _recording(db, document_id)
+    try:
+        return media_sound.sound_view(db, row)
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+
+
+@router.get("/documents/{document_id}/spectrogram.png", response_class=Response, responses={
+    200: {"content": {"image/png": {}}, "description": "A stretch of the recording as a spectrogram, 0 to 4 kHz"},
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}})
+def get_spectrogram(document_id: str, start: float = Query(0, ge=0), end: float = Query(60, gt=0), cleaned: bool = False,
+                    db: Session = Depends(get_db)) -> Response:
+    """A stretch (up to three minutes) of the original, or of the cleaned copy, drawn as a spectrogram (A/B)."""
+    from app.services import media_sound
+
+    row = _recording(db, document_id)
+    try:
+        return Response(media_sound.spectrogram_png(db, row, start, end, cleaned=cleaned), media_type="image/png",
+                        headers={"Cache-Control": "private, max-age=300", "X-Content-Type-Options": "nosniff"})
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@router.post("/documents/{document_id}/sync", response_model=SyncOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}, 503: {"model": ErrorOut}})
+def find_document_sync(document_id: str, body: SyncIn, db: Session = Depends(get_db)) -> Any:
+    """Where another recording of the same event lines up in this one, found by matching their sound. Nothing is kept
+    until a person accepts it."""
+    from app.services import media_sound
+
+    row, other = _recording(db, document_id), _recording(db, body.other_document_id)
+    try:
+        return media_sound.find_sync(db, row, other)
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+
+
+@router.post("/documents/{document_id}/sync/accept", response_model=SyncOut, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut}, 503: {"model": ErrorOut}})
+def accept_document_sync(document_id: str, body: SyncIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Accept the offset: it is found again here (not taken from the request) and kept beside the recording with who
+    accepted it and when."""
+    from app.services import media_sound
+
+    row, other = _recording(db, document_id), _recording(db, body.other_document_id)
+    try:
+        return media_sound.accept_sync(db, row, media_sound.find_sync(db, row, other), actor=scope_for_request(request).actor_id)
+    except media_derived.NotARecording as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except NativeUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc

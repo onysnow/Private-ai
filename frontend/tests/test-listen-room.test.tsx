@@ -203,8 +203,8 @@ describe('Listen & read', () => {
       'GET /api/derived-files/df-1/file': {status: 200, body: 'RIFF'}, 'GET /api/derived-files/df-2/file': {status: 200, body: 'RIFF'}});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('tab', {name: /Derived files · 1/}));
-    const tab = screen.getByRole('region', {name: 'Derived files'});
+    await user.click(await screen.findByRole('tab', {name: /Edit trail · 1/}));
+    const tab = screen.getByRole('region', {name: 'Edit trail'});
     expect(tab).toHaveTextContent('clip_3.3-5.8.wav');
     expect(tab).toHaveTextContent('made by you');
     await user.click(within(tab).getByRole('button', {name: 'Make a cleaned copy for listening'}));

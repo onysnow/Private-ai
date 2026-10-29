@@ -2092,6 +2092,17 @@ export const zClaimUpdate = z.object({
 });
 
 /**
+ * CleanIn
+ *
+ * The steps of a cleaned copy (Listen › Clean and cut): take out mains hum, reduce room noise, even out loudness.
+ */
+export const zCleanIn = z.object({
+  hum: z.boolean().optional().default(true),
+  loudness_target: z.number().gte(-30).lte(-10).nullish().default(-16),
+  noise: z.enum(['off', 'light', 'medium']).optional().default('medium'),
+});
+
+/**
  * ClipCreate
  *
  * A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`.
@@ -4905,6 +4916,15 @@ export const zCorpusSearchOut = z.object({
   results: z.array(zCorpusHitOut),
   state: z.enum(['ok', 'not_configured', 'no_collection', 'unreachable']),
   total: z.int(),
+});
+
+/**
+ * HumOut
+ */
+export const zHumOut = z.object({
+  above_db: z.number(),
+  harmonics: z.int(),
+  hz: z.int().nullish(),
 });
 
 /**
@@ -9271,6 +9291,44 @@ export const zSuiteCoverageOut = z.object({
 });
 
 /**
+ * SyncIn
+ *
+ * Another recording of the same event, to line up with this one by matching their sound.
+ */
+export const zSyncIn = z.object({
+  other_document_id: z.string().min(1).max(64),
+});
+
+/**
+ * SyncOut
+ *
+ * Where another recording lines up in this one: a positive offset means it started that many seconds later.
+ */
+export const zSyncOut = z.object({
+  accepted_at: z.string().nullish(),
+  accepted_by: z.string().nullish(),
+  confidence: z.number(),
+  distinct: z.number().nullish(),
+  offset_seconds: z.number().nullish(),
+  other_document_id: z.string(),
+  reliable: z.boolean(),
+});
+
+/**
+ * SoundOut
+ *
+ * A recording's sound: its length, any mains hum, its loudness, its latest cleaned copy, an accepted sync.
+ */
+export const zSoundOut = z.object({
+  cleaned_id: z.string().nullish(),
+  document_id: z.string(),
+  duration: z.number(),
+  hum: zHumOut,
+  loudness_lufs: z.number().nullish(),
+  sync: zSyncOut.nullish(),
+});
+
+/**
  * TableMappingIn
  *
  * A spreadsheet mapping: the ``entities`` of a FollowTheMoney mapping,
@@ -12258,6 +12316,11 @@ export const zListDerivedPath = z.object({
  */
 export const zListDerivedResponse = z.array(zDerivedFileOut);
 
+/**
+ * Body
+ */
+export const zMakeCleanedCopyBody = zCleanIn.nullable();
+
 export const zMakeCleanedCopyPath = z.object({
   document_id: z.string(),
 });
@@ -12389,6 +12452,47 @@ export const zGetSimilarDocumentsQuery = z.object({
  * Successful Response
  */
 export const zGetSimilarDocumentsResponse = zSimilarDocumentsOut;
+
+export const zGetSoundPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSoundResponse = zSoundOut;
+
+export const zGetSpectrogramPath = z.object({
+  document_id: z.string(),
+});
+
+export const zGetSpectrogramQuery = z.object({
+  start: z.number().gte(0).optional().default(0),
+  end: z.number().gt(0).optional().default(60),
+  cleaned: z.boolean().optional().default(false),
+});
+
+export const zFindDocumentSyncBody = zSyncIn;
+
+export const zFindDocumentSyncPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFindDocumentSyncResponse = zSyncOut;
+
+export const zAcceptDocumentSyncBody = zSyncIn;
+
+export const zAcceptDocumentSyncPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAcceptDocumentSyncResponse = zSyncOut;
 
 export const zGetDocumentTablePath = z.object({
   document_id: z.string(),
