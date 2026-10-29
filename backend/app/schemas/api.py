@@ -910,6 +910,13 @@ class LockReasonIn(BaseModel):
     reason: str | None = None   # idle | hide | sleep | button
 
 
+class VoiceName(BaseModel):
+    """A person names a voice of a recording, as a party of the case (`entity_id`) or in words (`name`); both empty
+    clears the name."""
+    name: str | None = Field(default=None, max_length=120)
+    entity_id: str | None = None
+
+
 class ClipCreate(BaseModel):
     """A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`."""
     start: float = Field(ge=0)

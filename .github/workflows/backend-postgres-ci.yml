@@ -86,6 +86,10 @@ jobs:
         # ADR-0020: the recording tests transcribe a short file with Whisper's smallest English model.
         run: TRANSCRIPTION_MODEL_DIR="$HOME/whisper-models" python -m app.services.transcription fetch tiny.en
 
+      - name: Fetch the voice models the tests use
+        # ADR-0026: the voices test tells the voices of a short file apart with the pinned models.
+        run: python -m app.services.voices fetch "$HOME/voice-models"
+
       - name: Verify Alembic migration chain has a single head
         # STRUCT-0006: the chain forked into two heads once already this
         # session (two independently-merged PRs, neither aware of the

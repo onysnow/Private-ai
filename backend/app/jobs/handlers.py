@@ -647,6 +647,14 @@ def capture_media_job(db: Session, job: BackgroundJob, report: Report) -> dict:
 
 
 FOLLOW_AUDIO = "follow_audio"
+FIND_VOICES = "find_voices"
+
+
+def find_voices_job(db: Session, job: BackgroundJob, report: Report) -> dict:
+    """Tell the voices of a transcribed recording apart (ADR-0026), on a person's request."""
+    from app.services.voices import find_in_document
+
+    return {"message": find_in_document(db, str(job.subject_id), report), "result": {"document_id": str(job.subject_id)}}
 
 
 def follow_audio_job(db: Session, job: BackgroundJob, report: Report) -> dict:
@@ -676,6 +684,7 @@ def follow_audio_job(db: Session, job: BackgroundJob, report: Report) -> dict:
 HANDLERS: dict[str, Handler] = {
     WEB_CAPTURE: web_capture_job,
     FOLLOW_AUDIO: follow_audio_job,
+    FIND_VOICES: find_voices_job,
     CAPTURE_MEDIA: capture_media_job,
     OUTSIDE_LOOKUP: outside_lookup_job,
     EXTRACT_DOCUMENT: extract_document_job,

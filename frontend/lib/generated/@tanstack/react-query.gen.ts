@@ -104,6 +104,7 @@ import {
   findExtractionLineageEndpoint,
   findingCandidates,
   findOpenalephChildren,
+  findVoices,
   followCapture,
   get1Mdb,
   getAiAnalysisCandidateEndpoint,
@@ -283,6 +284,7 @@ import {
   markStoryReady,
   me,
   nameStoryVersion,
+  nameVoice,
   newRecoveryKey,
   openalephIntegrationStatus,
   openCase,
@@ -671,6 +673,9 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenError,
   FindOpenalephChildrenResponse,
+  FindVoicesData,
+  FindVoicesError,
+  FindVoicesResponse,
   FollowCaptureData,
   FollowCaptureError,
   FollowCaptureResponse,
@@ -1207,6 +1212,9 @@ import type {
   NameStoryVersionData,
   NameStoryVersionError,
   NameStoryVersionResponse,
+  NameVoiceData,
+  NameVoiceError,
+  NameVoiceResponse,
   NewRecoveryKeyData,
   NewRecoveryKeyError,
   NewRecoveryKeyResponse,
@@ -4885,6 +4893,66 @@ export const getDocumentTranslationOptions = (
     },
     queryKey: getDocumentTranslationQueryKey(options),
   });
+
+/**
+ * Find Voices
+ *
+ * Tell the voices of a transcribed recording apart, on this computer (ADR-0026). Answers at once with the job.
+ * Names given earlier are cleared, and kept in the history.
+ */
+export const findVoicesMutation = (
+  options?: Partial<Options<FindVoicesData>>,
+): UseMutationOptions<
+  FindVoicesResponse,
+  FindVoicesError,
+  Options<FindVoicesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    FindVoicesResponse,
+    FindVoicesError,
+    Options<FindVoicesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await findVoices({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Name Voice
+ *
+ * Name this voice (a person only; the machine never names a voice), or clear its name. The earlier name is kept
+ * in the history. Never applied to another recording.
+ */
+export const nameVoiceMutation = (
+  options?: Partial<Options<NameVoiceData>>,
+): UseMutationOptions<
+  NameVoiceResponse,
+  NameVoiceError,
+  Options<NameVoiceData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    NameVoiceResponse,
+    NameVoiceError,
+    Options<NameVoiceData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await nameVoice({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const enrichmentSessionDetailQueryKey = (
   options: Options<EnrichmentSessionDetailData>,

@@ -297,6 +297,9 @@ import type {
   FindOpenalephChildrenData,
   FindOpenalephChildrenErrors,
   FindOpenalephChildrenResponses,
+  FindVoicesData,
+  FindVoicesErrors,
+  FindVoicesResponses,
   FollowCaptureData,
   FollowCaptureErrors,
   FollowCaptureResponses,
@@ -834,6 +837,9 @@ import type {
   NameStoryVersionData,
   NameStoryVersionErrors,
   NameStoryVersionResponses,
+  NameVoiceData,
+  NameVoiceErrors,
+  NameVoiceResponses,
   NewRecoveryKeyData,
   NewRecoveryKeyErrors,
   NewRecoveryKeyResponses,
@@ -1359,6 +1365,8 @@ import {
   zFindingCandidatesResponse,
   zFindOpenalephChildrenPath,
   zFindOpenalephChildrenResponse,
+  zFindVoicesPath,
+  zFindVoicesResponse,
   zFollowCaptureBody,
   zFollowCapturePath,
   zFollowCaptureResponse,
@@ -1748,6 +1756,9 @@ import {
   zNameStoryVersionBody,
   zNameStoryVersionPath,
   zNameStoryVersionResponse,
+  zNameVoiceBody,
+  zNameVoicePath,
+  zNameVoiceResponse,
   zNewRecoveryKeyBody,
   zNewRecoveryKeyResponse,
   zOpenalephIntegrationStatusResponse,
@@ -5404,6 +5415,66 @@ export const getDocumentTranslation = <ThrowOnError extends boolean = false>(
       await zGetDocumentTranslationResponse.parseAsync(data),
     url: '/api/documents/{document_id}/translation',
     ...options,
+  });
+
+/**
+ * Find Voices
+ *
+ * Tell the voices of a transcribed recording apart, on this computer (ADR-0026). Answers at once with the job.
+ * Names given earlier are cleared, and kept in the history.
+ */
+export const findVoices = <ThrowOnError extends boolean = false>(
+  options: Options<FindVoicesData, ThrowOnError>,
+): RequestResult<FindVoicesResponses, FindVoicesErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    FindVoicesResponses,
+    FindVoicesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zFindVoicesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zFindVoicesResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/voices',
+    ...options,
+  });
+
+/**
+ * Name Voice
+ *
+ * Name this voice (a person only; the machine never names a voice), or clear its name. The earlier name is kept
+ * in the history. Never applied to another recording.
+ */
+export const nameVoice = <ThrowOnError extends boolean = false>(
+  options: Options<NameVoiceData, ThrowOnError>,
+): RequestResult<NameVoiceResponses, NameVoiceErrors, ThrowOnError> =>
+  (options.client ?? client).patch<
+    NameVoiceResponses,
+    NameVoiceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zNameVoiceBody,
+          path: zNameVoicePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zNameVoiceResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/voices/{voice}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

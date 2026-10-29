@@ -41,6 +41,10 @@ c2pa-python==0.38.0
 # A capture's time proof (ADR-0025): RFC 3161 requests and tokens checked against the bundled roots, Trail of Bits'
 # rfc3161-client (Apache-2.0).
 rfc3161-client==1.0.9
+# Voices in a recording (ADR-0026): sherpa-onnx (Apache-2.0) with sherpa-onnx-core, its runtime; the two model files
+# are fetched once at setup (python -m app.services.voices fetch).
+sherpa-onnx==2.0.1
+sherpa-onnx-core==2.0.1
 av==17.0.0
 openaleph-client==1.1.4
 # Background job queue on PostgreSQL (ADR-0004). Its schema is vendored in

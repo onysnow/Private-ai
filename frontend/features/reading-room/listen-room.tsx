@@ -16,10 +16,11 @@ import type {KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEv
 
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
-import {compareTranscriptsOptions, getDocumentTranscriptOptions, listDerivedOptions, listDerivedQueryKey, listDocumentCandidatesEndpointOptions,
-  listDocumentCandidatesEndpointQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
-import {createEvidenceEndpoint, makeCleanedCopy, makeClip} from '../../lib/generated/sdk.gen';
-import type {DerivedFileOut, DocumentDetailOut, TranscriptCompareRowOut, TranscriptOut, TranscriptSegmentOut} from '../../lib/generated/types.gen';
+import {compareTranscriptsOptions, getDocumentTranscriptOptions, getDocumentTranscriptQueryKey, listDerivedOptions, listDerivedQueryKey,
+  listDocumentCandidatesEndpointOptions, listDocumentCandidatesEndpointQueryKey, listEntitiesOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {createEvidenceEndpoint, findVoices, makeCleanedCopy, makeClip, nameVoice} from '../../lib/generated/sdk.gen';
+import type {DerivedFileOut, DocumentDetailOut, TranscriptCompareRowOut, TranscriptOut, TranscriptSegmentOut, VoiceOut,
+  VoicesOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -66,6 +67,73 @@ export function partOf(segment: TranscriptSegmentOut, chosen: string, unsureBelo
   return whole();
 }
 
+/** A voice as the screen names it: the name a person gave it, else "Voice 2", a guess. */
+export function voiceLabel(voice: string | null | undefined, voices: VoiceOut[]): {text: string; named: boolean} | null {
+  if (!voice) return null;
+  const v = voices.find(x => x.voice === voice);
+  return v?.name ? {text: v.name, named: true} : {text: `Voice ${voice}`, named: false};
+}
+
+function VoiceTag({voice, voices}: {voice: string | null | undefined; voices: VoiceOut[]}): ReactElement {
+  const label = voiceLabel(voice, voices);
+  if (!label) return <span className="lr-sp"/>;
+  return <span className={`lr-sp lr-v${(Number(voice) - 1) % 6 + 1}`} title={label.named ? `${label.text}, named by a person` : 'A guess by the speaker model'}>
+    <i aria-hidden="true"/>{label.text}{label.named ? '' : ' ?'}</span>;
+}
+
+const spoken = (seconds: number) => seconds >= 60 ? `${Math.floor(seconds / 60)} min ${Math.round(seconds % 60)} s` : `${Math.round(seconds)} s`;
+
+/** Voices (INTAKE_4, ADR-0026): the voices the machine told apart in this recording, as guesses, and the names a
+ *  person gave them. Naming one as a party of the case links it; nothing is matched across recordings. */
+function Voices({doc, v, onChanged, onListening}: {doc: DocumentDetailOut; v: VoicesOut | null | undefined; onChanged: (words: string) => void;
+  onListening: () => void}): ReactElement {
+  const [naming, setNaming] = useState<string | null>(null);
+  const [typed, setTyped] = useState('');
+  const [busy, setBusy] = useState(false);
+  const parties = useQuery({...listEntitiesOptions({path: {investigation_id: doc.investigation_id}, query: {limit: 500}}), enabled: naming !== null}).data ?? [];
+  const voices = v?.voices ?? [];
+  const give = async (voice: string, words: string) => {
+    const party = parties.find(p => p.caption.toLowerCase() === words.trim().toLowerCase());
+    setBusy(true);
+    try {
+      await nameVoice({path: {document_id: doc.id, voice}, body: party ? {entity_id: party.id} : {name: words.trim() || null}, throwOnError: true});
+      onChanged(words.trim() ? `Voice ${voice} is now “${party?.caption ?? words.trim()}”${party ? ', a party of the case' : ''}. Named by you.` : `Voice ${voice}'s name was cleared; the old name is kept in its history.`);
+      setNaming(null); setTyped('');
+    } catch (error) { onChanged(errorMessage(error, 'Could not name the voice')); }
+    setBusy(false);
+  };
+  const listen = async () => {
+    setBusy(true);
+    try { await findVoices({path: {document_id: doc.id}, throwOnError: true}); onChanged('Listening for voices on this computer. They appear here when found.'); onListening(); }
+    catch (error) { onChanged(errorMessage(error, 'Could not listen for voices')); }
+    setBusy(false);
+  };
+  return <section className="lr-panel" aria-label="Voices">
+    <p className="lr-cap">Voices {v?.found_by && <span>told apart on this computer</span>}</p>
+    {voices.length ? <ul className="lr-voices">{voices.map(x => <li key={x.voice}>
+      <VoiceTag voice={x.voice} voices={voices}/>
+      <small>{x.name ? `named by ${by(x.named_by)}` : 'a guess'} · {x.turns} turn{x.turns === 1 ? '' : 's'} · {spoken(x.spoken)}</small>
+      {naming === x.voice ? <form className="lr-name" onSubmit={e => { e.preventDefault(); void give(x.voice, typed); }}>
+        <input autoFocus list={`lr-parties-${doc.id}`} value={typed} onChange={e => setTyped(e.target.value)} aria-label={`Name voice ${x.voice}`}
+          placeholder="A party of the case, or a name"/>
+        <datalist id={`lr-parties-${doc.id}`}>{parties.map(p => <option key={p.id} value={p.caption}/>)}</datalist>
+        <button type="submit" disabled={busy}>Name it</button><button type="button" onClick={() => setNaming(null)}>Cancel</button>
+      </form> : <span className="lr-acts">
+        <button type="button" onClick={() => { setNaming(x.voice); setTyped(x.name ?? ''); }}>{x.name ? 'Rename' : 'Name this voice'}</button>
+        {x.name && <button type="button" onClick={() => void give(x.voice, '')} disabled={busy}>Clear</button>}
+      </span>}
+    </li>)}</ul>
+    : v?.unavailable ? <p className="lr-note">Voices are not told apart yet: {v.unavailable}.</p>
+    : <div className="lr-acts"><button type="button" onClick={() => void listen()} disabled={busy || doc.extraction_status !== 'complete'}>Listen for voices</button></div>}
+    <p className="lr-note">Lanes are guesses by a speaker model, in this recording only. Names are yours; a voice is never matched to another recording.</p>
+    {voices.length > 0 && v?.found_by && <details className="lr-note"><summary>How they were found</summary>
+      {String(v.found_by.tool ?? '')} · {String(v.found_by.segmentation ?? '')} · {String(v.found_by.embedding ?? '')}
+      {(v.history ?? []).length > 0 && <ul>{(v.history ?? []).map((h, i) => <li key={i}>{String(h.at ?? '').slice(0, 16).replace('T', ' ')} · voice {String(h.voice)}: “{String(h.name ?? '')}” {String(h.what ?? '')}</li>)}</ul>}
+      <div className="lr-acts"><button type="button" onClick={() => void listen()} disabled={busy}>Listen again (names are cleared, kept in history)</button></div>
+    </details>}
+  </section>;
+}
+
 /** Where a quote sits in the recording, in the W3C Media Fragments form the evidence keeps. */
 export const placeOf = (p: {start: number; end: number}): string => `t=${p.start.toFixed(1)},${p.end.toFixed(1)}`;
 
@@ -108,7 +176,7 @@ function Outline({t, now, duration, pinned, onSeek}: {t: TranscriptOut; now: num
       {t.segments.filter(s => s.end > from && s.start < to).map(s => s.kind === 'no_speech'
         ? <rect key={s.id} className="lr-ns" x={x(s.start)} y={22} width={Math.max(1, x(s.end) - x(s.start))} height={92}/>
         : <g key={s.id}>
-          <rect className="lr-sp" x={x(s.start)} y={4} width={Math.max(1, x(s.end) - x(s.start) - 2)} height={8} rx={4}/>
+          <rect className={`lr-sp${s.speaker ? ` lr-v${(Number(s.speaker) - 1) % 6 + 1}` : ''}`} x={x(s.start)} y={4} width={Math.max(1, x(s.end) - x(s.start) - 2)} height={8} rx={4}/>
           {s.words.filter(w => w.p < t.unsure_below).map((w, i) => <circle key={i} className="lr-unsure" cx={x((w.s + w.e) / 2)} cy={17} r={2.5}/>)}
         </g>)}
       {pinned && <rect className="lr-pin" x={x(pinned.start)} y={22} width={Math.max(2, x(pinned.end) - x(pinned.start))} height={92}/>}
@@ -171,7 +239,11 @@ function Compare({rows, onSeek}: {rows: TranscriptCompareRowOut[]; onSeek: (s: n
 export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentDetailOut; caseName: string; decideHref: string; onClose: () => void}): ReactElement {
   const queryClient = useQueryClient();
   const openRealness = useWorkbenchStore(state => state.openRealness);
-  const transcript = useQuery({...getDocumentTranscriptOptions({path: {document_id: doc.id}}), enabled: doc.extraction_status === 'complete', retry: false});
+  // Asked to listen for voices: the transcript is fetched again until they come (two minutes at most).
+  const [listeningSince, setListeningSince] = useState<number | null>(null);
+  const transcript = useQuery({...getDocumentTranscriptOptions({path: {document_id: doc.id}}), enabled: doc.extraction_status === 'complete', retry: false,
+    refetchInterval: q => (listeningSince !== null && Date.now() - listeningSince < 120_000
+      && q.state.data?.voices?.found_by?.ran_at === undefined ? 2000 : false)});
   const t = transcript.data;
   // Names and claims found in the transcript wait in Decide, like any document's.
   const waiting = (useQuery({...listDocumentCandidatesEndpointOptions({path: {document_id: doc.id}})}).data ?? [])
@@ -212,6 +284,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
   const lines = useRef<HTMLDivElement>(null);
   const duration = t?.duration ?? player.current?.duration ?? 0;
   const segments = useMemo(() => t?.segments ?? [], [t]);
+  const voiceList = t?.voices?.voices ?? [];
   const current = segments.find(s => now >= s.start && now < s.end && s.kind === 'speech') ?? null;
   const findLower = find.trim().toLowerCase();
   const found = findLower.length > 1 ? segments.filter(s => s.kind === 'speech' && s.text.toLowerCase().includes(findLower)) : [];
@@ -260,10 +333,12 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
     setSaved(null);
     setStatus('');
   }, [t]);
+  const saidBy = pinned ? voiceLabel(segments.find(s => s.id === pinned.segmentId)?.speaker, voiceList) : null;
   const save = async () => {
     if (!pinned || !heard) return;
     try {
-      const ev = (await createEvidenceEndpoint({body: {source_id: doc.source_id, quote: pinned.text, locator: placeOf(pinned), heard: true}, throwOnError: true})).data;
+      const ev = (await createEvidenceEndpoint({body: {source_id: doc.source_id, quote: pinned.text, locator: placeOf(pinned), heard: true,
+        notes: saidBy ? `Said by ${saidBy.text} (${saidBy.named ? 'named by a person' : 'a guess by the speaker model'})` : undefined}, throwOnError: true})).data;
       setSaved(ev.id);
       setStatus('Saved as evidence, heard by you. Link it to a claim from Decide or the claim itself.');
       // The part is also kept as its own file, cut from the original: a copy to hand on, never the evidence itself.
@@ -361,10 +436,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
         </dl>
         {waiting > 0 && <p className="lr-note"><a href={decideHref}>{waiting} proposal{waiting === 1 ? '' : 's'} from this transcript</a> wait in Decide.</p>}
       </section>
-      <section className="lr-panel">
-        <p className="lr-cap">Voices</p>
-        <p className="lr-note">Speakers are not told apart yet: that needs a speaker model, a later step. When it comes, its lanes are guesses and the names are yours.</p>
-      </section>
+      <Voices doc={doc} v={t?.voices} onListening={() => setListeningSince(Date.now())} onChanged={words => { setStatus(words); void queryClient.invalidateQueries({queryKey: getDocumentTranscriptQueryKey({path: {document_id: doc.id}})}); }}/>
     </aside>
 
     <main className="lr-read" aria-label="Transcript">
@@ -433,7 +505,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
                 className={`lr-sg${current?.id === s.id ? ' now' : ''}${pinned?.segmentId === s.id ? ' pin' : ''}${found.includes(s) ? ' hit' : ''}`}
                 aria-current={current?.id === s.id ? 'true' : undefined}>
                 <button type="button" className="lr-tc" onClick={() => seek(s.start)} aria-label={`Play from ${clock(s.start)}`}>{clock(s.start)}</button>
-                <span className="lr-sp">{s.speaker ?? ''}</span>
+                <VoiceTag voice={s.speaker} voices={voiceList}/>
                 <span className="lr-tx"><Words segment={s} unsureBelow={t.unsure_below} now={now}/></span>
                 <button type="button" className="lr-pinbtn" onClick={() => pin(s)} aria-label={`Pin the line at ${clock(s.start)}`}>Pin</button>
               </div>)}
@@ -450,6 +522,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
           <dl className="lr-kv">
             <dt>Place</dt><dd><code>media:#{placeOf(pinned)}</code></dd>
             <dt>From</dt><dd>{doc.filename} · the original, as uploaded</dd>
+            {saidBy && <><dt>Said by</dt><dd>{saidBy.text} · {saidBy.named ? 'named by you' : 'a guess by the speaker model'}</dd></>}
           </dl>
           <ol className="lr-steps" aria-label="Before it is evidence">
             <li className="ok">1 Machine ✓</li>

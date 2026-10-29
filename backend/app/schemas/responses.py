@@ -5113,6 +5113,27 @@ class DerivedFileOut(ResponseModel):
     created_at: Timestamp
 
 
+class VoiceOut(ResponseModel):
+    """A voice the machine told apart in this recording (a guess), and the name a person gave it, if any."""
+    voice: str
+    spoken: float
+    turns: int
+    name: str | None = None
+    entity_id: str | None = None
+    named_by: str | None = None
+    named_at: str | None = None
+
+
+class VoicesOut(ResponseModel):
+    """Who spoke when (ADR-0026): the voices, their turns as [start, end, voice], how they were found, every earlier
+    name, and why there are none when there are none (`unavailable`)."""
+    voices: list[VoiceOut]
+    turns: list[list[float]]
+    found_by: dict[str, Any] | None = None
+    history: list[dict[str, Any]] = []
+    unavailable: str | None = None
+
+
 class TranscriptOut(ResponseModel):
     """A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
     (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
@@ -5129,6 +5150,7 @@ class TranscriptOut(ResponseModel):
     # From the episode's feed, when it came through Following: the publisher's own transcript, and its parts.
     publisher: PublisherTranscriptOut | None = None
     parts: list[TranscriptPartOut] = []
+    voices: VoicesOut | None = None
 
 
 # --- Web capture (app/services/web_capture.py, ADR-0018) ------------------------------------------------------------

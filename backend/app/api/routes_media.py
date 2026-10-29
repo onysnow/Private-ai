@@ -15,9 +15,17 @@ from app.db.session import get_db
 from app.core.authorization import scope_for_request
 from app.models.derived import DerivedFile
 from app.models.domain import Document, DocumentMedia, TranscriptSegment
-from app.schemas.api import ClipCreate
-from app.schemas.responses import DerivedFileOut, ErrorOut, TranscriptCompareRowOut, TranscriptOut, ValidationErrorOut
-from app.services import derived_files, media_derived, publisher_transcript
+from app.schemas.api import ClipCreate, VoiceName
+from app.schemas.responses import (
+    BackgroundJobOut,
+    DerivedFileOut,
+    ErrorOut,
+    TranscriptCompareRowOut,
+    TranscriptOut,
+    ValidationErrorOut,
+    VoicesOut,
+)
+from app.services import derived_files, media_derived, publisher_transcript, voices
 from app.services.derived_files import CaseGone
 from app.services.native import NativeUnavailable
 from app.services.security import resolve_storage_root
@@ -67,7 +75,7 @@ def get_document_transcript(document_id: str, db: Session = Depends(get_db)) -> 
         "publisher": publisher, "parts": parts,
         "document_id": row.id, "kind": media.kind, "duration": media.duration, "streams": media.streams,
         "outline": media.outline, "outline_step": media.outline_step, "transcript": media.transcript,
-        "unsure_below": UNSURE_BELOW,
+        "unsure_below": UNSURE_BELOW, "voices": voices.serialize(media),
         "segments": [{"id": s.id, "chunk_id": s.chunk_id, "ordinal": s.ordinal, "start": s.start, "end": s.end, "kind": s.kind,
                       "text": s.text, "words": s.words, "speaker": s.speaker} for s in segments],
     }
@@ -129,6 +137,52 @@ def make_clip(document_id: str, body: ClipCreate, request: Request, db: Session 
     row = _recording(db, document_id)
     return _made(lambda: media_derived.clip(db, row, body.start, body.end, actor=scope_for_request(request).actor_id,
                                             from_cleaned=body.from_cleaned))
+
+
+@router.post("/documents/{document_id}/voices", response_model=BackgroundJobOut, status_code=202, responses={
+    404: {"model": ErrorOut}, 415: {"model": ErrorOut},
+    409: {"model": ErrorOut, "description": "Not transcribed yet, or the voices are already being found"},
+    503: {"model": ErrorOut, "description": "The voice models are not on this computer"}})
+async def find_voices(document_id: str, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Tell the voices of a transcribed recording apart, on this computer (ADR-0026). Answers at once with the job.
+    Names given earlier are cleared, and kept in the history."""
+    from app.api.routes_documents import _submit_or_record_failure
+    from app.jobs.handlers import FIND_VOICES
+    from app.jobs.records import create_job, serialize_job
+    from app.jobs.runner import job_runner
+    from app.models.domain import BackgroundJob
+
+    row = _recording(db, document_id)
+    if db.get(DocumentMedia, row.id) is None:
+        raise HTTPException(409, "This recording has not been transcribed yet")
+    why = voices.available()
+    if why:
+        raise HTTPException(503, why)
+    running = db.scalar(select(BackgroundJob.id).where(BackgroundJob.kind == FIND_VOICES, BackgroundJob.subject_id == row.id,
+                                                       BackgroundJob.status.in_(("queued", "running"))))
+    if running:
+        raise HTTPException(409, "The voices of this recording are already being found")
+    job = create_job(db, kind=FIND_VOICES, investigation_id=row.investigation_id, subject_type="document", subject_id=row.id,
+                     runner=job_runner(request).mode, message="Waiting to listen for voices")
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    return serialize_job(db.get(BackgroundJob, job.id) or job)
+
+
+@router.patch("/documents/{document_id}/voices/{voice}", response_model=VoicesOut, responses={
+    404: {"model": ErrorOut, "description": "No such recording or voice"}, 415: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The party is not in this case"}})
+def name_voice(document_id: str, voice: str, body: VoiceName, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Name this voice (a person only; the machine never names a voice), or clear its name. The earlier name is kept
+    in the history. Never applied to another recording."""
+    row = _recording(db, document_id)
+    try:
+        voices.name(db, row.id, voice, name=body.name, entity_id=body.entity_id, actor=scope_for_request(request).actor_id)
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return voices.serialize(db.get(DocumentMedia, row.id))
 
 
 @router.get("/derived-files/{derived_file_id}/file", response_class=FileResponse, responses={

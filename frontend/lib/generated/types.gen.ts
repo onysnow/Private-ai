@@ -20961,6 +20961,7 @@ export type TranscriptOut = {
    * Unsure Below
    */
   unsure_below: number;
+  voices?: VoicesOut | null;
 };
 
 /**
@@ -21734,6 +21735,92 @@ export type VisualStyleOut = {
    * Preset
    */
   preset: string;
+};
+
+/**
+ * VoiceName
+ *
+ * A person names a voice of a recording, as a party of the case (`entity_id`) or in words (`name`); both empty
+ * clears the name.
+ */
+export type VoiceName = {
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+};
+
+/**
+ * VoiceOut
+ *
+ * A voice the machine told apart in this recording (a guess), and the name a person gave it, if any.
+ */
+export type VoiceOut = {
+  /**
+   * Entity Id
+   */
+  entity_id?: string | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+  /**
+   * Named At
+   */
+  named_at?: string | null;
+  /**
+   * Named By
+   */
+  named_by?: string | null;
+  /**
+   * Spoken
+   */
+  spoken: number;
+  /**
+   * Turns
+   */
+  turns: number;
+  /**
+   * Voice
+   */
+  voice: string;
+};
+
+/**
+ * VoicesOut
+ *
+ * Who spoke when (ADR-0026): the voices, their turns as [start, end, voice], how they were found, every earlier
+ * name, and why there are none when there are none (`unavailable`).
+ */
+export type VoicesOut = {
+  /**
+   * Found By
+   */
+  found_by?: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * History
+   */
+  history?: Array<{
+    [key: string]: unknown;
+  }>;
+  /**
+   * Turns
+   */
+  turns: Array<Array<number>>;
+  /**
+   * Unavailable
+   */
+  unavailable?: string | null;
+  /**
+   * Voices
+   */
+  voices: Array<VoiceOut>;
 };
 
 /**
@@ -26707,6 +26794,104 @@ export type GetDocumentTranslationResponses = {
 
 export type GetDocumentTranslationResponse =
   GetDocumentTranslationResponses[keyof GetDocumentTranslationResponses];
+
+export type FindVoicesData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/voices';
+};
+
+export type FindVoicesErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Not transcribed yet, or the voices are already being found
+   */
+  409: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The voice models are not on this computer
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type FindVoicesError = FindVoicesErrors[keyof FindVoicesErrors];
+
+export type FindVoicesResponses = {
+  /**
+   * Successful Response
+   */
+  202: BackgroundJobOut;
+};
+
+export type FindVoicesResponse = FindVoicesResponses[keyof FindVoicesResponses];
+
+export type NameVoiceData = {
+  body: VoiceName;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+    /**
+     * Voice
+     */
+    voice: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/voices/{voice}';
+};
+
+export type NameVoiceErrors = {
+  /**
+   * No such recording or voice
+   */
+  404: ErrorOut;
+  /**
+   * Unsupported Media Type
+   */
+  415: ErrorOut;
+  /**
+   * Response 422 Name Voice
+   *
+   * The party is not in this case
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type NameVoiceError = NameVoiceErrors[keyof NameVoiceErrors];
+
+export type NameVoiceResponses = {
+  /**
+   * Successful Response
+   */
+  200: VoicesOut;
+};
+
+export type NameVoiceResponse = NameVoiceResponses[keyof NameVoiceResponses];
 
 export type EnrichmentSessionDetailData = {
   body?: never;

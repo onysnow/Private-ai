@@ -129,6 +129,40 @@ describe('Listen & read', () => {
     expect(files).toHaveTextContent('Quotes play from the original.');
   });
 
+  it('shows the voices as guesses, names one as a party of the case, and says who said a pinned quote', async () => {
+    const voiced = {...TRANSCRIPT, segments: TRANSCRIPT.segments.map(x => ({...x, speaker: x.kind === 'speech' ? (x.id === 's2' ? '2' : '1') : null})),
+      voices: {voices: [{voice: '1', spoken: 5.8, turns: 2, name: 'Host', entity_id: null, named_by: 'local-owner', named_at: '2026-10-29T10:00:00'},
+        {voice: '2', spoken: 2.5, turns: 1, name: null, entity_id: null, named_by: null, named_at: null}],
+      turns: [[0, 2.9, 1], [3.2, 5.9, 2]], found_by: {tool: 'sherpa-onnx 2.0.1', segmentation: 'pyannote segmentation-3.0 (MIT)',
+        embedding: '3D-Speaker CAM++ VoxCeleb 16k (Apache-2.0)', where: 'this computer', ran_at: '2026-10-29T09:59:00'}, history: [], unavailable: null}};
+    const api = mockApi({...ROUTES, 'GET /api/documents/d1/transcript': voiced,
+      'GET /api/investigations/inv-1/entities': [{id: 'e-holt', ftm_id: 'ftm-holt', caption: 'Maren Holt', schema: 'Person', investigation_id: 'inv-1', properties: {}, created_at: '2026-10-29T09:00:00'}],
+      'PATCH /api/documents/d1/voices/2': voiced.voices});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    const panel = await screen.findByRole('region', {name: 'Voices'});
+    expect(await within(panel).findByText('Host')).toBeInTheDocument();
+    expect(panel).toHaveTextContent('named by you · 2 turns · 6 s');
+    expect(within(panel).getByText('Voice 2 ?')).toBeInTheDocument();
+    expect(panel).toHaveTextContent('a voice is never matched to another recording');
+    // Each line says its voice in words; the machine's guess carries a "?".
+    const lines = screen.getByRole('main', {name: 'Transcript'});
+    expect(within(lines).getAllByText('Host')).toHaveLength(2);
+    expect(within(lines).getByText('Voice 2 ?')).toHaveAttribute('title', 'A guess by the speaker model');
+
+    await user.click(within(panel).getByRole('button', {name: 'Name this voice'}));
+    const box = within(panel).getByRole('combobox', {name: 'Name voice 2'});
+    await waitFor(() => expect(panel.querySelector('datalist option[value="Maren Holt"]')).not.toBeNull());
+    await user.type(box, 'Maren Holt');
+    await user.click(within(panel).getByRole('button', {name: 'Name it'}));
+    await waitFor(() => expect(api.calls('PATCH /api/documents/d1/voices/2')).toHaveLength(1));
+    expect(api.calls('PATCH /api/documents/d1/voices/2')[0].body).toEqual({entity_id: 'e-holt'});
+
+    await user.click(screen.getByRole('button', {name: 'Pin the line at 0:03.3'}));
+    const quote = screen.getByRole('region', {name: 'Pinned quote'});
+    expect(quote).toHaveTextContent('Said byVoice 2 · a guess by the speaker model');
+  });
+
   it('shows the parts from the feed and compares the publisher\'s transcript with ours', async () => {
     const withFeed = {...TRANSCRIPT, parts: [{start: 0, title: 'Welcome'}, {start: 3.3, title: 'The board meeting'}],
       publisher: {url: 'https://fernhillnotes.example/ep41.vtt', type: 'text/vtt', sha256: 'a'.repeat(64), bytes: 120, fetched_at: '2026-10-28T10:20:00', error: null,

@@ -89,6 +89,8 @@ class Settings(BaseSettings):
     transcription_model: str = "small"
     transcription_model_dir: str = "./data/models"
     transcription_language: str = ""
+    # Where the voice models are kept (ADR-0026; python -m app.services.voices fetch).
+    voices_model_dir: str = "./data/models/voices"
     enable_pdf_ocr: bool = True
     pdf_ocr_language: str = "eng"
     pdf_ocr_dpi: int = 200

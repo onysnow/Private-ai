@@ -9504,27 +9504,6 @@ export const zTranscriptSegmentOut = z.object({
 });
 
 /**
- * TranscriptOut
- *
- * A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
- * (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
- * the machine was unsure of.
- */
-export const zTranscriptOut = z.object({
-  document_id: z.string(),
-  duration: z.number(),
-  kind: z.enum(['audio', 'video']),
-  outline: z.array(z.number()),
-  outline_step: z.number(),
-  parts: z.array(zTranscriptPartOut).optional().default([]),
-  publisher: zPublisherTranscriptOut.nullish(),
-  segments: z.array(zTranscriptSegmentOut),
-  streams: z.array(z.record(z.string(), z.unknown())),
-  transcript: z.record(z.string(), z.unknown()),
-  unsure_below: z.number(),
-});
-
-/**
  * TranslationPartOut
  *
  * One page (or the whole document) in OpenAleph's original text and its machine translation.
@@ -10105,6 +10084,68 @@ export const zDeckOut = z.object({
  */
 export const zDecksOut = z.object({
   decks: z.array(zDeckOut),
+});
+
+/**
+ * VoiceName
+ *
+ * A person names a voice of a recording, as a party of the case (`entity_id`) or in words (`name`); both empty
+ * clears the name.
+ */
+export const zVoiceName = z.object({
+  entity_id: z.string().nullish(),
+  name: z.string().max(120).nullish(),
+});
+
+/**
+ * VoiceOut
+ *
+ * A voice the machine told apart in this recording (a guess), and the name a person gave it, if any.
+ */
+export const zVoiceOut = z.object({
+  entity_id: z.string().nullish(),
+  name: z.string().nullish(),
+  named_at: z.string().nullish(),
+  named_by: z.string().nullish(),
+  spoken: z.number(),
+  turns: z.int(),
+  voice: z.string(),
+});
+
+/**
+ * VoicesOut
+ *
+ * Who spoke when (ADR-0026): the voices, their turns as [start, end, voice], how they were found, every earlier
+ * name, and why there are none when there are none (`unavailable`).
+ */
+export const zVoicesOut = z.object({
+  found_by: z.record(z.string(), z.unknown()).nullish(),
+  history: z.array(z.record(z.string(), z.unknown())).optional().default([]),
+  turns: z.array(z.array(z.number())),
+  unavailable: z.string().nullish(),
+  voices: z.array(zVoiceOut),
+});
+
+/**
+ * TranscriptOut
+ *
+ * A recording's transcript, made on this computer: what the file is, an outline of its loudness for the player
+ * (one peak per `outline_step` seconds), how it was transcribed, and each segment. A word under `unsure_below` is one
+ * the machine was unsure of.
+ */
+export const zTranscriptOut = z.object({
+  document_id: z.string(),
+  duration: z.number(),
+  kind: z.enum(['audio', 'video']),
+  outline: z.array(z.number()),
+  outline_step: z.number(),
+  parts: z.array(zTranscriptPartOut).optional().default([]),
+  publisher: zPublisherTranscriptOut.nullish(),
+  segments: z.array(zTranscriptSegmentOut),
+  streams: z.array(z.record(z.string(), z.unknown())),
+  transcript: z.record(z.string(), z.unknown()),
+  unsure_below: z.number(),
+  voices: zVoicesOut.nullish(),
 });
 
 /**
@@ -11770,6 +11811,27 @@ export const zGetDocumentTranslationPath = z.object({
  * Successful Response
  */
 export const zGetDocumentTranslationResponse = zDocumentTranslationOut;
+
+export const zFindVoicesPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zFindVoicesResponse = zBackgroundJobOut;
+
+export const zNameVoiceBody = zVoiceName;
+
+export const zNameVoicePath = z.object({
+  document_id: z.string(),
+  voice: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zNameVoiceResponse = zVoicesOut;
 
 export const zEnrichmentSessionDetailPath = z.object({
   session_id: z.string(),
