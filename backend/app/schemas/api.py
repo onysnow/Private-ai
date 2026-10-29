@@ -952,6 +952,17 @@ class MonitorCreate(BaseModel):
     route: Literal["direct", "tor"] = "direct"
 
 
+class MailboxCreate(BaseModel):
+    """A newsletter mailbox to follow (DECISIONS_LOG 11): a dedicated mailbox read over IMAP with TLS, and the one sender
+    (an address, or @domain for everything from it) whose messages are queued."""
+    host: str = Field(min_length=3, max_length=253)
+    port: int = Field(default=993, ge=1, le=65535)
+    user: str = Field(min_length=1, max_length=320)
+    password: str = Field(min_length=1, max_length=1000)
+    sender: str = Field(min_length=3, max_length=320)
+    every_minutes: int = 60
+
+
 class MonitorUpdate(BaseModel):
     every_minutes: Literal[15, 30, 60, 1440, 10080] | None = None
     route: Literal["direct", "tor"] | None = None

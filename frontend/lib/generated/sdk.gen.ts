@@ -183,6 +183,9 @@ import type {
   CreateLeadFromRelationshipContextData,
   CreateLeadFromRelationshipContextErrors,
   CreateLeadFromRelationshipContextResponses,
+  CreateMailboxMonitorData,
+  CreateMailboxMonitorErrors,
+  CreateMailboxMonitorResponses,
   CreateMonitorData,
   CreateMonitorErrors,
   CreateMonitorResponses,
@@ -1377,6 +1380,9 @@ import {
   zCreateLeadEndpointResponse,
   zCreateLeadFromRelationshipContextPath,
   zCreateLeadFromRelationshipContextResponse,
+  zCreateMailboxMonitorBody,
+  zCreateMailboxMonitorPath,
+  zCreateMailboxMonitorResponse,
   zCreateMonitorBody,
   zCreateMonitorPath,
   zCreateMonitorResponse,
@@ -9512,6 +9518,42 @@ export const createMonitor = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zCreateMonitorResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/monitors',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Create Mailbox Monitor
+ *
+ * Follow one sender's newsletters in a dedicated mailbox, read over IMAP with TLS and never marked read. The
+ * password is kept in its own file on this computer, not in the case or a backup.
+ */
+export const createMailboxMonitor = <ThrowOnError extends boolean = false>(
+  options: Options<CreateMailboxMonitorData, ThrowOnError>,
+): RequestResult<
+  CreateMailboxMonitorResponses,
+  CreateMailboxMonitorErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CreateMailboxMonitorResponses,
+    CreateMailboxMonitorErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zCreateMailboxMonitorBody,
+          path: zCreateMailboxMonitorPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zCreateMailboxMonitorResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/monitors/mailbox',
     ...options,
     headers: {
       'Content-Type': 'application/json',

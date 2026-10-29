@@ -43,7 +43,7 @@ from app.models.following import Monitor, MonitorItem, PageVersion
 
 logger = logging.getLogger("journalism.following")
 
-KINDS = ("feed", "sitemap", "page", "podcast", "account", "closed")
+KINDS = ("feed", "sitemap", "page", "podcast", "account", "closed", "mailbox")
 EVERY_MINUTES = (15, 30, 60, 1440, 10080)
 ROUTES = ("direct", "tor")
 USER_AGENT = "JournalismWorkbench/1.0 (following open sources; honours robots.txt)"
@@ -700,6 +700,10 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
     now = now or utcnow_naive()
     if monitor.kind == "closed" or monitor.health in ("paused", "moved"):
         return monitor
+    if monitor.kind == "mailbox":
+        from app.services import mailbox
+
+        return mailbox.check(db, monitor, now=now)
     monitor.last_checked_at = now
     if not robots_allow(db, monitor, monitor.url):
         monitor.health, monitor.health_detail = "broken", "robots.txt asks robots not to fetch this address: not followed"
@@ -966,6 +970,9 @@ def leaves(monitor: Monitor) -> str:
         return "Paused. Nothing is asked until you accept the new address. A moved source is never followed by itself."
     route = " through Tor: the site sees a Tor exit, not this computer" if monitor.route == "tor" else \
         ". The site sees a visit from this computer's address"
+    if monitor.kind == "mailbox":
+        return (f"One sign-in {how} to your mail server {host} over TLS, asking only for new mail from this sender. "
+                "Nothing is marked read; images in the mail are never loaded, so the sender learns nothing.")
     if monitor.platform == "bluesky":
         return (f"One request {how} to {host}, Bluesky's public read-only server, naming this handle. That server "
                 f"learns you read this account{'; through Tor' if monitor.route == 'tor' else ''}.")
@@ -1042,8 +1049,11 @@ def record_removal(db: Session, item: MonitorItem, actor: str | None) -> Monitor
 
 
 def capture_target(db: Session, item: MonitorItem) -> tuple[str, str]:
-    """("page", address) to capture as a web page, or ("audio", file address) for a podcast episode."""
+    """("page", address) to capture as a web page, ("audio", file address) for a podcast episode, or ("email", kept
+    file) for a newsletter from a mailbox."""
     monitor = db.get(Monitor, item.monitor_id)
+    if monitor is not None and monitor.kind == "mailbox":
+        return "email", str((item.extra or {}).get("eml") or "")
     audio = (item.extra or {}).get("audio") or {}
     if monitor is not None and monitor.kind == "podcast" and audio.get("url"):
         return "audio", str(audio["url"])

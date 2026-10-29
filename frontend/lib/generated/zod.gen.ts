@@ -5605,6 +5605,21 @@ export const zLookupSourceOut = z.object({
 });
 
 /**
+ * MailboxCreate
+ *
+ * A newsletter mailbox to follow (DECISIONS_LOG 11): a dedicated mailbox read over IMAP with TLS, and the one sender
+ * (an address, or @domain for everything from it) whose messages are queued.
+ */
+export const zMailboxCreate = z.object({
+  every_minutes: z.int().optional().default(60),
+  host: z.string().min(3).max(253),
+  password: z.string().min(1).max(1000),
+  port: z.int().gte(1).lte(65535).optional().default(993),
+  sender: z.string().min(3).max(320),
+  user: z.string().min(1).max(320),
+});
+
+/**
  * MappedEntityOut
  *
  * One entity or link a previewed row makes; a link names its two ends.
@@ -5968,7 +5983,15 @@ export const zMonitorOut = z.object({
   health: z.enum(['works', 'broken', 'moved', 'paused', 'unchecked', 'closed']),
   health_detail: z.string().nullish(),
   id: z.string(),
-  kind: z.enum(['feed', 'sitemap', 'page', 'podcast', 'account', 'closed']),
+  kind: z.enum([
+    'feed',
+    'sitemap',
+    'page',
+    'podcast',
+    'account',
+    'closed',
+    'mailbox',
+  ]),
   last_checked_at: z
     .string()
     .regex(
@@ -14143,6 +14166,17 @@ export const zCreateMonitorPath = z.object({
  * Successful Response
  */
 export const zCreateMonitorResponse = zMonitorOut;
+
+export const zCreateMailboxMonitorBody = zMailboxCreate;
+
+export const zCreateMailboxMonitorPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateMailboxMonitorResponse = zMonitorOut;
 
 export const zGetNotesPath = z.object({
   investigation_id: z.string(),

@@ -28237,6 +28237,55 @@
         "title": "LookupSourceOut",
         "type": "object"
       },
+      "MailboxCreate": {
+        "description": "A newsletter mailbox to follow (DECISIONS_LOG 11): a dedicated mailbox read over IMAP with TLS, and the one sender\n(an address, or @domain for everything from it) whose messages are queued.",
+        "properties": {
+          "every_minutes": {
+            "default": 60,
+            "title": "Every Minutes",
+            "type": "integer"
+          },
+          "host": {
+            "maxLength": 253,
+            "minLength": 3,
+            "title": "Host",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          },
+          "port": {
+            "default": 993,
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "type": "integer"
+          },
+          "sender": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Sender",
+            "type": "string"
+          },
+          "user": {
+            "maxLength": 320,
+            "minLength": 1,
+            "title": "User",
+            "type": "string"
+          }
+        },
+        "required": [
+          "host",
+          "user",
+          "password",
+          "sender"
+        ],
+        "title": "MailboxCreate",
+        "type": "object"
+      },
       "MappedEntityIn": {
         "additionalProperties": false,
         "properties": {
@@ -29410,7 +29459,8 @@
               "page",
               "podcast",
               "account",
-              "closed"
+              "closed",
+              "mailbox"
             ],
             "title": "Kind",
             "type": "string"
@@ -68261,6 +68311,84 @@
           }
         },
         "summary": "Create Monitor"
+      }
+    },
+    "/api/investigations/{investigation_id}/monitors/mailbox": {
+      "post": {
+        "description": "Follow one sender's newsletters in a dedicated mailbox, read over IMAP with TLS and never marked read. The\npassword is kept in its own file on this computer, not in the case or a backup.",
+        "operationId": "create_mailbox_monitor",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MailboxCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitorOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No such investigation"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Create Mailbox Monitor"
+                }
+              }
+            },
+            "description": "The mailbox or sender cannot be followed (the message says why)"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Create Mailbox Monitor"
       }
     },
     "/api/investigations/{investigation_id}/notes": {

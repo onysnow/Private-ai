@@ -66,6 +66,7 @@ import {
   createInvestigation,
   createLeadEndpoint,
   createLeadFromRelationshipContext,
+  createMailboxMonitor,
   createMonitor,
   createReportingTaskEndpoint,
   createSourceEndpoint,
@@ -591,6 +592,9 @@ import type {
   CreateLeadFromRelationshipContextData,
   CreateLeadFromRelationshipContextError,
   CreateLeadFromRelationshipContextResponse,
+  CreateMailboxMonitorData,
+  CreateMailboxMonitorError,
+  CreateMailboxMonitorResponse,
   CreateMonitorData,
   CreateMonitorError,
   CreateMonitorResponse,
@@ -9367,6 +9371,36 @@ export const createMonitorMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Create Mailbox Monitor
+ *
+ * Follow one sender's newsletters in a dedicated mailbox, read over IMAP with TLS and never marked read. The
+ * password is kept in its own file on this computer, not in the case or a backup.
+ */
+export const createMailboxMonitorMutation = (
+  options?: Partial<Options<CreateMailboxMonitorData>>,
+): UseMutationOptions<
+  CreateMailboxMonitorResponse,
+  CreateMailboxMonitorError,
+  Options<CreateMailboxMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateMailboxMonitorResponse,
+    CreateMailboxMonitorError,
+    Options<CreateMailboxMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createMailboxMonitor({
         ...options,
         ...fnOptions,
         throwOnError: true,

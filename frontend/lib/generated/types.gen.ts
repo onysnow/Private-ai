@@ -13808,6 +13808,39 @@ export type LookupSourceOut = {
 };
 
 /**
+ * MailboxCreate
+ *
+ * A newsletter mailbox to follow (DECISIONS_LOG 11): a dedicated mailbox read over IMAP with TLS, and the one sender
+ * (an address, or @domain for everything from it) whose messages are queued.
+ */
+export type MailboxCreate = {
+  /**
+   * Every Minutes
+   */
+  every_minutes?: number;
+  /**
+   * Host
+   */
+  host: string;
+  /**
+   * Password
+   */
+  password: string;
+  /**
+   * Port
+   */
+  port?: number;
+  /**
+   * Sender
+   */
+  sender: string;
+  /**
+   * User
+   */
+  user: string;
+};
+
+/**
  * MappedEntityIn
  */
 export type MappedEntityIn = {
@@ -14527,7 +14560,8 @@ export type MonitorOut = {
   /**
    * Kind
    */
-  kind: 'feed' | 'sitemap' | 'page' | 'podcast' | 'account' | 'closed';
+  kind:
+    'feed' | 'sitemap' | 'page' | 'podcast' | 'account' | 'closed' | 'mailbox';
   /**
    * Last Checked At
    */
@@ -33774,6 +33808,48 @@ export type CreateMonitorResponses = {
 
 export type CreateMonitorResponse =
   CreateMonitorResponses[keyof CreateMonitorResponses];
+
+export type CreateMailboxMonitorData = {
+  body: MailboxCreate;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/monitors/mailbox';
+};
+
+export type CreateMailboxMonitorErrors = {
+  /**
+   * No such investigation
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Create Mailbox Monitor
+   *
+   * The mailbox or sender cannot be followed (the message says why)
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type CreateMailboxMonitorError =
+  CreateMailboxMonitorErrors[keyof CreateMailboxMonitorErrors];
+
+export type CreateMailboxMonitorResponses = {
+  /**
+   * Successful Response
+   */
+  200: MonitorOut;
+};
+
+export type CreateMailboxMonitorResponse =
+  CreateMailboxMonitorResponses[keyof CreateMailboxMonitorResponses];
 
 export type GetNotesData = {
   body?: never;

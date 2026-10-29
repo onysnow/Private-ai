@@ -11,11 +11,11 @@ from app.api.routes_documents import _submit_or_record_failure
 from app.core.authorization import scope_for_request
 from app.core.time import utcnow_naive
 from app.db.session import get_db
-from app.jobs.handlers import FOLLOW_AUDIO, WEB_CAPTURE
+from app.jobs.handlers import EXTRACT_DOCUMENT, FOLLOW_AUDIO, WEB_CAPTURE
 from app.jobs.records import create_job
 from app.jobs.runner import job_runner
 from app.models.following import Monitor, MonitorItem
-from app.schemas.api import CaptureAllRequest, MonitorCreate, MonitorUpdate, PlatformChecksUpdate
+from app.schemas.api import CaptureAllRequest, MailboxCreate, MonitorCreate, MonitorUpdate, PlatformChecksUpdate
 from app.schemas.responses import (
     BackgroundJobOut,
     ErrorOut,
@@ -76,6 +76,25 @@ def create_monitor(investigation_id: str, body: MonitorCreate, request: Request,
     return following.serialize_monitor(row)
 
 
+@router.post("/investigations/{investigation_id}/monitors/mailbox", response_model=MonitorOut, responses={
+    404: {"model": ErrorOut, "description": "No such investigation"},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "The mailbox or sender cannot be followed (the message says why)"},
+})
+def create_mailbox_monitor(investigation_id: str, body: MailboxCreate, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Follow one sender's newsletters in a dedicated mailbox, read over IMAP with TLS and never marked read. The
+    password is kept in its own file on this computer, not in the case or a backup."""
+    from app.services import mailbox
+
+    try:
+        row = mailbox.follow(db, investigation_id, host=body.host, user=body.user, password=body.password, sender=body.sender,
+                             port=body.port, every_minutes=body.every_minutes, actor=_actor(request))
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except mailbox.MailboxRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return following.serialize_monitor(row)
+
+
 @router.patch("/monitors/{monitor_id}", response_model=MonitorOut, responses={404: {"model": ErrorOut},
                                                                          409: {"model": ErrorOut}})
 def update_monitor(monitor_id: str, body: MonitorUpdate, db: Session = Depends(get_db)) -> Any:
@@ -108,6 +127,10 @@ def delete_monitor(monitor_id: str, db: Session = Depends(get_db)) -> None:
     from app.models.following import PageVersion
 
     row = _monitor(db, monitor_id)
+    if row.kind == "mailbox":
+        from app.services import mailbox
+
+        mailbox.forget(db, row)
     db.query(MonitorItem).filter(MonitorItem.monitor_id == row.id).delete()
     db.query(PageVersion).filter(PageVersion.monitor_id == row.id).delete()
     db.delete(row)
@@ -131,7 +154,17 @@ def get_versions(monitor_id: str, db: Session = Depends(get_db)) -> Any:
 async def _capture(db: Session, request: Request, item: MonitorItem, *, reason: str | None = None) -> None:
     kind, url = following.capture_target(db, item)
     actor = _actor(request)
-    if kind == "audio":
+    if kind == "email":
+        from app.services import mailbox
+
+        try:
+            document_id = mailbox.capture(db, item, actor)
+        except mailbox.MailboxRefused as exc:
+            raise following.FollowRefused(str(exc)) from exc
+        following.mark_captured(db, item, actor, reason=reason)
+        job = create_job(db, kind=EXTRACT_DOCUMENT, investigation_id=item.investigation_id, subject_type="document",
+                         subject_id=document_id, runner=job_runner(request).mode, message="Waiting to read the newsletter")
+    elif kind == "audio":
         job = create_job(db, kind=FOLLOW_AUDIO, investigation_id=item.investigation_id, subject_type="monitor_item",
                          subject_id=item.id, runner=job_runner(request).mode, message="Waiting to fetch the episode",
                          payload={"actor": actor})

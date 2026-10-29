@@ -149,3 +149,4 @@
 .fl-works { grid-column: 1 / -1; min-width: 0; }
 .fl-atrest { font-size: 12px; margin: 2px 0 8px; }
 .fl-atrest.warn::before { content: "▲ "; color: var(--status-provisional, var(--accent-1)); }
+.fl-mail { display: flex; flex-direction: column; gap: 3px; }

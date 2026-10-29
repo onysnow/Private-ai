@@ -199,3 +199,21 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   encrypted, and whether backups are.
 - **Why:** the protection the research asks for exists (disk encryption, sealed backups); a second key on one table
   would add a way for the watcher to stop silently and protect nothing the disk does not.
+
+## 11. Newsletters through a mailbox (29 Oct)
+
+- **Question:** the source intake research puts newsletters "via a dedicated mailbox into the `.eml` path"; ADR-0022
+  left it unbuilt.
+- **Calls:**
+  1. A mailbox is followed one sender at a time (an address, or @domain for everything from it): each is its own
+     source in Following, with its own queue, so a case follows what it needs and not the whole mailbox.
+  2. IMAP over TLS only (port 993, the system's certificate checks), with Python's own `imaplib`: no new package.
+     Messages are fetched with `BODY.PEEK[]`, so nothing is marked read, and the mailbox is opened read-only.
+  3. The password is kept in its own file beside the connector keys (owner-only), never in the database or a backup,
+     and removed when the mailbox is unfollowed. An app password is suggested where the provider offers one.
+  4. A new message is kept as it came (.eml) outside the case until a person captures it; then it becomes a document
+     and goes through the ordinary email reader, which reads text and never loads remote images. Unfollowing deletes
+     the kept messages nobody captured.
+  5. No Tor route for mail: the reporter's mail server already knows the account; the form asks for a mailbox kept for
+     newsletters, never their own.
+  6. Each check is a line in the outbound log, saying the server and the sender asked about.

@@ -6471,7 +6471,7 @@ class MonitorOut(ResponseModel):
     closed (a closed platform: no monitor). `health`: works, broken, moved (paused until a person accepts `moved_to`),
     paused, unchecked or closed. `leaves` says in words what each check sends and where."""
     id: str
-    kind: Literal["feed", "sitemap", "page", "podcast", "account", "closed"]
+    kind: Literal["feed", "sitemap", "page", "podcast", "account", "closed", "mailbox"]
     platform: str | None = None
     url: str
     name: str

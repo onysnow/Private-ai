@@ -123,4 +123,23 @@ describe('Following', () => {
     expect(within(chosen).getByText(/The app does not sign in to any account/)).toBeInTheDocument();
     expect(within(chosen).getByRole('link', {name: 'Paste a link'})).toBeInTheDocument();
   });
+
+  it('follows one sender in a newsletter mailbox, its password sent once and never shown', async () => {
+    const api = mockApi({'GET /api/investigations/inv-1/following': screenData(), 'GET /api/monitors/m1/versions': [],
+      'POST /api/investigations/inv-1/monitors/mailbox': monitor({id: 'm3', kind: 'mailbox', platform: 'email', name: 'Newsletters from news@harbourwatch.example.org'})});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', {name: '+ Follow something'}));
+    await user.click(screen.getByRole('radio', {name: 'A newsletter mailbox'}));
+    expect(screen.getByRole('button', {name: 'Follow'})).toBeDisabled();
+    expect(screen.getByText(/never loads the images in it/)).toBeInTheDocument();
+    await user.type(screen.getByLabelText('Mail server'), 'imap.example.net');
+    await user.type(screen.getByLabelText('User name'), 'desk@example.net');
+    await user.type(screen.getByLabelText(/^Password/), 'right horse');
+    expect(screen.getByLabelText(/^Password/)).toHaveAttribute('type', 'password');
+    await user.type(screen.getByLabelText('The sender to follow'), 'news@harbourwatch.example.org');
+    await user.click(screen.getByRole('button', {name: 'Follow'}));
+    await waitFor(() => expect(api.lastBody('POST /api/investigations/inv-1/monitors/mailbox')).toEqual(
+      {host: 'imap.example.net', user: 'desk@example.net', password: 'right horse', sender: 'news@harbourwatch.example.org'}));
+  });
 });

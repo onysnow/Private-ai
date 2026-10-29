@@ -16,12 +16,12 @@ import {errorMessage} from '../../lib/api-client';
 import {useLockStore} from '../../lib/app-lock';
 import {caseHref} from '../../lib/case-href';
 import {getFollowingOptions, getFollowingQueryKey, getVersionsOptions} from '../../lib/generated/@tanstack/react-query.gen';
-import {captureAll, captureItem, checkMonitor, createMonitor, deleteMonitor, recordRemoval, skipItem, undoItem, updateMonitor} from '../../lib/generated/sdk.gen';
+import {captureAll, captureItem, checkMonitor, createMailboxMonitor, createMonitor, deleteMonitor, recordRemoval, skipItem, undoItem, updateMonitor} from '../../lib/generated/sdk.gen';
 import type {FollowingOut, MonitorItemOut, MonitorOut, PageVersionOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {WorksToday} from './works-today';
 
-const TAG: Record<MonitorOut['kind'], string> = {feed: 'FEED', sitemap: 'MAP', page: 'PAGE', podcast: 'POD', account: 'OPEN', closed: 'LINK'};
+const TAG: Record<MonitorOut['kind'], string> = {feed: 'FEED', sitemap: 'MAP', page: 'PAGE', podcast: 'POD', account: 'OPEN', closed: 'LINK', mailbox: 'MAIL'};
 const EVERY: [number, string][] = [[15, '15 min'], [30, '30 min'], [60, 'hourly'], [1440, 'daily'], [10080, 'weekly']];
 const everyWord = (m: number) => EVERY.find(([n]) => n === m)?.[1] ?? `${m} min`;
 const BULK_REASONS = ['Account is deleting posts', 'Page is being edited now', 'Too many in the same hour'];
@@ -171,24 +171,45 @@ function FollowForm({investigationId, onDone}: {investigationId: string; onDone:
   const [route, setRoute] = useState<'direct' | 'tor'>('direct');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [mail, setMail] = useState<null | {host: string; user: string; password: string; sender: string}>(null);
+  const mailReady = Boolean(mail && mail.host.trim() && mail.user.trim() && mail.password && mail.sender.trim());
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!target.trim()) return;
+    if (mail ? !mailReady : !target.trim()) return;
     setBusy(true); setError('');
     try {
-      const made = (await createMonitor({path: {investigation_id: investigationId}, body: {target: target.trim(), route}, throwOnError: true})).data;
+      const made = mail
+        ? (await createMailboxMonitor({path: {investigation_id: investigationId}, throwOnError: true,
+          body: {host: mail.host.trim(), user: mail.user.trim(), password: mail.password, sender: mail.sender.trim()}})).data
+        : (await createMonitor({path: {investigation_id: investigationId}, body: {target: target.trim(), route}, throwOnError: true})).data;
       onDone(made);
     } catch (err) { setError(errorMessage(err, 'That could not be followed')); } finally { setBusy(false); }
   };
+  const field = (key: 'host' | 'user' | 'password' | 'sender', label: string, hint: string) => mail &&
+    <label className="fl-note fl-mail">{label}<input className="fl-input" type={key === 'password' ? 'password' : 'text'} autoComplete="off"
+      value={mail[key]} placeholder={hint} onChange={e => setMail({...mail, [key]: e.target.value})}/></label>;
   return <form className="fl-panel fl-follow" onSubmit={e => void submit(e)} aria-label="Follow something">
     <p className="fl-cap">Follow something</p>
+    <span className="fl-rad" role="radiogroup" aria-label="What to follow">
+      <button type="button" role="radio" aria-checked={!mail} onClick={() => setMail(null)}>An address or account</button>
+      <button type="button" role="radio" aria-checked={Boolean(mail)} onClick={() => setMail(m => m ?? {host: '', user: '', password: '', sender: ''})}>A newsletter mailbox</button>
+    </span>
+    {mail ? <>
+      <p className="fl-note">Subscribe with a mailbox kept for newsletters, never your own: the sender learns that address. The app reads it over IMAP with TLS,
+        never marks a message read and never loads the images in it, so tracking pixels learn nothing. The password stays in a file on this computer, not in the case or a backup.</p>
+      {field('host', 'Mail server', 'imap.example.net')}
+      {field('user', 'User name', 'newsletters@example.net')}
+      {field('password', 'Password (an app password where the provider has them)', '')}
+      {field('sender', 'The sender to follow', 'news@outlet.example or @outlet.example')}
+    </> : <>
     <label className="fl-note" htmlFor="fl-target">A web address (a news feed, sitemap, podcast or page), a Bluesky handle (@name.bsky.social), a Mastodon account (@name@server) or a public Telegram channel (t.me/name)</label>
     <input id="fl-target" className="fl-input" value={target} onChange={e => setTarget(e.target.value)} placeholder="https://…, @handle or t.me/channel" autoFocus/>
     <div className="fl-row wrap"><span className="fl-note">Route</span>
       <span className="fl-rad" role="radiogroup" aria-label="Route">{(['direct', 'tor'] as const).map(r =>
         <button key={r} type="button" role="radio" aria-checked={route === r} onClick={() => setRoute(r)}>{r === 'direct' ? 'Direct' : 'Neutral route'}</button>)}</span></div>
     <p className="fl-note">The address is asked once to see what it is. Closed platforms (X, Instagram, Facebook, TikTok, LinkedIn, Telegram groups and private channels…) get a row with no monitor: the app never signs in.</p>
-    <div className="fl-row"><button type="submit" className="fl-btn pri sm" disabled={busy || !target.trim()}>{busy ? 'Asking…' : 'Follow'}</button>
+    </>}
+    <div className="fl-row"><button type="submit" className="fl-btn pri sm" disabled={busy || (mail ? !mailReady : !target.trim())}>{busy ? 'Asking…' : 'Follow'}</button>
       <button type="button" className="fl-btn sm" onClick={() => onDone(null)}>Cancel</button></div>
     {error && <p role="alert" className="fl-error">{error}</p>}
   </form>;
