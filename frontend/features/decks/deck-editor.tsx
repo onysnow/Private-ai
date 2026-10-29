@@ -5,6 +5,8 @@
 // words and its checks, each with a one-click fix. A slide citing a claim not yet shown carries a Draft band. Present
 // opens the presenter view: the slide now, its notes, the next slide, a timer against the planned length and "If they
 // ask" (the claims behind the slide), after a bar that names any draft or changed slide (warned, never blocked).
+// Style opens the deck's themes and fonts in the right panel; Export gives the .pptx, the slides as a PDF, or a handout
+// (a PDF page per slide with its notes), saving first so the file is what is on screen (DECISIONS_LOG 15).
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useState} from 'react';
 import type {ReactElement} from 'react';
@@ -12,9 +14,9 @@ import type {ReactElement} from 'react';
 import {SlideCanvas, SlideStyleProvider, buildCitationLookup, resolveTheme} from '../../components/presentation/slide-canvas';
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
-import type {CitationDetail, DeckSlide, DeckStyle} from '../../lib/api-types';
+import type {CitationDetail, DeckSlide, DeckStyle, PresentationStyleCatalog} from '../../lib/api-types';
 import {deckChecksEndpointOptions, deckChecksEndpointQueryKey, listClaimsOptions, listDecksEndpointOptions,
-  listDecksEndpointQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+  listDecksEndpointQueryKey, presentationStylesOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {createDeckEndpoint, updateDeckEndpoint} from '../../lib/generated/sdk.gen';
 import type {DeckChecksOut, DeckOut, SlideProblemOut} from '../../lib/generated/types.gen';
 
@@ -87,6 +89,9 @@ function DeckEditor({deck, investigationId}: {deck: DeckOut; investigationId: st
   const [kind, setKind] = useState<Kind>('presenting');
   const [presenting, setPresenting] = useState(false);
   const [message, setMessage] = useState('');
+  const [style, setStyle] = useState<DeckStyle>(deck.style as unknown as DeckStyle);
+  const [panel, setPanel] = useState<'slide' | 'style'>('slide');
+  const catalog = useQuery({...presentationStylesOptions()}).data as unknown as PresentationStyleCatalog | undefined;
   const checks = useQuery({...deckChecksEndpointOptions({path: {deck_id: deck.id}})});
   const claims = useQuery({...listClaimsOptions({path: {investigation_id: investigationId}})});
   const claimById = useMemo(() => new Map((claims.data ?? []).map(c => [c.id, c])), [claims.data]);
@@ -94,14 +99,14 @@ function DeckEditor({deck, investigationId}: {deck: DeckOut; investigationId: st
   const details = useMemo<CitationDetail[]>(() => (claims.data ?? []).map(c => ({record_type: 'claim', record_id: c.id, trace_record_type: 'claim',
     type_label: 'Claim', label: c.text, quote: null, locator: null, source_title: null, source_url: null, detail: c.status, missing: false})), [claims.data]);
   const lookup = useMemo(() => buildCitationLookup(slides, details), [slides, details]);
-  const theme = resolveTheme(null, deck.style as unknown as DeckStyle);
+  const theme = resolveTheme(catalog, style);
   const slide = slides[at];
   const check = checks.data?.slides[at];
   const contentTotal = slides.filter(s => (s.kind ?? 'content') === 'content').length;
 
   const save = useMutation({
     mutationFn: async () => (await updateDeckEndpoint({path: {deck_id: deck.id}, throwOnError: true,
-      body: {title, slides_json: slides as never}})).data,
+      body: {title, slides_json: slides as never, style_json: style}})).data,
     onSuccess: async () => {
       setDirty(false); setMessage('Saved');
       await queryClient.invalidateQueries({queryKey: deckChecksEndpointQueryKey({path: {deck_id: deck.id}})});
@@ -112,11 +117,17 @@ function DeckEditor({deck, investigationId}: {deck: DeckOut; investigationId: st
   const change = (next: Slide) => { setSlides(all => all.map((s, i) => (i === at ? next : s))); setDirty(true); setMessage(''); };
   const addSlide = () => { setSlides(all => [...all.slice(0, at + 1), {kind: 'content', heading: 'New slide', bullets: [], evidence: [], notes: ''}, ...all.slice(at + 1)]); setAt(at + 1); setDirty(true); };
   const removeSlide = () => { if (slides.length < 2) return; setSlides(all => all.filter((_, i) => i !== at)); setAt(Math.max(0, at - 1)); setDirty(true); };
-  const exportPptx = async () => {
-    const href = URL.createObjectURL(await api.blob(`/api/decks/${deck.id}/export.pptx`));
-    const a = document.createElement('a'); a.href = href; a.download = `${title || 'deck'}.pptx`; a.click();
-    window.setTimeout(() => URL.revokeObjectURL(href), 30_000);
+  // Exports read the saved deck, so unsaved changes are saved first.
+  const download = async (path: string, name: string) => {
+    try {
+      if (dirty) await save.mutateAsync();
+      const href = URL.createObjectURL(await api.blob(`/api/decks/${deck.id}/${path}`));
+      const a = document.createElement('a'); a.href = href; a.download = name; a.click();
+      window.setTimeout(() => URL.revokeObjectURL(href), 30_000);
+    } catch (error) { setMessage(errorMessage(error, 'Could not export the deck')); }
   };
+  const [exporting, setExporting] = useState(false);
+  const restyle = (next: DeckStyle) => { setStyle(next); setDirty(true); setMessage(''); };
 
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
@@ -140,7 +151,15 @@ function DeckEditor({deck, investigationId}: {deck: DeckOut; investigationId: st
       <input className="dk-title" aria-label="Deck title" value={title} onChange={e => { setTitle(e.target.value); setDirty(true); }}/>
       <span className="dk-kinds" role="radiogroup" aria-label="Deck kind">{(['presenting', 'slidedoc', 'side'] as Kind[]).map(k =>
         <button key={k} type="button" role="radio" aria-checked={kind === k} onClick={() => setKind(k)}>{k === 'presenting' ? 'Presenting' : k === 'slidedoc' ? 'Slidedoc' : 'Side by side'}</button>)}</span>
-      <button type="button" className="dk-btn plain" onClick={() => void exportPptx()}>Export .pptx</button>
+      <button type="button" className="dk-btn plain" aria-pressed={panel === 'style'} onClick={() => setPanel(p => (p === 'style' ? 'slide' : 'style'))}>Style</button>
+      <span className="dk-export">
+        <button type="button" className="dk-btn plain" aria-expanded={exporting} onClick={() => setExporting(o => !o)}>Export ▾</button>
+        {exporting && <span className="dk-menu" role="menu">
+          <button type="button" role="menuitem" onClick={() => { setExporting(false); void download('export.pptx', `${title || 'deck'}.pptx`); }}>PowerPoint (.pptx)<small>editable</small></button>
+          <button type="button" role="menuitem" onClick={() => { setExporting(false); void download('export.pdf', `${title || 'deck'}.pdf`); }}>PDF, the slides<small>one page a slide, on the theme&apos;s paper</small></button>
+          <button type="button" role="menuitem" onClick={() => { setExporting(false); void download('export.pdf?handout=true', `${title || 'deck'} handout.pdf`); }}>PDF handout<small>each slide with its notes</small></button>
+        </span>}
+      </span>
       <button type="button" className="dk-btn" onClick={() => save.mutate()} disabled={!dirty || save.isPending}>{save.isPending ? 'Saving…' : dirty ? 'Save' : 'Saved'}</button>
       <button type="button" className="dk-btn pri" onClick={() => setPresenting(true)}>Present <kbd>P</kbd></button>
       {message && <span className="dk-msg" role="status">{message}</span>}
@@ -154,7 +173,8 @@ function DeckEditor({deck, investigationId}: {deck: DeckOut; investigationId: st
       <label className="dk-notes">Speaker notes<textarea value={slide.notes ?? ''} rows={3} onChange={e => change({...slide, notes: e.target.value})}/></label>
     </section>
 
-    <aside className="dk-side" aria-label="This slide">
+    {panel === 'style' ? <DeckStylePanel catalog={catalog} style={style} onChange={restyle} onClose={() => setPanel('slide')}/>
+      : <aside className="dk-side" aria-label="This slide">
       <p className="dk-cap">Slide {at + 1} · {slide.kind ?? 'content'}</p>
       <label className="dk-field">Heading<input value={slide.heading} onChange={e => change({...slide, heading: e.target.value})}/></label>
       <label className="dk-field">Lines, one per line<textarea rows={5} value={slide.bullets.join('\n')}
@@ -172,7 +192,7 @@ function DeckEditor({deck, investigationId}: {deck: DeckOut; investigationId: st
         {dirty && <li className="dk-none">Save to check again.</li>}</ul>
       <div className="dk-row"><button type="button" className="dk-btn sm" onClick={addSlide}>Add a slide after</button>
         <button type="button" className="dk-btn sm plain" onClick={removeSlide} disabled={slides.length < 2}>Remove this slide</button></div>
-    </aside>
+    </aside>}
 
     <nav className="dk-strip" aria-label="Slides">{slides.map((s, i) => { const b = badge(checks.data?.slides[i]);
       return <button key={i} type="button" aria-current={i === at ? 'true' : undefined} onClick={() => setAt(i)} aria-label={`Slide ${i + 1}: ${s.heading}, ${b.label}`}>
@@ -233,4 +253,28 @@ function Present({slides, checks, title, canvas, claimText, onClose, start}: {sl
       </aside>
     </div>}
   </div>;
+}
+
+/** DECK_1's style panel: the deck's themes as cards with their colours, its fonts, and what a style never changes. */
+function DeckStylePanel({catalog, style, onChange, onClose}: {catalog: PresentationStyleCatalog | undefined; style: DeckStyle;
+  onChange: (style: DeckStyle) => void; onClose: () => void}): ReactElement {
+  const chosen = catalog?.themes.find(t => t.id === style.theme)?.id ?? catalog?.defaults.theme;
+  return <aside className="dk-side dk-style" aria-label="Style">
+    <p className="dk-cap">Style <span>whole deck</span></p>
+    <p className="dk-hint">The deck&apos;s theme. Present and every export follow it.</p>
+    {!catalog ? <p className="dk-none">Loading the themes…</p> : <>
+      <div className="dk-themes" role="radiogroup" aria-label="Theme">{catalog.themes.map(t =>
+        <button key={t.id} type="button" role="radio" aria-checked={chosen === t.id} onClick={() => onChange({...style, theme: t.id})}>
+          <span><b>{t.label}</b>{t.description}</span>
+          <span className="dk-swatches" aria-hidden="true">{[t.cover_bg, t.page, t.accent, t.alert].map((c, i) => <i key={i} style={{background: `#${c}`}}/>)}</span>
+        </button>)}</div>
+      <label className="dk-field">Fonts<select value={style.fonts} onChange={e => onChange({...style, fonts: e.target.value})}>
+        {catalog.font_pairs.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}</select></label>
+    </>}
+    <p className="dk-cap">Words on figures</p>
+    <p className="dk-hint">Every figure carries shown, estimated or alleged. A style cannot turn this off.</p>
+    <p className="dk-cap">Paper</p>
+    <p className="dk-hint">The PDF and the handout use a light paper version of the theme.</p>
+    <div className="dk-row"><button type="button" className="dk-btn sm plain" onClick={onClose}>Close style</button></div>
+  </aside>;
 }

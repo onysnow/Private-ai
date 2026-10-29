@@ -68,3 +68,31 @@ def test_a_blank_deck_and_a_long_run_of_text_slides():
     checks = client.get(f"/api/decks/{deck['id']}/checks").json()
     assert [p["kind"] for p in checks["slides"][6]["problems"]] == ["5-5-5"] and checks["slides"][5]["problems"] == []
     assert client.post("/api/investigations/nope/decks", json={}).status_code == 404
+
+
+def test_a_deck_prints_to_pdf_as_slides_and_as_a_handout_with_its_draft_band_and_sources():
+    import fitz
+
+    inv, _shown, _lead = _case_with_story()
+    deck = client.post(f"/api/investigations/{inv}/decks", json={"source": "story"}).json()
+    slides = deck["slides"]
+    slides[1]["notes"] = "Say the tender dates aloud."
+    client.patch(f"/api/decks/{deck['id']}", json={"slides_json": slides, "style_json": {"theme": "ledger"}})
+
+    r = client.get(f"/api/decks/{deck['id']}/export.pdf")
+    assert r.status_code == 200 and r.content.startswith(b"%PDF"), r.text[:300]
+    with fitz.open(stream=r.content, filetype="pdf") as doc:
+        assert doc.page_count == 4  # three slides, then the sources
+        width, height = doc[0].rect.width, doc[0].rect.height
+        assert round(width / height, 2) == 1.78
+        pages = [" ".join(page.get_text().split()) for page in doc]
+    assert "Draft" in pages[1].replace(" ", "") and "Draft" not in pages[0].replace(" ", "")  # the sale cites a claim not yet shown
+    assert "The council sold plot 14 to Kestrel SA" in pages[1] and "Sources 1, 2" in pages[1]
+    assert "Where each line comes from" in pages[3] and "Say the tender dates aloud" not in " ".join(pages)
+
+    handout = client.get(f"/api/decks/{deck['id']}/export.pdf", params={"handout": True})
+    with fitz.open(stream=handout.content, filetype="pdf") as doc:
+        assert doc[0].rect.height > doc[0].rect.width  # A4 portrait
+        assert "Say the tender dates aloud." in " ".join(" ".join(p.get_text().split()) for p in doc)
+    assert 'filename="Who bought the harbour land handout.pdf"' in handout.headers["content-disposition"]
+    assert client.get("/api/decks/nope/export.pdf").status_code == 404

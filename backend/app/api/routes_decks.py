@@ -106,6 +106,28 @@ def export_deck_pptx(deck_id: str, db: Session = Depends(get_db)) -> StreamingRe
     )
 
 
+@router.get("/decks/{deck_id}/export.pdf", response_class=Response, responses={
+    **file_response("application/pdf", "The deck as a PDF on the theme's paper, printed on this computer"),
+    404: {"model": ErrorOut, "description": "No such deck"}, 503: {"model": ErrorOut, "description": "The printing browser is not installed"}})
+def export_deck_pdf(deck_id: str, handout: bool = False, db: Session = Depends(get_db)) -> Response:
+    """Slides (one 16:9 page each) or, with `handout`, an A4 page per slide with its speaker notes."""
+    from app.services.deck_editor import slide_checks
+    from app.services.deck_pdf import render_deck_pdf
+    from app.services.print_pdf import PdfUnavailable
+
+    row = db.get(Deck, deck_id)
+    if row is None:
+        raise HTTPException(404, "Deck not found")
+    details = describe_record_refs(db, investigation_id=row.investigation_id, refs=deck_citation_refs(row.slides_json or []))
+    try:
+        data = render_deck_pdf(row, details, drafts=set(slide_checks(db, row)["drafts"]), handout=handout)
+    except PdfUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    filename = "".join(c for c in row.title if c.isalnum() or c in " _-").strip() or "deck"
+    return Response(content=data, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{filename}{" handout" if handout else ""}.pdf"'})
+
+
 @router.post("/decks/{deck_id}/charts", response_model=DeckOut, responses={
     422: {"model": ValidationErrorOut | ErrorOut, "description": "The order slip is not valid, or the chart cannot be drawn or fails the design checks"},
 })

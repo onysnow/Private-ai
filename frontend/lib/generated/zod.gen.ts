@@ -12328,6 +12328,19 @@ export const zDeckChecksEndpointPath = z.object({
  */
 export const zDeckChecksEndpointResponse = zDeckChecksOut;
 
+export const zExportDeckPdfPath = z.object({
+  deck_id: z.string(),
+});
+
+export const zExportDeckPdfQuery = z.object({
+  handout: z.boolean().optional().default(false),
+});
+
+/**
+ * The deck as a PDF on the theme's paper, printed on this computer
+ */
+export const zExportDeckPdfResponse = z.string();
+
 export const zExportDeckPptxPath = z.object({
   deck_id: z.string(),
 });

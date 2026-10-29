@@ -270,3 +270,19 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
   `features/relationship-graph/graph.tsx` is no longer mounted anywhere; its helpers stay in use.
 - **Found on the way:** inside the Wire, the theme's filled buttons drew light text on amber (the Wire's buttons inherit
   colour); the links panel now gives them dark text.
+
+## 15. Deck PDF without DeckCraft, and the style panel (29 Oct; revises entry 13, call 2)
+
+- **Call:** a deck exports to PDF now, printed by the browser that already prints the write-up and the evidence pack
+  (`app/services/print_pdf.py`, entry 3), not by waiting for DeckCraft in the native module. Entry 13 had held the PDF
+  back for DeckCraft; the printer was already in the app, so waiting bought nothing.
+  - **Two PDFs:** the slides (one 16:9 page a slide) and a handout (an A4 page a slide, its speaker notes under it).
+    Both use the theme's light paper version, as DECK_1's style panel says; a slide citing a claim not yet shown keeps
+    its Draft band; the sources are numbered as in the .pptx and listed on the last page.
+  - **Charts:** the render service's SVG of the same checked drawing the .pptx uses, so nothing runs in the page while
+    it prints; a chart that cannot be drawn says why in its place, as the .pptx does.
+  - **Exports save first**, so the file is what is on screen.
+- **Style panel:** Style opens the deck's themes in the right panel as DECK_1-state-style-open draws them (a card per
+  theme with its colours, the fonts, and what a style never changes); the slide on screen takes the theme at once, and
+  Save keeps it. The editor had drawn every deck in the default theme whatever it was saved with; it now draws the
+  deck's own.

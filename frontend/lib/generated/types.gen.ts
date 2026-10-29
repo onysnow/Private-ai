@@ -27081,6 +27081,54 @@ export type DeckChecksEndpointResponses = {
 export type DeckChecksEndpointResponse =
   DeckChecksEndpointResponses[keyof DeckChecksEndpointResponses];
 
+export type ExportDeckPdfData = {
+  body?: never;
+  path: {
+    /**
+     * Deck Id
+     */
+    deck_id: string;
+  };
+  query?: {
+    /**
+     * Handout
+     */
+    handout?: boolean;
+  };
+  url: '/api/decks/{deck_id}/export.pdf';
+};
+
+export type ExportDeckPdfErrors = {
+  /**
+   * No such deck
+   */
+  404: ErrorOut;
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * The printing browser is not installed
+   */
+  503: ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ExportDeckPdfError = ExportDeckPdfErrors[keyof ExportDeckPdfErrors];
+
+export type ExportDeckPdfResponses = {
+  /**
+   * The deck as a PDF on the theme's paper, printed on this computer
+   */
+  200: Blob | File;
+};
+
+export type ExportDeckPdfResponse =
+  ExportDeckPdfResponses[keyof ExportDeckPdfResponses];
+
 export type ExportDeckPptxData = {
   body?: never;
   path: {

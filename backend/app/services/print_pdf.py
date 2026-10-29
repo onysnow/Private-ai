@@ -11,7 +11,8 @@ class PdfUnavailable(RuntimeError):
     """The browser that prints is not on this computer, or it failed: said in the app's own words."""
 
 
-def html_to_pdf(html: str) -> bytes:
+def html_to_pdf(html: str, *, css_page: bool = False) -> bytes:
+    """A4 with the app's margins; `css_page` lets the page's own @page rule set the size and margins (a deck's 16:9)."""
     from playwright.sync_api import Error as PlaywrightError
     from playwright.sync_api import sync_playwright
 
@@ -29,6 +30,8 @@ def html_to_pdf(html: str) -> bytes:
             page = context.new_page()
             page.route("**/*", lambda route: route.abort())
             page.set_content(html, wait_until="load")
+            if css_page:
+                return page.pdf(print_background=True, prefer_css_page_size=True)
             return page.pdf(format="A4", print_background=True, margin={"top": "18mm", "bottom": "18mm", "left": "16mm", "right": "16mm"})
         except PlaywrightError as exc:
             raise PdfUnavailable("The PDF could not be printed") from exc

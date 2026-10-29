@@ -110,6 +110,7 @@ import {
   entityPostMergeReconciliation,
   examineAgain,
   expandEntityInCorpus,
+  exportDeckPdf,
   exportDeckPptx,
   exportEvidencePack,
   exportInvestigation,
@@ -726,6 +727,9 @@ import type {
   ExpandEntityInCorpusData,
   ExpandEntityInCorpusError,
   ExpandEntityInCorpusResponse,
+  ExportDeckPdfData,
+  ExportDeckPdfError,
+  ExportDeckPdfResponse,
   ExportDeckPptxData,
   ExportDeckPptxError,
   ExportDeckPptxResponse,
@@ -3707,6 +3711,33 @@ export const deckChecksEndpointOptions = (
       return data;
     },
     queryKey: deckChecksEndpointQueryKey(options),
+  });
+
+export const exportDeckPdfQueryKey = (options: Options<ExportDeckPdfData>) =>
+  createQueryKey('exportDeckPdf', options);
+
+/**
+ * Export Deck Pdf
+ *
+ * Slides (one 16:9 page each) or, with `handout`, an A4 page per slide with its speaker notes.
+ */
+export const exportDeckPdfOptions = (options: Options<ExportDeckPdfData>) =>
+  queryOptions<
+    ExportDeckPdfResponse,
+    ExportDeckPdfError,
+    ExportDeckPdfResponse,
+    ReturnType<typeof exportDeckPdfQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await exportDeckPdf({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: exportDeckPdfQueryKey(options),
   });
 
 export const exportDeckPptxQueryKey = (options: Options<ExportDeckPptxData>) =>

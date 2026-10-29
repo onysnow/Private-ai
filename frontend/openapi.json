@@ -57490,6 +57490,87 @@
         "summary": "Deck Checks Endpoint"
       }
     },
+    "/api/decks/{deck_id}/export.pdf": {
+      "get": {
+        "description": "Slides (one 16:9 page each) or, with `handout`, an A4 page per slide with its speaker notes.",
+        "operationId": "export_deck_pdf",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deck_id",
+            "required": true,
+            "schema": {
+              "title": "Deck Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "handout",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Handout",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The deck as a PDF on the theme's paper, printed on this computer"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "No such deck"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "The printing browser is not installed"
+          }
+        },
+        "summary": "Export Deck Pdf"
+      }
+    },
     "/api/decks/{deck_id}/export.pptx": {
       "get": {
         "operationId": "export_deck_pptx",

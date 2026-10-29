@@ -315,6 +315,9 @@ import type {
   ExpandEntityInCorpusData,
   ExpandEntityInCorpusErrors,
   ExpandEntityInCorpusResponses,
+  ExportDeckPdfData,
+  ExportDeckPdfErrors,
+  ExportDeckPdfResponses,
   ExportDeckPptxData,
   ExportDeckPptxErrors,
   ExportDeckPptxResponses,
@@ -1491,6 +1494,9 @@ import {
   zExamineAgainResponse,
   zExpandEntityInCorpusPath,
   zExpandEntityInCorpusResponse,
+  zExportDeckPdfPath,
+  zExportDeckPdfQuery,
+  zExportDeckPdfResponse,
   zExportDeckPptxPath,
   zExportDeckPptxResponse,
   zExportEvidencePackPath,
@@ -4271,6 +4277,33 @@ export const deckChecksEndpoint = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zDeckChecksEndpointResponse.parseAsync(data),
     url: '/api/decks/{deck_id}/checks',
+    ...options,
+  });
+
+/**
+ * Export Deck Pdf
+ *
+ * Slides (one 16:9 page each) or, with `handout`, an A4 page per slide with its speaker notes.
+ */
+export const exportDeckPdf = <ThrowOnError extends boolean = false>(
+  options: Options<ExportDeckPdfData, ThrowOnError>,
+): RequestResult<ExportDeckPdfResponses, ExportDeckPdfErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ExportDeckPdfResponses,
+    ExportDeckPdfErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zExportDeckPdfPath,
+          query: zExportDeckPdfQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zExportDeckPdfResponse.parseAsync(data),
+    url: '/api/decks/{deck_id}/export.pdf',
     ...options,
   });
 
