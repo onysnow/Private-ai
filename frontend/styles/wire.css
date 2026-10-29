@@ -198,6 +198,8 @@
 .tw .terr-s { font-family: var(--font-mono); fill: var(--text-muted); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
 .tw .lbl { font-family: var(--font-ui); fill: var(--text); opacity: var(--lo, 1); paint-order: stroke; stroke: var(--ground); stroke-linejoin: round; pointer-events: none; }
 .tw .lbl.peek { fill: url(#tw-peek); stroke: url(#tw-peek-halo); }
+/* A dot's name is part of the party: hovering the half-shown name reveals it in full, as hovering the circle does. */
+.tw .node .lbl[data-name] { pointer-events: auto; cursor: pointer; }
 .tw .lens-sum { fill: var(--accent-1); }
 .tw .card-bg { fill: var(--surface-1); }
 .tw .card-t { font: 600 12.5px var(--font-ui); fill: var(--text); pointer-events: none; }
