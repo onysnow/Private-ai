@@ -31,7 +31,7 @@ from app.models.domain import (
     DocumentChunk, ExtractionCandidate, InvestigationCorpusBinding, DocumentCorpusSync,
     AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
     Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
-    DocumentMedia, TranscriptSegment,
+    DocumentMedia, TranscriptSegment, Monitor, MonitorItem, MonitorVersion,
 )
 
 EXPORT_FORMAT = "journalism-workbench-investigation"
@@ -51,7 +51,7 @@ MODEL_BY_TABLE = {
         AIAnalysisCandidate, Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, IngestionBatchItem,
         WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, StorySection, StoryClaim, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture,
-        DocumentMedia, TranscriptSegment,
+        DocumentMedia, TranscriptSegment, Monitor, MonitorItem, MonitorVersion,
     ]
 }
 
@@ -112,6 +112,8 @@ RESTORE_ORDER = [
     # Web pages captured from links (ADR-0018): after the documents, sources and CAPT records they point at. Their
     # files travel as capture_files in the manifest.
     "captures",
+    # What Following watches (ADR-0021), after the captures its items and versions may point at.
+    "monitors", "monitor_items", "monitor_versions",
 ]
 
 
@@ -180,6 +182,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         ExternalRelationshipReview, ExternalRelationshipPromotion, ExtractionCandidate, AIAnalysisCandidate,
         Writeup, Deck, CrossReferenceProposal, CrossReferenceDecision, IngestionBatch, WatchlistEntry, WatchlistHit, TableMapping, Tag, RecordTag, Note, Collection, CollectionItem, PatternFlag, CheckItem, CaseRecord,
         Story, AIRunEvent, WriteupVersion, Preference, SavedQuestion, OutboundRequest, Capture, DocumentMedia, TranscriptSegment,
+        Monitor, MonitorItem, MonitorVersion,
     ]
     direct: dict[str, list[Any]] = {
         m.__tablename__: list(db.scalars(select(m).where(getattr(m, "investigation_id") == investigation_id)).all())
@@ -233,6 +236,7 @@ def collect_investigation_records(db: Session, investigation_id: str) -> dict[st
         "saved_questions": direct["saved_questions"],
         "outbound_requests": direct["outbound_requests"],
         "captures": direct["captures"],
+        "monitors": direct["monitors"], "monitor_items": direct["monitor_items"], "monitor_versions": direct["monitor_versions"],
         "document_media": direct["document_media"], "transcript_segments": direct["transcript_segments"],
     }
     return {name: [_row_dict(r) for r in rows] for name, rows in table_rows.items()}
@@ -725,6 +729,9 @@ def restore_investigation_export(db: Session, data: bytes, document_storage_dir:
                     row = dict(raw_row)
                     if table == "documents" and row["id"] in raw_locations:
                         row["storage_path"] = raw_locations[row["id"]]
+                    if table == "monitors":
+                        # A restored case sends nothing until a person resumes each monitor (ADR-0021).
+                        row["active"] = False
                     db.add(model(**_coerce_datetimes(model, row)))
                 if rows:
                     db.flush()

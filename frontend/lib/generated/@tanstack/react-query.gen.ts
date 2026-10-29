@@ -26,6 +26,8 @@ import {
   cancelJobEndpoint,
   canonicalEntityResolution,
   capabilities,
+  captureAll,
+  captureItem,
   changePassphrase,
   checkConnectorKey,
   checkWatchlistNow,
@@ -48,6 +50,7 @@ import {
   createInvestigation,
   createLeadEndpoint,
   createLeadFromRelationshipContext,
+  createMonitor,
   createReportingTaskEndpoint,
   createSourceEndpoint,
   createTimelineEventEndpoint,
@@ -61,6 +64,7 @@ import {
   deleteConnectorCredential,
   deleteDeckEndpoint,
   deleteInvestigationMembership,
+  deleteMonitor,
   deleteSavedQuestion,
   deleteStorySection,
   deleteWatch,
@@ -130,6 +134,7 @@ import {
   getExtractionCandidateLineage,
   getExtractionEntityMatches,
   getExtractionOpenalephMatches,
+  getFollowing,
   getGlossaryEntry,
   getIdentifierTargets,
   getInbox,
@@ -145,6 +150,7 @@ import {
   getLead,
   getLookupSettings,
   getMappingSchemas,
+  getMonitorItems,
   getNotes,
   getNotificationPrefs,
   getOpenalephCorpusBinding,
@@ -173,6 +179,7 @@ import {
   getSuiteCoverage,
   getTaggedRecords,
   getTags,
+  getVersions,
   getWatchlist,
   getWire,
   getWriteupEndpoint,
@@ -268,6 +275,7 @@ import {
   patchSourceSuite,
   peekAtRecord,
   placeStoryClaim,
+  pollMonitor,
   presentationStyles,
   previewBackupRestore,
   previewTableMapping,
@@ -328,6 +336,7 @@ import {
   setPin,
   setStoryThesis,
   settingsStatus,
+  skipItem,
   startSession,
   startStoryWriteup,
   syncCorpusNow,
@@ -344,6 +353,7 @@ import {
   updateDeckEndpoint,
   updateEntity,
   updateLeadEndpoint,
+  updateMonitor,
   updateReportingTaskEndpoint,
   updateStorySection,
   updateWriteupEndpoint,
@@ -401,6 +411,12 @@ import type {
   CapabilitiesData,
   CapabilitiesError,
   CapabilitiesResponse,
+  CaptureAllData,
+  CaptureAllError,
+  CaptureAllResponse,
+  CaptureItemData,
+  CaptureItemError,
+  CaptureItemResponse,
   ChangePassphraseData,
   ChangePassphraseError,
   ChangePassphraseResponse,
@@ -467,6 +483,9 @@ import type {
   CreateLeadFromRelationshipContextData,
   CreateLeadFromRelationshipContextError,
   CreateLeadFromRelationshipContextResponse,
+  CreateMonitorData,
+  CreateMonitorError,
+  CreateMonitorResponse,
   CreateReportingTaskEndpointData,
   CreateReportingTaskEndpointError,
   CreateReportingTaskEndpointResponse,
@@ -506,6 +525,9 @@ import type {
   DeleteInvestigationMembershipData,
   DeleteInvestigationMembershipError,
   DeleteInvestigationMembershipResponse,
+  DeleteMonitorData,
+  DeleteMonitorError,
+  DeleteMonitorResponse,
   DeleteSavedQuestionData,
   DeleteSavedQuestionError,
   DeleteSavedQuestionResponse,
@@ -712,6 +734,9 @@ import type {
   GetExtractionOpenalephMatchesData,
   GetExtractionOpenalephMatchesError,
   GetExtractionOpenalephMatchesResponse,
+  GetFollowingData,
+  GetFollowingError,
+  GetFollowingResponse,
   GetGlossaryEntryData,
   GetGlossaryEntryError,
   GetGlossaryEntryResponse,
@@ -757,6 +782,9 @@ import type {
   GetMappingSchemasData,
   GetMappingSchemasError,
   GetMappingSchemasResponse,
+  GetMonitorItemsData,
+  GetMonitorItemsError,
+  GetMonitorItemsResponse,
   GetNotesData,
   GetNotesError,
   GetNotesResponse,
@@ -841,6 +869,9 @@ import type {
   GetTagsData,
   GetTagsError,
   GetTagsResponse,
+  GetVersionsData,
+  GetVersionsError,
+  GetVersionsResponse,
   GetWatchlistData,
   GetWatchlistError,
   GetWatchlistResponse,
@@ -1122,6 +1153,9 @@ import type {
   PlaceStoryClaimData,
   PlaceStoryClaimError,
   PlaceStoryClaimResponse,
+  PollMonitorData,
+  PollMonitorError,
+  PollMonitorResponse,
   PresentationStylesData,
   PresentationStylesError,
   PresentationStylesResponse,
@@ -1302,6 +1336,9 @@ import type {
   SettingsStatusData,
   SettingsStatusError,
   SettingsStatusResponse,
+  SkipItemData,
+  SkipItemError,
+  SkipItemResponse,
   StartSessionData,
   StartSessionError,
   StartSessionResponse,
@@ -1350,6 +1387,9 @@ import type {
   UpdateLeadEndpointData,
   UpdateLeadEndpointError,
   UpdateLeadEndpointResponse,
+  UpdateMonitorData,
+  UpdateMonitorError,
+  UpdateMonitorResponse,
   UpdateReportingTaskEndpointData,
   UpdateReportingTaskEndpointError,
   UpdateReportingTaskEndpointResponse,
@@ -7185,6 +7225,63 @@ export const getInvestigationFinancialFlowsOptions = (
     queryKey: getInvestigationFinancialFlowsQueryKey(options),
   });
 
+export const getFollowingQueryKey = (options: Options<GetFollowingData>) =>
+  createQueryKey('getFollowing', options);
+
+/**
+ * Get Following
+ *
+ * What the case follows, and the items waiting for a person, the most at risk first.
+ */
+export const getFollowingOptions = (options: Options<GetFollowingData>) =>
+  queryOptions<
+    GetFollowingResponse,
+    GetFollowingError,
+    GetFollowingResponse,
+    ReturnType<typeof getFollowingQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getFollowing({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getFollowingQueryKey(options),
+  });
+
+/**
+ * Capture All
+ *
+ * Capture several waiting items at once, with a reason that goes on each (EGS rule 8), at most 50 a time, one
+ * after another. An item whose address cannot be visited stays in the queue.
+ */
+export const captureAllMutation = (
+  options?: Partial<Options<CaptureAllData>>,
+): UseMutationOptions<
+  CaptureAllResponse,
+  CaptureAllError,
+  Options<CaptureAllData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureAllResponse,
+    CaptureAllError,
+    Options<CaptureAllData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureAll({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getInvestigationGraphQueryKey = (
   options: Options<GetInvestigationGraphData>,
 ) => createQueryKey('getInvestigationGraph', options);
@@ -7557,6 +7654,35 @@ export const getInvestigationMoneyChecksOptions = (
     },
     queryKey: getInvestigationMoneyChecksQueryKey(options),
   });
+
+/**
+ * Create Monitor
+ *
+ * Follow an address. With `poll` it is looked at once before the reply, so its health is known.
+ */
+export const createMonitorMutation = (
+  options?: Partial<Options<CreateMonitorData>>,
+): UseMutationOptions<
+  CreateMonitorResponse,
+  CreateMonitorError,
+  Options<CreateMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CreateMonitorResponse,
+    CreateMonitorError,
+    Options<CreateMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getNotesQueryKey = (options: Options<GetNotesData>) =>
   createQueryKey('getNotes', options);
@@ -9671,6 +9797,206 @@ export const newRecoveryKeyMutation = (
   };
   return mutationOptions;
 };
+
+/**
+ * Capture Item
+ *
+ * A person captures what a monitor found: the same capture as pasting the link (ADR-0018).
+ */
+export const captureItemMutation = (
+  options?: Partial<Options<CaptureItemData>>,
+): UseMutationOptions<
+  CaptureItemResponse,
+  CaptureItemError,
+  Options<CaptureItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CaptureItemResponse,
+    CaptureItemError,
+    Options<CaptureItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await captureItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Skip Item
+ *
+ * Leave it uncaptured. It stays in the monitor's history, out of the queue.
+ */
+export const skipItemMutation = (
+  options?: Partial<Options<SkipItemData>>,
+): UseMutationOptions<
+  SkipItemResponse,
+  SkipItemError,
+  Options<SkipItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SkipItemResponse,
+    SkipItemError,
+    Options<SkipItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await skipItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete Monitor
+ *
+ * Stop following. What it found goes with it; pages already captured from it stay in the case.
+ */
+export const deleteMonitorMutation = (
+  options?: Partial<Options<DeleteMonitorData>>,
+): UseMutationOptions<
+  DeleteMonitorResponse,
+  DeleteMonitorError,
+  Options<DeleteMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteMonitorResponse,
+    DeleteMonitorError,
+    Options<DeleteMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update Monitor
+ *
+ * Change how often, the route, the name, pause or resume it, or accept the address it moved to.
+ */
+export const updateMonitorMutation = (
+  options?: Partial<Options<UpdateMonitorData>>,
+): UseMutationOptions<
+  UpdateMonitorResponse,
+  UpdateMonitorError,
+  Options<UpdateMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateMonitorResponse,
+    UpdateMonitorError,
+    Options<UpdateMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getMonitorItemsQueryKey = (
+  options: Options<GetMonitorItemsData>,
+) => createQueryKey('getMonitorItems', options);
+
+/**
+ * Get Monitor Items
+ *
+ * Everything this monitor found, newest first; `state` narrows to new, captured or skipped.
+ */
+export const getMonitorItemsOptions = (options: Options<GetMonitorItemsData>) =>
+  queryOptions<
+    GetMonitorItemsResponse,
+    GetMonitorItemsError,
+    GetMonitorItemsResponse,
+    ReturnType<typeof getMonitorItemsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getMonitorItems({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getMonitorItemsQueryKey(options),
+  });
+
+/**
+ * Poll Monitor
+ *
+ * Look now, outside the schedule (one request, logged like any other).
+ */
+export const pollMonitorMutation = (
+  options?: Partial<Options<PollMonitorData>>,
+): UseMutationOptions<
+  PollMonitorResponse,
+  PollMonitorError,
+  Options<PollMonitorData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PollMonitorResponse,
+    PollMonitorError,
+    Options<PollMonitorData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await pollMonitor({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getVersionsQueryKey = (options: Options<GetVersionsData>) =>
+  createQueryKey('getVersions', options);
+
+/**
+ * Get Versions
+ *
+ * A watched page's versions, newest first, each with the lines that changed from the one before.
+ */
+export const getVersionsOptions = (options: Options<GetVersionsData>) =>
+  queryOptions<
+    GetVersionsResponse,
+    GetVersionsError,
+    GetVersionsResponse,
+    ReturnType<typeof getVersionsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getVersions({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getVersionsQueryKey(options),
+  });
 
 /**
  * Remove Note

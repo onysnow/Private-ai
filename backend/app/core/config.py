@@ -75,6 +75,13 @@ class Settings(BaseSettings):
     capture_timeout_seconds: float = 45.0
     # What one capture may bring back, the page and everything it loads, before the rest is cut off.
     capture_max_megabytes: int = 100
+    # Following (ADR-0021): how long one poll may take, the most it reads, the pause between two requests to the same
+    # host, how many monitors one minute's tick polls, and the Tor the reporter runs (the app ships none).
+    follow_timeout_seconds: float = 20.0
+    follow_max_megabytes: int = 8
+    follow_host_gap_seconds: float = 2.0
+    follow_max_per_tick: int = 12
+    tor_socks_url: str = "socks5://127.0.0.1:9050"
     # Audio and video (ADR-0020): the largest recording an upload takes, and the Whisper model that transcribes it on
     # this computer (fetched once at setup into the folder below; a read never downloads it). Language: empty detects it.
     max_media_bytes: int = 500 * 1024 * 1024

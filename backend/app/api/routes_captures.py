@@ -25,7 +25,7 @@ MEDIA_TYPES = {".html": "text/html; charset=utf-8", ".png": "image/png", ".har":
                ".gz": "application/gzip"}
 
 
-def _out(db: Session, row: Capture) -> dict[str, Any]:
+def capture_out(db: Session, row: Capture) -> dict[str, Any]:
     out = serialize_capture(row)
     job = db.get(BackgroundJob, row.job_id) if row.job_id else None
     out["job"] = serialize_job(job) if job is not None else None
@@ -40,6 +40,20 @@ def _out(db: Session, row: Capture) -> dict[str, Any]:
     return out
 
 
+async def start_capture(db: Session, request: Request, investigation_id: str, url: str) -> Capture:
+    """Queue a capture of `url` and start its job (inline mode finishes it before this returns). Refuses an address it
+    will never visit (CaptureRefused); LookupError when the case does not exist. Shared with Following, where a person
+    captures what a monitor found."""
+    row = request_capture(db, investigation_id, url, collector=scope_for_request(request).actor_id)
+    job = create_job(db, kind=WEB_CAPTURE, investigation_id=investigation_id, subject_type="capture", subject_id=row.id,
+                     runner=job_runner(request).mode, message="Waiting to visit the page")
+    row.job_id = job.id
+    db.commit()
+    await _submit_or_record_failure(request, job, db)
+    db.expire_all()
+    return db.get(Capture, row.id) or row
+
+
 @router.post("/investigations/{investigation_id}/captures", response_model=CaptureOut, status_code=202, responses={
     200: {"model": CaptureOut, "description": "The capture finished before the reply (developer mode runs jobs inline)"},
     404: {"model": ErrorOut, "description": "No such investigation"},
@@ -51,19 +65,12 @@ async def create_capture(investigation_id: str, body: CaptureCreate, request: Re
     """Capture the page at `url`: one visit, no cookies, every file kept with its SHA-256, and the page's text as a
     case document. Answers at once with the queued capture; follow `job` (GET /api/jobs/{id}) or the capture itself."""
     try:
-        row = request_capture(db, investigation_id, body.url, collector=scope_for_request(request).actor_id)
+        row = await start_capture(db, request, investigation_id, body.url)
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
     except CaptureRefused as exc:
         raise HTTPException(422, str(exc)) from exc
-    job = create_job(db, kind=WEB_CAPTURE, investigation_id=investigation_id, subject_type="capture", subject_id=row.id,
-                     runner=job_runner(request).mode, message="Waiting to visit the page")
-    row.job_id = job.id
-    db.commit()
-    await _submit_or_record_failure(request, job, db)
-    db.expire_all()
-    row = db.get(Capture, row.id) or row
-    out = _out(db, row)
+    out = capture_out(db, row)
     if out["job"] is not None and out["job"]["finished"]:
         response.status_code = 200
     return out
@@ -85,7 +92,7 @@ async def collect_capture_media(capture_id: str, request: Request, response: Res
         raise HTTPException(409, "The media on this page is already being collected")
     if (row.media or {}).get("status") == "collected":
         response.status_code = 200  # one item per page: what was collected stays as it was hashed
-        return _out(db, row)
+        return capture_out(db, row)
     job = create_job(db, kind=CAPTURE_MEDIA, investigation_id=row.investigation_id, subject_type="capture", subject_id=row.id,
                      runner=job_runner(request).mode, message="Waiting to look for the video or audio")
     row.media = {**(row.media or {}), "status": "collecting", "job_id": job.id}
@@ -99,13 +106,13 @@ async def collect_capture_media(capture_id: str, request: Request, response: Res
         db.commit()
     if done is not None and done.finished_at is not None:
         response.status_code = 200
-    return _out(db, row)
+    return capture_out(db, row)
 
 
 @router.get("/investigations/{investigation_id}/captures", response_model=list[CaptureOut])
 def get_captures(investigation_id: str, db: Session = Depends(get_db)) -> Any:
     """The case's captures, newest first."""
-    return [_out(db, row) for row in list_captures(db, investigation_id)]
+    return [capture_out(db, row) for row in list_captures(db, investigation_id)]
 
 
 @router.get("/captures/{capture_id}", response_model=CaptureOut, responses={404: {"model": ErrorOut}})
@@ -113,7 +120,7 @@ def get_capture(capture_id: str, db: Session = Depends(get_db)) -> Any:
     row = db.get(Capture, capture_id)
     if row is None:
         raise HTTPException(404, "Capture not found")
-    return _out(db, row)
+    return capture_out(db, row)
 
 
 @router.get("/captures/{capture_id}/files/{name}", response_class=FileResponse, responses={

@@ -35,6 +35,7 @@ import {MoneyView} from '../../features/money/money-view';
 import {ChainOfCustody} from '../../features/custody/chain-of-custody';
 import {StoryScreen} from '../../features/story/story-screen';
 import {TheDrop} from '../../features/the-drop/the-drop';
+import {FollowingScreen} from '../../features/following/following-screen';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
@@ -275,6 +276,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
     </> : <>
       {screen('collect', [
         {anchor: 'the-drop', label: 'The Drop', fill: true, render: () => <PanelErrorBoundary name="The Drop"><TheDrop investigationId={inv} active={view === 'collect'}/></PanelErrorBoundary>},
+        {anchor: 'following', label: 'Following', fill: true, render: () => <PanelErrorBoundary name="Following"><FollowingScreen investigationId={inv} active={view === 'collect'}/></PanelErrorBoundary>},
         {anchor: 'investigation-search', label: 'Search', render: () => <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'document-ingestion', label: 'Library', render: () => <PanelErrorBoundary name="Library"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'source-capture', label: 'Sources & evidence', render: () => <PanelErrorBoundary name="Source & exact evidence capture">

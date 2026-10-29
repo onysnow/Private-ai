@@ -540,6 +540,19 @@
   .gt-card .gt-more { display: block; margin-top: 4px; font-size: 12px; color: var(--accent-2); }
   .gt-card .gt-foot { display: flex; gap: 10px; justify-content: space-between; margin-top: 8px; font: 11px var(--font-mono); color: var(--text-muted); }
   .gt-card .gt-foot a { color: var(--accent-1); margin-left: auto; }
+  /* Reveal (components/ui/reveal.tsx): sub-text and a type's name, shown on hover, focus or click (Ony, 29 Oct). The
+     mark carries no underline of its own; a dotted outline appears only on hover and focus, so the screen stays quiet. */
+  .rv-mark { cursor: help; border-radius: 4px; }
+  .rv-mark:hover, .rv-mark:focus-visible, .rv-mark.rv-open { outline: 1px dotted var(--accent-2); outline-offset: 2px; }
+  .rv-card { position: fixed; z-index: 90; width: max-content; max-width: min(320px, calc(100vw - 16px)); padding: 9px 12px; background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-lifted, 0 8px 24px rgba(0,0,0,.45)); color: var(--text-muted); font: 12.5px/1.45 var(--font-ui);
+    animation: gt-reveal 200ms var(--ease-out, ease-out) both; }
+  .rv-card.above { animation-name: gt-reveal-above; }
+  .rv-card.pinned { border-color: var(--accent-2); }
+  .rv-card b, .rv-card strong { color: var(--text); }
+  .rv-card .rv-row { display: block; }
+  .rv-card .rv-mono { font: 11.5px var(--font-mono); }
+  @media (prefers-reduced-motion: reduce) { .rv-card { animation: none; } }
 }
 
 /* The investigation's type on Red Flags (features/red-flags/red-flags-panel.tsx). */

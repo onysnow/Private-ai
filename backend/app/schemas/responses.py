@@ -5774,3 +5774,104 @@ class SuiteCatalogOut(ResponseModel):
     """Every system, module and record of the suite, and which app runs use each module."""
     source: str | None
     systems: list[SuiteCatalogSystemOut]
+
+
+# --- Following (app/services/following.py, ADR-0021) -----------------------------------------------
+
+class MonitorPollOut(ResponseModel):
+    at: str | None = None
+    items_seen: int = 0
+    items_new: int = 0
+    not_modified: bool = False
+    seconds: float | None = None
+
+
+class MonitorOut(ResponseModel):
+    """One address watched. `health`: waiting (not looked at yet), ok, moved (it redirects to `moved_to`), broken (see
+    `health_reason`), blocked (robots.txt or a login wall), paused."""
+    id: str
+    investigation_id: str
+    kind: Literal["feed", "sitemap", "page", "podcast", "youtube"]
+    url: str
+    host: str
+    title: str | None = None
+    interval_minutes: int
+    route: Literal["direct", "tor"]
+    active: bool
+    health: Literal["waiting", "ok", "moved", "broken", "blocked", "paused"]
+    health_reason: str | None = None
+    http_status: int | None = None
+    failures: int
+    moved_to: str | None = None
+    last_checked_at: Timestamp | None = None
+    last_ok_at: Timestamp | None = None
+    next_check_at: Timestamp | None = None
+    last_poll: MonitorPollOut
+    new_items: int
+    versions: int
+    egress: str
+    created_by: str | None = None
+    created_at: Timestamp
+
+
+class MonitorItemOut(ResponseModel):
+    """Something a monitor found. `flags`: edited (its entry changed after first seen), changed (a page's text changed),
+    gone. `displayed` is what the site said, as displayed and not verified."""
+    id: str
+    monitor_id: str
+    monitor_kind: Literal["feed", "sitemap", "page", "podcast", "youtube"] | None = None
+    monitor_title: str | None = None
+    url: str
+    title: str | None = None
+    displayed: dict[str, Any]
+    edits: int
+    flags: list[str]
+    state: Literal["new", "captured", "skipped"]
+    reason: str | None = None
+    decided_by: str | None = None
+    decided_at: Timestamp | None = None
+    capture_id: str | None = None
+    first_seen_at: Timestamp
+    last_seen_at: Timestamp
+
+
+class FollowingCountsOut(ResponseModel):
+    monitors: int
+    working: int
+    waiting: int
+    direct: int
+    tor: int
+
+
+class FollowingOut(ResponseModel):
+    monitors: list[MonitorOut]
+    at_risk: list[MonitorItemOut]
+    counts: FollowingCountsOut
+
+
+class VersionChangesOut(ResponseModel):
+    added: list[str]
+    removed: list[str]
+    more: int
+
+
+class MonitorVersionOut(ResponseModel):
+    id: str
+    monitor_id: str
+    number: int
+    text_sha256: str
+    lines_added: int
+    lines_removed: int
+    seen_at: Timestamp
+    capture_id: str | None = None
+    changes: VersionChangesOut | None = None
+
+
+class MonitorItemCaptureOut(ResponseModel):
+    item: MonitorItemOut
+    capture: CaptureOut
+
+
+class CaptureAllOut(ResponseModel):
+    captured: list[MonitorItemCaptureOut]
+    left: int

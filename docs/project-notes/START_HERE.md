@@ -15,6 +15,11 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
 - Don't announce your own honesty, rate your own point, announce a shortcut you declined, or
   perform contrition. Lead with the answer.
 - He likes innovative UI that uses the fact it's digital, not copies of other tools.
+- **Show only what matters; the rest on hover or click (29 Oct).** By default a screen shows titles, important data,
+  alerts, numbers and icons. Sub-text (how many times something was read, timings in ms, explanations, secondary
+  details) is revealed on hover or click, unless the context gives a reason to show it. Categorical facts (what type
+  of thing something is) are inferred through the UI (a mark, shape, colour or position) and named on hover or
+  click. Applies to the whole app; build every new screen this way.
 - Approval mode is auto: proceed without stopping on routine steps.
 
 ## Running and testing (cloud container)
@@ -49,6 +54,11 @@ This is where the Workbench redesign stands, for a new session picking it up. Th
   People and access gives a person a key that expires. Branch `claude/accounts-and-locking`.
   Disk encryption is left to Windows (BitLocker / Device encryption); the app only reports it,
   and the BitLocker reading is untested on a real Windows machine.
+
+- **Following (29 Oct, ADR-0021, mockup FOLLOW_1):** source intake Phase 3. Bring in › Following watches feeds,
+  sitemaps, podcasts, YouTube channel feeds and pages for a case, politely (conditional GET, robots.txt, Retry-After);
+  what it finds waits in an at-risk queue for a person to capture or skip. The first screen built to the 29 Oct rule
+  (sub-text on hover or click), with its shared component `components/ui/reveal.tsx`.
 
 ## Waiting on Ony
 - **See ("The Wire"):** the prototype is at https://claude.ai/artifact/8u73poSPQa9eLc5RZZXdn3,

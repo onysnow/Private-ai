@@ -4164,6 +4164,17 @@ export const zFlagIndicatorOut = z.object({
 });
 
 /**
+ * FollowingCountsOut
+ */
+export const zFollowingCountsOut = z.object({
+  direct: z.int(),
+  monitors: z.int(),
+  tor: z.int(),
+  waiting: z.int(),
+  working: z.int(),
+});
+
+/**
  * FontPairOut
  *
  * A heading and body font; empty names mean "keep the theme's own".
@@ -5303,6 +5314,175 @@ export const zMoneyCheckOut = z.object({
   payments_in: z.int(),
   payments_out: z.int(),
   to_check_id: z.string().nullish(),
+});
+
+/**
+ * MonitorCaptureAll
+ *
+ * Capturing many at once needs a reason, which goes on each item (EGS rule 8).
+ */
+export const zMonitorCaptureAll = z.object({
+  item_ids: z.array(z.string()).max(50).nullish(),
+  reason: z.string().min(3).max(500),
+});
+
+/**
+ * MonitorCreate
+ *
+ * An address to follow. `kind` is worked out from the address when left out.
+ */
+export const zMonitorCreate = z.object({
+  interval_minutes: z.int().gte(5).lte(10080).optional().default(30),
+  kind: z.enum(['feed', 'sitemap', 'page', 'podcast', 'youtube']).nullish(),
+  poll: z.boolean().optional().default(true),
+  route: z.enum(['direct', 'tor']).optional().default('direct'),
+  title: z.string().max(300).nullish(),
+  url: z.string().min(1).max(4096),
+});
+
+/**
+ * MonitorItemOut
+ *
+ * Something a monitor found. `flags`: edited (its entry changed after first seen), changed (a page's text changed),
+ * gone. `displayed` is what the site said, as displayed and not verified.
+ */
+export const zMonitorItemOut = z.object({
+  capture_id: z.string().nullish(),
+  decided_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  decided_by: z.string().nullish(),
+  displayed: z.record(z.string(), z.unknown()),
+  edits: z.int(),
+  first_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  flags: z.array(z.string()),
+  id: z.string(),
+  last_seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  monitor_id: z.string(),
+  monitor_kind: z
+    .enum(['feed', 'sitemap', 'page', 'podcast', 'youtube'])
+    .nullish(),
+  monitor_title: z.string().nullish(),
+  reason: z.string().nullish(),
+  state: z.enum(['new', 'captured', 'skipped']),
+  title: z.string().nullish(),
+  url: z.string(),
+});
+
+/**
+ * MonitorItemCaptureOut
+ */
+export const zMonitorItemCaptureOut = z.object({
+  capture: zCaptureOut,
+  item: zMonitorItemOut,
+});
+
+/**
+ * CaptureAllOut
+ */
+export const zCaptureAllOut = z.object({
+  captured: z.array(zMonitorItemCaptureOut),
+  left: z.int(),
+});
+
+/**
+ * MonitorItemSkip
+ */
+export const zMonitorItemSkip = z.object({
+  reason: z.string().max(500).nullish(),
+});
+
+/**
+ * MonitorPollOut
+ */
+export const zMonitorPollOut = z.object({
+  at: z.string().nullish(),
+  items_new: z.int().optional().default(0),
+  items_seen: z.int().optional().default(0),
+  not_modified: z.boolean().optional().default(false),
+  seconds: z.number().nullish(),
+});
+
+/**
+ * MonitorOut
+ *
+ * One address watched. `health`: waiting (not looked at yet), ok, moved (it redirects to `moved_to`), broken (see
+ * `health_reason`), blocked (robots.txt or a login wall), paused.
+ */
+export const zMonitorOut = z.object({
+  active: z.boolean(),
+  created_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  created_by: z.string().nullish(),
+  egress: z.string(),
+  failures: z.int(),
+  health: z.enum(['waiting', 'ok', 'moved', 'broken', 'blocked', 'paused']),
+  health_reason: z.string().nullish(),
+  host: z.string(),
+  http_status: z.int().nullish(),
+  id: z.string(),
+  interval_minutes: z.int(),
+  investigation_id: z.string(),
+  kind: z.enum(['feed', 'sitemap', 'page', 'podcast', 'youtube']),
+  last_checked_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  last_ok_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  last_poll: zMonitorPollOut,
+  moved_to: z.string().nullish(),
+  new_items: z.int(),
+  next_check_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    )
+    .nullish(),
+  route: z.enum(['direct', 'tor']),
+  title: z.string().nullish(),
+  url: z.string(),
+  versions: z.int(),
+});
+
+/**
+ * FollowingOut
+ */
+export const zFollowingOut = z.object({
+  at_risk: z.array(zMonitorItemOut),
+  counts: zFollowingCountsOut,
+  monitors: z.array(zMonitorOut),
+});
+
+/**
+ * MonitorUpdate
+ */
+export const zMonitorUpdate = z.object({
+  active: z.boolean().nullish(),
+  interval_minutes: z.int().gte(5).lte(10080).nullish(),
+  route: z.enum(['direct', 'tor']).nullish(),
+  title: z.string().max(300).nullish(),
+  url: z.string().min(1).max(4096).nullish(),
 });
 
 /**
@@ -8943,6 +9123,34 @@ export const zValidationErrorOut = z.object({
 });
 
 /**
+ * VersionChangesOut
+ */
+export const zVersionChangesOut = z.object({
+  added: z.array(z.string()),
+  more: z.int(),
+  removed: z.array(z.string()),
+});
+
+/**
+ * MonitorVersionOut
+ */
+export const zMonitorVersionOut = z.object({
+  capture_id: z.string().nullish(),
+  changes: zVersionChangesOut.nullish(),
+  id: z.string(),
+  lines_added: z.int(),
+  lines_removed: z.int(),
+  monitor_id: z.string(),
+  number: z.int(),
+  seen_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  text_sha256: z.string(),
+});
+
+/**
  * VisualEventRowOut
  *
  * A dated event at a place: an events row, without anything nested in it
@@ -11747,6 +11955,26 @@ export const zGetInvestigationFinancialFlowsPath = z.object({
  */
 export const zGetInvestigationFinancialFlowsResponse = zFinancialLedgerOut;
 
+export const zGetFollowingPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetFollowingResponse = zFollowingOut;
+
+export const zCaptureAllBody = zMonitorCaptureAll;
+
+export const zCaptureAllPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCaptureAllResponse = zCaptureAllOut;
+
 export const zGetInvestigationGraphPath = z.object({
   investigation_id: z.string(),
 });
@@ -11882,6 +12110,17 @@ export const zGetInvestigationMoneyChecksQuery = z.object({
  * Successful Response
  */
 export const zGetInvestigationMoneyChecksResponse = zMoneyChecksOut;
+
+export const zCreateMonitorBody = zMonitorCreate;
+
+export const zCreateMonitorPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateMonitorResponse = zMonitorOut;
 
 export const zGetNotesPath = z.object({
   investigation_id: z.string(),
@@ -12638,6 +12877,81 @@ export const zNewRecoveryKeyBody = zSecretIn;
  * Successful Response
  */
 export const zNewRecoveryKeyResponse = zRecoveryWordsOut;
+
+export const zCaptureItemPath = z.object({
+  monitor_item_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zCaptureItemResponse = zMonitorItemCaptureOut;
+
+export const zSkipItemBody = zMonitorItemSkip;
+
+export const zSkipItemPath = z.object({
+  monitor_item_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSkipItemResponse = zMonitorItemOut;
+
+export const zDeleteMonitorPath = z.object({
+  monitor_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteMonitorResponse = z.void();
+
+export const zUpdateMonitorBody = zMonitorUpdate;
+
+export const zUpdateMonitorPath = z.object({
+  monitor_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateMonitorResponse = zMonitorOut;
+
+export const zGetMonitorItemsPath = z.object({
+  monitor_id: z.string(),
+});
+
+export const zGetMonitorItemsQuery = z.object({
+  state: z.string().nullish(),
+});
+
+/**
+ * Response Get Monitor Items
+ *
+ * Successful Response
+ */
+export const zGetMonitorItemsResponse = z.array(zMonitorItemOut);
+
+export const zPollMonitorPath = z.object({
+  monitor_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zPollMonitorResponse = zMonitorOut;
+
+export const zGetVersionsPath = z.object({
+  monitor_id: z.string(),
+});
+
+/**
+ * Response Get Versions
+ *
+ * Successful Response
+ */
+export const zGetVersionsResponse = z.array(zMonitorVersionOut);
 
 export const zRemoveNotePath = z.object({
   note_id: z.string(),

@@ -20,6 +20,12 @@ Wherever a card appears (decision, dashboard widget, flag, timeline row, to-chec
 
 Cards that fail this today: "Keep this passage as evidence?" with no preview, four identical "business reason for the payments" checks, flags with no amounts or dates, and timeline rows with raw ids.
 
+## Asked for: research
+- **What is sub-text and what is categorical, screen by screen (29 Oct).** Ony's rule (CLAUDE.md): titles, important
+  data, alerts, numbers and icons show; sub-text is revealed on hover or click; a thing's type is inferred through the
+  UI and named on hover or click. Research: list, for every screen, which text is which, and how each type is shown
+  without words. New screens follow the rule from now on.
+
 ## Asked for: mockups first
 - **Login and account (19 Oct).** So decisions on this computer carry your name ("Accepted by Ony") rather than "a person": the app stores who decided from the signed-in account (built 19 Oct), but the local owner has no account. Mockups ACCOUNT_1–4 approved 19 Oct; tools researched in `docs/research/accounts-and-locking-tools.md`; Ony chose BitLocker for the disk plus small tools: ADR-0016, built 19 Oct (MOCKUP_BUILD_LIST.md, ACCOUNT_1–4).
 - **Bring in › Documents (ingestion page).** Redesign the queue and most of the page:

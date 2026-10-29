@@ -905,3 +905,33 @@ class CaseLockIn(BaseModel):
 
 class LockReasonIn(BaseModel):
     reason: str | None = None   # idle | hide | sleep | button
+
+
+# --- Following (ADR-0021) ----------------------------------------------------------------------------
+
+class MonitorCreate(BaseModel):
+    """An address to follow. `kind` is worked out from the address when left out."""
+    url: str = Field(min_length=1, max_length=4096)
+    kind: Literal["feed", "sitemap", "page", "podcast", "youtube"] | None = None
+    interval_minutes: int = Field(default=30, ge=5, le=7 * 24 * 60)
+    route: Literal["direct", "tor"] = "direct"
+    title: str | None = Field(default=None, max_length=300)
+    poll: bool = True   # look once now, so the reporter sees at once whether it works
+
+
+class MonitorUpdate(BaseModel):
+    interval_minutes: int | None = Field(default=None, ge=5, le=7 * 24 * 60)
+    route: Literal["direct", "tor"] | None = None
+    title: str | None = Field(default=None, max_length=300)
+    active: bool | None = None
+    url: str | None = Field(default=None, min_length=1, max_length=4096)  # to accept where it moved to
+
+
+class MonitorItemSkip(BaseModel):
+    reason: str | None = Field(default=None, max_length=500)
+
+
+class MonitorCaptureAll(BaseModel):
+    """Capturing many at once needs a reason, which goes on each item (EGS rule 8)."""
+    reason: str = Field(min_length=3, max_length=500)
+    item_ids: list[str] | None = Field(default=None, max_length=50)  # none: every item waiting, up to 50

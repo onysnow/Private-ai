@@ -326,6 +326,18 @@ def _red_flag(client: TestClient, inv: str) -> str:
     return next(f["id"] for f in flags if f["indicator_id"] == "BO-033")
 
 
+def _monitor_item(inv: str, monitor_id: str) -> str:
+    """Something the followed address found, waiting for a person (the contract tests make no requests out, so no poll found it)."""
+    from app.db.session import SessionLocal
+    from app.models.domain import MonitorItem
+
+    with SessionLocal() as db:
+        row = MonitorItem(investigation_id=inv, monitor_id=monitor_id, key="a-1", url="https://example.org/news/a-1", title="A story", displayed={}, flags=[])
+        db.add(row)
+        db.commit()
+        return row.id
+
+
 def _check_item(client: TestClient) -> str:
     """A "To check" item: what a seven-layer ownership chain's Red Flag (BO-002)
     cannot show from the records, in an investigation of its own."""
@@ -482,6 +494,8 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     saved_question = ok(client.post(f"/api/investigations/{inv}/saved-questions", json={"module": "case_synthesis", "question": "Who paid Meridian?"}))
     # A page captured from a link (app/services/web_capture.py), by a stand-in for the browser's visit.
     capture = ok(client.post(f"/api/investigations/{inv}/captures", json={"url": "https://example.org/meridian"}))
+    # An address the case follows (app/services/following.py), not looked at: the contract tests make no requests out.
+    monitor = ok(client.post(f"/api/investigations/{inv}/monitors", json={"url": "https://example.org/feed.xml", "poll": False}))
     # A recording, transcribed by a stand-in for the model (app/services/transcription.py).
     recording = ok(client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Board call"}, files={
         "file": ("board-call.mp3", (Path(__file__).parent / "fixtures" / "media" / "harbour-talk.mp3").read_bytes(), "audio/mpeg")}))
@@ -499,7 +513,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "name": "investigations", "pk": inv, "source": "app", "uid": user["id"], "tid": token["token_id"],
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
             "indicator_id": "BO-001", "case_id": "deripaska-en-rusal", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
-            "check_id": _check_item(client), "case_record_id": case_record["id"], "thought_id": "CLM-0001", "capture_id": capture["id"],
+            "check_id": _check_item(client), "case_record_id": case_record["id"], "thought_id": "CLM-0001", "capture_id": capture["id"], "monitor_id": monitor["id"], "monitor_item_id": _monitor_item(inv, monitor["id"]),
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={
