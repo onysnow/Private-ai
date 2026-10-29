@@ -434,7 +434,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
 
   type PartyInfo = {f: string; cx: number; cy: number; R1: number; RX: number; secLabels: {k: string; a: number; n: string; c: number}[]; more: {p: string; n: number; x: number; y: number}[]};
   let partyInfo: PartyInfo | null = null;
-  let moreEls: {x: number; y: number; g: SVGGElement}[] = [];
+  let moreEls: {p: string; w: number; g: SVGGElement; lead: SVGPathElement}[] = [];
   function partyTargets(f: string): Record<string, Target> {
     const T: Record<string, Target> = {};
     const cx = E[f].x, cy = E[f].y;
@@ -742,11 +742,42 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       S.t.style.display = ok ? '' : 'none';
       if (ok) { S.t.setAttribute('x', String(ok.wx)); S.t.setAttribute('y', String(ok.wy)); S.t.setAttribute('font-size', String(10.5 / C.k)); secBoxes.push(ok.b); }
     }
-    for (const M of moreEls) {
-      const s = toScreen(M.x, M.y);
-      M.g.setAttribute('transform', `translate(${M.x},${M.y}) scale(${1 / C.k})`);
-      secBoxes.push({x0: s.x - 40, x1: s.x + 40, y0: s.y - 12, y1: s.y + 12});
+    // "+N more" chips: beside their party, outward from the focus, at the first spot clear of every card, dot, its name
+    // and link chip (they used to sit at a fixed offset, over the cards' names). A leader line keeps them tied to it.
+    const dotBoxes: Box[] = [];
+    for (const id in node) {
+      const N = node[id];
+      if (N.cur.v !== 1 || N.cur.o < 0.5 || !P[id]) continue;
+      const s = toScreen(P[id].x, P[id].y), half = Math.max(16, (E[id]?.short.length ?? 8) * 3.6);
+      dotBoxes.push({x0: s.x - half, x1: s.x + half, y0: s.y - 14, y1: s.y + 30});
     }
+    const moreBoxes: Box[] = [];
+    for (const M of moreEls) {
+      const at = P[M.p], from = P[focus];
+      if (!at) { M.g.style.display = 'none'; M.lead.style.display = 'none'; continue; }
+      M.g.style.display = ''; M.lead.style.display = '';
+      const s = toScreen(at.x, at.y), f = from ? toScreen(from.x, from.y) : {x: W / 2, y: H / 2};
+      const base = Math.atan2(s.y - f.y, s.x - f.x) || 0;
+      const box = (x: number, y: number) => ({x0: x - M.w / 2 - 4, x1: x + M.w / 2 + 4, y0: y - 17, y1: y + 17});
+      const clear = (b: Box) => !overlap(b, cardBoxes) && !overlap(b, dotBoxes) && !overlap(b, secBoxes) && !overlap(b, moreBoxes)
+        && b.x0 > 8 && b.x1 < W - 8 && b.y0 > 8 && b.y1 < H - 8;
+      let spot: {x: number; y: number} | null = null;
+      for (const d of [120, 150, 185, 225, 270]) {
+        for (const turn of [0, 0.45, -0.45, 0.9, -0.9, 1.4, -1.4, Math.PI]) {
+          const x = s.x + Math.cos(base + turn) * d, y = s.y + Math.sin(base + turn) * d * 0.62;
+          if (clear(box(x, y))) { spot = {x, y}; break; }
+        }
+        if (spot) break;
+      }
+      spot ??= {x: s.x + Math.cos(base) * 150, y: s.y + Math.sin(base) * 93};
+      moreBoxes.push(box(spot.x, spot.y));
+      const wx = (spot.x - W / 2) / C.k + C.x, wy = (spot.y - H / 2) / C.k + C.y;
+      M.g.setAttribute('transform', `translate(${wx},${wy}) scale(${1 / C.k})`);
+      M.lead.setAttribute('d', `M${at.x},${at.y}L${wx},${wy}`);
+      M.lead.setAttribute('stroke-width', String(1.2 / C.k));
+      M.lead.setAttribute('stroke-dasharray', `${2 / C.k} ${4 / C.k}`);
+    }
+    secBoxes.push(...moreBoxes);
     for (const h of hopEls) {
       const R = edgeEls[h.k];
       if (!R || !R.mid) { h.g.style.display = 'none'; continue; }
@@ -990,12 +1021,19 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         secEls.push({t, a: s.a * Math.PI / 180, r: I.R1, rx: I.RX, cx: I.cx, cy: I.cy});
       }
       for (const m of I.more) {
-        const g = el('g', {class: 'more', transform: `translate(${m.x},${m.y})`, role: 'button', 'aria-label': `Show ${m.n} more linked to ${E[m.p].short}`}, gM);
-        el('rect', {x: -40, y: -12, width: 80, height: 24, rx: 12}, g);
-        const t = el('text', {'text-anchor': 'middle', y: 4}, g);
-        t.textContent = `+${m.n} more`;
-        on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); expanded.add(m.p); go('party', {noTrail: true}); });
-        moreEls.push({x: m.x, y: m.y, g});
+        // A folded stack: a leader back to its party, then a tab with three stacked dots and the count.
+        const lead = el('path', {class: 'more-lead'}, gM);
+        const g = el('g', {class: 'more', transform: `translate(${m.x},${m.y})`, role: 'button', tabindex: 0, 'aria-label': `Show ${m.n} more linked to ${E[m.p].short}`}, gM);
+        const w = 80 + String(m.n).length * 8;
+        el('rect', {x: -w / 2, y: -13, width: w, height: 26, rx: 6, class: 'more-bg'}, g);
+        for (const [i, dx] of [0, 5, 10].entries()) el('circle', {cx: -w / 2 + 11 + dx, cy: 0, r: 4.2, class: `more-stack s${i}`}, g);
+        const t = el('text', {x: -w / 2 + 30, y: 4.5}, g);
+        el('tspan', {class: 'more-n'}, t).textContent = `+${m.n}`;
+        el('tspan', {class: 'more-w', dx: 4}, t).textContent = 'more';
+        const open = () => { expanded.add(m.p); go('party', {noTrail: true}); };
+        on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); open(); });
+        on<KeyboardEvent>(g, 'keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); open(); } });
+        moreEls.push({p: m.p, w, g, lead});
       }
     }
     chains.forEach(c => { const t = node[c.id]?.dot.querySelector('text'); if (t) t.textContent = c.mids.length > 1 ? `CHAIN OF ${c.mids.length} COMPANIES` : '1 COMPANY BETWEEN'; });

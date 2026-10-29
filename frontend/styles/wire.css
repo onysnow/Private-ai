@@ -209,10 +209,18 @@
 .tw .elab.lit rect:first-of-type { stroke-width: 2; }
 .tw g.lit .strand { stroke-width: 4px; }
 @keyframes tw-halo { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .15; transform: scale(1.35); } }
-.tw .more { cursor: pointer; }
-.tw .more rect { fill: var(--surface-1); stroke: var(--line); stroke-dasharray: 3 3; }
-.tw .more:hover rect { stroke: var(--accent-1); }
-.tw .more text { font: 500 11px var(--font-ui); fill: var(--text-muted); }
+/* "+N more": a folded stack of parties, told apart from link chips (rounded pills) and cards by its square tab,
+   amber edge, stacked dots and mono count; tied to its party by a dotted leader. */
+.tw .more { cursor: pointer; outline: none; }
+.tw .more-bg { fill: color-mix(in srgb, #E8A95B 13%, #0f1a26); stroke: #E8A95B; stroke-width: 1.2; transition: fill .15s; }
+.tw .more:hover .more-bg, .tw .more:focus-visible .more-bg { fill: color-mix(in srgb, #E8A95B 30%, #0f1a26); }
+.tw .more:focus-visible .more-bg { stroke-width: 2; }
+.tw .more-stack { stroke: #0f1a26; stroke-width: 1.2; }
+.tw .more-stack.s0 { fill: #7FB7E0; } .tw .more-stack.s1 { fill: #d4a152; } .tw .more-stack.s2 { fill: #baac91; }
+.tw .more text { font: 500 11px var(--font-ui); }
+.tw .more-n { font: 700 12px var(--font-mono); fill: #F3C887; }
+.tw .more-w { fill: var(--text-muted); letter-spacing: .04em; }
+.tw .more-lead { fill: none; stroke: #E8A95B; stroke-opacity: .55; pointer-events: none; }
 .tw .hop-bg { fill: var(--ground); }
 .tw .round-l { font: 600 11px var(--font-mono); letter-spacing: .06em; fill: #ffe9e4; }
 
