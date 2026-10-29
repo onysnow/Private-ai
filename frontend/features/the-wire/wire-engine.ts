@@ -66,6 +66,8 @@ const KIND: Record<string, {fill: string; ring: string; name: string}> = {
 /** The symbol (drawn by the-wire.tsx from components/network/party-icons) that shows each kind. */
 export const KIND_SYMBOL: Record<string, string> = {person: 'tw-k-person', company: 'tw-k-company', org: 'tw-k-org', vehicle: 'tw-k-vehicle',
   property: 'tw-k-property', account: 'tw-k-account'};
+/** A party's circle (on a card and as a dot), before the card scale. */
+const DOT_R = 11;
 const FAM: Record<string, {c: string; n: string}> = {
   owns: {c: '#d4a152', n: 'Owns'}, runs: {c: '#baac91', n: 'Directs or works for'}, money: {c: '#c98a5e', n: 'Paid'}, other: {c: '#927e5d', n: 'Linked, kind not yet known'},
 };
@@ -372,10 +374,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       for (let i = 2; i >= 0; i--) el('rect', {x: -58 + i * 5, y: -17 - i * 5, width: 116, height: 34, rx: 7, fill: K.fill, stroke: K.ring, 'stroke-width': 1.2, opacity: 1 - i * 0.22}, dot);
       el('text', {class: 'card-s', x: 0, y: 4, 'text-anchor': 'middle'}, dot);
     } else {
-      const r = 4 + Math.sqrt(deg[id] || 0) * 2.6;
-      el('circle', {r, fill: K.fill, stroke: K.ring, 'stroke-width': 1.6, class: 'ring'}, dot);
-      // The kind as its icon (SEE_1), where the dot is big enough to hold one.
-      if (r >= 8.5) kindIcon(E[id].kind, 0, 0, r * 1.15, K.ring, dot);
+      // A party drawn as a dot is the card's own circle with its kind's icon, the same size on screen as on a card.
+      el('circle', {r: DOT_R, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5, class: 'ring'}, dot);
+      kindIcon(E[id].kind, 0, 0, 13, K.ring, dot);
     }
     const lbl = el('text', {class: 'lbl', 'text-anchor': 'middle'}, g);
     const card = el('g', {}, g);
@@ -412,8 +413,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     }
     const N: NodeEl = {id, g, halo, tags, dx, hw: 90 + pad / 2, hh: 27, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
     on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); onNodeClick(id); });
-    on<PointerEvent>(g, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showTip(ev, id); });
-    on(g, 'pointerleave', hideTip);
+    on<PointerEvent>(g, 'pointerenter', ev => { if (ev.pointerType !== 'touch') { showTip(ev, id); revealName(N, true); } });
+    on(g, 'pointerleave', () => { hideTip(); revealName(N, false); });
     node[id] = N;
     return N;
   }
@@ -676,9 +677,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   let gridKey = '';
   function moveGrid(): void {
     if (!gridEl) return;
-    // 24 px cells all the way out (15%), about 65 px at 63%, 75 px at 100%, 240 px at 400%; past about 50% the grid is
-    // close enough to the lens to fall slightly out of focus.
-    const still = RM(), gs = still ? 48 : 24 * Math.pow(C.k / 0.15, 0.7), blur = still ? 0 : Math.min(2.4, Math.max(0, (C.k - 0.5) * 1.1));
+    // 48 px cells all the way out (15%), about 130 px at 63%, 150 px at 100%, 480 px at 400%; past about 50% the grid is
+    // close enough to the lens to fall out of focus, up to a 4.8 px blur.
+    const still = RM(), gs = still ? 48 : 48 * Math.pow(C.k / 0.15, 0.7), blur = still ? 0 : Math.min(4.8, Math.max(0, (C.k - 0.5) * 2.2));
     const off = (v: number) => (still ? 0 : ((v % gs) + gs) % gs);
     const key = `${off(-C.x * C.k / 6).toFixed(1)}|${off(-C.y * C.k / 6).toFixed(1)}|${gs.toFixed(2)}|${blur.toFixed(2)}`;
     if (key === gridKey) return;
@@ -688,6 +689,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     gridEl.style.filter = Number(bl) > 0.05 ? `blur(${bl}px)` : '';
   }
 
+  let curCs = 1;
   function render(): void {
     cam.setAttribute('transform', `translate(${W / 2},${H / 2}) scale(${C.k}) translate(${-C.x},${-C.y})`);
     moveGrid();
@@ -695,6 +697,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const cands: {id: string; N: NodeEl; d: Pt; pri: number}[] = [];
     // Cards keep a readable size on screen (about 170 px wide) whatever the zoom.
     const cs = Math.min(2.6, Math.max(1, 0.95 / C.k));
+    curCs = cs;
     for (const id in node) {
       const N = node[id], d = disp(N);
       P[id] = d;
@@ -704,6 +707,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       N.g.style.display = o < 0.02 ? 'none' : '';
       N.dust.style.display = v === 0 ? '' : 'none';
       N.dot.style.display = v === 1 || (v === 2 && N.isChain) ? '' : 'none';
+      if (!N.isChain) N.dot.setAttribute('transform', `scale(${cs})`);
       N.card.style.display = v === 2 && !N.isChain ? '' : 'none';
       if (v === 2) N.card.setAttribute('transform', `scale(${cs})`);
       N.g.style.pointerEvents = v === 0 ? 'none' : '';
@@ -719,11 +723,11 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         N.halo.setAttribute('stroke-dasharray', lvl === 'faint' ? '3 3' : 'none');
       }
       // On a card the ring sits round the card's kind dot; on a dot, round the dot.
-      N.halo.setAttribute('r', String(v === 2 && !N.isChain ? 14 * cs : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 5));
+      N.halo.setAttribute('r', String(v === 2 && !N.isChain ? 14 * cs : (DOT_R + 4) * cs));
       N.halo.setAttribute('cx', String(v === 2 && !N.isChain ? N.dx * cs : 0));
       if (N.tags) {
         N.tags.style.display = v > 0 ? '' : 'none';
-        const r = v === 2 ? 18.5 * cs : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 9;
+        const r = v === 2 ? 18.5 * cs : (DOT_R + 7.5) * cs;
         N.tags.setAttribute('transform', v === 2 ? `translate(${N.dx * cs},0)` : '');
         for (const c of Array.from(N.tags.querySelectorAll('circle'))) c.setAttribute('r', String(r));
       }
@@ -846,8 +850,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     for (const id in node) {
       const N = node[id];
       if (N.cur.v !== 1 || N.cur.o < 0.5 || !P[id]) continue;
-      const s = toScreen(P[id].x, P[id].y), half = Math.max(16, (E[id]?.short.length ?? 8) * 3.6);
-      dotBoxes.push({x0: s.x - half, x1: s.x + half, y0: s.y - 14, y1: s.y + 30});
+      // The dot and its name beside it, on either side.
+      const s = toScreen(P[id].x, P[id].y), r = DOT_R * curCs * C.k, half = r + 12 + Math.min(PEEK, E[id]?.short.length ?? 8) * 6.5;
+      dotBoxes.push({x0: s.x - half, x1: s.x + half, y0: s.y - r - 4, y1: s.y + r + 4});
     }
     const moreBoxes: Box[] = [];
     for (const M of moreEls) {
@@ -890,29 +895,40 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     q('.tw-zoom').textContent = `${Math.round(C.k * 100)}%`;
   }
 
+  /* A dot's name sits beside it, on whichever side has more open room, partly revealed: its first few words, fading
+     out. Hovering the party shows the whole name there (revealName). */
+  const PEEK = 13;
+  function revealName(N: NodeEl, full: boolean): void {
+    const name = N.lbl.dataset.name;
+    if (!name || N.lbl.style.display === 'none') return;
+    N.lbl.textContent = full || name.length <= PEEK ? name : name.slice(0, PEEK);
+    N.lbl.classList.toggle('peek', !full && name.length > PEEK);
+  }
   function placeLabels(cands: {id: string; N: NodeEl; d: Pt; pri: number}[]): Box[] {
     const boxes = terrBoxes.concat(cardBoxes, secBoxes);
     cands.sort((a, b) => b.pri - a.pri);
     const fsS = mode === 'case' ? 12 : 11.5;
+    const fp = focus && node[focus] ? node[focus].cur : null, centre = fp ? toScreen(fp.x, fp.y) : {x: W / 2, y: H / 2};
     for (const c of cands) {
-      const s = toScreen(c.d.x, c.d.y), r = (4 + Math.sqrt(deg[c.id]) * 2.6) * C.k, off = r + fsS + 2;
-      // Always under the dot, so every name sits in the same place; a long name is shortened (the whole of it is on
-      // hover), and one that has no room under its dot is left to hover rather than moved above or beside it.
-      const name = clipWords(E[c.id].short, 20);
-      const w = name.length * fsS * 0.56;
-      // Centred under it first, then under it starting at the dot or ending at it: always the same height under the dot.
-      const spots: {dx: number; dy: number; anchor: string}[] = [{dx: 0, dy: off, anchor: 'middle'}, {dx: -r, dy: off, anchor: 'start'}, {dx: r, dy: off, anchor: 'end'}];
-      const box = (p: typeof spots[number]) => {
-        const x0 = p.anchor === 'middle' ? s.x - w / 2 : p.anchor === 'start' ? s.x + p.dx : s.x + p.dx - w;
-        return {x0: x0 - 3, x1: x0 + w + 3, y0: s.y + p.dy - fsS, y1: s.y + p.dy + 3};
+      const name = E[c.id].short, shown = name.length > PEEK ? name.slice(0, PEEK) : name;
+      const s = toScreen(c.d.x, c.d.y), r = DOT_R * curCs * C.k, w = shown.length * fsS * 0.56;
+      const side = (dir: 1 | -1) => {
+        const x0 = dir > 0 ? s.x + r + 6 : s.x - r - 6 - w;
+        return {x0: x0 - 3, x1: x0 + w + 3, y0: s.y - fsS * 0.7, y1: s.y + fsS * 0.5};
       };
-      const at = spots.find(p => { const b = box(p); return b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes); });
-      if (!at) continue;
-      boxes.push(box(at));
+      const room = (b: Box) => b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes);
+      // Outward from the party in the middle has more room, unless something sits there.
+      const out: 1 | -1 = s.x >= centre.x ? 1 : -1;
+      const dir = room(side(out)) ? out : room(side(out === 1 ? -1 : 1)) ? (out === 1 ? -1 : 1) : 0;
+      if (!dir) continue;
+      boxes.push(side(dir));
       c.N.lbl.style.display = '';
+      c.N.lbl.dataset.name = name;
       c.N.lbl.setAttribute('font-size', String(fsS / C.k)); c.N.lbl.setAttribute('stroke-width', String(4 / C.k));
-      c.N.lbl.setAttribute('x', String(at.dx / C.k)); c.N.lbl.setAttribute('y', String((at.dy - 2) / C.k)); c.N.lbl.setAttribute('text-anchor', at.anchor);
-      c.N.lbl.textContent = name;
+      c.N.lbl.setAttribute('x', String((dir * (r + 6)) / C.k)); c.N.lbl.setAttribute('y', String((fsS * 0.35) / C.k));
+      c.N.lbl.setAttribute('text-anchor', dir > 0 ? 'start' : 'end');
+      c.N.lbl.dataset.side = dir > 0 ? 'r' : 'l';
+      revealName(c.N, false);
     }
     return boxes;
   }
@@ -926,7 +942,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     for (const id in node) {
       const N = node[id];
       if (N.cur.v !== 1 || N.cur.o < 0.5) continue;
-      const s = toScreen(N.cur.x, N.cur.y), r = (4 + Math.sqrt(deg[id] || 0) * 2.6) * C.k + 3;
+      const s = toScreen(N.cur.x, N.cur.y), r = DOT_R * curCs * C.k + 3;
       dots.push({x0: s.x - r, x1: s.x + r, y0: s.y - r, y1: s.y + r});
     }
     const placed = boxes.concat(dots);

@@ -129,6 +129,9 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
           <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/>
           <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -10"/>
         </filter>
+        {/* A dot's name, partly revealed: its first words fading out (and its dark halo with them). */}
+        <linearGradient id="tw-peek" x1="0" x2="1"><stop offset="0.5" style={{stopColor: 'var(--text)'}}/><stop offset="1" style={{stopColor: 'var(--text)', stopOpacity: 0}}/></linearGradient>
+        <linearGradient id="tw-peek-halo" x1="0" x2="1"><stop offset="0.5" style={{stopColor: 'var(--ground)'}}/><stop offset="1" style={{stopColor: 'var(--ground)', stopOpacity: 0}}/></linearGradient>
         <filter id="tw-flagglow" x="-30%" y="-90%" width="160%" height="280%"><feGaussianBlur stdDeviation="8"/></filter>
         <filter id="tw-flagglow-core" x="-10%" y="-40%" width="120%" height="180%"><feGaussianBlur stdDeviation="2"/></filter>
         <filter id="tw-tagglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/></feMerge></filter>
