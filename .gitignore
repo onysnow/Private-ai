@@ -42,5 +42,3 @@ Thumbs.db
 .coverage.*
 backend/.coverage.*
 
-# The site mockup export (tools/export_site_mockup.py): large generated files, made on demand.
-docs/design/site-export/
