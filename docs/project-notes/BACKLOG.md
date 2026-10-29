@@ -157,6 +157,14 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
 - The dot's link count (all connections) and a card's "+N" (only those not drawn) mean different things, and he
   couldn't tell. Options page for showing connections not drawn, the same on cards and dots (artifact Hidden
   Connections): A the same "+N" everywhere, B pips (drawn vs not), C stubs that reach out. Waiting for his pick.
+- Solid on hover also covers the circles with numbers (flag counts, "+N") and the owns key mark: colours flip, the
+  circle fills in its colour and the number or key turns dark. Ship's solid version redrawn (cabin with portholes, a
+  deck line, no line through the hull). Bank account icon: the tipping flap and dropping coin replaced by the snap strap
+  easing out and back. The owns mark's reveal is sharper and quicker (no spring overshoot). Shapes preview.
+- Line thicknesses are inconsistent (about twelve values). Proposed: hairline 1 (leaders, tethers), regular 1.5 (every
+  outline, non-money lines, threads, icons drawn to 1.5 on screen), strong 2.5 (centre party, the share ring, a hovered
+  flag thread); money lines keep scaling with the amount. Waiting for his yes.
+- He asked for redesign options for how much is owned, and better options for the dot's name tab (to the research).
 - Research before designing more: how 2026 UI hints at more information, and how ownership share is shown (the
   key-and-ring share mark is not good). Findings to discuss with him before any redesign.
   - The shader preview had stopped drawing its liquid (a script error from the colour edit, and a missing reference),
