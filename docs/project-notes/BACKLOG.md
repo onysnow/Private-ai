@@ -104,7 +104,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
   - There is no form for manual entities, relationships or events.
 - **Data quality and counts:**
   - The 1MDB queue has about 15,000 items.
-  - Deripaska proposes a railway (CSX) claim from the whole Federal Register issue.
+  - ~~Deripaska proposes a railway (CSX) claim from the whole Federal Register issue.~~ Fixed 29 Oct: the pinned PDF (83 FR 19138-19140) starts with the end of an FRA notice about CSX and ends with the start of a Treasury meeting notice. The manifest now names the OFAC notice's first and last words (`part`), and proposals come only from between them; every page is still kept and searchable, and the PDF is unchanged (`own_part` in `app/services/documents.py`). A demo loaded before this keeps its old proposals; loading it again after removing it reads the notice only.
   - ~~The Home counts and the Next-up counts disagree.~~ Checked 29 Oct in Chromium on the Vekselberg demo: "984 to decide" on the strip, "1 of 984" on Next up.
 - **Layout:**
   - ~~At phone width, Home and Decide overflow and Red Flags collapses.~~ Fixed 29 Oct: their one-column layout used `1fr`, which never shrinks below its widest child; now `minmax(0, 1fr)` (`styles/case.css`). Checked in Chromium at 390 px: no screen scrolls sideways; Red Flags already stacked.

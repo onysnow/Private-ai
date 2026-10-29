@@ -138,7 +138,8 @@ def build(db: Session, case_id: str, documents: list[tuple[dict[str, Any], bytes
     for meta, data in documents:
         doc = store_document(db, investigation_id=inv.id, title=meta["title"], filename=meta["filename"], mime_type="application/pdf", data=data,
                              storage_dir=storage_dir, source_metadata={"url": meta["url"], "publisher": meta["publisher"], "date": meta["date"],
-                                                                       "licence": meta["licence_note"], "demo": case_id})
+                                                                       "licence": meta["licence_note"], "demo": case_id,
+                                                                       **({"part": meta["part"]} if meta.get("part") else {})})
         source = db.get(Source, doc.source_id)
         if source is not None:
             source.url = meta["url"]

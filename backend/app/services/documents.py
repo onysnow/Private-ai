@@ -1,7 +1,7 @@
 from __future__ import annotations
 import hashlib, re, uuid
 from pathlib import Path
-from typing import Iterable, NamedTuple
+from typing import Any, Iterable, NamedTuple
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.core.time import utcnow_naive
@@ -127,6 +127,70 @@ def extract_chunks(path: Path) -> tuple[list[dict], list[str]]:
         if not rows:
             issues.append('This file has no readable text content.')
     return rows, issues
+
+
+def _marker(text: str) -> re.Pattern[str]:
+    """A marker's words with any run of space between them, as a reader may break lines anywhere."""
+    return re.compile(r'\s+'.join(re.escape(word) for word in text.split()))
+
+
+def own_part(chunks: list[dict], part: dict | None) -> tuple[list[tuple[int, int] | None], str | None]:
+    """Where in each chunk a document's own text is, when its file holds more than it.
+
+    A gazette page carries the notices printed beside the one a source is
+    (a Federal Register PDF of one notice starts with the end of the notice
+    before it). ``part`` names the first words of the document's own text and
+    the last (``{"from": ..., "to": ...}``, the last included); each chunk gets
+    the (start, end) of its share of that text, or None for none of it. Without
+    ``part`` every chunk is wholly the document's. When the first words are
+    not found, nothing is cut and the second value says so."""
+    if not part:
+        return [(0, len(c.get('text') or '')) for c in chunks], None
+    start, stop = _marker(part['from']), _marker(part['to'])
+    out: list[tuple[int, int] | None] = []
+    inside, ended = False, False
+    for c in chunks:
+        text = c.get('text') or ''
+        a = 0
+        if not inside and not ended:
+            found = start.search(text)
+            if found is None:
+                out.append(None)
+                continue
+            inside, a = True, found.start()
+        if ended:
+            out.append(None)
+            continue
+        end = stop.search(text, a)
+        if end is not None:
+            inside, ended = False, True
+            out.append((a, end.end()))
+        else:
+            out.append((a, len(text)))
+    if not any(out):
+        return [(0, len(c.get('text') or '')) for c in chunks], (
+            f"The start of this document's own text (\"{part['from']}\") was not found, so the whole file was read for proposals.")
+    return out, None
+
+
+class _Part(NamedTuple):
+    text: str
+    locator: str | None
+
+
+def _part_payloads(chunk: DocumentChunk, share: tuple[int, int], **kwargs: Any) -> Iterable[tuple[str, dict, float]]:
+    """``_candidate_payloads`` over one chunk's share of the document's own text, with spans counted in the whole chunk."""
+    a, b = share
+    if (a, b) == (0, len(chunk.text)):
+        yield from _candidate_payloads(chunk, **kwargs)
+        return
+    part = chunk.text[a:b]
+    lead = len(part) - len(part.lstrip())
+    for typ, payload, conf in _candidate_payloads(_Part(part, chunk.locator), **kwargs):  # type: ignore[arg-type]
+        span = payload.get('span')
+        if span:
+            payload = {**payload, 'span': {'start_char': span['start_char'] + a + lead, 'end_char': span['end_char'] + a + lead}}
+        yield typ, payload, conf
 
 
 def _candidate_payloads(chunk: DocumentChunk, *, include_entities: bool = True,
@@ -291,6 +355,10 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
     find_names = find_names and not mapped and not table
     try:
         chunks, issues = text if text is not None else read_chunks(Path(doc.storage_path))
+        source = db.get(Source, doc.source_id)
+        shares, not_found = own_part(chunks, ((source.metadata_json or {}) if source else {}).get('part'))
+        if not_found:
+            issues = [*(issues or []), not_found]
         # One proposal per name (and per claim sentence) in a document, with every place it is
         # mentioned: a name on 146 pages is one thing to decide, mentioned 146 times.
         once: dict[tuple[str, str], ExtractionCandidate] = {}
@@ -299,10 +367,11 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
             provenance = item.pop('provenance', None)
             chunk = DocumentChunk(document_id=doc.id, ordinal=ordinal, **item)
             db.add(chunk); db.flush()
-            if table:
+            share = shares[ordinal - 1]
+            if table or share is None:
                 continue
-            for typ, payload, conf in _candidate_payloads(chunk, include_entities=find_names and settings.enable_local_entity_suggestions,
-                                                          existing=existing):
+            for typ, payload, conf in _part_payloads(chunk, share, include_entities=find_names and settings.enable_local_entity_suggestions,
+                                                     existing=existing):
                 if provenance:
                     payload = {**payload, 'provenance': provenance}
                 key = _once_key(typ, payload)
