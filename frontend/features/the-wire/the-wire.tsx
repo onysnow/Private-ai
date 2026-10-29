@@ -4,7 +4,7 @@
 // wire-engine.ts; this component lays out its chrome, loads the case and mounts it.
 import {useQuery} from '@tanstack/react-query';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import type {ReactElement} from 'react';
+import type {PointerEvent as ReactPointerEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {getAllRecordTagsOptions, getInvestigationGraphOptions, getWireOptions} from '../../lib/generated/@tanstack/react-query.gen';
@@ -18,7 +18,7 @@ import {KIND_SYMBOL, brighten, mountWire} from './wire-engine';
 import {KIND_ICON} from '../../components/network/party-icons';
 import {Wallet} from 'lucide-react';
 import type {LucideIcon} from 'lucide-react';
-import {GridLight} from '../effects/grid-light';
+import {GridLight, lampColour} from '../effects/grid-light';
 import {webglAvailable} from '../effects/webgl';
 import {currentAppearance, onAppearanceChange} from '../../lib/theme';
 import type {LinkInfo, LinkSure, OpenLink, PartyTags} from './wire-engine';
@@ -110,7 +110,16 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
     <button type="button" onClick={() => query.refetch()}>Try again</button></div>;
   if (!data || !data.entities.length) return <div className="tw tw-state"><p>No parties in this case yet. Records you accept in Decide appear here.</p></div>;
 
-  return <div className={tagsOn ? 'tw' : 'tw tw-tags-off'} ref={root} aria-label="The Wire">
+  // The panel the pointer is in carries a small light at the pointer along its edge, so the pointer is easy to keep
+  // track of among the panels (Ony, 29 Oct).
+  const lightPanel = (e: ReactPointerEvent) => {
+    const panel = (e.target as Element).closest<HTMLElement>('.tw-glass');
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    panel.style.setProperty('--mx', `${e.clientX - r.left}px`); panel.style.setProperty('--my', `${e.clientY - r.top}px`);
+  };
+  return <div className={tagsOn ? 'tw' : 'tw tw-tags-off'} ref={root} aria-label="The Wire" onPointerMove={lightPanel}
+    style={{['--tw-light' as string]: lampColour()}}>
     <div className="tw-grid" ref={grid} aria-hidden="true">{gridLight && <GridLight grid={grid}/>}</div>
     <svg className="tw-map" role="img" aria-label="Map of the parties in this case and how they are linked">
       <defs>
@@ -120,7 +129,8 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
           <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/>
           <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -10"/>
         </filter>
-        <filter id="tw-flagglow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="4.5"/></filter>
+        <filter id="tw-flagglow" x="-30%" y="-90%" width="160%" height="280%"><feGaussianBlur stdDeviation="8"/></filter>
+        <filter id="tw-flagglow-core" x="-10%" y="-40%" width="120%" height="180%"><feGaussianBlur stdDeviation="2"/></filter>
         <filter id="tw-tagglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/></feMerge></filter>
         <radialGradient id="tw-glow"><stop offset="0" stopColor="#E8A95B" stopOpacity=".35"/><stop offset="1" stopColor="#E8A95B" stopOpacity="0"/></radialGradient>
       </defs>

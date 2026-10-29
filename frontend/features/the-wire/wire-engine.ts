@@ -383,7 +383,10 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const own = isChain ? [] : partyTags[id] ?? [];
     const pad = own.length ? 14 : 0, dx = -70 - pad / 2, tx = -52 + pad / 3;
     // A flagged card's outline takes its level's colour over a glow (paintFlag); the glow sits behind the card.
-    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'flag-glow', fill: 'none', filter: 'url(#tw-flagglow)', style: 'display:none'}, card);
+    // The glow is light from the outline (the grid's lamp colour): a wide soft spread and a tight bright core, added to
+    // what is behind them as light is.
+    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'flag-glow wide', fill: 'none', filter: 'url(#tw-flagglow)', style: 'display:none'}, card);
+    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'flag-glow core', fill: 'none', filter: 'url(#tw-flagglow-core)', style: 'display:none'}, card);
     el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4, 'data-ring': K.ring}, card);
     el('circle', {cx: dx, cy: 0, r: 11, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5, class: 'kind-dot'}, card);
     if (!isChain) kindIcon(E[id].kind, dx, 0, 13, K.ring, card);
@@ -452,20 +455,20 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   }
   const LEVEL_C: Record<string, string> = {textbook: '#FF8070', strong: '#F6966A', faint: '#E9AFA8'};
   function paintFlag(N: NodeEl, f: Flags): void {
-    const g = N.flag, bg = N.card.querySelector<SVGRectElement>('.card-bg')!, glow = N.card.querySelector<SVGRectElement>('.flag-glow')!;
+    const g = N.flag, bg = N.card.querySelector<SVGRectElement>('.card-bg')!, glows = Array.from(N.card.querySelectorAll<SVGRectElement>('.flag-glow'));
     g.textContent = '';
     const n = nOpen(f);
     if (!n) {
       bg.setAttribute('stroke', bg.dataset.ring ?? ''); bg.setAttribute('stroke-width', '1.4'); bg.removeAttribute('stroke-dasharray');
-      glow.style.display = 'none'; N.g.classList.remove('flagged', 'faint', 'strong', 'textbook');
+      glows.forEach(gl => { gl.style.display = 'none'; }); N.g.classList.remove('flagged', 'faint', 'strong', 'textbook');
       return;
     }
     const lvl = f.textbook ? 'textbook' : f.strong ? 'strong' : 'faint', c = LEVEL_C[lvl];
-    // The outline is the level: its colour, a glow behind it (stronger by level, brighter on hover), dashed when faint
-    // so the level never rests on colour alone.
+    // The outline is the level: its colour, dashed when faint so the level never rests on colour alone. The light
+    // round it is the grid's pale blue, stronger by level and brighter on hover.
     bg.setAttribute('stroke', c); bg.setAttribute('stroke-width', '1.8');
     if (lvl === 'faint') bg.setAttribute('stroke-dasharray', '5 3'); else bg.removeAttribute('stroke-dasharray');
-    glow.style.display = ''; glow.setAttribute('stroke', c);
+    glows.forEach(gl => { gl.style.display = ''; });
     N.g.classList.remove('faint', 'strong', 'textbook'); N.g.classList.add('flagged', lvl);
     // The count in a small circle on the top right corner; hover it for the flags themselves.
     el('circle', {r: 15, class: 'flag-hit', fill: 'transparent'}, g);

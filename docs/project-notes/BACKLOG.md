@@ -22,6 +22,9 @@ when you're not hovering, have selected or in said container."
   research §7.4 ideas B "four depths" and D are the starting point).
 - Every container gets a small effect while the pointer is inside it, so the pointer is easy to keep track of.
 - Keep the floor (research §3): status, level and provenance stay visible at rest.
+- **The Wire done first (29 Oct):** its panels show only their first line at rest (the header's one line, the trail's
+  current party, the key's title) and open on hover or keyboard focus; the panel the pointer is in lights its edge at the
+  pointer, and over the map the pointer carries a small lamp on the grid. The rest of the site follows in the pass.
 
 ## Ony's standing requirement for every card
 Wherever a card appears (decision, dashboard widget, flag, timeline row, to-check item), it must:

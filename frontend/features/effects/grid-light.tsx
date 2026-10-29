@@ -18,10 +18,16 @@ import {blackbodyRgb} from '@fx/effects/light/blackbody';
 /** The lamps' colour temperature: past daylight (6500 K) a blackbody turns pale blue. */
 export const GRID_LAMP_KELVIN = 16000;
 
+/** The lamps' colour as the screen shows it (the engine's linear colour in sRGB), for the glows drawn in CSS and SVG. */
+export function lampColour(kelvin = GRID_LAMP_KELVIN): string {
+  const [r, g, b] = blackbodyRgb(kelvin).map(v => Math.round(255 * Math.pow(Math.max(0, Math.min(1, v)), 1 / 2.2)));
+  return `rgb(${r} ${g} ${b})`;
+}
+
 const VERT = `attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }`;
 const FRAG = `precision mediump float;
 uniform vec2 u_res; uniform float u_dpr; uniform float u_gs; uniform vec2 u_off; uniform vec3 u_col; uniform float u_t;
-uniform vec4 u_lamp[2];
+uniform vec4 u_lamp[3];
 float lineDist(vec2 p) { vec2 q = mod(p - u_off, u_gs); vec2 d = min(q, u_gs - q); return min(d.x, d.y); }
 void main() {
   vec2 p = vec2(gl_FragCoord.x, u_res.y - gl_FragCoord.y) / u_dpr;
@@ -29,7 +35,7 @@ void main() {
   float core = clamp(1.0 - d, 0.0, 1.0);
   float glow = exp(-d * d / (2.0 * 2.6 * 2.6));
   float E = 0.0;
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 3; i++) {
     vec4 L = u_lamp[i];
     vec3 v = vec3(L.xy - p, L.z);
     float r2 = dot(v, v);
@@ -37,7 +43,7 @@ void main() {
     float irr = L.z * L.z * lambert / r2;            // E = I cos(theta) / d^2, 1 straight under the lamp
     float r = length(L.xy - p);
     float ring = mod(u_t * 150.0 + float(i) * 420.0, 900.0);
-    float pulse = exp(-(r - ring) * (r - ring) / (2.0 * 60.0 * 60.0)) * (1.0 - ring / 900.0);
+    float pulse = i == 2 ? 0.0 : exp(-(r - ring) * (r - ring) / (2.0 * 60.0 * 60.0)) * (1.0 - ring / 900.0);
     E += L.w * irr * (1.0 + 0.6 * pulse);
   }
   float lit = 1.0 - exp(-E * (core + glow * 0.35));
@@ -66,6 +72,17 @@ export function GridLight({grid}: {grid: RefObject<HTMLElement | null>}): ReactE
     gl.uniform3f(loc.col, r, g, b);
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     const t0 = performance.now();
+    // The pointer carries a small lamp of its own over the grid (the engine's cursor lamp), so it is easy to find among
+    // the panels; it fades in when the pointer comes onto the map and out when it leaves.
+    const host = grid.current?.parentElement;
+    const pointer = {x: 0, y: 0, on: 0, want: 0};
+    const move = (e: PointerEvent) => {
+      const r = cv.getBoundingClientRect();
+      pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top;
+      pointer.want = (e.target as Element | null)?.closest('.tw-glass, .tw-tools, .tw-drawer') ? 0.35 : 1;
+    };
+    const leave = () => { pointer.want = 0; };
+    host?.addEventListener('pointermove', move); host?.addEventListener('pointerleave', leave);
     let raf = 0;
     const frame = () => {
       raf = requestAnimationFrame(frame);
@@ -84,14 +101,16 @@ export function GridLight({grid}: {grid: RefObject<HTMLElement | null>}): ReactE
       const lamps = [
         W * (0.5 + 0.42 * Math.sin(t * 0.05)), H * (0.48 + 0.34 * Math.sin(t * 0.083 + 1.2)), 210, 0.42 + 0.14 * Math.sin(t * 0.7),
         W * (0.5 + 0.4 * Math.sin(t * 0.037 + 2.6)), H * (0.5 + 0.3 * Math.cos(t * 0.061)), 260, 0.2 + 0.07 * Math.sin(t * 0.53 + 1),
+        pointer.x, pointer.y, 90, 0.5 * pointer.on,
       ];
+      pointer.on += (pointer.want - pointer.on) * 0.12;
       gl.uniform2f(loc.res, w, h); gl.uniform1f(loc.dpr, dpr);
       gl.uniform1f(loc.gs, px('--gs', 48)); gl.uniform2f(loc.off, px('--gx', 0), px('--gy', 0));
       gl.uniform1f(loc.t, t); gl.uniform4fv(loc.lamp, new Float32Array(lamps));
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     };
     frame();
-    return () => cancelAnimationFrame(raf);
+    return () => { cancelAnimationFrame(raf); host?.removeEventListener('pointermove', move); host?.removeEventListener('pointerleave', leave); };
   }, [grid]);
   return <canvas ref={canvas} className="tw-grid-light" aria-hidden="true"/>;
 }
