@@ -94,6 +94,13 @@ In the chip and shader previews (artifacts S87VtyemmhJjycuQG7Vbtq and BoFrMo6ZYm
   card, organisation hexagonal ends, vessel pointed bow, property slanted end, bank account cut corner); outlines only
   on parties, weighted by importance (centre 2.4, flagged 1.8, others and dots 1.1); link labels a filled tab with no
   outline, card details just words. Waiting for his view.
+- Then he asked to redesign how the flags appear on the Wire (no hover, full text unreadable, no sense of where a flag
+  comes from). In the shapes preview: each flag is a numbered pennant in its level's colour on a thread that starts at
+  the count badge and ends in an arrow at the edge of the party it touches, with a light running along it from the flag
+  to the party; the pennants fly out of the count on the spring. Hovering a pennant opens it into a card with the whole
+  flag, "From <party> → <parties>", brightens its threads, pulses those parties and quiets the other flags. Flags that
+  touch no other party hang in a column from the count on elbowed poles. A title over the party names the flags and
+  says Esc closes. Pennants avoid parties, link labels and each other; one pushed off its thread keeps a dotted tether.
 - Then: even the textbook siren on the whole outline was too much. At every level the moving beam runs round the count's
   circle only (red, bright and quick for textbook; dimmer and slower for strong and faint); the card's outline stays still.
 - The chip liquid takes the party's kind colour (the kind circle's fill, from a deep shade to a light one tinted towards
