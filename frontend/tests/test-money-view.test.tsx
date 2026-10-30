@@ -8,7 +8,7 @@ import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {MoneyView, stripValues} from '../features/money/money-view';
-import {cycleClosers, layout, pathOf, placeLabels, shortAmount, wrapName, type Payment} from '../features/money/money-layout';
+import {cycleClosers, layout, middleMarks, pathOf, placeLabels, shortAmount, wrapName, type Payment} from '../features/money/money-layout';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -180,6 +180,19 @@ describe('the money picture', () => {
       expect(a.x).toBeGreaterThanOrEqual(0); expect(a.x + a.w).toBeLessThanOrEqual(420);
       all.slice(i + 1).forEach(b => expect(a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y).toBe(false));
     });
+  });
+
+  it('keeps a middle bar\'s check mark off the names and bars around it', () => {
+    const n = {x: 440, y: 410, h: 20, marks: ['round_trip' as const]};
+    // A name right above the bar, where the mark used to go.
+    const name = {x: 446, top: 382, w: 120, h: 28};
+    const [at] = middleMarks(n, [name], [n], []);
+    const box = {x: at.x - 9, y: at.y - 9, w: 18, h: 18};
+    const off = (o: {x: number; y: number; w: number; h: number}) => !(box.x < o.x + o.w && box.x + box.w > o.x && box.y < o.y + o.h && box.y + box.h > o.y);
+    expect(off({x: name.x - 3, y: name.top - 1, w: name.w + 6, h: name.h + 2})).toBe(true);
+    expect(off({x: n.x, y: n.y, w: 12, h: n.h})).toBe(true);
+    // With room above, it stays above the bar.
+    expect(middleMarks(n, [], [n], [])).toEqual([{x: 446, y: 396}]);
   });
 
   it('never refuses a cycle: the latest payment of a round trip is drawn as a return arc', () => {

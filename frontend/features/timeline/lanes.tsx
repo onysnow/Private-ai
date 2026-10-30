@@ -17,7 +17,7 @@ import {Reveal} from '../../components/ui/reveal';
 import {PARTY, eventKind, partyKind} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {LaneDetail} from './lane-detail';
-import {FACT, FACT_ORDER, bounds, denseStretch, isFuzzy, justUnder, lanesOf, layoutLabels, parseWhen, quarters, span, windowFor, wrapName, yearStep} from './lanes-model';
+import {FACT, FACT_ORDER, bounds, denseStretch, filmCards, isFuzzy, justUnder, lanesOf, layoutLabels, parseWhen, quarters, span, windowFor, wrapName, yearStep} from './lanes-model';
 import type {Fact, LanesBy, Zoom} from './lanes-model';
 import {Aside, FactMark, KeysMark, KindDot, factWord} from './marks';
 
@@ -79,6 +79,18 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   const wrap = useRef<HTMLDivElement>(null);
   const clipId = `tl2-clip-${useId().replace(/:/g, '')}`;
   const svg = useRef<SVGSVGElement>(null);
+
+  // The strip shows as many whole cards as its width holds (a card cut at the edge read as covered by the Undated
+  // box); the rest are counted in a last chip.
+  const film = useRef<HTMLDivElement>(null);
+  const [filmW, setFilmW] = useState(0);
+  useEffect(() => {
+    const el = film.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(([entry]) => setFilmW(Math.floor(entry.contentRect.width)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [view]);
 
   useEffect(() => {
     const el = wrap.current;
@@ -288,6 +300,7 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   const tickEnd = LABEL_W + chartW - (later.length || (zoom === 'all' && unfold.late && foldsLate) ? LATER_W + 34 : 30);
   const months = zoom === '1y' ? Array.from({length: 13}, (_, i) => Date.UTC(new Date(from).getUTCFullYear(), new Date(from).getUTCMonth() + i, 1)).filter(t => t > from && t < to) : [];
 
+  const strip = filmCards(view.not_placed, view.not_placed_total, filmW);
   return <div className="tl2" onKeyDown={onKey} tabIndex={-1} aria-label="Timeline lanes">
     <div className="tl2-bar">
       <div className="tl2-seg" role="group" aria-label="Lanes by">
@@ -307,6 +320,8 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
         <button aria-pressed={moneyRow} onClick={() => setMoneyRow(v => !v)}>Money</button>
         <button aria-pressed={periodsOn} onClick={() => setPeriodsOn(v => !v)}>Periods</button>
       </div>
+      {/* Beside the Periods it adds to (it sat alone at the screen's bottom-left edge). */}
+      <button className="tl2-plain" onClick={() => setAdding('period')}>Name a period</button>
       <button className="tl2-plain" aria-pressed={list} onClick={() => setList(v => !v)}>List</button>
     </div>
 
@@ -396,7 +411,10 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
                         const body: [number, number] = ranged ? [m.x0 - 7, Math.max(m.x1, m.x0) + 7] : many ? [m.x0 - 9, m.x1 + 9] : fuzzy ? [m.x0 - 2, Math.max(m.x0 + 6, m.x1) + 2] : [cx - 9, cx + 9];
                         return {m, e, many, ranged, fuzzy, cx, label, at, body, on: m.ids.includes(selected ?? '')};
                       });
-                      const taken = new Map<string, Array<[number, number]>>([['main', drawn.map(d => d.body)]]);
+                      // The row above the marks also holds this lane's flag brackets and their words: a range's label keeps off them.
+                      const flagSpans = brackets.filter(b => Math.max(0, by === 'party' ? laneRows.findIndex(l => l.party === b.lane) : 0) === i)
+                        .map(b => [x(b.from) - 6, x(b.to) + 12 + (b.say.length + 9) * 6.2] as [number, number]);
+                      const taken = new Map<string, Array<[number, number]>>([['main', drawn.map(d => d.body)], ['above', flagSpans]]);
                       const placed = layoutLabels([...drawn.filter(d => d.on), ...drawn.filter(d => !d.on)].map(d => ({id: d.m.ids.join(), at: d.at})), taken, LABEL_W + 2, LABEL_W + chartW - 2);
                       return drawn.map(({m, e, many, ranged, fuzzy, cx, label, at, on}) => {
                       const later = asOf !== null && span(e)[0] > asOf;
@@ -405,7 +423,8 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
                       const placeholder = Boolean(e.placeholder) || (lane.mine && !e.refs.source_id && !e.refs.evidence_id && !e.refs.entity_id && !e.refs.relationship_entity_id && !e.refs.claim_id);
                       const where = placed.get(m.ids.join());
                       const spot = at[where ?? 0];
-                      const ly = ranged ? y - 11 : y + 4;
+                      // Above a range, clear of the marks' rings (at y − 11 it touched them).
+                      const ly = ranged ? y - 14 : y + 4;
                       return <g key={m.ids.join()} className={`tl2-mark f-${FACT[e.fact].tone}${later ? ' later' : ''}${on ? ' on' : ''}${lightOn ? '' : ' dim'}${placeholder ? ' placeholder' : ''}${seq ? ' seq' : ''}`}
                         onClick={() => setSelected(m.ids[0])} role="button" tabIndex={-1}
                         aria-label={`${dateWords(e.date_start, e.precision)}: ${e.title}, ${FACT[e.fact].name}`}>
@@ -532,27 +551,27 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
         {adding === 'goto' && <GoTo onCancel={() => setAdding(null)} onGo={t => { moveAsOf(t); setAdding(null); }}/>}
 
         <div className="tl2-strip">
-          <div className="tl2-film">
+          <div className="tl2-film" ref={film}>
             <p className="tl2-cap">Not on the timeline yet <Aside label="How to place one">Drag one onto the lanes, or press <kbd>N</kbd> and type “March 2019”, “spring 2019”, “2019”.</Aside></p>
             {view.not_placed.length === 0 ? <p className="tl2-none">Every dated document is on the timeline.</p>
-              : <div className="tl2-cards">{view.not_placed.map(f => <div key={f.source_id} className="tl2-card" draggable
+              : <div className="tl2-cards">{strip.shown.map(f => <div key={f.source_id} className="tl2-card" draggable
                 onDragStart={ev => { ev.dataTransfer.setData('text/x-source', f.source_id); ev.dataTransfer.effectAllowed = 'copy'; }}>
                 <Reveal tabbable={false} detail={<><b>{f.title}</b><span className="rv-row">{f.kind.replace(/_/g, ' ')}</span></>}><b>{shortTitle(f.title, 52)}</b></Reveal>
                 <span>{dateWords(f.date, f.precision)} · {f.date_key}{f.precision !== 'day' ? ` · ${f.precision} only` : ''}</span>
                 <button onClick={() => place.mutate({title: f.title, date_start: f.date, precision: f.precision, source_id: f.source_id})}>Place it</button>
               </div>)}
-              {view.not_placed_total > view.not_placed.length && <p className="tl2-none">and {view.not_placed_total - view.not_placed.length} more</p>}</div>}
+              {strip.more > 0 && <p className="tl2-none tl2-more-cards">and {strip.more} more</p>}</div>}
           </div>
           <div className="tl2-undated">
             <p><Reveal detail="Kept here, never placed on a day."><b>Undated · {view.undated_total}</b></Reveal></p>
-            {view.undated.slice(0, 4).map(u => <p key={u.source_id} className="tl2-none"><Reveal detail={u.why}><span>“{shortTitle(u.title, 40)}”</span></Reveal></p>)}
+            {/* One line each, as many as the box holds whole (the fourth was cut by its edge). */}
+            {view.undated.slice(0, 3).map(u => <p key={u.source_id} className="tl2-none tl2-oneline"><Reveal detail={<><b>{u.title}</b><span className="rv-row">{u.why}</span></>}><span>“{shortTitle(u.title, 30)}”</span></Reveal></p>)}
           </div>
         </div>
         <p className="tl2-keys"><KeysMark><kbd>Space</kbd> play · <kbd>J</kbd><kbd>K</kbd> events · <kbd>←</kbd><kbd>→</kbd> move the as-of handle · <kbd>+</kbd><kbd>−</kbd><kbd>0</kbd> zoom ·
-          <kbd>F</kbd><kbd>M</kbd><kbd>P</kbd> flags · money · periods · <kbd>L</kbd> list · <kbd>G</kbd> go to a date · <kbd>N</kbd> add · <kbd>Esc</kbd> unlight · click a name to light it in every lane</KeysMark>
-          <button className="tl2-plain" onClick={() => setAdding('period')}>Name a period</button></p>
+          <kbd>F</kbd><kbd>M</kbd><kbd>P</kbd> flags · money · periods · <kbd>L</kbd> list · <kbd>G</kbd> go to a date · <kbd>N</kbd> add · <kbd>Esc</kbd> unlight · click a name to light it in every lane</KeysMark></p>
       </div>
-      <LaneDetail view={view} event={sel} lane={by === 'party' ? (lit ?? sel?.parties[0] ?? null) : null} finding={sel ? outOfOrder.get(sel.id) : undefined}
+      <LaneDetail view={view} drawn={events} event={sel} lane={by === 'party' ? (lit ?? sel?.parties[0] ?? null) : null} finding={sel ? outOfOrder.get(sel.id) : undefined}
         opened={sel !== null && sel.id === opensOn} onSelect={setSelected} onStep={step} investigationId={investigationId}
         onLead={(title, detail) => lead.mutate({title, detail})}
         onMine={e => place.mutate({title: e.title, date_start: e.date_start, date_end: e.date_end ?? undefined, precision: e.precision,

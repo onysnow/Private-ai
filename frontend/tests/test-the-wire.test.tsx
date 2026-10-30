@@ -8,7 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {InspectorSlot} from '../features/inspector/inspector-slot';
 import {TheWire, linkInfo} from '../features/the-wire/the-wire';
-import {brighten, clipWords, fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
+import {brighten, clipWords, fmtAmt, fmtDate, linkSentence, pointsIn, separate} from '../features/the-wire/wire-engine';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -105,6 +105,24 @@ describe('The Wire', () => {
     expect(fmtDate('2018-02-06')).toBe('6 Feb 2018');
     expect(fmtDate('2018-02')).toBe('Feb 2018');
     expect(fmtDate('')).toBe('no date');
+  });
+
+  it('keeps party footprints apart: a card with its flag count and accounts never covers another, the middle never moves', () => {
+    const card = (id: string, x: number, y: number, fixed = false) => ({id, x, y, x0: -90, x1: 100, y0: -40, y1: 45, fixed});
+    const items = [card('f', 0, 0, true), card('a', 60, 20), card('b', 80, 30), card('c', -20, 70)];
+    const at = separate(items, 8);
+    expect(at.f).toEqual({x: 0, y: 0});
+    const box = (i: typeof items[number]) => ({x0: at[i.id].x + i.x0, x1: at[i.id].x + i.x1, y0: at[i.id].y + i.y0, y1: at[i.id].y + i.y1});
+    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
+      const a = box(items[i]), b = box(items[j]);
+      expect(a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0).toBe(false);
+    }
+    // Apart already: nothing moves.
+    expect(separate([card('p', 0, 0), card('q', 0, 400)])).toEqual({p: {x: 0, y: 0}, q: {x: 0, y: 400}});
+  });
+
+  it('counts the line points inside a sentence box, so a sentence can sit where no other line runs', () => {
+    expect(pointsIn({x0: 0, x1: 10, y0: 0, y1: 10}, [5, 5, 20, 5, 1, 9])).toBe(2);
   });
 
   it('reads how sure each link is from the review advisory, with its end date', () => {

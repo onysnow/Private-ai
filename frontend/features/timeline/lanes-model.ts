@@ -277,3 +277,13 @@ export const EVENT_GRADES: Record<string, string> = {
   unsubstantiated: 'no conclusion can be reached for lack of evidence',
   unknown: 'what happened cannot be identified',
 };
+
+/** The strip's cards that fit whole in `width` px (cards 168 px, gaps 10 px, a last "and N more" chip of 90 px when
+ *  any are left over); before the width is known, all of them. */
+export function filmCards<T>(cards: T[], total: number, width: number, card = 168, gap = 10, chip = 90): {shown: T[]; more: number} {
+  if (width <= 0) return {shown: cards, more: Math.max(0, total - cards.length)};
+  const all = Math.floor((width + gap) / (card + gap));
+  if (all >= cards.length && total <= cards.length) return {shown: cards, more: 0};
+  const n = Math.max(1, Math.min(cards.length, Math.floor((width + gap - chip - gap) / (card + gap))));
+  return {shown: cards.slice(0, n), more: total - n};
+}

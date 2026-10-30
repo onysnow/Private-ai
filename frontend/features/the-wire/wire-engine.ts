@@ -147,6 +147,47 @@ export function linkSentence(fam: string, links: WireLinkOut[], ended: string): 
   return `${l0.role ? clipWords(l0.role, 32) : 'linked'}${l0.date && !ended ? ` · ${fmtDate(l0.date)}` : ended ? ` · ended ${monthYear(ended)}` : ''}${many}`;
 }
 
+/* Keeping parties apart (DECISIONS_LOG 30, 52 and 54): each item is a party's footprint, its card with the flag count
+   above it and the accounts under it, or its dot with the name chip on its outward side, as offsets round its place.
+   Overlapping footprints are pushed apart along the axis that needs the shorter move, a fixed item (the party in the
+   middle) never moving, until none overlap or the rounds run out. Returns the new places. */
+export type Footprint = {id: string; x: number; y: number; x0: number; x1: number; y0: number; y1: number; fixed?: boolean};
+export function separate(items: Footprint[], gap = 0, rounds = 80): Record<string, {x: number; y: number}> {
+  const P = items.map(it => ({...it}));
+  for (let r = 0; r < rounds; r++) {
+    let moved = false;
+    for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+      const a = P[i], b = P[j];
+      if (a.fixed && b.fixed) continue;
+      const ox = Math.min(a.x + a.x1, b.x + b.x1) - Math.max(a.x + a.x0, b.x + b.x0) + gap;
+      const oy = Math.min(a.y + a.y1, b.y + b.y1) - Math.max(a.y + a.y0, b.y + b.y0) + gap;
+      if (ox <= 0 || oy <= 0) continue;
+      moved = true;
+      // Who moves: both half way, or all of it the one that is free.
+      const wa = a.fixed ? 0 : b.fixed ? 1 : 0.5, wb = 1 - wa;
+      if (oy <= ox) {
+        const dir = (b.y + (b.y0 + b.y1) / 2) >= (a.y + (a.y0 + a.y1) / 2) ? 1 : -1, d = oy + 0.01;
+        a.y -= dir * d * wa; b.y += dir * d * wb;
+      } else {
+        const dir = (b.x + (b.x0 + b.x1) / 2) >= (a.x + (a.x0 + a.x1) / 2) ? 1 : -1, d = ox + 0.01;
+        a.x -= dir * d * wa; b.x += dir * d * wb;
+      }
+    }
+    if (!moved) break;
+  }
+  const out: Record<string, {x: number; y: number}> = {};
+  for (const p of P) out[p.id] = {x: p.x, y: p.y};
+  return out;
+}
+
+/* How much of a box a set of lines runs through: the lines are sampled as points; a label is better off where none
+   falls inside it. */
+export const pointsIn = (b: {x0: number; x1: number; y0: number; y1: number}, pts: number[]): number => {
+  let n = 0;
+  for (let i = 0; i < pts.length; i += 2) if (pts[i] > b.x0 && pts[i] < b.x1 && pts[i + 1] > b.y0 && pts[i + 1] < b.y1) n++;
+  return n;
+};
+
 export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, info: LinkInfo = {}, partyTags: PartyTags = {}): () => void {
   // Calm (Appearance) and the system's reduced motion both stop the camera and the nodes travelling.
   const RM = () => document.documentElement.dataset.motion === 'calm' || (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
@@ -627,17 +668,43 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       if (!opts.noTrail) { trail = trail.filter(t => t !== focus); trail.push(focus); if (trail.length > 7) trail.shift(); }
     }
     const T = m === 'case' ? caseTargets() : m === 'path' ? pathTargets(pathIds) : partyTargets(focus);
+    const fitOf = (): {x: number; y: number; k: number} => (m === 'party' ? fitBox(Object.values(T).filter(t => t.v > 0), 40, 1.1)
+      : fitBox(Object.values(T).filter(t => t.v > 0), 60, 1.25));
+    // Around a party and along a path: no card, its name, its flag count or its accounts covers another party, and no
+    // dot's name runs over another dot (DECISIONS_LOG 54). Cards keep their size on screen, so their room on the map
+    // depends on the zoom the view settles at: twice round, the second time at the zoom the first one gave.
+    if (m === 'party' || m === 'path') for (let pass = 0; pass < 2; pass++) keepApart(T, fitOf().k, m === 'party' ? focus : '');
     for (const id in T) { const N = node[id]; if (!N) continue; N.from = {...N.cur}; N.tgt = T[id]; }
     tw = {t0: performance.now(), dur: RM() ? 1 : opts.slow ? 1500 : 950};
     let to: {x: number; y: number; k: number};
     if (m === 'case') to = fitBox(Object.values(T).filter(t => t.o), 120);
-    else if (m === 'party') to = fitBox(Object.values(T).filter(t => t.v > 0), 40, 1.1);
-    else if (m === 'path') to = fitBox(Object.values(T).filter(t => t.v > 0), 60, 1.25);
+    else if (m === 'party' || m === 'path') to = fitOf();
     else { const [a, b] = wireKey.split('|'); to = {x: (T[a].x + T[b].x) / 2, y: (T[a].y + T[b].y) / 2, k: Math.min(3.2, C.k * 2.2)}; }
     Cto = {...to, from: {...C}};
     if (m !== 'wire') { q('.tw-wire').classList.remove('on'); svg.style.opacity = '1'; }
     litLink = null;
     drawStatic(); renderChrome(); kick();
+  }
+  function keepApart(T: Record<string, Target>, k: number, fixed: string): void {
+    const cs = Math.min(2.6, Math.max(1, 0.95 / k)), gap = 10 / k;
+    const fx = fixed && T[fixed] ? T[fixed].x : C.x;
+    const items: Footprint[] = [];
+    for (const id in T) {
+      const t = T[id], N = node[id];
+      if (!N || t.v < 1 || t.o < 0.5) continue;
+      if (t.v === 2 && !N.isChain) {
+        const flagged = nOpen(flagsOf(id)) > 0, accts = rollAccounts && D.entities.some(a => a.holder === id);
+        items.push({id, x: t.x, y: t.y, fixed: id === fixed, x0: -(N.hw + 4) * cs, x1: (N.hw + 14) * cs,
+          y0: -(N.hh + (flagged ? 14 : 5)) * cs, y1: (N.hh + (accts ? 16 : 5)) * cs});
+      } else {
+        // A dot and its name chip at rest, on the side away from the middle (where placeLabels puts it first).
+        const name = E[id]?.short ?? '', reach = (DOT_R + 7 + Math.min(PEEK, name.length) * PILL_FS * 0.55 + 12) * cs, r = (DOT_R + 4) * cs;
+        const out = t.x >= fx;
+        items.push({id, x: t.x, y: t.y, fixed: id === fixed, x0: out ? -r : -reach, x1: out ? reach : r, y0: -14 * cs, y1: 14 * cs});
+      }
+    }
+    const at = separate(items, gap);
+    for (const id in at) { T[id].x = at[id].x; T[id].y = at[id].y; }
   }
   function fitBox(pts: Target[], pad: number, maxK = 1.6): {x: number; y: number; k: number} {
     if (!pts.length) return {x: 1200, y: 800, k: 0.5};
@@ -928,12 +995,23 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     }
     // Sector names: the first radius between the focus and its ring that is clear of cards and chips.
     secBoxes = rtBoxes;
+    // Sector names keep off every card, dot and its name, chip and panel (DECISIONS_LOG 54); with no clear spot between
+    // the focus and its ring the name is left out (the sector's parties are still where they are).
+    const secPanels: Box[] = [];
+    if (secEls.length) {
+      const rb = root.getBoundingClientRect();
+      for (const e of Array.from(root.querySelectorAll<HTMLElement>('.tw-glass:not(.tw-tip), .tw-tools'))) {
+        if (!e.offsetParent || getComputedStyle(e).opacity === '0') continue;
+        const r = e.getBoundingClientRect();
+        secPanels.push({x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top});
+      }
+    }
     for (const S of secEls) {
       let ok: {wx: number; wy: number; b: Box} | null = null;
       for (const f of [0.6, 0.5, 0.7, 0.42, 0.8, 0.34]) {
         const wx = S.cx + Math.cos(S.a) * S.r * f * S.rx, wy = S.cy + Math.sin(S.a) * S.r * f, s = toScreen(wx, wy);
         const w = (S.t.textContent ?? '').length * 9.4, b = {x0: s.x - w / 2, x1: s.x + w / 2, y0: s.y - 11, y1: s.y + 6};
-        if (!overlap(b, cardBoxes) && !overlap(b, secBoxes)) { ok = {wx, wy, b}; break; }
+        if (!overlap(b, cardBoxes) && !overlap(b, dotBoxes) && !overlap(b, secBoxes) && !overlap(b, secPanels)) { ok = {wx, wy, b}; break; }
       }
       S.t.style.display = ok ? '' : 'none';
       if (ok) {
@@ -1031,6 +1109,11 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const r = e.getBoundingClientRect();
       return {x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top};
     });
+    // Every other dot's circle: a name chip never runs over one (the 1Malaysia name ran under two icons).
+    const circles = cands.map(c => {
+      const s = toScreen(c.d.x, c.d.y), r = (DOT_R + 3) * curCs * C.k;
+      return {id: c.id, x0: s.x - r, x1: s.x + r, y0: s.y - r, y1: s.y + r};
+    });
     for (const c of cands) {
       const P = c.N.pill;
       if (!P) continue;
@@ -1043,7 +1126,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const extra = `${deg[c.id]} linked ${deg[c.id] === 1 ? 'party' : 'parties'}`;
       const open = (DOT_R + 7 + (name.length + extra.length + 1) * PILL_FS * 0.55 + 12) * u;
       const opened = (dir: 1 | -1): Box => ({x0: dir > 0 ? s.x : s.x - open, x1: dir > 0 ? s.x + open : s.x, y0: s.y - 13 * u, y1: s.y + 13 * u});
-      const room = (dir: 1 | -1) => { const b = side(dir); return b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes); };
+      const room = (dir: 1 | -1) => { const b = side(dir); return b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes) && !overlap(b, circles.filter(o => o.id !== c.id)); };
       const openRoom = (dir: 1 | -1) => { const b = opened(dir); return b.x0 >= 0 && b.x1 <= W && !overlap(b, panels); };
       // Outward from the party in the middle has more room, unless something sits there; a side where the opened
       // chip would run under a panel or off the map comes second.
@@ -1075,6 +1158,20 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     }
     const placed = boxes.concat(dots);
     const order = Object.values(edgeEls).filter(R => R.lab).sort((a, b) => pri(b) - pri(a));
+    // The lines drawn, sampled on screen per link: a sentence goes, where it can, at a spot no other line runs through
+    // (they sat across other links' lines). Skipped while the view moves, to keep the frames light.
+    const lines: Record<string, number[]> = {};
+    if (!tw) for (const k in edgeEls) {
+      const R = edgeEls[k];
+      if (!R.q || R.g.style.display === 'none') continue;
+      const [ax, ay, mx, my, bx, by] = R.q, pts: number[] = [];
+      for (let i = 1; i < 24; i++) {
+        const t = i / 24, u = 1 - t, s = toScreen(u * u * ax + 2 * u * t * mx + t * t * bx, u * u * ay + 2 * u * t * my + t * t * by);
+        pts.push(s.x, s.y);
+      }
+      lines[k] = pts;
+    }
+    const crossed = (b: Box, own: EdgeEl) => { let n = 0; for (const k in lines) if (edgeEls[k] !== own) n += pointsIn(b, lines[k]); return n; };
     let hidden = 0;
     const top = 120, bottom = H - 112;
     for (const R of order) {
@@ -1083,11 +1180,15 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       if (!vis) { L.g.style.display = 'none'; continue; }
       // The middle of the curve first, then further along it either way.
       const [ax, ay, mx, my, bx, by] = R.q!;
-      let spot: {x: number; y: number; b: Box} | null = null;
+      let spot: {x: number; y: number; b: Box} | null = null, least = Infinity;
       for (const t of R.stub?.on ? [0.14, 0.86, 0.2, 0.8] : [0.5, 0.4, 0.6, 0.3, 0.7, 0.22, 0.78, 0.15, 0.85]) {
         const u = 1 - t, x = u * u * ax + 2 * u * t * mx + t * t * bx, y = u * u * ay + 2 * u * t * my + t * t * by, s = toScreen(x, y);
         const b = {x0: s.x - L.w / 2 - 2, x1: s.x + L.w / 2 + 2, y0: s.y - 12, y1: s.y + 12};
-        if (b.x0 >= 0 && b.x1 <= W && b.y0 >= top && b.y1 <= bottom && !overlap(b, placed)) { spot = {x, y, b}; break; }
+        if (!(b.x0 >= 0 && b.x1 <= W && b.y0 >= top && b.y1 <= bottom && !overlap(b, placed))) continue;
+        // The clear spot that the fewest other lines run through; the first with none wins.
+        const n = crossed(b, R);
+        if (n < least) { least = n; spot = {x, y, b}; }
+        if (!n) break;
       }
       if (!spot) { L.g.style.display = 'none'; hidden++; continue; }
       placed.push(spot.b);

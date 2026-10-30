@@ -237,7 +237,9 @@ html[data-motion='calm'] .kc-flip.flipped .kc-face.front { opacity: 0; }
 .kg-body { min-height: 0; display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(320px, 440px); gap: 14px; }
 @media (max-width: 1000px) { .kg-body { grid-template-columns: 34px minmax(0, 1fr); } .kg-card { grid-column: 1 / -1; } }
 .kg-rail { min-height: 0; overflow-y: auto; }
-.kg-rail ol { list-style: none; margin: 0; padding: 0; height: 100%; min-height: 540px; display: grid; grid-auto-rows: minmax(0, 1fr); gap: 1px; }
+/* 27 letters, each at most 25 px tall, from the top: the whole rail fits above the screen's bottom corner (Y was cut and Z
+   gone when the rows stretched to the panel's foot). */
+.kg-rail ol { list-style: none; margin: 0; padding: 0; min-height: 540px; display: grid; grid-auto-rows: minmax(18px, 25px); align-content: start; gap: 1px; }
 .kg-rail button { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; height: 100%; display: grid; place-content: center; justify-items: center; padding: 0; border-radius: 6px; font: 600 11px/1.05 var(--font-mono); }
 .kg-rail button small { font-size: 8px; line-height: 1; color: var(--text-muted); font-weight: 400; }
 .kg-rail button[aria-current='true'] { background: var(--surface-2); color: var(--accent-1); }
@@ -289,3 +291,15 @@ html[data-motion='calm'] .kc-flip.flipped .kc-face.front { opacity: 0; }
 .kg-areas i.safety { color: var(--accent-2); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-2) 55%, transparent); }
 .kg-areas small { font: 10.5px var(--font-mono); color: var(--text-muted); }
 .rv.kg-tabs-rv { display: block; }
+
+/* The card's case and catalogue rows: a mark, then the title; the kind and the snippet (or the area's counts) on reveal. */
+.kg-hits { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.kg-hits li { min-width: 0; }
+.kg-hits .rv { display: block; }
+.kg-hit { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; align-items: center; padding: 5px 4px; border-bottom: 1px solid var(--line, rgba(127,127,127,.15));
+  font-size: 13.5px; }
+.kg-hit-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kg-hit > i { font: 600 11px/1 var(--font-mono); font-style: normal; color: var(--text-muted); text-align: center; }
+.kg-hit > i.safety { color: var(--accent-2); }
+.kg-hit a { color: var(--text); text-decoration: none; }
+.kg-hit a:hover { color: var(--accent-1); }

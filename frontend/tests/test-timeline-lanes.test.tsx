@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TimelinePanel} from '../features/timeline/timeline-panel';
-import {bounds, denseStretch, justUnder, layoutLabels, parseWhen, quarters, windowFor, wrapName, yearStep} from '../features/timeline/lanes-model';
+import {bounds, denseStretch, filmCards, justUnder, layoutLabels, parseWhen, quarters, windowFor, wrapName, yearStep} from '../features/timeline/lanes-model';
 import type {TimelineLaneEventOut} from '../lib/generated/types.gen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -194,6 +194,27 @@ describe('Lanes', () => {
     const from = screen.getByText('From').nextElementSibling as HTMLElement;
     expect(from).toHaveTextContent(/^An imported dataset/);
     expect(within(from).getByText('An imported dataset').closest('.rv')).toHaveAccessibleDescription(/1mdb-demo/);
+  });
+
+  it('shows only the strip cards that fit whole, the rest counted in a last chip', () => {
+    const cards = ['a', 'b', 'c', 'd', 'e', 'f'];
+    // Before the width is known: all of them.
+    expect(filmCards(cards, 6, 0)).toEqual({shown: cards, more: 0});
+    // 5 × 168 + 4 × 10 = 880 holds five; with a sixth left over, four and the chip.
+    expect(filmCards(cards, 6, 880)).toEqual({shown: ['a', 'b', 'c', 'd'], more: 2});
+    expect(filmCards(cards, 6, 1100)).toEqual({shown: cards, more: 0});
+    expect(filmCards(cards, 20, 1100)).toEqual({shown: ['a', 'b', 'c', 'd', 'e'], more: 15});
+  });
+
+  it('fills the event panel with the run of its lane, the event lit, another opened with a click', async () => {
+    const later = ev('later', 'Kestrel SA signs the contract', '2020-03-01', {parties: ['fern']});
+    mockApi({[LANES]: lanesBody('inv-1', [pay, later], {parties})});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    await screen.findByRole('heading', {name: 'Fernhill Ltd paid Kestrel SA'});
+    const run = screen.getByRole('list', {name: /lane/});
+    expect(within(run).getAllByRole('listitem')).toHaveLength(2);
+    await userEvent.setup().click(within(run).getByRole('button', {name: /Kestrel SA signs the contract/}));
+    expect(await screen.findByRole('heading', {name: 'Kestrel SA signs the contract'})).toBeInTheDocument();
   });
 
   it('names a period from words, and draws it over the lanes', async () => {

@@ -14,7 +14,7 @@ import {PlacesMap} from '../components/places-map';
 import {PlacesPanel, coordinates} from '../features/places/places-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
-import {BASEMAP_PROTOCOL, PLACE_DOT, PLACE_RADIUS, PLACE_RING, basemapLoader, basemapStyle, dotImage, dotName, placesBounds, placesGeoJson} from '../lib/basemap-style';
+import {BASEMAP_PROTOCOL, PLACE_DOT, PLACE_RADIUS, PLACE_RING, basemapLoader, basemapStyle, dotImage, dotName, nameRoomRight, placesBounds, placesGeoJson} from '../lib/basemap-style';
 import type {PlaceOut, PlacePictureOut} from '../lib/generated/types.gen';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
@@ -94,11 +94,18 @@ describe('the base map style', () => {
     const json = JSON.stringify(style);
     expect(json).not.toMatch(/https?:\/\//);          // no other host is asked for anything
     const names = style.layers.map(l => l.id);
-    expect(names.slice(-2)).toEqual(['places-dot', 'places-name']);
+    expect(names.slice(-3)).toEqual(['places-dot', 'places-name', 'places-keepout']);
     // The dot is a symbol, so the base map's labels give way to it.
-    expect(style.layers.at(-2)).toMatchObject({type: 'symbol', layout: {'icon-image': ['get', 'dot']}});
-    expect(style.layers.at(-1)).toMatchObject({layout: {'text-allow-overlap': false}});   // names wait for a closer zoom here
+    expect(style.layers.at(-3)).toMatchObject({type: 'symbol', layout: {'icon-image': ['get', 'dot']}});
+    expect(style.layers.at(-2)).toMatchObject({layout: {'text-allow-overlap': false}});   // names wait for a closer zoom here
+    // Every dot, unseen, placed before the names: a name never covers another place's dot.
+    expect(style.layers.at(-1)).toMatchObject({type: 'symbol', layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true}, paint: {'icon-opacity': 0}});
     expect(basemapStyle(STATUS, placesGeoJson([VILLA]), {everyName: true}).layers.at(-1)).toMatchObject({layout: {'text-allow-overlap': true}});
+    // The right side keeps room for the widest name, at most a third or so of the map.
+    expect(nameRoomRight([{caption: 'Villa'}], 1000)).toBe(67);
+    expect(nameRoomRight([], 1000)).toBe(60);
+    expect(nameRoomRight([{caption: '1MDB head office (IMC), Kuala Lumpur'}], 1000)).toBe(Math.ceil((0.9 + 14) * 13) + 16);
+    expect(nameRoomRight([{caption: '1MDB head office (IMC), Kuala Lumpur'}], 400)).toBe(140);
     expect(placesBounds([VILLA, OFFICE])).toEqual([-0.1276, 35.3364, 33.3199, 51.5072]);
     expect(placesBounds([])).toBeNull();
     expect(coordinates(OFFICE)).toBe('51.5072° N, 0.1276° W');
