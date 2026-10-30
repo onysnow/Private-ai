@@ -127,13 +127,16 @@
 .rb-about { margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .rb-about b { color: var(--text); }
 .rb-acts { display: grid; gap: 6px; }
-.rb-acts > button, .rb-link-btn, .rb-why button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
+/* Watch and Share sit inside a Reveal (their hover words), so the button is one level down: styled the same. */
+.rb-acts > .rv { display: grid; }
+.rb-acts > button, .rb-acts > .rv > button, .rb-link-btn, .rb-why button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
   padding: 8px 12px; border-radius: 10px; font-size: 13px; box-shadow: inset 0 0 0 1px var(--line); text-align: center; }
 .rb-acts > button.primary { background: var(--accent-1); color: var(--ground); box-shadow: none; font-weight: 650; }
-.rb-acts > button:disabled { cursor: default; opacity: .5; }
+.rb-acts > button:disabled, .rb-acts > .rv > button:disabled { cursor: default; opacity: .5; }
+.rb-acts > .rv > button[aria-pressed='true'] { box-shadow: inset 0 0 0 1px var(--accent-2); color: var(--accent-2); }
 .rb-acts kbd { font: 600 10.5px var(--font-mono); padding: 0 5px; border-radius: 4px; box-shadow: inset 0 0 0 1px currentColor; }
 .rb-acts small { font-size: 11px; color: var(--text-muted); text-align: center; }
-.rb-acts > button:focus-visible, .rb-link-btn:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.rb-acts > button:focus-visible, .rb-acts > .rv > button:focus-visible, .rb-link-btn:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .rb-why { display: grid; gap: 6px; font-size: 12px; }
 .rb-why input, .inn-why input { padding: 6px 8px; border-radius: 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); font: inherit; }
 .rb-why span { display: flex; gap: 6px; }
@@ -224,3 +227,12 @@ html[data-motion='calm'] .rb-open[data-dir] > *, html[data-motion='calm'] .rb-op
 .rb .inn-mark { font-size: 15px; }
 .rf-setby { font: 600 14px var(--font-mono); color: var(--text-muted); padding: 0 4px; }
 .cf-segmented > .rv { display: inline-flex; } .cf-segmented > .rv:not(:last-child) > button { border-right: 1px solid var(--line); }
+
+/* 30 Oct (mockup ACT_1): the open flag's ladder and actions fill the pane's height rather than leaving its lower half
+   empty: taller rungs and actions, the summary a step larger. */
+.rb-summary { font-size: 16px; }
+.rb-ladder ol { gap: 8px; }
+.rung { padding: 12px 14px; font-size: 13.5px; }
+.rung-head b { font-size: 11.5px; }
+.rb-acts { gap: 8px; }
+.rb-acts > button, .rb-acts > .rv > button, .rb-link-btn { padding: 11px 14px; font-size: 14px; }

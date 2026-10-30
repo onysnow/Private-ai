@@ -82,7 +82,10 @@ describe('Chain of Custody', () => {
     // The claim card carries the server's Done checklist for Supported: each rule met or not, and what it waits on.
     const claim = screen.getByRole('article', {name: `The claim: ${CHAIN.claim.text}`});
     const done = within(claim).getByLabelText('Done for Supported');
-    expect(done).toHaveTextContent('Done for Supported · 1 left');
+    // The head is the name and what is left (an alert, in sight); its summary in words is revealed on the name.
+    const head = done.querySelector('.cc-done-head')!;
+    expect(head.querySelector('.bad')).toHaveTextContent('· 1 left');
+    expect(within(done).getByText('Done for Supported', {selector: '.rv'})).toHaveAccessibleDescription(/^Done for Supported1 left/);
     expect(within(done).getByLabelText('Every contradicting item has a written answer: met. 1 answered')).toHaveTextContent('✓ against answered');
     // The rule's short name shows; its full wording and what it waits on are revealed on it (Ony, 29 Oct).
     const unmet = within(done).getByLabelText('Every supporting item has an exact locator: not met. 1 without a page, paragraph or timestamp.');
@@ -225,7 +228,23 @@ describe('Chain of Custody', () => {
     mockApi({...routes, 'GET /api/claims/c1/custody-chain': {...CHAIN, done}});
     render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
     const list = await screen.findByLabelText('Done for Supported');
-    expect(list).toHaveTextContent('Done for Supported · ✓ every checkable rule met · ○ 1 not checkable here');
+    // One mark in sight; the words on reveal.
+    expect(list.querySelector('.cc-done-head .ok')).toHaveTextContent('✓');
+    expect(within(list).getByText('Done for Supported', {selector: '.rv'}))
+      .toHaveAccessibleDescription(/✓ every checkable rule met · ○ 1 not checkable here/);
+  });
+
+  it('draws only the columns a card stands in, so a typed-in source runs straight to its decision and the claim', async () => {
+    const source = {...CHAIN, rows: [{...CHAIN.rows[0], cards: [
+      {...CHAIN.rows[0].cards[0], id: 'source:s1', kind: 'source', title: 'MAS release', checks: [], document_id: null, sha256: null},
+      {...CHAIN.rows[0].cards[CHAIN.rows[0].cards.length - 1], id: 'decision:s1'}]}]};
+    mockApi({...routes, 'GET /api/claims/c1/custody-chain': source});
+    const {container} = render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+    await screen.findByText(/7 steps · 1 person/);
+    expect([...container.querySelectorAll('.cc-col')].map(c => c.textContent)).toEqual(['FILES', 'DECISION', 'THE CLAIM']);
+    expect(container.querySelector('.cc-wires')).toHaveAttribute('data-columns', '3');
+    expect((container.querySelector('[data-card="decision:s1"]') as HTMLElement).style.gridColumn).toBe('2');
+    expect((container.querySelector('[data-card="claim"]') as HTMLElement).style.gridColumn).toBe('3');
   });
 
   it('opens the claim another panel asked for, and says when there is nothing to trace', async () => {

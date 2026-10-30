@@ -339,16 +339,24 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
   const [draw] = useState(() => !calmNow());
   // A step lights the wires on both its sides.
   const wireLit = (key: string) => Boolean(lit && (key.startsWith(`${lit}>`) || key.endsWith(`>${lit}`)));
-  return <div className={`cc-wires${breaking ? ' breaking' : ''}${draw ? ' draw' : ''}`} ref={box} style={scale < 1 ? {zoom: scale} : undefined}>
+  // Only the columns a card stands in are drawn (a source typed in by hand has no reading or passage step), so the
+  // steps sit side by side into the claim instead of across empty columns; with no evidence yet, all five show.
+  const used = chain.rows.length ? [0, 1, 2, 3].filter(i => chain.rows.some(r => r.cards.some(c => COL[c.kind] === i))) : [0, 1, 2, 3];
+  const at = (col: number) => used.indexOf(col) + 1;
+  const claimAt = used.length + 1;
+  const gridStyle: CSSProperties = {gridTemplateColumns: `repeat(${used.length}, minmax(140px, ${used.length < 4 ? '250px' : '1fr'})) ${used.length < 4 ? 'minmax(220px, 300px)' : 'minmax(200px, 1.2fr)'}`,
+    ...(used.length < 4 ? {justifyContent: 'space-between'} : {}),
+    ...(scale < 1 ? {zoom: scale} : {})};
+  return <div className={`cc-wires${breaking ? ' breaking' : ''}${draw ? ' draw' : ''}`} ref={box} style={gridStyle} data-columns={used.length + 1}>
     <svg key={chain.claim.id} className={`cc-lines${draw ? ' draw' : ''}`} aria-hidden="true">
       {lines.map(l => <g key={l.key} className={`cc-wire w-${l.style}${wireLit(l.key) ? ' lit' : ''}`}>
         <path d={l.d}/>{l.words && <text x={l.x} y={l.y - (l.words.includes(' · ') ? 6 : 0)} textAnchor="middle">
           {l.words.split(' · ').map((w, i) => <tspan key={i} x={l.x} dy={i ? 11 : 0}>{w}</tspan>)}</text>}</g>)}
     </svg>
-    {COLUMNS.map((c, i) => <p key={c} className="cc-col" style={{gridColumn: i + 1}}>{c.toUpperCase()}</p>)}
-    {chain.rows.map((row, r) => row.cards.map(c => <CardBox key={c.id} card={c} row={r + 2} picked={picked === c.id} lit={lit === c.id} falls={downstream.has(c.id)}
+    {COLUMNS.map((c, i) => (i === 4 || used.includes(i)) && <p key={c} className="cc-col" style={{gridColumn: i === 4 ? claimAt : at(i)}}>{c.toUpperCase()}</p>)}
+    {chain.rows.map((row, r) => row.cards.map(c => <CardBox key={c.id} card={c} row={r + 2} column={at(COL[c.kind])} picked={picked === c.id} lit={lit === c.id} falls={downstream.has(c.id)}
       against={row.stance === 'contradicts'} anchor={spanOf(row.anchor)} onPick={() => onPick(c.id)} onLight={onLight}/>))}
-    <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}${lit === 'claim' ? ' lit' : ''}`} data-card="claim" style={{gridColumn: 5, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
+    <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}${lit === 'claim' ? ' lit' : ''}`} data-card="claim" style={{gridColumn: claimAt, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
       aria-label={`The claim: ${chain.claim.text}`}>
       <StatusChip status={claimStatus}/>
       <b>{chain.claim.text}</b>
@@ -356,17 +364,17 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
     </article>
     {/* An AI step: the plum AI mark; "not accepted yet" is the dashed outline (solid once accepted), its words and time
         revealed on the mark. */}
-    {aiShown.map((a, i) => <article key={a.id} className={`cc-card cc-ai${a.status === 'accepted' ? ' accepted' : ''}${lit === `ai:${a.id}` ? ' lit' : ''}`} data-card={`ai:${a.id}`} style={{gridColumn: 5, gridRow: chain.rows.length + 2 + i}} aria-label="AI step">
+    {aiShown.map((a, i) => <article key={a.id} className={`cc-card cc-ai${a.status === 'accepted' ? ' accepted' : ''}${lit === `ai:${a.id}` ? ' lit' : ''}`} data-card={`ai:${a.id}`} style={{gridColumn: claimAt, gridRow: chain.rows.length + 2 + i}} aria-label="AI step">
       <span className="cc-ai-top"><Reveal label={`AI step, ${a.status === 'accepted' ? 'accepted' : 'not accepted yet'}`} detail={<><b>AI step · {a.status === 'accepted' ? 'accepted' : 'not accepted yet'}</b>
         <span className="rv-row">{short(a.when)}</span></>}><span className="ai-notice" aria-hidden="true">AI</span></Reveal>
         <b>{AI_MODULE[a.module] ?? a.module} draft quoted this claim</b></span>
       {a.run_id && <button type="button" className="cc-watch" onClick={() => onWatch(a.run_id!)}>Watch the run →</button>}
     </article>)}
-    {aiShown.length < chain.ai.length && <button type="button" className={`cc-card cc-ai cc-ai-more${aiFolded(lit) ? ' lit' : ''}`} data-card="ai:more" style={{gridColumn: 5, gridRow: chain.rows.length + 2 + aiShown.length}}
+    {aiShown.length < chain.ai.length && <button type="button" className={`cc-card cc-ai cc-ai-more${aiFolded(lit) ? ' lit' : ''}`} data-card="ai:more" style={{gridColumn: claimAt, gridRow: chain.rows.length + 2 + aiShown.length}}
       onClick={() => setAllAi(true)} aria-label={`Show ${chain.ai.length - aiShown.length} more AI steps that quoted this claim`}>
       <span className="ai-notice" aria-hidden="true">AI</span><b>+{chain.ai.length - aiShown.length} more AI drafts quoted this claim</b><small>Show them all</small>
     </button>}
-    {!chain.rows.length && <p className="cc-muted" style={{gridColumn: '1 / 5', gridRow: 2}}>
+    {!chain.rows.length && <p className="cc-muted" style={{gridColumn: `1 / ${claimAt}`, gridRow: 2}}>
       This claim has no evidence linked to it yet, so there is no chain to draw. Link a quote to it in Claims to make it traceable.</p>}
   </div>;
 }
@@ -374,20 +382,25 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
 /** The Done checklist for Supported (server, app/services/claim_done.py): each rule met, not met, or not checkable
  * here, with what it waits on. Shape and word, never colour alone. */
 function DoneList({done}: {done: ClaimDoneOut}): ReactElement {
+  // The head is the name and one mark (✓ every checkable rule met); what is left stays in sight, an alert. The
+  // summary in words is revealed on the name (Ony, 29 Oct), so the card keeps to the checks themselves.
+  const summary = done.met ? `${done.unknown ? '✓ every checkable rule met' : '✓ every rule met'}${done.unknown ? ` · ○ ${done.unknown} not checkable here` : ''}`
+    : `${done.left} left${done.unknown ? ` · ○ ${done.unknown} not checkable here` : ''}`;
   return <div className="cc-done" aria-label="Done for Supported">
-    <p className="cc-done-head">Done for Supported · <span className={done.met ? 'ok' : 'bad'}>{done.met ? (done.unknown ? '✓ every checkable rule met' : '✓ every rule met') : `${done.left} left`}</span>
-      {done.unknown ? <span className="unknown"> · ○ {done.unknown} not checkable here</span> : null}</p>
+    <p className="cc-done-head"><Reveal detail={<><b>Done for Supported</b><span className="rv-row">{summary}</span>
+      <span className="rv-row">The rules a review to Supported is held to.</span></>}>Done for Supported</Reveal>
+      {done.met ? <span className="ok" aria-hidden="true"> ✓</span> : <span className="bad"> · {done.left} left</span>}</p>
     {/* A publication gate: the rules stay; each rule's full wording and what it waits on are revealed on its name. */}
     <ul>{done.rules.map(r => <li key={r.key} className={`done-${r.state}`}
       aria-label={`${r.label}: ${DONE_STATE[r.state].word}. ${r.detail}`}>
-      <span aria-hidden="true">{DONE_STATE[r.state].mark}</span> <Reveal detail={<><b>{r.label}</b>
+      <span className="cc-done-mark" aria-hidden="true">{DONE_STATE[r.state].mark}</span>{' '}<Reveal detail={<><b>{r.label}</b>
         <span className="rv-row">{r.state === 'not_met' ? 'waits on: ' : ''}{r.detail}</span></>}>{DONE_SHORT[r.key] ?? r.label}</Reveal>
     </li>)}</ul>
   </div>;
 }
 
-function CardBox({card, row, picked, lit, falls, against, anchor, onPick, onLight}: {
-  card: CustodyCardOut; row: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; anchor: {start: number; end: number} | null;
+function CardBox({card, row, column, picked, lit, falls, against, anchor, onPick, onLight}: {
+  card: CustodyCardOut; row: number; column: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; anchor: {start: number; end: number} | null;
   onPick: () => void; onLight: (id: string | null) => void;
 }): ReactElement {
   const id = useId();
@@ -401,7 +414,7 @@ function CardBox({card, row, picked, lit, falls, against, anchor, onPick, onLigh
   const extra = card.kind === 'file' || card.kind === 'source' ? card.lines.filter(Boolean) : [];
   const detail = <><b>{KIND_WORD[card.kind]}</b>{extra.map((l, i) => <span key={i} className="rv-row rv-mono">{l}</span>)}{whoWhen && <span className="rv-row">{whoWhen}</span>}</>;
   return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}`}
-    style={{gridColumn: COL[card.kind] + 1, gridRow: row, '--col': COL[card.kind]} as CSSProperties} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
+    style={{gridColumn: column, gridRow: row, '--col': COL[card.kind]} as CSSProperties} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
     aria-label={`${KIND_WORD[card.kind]}: ${card.title}. ${card.checks.map(c => `${c.label} ${c.ok === true ? 'passed' : c.ok === false ? 'failed' : 'not known'}`).join(', ')}`}
     aria-describedby={extra.length || whoWhen ? `${id}-who` : undefined}>
     {(extra.length > 0 || whoWhen) && <span id={`${id}-who`} hidden>{[...extra, whoWhen].filter(Boolean).join(' · ')}</span>}
