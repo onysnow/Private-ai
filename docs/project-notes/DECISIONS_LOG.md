@@ -709,6 +709,11 @@ BACKLOG "Documents have no kind/language field". Built on `documents` (migration
   Its answer carries nothing that says a shard failed. A user can meet it too: a small collection whose documents were
   re-processed or deleted can show "no similar documents" for one that has some.
 - **Call:** `backend/tests/test_openaleph_live.py` keeps the collections it makes until every test has run (a
-  session fixture), so the tests no longer fill the index with deleted documents before the search test. The test's
-  assertions are unchanged. Running the live tests again on the same stack straight after a run can still meet the
+  session fixture), so the tests no longer fill the index with deleted documents before the search test; and the
+  progress test's three files each get their own text (three files with the same text were one OpenAleph entity
+  written six times, enough to fail a shard holding it, the memo and little else). No assertion changed. What is left
+  is each document's own earlier versions (two writes each, three for the memo analysed again), which keeps every
+  shard under the limit. On 10 fresh local stacks after the change (CI's pytest command each time; the last 6 with
+  the progress files apart, where no document was written more than 3 times) the similar documents test passed every
+  time and no shard failed the query. Running the live tests again on the same stack straight after a run can still meet the
   bug, through the collections the last run deleted; CI starts from a new stack each time.

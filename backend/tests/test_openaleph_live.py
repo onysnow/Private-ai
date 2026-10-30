@@ -189,7 +189,9 @@ def test_reading_progress_follows_openaleph_until_it_is_idle(live, tmp_path):
     aleph = openaleph_corpus._client_factory()
     for number in range(3):
         memo = tmp_path / f"progress-{number}.txt"
-        memo.write_text(MEMO, encoding="utf-8")
+        # Each file its own text: three files with the same text are one OpenAleph entity, written six times, and
+        # those versions count against the similar documents test until merged (`_collections`).
+        memo.write_text(f"{MEMO}\n\nCopy {number + 1} of 3.", encoding="utf-8")
         aleph.ingest_upload(collection_id, memo, {"file_name": memo.name})
 
     seen: list[dict] = []
