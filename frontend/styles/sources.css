@@ -114,6 +114,11 @@
 .sb-claim.st-unshown { background: none; border: 1.5px dashed currentColor; width: 21px; height: 21px; }
 .sb-claim.st-unshown span { color: currentColor; }
 .sb-claim:hover { filter: brightness(1.2); transform: scale(1.08); }
+.sb-claim.gone { opacity: .45; background: none; border: 1.5px solid currentColor; width: 21px; height: 21px; }
+.sb-claim.gone span { color: currentColor; }
+.sb-ev.gone .sb-quote, .sb-ev.gone .sb-ev-side { opacity: .5; }
+.sb-ev.gone .sb-quote s { text-decoration-thickness: 1.5px; text-decoration-color: var(--text-muted); }
+.sb-ev.replacer { background: color-mix(in srgb, var(--accent-1) 10%, transparent); box-shadow: inset 3px 0 0 var(--accent-1); border-radius: 8px; }
 .st-ruled_out.sb-claim, .sb-dot.st-ruled_out, .sb-tally-n.st-ruled_out { color: var(--text-muted); }
 .sb-ev-acts { display: inline-flex; gap: 4px; opacity: 0; transition: opacity var(--dur-fast, .12s); }
 .sb-ev:hover .sb-ev-acts, .sb-ev:focus-within .sb-ev-acts { opacity: 1; }

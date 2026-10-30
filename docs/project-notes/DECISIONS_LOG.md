@@ -685,3 +685,18 @@ Calls:
   Custody's "Back to the claim" (which had its own dialog check), and the theme trial bar (which had one too). The
   screens' other keys are left as they were: only Esc is shared between layers.
 - **Unchanged:** the slot's Back still closes it, its Esc still walks the trail and closes from the first step.
+
+## 39. Sources & evidence shows superseded evidence as Claims does (30 Oct 2026)
+
+Bring in › Sources & evidence was told a link was superseded (entry 36) but showed nothing of it. Calls:
+- **The mark travels with the link.** `GET /investigations/{id}/evidence-claim-links` keeps `superseded` (a boolean) and
+  adds `superseded_mark`, the same object the Claims screen reads (what replaced it, why, who, when; `claims.
+  superseded_of`), null while the link counts.
+- **Per link, not per piece.** A piece can be superseded on one claim and still back another, so the mark is on that
+  claim's chip: struck and faded, its stance mark struck, named "superseded" in its accessible name, and on hover the
+  claim, then what replaced it, why, who and when (the Claims screen's own `supersededDetail`). Pointing at it lights the
+  record that replaced it when that record is in the pane, as on Claims. Only a piece superseded on every claim it was
+  linked to has its quote struck and faded.
+- **Not counted.** A superseded link backs its claim no longer, so the source's claim count, status dots, tally and
+  sort leave it out; a source whose every link is superseded says so ("Superseded on every claim it was linked to")
+  instead of "Not used in a claim yet", and is in neither "Backing claims" nor "Not used yet".

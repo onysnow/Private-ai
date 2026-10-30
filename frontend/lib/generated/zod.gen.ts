@@ -4214,6 +4214,7 @@ export const zEvidenceClaimLinkOut = z.object({
   evidence_id: z.string(),
   stance: z.string(),
   superseded: z.boolean().optional().default(false),
+  superseded_mark: zClaimEvidenceSupersededOut.nullish(),
 });
 
 /**

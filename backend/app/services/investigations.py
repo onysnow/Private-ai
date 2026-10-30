@@ -111,13 +111,17 @@ def list_investigation_evidence_claim_links(db: Session, investigation_id: str) 
     """Every evidence-to-claim link in the investigation, one row per link: which
     evidence record backs, contradicts or gives context to which claim. Lets the
     Sources & evidence browser show each record's claims without a call per claim."""
-    rows = db.execute(
-        select(ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance, ClaimEvidenceLink.superseded_at)
+    from app.services.claims import superseded_of
+
+    links = db.scalars(
+        select(ClaimEvidenceLink)
         .join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
         .where(Claim.investigation_id == investigation_id)
         .order_by(ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance)
     ).all()
-    return [{"evidence_id": e, "claim_id": c, "stance": st, "superseded": at is not None} for e, c, st, at in rows]
+    # A superseded link carries its mark (what replaced it, why, who, when), as the Claims screen shows it.
+    return [{"evidence_id": link.evidence_id, "claim_id": link.claim_id, "stance": link.stance,
+             "superseded": link.superseded_at is not None, "superseded_mark": superseded_of(db, link)} for link in links]
 
 
 def list_investigation_claims(

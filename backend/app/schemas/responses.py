@@ -1861,6 +1861,7 @@ class EvidenceClaimLinkOut(ResponseModel):
     claim_id: str
     stance: str  # supports | contradicts | context
     superseded: bool = False  # marked superseded by a newer record: no longer counts toward the claim
+    superseded_mark: ClaimEvidenceSupersededOut | None = None  # what replaced it, why, who and when; null while it counts
 
 
 class ClaimEvidenceRowOut(ResponseModel):

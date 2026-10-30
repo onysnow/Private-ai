@@ -22512,6 +22512,16 @@
             "default": false,
             "title": "Superseded",
             "type": "boolean"
+          },
+          "superseded_mark": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimEvidenceSupersededOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [

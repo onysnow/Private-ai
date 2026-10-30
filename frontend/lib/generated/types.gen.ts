@@ -10558,6 +10558,7 @@ export type EvidenceClaimLinkOut = {
    * Superseded
    */
   superseded?: boolean;
+  superseded_mark?: ClaimEvidenceSupersededOut | null;
 };
 
 /**

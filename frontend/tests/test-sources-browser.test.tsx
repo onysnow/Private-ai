@@ -142,6 +142,42 @@ describe('SourcesBrowser', () => {
     expect(screen.queryByPlaceholderText('Source title')).not.toBeInTheDocument();
   });
 
+  it('shows evidence a newer record replaced as the Claims screen does: struck, faded, not counted, what replaced it on hover', async () => {
+    const mark = {at, by_evidence_id: 'e2', by_label: 'Forfeiture complaint', by_locator: 'page 54', reason: 'Corrected in the amended complaint',
+      decided_by_id: null, decided_by_name: 'Ony'};
+    const withGone = [...links,
+      {evidence_id: 'e1', claim_id: 'c-ok', stance: 'supports', superseded: true, superseded_mark: mark},
+      {evidence_id: 'e4', claim_id: 'c-ok', stance: 'supports', superseded: true, superseded_mark: {...mark, by_evidence_id: null, by_label: null, by_locator: null}}];
+    vi.stubGlobal('fetch', serve({'/evidence-claim-links': () => json(withGone)}));
+    const user = userEvent.setup();
+    draw();
+    await waitFor(() => expect(within(list()).getAllByRole('button')).toHaveLength(3));
+    const rows = within(list()).getAllByRole('button');
+    // The superseded link backs its claim no longer: the counts leave it out.
+    expect(rows[0]).toHaveAccessibleName(/Forfeiture complaint\. Document brought in\. 2 pieces of evidence\. Backs 1 claim, 1 disputed\.$/);
+    expect(within(list()).getByRole('button', {name: /^Phone call notes/})).toHaveAccessibleName(/Superseded on every claim it was linked to\.$/);
+
+    const pane = screen.getByRole('region', {name: 'Evidence from Forfeiture complaint'});
+    const chip = within(pane).getByRole('button', {name: 'Backs it, superseded: Acme was registered in 2009 (Supported). Open the claim'});
+    expect(chip).toHaveClass('gone');
+    const struck = within(pane).getByText('Wire of $576 million to Falcon Bank').closest('li')!;
+    expect(struck).toHaveClass('gone');
+    expect(struck.querySelector('blockquote s')).not.toBeNull();
+    // The live piece is not struck.
+    const live = within(pane).getByText('The deposit was refundable').closest('li')!;
+    expect(live).not.toHaveClass('gone');
+
+    await user.hover(chip);
+    const card = await screen.findByRole('tooltip');
+    expect(card).toHaveTextContent('Superseded by Forfeiture complaint, page 54');
+    expect(card).toHaveTextContent('Corrected in the amended complaint');
+    expect(card).toHaveTextContent('Marked by Ony');
+    // Pointing at it lights the record that replaced it.
+    expect(live).toHaveClass('replacer');
+    await user.unhover(chip);
+    expect(live).not.toHaveClass('replacer');
+  });
+
   it('leads with the capture form when the case has no sources yet', async () => {
     vi.stubGlobal('fetch', serve({'/sources': () => json([]), '/evidence': () => json([])}));
     draw();
