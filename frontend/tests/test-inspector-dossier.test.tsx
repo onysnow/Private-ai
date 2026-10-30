@@ -82,6 +82,42 @@ describe('a party opened in the inspector slot', () => {
     expect(useWorkbenchStore.getState().inspector).toEqual([]);
   });
 
+  it('with Esc taken as the topmost layer, still steps its trail one party at a time, and Back still closes it', async () => {
+    const other = entityFixture('ent-2', 'Orrin Shipping SA', 'Company');
+    mockApi({...dossierRoutes('ent-1', dossierFixture(entity)), ...dossierRoutes('ent-2', dossierFixture(other))});
+    wrap(<><Party/><InspectorSlot investigationId="inv-1"/></>);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: 'Kestrelwood'}));
+    expect(await screen.findByText('Kestrelwood Holdings Ltd dossier')).toBeInTheDocument();
+    // A party followed from inside the slot moves along the trail.
+    const {markSlotInteraction} = await import('../lib/workbench-store');
+    act(() => { markSlotInteraction(); useWorkbenchStore.getState().openDossier('ent-2'); });
+    expect(await screen.findByText('Orrin Shipping SA dossier')).toBeInTheDocument();
+    expect(useWorkbenchStore.getState().inspector).toHaveLength(2);
+    await waitFor(() => expect(partyInAddress()).toBe('ent-2'));
+
+    // Esc: one step back, and the slot takes the key so nothing under it acts on the same Esc.
+    let taken: boolean | undefined;
+    const under = (e: KeyboardEvent) => { if (e.key === 'Escape') taken = e.defaultPrevented; };
+    window.addEventListener('keydown', under);
+    await user.keyboard('{Escape}');
+    window.removeEventListener('keydown', under);
+    expect(taken).toBe(true);
+    expect(slotOf()).toBeVisible();
+    expect(useWorkbenchStore.getState().inspector).toMatchObject([{kind: 'dossier', entityId: 'ent-1'}]);
+    expect(await screen.findByText('Kestrelwood Holdings Ltd dossier')).toBeInTheDocument();
+    await waitFor(() => expect(partyInAddress()).toBe('ent-1'));
+    expect(window.history.state?.wbSlot).toBe(true);
+
+    // The browser's Back closes it from there.
+    act(() => {
+      window.history.replaceState(null, '', '/see?inv=inv-1#the-wire');
+      window.dispatchEvent(new PopStateEvent('popstate', {state: null}));
+    });
+    expect(slotOf()).not.toBeVisible();
+    expect(useWorkbenchStore.getState().inspector).toEqual([]);
+  });
+
   it('opens the party named in the address once the case is known', async () => {
     window.history.replaceState({wbSlot: true}, '', '/see?inv=inv-1&dossier=ent-1');
     mockApi(dossierRoutes('ent-1', dossierFixture(entity)));
