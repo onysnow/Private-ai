@@ -17,6 +17,11 @@ against its mockup at 1440×900 (pictures were sent to Ony), then fixes from it.
   **Safety & data**, the **Knowledge** map (was blank: a CSS grid bug).
 Fixed later on 30 Oct: the Story's evidence chips show a short label worked out from each source (DECISIONS_LOG 31);
 a Board note pinned to a single year shows on the board that now holds that year.
+Built later on 30 Oct (DECISIONS_LOG 32–37): BO-033 raises one flag per payer and payee; a payment has a kind (a fine,
+an order or an agreed price is owed, not money that moved); one date and time style on every screen; a party's
+dossier opens in the inspector slot over the current screen (Esc, Back, a drag handle, a bottom sheet on a phone);
+claim evidence can be marked superseded; documents keep their kind and language (py3langid, ADR-0027). None of these
+has been looked at in a browser yet. Migrations chain a7d3f9c2e614 → a7f3c9e2d641 → a8d2f6c4e913.
 Open: openaleph-live's similar-documents test fails on some runs for a reason not established (PR #117 comments); The
 Wire is Ony's own redesign.
 
