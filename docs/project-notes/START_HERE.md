@@ -1,6 +1,25 @@
-# Start here (29 Oct 2026)
+# Start here (30 Oct 2026)
 
-**Where it stands, 29 Oct, late (PR #117, branch `claude/laughing-tesla-dstx1t`, which carries #116's branch
+**Where it stands, 30 Oct (PR #117, branch `claude/laughing-tesla-dstx1t`):** a side-by-side check of every screen
+against its mockup at 1440×900 (pictures were sent to Ony), then fixes from it. Built or fixed 30 Oct:
+- **Places** on a real world map (Protomaps, fetched once by the backend, `app/services/basemap_install.py`), opening on a
+  place, a draggable date window, paths on the map (DECISIONS_LOG 18).
+- **Timeline**: every view opens on the case's busy years with outliers folded (Lanes, Stack, Board, Replay, Periods,
+  Build your own).
+- **Is it real?** opens on an item with a file rail; **Chain of Custody** checklist and columns; **Red Flags** buttons;
+  **Money** labels placed without overlap; **Case home** quiet empty states, Next up's evidence, the Red Flag notice docked.
+- **Redact**: margin line numbers no longer proposed as phones, proposals grouped; **reading**: court filings' margin
+  line numbers no longer read as text (DECISIONS_LOG 22); **Clean and cut** spectrogram; **Listen & read** parts, voices
+  and player; **photo room** proposals and size; MP3 cover art no longer a "video".
+- **Demo data** so screens can be judged: five followed sources (19), a story (20), a deck from it (21), three captures
+  from pages the loader really downloaded (23). Demo sources are never checked automatically.
+- **Following**, **Story**, **Decks**, **Links & captures**, **Check a pack** (can be tried on the case), **Add by hand**,
+  **Safety & data**, the **Knowledge** map (was blank: a CSS grid bug).
+Open: openaleph-live's similar-documents test fails on some runs for a reason not established (PR #117 comments); the
+Story's evidence chips need a short label on sources; Board notes saved on single years now inside a group no longer
+show; The Wire is Ony's own redesign.
+
+**Earlier, 29 Oct, late (PR #117, branch `claude/laughing-tesla-dstx1t`, which carries #116's branch
 `claude/native-module` merged in):** everything #116 built (below) plus, from #117, Ony's hover rule applied to every
 screen (sub-text on reveal, types as marks, statuses colour-only with Settings › Appearance › Status marks, key hints
 behind `?`, the AI mark), the style guide at `/style-guide`, and the site mockup for Illustrator
