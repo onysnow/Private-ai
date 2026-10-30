@@ -92,6 +92,9 @@ def probe(path: Path) -> tuple[str, float, list[dict[str, Any]]]:
                 entry.update(channels=context.channels, sample_rate=context.sample_rate)
             elif stream.type == "video":
                 entry.update(width=context.width, height=context.height)
+                # Cover art in a sound file (an MP3's picture) is a one-picture stream, not moving pictures.
+                if "attached_pic" in str(getattr(stream, "disposition", "")):
+                    entry["type"] = "cover"
             streams.append(entry)
         duration = float(container.duration) / 1_000_000 if container.duration else 0.0
     if not any(s["type"] == "audio" for s in streams):

@@ -391,13 +391,15 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
     lines.current?.querySelector<HTMLElement>(`[data-segment="${current.id}"]`)?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
   }, [current, playing]);
 
-  const kindWord = t?.kind === 'video' ? 'Video' : 'Audio';
+  // A sound file is never a video, even if an older transcript called its cover art one.
+  const isVideo = t?.kind === 'video' && !(doc.mime_type ?? '').startsWith('audio/');
+  const kindWord = isVideo ? 'Video' : 'Audio';
   const spoken = segments.filter(s => s.kind === 'speech');
   const silent = segments.filter(s => s.kind === 'no_speech');
   const unsureCount = t ? spoken.reduce((n, s) => n + s.words.filter(w => w.p < t.unsure_below).length, 0) : 0;
   const about = (t?.transcript ?? {}) as {tool?: string; model?: string; language?: string; language_probability?: number; ran_at?: string};
   const title = doc.filename.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
-  const MediaTag = t?.kind === 'video' ? 'video' : 'audio';
+  const MediaTag = isVideo ? 'video' : 'audio';
   const events = {onPlay: () => setPlaying(true), onPause: () => setPlaying(false), onEnded: () => setPlaying(false),
     onTimeUpdate: (e: {currentTarget: HTMLMediaElement}) => setNow(e.currentTarget.currentTime)};
   // A video plays in the left column, its picture beside the transcript; audio has no picture and sits in the player.
