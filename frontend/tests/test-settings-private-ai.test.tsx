@@ -52,7 +52,10 @@ describe('Settings: AI and research', () => {
 
   it('explains when AI is off', async () => {
     await renderSettings({enabled: false, model: null});
-    expect(screen.getByText(/AI reasoning is disabled on this deployment/)).toBeInTheDocument();
+    // A calm state in plain words; the deployment flag only on the reveal.
+    const state = screen.getByTestId('ai-state');
+    expect(within(state).getByText('AI is off').closest('.rv')).toHaveAccessibleDescription(/ENABLE_AI_FEATURES is off/);
+    for (const el of screen.queryAllByText(/ENABLE_AI_FEATURES/)) expect(el.closest('[hidden]')).not.toBeNull();
     expect(screen.queryByText(/Model:/)).not.toBeInTheDocument();
   });
 });

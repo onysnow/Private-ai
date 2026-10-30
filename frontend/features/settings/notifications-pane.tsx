@@ -6,6 +6,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
+import {Bell, BellOff, Inbox, Zap} from 'lucide-react';
 
 import {errorMessage} from '../../lib/api-client';
 import {
@@ -15,11 +16,19 @@ import {
 import type {NotificationPrefsOut} from '../../lib/generated/types.gen';
 
 import {Reveal} from '../../components/ui/reveal';
+import {OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
 import {OutsideChannels} from './outside-channels';
 import {HelpRow} from './settings-index';
 
 type Route = 'interrupt' | 'needs' | 'else' | 'off';
+const ROUTES: Route[] = ['interrupt', 'needs', 'else', 'off'];
 const ROUTE_WORDS: Record<Route, string> = {interrupt: 'Interrupt', needs: 'Needs you', else: 'Everything else', off: 'Off'};
+const ROUTE_DOES: Record<Route, string> = {
+  interrupt: 'One notice in the top band, in the alarm colour, shown once and never repeated. Only a Textbook Red Flag may interrupt.',
+  needs: 'The bell’s first tab: what waits for you.', else: 'The bell’s second tab: the rest, to read when you like.', off: 'Not shown anywhere.',
+};
+const icon = {width: 15, height: 15, strokeWidth: 2, 'aria-hidden': true} as const;
+const ROUTE_ICON: Record<Route, ReactElement> = {interrupt: <Zap {...icon}/>, needs: <Bell {...icon}/>, else: <Inbox {...icon}/>, off: <BellOff {...icon}/>};
 const BACKUP_DAYS: {days: 7 | 14 | 30 | 0; words: string}[] = [
   {days: 7, words: 'A week'}, {days: 14, words: 'Two weeks'}, {days: 30, words: 'A month'}, {days: 0, words: 'Never'},
 ];
@@ -75,27 +84,39 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
 
   return <div className="ap-two">
     <section className="ap-pane" aria-labelledby="nt-routes">
-      <div className="ap-pane-head"><h2 id="nt-routes"><Reveal detail={<><span className="rv-row">The bell’s two tabs, the top band, or nowhere.</span>
-        <span className="rv-row">Interrupt is one notice in the top band, in the alarm colour, shown once and never repeated. Only a Textbook Red Flag may interrupt.</span></>}><span>Where each kind goes</span></Reveal></h2>
+      <div className="ap-pane-head"><h2 id="nt-routes"><Reveal detail="The top band, the bell’s two tabs, or nowhere. Point at a column’s mark for what it does; a ring marks the default."><span>Where each kind goes</span></Reveal></h2>
         <button type="button" className="st-link" onClick={() => put({routes: Object.fromEntries(p.kinds.map(k => [k.key, k.default as Route]))})}>Reset to defaults</button></div>
-      {p.kinds.map(k => {
-        const routes: Route[] = k.can_interrupt ? ['interrupt', 'needs', 'else', 'off'] : ['needs', 'else', 'off'];
-        const current = (p.routes[k.key] ?? k.default) as Route;
-        return <div key={k.key} className="st-route">
-          <span className="st-route-what"><b>{k.label}</b>{week && <small>{week[k.key] ?? 0} last week</small>}</span>
-          <span className="ap-seg" role="radiogroup" aria-label={k.label}>
-            {routes.map(r => <button key={r} type="button" role="radio" aria-checked={current === r} className={current === r ? 'on' : ''}
-              onClick={() => current !== r && put({routes: {[k.key]: r}})}>{ROUTE_WORDS[r]}{r === k.default && <em className="st-default">default</em>}</button>)}
-          </span>
-        </div>;
-      })}
+      {/* Kinds × where they go: one row per kind, one column per place, a dot for the choice. The places are marks named
+          on hover; the default is a ring on its cell, named in the dot's name; last week's count is the number. */}
+      <div className="st-grid" role="presentation">
+        <div className="st-grid-head" aria-hidden="true">
+          <span/>
+          <Reveal detail="How many of each this case raised in the last seven days."><span className="st-grid-n">7d</span></Reveal>
+          {ROUTES.map(r => <Reveal key={r} detail={<><b className="rv-row">{ROUTE_WORDS[r]}</b><span className="rv-row">{ROUTE_DOES[r]}</span></>}>
+            <span className={`st-grid-mark st-to-${r}`}>{ROUTE_ICON[r]}</span></Reveal>)}
+        </div>
+        {p.kinds.map(k => {
+          const current = (p.routes[k.key] ?? k.default) as Route;
+          return <div key={k.key} className={`st-grid-row${current !== k.default ? ' st-changed' : ''}`}>
+            <b className="st-grid-kind">{k.label}</b>
+            {week ? <Reveal detail={`${week[k.key] ?? 0} last week`}><span className={`st-grid-n${week[k.key] ? '' : ' zero'}`}>{week[k.key] ?? 0}</span></Reveal> : <span className="st-grid-n zero" aria-hidden="true">·</span>}
+            <span className="st-grid-cells" role="radiogroup" aria-label={k.label}>
+              {ROUTES.map(r => !k.can_interrupt && r === 'interrupt' ? <span key={r} className="st-grid-none" aria-hidden="true"/>
+                : <button key={r} type="button" role="radio" aria-checked={current === r} aria-label={`${ROUTE_WORDS[r]}${r === k.default ? ' (default)' : ''}`}
+                  className={`st-grid-dot st-to-${r}${current === r ? ' on' : ''}${r === k.default ? ' dflt' : ''}`}
+                  onClick={() => current !== r && put({routes: {[k.key]: r}})}><i aria-hidden="true"/></button>)}
+            </span>
+          </div>;
+        })}
+      </div>
       {problem && <p className="st-problem" role="alert">{problem}</p>}
     </section>
 
     <div className="st-col">
       <section className="ap-pane" aria-labelledby="nt-week">
         <div className="ap-pane-head"><h2 id="nt-week"><Reveal detail="Counted from what this case raised in the last seven days. Change a route and the numbers move, so you see what you would have been told before you choose.">
-          <span>Last week, with these choices</span></Reveal></h2><span>{caseName}</span></div>
+          <span>Last week, with these choices</span></Reveal></h2><span>{caseName}</span>
+          <button type="button" className="st-link" onClick={() => window.dispatchEvent(new Event(OPEN_INBOX_EVENT))}>Open the inbox</button></div>
         {!investigationId ? <p className="st-hint">Open a case to replay its week.</p>
           : !week ? <p className="st-wait">Counting…</p>
           : <div className="st-bins">{BINS.map(b => <div key={b.route} className={`st-bin st-bin-${b.route}`}><b>{bins[b.route]}</b><span>{b.words}</span></div>)}</div>}

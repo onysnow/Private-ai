@@ -52,6 +52,16 @@ export function whatLeaves(sources: LookupSourceOut[]): string {
   return parts.length ? `Nothing leaves this computer for an outside lookup except: ${parts.join('; ')}.` : 'Nothing leaves this computer for an outside lookup.';
 }
 
+const listWords = (names: string[]): string => names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+
+/** The same in a few words, for the pane at rest: "A party’s name, to OpenAleph and Firecrawl, when you say so." */
+export function leavesShort(sources: LookupSourceOut[]): string {
+  const by = (m: Mode) => sources.filter(s => (s.mode ?? s.default) === m).map(s => s.label);
+  const parts = [by('ask').length ? `to ${listWords(by('ask'))}, when you say so` : '', by('automatic').length ? `to ${listWords(by('automatic'))}, as each new party joins` : '']
+    .filter(Boolean);
+  return parts.length ? `A party’s name, ${parts.join('; ')}.` : 'Nothing leaves for an outside lookup.';
+}
+
 function Seg({label, value, onPick, disabled}: {label: string; value: Mode; onPick: (m: Mode) => void; disabled?: boolean}): ReactElement {
   return <span className="ap-seg" role="radiogroup" aria-label={label}>
     {MODES.map(m => <button key={m} type="button" role="radio" aria-checked={value === m} className={value === m ? 'on' : ''}
@@ -125,7 +135,8 @@ export function LookupsPane({investigationId, caseName, providers}: {investigati
   return <div className="st-stack">
     <section className="ap-pane st-sum" aria-labelledby="lk-sum">
       <div className="ap-pane-head"><h2 id="lk-sum">What leaves this computer, from these settings</h2>{investigationId && <span>{caseName}</span>}</div>
-      <p className="st-sentence">{whatLeaves(d.sources)}</p>
+      {/* A few words at rest; the full sentence, with each source's address, is revealed on them. */}
+      <p className="st-sentence"><Reveal detail={whatLeaves(d.sources)}><span>{leavesShort(d.sources)}</span></Reveal></p>
     </section>
     <div className="ap-two">
       <section className="ap-pane" aria-labelledby="lk-src">

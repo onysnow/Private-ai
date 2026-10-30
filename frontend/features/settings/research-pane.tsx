@@ -52,6 +52,8 @@ export function ResearchPane({model, rules}: {model: ReactNode; rules: ReactNode
   }, 'Could not save the defaults.');
 
   return <div className="st-stack">
+    {/* The model and what the AI may start on its own, side by side, so the pane fits the window. */}
+    <div className="ap-two st-ai-top">
     <section className="ap-pane" aria-labelledby="ai-model">
       <div className="ap-pane-head"><h2 id="ai-model"><Reveal detail="Set on the server."><span>The model</span></Reveal></h2></div>
       {model}
@@ -72,6 +74,7 @@ export function ResearchPane({model, rules}: {model: ReactNode; rules: ReactNode
       </div>
       {!d.ai_enabled && <p className="st-hint">No model is set up, so nothing is asked or run either way.</p>}
     </section>
+    </div>
 
     <div className="ap-two">
       <section className="ap-pane" aria-labelledby="ai-def">
