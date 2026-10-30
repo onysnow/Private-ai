@@ -66,9 +66,10 @@ describe('DeletionPanel', () => {
     vi.stubGlobal('fetch', fetchMock);
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={onDeleted}/>);
 
-    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
+    // What goes is counted as the screen opens: no button to press first.
     await screen.findByText('Preview ready. Type the case’s name to enable deletion.');
     expect(screen.getByText(/3 record\(s\) · 1 owned file\(s\) to delete/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Preview deletion'})).not.toBeInTheDocument();
     const remove = screen.getByRole('button', {name: 'Permanently delete investigation'});
     expect(remove).toBeDisabled();
     const name = screen.getByRole('textbox', {name: 'Type the case’s name to delete it'});
@@ -94,7 +95,6 @@ describe('DeletionPanel', () => {
         document_files_deleted: 1, shared_document_files_preserved: 0, missing_document_files: 0,
         openaleph_collection: {...casefile, deleted: false, detail: 'OpenAleph could not be reached to delete its casefile (ConnectError); delete it in OpenAleph.'}})));
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()}/>);
-    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
     expect(await screen.findByText('OpenAleph casefile “Kestrelwood” is deleted too.')).toBeInTheDocument();
     await user.type(screen.getByPlaceholderText('The case’s name'), 'Kestrelwood');
     await user.click(screen.getByRole('button', {name: 'Permanently delete investigation'}));
@@ -103,12 +103,21 @@ describe('DeletionPanel', () => {
     expect(casefileOutcome(null)).toBe('');
   });
 
-  it('says why a deletion is blocked and keeps the delete control away', async () => {
+  it('waits for Preview deletion on the all-stages page, which mounts every panel at once', async () => {
     const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValueOnce(json(preview));
+    vi.stubGlobal('fetch', fetchMock);
+    wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()} countOnOpen={false}/>);
+    expect(fetchMock).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
+    await screen.findByText('Preview ready. Type the case’s name to enable deletion.');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('says why a deletion is blocked and keeps the delete control away', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(json({...preview, can_delete: false,
       unsafe_paths: [{document_id: 'd1', storage_path: '/etc/passwd', error: 'outside the storage root'}]})));
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()}/>);
-    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
     await screen.findByText('Deletion is blocked by an unsafe document path.');
     expect(screen.getByText('outside the storage root')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Permanently delete investigation'})).not.toBeInTheDocument();

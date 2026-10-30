@@ -164,3 +164,134 @@ html[data-motion='calm'] .sd-pulse .sd-line { animation: none; border-top-color:
 .sd-grid:has(> .sd-right) .sd-cards { grid-column: 1; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; }
 .sd-grid:has(> .sd-right) .sd-card p:not(.sd-eyebrow):not(.sd-warn):not(.sd-kept) { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 @media (max-width: 1100px) { .sd-grid:has(> .sd-right) .sd-right, .sd-grid:has(> .sd-right) .sd-cards { grid-column: 1; grid-row: auto; } .ys { max-height: none; } }
+
+/* Keep › Backup & restore and Keep › Delete (30 Oct; features/backups/backup-panel.tsx, features/deletion/deletion-panel.tsx),
+   in the look of Safety & data: two panels filling the screen, numbers big, the sub-text revealed. The page never
+   scrolls; a panel scrolls inside itself when it must. The alarm colour appears only on Delete (its allowed place). */
+.kp { height: 100%; box-sizing: border-box; padding: 4px 28px 18px; display: flex; flex-direction: column; gap: 14px; color: var(--text); font-family: var(--font-ui); overflow: hidden; }
+.kp-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.kp-grid > .sd-panel { display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+.kp-big { margin: 0; font: 300 clamp(26px, 2.6vw, 38px)/1.1 var(--font-display); }
+.kp-big b { font-weight: inherit; }
+.kp-facts { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font: 15px var(--font-mono); color: var(--text-muted); }
+.kp-sealed { color: var(--accent-2); border-color: var(--accent-2); }
+.kp-holds-head { margin-top: 6px; }
+.kp-holds { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.kp-holds li { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 2px 10px; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); }
+.kp-holds .sd-mark { grid-row: span 2; align-self: center; font-size: 20px; }
+.kp-n { font: 600 30px/1 var(--font-mono); }
+.kp-unit { font-size: 13px; color: var(--text-muted); }
+.kp-act { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.kp-act button { min-height: 42px; padding: 0 22px; font-size: 14px; }
+.kp-drop { position: relative; flex: 1 1 auto; min-height: 140px; display: flex; align-items: center; justify-content: center; gap: 18px; padding: 18px; border-radius: 14px;
+  border: 2px dashed var(--line); background: var(--surface-2); cursor: pointer; transition: border-color var(--dur-base, .2s), background var(--dur-base, .2s); }
+.kp-drop:hover, .kp-drop.over, .kp-drop:focus-within { border-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 8%, var(--surface-2)); }
+.kp-drop.has { flex: 0 0 auto; min-height: 96px; border-style: solid; }
+.kp-file { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.kp-drop-mark { font-size: 44px; color: var(--accent-2); }
+.kp-drop.has .kp-drop-mark { font-size: 30px; }
+.kp-drop-word { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kp-drop-word b { font: 300 24px/1.15 var(--font-display); word-break: break-all; }
+.kp-drop-word small { font-size: 13px; color: var(--text-muted); }
+.kp-preview { display: flex; flex-direction: column; gap: 10px; }
+.kp-tiles > div { min-width: 120px; padding: 12px 16px; }
+.kp-tiles dd { font-size: 32px; }
+.kp-miss dd { color: var(--accent-1); }
+.kp-checks { font: 14px var(--font-mono); }
+.kp-warn small { color: var(--accent-1); font-size: 13px; }
+.kp-conflict small { font-size: 13px; }
+.kp-confirm { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; line-height: 1.4; }
+/* Delete: the alarm colour (deletion is one of its two allowed places), three steps on a rail. */
+.kp-alarm { color: var(--status-disputed) !important; font-style: normal; }
+.kp-steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
+.kp-steps li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; color: var(--text-muted); }
+.kp-steps li.now { color: var(--text); border-color: var(--status-disputed); }
+.kp-steps li.done { color: var(--text); }
+.kp-step-n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); font: 600 12px var(--font-mono); }
+.kp-steps li.now .kp-step-n { background: var(--status-disputed); color: var(--ground); }
+.kp-gone dd { color: var(--status-disputed); }
+.kp-also { margin: 0; font-size: 14px; }
+.kp-keep { margin: auto 0 0; font-size: 13px; color: var(--text-muted); }
+.kp-keep .sd-link { margin-left: 6px; }
+.kp-confirm-del { border: 1px solid var(--status-disputed); }
+.kp-name { margin: 0; font-size: 14px; color: var(--text-muted); }
+.kp-name code { display: block; margin-top: 8px; font: 500 24px/1.2 var(--font-mono); color: var(--text); word-break: break-word; }
+.kp-type { min-height: 52px; font: 18px var(--font-mono); }
+.kp-delete { min-height: 48px; font-size: 15px; }
+@media (max-width: 1100px) { .kp { overflow: auto; } .kp-grid { grid-template-columns: 1fr; } }
+
+/* Keep › Access (features/security/access-screen.tsx): the people on the left, the ways in on the right. */
+.ax-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 340px); gap: 14px; }
+.ax-people { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.ax-people .lk-settings { grid-template-columns: minmax(0, 1fr) 320px; }
+.ax-side { min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+.ax-doors { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ax-door { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
+.ax-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--line); font-size: 17px; color: var(--text-muted); }
+.ax-shut .ax-mark { color: var(--accent-2); border-color: var(--accent-2); }
+.ax-open .ax-mark { color: var(--accent-1); border-color: var(--accent-1); }
+.ax-alert .ax-mark, .ax-alert .ax-word { color: var(--accent-1); }
+.ax-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ax-word { font: 400 20px/1.15 var(--font-display); }
+.ax-go { font-size: 12.5px; color: var(--accent-2); text-decoration: none; white-space: nowrap; }
+.ax-go:hover { text-decoration: underline; }
+.ax-go:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.ax-alert { margin: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--accent-1); color: var(--accent-1); font-size: 13px; }
+.ax-setup { display: flex; flex-direction: column; gap: 8px; }
+.ax-house { margin-top: 6px; }
+@media (max-width: 1100px) { .ax-grid { grid-template-columns: 1fr; } }
+
+/* The server's setup as marks (features/security/security-panel.tsx), spaced, each value revealed on its mark; and the
+   Settings › Security log pane: the events loaded with it, scrolling inside, the previews as small secondary actions. */
+.sec-status { display: flex; flex-direction: column; gap: 10px; }
+.sec-marks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.sec-fact { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--surface-2); }
+.sec-glyph { color: var(--text-muted); font-size: 14px; }
+.sec-chip { font-size: 13px; color: var(--text); }
+.sec-denials small { font-size: 13px; color: var(--text-muted); }
+.sec-denials b { font: 600 18px var(--font-mono); color: var(--text); }
+.sec-denials.alert small { color: var(--accent-1); }
+.sec-pane { gap: 16px; }
+.sec-log { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.sec-logbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.sec-sum small { font: 12px var(--font-mono); color: var(--text-muted); }
+.sec-toggles { display: inline-flex; gap: 12px; margin-left: auto; }
+.sec-toggles label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.sec-events { list-style: none; margin: 0; padding: 0; max-height: max(240px, calc(100vh - 420px)); overflow: auto; overscroll-behavior: contain; border-top: 1px solid var(--line); }
+.sec-events li { padding: 7px 2px; border-bottom: 1px solid var(--line); }
+.sec-events small { font-size: 13px; }
+.sec-events code { font-size: 11.5px; color: var(--text-muted); }
+.sec-events:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.sec-refused { color: var(--accent-1); }
+.sec-allowed { color: var(--accent-2); }
+.sec-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.sec-count { font: 12px var(--font-mono); color: var(--text-muted); }
+.sec-secondary { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
+.sd-btn.sec-quiet { margin-top: 0; padding: 4px 11px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
+.sd-btn.sec-quiet:hover { color: var(--text); border-color: var(--text-muted); }
+.sec-stray { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.sec-stray-out small { font: 12px var(--font-mono); }
+.sec-alert { color: var(--accent-1); font-size: 12.5px; }
+.sec-said { color: var(--text-muted); font-size: 12px; }
+.sec-retention { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); }
+.sec-prune { display: flex; gap: 8px; align-items: center; }
+.sec-prune input { max-width: 280px; }
+/* Fill the space: the counted tiles grow with the panel instead of leaving it empty. */
+.kp-holds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.kp-holds li { min-height: 120px; padding: 18px 22px; }
+.kp-holds .sd-mark { font-size: 26px; }
+.kp-n { font-size: 44px; }
+.kp-unit { font-size: 15px; }
+.kp-del .kp-tiles > div { min-width: 150px; padding: 18px 22px; }
+.kp-del .kp-tiles dd { font-size: 46px; }
+.kp-del .kp-tiles dt { font-size: 13px; }
+.kp-confirm-del { justify-content: center; gap: 18px !important; }
+.kp-confirm-del > .sd-eyebrow { position: absolute; }
+.kp-confirm-del { position: relative; padding-top: 44px; }
+.kp-confirm-del > .sd-eyebrow { top: 16px; left: 18px; }
+.kp-make .kp-holds { flex: 1 1 auto; min-height: 0; grid-auto-rows: minmax(120px, 1fr); align-content: stretch; }
+.kp-make .kp-holds li { align-content: center; }
+.kp-make .kp-n { font-size: clamp(44px, 4.4vw, 68px); }
+.kp-make .kp-act { margin-top: 0; }
+.kp-del .kp-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 560px; }
+.kp-make .kp-holds { grid-auto-rows: minmax(120px, 260px); align-content: start; }

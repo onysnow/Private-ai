@@ -175,6 +175,8 @@ describe('Home portable investigation backup & restore', () => {
       },
       'GET /api/investigations': [investigationRecord(restored)],
       ...investigationRoutes(restored.id),
+      // The backup panel counts what a backup of the open case holds (Safety & data's stores).
+      [`GET /api/investigations/${restored.id}/safety-data`]: {status: 404, body: {detail: 'Investigation not found'}},
     });
 
     await user.click(screen.getByRole('button', {name: 'Restore investigation'}));

@@ -764,3 +764,36 @@ sometimes says it outright. Calls:
   proposal's kind becomes the link's.
 - **Mapping screen:** under a Payment link, one select, "Kind of payment: not said" or "Kind of payment from “column”";
   what happens to a cell that names no kind is on hover.
+
+## 43. Keep › Backup & restore, Delete and Access, and Settings › Security log, converted (30 Oct 2026)
+
+The sweep found Keep's last three tabs and the Security log pane unconverted: big headings, stacked orange buttons, a
+raw file input, a collapsed "Local security/settings status" line on an empty Access page, and the server's facts
+running together ("EnvironmentDatabaseDocument storage…"). Calls, all in the look of Safety & data (KEEP mockup):
+- **Backup & restore** fills the screen in two panels. Left, *Make one*: the last backup big ("Last backup 3 days ago"),
+  its size and a ✓ checksum (SHA-256 on hover), and what a backup holds counted from Safety & data's own stores (records,
+  documents… big numbers; where each lives on hover; what stays out, keys and the security log, behind ⓘ); Download
+  backup at the foot. Right, *Restore safely*: a target to drop a backup on, or press to choose one (the file input
+  stays in the page for the keyboard); the passphrase field when the file is sealed; the preview counted as tiles
+  (records, stored files, missing files), lineage and restore as ✓/✕ marks, warnings and conflicts written out, then the
+  confirmation and Restore investigation. Sealed or not (ADR-0016) is a chip in the heading, its meaning on hover.
+- **Delete** is the deliberate step in the alarm colour (one of its two allowed places): the case's name in the alarm
+  colour in the heading and three steps on a rail (See what goes · Type its name · Delete). What goes is counted when
+  the tab opens (a read-only count: records removed and files removed in the alarm colour, shared files kept and already
+  missing calm; records by table on hover), with "Back up this case" beside it. The name to type is shown big in the
+  panel beside, and the button stays shut until it matches. The all-stages page, which mounts every panel at once,
+  keeps the count behind Preview deletion (`countOnOpen={false}`).
+- **Access** is a real screen: *Who can reach {case}, and how*. The people and their keys on the left are Settings ›
+  People and access itself (one table, so a role or a key changes in either place); on the right the ways in, each a
+  mark and a big word with its detail on hover and a link to the setting that changes it: Network (only this computer
+  / devices with a key), App lock (passphrase / nothing to unlock; idle, hide and sleep on hover), Refused · 24 h, Backups
+  (sealed / not sealed), Connector keys (n of m). Refusals that need a look stay written out as an alert. Below, the
+  server's setup as marks and the stray files as one quiet action (Safety & data's "Look at them" opens here). The
+  connector-key form that sat in the old collapsed block is not repeated: Settings › Connector keys is the full form.
+- **Settings › Security log**: the setup is a list of spaced marks, each name with its value on hover and a status
+  colour (the word on reveal; Settings › Appearance › Status marks adds the shape or word) for those with a state; the
+  denials a count with its sentence on hover, or the alert written out. The events load with the pane and scroll inside
+  it; refused-only and technical are small switches; "Stray files" and "Preview 90-day retention" are small secondary
+  actions at its foot (the prune still needs the typed phrase).
+- The pieces live in `features/security/security-panel.tsx` (ServerStatus, StrayFiles, SecurityLog) and
+  `features/security/access-screen.tsx`; the old collapsed block remains only on the all-stages page.

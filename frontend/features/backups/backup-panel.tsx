@@ -5,21 +5,24 @@
 // generated from the API schema (fix 2). The archive goes up as a file and
 // comes down as one, so these three calls use the app's own client with the
 // generated Zod schema for the reply (see checkedReply in lib/api-generated.ts).
+// Converted 30 Oct (Keep › Backup & restore, in the look of Safety & data): sealed or not as a chip, the last backup
+// and what a backup holds counted on the left with Download backup; the restore on the right, a target to drop a
+// backup on (or press to choose one), then its preview counted before Restore investigation.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
-import type {ChangeEvent, ReactElement, ReactNode} from 'react';
+import type {ChangeEvent, DragEvent, ReactElement, ReactNode} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Reveal} from '@/components/ui/reveal';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Input} from '@/components/ui/input';
 import {agoText} from '../act/red-flags-board';
+import {STORE_MARK, storeParts} from '../safety/safety-screen';
 import {errorMessage} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
 import {useLockStore} from '../../lib/app-lock';
-import {listInvestigationsOptions, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import {getSafetyDataOptions, listInvestigationsOptions, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import type {BackupPreviewOut, BackupRestoreResultOut} from '../../lib/generated/types.gen';
 import {zBackupPreviewOut, zBackupRestoreResultOut} from '../../lib/generated/zod.gen';
 
@@ -60,12 +63,16 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
   const [preview, setPreview] = useState<BackupPreviewOut | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState('');
+  const [made, setMade] = useState('');
   const [secret, setSecret] = useState('');
   const [askSecret, setAskSecret] = useState(false);
+  const [over, setOver] = useState(false);
   const sealed = useLockStore(s => Boolean(s.state?.backups_encrypted));
   const queryClient = useQueryClient();
   const investigations = useQuery({...listInvestigationsOptions(), enabled: Boolean(investigationId)});
   const last = lastBackupOf(investigations.data?.find(i => i.id === investigationId)?.last_backup);
+  // What a backup holds: the stores Safety & data counts that go into one (the same query, so the same cache).
+  const safety = useQuery({...getSafetyDataOptions({path: {investigation_id: investigationId}, query: {period: '7d'}}), enabled: Boolean(investigationId), retry: false});
 
   const download = useMutation({
     mutationFn: (id: string) => api.blob(`/api/investigations/${id}/export?include_documents=true`),
@@ -80,7 +87,7 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
 
   const downloadBackup = async () => {
     if (!investigationId) return;
-    setStatus('Preparing backup…');
+    setMade('Preparing backup…');
     try {
       const blob = await download.mutateAsync(investigationId);
       const url = URL.createObjectURL(blob);
@@ -91,10 +98,10 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
-      setStatus('Backup downloaded.');
+      setMade('Backup downloaded.');
       await queryClient.invalidateQueries({queryKey: listInvestigationsQueryKey()});
     } catch (error) {
-      setStatus(errorMessage(error, 'Backup download failed'));
+      setMade(errorMessage(error, 'Backup download failed'));
     }
   };
 
@@ -127,8 +134,7 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
     }
   };
 
-  const chooseFile = (e: ChangeEvent<HTMLInputElement>) => {
-    const chosen = e.target.files?.[0] || null;
+  const pick = (chosen: File | null) => {
     setFile(chosen);
     setAskSecret(Boolean(chosen?.name.includes('.encrypted')));
     setSecret('');
@@ -136,38 +142,85 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
     setConfirmed(false);
     setStatus('');
   };
+  const chooseFile = (e: ChangeEvent<HTMLInputElement>) => pick(e.target.files?.[0] || null);
+  const drop = (e: DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setOver(false);
+    const dropped = e.dataTransfer.files?.[0];
+    if (dropped) pick(dropped);
+  };
 
-  return <Card className="card" id="backup-restore">
-    <CardHeader className="pb-3">
-      <CardTitle><Reveal detail="Export FollowTheMoney JSONL, evidence and claim provenance, leads/tasks, timeline, extracted document text, review decisions, and stored source files in one checksum-verified archive.">
-        <span>Portable investigation backup & restore</span></Reveal></CardTitle>
-    </CardHeader>
-    <CardContent>
-      {investigationId && <p className="backup-last" aria-live="polite">{last
-        ? <><b>Last backup {agoText(last.at)}</b> · <Reveal detail={`${sizeWords(last.bytes)} · checksum kept${last.encrypted ? ' · encrypted' : ' · not encrypted'}`}><span>✓ checksum</span></Reveal>
-          {last.documents_included ? '' : ' · without the stored files'}</>
-        : <b>No backup of this case yet</b>}</p>}
-      <Button onClick={downloadBackup} disabled={!investigationId}>Download backup</Button>
-      <hr/>
-      <h4><Reveal detail="Restore is preview-first and never merges into an existing investigation. The preview checks archive integrity, every restored record ID, provenance lineage, and destination document paths before mutation.">
-        <span>Restore safely</span></Reveal></h4>
-      <Input type="file" accept=".zip,.jwbackup.zip,application/zip" onChange={chooseFile}/>
-      {askSecret && <Input type="password" autoComplete="off" value={secret} onChange={e => setSecret(e.target.value)}
-        aria-label="Passphrase or recovery words" placeholder="This backup is encrypted: its passphrase, or the 12 recovery words"/>}
-      <Button onClick={previewBackup} disabled={!file || (askSecret && !secret)}>Preview restore</Button>
-      {preview && <div className="candidate">
-        <b>{preview.investigation.name}</b>
-        <div>{Object.values(preview.record_counts).reduce((a, b) => a + b, 0)} records · {preview.document_file_count} stored document file(s) · {preview.missing_document_count} missing raw file(s)</div>
-        {/* Lineage and the restore API as ✓ / ✕ marks; their words are revealed on them. */}
-        <div><Reveal detail={`Lineage: ${preview.lineage_integrity && preview.lineage_integrity.valid === true ? 'valid' : 'not declared/invalid'} · Restore API: ${preview.restore_api_enabled ? 'enabled' : 'disabled'}`}>
-          <span>{preview.lineage_integrity && preview.lineage_integrity.valid === true ? '✓' : '✕'} lineage · {preview.restore_api_enabled ? '✓' : '✕'} restore</span></Reveal></div>
-        {preview.warnings.map((w, i) => <div key={i}><small>Warning: {w}</small></div>)}
-        {preview.conflicts.map((c, i) => <div key={i}><small><b>Conflict:</b> {c.table} / {c.id} — {c.message}</small></div>)}
-        {preview.can_restore && <label><Checkbox checked={confirmed} onCheckedChange={(checked: boolean | 'indeterminate') => setConfirmed(checked === true)}/> I understand this creates a separate investigation and will not merge with existing records.</label>}
-        <div><Button onClick={restoreBackup} disabled={!preview.can_restore || !preview.restore_api_enabled || !confirmed}>Restore investigation</Button></div>
-      </div>}
-      {status && <p className="muted">{status}</p>}
-      {children}
-    </CardContent>
-  </Card>;
+  const holds = (safety.data?.stores ?? []).filter(s => s.in_backups === true);
+  const leftOut = (safety.data?.stores ?? []).filter(s => s.in_backups === false).map(s => s.name);
+  const records = preview ? Object.values(preview.record_counts).reduce((a, b) => a + b, 0) : 0;
+  const lineageOk = Boolean(preview?.lineage_integrity && preview.lineage_integrity.valid === true);
+
+  return <div className="kp" id="backup-restore">
+    <header className="sd-head">
+      <h2 className="sd-title"><Reveal detail="Export FollowTheMoney JSONL, evidence and claim provenance, leads/tasks, timeline, extracted document text, review decisions, and stored source files in one checksum-verified archive.">
+        <span>Keep a copy <em>off this computer</em>, bring one back</span></Reveal></h2>
+      {/* Sealed or not (ADR-0016): the chip's colour and mark; what it means and how to change it are revealed on it. */}
+      <Reveal detail={sealed ? 'Backups made now are encrypted with your passphrase. They open on any computer with it, or with the 12 recovery words.'
+        : 'Backups are not encrypted: anyone who has the file can read it. Lock the app with a passphrase (Settings › Your safety) and backups are sealed from then on.'}>
+        <span className={`sd-chip${sealed ? ' kp-sealed' : ' sd-chip-out'}`}>{sealed ? '🔒 sealed' : '▲ not sealed'}</span></Reveal>
+    </header>
+
+    <div className="kp-grid">
+      <section className="sd-panel kp-make" aria-label="Make a backup">
+        <p className="sd-eyebrow">Make one</p>
+        {investigationId ? <p className="backup-last kp-big" aria-live="polite">{last
+          ? <><b>Last backup {agoText(last.at)}</b></>
+          : <b>No backup of this case yet</b>}</p> : <p className="kp-big"><b>Open a case to back it up</b></p>}
+        {last && <p className="kp-facts"><span>{sizeWords(last.bytes)}</span>
+          <Reveal detail={`${sizeWords(last.bytes)} · checksum kept${last.encrypted ? ' · encrypted' : ' · not encrypted'}${last.sha256 ? ` · SHA-256 ${last.sha256}` : ''}`}><span>✓ checksum</span></Reveal>
+          {last.documents_included ? null : <span className="sd-warn">without the stored files</span>}</p>}
+        {holds.length > 0 && <>
+          <p className="sd-eyebrow kp-holds-head">What it holds {leftOut.length > 0 && <Reveal label="Not in a backup" detail={`Not in a backup: ${leftOut.join(', ')}. They stay on this computer.`}><span aria-hidden="true">ⓘ</span></Reveal>}</p>
+          {/* Each store the backup carries, its number big (fill the space); where it lives is revealed on its name. */}
+          <ul className="kp-holds">{holds.map(s => { const [big, unit] = storeParts(s); return <li key={s.id}>
+            <span className="sd-mark" aria-hidden="true">{STORE_MARK[s.id] ?? '·'}</span>
+            <span className="kp-n">{big}</span>
+            <Reveal detail={<span className="rv-mono">{s.where}</span>}><span className="kp-unit">{unit || s.name}</span></Reveal>
+          </li>; })}</ul>
+        </>}
+        <div className="kp-act">
+          <Button onClick={downloadBackup} disabled={!investigationId}>Download backup</Button>
+          {made && <p className="sd-quiet" role="status">{made}</p>}
+        </div>
+      </section>
+
+      <section className="sd-panel kp-restore" aria-label="Restore a backup">
+        <p className="sd-eyebrow"><Reveal detail="Restore is preview-first and never merges into an existing investigation. The preview checks archive integrity, every restored record ID, provenance lineage, and destination document paths before mutation.">
+          <span>Restore safely</span></Reveal></p>
+        {/* Drop a backup on the target, or press it to choose one. The file input stays in the page for the keyboard. */}
+        <label className={`kp-drop${over ? ' over' : ''}${file ? ' has' : ''}`} onDragOver={e => { e.preventDefault(); setOver(true); }}
+          onDragLeave={() => setOver(false)} onDrop={drop}>
+          <input type="file" className="kp-file" accept=".zip,.jwbackup.zip,application/zip" onChange={chooseFile} aria-label="Choose a backup file"/>
+          <span className="kp-drop-mark" aria-hidden="true">⟲</span>
+          {file ? <span className="kp-drop-word"><b>{file.name}</b><small>{sizeWords(file.size)} · press to choose another</small></span>
+            : <span className="kp-drop-word"><b>Drop a backup here</b><small>or press to choose one</small></span>}
+        </label>
+        {askSecret && <Input type="password" autoComplete="off" value={secret} onChange={e => setSecret(e.target.value)}
+          aria-label="Passphrase or recovery words" placeholder="This backup is encrypted: its passphrase, or the 12 recovery words"/>}
+        {!preview && <div className="kp-act"><Button variant="outline" onClick={previewBackup} disabled={!file || (askSecret && !secret)}>Preview restore</Button></div>}
+        {preview && <div className="kp-preview">
+          <p className="kp-big"><b>{preview.investigation.name}</b></p>
+          {/* The counts big; lineage and the restore API as ✓ / ✕ marks, their words revealed on them. */}
+          <dl className="sd-tiles kp-tiles" aria-label={`${records} records · ${preview.document_file_count} stored document file(s) · ${preview.missing_document_count} missing raw file(s)`}>
+            <div><dt>records</dt><dd>{records.toLocaleString()}</dd></div>
+            <div><dt>stored files</dt><dd>{preview.document_file_count}</dd></div>
+            <div className={preview.missing_document_count ? 'kp-miss' : ''}><dt>missing files</dt><dd>{preview.missing_document_count}</dd></div>
+          </dl>
+          <div className="kp-checks"><Reveal detail={`Lineage: ${lineageOk ? 'valid' : 'not declared/invalid'} · Restore API: ${preview.restore_api_enabled ? 'enabled' : 'disabled'}`}>
+            <span>{lineageOk ? '✓' : '✕'} lineage · {preview.restore_api_enabled ? '✓' : '✕'} restore</span></Reveal></div>
+          {preview.warnings.map((w, i) => <div key={i} className="kp-warn"><small>Warning: {w}</small></div>)}
+          {preview.conflicts.map((c, i) => <div key={i} className="kp-conflict"><small><b>Conflict:</b> {c.table} / {c.id} — {c.message}</small></div>)}
+          {preview.can_restore && <label className="kp-confirm"><Checkbox checked={confirmed} onCheckedChange={(checked: boolean | 'indeterminate') => setConfirmed(checked === true)}/> I understand this creates a separate investigation and will not merge with existing records.</label>}
+          <div className="kp-act"><Button onClick={restoreBackup} disabled={!preview.can_restore || !preview.restore_api_enabled || !confirmed}>Restore investigation</Button></div>
+        </div>}
+        {status && <p className="sd-quiet" role="status">{status}</p>}
+      </section>
+    </div>
+    {children}
+  </div>;
 }

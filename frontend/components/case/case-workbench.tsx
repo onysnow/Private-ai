@@ -61,6 +61,7 @@ import {ToCheckPanel} from '../../features/to-check/to-check-panel';
 import {ReviewQueuePanel} from '../../features/review-queue/review-queue-panel';
 import {SearchPanel} from '../../features/search/search-panel';
 import {SecurityPanel} from '../../features/security/security-panel';
+import {AccessScreen} from '../../features/security/access-screen';
 import {SourceCapturePanel} from '../../features/source-capture/source-capture-panel';
 import {SourcesBrowser} from '../../features/source-capture/sources-browser';
 import {TimelinePanel} from '../../features/timeline/timeline-panel';
@@ -276,7 +277,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       {stage('keep', <>
         <div className="wb-row">
           <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>
-          <div id="deletion"><PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary></div>
+          <div id="deletion"><PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted} countOnOpen={false}/></PanelErrorBoundary></div>
         </div>
         {access.settingsStatus && <div id="access"><PanelErrorBoundary name="Local security/settings status"><SecurityPanel settingsStatus={access.settingsStatus} providers={providers}/></PanelErrorBoundary></div>}
       </>)}
@@ -318,10 +319,10 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       ])}
       {screen('keep', [
         {anchor: 'safety-data', label: 'Safety & data', fill: true, render: () => <PanelErrorBoundary name="Safety & data"><SafetyScreen investigationId={inv} caseName={investigationName} active={view === 'keep'}/></PanelErrorBoundary>},
-        {anchor: 'backup-restore', label: 'Backup & restore', render: () => <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>},
-        {anchor: 'deletion', label: 'Delete', render: () => <PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary>},
-        ...(access.settingsStatus ? [{anchor: 'access', label: 'Access', render: () => <PanelErrorBoundary name="Local security/settings status">
-          <SecurityPanel settingsStatus={access.settingsStatus!} providers={providers}/></PanelErrorBoundary>}] : []),
+        {anchor: 'backup-restore', label: 'Backup & restore', fill: true, render: () => <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>},
+        {anchor: 'deletion', label: 'Delete', fill: true, render: () => <PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} caseName={investigationName} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary>},
+        ...(access.settingsStatus ? [{anchor: 'access', label: 'Access', fill: true, render: () => <PanelErrorBoundary name="Access">
+          <AccessScreen investigationId={inv} caseName={investigationName} settingsStatus={access.settingsStatus!}/></PanelErrorBoundary>}] : []),
       ])}
     </>}
   </>;
