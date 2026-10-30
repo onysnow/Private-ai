@@ -40053,6 +40053,22 @@
             ],
             "title": "Quote"
           },
+          "short": {
+            "default": "",
+            "title": "Short",
+            "type": "string"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
           "stance": {
             "title": "Stance",
             "type": "string"

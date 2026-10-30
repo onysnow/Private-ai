@@ -335,17 +335,20 @@ function Tree({story, lit, setLit, byId, canDrag, gates, thesisForm, tray, onRem
   </div>;
 }
 
-/** A claim's records as one-line chips: each record once (a source quoted twice is one chip), the first two on the
- * card, the rest counted; a chip's full title and place in the record on hover. */
+/** A claim's records as one-line chips: each record once (a source quoted twice is one chip), named by its short
+ * label, the first two on the card, the rest counted; a chip's full title and place in the record on hover. */
 function EvidenceChips({evidence}: {evidence: StoryOut['sections'][number]['claims'][number]['evidence']}): ReactElement {
   const seen = new Map<string, typeof evidence>();
-  for (const e of evidence) seen.set(`${e.label}|${e.stance === 'contradicts'}`, [...(seen.get(`${e.label}|${e.stance === 'contradicts'}`) ?? []), e]);
+  for (const e of evidence) {
+    const key = `${e.source_id ?? e.label}|${e.stance === 'contradicts'}`;
+    seen.set(key, [...(seen.get(key) ?? []), e]);
+  }
   const records = [...seen.values()];
   const chip = (group: typeof evidence) => {
     const e = group[0];
     const where = group.map(x => x.locator).filter(Boolean).join(' · ');
     return <Reveal key={e.id} tabbable={false} describe={false} detail={<>{e.stance === 'contradicts' && <b>Against · </b>}{e.label}{where ? <> · {where}</> : null}</>}>
-      <span className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>{e.label}</span></Reveal>;
+      <span className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>{e.short || e.label}</span></Reveal>;
   };
   const rest = records.slice(2);
   return <>{records.slice(0, 2).map(chip)}

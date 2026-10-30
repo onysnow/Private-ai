@@ -72,7 +72,7 @@ const STORY = {
       claim('c1', 'Fernhill Ltd bought the harbour land in November 2017', 'shown', [{id: 'e1', stance: 'supports', label: 'Land registry', locator: 'title ML-2017', quote: 'transferred to Fernhill Ltd'}]),
       claim('c2', 'The sale was not put out to tender', 'unshown')]},
     {id: 'sec2', title: 'Where the money went', position: 1, status: 'disputed', shown: 0, total: 1, claims: [
-      claim('c3', 'M. Ross was a director of both companies', 'disputed', [{id: 'e2', stance: 'contradicts', label: 'Kestrel annual report', locator: 'p.11'}])]},
+      claim('c3', 'M. Ross was a director of both companies', 'disputed', [{id: 'e2', stance: 'contradicts', label: 'Kestrel SA annual report and accounts for the year ended 31 December 2018', short: 'Kestrel annual report · 2018', source_id: 's2', locator: 'p.11'}])]},
   ],
   counts: {claims: 3, shown: 1, disputed: 1, unshown: 1},
   critical: [{claim_id: 'c2', text: 'The sale was not put out to tender', section: 'Who bought the land'}],
@@ -103,6 +103,9 @@ describe('StoryScreen', () => {
     // The evidence chip shows its label; the locator waits in a reveal.
     expect(within(tree).getByText('Land registry')).toBeVisible();
     expect(within(tree).queryByText(/title ML-2017/)).toBeNull();
+    // A source with a short label shows it; its full title waits in the reveal.
+    expect(within(tree).getByText('Kestrel annual report · 2018')).toHaveClass('sy-ev-chip');
+    expect(within(tree).queryByText('Kestrel SA annual report and accounts for the year ended 31 December 2018', {selector: '.sy-ev-chip'})).toBeNull();
     const gates = screen.getByRole('region', {name: 'Gates'});
     expect(within(gates).getByText('Gates · 0 of 5 passed')).toBeInTheDocument();
     expect(within(gates).getByRole('button', {name: 'Ready to run'})).toBeDisabled();

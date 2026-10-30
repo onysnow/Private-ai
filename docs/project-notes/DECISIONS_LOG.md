@@ -480,3 +480,21 @@ and no panel; on 1MDB at the whole-case view that leaves most names out at rest,
 group's name, drawn above the parties. Before, the names sat over the next group's dots. The other arrangements'
 headings sit beside their own parties by design, so they only keep clear of other names and the panels (a column under
 the Altitude panel loses its heading, which was drawn under the panel before).
+
+## 31. Short labels for sources, worked out from what each source records (30 Oct 2026)
+
+The Story's evidence chips showed long source titles cut short ("United States v. All Right and Title to the Yacht…"),
+not the mockup's short labels (ACT_2: "Council minutes 14 Nov 2017 p.6"). Sources have no short label, and none is
+typed. Call: the server works one out (`app/services/source_labels.py`, `short` on the Story's evidence), from what the
+source already holds, never invented:
+- **A court filing** is what it is and the court's number: "Forfeiture complaint · 2:17-cv-04441", "DPA · 20-437",
+  "Judgment · WA-45-7-11/2018"; the number is the last one in the caption (an account number earlier in it is not the
+  court's); with no number, its date ("Cease-and-desist order · 22 Oct 2020"). A short heading before an id reads the
+  same way ("Press release · SK.2023.24").
+- **A post** is its account and date ("@WSJ · 7 Jul 2015"), else its site ("jho-low.com · Sep 2018").
+- **An article** with a long headline is its publisher and date ("The Guardian · 9 Nov 2018"), the publisher's bracketed
+  aside dropped ("SBS News", not "SBS News (Reuters wire copy)").
+- **A title of 32 characters or fewer** stays as it is; anything else is cut at a whole word.
+The full title and the place in the record stay on hover. Chips are now one per source (two sources with the same
+title are two chips) and wrap onto a second line, as ACT_2 draws them, instead of being cut on one line. The Cited tab
+and the citation hover keep the full title: they have the room.

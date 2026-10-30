@@ -60,7 +60,8 @@ def test_the_tree_is_as_strong_as_its_weakest_claim_and_ready_waits_for_every_ga
         story = ok(client.post(f"/api/investigations/{inv}/story/sections/{section['id']}/claims", json={"claim_id": claim["id"]}))
     section = story["sections"][0]
     assert section["status"] == "unshown" and (section["shown"], section["total"]) == (1, 2)
-    assert section["claims"][0]["evidence"] == [{"id": ev["id"], "stance": "supports", "label": "Land registry", "locator": "title ML-2017",
+    assert section["claims"][0]["evidence"] == [{"id": ev["id"], "stance": "supports", "label": "Land registry", "short": "Land registry",
+                                                  "source_id": src["id"], "locator": "title ML-2017",
                                                   "quote": "transferred to Fernhill Ltd"}]
     assert section["claims"][0]["single_source"] is True
     assert story["critical"] == [{"claim_id": unshown["id"], "text": "The sale was not put out to tender", "section": "Who bought the land"}]

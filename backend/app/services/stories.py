@@ -30,6 +30,7 @@ from app.models.domain import (
     StorySection,
     Writeup,
 )
+from app.services.source_labels import short_label
 
 SHOWN = {"supported", "confirmed"}
 RECORDED_GATES = ("right_of_reply", "legal_read")
@@ -227,6 +228,8 @@ def story_tree(db: Session, investigation_id: str) -> dict[str, Any]:
                         continue
                     src = db.get(Source, ev.source_id) if ev.source_id else None
                     evidence.append({"id": ev.id, "stance": link.stance, "label": (src.title if src else "Typed in"), "locator": ev.locator,
+                                     "source_id": src.id if src else None,
+                                     "short": short_label(src.title, url=src.url, source_type=src.source_type, metadata=src.metadata_json) if src else "Typed in",
                                      "quote": ev.quote})
                 supporting = sum(1 for e in evidence if e["stance"] == "supports")
                 if state == "shown" and supporting == 1:

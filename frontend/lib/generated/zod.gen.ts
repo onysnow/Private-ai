@@ -9306,6 +9306,8 @@ export const zStoryEvidenceOut = z.object({
   label: z.string(),
   locator: z.string().nullish(),
   quote: z.string().nullish(),
+  short: z.string().optional().default(''),
+  source_id: z.string().nullish(),
   stance: z.string(),
 });
 

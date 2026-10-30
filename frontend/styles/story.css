@@ -86,11 +86,12 @@
 .sy-x { all: unset; cursor: pointer; margin-left: auto; color: var(--text-muted); padding: 0 4px; }
 .sy-ev { display: flex; flex-wrap: wrap; gap: 4px; }
 .sy-ev { min-width: 0; }
-.sy-ev { flex-wrap: nowrap; align-items: center; overflow: hidden; }
+/* Short labels (the server's `short`) wrap onto a second line, as ACT_2 draws them, rather than being cut. */
+.sy-ev { align-items: center; overflow: hidden; }
 .sy-ev .rv { min-width: 0; flex: 0 1 auto; display: inline-flex; overflow: hidden; }
 .sy-ev .rv:has(.sy-ev-n), .sy-ev .rv:has(.sy-single), .sy-ev .sy-single { flex: none; }
 .sy-ev-chip { min-width: 0; }
-.sy-ev-chip { display: inline-block; max-width: 210px; padding: 1px 7px; border-radius: 6px; font: 500 10.5px/1.6 var(--font-mono); background: var(--surface-3);
+.sy-ev-chip { display: inline-block; max-width: 100%; padding: 1px 7px; border-radius: 6px; font: 500 10.5px/1.6 var(--font-mono); background: var(--surface-3);
   color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
 .sy-ev-n { max-width: none; }
 .sy-ev-more { display: grid; gap: 2px; }

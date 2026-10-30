@@ -2975,7 +2975,9 @@ class WriteupVersionsOut(ResponseModel):
 class StoryEvidenceOut(ResponseModel):
     id: str
     stance: str
-    label: str
+    label: str  # the source's full title
+    short: str = ""  # the few words a chip shows (app/services/source_labels.py); the full title on hover
+    source_id: str | None = None
     locator: str | None = None
     quote: str | None = None  # the passage's own words (shown on a citation's hover, and beside the text)
 

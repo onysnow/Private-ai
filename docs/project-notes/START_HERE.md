@@ -15,9 +15,10 @@ against its mockup at 1440×900 (pictures were sent to Ony), then fixes from it.
   from pages the loader really downloaded (23). Demo sources are never checked automatically.
 - **Following**, **Story**, **Decks**, **Links & captures**, **Check a pack** (can be tried on the case), **Add by hand**,
   **Safety & data**, the **Knowledge** map (was blank: a CSS grid bug).
-Open: openaleph-live's similar-documents test fails on some runs for a reason not established (PR #117 comments); the
-Story's evidence chips need a short label on sources; Board notes saved on single years now inside a group no longer
-show; The Wire is Ony's own redesign.
+Fixed later on 30 Oct: the Story's evidence chips show a short label worked out from each source (DECISIONS_LOG 31);
+a Board note pinned to a single year shows on the board that now holds that year.
+Open: openaleph-live's similar-documents test fails on some runs for a reason not established (PR #117 comments); The
+Wire is Ony's own redesign.
 
 **Earlier, 29 Oct, late (PR #117, branch `claude/laughing-tesla-dstx1t`, which carries #116's branch
 `claude/native-module` merged in):** everything #116 built (below) plus, from #117, Ony's hover rule applied to every

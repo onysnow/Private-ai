@@ -20888,6 +20888,14 @@ export type StoryEvidenceOut = {
    */
   quote?: string | null;
   /**
+   * Short
+   */
+  short?: string;
+  /**
+   * Source Id
+   */
+  source_id?: string | null;
+  /**
    * Stance
    */
   stance: string;
