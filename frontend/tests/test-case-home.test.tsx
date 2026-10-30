@@ -324,6 +324,37 @@ describe('Case home', () => {
 });
 
 describe('Decide', () => {
+  it('shows a decision with no passage by what the records hold between its parties, apart from the card', async () => {
+    const edge = (id: string, schema: string, from: [string, string], to: [string, string], props: Record<string, string[]>) => ({
+      id, investigation_id: 'inv-1', relationship_entity_id: `r-${id}`, ftm_id: id, schema, properties: props, statements: [],
+      source: {id: from[0], ftm_id: from[0], schema: 'Company', caption: from[1]}, target: {id: to[0], ftm_id: to[0], schema: 'Company', caption: to[1]},
+      provenance: {statement_count: 0, sources: [], evidence_attachments: []},
+      advisory: {needs_review: false, support_state: 'no_claim_dependency', has_independent_support: false, healthy_supporting_claim_count: 0,
+        challenged_supporting_claim_count: 0, disputed_claim_count: 0, rejected_claim_count: 0, claim_dependencies: [],
+        relationship_evidence_review: null, relationship_evidence_needs_review: false, relationship_evidence_attachment_count: 0,
+        relationship_evidence_review_counts: {supports: 0, contradicts: 0, context: 0, superseded: 0, unresolved: 0, unreviewed: 0}, presentation_aggregate: false},
+      created_at: '2026-10-01T00:00:00'});
+    const item = {...checkItem, id: 'chk-2', evidence: null, question: 'Was there a business reason for the payments?',
+      parties: [{id: 'e1', name: 'Fernhill Ltd', schema: 'Company'}, {id: 'e2', name: 'Kestrel SA', schema: 'Company'}]};
+    routes({
+      'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {to_check: 1}, total: 1, offset: 0, items: [item]},
+      'GET /api/investigations/inv-1/graph': {nodes: [], schemas: ['Payment'],
+        reconciliation: {collapsed_by_default: true, suppressed_duplicate_count: 0, underlying_edge_count: 1, visible_edge_count: 1},
+        edges: [edge('x1', 'Payment', ['e1', 'Fernhill Ltd'], ['e2', 'Kestrel SA'], {amount: ['29400'], currency: ['EUR'], date: ['2018-02-01']})]},
+    });
+    wrap(<DecideScreen investigationId="inv-1" investigationName="Kestrel SA"/>);
+    const pane = await screen.findByRole('region', {name: 'What it rests on'});
+    const links = await within(pane).findByRole('list', {name: 'What the records show between them'});
+    expect(within(links).getByText('paid €29,400 · 2018', {exact: false})).toBeInTheDocument();
+    // The proposal and the party chips are on the card only; the keys are behind its ?.
+    expect(within(pane).queryByText(item.proposal)).toBeNull();
+    expect(within(pane).queryByRole('list', {name: 'Parties'})).toBeNull();
+    const card = screen.getByTestId('decision-card');
+    expect(within(card).getByText(item.proposal)).toBeInTheDocument();
+    expect(card.querySelector('kbd:not([hidden] kbd)')).toBeNull();
+    expect(within(card).getByRole('img', {name: 'Keys'})).toBeInTheDocument();
+  });
+
   it('lists every kind with counts, filters, and answers with 1/2/3 and reason chips', async () => {
     vi.useFakeTimers({shouldAdvanceTime: true});
     const api = routes({'POST /api/checks/mv-1/decide': {investigation_id: 'inv-1', items: [], gone: [], missing: []}});
@@ -549,7 +580,7 @@ describe('A table-row card', () => {
                  rows: [{number: 2, cells: {Date: '2011-05-23', Payer: 'Meridian Holdings Ltd', Amount: '65000000'}}]},
       known: ['Already in the case: $330,000,000 from Meridian Holdings Ltd to Bellcastle Trading Group, no date'],
     } as unknown as Parameters<typeof DecisionCard>[0]['item'];
-    wrap(<DecisionCard item={item} position={1} total={1} keys="decide" active={false} onDecide={() => undefined}/>);
+    wrap(<DecisionCard item={item} position={1} total={1} keys="home" active={false} onDecide={() => undefined}/>);
     const table = screen.getByRole('table');
     expect(within(table).getByRole('columnheader', {name: 'Payer'})).toBeTruthy();
     expect(within(table).getByRole('cell', {name: '65000000'})).toBeTruthy();

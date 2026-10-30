@@ -21,6 +21,11 @@ import type {DecisionKind} from './use-decisions';
 
 const MARK: Record<DecisionChoiceOut['key'], string> = {yes: '✓', no: '✕', unsure: '○'};
 export const KEYS = {home: {yes: 's', no: 'd', unsure: 'u'}, decide: {yes: '1', no: '2', unsure: '3'}} as const;
+/** The keys a card answers to, behind its `?` (Ony, 29 Oct: key hints never show at rest). */
+export function KeysHint({rows}: {rows: [string, string][]}): ReactElement {
+  return <Reveal label="Keys" detail={<><b>Keys</b>{rows.map(([k, w]) => <span key={k} className="rv-row"><kbd>{k}</kbd> {w}</span>)}</>}>
+    <span className="ch-keys" aria-hidden="true">?</span></Reveal>;
+}
 
 const typing = (target: EventTarget | null): boolean => {
   const el = target as HTMLElement | null;
@@ -117,13 +122,18 @@ function PageThumb({documentId, page, passage}: {documentId: string; page: numbe
 
 /** "What happens" (CHECK_1): what each answer does, as the server words it from the endpoint the answer posts
  *  to, then what holds whichever way you answer. */
-export function WhatHappens({item}: {item: DecisionItemOut}): ReactElement | null {
+export function WhatHappens({item, mark = false}: {item: DecisionItemOut;
+  /** Drawn as a mark in the card's top line (Decide) rather than a heading of its own over empty room. */
+  mark?: boolean}): ReactElement | null {
   const answers = item.choices.filter(c => c.happens);
   const unlocks = item.unlocks ?? [];
   if (!answers.length && !item.consequences.length && !unlocks.length) return null;
   // Ony, 29 Oct: the explanation is revealed, on one quiet line; a Yes that unlocks something keeps its mark and count
   // in sight. Each answer's own line is also revealed on its button.
-  return <div className="ch-happens-line"><Reveal detail={<WhatHappensBox answers={answers} unlocks={unlocks} consequences={item.consequences}/>}>
+  const box = <WhatHappensBox answers={answers} unlocks={unlocks} consequences={item.consequences}/>;
+  if (mark) return <Reveal label="What each answer does" detail={box}>
+    <span className="ch-happens-mark" aria-hidden="true">{unlocks.length > 0 ? <>◆{unlocks.length > 1 ? unlocks.length : ''}</> : '⇢'}</span></Reveal>;
+  return <div className="ch-happens-line"><Reveal detail={box}>
     <span>{unlocks.length > 0 && <span className="ch-happens-unlock" aria-hidden="true">◆{unlocks.length > 1 ? unlocks.length : ''}</span>}What happens</span></Reveal></div>;
 }
 
@@ -177,26 +187,32 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
   const question = <h3 className="ch-question">{item.reason
     ? <Reveal detail={<>{item.actor_kind !== 'ai' && item.actor ? <b>{item.actor}</b> : null}<span className="rv-row">{item.reason}</span></>}>{item.question}</Reveal>
     : item.question}</h3>;
+  // On Decide the passage (or the rows) fills the evidence pane beside the card, so the card carries the proposal.
+  const inPane = keys === 'decide';
   const words = <>
-    {ev?.rows?.length ? <RowCells rows={ev.rows} compact/>
+    {inPane ? <p className="ch-proposal">{item.proposal}</p>
+      : ev?.rows?.length ? <RowCells rows={ev.rows} compact/>
       : ev?.excerpt ? <blockquote className="ch-excerpt">{locator
         ? <Reveal detail={<span className="rv-mono">{locator}</span>}><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></Reveal>
         : <Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/>}</blockquote>
       : <p className="ch-proposal">{item.proposal}</p>}
     {/* No passage to show here (an AI draft, a missing record): the thing itself is one click away. */}
     {keys === 'home' && !ev && item.choices.length > 0 && <Link className="ch-source-link" href={caseHref(item.open.href, inv)}>{item.open.label} <span aria-hidden="true">↗</span></Link>}
-    {ev && !ev.excerpt && locator && <p className="ch-locator"><Reveal detail={<span className="rv-mono">{locator}</span>}><span>{ev.filename || 'Source'}</span></Reveal></p>}
+    {!inPane && ev && !ev.excerpt && locator && <p className="ch-locator"><Reveal detail={<span className="rv-mono">{locator}</span>}><span>{ev.filename || 'Source'}</span></Reveal></p>}
     {aside ?? <PartyChips parties={item.parties}/>}
   </>;
   const extras = <>
     {item.known && item.known.length > 0 && <ul className="ch-known" aria-label="Already in the case">{item.known.map(k => <li key={k}>{k}</li>)}</ul>}
-    {showWhatHappens && <WhatHappens item={item}/>}
+    {showWhatHappens && !inPane && <WhatHappens item={item}/>}
   </>;
   return <article className={`ch-card ch-kind-${item.kind}`} aria-label={`${item.question} (${position} of ${total})`} data-testid="decision-card">
-    {(item.actor_kind === 'ai' || (keys === 'decide' && item.level)) && <p className="ch-why">
+    <p className="ch-why">
       {item.actor_kind === 'ai' && <AiTag/>}
       {keys === 'decide' && item.level && <LevelChip level={item.level} focusable/>}
-    </p>}
+      {showWhatHappens && inPane && <WhatHappens item={item} mark/>}
+      {item.choices.length > 0 && <KeysHint rows={[...item.choices.map(c => [keyOf[c.key].toUpperCase(), c.label] as [string, string]),
+        ...(keys === 'decide' ? [['J / K', 'next, previous'], ['Z', 'undo'], ['O', 'open the source']] as [string, string][] : [['Z', 'undo']] as [string, string][])]}/>}
+    </p>
     {page !== null && ev?.document_id ? <div className="ch-card-body ch-split">
       <PageThumb documentId={ev.document_id} page={page} passage={ev.excerpt!.trim()}/>
       <div className="ch-split-words">{question}{words}{extras}</div>
@@ -209,7 +225,7 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
         {item.choices.map(c => {
           const button = <button type="button" className={`ch-choice ch-${c.key}`} aria-keyshortcuts={keyOf[c.key].toUpperCase()}
             onClick={() => (c.key === 'no' && !noOpen && NO_REASONS[item.kind].length ? setNoOpen(true) : onDecide(c, note))}>
-            <span aria-hidden="true">{MARK[c.key]}</span>{c.label}<kbd>{keyOf[c.key].toUpperCase()}</kbd>
+            <span aria-hidden="true">{MARK[c.key]}</span>{c.label}
           </button>;
           // What this answer does is revealed on it (Decide; Case home keeps its card bare).
           return showWhatHappens && c.happens ? <Reveal key={c.key} tabbable={false} describe={false} className="ch-choice-rv" detail={c.happens}>{button}</Reveal>

@@ -22,7 +22,7 @@ import {errorMessage} from '../../lib/api-client';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {decideCheckMutation, getChecksOptions, getChecksQueryKey, getRedFlagsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
-import type {ToCheckItemOut} from '../../lib/generated/types.gen';
+import type {RedFlagOut, ToCheckItemOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
 import './to-check.css';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -77,6 +77,23 @@ export function marked(text: string, terms: string[]): ReactNode[] {
   return out;
 }
 
+/** What tells one card from another (Ony's card rule: who, what, how much, when, and why it is there). One indicator
+ *  fires on several groups and asks each the same question ("whether there was a business reason for the payments"),
+ *  so the title is what the item's Red Flag found, as its summary words it ("3 payments between Tanore Finance and
+ *  Granton Property"), with the years it covers; why it is there follows (what the summary adds after its first
+ *  clause), then the question itself. An item with no flag keeps its question as the title. */
+export function checkTitle(item: Pick<ToCheckItemOut, 'question'>, flag?: Pick<RedFlagOut, 'summary' | 'years'> | null): {head: string; when: string | null; why: string | null; ask: string | null} {
+  const question = sentence(item.question);
+  const summary = flag?.summary?.trim() ?? '';
+  const years = [...new Set(flag?.years ?? [])].sort((a, b) => a - b);
+  const when = years.length ? (years.length === 1 ? String(years[0]) : `${years[0]}–${years[years.length - 1]}`) : null;
+  if (!summary) return {head: question, when, why: null, ask: null};
+  const at = summary.indexOf('; ');
+  const head = (at < 0 ? summary : summary.slice(0, at)).replace(/\.$/, '');
+  const why = at < 0 ? null : sentence(summary.slice(at + 2).trim());
+  return {head: sentence(head), when, why, ask: question};
+}
+
 function Parties({parties}: {parties: ToCheckItemOut['parties']}): ReactElement | null {
   const setPointed = useWorkbenchStore(state => state.setPointedParty);
   if (!parties.length) return null;
@@ -89,7 +106,7 @@ function Parties({parties}: {parties: ToCheckItemOut['parties']}): ReactElement 
     {shown.length < parties.length && <span className="sv-muted">+{parties.length - shown.length} more</span>}</div>;
 }
 
-function CheckCard({item, highlighted, inHand, onHand, onDecide, onUndoDemo}: {item: ToCheckItemOut; highlighted: boolean; inHand: boolean;
+function CheckCard({item, flag, highlighted, inHand, onHand, onDecide, onUndoDemo}: {item: ToCheckItemOut; flag?: RedFlagOut; highlighted: boolean; inHand: boolean;
   onHand: () => void; onDecide: (status: Status, note: string | null) => Promise<void>;
   /** Undo a decision the demo made ahead (back to not checked, its note gone with it). */
   onUndoDemo: () => Promise<void>}): ReactElement {
@@ -115,15 +132,19 @@ function CheckCard({item, highlighted, inHand, onHand, onDecide, onUndoDemo}: {i
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
   });
+  const title = checkTitle(item, flag);
   return <article id={`check-${item.id}`} className={`tc-card status-${item.status}${highlighted ? ' open' : ''}${inHand ? ' in-hand' : ''}`}
-    aria-label={`To check: ${sentence(item.question)}`} onPointerEnter={onHand} onFocus={onHand}>
+    aria-label={`To check: ${title.head}`} onPointerEnter={onHand} onFocus={onHand}>
+    <div className="tc-body">
     {/* The kind is the icon; it and where the item comes from (the indicator, or See › Money) are revealed on it. */}
     <header className="tc-head">
       <Reveal label={KIND_WORD[item.kind]} detail={<><b>{KIND_WORD[item.kind]}</b>
         <span className="rv-row">{item.kind === 'money' ? <>Kept from See › Money · {item.locator}</> : <>{item.indicator_name} · {item.indicator_id}</>}</span></>}>
         <KindIcon kind={item.kind}/></Reveal>
-      <h4>{sentence(item.question)}</h4>
+      <h4>{title.head}</h4>
+      {title.when && <span className="tc-when">{title.when}</span>}
     </header>
+    {(title.ask || title.why) && <p className="tc-ask">{title.ask && <b>{title.ask}</b>}{title.why && <span>{title.why}</span>}</p>}
     {(item.flag_id || item.related_flags.length > 0) && <p className="tc-from">
       {item.flag_id && <button type="button" className="tc-link" onClick={() => goToFlag(item.flag_id!)}>Its Red Flag</button>}
       {item.related_flags.length > 0 && <Reveal detail={`${item.related_flags.length} other flag${item.related_flags.length > 1 ? 's' : ''} on these parties`}>
@@ -146,12 +167,13 @@ function CheckCard({item, highlighted, inHand, onHand, onDecide, onUndoDemo}: {i
       {demo ? <DemoMark rule={demoRule(item.note)}/> : item.note && <span>{item.note}</span>}</p>}
     {noting && <textarea className="tc-note" aria-label="What you saw" placeholder="What you saw (stays with the item)" value={note}
       onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}/>}
+    </div>
     <div className="tc-decide">
       <div className="ch-choices" role="group" aria-label="Your decision">
         {ANSWERS.map(a => <button type="button" key={a.status} aria-pressed={item.status === a.status} aria-label={DECISION[a.status]}
           aria-keyshortcuts={inHand ? a.key.toUpperCase() : undefined}
           className={`ch-choice ${a.cls}${item.status === a.status ? ' on' : ''}`} onClick={() => decide(a.status)}>
-          <span aria-hidden="true">{DECISION_MARK[a.status]}</span>{a.word}{inHand && <kbd aria-hidden="true">{a.key.toUpperCase()}</kbd>}</button>)}
+          <span aria-hidden="true">{DECISION_MARK[a.status]}</span>{a.word}</button>)}
       </div>
       {/* Undo and the note are icons; their words on reveal. */}
       <span className="tc-tools">
@@ -172,7 +194,7 @@ export function ToCheckPanel({investigationId}: {investigationId: string}): Reac
   const query = useQuery({...getChecksOptions({path}), enabled: Boolean(investigationId)});
   // Reading To check never brings it up to date: when it is behind the records, this runs the rules once and the
   // run refetches the items.
-  useRedFlagsQuery(investigationId);
+  const flags = useRedFlagsQuery(investigationId).query.data;
   const decide = useMutation({...decideCheckMutation()});
   const key = getChecksQueryKey({path});
   const [problem, setProblem] = useState('');
@@ -212,7 +234,8 @@ export function ToCheckPanel({investigationId}: {investigationId: string}): Reac
   // The card the keys answer: the one last pointed at or focused while it is still open, else the first open one.
   const [hand, setHand] = useState<string | null>(null);
   const inHand = open.some(i => i.id === hand) ? hand : open[0]?.id ?? null;
-  const card = (i: ToCheckItemOut) => <CheckCard key={i.id} item={i} highlighted={highlight === i.id} inHand={inHand === i.id}
+  const flagOf = new Map([...(flags?.flags ?? []), ...(flags?.gone ?? [])].map(f => [f.id, f]));
+  const card = (i: ToCheckItemOut) => <CheckCard key={i.id} item={i} flag={i.flag_id ? flagOf.get(i.flag_id) : undefined} highlighted={highlight === i.id} inHand={inHand === i.id}
     onHand={() => setHand(i.id)} onDecide={onDecide(i)} onUndoDemo={onUndoDemo(i)}/>;
   const figure = (n: number, mark: string, cls: string, word: string) => <Reveal label={`${n} ${word}`} describe={false} detail={<b>{n} {word}</b>}>
     <span className={`tc-fig ${cls}${n ? '' : ' zero'}`} aria-hidden="true"><i>{mark}</i><b>{n}</b></span></Reveal>;
@@ -222,6 +245,9 @@ export function ToCheckPanel({investigationId}: {investigationId: string}): Reac
     <header className="tc-top">
       <h3 id="to-check-title"><Reveal detail="What the records cannot show. A person decides each one; the app never does.">To check</Reveal></h3>
       {query.data && <p className="tc-figs">{figure(open.length, '○', 'f-open', 'open')}{figure(decided.length, '✓', 'f-decided', 'decided')}</p>}
+      {/* The keys answer the card in hand (the one pointed at or focused, else the first open one); they are behind ?. */}
+      {open.length > 0 && <Reveal label="Keys" detail={<><b>Keys</b><span className="rv-row"><kbd>S</kbd> Shows it · <kbd>D</kbd> Does not · <kbd>U</kbd> Unclear</span>
+        <span className="rv-row">They answer the card you point at, else the first open one.</span></>}><span className="tc-keys" aria-hidden="true">?</span></Reveal>}
     </header>
     {query.isError && <p className="sv-error">{errorMessage(query.error, 'Could not load what to check')}</p>}
     {problem && <p className="sv-error" role="alert">{problem}</p>}

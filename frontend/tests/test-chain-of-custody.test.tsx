@@ -8,7 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const push = vi.fn();
 vi.mock('next/navigation', () => ({useRouter: () => ({push})}));
 
-import {ChainOfCustody, logTable, sealLine, unitSpan, whoWord} from '../features/custody/chain-of-custody';
+import {ChainOfCustody, growScale, logTable, sealLine, unitSpan, whoWord} from '../features/custody/chain-of-custody';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -86,13 +86,14 @@ describe('Chain of Custody', () => {
     const head = done.querySelector('.cc-done-head')!;
     expect(head.querySelector('.bad')).toHaveTextContent('· 1 left');
     expect(within(done).getByText('Done for Supported', {selector: '.rv'})).toHaveAccessibleDescription(/^Done for Supported1 left/);
-    expect(within(done).getByLabelText('Every contradicting item has a written answer: met. 1 answered')).toHaveTextContent('✓ against answered');
+    // A rule met is not in sight: the whole checklist is revealed on the name (Ony, 29 Oct).
+    expect(within(done).getByText('against answered').closest('[hidden]')).not.toBeNull();
     // The rule's short name shows; its full wording and what it waits on are revealed on it (Ony, 29 Oct).
     const unmet = within(done).getByLabelText('Every supporting item has an exact locator: not met. 1 without a page, paragraph or timestamp.');
     expect(unmet).toHaveTextContent('✕ each says where');
     expect(within(unmet).getByText('each says where')).toHaveAccessibleDescription('Every supporting item has an exact locatorwaits on: 1 without a page, paragraph or timestamp.');
     expect(within(unmet).getByText(/waits on: 1 without a page/).closest('[hidden]')).not.toBeNull();
-    expect(within(done).getAllByRole('listitem')).toHaveLength(6);
+    expect(within(done).getAllByRole('listitem')).toHaveLength(1);
     expect(screen.getByRole('article', {name: 'AI step'})).toHaveTextContent('Case synthesis draft quoted this claim');
     // The passage opens first in the detail panel, with its words lit.
     const detail = screen.getByRole('complementary', {name: 'Step 3 of 4: Passage'});
@@ -263,5 +264,17 @@ describe('unitSpan', () => {
     const b = unitSpan(text, {start: 19, end: 26})!;
     expect(text.slice(b.start, b.end)).toBe('𝐋imited');
     expect(unitSpan('plain', null)).toBeNull();
+  });
+});
+
+describe('growScale', () => {
+  it('grows a small chain to fill its room, within the width and 1.5, never below 1, and ignores small changes', () => {
+    expect(growScale(1, 520, 300, 1.56)).toBe(1.5);
+    expect(growScale(1, 520, 400, 2)).toBe(1.3);
+    expect(growScale(1, 520, 300, 1.2)).toBe(1.2);
+    expect(growScale(1.3, 520, 600, 2)).toBe(1.1);
+    expect(growScale(1, 300, 600, 2)).toBe(1);
+    expect(growScale(1.3, 520, 515, 2)).toBe(1.3);
+    expect(growScale(1, 0, 300, 2)).toBe(1);
   });
 });

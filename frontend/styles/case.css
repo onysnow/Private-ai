@@ -691,3 +691,24 @@ button.ch-link:focus-visible { outline: 2px solid var(--accent-1); }
 .ch-next-foot .pd-line, .ch-next-foot .pd-confirm { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .pd-confirm { animation: cv-fade 120ms both; } }
 html[data-motion='calm'] .pd-confirm { animation: cv-fade 120ms both; }
+
+/* 30 Oct (Decide): the two right-hand panes show different things. With no passage of its own, the evidence pane holds
+   what the records show between the item's parties, as large as the pane allows; the card holds the question, the
+   proposal, the parties and the answers. "What happens" and the keys are marks in the card's top line, their words on
+   reveal; the demo's line keeps to its mark, its count and Undo. */
+.dc-links-head { display: flex; align-items: baseline; gap: 10px; margin: 0 !important; font: 500 11px var(--font-mono) !important; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text-muted); }
+.dc-links-head b { font: 500 15px var(--font-mono); color: var(--text); letter-spacing: 0; }
+.dc-noevidence .ch-links-wrap { flex: 1 1 auto; gap: 14px; }
+.dc-noevidence .ch-link-quote { max-width: 62ch; font: 400 clamp(16px, 1.3vw, 19px)/1.65 var(--font-read); margin: 0; }
+.dc-noevidence .ch-links { gap: 8px; }
+.dc-noevidence .ch-link { padding: 14px 16px; font-size: clamp(14px, 1.1vw, 16px); background: var(--surface-1); }
+.dc-noevidence .ch-link-word { font-size: 13px; }
+.dc-why { color: var(--text-muted); }
+.ch-why .ch-keys, .ch-why > .rv:has(.ch-keys) { margin-left: auto; }
+.ch-keys { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); font: 600 11.5px var(--font-mono); color: var(--text-muted); cursor: help; }
+.ch-happens-mark { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 4px; box-sizing: border-box; border-radius: 11px; border: 1px solid var(--line);
+  font: 600 12px var(--font-mono); color: var(--accent-2); cursor: help; }
+.ch-why > .rv:has(.ch-happens-mark) { margin-left: auto; }
+.ch-why > .rv:has(.ch-happens-mark) + .rv:has(.ch-keys) { margin-left: 0; }
+.pd-count { white-space: nowrap; }

@@ -381,3 +381,18 @@ describe('ClaimsPanel', () => {
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toMatchObject({status: 'supported', override_reason: 'The registry is the only record.'});
   });
 });
+
+describe('Claims overview: left to do', () => {
+  afterEach(cleanup);
+  it('counts what is left to do, and a count shows only those claims', async () => {
+    await renderPanel({[CLAIMS]: [claimFixture(), claimFixture({id: 'claim-2', text: 'The vendor was paid twice.', status: 'disputed'}),
+      claimFixture({id: 'claim-3', text: 'The board met in May.', confidence: 0.8})]});
+    const left = screen.getByRole('region', {name: 'Left to do'});
+    expect(within(left).getByRole('button', {name: 'Near done: 1'})).toBeInTheDocument();
+    expect(within(left).getByRole('button', {name: 'Leads: 0'})).toBeDisabled();
+    await userEvent.setup().click(within(left).getByRole('button', {name: 'Under 50%: 1'}));
+    expect(screen.queryByText('The vendor was paid twice.')).toBeNull();
+    expect(screen.queryByText('The board met in May.')).toBeNull();
+    expect(screen.getByText('The contract was approved on March 3.')).toBeInTheDocument();
+  });
+});

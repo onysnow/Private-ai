@@ -121,6 +121,8 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const [createProblem, setCreateProblem] = useState('');
   const [shapes, setShapes] = useState<Set<ClaimStatus>>(new Set());
   const [typed, setTyped] = useState('');
+  // What is left to do (the overview's counts): one at a time, filtering the list with the status and the words.
+  const [need, setNeed] = useState<string | null>(null);
   const q = useDeferredValue(typed.trim().toLowerCase());
   const [attaching, setAttaching] = useState(false);
   const [poolTyped, setPoolTyped] = useState('');
@@ -143,7 +145,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const claimEvidence = useMemo(() => workspace?.evidence ?? [], [workspace]);
 
   // A new case starts with no claim open and nothing filtered.
-  useEffect(() => { setSelectedId(null); setReviewStatus(''); setShapes(new Set()); setTyped(''); setAttaching(false); setSuperseding(null); }, [investigationId]);
+  useEffect(() => { setSelectedId(null); setReviewStatus(''); setShapes(new Set()); setTyped(''); setNeed(null); setAttaching(false); setSuperseding(null); }, [investigationId]);
 
   // Opening a claim (from the list here or from a dossier) starts the review
   // form from the claim's current status and confidence. Each request is
@@ -170,9 +172,12 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
     for (const c of claims) out[shapeOf(c.status)] += 1;
     return out;
   }, [claims]);
-  const shown = useMemo(() => claims.filter(c => (!shapes.size || shapes.has(shapeOf(c.status))) && (!q || c.text.toLowerCase().includes(q))), [claims, shapes, q]);
-  const filtering = Boolean(shapes.size || q);
-  const clearFilters = (): void => { setShapes(new Set()); setTyped(''); };
+  const shown = useMemo(() => {
+    const work = WORK.find(w => w.key === need);
+    return claims.filter(c => (!shapes.size || shapes.has(shapeOf(c.status))) && (!q || c.text.toLowerCase().includes(q)) && (!work || work.test(c)));
+  }, [claims, shapes, q, need]);
+  const filtering = Boolean(shapes.size || q || need);
+  const clearFilters = (): void => { setShapes(new Set()); setTyped(''); setNeed(null); };
   const toggleShape = (s: ClaimStatus): void => setShapes(prev => {
     const next = new Set(prev);
     if (next.has(s)) next.delete(s); else next.add(s);
@@ -332,7 +337,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
       </aside>
 
       <section className="cw-right" aria-label={selectedClaim ? 'The open claim' : 'Claims overview'}>
-        {!selectedClaim ? <ClaimsOverview counts={counts} total={claims.length} onShape={s => setShapes(new Set([s]))}/> : <>
+        {!selectedClaim ? <ClaimsOverview counts={counts} total={claims.length} onShape={s => setShapes(new Set([s]))} claims={claims} need={need} onNeed={setNeed}/> : <>
           <header className="cw-detail-head">
             <div className="cl-head"><ClaimStatusChip status={selectedClaim.status}/><h4>{selectedClaim.text}</h4></div>
             <div className="cw-acts">
@@ -525,8 +530,21 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   </div>;
 }
 
-/** No claim open: the case's claims at a glance, each status a bar as long as its share; a click shows only those. */
-function ClaimsOverview({counts, total, onShape}: {counts: Record<ClaimStatus, number>; total: number; onShape: (s: ClaimStatus) => void}): ReactElement {
+/** What is left to do on the case's claims (beyond the status bars above), each a count that filters the list (Ony, 29 Oct: numbers show, what each
+ *  means on hover). A claim can be in more than one. */
+export const WORK: {key: string; label: string; detail: string; test: (c: ClaimOut) => boolean}[] = [
+  {key: 'ready', label: 'Near done', detail: 'Not yet shown, at 70% confidence or more: the nearest to Supported. Review them against the Done rules.',
+    test: c => shapeOf(c.status) === 'unshown' && c.confidence >= 0.7},
+  {key: 'low', label: 'Under 50%', detail: 'Not yet shown, under 50% confidence: they need evidence.', test: c => shapeOf(c.status) === 'unshown' && c.confidence < 0.5},
+  {key: 'ungraded', label: 'Not graded', detail: 'No IPCC grade (evidence and agreement) yet. Ruled-out claims are left out.',
+    test: c => !gradeText(c) && shapeOf(c.status) !== 'ruled_out'},
+  {key: 'lead', label: 'Leads', detail: 'Questions to follow, not yet claims a reader could check.', test: c => c.status === 'lead'},
+];
+
+/** No claim open: the case's claims at a glance, each status a bar as long as its share (a click shows only those), and
+ *  under it what is left to do, each a count that shows only those claims. */
+function ClaimsOverview({counts, total, onShape, claims, need, onNeed}: {counts: Record<ClaimStatus, number>; total: number; onShape: (s: ClaimStatus) => void;
+  claims: ClaimOut[]; need: string | null; onNeed: (key: string | null) => void}): ReactElement {
   return <div className="cw-over">
     <p className="cw-over-ask">Choose a claim to inspect its evidence and verification state.</p>
     {total > 0 && <ul className="cw-over-bars">{SHAPE_ORDER.filter(s => counts[s]).map(s => <li key={s}>
@@ -534,6 +552,16 @@ function ClaimsOverview({counts, total, onShape}: {counts: Record<ClaimStatus, n
         <b>{counts[s]}</b><span className="cw-over-word">{SHAPE_WORD[s]}</span>
         <span className="cw-over-track" aria-hidden="true"><i style={{width: `${(counts[s] / total) * 100}%`}}/></span>
       </button></li>)}</ul>}
+    {total > 0 && <section className="cw-work" aria-label="Left to do">
+      <h5 className="cw-sec-h">Left to do</h5>
+      <div className="cw-work-tiles">{WORK.map(w => {
+        const n = claims.filter(w.test).length;
+        return <Reveal key={w.key} tabbable={false} describe={false} className="cw-work-rv" detail={<><b>{n} {w.label.toLowerCase()}</b><span className="rv-row">{w.detail}</span>
+          {n > 0 && <span className="rv-row">Click to show only these.</span>}</>}>
+          <button type="button" className={`cw-work-n w-${w.key}${n ? '' : ' zero'}${need === w.key ? ' on' : ''}`} disabled={!n} aria-pressed={need === w.key}
+            aria-label={`${w.label}: ${n}`} onClick={() => onNeed(need === w.key ? null : w.key)}><b>{n}</b><span>{w.label}</span></button></Reveal>;
+      })}</div>
+    </section>}
   </div>;
 }
 
