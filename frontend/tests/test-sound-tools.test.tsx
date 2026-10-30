@@ -48,6 +48,15 @@ describe('sound tools', () => {
     expect(screen.getByRole('button', {name: 'Cut from the original'})).toBeDisabled();
   });
 
+  it('says it is drawing the sound inside the frame, as a status, until the picture comes', async () => {
+    mockApi({'GET /api/documents/r1/sound': SOUND, 'GET /api/documents/r1/spectrogram.png': {status: 200, body: 'x'}, 'GET /api/documents/r1/derived': []});
+    render(<QueryProvider><CleanAndCut doc={DOC} duration={72.5} files={[]} onStatus={() => undefined}/></QueryProvider>);
+    const waiting = screen.getByRole('status');
+    expect(waiting).toHaveTextContent('Drawing the sound…');
+    expect(waiting.closest('.snd-frame')).not.toBeNull();
+    expect(await screen.findByRole('img', {name: /The sound from 0:00.0 to 1:00.0, original/})).toHaveClass('snd-spectro');
+  });
+
   it('lines up another recording and keeps the offset once accepted', async () => {
     const found = {other_document_id: 'r2', offset_seconds: -2.48, confidence: 900.6, distinct: 12.4, reliable: true};
     const api = mockApi({'GET /api/documents/r1/sound': SOUND,

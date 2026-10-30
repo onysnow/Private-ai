@@ -35,15 +35,41 @@ export function newFileName(filename: string, madeFor: MadeFor, today: Date): st
   return `${stem}-redacted-for-${madeFor}-${day}.pdf`.replace(/[^A-Za-z0-9._-]+/g, '_');
 }
 
-/** The proposals grouped as the list shows them: the same words on the same page once, with how many times. */
-export function groupProposals(proposals: RedactProposalOut[]): Array<{key: string; items: RedactProposalOut[]}> {
+/** The words a proposal covers, as a person reads them: line breaks and runs of spaces as one space. */
+const plain = (text: string) => text.replace(/\s+/g, ' ').trim();
+
+export type ProposalGroup = {key: string; kind: Kind; text: string; items: RedactProposalOut[]; pages: number[]};
+export type KindGroup = {kind: Kind; items: RedactProposalOut[]; pages: number[]; texts: ProposalGroup[]};
+const pagesOf = (items: RedactProposalOut[]) => [...new Set(items.map(i => i.page))].sort((a, b) => a - b);
+
+/** The proposals grouped as the list shows them: the same words of the same kind once across the whole file, with how
+ *  many times and on which pages, most frequent first. */
+export function groupProposals(proposals: RedactProposalOut[]): ProposalGroup[] {
   const groups = new Map<string, RedactProposalOut[]>();
   for (const p of proposals) {
-    const key = `${p.page}|${p.kind}|${p.text.toLowerCase()}`;
+    const key = `${p.kind}|${plain(p.text).toLowerCase()}`;
     groups.set(key, [...(groups.get(key) ?? []), p]);
   }
-  return [...groups.entries()].map(([key, items]) => ({key, items}));
+  return [...groups.entries()].map(([key, items]) => ({key, kind: items[0].kind as Kind, text: plain(items[0].text), items, pages: pagesOf(items)}))
+    .sort((a, b) => b.items.length - a.items.length || a.pages[0] - b.pages[0]);
 }
+
+/** The groups by kind (names, phone numbers, email addresses), so a whole kind is decided in one move. */
+export function groupByKind(proposals: RedactProposalOut[]): KindGroup[] {
+  const order: Kind[] = ['person', 'phone', 'email', 'drawn'];
+  const texts = groupProposals(proposals);
+  return order.map(kind => {
+    const mine = texts.filter(g => g.kind === kind);
+    const items = mine.flatMap(g => g.items);
+    return {kind, items, pages: pagesOf(items), texts: mine};
+  }).filter(k => k.items.length > 0);
+}
+
+const KIND_PLURAL: Record<Kind, string> = {drawn: 'Areas', phone: 'Phone numbers', email: 'Email addresses', person: 'Names'};
+const KIND_MARK: Record<Kind, string> = {drawn: '▭', phone: '#', email: '@', person: 'A'};
+const times = (n: number) => (n > 1 ? ` × ${n}` : '');
+const onPages = (pages: number[]) => (pages.length === 1 ? `p.${pages[0]}` : `${pages.length} pages`);
+const textLabel = (g: ProposalGroup) => `${g.kind === 'person' ? `“${g.text}”` : g.text}${times(g.items.length)}, ${onPages(g.pages)}`;
 
 async function openCopy(row: DerivedFileOut): Promise<void> {
   const href = URL.createObjectURL(await api.blob(`/api/derived-files/${row.id}/file`));
@@ -78,7 +104,17 @@ export function RedactRoom({doc, caseName, onClose}: Props): ReactElement {
   const size = v?.pages.find(p => p.page === page);
   const hiddenFound = (v?.hidden ?? []).filter(h => h.count > 0);
   const removing = remove ?? hiddenFound.map(h => h.category);
-  const groups = useMemo(() => groupProposals((v?.proposals ?? []).filter(p => !settled[p.id])), [v, settled]);
+  const open = useMemo(() => (v?.proposals ?? []).filter(p => !settled[p.id]), [v, settled]);
+  const kinds = useMemo(() => groupByKind(open), [open]);
+  const doneGroups = useMemo(() => {
+    const byLabel = new Map<string, Mark[]>();
+    for (const m of marks) byLabel.set(`${m.label}|${m.reason}`, [...(byLabel.get(`${m.label}|${m.reason}`) ?? []), m]);
+    return [...byLabel.entries()].map(([key, items]) => ({key, items}));
+  }, [marks]);
+  // A kind with only a few kinds of words opens on its words; a long one stays one row until it is opened.
+  const [openKinds, setOpenKinds] = useState<Record<string, boolean>>({});
+  const [openTexts, setOpenTexts] = useState<Record<string, boolean>>({});
+  const kindOpen = (k: KindGroup) => openKinds[k.kind] ?? k.texts.length <= 6;
   const pageImage = useBlobUrl(`pdfpage:${doc.id}:${page}`, `/api/documents/${doc.id}/page-image?page=${page}&width=1100`);
 
   useEffect(() => { centre.current?.scrollTo?.({top: 0}); }, [page]);
@@ -105,11 +141,13 @@ export function RedactRoom({doc, caseName, onClose}: Props): ReactElement {
     onError: error => setMessage(errorMessage(error, 'Could not make the redacted copy')),
   });
 
-  const keep = (items: RedactProposalOut[]) => {
-    const first = items[0];
+  const keep = (items: RedactProposalOut[], label?: string) => {
+    const first = [...items].sort((a, b) => (a.page === page ? -1 : 0) - (b.page === page ? -1 : 0) || a.page - b.page)[0];
+    if (!first) return;
     setPage(first.page);
     setReason('');
-    setPending({page: first.page, rect: first.rect, kind: first.kind as Kind, label: `${first.kind === 'person' ? `“${first.text}”` : KIND_WORDS[first.kind as Kind]}${items.length > 1 ? ` × ${items.length}` : ''}, p.${first.page}`, keys: items.map(i => i.id)});
+    setPending({page: first.page, rect: first.rect, kind: first.kind as Kind, keys: items.map(i => i.id),
+      label: label ?? `${first.kind === 'person' ? `“${plain(first.text)}”` : KIND_WORDS[first.kind as Kind]}${times(items.length)}, ${onPages(pagesOf(items))}`});
   };
   const reject = (items: RedactProposalOut[]) => setSettled(s => ({...s, ...Object.fromEntries(items.map(i => [i.id, 'rejected' as const]))}));
   const confirm = () => {
@@ -122,9 +160,9 @@ export function RedactRoom({doc, caseName, onClose}: Props): ReactElement {
     setSettled(s => ({...s, ...Object.fromEntries(pending.keys.map(k => [k, 'kept' as const]))}));
     setPending(null); setReason(''); setMade(null);
   };
-  const unmark = (key: string) => {
-    setMarks(m => m.filter(x => x.key !== key));
-    setSettled(s => { const next = {...s}; delete next[key]; return next; });
+  const unmark = (...keys: string[]) => {
+    setMarks(m => m.filter(x => !keys.includes(x.key)));
+    setSettled(s => { const next = {...s}; for (const key of keys) delete next[key]; return next; });
     setMade(null);
   };
 
@@ -161,7 +199,8 @@ export function RedactRoom({doc, caseName, onClose}: Props): ReactElement {
     if (!marked && !proposed) return 'nothing marked';
     return [marked ? `${marked} redacted` : '', proposed ? `${proposed} proposed` : ''].filter(Boolean).join(' · ');
   };
-  const proposedLeft = (v?.proposals ?? []).filter(p => !settled[p.id]).length;
+  const proposedLeft = open.length;
+  const hereOpen = open.filter(p => p.page === page);
   const name = newFileName(doc.filename, madeFor, new Date());
 
   return <div className="ph rd" data-calm-zone="" role="dialog" aria-modal="true" aria-label={`Redact before sharing: ${doc.filename}`}>
@@ -193,6 +232,11 @@ export function RedactRoom({doc, caseName, onClose}: Props): ReactElement {
         </nav>
 
         <section ref={centre} className="rd-centre">
+          {hereOpen.length > 0 && <div className="rd-here" role="group" aria-label={`Proposed on page ${page}`}>
+            <span><b>{hereOpen.length}</b> proposed on page {page}</span>
+            <button className="tl2-plain" onClick={() => keep(hereOpen, `Everything proposed on p.${page}${times(hereOpen.length)}`)}>Redact all on this page</button>
+            <button className="tl2-plain" onClick={() => reject(hereOpen)}>Keep all</button>
+          </div>}
           <div ref={stage} className="rd-stage" onPointerDown={onDown} style={size ? {aspectRatio: `${size.width} / ${size.height}`} : undefined}>
             {/* eslint-disable-next-line @next/next/no-img-element -- a blob URL of a page of a case file, drawn by this app */}
             {pageImage ? <img src={pageImage} alt={`Page ${page} of ${doc.filename}`} draggable={false}/> : <p className="tl2-none">Drawing page {page}…</p>}
@@ -201,7 +245,7 @@ export function RedactRoom({doc, caseName, onClose}: Props): ReactElement {
               <button className="rd-box done" style={place(m.rect)} onClick={() => unmark(m.key)}
               aria-label={`Redacted: ${m.label}, ${m.reason}. Press to take the box off`}/></Reveal>)}
             {(v?.proposals ?? []).filter(p => p.page === page && !settled[p.id]).map(p => <button key={p.id} className="rd-box proposed" style={place(p.rect)}
-              onClick={() => keep((v?.proposals ?? []).filter(q => q.page === p.page && q.kind === p.kind && q.text.toLowerCase() === p.text.toLowerCase() && !settled[q.id]))}
+              onClick={() => keep(open.filter(q => q.kind === p.kind && plain(q.text).toLowerCase() === plain(p.text).toLowerCase()))}
               aria-label={`Proposed: ${p.text}, ${p.why}. Press to redact it`}/>)}
             {pending?.page === page && <span className="rd-box pending" style={place(pending.rect)}/>}
             {pending?.page === page && size && <form className="rd-why" style={whyPlace(pending.rect)} onSubmit={ev => { ev.preventDefault(); confirm(); }}>
@@ -222,14 +266,29 @@ export function RedactRoom({doc, caseName, onClose}: Props): ReactElement {
           <section className="rd-panel" aria-label="This redaction">
             <p className="tl2-cap">This redaction · {marks.length} done, {proposedLeft} proposed</p>
             <ul className="rd-list">
-              {marks.map(m => <li key={m.key}><i className="done" aria-hidden>■</i><p><Reveal detail={`reason: ${m.reason}`}>{m.label}</Reveal></p>
-                <button className="tl2-plain" onClick={() => unmark(m.key)} aria-label={`Take off the box: ${m.label}`}>×</button></li>)}
-              {groups.map(g => { const p = g.items[0];
-                return <li key={g.key}><i className="proposed" aria-hidden>?</i>
-                  <p><Reveal detail={p.kind === 'person' ? p.why : `${p.text} · ${p.why}`}>{p.kind === 'person' ? `“${p.text}”` : KIND_WORDS[p.kind as Kind]}{g.items.length > 1 ? ` × ${g.items.length}` : ''}, p.{p.page}</Reveal></p>
-                  <span className="ph-yn"><button aria-label={`Yes: redact ${p.text}`} onClick={() => keep(g.items)}>Y</button>
-                    <button aria-label={`No: keep ${p.text}`} onClick={() => reject(g.items)}>X</button></span></li>; })}
-              {!marks.length && !groups.length && <li className="rd-empty"><Reveal detail="Drag a box over the page, or accept a proposal.">Nothing marked yet.</Reveal></li>}
+              {doneGroups.map(({key, items}) => { const m = items[0];
+                return <li key={key}><i className="done" aria-hidden>■</i><p><Reveal detail={`reason: ${m.reason}`}>{m.label}</Reveal></p>
+                  <button className="tl2-plain" onClick={() => unmark(...items.map(x => x.key))} aria-label={`Take off the box: ${m.label}`}>×</button></li>; })}
+              {/* Proposals by kind across the file: a whole kind in one move, then the same words everywhere, then each place. */}
+              {kinds.map(k => <li key={k.kind} className="rd-kind">
+                <i className="proposed" aria-hidden>{KIND_MARK[k.kind]}</i>
+                <button className="rd-open" aria-expanded={kindOpen(k)} onClick={() => setOpenKinds(o => ({...o, [k.kind]: !kindOpen(k)}))}>
+                  <b>{KIND_PLURAL[k.kind]}</b> <span className="rd-n">{k.items.length}</span>
+                  <small>{k.texts.length > 1 ? `${k.texts.length} different · ` : ''}{onPages(k.pages)}</small></button>
+                <span className="ph-yn"><button aria-label={`Yes: redact every ${KIND_WORDS[k.kind].toLowerCase()} (${k.items.length})`}
+                  onClick={() => keep(k.items, `${KIND_PLURAL[k.kind]}${times(k.items.length)}, ${onPages(k.pages)}`)}>Y</button>
+                  <button aria-label={`No: keep every ${KIND_WORDS[k.kind].toLowerCase()} (${k.items.length})`} onClick={() => reject(k.items)}>X</button></span>
+                {kindOpen(k) && <ul className="rd-texts">{k.texts.map(g => <li key={g.key}>
+                  <button className="rd-open" aria-expanded={Boolean(openTexts[g.key])} onClick={() => setOpenTexts(o => ({...o, [g.key]: !o[g.key]}))}>
+                    <Reveal detail={g.items[0].why}><span>{g.kind === 'person' ? `“${g.text}”` : g.text}</span></Reveal>
+                    <small>{g.items.length > 1 ? `×${g.items.length} · ` : ''}{onPages(g.pages)}</small></button>
+                  <span className="ph-yn"><button aria-label={`Yes: redact ${g.text}`} onClick={() => keep(g.items, textLabel(g))}>Y</button>
+                    <button aria-label={`No: keep ${g.text}`} onClick={() => reject(g.items)}>X</button></span>
+                  {openTexts[g.key] && <p className="rd-where">{g.pages.map(n => { const here = g.items.filter(i => i.page === n).length;
+                    return <button key={n} aria-current={n === page ? 'page' : undefined} onClick={() => setPage(n)}>p.{n}{here > 1 ? ` ×${here}` : ''}</button>; })}</p>}
+                </li>)}</ul>}
+              </li>)}
+              {!marks.length && !kinds.length && <li className="rd-empty"><Reveal detail="Drag a box over the page, or accept a proposal.">Nothing marked yet.</Reveal></li>}
             </ul>
           </section>
           <section className="rd-panel" aria-label="Also remove from the copy">

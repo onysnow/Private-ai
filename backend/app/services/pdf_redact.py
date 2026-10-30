@@ -33,8 +33,41 @@ HIDDEN = ("metadata", "attachments", "comments", "form-fields", "hidden-text", "
           "links-actions-scripts", "private-data")
 MADE_FOR = {"editor": "the editor", "lawyer": "a lawyer", "publication": "publication"}
 MAX_BOXES = 500
-PHONE = re.compile(r"(?<![\w+])(?:\+\d{1,3}[\s.-]?)?(?:\(\d{2,5}\)[\s.-]?)?\d{2,5}(?:[\s.-]?\d{2,4}){2,4}(?!\w)")
+# Separators inside a phone number are spaces, dots or hyphens on one line: a newline between numbers is a column of
+# numbers (a court filing's margin line numbers 1 to 28, a table), never one phone number.
+PHONE = re.compile(r"(?<![\w+])(?:\+\d{1,3}[ \t.-]?)?(?:\(\d{2,5}\)[ \t.-]?)?\d{2,5}(?:[ \t.-]?\d{2,4}){2,4}(?!\w)")
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+
+
+def looks_like_phone(found: str) -> bool:
+    """Whether a PHONE match is worth proposing. Not: under seven digits; a column of numbers across lines (a court
+    filing's margin line numbers); a run of counting numbers on one line ("10 11 12 13"); a date ("22.03.2013",
+    "2013-03-22"); a decimal ("620.068965"); two groups that are not a local number ("0583-994"); and a bare run of
+    digits under ten long (a case number or an amount far more often than a phone number)."""
+    found = found.strip()
+    digits = sum(ch.isdigit() for ch in found)
+    if digits < 7 or "\n" in found:
+        return False
+    groups = re.findall(r"\d+", found)
+    numbers = [int(g) for g in groups]
+    if len(numbers) >= 3 and all(b - a == 1 for a, b in zip(numbers, numbers[1:], strict=False)):
+        return False
+    if len(groups) == 3 and (_is_date(groups) or _is_date(groups[::-1])):
+        return False
+    if found.startswith("+") or "(" in found:
+        return True
+    if len(groups) == 1:
+        return digits >= 10
+    if len(groups) == 2:
+        return "." not in found and len(groups[-1]) >= 4
+    return True
+
+
+def _is_date(groups: list[str]) -> bool:
+    """Day, month, year (or month, day, year) with a four-digit year."""
+    day, month, year = groups
+    return len(year) == 4 and year[:2] in ("19", "20") and 1 <= int(month) <= 31 and 1 <= int(day) <= 31 and \
+        (int(month) <= 12 or int(day) <= 12)
 
 
 class RedactRefused(ValueError):
@@ -110,7 +143,7 @@ def _proposals(db: Session, document: Document, pdf: _Pdf, doc: int) -> list[dic
         for match in EMAIL.finditer(page["text"]):
             wanted.append(("email", match.group(0), None))
         for match in PHONE.finditer(page["text"]):
-            if sum(ch.isdigit() for ch in match.group(0)) >= 7:
+            if looks_like_phone(match.group(0)):
                 wanted.append(("phone", match.group(0).strip(), None))
     wanted += [("person", name, entity_id) for entity_id, name in _people(db, document)]
     out: list[dict[str, Any]] = []

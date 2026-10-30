@@ -48,6 +48,15 @@ def _minutes() -> tuple[str, str]:
     return inv, r.json()["id"]
 
 
+def test_margin_line_numbers_and_bare_numbers_are_not_phone_numbers():
+    from app.services.pdf_redact import PHONE, looks_like_phone
+
+    page = "1\n2\n3\n10\n11\n12\n13\n14\n25\n26\n27\n28\nPage 10 11 12 13\nCase 2016123\nOn 22.03.2013 and 2013-03-22 paid 620.068965 ref 0583-994\nTelephone: (213) 894-3391\n" \
+           "Call 07700 900 431 or +44 20 7946 0958 or 2135551234"
+    found = [m.group(0).strip() for m in PHONE.finditer(page) if looks_like_phone(m.group(0))]
+    assert found == ["(213) 894-3391", "07700 900 431", "+44 20 7946 0958", "2135551234"]
+
+
 def test_proposes_boxes_and_says_what_hidden_data_the_file_carries():
     _inv, doc = _minutes()
     view = client.get(f"/api/documents/{doc}/redaction")

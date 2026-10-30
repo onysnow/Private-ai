@@ -5,7 +5,7 @@ import {cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {RedactRoom, groupProposals, newFileName} from '../features/reading-room/redact-room';
+import {RedactRoom, groupByKind, groupProposals, newFileName} from '../features/reading-room/redact-room';
 import type {DocumentDetailOut, RedactProposalOut} from '../lib/generated/types.gen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -30,10 +30,33 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe('redact before sharing', () => {
-  it('names the new file and groups the same words on a page', () => {
+  it('names the new file and groups the same words across the file, then by kind', () => {
     expect(newFileName('minutes-2019-10-02.pdf', 'editor', new Date(2026, 9, 28))).toBe('minutes-2019-10-02-redacted-for-editor-28-Oct.pdf');
-    const groups = groupProposals(VIEW.proposals);
-    expect(groups.map(g => g.items.length)).toEqual([1, 2]);
+    const spread = [...VIEW.proposals, {...proposal('person-4', 'person', 'HENDRY', 300), page: 2}, {...proposal('person-5', 'person', 'Ann\nExample', 400), page: 2}];
+    const groups = groupProposals(spread);
+    expect(groups.map(g => [g.text, g.items.length, g.pages])).toEqual([['Hendry', 3, [1, 2]], ['07700 900 431', 1, [1]], ['Ann Example', 1, [2]]]);
+    expect(groupByKind(spread).map(k => [k.kind, k.items.length, k.texts.length, k.pages])).toEqual([['person', 4, 2, [1, 2]], ['phone', 1, 1, [1]]]);
+  });
+
+  it('decides a whole kind, or everything on a page, in one move, and lists each page behind a click', async () => {
+    const many = {...VIEW, proposals: [...VIEW.proposals, {...proposal('person-4', 'person', 'Hendry', 300), page: 2}]};
+    mockApi({'GET /api/documents/m1/redaction': many, 'GET /api/documents/m1/derived': [], 'GET /api/documents/m1/page-image': {status: 200, body: 'x'}});
+    render(<QueryProvider><RedactRoom doc={DOC} caseName="The harbour land" onClose={() => undefined}/></QueryProvider>);
+    const user = userEvent.setup();
+    const panel = await screen.findByRole('region', {name: 'This redaction'});
+    expect(await within(panel).findByText('This redaction · 0 done, 4 proposed')).toBeInTheDocument();
+    await user.click(within(panel).getByRole('button', {name: /“Hendry”/}));
+    expect(within(panel).getByRole('button', {name: 'p.2'})).toBeInTheDocument();
+    await user.click(within(panel).getByRole('button', {name: 'p.2'}));
+    expect(screen.getByRole('button', {name: 'p.2'})).toHaveAttribute('aria-current', 'page');
+    // Page 2 holds one proposal; keep everything on it in one move.
+    await user.click(within(screen.getByRole('group', {name: 'Proposed on page 2'})).getByRole('button', {name: 'Keep all'}));
+    expect(within(panel).getByText('This redaction · 0 done, 3 proposed')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Yes: redact every name (2)'}));
+    await user.click(screen.getByRole('button', {name: 'a private person'}));
+    await user.click(screen.getByRole('button', {name: 'Redact it'}));
+    expect(within(panel).getByText('This redaction · 2 done, 1 proposed')).toBeInTheDocument();
+    expect(within(panel).getByText('Names × 2, p.1')).toBeInTheDocument();
   });
 
   it('keeps a proposal only with a reason, drops a rejected one, and sends the copy as set', async () => {
@@ -54,7 +77,7 @@ describe('redact before sharing', () => {
     await user.click(screen.getByRole('button', {name: 'Redact it'}));
     await user.click(screen.getByRole('button', {name: 'No: keep 07700 900 431'}));
     expect(within(panel).getByText('This redaction · 2 done, 0 proposed')).toBeInTheDocument();
-    expect(within(panel).getAllByText('reason: source protection')).toHaveLength(2);
+    expect(within(panel).getAllByText('reason: source protection')).toHaveLength(1);
 
     await user.click(screen.getByLabelText('Comments and markups'));
     await user.click(screen.getByLabelText('Make it PDF/A for archiving'));

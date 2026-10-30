@@ -42,10 +42,10 @@ function Spectrogram({doc, start, end, cleaned}: {doc: DocumentDetailOut; start:
     setHref(made);
     return () => URL.revokeObjectURL(made);
   }, [png.data]);
-  if (png.isError) return <p className="lr-note" role="alert">{errorMessage(png.error, 'Could not draw the sound')}</p>;
+  if (png.isError) return <p className="snd-wait" role="alert">{errorMessage(png.error, 'Could not draw the sound')}</p>;
   // eslint-disable-next-line @next/next/no-img-element -- a blob URL of a picture this app drew
   return href ? <img className="snd-spectro" src={href} alt={`The sound from ${clockOf(start)} to ${clockOf(end)}, ${cleaned ? 'cleaned copy' : 'original'}: 0 to 4 kHz`} draggable={false}/>
-    : <p className="lr-note">Drawing the sound…</p>;
+    : <p className="snd-wait" role="status"><span>Drawing the sound…</span></p>;
 }
 
 type Props = {doc: DocumentDetailOut; duration: number; files: DerivedFileOut[]; onStatus: (s: string) => void};
