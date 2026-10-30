@@ -7,7 +7,7 @@
 // duplicate review, a previewed merge and the post-merge reconciliation; a
 // lead from a relationship's context; an entity edit; a merged alias that
 // answers with its surviving record.
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -19,7 +19,7 @@ import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
 import type {Routes} from '../test-support/mock-api';
-import {dossierFixture, dossierRoutes, emptyOwnershipChain, emptyReconciliation, entityFixture, findingFixture, leadQueueBody, relationshipFixture} from '../test-support/page-routes';
+import {dossierCaseRoutes, dossierFixture, dossierRoutes, emptyOwnershipChain, emptyReconciliation, entityFixture, findingFixture, leadQueueBody, relationshipFixture} from '../test-support/page-routes';
 
 const wrap = (node: ReactElement) => render(<QueryProvider>{node}</QueryProvider>);
 
@@ -71,7 +71,7 @@ function fullDossier() {
 }
 
 async function renderOpen(routes: Routes = {}, dossier: unknown = fullDossier()) {
-  const api = mockApi({...dossierRoutes('ent-1', dossier), ...routes});
+  const api = mockApi({...dossierRoutes('ent-1', dossier), ...dossierCaseRoutes('inv-1'), ...routes});
   wrap(<DossierPanel investigationId="inv-1"/>);
   useWorkbenchStore.getState().openDossier('ent-1');
   await screen.findByText('Kestrelwood Holdings Ltd dossier');
@@ -81,27 +81,77 @@ async function renderOpen(routes: Routes = {}, dossier: unknown = fullDossier())
 describe('DossierPanel', () => {
   it('opens on request with the dossier, its duplicate candidates and its reconciliation, and shows every part', async () => {
     const api = await renderOpen();
-    expect(screen.getByText('Company · 5 statements · 1 relationships · 1 claims · 1 evidence · 1 leads · 1 external findings').closest('[hidden]')).not.toBeNull();
-    expect(screen.getByText('Merge audit: ent-2 → ent-1', {exact: false}).closest('[hidden]')).not.toBeNull();  // raw IDs only on hover
-    expect(screen.getByText((_, node) => node?.textContent === ' · 1 merged alias(es) · 1 reporter identity decision(s) · 1 unresolved', {selector: 'small'})).toBeInTheDocument();
+    // The key numbers are figures that open their sections; a zero is quiet and not a control.
+    const figures = screen.getByRole('list', {name: 'What the case holds on this party'});
+    expect(within(figures).getByRole('button', {name: '1 link. Go to Links'})).toBeInTheDocument();
+    expect(within(figures).getByRole('button', {name: '1 claim: 1 supported. Go to Claims'})).toBeInTheDocument();
+    expect(within(figures).getByRole('button', {name: '1 source, 1 quote. Go to Sources'})).toBeInTheDocument();
+    expect(within(figures).getByRole('button', {name: '1 lead(s), 1 task(s). Go to Leads'})).toBeInTheDocument();
+    expect(within(figures).getByRole('button', {name: '1 dated event(s). Go to Dates'})).toBeInTheDocument();
+    expect(within(figures).queryByRole('button', {name: /red flag/})).toBeNull();
+    expect(within(figures).getByRole('img', {name: '0 red flags: none'})).toBeInTheDocument();
+    // Its kind is a mark named on hover; its country a chip that traces where it comes from.
+    expect(screen.getAllByRole('img', {name: 'Company'}).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', {name: 'jurisdiction: United Kingdom. Where it comes from'})).toBeInTheDocument();
+    // History, OpenAleph and every recorded value are folded under More; raw IDs only on hover.
+    expect(screen.getByText('Identity / merge history').closest('details')).not.toBeNull();
+    expect(screen.getByText('Merge audit: ent-2 → ent-1', {exact: false}).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('1 identity decision(s) unresolved')).toBeInTheDocument();
     expect(screen.getByText('Alias: Kestrelwood Holdings LLC', {exact: false})).toBeInTheDocument();
     expect(screen.getByText('same: Kestrelwood Holdings LLC', {exact: false})).toBeInTheDocument();
     expect(screen.getByText('Merge audit: ent-2 → ent-1', {exact: false})).toBeInTheDocument();
     expect(screen.getByText('1 external finding(s) need review.')).toBeInTheDocument();
-    expect(screen.getByText('No unresolved multi-value property conflicts detected.')).toBeInTheDocument();
-    expect(screen.getByText('Ownership: Kestrelwood Holdings Ltd → MV Fair Tern', {exact: false})).toBeInTheDocument();
+    // Nothing to decide: the section is not drawn.
+    expect(screen.queryByText('Values that disagree')).toBeNull();
+    expect(screen.queryByRole('heading', {name: /To decide/})).toBeNull();
+    expect(screen.getByText('Ownership: Kestrelwood Holdings Ltd → MV Fair Tern', {exact: false}).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('button', {name: 'Open MV Fair Tern'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Supported Kestrelwood owns the vessel.'})).toBeInTheDocument();
     // A status is its shape; its word is the mark's name and on hover (Ony, 29 Oct).
     expect(screen.getByRole('img', {name: 'active'}).parentElement).toHaveTextContent('Ask the registry');
     expect(screen.getByRole('img', {name: 'todo'}).parentElement).toHaveTextContent('File the request');
-    expect(screen.getByText('2024-03-02: Vessel registered', {exact: false})).toBeInTheDocument();
+    expect(screen.getByText('Vessel registered')).toBeInTheDocument();
     expect(screen.getByRole('img', {name: 'verified'})).toBeInTheDocument();
     expect(screen.getByRole('img', {name: 'needs_followup'}).parentElement).toHaveTextContent('Kestrelwood Holdings');
-    expect(screen.getByText('Registry filing: Owner: Kestrelwood Holdings Ltd (p.2)', {exact: false})).toBeInTheDocument();
+    expect(screen.getByText('Registry filing')).toBeInTheDocument();
+    expect(screen.getByText('Owner: Kestrelwood Holdings Ltd')).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: 'Open the source'})).toHaveAttribute('href', 'https://example.test/filing');
     expect(useWorkbenchStore.getState().entityId).toBe('ent-1');
     expect(api.calls(DOSSIER)).toHaveLength(1);
     expect(api.calls(DUPLICATES)).toHaveLength(1);
     expect(api.calls(RECONCILIATION)).toHaveLength(1);
+    expect(api.unmatched()).toEqual([]);
+  });
+
+  it('draws no empty section, and works out its party\'s Red Flags and money from the case', async () => {
+    const flag = {
+      id: 'f-1', indicator_id: 'BO-001', rule_version: 1, level: 'strong', status: 'open', dismissed_reason: null, lead_id: null, weight: 0.8, weight_parts: [],
+      parties: [{id: 'ent-1', name: 'Kestrelwood Holdings Ltd', schema: 'Company'}], links: [], facts: {}, not_shown: [], summary: 'Ownership runs in a loop.',
+      first_seen_at: '2026-10-10T00:00:00', last_seen_at: '2026-10-10T00:00:00', gone_at: null,
+      indicator: {id: 'BO-001', name: 'Circular ownership', definition: 'Companies own each other in a loop.', area: 'BO', area_name: 'Hidden ownership',
+        levels: {faint: 'To be set', strong: 'To be set', textbook: 'As worded', threshold_source: 'none', threshold_note: null}, sources: [], innocent_explanations: [], cross_hints: [], version: 1},
+    };
+    const other = {...flag, id: 'f-2', parties: [{id: 'ent-5', name: 'Someone else', schema: 'Person'}]};
+    const pay = (id: string, from: [string, string], to: [string, string], amount: number) => ({id, relationship_id: `rel-${id}`, dateTime: '2018-02-06', from: from[1], to: to[1],
+      from_entity_id: from[0], to_entity_id: to[0], amount, currency: 'EUR', statedPurpose: null, transactionNumber: null, evidence: null, evidence_count: 0,
+      supporting_evidence_count: 0, status: 'no_claim_dependency', flowType: 'inferred', certainty: 'shown', locator: null});
+    const KES: [string, string] = ['ent-1', 'Kestrelwood Holdings Ltd']; const FERN: [string, string] = ['fern', 'Fernhill Ltd'];
+    const api = await renderOpen(dossierCaseRoutes('inv-1', [flag, other], [pay('t1', FERN, KES, 2_500_000), pay('t2', KES, FERN, 400), pay('t3', FERN, ['x', 'X'], 9)]), dossierFixture(entityA));
+    // An empty dossier: one quiet line, no empty headings.
+    expect(screen.getByText('No claims, leads or tasks yet')).toBeInTheDocument();
+    for (const name of [/^Claims/, /^Leads and tasks/, /^Dates/, /^Outside findings/, /^Sources/, /^Links/]) expect(screen.queryByRole('heading', {name})).toBeNull();
+    // Only this party's flag and payments count.
+    const flags = await screen.findByRole('button', {name: '1 red flag: 1 strong. Go to Flags'});
+    expect(screen.getByRole('button', {name: 'Money in: €2,500,000; out: €400. Go to Money'})).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(flags);
+    expect(screen.getByRole('heading', {name: /Red Flags/})).toHaveFocus();
+    await user.click(screen.getByRole('button', {name: /Circular ownership/}));
+    expect(useWorkbenchStore.getState().flag).toMatchObject({flagId: 'f-1'});
+    // A payment row names the other party (which opens its dossier) and traces.
+    expect(screen.getAllByRole('button', {name: 'Open Fernhill Ltd'})).toHaveLength(2);
+    await user.click(screen.getAllByRole('button', {name: 'Trace payment'})[0]);
+    expect(useWorkbenchStore.getState().provenance?.request).toMatchObject({kind: 'payment', traceRecordType: 'relationship', acceptedRecordId: 'rel-t1'});
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -145,7 +195,8 @@ describe('DossierPanel', () => {
       ],
     };
     const api = await renderOpen({}, dossierFixture(entityA, {property_conflicts: [conflict]}));
-    expect(screen.getByText('gb', {exact: false, selector: 'div'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Prefer gb'})).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', {name: /^1 to decide/})).toBeInTheDocument();
     api.add({
       [decision]: {id: 'pcd-1', investigation_id: 'inv-1', entity_id: 'ent-1', prop: 'jurisdiction', decision: 'preferred', values_json: ['gb', 'je'], preferred_value: 'gb', rationale: 'The newer filing.', temporal_intervals_json: [], created_at: '2026-10-01T00:00:00'},
       [DOSSIER]: dossierFixture(entityA, {property_conflicts: [{...conflict, status: 'preferred', preferred_value: 'gb', latest_decision: {id: 'pcd-1', decision: 'preferred', values: ['gb', 'je'], preferred_value: 'gb', rationale: 'The newer filing.', temporal_intervals: [], created_at: '2026-10-01T00:00:00'}}]}),
@@ -156,7 +207,8 @@ describe('DossierPanel', () => {
     await user.click(screen.getByRole('button', {name: 'Confirm'}));
 
     await screen.findByText('Reporter rationale: The newer filing.', {exact: false});
-    expect(screen.getByText('· preferred · preferred: gb', {exact: false})).toBeInTheDocument();
+    expect(screen.getByText('Preferred: gb')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Prefer gb'})).toHaveAttribute('aria-pressed', 'true');
     expect(api.lastBody(decision)).toEqual({decision: 'preferred', values: ['gb', 'je'], preferred_value: 'gb', rationale: 'The newer filing.'});
     expect(api.calls(DOSSIER)).toHaveLength(2);
     expect(api.unmatched()).toEqual([]);
@@ -165,7 +217,7 @@ describe('DossierPanel', () => {
   it('reviews a duplicate, previews the merge once the pair is "same", executes it and opens the surviving record', async () => {
     const candidate = {entity_id: 'ent-2', caption: 'Kestrelwood Holdings LLC', schema: 'Company', score: 0.87, latest_decision: null};
     const api = await renderOpen({[DUPLICATES]: [candidate]}, dossierFixture(entityA));
-    await screen.findByText('Possible canonical duplicates');
+    await screen.findByText('Same party?');
     expect(screen.getByRole('button', {name: 'Preview merge into this record'})).toBeDisabled();
 
     const same = {id: 'dec-1', decision: 'same', confidence: 0.9, rationale: null, created_at: '2026-10-01T00:00:00'};
@@ -175,7 +227,8 @@ describe('DossierPanel', () => {
     });
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: 'Same entity'}));
-    await screen.findByText('Latest review: same · 90%', {selector: 'small'});
+    await screen.findByText('Latest review: same · 90%');
+    expect(screen.getByRole('button', {name: 'Same entity'})).toHaveAttribute('aria-pressed', 'true');
     expect(api.lastBody('POST /api/entities/ent-1/canonical-resolution')).toEqual({other_entity_id: 'ent-2', decision: 'same', confidence: 0.9, rationale: 'Reporter-reviewed canonical duplicate decision'});
     expect(api.calls(DOSSIER)).toHaveLength(2);
 
@@ -256,7 +309,7 @@ describe('DossierPanel', () => {
     const alias = entityFixture('ent-9', 'Kestrelwood Holdings LLC', 'Company', {merged_into_entity_id: 'ent-1'});
     const resolved = dossierFixture(entityA, {alias_resolution: {requested_entity_id: 'ent-9', requested_caption: 'Kestrelwood Holdings LLC', active_entity_id: 'ent-1', active_caption: 'Kestrelwood Holdings Ltd', alias_chain: [{id: 'ent-9', caption: 'Kestrelwood Holdings LLC', merged_into_entity_id: 'ent-1'}]}});
     const api = mockApi({'GET /api/entities/ent-9/dossier': resolved, [DUPLICATES]: [], [RECONCILIATION]: emptyReconciliation('ent-1'),
-      'GET /api/entities/ent-1/ownership-chain': emptyOwnershipChain('ent-1')});
+      'GET /api/entities/ent-1/ownership-chain': emptyOwnershipChain('ent-1'), ...dossierCaseRoutes('inv-1')});
     wrap(<DossierPanel investigationId="inv-1"/>);
     useWorkbenchStore.getState().openDossier(alias.id);
     await screen.findByText('Kestrelwood Holdings Ltd dossier');

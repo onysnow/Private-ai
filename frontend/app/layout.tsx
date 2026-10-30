@@ -13,6 +13,7 @@ import '../styles/act.css';
 import '../styles/story.css';
 import '../styles/before-run.css';
 import '../styles/drop.css';
+import '../styles/dossier.css';
 import '../styles/library.css';
 import '../styles/following.css';
 import '../styles/style-guide.css';

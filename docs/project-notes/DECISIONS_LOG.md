@@ -670,3 +670,34 @@ BACKLOG "Documents have no kind/language field". Built on `documents` (migration
   detected" stays only where nothing is known.
 - Kind and language travel in a backup (they are columns of `documents`); a backup made before keeps none and the
   restored documents read as not known.
+
+## 38. A party's dossier, converted for the inspector slot (30 Oct 2026)
+Seen in Chromium on 1MDB: the dossier in the inspector slot (entry 35) was still the old panel: a line of count
+glyphs with no meaning ("6 ≡ 1 ↔ 0 ○ …"), a wall of large buttons on every row, headings with nothing under them,
+full-width text. Rebuilt in the converted screens' grammar (Red Flags, Claims, Sources & evidence, the Wire's drawer)
+for a ~520 px side slot and a phone's bottom sheet (`features/dossier/*`, `styles/dossier.css`).
+- **At rest:** who or what (its kind as the Drop's party mark, named on hover; the name, large; the country and up to
+  three key identifiers as chips: registration, LEI, tax, VAT, ID, passport, IMO, MMSI, SWIFT, INN, OGRN, the
+  incorporation, birth and dissolution dates; more as "+n" with the rest on hover). A chip's hover says where the value
+  comes from; its click traces it. Then what waits on a person: "n to decide" (the one primary action) and the outside
+  findings to review. Then the figures, each opening its section (scrolled to, its title focused, lit for a moment):
+  links (a bar of link families in their colours), claims (a bar by status), Red Flags (a bar by level), sources
+  (quotes on hover), money in and out (short amounts, every currency on hover), and leads and dates when there are any.
+  A zero figure is quiet and not a control.
+- **The dossier works out its party's flags and money** from the case's Red Flags and ledger reads (shared with Act ›
+  Red Flags and See › Money, counted over the party and its merged aliases); a dismissed flag does not count. The
+  API's dossier has neither; nothing new is asked of the backend.
+- **A section is drawn only when it holds something**; an empty dossier shows one quiet line ("No claims, leads or
+  tasks yet"). A section shows five rows, then "Show all". Order: To decide, Red Flags, Claims, Links (by family),
+  Money, Ownership and control (only when the chain has links), Sources, Leads and tasks, Dates, Outside findings.
+- **Row actions are small icon buttons**, shown on hover or focus (always on a touch screen), named on hover and as
+  their accessible name; the names are the old buttons' words, so nothing is lost: Review relationship evidence, Trace
+  relationship, Create question / lead with exact context, Trace payment, Trace provenance, Open the source, Trace lead,
+  Trace task, Same entity, Different, Unsure, Preview merge into this record, Temporal change, Both valid,
+  Unresolved, Duplicate · prefer first/second, Keep separate, Expand in the corpus. A property's values are chips:
+  clicking one is "Prefer <value>". The previewed merge's "Merge" is the only other filled button.
+- **The other party of a link, payment or duplicate opens its own dossier** in the slot (the trail keeps the way back),
+  so a reporter can compare two records before saying they are the same.
+- **Folded under "More":** identity and merge history, OpenAleph's "Expand in the corpus", and every recorded value
+  (each traceable). Explanations that used to be paragraphs are on the hover of their section's title.
+- Statuses of leads, tasks, dates and findings are shapes with the word on hover, as on Leads and the Drop.

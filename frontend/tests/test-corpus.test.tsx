@@ -190,9 +190,15 @@ describe('CorpusExpand', () => {
     const api = mockApi({[EXPAND]: expanded});
     wrap(<CorpusExpand entityId="ent-1"/>);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Expand in the corpus'}));
-    await screen.findByText(/1 relationship\(s\) and 1 linked entity proposed for review \(2 already in this investigation\)/);
-    expect(screen.getByText('Entity: Bob Smith · Person · Port authority · unreviewed')).toBeInTheDocument();
-    expect(screen.getByText('Relationship: director · Directorship · unreviewed')).toBeInTheDocument();
+    // The count shows; what was already held and where to review them are on its hover (Ony, 29 Oct).
+    await screen.findByText('1 link(s) and 1 party proposed for review');
+    expect(screen.getByText('2 already in this investigation. Review them in the review queue.').closest('[hidden]')).not.toBeNull();
+    // Each finding is its name; its kind and collection on hover, its review state as a shape.
+    expect(screen.getByText('Bob Smith')).toBeInTheDocument();
+    expect(screen.getByText('Party · Person · Port authority').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('director')).toBeInTheDocument();
+    expect(screen.getByText('Link · Directorship').closest('[hidden]')).not.toBeNull();
+    expect(screen.getAllByRole('img', {name: 'unreviewed'})).toHaveLength(2);
     expect(screen.getAllByRole('link', {name: 'Open in OpenAleph'})).toHaveLength(1);
     expect(api.calls(EXPAND)).toHaveLength(1);
   });
@@ -209,7 +215,8 @@ describe('CorpusExpand', () => {
     mockApi({[EXPAND]: {...expanded, relationships: 0, neighbours: 2, skipped_own: 0, findings: []}});
     wrap(<CorpusExpand entityId="ent-1"/>);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Expand in the corpus'}));
-    await screen.findByText(/0 relationship\(s\) and 2 linked entities proposed for review; review them/);
+    await screen.findByText('0 link(s) and 2 parties proposed for review');
+    expect(screen.getByText('Review them in the review queue.').closest('[hidden]')).not.toBeNull();
   });
 });
 
@@ -220,8 +227,10 @@ describe('DuplicateCandidates', () => {
   it('says when OpenAleph cross-referencing found a possible duplicate', () => {
     render(<DuplicateCandidates candidates={[{...candidate, found_by: ['openaleph_xref']}, {...candidate, entity_id: 'ent-3', caption: 'Meridian Holdings', found_by: ['name_overlap', 'openaleph_xref']},
       {...candidate, entity_id: 'ent-4', caption: 'Meridian', found_by: ['name_overlap']}]} previews={{}} onDecide={noop} onPreviewMerge={noop} onExecuteMerge={noop}/>);
-    expect(screen.getByText('· found by OpenAleph cross-referencing')).toBeInTheDocument();
-    expect(screen.getByText('· found by OpenAleph cross-referencing and by name')).toBeInTheDocument();
-    expect(screen.getAllByText(/found by OpenAleph/)).toHaveLength(2);
+    // How a candidate was found is on its score's hover.
+    expect(screen.getByText('Found by OpenAleph cross-referencing').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('Found by OpenAleph cross-referencing and by name')).toBeInTheDocument();
+    expect(screen.getAllByText(/Found by OpenAleph/)).toHaveLength(2);
+    expect(screen.getByText('Found by name')).toBeInTheDocument();
   });
 });
