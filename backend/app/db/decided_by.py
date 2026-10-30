@@ -28,6 +28,12 @@ def _actor(db: Session) -> tuple[str, str | None] | None:
     return scope.actor_id, (user.display_name if user is not None else None)
 
 
+def person_name(db: Session) -> str | None:
+    """The signed-in person's name as it is now (None outside a request, or when none was given)."""
+    actor = _actor(db)
+    return actor[1] if actor is not None else None
+
+
 def _changed(obj: object, attr: str) -> bool:
     state = inspect(obj, raiseerr=False)
     return state is not None and bool(state.attrs[attr].history.has_changes())

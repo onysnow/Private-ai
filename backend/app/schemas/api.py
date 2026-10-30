@@ -2,7 +2,15 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.services.document_facts import DocumentKind
 from app.visuals.spec import VisualSpec
+
+class DocumentAboutUpdate(BaseModel):
+    """What a person says a document is and its language. Only the fields sent change; null clears one, and a value a
+    person set is never replaced by the machine."""
+    kind: DocumentKind | None = None
+    language: str | None = Field(default=None, max_length=32, description="ISO 639-1 code (or a BCP-47 tag, an ISO 639-3 code)")
+
 
 class InvestigationCreate(BaseModel):
     name: str

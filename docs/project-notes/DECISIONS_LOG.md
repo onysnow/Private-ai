@@ -498,3 +498,31 @@ source already holds, never invented:
 The full title and the place in the record stay on hover. Chips are now one per source (two sources with the same
 title are two chips) and wrap onto a second line, as ACT_2 draws them, instead of being cut on one line. The Cited tab
 and the citation hover keep the full title: they have the room.
+
+## 32. Documents keep what they are and their language, with how each was set (30 Oct 2026)
+BACKLOG "Documents have no kind/language field". Built on `documents` (migration `a8d2f6c4e913`), filled in
+`app/services/document_facts.py`:
+- **Twelve kinds**, enough to tell a case's papers apart without becoming a taxonomy: court filing (complaints,
+  indictments, pleas, motions), judgment or order, official record or notice (registries, regulatory notices, gazettes),
+  article, press release, email, social media post, spreadsheet, recording, photo, web page, other. The demo records'
+  words map onto them (`complaint` → court filing, `registry` → official record, `web_page` → web page); a word that
+  names a file format (`docx`, `archive`) gives no kind. A PDF's type says nothing about what it is, so it stays
+  "kind not set" until its source's record or a person says.
+- **Language as ISO 639-1** (the primary subtag of a BCP-47 tag; ISO 639-3 only where no two-letter code exists).
+  Regional variants are not kept: nothing in the app reads them.
+- **How each was set:** `reader` (its file type, or what OpenAleph read it as), `source` (its source's record states it),
+  `detected` (OpenAleph, faster-whisper for a recording, or py3langid for any other text, with how sure), `person`. A
+  person's value is never replaced by the machine; a source's is not replaced by a detection; detections replace each
+  other as they come (OpenAleph's and faster-whisper's after the app's own). A person clearing one keeps it cleared.
+- **A detector of the app's own** (ADR-0027): py3langid 0.4.0 (BSD-3, 4.5 MB, numpy only), two-letter languages only,
+  kept only at 80 % sure or more and with at least 40 letters of text. The alternatives were larger (lingua, fastText)
+  or random unless seeded (langdetect). Documents already in a case are detected once by the migration.
+- **On screen:** the Library row's mark is what the document is, named on hover with its file kind, how it was set and
+  its language; a document with no kind shows its file's mark faint and dashed. The kind filter chips are now what
+  documents are, plus "Kind not set" (the file-kind filter is kept in the model, no longer drawn: the two would have
+  been the same marks twice). The pane and the reading room's Details hold two chips, kind and language, which open a
+  chooser in place (the kinds as marks; a language typed as a code or a name). The reading room's language chip names
+  the document's own language first, with how it was set, then any other language OpenAleph found; "Language not
+  detected" stays only where nothing is known.
+- Kind and language travel in a backup (they are columns of `documents`); a backup made before keeps none and the
+  restored documents read as not known.

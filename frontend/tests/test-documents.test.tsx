@@ -143,6 +143,36 @@ describe('DocumentsPanel upload and review', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
+  it('marks each document by what it is, filters by it, and lets a person set its kind and language in the pane', async () => {
+    const judgment = docFixture({kind: 'judgment', kind_set_by: 'source', language: 'fr', language_name: 'French', language_set_by: 'detected',
+      language_by: 'py3langid', language_confidence: 0.99});
+    const api = await renderWithDocuments([judgment, docFixture({id: 'doc-2', filename: 'ledger.pdf'})]);
+    // The kind is the row's mark, named on hover; a document whose kind is not known shows its file's kind, faint.
+    expect(within(screen.getByTestId('document-doc-1')).getByRole('img', {name: 'Judgment or order'})).toBeInTheDocument();
+    expect(within(screen.getByTestId('document-doc-2')).getByRole('img', {name: 'PDF'})).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: 'Kind not set'}));
+    expect(screen.getAllByTestId(/^document-/).map(row => row.dataset.testid)).toEqual(['document-doc-2']);
+    await user.click(screen.getByRole('button', {name: 'Kind not set'}));
+    await user.click(screen.getByRole('button', {name: 'Judgments and orders'}));
+    expect(screen.getAllByTestId(/^document-/).map(row => row.dataset.testid)).toEqual(['document-doc-1']);
+    // The pane: its kind and language as chips; how each was set is on hover.
+    expect(within(pane()).getByText('Detected by py3langid · 99% sure').closest('[hidden]')).not.toBeNull();
+    api.add({'PATCH /api/documents/doc-1/about': {...judgment, kind: 'court_filing', kind_set_by: 'person', kind_by: 'Ony'}});
+    await user.click(within(pane()).getByRole('button', {name: 'Kind: Judgment or order. Change it'}));
+    await user.click(within(pane()).getByRole('radio', {name: 'Court filing'}));
+    await waitFor(() => expect(api.calls('PATCH /api/documents/doc-1/about')).toHaveLength(1));
+    expect(api.lastBody('PATCH /api/documents/doc-1/about')).toEqual({kind: 'court_filing'});
+    api.add({'PATCH /api/documents/doc-1/about': {...judgment, language: 'ms', language_name: 'Malay', language_set_by: 'person'}});
+    await user.click(within(pane()).getByRole('button', {name: 'Language: French. Change it'}));
+    const field = within(pane()).getByRole('combobox', {name: 'Language, as a code or a name'});
+    await user.clear(field);
+    await user.type(field, 'Malay');
+    await user.click(within(pane()).getByRole('button', {name: 'Save'}));
+    await waitFor(() => expect(api.calls('PATCH /api/documents/doc-1/about')).toHaveLength(2));
+    expect(api.lastBody('PATCH /api/documents/doc-1/about')).toEqual({language: 'ms'});
+  });
+
   it('moves along the list with J and K and opens the chosen file in the reading room with Enter', async () => {
     await renderWithDocuments([docFixture(), docFixture({id: 'doc-2', filename: 'ledger.pdf'})]);
     const user = userEvent.setup();

@@ -14,6 +14,8 @@ from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, WithJsonSchema
 
+from app.services.document_facts import DocumentKind, SetBy as FactSetBy
+
 
 class ResponseModel(BaseModel):
     # Read from ORM rows as well as dicts.
@@ -1028,6 +1030,16 @@ class DocumentOut(ResponseModel):
     openaleph_schema: str | None = None
     # The archive or email the file was found in (ADR-0006, Wave A).
     parent_document_id: str | None = None
+    # What the document is and its language (ISO 639-1), each with how it was set and who or what set it
+    # (app/services/document_facts.py). None until known.
+    kind: DocumentKind | None = None
+    kind_set_by: FactSetBy | None = None
+    kind_by: str | None = None
+    language: str | None = None
+    language_name: str | None = None
+    language_set_by: FactSetBy | None = None
+    language_by: str | None = None
+    language_confidence: float | None = Field(default=None, description="How sure the detector was, 0-1, for a detected language.")
 
 
 class DocumentChunkOut(ResponseModel):

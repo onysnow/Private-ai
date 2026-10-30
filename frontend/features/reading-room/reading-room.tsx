@@ -38,6 +38,9 @@ import {PagePicture} from '../case-home/decision-card';
 import {FEATURE_OPEN_EVENT, SHUTTER_EVENT} from '../effects/board-effects';
 import {confidenceBand} from '../documents/confidence';
 import {DocumentTranslation} from '../documents/document-translation';
+import {DocumentAbout} from '../documents/document-about';
+import {languageName, setByWords} from '../documents/document-kinds';
+import {fileKind} from '../documents/library-model';
 import {needsSchemaAnswer} from '../documents/schema-question';
 import {isPicture as isPictureFile} from '../documents/picture-evidence';
 import {identityFields, sameAsOptions, type IdentityChoice} from '../documents/entity-identity';
@@ -468,6 +471,9 @@ function Room({investigationId, documentId, startPage, onClose, onRedact}: {inve
   const legibility = pageChunks.map(ch => ch.ocr_legibility).find((n): n is number => n != null);
   const ocr = legibility !== undefined || pageChunks.some(ch => /\(OCR\)/i.test(ch.locator));
   const languages = doc?.languages ?? [];
+  // The document's language as kept (detected, from its source, or set by a person), first; then any other OpenAleph found.
+  const language = doc?.language ? {code: doc.language, name: languageName(doc.language, doc.language_name)} : null;
+  const alsoFound = languages.filter(l => !language || l.name !== language.name);
   const isPdf = /\.pdf$/i.test(doc?.filename ?? '');
 
   // Focus the first waiting proposal of the page once there is one.
@@ -752,9 +758,14 @@ function Room({investigationId, documentId, startPage, onClose, onRedact}: {inve
               {pageChunks.length > 0 && <Reveal detail={<><span className="rv-row">{ocr ? `Read by OCR · ${legibility !== undefined ? `${Math.round(legibility)}% legible` : 'legibility not measured'}` : 'Read from the file’s own text'}</span>
                 {ocr && legibility === undefined && <span className="rv-row">The reader has not measured this page yet, or could not.</span>}</>}>
                 <span>{ocr ? <>OCR{legibility !== undefined ? <> · <b>{Math.round(legibility)}%</b></> : ' · ?'}</> : 'TXT'}</span></Reveal>}
-              <Reveal detail={<><span className="rv-row">{languages.length ? languages.map(l => l.name).join(' · ') : 'Language not detected'}</span>
-                <span className="rv-row">{languages.length ? 'Detected by OpenAleph when it read the document' : 'The app’s own reader does not detect a language; OpenAleph has not read this document'}</span></>}>
-                <span className="rr-lang">{languages.length ? languages.map(l => l.code.slice(0, 2).toUpperCase()).join(' · ') : '–'}</span></Reveal>
+              <Reveal detail={<>{language ? <>
+                <span className="rv-row"><b>{language.name}</b></span>
+                <span className="rv-row">{setByWords(doc?.language_set_by, doc?.language_by, doc?.language_confidence)}</span>
+                {alsoFound.length > 0 && <span className="rv-row">OpenAleph also found {alsoFound.map(l => l.name).join(' · ')}</span>}</>
+                : <><span className="rv-row">{languages.length ? languages.map(l => l.name).join(' · ') : 'Language not detected'}</span>
+                  <span className="rv-row">{languages.length ? 'Detected by OpenAleph when it read the document' : 'Too little text to tell, or the detector was not sure enough'}</span></>}
+                <span className="rv-row">Change it under Details.</span></>}>
+                <span className="rr-lang">{language || languages.length ? [...(language ? [language.code] : []), ...alsoFound.map(l => l.code)].map(c => c.slice(0, 2).toUpperCase()).join(' · ') : '–'}</span></Reveal>
             </p>
             <h2 className="rr-doc-title">{title}</h2>
             {pageChunks.map((ch, i) => <div key={ch.id} className="rr-para">
@@ -771,6 +782,7 @@ function Room({investigationId, documentId, startPage, onClose, onRedact}: {inve
           ? <OriginalPage documentId={documentId} page={current}/> : <p className="rr-quiet">Only a PDF has pages to show as they look.</p>}</div>
         : tab === 'translation' ? <div className="rr-orig-wrap"><DocumentTranslation documentId={documentId}/></div>
         : <dl className="rr-details">
+          {doc && <div><dt>What it is</dt><dd><DocumentAbout key={doc.id} document={doc} file={fileKind(doc)}/></dd></div>}
           <div><dt>File</dt><dd>{doc?.filename}</dd></div>
           <div><dt>Fingerprint</dt><dd>{doc?.sha256 ? <FingerprintMark hash={doc.sha256}/> : '–'}</dd></div>
           <div><dt>Read</dt><dd>{readWord(doc?.extraction_status)}{doc?.extraction_error ? ` · ${doc.extraction_error}` : ''}</dd></div>

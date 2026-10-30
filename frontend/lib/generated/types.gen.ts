@@ -8292,6 +8292,38 @@ export type DiskStatusOut = {
 };
 
 /**
+ * DocumentAboutUpdate
+ *
+ * What a person says a document is and its language. Only the fields sent change; null clears one, and a value a
+ * person set is never replaced by the machine.
+ */
+export type DocumentAboutUpdate = {
+  /**
+   * Kind
+   */
+  kind?:
+    | 'court_filing'
+    | 'judgment'
+    | 'official_record'
+    | 'article'
+    | 'press_release'
+    | 'email'
+    | 'social_post'
+    | 'spreadsheet'
+    | 'recording'
+    | 'photo'
+    | 'web_capture'
+    | 'other'
+    | null;
+  /**
+   * Language
+   *
+   * ISO 639-1 code (or a BCP-47 tag, an ISO 639-3 code)
+   */
+  language?: string | null;
+};
+
+/**
  * DocumentChunkOut
  */
 export type DocumentChunkOut = {
@@ -8381,6 +8413,53 @@ export type DocumentDetailOut = {
    * Investigation Id
    */
   investigation_id: string;
+  /**
+   * Kind
+   */
+  kind?:
+    | 'court_filing'
+    | 'judgment'
+    | 'official_record'
+    | 'article'
+    | 'press_release'
+    | 'email'
+    | 'social_post'
+    | 'spreadsheet'
+    | 'recording'
+    | 'photo'
+    | 'web_capture'
+    | 'other'
+    | null;
+  /**
+   * Kind By
+   */
+  kind_by?: string | null;
+  /**
+   * Kind Set By
+   */
+  kind_set_by?: 'reader' | 'source' | 'detected' | 'person' | null;
+  /**
+   * Language
+   */
+  language?: string | null;
+  /**
+   * Language By
+   */
+  language_by?: string | null;
+  /**
+   * Language Confidence
+   *
+   * How sure the detector was, 0-1, for a detected language.
+   */
+  language_confidence?: number | null;
+  /**
+   * Language Name
+   */
+  language_name?: string | null;
+  /**
+   * Language Set By
+   */
+  language_set_by?: 'reader' | 'source' | 'detected' | 'person' | null;
   /**
    * Languages
    */
@@ -8562,6 +8641,53 @@ export type DocumentOut = {
    */
   investigation_id: string;
   /**
+   * Kind
+   */
+  kind?:
+    | 'court_filing'
+    | 'judgment'
+    | 'official_record'
+    | 'article'
+    | 'press_release'
+    | 'email'
+    | 'social_post'
+    | 'spreadsheet'
+    | 'recording'
+    | 'photo'
+    | 'web_capture'
+    | 'other'
+    | null;
+  /**
+   * Kind By
+   */
+  kind_by?: string | null;
+  /**
+   * Kind Set By
+   */
+  kind_set_by?: 'reader' | 'source' | 'detected' | 'person' | null;
+  /**
+   * Language
+   */
+  language?: string | null;
+  /**
+   * Language By
+   */
+  language_by?: string | null;
+  /**
+   * Language Confidence
+   *
+   * How sure the detector was, 0-1, for a detected language.
+   */
+  language_confidence?: number | null;
+  /**
+   * Language Name
+   */
+  language_name?: string | null;
+  /**
+   * Language Set By
+   */
+  language_set_by?: 'reader' | 'source' | 'detected' | 'person' | null;
+  /**
    * Mime Type
    */
   mime_type?: string | null;
@@ -8705,6 +8831,53 @@ export type DocumentUploadOut = {
    */
   investigation_id: string;
   job?: BackgroundJobOut | null;
+  /**
+   * Kind
+   */
+  kind?:
+    | 'court_filing'
+    | 'judgment'
+    | 'official_record'
+    | 'article'
+    | 'press_release'
+    | 'email'
+    | 'social_post'
+    | 'spreadsheet'
+    | 'recording'
+    | 'photo'
+    | 'web_capture'
+    | 'other'
+    | null;
+  /**
+   * Kind By
+   */
+  kind_by?: string | null;
+  /**
+   * Kind Set By
+   */
+  kind_set_by?: 'reader' | 'source' | 'detected' | 'person' | null;
+  /**
+   * Language
+   */
+  language?: string | null;
+  /**
+   * Language By
+   */
+  language_by?: string | null;
+  /**
+   * Language Confidence
+   *
+   * How sure the detector was, 0-1, for a detected language.
+   */
+  language_confidence?: number | null;
+  /**
+   * Language Name
+   */
+  language_name?: string | null;
+  /**
+   * Language Set By
+   */
+  language_set_by?: 'reader' | 'source' | 'detected' | 'person' | null;
   /**
    * Mime Type
    */
@@ -12586,6 +12759,53 @@ export type IngestionBatchDocumentOut = {
    */
   investigation_id: string;
   job: BackgroundJobOut | null;
+  /**
+   * Kind
+   */
+  kind?:
+    | 'court_filing'
+    | 'judgment'
+    | 'official_record'
+    | 'article'
+    | 'press_release'
+    | 'email'
+    | 'social_post'
+    | 'spreadsheet'
+    | 'recording'
+    | 'photo'
+    | 'web_capture'
+    | 'other'
+    | null;
+  /**
+   * Kind By
+   */
+  kind_by?: string | null;
+  /**
+   * Kind Set By
+   */
+  kind_set_by?: 'reader' | 'source' | 'detected' | 'person' | null;
+  /**
+   * Language
+   */
+  language?: string | null;
+  /**
+   * Language By
+   */
+  language_by?: string | null;
+  /**
+   * Language Confidence
+   *
+   * How sure the detector was, 0-1, for a detected language.
+   */
+  language_confidence?: number | null;
+  /**
+   * Language Name
+   */
+  language_name?: string | null;
+  /**
+   * Language Set By
+   */
+  language_set_by?: 'reader' | 'source' | 'detected' | 'person' | null;
   /**
    * Mime Type
    */
@@ -27612,6 +27832,48 @@ export type GetDocumentResponses = {
 
 export type GetDocumentResponse =
   GetDocumentResponses[keyof GetDocumentResponses];
+
+export type UpdateDocumentAboutData = {
+  body: DocumentAboutUpdate;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/about';
+};
+
+export type UpdateDocumentAboutErrors = {
+  /**
+   * Not Found
+   */
+  404: ErrorOut;
+  /**
+   * Response 422 Update Document About
+   *
+   * Not a kind this app knows, or not a language
+   */
+  422: ValidationErrorOut | ErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UpdateDocumentAboutError =
+  UpdateDocumentAboutErrors[keyof UpdateDocumentAboutErrors];
+
+export type UpdateDocumentAboutResponses = {
+  /**
+   * Successful Response
+   */
+  200: DocumentOut;
+};
+
+export type UpdateDocumentAboutResponse =
+  UpdateDocumentAboutResponses[keyof UpdateDocumentAboutResponses];
 
 export type GetAuthenticityData = {
   body?: never;

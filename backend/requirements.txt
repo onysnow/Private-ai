@@ -33,6 +33,9 @@ warcio==1.8.1
 # Audio and video transcribed on this computer (ADR-0020): faster-whisper (MIT) on CTranslate2 (MIT); PyAV (BSD-3)
 # decodes with the FFmpeg its wheels carry. av is pinned: 19 removed an argument faster-whisper 1.2.1 passes.
 faster-whisper==1.2.1
+# A document's language detected in its text (ADR-0027; app/services/document_facts.py): py3langid (BSD-3), langid.py's
+# model in numpy (no pickle), about 4.5 MB; numpy is already pinned above.
+py3langid==0.4.0
 # The video or audio on a captured page (ADR-0020, Phase 2c): yt-dlp (Unlicense), one item, logged out.
 yt-dlp==2026.8.19
 # Content credentials (C2PA) validated on this computer against the bundled trust lists (ADR-0023): c2pa-python

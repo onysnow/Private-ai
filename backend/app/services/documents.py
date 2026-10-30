@@ -15,6 +15,7 @@ from app.services.image_reader import IMAGE_EXTENSIONS, extract_image_chunks
 from app.services.container_readers import CONTAINER_EXTENSIONS, read_container
 from app.services.document_reader import read_chunks
 from app.services.anchors import anchor_document_quotes
+from app.services import document_facts
 from app.services.entity_signals import clean_names, norm_name, read_name, read_passage, split_title
 from app.core.config import settings
 from app.db.locking import lock_investigation_transaction
@@ -298,6 +299,7 @@ def store_document(db: Session, *, investigation_id: str, title: str, filename: 
         source = Source(investigation_id=investigation_id, title=title or filename, source_type='document', metadata_json={**(source_metadata or {}), 'filename': filename, 'mime_type': mime_type, 'sha256': digest})
         db.add(source); db.flush()
         doc = Document(investigation_id=investigation_id, source_id=source.id, filename=filename, mime_type=mime_type, sha256=digest, storage_path=str(stored), extraction_status='queued', parent_document_id=parent_document_id)
+        document_facts.fill_at_intake(doc, source_metadata)
         db.add(doc); db.flush()
 
         # Promote the staged bytes only after relational state has been prepared.
@@ -337,13 +339,16 @@ def _once_key(typ: str, payload: dict) -> tuple[str, str] | None:
 
 
 def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], list[str]] | None = None,
-                     find_names: bool = True) -> Document | None:
+                     find_names: bool = True, language: tuple[str, float | None, str, str] | None = None) -> Document | None:
     """Turn a stored document into locator-preserving chunks and proposals.
 
     ``text`` is text already read elsewhere (OpenAleph; see
     app/services/openaleph_reader.py) as ``(chunks, issues)``; a chunk may
     carry a ``provenance`` dict, which every proposal made from it records.
     Without it the Workbench reads the file itself.
+
+    ``language`` is the language the reader itself found, as ``(code, how sure 0-1, tool, how it was set)`` (a
+    recording's, from faster-whisper: ``detected``, or ``reader`` when Settings names the language); without it the language is detected in the text read (app/services/document_facts.py).
 
     ``find_names`` runs the Workbench's own pattern name-finder (when
     ENABLE_LOCAL_ENTITY_SUGGESTIONS is on). The caller turns it off when
@@ -418,6 +423,10 @@ def extract_document(db: Session, document_id: str, *, text: tuple[list[dict], l
                 db.add(row)
                 if key is not None:
                     once[key] = row
+        if language is not None:
+            document_facts.set_language(doc, language[0], language[3], who=language[2], confidence=language[1])
+        else:
+            document_facts.fill_from_text(doc, (str(c.get('text') or '') for c in chunks))
         doc.extraction_status = 'complete'
         doc.extraction_issues = issues or None
         db.flush()
@@ -477,7 +486,7 @@ def serialize_document(db: Session, doc: Document, *, openaleph_ids: dict[str, O
     return {'id':doc.id,'investigation_id':doc.investigation_id,'source_id':doc.source_id,'filename':doc.filename,
             'title':source.title if source is not None else None,'mime_type':doc.mime_type,'sha256':doc.sha256,'extraction_status':doc.extraction_status,'extraction_error':doc.extraction_error,'extraction_issues':doc.extraction_issues or [],'created_at':doc.created_at,'chunk_count':len(chunks),'candidate_counts':counts,
             'openaleph_document_id':ref.entity_id if ref else None, 'openaleph_schema':ref.schema if ref else None,
-            'parent_document_id':doc.parent_document_id}
+            'parent_document_id':doc.parent_document_id, **document_facts.describe(doc)}
 
 
 def serialize_chunk(chunk: DocumentChunk) -> dict:

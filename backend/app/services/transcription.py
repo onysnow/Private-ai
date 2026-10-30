@@ -208,8 +208,13 @@ def read_media_document(db: Session, document_id: str, report: Callable[[int | N
     if unsure:
         issues.append(f"{unsure} word{'s' if unsure != 1 else ''} the machine was unsure of: listen before quoting them.")
     report(92, "Reading the transcript")
+    # The language the model heard (or was told to hear, in Settings) is the recording's, unless a firmer one is kept.
+    heard = transcript.about.get("language")
+    told = bool(settings.transcription_language)
+    language = (str(heard), None if told else transcript.about.get("language_probability"), _tool(),
+                "reader" if told else "detected") if heard else None
     doc = extract_document(db, document_id, text=([{"locator": locator(s.start, s.end), "page_number": None, "text": s.text}
-                                                   for s in spoken], issues))
+                                                   for s in spoken], issues), language=language)
     if doc is None:
         return "The document was deleted before it was read"
     if doc.extraction_status != "complete":

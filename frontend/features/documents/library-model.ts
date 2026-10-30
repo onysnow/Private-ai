@@ -3,6 +3,8 @@
 // passages, proposals waiting. Files found inside an archive or an email stay under it (document-tree.ts). Pure helpers,
 // so the panel (documents-panel.tsx) only draws.
 import type {DocumentOut, DropLaneOut} from '../../lib/generated/types.gen';
+import {docKind} from './document-kinds';
+import type {DocKind} from './document-kinds';
 import {nestDocuments} from './document-tree';
 
 export type FileKind = 'pdf' | 'email' | 'web' | 'picture' | 'table' | 'text' | 'media' | 'archive' | 'other';
@@ -88,11 +90,15 @@ export type Sort = {key: SortKey; descending: boolean};
 export type LibraryRow = {
   document: DocumentOut; depth: number; parent: DocumentOut | null; lane: DropLaneOut | undefined;
   kind: FileKind; state: FileState; children: number;
+  /** What the document is (a court filing, an article…), else null: its mark is then its file's kind, faint. */
+  docKind: DocKind | null;
   /** Shown only to place a file that matches under it: it does not match itself. */
   context: boolean;
 };
 
-export type LibraryFilter = {query: string; kinds: ReadonlySet<FileKind>; states: ReadonlySet<FileState>};
+/** A filter by what documents are: one of the kinds, or 'unset' for those whose kind is not known. */
+export type DocKindFilter = DocKind | 'unset';
+export type LibraryFilter = {query: string; kinds: ReadonlySet<FileKind>; states: ReadonlySet<FileState>; docKinds?: ReadonlySet<DocKindFilter>};
 
 const pagesOf = (r: LibraryRow) => r.lane?.receipt.pages ?? -1;
 const passagesOf = (r: LibraryRow) => r.lane?.receipt.passages ?? r.document.chunk_count;
@@ -111,7 +117,7 @@ function compare(sort: Sort): (a: LibraryRow, b: LibraryRow) => number {
   return (a, b) => (sort.descending ? -f(a, b) : f(a, b)) || (sort.key === 'added' ? 0 : by.name(a, b));
 }
 
-export const isFiltered = (f: LibraryFilter): boolean => Boolean(f.query.trim()) || f.kinds.size > 0 || f.states.size > 0;
+export const isFiltered = (f: LibraryFilter): boolean => Boolean(f.query.trim()) || f.kinds.size > 0 || f.states.size > 0 || (f.docKinds?.size ?? 0) > 0;
 
 /** The rows the list draws: each file followed by the files inside it (unless its container is folded), sorted at each
  *  level. While a filter is on, a file that matches shows with the containers above it, which are marked as context;
@@ -123,7 +129,8 @@ export function libraryRows(documents: readonly DocumentOut[], lanes: Map<string
   const rowOf = new Map<string, LibraryRow>();
   for (const {document, depth, parent} of nested) {
     const lane = lanes.get(document.id);
-    const row: LibraryRow = {document, depth, parent, lane, kind: fileKind(document), state: fileState(document, lane), children: 0, context: false};
+    const kind = fileKind(document);
+    const row: LibraryRow = {document, depth, parent, lane, kind, docKind: docKind(document, kind), state: fileState(document, lane), children: 0, context: false};
     rowOf.set(document.id, row);
     const key = parent?.id ?? null;
     childrenOf.set(key, [...(childrenOf.get(key) ?? []), row]);
@@ -131,7 +138,8 @@ export function libraryRows(documents: readonly DocumentOut[], lanes: Map<string
   }
   const q = filter.query.trim().toLowerCase();
   const matches = (r: LibraryRow) => (!q || titleOf(r.document).toLowerCase().includes(q) || r.document.filename.toLowerCase().includes(q))
-    && (filter.kinds.size === 0 || filter.kinds.has(r.kind)) && (filter.states.size === 0 || filter.states.has(r.state));
+    && (filter.kinds.size === 0 || filter.kinds.has(r.kind)) && (filter.states.size === 0 || filter.states.has(r.state))
+    && (!filter.docKinds?.size || filter.docKinds.has(r.docKind ?? 'unset'));
   const filtering = isFiltered(filter);
   const order = compare(sort);
   const out: LibraryRow[] = [];
@@ -151,17 +159,21 @@ export function libraryRows(documents: readonly DocumentOut[], lanes: Map<string
   return out;
 }
 
-/** How many files of each kind and in each state, over the whole case, for the filters. */
-export function tally(documents: readonly DocumentOut[], lanes: Map<string, DropLaneOut>): {kinds: Map<FileKind, number>; states: Map<FileState, number>} {
+/** How many files of each kind of file, kind of document and state, over the whole case, for the filters. */
+export function tally(documents: readonly DocumentOut[], lanes: Map<string, DropLaneOut>):
+  {kinds: Map<FileKind, number>; states: Map<FileState, number>; docKinds: Map<DocKindFilter, number>} {
   const kinds = new Map<FileKind, number>();
   const states = new Map<FileState, number>();
+  const docKinds = new Map<DocKindFilter, number>();
   for (const d of documents) {
     const k = fileKind(d);
     const s = fileState(d, lanes.get(d.id));
+    const dk = docKind(d, k) ?? 'unset';
     kinds.set(k, (kinds.get(k) ?? 0) + 1);
     states.set(s, (states.get(s) ?? 0) + 1);
+    docKinds.set(dk, (docKinds.get(dk) ?? 0) + 1);
   }
-  return {kinds, states};
+  return {kinds, states, docKinds};
 }
 
 const BREAK = /[\s,;:—–\-(/]/;

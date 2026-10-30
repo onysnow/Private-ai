@@ -62,7 +62,9 @@ import {apiTime} from '../../lib/timestamps';
 import {
   fileKind as libraryKind, fileState, isFiltered, KINDS, lanesById, libraryRows, sharedOpenings, STATE_ORDER, STATES, tally, titleOf, waitingIn,
 } from './library-model';
-import type {FileKind, FileState, LibraryRow, Sort, SortKey} from './library-model';
+import type {DocKindFilter, FileKind, FileState, LibraryRow, Sort, SortKey} from './library-model';
+import {DocumentAbout} from './document-about';
+import {DOC_KIND_ORDER, DOC_KINDS, setByWords} from './document-kinds';
 
 /** Each kind of file as its mark (Ony, 29 Oct: a type is a mark, named on hover). */
 const KIND_ICON: Record<FileKind, LucideIcon> = {pdf: FileText, email: Mail, web: Globe, picture: ImageIcon, table: Sheet,
@@ -146,6 +148,8 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const [oaMenuFor, setOaMenuFor] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [kinds, setKinds] = useState<ReadonlySet<FileKind>>(new Set());
+  // What documents are (a court filing, an article…), the filter the kind marks offer.
+  const [docKinds, setDocKinds] = useState<ReadonlySet<DocKindFilter>>(new Set());
   const [states, setStates] = useState<ReadonlySet<FileState>>(new Set());
   const [sort, setSort] = useState<Sort>({key: 'added', descending: false});
   // Containers folded or unfolded by hand; the rest follow FOLD_OVER.
@@ -478,7 +482,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
   const entityCaption = (id: unknown, fallback: string) => entities.find(e => e.id === id)?.caption || text(id) || fallback;
 
   // The list: filtered, sorted, containers folded.
-  const filter = {query, kinds, states};
+  const filter = {query, kinds, states, docKinds};
   const filtering = isFiltered(filter);
   const folded = useMemo(() => {
     const out = new Set<string>();
@@ -558,6 +562,13 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
     const Icon = KIND_ICON[kind];
     return <span className={`lib-kind lib-k-${kind}`} aria-hidden="true"><Icon size={size} strokeWidth={1.9}/></span>;
   };
+  // A row's mark: what the document is when known (a court filing, an article…); else its kind of file, faint.
+  const docMark = (r: Pick<LibraryRow, 'kind' | 'docKind'>, size = 16) => {
+    if (!r.docKind) return <span className="lib-kind-unset">{kindMark(r.kind, size)}</span>;
+    const Icon = DOC_KINDS[r.docKind].icon;
+    return <span className={`lib-kind lib-d-${r.docKind}`} aria-hidden="true"><Icon size={size} strokeWidth={1.9}/></span>;
+  };
+  const clearFilters = () => { setQuery(''); setKinds(new Set()); setStates(new Set()); setDocKinds(new Set()); };
 
   const row = (r: LibraryRow): ReactElement => {
     const d = r.document;
@@ -574,8 +585,12 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         ? <button type="button" tabIndex={-1} aria-expanded={!isFolded} aria-label={`${isFolded ? 'Show' : 'Hide'} the ${r.children} file${r.children === 1 ? '' : 's'} inside`}
           onClick={e => { e.stopPropagation(); setFoldedByHand(cur => ({...cur, [d.id]: !isFolded})); }}>{isFolded ? <ChevronRight size={14}/> : <ChevronDown size={14}/>}</button>
         : r.parent ? <Reveal label={`Inside ${r.parent.filename}`} detail={`Inside ${r.parent.filename}`}><span className="lib-in" aria-hidden="true">↳</span></Reveal> : null}</span>
-      <Reveal label={KINDS[r.kind].name} detail={<><b>{KINDS[r.kind].name}</b><span className="rv-row">{STATES[r.state].word} · {STATES[r.state].meaning}</span></>}>
-        {kindMark(r.kind)}</Reveal>
+      <Reveal label={r.docKind ? DOC_KINDS[r.docKind].name : KINDS[r.kind].name} detail={<>
+        <b>{r.docKind ? DOC_KINDS[r.docKind].name : KINDS[r.kind].name}</b>
+        <span className="rv-row">{r.docKind ? `${KINDS[r.kind].name} · ${d.kind ? setByWords(d.kind_set_by, d.kind_by) : setByWords('reader', null)}` : 'Kind not set: set it in the pane'}</span>
+        {d.language && <span className="rv-row">{d.language_name ?? d.language.toUpperCase()} · {setByWords(d.language_set_by, d.language_by, d.language_confidence)}</span>}
+        <span className="rv-row">{STATES[r.state].word} · {STATES[r.state].meaning}</span></>}>
+        {docMark(r)}</Reveal>
       <span className="lib-name">
         <button type="button" id={`lib-pick-${d.id}`} className="lib-title" tabIndex={on || (!currentId && r === rows[0]) ? 0 : -1}
           onClick={e => { e.stopPropagation(); pick(); }} onDoubleClick={() => d.extraction_status !== 'failed' && openInReadingRoom(d.id)}>
@@ -600,17 +615,19 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
         <input ref={searchRef} type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Find a file by name" aria-label="Find a file by name"
           onKeyDown={e => { if (e.key === 'Escape') setQuery(''); if (e.key === 'ArrowDown') { e.preventDefault(); move(0); } }}/>
         <kbd aria-hidden="true">/</kbd></label>
-      <div className="lib-chips" role="group" aria-label="Kinds of file">
-        {(Object.keys(KINDS) as FileKind[]).filter(k => counts.kinds.get(k)).map(k => <Reveal key={k} tabbable={false} detail={<><b>{KINDS[k].plural}</b> · {counts.kinds.get(k)}</>}>
-          <button type="button" className={`lib-chip${kinds.has(k) ? ' on' : ''}`} aria-pressed={kinds.has(k)} aria-label={KINDS[k].plural}
-            onClick={() => setKinds(cur => toggle(cur, k))}>{kindMark(k, 14)}<b>{counts.kinds.get(k)}</b></button></Reveal>)}
+      <div className="lib-chips" role="group" aria-label="What the documents are">
+        {([...DOC_KIND_ORDER, 'unset'] as DocKindFilter[]).filter(k => counts.docKinds.get(k)).map(k => <Reveal key={k} tabbable={false}
+          detail={<><b>{k === 'unset' ? 'Kind not set' : DOC_KINDS[k].plural}</b> · {counts.docKinds.get(k)}</>}>
+          <button type="button" className={`lib-chip${docKinds.has(k) ? ' on' : ''}`} aria-pressed={docKinds.has(k)} aria-label={k === 'unset' ? 'Kind not set' : DOC_KINDS[k].plural}
+            onClick={() => setDocKinds(cur => toggle(cur, k))}>{k === 'unset' ? <span className="lib-kind-unset">{kindMark('other', 14)}</span> : docMark({kind: 'other', docKind: k}, 14)}
+            <b>{counts.docKinds.get(k)}</b></button></Reveal>)}
       </div>
       <div className="lib-chips" role="group" aria-label="Where each file is">
         {STATE_ORDER.filter(st => counts.states.get(st)).map(st => <Reveal key={st} tabbable={false} detail={<><b>{STATES[st].word}</b> · {STATES[st].meaning}</>}>
           <button type="button" className={`lib-chip lib-st${states.has(st) ? ' on' : ''}`} aria-pressed={states.has(st)} aria-label={STATES[st].word}
             onClick={() => setStates(cur => toggle(cur, st))}><i className={`lib-dot lib-s-${st}`} aria-hidden="true"/><b>{counts.states.get(st)}</b></button></Reveal>)}
       </div>
-      {filtering && <button type="button" className="lib-clear" onClick={() => { setQuery(''); setKinds(new Set()); setStates(new Set()); }}>Clear</button>}
+      {filtering && <button type="button" className="lib-clear" onClick={clearFilters}>Clear</button>}
       <span className="lib-grow"/>
       {investigationId && <Reveal tabbable={false} detail="Every document here that still has proposals waiting, one at a time, not only a just-imported batch.">
         <Link className="lib-queue" href={`/review?inv=${encodeURIComponent(investigationId)}`}>Review queue{waitingTotal ? <b> {waitingTotal}</b> : null}</Link></Reveal>}
@@ -637,7 +654,7 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       </select></label>
       <ul ref={listRef} className="lib-rows" onKeyDown={onListKey} aria-label="Documents">{rows.map(row)}</ul>
       {documents.length > 0 && rows.length === 0 && <p className="lib-quiet lib-none">No file matches. <button type="button" className="lib-link"
-        onClick={() => { setQuery(''); setKinds(new Set()); setStates(new Set()); }}>Show every file</button></p>}
+        onClick={clearFilters}>Show every file</button></p>}
       {documentsQuery.isSuccess && documents.length === 0 && <p className="lib-quiet lib-none">No documents yet. Drop files on The Drop, or use Add files.</p>}
     </div>
 
@@ -683,6 +700,9 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
           {parent && <p className="lib-quiet">Inside <button type="button" className="lib-link" onClick={() => setPicked(parent.id)}>{titleOf(parent)}</button></p>}
         </div>
       </div>
+
+      {/* What it is and its language: chips a person presses to correct them; how each was set is on hover. */}
+      <DocumentAbout key={d.id} document={d} file={kind}/>
 
       {/* Why a file could not be read, or that its read has not moved, is an alert: it stays on screen. */}
       {state === 'problem' && <p className="lib-alert bad" role="note"><i aria-hidden="true">✕</i>{lane?.note || d.extraction_error || 'Could not be read'}</p>}

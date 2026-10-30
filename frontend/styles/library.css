@@ -166,6 +166,41 @@
 .lib-receipt dt { color: var(--text-muted); }
 .lib-receipt dd { margin: 0; text-align: right; }
 
+/* What a document is (features/documents/document-kinds.ts): a mark per kind. A document whose kind is not known shows
+   its kind of file, faint and dashed, until a person sets it. */
+.lib-d-court_filing, .lib-d-judgment { color: #F08A7A; background: color-mix(in srgb, #F08A7A 13%, transparent); }
+.lib-d-official_record { color: #D9A98C; background: color-mix(in srgb, #D9A98C 13%, transparent); }
+.lib-d-article, .lib-d-press_release { color: #9FB8F0; background: color-mix(in srgb, #9FB8F0 13%, transparent); }
+.lib-d-email { color: var(--accent-2); }
+.lib-d-social_post, .lib-d-web_capture { color: #9FD0C4; background: color-mix(in srgb, #9FD0C4 12%, transparent); }
+.lib-d-spreadsheet { color: #A9D39A; background: color-mix(in srgb, #A9D39A 13%, transparent); }
+.lib-d-recording { color: #E6C27A; background: color-mix(in srgb, #E6C27A 12%, transparent); }
+.lib-d-photo { color: #C9B3E8; background: color-mix(in srgb, #C9B3E8 13%, transparent); }
+.lib-d-other { color: var(--text-muted); background: color-mix(in srgb, var(--text-muted) 12%, transparent); }
+.lib-kind-unset { display: inline-grid; opacity: .55; }
+.lib-kind-unset .lib-kind { background: transparent; outline: 1px dashed color-mix(in srgb, currentColor 50%, transparent); outline-offset: -1px; }
+
+/* A document's kind and language, as chips a person presses to correct (features/documents/document-about.tsx). */
+.da { display: flex; flex-direction: column; gap: 6px; }
+.da-chips { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.da-chip { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 99px;
+  border: 1px solid var(--line); font-size: 12.5px; color: var(--text); }
+.da-chip:hover { border-color: var(--accent-1); }
+.da-chip:focus-visible, .da-kinds button:focus-visible, .da-lang button:focus-visible, .da-lang input:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.da-chip.unset { border-style: dashed; color: var(--text-muted); }
+.da-code { font: 600 11px var(--font-mono); letter-spacing: .06em; }
+.da-kinds { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 2px; padding: 6px; border-radius: 12px; background: var(--surface-2); }
+.da-kinds button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 7px; padding: 6px 8px; border-radius: 7px; font-size: 12.5px; color: var(--text); }
+.da-kinds button:hover { background: var(--surface-3); }
+.da-kinds button.on { box-shadow: inset 0 0 0 1.5px var(--accent-1); }
+.da-kinds button.da-clear { color: var(--text-muted); }
+.da-kinds button:disabled, .da-lang button:disabled { opacity: .5; cursor: default; }
+.da-lang { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.da-lang input { flex: 1 1 140px; min-width: 0; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-1); color: var(--text); font-size: 13px; }
+.da-lang button { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 9px; border: 1px solid var(--line); font-size: 12.5px; color: var(--text); }
+.da-lang button.p { background: var(--accent-1); color: var(--ground); border-color: var(--accent-1); font-weight: 650; }
+.da-error { margin: 0; font-size: 12.5px; color: var(--status-disputed); }
+
 @media (max-width: 1100px) {
   .lib { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'bar' 'status' 'corpus' 'list' 'pane'; grid-template-rows: auto auto auto minmax(320px, 1fr) auto; height: auto; }
 }
