@@ -204,7 +204,8 @@ function BeforeSearch({investigationId, kind, onKind, onRun, recent}: {investiga
   const path = {investigation_id: investigationId};
   const standing = useQuery({...getStandingOptions({path}), enabled: Boolean(investigationId)}).data;
   // Names to try: real names before the labels a source gave anonymised parties ("A.", "Shell Company Account 2").
-  const rows = useQuery({...listEntitiesOptions({path, query: {limit: 60}}), enabled: Boolean(investigationId)}).data;
+  // The same list the Library and Connectors hold (one cache entry, one reload when parties change).
+  const rows = useQuery({...listEntitiesOptions({path}), enabled: Boolean(investigationId)}).data;
   const parties = useMemo(() => [...(rows ?? [])].sort((a, b) => Number(/^["“']/.test(a.caption)) - Number(/^["“']/.test(b.caption))).slice(0, 12), [rows]);
   const counts: Partial<Record<RecordKind, number | undefined>> = standing ? {
     party: standing.network.parties, link: standing.network.links, evidence: standing.evidence + standing.sources,

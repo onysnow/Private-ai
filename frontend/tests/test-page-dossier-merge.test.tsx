@@ -92,7 +92,7 @@ async function bootstrapAndOpenDossier(
   await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
 
   // loadEntities() auto-fills entityId to entities[0].
-  await userEvent.setup().click(screen.getByRole('button', {name: 'Open dossier'}));
+  await userEvent.setup().click(await screen.findByRole('button', {name: 'Open dossier'}));
   await screen.findByText('Kestrelwood Holdings Ltd dossier');
 
   return api;

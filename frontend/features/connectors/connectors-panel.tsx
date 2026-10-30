@@ -76,7 +76,7 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
   const path = {investigation_id: investigationId};
   const entitiesQuery = useQuery({...listEntitiesOptions({path}), enabled: Boolean(investigationId)});
   const entities = entitiesQuery.data ?? NO_ENTITIES;
-  const lookups = useQuery({...getLookupSettingsOptions({query: investigationId ? {investigation_id: investigationId} : {}})});
+  const lookups = useQuery({...getLookupSettingsOptions({query: investigationId ? {investigation_id: investigationId} : {}}), enabled: Boolean(investigationId)});
   const findingsQuery = useQuery({...listConnectorFindingsOptions({path}), enabled: Boolean(investigationId)});
   const waiting = (findingsQuery.data ?? []).filter(f => f.review_status === 'unreviewed').length;
   const clustersQuery = useQuery({...enrichmentSessionClustersOptions({path: {session_id: clusterSession}}), enabled: Boolean(clusterSession)});

@@ -344,6 +344,11 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     // The Wire (See; in the single-page view since it took over the Relationships panel).
     [`GET ${base}/wire`]: {investigation_id: id, entities: [], links: [], events: []},
     [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
+    // Asked as their screens open (the 30 Oct sweep): Search's counts, What stands out, and what a backup holds.
+    // Safety & data answers 404 here, as a case with no stores to count does; Backup & restore shows its own words.
+    [`GET ${base}/standing`]: emptyCaseHomeRoutes(id)[`GET ${base}/standing`],
+    [`GET ${base}/corpus/insights`]: {investigation_id: id, state: 'disabled', detail: 'OpenAleph is turned off here.', collection_id: null, groups: []},
+    [`GET ${base}/safety-data`]: {status: 404, body: {detail: 'Not counted in this test'}},
     // Act › Charts asks for its catalogue as it opens (in the single-page view, with the page).
     [`GET ${base}/visuals/catalog`]: {investigation_id: id, queries: [], kinds: [], drawn_kinds: [], questions: []},
     [`GET ${base}/timeline`]: timelineBody(id, records.events ?? []),
