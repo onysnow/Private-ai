@@ -460,3 +460,15 @@ screen now" joins the passphrase actions in Your safety's status row. "Sent this
 address on hover. A connector key's state is colour-only ("no key" a hollow ring; "refused" keeps its word as an
 alert). A working Access state is the mark with its sentence on hover; states that need action stay written out.
 "Kept · Leaves this computer" stays on every pane. No security behaviour changed.
+
+## 29. Claims, Connector findings and Charts rebuilt to the list-and-detail rule (30 Oct 2026)
+
+Calls: Claims is a list beside the open claim, like Sources & evidence; status is colour and edge shape, the word on
+hover, and the status counts filter the list. Confidence shows in the list only above 0. The evidence pool (about 930
+records on the demo case) sits behind "Attach evidence", searchable, 30 at a time, the records sharing most words with
+the claim first, instead of listing every record under every claim. Connector findings rows open by click (no per-row
+Inspect button); "To follow up" gets its own amber ring so it no longer looks like "not reviewed"; with no findings
+the screen sends you to Bring in › Connectors. Charts still loads its catalogue only on "Build a chart" (it runs every
+query; 38 s on the demo case, a backend speed item), but the closed state now says what the builder makes; the data
+choice is cards with record counts, empty ones disabled. All three fill the height. Leads and To check stay as they
+are: already closer to the 29 Oct rules.

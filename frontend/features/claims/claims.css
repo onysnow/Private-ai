@@ -1,40 +1,145 @@
-/* The claims list on Check › Claims (features/claims/claims-panel.tsx). Each row carries the status grammar
-   (docs/handoff/02_RULES.md): a shape and a word in its chip, and the same shape on its left edge: shown solid,
-   not yet shown dashed, disputed red with a double edge, ruled out dotted. Never colour alone. */
-.finding.cl-row { display: flex; flex-direction: column; align-items: stretch; gap: 6px; cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast), border-color var(--dur-fast); }
-.cl-row > .st { align-self: flex-start; display: inline-flex; gap: 5px; align-items: center; font: 600 11.5px/1.2 var(--font-ui); padding: 3px 8px; }
-.cl-row > small { margin-top: 0; }
-.finding.cl-row:hover, .finding.cl-row:focus-visible { transform: translateX(3px); background: var(--surface-2); }
-.finding.cl-row:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
-.finding.cl-row[aria-current='true'] { background: var(--surface-2); border-top-color: var(--accent-1); border-right-color: var(--accent-1); border-bottom-color: var(--accent-1); }
-.finding.cl-supported { border-left: 4px solid var(--status-supported); }
-.finding.cl-unshown { border-left: 4px dashed var(--status-unshown); }
-.finding.cl-disputed { border-left: 6px double var(--status-disputed); }
-.finding.cl-ruled_out { border-left: 4px dotted var(--text-muted); }
-.cl-row > .st-disputed, .cl-head .st-disputed { border-style: double; border-width: 3px; }
-.cl-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.cl-head .st { display: inline-flex; gap: 5px; align-items: center; font: 600 11.5px/1.2 var(--font-ui); padding: 3px 8px; }
+/* Check › Claims (features/claims/claims-panel.tsx): the claims on the left, the open claim on the right, the same
+   frame as Sources & evidence (styles/sources.css). Each row carries the status grammar (docs/handoff/02_RULES.md):
+   its colour in the chip, and the same state as the row's left edge: shown solid, not yet shown dashed, disputed
+   double, ruled out dotted. The words come with Settings › Appearance › Status marks, or on hover. */
+.cw { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; padding: 4px 2px 0; color: var(--text); font-size: 13px; }
+.cw-muted { color: var(--text-muted); margin: 10px 4px; }
 
-/* Calm and reduced motion: no slide on hover, the colour change only, at once. */
-html[data-motion='calm'] .finding.cl-row { transition: none; }
-html[data-motion='calm'] .finding.cl-row:hover, html[data-motion='calm'] .finding.cl-row:focus-visible { transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  .finding.cl-row { transition: none; }
-  .finding.cl-row:hover, .finding.cl-row:focus-visible { transform: none; }
-}
-.cl-head h4 { margin: 0; }
+.cw-head { display: flex; align-items: center; gap: 22px; }
+.cw-count { margin: 0; font: 400 15px var(--font-ui); color: var(--text-muted); white-space: nowrap; }
+.cw-count b { font: 300 34px/1 var(--font-display); color: var(--text); margin-right: 6px; }
+.cw-tally { display: flex; gap: 6px; }
+.cw-tally-n { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; border-radius: 9px;
+  border: 1px solid var(--line); font: 500 14px var(--font-mono); color: var(--text); }
+.cw-tally-n i { width: 11px; height: 11px; border-radius: 50%; background: currentColor; }
+.cw-tally-n.t-supported i { background: var(--status-supported); }
+.cw-tally-n.t-disputed i { background: var(--status-disputed); }
+.cw-tally-n.t-unshown i { background: none; border: 1.5px dashed var(--status-unshown); width: 9px; height: 9px; }
+.cw-tally-n.t-ruled_out i { background: var(--text-muted); }
+.cw-tally-n:hover { background: var(--surface-1); }
+.cw-tally-n.on { background: var(--surface-2); border-color: var(--accent-1); }
+.cw-search { flex: 1; max-width: 460px; margin-left: auto; display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 12px; border-radius: 11px;
+  background: var(--surface-1); border: 1px solid var(--line); color: var(--text-muted); }
+.cw-search.sm { height: 34px; max-width: none; margin: 0; }
+.cw-search:focus-within { border-color: var(--accent-1); }
+.cw-search input { all: unset; flex: 1; min-width: 0; color: var(--text); font-size: 14px; }
+.cw-search input::placeholder { color: var(--text-muted); }
+.cw-search button { all: unset; cursor: pointer; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; }
 
-/* Ony's rule of 29 Oct: the row shows the status colour, the claim and its confidence as a bar and a number; the
-   grade words are revealed. Stance is drawn as Chain of Custody's line (components/network/marks.tsx). */
+.cw-btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface-1); color: var(--text); font-size: 13px; white-space: nowrap; }
+.cw-btn:hover { background: var(--surface-2); }
+.cw-btn.on, .cw-btn[aria-pressed='true'] { border-color: var(--accent-1); background: var(--surface-2); }
+.cw-btn.pri { background: var(--accent-1); border-color: var(--accent-1); color: var(--accent-foreground, #1a1208); font-weight: 600; padding: 6px 11px; font-size: 12.5px; }
+.cw-btn:disabled { opacity: .45; cursor: default; }
+.cw-btn.pri:disabled { background: none; color: var(--text-muted); border-color: var(--line); }
+.cw-link { all: unset; cursor: pointer; color: var(--accent-1); text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
+.cw-icon { all: unset; cursor: pointer; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 7px; color: var(--text-muted); }
+.cw-icon:hover { background: var(--surface-2); color: var(--text); }
+.cw-btn:focus-visible, .cw-icon:focus-visible, .cw-tally-n:focus-visible, .cw-link:focus-visible, .cl-row:focus-visible, .cw-stance:focus-visible,
+.cw-over-bar:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+
+.cw-body { min-height: 0; display: grid; grid-template-columns: minmax(360px, 480px) minmax(0, 1fr); gap: 16px; }
+.cw-left, .cw-right { min-height: 0; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel);
+  border: 1px solid color-mix(in srgb, var(--accent-1) 16%, transparent); }
+.cw-left { display: flex; flex-direction: column; padding: 10px 8px 8px 10px; }
+.cw-right { overflow-y: auto; overscroll-behavior: contain; padding: 20px 24px 24px; }
+
+/* A new claim is written at the top of the list. */
+.cw-new { display: flex; align-items: center; gap: 8px; margin: 0 4px 8px 0; padding: 4px 4px 4px 10px; border-radius: 10px; border: 1px dashed var(--line); color: var(--text-muted); }
+.cw-new:focus-within { border-style: solid; border-color: var(--accent-1); }
+.cw-new input { all: unset; flex: 1; min-width: 0; height: 30px; color: var(--text); font-size: 13.5px; }
+.cw-new input::placeholder { color: var(--text-muted); }
+.cw-showing { margin: 0 4px 6px; color: var(--text-muted); }
+.cw-showing b { color: var(--text); font-family: var(--font-mono); font-weight: 500; }
+.cw-none { display: flex; flex-direction: column; gap: 6px; padding: 28px 12px; color: var(--text-muted); }
+.cw-none b { font: 400 22px var(--font-display); color: var(--text); }
+
+.cw-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; display: flex; flex-direction: column; gap: 2px; }
 .cl-row-wrap { display: block; }
-.cl-conf { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
-.cl-bar { display: inline-block; width: 56px; height: 4px; border-radius: 2px; background: var(--surface-3, var(--line)); overflow: hidden; }
-.cl-bar i { display: block; height: 100%; background: var(--accent-1); }
-.cl-counts { display: inline-flex; gap: 14px; align-items: center; font-size: 15px; font-variant-numeric: tabular-nums; }
-.cl-counts > span { display: inline-flex; gap: 5px; align-items: center; }
-.cl-balance { display: grid; gap: 4px; }
-.cl-rel, .cl-ev-head, .cl-move { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.cl-ev { border-left: 3px solid var(--status-supported); }
-.cl-ev-contradicts { border-left: 3px dashed var(--status-disputed); }
-.cl-ev-context { border-left: 3px dotted var(--text-muted); }
+.cl-row { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; display: grid; grid-template-columns: 16px minmax(0, 1fr) 44px; align-items: center; gap: 10px;
+  min-height: 48px; padding: 7px 10px 7px 10px; border-radius: 10px; border-left: 3px solid transparent; transition: background var(--dur-fast, .12s); }
+.cl-row:hover { background: var(--surface-2); }
+.cl-row[aria-current='true'] { background: var(--surface-3); }
+.cl-row strong { font-weight: 500; font-size: 14px; line-height: 1.32; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.cl-row.cl-supported { border-left: 3px solid var(--status-supported); }
+.cl-row.cl-unshown { border-left: 3px dashed color-mix(in srgb, var(--status-unshown) 55%, transparent); }
+.cl-row.cl-disputed { border-left: 5px double var(--status-disputed); }
+.cl-row.cl-ruled_out { border-left: 3px dotted var(--text-muted); }
+.cl-row.cl-ruled_out strong { color: var(--text-muted); }
+.cl-row > .rv { justify-self: center; }
+.cl-conf { justify-self: end; font: 500 15px var(--font-mono); color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* The open claim. */
+.cw-detail-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: start; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.cl-head { display: flex; align-items: baseline; gap: 12px; }
+.cl-head > .rv { flex: 0 0 auto; transform: translateY(-3px); }
+.cl-head h4 { margin: 0; font: 400 23px/1.3 var(--font-display); color: var(--text); }
+.cl-head .st-always, .cl-row .st-always { font-size: 10px; }
+.cw-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.cw-nums { display: flex; align-items: flex-end; gap: 36px; padding: 16px 2px 14px; border-bottom: 1px solid var(--line); }
+.cw-num { display: inline-flex; flex-direction: column; gap: 4px; color: var(--text-muted); font-size: 12px; }
+.cw-num b { font: 300 38px/1 var(--font-display); color: var(--text); font-variant-numeric: tabular-nums; }
+.cw-num b small { font-size: 18px; margin-left: 2px; color: var(--text-muted); }
+.cl-counts { display: inline-flex; gap: 22px; align-items: flex-end; }
+.cw-num.s-contradicts b { color: var(--status-disputed); }
+.cw-num.s-supports b { color: var(--status-supported); }
+.cw-status { margin: 10px 2px 0; color: var(--text-muted); }
+
+.cw-sec { padding: 18px 0 4px; }
+.cw-sec + .cw-sec { border-top: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.cw-sec-h { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.cw-sec-h .cw-btn { margin-left: auto; letter-spacing: 0; text-transform: none; font-family: var(--font-ui); }
+.cw-sec-n { font: 500 13px var(--font-mono); color: var(--text); letter-spacing: 0; }
+
+.cw-evs { list-style: none; margin: 0; padding: 0; }
+.cl-ev { display: grid; grid-template-columns: 30px minmax(0, 1fr) 30px; gap: 14px; align-items: start; padding: 12px 2px; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+.cl-ev > .rv:first-child { padding-top: 6px; }
+.cl-ev-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cw-quote { margin: 0; font: 400 16px/1.55 var(--font-read); color: var(--text); max-width: 78ch; }
+.cl-ev-src { font-size: 12px; color: var(--text-muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cl-ev-src a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.cl-ev .cw-icon { opacity: 0; transition: opacity var(--dur-fast, .12s); }
+.cl-ev:hover .cw-icon, .cl-ev:focus-within .cw-icon { opacity: 1; }
+
+.cw-pool { margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--surface-2); }
+.cw-pool-bar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-bottom: 8px; }
+.cw-pool-list { list-style: none; margin: 0; padding: 0; max-height: 420px; overflow-y: auto; overscroll-behavior: contain; }
+.cw-pool-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 8px 4px; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+.cw-pool-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.cw-pool-quote { font: 400 14px/1.45 var(--font-read); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.cw-pool-acts { display: flex; gap: 4px; align-items: center; }
+.cw-stance { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line); font-size: 12px; color: var(--text); }
+.cw-stance:hover { background: var(--surface-3); }
+.cw-stance:disabled { cursor: default; color: var(--text-muted); border-color: transparent; }
+
+.cw-form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cw-form > input { flex: 1; min-width: 240px; }
+.cw-conf { display: inline-flex; align-items: center; gap: 10px; margin-left: 6px; font-variant-numeric: tabular-nums; }
+
+.cw-hist, .cw-rels { list-style: none; margin: 0; padding: 0; }
+.cw-hist li { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 14px; align-items: baseline; padding: 8px 2px; font: 400 14.5px/1.45 var(--font-read); }
+.cl-move { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); }
+.cw-rels li { display: flex; align-items: center; gap: 10px; padding: 6px 2px; }
+.cl-rel { display: inline-flex; align-items: center; gap: 8px; margin-right: auto; font-size: 14px; }
+
+/* No claim open: the case's claims as bars. */
+.cw-over { display: flex; flex-direction: column; gap: 22px; padding: 18px 8px; max-width: 640px; }
+.cw-over-ask { margin: 0; font: 400 20px/1.35 var(--font-display); color: var(--text-muted); }
+.cw-over-bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.cw-over-bar { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 70px 170px minmax(0, 1fr); align-items: center; gap: 14px;
+  padding: 8px 10px; border-radius: 10px; }
+.cw-over-bar:hover { background: var(--surface-2); }
+.cw-over-bar b { font: 300 32px/1 var(--font-display); color: var(--text); text-align: right; }
+.cw-over-word { color: var(--text-muted); font-size: 13px; }
+.cw-over-track { height: 10px; border-radius: 5px; background: color-mix(in srgb, var(--text-muted) 14%, transparent); overflow: hidden; }
+.cw-over-track i { display: block; height: 100%; border-radius: 5px; background: currentColor; }
+.cw-over-bar.t-supported { color: var(--status-supported); }
+.cw-over-bar.t-disputed { color: var(--status-disputed); }
+.cw-over-bar.t-unshown { color: var(--status-unshown); }
+.cw-over-bar.t-ruled_out { color: var(--text-muted); }
+
+@media (hover: none) { .cl-ev .cw-icon { opacity: 1; } }
+@media (max-width: 1100px) { .cw-body { grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); } .cw-nums { gap: 22px; } }
+html[data-motion='calm'] .cl-row { transition: none; }
+@media (prefers-reduced-motion: reduce) { .cl-row { transition: none; } }

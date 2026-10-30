@@ -174,6 +174,8 @@ describe('Home claim verification workspace', () => {
       },
     });
 
+    // The evidence pool opens on Attach evidence.
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Attach evidence'}));
     await userEvent.setup().click(screen.getByRole('button', {name: 'Supports'}));
 
     await waitFor(() => expect(screen.getByText('Linked evidence as supports.')).toBeInTheDocument());

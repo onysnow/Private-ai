@@ -292,10 +292,10 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'corpus', label: 'OpenAleph corpus', render: () => <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>},
       ])}
       {screen('verify', [
-        {anchor: 'claim-verification', label: 'Claims', render: () => <PanelErrorBoundary name="Claim verification workspace">
+        {anchor: 'claim-verification', label: 'Claims', fill: true, render: () => <PanelErrorBoundary name="Claim verification workspace">
           <ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>},
         {anchor: 'to-check', label: 'To check', render: () => <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'review-queue', label: 'Connector findings', render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'review-queue', label: 'Connector findings', fill: true, render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'is-it-real', label: 'Is it real?', render: () => <PanelErrorBoundary name="Is it real?"><RealnessList investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'chain-of-custody', label: 'Chain of Custody', render: () => <PanelErrorBoundary name="Chain of Custody (full)"><ChainOfCustody investigationId={inv} active={view === 'verify'}/></PanelErrorBoundary>},
         {anchor: 'check-a-pack', label: 'Check a pack', render: () => <PanelErrorBoundary name="Check a pack"><CheckAPack investigationId={inv}/></PanelErrorBoundary>},
@@ -311,7 +311,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'red-flags', label: 'Red Flags', fill: true, render: () => <PanelErrorBoundary name="Red Flags"><RedFlagsBoard investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'story', label: 'Story', render: () => <PanelErrorBoundary name="Story"><StoryScreen investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
         {anchor: 'leads', label: 'Leads', render: () => <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'chart-builder', label: 'Charts', render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'chart-builder', label: 'Charts', fill: true, render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'decks', label: 'Decks', fill: true, render: () => <PanelErrorBoundary name="Decks"><DecksScreen investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'ai-runs', label: 'AI runs', render: () => <PanelErrorBoundary name="AI runs"><BeforeYouRun investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
         {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},

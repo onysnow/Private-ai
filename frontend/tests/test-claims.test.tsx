@@ -195,6 +195,9 @@ describe('ClaimsPanel', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText('No evidence is linked to this claim yet.');
+    // The case's evidence pool is one click away, not a wall of text under the claim.
+    expect(screen.queryByText('Approved 3/3, signed by CFO.')).toBeNull();
+    await user.click(screen.getByRole('button', {name: 'Attach evidence'}));
     expect(screen.getByText('Approved 3/3, signed by CFO.')).toBeInTheDocument();
 
     api.add({
@@ -248,6 +251,7 @@ describe('ClaimsPanel', () => {
       title: 'The contract was approved on March 3.', kind: 'claim evidence: supports', sourceId: 'src-1', sourceUrl: 'https://example.test/minutes',
       locator: 'p.4', detail: 'Approved 3/3, signed by CFO.', acceptedRecordType: 'evidence', acceptedRecordId: 'ev-1',
     });
+    await user.click(screen.getByRole('button', {name: 'Attach evidence'}));
     await user.click(screen.getAllByRole('button', {name: 'Trace provenance'})[1]);
     expect(useWorkbenchStore.getState().provenance?.request).toMatchObject({title: 'Board minutes', kind: 'evidence pool', sourceId: 'src-1', acceptedRecordId: 'ev-1'});
     expect(api.unmatched()).toEqual([]);
@@ -261,6 +265,7 @@ describe('ClaimsPanel', () => {
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText('No evidence is linked to this claim yet.');
     api.add({'POST /api/claims/claim-1/evidence': {status: 400, body: {detail: 'Claim and evidence must belong to the same investigation'}}});
+    await user.click(screen.getByRole('button', {name: 'Attach evidence'}));
     await user.click(screen.getByRole('button', {name: 'Context'}));
     await screen.findByText(/Claim and evidence must belong to the same investigation/);
 
@@ -269,6 +274,25 @@ describe('ClaimsPanel', () => {
     wrap(<ClaimsPanel investigationId="inv-2" relationships={[]} onInspectRelationship={vi.fn()}/>);
     await waitFor(() => expect(api.calls('GET /api/investigations/inv-2/claims')).toHaveLength(1));
     expect(screen.getByText('No claims yet.')).toBeInTheDocument();
+  });
+
+  it('filters the list by status from the tally and by the words typed, and ranks the pool by the open claim\'s words', async () => {
+    const other = {evidence: {id: 'ev-2', source_id: 'src-1', quote: 'The weather was mild in spring.', locator: null, notes: null}, source};
+    const fitting = {evidence: {id: 'ev-3', source_id: 'src-1', quote: 'The contract was approved by the board.', locator: null, notes: null}, source};
+    await renderPanel({[CLAIMS]: [claimFixture(), claimFixture({id: 'claim-2', text: 'The vendor was paid twice.', status: 'disputed'})],
+      [EVIDENCE]: [other, fitting], [WORKSPACE]: workspace(claimFixture())});
+    const user = userEvent.setup();
+    // The tally shows each status's count; a click shows only those claims.
+    await user.click(screen.getByRole('button', {name: 'Disputed: 1'}));
+    expect(screen.queryByText('The contract was approved on March 3.')).toBeNull();
+    expect(screen.getByText('The vendor was paid twice.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Clear'}));
+    await user.type(screen.getByRole('searchbox', {name: 'Find a claim'}), 'contract');
+    expect(screen.queryByText('The vendor was paid twice.')).toBeNull();
+    await user.click(screen.getByRole('button', {name: /The contract was approved/}));
+    await user.click(await screen.findByRole('button', {name: 'Attach evidence'}));
+    const quotes = [...document.querySelectorAll('.cw-pool-quote')].map(el => el.textContent);
+    expect(quotes).toEqual(['The contract was approved by the board.', 'The weather was mild in spring.']);
   });
 
   it('holds Supported to the Done rules: names what is left, and records it anyway only with a reason', async () => {

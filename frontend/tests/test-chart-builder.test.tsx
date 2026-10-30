@@ -107,6 +107,8 @@ describe('ChartBuilderPanel', () => {
     const {api, user} = await openBuilder();
     expect(screen.getByRole('button', {name: 'Build a chart'})).toBeInTheDocument();
     expect(api.calls(CATALOG)).toHaveLength(0);
+    // Until it is opened the screen says what it makes.
+    expect(screen.getByRole('heading', {name: /A checked chart from the case/})).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     const questions = within(await screen.findByRole('group', {name: 'Question'}));
@@ -120,18 +122,18 @@ describe('ChartBuilderPanel', () => {
     const {user} = await openBuilder();
     await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
-    expect(screen.getByRole('combobox', {name: 'Data'})).toHaveTextContent('Payments by party · 5 payments');
+    // The data are cards with their record counts; the first with records is chosen.
+    expect(screen.getByRole('radio', {name: 'Payments by party · 5 payments'})).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('radio', {name: 'Payments by party · 5 payments'})).toHaveTextContent('5payments');
     const chartKinds = within(screen.getByRole('group', {name: 'Chart kind'}));
     expect(chartKinds.getAllByRole('button').map(b => b.textContent)).toEqual(['100% bar (suggested) ★', 'Donut', 'Treemap']);
     expect(chartKinds.getByRole('button', {name: /^100% bar\s*\(suggested\)/})).toHaveAttribute('aria-pressed', 'true');
 
     // Data with no records yet is listed but cannot be chosen.
-    await user.click(screen.getByRole('combobox', {name: 'Data'}));
-    expect(await screen.findByRole('option', {name: 'Documents by status · no records yet'})).toHaveAttribute('aria-disabled', 'true');
-    await user.keyboard('{Escape}');
+    expect(screen.getByRole('radio', {name: 'Documents by status · no records yet'})).toBeDisabled();
 
     await user.click(screen.getByRole('button', {name: 'Distribution'}));
-    expect(screen.getByRole('combobox', {name: 'Data'})).toHaveTextContent('Payment amounts');
+    expect(screen.getByRole('radio', {name: /^Payment amounts/})).toHaveAttribute('aria-checked', 'true');
     expect(within(screen.getByRole('group', {name: 'Chart kind'})).getAllByRole('button').map(b => b.textContent)).toEqual(['Histogram (suggested) ★']);
   });
 
