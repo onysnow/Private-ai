@@ -48,4 +48,15 @@ describe('Does it work today?', () => {
     await waitFor(() => expect(api.calls('POST /api/platform-checks/run')).toHaveLength(1));
     expect(await screen.findByText('Trying every platform now, one request each, logged.')).toBeInTheDocument();
   });
+
+  it('says when no platform was checked yet, and offers the first check instead of a platform in detail', async () => {
+    const never: PlatformChecksOut = {...DATA, working: 0, checked: 0, last_checked_at: null,
+      platforms: DATA.platforms.map(p => ({...p, state: null, broken_since: null, days: p.days.map(d => ({...d, state: null}))}))};
+    mockApi({'GET /api/platform-checks': never});
+    render(<QueryProvider><WorksToday/></QueryProvider>);
+    const first = await screen.findByRole('region', {name: 'Not checked yet'});
+    expect(screen.getByText('3 platforms · not checked yet')).toBeInTheDocument();
+    expect(screen.queryByRole('region', {name: /in detail$/})).toBeNull();
+    expect(screen.getAllByRole('button', {name: 'Check all now'})).toEqual([within(first).getByRole('button', {name: 'Check all now'})]);
+  });
 });

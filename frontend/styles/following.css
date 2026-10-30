@@ -175,3 +175,46 @@
 .wt-state { justify-self: center; width: 26px; height: 26px; padding: 0; display: grid; place-items: center; font-size: 14px; }
 .wt-days .rv { display: block; }
 .rv-card .wt-key { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 4px 0 0; }
+
+/* A case that follows nothing yet (follow-form.tsx EmptyFollowing): the paste field is the screen, large; the kinds
+   that can be followed are their marks, named on hover; how it works is three marks, its sentences on hover. */
+.fl-empty { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 330px); gap: 16px; align-items: stretch; }
+.fl-empty-main { padding: 26px 28px 24px; border-radius: 16px; background: var(--surface-1); box-shadow: var(--shadow-panel);
+  border: 1px solid color-mix(in srgb, var(--accent-1) 45%, transparent); min-width: 0; }
+.fl-empty-h { margin: 4px 0 18px; font: 300 30px/1.15 var(--font-display); color: var(--text); }
+.fl-follow.fl-hero .fl-paste { display: flex; gap: 10px; align-items: stretch; }
+.fl-follow.fl-hero .fl-paste .fl-input { margin: 0; flex: 1 1 auto; min-width: 0; padding: 14px 16px; font-size: 16px; border-radius: 12px;
+  border-color: color-mix(in srgb, var(--accent-1) 40%, var(--line)); }
+.fl-follow.fl-hero .fl-paste .fl-btn { padding: 0 26px; font-size: 15px; border-radius: 12px; }
+.fl-follow.fl-hero .fl-row { margin-top: 12px; }
+.fl-follow.fl-hero .fl-row .rv.fl-egress { margin: 0 0 0 auto; }
+.fl-mail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
+@media (max-width: 760px) { .fl-mail-grid { grid-template-columns: minmax(0, 1fr); } .fl-empty { grid-template-columns: minmax(0, 1fr); } }
+.fl-kinds { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 6px; }
+.fl-kinds .rv { display: inline-block; }
+.fl-kind-tile { all: unset; box-sizing: border-box; cursor: pointer; width: 64px; height: 64px; display: grid; place-items: center; border-radius: 14px;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--accent-2); }
+.fl-kind-tile:hover { border-color: color-mix(in srgb, var(--accent-2) 60%, var(--line)); }
+.fl-kind-tile:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+.fl-kind-tile[aria-checked="true"] { border-color: var(--accent-1); color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 12%, var(--surface-2)); }
+.fl-kind-tile.closed { border-style: dashed; color: var(--text-muted); }
+.fl .fl-kind-tile .fl-kind { width: 30px; height: 30px; color: inherit; }
+.fl-empty .fl-atrest { margin: 16px 0 0; }
+.fl-steps { list-style: none; margin: 0; padding: 22px 22px; border-radius: 16px; background: var(--surface-1); box-shadow: var(--shadow-panel);
+  border: 1px solid color-mix(in srgb, var(--accent-1) 18%, transparent); display: flex; flex-direction: column; justify-content: space-around; gap: 18px; counter-reset: none; }
+.fl-steps li { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 14px; }
+.fl-steps li:not(:last-child)::after { content: ""; position: absolute; left: 27px; top: 60px; height: calc(100% - 42px); border-left: 1px dashed var(--line); }
+.fl-step-ico { width: 56px; height: 56px; padding: 13px; box-sizing: border-box; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--accent-2) 45%, var(--line)); color: var(--accent-2); }
+.fl-steps li:last-child .fl-step-ico { color: var(--accent-1); border-color: color-mix(in srgb, var(--accent-1) 55%, var(--line)); }
+.fl-step-n { position: absolute; left: 40px; top: -2px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface-3, var(--surface-2)); font: 600 10px var(--font-mono); color: var(--text-muted); }
+.fl-step-t { font: 400 20px/1.2 var(--font-display); color: var(--text); }
+.fl-empty .fl-kinds-cap { margin: 26px 0 0; color: var(--text-muted); }
+.fl-empty .fl-kinds { margin-top: 10px; }
+.wt-title .fl-btn { margin-left: auto; }
+.wt-name { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.wt-mono { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--surface-2); font: 600 11px var(--font-mono); color: var(--text); }
+.wt-row { grid-template-columns: 190px 46px minmax(150px, 1fr) minmax(0, 1fr); }
+.wt-first { border-color: color-mix(in srgb, var(--accent-1) 55%, transparent); }
+.wt-first .fl-h3 { font-size: 18px; margin: 4px 0 12px; }

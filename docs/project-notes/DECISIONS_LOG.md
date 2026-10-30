@@ -332,3 +332,17 @@ corner that opens its list. The country count is left out when the records name 
 "0 countries".
 
 Demo: Ony said the demo matters less while the rest of the app is unfinished, so it moves to the end of the list.
+
+## 19. The 1MDB demo follows five sources, and never checks them by itself (30 Oct 2026)
+
+Following was empty in the demo, so its screens could not be judged against FOLLOW_1 and WORKS_1. The 1MDB demo now
+follows five sources with items already in the case (`app/services/demo_following.py`): the Justice Department's
+press-release feed, Sarawak Report's news feed, the US v. Ng docket page (two versions), the WNYC Money Talking podcast,
+and Sarawak Report on X (a closed platform, no monitor). Items written for the demo say so in their summary.
+Calls:
+- **No automatic checks for demo sources.** A demo must never contact a site on its own; the monitors have no next
+  check, so a site is asked only when a person presses "Check now". It also keeps an address that does not answer
+  (two were not confirmed) from turning "broken" while someone looks around.
+- **No made-up "Works today" results.** Those rows are app-wide results of really trying each platform's save tool;
+  seeding them would claim something works that was never tried. Works today says "not checked yet" and offers the
+  first check.

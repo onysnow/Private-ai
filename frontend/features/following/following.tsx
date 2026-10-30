@@ -14,17 +14,18 @@
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useEffect, useMemo, useState} from 'react';
-import type {FormEvent, ReactElement} from 'react';
+import type {ReactElement} from 'react';
 
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {useLockStore} from '../../lib/app-lock';
 import {caseHref} from '../../lib/case-href';
 import {getFollowingOptions, getFollowingQueryKey, getVersionsOptions} from '../../lib/generated/@tanstack/react-query.gen';
-import {captureAll, captureItem, checkMonitor, createMailboxMonitor, createMonitor, deleteMonitor, recordRemoval, skipItem, undoItem, updateMonitor} from '../../lib/generated/sdk.gen';
+import {captureAll, captureItem, checkMonitor, deleteMonitor, recordRemoval, skipItem, undoItem, updateMonitor} from '../../lib/generated/sdk.gen';
 import type {FollowingOut, MonitorItemOut, MonitorOut, PageVersionOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {FingerprintMark} from '../the-drop/kind-marks';
+import {EmptyFollowing, FollowForm} from './follow-form';
 import {HealthMark, KIND_NAME, KindIcon, KindMark} from './marks';
 import type {SourceKind} from './marks';
 import {WorksToday} from './works-today';
@@ -193,58 +194,6 @@ function Versions({monitor}: {monitor: MonitorOut | undefined}): ReactElement {
   </section>;
 }
 
-function FollowForm({investigationId, onDone}: {investigationId: string; onDone: (m: MonitorOut | null) => void}): ReactElement {
-  const [target, setTarget] = useState('');
-  const [route, setRoute] = useState<'direct' | 'tor'>('direct');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [mail, setMail] = useState<null | {host: string; user: string; password: string; sender: string}>(null);
-  const mailReady = Boolean(mail && mail.host.trim() && mail.user.trim() && mail.password && mail.sender.trim());
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (mail ? !mailReady : !target.trim()) return;
-    setBusy(true); setError('');
-    try {
-      const made = mail
-        ? (await createMailboxMonitor({path: {investigation_id: investigationId}, throwOnError: true,
-          body: {host: mail.host.trim(), user: mail.user.trim(), password: mail.password, sender: mail.sender.trim()}})).data
-        : (await createMonitor({path: {investigation_id: investigationId}, body: {target: target.trim(), route}, throwOnError: true})).data;
-      onDone(made);
-    } catch (err) { setError(errorMessage(err, 'That could not be followed')); } finally { setBusy(false); }
-  };
-  const field = (key: 'host' | 'user' | 'password' | 'sender', label: string, hint: string) => mail &&
-    <label className="fl-note fl-mail">{label}<input className="fl-input" type={key === 'password' ? 'password' : 'text'} autoComplete="off"
-      value={mail[key]} placeholder={hint} onChange={e => setMail({...mail, [key]: e.target.value})}/></label>;
-  return <form className="fl-panel fl-follow" onSubmit={e => void submit(e)} aria-label="Follow something">
-    <p className="fl-cap">Follow something</p>
-    <span className="fl-rad" role="radiogroup" aria-label="What to follow">
-      <button type="button" role="radio" aria-checked={!mail} onClick={() => setMail(null)}>An address or account</button>
-      <button type="button" role="radio" aria-checked={Boolean(mail)} onClick={() => setMail(m => m ?? {host: '', user: '', password: '', sender: ''})}>A newsletter mailbox</button>
-    </span>
-    {mail ? <>
-      <p className="fl-note">Subscribe with a mailbox kept for newsletters, never your own: the sender learns that address. The app reads it over IMAP with TLS,
-        never marks a message read and never loads the images in it, so tracking pixels learn nothing. The password stays in a file on this computer, not in the case or a backup.</p>
-      {field('host', 'Mail server', 'imap.example.net')}
-      {field('user', 'User name', 'newsletters@example.net')}
-      {field('password', 'Password (an app password where the provider has them)', '')}
-      {field('sender', 'The sender to follow', 'news@outlet.example or @outlet.example')}
-    </> : <>
-    <label className="fl-note" htmlFor="fl-target"><Reveal tabbable={false} detail="A web address (a news feed, sitemap, podcast or page), a Bluesky handle (@name.bsky.social), a Mastodon account (@name@server) or a public Telegram channel (t.me/name).">
-      A web address or a public account</Reveal></label>
-    <input id="fl-target" className="fl-input" value={target} onChange={e => setTarget(e.target.value)} placeholder="https://…, @handle or t.me/channel" autoFocus/>
-    <div className="fl-row wrap"><span className="fl-note">Route</span>
-      <span className="fl-rad" role="radiogroup" aria-label="Route">{(['direct', 'tor'] as const).map(r =>
-        <button key={r} type="button" role="radio" aria-checked={route === r} onClick={() => setRoute(r)}>{r === 'direct' ? 'Direct' : 'Neutral route'}</button>)}</span></div>
-    {/* What leaves this computer stays as one line; the sentence is on hover. */}
-    <Reveal className="fl-egress" detail="The address is asked once to see what it is. Closed platforms (X, Instagram, Facebook, TikTok, LinkedIn, Telegram groups and private channels…) get a row with no monitor: the app never signs in.">
-      <span>↗ asked once · no login</span></Reveal>
-    </>}
-    <div className="fl-row"><button type="submit" className="fl-btn pri sm" disabled={busy || (mail ? !mailReady : !target.trim())}>{busy ? 'Asking…' : 'Follow'}</button>
-      <button type="button" className="fl-btn sm" onClick={() => onDone(null)}>Cancel</button></div>
-    {error && <p role="alert" className="fl-error">{error}</p>}
-  </form>;
-}
-
 export function Following({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
   const queryClient = useQueryClient();
   const key = getFollowingQueryKey({path: {investigation_id: investigationId}});
@@ -291,9 +240,14 @@ export function Following({investigationId, active = true}: {investigationId: st
     <nav className="fl-tabs" aria-label="Following">
       {([['sources', 'Sources'], ['risk', 'At risk'], ['changes', 'Changes'], ['history', 'History'], ['works', 'Works today']] as [Tab, string][]).map(([t, label]) =>
         <button key={t} type="button" className={tab === t ? 'on' : ''} aria-current={tab === t ? 'page' : undefined} onClick={() => setTab(t)}>{label}</button>)}
-      <span className="fl-live"><i aria-hidden="true"/>{data.working} of {data.followed} working today</span>
+      {data.followed > 0 && <span className="fl-live"><i aria-hidden="true"/>{data.working} of {data.followed} working today</span>}
     </nav>
-    {tab === 'works' ? <div className="fl-works"><WorksToday/></div> : <>
+    {tab === 'works' ? <div className="fl-works"><WorksToday/></div> : !monitors.length ? <>
+    {/* Nothing followed yet: the screen is the way to follow a first source. */}
+    <header className="fl-title"><h1>Following</h1></header>
+    <EmptyFollowing investigationId={investigationId} atRest={<ListAtRest/>}
+      onDone={m => { if (m) { setPicked(m.id); void refresh(); } }}/>
+    </> : <>
     <header className="fl-title"><Reveal detail="The app watches. A person captures. No account logins anywhere."><h1>Following</h1></Reveal>
       <button type="button" className="fl-btn" aria-expanded={adding} onClick={() => setAdding(a => !a)}>+ Follow something</button></header>
 
@@ -303,9 +257,8 @@ export function Following({investigationId, active = true}: {investigationId: st
         <p className="fl-cap">Sources followed<span className="r">{monitors.some(m => m.last_checked_at)
           ? <Reveal detail={`Health checked ${hhmm(monitors.map(m => m.last_checked_at ?? '').sort().at(-1))}`}>{monitors.length}</Reveal> : monitors.length}</span></p>
         <ListAtRest/>
-        {!monitors.length ? <p className="fl-note"><Reveal detail="Follow a news feed, a sitemap, a page, a podcast or a public account; what they publish waits here for you.">Nothing is followed yet.</Reveal></p>
-          : <div role="listbox" aria-label="Sources" className="fl-mons">{monitors.map(m =>
-            <SourceRow key={m.id} m={m} picked={m.id === selected?.id} onPick={() => setPicked(m.id)}/>)}</div>}
+        <div role="listbox" aria-label="Sources" className="fl-mons">{monitors.map(m =>
+          <SourceRow key={m.id} m={m} picked={m.id === selected?.id} onPick={() => setPicked(m.id)}/>)}</div>
       </section>
       {selected && <SelectedSource m={selected} investigationId={investigationId} onChanged={refresh}/>}
     </div>

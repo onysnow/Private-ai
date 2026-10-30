@@ -19,6 +19,10 @@ import type {PlatformOut} from '../../lib/generated/types.gen';
 const WORD = {works: '✓ works', partly: '◐ partly', broken: '✕ broken'} as const;
 const GLYPH = {works: '✓', partly: '◐', broken: '✕'} as const;
 const DAY_WORD = {works: 'saved as expected', partly: 'saved, with something missing', broken: 'not saved'} as const;
+// The platform's mark, as the mockup draws it: two letters in a tile (the name stays beside it).
+const MONO: Record<string, string> = {youtube: 'YT', instagram: 'IG', x: 'X', tiktok: 'TT', facebook: 'FB', telegram: 'TG', bluesky: 'BS',
+  mastodon: 'MA', vimeo: 'VM', soundcloud: 'SC'};
+const mono = (p: PlatformOut) => MONO[p.key] ?? p.name.slice(0, 2).toUpperCase();
 const short = (iso?: string | null) => (iso ? iso.slice(0, 16).replace('T', ' ') : '');
 const daysSince = (iso: string) => Math.max(1, Math.round((Date.now() - Date.parse(`${iso}Z`)) / 86_400_000));
 
@@ -45,23 +49,25 @@ export function WorksToday(): ReactElement {
   };
   if (!data) return <p className="fl-note">{query.isError ? errorMessage(query.error, 'Could not load the checks') : 'Loading…'}</p>;
   const platforms = data.platforms;
-  const selected: PlatformOut | undefined = platforms.find(p => p.key === picked) ?? platforms.find(p => p.state === 'broken') ?? platforms[0];
+  // Never checked: no platform is shown in detail until one is picked; the side says so and offers the first check.
+  const never = !data.checked;
+  const selected: PlatformOut | undefined = platforms.find(p => p.key === picked) ?? (never ? undefined : platforms.find(p => p.state === 'broken') ?? platforms[0]);
   return <div className="wt">
     <header className="wt-title"><Reveal detail="Platforms change their pages without notice, and the tools that save from them break. The app saves one public test item per platform, so you know before you need it.">
       <h1>Does it work today?</h1></Reveal>
-      <button type="button" className="fl-btn" onClick={() => void run()}>Check all now</button></header>
+      {!never && <button type="button" className="fl-btn" onClick={() => void run()}>Check all now</button>}</header>
     <section className="fl-panel wt-list" aria-label="Platforms">
       {/* The day squares' key, and when it was last checked, are on hover of the count; whether the daily check is on shows. */}
       <p className="fl-cap"><Reveal detail={<><span className="rv-row">{data.last_checked_at ? `Last checked ${short(data.last_checked_at)} UTC` : 'Not checked yet'}{data.daily ? ' · next within a day' : ''}</span>
         <span className="rv-row wt-key"><span><i className="works"/>saved as expected</span><span><i className="partly"/>saved, with something missing</span><span><i className="broken"/>not saved</span><span><i className="none"/>not checked</span></span></>}>
-        {platforms.length} platforms · {data.working} work today</Reveal><span className="r">{data.daily ? '' : 'the daily check is off'}</span></p>
+        {platforms.length} platforms · {never ? 'not checked yet' : `${data.working} work today`}</Reveal><span className="r">{data.daily ? '' : 'the daily check is off'}</span></p>
       <div className="wt-row wt-head" aria-hidden="true"><span>Platform</span><span>Today</span><span>Last 14 days</span><span>What is saved from it</span></div>
       {/* A row is the platform, today's shape, its fortnight and what it saves (what broke, when it did); the state's
           word, the tool and the seconds are on hover. */}
       <ul>{platforms.map(p => <li key={p.key}><Reveal tabbable={false} className="wt-rv" detail={<><b>{p.name}: {p.state ? WORD[p.state] : 'not checked'}</b>
         <span className="rv-row">{p.route}{p.seconds != null ? ` · ${p.seconds} s` : ''}</span></>}>
         <button type="button" className={`wt-row${selected?.key === p.key ? ' sel' : ''}`} onClick={() => setPicked(p.key)} aria-label={`${p.name}: ${p.state ? WORD[p.state] : 'not checked'}`}>
-        <span className="wt-name"><b>{p.name}</b></span>
+        <span className="wt-name"><span className="wt-mono" aria-hidden="true">{mono(p)}</span><b>{p.name}</b></span>
         <span className={`wt-state ${p.state ?? 'none'}`} aria-hidden="true">{p.state ? GLYPH[p.state] : '○'}</span>
         <span className="wt-days" aria-label="Last 14 days">{p.days.map(d => <Reveal key={d.day} tabbable={false} describe={false} detail={`${d.day}: ${d.state ? DAY_WORD[d.state] : 'not checked'}`}>
           <i className={d.state ?? 'none'}/></Reveal>)}</span>
@@ -69,6 +75,12 @@ export function WorksToday(): ReactElement {
       </button></Reveal></li>)}</ul>
     </section>
     <aside className="wt-side">
+      {never && !selected && <section className="fl-panel wt-first" aria-label="Not checked yet">
+        <p className="fl-cap">Not checked yet</p>
+        <h3 className="fl-h3"><Reveal detail="Each platform is asked for one public test item, with the tool a real save uses, logged out. A broken one is then named before you save from it.">
+          Find out which platforms the app can save from today.</Reveal></h3>
+        <div className="wt-acts"><button type="button" className="fl-btn pri" onClick={() => void run()}>Check all now</button></div>
+      </section>}
       {selected && <section className={`fl-panel${selected.state === 'broken' ? ' wt-hot' : ''}`} aria-label={`${selected.name} in detail`}>
         <p className="fl-cap">{selected.name}{selected.state === 'broken' && selected.broken_since ? ` · broken since ${short(selected.broken_since).slice(0, 10)}` : ''}
           <span className="r">{selected.state === 'broken' && selected.broken_since ? `${daysSince(selected.broken_since)} day${daysSince(selected.broken_since) === 1 ? '' : 's'}` : ''}</span></p>

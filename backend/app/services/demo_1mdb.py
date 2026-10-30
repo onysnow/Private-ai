@@ -28,7 +28,9 @@ emails rebuilt word for word from the US filings' quotes (with a .zip and an
 .mbox thread), a Word conversion, the DOJ payments table (mapped to proposals),
 and the records drawn from them: registry values on the parties, places with
 coordinates, payments in five currencies, ranged and disputed dates, graded
-claims, disputed and superseded links, and leads with next actions.
+claims, disputed and superseded links, and leads with next actions. The case
+also follows a few public sources (app/services/demo_following.py), with what
+they turned up already waiting in the Following queue.
 
 Copyrighted material is fetched from its own address at load and never stored
 with the app; files/ holds only public-domain text and pictures and the
@@ -463,6 +465,10 @@ def build(db: Session, documents: list[tuple[dict[str, Any], bytes | None]], *, 
 
     _build_more(db, inv, docs=docs, source_ids=source_ids, entities=entities, edges=edges, claim_rows=claim_rows, lead_rows=lead_rows,
                 pictures=pictures, evidence=evidence, origin=origin, problems=problems)
+    # The sources the case follows, with what they turned up waiting in the queue (nothing is fetched).
+    from app.services.demo_following import seed_following
+
+    seed_following(db, inv.id)
 
     LAST_PROBLEMS[:] = problems
     if problems:

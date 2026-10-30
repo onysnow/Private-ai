@@ -148,4 +148,27 @@ describe('Following', () => {
     await waitFor(() => expect(api.lastBody('POST /api/investigations/inv-1/monitors/mailbox')).toEqual(
       {host: 'imap.example.net', user: 'desk@example.net', password: 'right horse', sender: 'news@harbourwatch.example.org'}));
   });
+
+  it('shows a case that follows nothing the way to follow a first source: a paste field, the kinds as marks', async () => {
+    const empty = screenData({monitors: [], queue: [], waiting: 0, egress: {sources: 0, third_party: 0, direct: 0, tor: 0, public_server: 0, no_monitor: 0}, working: 0, followed: 0});
+    const api = mockApi({'GET /api/investigations/inv-1/following': empty, 'POST /api/investigations/inv-1/monitors': monitor()});
+    render(<QueryProvider><Following investigationId="inv-1"/></QueryProvider>);
+    const hero = await screen.findByRole('region', {name: 'Follow a first source'});
+    expect(screen.queryByRole('button', {name: '+ Follow something'})).toBeNull();
+    expect(screen.queryByText(/working today/)).toBeNull();
+    // The kinds are marks named for screen readers, their meaning on hover; how it works is three titles.
+    const kinds = within(hero).getByRole('radiogroup', {name: 'What can be followed'});
+    expect(within(kinds).getAllByRole('radio').map(r => r.getAttribute('aria-label'))).toEqual(
+      ['News feed', 'Watched page', 'Sitemap', 'Podcast', 'Public account', 'Newsletter mailbox', 'Closed platform']);
+    expect(within(hero).getByText(/each new entry waits here/).closest('[hidden]')).not.toBeNull();
+    expect(within(hero).getByText('You capture')).toBeVisible();
+    const user = userEvent.setup();
+    await user.click(within(kinds).getByRole('radio', {name: 'Podcast'}));
+    expect(within(hero).getByRole('textbox')).toHaveAttribute('placeholder', 'https://show.example/podcast.rss');
+    await user.type(within(hero).getByRole('textbox'), 'https://www.marlow-courier.example/feed.xml');
+    await user.click(within(hero).getByRole('button', {name: 'Follow'}));
+    await waitFor(() => expect(api.lastBody('POST /api/investigations/inv-1/monitors')).toEqual({target: 'https://www.marlow-courier.example/feed.xml', route: 'direct'}));
+    await user.click(within(kinds).getByRole('radio', {name: 'Newsletter mailbox'}));
+    expect(within(hero).getByLabelText('Mail server')).toBeInTheDocument();
+  });
 });
