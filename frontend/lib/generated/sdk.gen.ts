@@ -1161,6 +1161,9 @@ import type {
   SetPinData,
   SetPinErrors,
   SetPinResponses,
+  SetRelationshipPaymentKindData,
+  SetRelationshipPaymentKindErrors,
+  SetRelationshipPaymentKindResponses,
   SetStoryThesisData,
   SetStoryThesisErrors,
   SetStoryThesisResponses,
@@ -2131,6 +2134,9 @@ import {
   zSetNameResponse,
   zSetPinBody,
   zSetPinResponse,
+  zSetRelationshipPaymentKindBody,
+  zSetRelationshipPaymentKindPath,
+  zSetRelationshipPaymentKindResponse,
   zSetStoryThesisBody,
   zSetStoryThesisPath,
   zSetStoryThesisResponse,
@@ -12814,6 +12820,44 @@ export const createLeadFromRelationshipContext = <
       await zCreateLeadFromRelationshipContextResponse.parseAsync(data),
     url: '/api/relationships/{relationship_id}/lead-from-context',
     ...options,
+  });
+
+/**
+ * Set Relationship Payment Kind
+ *
+ * What kind of payment it is (app/services/payment_kinds.py); null clears it. An amount owed (an agreed price,
+ * a fine, an order) leaves the money totals, the flows, the money checks and the Red Flag payment rules.
+ */
+export const setRelationshipPaymentKind = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<SetRelationshipPaymentKindData, ThrowOnError>,
+): RequestResult<
+  SetRelationshipPaymentKindResponses,
+  SetRelationshipPaymentKindErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    SetRelationshipPaymentKindResponses,
+    SetRelationshipPaymentKindErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSetRelationshipPaymentKindBody,
+          path: zSetRelationshipPaymentKindPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSetRelationshipPaymentKindResponse.parseAsync(data),
+    url: '/api/relationships/{relationship_id}/payment-kind',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

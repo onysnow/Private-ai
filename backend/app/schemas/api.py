@@ -250,6 +250,10 @@ class CrossProviderDecisionRequest(BaseModel):
     rationale: str | None = None
 
 
+# A Payment's kind (app/services/payment_kinds.py); None is "not said", read as money that moved.
+PaymentKind = Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"]
+
+
 class RelationshipCreate(BaseModel):
     investigation_id: str
     schema: str  # type: ignore[assignment]  # see EntityCreate.schema above
@@ -259,6 +263,13 @@ class RelationshipCreate(BaseModel):
     dataset: str = "reporter"
     origin: str | None = None
     evidence_id: str | None = None
+    payment_kind: PaymentKind | None = None
+
+
+class PaymentKindSet(BaseModel):
+    """What kind of payment it is; null clears it."""
+    model_config = ConfigDict(extra="forbid")
+    payment_kind: PaymentKind | None = None
 
 
 class RelationshipEvidenceAttachRequest(BaseModel):

@@ -21450,6 +21450,26 @@
             "title": "Investigation Id",
             "type": "string"
           },
+          "payment_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Kind"
+          },
           "properties": {
             "additionalProperties": {
               "items": {
@@ -24112,6 +24132,19 @@
             "title": "Investigation Id",
             "type": "string"
           },
+          "owed": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FinancialTransactionOut"
+            },
+            "title": "Owed",
+            "type": "array"
+          },
+          "owed_rule": {
+            "default": "",
+            "title": "Owed Rule",
+            "type": "string"
+          },
           "transactions": {
             "items": {
               "$ref": "#/components/schemas/FinancialTransactionOut"
@@ -24219,6 +24252,27 @@
               }
             ],
             "title": "Locator"
+          },
+          "paymentKind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What kind of payment a person says it is (app/services/payment_kinds.py); null: not said.",
+            "title": "Paymentkind"
           },
           "relationship_id": {
             "title": "Relationship Id",
@@ -25780,6 +25834,27 @@
               }
             ],
             "title": "Locator"
+          },
+          "paymentKind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What kind of payment a person says it is (app/services/payment_kinds.py); null: not said.",
+            "title": "Paymentkind"
           },
           "problems": {
             "items": {
@@ -27912,6 +27987,26 @@
       },
       "LinkIn": {
         "properties": {
+          "payment_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Kind"
+          },
           "properties": {
             "additionalProperties": {
               "items": {
@@ -32035,6 +32130,34 @@
         "title": "PartyYearsOut",
         "type": "object"
       },
+      "PaymentKindSet": {
+        "additionalProperties": false,
+        "description": "What kind of payment it is; null clears it.",
+        "properties": {
+          "payment_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Kind"
+          }
+        },
+        "title": "PaymentKindSet",
+        "type": "object"
+      },
       "PdfPageOut": {
         "properties": {
           "height": {
@@ -34905,6 +35028,26 @@
             ],
             "title": "Origin"
           },
+          "payment_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Kind"
+          },
           "properties": {
             "additionalProperties": {
               "items": {
@@ -35266,6 +35409,26 @@
           "investigation_id": {
             "title": "Investigation Id",
             "type": "string"
+          },
+          "payment_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Kind"
           },
           "properties": {
             "additionalProperties": {
@@ -75112,6 +75275,66 @@
           }
         },
         "summary": "Create Lead From Relationship Context"
+      }
+    },
+    "/api/relationships/{relationship_id}/payment-kind": {
+      "patch": {
+        "description": "What kind of payment it is (app/services/payment_kinds.py); null clears it. An amount owed (an agreed price,\na fine, an order) leaves the money totals, the flows, the money checks and the Red Flag payment rules.",
+        "operationId": "set_relationship_payment_kind",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "relationship_id",
+            "required": true,
+            "schema": {
+              "title": "Relationship Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentKindSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Set Relationship Payment Kind"
       }
     },
     "/api/relationships/{relationship_id}/sources": {

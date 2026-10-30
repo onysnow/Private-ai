@@ -1,6 +1,11 @@
 """The case graph the rules read: the parties and links the network draws
 (the reconciled view: a reviewed duplicate counts once), with each party's
-properties and each link's properties and how sure it is."""
+properties and each link's properties and how sure it is.
+
+A payment a person says is an amount owed (an agreed price, a fine or penalty,
+an amount ordered by a court or authority; app/services/payment_kinds.py) is
+not a record that money moved, so the rules that read payments as money
+moving between parties do not read it: it is kept in ``owed``, not ``links``."""
 
 from __future__ import annotations
 
@@ -13,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.models.domain import Entity
 from app.services.paths import certainty_of
+from app.services.payment_kinds import is_owed
 from app.services.relationships import investigation_graph
 
 
@@ -38,6 +44,8 @@ class Link:
 class CaseGraph:
     parties: dict[str, Party] = field(default_factory=dict)
     links: list[Link] = field(default_factory=list)
+    # Payments that are amounts owed, not money moved: no rule reads them.
+    owed: list[Link] = field(default_factory=list)
 
     def directed(self, *schemas: str) -> nx.MultiDiGraph:
         """The links of these schemas as a directed multigraph, keyed by link id."""
@@ -65,8 +73,9 @@ def build(db: Session, investigation_id: str) -> CaseGraph:
     for edge in graph["edges"]:
         if not (edge.get("source") and edge.get("target")):
             continue
-        out.links.append(Link(edge["id"], edge["schema"], edge["source"]["id"], edge["target"]["id"],
-                              dict(edge.get("properties") or {}), certainty_of(edge.get("advisory"))))
+        link = Link(edge["id"], edge["schema"], edge["source"]["id"], edge["target"]["id"],
+                    dict(edge.get("properties") or {}), certainty_of(edge.get("advisory")))
+        (out.owed if edge["schema"] == "Payment" and is_owed(edge.get("payment_kind")) else out.links).append(link)
     return out
 
 

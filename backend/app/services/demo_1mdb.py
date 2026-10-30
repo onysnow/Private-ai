@@ -652,11 +652,12 @@ def _build_more(db: Session, inv: Investigation, *, docs: dict[str, Document], s
             ev_row.notes = f"{ev_row.notes or ''} {v['note']}".strip()
     db.commit()
 
-    def link(schema: str, source_key: str, target_key: str, props: dict[str, list[str]], quotes: list[dict[str, Any]], note: str | None) -> Any:
+    def link(schema: str, source_key: str, target_key: str, props: dict[str, list[str]], quotes: list[dict[str, Any]], note: str | None,
+             payment_kind: str | None = None) -> Any:
         try:
             edge = create_relationship(db, investigation_id=inv.id, schema=schema, source_entity_id=entities[source_key].id,
                                        target_entity_id=entities[target_key].id, properties=props, dataset="1mdb-demo",
-                                       origin=origin(next((q for q in quotes if "doc" in q), None)))
+                                       origin=origin(next((q for q in quotes if "doc" in q), None)), payment_kind=payment_kind)
         except Exception as exc:
             db.rollback()
             problems.append(f"{schema} {source_key} → {target_key}: {exc}")
@@ -690,7 +691,9 @@ def _build_more(db: Session, inv: Investigation, *, docs: dict[str, Document], s
     # Payments and other links, then the case's own links' further evidence (disputed, superseded).
     by_id: dict[str, Any] = {}
     for r in data["relationships"]:
-        edge = link(r["schema"], r["source"], r["target"], r["properties"], r["evidence"], r.get("note"))
+        # A payment's kind only where the record's own note says it (a fine, a regulator's penalty, a court order, an
+        # agreed price); never guessed from its purpose (DECISIONS_LOG 32).
+        edge = link(r["schema"], r["source"], r["target"], r["properties"], r["evidence"], r.get("note"), r.get("payment_kind"))
         if r.get("id") and edge is not None:
             by_id[r["id"]] = edge
     for item in data["link_evidence"]:

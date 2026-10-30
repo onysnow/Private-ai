@@ -24,6 +24,10 @@ Rules this module keeps (read-only; nothing is created or changed):
 * ``flow_type`` is ``direct`` only when at least one attached evidence record's
   latest reporter review is ``supports``; otherwise ``inferred``. The rule is
   returned with the ledger (``flow_type_rule``) so the UI can state it.
+* ``paymentKind`` is what a person says the payment is (app/services/payment_kinds.py). An amount owed (an agreed
+  price, a fine or penalty, an amount ordered by a court or authority) records what was set or agreed, not that
+  money moved: a complete one is listed under ``owed``, never in ``transactions``, so nothing that adds up or draws
+  the transactions counts it as money moved. Kind not said reads as money that moved.
 """
 from __future__ import annotations
 
@@ -31,12 +35,17 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
+from app.services.payment_kinds import is_owed
 from app.services.relationships import investigation_relationships
 
 FLOW_TYPE_RULE = (
     "direct = at least one attached evidence record whose latest reporter review is 'supports'; "
     "inferred = no such evidence (none attached, not yet reviewed, or reviewed as context/contradicts/"
     "superseded/unresolved)."
+)
+OWED_RULE = (
+    "An agreed price, a fine or penalty, or an amount ordered by a court or authority is what was set or agreed, "
+    "not a record that the money moved: it is listed apart and not added to the totals, the flows or the checks."
 )
 
 
@@ -76,6 +85,7 @@ def investigation_financial_ledger(db: Session, investigation_id: str) -> dict[s
     labels = _endpoint_labels(rows)
     transactions: list[dict[str, Any]] = []
     incomplete: list[dict[str, Any]] = []
+    owed: list[dict[str, Any]] = []
     for row in rows:
         props = row.get("properties") or {}
         source, target = row.get("source"), row.get("target")
@@ -124,6 +134,7 @@ def investigation_financial_ledger(db: Session, investigation_id: str) -> dict[s
             "amount": amount,
             "currency": currency.upper() if currency else None,
             "statedPurpose": purpose,
+            "paymentKind": row.get("payment_kind"),
             "transactionNumber": _single(props.get("transactionNumber"))[0],
             "evidence": "; ".join(evidence_bits) if evidence_bits else None,
             "evidence_count": len(attachments),
@@ -136,14 +147,19 @@ def investigation_financial_ledger(db: Session, investigation_id: str) -> dict[s
         }
         if problems:
             incomplete.append({**record, "problems": problems})
+        elif is_owed(record["paymentKind"]):
+            owed.append(record)
         else:
             transactions.append(record)
     transactions.sort(key=lambda t: (t["dateTime"] or "", t["id"]))
+    owed.sort(key=lambda t: (t["dateTime"] or "", t["id"]))
     return {
         "investigation_id": investigation_id,
         "transactions": transactions,
+        "owed": owed,
         "incomplete": incomplete,
         "currencies": sorted({t["currency"] for t in transactions}),
         "flow_type_rule": FLOW_TYPE_RULE,
         "duplicate_rule": "Reviewed duplicate payments are shown once (the reporter-preferred record); unreviewed look-alikes are listed separately.",
+        "owed_rule": OWED_RULE,
     }

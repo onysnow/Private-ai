@@ -3,12 +3,14 @@
 // Add by hand (mockup ENTRY_1; backend app/services/manual_entry.py): a party, a link or an event a reporter knows,
 // written as a sentence with blanks, and where it comes from. Beside it, before anything is written: where a link
 // lands, what it would change (a dry run of the Red Flag rules), and what the case already holds or has waiting in
-// Decide. Kinds are never guessed: a new party's kind is picked, "not known" included.
+// Decide. Kinds are never guessed: a new party's kind is picked, "not known" included, and so is a payment's kind
+// (a transfer, a loan, a fine, an order...; "not said" by default). An amount owed raises no Red Flag (DECISIONS_LOG 32).
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useState} from 'react';
 import type {ReactElement} from 'react';
 
-import {PartyMark} from '../../components/network/marks';
+import {PAYMENT_KIND, PAYMENT_KINDS, PaymentKindGlyph, PartyMark} from '../../components/network/marks';
+import type {PaymentKind} from '../../components/network/marks';
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {byHandSuggestOptions, listDocumentsOptions} from '../../lib/generated/@tanstack/react-query.gen';
@@ -102,6 +104,7 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
   const [currency, setCurrency] = useState('EUR');
   const [date, setDate] = useState('');
   const [purpose, setPurpose] = useState('');
+  const [payKind, setPayKind] = useState<PaymentKind | ''>('');
   const [partyKind, setPartyKind] = useState<PartyKind | null>(null);
   const [country, setCountry] = useState('');
   const [title, setTitle] = useState('');
@@ -121,10 +124,11 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
 
   const entry: EntryIn | null = useMemo(() => {
     if (kind === 'party') return a.text.trim() && partyKind ? {kind, party: {caption: a.text.trim(), schema: partyKind, country: country.trim() || null}} : null;
-    if (kind === 'link') return ready(a) && ready(b) ? {kind, link: {schema, source: end(a), target: end(b), properties: linkProperties(schema, amount, currency, date, purpose)}} : null;
+    if (kind === 'link') return ready(a) && ready(b) ? {kind, link: {schema, source: end(a), target: end(b), properties: linkProperties(schema, amount, currency, date, purpose),
+      ...(schema === 'Payment' && payKind ? {payment_kind: payKind} : {})}} : null;
     return title.trim() && precision ? {kind, event: {title: title.trim(), date: date.trim(), precision: precision === 'year' ? 'year' : precision, where: where.trim() || null,
       entity_ids: [a.id, b.id].filter((x): x is string => Boolean(x))}} : null;
-  }, [kind, a, b, schema, amount, currency, date, purpose, partyKind, country, title, where, precision]);
+  }, [kind, a, b, schema, amount, currency, date, purpose, payKind, partyKind, country, title, where, precision]);
   // The preview writes nothing: asked again as the sentence changes.
   const preview = useQuery({queryKey: ['by-hand-preview', investigationId, entry], enabled: Boolean(entry), staleTime: 0,
     queryFn: async () => (await byHandPreview({path: {investigation_id: investigationId}, body: entry as EntryIn, throwOnError: true})).data});
@@ -133,7 +137,7 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
   const sourceReady = mode === 'none' || (mode === 'passage' ? Boolean(docId && quote.trim()) : Boolean(srcTitle.trim()));
   useEffect(() => { setStatus(''); }, [kind]);
 
-  const reset = () => { setA(EMPTY); setB(EMPTY); setAmount(''); setDate(''); setPurpose(''); setTitle(''); setWhere(''); setQuote(''); setLocator(''); setPartyKind(null); setCountry(''); };
+  const reset = () => { setA(EMPTY); setB(EMPTY); setAmount(''); setDate(''); setPurpose(''); setPayKind(''); setTitle(''); setWhere(''); setQuote(''); setLocator(''); setPartyKind(null); setCountry(''); };
   const add = async (another: boolean) => {
     if (!entry || !sourceReady) return;
     setBusy(true);
@@ -172,7 +176,11 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
             <label className={`bh-slot${date ? '' : ' empty'}`}><small>date</small><input value={date} onChange={e => setDate(e.target.value)} aria-label="Date" placeholder="2019-03-03"/></label>
             <Precision value={precision} date={date}/>
             {schema === 'Payment' && <><span>, for</span><label className={`bh-slot${purpose ? '' : ' empty'}`}><small>purpose</small>
-              <input value={purpose} onChange={e => setPurpose(e.target.value)} aria-label="Purpose" placeholder="not known"/></label></>}
+              <input value={purpose} onChange={e => setPurpose(e.target.value)} aria-label="Purpose" placeholder="not known"/></label>
+              <span>, as</span><label className={`bh-slot${payKind ? '' : ' empty'}`}><small>kind</small>
+              {payKind && <PaymentKindGlyph kind={payKind}/>}
+              <select value={payKind} onChange={e => setPayKind(e.target.value as PaymentKind | '')} aria-label="Kind of payment">
+                <option value="">not said</option>{PAYMENT_KINDS.map(k => <option key={k} value={k}>{PAYMENT_KIND[k].word.toLowerCase()}</option>)}</select></label></>}
           </p>
           : kind === 'party' ? <p className="bh-sentence">
             <label className={`bh-slot${a.text ? '' : ' empty'}`}><small>name</small><input value={a.text} autoFocus onChange={e => setA({id: null, text: e.target.value, kind: null})} aria-label="Name" placeholder="type a name"/></label>

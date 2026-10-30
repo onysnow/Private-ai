@@ -8,11 +8,14 @@
 // Keys: J / K move the lit row (and its band), L shows the ledger, Esc clears the traced set. Pointing at a band
 // (mouse or Tab) lights every ledger row it carries, in the table and on the strip. A very large ledger draws its
 // 20 largest flows and folds the rest into "others (n)", which opens out on a click.
+// A payment's kind is its mark beside its parties, named on reveal. An amount owed (an agreed price, a fine, an order;
+// the ledger's `owed`) is not money that moved: it is listed under "Owed, not paid", never drawn, added or checked.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 
+import {OWED_LINE, PaymentKindMark} from '../../components/network/marks';
 import {LevelChip, StatusChip, type ClaimStatus} from '../../components/status';
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
@@ -76,6 +79,8 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   const [allFlows, setAllFlows] = useState(false); // "others (n)" opened out
 
   const all = useMemo(() => (ledgerQ.data?.transactions ?? [])
+    .filter(t => asOf === null || !t.dateTime || Number(t.dateTime.slice(0, 4)) <= asOf), [ledgerQ.data, asOf]);
+  const owed = useMemo(() => (ledgerQ.data?.owed ?? [])
     .filter(t => asOf === null || !t.dateTime || Number(t.dateTime.slice(0, 4)) <= asOf), [ledgerQ.data, asOf]);
   const counts = useMemo(() => {
     const c = new Map<string, number>();
@@ -197,6 +202,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
       <b>No payment has an amount yet.</b>
       <span>Add one from a bank statement: a payment with a payer, a payee, an amount and its currency.</span>
       {(ledgerQ.data?.incomplete.length ?? 0) > 0 && <span>{ledgerQ.data!.incomplete.length} payment{ledgerQ.data!.incomplete.length === 1 ? ' is' : 's are'} missing something, listed under Not charted below.</span>}
+      {owed.length > 0 && <span>{owed.length} amount{owed.length === 1 ? ' is' : 's are'} owed, not paid, listed below.</span>}
     </div>}
 
     {currency && payments.length > 0 && <div className="mn-body">
@@ -309,7 +315,17 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
       <ChecksPanel investigationId={investigationId} currency={currency} checks={checks} ranAt={checksQ.data?.ran_at} asOf={asOf}
         error={checksQ.isError ? errorMessage(checksQ.error, 'Could not run the checks') : ''}/>
     </div>}
+    {!status && <OwedList owed={owed}/>}
   </section>;
+}
+
+/** Amounts owed, not paid (an agreed price, a fine, an order): each with its kind's mark, in every currency, none added. */
+function OwedList({owed}: {owed: FinancialTransactionOut[]}): ReactElement | null {
+  if (!owed.length) return null;
+  return <details className="mn-incomplete mn-owed">
+    <summary><Reveal tabbable={false} detail={OWED_LINE}><span>Owed, not paid: {owed.length}</span></Reveal></summary>
+    <ul aria-label="Amounts owed, not paid">{owed.map(t => <li key={t.id}><PaymentKindMark kind={t.paymentKind}/> {t.dateTime ? day(t.dateTime) : t.dateEnd ? `by ${day(t.dateEnd)}` : day(null)} · {t.from} → {t.to} · {amountText(t.amount, t.currency)}</li>)}</ul>
+  </details>;
 }
 
 /** The band chips, each in a free place near its band, never over a bar or a party's label. */
@@ -373,7 +389,7 @@ function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
         const on = lit.has(t.id);
         return <tr key={t.id} className={`${on ? 'lit' : ''}${flagged.has(t.id) ? ' flagged' : ''}${traced.has(t.id) ? ' traced' : ''}`} onMouseEnter={() => onLight(t.id, from + i)}
           aria-current={on ? 'true' : undefined}>
-          <td>{t.dateTime ? day(t.dateTime) : t.dateEnd ? `by ${day(t.dateEnd)}` : day(null)}{t.dateTime && t.dateEnd ? ` to ${day(t.dateEnd)}` : ''}</td><td>{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          <td>{t.dateTime ? day(t.dateTime) : t.dateEnd ? `by ${day(t.dateEnd)}` : day(null)}{t.dateTime && t.dateEnd ? ` to ${day(t.dateEnd)}` : ''}</td><td><PaymentKindMark kind={t.paymentKind}/>{t.paymentKind ? ' ' : ''}{t.from} → {t.to}</td><td className="num">{t.amount.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
           <td><StatusChip status={c.status} label={c.word}/></td>
           <td>{t.locator ?? <span className="mn-muted">none attached</span>}</td>
           {full && <td>{t.statedPurpose ?? <span className="mn-muted">none stated</span>}</td>}

@@ -377,7 +377,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 
 ## Still open from before
 - See ("The Wire") prototype awaits approval: SEE_THE_WIRE_PROTOTYPE.md.
-- BO-033 raises one flag per payment. Documents have no kind/language field. Claim evidence can't be "superseded". Payments can't be typed.
+- BO-033 raises one flag per payment. Documents have no kind/language field. Claim evidence can't be "superseded". ~~Payments can't be typed.~~ Done 30 Oct: a payment has a kind (a transfer, loan, fee, settlement, agreed price, fine, or ordered); a fine, an order or an agreed price is owed, not money that moved (DECISIONS_LOG 32).
 
 ## Case home: built vs the approved mockup (Ony sent both, 12 Oct)
 The mockup is the Kestrel SA screen in the redesign PDF; the built one is the Demo Investigation home. To match:
