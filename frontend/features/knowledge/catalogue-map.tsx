@@ -18,8 +18,8 @@ import {MAP_H, MAP_W, layoutMap} from './map-layout';
 
 const WHEEL_STEP_MS = 140;
 
-export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndicator, onShowTable}: {
-  areas: CatalogueAreaOut[]; map: CatalogueMapOut | undefined; layer: CaseLayer; selected: string;
+export function CatalogueMap({loading = false, areas, map, layer, selected, onSelect, onOpenIndicator, onShowTable}: {
+  loading?: boolean; areas: CatalogueAreaOut[]; map: CatalogueMapOut | undefined; layer: CaseLayer; selected: string;
   onSelect: (key: string) => void; onOpenIndicator: (id: string) => void; onShowTable: () => void;
 }): ReactElement {
   const counts = useMemo(() => Object.fromEntries(areas.map(a => [a.key, a.indicators])), [areas]);
@@ -77,6 +77,7 @@ export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndic
   return <section className="kc-panel kc-map" aria-label="Catalogue map">
     <p className="kc-eyebrow">Catalogue map</p>
     {/* How to use the map is on its title, on hover or focus (Ony, 29 Oct). */}
+    {loading && !areas.length ? <><h2 className="kc-title">Reading the catalogue…</h2><div className="kc-skeleton tall" aria-hidden="true"/></> : <>
     <h2 className="kc-title"><Reveal detail="Scroll over the map to step through the areas, or use the arrow keys; click to open one. Lines show “may also point to”.">
       {areas.length} areas · {total.toLocaleString('en-GB')} indicators</Reveal></h2>
     <ul className="kc-legend" aria-label="Key">
@@ -89,18 +90,6 @@ export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndic
       aria-activedescendant={selected ? `kc-area-${selected}` : undefined} onKeyDown={onKey}>
       <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="kc-svg" preserveAspectRatio="xMidYMin meet" focusable="false">
         {labels.map(l => <text key={l.family} x={l.x} y={l.y} className={`kc-fam${l.safety ? ' safety' : ''}`} textAnchor="middle" aria-hidden="true">{l.name.toUpperCase()}</text>)}
-        <g className="kc-lines" key={selected} aria-hidden="true">
-          {at && lines.map(l => {
-            const to = bubbles.find(b => b.key === l.target);
-            if (!to) return null;
-            const mx = (at.x + to.x) / 2;
-            const my = (at.y + to.y) / 2 - Math.min(40, Math.hypot(to.x - at.x, to.y - at.y) / 5);
-            return <g key={l.target}>
-              <path d={`M${at.x},${at.y} Q${mx},${my} ${to.x},${to.y}`} pathLength={1} className="kc-line" style={{strokeWidth: Math.min(4, 1 + l.count / 4)}}/>
-              <text x={(at.x + 2 * mx + to.x) / 4} y={(at.y + 2 * my + to.y) / 4 - 3} className="kc-line-n" textAnchor="middle">{l.count}</text>
-            </g>;
-          })}
-        </g>
         {bubbles.map(b => {
           const fires = layer.firesByArea.get(b.key) ?? 0;
           const safety = b.family === 'safety';
@@ -120,6 +109,25 @@ export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndic
             {b.r > 15 && <text x={b.x} y={b.y + 10} textAnchor="middle" className="kc-n">{b.count}</text>}
           </g>;
         })}
+        {/* The lines go over the circles and run edge to edge: neighbours in a family touch, so lines drawn under the
+            circles were hidden by them. */}
+        <g className="kc-lines" key={selected} aria-hidden="true">
+          {at && lines.map(l => {
+            const to = bubbles.find(b => b.key === l.target);
+            if (!to) return null;
+            const d = Math.hypot(to.x - at.x, to.y - at.y) || 1;
+            const ux = (to.x - at.x) / d, uy = (to.y - at.y) / d;
+            const a = {x: at.x + ux * (at.r + 2), y: at.y + uy * (at.r + 2)};
+            const z = {x: to.x - ux * (to.r + 2), y: to.y - uy * (to.r + 2)};
+            const mx = (a.x + z.x) / 2;
+            const my = (a.y + z.y) / 2 - Math.min(40, Math.hypot(z.x - a.x, z.y - a.y) / 5);
+            return <g key={l.target}>
+              <path d={`M${a.x},${a.y} Q${mx},${my} ${z.x},${z.y}`} pathLength={1} className="kc-line" style={{strokeWidth: Math.min(4, 1 + l.count / 4)}}/>
+              {/* A line too short to carry its count leaves it to the hover card ("BO points here 7 times"). */}
+              {Math.hypot(z.x - a.x, z.y - a.y) >= 36 && <text x={(a.x + 2 * mx + z.x) / 4} y={(a.y + 2 * my + z.y) / 4 - 3} className="kc-line-n" textAnchor="middle">{l.count}</text>}
+            </g>;
+          })}
+        </g>
       </svg>
       {hovered && hoveredArea && <div className="kc-hover" role="presentation"
         style={{left: hoverAt.left, top: hoverAt.top, transform: hoverAt.right ? `translateX(calc(-100% - ${hoverAt.w + 12}px))` : undefined}}>
@@ -130,6 +138,7 @@ export function CatalogueMap({areas, map, layer, selected, onSelect, onOpenIndic
     </div>
     <button type="button" className="kc-link kc-aslist" onClick={onShowTable}>Show as list</button>
     <AreaCard area={byKey.get(selected)} counts={map?.areas.find(a => a.key === selected)} layer={layer} onOpenIndicator={onOpenIndicator}/>
+    </>}
   </section>;
 }
 

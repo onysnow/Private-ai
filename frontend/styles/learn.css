@@ -53,14 +53,16 @@
 @keyframes kc-shimmer { to { background-position: -200% 0; } }
 
 /* Panel A: the map. */
-.kc-map { display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr) auto auto; overflow: hidden; }
+/* A column, not a grid of counted rows: a fixed row list broke when the "how to use" line moved into the title's reveal
+   (29 Oct) and the map box fell into an auto row of height 0, so the map drew nothing. The box takes the room left. */
+.kc-map { display: flex; flex-direction: column; overflow: hidden; }
 .kc-legend { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 11.5px; color: var(--text-muted); }
 .kc-legend li { display: inline-flex; align-items: center; gap: 6px; }
 .kc-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--line); }
 .kc-legend .kc-key-fires { border: 1.5px dashed var(--flag-strong); }
 .kc-legend .kc-key-line { width: 18px; height: 0; border-radius: 0; border: 0; border-top: 2px solid var(--accent-1); }
 .kc-legend .kc-key-safety { border: 1.5px dashed var(--accent-2); }
-.kc-map-box { position: relative; min-height: 0; margin-top: 4px; overflow: hidden; }
+.kc-map-box { position: relative; flex: 1 1 0; min-height: 240px; margin-top: 4px; overflow: hidden; }
 .kc-map-box:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; border-radius: 10px; }
 .kc-svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 .kc-fam { font: 600 10px var(--font-mono); letter-spacing: .14em; fill: var(--text); opacity: .85; }
@@ -77,6 +79,7 @@
 .kc-n { font: 9px var(--font-mono); fill: var(--text-muted); pointer-events: none; }
 .kc-area.on .kc-key, .kc-area.on .kc-n { fill: var(--ground); }
 .kc-area.safety .kc-key { fill: var(--accent-2); }
+.kc-lines { pointer-events: none; }
 .kc-line { fill: none; stroke: var(--accent-1); opacity: .85; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: kc-draw var(--dur-base, 450ms) var(--ease-out) forwards; }
 .kc-line-n { font: 600 10px var(--font-mono); fill: var(--accent-1); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; }
 @keyframes kc-draw { to { stroke-dashoffset: 0; } }
@@ -85,7 +88,7 @@
 .kc-hover b { font-size: 12.5px; }
 .kc-hover span { color: var(--text-muted); }
 .kc-hover em { font-style: normal; color: var(--accent-1); }
-.kc-aslist { justify-self: end; margin: 2px 0 6px; }
+.kc-aslist { align-self: flex-end; margin: 2px 0 6px; }
 .kc-area-card { padding: 12px 14px; border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-panel); display: grid; gap: 6px; }
 .kc-area-card header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
 .kc-area-card h3 { margin: 0; font: 700 14.5px var(--font-ui); }

@@ -141,7 +141,7 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
     {problem && <p className="kc-error" role="alert">{problem}</p>}
     <div className={`kc-board view-${view}`}>
       {view === 'map' && <>
-        <CatalogueMap areas={areas} map={mapQuery.data} layer={layer} selected={area} onSelect={chooseArea} onOpenIndicator={openIndicator} onShowTable={() => setView('table')}/>
+        <CatalogueMap loading={areasQuery.isPending} areas={areas} map={mapQuery.data} layer={layer} selected={area} onSelect={chooseArea} onOpenIndicator={openIndicator} onShowTable={() => setView('table')}/>
         <IndicatorList area={areaRow} rows={rows} loading={rowsQuery.isPending && Boolean(area)} error={rowsQuery.isError ? errorMessage(rowsQuery.error, 'Could not load the indicators') : ''}
           layer={layer} filter={filter} onFilter={setFilter} selected={indicator} onSelect={id => { setIndicator(id); setPreview(null); }} onPreview={setPreview}/>
       </>}
