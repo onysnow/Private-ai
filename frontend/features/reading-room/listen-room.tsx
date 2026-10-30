@@ -88,16 +88,26 @@ function VoiceTag({voice, voices, more, tabbable = false}: {voice: string | null
 }
 
 const spoken = (seconds: number) => seconds >= 60 ? `${Math.floor(seconds / 60)} min ${Math.round(seconds % 60)} s` : `${Math.round(seconds)} s`;
+const voiceClass = (voice: string | number | null | undefined) => `lr-v${(Number(voice) - 1) % 6 + 1}`;
+/** Past this many voices, the ones heard for only a moment fold away behind one row. */
+const MANY_VOICES = 6;
+const BRIEF = 5;
 
 /** Voices (INTAKE_4, ADR-0026): the voices the machine told apart in this recording, as guesses, and the names a
- *  person gave them. Naming one as a party of the case links it; nothing is matched across recordings. */
+ *  person gave them. One row each: its colour, its name or "Voice 2 · a guess"; a click on the row names it there.
+ *  Naming one as a party of the case links it; nothing is matched across recordings. */
 function Voices({doc, v, onChanged, onListening}: {doc: DocumentDetailOut; v: VoicesOut | null | undefined; onChanged: (words: string) => void;
   onListening: () => void}): ReactElement {
   const [naming, setNaming] = useState<string | null>(null);
   const [typed, setTyped] = useState('');
   const [busy, setBusy] = useState(false);
+  const [allShown, setAllShown] = useState(false);
   const parties = useQuery({...listEntitiesOptions({path: {investigation_id: doc.investigation_id}, query: {limit: 500}}), enabled: naming !== null}).data ?? [];
   const voices = v?.voices ?? [];
+  // The voices heard longest first; when there are many, the ones heard for a moment fold behind one row.
+  const ordered = [...voices].sort((a, b) => b.spoken - a.spoken);
+  const brief = voices.length > MANY_VOICES ? ordered.filter(x => x.spoken < BRIEF && !x.name && x.voice !== naming) : [];
+  const shown = allShown ? ordered : ordered.filter(x => !brief.includes(x));
   const give = async (voice: string, words: string) => {
     const party = parties.find(p => p.caption.toLowerCase() === words.trim().toLowerCase());
     setBusy(true);
@@ -115,21 +125,31 @@ function Voices({doc, v, onChanged, onListening}: {doc: DocumentDetailOut; v: Vo
     setBusy(false);
   };
   return <section className="lr-panel" aria-label="Voices">
-    <p className="lr-cap"><Reveal detail="Lanes are guesses by a speaker model, in this recording only. Names are yours; a voice is never matched to another recording.">Voices</Reveal>
+    <p className="lr-cap"><Reveal detail="Lanes are guesses by a speaker model, in this recording only. Names are yours; a voice is never matched to another recording. Click a voice to name it.">Voices</Reveal>
       {v?.found_by && <span>⌂ on this computer</span>}</p>
-    {voices.length ? <ul className="lr-voices">{voices.map(x => <li key={x.voice}>
-      <VoiceTag voice={x.voice} voices={voices} tabbable
-        more={`${x.name ? `named by ${by(x.named_by)}` : 'a guess'} · ${x.turns} turn${x.turns === 1 ? '' : 's'} · ${spoken(x.spoken)}`}/>
+    {voices.length ? <ul className="lr-voices">{shown.map(x => <li key={x.voice} className={voiceClass(x.voice)}>
       {naming === x.voice ? <form className="lr-name" onSubmit={e => { e.preventDefault(); void give(x.voice, typed); }}>
+        <i aria-hidden="true"/>
         <input autoFocus list={`lr-parties-${doc.id}`} value={typed} onChange={e => setTyped(e.target.value)} aria-label={`Name voice ${x.voice}`}
-          placeholder="A party of the case, or a name"/>
+          placeholder="A party, or a name" onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); setNaming(null); } }}/>
         <datalist id={`lr-parties-${doc.id}`}>{parties.map(p => <option key={p.id} value={p.caption}/>)}</datalist>
-        <button type="submit" disabled={busy}>Name it</button><button type="button" onClick={() => setNaming(null)}>Cancel</button>
-      </form> : <span className="lr-acts">
-        <button type="button" onClick={() => { setNaming(x.voice); setTyped(x.name ?? ''); }}>{x.name ? 'Rename' : 'Name this voice'}</button>
-        {x.name && <button type="button" onClick={() => void give(x.voice, '')} disabled={busy}>Clear</button>}
-      </span>}
-    </li>)}</ul>
+        <span className="lr-acts">
+          <button type="submit" disabled={busy}>Name it</button>
+          {x.name && <button type="button" onClick={() => void give(x.voice, '')} disabled={busy}>Clear</button>}
+          <button type="button" onClick={() => setNaming(null)}>Cancel</button>
+        </span>
+      </form>
+      : <Reveal tabbable={false} detail={<><b>{x.name ? `${x.name}, named by ${by(x.named_by)}` : `Voice ${x.voice}, a guess by the speaker model`}</b>
+        <span className="rv-row">{x.turns} turn{x.turns === 1 ? '' : 's'} · {spoken(x.spoken)}</span>
+        <span className="rv-row">Click to {x.name ? 'rename it' : 'name it'}.</span></>}>
+        <button type="button" className="lr-vrow" onClick={() => { setNaming(x.voice); setTyped(x.name ?? ''); }}
+          aria-label={x.name ? `${x.name}: rename this voice` : `Voice ${x.voice}, a guess: name this voice`}>
+          <i aria-hidden="true"/><b>{x.name ?? `Voice ${x.voice}`}</b><small>{x.name ? `named by ${by(x.named_by)}` : 'a guess'}</small><em aria-hidden="true">✎</em>
+        </button></Reveal>}
+    </li>)}
+      {brief.length > 0 && <li><button type="button" className="lr-vrow more" onClick={() => setAllShown(!allShown)} aria-expanded={allShown}>
+        {allShown ? 'Fold the brief voices' : <><b>+{brief.length}</b><small>heard for under {BRIEF} s</small></>}</button></li>}
+    </ul>
     : v?.unavailable ? <p className="lr-note">Voices are not told apart yet: {v.unavailable}.</p>
     : <div className="lr-acts"><button type="button" onClick={() => void listen()} disabled={busy || doc.extraction_status !== 'complete'}>Listen for voices</button></div>}
     {voices.length > 0 && v?.found_by && <details className="lr-note"><summary>How they were found</summary>
@@ -138,6 +158,43 @@ function Voices({doc, v, onChanged, onListening}: {doc: DocumentDetailOut; v: Vo
       <div className="lr-acts"><button type="button" onClick={() => void listen()} disabled={busy}>Listen again (names are cleared, kept in history)</button></div>
     </details>}
   </section>;
+}
+
+export type Part = {start: number; title: string; voice?: string; noSpeech?: boolean};
+/** A floor this long, held by one voice, starts a part of its own. */
+const FLOOR = 20;
+
+/** The parts of a recording: the ones its feed names; else, honestly derived, where one voice takes the floor for
+ *  {FLOOR} s or more (from the speaker turns) and where a long stretch has no speech, each titled by its first words.
+ *  None when neither is known. */
+export function partsOf(t: TranscriptOut): {parts: Part[]; fromFeed: boolean} {
+  if ((t.parts ?? []).length) return {parts: (t.parts ?? []).map(p => ({start: p.start, title: p.title})), fromFeed: true};
+  const turns = t.voices?.turns ?? [];
+  if (!turns.length) return {parts: [], fromFeed: false};
+  const runs: {start: number; end: number; voice: string}[] = [];
+  for (const [start, end, voice] of turns) {
+    const last = runs.at(-1);
+    if (last && last.voice === String(voice)) last.end = Math.max(last.end, end);
+    else runs.push({start, end, voice: String(voice)});
+  }
+  const firstWords = (from: number) => {
+    const s = t.segments.find(x => x.kind === 'speech' && x.end > from + 0.3);
+    if (!s) return '…';
+    const words = s.text.trim().split(/\s+/);
+    return words.length > 6 ? `${words.slice(0, 6).join(' ')}…` : s.text.trim();
+  };
+  const starts: Part[] = [];
+  for (const r of runs.filter(x => x.end - x.start >= FLOOR)) starts.push({start: r.start, title: '', voice: r.voice});
+  for (const s of t.segments.filter(x => x.kind === 'no_speech' && x.end - x.start >= FLOOR / 2)) starts.push({start: s.start, title: 'No speech', noSpeech: true});
+  starts.sort((a, b) => a.start - b.start);
+  const parts: Part[] = [];
+  for (const p of starts) {
+    const at = parts.length === 0 && p.start < FLOOR ? 0 : p.start;
+    if (parts.length && at - parts[parts.length - 1].start < FLOOR / 2) continue;
+    if (!parts.length && at > 0) parts.push({start: 0, title: firstWords(0), voice: runs[0]?.voice});
+    parts.push({...p, start: at, title: p.noSpeech ? p.title : firstWords(p.start)});
+  }
+  return {parts: parts.length > 1 ? parts : [], fromFeed: false};
 }
 
 /** Where a quote sits in the recording, in the W3C Media Fragments form the evidence keeps. */
@@ -153,44 +210,82 @@ function Words({segment, unsureBelow, now}: {segment: TranscriptSegmentOut; unsu
   })}</>;
 }
 
+/** A tick every so often across the window: about eight to ten of them. */
+const tickStep = (span: number) => [1, 2, 5, 10, 15, 20, 30, 60, 120, 300, 600, 900, 1800].find(s => span / s <= 10) ?? 3600;
+
+/** Who spoke when, per voice: the speaker turns when the voices were found, else the voice on each spoken part. */
+function lanesOf(t: TranscriptOut): {voice: string; start: number; end: number}[] {
+  const turns = t.voices?.turns ?? [];
+  if (turns.length) return turns.map(([start, end, voice]) => ({voice: String(voice), start, end}));
+  return t.segments.filter(s => s.kind === 'speech' && s.speaker).map(s => ({voice: String(s.speaker), start: s.start, end: s.end}));
+}
+
 function Outline({t, now, duration, pinned, onSeek}: {t: TranscriptOut; now: number; duration: number; pinned: Pinned | null;
   onSeek: (seconds: number) => void}): ReactElement {
   const from = duration > WINDOW ? Math.min(Math.max(0, now - WINDOW / 3), duration - WINDOW) : 0;
   const to = duration > WINDOW ? from + WINDOW : duration;
   const span = Math.max(to - from, 0.001);
   const x = (s: number) => ((s - from) / span) * 1000;
+  const pct = (s: number) => `${((s - from) / span) * 100}%`;
   const step = t.outline_step || duration / Math.max(t.outline.length, 1);
   const first = Math.max(0, Math.floor(from / step));
   const last = Math.min(t.outline.length, Math.ceil(to / step));
   const peaks = t.outline.slice(first, last);
   const bar = peaks.length ? 1000 / peaks.length : 0;
-  const seekFrom = (e: ReactPointerEvent<SVGSVGElement>, scaleFrom: number, scaleSpan: number) => {
+  const speech = t.segments.filter(s => s.kind === 'speech');
+  const spokenAt = (s: number) => speech.some(x => s >= x.start && s < x.end);
+  const seekFrom = (e: ReactPointerEvent<Element>, scaleFrom: number, scaleSpan: number) => {
     const box = e.currentTarget.getBoundingClientRect();
     onSeek(scaleFrom + ((e.clientX - box.left) / Math.max(box.width, 1)) * scaleSpan);
   };
+  // One lane per voice heard in the window, in the order the voices are numbered; their height shares the band.
+  const turns = lanesOf(t).filter(r => r.end > from && r.start < to);
+  const laneVoices = [...new Set(turns.map(r => r.voice))].sort((a, b) => Number(a) - Number(b));
+  const laneH = laneVoices.length ? Math.min(7, 34 / laneVoices.length) : 0;
+  const laneY = (voice: string) => 2 + laneVoices.indexOf(voice) * laneH;
+  const lanesEnd = 2 + laneVoices.length * laneH;
+  const waveTop = lanesEnd + 10;
+  const mid = waveTop + (120 - waveTop) / 2;
+  const half = (120 - waveTop) / 2 - 2;
+  const every = tickStep(span);
+  const ticks: number[] = [];
+  for (let s = Math.ceil(from / every) * every; s <= to; s += every) ticks.push(s);
+  const voices = t.voices?.voices ?? [];
   return <div className="lr-wf">
-    <svg className="lr-ovw" viewBox="0 0 1000 10" preserveAspectRatio="none" role="presentation" onPointerDown={e => seekFrom(e, 0, duration)}>
-      <rect x={0} y={0} width={1000} height={10} rx={5} className="lr-ovw-bg"/>
-      <rect x={(from / duration) * 1000} y={0} width={(span / duration) * 1000} height={10} rx={4} className="lr-ovw-win"/>
-      <rect x={(now / duration) * 1000 - 1} y={0} width={2} height={10} className="lr-ovw-ph"/>
-    </svg>
     {/* The window shows; the whole length and the marks' key are on hover (Ony, 29 Oct). */}
     <p className="lr-wf-cap"><Reveal detail={<><span className="rv-row">Whole file {clock(duration, false)} · showing {clock(from, false)}–{clock(to, false)}</span>
-      <span className="rv-row"><i className="lr-key pin"/>pinned quote <i className="lr-key unsure"/>machine unsure <i className="lr-key ns"/>no speech</span></>}>
-      {clock(from, false)}–{clock(to, false)}</Reveal></p>
-    <svg className="lr-wave" viewBox="0 0 1000 120" preserveAspectRatio="none" role="slider" tabIndex={-1} aria-label="Position in the recording"
-      aria-valuemin={0} aria-valuemax={Math.round(duration)} aria-valuenow={Math.round(now)} aria-valuetext={clock(now)}
-      onPointerDown={e => seekFrom(e, from, span)}>
-      {t.segments.filter(s => s.end > from && s.start < to).map(s => s.kind === 'no_speech'
-        ? <rect key={s.id} className="lr-ns" x={x(s.start)} y={22} width={Math.max(1, x(s.end) - x(s.start))} height={92}/>
-        : <g key={s.id}>
-          <rect className={`lr-sp${s.speaker ? ` lr-v${(Number(s.speaker) - 1) % 6 + 1}` : ''}`} x={x(s.start)} y={4} width={Math.max(1, x(s.end) - x(s.start) - 2)} height={8} rx={4}/>
-          {s.words.filter(w => w.p < t.unsure_below).map((w, i) => <circle key={i} className="lr-unsure" cx={x((w.s + w.e) / 2)} cy={17} r={2.5}/>)}
-        </g>)}
-      {pinned && <rect className="lr-pin" x={x(pinned.start)} y={22} width={Math.max(2, x(pinned.end) - x(pinned.start))} height={92}/>}
-      {peaks.map((p, i) => <rect key={i} className={(first + i) * step < now ? 'lr-bar on' : 'lr-bar'} x={i * bar} y={68 - p * 44} width={Math.max(bar * 0.7, 0.5)} height={Math.max(p * 88, 1)}/>)}
-      <line className="lr-ph" x1={x(now)} x2={x(now)} y1={0} y2={120}/>
-    </svg>
+      <span className="rv-row"><i className="lr-key pin"/>pinned quote <i className="lr-key unsure"/>machine unsure <i className="lr-key ns"/>no speech</span>
+      <span className="rv-row">Above the outline, a lane for each voice.</span></>}>
+      {clock(from, false)}–{clock(to, false)}</Reveal>
+      <svg className="lr-ovw" viewBox="0 0 1000 10" preserveAspectRatio="none" role="presentation" onPointerDown={e => seekFrom(e, 0, duration)}>
+        <rect x={0} y={4} width={1000} height={2} rx={1} className="lr-ovw-bg"/>
+        {pinned && <rect x={(pinned.start / duration) * 1000} y={2} width={Math.max(3, ((pinned.end - pinned.start) / duration) * 1000)} height={6} className="lr-ovw-pin"/>}
+        <rect x={(from / duration) * 1000} y={1} width={(span / duration) * 1000} height={8} rx={4} className="lr-ovw-win"/>
+        <rect x={(now / duration) * 1000 - 1} y={0} width={2} height={10} className="lr-ovw-ph"/>
+      </svg></p>
+    <div className="lr-ticks" aria-hidden="true">{ticks.map(s => <span key={s} style={{left: pct(s)}}>{clock(s, false)}</span>)}</div>
+    <div className="lr-wave-box">
+      <svg className="lr-wave" viewBox="0 0 1000 120" preserveAspectRatio="none" role="slider" tabIndex={-1} aria-label="Position in the recording"
+        aria-valuemin={0} aria-valuemax={Math.round(duration)} aria-valuenow={Math.round(now)} aria-valuetext={clock(now)}
+        onPointerDown={e => seekFrom(e, from, span)}>
+        <defs><pattern id="lr-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <rect width="3" height="6" className="lr-hatch"/></pattern></defs>
+        {ticks.map(s => <line key={s} className="lr-tick" x1={x(s)} x2={x(s)} y1={0} y2={120}/>)}
+        {turns.map((r, i) => <rect key={i} className={`lr-lane ${voiceClass(r.voice)}`} x={x(r.start)} y={laneY(r.voice)}
+          width={Math.max(1, x(r.end) - x(r.start) - 1.5)} height={Math.max(1.5, laneH - 1.5)} rx={Math.min(3, laneH / 2)}>
+          <title>{voiceLabel(r.voice, voices)?.text ?? `Voice ${r.voice}`} · {clock(r.start)}–{clock(r.end)}</title></rect>)}
+        {t.segments.filter(s => s.end > from && s.start < to).map(s => s.kind === 'no_speech'
+          ? <rect key={s.id} className="lr-ns" x={x(s.start)} y={waveTop} width={Math.max(1, x(s.end) - x(s.start))} height={120 - waveTop}/>
+          : s.words.filter(w => w.p < t.unsure_below).map((w, i) => <rect key={`${s.id}-${i}`} className="lr-unsure" x={x((w.s + w.e) / 2) - 2} y={lanesEnd + 3} width={4} height={4}
+            transform={`rotate(45 ${x((w.s + w.e) / 2)} ${lanesEnd + 5})`}/>))}
+        {pinned && <rect className="lr-pin" x={x(pinned.start)} y={waveTop - 2} width={Math.max(2, x(pinned.end) - x(pinned.start))} height={122 - waveTop}/>}
+        {peaks.map((p, i) => { const at = (first + i) * step; return <rect key={i} className={`lr-bar${spokenAt(at) ? ' sp' : ''}${at < now ? ' on' : ''}`}
+          x={i * bar} y={mid - Math.max(p * half, 0.5)} width={Math.max(bar * 0.7, 0.5)} height={Math.max(p * half * 2, 1)}/>; })}
+        <line className="lr-ph" x1={x(now)} x2={x(now)} y1={0} y2={120}/>
+      </svg>
+      <i className="lr-ph-dot" aria-hidden="true" style={{left: pct(now)}}/>
+      {pinned && pinned.end > from && pinned.start < to && <code className="lr-pin-at" style={{left: pct(pinned.start)}}>media:#{placeOf(pinned)}</code>}
+    </div>
   </div>;
 }
 
@@ -398,6 +493,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
   const silent = segments.filter(s => s.kind === 'no_speech');
   const unsureCount = t ? spoken.reduce((n, s) => n + s.words.filter(w => w.p < t.unsure_below).length, 0) : 0;
   const about = (t?.transcript ?? {}) as {tool?: string; model?: string; language?: string; language_probability?: number; ran_at?: string};
+  const {parts, fromFeed: partsFromFeed} = useMemo(() => (t ? partsOf(t) : {parts: [], fromFeed: false}), [t]);
   const title = doc.filename.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
   const MediaTag = isVideo ? 'video' : 'audio';
   const events = {onPlay: () => setPlaying(true), onPause: () => setPlaying(false), onEnded: () => setPlaying(false),
@@ -435,26 +531,27 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
 
     <aside className="lr-left" aria-label="This recording">
       {MediaTag === 'video' && <section className="lr-panel lr-video" aria-label="Picture">{mediaElement ?? <p className="lr-note">Opening…</p>}</section>}
-      {(t?.parts ?? []).length > 0 && <section className="lr-panel" aria-label="Parts">
-        <p className="lr-cap"><Reveal detail="The parts the episode’s feed names.">Parts</Reveal></p>
-        <ol className="lr-parts">{(t?.parts ?? []).map((part, i, all) => {
+      {parts.length > 0 && <section className="lr-panel" aria-label="Parts">
+        <p className="lr-cap"><Reveal detail={partsFromFeed ? 'The parts the episode’s feed names.'
+          : `The feed names no parts: these begin where one voice holds the floor for ${FLOOR} s or more, found from the speaker turns, each titled by its first words.`}>Parts</Reveal>
+          <span>{partsFromFeed ? 'from the feed' : 'by who speaks'}</span></p>
+        <ol className="lr-parts">{parts.map((part, i, all) => {
           const on = now >= part.start && (i === all.length - 1 || now < all[i + 1].start);
-          return <li key={i}><button type="button" className={on ? 'on' : ''} aria-current={on ? 'true' : undefined} onClick={() => seek(part.start)}>
-            <span>{clock(part.start, false)}</span>{part.title}</button></li>;
+          return <li key={i}><button type="button" className={`${on ? 'on' : ''}${part.voice ? ` ${voiceClass(part.voice)}` : ''}${part.noSpeech ? ' ns' : ''}`}
+            aria-current={on ? 'true' : undefined} onClick={() => seek(part.start)} title={part.title}>
+            <span>{clock(part.start, false)}</span><b>{part.title}</b></button></li>;
         })}</ol>
       </section>}
-      <section className="lr-panel">
-        <p className="lr-cap">In this recording</p>
-        <dl className="lr-facts">
+      <Voices doc={doc} v={t?.voices} onListening={() => setListeningSince(Date.now())} onChanged={words => { setStatus(words); void queryClient.invalidateQueries({queryKey: getDocumentTranscriptQueryKey({path: {document_id: doc.id}})}); }}/>
+      <section className="lr-panel lr-facts-panel" aria-label="In this recording">
+        <p className="lr-cap"><Reveal detail={<dl className="lr-facts">
           <div><dt>Spoken parts</dt><dd>{spoken.length}</dd></div>
           <div><dt>No speech</dt><dd>{silent.length}</dd></div>
           <div><dt>Machine unsure</dt><dd>{unsureCount} word{unsureCount === 1 ? '' : 's'}</dd></div>
-          <div><dt>Language</dt><dd>{about.language ? <Reveal detail={`${about.language} · ${Math.round((about.language_probability ?? 0) * 100)}%`}>
-            {about.language.length <= 3 ? about.language.toUpperCase() : about.language}</Reveal> : '–'}</dd></div>
-        </dl>
+          <div><dt>Language</dt><dd>{about.language ? `${about.language.length <= 3 ? about.language.toUpperCase() : about.language} · ${Math.round((about.language_probability ?? 0) * 100)}%` : '–'}</dd></div>
+        </dl>}>In this recording</Reveal>{about.language && <span>{about.language.length <= 3 ? about.language.toUpperCase() : about.language}</span>}</p>
         {waiting > 0 && <p className="lr-note"><a href={decideHref}>{waiting} proposal{waiting === 1 ? '' : 's'} from this transcript</a> wait in Decide.</p>}
       </section>
-      <Voices doc={doc} v={t?.voices} onListening={() => setListeningSince(Date.now())} onChanged={words => { setStatus(words); void queryClient.invalidateQueries({queryKey: getDocumentTranscriptQueryKey({path: {document_id: doc.id}})}); }}/>
     </aside>
 
     <main className="lr-read" aria-label="Transcript">
@@ -539,9 +636,11 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
     </main>
 
     <aside className="lr-right" aria-label="Pinned quote and files">
-      <section className={`lr-panel lr-pinned${pinned ? ' hot' : ''}`} aria-label="Pinned quote">
-        <p className="lr-cap">Pinned quote {pinned && <span className={`lr-chip ${saved ? 'ok' : heard ? 'teal' : 'amber'}`}>
-          {saved ? 'Saved · heard by you' : heard ? 'Heard by you' : 'Transcribed · not yet heard'}</span>}</p>
+      <section className={`lr-panel lr-pinned${pinned ? ' hot' : ' empty'}`} aria-label="Pinned quote">
+        <p className="lr-cap">Pinned quote {pinned ? <span className={`lr-chip ${saved ? 'ok' : heard ? 'teal' : 'amber'}`}>
+          {saved ? 'Saved · heard by you' : heard ? 'Heard by you' : 'Transcribed · not yet heard'}</span>
+          : <Reveal detail={<>Choose words in a line, use its Pin, or press <kbd>P</kbd> while it plays. A quote from a recording is saved only once you have heard it.</>}>
+            <span className="lr-empty">Nothing pinned</span></Reveal>}</p>
         {pinned ? <>
           {/* Where the quote sits, which file it plays from and who said it are on hover of the quote. */}
           <Reveal detail={<><span className="rv-row">Place <code>media:#{placeOf(pinned)}</code></span><span className="rv-row">From {doc.filename} · the original, as uploaded</span>
@@ -564,7 +663,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
           </div>
           {/* A blocking state stays on screen: while the part is not yet heard, why Save is locked shows. */}
           {!heard && <p className="lr-note">Evidence stays locked until you have heard the part yourself. Machines can invent words.</p>}
-        </> : <p className="lr-note"><Reveal detail={<>Pin a line with its Pin button or <kbd>P</kbd> while it plays, or choose words in it. A quote from a recording is saved only once you have heard it.</>}>Nothing pinned</Reveal></p>}
+        </> : null}
         {status && <p role="status" className="lr-status">{status}</p>}
       </section>
       <section className="lr-panel" aria-label="Files">

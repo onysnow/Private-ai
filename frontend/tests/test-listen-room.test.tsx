@@ -6,7 +6,7 @@ import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {clock, joinWords, partOf, placeOf} from '../features/reading-room/listen-room';
+import {clock, joinWords, partOf, partsOf, placeOf} from '../features/reading-room/listen-room';
 import {ReadingRoom} from '../features/reading-room/reading-room';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -77,6 +77,32 @@ describe('Listen & read helpers', () => {
   });
 });
 
+// A longer recording with many voices and no parts from its feed: three voices hold the floor, five are heard briefly.
+const MANY = (() => {
+  const segs = [seg('a', 0, 25, 'speech', 'Welcome to the show about the harbour land today.'), seg('b', 40, 70, 'speech', 'The minutes say the parcel was to be transferred.'),
+    seg('c', 70, 84, 'no_speech', ''), seg('d', 84, 120, 'speech', 'I never saw a valuation before we voted.')]
+    .map(x => ({...x, speaker: x.id === 'a' ? '1' : x.id === 'b' ? '2' : x.id === 'd' ? '3' : null}));
+  const brief = ['4', '5', '6', '7', '8'].map((voice, i) => ({voice, spoken: 1 + i * 0.5, turns: 1, name: null, entity_id: null, named_by: null, named_at: null}));
+  return {...TRANSCRIPT, duration: 120, segments: segs, voices: {voices: [
+    {voice: '1', spoken: 25, turns: 1, name: 'Host', entity_id: null, named_by: 'local-owner', named_at: '2026-10-29T10:00:00'},
+    {voice: '2', spoken: 30, turns: 1, name: null, entity_id: null, named_by: null, named_at: null},
+    {voice: '3', spoken: 36, turns: 1, name: null, entity_id: null, named_by: null, named_at: null}, ...brief],
+  turns: [[0, 25, 1], [25, 26, 4], [40, 70, 2], [84, 120, 3]], found_by: {tool: 'sherpa-onnx 2.0.1', where: 'this computer', ran_at: '2026-10-29T09:59:00'},
+  history: [], unavailable: null}};
+})();
+
+describe('Parts of a recording', () => {
+  it('takes the feed\'s parts when it names them, and otherwise finds them where one voice holds the floor', () => {
+    expect(partsOf({...TRANSCRIPT, parts: [{start: 0, title: 'Welcome'}]} as never)).toEqual({parts: [{start: 0, title: 'Welcome'}], fromFeed: true});
+    const {parts, fromFeed} = partsOf(MANY as never);
+    expect(fromFeed).toBe(false);
+    expect(parts.map(p => [p.start, p.voice ?? null, p.title])).toEqual([
+      [0, '1', 'Welcome to the show about the…'], [40, '2', 'The minutes say the parcel was…'], [70, null, 'No speech'], [84, '3', 'I never saw a valuation before…']]);
+    // Without speaker turns nothing honest can be shown: no parts.
+    expect(partsOf(TRANSCRIPT as never).parts).toEqual([]);
+  });
+});
+
 describe('Listen & read', () => {
   it('opens a recording beside its transcript, with the parts with no speech kept apart', async () => {
     mockApi(ROUTES);
@@ -143,18 +169,20 @@ describe('Listen & read', () => {
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
     const user = userEvent.setup();
     const panel = await screen.findByRole('region', {name: 'Voices'});
+    // One row a voice: its name, or "Voice 2 · a guess"; its turns and time are on hover.
     expect(await within(panel).findByText('Host')).toBeInTheDocument();
-    expect(panel).toHaveTextContent('named by you · 2 turns · 6 s');
-    expect(within(panel).getByText('Voice 2 ?')).toBeInTheDocument();
+    expect(within(panel).getByText('Voice 2')).toBeInTheDocument();
+    expect(within(panel).getByText('a guess')).toBeVisible();
+    expect(within(panel).getByText('2 turns · 6 s').closest('[hidden]')).not.toBeNull();
     expect(panel).toHaveTextContent('a voice is never matched to another recording');
     // Each line says its voice in words; the machine's guess carries a "?".
     const lines = screen.getByRole('main', {name: 'Transcript'});
     expect(within(lines).getAllByText('Host')).toHaveLength(2);
     // Who named a voice, or that it is a guess, is on hover of its tag (Ony, 29 Oct).
     expect(within(lines).getAllByText('A guess by the speaker model').every(el => el.closest('[hidden]'))).toBe(true);
-    expect(within(panel).getByText('named by you · 2 turns · 6 s').closest('[hidden]')).not.toBeNull();
 
-    await user.click(within(panel).getByRole('button', {name: 'Name this voice'}));
+    // A click on the voice's row names it in place.
+    await user.click(within(panel).getByRole('button', {name: 'Voice 2, a guess: name this voice'}));
     const box = within(panel).getByRole('combobox', {name: 'Name voice 2'});
     await waitFor(() => expect(panel.querySelector('datalist option[value="Maren Holt"]')).not.toBeNull());
     await user.type(box, 'Maren Holt');
@@ -231,5 +259,30 @@ describe('Listen & read', () => {
     expect(at).toBe(5);
     fireEvent.keyDown(window, {key: 'ArrowLeft'});
     expect(at).toBe(0);
+  });
+
+  it('lists the voices one row each, folds the brief ones, and lays each voice in its own lane under the parts', async () => {
+    mockApi({...ROUTES, 'GET /api/documents/d1/transcript': MANY});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    const panel = await screen.findByRole('region', {name: 'Voices'});
+    // Heard longest first; the five heard for a moment fold behind one row.
+    expect((await within(panel).findAllByRole('button', {name: /name this voice|rename this voice/})).map(b => b.getAttribute('aria-label')))
+      .toEqual(['Voice 3, a guess: name this voice', 'Voice 2, a guess: name this voice', 'Host: rename this voice']);
+    await user.click(within(panel).getByRole('button', {name: /\+5/}));
+    expect(within(panel).getAllByRole('button', {name: /name this voice|rename this voice/})).toHaveLength(8);
+    const parts = screen.getByRole('region', {name: 'Parts'});
+    expect(parts).toHaveTextContent('by who speaks');
+    await user.click(within(parts).getByRole('button', {name: /I never saw a valuation/}));
+    expect(at).toBe(84);
+    // The player: a lane for each voice heard in the window, and nothing pinned says so in one line.
+    expect(document.querySelectorAll('.lr-wave .lr-lane')).toHaveLength(4);
+    const empty = screen.getByRole('region', {name: 'Pinned quote'});
+    expect(within(empty).getByText('Nothing pinned')).toBeVisible();
+    expect(within(empty).getByText(/Choose words in a line/).closest('[hidden]')).not.toBeNull();
+    // The counts are on hover; the proposals waiting in Decide stay on screen.
+    const facts = screen.getByRole('region', {name: 'In this recording'});
+    expect(within(facts).getByText('Spoken parts').closest('[hidden]')).not.toBeNull();
+    expect(within(facts).getByRole('link', {name: '1 proposal from this transcript'})).toBeVisible();
   });
 });
