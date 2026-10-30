@@ -670,3 +670,14 @@ BACKLOG "Documents have no kind/language field". Built on `documents` (migration
   detected" stays only where nothing is known.
 - Kind and language travel in a backup (they are columns of `documents`); a backup made before keeps none and the
   restored documents read as not known.
+
+## 39. Money's columns say less at rest when the picture is dense (30 Oct 2026)
+
+Ony, 30 Oct, on the 1MDB Money columns: "a LOT of overlapping UI". With five columns and twenty flows, every middle
+party's "in · out" sums sat on the bands, six amount chips were laid over them, and the bands showed through the names.
+Call, for a picture with more than six chipped bands (`isDense`, `features/money/money-layout.ts`; the mockup SEE_2
+draws five): a band's chip shows only while the band is pointed at or focused, or its payment is lit in the ledger,
+drawn above everything else and in its own place when no free place is near; a middle party's label is its name alone;
+a source's is its name and total (the count of payments on the label's reveal, as the in/out sums already are); a
+label's plate is opaque, so a band passing behind never reads through a name. A sparse picture keeps every chip and
+sum at rest, as SEE_2 draws it.

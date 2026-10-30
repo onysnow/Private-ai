@@ -336,7 +336,17 @@ export type Label = {
 
 const lineW = (l: LabelLine) => l.text.length * (l.kind === 'name' ? NAME_CH : SUM_CH) + (l.tail ? 8 + l.tail.length * SUM_CH : 0);
 
-export function placeLabels(picture: Picture, payments: Payment[], currency: string): {labels: Label[]; height: number} {
+/** A picture with more bands than this is dense: band chips wait for a pointer and the labels say less at rest. */
+export const QUIET_BANDS = 6;
+
+/** Dense: more chipped bands than the few the mockup draws (SEE_2 has five). Then a band's chip shows only while the band
+ *  is pointed at, focused or lit, a middle party's label is its name alone and a source's its name and total; the rest
+ *  (in, out, the count of payments) is revealed on the label (Ony, 29 Oct: show only what matters). */
+export function isDense(picture: Picture): boolean {
+  return picture.bands.filter(b => b.chip.text).length > QUIET_BANDS;
+}
+
+export function placeLabels(picture: Picture, payments: Payment[], currency: string, quiet = isDense(picture)): {labels: Label[]; height: number} {
   const cols = picture.columns.length;
   const last = cols - 1;
   const count = (id: string) => payments.filter(p => p.fromId === id).length;
@@ -361,6 +371,11 @@ export function placeLabels(picture: Picture, payments: Payment[], currency: str
       const w = wrapName(n.name, lane - 8 - tail.length * SUM_CH, 1);
       return {lines: [{text: w.lines[0] ?? '', kind: 'name' as const, tail}], cut: w.cut};
     };
+    if (quiet && !n.ghost && c > 0 && c < last) {
+      const w = wrapName(n.name, lane, level === 0 ? 2 : 1);
+      return {lines: w.lines.map(t => ({text: t, kind: 'name' as const})), cut: w.cut};
+    }
+    if (quiet && !n.ghost && c === 0) return level < 2 ? named([amt(n.amountOut)]) : beside(amt(n.amountOut));
     if (n.ghost) return level < 2 ? named([fit([`ƒ ${amt(n.amountOut)} · worked out`, `ƒ ${amt(n.amountOut)}`], lane)]) : beside(`ƒ ${amt(n.amountOut)}`);
     if (c === 0) {
       const k = n.others ? picture.folded?.payments ?? 0 : count(n.id);

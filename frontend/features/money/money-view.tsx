@@ -29,7 +29,7 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {dateWords} from '../../lib/dates';
 import {timeWords} from '../../lib/timestamps';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
-import {amountText, layout, pathOf, placeLabels, shortAmount, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
+import {amountText, isDense, layout, pathOf, placeLabels, shortAmount, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
 
 const FinancialFlowSankey = dynamic(() => import('../../components/charts/financial-flow-sankey').then(m => m.FinancialFlowSankey),
   {ssr: false, loading: () => <p className="mn-muted">Drawing the flow…</p>});
@@ -153,7 +153,8 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
 
   // Marks drawn in the picture that are revealed on hover, focus or click: an HTML layer over the SVG, placed in the
   // picture's own units (Ony, 29 Oct; an SVG <title> reaches neither keyboard nor touch).
-  const placed = picture ? placeLabels(picture, payments, currency ?? '') : null;
+  const dense = picture ? isDense(picture) : false;
+  const placed = picture ? placeLabels(picture, payments, currency ?? '', dense) : null;
   const labels = placed?.labels ?? [];
   // The labels may need more height than the bars (a crowded column runs on below): the picture grows to hold them.
   const tall = placed?.height ?? 0;
@@ -227,9 +228,6 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
               <path d={r.d}/><text x={r.labelX} y={r.labelY + 12} textAnchor="middle">↺ {r.label}</text>
             </g>)}
             {labels.map(l => l.leader && <path key={`lead${l.nodeId}`} d={l.leader} className="mn-leader"/>)}
-            {chips(picture.bands, labels.map(l => ({x: l.x - 2, y: l.top - 2, w: l.w + 4, h: l.h + 4})), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h})), tall).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
-              <rect x={0} y={-13} width={c.w} height={c.sub ? 34 : 19} rx={5}/>
-              <text x={8} y={0}>{c.text}</text>{c.sub && <text x={8} y={15} className="sub">{c.sub}</text>}</g>)}
             {picture.nodes.map(n => {
               const last = n.col === picture.columns.length - 1;
               const first = n.col === 0;
@@ -265,6 +263,11 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
                   {line.tail && <tspan className="mn-node-sum" dx={8}>{line.tail}</tspan>}</text>)}
               </g>;
             })}
+            {/* Chips last: one shown on pointing sits above the names around it. */}
+            {/* In a dense picture a band's chip waits for the band to be pointed at or focused, or its payment lit. */}
+            {chips(dense ? picture.bands.filter(b => b.key === litBand?.key) : picture.bands, labels.map(l => ({x: l.x - 2, y: l.top - 2, w: l.w + 4, h: l.h + 4})), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h})), tall, dense).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
+              <rect x={0} y={-13} width={c.w} height={c.sub ? 34 : 19} rx={5}/>
+              <text x={8} y={0}>{c.text}</text>{c.sub && <text x={8} y={15} className="sub">{c.sub}</text>}</g>)}
           </svg>
           {hot.map(h => <span key={h.key} className="mn-hot" style={{left: `${(h.x / picture.width) * 100}%`, top: `${(h.y / tall) * 100}%`,
             width: `${(h.w / picture.width) * 100}%`, height: `${(h.h / tall) * 100}%`}}>
@@ -323,7 +326,7 @@ function OwedList({owed}: {owed: FinancialTransactionOut[]}): ReactElement | nul
 
 /** The band chips, each in a free place near its band, never over a bar or a party's label. */
 function chips(bands: ReturnType<typeof layout>['bands'], avoid: Array<{x: number; y: number; w: number; h: number}> = [],
-  bars: Array<{x: number; y: number; w: number; h: number}> = [], height = Infinity): Array<{key: string; certainty: string; text: string; sub: string | null; x: number; y: number; w: number}> {
+  bars: Array<{x: number; y: number; w: number; h: number}> = [], height = Infinity, asked = false): Array<{key: string; certainty: string; text: string; sub: string | null; x: number; y: number; w: number}> {
   const placed: Array<{x: number; y: number; w: number; h: number}> = [...avoid];
   // A chip with no free place near its band is left out rather than laid over a name or moved far from its band
   // (the band still says it in its title and in the list; the mockup's €60,000 band has no chip either).
@@ -334,7 +337,9 @@ function chips(bands: ReturnType<typeof layout>['bands'], avoid: Array<{x: numbe
     // inside the picture (under the column titles, above its foot), so a chip is never cut off.
     const free = (x: number, top: number) => top >= 20 && top + h <= height && [...placed, ...bars].every(p => !(x < p.x + p.w + 6 && x + w > p.x && top < p.y + p.h && top + h > p.y));
     const spots = [0, -1, 1, -2].flatMap(r => [0, 1, 2, 3, -1].map(s => ({x: b.chip.x + s * 60, top: b.chip.y - 13 + r * (h + 4)})));
-    const at = spots.find(s => free(s.x, s.top));
+    // A chip asked for (its band pointed at or focused) always shows: in its own place, over what is there, if no
+    // free place is near.
+    const at = spots.find(s => free(s.x, s.top)) ?? (asked ? {x: b.chip.x, top: Math.max(20, Math.min(b.chip.y - 13, height - h))} : undefined);
     if (!at) return [];
     placed.push({x: at.x, y: at.top, w, h});
     return [{key: b.key, certainty: b.certainty, text: b.chip.text, sub: b.chip.sub, x: at.x, y: at.top + 13, w}];

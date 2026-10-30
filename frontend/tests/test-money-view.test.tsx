@@ -337,8 +337,9 @@ describe('MoneyView', () => {
     for (const b of container.querySelectorAll('.mn-band')) if (b !== others) fireEvent.click(b);
     expect(screen.getByText('Traced so far').parentElement).toHaveTextContent(`€${top20.toLocaleString('en-GB')}`);
     // A party's label keeps its exact total even when some of its flows are folded away: Payer 20 pays
-    // Payee 50 €12,000 (drawn) and Payee 20 €9,000 (folded).
-    expect([...container.querySelectorAll('.mn-node-name')].map(t => t.textContent)).toContain('Payer 20€21,000 · 5 payments');
+    // Payee 50 €12,000 (drawn) and Payee 20 €9,000 (folded). The picture is dense, so the count waits on the label.
+    const label = [...container.querySelectorAll('.mn-node-name')].find(t => t.textContent === 'Payer 20')!;
+    expect(label.parentElement!.textContent).toContain('Payer 20€21,000');
     fireEvent.click(others);
     expect(container.querySelectorAll('.mn-band')).toHaveLength(61);
     expect(screen.getByText(/All 61 flows are drawn/)).toBeInTheDocument();
@@ -389,5 +390,21 @@ describe('MoneyView', () => {
     mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {status: 500, body: {detail: 'ledger unavailable'}}});
     wrap(<MoneyView investigationId="inv-1"/>);
     expect(await screen.findByText(/ledger unavailable/)).toBeInTheDocument();
+  });
+});
+
+describe('a dense picture says less at rest', () => {
+  const pay = (i: number, from: string, to: string, amount: number): Payment => ({id: `p${i}`, from, to, fromId: from, toId: to, amount,
+    date: `2012-0${1 + (i % 9)}-01`, certainty: 'shown', purpose: null, locator: `page ${i}`});
+  it('names a middle party alone and a source with its total; a sparse one keeps every sum', () => {
+    const chain = [pay(1, 'A', 'B', 9e6), pay(2, 'B', 'C', 8e6), pay(3, 'C', 'D', 7e6)];
+    const sparse = layout(chain, 'USD');
+    const middle = (pic: ReturnType<typeof layout>, quiet?: boolean) => placeLabels(pic, chain, 'USD', quiet).labels.find(l => l.nodeId === 'B')!;
+    expect(middle(sparse).lines.some(l => l.kind === 'sum')).toBe(true);
+    expect(middle(sparse, true).lines.map(l => l.kind)).toEqual(['name']);
+    const many = Array.from({length: 9}, (_, i) => pay(10 + i, `S${i}`, `T${i}`, (i + 1) * 1e6));
+    const dense = layout(many, 'USD');
+    const source = placeLabels(dense, many, 'USD').labels.find(l => l.nodeId === 'S3')!;
+    expect(source.lines).toEqual([{text: 'S3', kind: 'name'}, {text: '$4,000,000', kind: 'sum'}]);
   });
 });
