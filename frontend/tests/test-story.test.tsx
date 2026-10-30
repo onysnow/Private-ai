@@ -116,6 +116,24 @@ describe('StoryScreen', () => {
     expect(screen.getByText('Start the write-up first')).toBeInTheDocument();
   });
 
+  it('shows a superseded record as a struck chip after the ones that count, with what replaced it on hover', async () => {
+    const gone = {id: 'e0', stance: 'supports', label: 'Indictment 2016', short: 'Indictment 2016', source_id: 's0', locator: 'para 12',
+      superseded: {at: '2026-10-04T00:00:00', by_evidence_id: 'e1', by_label: 'Land registry', by_locator: 'title ML-2017', reason: 'The registry corrected it'}};
+    const live = {id: 'e1', stance: 'supports', label: 'Land registry', source_id: 's1', locator: 'title ML-2017', quote: 'transferred to Fernhill Ltd'};
+    const story = {...STORY, sections: [{...STORY.sections[0], claims: [
+      {...claim('c1', 'Fernhill Ltd bought the harbour land in November 2017', 'shown', [gone, live]), single_source: true}, STORY.sections[0].claims[1]]}, STORY.sections[1]]};
+    mockApi({[`GET ${PATH}`]: story});
+    render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
+    const tree = await screen.findByRole('tree', {name: 'What the story needs'});
+    const chips = [...tree.querySelectorAll('.sy-ev-chip')].map(c => c.textContent);
+    expect(chips.indexOf('Land registry')).toBeLessThan(chips.indexOf('Indictment 2016'));
+    const struck = within(tree).getByText('Indictment 2016');
+    expect(struck.tagName).toBe('S');
+    expect(struck.closest('.sy-ev-chip')).toHaveClass('gone');
+    await userEvent.setup().hover(struck);
+    expect(await screen.findByText('Superseded by Land registry: The registry corrected it · not counted')).toBeInTheDocument();
+  });
+
   it('puts a claim under a section, records a gate, and starts the write-up with the claims numbered for citing', async () => {
     const withWriteup = {...STORY, writeup_id: 'w1', sentences: {total: 4, uncited: 1}};
     const api = mockApi({[`GET ${PATH}`]: STORY, [`POST ${PATH}/sections/sec1/claims`]: STORY,

@@ -1,6 +1,7 @@
 from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from app.core.time import utcnow_naive
 from app.schemas.api import ClaimCreate
 from app.models.domain import Claim, ClaimReviewEvent, ClaimEvidenceLink, Evidence, Source, RelationshipEdge, RelationshipEvidenceAttachment
 
@@ -79,7 +80,8 @@ def claim_review_workspace(db: Session, claim: Claim) -> dict:
         source = db.get(Source, evidence.source_id) if evidence else None
         if evidence:
             evidence_ids.append(evidence.id)
-        evidence_rows.append({"id": link.id, "stance": link.stance, "note": link.note, "created_at": link.created_at, "evidence": evidence, "source": source})
+        evidence_rows.append({"id": link.id, "stance": link.stance, "note": link.note, "created_at": link.created_at, "evidence": evidence, "source": source,
+                              "superseded": superseded_of(db, link)})
     relationships = []
     if evidence_ids:
         attachments = list(db.scalars(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.evidence_id.in_(evidence_ids))).all())
@@ -93,11 +95,13 @@ def claim_review_workspace(db: Session, claim: Claim) -> dict:
             relationships.append({"id": edge.id, "relationship_entity_id": edge.relationship_entity_id, "source_entity_id": edge.source_entity_id, "target_entity_id": edge.target_entity_id, "evidence_ids": sorted(attached_by_edge.get(edge.id, []))})
     history = list(db.scalars(select(ClaimReviewEvent).where(ClaimReviewEvent.claim_id == claim.id).order_by(ClaimReviewEvent.created_at.desc())).all())
     # What the grade is judged from: the stances, and how many separate sources the evidence comes from.
-    sources = {link_source.id for row in evidence_rows if isinstance(link_source := row["source"], Source)}
+    # A superseded link is shown but not counted (supersede_claim_evidence).
+    sources = {link_source.id for row in evidence_rows if row["superseded"] is None and isinstance(link_source := row["source"], Source)}
     from app.services.claim_done import done_checks
 
     return {"claim": claim, "evidence": evidence_rows, "dependent_relationships": relationships, "review_history": history,
-            "stance_counts": {s: sum(1 for x in links if x.stance == s) for s in ("supports", "contradicts", "context")},
+            "stance_counts": {s: sum(1 for x in links if x.stance == s and x.counts_toward_claim) for s in ("supports", "contradicts", "context")},
+            "superseded_count": sum(1 for x in links if not x.counts_toward_claim),
             "source_count": len(sources),
             "done": {"supported": done_checks(db, claim, target="supported"), "confirmed": done_checks(db, claim, target="confirmed")}}
 
@@ -171,6 +175,73 @@ def link_claim_evidence(db: Session, claim: Claim, evidence: Evidence, *, stance
     return row
 
 
+def superseded_of(db: Session, link: ClaimEvidenceLink) -> dict[str, Any] | None:
+    """A superseded link's mark, as every screen shows it: when, the record that replaces it (its source's title and
+    place, when it is in the case), why, and who marked it. None while the link counts."""
+    if link.superseded_at is None:
+        return None
+    by = db.get(Evidence, link.superseded_by_evidence_id) if link.superseded_by_evidence_id else None
+    by_source = db.get(Source, by.source_id) if by is not None else None
+    return {"at": link.superseded_at, "by_evidence_id": by.id if by is not None else None,
+            "by_label": by_source.title if by_source is not None else None, "by_locator": by.locator if by is not None else None,
+            "reason": link.superseded_reason or "", "decided_by_id": link.superseded_decided_by_id,
+            "decided_by_name": link.superseded_decided_by_name}
+
+
+def supersede_claim_evidence(db: Session, claim: Claim, link: ClaimEvidenceLink, *, reason: str,
+                             by_evidence_id: str | None = None) -> ClaimEvidenceLink:
+    """Mark a claim's evidence link superseded by a newer record (or change the mark: who and when are taken again).
+    The link stays, with its stance, but no longer counts toward the claim (claim_done.py, stories.py, custody_chain.py).
+    A reason is required (the suite: a status does not change without a stated basis); the replacing record is
+    optional, as it may not be in the case yet, and must be another record of the same case."""
+    if link.claim_id != claim.id:
+        raise LookupError("Evidence link not found on this claim")
+    reason = (reason or "").strip()
+    if not reason:
+        raise ValueError("Say why this evidence is superseded")
+    by_id = (by_evidence_id or "").strip() or None
+    if by_id is not None:
+        if by_id == link.evidence_id:
+            raise ValueError("Evidence cannot supersede itself")
+        by = db.get(Evidence, by_id)
+        by_source = db.get(Source, by.source_id) if by is not None else None
+        if by is None or by_source is None or by_source.investigation_id != claim.investigation_id:
+            raise ValueError("The replacing evidence must be a record of the same case")
+        # Two records replacing each other would leave the claim with neither: refuse the loop.
+        loop = db.scalar(select(ClaimEvidenceLink.id).where(
+            ClaimEvidenceLink.claim_id == claim.id, ClaimEvidenceLink.evidence_id == by_id,
+            ClaimEvidenceLink.superseded_by_evidence_id == link.evidence_id, ClaimEvidenceLink.superseded_at.is_not(None)))
+        if loop is not None:
+            raise ValueError("That record is itself marked superseded by this one; undo that first")
+    link.superseded_at = utcnow_naive()
+    link.superseded_by_evidence_id = by_id
+    link.superseded_reason = reason
+    link.superseded_decided_by_id = link.superseded_decided_by_name = None  # stamped at flush (app/db/decided_by.py)
+    db.commit()
+    db.refresh(link)
+    return link
+
+
+def unsupersede_claim_evidence(db: Session, claim: Claim, link: ClaimEvidenceLink) -> ClaimEvidenceLink:
+    """Undo a superseded mark: the link counts toward the claim again."""
+    if link.claim_id != claim.id:
+        raise LookupError("Evidence link not found on this claim")
+    link.superseded_at = None
+    link.superseded_by_evidence_id = None
+    link.superseded_reason = None
+    link.superseded_decided_by_id = link.superseded_decided_by_name = None
+    db.commit()
+    db.refresh(link)
+    return link
+
+
+def link_out(db: Session, link: ClaimEvidenceLink) -> dict[str, Any]:
+    """The link as stored, with its superseded mark."""
+    return {"id": link.id, "claim_id": link.claim_id, "evidence_id": link.evidence_id, "stance": link.stance, "note": link.note,
+            "decided_by_id": link.decided_by_id, "decided_by_name": link.decided_by_name, "created_at": link.created_at,
+            "superseded": superseded_of(db, link)}
+
+
 def list_claim_evidence(db: Session, claim_id: str) -> list[dict]:
     """Return a claim's evidence links, each with its evidence and source
     attached. The caller confirms the claim exists (a 404 concern)."""
@@ -181,6 +252,6 @@ def list_claim_evidence(db: Session, claim_id: str) -> list[dict]:
         source = db.get(Source, evidence.source_id) if evidence else None
         rows.append({
             "id": link.id, "stance": link.stance, "note": link.note, "created_at": link.created_at,
-            "evidence": evidence, "source": source,
+            "evidence": evidence, "source": source, "superseded": superseded_of(db, link),
         })
     return rows

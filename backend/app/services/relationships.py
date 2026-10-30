@@ -273,7 +273,9 @@ def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
     claim_dependencies = []
     attached_evidence_ids = {attachment.evidence_id for attachment in attachments}
     if attached_evidence_ids:
-        links = db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id.in_(attached_evidence_ids))).all()
+        # A claim's link marked superseded by a newer record: the claim no longer rests on that evidence.
+        links = db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id.in_(attached_evidence_ids),
+                                                           ClaimEvidenceLink.superseded_at.is_(None))).all()
         for link in links:
             claim = db.get(Claim, link.claim_id)
             if claim is not None:

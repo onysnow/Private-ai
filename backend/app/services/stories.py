@@ -31,6 +31,7 @@ from app.models.domain import (
     Writeup,
 )
 from app.services.source_labels import short_label
+from app.services.claims import superseded_of
 
 SHOWN = {"supported", "confirmed"}
 RECORDED_GATES = ("right_of_reply", "legal_read")
@@ -230,8 +231,9 @@ def story_tree(db: Session, investigation_id: str) -> dict[str, Any]:
                     evidence.append({"id": ev.id, "stance": link.stance, "label": (src.title if src else "Typed in"), "locator": ev.locator,
                                      "source_id": src.id if src else None,
                                      "short": short_label(src.title, url=src.url, source_type=src.source_type, metadata=src.metadata_json) if src else "Typed in",
-                                     "quote": ev.quote})
-                supporting = sum(1 for e in evidence if e["stance"] == "supports")
+                                     "quote": ev.quote, "superseded": superseded_of(db, link)})
+                # A superseded record is still shown (struck) but rests nothing: a claim left on one record is single-source.
+                supporting = sum(1 for e in evidence if e["stance"] == "supports" and e["superseded"] is None)
                 if state == "shown" and supporting == 1:
                     single.append(claim.id)
                 counts["claims"] += 1

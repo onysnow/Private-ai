@@ -159,7 +159,7 @@ def _lead_triage(db: Session, links: list[LeadLink]) -> dict:
 
     stance_counts = {"supports": 0, "contradicts": 0, "context": 0}
     for row in evidence_links:
-        if row.stance in stance_counts:
+        if row.stance in stance_counts and row.counts_toward_claim:
             stance_counts[row.stance] += 1
     disputed_claim_count = sum(1 for claim in claims if claim.status == "disputed")
     contradiction_count = stance_counts["contradicts"]
@@ -291,7 +291,7 @@ def _lead_triage_batch(db: Session, links_by_lead: dict[str, list[LeadLink]]) ->
 
         stance_counts = {"supports": 0, "contradicts": 0, "context": 0}
         for row in evidence_links:
-            if row.stance in stance_counts:
+            if row.stance in stance_counts and row.counts_toward_claim:
                 stance_counts[row.stance] += 1
         disputed_claim_count = sum(1 for claim in claims if claim.status == "disputed")
         contradiction_count = stance_counts["contradicts"]

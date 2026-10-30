@@ -1176,6 +1176,9 @@ import type {
   StartStoryWriteupData,
   StartStoryWriteupErrors,
   StartStoryWriteupResponses,
+  SupersedeClaimEvidenceEndpointData,
+  SupersedeClaimEvidenceEndpointErrors,
+  SupersedeClaimEvidenceEndpointResponses,
   SyncCorpusNowData,
   SyncCorpusNowErrors,
   SyncCorpusNowResponses,
@@ -1206,6 +1209,9 @@ import type {
   UnlockPinErrors,
   UnlockPinResponses,
   UnlockResponses,
+  UnsupersedeClaimEvidenceEndpointData,
+  UnsupersedeClaimEvidenceEndpointErrors,
+  UnsupersedeClaimEvidenceEndpointResponses,
   UntagARecordData,
   UntagARecordErrors,
   UntagARecordResponses,
@@ -2140,6 +2146,9 @@ import {
   zStartSessionResponse,
   zStartStoryWriteupPath,
   zStartStoryWriteupResponse,
+  zSupersedeClaimEvidenceEndpointBody,
+  zSupersedeClaimEvidenceEndpointPath,
+  zSupersedeClaimEvidenceEndpointResponse,
   zSyncCorpusNowPath,
   zSyncCorpusNowResponse,
   zSyncOpenalephDocumentPath,
@@ -2161,6 +2170,8 @@ import {
   zUnlockPinBody,
   zUnlockPinResponse,
   zUnlockResponse,
+  zUnsupersedeClaimEvidenceEndpointPath,
+  zUnsupersedeClaimEvidenceEndpointResponse,
   zUntagARecordPath,
   zUntagARecordQuery,
   zUntagARecordResponse,
@@ -3501,6 +3512,77 @@ export const linkClaimEvidenceEndpoint = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zLinkClaimEvidenceEndpointResponse.parseAsync(data),
     url: '/api/claims/{claim_id}/evidence',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Unsupersede Claim Evidence Endpoint
+ *
+ * Undo the mark: the link counts toward the claim again.
+ */
+export const unsupersedeClaimEvidenceEndpoint = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UnsupersedeClaimEvidenceEndpointData, ThrowOnError>,
+): RequestResult<
+  UnsupersedeClaimEvidenceEndpointResponses,
+  UnsupersedeClaimEvidenceEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    UnsupersedeClaimEvidenceEndpointResponses,
+    UnsupersedeClaimEvidenceEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zUnsupersedeClaimEvidenceEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUnsupersedeClaimEvidenceEndpointResponse.parseAsync(data),
+    url: '/api/claims/{claim_id}/evidence/{link_id}/supersede',
+    ...options,
+  });
+
+/**
+ * Supersede Claim Evidence Endpoint
+ *
+ * Mark the link superseded by a newer record: it stays on the claim, struck, and no longer counts toward it.
+ * Marking it again changes the reason or the replacing record. The reply is the claim's workspace as it now stands.
+ */
+export const supersedeClaimEvidenceEndpoint = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<SupersedeClaimEvidenceEndpointData, ThrowOnError>,
+): RequestResult<
+  SupersedeClaimEvidenceEndpointResponses,
+  SupersedeClaimEvidenceEndpointErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    SupersedeClaimEvidenceEndpointResponses,
+    SupersedeClaimEvidenceEndpointErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zSupersedeClaimEvidenceEndpointBody,
+          path: zSupersedeClaimEvidenceEndpointPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zSupersedeClaimEvidenceEndpointResponse.parseAsync(data),
+    url: '/api/claims/{claim_id}/evidence/{link_id}/supersede',
     ...options,
     headers: {
       'Content-Type': 'application/json',

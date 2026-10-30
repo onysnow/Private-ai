@@ -16,7 +16,9 @@ import type {EditorView} from '@tiptap/pm/view';
 /** The drag type a claim of the story tree carries (its id). */
 export const CLAIM_DRAG = 'application/x-story-claim';
 
-export type CitablePassage = {id: string; stance: string; label: string; locator?: string | null; quote?: string | null};
+export type CitablePassage = {id: string; stance: string; label: string; locator?: string | null; quote?: string | null;
+  /** Marked superseded by a newer record: shown struck, never the passage a citation quotes first. */
+  superseded?: {by_label?: string | null; reason: string} | null};
 export type CitableClaim = {id: string; n: number; text: string; state: 'shown' | 'unshown' | 'disputed' | 'ruled_out'; evidence?: CitablePassage[]};
 
 /** The citation chip: an inline atom with the attributes the server reads (app/services/writeups.py). */

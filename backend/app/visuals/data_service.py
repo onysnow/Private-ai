@@ -750,13 +750,14 @@ def entities_by_schema(db: Session, investigation_id: str, params: dict[str, str
 def evidence_by_stance(db: Session, investigation_id: str, params: dict[str, str]) -> VisualData:
     groups: dict[str, list[RecordRef]] = defaultdict(list)
     links = db.execute(
-        select(ClaimEvidenceLink.stance, ClaimEvidenceLink.evidence_id)
+        select(ClaimEvidenceLink.stance, ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.superseded_at)
         .join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
         .where(Claim.investigation_id == investigation_id)
     ).all()
     seen: set[str] = set()
-    for stance, evidence_id in links:
-        groups[stance or "unknown"].append(RecordRef("evidence", evidence_id))
+    for stance, evidence_id, superseded_at in links:
+        # A link marked superseded by a newer record is its own bar, not counted under the stance it had.
+        groups["superseded" if superseded_at is not None else (stance or "unknown")].append(RecordRef("evidence", evidence_id))
         seen.add(evidence_id)
     rows = _category_rows(groups, labels={k: _humanize(k) for k in groups})
     return VisualData(investigation_id=investigation_id, query="evidence_by_stance", params=params, unit="evidence records", unit_kind="count",

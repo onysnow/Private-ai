@@ -312,9 +312,10 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
           const x2 = b.left - r0.left; const y2 = next ? b.top + b.height / 2 - r0.top : Math.min(Math.max(y1, b.top - r0.top + 24), b.bottom - r0.top - 24);
           const mx = (x1 + x2) / 2;
           // Only the line into the claim says what it does (as the mockup draws it); the others speak by their style.
-          const words = next ? '' : c.wire.style === 'against' ? `✕ against${c.lines.some(l => l && l !== 'typed in by a person') ? ' · answered' : ''}` : c.wire.words;
+          // A row marked superseded by a newer record still runs to the claim, faded, and says so: it counts for nothing.
+          const words = next ? '' : row.superseded ? 'superseded' : c.wire.style === 'against' ? `✕ against${c.lines.some(l => l && l !== 'typed in by a person') ? ' · answered' : ''}` : c.wire.words;
           // A row against the claim is red from its first step (mockup CHECK_2).
-          out.push({key: `${c.id}>${next?.id ?? 'claim'}`, d: `M${x1},${y1}C${mx},${y1} ${mx},${y2} ${x2},${y2}`, style: against ? 'against' : c.wire.style, words,
+          out.push({key: `${c.id}>${next?.id ?? 'claim'}`, d: `M${x1},${y1}C${mx},${y1} ${mx},${y2} ${x2},${y2}`, style: row.superseded ? 'gone' : against ? 'against' : c.wire.style, words,
             x: mx, y: (y1 + y2) / 2 - 5});
         });
       }
@@ -355,7 +356,7 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
     </svg>
     {COLUMNS.map((c, i) => (i === 4 || used.includes(i)) && <p key={c} className="cc-col" style={{gridColumn: i === 4 ? claimAt : at(i)}}>{c.toUpperCase()}</p>)}
     {chain.rows.map((row, r) => row.cards.map(c => <CardBox key={c.id} card={c} row={r + 2} column={at(COL[c.kind])} picked={picked === c.id} lit={lit === c.id} falls={downstream.has(c.id)}
-      against={row.stance === 'contradicts'} anchor={spanOf(row.anchor)} onPick={() => onPick(c.id)} onLight={onLight}/>))}
+      against={row.stance === 'contradicts'} gone={Boolean(row.superseded)} anchor={spanOf(row.anchor)} onPick={() => onPick(c.id)} onLight={onLight}/>))}
     <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}${lit === 'claim' ? ' lit' : ''}`} data-card="claim" style={{gridColumn: claimAt, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
       aria-label={`The claim: ${chain.claim.text}`}>
       <StatusChip status={claimStatus}/>
@@ -399,8 +400,8 @@ function DoneList({done}: {done: ClaimDoneOut}): ReactElement {
   </div>;
 }
 
-function CardBox({card, row, column, picked, lit, falls, against, anchor, onPick, onLight}: {
-  card: CustodyCardOut; row: number; column: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; anchor: {start: number; end: number} | null;
+function CardBox({card, row, column, picked, lit, falls, against, gone = false, anchor, onPick, onLight}: {
+  card: CustodyCardOut; row: number; column: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; gone?: boolean; anchor: {start: number; end: number} | null;
   onPick: () => void; onLight: (id: string | null) => void;
 }): ReactElement {
   const id = useId();
@@ -413,7 +414,7 @@ function CardBox({card, row, column, picked, lit, falls, against, anchor, onPick
     ? `${card.kind === 'file' && card.who ? `uploaded by ${card.who} · ` : card.who ? `${card.who.charAt(0).toLowerCase()}${card.who.slice(1)} · ` : ''}${short(card.when)}` : '';
   const extra = card.kind === 'file' || card.kind === 'source' ? card.lines.filter(Boolean) : [];
   const detail = <><b>{KIND_WORD[card.kind]}</b>{extra.map((l, i) => <span key={i} className="rv-row rv-mono">{l}</span>)}{whoWhen && <span className="rv-row">{whoWhen}</span>}</>;
-  return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}`}
+  return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}${gone ? ' gone' : ''}`}
     style={{gridColumn: column, gridRow: row, '--col': COL[card.kind]} as CSSProperties} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
     aria-label={`${KIND_WORD[card.kind]}: ${card.title}. ${card.checks.map(c => `${c.label} ${c.ok === true ? 'passed' : c.ok === false ? 'failed' : 'not known'}`).join(', ')}`}
     aria-describedby={extra.length || whoWhen ? `${id}-who` : undefined}>

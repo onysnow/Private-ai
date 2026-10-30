@@ -398,6 +398,7 @@ import {
   skipItem,
   startSession,
   startStoryWriteup,
+  supersedeClaimEvidenceEndpoint,
   syncCorpusNow,
   syncOpenalephDocument,
   tagARecord,
@@ -408,6 +409,7 @@ import {
   undoItem,
   unlock,
   unlockPin,
+  unsupersedeClaimEvidenceEndpoint,
   untagARecord,
   updateAppUser,
   updateAuthenticity,
@@ -1586,6 +1588,9 @@ import type {
   StartStoryWriteupData,
   StartStoryWriteupError,
   StartStoryWriteupResponse,
+  SupersedeClaimEvidenceEndpointData,
+  SupersedeClaimEvidenceEndpointError,
+  SupersedeClaimEvidenceEndpointResponse,
   SyncCorpusNowData,
   SyncCorpusNowError,
   SyncCorpusNowResponse,
@@ -1616,6 +1621,9 @@ import type {
   UnlockPinError,
   UnlockPinResponse,
   UnlockResponse,
+  UnsupersedeClaimEvidenceEndpointData,
+  UnsupersedeClaimEvidenceEndpointError,
+  UnsupersedeClaimEvidenceEndpointResponse,
   UntagARecordData,
   UntagARecordError,
   UntagARecordResponse,
@@ -3023,6 +3031,65 @@ export const linkClaimEvidenceEndpointMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await linkClaimEvidenceEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Unsupersede Claim Evidence Endpoint
+ *
+ * Undo the mark: the link counts toward the claim again.
+ */
+export const unsupersedeClaimEvidenceEndpointMutation = (
+  options?: Partial<Options<UnsupersedeClaimEvidenceEndpointData>>,
+): UseMutationOptions<
+  UnsupersedeClaimEvidenceEndpointResponse,
+  UnsupersedeClaimEvidenceEndpointError,
+  Options<UnsupersedeClaimEvidenceEndpointData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UnsupersedeClaimEvidenceEndpointResponse,
+    UnsupersedeClaimEvidenceEndpointError,
+    Options<UnsupersedeClaimEvidenceEndpointData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unsupersedeClaimEvidenceEndpoint({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Supersede Claim Evidence Endpoint
+ *
+ * Mark the link superseded by a newer record: it stays on the claim, struck, and no longer counts toward it.
+ * Marking it again changes the reason or the replacing record. The reply is the claim's workspace as it now stands.
+ */
+export const supersedeClaimEvidenceEndpointMutation = (
+  options?: Partial<Options<SupersedeClaimEvidenceEndpointData>>,
+): UseMutationOptions<
+  SupersedeClaimEvidenceEndpointResponse,
+  SupersedeClaimEvidenceEndpointError,
+  Options<SupersedeClaimEvidenceEndpointData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SupersedeClaimEvidenceEndpointResponse,
+    SupersedeClaimEvidenceEndpointError,
+    Options<SupersedeClaimEvidenceEndpointData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await supersedeClaimEvidenceEndpoint({
         ...options,
         ...fnOptions,
         throwOnError: true,

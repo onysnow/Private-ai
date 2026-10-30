@@ -40,6 +40,7 @@ from app.models.domain import (
 )
 from app.services.authenticity import STATUS_WORDS
 from app.services.claim_done import _document_of, _file_matches
+from app.services.claims import superseded_of
 from app.services.custody_chain import claim_custody_chain
 from app.services.security import resolve_storage_root
 from app.services.stories import story_of, story_tree
@@ -103,9 +104,15 @@ def _exhibits(db: Session, refs: list[dict[str, Any]]) -> tuple[list[dict[str, A
             for link in links:
                 ev = db.get(Evidence, link.evidence_id)
                 if ev is not None:
-                    nums.append(add(ev, claim, link.stance))
+                    # A superseded record stays an exhibit, said to be superseded, with what replaced it and why.
+                    gone = superseded_of(db, link)
+                    replaced = f"; replaced by {gone['by_label']}" if gone and gone["by_label"] else ""
+                    stance = link.stance if gone is None else f"superseded (was {link.stance}{replaced}: {gone['reason']})"
+                    nums.append(add(ev, claim, stance))
             if not nums:
                 gaps.append(f"The cited claim “{claim.text[:120]}” has no evidence linked.")
+            elif all(not link.counts_toward_claim for link in links if db.get(Evidence, link.evidence_id) is not None):
+                gaps.append(f"The cited claim “{claim.text[:120]}” rests only on evidence marked superseded.")
             behind[key] = nums
         elif key[0] == "evidence":
             ev = db.get(Evidence, key[1])

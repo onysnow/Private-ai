@@ -417,6 +417,8 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
     evidence = ok(client.get(f"{base}/evidence"))
     payment = next(row for row in evidence if row["evidence"]["quote"].startswith("Bank records show"))
     relationship_evidence = ok(client.get(f"/api/relationships/{relationship}/evidence-reviews"))
+    # A claim's evidence link, which can be marked superseded and the mark undone.
+    claim_link = ok(client.post(f"/api/claims/{claim['id']}/evidence", json={"evidence_id": payment["evidence"]["id"], "stance": "context"}))
 
     # A read document, its proposals (one accepted, so a record has a lineage) and the job that read it,
     # sent as part of a bulk import.
@@ -554,7 +556,7 @@ def _seed(app: FastAPI, client: TestClient, monkeypatch: pytest.MonkeyPatch, rea
             "watch_id": watched, "hit_id": watch_hit, "timeline_event_id": event,
             "indicator_id": "BO-001", "case_id": "deripaska-en-rusal", "tag_id": tag, "note_id": note, "collection_id": marked, "flag_id": _red_flag(client, inv),
             "check_id": _check_item(client), "case_record_id": case_record["id"], "thought_id": "CLM-0001", "capture_id": capture["id"],
-            "derived_file_id": clip["id"],
+            "derived_file_id": clip["id"], "link_id": claim_link["id"],
             "z": "0", "x": "0", "y": "0", "stack": "Noto Sans Regular", "glyph_range": "0-255",
         },
         per_operation={

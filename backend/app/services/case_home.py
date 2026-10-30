@@ -725,13 +725,15 @@ def claim_sources(db: Session, investigation_id: str) -> list[dict[str, Any]]:
     before context) with its locator, and how many open leads are linked to it."""
     from app.models.domain import ClaimEvidenceLink, LeadLink
 
-    rows = db.execute(select(ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance, Evidence.locator, Source.id, Source.title)
+    rows = db.execute(select(ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance, ClaimEvidenceLink.superseded_at, Evidence.locator, Source.id, Source.title)
                       .join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
                       .join(Evidence, Evidence.id == ClaimEvidenceLink.evidence_id)
                       .join(Source, Source.id == Evidence.source_id)
                       .where(Claim.investigation_id == investigation_id))
     by_claim: dict[str, list[tuple[int, str, str, str | None, str]]] = {}
-    for claim_id, stance, locator, source_id, title in rows:
+    for claim_id, stance, superseded_at, locator, source_id, title in rows:
+        # A link marked superseded by a newer record is listed last and counts neither for nor against.
+        stance = "superseded" if superseded_at is not None else stance
         by_claim.setdefault(claim_id, []).append((STANCE_ORDER.get(stance, 3), stance, title or "", locator, source_id))
     leads: Counter[str] = Counter(claim_id for (claim_id,) in db.execute(
         select(LeadLink.claim_id).join(Lead, Lead.id == LeadLink.lead_id)

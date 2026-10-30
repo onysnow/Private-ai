@@ -93,7 +93,7 @@
 .cw-sec-n { font: 500 13px var(--font-mono); color: var(--text); letter-spacing: 0; }
 
 .cw-evs { list-style: none; margin: 0; padding: 0; }
-.cl-ev { display: grid; grid-template-columns: 30px minmax(0, 1fr) 30px; gap: 14px; align-items: start; padding: 12px 2px; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+.cl-ev { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 14px; align-items: start; padding: 12px 2px; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
 .cl-ev > .rv:first-child { padding-top: 6px; }
 .cl-ev-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .cw-quote { margin: 0; font: 400 16px/1.55 var(--font-read); color: var(--text); max-width: 78ch; }
@@ -101,6 +101,22 @@
 .cl-ev-src a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .cl-ev .cw-icon { opacity: 0; transition: opacity var(--dur-fast, .12s); }
 .cl-ev:hover .cw-icon, .cl-ev:focus-within .cw-icon { opacity: 1; }
+.cl-ev-acts { display: inline-flex; gap: 2px; }
+
+/* Superseded (./superseded.tsx): the record stays where it was, struck and faded; it counts for nothing. Pointing at
+   it lights the record that replaced it. Undo stays in sight on a superseded row, so the way back is never hidden. */
+.cl-ev-gone > .rv:first-child, .cl-ev-gone .cw-quote, .cl-ev-gone .cl-ev-src { opacity: .5; }
+.cl-ev-gone .cw-quote s { text-decoration-thickness: 1.5px; text-decoration-color: var(--text-muted); }
+.cl-ev-gone .cw-icon[aria-label='Undo superseded'] { opacity: 1; }
+.cl-ev-replacer { background: color-mix(in srgb, var(--accent-1) 10%, transparent); box-shadow: inset 3px 0 0 var(--accent-1); border-radius: 8px; }
+.cw-num.cl-gone-n b { color: var(--text-muted); text-decoration: line-through; text-decoration-thickness: 2px; }
+.cl-sup-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-top: 6px; padding: 10px; border-radius: 10px; background: var(--surface-2); }
+.cl-sup-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-muted); min-width: 0; max-width: 100%; }
+.cl-sup-field.grow { flex: 1; min-width: 220px; }
+.cl-sup-field select, .cl-sup-field input { font: 400 14px var(--font-ui); color: var(--text); background: var(--surface-1, var(--surface)); border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px 8px; max-width: 100%; }
+.cl-sup-field select { max-width: 360px; }
+.cl-sup-acts { display: flex; gap: 6px; }
 
 .cw-pool { margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--surface-2); }
 .cw-pool-bar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-bottom: 8px; }

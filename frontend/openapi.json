@@ -8316,6 +8316,16 @@
           "stance": {
             "title": "Stance",
             "type": "string"
+          },
+          "superseded": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimEvidenceSupersededOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -8375,6 +8385,16 @@
           "stance": {
             "title": "Stance",
             "type": "string"
+          },
+          "superseded": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimEvidenceSupersededOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -8383,6 +8403,107 @@
           "created_at"
         ],
         "title": "ClaimEvidenceRowOut",
+        "type": "object"
+      },
+      "ClaimEvidenceSupersede": {
+        "description": "Mark a claim's evidence link superseded: why (required), and the newer record that replaces it, when it is in\nthe case.",
+        "properties": {
+          "by_evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By Evidence Id"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "ClaimEvidenceSupersede",
+        "type": "object"
+      },
+      "ClaimEvidenceSupersededOut": {
+        "description": "A link marked superseded by a newer record: shown, no longer counted for or against the claim.",
+        "properties": {
+          "at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "At",
+            "type": "string"
+          },
+          "by_evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By Evidence Id"
+          },
+          "by_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By Label"
+          },
+          "by_locator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By Locator"
+          },
+          "decided_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Id"
+          },
+          "decided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Name"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "reason"
+        ],
+        "title": "ClaimEvidenceSupersededOut",
         "type": "object"
       },
       "ClaimOut": {
@@ -8852,6 +8973,11 @@
           },
           "stance_counts": {
             "$ref": "#/components/schemas/StanceCountsOut"
+          },
+          "superseded_count": {
+            "default": 0,
+            "title": "Superseded Count",
+            "type": "integer"
           }
         },
         "required": [
@@ -16680,6 +16806,16 @@
             ],
             "title": "Stance",
             "type": "string"
+          },
+          "superseded": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimEvidenceSupersededOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -21961,6 +22097,11 @@
           "stance": {
             "title": "Stance",
             "type": "string"
+          },
+          "superseded": {
+            "default": false,
+            "title": "Superseded",
+            "type": "boolean"
           }
         },
         "required": [
@@ -40072,6 +40213,16 @@
           "stance": {
             "title": "Stance",
             "type": "string"
+          },
+          "superseded": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimEvidenceSupersededOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -48987,6 +49138,132 @@
           }
         },
         "summary": "Link Claim Evidence Endpoint"
+      }
+    },
+    "/api/claims/{claim_id}/evidence/{link_id}/supersede": {
+      "delete": {
+        "description": "Undo the mark: the link counts toward the claim again.",
+        "operationId": "unsupersede_claim_evidence_endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "claim_id",
+            "required": true,
+            "schema": {
+              "title": "Claim Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "link_id",
+            "required": true,
+            "schema": {
+              "title": "Link Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimReviewWorkspaceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Unsupersede Claim Evidence Endpoint"
+      },
+      "post": {
+        "description": "Mark the link superseded by a newer record: it stays on the claim, struck, and no longer counts toward it.\nMarking it again changes the reason or the replacing record. The reply is the claim's workspace as it now stands.",
+        "operationId": "supersede_claim_evidence_endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "claim_id",
+            "required": true,
+            "schema": {
+              "title": "Claim Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "link_id",
+            "required": true,
+            "schema": {
+              "title": "Link Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimEvidenceSupersede"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimReviewWorkspaceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Supersede Claim Evidence Endpoint"
       }
     },
     "/api/claims/{claim_id}/relationship-proposals": {

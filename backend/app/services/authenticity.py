@@ -373,7 +373,8 @@ def claims_preview(db: Session, doc: Document, status: str, role: str) -> dict[s
     about = set(item.about_evidence or [])
     mine = {e.id for e in item_evidence(db, doc)}
     links = list(db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id.in_(mine),
-                                                            ClaimEvidenceLink.stance == "supports"))) if mine else []
+                                                            ClaimEvidenceLink.stance == "supports",
+                                                            ClaimEvidenceLink.superseded_at.is_(None)))) if mine else []
     blocking = status in SYNTHETIC
     claims: list[dict[str, Any]] = []
     for claim_id in dict.fromkeys(link.claim_id for link in links):
@@ -386,7 +387,8 @@ def claims_preview(db: Session, doc: Document, status: str, role: str) -> dict[s
             continue
         others = []
         for link in db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id == claim_id,
-                                                               ClaimEvidenceLink.stance == "supports")):
+                                                               ClaimEvidenceLink.stance == "supports",
+                                                               ClaimEvidenceLink.superseded_at.is_(None))):
             if link.evidence_id in mine:
                 continue
             ev = db.get(Evidence, link.evidence_id)

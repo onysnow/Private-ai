@@ -92,6 +92,6 @@ def test_investigation_evidence_claim_links_lists_each_link_in_the_case_only():
     assert sorted((x['evidence_id'], x['claim_id'], x['stance']) for x in links) == sorted([
         (ev_a['id'], claim_1['id'], 'supports'), (ev_a['id'], claim_2['id'], 'contradicts'),
     ])
-    assert all(set(x) == {'evidence_id', 'claim_id', 'stance'} for x in links)
+    assert all(set(x) == {'evidence_id', 'claim_id', 'stance', 'superseded'} for x in links)
     assert ev_unlinked['id'] not in {x['evidence_id'] for x in links}
     assert client.get('/api/investigations/no-such-case/evidence-claim-links').status_code == 404

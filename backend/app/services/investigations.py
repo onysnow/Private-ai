@@ -112,12 +112,12 @@ def list_investigation_evidence_claim_links(db: Session, investigation_id: str) 
     evidence record backs, contradicts or gives context to which claim. Lets the
     Sources & evidence browser show each record's claims without a call per claim."""
     rows = db.execute(
-        select(ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance)
+        select(ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance, ClaimEvidenceLink.superseded_at)
         .join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
         .where(Claim.investigation_id == investigation_id)
         .order_by(ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance)
     ).all()
-    return [{"evidence_id": e, "claim_id": c, "stance": st} for e, c, st in rows]
+    return [{"evidence_id": e, "claim_id": c, "stance": st, "superseded": at is not None} for e, c, st, at in rows]
 
 
 def list_investigation_claims(

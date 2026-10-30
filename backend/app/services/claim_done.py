@@ -96,11 +96,16 @@ def _origin(source: Source) -> str:
 
 def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict[str, Any]:
     links = list(db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id == claim.id)))
-    return judge(db, claim.id, [(link.stance, db.get(Evidence, link.evidence_id), link.note) for link in links], target=target)
+    # A link marked superseded by a newer record counts neither for nor against the claim (claims.supersede_claim_evidence;
+    # the suite's RAS Module 07 rule 5: a superseded contradicting source stops being live dissent, as a supporting one
+    # stops being cited as support).
+    superseded = sum(1 for link in links if not link.counts_toward_claim and link.stance == "supports")
+    return judge(db, claim.id, [(link.stance, db.get(Evidence, link.evidence_id), link.note) for link in links if link.counts_toward_claim],
+                 target=target, superseded=superseded)
 
 
 def judge(db: Session, claim_id: str | None, links: list[tuple[str, Evidence | None, str | None]], *,
-          target: str = "supported") -> dict[str, Any]:
+          target: str = "supported", superseded: int = 0) -> dict[str, Any]:
     """The rules over a claim's evidence links, each (stance, evidence, note). The evidence need not be saved:
     Decide's "what it unlocks" asks what a claim not yet kept would meet (app/services/unlocks.py)."""
     supporting: list[tuple[Evidence, Source | None]] = []
@@ -119,9 +124,12 @@ def judge(db: Session, claim_id: str | None, links: list[tuple[str, Evidence | N
         rules.append({"key": key, "label": label, "state": state, "detail": detail})
 
     n = len(supporting)
+    not_counted = "".join([f"; {synthetic} marked AI-made does not count" if synthetic else "",
+                           f"; {superseded} superseded {'does' if superseded == 1 else 'do'} not count" if superseded else ""])
     rule("supporting", "At least one supporting item is linked", "met" if n else "not_met",
-         (f"{n} supporting item{'s' if n != 1 else ''}" + (f"; {synthetic} marked AI-made does not count" if synthetic else "")) if n
+         (f"{n} supporting item{'s' if n != 1 else ''}" + not_counted) if n
          else "Supported only by a synthetic source: it needs other support." if synthetic
+         else "Its supporting evidence is superseded: link the record that replaces it." if superseded
          else "Link the evidence that shows it, with the stance Supports.")
 
     says, unknown_says, failed_says = 0, 0, []

@@ -222,6 +222,49 @@ describe('ClaimsPanel', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
+  it('marks evidence superseded by a newer record: struck, its reason and replacement on hover, not counted, and undone', async () => {
+    const later = {id: 'ev-2', source_id: 'src-2', quote: 'Approved 4/3 after correction.', locator: 'p.2', notes: null};
+    const judgment = {...source, id: 'src-2', title: 'Corrected minutes', url: null};
+    const rows = [
+      {id: 'link-1', stance: 'supports', evidence, source, note: null, created_at: '2026-10-02T00:00:00'},
+      {id: 'link-2', stance: 'supports', evidence: later, source: judgment, note: null, created_at: '2026-10-03T00:00:00'},
+    ];
+    const mark = {at: '2026-10-04T00:00:00', by_evidence_id: 'ev-2', by_label: 'Corrected minutes', by_locator: 'p.2', reason: 'The minutes were corrected',
+      decided_by_id: 'local-owner', decided_by_name: 'Ony'};
+    const api = await renderPanel({[WORKSPACE]: workspace(claimFixture(), {evidence: rows, stance_counts: {supports: 2, contradicts: 0, context: 0}})});
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: /The contract was approved/}));
+    await screen.findByText('Approved 3/3, signed by CFO.');
+    await user.click(screen.getAllByRole('button', {name: 'Mark superseded'})[0]);
+    const form = screen.getByRole('form', {name: 'Mark superseded'});
+    // The claim's own other evidence is offered first as what replaces it; nothing is sent without a reason.
+    expect(within(form).getByRole('option', {name: /Corrected minutes · Approved 4\/3/})).toBeInTheDocument();
+    expect(within(form).getByRole('button', {name: 'Mark superseded'})).toBeDisabled();
+    await user.selectOptions(within(form).getByRole('combobox'), 'ev-2');
+    await user.type(within(form).getByRole('textbox'), 'The minutes were corrected');
+    api.add({'POST /api/claims/claim-1/evidence/link-1/supersede': workspace(claimFixture(), {
+      evidence: [{...rows[0], superseded: mark}, rows[1]], stance_counts: {supports: 1, contradicts: 0, context: 0}, superseded_count: 1})});
+    await user.click(within(form).getByRole('button', {name: 'Mark superseded'}));
+    await screen.findByText('Marked superseded: shown, no longer counted toward the claim.');
+    expect(api.lastBody('POST /api/claims/claim-1/evidence/link-1/supersede')).toEqual({reason: 'The minutes were corrected', by_evidence_id: 'ev-2'});
+    // Still listed, struck; what replaced it, why and who are revealed (in the page for screen readers).
+    const struck = screen.getByText('Approved 3/3, signed by CFO.');
+    expect(struck.tagName).toBe('S');
+    expect(struck.closest('li')).toHaveClass('cl-ev-gone');
+    expect(screen.getByText('Superseded by Corrected minutes, p.2').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('Marked by Ony · ' + new Date('2026-10-04T00:00:00Z').toLocaleDateString())).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '1 supporting · 0 contradicting · 0 context'})).toBeInTheDocument();
+    // Pointing at it lights the record that replaced it.
+    await user.hover(struck.closest('li')!);
+    expect(screen.getByText('Approved 4/3 after correction.').closest('li')).toHaveClass('cl-ev-replacer');
+
+    api.add({'DELETE /api/claims/claim-1/evidence/link-1/supersede': workspace(claimFixture(), {evidence: rows, stance_counts: {supports: 2, contradicts: 0, context: 0}})});
+    await user.click(screen.getByRole('button', {name: 'Undo superseded'}));
+    await screen.findByText('Counted again: the superseded mark is undone.');
+    expect(screen.getByText('Approved 3/3, signed by CFO.').tagName).not.toBe('S');
+    expect(api.unmatched()).toEqual([]);
+  });
+
   it('names a dependent relationship the page holds, inspects it there, and traces the rest', async () => {
     const onInspect = vi.fn();
     const api = await renderPanel({[WORKSPACE]: workspace(claimFixture(), {
