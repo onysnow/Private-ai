@@ -25,7 +25,7 @@ import type {CurrencyMoneyChecksOut, FinancialTransactionOut, MoneyCheckOut, Red
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {apiTime} from '../../lib/timestamps';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
-import {amountText, layout, pathOf, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
+import {amountText, layout, pathOf, placeLabels, shortAmount, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
 
 const FinancialFlowSankey = dynamic(() => import('../../components/charts/financial-flow-sankey').then(m => m.FinancialFlowSankey),
   {ssr: false, loading: () => <p className="mn-muted">Drawing the flow…</p>});
@@ -155,6 +155,11 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
 
   // Marks drawn in the picture that are revealed on hover, focus or click: an HTML layer over the SVG, placed in the
   // picture's own units (Ony, 29 Oct; an SVG <title> reaches neither keyboard nor touch).
+  const placed = picture ? placeLabels(picture, payments, currency ?? '') : null;
+  const labels = placed?.labels ?? [];
+  // The labels may need more height than the bars (a crowded column runs on below): the picture grows to hold them.
+  const tall = placed?.height ?? 0;
+  const labelOf = new Map(labels.map(l => [l.nodeId, l]));
   const hot: Array<{key: string; x: number; y: number; w: number; h: number; label: string; detail: ReactNode}> = [];
   const toggle = (ids: string[]) => setTraced(now => ids.every(id => now.includes(id)) ? now.filter(id => !ids.includes(id)) : [...new Set([...now, ...ids])]);
   const status = ledgerQ.isError ? errorMessage(ledgerQ.error, 'Could not read the ledger') : ledgerQ.isPending ? 'Reading the ledger…' : '';
@@ -198,7 +203,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
       <div className="mn-main">
         {view === 'columns' && picture && <figure className="mn-figure" ref={figureRef}>
           <div className="mn-svg-wrap">
-          <svg viewBox={`0 0 ${picture.width} ${picture.height}`} role="img" aria-label={`Money in ${currency}, from where it comes to where it goes`}>
+          <svg viewBox={`0 0 ${picture.width} ${tall}`} role="img" aria-label={`Money in ${currency}, from where it comes to where it goes`}>
             <defs>
               <pattern id="mn-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
                 <rect width="7" height="7" className="mn-hatch-bg"/><line x1="0" y1="0" x2="0" y2="7" className="mn-hatch-line"/>
@@ -222,49 +227,48 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
             {picture.returns.map(r => <g key={r.id} className="mn-return">
               <path d={r.d}/><text x={r.labelX} y={r.labelY + 12} textAnchor="middle">↺ {r.label}</text>
             </g>)}
-            {chips(picture.bands, labelBoxes(picture, payments, currency), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h})), picture.height).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
+            {labels.map(l => l.leader && <path key={`lead${l.nodeId}`} d={l.leader} className="mn-leader"/>)}
+            {chips(picture.bands, labels.map(l => ({x: l.x - 2, y: l.top - 2, w: l.w + 4, h: l.h + 4})), picture.nodes.map(n => ({x: n.x - 2, y: n.y, w: 16, h: n.h})), tall).map(c => <g key={`c${c.key}`} className={`mn-chip-band mn-chip-${c.certainty}`} transform={`translate(${c.x} ${c.y})`}>
               <rect x={0} y={-13} width={c.w} height={c.sub ? 34 : 19} rx={5}/>
               <text x={8} y={0}>{c.text}</text>{c.sub && <text x={8} y={15} className="sub">{c.sub}</text>}</g>)}
             {picture.nodes.map(n => {
               const last = n.col === picture.columns.length - 1;
               const first = n.col === 0;
-              // First column: name right of the bar, on its band; the others: right of the bar too, the middle
-              // ones under their outgoing money (mockup SEE_2). Marks: left of a source, right of an end, above a middle.
-              const lx = n.x + 20;
+              // Each name sits right of its bar, in its column's lane, placed by placeLabels so none overlaps another
+              // (mockup SEE_2). Marks: left of a source, at the right edge on an end's label, above a middle bar.
+              const l = labelOf.get(n.id);
               const owner = n.ghost ? picture.nodes.find(x => `ghost:${x.id}` === n.id) : undefined;
-              const incoming = picture.bands.filter(b => b.toId === n.id && b.certainty !== 'worked_out');
-              const purposes = [...new Set(incoming.map(b => payments.find(p => b.ids.includes(p.id))?.purpose).filter(Boolean))];
-              const count = n.others ? picture.folded?.payments ?? 0 : payments.filter(p => p.fromId === n.id).length;
-              const lines: Array<[string, string]> = // [words, 'sum'] or, in the first column, [name, its sum on the same line]
-                n.others ? (first ? [[n.name, `${amountText(n.amountOut, currency)} · ${count} payments`]] : [])
-                : n.ghost
-                ? [[n.name, ''], [`ƒ ${amountText(n.amountOut, currency)} · worked out`, 'sum']]
-                : first ? [[n.name, `${amountText(n.amountOut, currency)} · ${count} payment${count === 1 ? '' : 's'}${n.marks.includes('miracle') && n.h > 24 ? ' · nothing seen coming in' : ''}`]]
-                : last && picture.crowded ? [[n.name, `${amountText(n.amountIn, currency)} in`]] // one line each in a crowded column
-                : last ? [[n.name, ''], [n.marks.includes('black_hole') ? `${amountText(n.amountIn, currency)} in · ${amountText(0, currency)} out`
-                    : `${amountText(n.amountIn, currency)}${purposes.length === 1 ? ` · ${purposes[0]}` : ''}`, 'sum']]
-                : [[n.name, ''], [`in ${amountText(n.amountIn, currency)}`, 'sum'], [`out ${amountText(n.amountOut, currency)}`, 'sum']];
-              const ly = n.ghost ? n.y + 20 : last || first ? n.y + Math.min(n.h / 2, 14) + (n.h < 30 ? 0 : 0) : n.y + n.h + 16;
               const markAt = (i: number) => first ? {x: n.x - 14 - i * 20, y: n.y + Math.min(n.h / 2, 10)}
-                : last && lines.length === 1 ? {x: lx + lines[0][0].length * 7.4 + lines[0][1].length * 6.6 + 22 + i * 20, y: ly - 4}
-                : last ? {x: lx + lines[1][0].length * 6.6 + 14 + i * 20, y: ly + 10} : {x: n.x + 6 + i * 20, y: n.y - 14};
-              // The worked-out sum's "=" explanation is revealed on its line; each check mark is named on reveal.
-              if (n.ghost) hot.push({key: `f:${n.id}`, x: lx, y: ly + 14 - 11, w: lines[1][0].length * 6.6, h: 15, label: lines[1][0],
-                detail: <><b>{lines[1][0]}</b><span className="rv-row">= what left {owner?.name ?? 'it'} minus what came in</span></>});
+                : last && l ? {x: picture.width - 12 - i * 20, y: l.top + 7} : {x: n.x + 6 - i * 20, y: n.y - 14}; // a middle bar's marks run left, away from its label
+              // The worked-out sum's "=" explanation is revealed on its line; a party's exact totals, its count of
+              // payments and its full name on its label; each check mark is named on reveal.
+              if (l && n.ghost) {
+                const sumAt = l.lines.findIndex(x => x.kind === 'sum');
+                hot.push({key: `f:${n.id}`, x: l.x, y: l.top + sumAt * 14, w: l.w, h: 14, label: l.lines[sumAt].text,
+                  detail: <><b>ƒ {amountText(n.amountOut, currency)} · worked out</b><span className="rv-row">= what left {owner?.name ?? 'it'} minus what came in</span></>});
+              } else if (l) {
+                const k = n.others ? picture.folded?.payments ?? 0 : payments.filter(p => p.fromId === n.id).length;
+                hot.push({key: `l:${n.id}`, x: l.x, y: l.top, w: l.w, h: l.h, label: n.name, detail: <><b>{n.name}</b>
+                  {n.amountIn > 0 && <span className="rv-row">in {amountText(n.amountIn, currency)}</span>}
+                  {(n.amountOut > 0 || n.marks.includes('black_hole')) && <span className="rv-row">out {amountText(n.amountOut, currency)}</span>}
+                  {k > 0 && <span className="rv-row">{k} payment{k === 1 ? '' : 's'} out</span>}
+                  {n.marks.includes('miracle') && <span className="rv-row">nothing seen coming in</span>}</>});
+              }
               n.marks.forEach((m, i) => { const at = markAt(i); hot.push({key: `m:${n.id}:${m}`, x: at.x - 9, y: at.y - 9, w: 18, h: 18, label: KIND[m].word,
                 detail: <><b>{KIND[m].word}</b><span className="rv-row">{KIND[m].line}</span></>}); });
               return <g key={n.id} className={`mn-node${n.ghost ? ' ghost' : ''}${n.others ? ' others' : ''}`}>
                 <rect x={n.x} y={n.y} width={12} height={n.h} rx={2} fill={n.ghost ? 'url(#mn-hatch)' : undefined}/>
-                {n.ghost && <rect x={n.x} y={n.y} width={picture.nodes.find(x => `ghost:${x.id}` === n.id)!.x - n.x} height={n.h} className="mn-ghost-box"/>}
+                {n.ghost && owner && <rect x={n.x} y={n.y} width={owner.x - n.x} height={n.h} className="mn-ghost-box"/>}
                 {n.marks.map((m, i) => { const at = markAt(i); return <g key={m} className={`mn-mark mn-mark-${m}`} transform={`translate(${at.x} ${at.y})`}>
                   <circle r={8}/><text y={4} textAnchor="middle">{KIND[m].icon}</text></g>; })}
-                {lines.map(([words, cls], i) => <text key={i} x={lx} y={ly + i * 14} className={cls === 'sum' ? 'mn-node-sum' : 'mn-node-name'}>{words}
-                  {cls && cls !== 'sum' && <tspan className="mn-node-sum" dx={8}>{cls}</tspan>}</text>)}
+                {l && <rect x={l.x - 3} y={l.top - 1} width={l.w + 6} height={l.h + 2} rx={3} className="mn-label-bg"/>}
+                {l?.lines.map((line, i) => <text key={i} x={l.x} y={l.top + 11 + i * 14} className={line.kind === 'sum' ? 'mn-node-sum' : 'mn-node-name'}>{line.text}
+                  {line.tail && <tspan className="mn-node-sum" dx={8}>{line.tail}</tspan>}</text>)}
               </g>;
             })}
           </svg>
-          {hot.map(h => <span key={h.key} className="mn-hot" style={{left: `${(h.x / picture.width) * 100}%`, top: `${(h.y / picture.height) * 100}%`,
-            width: `${(h.w / picture.width) * 100}%`, height: `${(h.h / picture.height) * 100}%`}}>
+          {hot.map(h => <span key={h.key} className="mn-hot" style={{left: `${(h.x / picture.width) * 100}%`, top: `${(h.y / tall) * 100}%`,
+            width: `${(h.w / picture.width) * 100}%`, height: `${(h.h / tall) * 100}%`}}>
             <Reveal className="mn-hot-rv" label={h.label} detail={h.detail}><span/></Reveal></span>)}
           </div>
           <ul className="sr-only" aria-label="The payments, in order">
@@ -308,18 +312,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   </section>;
 }
 
-/** The band chips, nudged right where two would overlap. */
-/** Where the parties' names sit (roughly), so a chip never covers one. */
-function labelBoxes(picture: ReturnType<typeof layout>, payments: Payment[], currency: string): Array<{x: number; y: number; w: number; h: number}> {
-  return picture.nodes.filter(n => !n.ghost).map(n => {
-    const first = n.col === 0; const last = n.col === picture.columns.length - 1;
-    const count = payments.filter(p => p.fromId === n.id).length;
-    const w = first ? n.name.length * 7.4 + (amountText(n.amountOut, currency).length + 14 + String(count).length) * 6.6 + 12 : Math.max(n.name.length * 7.4, 150);
-    const y = first || last ? n.y + Math.min(n.h / 2, 14) - 12 : n.y + n.h + 4;
-    return {x: n.x + 18, y: y - 3, w, h: first || (last && picture.crowded) ? 22 : 46};
-  });
-}
-
+/** The band chips, each in a free place near its band, never over a bar or a party's label. */
 function chips(bands: ReturnType<typeof layout>['bands'], avoid: Array<{x: number; y: number; w: number; h: number}> = [],
   bars: Array<{x: number; y: number; w: number; h: number}> = [], height = Infinity): Array<{key: string; certainty: string; text: string; sub: string | null; x: number; y: number; w: number}> {
   const placed: Array<{x: number; y: number; w: number; h: number}> = [...avoid];
@@ -426,10 +419,38 @@ function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[
       })}
       {dated.map(t => <rect key={t.id} x={x(time(t.dateTime!)) - 3} width={6} y={H - B - h(t.amount)} height={h(t.amount)}
         className={`mn-bar mn-bar-${t.certainty}${lit.has(t.id) ? ' lit' : ''}`}><title>{day(t.dateTime ?? null)}{t.dateEnd ? ` to ${day(t.dateEnd)}` : ''} · {t.from} → {t.to} · {amountText(t.amount, currency)}</title></rect>)}
-      {dated.filter(t => t.amount >= 10 * (line ?? 10000)).map(t => <text key={`v${t.id}`} x={x(time(t.dateTime!)) + 6} y={H - B - h(t.amount) + 8} className="mn-bar-value">{amountText(t.amount, currency)}</text>)}
+      {stripValues(dated.map(t => ({id: t.id, x: x(time(t.dateTime!)), top: H - B - h(t.amount), amount: t.amount})), currency, W, H - B,
+        line && line < 10 ** maxLog ? {x: gapX - 34, y: H - B - h(line) - 14, w: 68, h: 12} : null, line ?? 10000)
+        .map(v => <text key={`v${v.id}`} x={v.x} y={v.y} textAnchor={v.anchor} className="mn-bar-value">{v.text}</text>)}
     </svg>
     <p className="mn-muted mn-axis-note"><Reveal detail={`Bar height: amount, on a log scale${flags.length ? '' : ` · no structuring flag on these ${currency} payments`}`}><span>log scale</span></Reveal></p>
   </figure>;
+}
+
+/** The values written on the strip's largest bars: largest first, each where it overlaps no other value, no bar and
+ *  not the line's name; one that finds no free place is left to its bar's own title (the mockup names only a few). */
+export function stripValues(bars: Array<{id: string; x: number; top: number; amount: number}>, currency: string, width: number, base: number,
+  lineBox: {x: number; y: number; w: number; h: number} | null, line: number): Array<{id: string; x: number; y: number; anchor: 'start' | 'end'; text: string}> {
+  const CH = 5.8; const TH = 11;
+  const taken: Array<{x: number; y: number; w: number; h: number}> = lineBox ? [lineBox] : [];
+  const rects = bars.map(b => ({id: b.id, x: b.x - 3, y: b.top, w: 6, h: base - b.top}));
+  const out: Array<{id: string; x: number; y: number; anchor: 'start' | 'end'; text: string}> = [];
+  for (const b of [...bars].filter(v => v.amount >= 10 * line).sort((a, c) => c.amount - a.amount)) {
+    const text = shortAmount(b.amount, currency);
+    const w = text.length * CH;
+    // Right of the bar's top, left of it, then just above it.
+    const spots = [{x: b.x + 5, y: b.top + 9, anchor: 'start' as const, bx: b.x + 5}, {x: b.x - 5, y: b.top + 9, anchor: 'end' as const, bx: b.x - 5 - w},
+      {x: b.x + 2, y: b.top - 3, anchor: 'start' as const, bx: b.x + 2}, {x: b.x - 2, y: b.top - 3, anchor: 'end' as const, bx: b.x - 2 - w}];
+    const at = spots.find(s => {
+      const box = {x: s.bx, y: s.y - TH + 2, w, h: TH};
+      return box.x >= 0 && box.x + w <= width && box.y >= 0
+        && [...taken, ...rects.filter(r => r.id !== b.id)].every(o => !(box.x < o.x + o.w && box.x + box.w > o.x && box.y < o.y + o.h && box.y + box.h > o.y));
+    });
+    if (!at) continue;
+    taken.push({x: at.bx, y: at.y - TH + 2, w, h: TH});
+    out.push({id: b.id, x: at.x, y: at.y, anchor: at.anchor, text});
+  }
+  return out;
 }
 
 function ChecksPanel({investigationId, currency, checks, ranAt, asOf, error}: {

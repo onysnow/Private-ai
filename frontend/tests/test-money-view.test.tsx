@@ -7,8 +7,8 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {MoneyView} from '../features/money/money-view';
-import {cycleClosers, layout, pathOf, type Payment} from '../features/money/money-layout';
+import {MoneyView, stripValues} from '../features/money/money-view';
+import {cycleClosers, layout, pathOf, placeLabels, shortAmount, wrapName, type Payment} from '../features/money/money-layout';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -129,6 +129,57 @@ describe('the money picture', () => {
     expect(performance.now() - t0).toBeLessThan(3000);
     expect(pic.bands.filter(b => b.certainty !== 'worked_out')).toHaveLength(21);
     expect(pic.bands.reduce((s, b) => s + b.amount, 0)).toBe(ps.reduce((s, x) => s + x.amount, 0));
+  });
+
+  it('places every party\'s label so none overlaps another, none crosses into the next column and none runs off the picture', () => {
+    // A ledger like the demo case's: long names, nine-digit sums, crowded columns, two steps through the middle.
+    const long = (i: number) => `Party ${i} International Investment Holdings Corporation (BVI) Limited`;
+    const ps: Payment[] = [];
+    for (let i = 0; i < 9; i++) {
+      ps.push({...p(`a${i}`, `S${i}`, `M${i % 4}`, 300_000_000 + i * 7_000_000, '2012'), from: long(i), to: long(10 + (i % 4))});
+      ps.push({...p(`b${i}`, `M${i % 4}`, `N${i % 3}`, 200_000_000 + i, '2013'), from: long(10 + (i % 4)), to: long(20 + (i % 3))});
+      ps.push({...p(`c${i}`, `N${i % 3}`, `E${i}`, 150_000_000 + i, '2014'), from: long(20 + (i % 3)), to: long(30 + i)});
+    }
+    const pic = layout(ps, 'USD', {top: 20});
+    const {labels, height} = placeLabels(pic, ps, 'USD');
+    expect(labels).toHaveLength(pic.nodes.filter(n => !(n.others && n.col === pic.columns.length - 1)).length);
+    expect(height).toBeGreaterThanOrEqual(pic.height);
+    const col = (id: string) => pic.nodes.find(n => n.id === id)!.col;
+    labels.forEach((a, i) => {
+      expect(a.top).toBeGreaterThanOrEqual(20);
+      expect(a.top + a.h).toBeLessThanOrEqual(height);
+      expect(a.x + a.w).toBeLessThanOrEqual(col(a.nodeId) < pic.columns.length - 1 ? pic.columns[col(a.nodeId) + 1].x : pic.width);
+      labels.slice(i + 1).forEach(b => expect(a.x < b.x + b.w && a.x + a.w > b.x && a.top < b.top + b.h && a.top + a.h > b.top).toBe(false));
+    });
+    // Long names are shortened (the full name is revealed on the label), and nine-digit sums are written short.
+    expect(labels.some(l => l.cut)).toBe(true);
+    expect(labels.flatMap(l => l.lines.map(x => `${x.text}${x.tail ?? ''}`)).join(' ')).toMatch(/\$3\d\dm/);
+    expect(labels.filter(l => l.leader).every(l => l.leader!.startsWith('M'))).toBe(true);
+  });
+
+  it('wraps a long name over two lines and cuts the rest with an ellipsis; writes big sums short', () => {
+    expect(wrapName('Kestrel SA', 200)).toEqual({lines: ['Kestrel SA'], cut: false});
+    const w = wrapName('1MDB Global Investments Limited of the Cayman Islands', 140);
+    expect(w.cut).toBe(true);
+    expect(w.lines).toHaveLength(2);
+    expect(w.lines[1].endsWith('…')).toBe(true);
+    expect(wrapName('Enterprise Emerging Markets Fund', 150, 1).lines[0]).toMatch(/^Enterprise Emerging M.*…$/);
+    expect(shortAmount(1_250_000, 'EUR')).toBe('€1,250,000');
+    expect(shortAmount(646_464_649, 'USD')).toBe('$646m');
+    expect(shortAmount(1_592_311_599, 'USD')).toBe('$1.59bn');
+    expect(shortAmount(5_200_000, 'SGD', 1e6)).toBe('5.2m SGD');
+  });
+
+  it('writes the strip\'s values only where they overlap nothing', () => {
+    const bars = Array.from({length: 12}, (_, i) => ({id: `v${i}`, x: 100 + i * 4, top: 20 + (i % 3), amount: 500_000_000 + i}));
+    const vals = stripValues(bars, 'USD', 420, 130, {x: 200, y: 80, w: 68, h: 12}, 10000);
+    expect(vals.length).toBeGreaterThan(0);
+    expect(vals.length).toBeLessThan(bars.length);
+    const box = (v: typeof vals[number]) => { const w = v.text.length * 5.8; return {x: v.anchor === 'start' ? v.x : v.x - w, y: v.y - 9, w, h: 11}; };
+    vals.map(box).forEach((a, i, all) => {
+      expect(a.x).toBeGreaterThanOrEqual(0); expect(a.x + a.w).toBeLessThanOrEqual(420);
+      all.slice(i + 1).forEach(b => expect(a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y).toBe(false));
+    });
   });
 
   it('never refuses a cycle: the latest payment of a round trip is drawn as a return arc', () => {

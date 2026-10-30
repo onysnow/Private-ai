@@ -147,3 +147,5 @@
 .mn-check-row .mn-check-icon { display: grid; width: 30px; color: var(--text-muted); box-shadow: inset 0 0 0 1.5px var(--line); }
 .mn-check-row .mn-check-icon.found { color: var(--ground); background: var(--accent-1); box-shadow: none; }
 .mn-check-row .mn-icon-round_trip.found { background: var(--accent-2); }
+.mn-leader { fill: none; stroke: color-mix(in srgb, var(--text-muted) 70%, transparent); stroke-width: 1; pointer-events: none; }
+.mn-node rect.mn-label-bg { fill: color-mix(in srgb, var(--surface-1) 62%, transparent); pointer-events: none; }

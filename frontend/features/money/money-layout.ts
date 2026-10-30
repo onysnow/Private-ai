@@ -50,6 +50,7 @@ export function amountText(amount: number, currency: string): string {
 }
 
 const W = 1000;
+const RIGHT = 280;
 const NODE_W = 12;
 const TOP = 34;
 const GAP = 22;
@@ -166,8 +167,9 @@ export function layout(payments: Payment[], currency: string, opts: {
     drawnOut.get(n) ?? 0,
   );
   const cols = last + 1;
-  // Labels of the first column sit right of their bars, on the bands (mockup SEE_2), so the picture starts near the edge.
-  const xs = Array.from({length: cols}, (_, i) => 56 + i * ((W - 56 - 230) / (cols - 1)));
+  // Labels of the first column sit right of their bars, on the bands (mockup SEE_2), so the picture starts near the edge;
+  // the last column keeps a gutter wide enough for a name and its amount (placeLabels fits them in it).
+  const xs = Array.from({length: cols}, (_, i) => 56 + i * ((W - 56 - RIGHT) / (cols - 1)));
   const byCol: string[][] = Array.from({length: cols}, () => []);
   for (const n of names.keys()) byCol[depth.get(n)!].push(n);
   // A crowded column (a large ledger) packs its parties closer and makes the picture taller, never thinner than a line.
@@ -281,4 +283,152 @@ export function pathOf(picture: Picture, key: string): Set<string> {
   up(band.fromId);
   down(band.toId);
   return lit;
+}
+
+/** Amounts in a party's label: exact below `from` (€1,250,000), shortened from it (€646m, $1.59bn); the exact sum is
+ *  revealed on the label. */
+export function shortAmount(amount: number, currency: string, from = 1e7): string {
+  const a = Math.abs(amount);
+  if (a < from) return amountText(amount, currency);
+  const [n, unit] = a >= 1e9 ? [amount / 1e9, 'bn'] : [amount / 1e6, 'm'];
+  const num = `${Number(n.toPrecision(3))}${unit}`;
+  const sign = SIGN[currency];
+  return sign ? `${sign}${num}` : `${num} ${currency}`;
+}
+
+// Text widths in the picture's own units (1000 wide, drawn at about 1:1): names 600 12.5px, sums 11px mono.
+const NAME_CH = 6.7;
+const SUM_CH = 6.6;
+const LINE = 14;
+const PAD = 4;
+/** Room for each check mark drawn at the right edge on an end's label. */
+const MARK_W = 26;
+
+/** A name wrapped into at most `max` lines of `width`, the last cut with an ellipsis if it still does not fit. */
+export function wrapName(name: string, width: number, max = 2): {lines: string[]; cut: boolean} {
+  const per = Math.max(4, Math.floor(width / NAME_CH));
+  const all: string[] = [];
+  let cur = '';
+  for (let word of name.split(/\s+/).filter(Boolean)) {
+    if (cur && `${cur} ${word}`.length <= per) { cur = `${cur} ${word}`; continue; }
+    if (cur) all.push(cur);
+    while (word.length > per) { all.push(word.slice(0, per)); word = word.slice(per); }
+    cur = word;
+  }
+  if (cur) all.push(cur);
+  if (all.length <= max) return {lines: all, cut: false};
+  // The last line keeps as much of the rest of the name as fits, cut mid-word if need be, then "…".
+  const lines = all.slice(0, max);
+  lines[max - 1] = `${all.slice(max - 1).join(' ').slice(0, per - 1).replace(/[\s,.(-]+$/, '')}…`;
+  return {lines, cut: true};
+}
+
+export type LabelLine = {text: string; kind: 'name' | 'sum'; tail?: string};
+/** A party's label, placed so no two overlap: right of its bar inside its column's lane, moved up or down (with a
+ *  leader back to the bar) when a neighbour's label is in the way. */
+export type Label = {
+  nodeId: string; x: number; top: number; w: number; h: number; lines: LabelLine[];
+  /** The label had to move from its bar: the leader's elbow path back to it. */
+  leader: string | null;
+  /** The name was shortened or wrapped short: the full name is revealed on the label. */
+  cut: boolean;
+};
+
+const lineW = (l: LabelLine) => l.text.length * (l.kind === 'name' ? NAME_CH : SUM_CH) + (l.tail ? 8 + l.tail.length * SUM_CH : 0);
+
+export function placeLabels(picture: Picture, payments: Payment[], currency: string): {labels: Label[]; height: number} {
+  const cols = picture.columns.length;
+  const last = cols - 1;
+  const count = (id: string) => payments.filter(p => p.fromId === id).length;
+  const floor = Math.max(...picture.nodes.map(n => n.y + n.h));
+  const limit = picture.returns.length ? floor + 8 : picture.height - 2;
+  const minTop = TOP - 8;
+  // Each column's labels keep to its lane: up to the next column's bars, or in the last, up to its marks at the edge.
+  const laneEnd = (c: number, n: Node) => c < last ? picture.columns[c + 1].x - 10 : W - 6 - MARK_W * n.marks.length;
+  const fit = (options: string[], lane: number) => options.find(o => o.length * SUM_CH <= lane) ?? options[options.length - 1];
+  // One picture writes its amounts one way: a picture with sums of eight digits or more shortens every sum from a million.
+  const big = picture.nodes.some(n => Math.max(n.amountIn, n.amountOut) >= 1e7);
+  const amt = (a: number) => shortAmount(a, currency, big ? 1e6 : Infinity);
+  // What a label says, from the fullest (level 0: the name on two lines, every sum) to the most compact (level 2: the
+  // name on one line and only what fits beside it); the rest is revealed on the label.
+  const content = (n: Node, c: number, lane: number, level: number): {lines: LabelLine[]; cut: boolean} => {
+    const nameLines = level === 0 ? 2 : 1;
+    const named = (sums: string[]) => {
+      const w = wrapName(n.name, lane, nameLines);
+      return {lines: [...w.lines.map(t => ({text: t, kind: 'name' as const})), ...sums.map(t => ({text: t, kind: 'sum' as const}))], cut: w.cut};
+    };
+    const beside = (tail: string) => {
+      const w = wrapName(n.name, lane - 8 - tail.length * SUM_CH, 1);
+      return {lines: [{text: w.lines[0] ?? '', kind: 'name' as const, tail}], cut: w.cut};
+    };
+    if (n.ghost) return level < 2 ? named([fit([`ƒ ${amt(n.amountOut)} · worked out`, `ƒ ${amt(n.amountOut)}`], lane)]) : beside(`ƒ ${amt(n.amountOut)}`);
+    if (c === 0) {
+      const k = n.others ? picture.folded?.payments ?? 0 : count(n.id);
+      const sum = `${amt(n.amountOut)} · ${k} payment${k === 1 ? '' : 's'}`;
+      const one: LabelLine = {text: n.name, kind: 'name', tail: sum};
+      if (lineW(one) <= lane) return {lines: [one], cut: false};
+      return level < 2 ? named([fit([sum, amt(n.amountOut)], lane)]) : beside(amt(n.amountOut));
+    }
+    if (c === last) {
+      if (picture.crowded || level === 2) return beside(`${amt(n.amountIn)} in`);
+      const purposes = [...new Set(picture.bands.filter(b => b.toId === n.id && b.certainty !== 'worked_out')
+        .map(b => payments.find(p => b.ids.includes(p.id))?.purpose).filter(Boolean))];
+      const sum = n.marks.includes('black_hole') ? `${amt(n.amountIn)} in · ${amountText(0, currency)} out`
+        : `${amt(n.amountIn)}${purposes.length === 1 ? ` · ${purposes[0]}` : ''}`;
+      return named([fit([sum, amt(n.amountIn)], lane)]);
+    }
+    // Passes through: what came in and what went out; a side with nothing is left to the party's mark.
+    const parts = [n.amountIn > 0 ? `in ${amt(n.amountIn)}` : '', n.amountOut > 0 ? `out ${amt(n.amountOut)}` : ''].filter(Boolean);
+    const joined = parts.join(' · ');
+    const arrow = n.amountIn > 0 && n.amountOut > 0 ? `${amt(n.amountIn)} → ${amt(n.amountOut)}` : joined;
+    if (level === 2) return beside(fit([arrow, amt(Math.max(n.amountIn, n.amountOut))], lane / 2));
+    return named(level === 0 && joined.length * SUM_CH > lane ? parts : [fit([joined, arrow], lane)]);
+  };
+  const labels: Label[] = [];
+  let bottom = 0;
+  for (let c = 0; c < cols; c++) {
+    const col = picture.nodes.filter(n => n.col === c && !(n.others && c === last && c !== 0));
+    if (!col.length) continue;
+    // The fullest level whose labels all fit the column's height.
+    let want: Array<{label: Label; desired: number; node: Node}> = [];
+    for (let level = 0; level <= 2; level++) {
+      want = col.map(n => {
+        const x = n.x + NODE_W + 6;
+        const lane = laneEnd(c, n) - x;
+        const {lines, cut} = content(n, c, lane, level);
+        const h = lines.length * LINE;
+        const w = Math.min(lane, Math.max(...lines.map(lineW)));
+        const desired = n.ghost ? n.y + 8 : n.y + Math.min(n.h / 2, 14) - 9;
+        return {node: n, desired, label: {nodeId: n.id, x, top: desired, w, h, lines, leader: null, cut}};
+      });
+      if (want.reduce((s, it) => s + it.label.h + PAD, -PAD) <= limit - minTop) break;
+    }
+    // Down from the top so none overlaps the one above, then up from the foot so none runs off it; a column that
+    // still cannot fit runs on below, and the picture grows to hold it.
+    want.sort((a, b) => a.desired - b.desired);
+    let edge = minTop;
+    for (const it of want) { it.label.top = Math.max(it.desired, edge); edge = it.label.top + it.label.h + PAD; }
+    if (edge - PAD > limit && want.reduce((s, it) => s + it.label.h + PAD, -PAD) <= limit - minTop) {
+      edge = limit;
+      for (let i = want.length - 1; i >= 0; i--) {
+        const l = want[i].label;
+        if (l.top + l.h > edge) l.top = edge - l.h;
+        edge = l.top - PAD;
+      }
+    }
+    for (const {node: n, desired, label: l} of want) {
+      if (Math.abs(l.top - desired) > 6) {
+        // Moved: indent it and draw an elbow from the nearest point of its bar to its first line.
+        const ly = l.top + 7;
+        const by = Math.min(n.y + n.h, Math.max(n.y, ly));
+        const bx = n.x + NODE_W;
+        l.x += 8;
+        l.w = Math.min(l.w, laneEnd(c, n) - l.x);
+        l.leader = `M${bx},${by}H${bx + 4}L${l.x - 3},${ly}`;
+      }
+      bottom = Math.max(bottom, l.top + l.h);
+      labels.push(l);
+    }
+  }
+  return {labels, height: Math.max(picture.height, bottom + 6)};
 }
