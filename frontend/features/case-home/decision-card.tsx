@@ -206,13 +206,13 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
     {showWhatHappens && !inPane && <WhatHappens item={item}/>}
   </>;
   return <article className={`ch-card ch-kind-${item.kind}`} aria-label={`${item.question} (${position} of ${total})`} data-testid="decision-card">
-    <p className="ch-why">
+    <div className="ch-why">
       {item.actor_kind === 'ai' && <AiTag/>}
       {keys === 'decide' && item.level && <LevelChip level={item.level} focusable/>}
       {showWhatHappens && inPane && <WhatHappens item={item} mark/>}
       {item.choices.length > 0 && <KeysHint rows={[...item.choices.map(c => [keyOf[c.key].toUpperCase(), c.label] as [string, string]),
         ...(keys === 'decide' ? [['J / K', 'next, previous'], ['Z', 'undo'], ['O', 'open the source']] as [string, string][] : [['Z', 'undo']] as [string, string][])]}/>}
-    </p>
+    </div>
     {page !== null && ev?.document_id ? <div className="ch-card-body ch-split">
       <PageThumb documentId={ev.document_id} page={page} passage={ev.excerpt!.trim()}/>
       <div className="ch-split-words">{question}{words}{extras}</div>
