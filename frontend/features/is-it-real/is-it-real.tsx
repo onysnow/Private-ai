@@ -6,7 +6,7 @@
 // with what was checked and why. Right: before anything is sent (a local comparison, or one outside check allowed
 // once with exactly what goes; nothing for a source-protected item) and the append-only history.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 
 import {Reveal} from '../../components/ui/reveal';
@@ -68,7 +68,10 @@ export function IsItReal({investigationId}: {investigationId: string}): ReactEle
   return <Screen key={`${request.documentId}:${request.serial}`} investigationId={investigationId} documentId={request.documentId} onClose={close}/>;
 }
 
-function Screen({investigationId, documentId, onClose}: {investigationId: string; documentId: string; onClose: () => void}): ReactElement {
+/** The item view. Over the whole screen when opened from elsewhere (a capture, the reading room); `embedded` inside the
+ *  Check stage's own section, beside the rail of the case's files. */
+function Screen({investigationId, documentId, onClose, embedded = false}: {investigationId: string; documentId: string; onClose?: () => void;
+  embedded?: boolean}): ReactElement {
   const queryClient = useQueryClient();
   const caseName = useWorkbenchStore(state => state.investigationName);
   const query = useQuery({...getAuthenticityOptions({path: {document_id: documentId}})});
@@ -76,11 +79,12 @@ function Screen({investigationId, documentId, onClose}: {investigationId: string
   const [choice, setChoice] = useState<Status | null>(null);
   const [error, setError] = useState('');
   useEffect(() => {
+    if (embedded || !onClose) return undefined;
     // Escape closes this screen only, not the reading room it may have been opened from.
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopImmediatePropagation(); onClose(); } };
     window.addEventListener('keydown', onKey, true);
     return () => window.removeEventListener('keydown', onKey, true);
-  }, [onClose]);
+  }, [onClose, embedded]);
   const refresh = (next: AuthenticityOut) => {
     queryClient.setQueryData(getAuthenticityQueryKey({path: {document_id: documentId}}), next);
     void queryClient.invalidateQueries({queryKey: listAuthenticityQueryKey({path: {investigation_id: investigationId}})});
@@ -90,6 +94,10 @@ function Screen({investigationId, documentId, onClose}: {investigationId: string
     catch (e) { setError(errorMessage(e, 'Could not save that')); }
   };
 
+  if (!data && embedded) return <div className="ir ir-embedded" aria-label="The item" aria-busy={!query.isError}>
+    <p className="ir-quiet">{query.isError ? <>{errorMessage(query.error, 'Could not open this item')}{' '}
+      <button type="button" className="ir-ghost" onClick={() => void query.refetch()}>Try again</button></> : 'Reading what the file says about itself…'}</p>
+  </div>;
   if (!data) return <div className="ir" role="dialog" aria-modal="true" aria-label="Is it real?">
     <header className="ir-top"><h1>Is it real?</h1><button type="button" className="rr-close" onClick={onClose} aria-label="Close">×</button></header>
     <p className="ir-quiet">{query.isError ? errorMessage(query.error, 'Could not open this item') : 'Reading what the file says about itself…'}</p>
@@ -97,15 +105,16 @@ function Screen({investigationId, documentId, onClose}: {investigationId: string
 
   const findings = data.findings as Findings;
   const shown: Status = choice ?? (data.status as Status);
-  return <div className="ir" data-calm-zone="" role="dialog" aria-modal="true" aria-label={`Is it real? ${data.item.title}`}>
-    <header className="ir-top">
+  return <div className={embedded ? 'ir ir-embedded' : 'ir'} data-calm-zone="" {...(embedded ? {'aria-label': data.item.title}
+    : {role: 'dialog', 'aria-modal': true, 'aria-label': `Is it real? ${data.item.title}`})}>
+    {!embedded && <><header className="ir-top">
       <nav className="rr-crumbs" aria-label="You are here"><span>{caseName || 'Case'}</span><span>Check</span><span>Sources</span><b>Is it real?</b></nav>
       <span className="ir-mono ir-dim">Content verified: not done by the capture</span>
       <button type="button" className="rr-close" onClick={onClose} aria-label="Close Is it real?">×</button>
     </header>
     <div className="ir-title"><h1>Is it real?</h1><p>The system records what it found. A detector cannot decide this. Only you can, with reasons.</p>
       <Reveal label={`A${data.item.kind === 'image' || data.item.kind === 'audio' ? 'n' : ''} ${data.item.kind}`} detail={<b>{data.item.kind}</b>}>
-        <span className="ir-kind" aria-hidden="true">{KIND_MARK[data.item.kind] ?? data.item.kind}</span></Reveal></div>
+        <span className="ir-kind" aria-hidden="true">{KIND_MARK[data.item.kind] ?? data.item.kind}</span></Reveal></div></>}
     {error && <p role="alert" className="ir-err">{error}</p>}
     <aside className="ir-col" aria-label="The item">
       <Item data={data} onProtect={v => void patch({source_protected: v})}/>
@@ -164,7 +173,8 @@ function Item({data, onProtect}: {data: AuthenticityOut; onProtect: (v: boolean)
     {/* eslint-disable-next-line @next/next/no-img-element */}
     {item.kind === 'image' && (src ? <img className="ir-pic" src={src} alt={`The item: ${item.filename}`}/> : <div className="ir-pic ir-quiet">{picture.isError ? 'No picture to show' : 'Opening…'}</div>)}
     {item.kind === 'text' && <blockquote className="ir-excerpt">{highlight(item.excerpt ?? '', item.quotes)}</blockquote>}
-    {(item.kind === 'audio' || item.kind === 'video') && <div className="ir-pic ir-quiet">{item.kind === 'audio' ? 'A recording' : 'A video'} · {item.filename}</div>}
+    {(item.kind === 'audio' || item.kind === 'video') && <div className="ir-media" role="img" aria-label={`${item.kind === 'audio' ? 'A recording' : 'A video'}: ${item.filename}`}>
+      <b aria-hidden="true">{KIND_MARK[item.kind]}</b><span aria-hidden="true">{item.filename}</span></div>}
     <h2 className="ir-item-title">{item.title}</h2>
     {/* Who posted it stays; when it came in, the file's size and its fingerprint are on reveal (Ony, 29 Oct). */}
     <p className="ir-small"><Reveal detail={item.from_link ? `Captured ${when(item.captured_at)} from a link` : `Added ${when(item.added_at)}`}>
@@ -371,29 +381,128 @@ function History({rows, onAgain}: {rows: AuthenticityHistoryOut[]; onAgain: () =
   </section>;
 }
 
-/** The Check stage's part: the case's files, each with its standing, most in need of a look first (a review flag, a
- *  synthetic or disputed status), and the way into "Is it real?" for each. */
+/** A file's kind, as the server works it out (`authenticity.kind_of`): by its type, else by its name. */
+export function kindOf(mime: string | null | undefined, filename: string): 'image' | 'video' | 'audio' | 'text' {
+  const m = (mime ?? '').toLowerCase();
+  const n = filename.toLowerCase();
+  if (m.startsWith('image/') || /\.(jpe?g|png|heic|heif|webp|gif|avif|dng)$/.test(n)) return 'image';
+  if (m.startsWith('video/') || /\.(mp4|mov|m4v|avi|webm)$/.test(n)) return 'video';
+  if (m.startsWith('audio/') || /\.(mp3|m4a|wav|flac|ogg|opus)$/.test(n)) return 'audio';
+  return 'text';
+}
+const KINDS = [{key: 'image', label: 'Pictures'}, {key: 'video', label: 'Video'}, {key: 'audio', label: 'Recordings'}, {key: 'text', label: 'Text'}] as const;
+type Kind = typeof KINDS[number]['key'];
+type Standing = {document_id: string; status: string; flagged: boolean; source_protected: boolean; decided_at?: string | null};
+
+/** Most in need of a look first: a synthetic or disputed status, then a review flag still unverified, then pictures,
+ *  video and recordings not yet decided (what can be faked to look like evidence), then text, then verified origin. */
+export function realnessWeight(kind: Kind, s: Standing | undefined): number {
+  if (s && (s.status === 'confirmed_synthetic' || s.status === 'likely_synthetic' || s.status === 'disputed')) return 0;
+  if (s?.flagged && s.status === 'unverified') return 1;
+  if (s?.status === 'verified_origin') return 4;
+  return kind === 'text' ? 3 : 2;
+}
+
+const lastKey = (inv: string) => `ir-last:${inv}`;
+const readLast = (inv: string): string | null => { try { return window.localStorage.getItem(lastKey(inv)); } catch { return null; } };
+const writeLast = (inv: string, id: string) => { try { window.localStorage.setItem(lastKey(inv), id); } catch { /* per-viewer convenience only */ } };
+const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+
+/** The Check stage's part: it opens on an item (the last one opened here, else the first worth looking at), with the
+ *  case's files as a rail beside it: each file's kind a mark, its status a colour, its name on one line. J / K or the
+ *  arrow keys in the rail move between items. */
 export function RealnessList({investigationId}: {investigationId: string}): ReactElement {
-  const open = useWorkbenchStore(state => state.openRealness);
-  const docs = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data ?? [];
-  const standing = new Map((useQuery({...listAuthenticityOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data ?? [])
-    .map(s => [s.document_id, s]));
-  const weight = (id: string) => {
-    const s = standing.get(id);
-    if (!s) return 2;
-    return s.status === 'confirmed_synthetic' || s.status === 'likely_synthetic' || s.status === 'disputed' ? 0 : s.flagged && s.status === 'unverified' ? 1 : 3;
-  };
-  const rows = [...docs].filter(d => !d.parent_document_id).sort((a, b) => weight(a.id) - weight(b.id));
-  return <section className="ir-list" aria-label="Is it real?">
-    <p className="ir-small">The system records what it found about each file; only you set a status, with reasons. Nothing is sent unless you allow it, once.</p>
-    {!rows.length ? <p className="ir-small">No files in this case yet.</p> : <ul>{rows.slice(0, 60).map(d => {
+  const overlay = useWorkbenchStore(state => state.realness);
+  const docs = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const standingRows = useQuery({...listAuthenticityOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const [filter, setFilter] = useState<Kind | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const rail = useRef<HTMLUListElement>(null);
+
+  const all = useMemo(() => {
+    const standing = new Map((standingRows ?? []).map(s => [s.document_id, s as Standing]));
+    return (docs ?? []).filter(d => !d.parent_document_id).map(d => {
+      const kind = kindOf(d.mime_type, d.filename);
       const s = standing.get(d.id);
-      return <li key={d.id}><button type="button" onClick={() => open(d.id)}>
-        <span className="ir-list-name">{d.filename}</span>
-        {s?.flagged && s.status === 'unverified' && <em className="ir-chip">Review flag</em>}
-        {s?.source_protected && <em className="ir-chip ir-bad">Source-protected</em>}
-        <span className="ir-status" data-status={s?.status ?? 'unverified'}>{s ? statusLabel(s.status) : 'Not looked at'}</span>
-      </button></li>;
-    })}</ul>}
-  </section>;
+      return {id: d.id, filename: d.filename, kind, s, weight: realnessWeight(kind, s)};
+    }).sort((a, b) => a.weight - b.weight);
+  }, [docs, standingRows]);
+  const counts = useMemo(() => Object.fromEntries(KINDS.map(k => [k.key, all.filter(r => r.kind === k.key).length])) as Record<Kind, number>, [all]);
+  const rows = filter ? all.filter(r => r.kind === filter) : all;
+  // Opens on an item: the one picked, else the last one opened here, else the first worth looking at.
+  const remembered = picked ?? readLast(investigationId);
+  const current = rows.find(r => r.id === remembered)?.id ?? rows[0]?.id ?? null;
+  const at = rows.findIndex(r => r.id === current);
+
+  const select = (id: string, focus = false) => {
+    setPicked(id);
+    writeLast(investigationId, id);
+    if (focus) requestAnimationFrame(() => (rail.current?.querySelector(`[data-id="${id}"]`) as HTMLElement | null)?.focus());
+  };
+  const step = (by: number, focus = false) => {
+    if (!rows.length) return;
+    select(rows[Math.min(rows.length - 1, Math.max(0, at + by))].id, focus);
+  };
+  const stepRef = useRef(step);
+  stepRef.current = step;
+
+  useEffect(() => {
+    const el = current ? rail.current?.querySelector(`[data-id="${current}"]`) as HTMLElement | null : null;
+    el?.scrollIntoView?.({block: 'nearest'});
+  }, [current]);
+  useEffect(() => {
+    // J / K anywhere on this section while it is shown and nothing is being typed (the rail itself takes the arrows).
+    const onKey = (e: KeyboardEvent) => {
+      if (overlay || e.metaKey || e.ctrlKey || e.altKey || typing(e.target)) return;
+      if (e.key !== 'j' && e.key !== 'k') return;
+      const el = root.current;
+      if (!el || !el.isConnected || el.closest('[hidden]')) return;
+      e.preventDefault();
+      stepRef.current(e.key === 'j' ? 1 : -1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [overlay]);
+
+  if (!docs) return <div className="ir-desk"><p className="ir-quiet">Opening the case’s files…</p></div>;
+  if (!all.length) return <div className="ir-desk"><p className="ir-small">No files in this case yet.</p></div>;
+  return <div className="ir-desk" ref={root}>
+    <nav className="ir-rail" aria-label="The case’s files">
+      <div className="ir-rail-head">
+        <span className="ir-rail-at"><b>{at + 1}</b><span className="ir-dim"> / {rows.length}</span></span>
+        <button type="button" className="ir-step" aria-label="Previous item" disabled={at <= 0} onClick={() => step(-1)}>‹</button>
+        <button type="button" className="ir-step" aria-label="Next item" disabled={at >= rows.length - 1} onClick={() => step(1)}>›</button>
+        <Reveal label="Keys" detail={<><b>Moving between items</b><span className="rv-row">J or ↓ next · K or ↑ previous</span>
+          <span className="rv-row">Most in need of a look first: synthetic or disputed, a review flag, then pictures, video and recordings, then text.</span>
+          <span className="rv-row">The system records what it found about each file; only you set a status, with reasons. Nothing is sent unless you allow it, once.</span></>}>
+          <span className="ir-keys" aria-hidden="true">?</span></Reveal>
+      </div>
+      <div className="ir-kinds" role="group" aria-label="Show only">
+        {KINDS.filter(k => counts[k.key] > 0).map(k => <button key={k.key} type="button" aria-pressed={filter === k.key} title={k.label}
+          aria-label={`${k.label}: ${counts[k.key]}`} onClick={() => setFilter(filter === k.key ? null : k.key)}>
+          <span aria-hidden="true">{KIND_MARK[k.key]}</span><span>{counts[k.key]}</span></button>)}
+      </div>
+      <ul ref={rail} role="listbox" aria-label="Files" onKeyDown={e => {
+        if (e.key === 'ArrowDown') { e.preventDefault(); step(1, true); }
+        if (e.key === 'ArrowUp') { e.preventDefault(); step(-1, true); }
+        if (e.key === 'Home') { e.preventDefault(); if (rows[0]) select(rows[0].id, true); }
+        if (e.key === 'End') { e.preventDefault(); const last = rows[rows.length - 1]; if (last) select(last.id, true); }
+      }}>
+        {rows.map(r => {
+          const status = r.s ? statusLabel(r.s.status) : 'Not looked at';
+          return <li key={r.id} role="option" data-id={r.id} aria-selected={r.id === current} tabIndex={r.id === current ? 0 : -1}
+            data-status={r.s?.status ?? 'none'} data-looked={r.s ? 'true' : undefined} data-flag={r.s?.flagged && r.s.status === 'unverified' ? 'true' : undefined}
+            title={`${r.filename} · ${KINDS.find(k => k.key === r.kind)?.label} · ${status}${r.s?.flagged ? ' · review flag' : ''}${r.s?.source_protected ? ' · source-protected' : ''}`}
+            aria-label={`${r.filename}, ${status}${r.s?.flagged && r.s.status === 'unverified' ? ', review flag' : ''}${r.s?.source_protected ? ', source-protected' : ''}`}
+            onClick={() => select(r.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(r.id); } }}>
+            <span className="ir-rail-mark" aria-hidden="true">{KIND_MARK[r.kind]}</span>
+            <span className="ir-rail-name">{r.filename}</span>
+            {r.s?.source_protected && <span className="ir-rail-lock" aria-hidden="true">⛨</span>}
+          </li>;
+        })}
+      </ul>
+    </nav>
+    {current && <Screen key={current} investigationId={investigationId} documentId={current} embedded/>}
+  </div>;
 }

@@ -128,13 +128,53 @@
   .ir-statuses { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* The Check stage's list of files. */
-.ir-list ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; }
-.ir-list button { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-  border-radius: 10px; background: var(--surface-1); font-size: 13px; }
-.ir-list button:hover { background: var(--surface-2); }
-.ir-list button:focus-visible { outline: 2px solid var(--accent-1); }
-.ir-list-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The Check stage's own view (29 Oct): it opens on an item, with the case's files as a rail beside it. Each file is
+   its kind's mark and its name on one line; its status is the mark's colour (named on hover). */
+.ir-desk { height: 100%; min-height: 0; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 14px; color: var(--text); font-family: var(--font-ui); }
+.ir-rail { min-height: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 8px; padding: 10px 8px 8px; border-radius: 14px;
+  background: var(--surface-1); box-shadow: var(--shadow-panel); }
+.ir-rail-head { display: flex; align-items: center; gap: 4px; padding: 0 4px; }
+.ir-rail-at { margin-right: auto; font: 500 13px var(--font-mono); }
+.ir-rail-at b { font-size: 18px; font-weight: 500; color: var(--accent-1); }
+.ir-step { all: unset; cursor: pointer; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--line); font-size: 17px; line-height: 1; }
+.ir-step:hover:not(:disabled) { border-color: var(--accent-1); color: var(--accent-1); }
+.ir-step:disabled { opacity: .35; cursor: default; }
+.ir-keys { display: grid; place-items: center; width: 22px; height: 22px; margin-left: 4px; border-radius: 50%; border: 1px solid var(--line); font: 600 11.5px var(--font-mono); color: var(--text-muted); }
+.ir-kinds { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; padding: 3px; border-radius: 10px; border: 1px solid var(--line); }
+.ir-kinds button { all: unset; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 4px 2px; border-radius: 7px;
+  font: 500 11px var(--font-mono); color: var(--text-muted); }
+.ir-kinds button span:first-child { font-size: 14px; }
+.ir-kinds button[aria-pressed=true] { background: color-mix(in srgb, var(--accent-1) 16%, transparent); color: var(--accent-1); }
+.ir-kinds button:hover { color: var(--text); }
+.ir-rail ul { list-style: none; margin: 0; padding: 0 2px 0 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; align-content: start; gap: 1px; }
+.ir-rail li { --ir-mark: var(--text-muted); position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 6px;
+  padding: 5px 8px 5px 6px; border-radius: 8px; cursor: pointer; font-size: 12.5px; color: var(--text-muted); outline: none; }
+.ir-rail li:hover { background: var(--surface-2); color: var(--text); }
+.ir-rail li:focus-visible { box-shadow: inset 0 0 0 2px var(--accent-1); }
+.ir-rail li[aria-selected=true] { background: color-mix(in srgb, var(--ir-mark) 16%, var(--surface-2)); color: var(--text); }
+.ir-rail li[aria-selected=true]::before { content: ''; position: absolute; left: -8px; top: 5px; bottom: 5px; width: 3px; border-radius: 2px; background: var(--ir-mark); }
+.ir-rail li[data-looked] { color: var(--text); --ir-mark: var(--text); }
+.ir-rail li[data-flag] { --ir-mark: var(--accent-1); }
+.ir-rail li[data-status=verified_origin] { --ir-mark: var(--status-supported); }
+.ir-rail li[data-status=likely_synthetic] { --ir-mark: var(--accent-1); }
+.ir-rail li[data-status=confirmed_synthetic] { --ir-mark: var(--accent-plum, #a58bd8); }
+.ir-rail li[data-status=disputed] { --ir-mark: var(--status-disputed); }
+.ir-rail-mark { text-align: center; font-size: 15px; line-height: 1; color: var(--ir-mark); }
+.ir-rail li:not([data-looked]) .ir-rail-mark { opacity: .55; }
+.ir-rail li[data-flag] .ir-rail-mark::after { content: ''; display: inline-block; width: 5px; height: 5px; margin-left: 1px; vertical-align: top; border-radius: 50%; background: var(--accent-1); }
+.ir-rail-name { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ir-rail-lock { font-size: 11px; color: var(--status-disputed); }
+/* The item inside the stage: the same three columns, in place rather than over the screen. */
+.ir.ir-embedded { position: static; inset: auto; z-index: auto; height: 100%; min-height: 0; padding: 0; background: none;
+  grid-template-columns: minmax(250px, 290px) minmax(0, 1fr) minmax(270px, 310px); grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: 'err err err' 'left mid right'; gap: 0 14px; }
+.ir-embedded .ir-err { grid-area: err; }
+.ir-embedded.ir > .ir-quiet { grid-column: 1 / -1; grid-row: 1 / -1; }
+@media (max-width: 1100px) {
+  .ir-desk { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); height: auto; }
+  .ir-rail { max-height: 220px; }
+  .ir.ir-embedded { grid-template-columns: 1fr; grid-template-areas: 'err' 'mid'; height: auto; overflow: visible; }
+}
 .ir-services { display: inline-flex; gap: 4px; margin-top: 8px; }
 .ir-services button { all: unset; cursor: pointer; padding: 3px 9px; border-radius: 7px; border: 1px solid var(--line); font-size: 11.5px; color: var(--text-muted); }
 .ir-services button[aria-pressed=true] { color: var(--text); border-color: var(--accent-1); }
@@ -144,3 +184,7 @@
 .ir-title > .rv { margin-left: auto; }
 .ir-title .ir-kind { margin-left: 0; font-size: 18px; padding: 2px 12px; }
 .ir-fp { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 4px; border: 1px solid currentColor; font: 600 11px var(--font-mono); color: var(--text-muted); }
+/* A recording or a video has no picture here: its kind's mark fills the space instead of an empty box. */
+.ir-media { display: grid; place-items: center; align-content: center; gap: 6px; aspect-ratio: 3 / 1; border-radius: 10px; background: var(--surface-2); color: var(--text-muted); }
+.ir-media b { font-size: 40px; line-height: 1; font-weight: 400; color: var(--accent-1); }
+.ir-media span { max-width: 90%; font: 11px var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

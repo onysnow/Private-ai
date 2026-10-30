@@ -2,11 +2,11 @@
 // Is it real? (mockup CHECK_3, ADR-0023): the findings as the server recorded them, a status only a person sets with
 // what they checked and why, a preview of what it would do to the claims before it is recorded, and the consent card:
 // exactly what is sent, allowed once; nothing for a source-protected item.
-import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
+import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {IsItReal} from '../features/is-it-real/is-it-real';
+import {IsItReal, RealnessList} from '../features/is-it-real/is-it-real';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import type {AuthenticityOut, AuthenticityPreviewOut} from '../lib/generated/types.gen';
@@ -150,5 +150,61 @@ describe('Is it real?', () => {
     await waitFor(() => expect(api.calls('POST /api/documents/d1/authenticity/about-claim')[0].body).toEqual({text: 'This image circulated from 17 Mar 2019.'}));
     expect(await within(claims).findByText('Supported by this item')).toBeInTheDocument();
     expect(within(claims).queryByRole('button', {name: 'Add this claim'})).toBeNull();
+  });
+
+  it('opens on the item most worth a look, with the files as a rail to move between them by click or key', async () => {
+    window.localStorage.clear();
+    useWorkbenchStore.setState({realness: null});
+    const doc = (id: string, filename: string, mime: string | null = null) => ({id, investigation_id: 'inv-1', filename, source_id: `src-${id}`, mime_type: mime,
+      sha256: 'abc', extraction_status: 'done', extraction_error: null, extraction_issues: [], created_at: '2026-10-12T00:00:00', chunk_count: 0,
+      candidate_counts: {}, parent_document_id: null});
+    const screenFor = (id: string, filename: string, kind: string) => item({item: {...item().item, document_id: id, filename, kind, title: filename}});
+    const api = mockApi({
+      'GET /api/investigations/inv-1/documents': [doc('e1', 'e01-official.eml'), doc('p1', 'parcel_aerial.jpg', 'image/jpeg'), doc('e2', 'e02-officer.eml'),
+        doc('r1', 'call.m4a')],
+      'GET /api/investigations/inv-1/authenticity': [{document_id: 'e2', status: 'disputed', flagged: false, role: 'events', source_protected: false}],
+      'GET /api/documents/e1/authenticity': screenFor('e1', 'e01-official.eml', 'text'),
+      'GET /api/documents/e2/authenticity': screenFor('e2', 'e02-officer.eml', 'text'),
+      'GET /api/documents/p1/authenticity': screenFor('p1', 'parcel_aerial.jpg', 'image'),
+      'GET /api/documents/r1/authenticity': screenFor('r1', 'call.m4a', 'audio'),
+      'GET /api/documents/p1/picture': {status: 200, body: 'jpg'},
+    });
+    const view = render(<QueryProvider><RealnessList investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    const files = await screen.findByRole('listbox', {name: 'Files'});
+    // Disputed first, then the picture and the recording, then plain text; the first is open without a click.
+    expect(within(files).getAllByRole('option').map(o => o.getAttribute('data-id'))).toEqual(['e2', 'p1', 'r1', 'e1']);
+    expect(within(files).getByRole('option', {name: /e02-officer\.eml, Disputed/})).toHaveAttribute('aria-selected', 'true');
+    expect(within(files).getByRole('option', {name: /e02-officer\.eml/})).toHaveAttribute('data-status', 'disputed');
+    expect(await screen.findByRole('region', {name: 'Content credentials'})).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.querySelector('.ir-rail-at')).toHaveTextContent('1 / 4');
+
+    await user.keyboard('j');
+    await waitFor(() => expect(within(files).getByRole('option', {name: /parcel_aerial\.jpg/})).toHaveAttribute('aria-selected', 'true'));
+    await waitFor(() => expect(api.calls('GET /api/documents/p1/authenticity')).toHaveLength(1));
+    // J / K do nothing while something is being typed.
+    const label = await screen.findByRole('textbox', {name: 'Platform label'});
+    await user.click(label);
+    await user.keyboard('j');
+    expect(within(files).getByRole('option', {name: /parcel_aerial\.jpg/})).toHaveAttribute('aria-selected', 'true');
+
+    fireEvent.keyDown(within(files).getByRole('option', {name: /parcel_aerial\.jpg/}), {key: 'ArrowDown'});
+    await waitFor(() => expect(within(files).getByRole('option', {name: /call\.m4a/})).toHaveAttribute('aria-selected', 'true'));
+    await user.click(screen.getByRole('button', {name: 'Previous item'}));
+    await waitFor(() => expect(within(files).getByRole('option', {name: /parcel_aerial\.jpg/})).toHaveAttribute('aria-selected', 'true'));
+    await user.click(within(files).getByRole('option', {name: /e01-official\.eml/}));
+    await waitFor(() => expect(api.calls('GET /api/documents/e1/authenticity')).toHaveLength(1));
+
+    // The kind marks filter the rail.
+    await user.click(screen.getByRole('button', {name: 'Recordings: 1'}));
+    expect(within(files).getAllByRole('option')).toHaveLength(1);
+    await user.click(screen.getByRole('button', {name: 'Recordings: 1'}));
+
+    // It opens again on the last one opened here.
+    view.unmount();
+    render(<QueryProvider><RealnessList investigationId="inv-1"/></QueryProvider>);
+    const again = await screen.findByRole('listbox', {name: 'Files'});
+    expect(within(again).getByRole('option', {name: /e01-official\.eml/})).toHaveAttribute('aria-selected', 'true');
   });
 });
