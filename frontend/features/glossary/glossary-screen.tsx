@@ -16,10 +16,10 @@ import {errorMessage} from '../../lib/api-client';
 import {getGlossaryEntryOptions, listAreasOptions, listTermHintsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {CatalogueAreaOut, GlossaryHintOut} from '../../lib/generated/types.gen';
 import {setTrailTail} from '../../lib/trail';
-import {FAMILIES} from '../knowledge/families';
+import {FAMILIES, familyOf} from '../knowledge/families';
 import {GlossaryText} from './glossary-text';
 
-export const ROW_H = 46;
+export const ROW_H = 34;
 const OVERSCAN = 8;
 const DWELL_MS = 120;
 const LETTERS = ['#', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
@@ -103,7 +103,9 @@ export function GlossaryScreen({tabs}: {tabs?: ReactNode}): ReactElement {
   const shown = useMemo(() => filterTerms(hints, q, chosen), [hints, q, chosen]);
   useEffect(() => setActive(0), [q, chosen]);
   const pinnedHint = hints.find(h => h.term.toLowerCase() === pinned.toLowerCase());
-  const open = hover || pinnedHint?.term || '';
+  // The card is never empty: with nothing pinned it holds the first term shown (Ony, 29 Oct: fill the space).
+  const kept = pinnedHint?.term ?? shown[0]?.term ?? '';
+  const open = hover || kept;
   const firstIndex = useMemo(() => {
     const m = new Map<string, number>();
     shown.forEach((h, i) => { const l = letterOf(h.term); if (!m.has(l)) m.set(l, i); });
@@ -182,17 +184,17 @@ export function GlossaryScreen({tabs}: {tabs?: ReactNode}): ReactElement {
           <div style={{height: shown.length * ROW_H, position: 'relative'}}>
             {shown.slice(from, to).map((h, k) => {
               const i = from + k;
-              return <div key={h.term} id={`kg-row-${i}`} role="option" aria-selected={h.term === pinnedHint?.term}
-                className={`kg-row${i === active ? ' active' : ''}${h.term === pinnedHint?.term ? ' on' : ''}`} style={{top: i * ROW_H, height: ROW_H}}
+              return <div key={h.term} id={`kg-row-${i}`} role="option" aria-selected={h.term === kept}
+                className={`kg-row${i === active ? ' active' : ''}${h.term === kept ? ' on' : ''}`} style={{top: i * ROW_H, height: ROW_H}}
                 onClick={() => { setActive(i); pin(h.term); }}
                 onPointerEnter={() => { clearTimer(); timer.current = window.setTimeout(() => setHover(h.term), DWELL_MS); }}>
                 {/* A row is its term; the first sentence opens in the card on point (and is read with the row), and its areas
-                    are a dot each, named on hover (Ony, 29 Oct). */}
+                    are their short codes (ML, BO), each area's name on hover (Ony, 29 Oct). */}
                 <span className="kg-term">{h.term}</span>
                 <span className="kg-first sr-only">{firstSentence(h.definition)}</span>
                 <Reveal tabbable={false} describe={false} detail={h.areas.map(a => <span key={a} className="rv-row">{areaName.get(a) ?? a}</span>)}>
                   <span className="kg-areas" aria-label={`Areas: ${h.areas.map(a => areaName.get(a) ?? a).join(', ')}`}>
-                    {h.areas.slice(0, 4).map(a => <i key={a} aria-hidden="true"/>)}{h.areas.length > 4 && <small aria-hidden="true">+{h.areas.length - 4}</small>}</span></Reveal>
+                    {h.areas.slice(0, 3).map(a => <i key={a} aria-hidden="true" className={familyOf(a).safety ? 'safety' : undefined}>{a}</i>)}{h.areas.length > 3 && <small aria-hidden="true">+{h.areas.length - 3}</small>}</span></Reveal>
               </div>;
             })}
           </div>

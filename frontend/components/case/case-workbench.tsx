@@ -303,7 +303,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       {screen('map', [
         {anchor: 'the-wire', label: 'The Wire', fill: true, render: () => <PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
         {anchor: 'money-flows', label: 'Money', render: () => <PanelErrorBoundary name="Money"><MoneyView investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
-        {anchor: 'timeline', label: 'Timeline', render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'timeline', label: 'Timeline', fill: true, render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'places', label: 'Places', render: () => <PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'add-by-hand', label: 'Add by hand', render: () => <PanelErrorBoundary name="Add by hand"><AddByHand investigationId={inv}/></PanelErrorBoundary>},
       ])}

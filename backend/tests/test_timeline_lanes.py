@@ -187,3 +187,22 @@ def test_the_board_keeps_where_cards_were_moved_its_notes_and_its_style():
     assert ok(client.get(f"/api/investigations/{inv}/timeline/board")) == body
     off = client.put(f"/api/investigations/{inv}/timeline/board", json={**body, "notes": [{**body["notes"][0], "x": 3}]})
     assert off.status_code == 422
+
+
+def test_a_date_read_from_a_source_names_that_source_not_its_dataset():
+    """A statement's origin carries where in the source it was read ("source:<id>#<locator>"): the event is from that
+    source, by its title, never the dataset's id (the 1MDB demo showed "1mdb-demo" under From)."""
+    from app.models.entities import Statement
+
+    inv = _inv("Origins")
+    kestrel = _party(inv, "Kestrel SA")
+    with SessionLocal() as db:
+        register = Source(investigation_id=inv, title="Company register extract", source_type="document")
+        db.add(register)
+        db.flush()
+        db.add(Statement(entity_id=kestrel, prop="incorporationDate", value="2016-03-01", dataset="demo-set",
+                         origin=f"source:{register.id}#register entry (creation date)"))
+        db.commit()
+        register_id = register.id
+    formed = next(e for e in _lanes(inv)["events"] if e["date_start"] == "2016-03-01")
+    assert (formed["source_key"], formed["source_label"]) == (f"source:{register_id}", "Company register extract")

@@ -764,3 +764,34 @@ sometimes says it outright. Calls:
   proposal's kind becomes the link's.
 - **Mapping screen:** under a Payment link, one select, "Kind of payment: not said" or "Kind of payment from “column”";
   what happens to a cell that names no kind is on hover.
+
+## 43. See › Timeline fits the screen; Money's checks at rest; the Wire's round-trip chips keep off parties; Glossary never empty (30 Oct 2026)
+
+A sweep of the 1MDB demo at 1440×900 found these screens saying too much, or cut off. Calls:
+- **Timeline fits its section and never scrolls the page.** The section is a fill section like The Wire; each view
+  scrolls inside itself. In Lanes the strip ("Not on the timeline yet", Undated) and the key line always show under the
+  chart, and the chart shows as many lanes as fit its height (at least three), the busiest first; the selected event's
+  and the lit party's lanes count inside that number. The rest are behind "+ N more lanes", and the chart scrolls inside
+  itself when they are open. Before, the strip and the Undated tray ran off the bottom of the screen.
+- **The bands' switch.** "hide them 20", struck through when on, read as a mistake. It is now one switch: the band, the
+  count and a track that is lit while the month-or-year dates are drawn; what it does is on reveal.
+- **From names the source, not the dataset's id.** The 1MDB demo's dates were read from sources, but the source was
+  missed because a statement's origin carries where in it the date was read ("source:<id>#<locator>"); the drawer
+  showed "1mdb-demo". The server now reads the origin's source (and a document's source) before falling back to the
+  dataset (`app/services/timeline_lanes.py`). This also moves those events to their source's lane in "Lanes by
+  Source", and a date from a Tier A source is marked shown, as the rule already said. Where no source is recorded, the
+  drawer says "An imported dataset", the dataset's id on reveal.
+- **Money's checks: title and figure at rest.** A check is its kind's icon, the party and one figure ("$5.24m
+  unsourced", "$1.59bn out", "$378m back"). The numbers sentence and "Could be innocent" are on reveal on the name
+  (still read with it, never dropped: a check is an indicator, not a finding); the lead idea on Make a lead. Make a lead
+  and Add to To check are quiet icon buttons named on reveal, no primary: a column of orange buttons is gone.
+- **Money's key is drawn**, a swatch per kind of band with its word on reveal, in place of a "KEY" word with nothing
+  under it. "40 more" under the compact ledger is now "All 46 payments in the Ledger ›", which opens the Ledger layout
+  (as L does); how many are above or lit stays on reveal.
+- **The Wire's round-trip chips keep off every party** (the rule of entry 30 for group names): by the line from the
+  focus, above it then below, further out each time, clear of cards, dots and their names, the other chips and the
+  panels. With no clear spot a chip is left out at rest and shown while the pointer is on either party of the round
+  trip. Nothing else on the Wire changed.
+- **Glossary: compact rows, the card never empty.** Rows are 34 px, not 46. With nothing pinned the card holds the
+  first term shown (it is not written to the address, so it does not pin). The dot per area, which said nothing, is the
+  area's short code (ML, BO, SF), up to three and "+n", each area's name on reveal; the safety area in its own colour.

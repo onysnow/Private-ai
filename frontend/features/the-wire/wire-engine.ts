@@ -434,7 +434,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       // An opened name chip comes to the front of the map.
       if (!g.classList.contains('hovering') && g.nextSibling) g.parentNode?.appendChild(g);
       g.classList.add('hovering'); showTip(ev, id); revealName(N, true);
-      if (mode === 'case' && terrEls.length) { hotParty = id; kick(); }
+      if ((mode === 'case' && terrEls.length) || (mode === 'party' && rtEls.length)) { hotParty = id; kick(); }
     });
     on(g, 'pointerleave', () => {
       g.classList.remove('hovering'); hideTip(); revealName(N, false);
@@ -879,22 +879,52 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
           y1: s.y + (N.hh + (D.entities.some(a => a.holder === id) ? 16 : 4)) * C.k * cs});
       }
     }
-    const rtBoxes: Box[] = [];
+    // Every dot drawn, with its name beside it on either side (the round-trip chips and the "+N more" chips keep off them).
+    const dotBoxes: Box[] = [];
+    for (const id in node) {
+      const N = node[id];
+      if (N.cur.v !== 1 || N.cur.o < 0.5 || !P[id]) continue;
+      const s = toScreen(P[id].x, P[id].y), r = DOT_R * curCs * C.k, half = r + 12 + Math.min(PEEK, E[id]?.short.length ?? 8) * 6.5;
+      dotBoxes.push({x0: s.x - half, x1: s.x + half, y0: s.y - r - 4, y1: s.y + r + 4});
+    }
+    // Round-trip chips (as the group names, DECISIONS_LOG 30): by the line from the focus, at the first spot clear of every
+    // party (card or dot), the other chips and the panels; above the line first, then below, further out each time. With
+    // no clear spot it is left out at rest and shown while the pointer is on either party of the round trip.
+    const rtBoxes: Box[] = [], rtPanels: Box[] = [];
+    if (rtEls.length) {
+      const rb = root.getBoundingClientRect();
+      for (const e of Array.from(root.querySelectorAll<HTMLElement>('.tw-glass:not(.tw-tip), .tw-tools'))) {
+        if (!e.offsetParent || getComputedStyle(e).opacity === '0') continue;   // the pointer's tip follows the pointer: not a panel
+        const r = e.getBoundingClientRect();
+        rtPanels.push({x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top});
+      }
+    }
     for (const L of rtEls) {
       const R = edgeEls[L.k];
       if (!R || R.g.style.display === 'none') { L.g.style.display = 'none'; continue; }
-      L.g.style.display = '';
       const a = P[focus], b = P[L.o];
+      if (!a || !b) { L.g.style.display = 'none'; continue; }
       // Chips keep their size on screen whatever the zoom (at 65% they were too small to read).
-      // Along the line from the focus, clear of the cards where it can be.
       const w = Number(L.g.querySelector('rect')?.getAttribute('width')) || 150;
-      const at = (f: number) => {
-        const cx = a.x * (1 - f) + b.x * f, cy = a.y * (1 - f) + b.y * f - 30 / C.k, sc = toScreen(cx, cy);
-        return {cx, cy, b: {x0: sc.x - w / 2, x1: sc.x + w / 2, y0: sc.y - 13, y1: sc.y + 13}};
+      const at = (f: number, dy: number) => {
+        const cx = a.x * (1 - f) + b.x * f, cy = a.y * (1 - f) + b.y * f + dy / C.k, sc = toScreen(cx, cy);
+        return {cx, cy, b: {x0: sc.x - w / 2 - 3, x1: sc.x + w / 2 + 3, y0: sc.y - 15, y1: sc.y + 15}};
       };
-      const spot = [0.58, 0.5, 0.42, 0.66, 0.34].map(at).find(o => !overlap(o.b, cardBoxes)) ?? at(0.58);
-      L.g.setAttribute('transform', `translate(${spot.cx},${spot.cy}) scale(${1 / C.k})`);
-      rtBoxes.push(spot.b);
+      const clear = (o: Box) => !overlap(o, cardBoxes) && !overlap(o, dotBoxes) && !overlap(o, rtBoxes) && !overlap(o, rtPanels)
+        && o.x0 > 4 && o.x1 < W - 4 && o.y0 > 4 && o.y1 < H - 4;
+      let spot: ReturnType<typeof at> | undefined;
+      for (const dy of [-30, 30, -58, 58, -86, 86, -114, 114]) {
+        spot = [0.5, 0.58, 0.42, 0.66, 0.34, 0.75, 0.25].map(f => at(f, dy)).find(o => clear(o.b));
+        if (spot) break;
+      }
+      const hot = hotParty !== null && (hotParty === focus || hotParty === L.o);
+      L.g.classList.toggle('rt-hot', !spot && hot);
+      if (!spot && !hot) { L.g.style.display = 'none'; continue; }
+      // Shown on hover with no clear spot: at least off the cards and the other chips where it can be.
+      const put = spot ?? [-30, 30, -58, 58, -86, 86, -114, 114].flatMap(dy => [0.5, 0.58, 0.42, 0.66, 0.34].map(f => at(f, dy))).find(o => !overlap(o.b, cardBoxes) && !overlap(o.b, rtBoxes)) ?? at(0.5, -30);
+      L.g.style.display = '';
+      L.g.setAttribute('transform', `translate(${put.cx},${put.cy}) scale(${1 / C.k})`);
+      rtBoxes.push(put.b);
     }
     // Sector names: the first radius between the focus and its ring that is clear of cards and chips.
     secBoxes = rtBoxes;
@@ -913,14 +943,6 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     }
     // "+N more" chips: beside their party, outward from the focus, at the first spot clear of every card, dot, its name
     // and link chip (they used to sit at a fixed offset, over the cards' names). A leader line keeps them tied to it.
-    const dotBoxes: Box[] = [];
-    for (const id in node) {
-      const N = node[id];
-      if (N.cur.v !== 1 || N.cur.o < 0.5 || !P[id]) continue;
-      // The dot and its name beside it, on either side.
-      const s = toScreen(P[id].x, P[id].y), r = DOT_R * curCs * C.k, half = r + 12 + Math.min(PEEK, E[id]?.short.length ?? 8) * 6.5;
-      dotBoxes.push({x0: s.x - half, x1: s.x + half, y0: s.y - r - 4, y1: s.y + r + 4});
-    }
     const moreBoxes: Box[] = [];
     for (const M of moreEls) {
       const at = P[M.p], from = P[focus];

@@ -175,6 +175,27 @@ describe('Lanes', () => {
     expect(screen.getAllByRole('button', {name: /Fernhill Ltd paid Kestrel SA/})[0]).not.toHaveClass('dim');
   });
 
+  it('turns the month-or-year bands off and on with one switch, and names a dataset rather than showing its id', async () => {
+    const vague = ev('vague', 'Owned by Kestrel SA', '2017', {parties: ['fern'], source_key: 'dataset:1mdb-demo', source_label: '1mdb-demo', fact: 'not_yet'});
+    mockApi({[LANES]: lanesBody('inv-1', [vague, pay], {parties})});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    const bands = await screen.findByRole('switch', {name: 'Month-or-year dates, 2'});
+    expect(bands).toHaveAttribute('aria-checked', 'true');
+    // What it does is on reveal, read with the switch.
+    expect(bands).toHaveAccessibleDescription(/2 dates known only to the month or the year.*Click to hide them/);
+    expect(screen.getAllByRole('button', {name: /Owned by Kestrel SA/}).length).toBeGreaterThan(0);
+    const user = userEvent.setup();
+    await user.click(bands);
+    expect(bands).toHaveAttribute('aria-checked', 'false');
+    expect(screen.queryAllByRole('button', {name: /Owned by Kestrel SA/})).toHaveLength(0);
+    await user.click(bands);
+    await user.click(screen.getAllByRole('button', {name: /Owned by Kestrel SA/})[0]);
+    // The drawer says where it came from in words; the dataset's id is on reveal only.
+    const from = screen.getByText('From').nextElementSibling as HTMLElement;
+    expect(from).toHaveTextContent(/^An imported dataset/);
+    expect(within(from).getByText('An imported dataset').closest('.rv')).toHaveAccessibleDescription(/1mdb-demo/);
+  });
+
   it('names a period from words, and draws it over the lanes', async () => {
     const api = mockApi({[LANES]: lanesBody('inv-1', [pay], {parties}),
       'POST /api/investigations/inv-1/timeline/periods': {status: 201, body: {id: 'p-1', name: 'The money', date_start: '2019', date_end: '2019-12', summary: '', made_by: null}}});
