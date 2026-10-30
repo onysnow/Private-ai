@@ -30,6 +30,17 @@ phone sheet. A dev server started with `npx next dev` skips `predev`, which copi
 Open: openaleph-live's similar-documents test fails on some runs for a reason not established (PR #117 comments); The
 Wire is Ony's own redesign.
 
+**Later on 30 Oct (DECISIONS_LOG 38–52, all merged into PR #117):** Money's columns say less at rest when dense (38, Ony's
+feedback); a table proposes its own mapping (39); Esc goes to the topmost layer (40); superseded evidence in Sources &
+evidence (41); a payment's kind from a mapped column or a sentence that states it (42); Charts loads its catalogue with
+the screen, 5,025 → 270 queries (43); a place's pictures and the timeline window, PLACE_1 (44); the 1MDB demo opens as a
+nearly finished investigation, about 500 waiting → 47, every pre-made decision signed "Demo (pre-decided)" and undoable
+(45); the party dossier rebuilt to the hover rule (46); a sweep of every screen against the rules, then fixes to
+Settings (47), Act (48), Keep (49), Bring in (50), Check (51) and See and the Glossary (52). Two tests that failed only
+on a busy machine were fixed (the water-drop one belongs upstream in onysnow-studios too). Migrations chain
+a8d2f6c4e913 → b1c4e7a9d352 → b2e5c8a1d730. Open: openaleph-live's similar-documents test (its cause being reproduced
+in Docker); the demo's undo endpoints have no screen yet.
+
 **Earlier, 29 Oct, late (PR #117, branch `claude/laughing-tesla-dstx1t`, which carries #116's branch
 `claude/native-module` merged in):** everything #116 built (below) plus, from #117, Ony's hover rule applied to every
 screen (sub-text on reveal, types as marks, statuses colour-only with Settings › Appearance › Status marks, key hints
