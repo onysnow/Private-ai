@@ -30,7 +30,7 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {dateWords} from '../../lib/dates';
 import {timeWords} from '../../lib/timestamps';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
-import {amountText, isDense, layout, pathOf, placeLabels, shortAmount, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
+import {amountText, isDense, layout, middleMarks, pathOf, placeLabels, shortAmount, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
 
 const FinancialFlowSankey = dynamic(() => import('../../components/charts/financial-flow-sankey').then(m => m.FinancialFlowSankey),
   {ssr: false, loading: () => <p className="mn-muted">Drawing the flow…</p>});
@@ -160,6 +160,13 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
   // The labels may need more height than the bars (a crowded column runs on below): the picture grows to hold them.
   const tall = placed?.height ?? 0;
   const labelOf = new Map(labels.map(l => [l.nodeId, l]));
+  // A middle bar's marks keep off every name and bar (an end's marks sit at the picture's edges).
+  const midMarks = new Map<string, Array<{x: number; y: number}>>();
+  if (picture) {
+    const taken: Array<{x: number; y: number; w: number; h: number}> = [];
+    const cols = picture.columns.length;
+    for (const n of picture.nodes) if (n.marks.length && n.col > 0 && n.col < cols - 1) midMarks.set(n.id, middleMarks(n, labels, picture.nodes, taken));
+  }
   const hot: Array<{key: string; x: number; y: number; w: number; h: number; label: string; detail: ReactNode}> = [];
   const toggle = (ids: string[]) => setTraced(now => ids.every(id => now.includes(id)) ? now.filter(id => !ids.includes(id)) : [...new Set([...now, ...ids])]);
   const status = ledgerQ.isError ? errorMessage(ledgerQ.error, 'Could not read the ledger') : ledgerQ.isPending ? 'Reading the ledger…' : '';
@@ -237,7 +244,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
               const l = labelOf.get(n.id);
               const owner = n.ghost ? picture.nodes.find(x => `ghost:${x.id}` === n.id) : undefined;
               const markAt = (i: number) => first ? {x: n.x - 14 - i * 20, y: n.y + Math.min(n.h / 2, 10)}
-                : last && l ? {x: picture.width - 12 - i * 20, y: l.top + 7} : {x: n.x + 6 - i * 20, y: n.y - 14}; // a middle bar's marks run left, away from its label
+                : last && l ? {x: picture.width - 12 - i * 20, y: l.top + 7} : midMarks.get(n.id)?.[i] ?? {x: n.x + 6 - i * 20, y: n.y - 14}; // a middle bar's marks: clear of every name and bar
               // The worked-out sum's "=" explanation is revealed on its line; a party's exact totals, its count of
               // payments and its full name on its label; each check mark is named on reveal.
               if (l && n.ghost) {
@@ -409,6 +416,7 @@ function LedgerTable({txs, lit, flagged, traced, onLight, onAll, full = false}: 
 
 /** Payments on a time axis, height on a log scale (stated on the axis), the reporting line, and Red Flags' brackets. */
 function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[]; currency: string; lit: Set<string>; flags: RedFlagOut[]}): ReactElement | null {
+  const [peek, setPeek] = useState<string | null>(null);
   const dated = txs.filter(t => t.dateTime);
   if (!dated.length) return null;
   const W = 420; const H = 150; const L = 8; const B = 20;
@@ -424,6 +432,8 @@ function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[
   const xsAll = [L, ...dated.map(t => x(time(t.dateTime!))).sort((a, b) => a - b), W - L];
   const gapX = xsAll.slice(1).reduce((best, xv, i) => (xv - xsAll[i] > best.w ? {w: xv - xsAll[i], x: (xv + xsAll[i]) / 2} : best), {w: 0, x: W / 2}).x;
   const years = Array.from({length: new Date(y1).getUTCFullYear() - new Date(y0).getUTCFullYear()}, (_, i) => new Date(y0).getUTCFullYear() + i);
+  const values = stripValues(dated.map(t => ({id: t.id, x: x(time(t.dateTime!)), top: H - B - h(t.amount), amount: t.amount})), currency, W, H - B,
+    line && line < 10 ** maxLog ? {x: gapX - 34, y: H - B - h(line) - 14, w: 68, h: 12} : null, line ?? 10000);
   return <figure className="mn-ledger-strip">
     <figcaption>The ledger, in date order · {currency}</figcaption>
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Each payment in ${currency} by date; bar height on a log scale`}>
@@ -438,20 +448,25 @@ function LedgerStrip({txs, currency, lit, flags}: {txs: FinancialTransactionOut[
         return <g key={f.id} className="mn-bracket"><path d={`M${Math.min(...xs) - 4},${top + 8}V${top}H${Math.max(...xs) + 4}V${top + 8}`}/></g>;
       })}
       {dated.map(t => <rect key={t.id} x={x(time(t.dateTime!)) - 3} width={6} y={H - B - h(t.amount)} height={h(t.amount)}
+        onPointerEnter={() => setPeek(t.id)} onPointerLeave={() => setPeek(p => (p === t.id ? null : p))}
         className={`mn-bar mn-bar-${t.certainty}${lit.has(t.id) ? ' lit' : ''}`}><title>{day(t.dateTime ?? null)}{t.dateEnd ? ` to ${day(t.dateEnd)}` : ''} · {t.from} → {t.to} · {amountText(t.amount, currency)}</title></rect>)}
-      {stripValues(dated.map(t => ({id: t.id, x: x(time(t.dateTime!)), top: H - B - h(t.amount), amount: t.amount})), currency, W, H - B,
-        line && line < 10 ** maxLog ? {x: gapX - 34, y: H - B - h(line) - 14, w: 68, h: 12} : null, line ?? 10000)
-        .map(v => <text key={`v${v.id}`} x={v.x} y={v.y} textAnchor={v.anchor} className="mn-bar-value">{v.text}</text>)}
+      {values.map(v => <text key={`v${v.id}`} x={v.x} y={v.y} textAnchor={v.anchor} className="mn-bar-value">{v.text}</text>)}
+      {/* A value with no free place at rest is shown while its bar is pointed at, drawn last so it is over everything. */}
+      {(() => { const t = dated.find(d => d.id === peek); if (!t || values.some(v => v.id === t.id)) return null;
+        const bx = x(time(t.dateTime!)), top = H - B - h(t.amount), text = shortAmount(t.amount, currency), w = text.length * 5.8;
+        return <text x={Math.max(w / 2 + 2, Math.min(W - w / 2 - 2, bx))} y={Math.max(10, top - 4)} textAnchor="middle" className="mn-bar-value mn-bar-peek" aria-hidden="true">{text}</text>; })()}
     </svg>
     <p className="mn-muted mn-axis-note"><Reveal detail={`Bar height: amount, on a log scale${flags.length ? '' : ` · no structuring flag on these ${currency} payments`}`}><span>log scale</span></Reveal></p>
   </figure>;
 }
 
 /** The values written on the strip's largest bars: largest first, each where it overlaps no other value, no bar and
- *  not the line's name; one that finds no free place is left to its bar's own title (the mockup names only a few). */
+ *  not the line's name, with a few px to spare; one that finds no free place is shown only while its bar is pointed at
+ *  (the mockup names only a few). */
 export function stripValues(bars: Array<{id: string; x: number; top: number; amount: number}>, currency: string, width: number, base: number,
   lineBox: {x: number; y: number; w: number; h: number} | null, line: number): Array<{id: string; x: number; y: number; anchor: 'start' | 'end'; text: string}> {
-  const CH = 5.8; const TH = 11;
+  // A value's box keeps PAD clear of every other value and bar, so two never touch or read as one stack.
+  const CH = 5.8; const TH = 11; const PAD = 3;
   const taken: Array<{x: number; y: number; w: number; h: number}> = lineBox ? [lineBox] : [];
   const rects = bars.map(b => ({id: b.id, x: b.x - 3, y: b.top, w: 6, h: base - b.top}));
   const out: Array<{id: string; x: number; y: number; anchor: 'start' | 'end'; text: string}> = [];
@@ -464,7 +479,7 @@ export function stripValues(bars: Array<{id: string; x: number; top: number; amo
     const at = spots.find(s => {
       const box = {x: s.bx, y: s.y - TH + 2, w, h: TH};
       return box.x >= 0 && box.x + w <= width && box.y >= 0
-        && [...taken, ...rects.filter(r => r.id !== b.id)].every(o => !(box.x < o.x + o.w && box.x + box.w > o.x && box.y < o.y + o.h && box.y + box.h > o.y));
+        && [...taken, ...rects.filter(r => r.id !== b.id)].every(o => !(box.x < o.x + o.w + PAD && box.x + box.w + PAD > o.x && box.y < o.y + o.h + PAD && box.y + box.h + PAD > o.y));
     });
     if (!at) continue;
     taken.push({x: at.bx, y: at.y - TH + 2, w, h: TH});

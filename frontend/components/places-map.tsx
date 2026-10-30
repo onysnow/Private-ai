@@ -12,7 +12,7 @@ import {useEffect, useRef} from 'react';
 import type {ReactElement} from 'react';
 
 import {api} from '../lib/api-instance';
-import {BASEMAP_PROTOCOL, PATH_SOURCE, PLACES_SOURCE, basemapLoader, basemapStyle, dotImage, dotRadius, pathGeoJson, placesBounds, placesGeoJson} from '../lib/basemap-style';
+import {BASEMAP_PROTOCOL, PATH_SOURCE, PLACES_SOURCE, VIEW_PADDING, basemapLoader, basemapStyle, dotImage, dotRadius, nameRoomRight, pathGeoJson, placesBounds, placesGeoJson} from '../lib/basemap-style';
 import type {BasemapStatusOut, PlaceOut} from '../lib/generated/types.gen';
 
 let protocolAdded = false;
@@ -76,7 +76,9 @@ export function PlacesMap({status, places, onPlace, picked = null, height = 420,
     const bounds = placesBounds(places);
     const made = new MapLibreMap({
       container: container.current, style: basemapStyle(status, placesGeoJson(places, picked), {flavor}),
-      ...(bounds ? {bounds, fitBoundsOptions: {padding: 60, maxZoom: Math.min(10, (status.max_zoom ?? 6) + 2)}} : {center: [0, 20], zoom: 1}),
+      // Names run to the right of their dots: the right side keeps room for them, so none is cut at the map's edge.
+      ...(bounds ? {bounds, fitBoundsOptions: {padding: {top: VIEW_PADDING, bottom: VIEW_PADDING, left: VIEW_PADDING,
+        right: nameRoomRight(places, container.current.clientWidth || 800)}, maxZoom: Math.min(10, (status.max_zoom ?? 6) + 2)}} : {center: [0, 20], zoom: 1}),
       attributionControl: {compact: false},
     });
     made.addControl(new NavigationControl({showCompass: false}), 'top-right');
@@ -117,7 +119,7 @@ export function PlacesMap({status, places, onPlace, picked = null, height = 420,
     if (!map.current || seen.length < 2) return;
     const bounds = new LngLatBounds();
     for (const p of seen) bounds.extend([p.longitude, p.latitude]);
-    map.current.fitBounds(bounds, {padding: 90, maxZoom: Math.min(10, (status.max_zoom ?? 6) + 2), duration: 600});
+    map.current.fitBounds(bounds, {padding: {top: 90, bottom: 90, left: 90, right: Math.max(90, nameRoomRight(seen, container.current?.clientWidth || 800))}, maxZoom: Math.min(10, (status.max_zoom ?? 6) + 2), duration: 600});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markedKey]);
 

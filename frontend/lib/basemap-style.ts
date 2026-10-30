@@ -35,6 +35,13 @@ export const VIEW_PADDING = 60;    // px kept clear around a chart's places
 export const MAX_OVERZOOM = 2;     // zoom levels past the base map's own
 export const ONE_PLACE_ZOOM = 8;   // a single place's view
 
+/** The px kept clear on the right of an interactive map's places: the room the widest name takes beside its dot
+ *  (they ran off the map's right edge), at most `share` of the map's width. */
+export function nameRoomRight(places: {caption: string}[], width: number, share = 0.35): number {
+  const most = Math.max(0, ...places.map(p => nameRoom(p.caption, false)));
+  return Math.round(Math.max(VIEW_PADDING, Math.min(most + 16, width * share)));
+}
+
 /** The px a place's name takes to the right of its dot. */
 export function nameRoom(name: string, picked: boolean): number {
   const size = picked ? PICKED_LABEL_PX : PLACE_LABEL_PX;
@@ -186,6 +193,12 @@ export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks,
         'symbol-sort-key': ['case', ['boolean', ['get', 'picked'], false], 0, ['boolean', ['get', 'marked'], false], 1, 2]},
       paint: dark ? {'text-color': '#F2EEE6', 'text-halo-color': '#0B1220', 'text-halo-width': 1.5}
         : {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
+    // The interactive map: every dot, unseen, placed before the names (MapLibre places the upper layer first), so a
+    // name never covers another place's dot; such a name waits for a closer zoom and is shown on hover. A little
+    // smaller than the dot, so its own name, NAME_OFFSET_EM off, still fits beside it. A chart keeps every name.
+    ...(everyName ? [] : [{id: 'places-keepout', type: 'symbol', source: PLACES_SOURCE,
+      layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true, 'icon-size': 0.85, 'icon-padding': 0},
+      paint: {'icon-opacity': 0}} as LayerSpecification]),
   ];
   return {
     version: 8,

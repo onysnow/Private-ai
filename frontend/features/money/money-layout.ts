@@ -447,3 +447,19 @@ export function placeLabels(picture: Picture, payments: Payment[], currency: str
   }
   return {labels, height: Math.max(picture.height, bottom + 6)};
 }
+
+/** Where a middle bar's check marks go (DECISIONS_LOG 55): above the bar as before, else below it, else left of it,
+ *  else higher up, at the first spot whose 18 px mark keeps 2 px off every name, every bar and the marks already
+ *  placed (a round trip's mark sat on the next bar's name). With no clear spot, above the bar. */
+export function middleMarks(n: Pick<Node, 'x' | 'y' | 'h' | 'marks'>, labels: Pick<Label, 'x' | 'top' | 'w' | 'h'>[],
+  bars: Pick<Node, 'x' | 'y' | 'h'>[], taken: Array<{x: number; y: number; w: number; h: number}>): Array<{x: number; y: number}> {
+  const boxes = [...labels.map(l => ({x: l.x - 3, y: l.top - 1, w: l.w + 6, h: l.h + 2})), ...bars.map(b => ({x: b.x, y: b.y, w: 12, h: b.h}))];
+  const clear = (x: number, y: number) => [...boxes, ...taken].every(o => !(x - 11 < o.x + o.w && x + 11 > o.x && y - 11 < o.y + o.h && y + 11 > o.y));
+  return n.marks.map((_, i) => {
+    const spots = [{x: n.x + 6 - i * 20, y: n.y - 14}, {x: n.x + 6 - i * 20, y: n.y + n.h + 14},
+      {x: n.x - 14 - i * 20, y: n.y + Math.min(n.h / 2, 10)}, {x: n.x + 6 - i * 20, y: n.y - 36}];
+    const at = spots.find(p => clear(p.x, p.y)) ?? spots[0];
+    taken.push({x: at.x - 9, y: at.y - 9, w: 18, h: 18});
+    return at;
+  });
+}

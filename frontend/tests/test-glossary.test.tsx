@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import GlossaryPage from '../app/glossary/page';
-import {ROW_H, filterTerms, letterOf} from '../features/glossary/glossary-screen';
+import {ROW_H, filterTerms, letterOf, termsAround} from '../features/glossary/glossary-screen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {useWorkbenchStore} from '../lib/workbench-store';
@@ -63,7 +63,36 @@ describe('filterTerms and letters', () => {
   });
 });
 
+describe('the terms around a term', () => {
+  it('finds the terms whose definition names it, and its neighbours in its first area', () => {
+    const ts = [hint('Shell company', 'No operations.', ['BO']), hint('Front', 'Often a shell company, run for another.', ['BO']),
+      hint('Shelling', 'Not the same word as shell company-ish.', ['ML']), hint('Nominee', 'Someone named for another.', ['BO']), hint('Trust', 'An arrangement.', ['TR'])];
+    const r = termsAround('Shell company', ['BO'], ts);
+    expect(r.mentionedIn.map(h => h.term)).toEqual(['Front', 'Shelling']);
+    expect(r.sameArea.map(h => h.term)).toEqual(['Nominee']);
+    expect(termsAround('', [], ts)).toEqual({mentionedIn: [], sameArea: []});
+    // A name that starts with a sign is still found as a whole word.
+    expect(termsAround('#TAPEX', ['KX'], [hint('#TAPEX', 'x', ['KX']), hint('Tag', 'Reports tagged #TAPEX.', ['KX'])]).mentionedIn.map(h => h.term)).toEqual(['Tag']);
+  });
+});
+
 describe('Glossary', () => {
+  it('fills the card with where the term is in the open case and its catalogue entry', async () => {
+    useWorkbenchStore.setState({investigationId: 'inv-1'});
+    const api = mockApi({...routes, 'GET /api/search': {query: 'Nominee', investigation_id: 'inv-1', counts: {party: 1}, returned: 1, total: 1,
+      results: [{id: 'e1', investigation_id: 'inv-1', kind: 'party', group: 'parties', title: 'Harbour Nominees Ltd', snippet: 'a <mark>nominee</mark> director', score: 1, type: 'Company', metadata: {}, provenance: {}}]}});
+    window.history.replaceState(null, '', '/glossary?term=Nominee');
+    render(<GlossaryPage/>);
+    expect(await screen.findByRole('heading', {name: 'In this case · 1'})).toBeInTheDocument();
+    const card = screen.getByRole('article');
+    expect(within(card).getAllByText('Harbour Nominees Ltd').length).toBeGreaterThan(0);
+    expect(api.lastUrl('GET /api/search').searchParams.get('investigation_id')).toBe('inv-1');
+    expect(api.lastUrl('GET /api/search').searchParams.get('q')).toBe('Nominee');
+    // The catalogue's entry: each area, opening it in the Red Flags catalogue.
+    expect(within(card).getByRole('heading', {name: 'In the catalogue'})).toBeInTheDocument();
+    expect(within(card).getByRole('link', {name: 'Hidden ownership and shell companies'})).toHaveAttribute('href', '/learn?area=BO&inv=inv-1');
+  });
+
   it('lists every term (not the first 200) in a windowed list, and the rail jumps to a letter', async () => {
     mockApi(routes);
     render(<GlossaryPage/>);

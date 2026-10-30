@@ -1124,3 +1124,33 @@ A second look at 1440×900 found these, and the calls:
   Ask the case at the foot, so the panel is filled rather than half empty.
 - **Leads:** a card's "↳ what it is for" line is the ↳ mark in the card's last line, the words on hover. An empty
   Now / Next / Later is a dashed slot sized to its content saying what to drop there, not a tall empty box.
+
+## 55. See and Glossary: nothing overlaps, nothing is cut, the side panels are full (30 Oct 2026)
+
+A sweep of the 1MDB demo at 1440×900 found marks and labels printed over each other on the See screens, and two side
+panels empty for most of their height. Calls (placement only; nothing's look or features changed):
+- **The Wire keeps parties apart (the rule of entries 30 and 52, extended to the parties themselves).** Around a party
+  and along a path, each party's footprint (its card with the flag count above and the accounts under it, or its dot
+  with its name chip on the side away from the middle) is pushed clear of every other before the view moves there; the
+  party in the middle never moves. Cards keep their size on screen, so the room is worked out at the zoom the view
+  settles at. A dot's name chip also keeps off every other dot (the 1Malaysia name ran under two icons); a sector name
+  ("Other links") keeps off dots and their names and off the panels as well as the cards, else it is left out; a link's
+  sentence goes, of its clear spots, where the fewest other lines run through it (skipped while the view moves).
+- **Timeline.** The strip shows as many whole "Not on the timeline yet" cards as fit (they grow into the room), the
+  rest counted in a last "and N more"; a card cut at the edge read as covered by the Undated box. Undated lists three
+  titles, one line each, the full title and why on reveal. A range's label sits 3 px higher, clear of the marks' rings,
+  and keeps off the lane's flag brackets. "Name a period" moved beside the Periods switch (it sat alone at the screen's
+  bottom-left edge). The event panel runs the full height and its rest is the event's run: its lane's events in date
+  order (or, with no party, the same source's), the event lit, a click opens another; only events drawn now are listed.
+- **Places.** The map keeps room on its right for the widest name (at most 35% of the map), so no name runs off the
+  edge; an unseen copy of every dot is placed before the names, so a name never covers another place's dot (it waits
+  for a closer zoom and is named on hover, as colliding names already did). Charts (every name kept) are unchanged.
+- **Money.** The ledger strip's values keep 3 px off each other and the bars; one with no room is shown while its bar
+  is pointed at, drawn over everything. A middle bar's check marks go above the bar, else below, else left of it, else
+  higher, at the first spot clear of every name and bar (the round trip's mark sat on Cistenique's name). Entry 38's
+  quiet columns are unchanged.
+- **Glossary.** The card holds, under the definition: where the term is in the case open in the workbench (up to five
+  records, each a kind mark and title, the kind, date and snippet on reveal; "Not in this case's records" when none),
+  the catalogue's entry (each area, opening it in the Red Flags catalogue, its counts on reveal), and the terms around
+  it (those whose definition names it; its neighbours in its first area). The letter rail's rows are at most 25 px
+  from the top, so all 27 letters fit above the bottom corner (Y was cut and Z gone).

@@ -3,7 +3,7 @@
 // where it comes from, the sequence check if it fails one, the actions (Open the source, Make a lead, Add to my
 // timeline, Trace), a reporter's grade, and the events before and after it in its lane.
 import {useMutation, useQueryClient} from '@tanstack/react-query';
-import type {ReactElement} from 'react';
+import {useEffect, useRef, type ReactElement} from 'react';
 
 import {timelineLanesViewQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {gradeTimelineEventEndpoint} from '../../lib/generated/sdk.gen';
@@ -36,14 +36,19 @@ export function whenWords(e: Pick<TimelineLaneEventOut, 'date_start' | 'date_end
 const text = (v: unknown): string | undefined => (typeof v === 'string' && v ? v : undefined);
 
 type Props = {
-  view: TimelineLanesOut; event: TimelineLaneEventOut | null; lane: string | null; finding?: TimelineSequenceOut;
+  view: TimelineLanesOut; event: TimelineLaneEventOut | null;
+  /** The events drawn now (the key's filters and the bands' switch applied): the run lists only these. */
+  drawn?: TimelineLaneEventOut[]; lane: string | null; finding?: TimelineSequenceOut;
   opened: boolean; investigationId: string;
   onSelect: (id: string) => void; onStep: (d: 1 | -1) => void;
   onLead: (title: string, detail: string) => void; onMine: (e: TimelineLaneEventOut) => void;
 };
 
-export function LaneDetail({view, event: e, lane, finding, opened, investigationId, onSelect, onStep, onLead, onMine}: Props): ReactElement {
+export function LaneDetail({view, drawn, event: e, lane, finding, opened, investigationId, onSelect, onStep, onLead, onMine}: Props): ReactElement {
   const queryClient = useQueryClient();
+  const runRef = useRef<HTMLOListElement>(null);
+  // The run keeps the event in view as the selection moves along it.
+  useEffect(() => { runRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView?.({block: 'nearest'}); }, [e?.id]);
   const openProvenance = useWorkbenchStore(s => s.openProvenance);
   const regrade = useMutation({
     mutationFn: async ({id, value}: {id: string; value: string}) => (await gradeTimelineEventEndpoint({
@@ -62,6 +67,12 @@ export function LaneDetail({view, event: e, lane, finding, opened, investigation
   const sourceId = text(e.refs.source_id) ?? (e.source_key.startsWith('source:') ? e.source_key.slice(7) : undefined);
   const sourceUrl = text(e.provenance.source_url);
   const trace = () => openProvenance({title: e.title, kind: 'timeline', sourceId, sourceUrl, locator: text(e.provenance.locator), detail: e.description || e.date_start});
+  // The rest of the panel is the run the event sits in: its lane's events in date order, or, with no party, the events
+  // read from the same source; the event is lit, a click opens another (the panel was empty below Before and after).
+  const pool = new Set((drawn ?? view.events).map(v => v.id));
+  pool.add(e.id);
+  const run = (party ? inLane : view.events.filter(v => v.source_key === e.source_key && v.date_start).sort((a, b) => span(a)[0] - span(b)[0])).filter(v => pool.has(v.id));
+  const runName = party ? `In ${partyName ?? 'this party'}’s lane` : 'From the same source';
   const nearest = finding?.after_id ? view.events.find(v => v.id === finding.after_id) : undefined;
 
   return <aside className="tl2-side" aria-label="Event">
@@ -107,6 +118,14 @@ export function LaneDetail({view, event: e, lane, finding, opened, investigation
         <li><button aria-label="After" onClick={() => (after ? onSelect(after.id) : onStep(1))}>→</button>
           <span>{after ? dateWords(after.date_start, 'year') : '–'}</span><span>{after ? after.title : 'nothing recorded'}</span></li>
       </ul>
+    </>}
+    {run.length > 1 && <>
+      <p className="tl2-cap"><Reveal detail={runName}><span>{party ? 'Its lane' : 'Same source'} · {run.length}</span></Reveal></p>
+      <ol className="tl2-run" ref={runRef} aria-label={runName}>
+        {run.map(v => <li key={v.id} aria-current={v.id === e.id}>
+          <button onClick={() => onSelect(v.id)} title={v.title}><span>{dateWords(v.date_start, 'year')}</span><FactMark fact={v.fact} tabbable={false}/><span>{v.title}</span></button>
+        </li>)}
+      </ol>
     </>}
   </aside>;
 }
