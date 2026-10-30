@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TimelinePanel} from '../features/timeline/timeline-panel';
-import {boardItems, boardOpensAt, boardsFor} from '../features/timeline/board';
+import {boardItems, boardOpensAt, boardsFor, noteBoard} from '../features/timeline/board';
 import type {TimelineLaneEventOut, TimelineLanesOut} from '../lib/generated/types.gen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -60,6 +60,29 @@ describe('board model', () => {
       {a: 'event:minutes', b: 'party:kestrel', label: '', shown: true},
       {a: 'chart', b: 'party:kestrel', label: '', shown: false},
     ]);
+  });
+});
+
+describe('notes on boards since recut', () => {
+  it('shows a note pinned to a single year on the run of years, or the period, that now holds it', () => {
+    const many: TimelineLaneEventOut[] = [ev('f', 'Founded', '1952-11-10')];
+    const per: Record<number, number> = {2009: 18, 2010: 10, 2011: 13, 2012: 37, 2013: 28, 2014: 28, 2015: 2, 2016: 14};
+    for (const [y, n] of Object.entries(per)) for (let i = 0; i < n; i += 1) many.push(ev(`${y}-${i}`, `Event ${y} ${i}`, `${y}-0${1 + (i % 9)}-1${i % 9}`));
+    const view = lanesBody('inv-1', many) as unknown as TimelineLanesOut;
+    const boards = boardsFor(view); // 1952 · 2009–11 · 2012 · 2013 · 2014–16
+    expect(noteBoard('2010', boards)).toBe('2009–11');
+    expect(noteBoard('2015', boards)).toBe('2014–16');
+    expect(noteBoard('2013', boards)).toBe('2013');
+    expect(noteBoard('2009–10', boards)).toBe('2009–11');
+    expect(noteBoard('2030', boards)).toBe('2014–16');
+    expect(noteBoard('fold:late', boards)).toBe('2014–16');
+    expect(noteBoard('a-removed-period', boards)).toBe('2009–11');
+    const note = {id: 'n', board: '2010', text: 'Who signed this?', x: 0.5, y: 0.1};
+    expect(boards.map(b => boardItems(view, b, [note], boards).items.some(i => i.key === 'note:n'))).toEqual([false, true, false, false, false]);
+    const named = boardsFor({...view, periods: [{id: 'p', name: 'The bonds', date_start: '2009', date_end: '2013', summary: '', made_by: null}]});
+    expect(noteBoard('2010', named)).toBe('p');
+    expect(noteBoard('p', named)).toBe('p');
+    expect(noteBoard('2010', [])).toBeUndefined();
   });
 });
 

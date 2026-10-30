@@ -54,10 +54,27 @@ export function boardOpensAt(view: TimelineLanesOut, boards: BoardDef[]): number
   return Math.max(0, boards.findIndex(b => !b.fold));
 }
 
+/** The board a note is shown on. A note keeps the key of the board it was pinned to, but the boards are recut as
+ *  records arrive and periods are named, so a key no longer in use is placed by what it names: a year or run of years
+ *  goes to the board holding its first year (else the nearest), a fold to the first or last board, and anything else
+ *  (a period since removed) to the board the case opens on, so no note is ever left on no board. */
+export function noteBoard(key: string, boards: BoardDef[]): string | undefined {
+  if (!boards.length || boards.some(b => b.key === key)) return boards.length ? key : undefined;
+  if (key === 'fold:early') return boards[0].key;
+  if (key === 'fold:late') return boards[boards.length - 1].key;
+  const year = /^(\d{4})(?:–\d{2,4})?$/.exec(key);
+  if (year) {
+    const t = Date.UTC(Number(year[1]), 0, 1);
+    const gap = (b: BoardDef) => (t < b.from ? b.from - t : t > b.to ? t - b.to : 0);
+    return [...boards].sort((a, b) => gap(a) - gap(b))[0].key;
+  }
+  return (boards.find(b => !b.fold) ?? boards[0]).key;
+}
+
 /** A board's items and its string: the events most worth seeing (unresolved first, then those with a document), the
  *  people they are about, a chart when there are two payments or more, and the notes; a string joins an event to
  *  each party it names, dashed when the event is not yet shown. */
-export function boardItems(view: TimelineLanesOut, board: BoardDef, notes: TimelineBoardOut['notes']): {items: BoardItem[]; strings: BoardString[]; more: number} {
+export function boardItems(view: TimelineLanesOut, board: BoardDef, notes: TimelineBoardOut['notes'], boards: BoardDef[] = [board]): {items: BoardItem[]; strings: BoardString[]; more: number} {
   const all = inPeriod(view.events.filter(e => !e.placeholder && e.precision !== 'unknown'), {date_start: new Date(board.from).toISOString().slice(0, 10), date_end: new Date(board.to).toISOString().slice(0, 10)});
   const weight = (e: TimelineLaneEventOut) => (e.fact !== 'shown' ? 2 : 0) + (e.source_key.startsWith('source:') || e.context?.evidence ? 1 : 0);
   const payments = all.filter(e => e.schema === 'Payment' && e.amount);
@@ -72,7 +89,7 @@ export function boardItems(view: TimelineLanesOut, board: BoardDef, notes: Timel
     ...events.map(e => ({key: `event:${e.id}`, kind: 'event' as const, event: e})),
     ...people.map(p => ({key: `party:${p.id}`, kind: 'party' as const, id: p.id, caption: p.caption, schema: p.schema})),
     ...(chart ? [{key: 'chart', kind: 'chart' as const, payments}] : []),
-    ...notes.filter(n => n.board === board.key).map(n => ({key: `note:${n.id}`, kind: 'note' as const, id: n.id, text: n.text})),
+    ...notes.filter(n => noteBoard(n.board, boards) === board.key).map(n => ({key: `note:${n.id}`, kind: 'note' as const, id: n.id, text: n.text})),
   ];
   const strings: BoardString[] = [];
   for (const e of events) for (const p of people) if (e.parties.includes(p.id)) strings.push({a: `event:${e.id}`, b: `party:${p.id}`, label: e.schema === 'Payment' && e.amount ? `${e.amount.toLocaleString('en-GB')} ${e.currency ?? ''}`.trim() : '', shown: e.fact === 'shown'});
@@ -125,10 +142,11 @@ export function TimelineBoard({view, investigationId, onShowInLanes}: Props): Re
   if (kept.isError) return <p className="muted">{errorMessage(kept.error, 'Could not load the board')}</p>;
   if (!board) return <div className="tl2-empty"><b>No dated records yet.</b> A board holds a period&apos;s documents, people and notes; name periods in Periods, or add dated events in Lanes.</div>;
 
-  const {items, strings, more} = boardItems(view, board, layout.notes);
+  const {items, strings, more} = boardItems(view, board, layout.notes, boards);
   const spots = layout.positions[board.key] ?? {};
   const spot = (key: string, i: number): [number, number] => {
-    const s = spots[key];
+    // Where it was left on this board, else where it was left on a board since recut (its key is the same).
+    const s = spots[key] ?? Object.values(layout.positions).find(m => m[key])?.[key];
     return s ? [s[0], s[1]] : defaultSpot(i, items.length);
   };
   const place = new Map(items.map((it, i) => [it.key, spot(it.key, i)]));
