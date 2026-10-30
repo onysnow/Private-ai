@@ -41,6 +41,16 @@ on a busy machine were fixed (the water-drop one belongs upstream in onysnow-stu
 a8d2f6c4e913 → b1c4e7a9d352 → b2e5c8a1d730. Open: openaleph-live's similar-documents test (its cause being reproduced
 in Docker); the demo's undo endpoints have no screen yet.
 
+**Late on 30 Oct (DECISIONS_LOG 53–58):** the demo's pre-made decisions shown and undoable (53); a re-check of every
+screen in Chromium on the merged code, then fixes: frame hints off the content, every Red Flag rung's rule, Following
+and Leads (54); the Wire's cards kept apart, Timeline, Places, Money bar values and the Glossary (55); Keep and Bring in
+filled, names cut with an ellipsis, and the dev-only hydration mismatch traced to Next's segment explorer, turned off
+in next.config (56); Is it real?'s empty state, Decide without repeats, To check titles that differ (57). openaleph-live's
+similar-documents failure is explained and its test fixed (58: an openaleph-search + Elasticsearch bug; upstream fixes
+written up for Ony). CI on PR #117: the three guard tests and a lint error fixed in 73358a4, which went fully green.
+Every push now goes through the full gate first (lint, typecheck, the whole frontend suite, the backend guard tests).
+Not yet looked at in a browser: the Settings panes after the sweep, an opened claim, the dossier at 1440 and 390.
+
 **Earlier, 29 Oct, late (PR #117, branch `claude/laughing-tesla-dstx1t`, which carries #116's branch
 `claude/native-module` merged in):** everything #116 built (below) plus, from #117, Ony's hover rule applied to every
 screen (sub-text on reveal, types as marks, statuses colour-only with Settings › Appearance › Status marks, key hints
