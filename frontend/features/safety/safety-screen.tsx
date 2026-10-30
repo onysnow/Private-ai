@@ -32,7 +32,7 @@ const DWELL_MS = 250;
 const REFRESH_MS = 20_000;
 const PULSE_MS = 1600;
 // The AI store is the plum AI mark (◇ is a proposal elsewhere in the app).
-const STORE_MARK: Record<string, string> = {records: '≡', documents: '▤', backups: '⟲', keys: '⚿', log: '≣', ai: 'AI'};
+export const STORE_MARK: Record<string, string> = {records: '≡', documents: '▤', backups: '⟲', keys: '⚿', log: '≣', ai: 'AI'};
 /** A service's mode as a shape, named on hover: ⊘ off, ? ask first, ↻ automatic, ↗ on request, ⌂ local. */
 const STATE_MARK: Record<SafetyServiceOut['state'], string> = {off: '⊘', ask_first: '?', automatic: '↻', on_request: '↗', local: '⌂'};
 

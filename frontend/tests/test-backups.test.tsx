@@ -2,7 +2,7 @@
 // The portable backup & restore panel, moved out of app/page.tsx onto the
 // generated reply checks (Foundation Fixes fixes 2 and 3): download the
 // archive, preview a restore, restore only after the reporter confirms.
-import {cleanup, render, screen} from '@testing-library/react';
+import {cleanup, fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -28,6 +28,7 @@ const PREVIEW = 'POST /api/backups/preview';
 const RESTORE = 'POST /api/backups/restore';
 const EXPORT = 'GET /api/investigations/inv-1/export';
 const CASES = 'GET /api/investigations';
+const SAFETY = 'GET /api/investigations/inv-1/safety-data';
 const caseRow = (last_backup: unknown) => [{id: 'inv-1', name: 'Harbour land', is_demo: false, created_at: '2026-10-01T00:00:00Z', last_backup}];
 const CONFIRMATION = 'I understand this creates a separate investigation and will not merge with existing records.';
 
@@ -131,7 +132,8 @@ describe('BackupPanel preview and restore', () => {
     await user.click(screen.getByRole('button', {name: 'Preview restore'}));
 
     await screen.findByText('Kestrelwood filings');
-    expect(screen.getByText('6 records · 1 stored document file(s) · 0 missing raw file(s)')).toBeInTheDocument();
+    // The counts show big, as tiles; the sentence is their name for screen readers.
+    expect(screen.getByLabelText('6 records · 1 stored document file(s) · 0 missing raw file(s)')).toBeInTheDocument();
     expect(screen.getByText('✓ lineage · ✓ restore').closest('.rv')).toHaveAccessibleDescription('Lineage: valid · Restore API: enabled');
     expect(screen.getByText('Preview passed. Review the details before restoring.')).toBeInTheDocument();
     expect(screen.getByText('Warning: Backup is 3 days old.')).toBeInTheDocument();
@@ -168,6 +170,7 @@ describe('BackupPanel preview and restore', () => {
       [CASES]: caseRow(null),
       [PREVIEW]: restorablePreview(),
       [RESTORE]: {investigation_id: 'inv-restored', restored_counts: {entities: 4}, manifest: {format: 'jwbackup', version: 1}},
+      [SAFETY]: {status: 404, body: {detail: 'Investigation not found'}},
     });
     const onRestored = vi.fn();
     wrap(<BackupPanel investigationId="inv-1" onRestored={onRestored}/>);
@@ -203,5 +206,42 @@ describe('BackupPanel preview and restore', () => {
     await user.upload(fileInput(), new File(['other'], 'other.jwbackup.zip', {type: 'application/zip'}));
     expect(screen.queryByText('Kestrelwood filings')).not.toBeInTheDocument();
     expect(screen.queryByText('Preview passed. Review the details before restoring.')).not.toBeInTheDocument();
+  });
+});
+
+describe('BackupPanel at rest (Keep › Backup & restore)', () => {
+  const stores = [
+    {id: 'records', name: 'Case records', count: 4812, count_note: '37 claims', where: 'Database on this machine', in_backups: true},
+    {id: 'documents', name: 'Documents & pictures', count: 86, bytes: 1_400_000_000, where: 'Kept as received, checksummed', in_backups: true},
+    {id: 'keys', name: 'Service keys', count: 2, count_note: 'of 3 set', where: 'Stored here, never shown again', in_backups: false},
+    {id: 'log', name: 'Security log', count: 1204, where: 'Who asked what, never the content', in_backups: false},
+  ];
+  const safety = {
+    period: '7d', totals: {requests_left: 0, services_reached: 0, documents_sent_out: 0, ai_calls_outside: 0}, exposure: '', stores, services: [],
+    backup: {last_backup_at: null, encrypted: false, restore_enabled: true}, access: {mode: 'local_only', refused_24h: 0, log_readable: true},
+    housekeeping: {stray_files: 0, stray_bytes: 0}, outbound: [], outbound_total: 0,
+  };
+
+  it('counts what a backup holds, names what it leaves out on hover, and says it is not sealed', async () => {
+    mockApi({[CASES]: caseRow(null), [SAFETY]: safety});
+    wrap(<BackupPanel investigationId="inv-1" onRestored={vi.fn()}/>);
+    expect(await screen.findByText('4,812')).toBeInTheDocument();
+    expect(screen.getByText('86')).toBeInTheDocument();
+    expect(screen.getByText('records').closest('.rv')).toHaveAccessibleDescription('Database on this machine');
+    expect(screen.getByRole('img', {name: 'Not in a backup'})).toHaveAccessibleDescription('Not in a backup: Service keys, Security log. They stay on this computer.');
+    expect(screen.getByText('▲ not sealed').closest('.rv')).toHaveAccessibleDescription(/not encrypted/);
+  });
+
+  it('takes a backup dropped on the target, and previews it from there', async () => {
+    mockApi({[PREVIEW]: restorablePreview()});
+    wrap(<BackupPanel investigationId="" onRestored={vi.fn()}/>);
+    expect(screen.getByText('Drop a backup here')).toBeInTheDocument();
+    const target = screen.getByText('Drop a backup here').closest('label')!;
+    fireEvent.dragOver(target, {dataTransfer: {files: [backupFile()]}});
+    expect(target).toHaveClass('over');
+    fireEvent.drop(target, {dataTransfer: {files: [backupFile()]}});
+    expect(screen.getByText('investigation-inv-1.jwbackup.zip')).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Preview restore'}));
+    expect(await screen.findByText('Kestrelwood filings')).toBeInTheDocument();
   });
 });
