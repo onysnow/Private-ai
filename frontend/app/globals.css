@@ -410,7 +410,8 @@
   .wb-drawer-close { position: absolute; top: 10px; right: 12px; z-index: 1; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--surface-3); background: var(--surface-2); color: var(--text); cursor: pointer; font-size: 18px; line-height: 1; }
   .wb-drawer-close:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
   /* The inspector slot (DECISIONS_LOG 16): docked at the right; the page gives it room rather than sitting under it. */
-  :root { --slot-w: min(520px, 40vw); }
+  /* --slot-w-chosen: the width dragged from the slot's handle (features/inspector/inspector-slot.tsx). */
+  :root { --slot-w: var(--slot-w-chosen, min(520px, 40vw)); }
   .wb-slot { position: fixed; z-index: 40; top: 0; right: 0; bottom: 0; width: var(--slot-w); overflow: auto; background: var(--ground); border-left: 1px solid var(--line); padding: 0 16px 16px; }
   .wb-slot[hidden] { display: none; }
   .cv:has(> .wb-slot:not([hidden])), .wb-page:has(.wb-slot:not([hidden])) { margin-right: var(--slot-w); }
@@ -421,6 +422,29 @@
   .wb-slot-head nav li[aria-current] { color: var(--text); font-weight: 600; }
   .wb-slot-back { flex: none; height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--surface-3); background: var(--surface-2); color: var(--text); font: 500 12.5px var(--font-ui); cursor: pointer; }
   @media (max-width: 900px) { :root { --slot-w: 100vw; } .cv:has(> .wb-slot:not([hidden])), .wb-page:has(.wb-slot:not([hidden])) { margin-right: 0; } }
+  .wb-slot:not([hidden]) { animation: wb-slot-in var(--dur-base, 220ms) var(--ease-out, ease-out); }
+  .wb-slot-full { flex: none; margin-left: auto; font-size: 12.5px; color: var(--accent-1); text-decoration: none; white-space: nowrap; }
+  .wb-slot-full:hover, .wb-slot-full:focus-visible { text-decoration: underline; }
+  /* The handle on the slot's left edge: fixed to the viewport, so it stays put while the slot scrolls. */
+  .wb-slot-handle { position: fixed; z-index: 41; top: 0; bottom: 0; right: calc(var(--slot-w) - 6px); width: 12px; cursor: ew-resize; touch-action: none; }
+  .wb-slot-handle::after { content: ''; position: absolute; left: 4px; top: 50%; width: 4px; height: 44px; margin-top: -22px; border-radius: 2px;
+    background: color-mix(in srgb, var(--text) 28%, transparent); transition: background var(--dur-fast, 120ms), height var(--dur-fast, 120ms), margin var(--dur-fast, 120ms); }
+  .wb-slot-handle:hover::after, .wb-slot-handle:focus-visible::after { background: var(--accent-1); height: 72px; margin-top: -36px; }
+  .wb-slot-handle:focus-visible { outline: none; }
+  @keyframes wb-slot-in { from { transform: translateX(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes wb-slot-up { from { transform: translateY(48px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @media (max-width: 900px) { .wb-slot-handle { display: none; } }
+  /* Phone width: a bottom sheet over the screen, with a grab bar; a swipe down closes it. */
+  @media (max-width: 640px) {
+    .wb-slot { top: auto; left: 0; width: 100vw; height: 86vh; border-left: 0; border-top: 1px solid var(--line); border-radius: 16px 16px 0 0; box-shadow: 0 -16px 40px #000a; }
+    .wb-slot:not([hidden]) { animation-name: wb-slot-up; }
+    .wb-slot-head { padding-top: 22px; flex-wrap: wrap; }
+    .wb-slot-head::before { content: ''; position: absolute; left: 50%; top: 8px; width: 38px; height: 4px; margin-left: -19px; border-radius: 2px; background: color-mix(in srgb, var(--text) 28%, transparent); }
+    .wb-slot-head .wb-drawer-close { width: 44px; height: 44px; top: 14px; }
+    .wb-slot-full { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wb-slot:not([hidden]) { animation: none; } .wb-slot-handle::after { transition: none; } }
+  html[data-motion='calm'] .wb-slot:not([hidden]) { animation: none; }
 }
 
 /* Palette pass (docs/discovery/README.md, page-by-page audit: "beige cards

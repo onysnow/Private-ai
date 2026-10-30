@@ -326,7 +326,13 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
     </>}
   </>;
 
-  const drawer = <InspectorSlot investigationId={inv}/>;
+  // A dossier's "Open in Bring in › Connectors": the party stays selected there (opening its dossier selected it), and
+  // the slot stays open beside it.
+  const openInConnectors = fixedView ? undefined : () => {
+    if (viewOfPath(window.location.pathname) !== 'collect') router.push(caseHref('/bring-in#connectors', inv));
+    else if (window.location.hash !== '#connectors') window.location.hash = 'connectors';
+  };
+  const drawer = <InspectorSlot investigationId={inv} onOpenInConnectors={openInConnectors}/>;
 
   if (view === 'all') return <AllStages investigationName={investigationName} picker={investigations.length > 0 ? picker : null}
     accessLabel={accessLabel} accessMessage={access.message} onClear={access.state === 'authenticated' ? clearApiSession : null} drawer={drawer}>{body}</AllStages>;
