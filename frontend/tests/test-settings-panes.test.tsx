@@ -266,6 +266,10 @@ describe('The top-band notice', () => {
     vi.useFakeTimers({shouldAdvanceTime: true});
     render(<QueryProvider><InterruptNotice/></QueryProvider>);
     await screen.findByRole('alert');
+    // The alert is found as soon as React puts it on the page; the effect that starts the fold
+    // timer runs after that, on a task of its own. Let it run before moving the clock, or the
+    // clock moves first and the timer starts after it (whether it had run was a matter of luck).
+    await act(async () => {});
     try {
       act(() => { vi.advanceTimersByTime(FOLD_MS + 10); });
       expect(screen.queryByRole('alert')).toBeNull();
