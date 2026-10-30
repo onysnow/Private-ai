@@ -26,6 +26,7 @@ from __future__ import annotations
 import calendar
 import re
 from collections import defaultdict
+from contextvars import ContextVar
 from dataclasses import asdict, dataclass, field
 from datetime import date
 from typing import Any, Callable
@@ -35,6 +36,19 @@ from sqlalchemy.orm import Session
 
 from app.models.domain import Claim, ClaimEvidenceLink, Document, Entity, Investigation, Lead, RelationshipEdge
 from app.visuals.spec import DRAWN_KINDS, QUERY_CATALOG, QUESTIONS, ChartKind, QueryRef, QuerySpec
+
+# While the catalogue runs every query, the money ledger and the timeline are built once and shared: five queries
+# read the ledger and three the timeline, and each build walks every relationship. Outside the catalogue nothing is kept.
+_shared: ContextVar[dict[Any, Any] | None] = ContextVar("visual_shared", default=None)
+
+
+def _once(key: Any, build: Callable[[], Any]) -> Any:
+    memo = _shared.get()
+    if memo is None:
+        return build()
+    if key not in memo:
+        memo[key] = build()
+    return memo[key]
 
 _MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -277,7 +291,7 @@ def _pick_currency(by_currency: dict[str, list[dict]], wanted: str | None) -> tu
 def _ledger(db: Session, investigation_id: str, currency: str | None) -> tuple[list[dict], str | None, list[dict[str, Any]]]:
     from app.services.financial_flows import investigation_financial_ledger
 
-    ledger = investigation_financial_ledger(db, investigation_id)
+    ledger = _once(("ledger", investigation_id), lambda: investigation_financial_ledger(db, investigation_id))
     omitted: list[dict[str, Any]] = [
         {"reason": "incomplete payment", "record_type": "relationship", "record_id": row["id"], "detail": "; ".join(row.get("problems") or [])}
         for row in ledger["incomplete"]
@@ -446,7 +460,7 @@ def events_over_time(db: Session, investigation_id: str, params: dict[str, str])
     from app.services.timeline import investigation_timeline
 
     granularity = params.get("granularity", "month")
-    events = investigation_timeline(db, investigation_id)["events"]
+    events = _once(("timeline", investigation_id, None), lambda: investigation_timeline(db, investigation_id))["events"]
     periods: dict[str, DataRow] = {}
     omitted: list[dict[str, Any]] = []
     used = 0
@@ -554,7 +568,8 @@ def events_in_order(db: Session, investigation_id: str, params: dict[str, str]) 
     from app.services.timeline import investigation_timeline
 
     statuses = {params["status"]} if params.get("status") else None
-    events = investigation_timeline(db, investigation_id, verification_statuses=statuses)["events"]
+    events = _once(("timeline", investigation_id, frozenset(statuses) if statuses else None),
+                   lambda: investigation_timeline(db, investigation_id, verification_statuses=statuses))["events"]
     window_from = date_bounds(params.get("from"))
     window_to = date_bounds(params.get("to"))
     omitted: list[dict[str, Any]] = []
@@ -607,7 +622,7 @@ def places_on_map(db: Session, investigation_id: str, params: dict[str, str]) ->
     from app.services.timeline import investigation_timeline
 
     found = investigation_places(db, investigation_id)
-    timeline = {str(event["id"]): event for event in investigation_timeline(db, investigation_id)["events"]} if found["places"] else {}
+    timeline = {str(event["id"]): event for event in _once(("timeline", investigation_id, None), lambda: investigation_timeline(db, investigation_id))["events"]} if found["places"] else {}
     # Two places of one name are told apart by their record id, as each is
     # named on the map and checked by its name.
     names: dict[str, int] = defaultdict(int)
@@ -815,8 +830,13 @@ def describe_catalog(db: Session, investigation_id: str) -> dict[str, Any]:
     if db.get(Investigation, investigation_id) is None:
         raise QueryError("Investigation not found")
     queries = []
+    token = _shared.set({})
+    try:
+        ran = {name: QUERIES[name](db, investigation_id, QueryRef(name=name).resolved_params()) for name in QUERY_CATALOG}
+    finally:
+        _shared.reset(token)
     for name, spec in QUERY_CATALOG.items():
-        data = QUERIES[name](db, investigation_id, QueryRef(name=name).resolved_params())
+        data = ran[name]
         currencies = sorted({str(o["currency"]) for o in data.omitted if o.get("reason") == "other currency"} | ({data.currency} if data.currency else set()))
         queries.append({
             "name": name, "label": spec.label, "description": spec.description,
