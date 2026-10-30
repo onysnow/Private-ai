@@ -222,3 +222,35 @@
 .wt-row { grid-template-columns: 190px 46px minmax(150px, 1fr) minmax(0, 1fr); }
 .wt-first { border-color: color-mix(in srgb, var(--accent-1) 55%, transparent); }
 .wt-first .fl-h3 { font-size: 18px; margin: 4px 0 12px; }
+
+/* 30 Oct sweep: the screen fills its tab and never scrolls; each column scrolls inside itself. Statuses at rest are a
+   colour (a dot) or, for a risk that asks for action, a short alert word; their sentences on hover. */
+.ss-sec.fill > .fl { height: 100%; min-height: 0; grid-template-rows: auto auto minmax(0, 1fr); align-items: stretch; }
+.ss-sec.fill > .fl > .fl-left, .ss-sec.fill > .fl > .fl-mid, .ss-sec.fill > .fl > .fl-right { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.ss-sec.fill > .fl > .fl-works { grid-row: 2 / -1; min-height: 0; overflow-y: auto; }
+/* Left: the sources list takes the room the column has; its rows grow (up to a limit) and their name and icon with them. */
+.fl-left > .fl-panel[aria-label="Sources followed"] { flex: 1 0 auto; display: flex; flex-direction: column; }
+.fl-left .fl-mons { flex: 1 0 auto; }
+.fl-left .fl-mon { flex: 1 0 auto; min-height: 46px; max-height: 76px; }
+.fl-left .fl-mon .fl-t { font-size: 15px; }
+.fl-left .fl-tag .fl-kind { width: 26px; height: 26px; }
+.fl-badge { display: inline-block; min-width: 26px; text-align: center; box-sizing: border-box; }
+.fl-badge.none { width: 22px; height: 22px; min-width: 0; padding: 0; border-radius: 50%; }
+/* Middle: the queue scrolls inside its panel. */
+.ss-sec.fill > .fl > .fl-mid { overflow: hidden; }
+.ss-sec.fill > .fl > .fl-mid > .fl-queue { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.fl-qt .fl-dot { display: inline-block; width: 9px; height: 9px; margin-left: 8px; border-radius: 50%; background: var(--text-muted); vertical-align: 1px; }
+.fl-qt .fl-dot.teal { background: var(--accent-2); }
+.fl-qt .fl-dot.quiet { background: transparent; box-shadow: inset 0 0 0 1.5px var(--text-muted); }
+.fl-why .rv { display: inline-block; }
+/* Right: what leaves this computer takes the rest of the column, its counts large. */
+.fl-right > .fl-leaves { flex: 1 0 auto; display: flex; flex-direction: column; }
+.rv.fl-safe-rv { display: block; }
+.fl-leaves .fl-safe { display: flex; align-items: baseline; gap: 10px; font-size: 15px; }
+.fl-safe-n { font: 300 40px/1 var(--font-display); color: var(--status-supported); }
+.fl-safe.some { border-color: color-mix(in srgb, var(--accent-1) 50%, transparent); }
+.fl-safe.some .fl-safe-n { color: var(--accent-1); }
+.fl-routes { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; flex: 1 0 auto; justify-content: space-evenly; gap: 6px; }
+.fl-routes li { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 6px 2px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--text-muted); }
+.fl-routes li b { font: 300 26px/1 var(--font-display); color: var(--text); }
+.ss-sec.fill > .fl > .fl-empty { min-height: 0; overflow-y: auto; }

@@ -153,7 +153,6 @@
 .rr-next { margin-left: auto; background: var(--accent-1); border-color: var(--accent-1); color: var(--ground); font-weight: 600; }
 .rr-anchor { display: inline-block; width: 0; height: 1em; vertical-align: baseline; }
 @media (max-width: 1000px) { .rr { grid-template-columns: 1fr; grid-template-areas: 'top' 'main' 'side' 'foot'; grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr) auto; overflow: auto; } .rr-pages { display: none; } .rr-leader { display: none; } }
-.fr-hint { z-index: 65; }
 
 /* Pointing (research §6): a card and its words light together; every control answers the pointer. */
 .rr-span.lit { text-decoration-style: solid; text-decoration-color: var(--accent-1); }

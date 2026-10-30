@@ -63,17 +63,19 @@
 .rb-level-faint { color: var(--flag-faint); border: 1px dashed var(--flag-faint); }
 .rb-quiet { margin: 6px 2px; color: var(--text-muted); font-size: 13px; }
 .rb-carriers { display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 8px; }
-.rb-carriers > div { display: flex; flex-wrap: wrap; gap: 8px; }
-.rb-carrier { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 2px; width: 62px; text-align: center; }
-.rb-carrier small { font-size: 10.5px; line-height: 1.2; color: var(--text-muted); }
+.rb-carriers > ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; max-height: 168px; overflow-y: auto; overscroll-behavior: contain; }
+.rb-carriers > ul > li > .rv { display: block; }
+.rb-carrier { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 4px minmax(0, 1fr) auto; align-items: center; gap: 8px; width: 100%; padding: 4px 6px; border-radius: 6px; font-size: 13px; }
+.rb-carrier:hover, .rb-carrier.on { background: var(--surface-3); }
+.rb-carrier > i { align-self: stretch; border-radius: 2px; background: var(--flag-faint); }
+.rb-carrier.rk-strong > i { background: var(--flag-strong); }
+.rb-carrier.rk-textbook > i { background: var(--flag-textbook-edge); }
+.rb-carrier-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rb-carrier > b { font: 600 13px var(--font-mono); }
 .rb-shared-row { font-size: 14px; }
 .rb-shared-value { font: 400 14px/1.5 var(--font-read); padding: 6px 10px; border-radius: 8px; border: 1px dashed var(--line); }
 .rb-shared-value small { font: 600 10px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-right: 6px; }
 .rb-shared-value i { color: var(--text-muted); font-size: 12.5px; }
-.rb-ring { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 600 13px var(--font-mono); box-shadow: inset 0 0 0 3px var(--flag-faint); }
-.rb-carrier.rk-strong .rb-ring { box-shadow: inset 0 0 0 3px var(--flag-strong); }
-.rb-carrier.rk-textbook .rb-ring { box-shadow: inset 0 0 0 3px var(--flag-textbook-edge); }
-.rb-carrier.on .rb-ring { background: var(--surface-3); }
 .rb-carrier:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 
 .rb-open { overflow-y: auto; overscroll-behavior: contain; padding: 14px 18px 18px; display: grid; gap: 12px; align-content: start; outline: none; }
@@ -163,7 +165,7 @@
 .rb-quote footer { font-size: 11px; color: var(--text-muted); }
 .rb-quote > .rv { font-size: 12.5px; color: var(--text); }
 .rb-quote a { color: var(--accent-2); }
-.rb-foot { margin: 0; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--line); padding-top: 8px; }
+.rb-foot { margin: 0; display: flex; gap: 10px; font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--line); padding-top: 8px; }
 
 /* Reading never writes: when the rules last ran, and running them on demand. */
 .rb-runline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
@@ -250,5 +252,4 @@ html[data-motion='calm'] .rb-open[data-dir] > *, html[data-motion='calm'] .rb-op
 .rung-found { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: baseline; font-size: 12px; }
 .rung-found b { font: 700 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--status-supported); }
 .rung-found span { padding: 1px 7px; border-radius: 999px; background: var(--surface-1); box-shadow: inset 0 0 0 1px var(--line); font-family: var(--font-mono); font-size: 11.5px; }
-.rb-carrier small { display: block; max-width: 62px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .inn-title { line-height: 1.4; }

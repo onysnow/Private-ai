@@ -579,6 +579,8 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
    span takes the handle's place so its card opens beside the handle. */
 .rv.fr-handle-rv { position: fixed; z-index: 75; left: 3px; top: 50%; width: 5px; height: 240px; margin-top: -120px; }
 .fr.pin-left .rv.fr-handle-rv { display: none; }
+.rv.fr-handle-rv-top { position: fixed; z-index: 75; top: 3px; left: 50%; width: 72px; height: 5px; margin-left: -36px; }
+.fr.pin-top .rv.fr-handle-rv-top { display: none; }
 
 /* Ony's rule of 29 Oct on Case home and Decide: sub-text and type words are in reveals (components/ui/reveal.tsx).
    A reveal that wraps a whole card or row takes the card's place in the list. */

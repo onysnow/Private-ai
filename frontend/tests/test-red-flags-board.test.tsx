@@ -60,8 +60,9 @@ describe('the ladder says what met it (30 Oct sweep)', () => {
     expect(rungs.map(r => r.state)).toEqual(['met', 'met', 'met']);
     expect(rungs[0].text).toBe('Meets the published definition as worded');
     expect(rungs[0].found).toEqual(['2 parties in the loop', '378,000,000 USD · 430,000,000 USD']);
-    expect(rungs[1].text).toBe('');
-    expect(rungs[1].found).toBeUndefined();
+    expect(rungs[1].text).toBe('Met through the Textbook rule above');
+    expect(rungs[1].found).toEqual(rungs[0].found);
+    expect(rungs[2].found).toEqual(rungs[0].found);
   });
   it('reads counts, dates and holders from the rule\'s facts', () => {
     expect(metBy(flag('a', BO, 'faint', 1, {facts: {count_text: '2 payments', holders: 'Eric Tan (ownership)'}}) as never)).toEqual(['2 payments', 'held by Eric Tan (ownership)']);

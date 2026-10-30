@@ -6,7 +6,7 @@ import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {Following} from '../features/following/following';
+import {Following, riskWord} from '../features/following/following';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import type {FollowingOut, MonitorItemOut, MonitorOut} from '../lib/generated/types.gen';
@@ -41,6 +41,15 @@ function screenData(over: Partial<FollowingOut> = {}): FollowingOut {
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => cleanup());
 
+describe('a risk\'s short alert word', () => {
+  it('is the words before a colon, or the first word', () => {
+    expect(riskWord('At risk: edited twice since first seen')).toBe('At risk');
+    expect(riskWord('Removed: now answers 404')).toBe('Removed');
+    expect(riskWord('Changed since capture · 2 lines')).toBe('Changed');
+    expect(riskWord('Deleted at the source since it was seen')).toBe('Deleted');
+  });
+});
+
 describe('Following', () => {
   it('shows the sources, the queue most at risk first, and what leaves this computer', async () => {
     mockApi({'GET /api/investigations/inv-1/following': screenData(), 'GET /api/monitors/m1/versions': []});
@@ -48,17 +57,26 @@ describe('Following', () => {
     const sources = await screen.findByRole('listbox', {name: 'Sources'});
     const feed = within(sources).getByRole('option', {name: /The Marlow Courier · news feed/});
     expect(feed).toHaveAttribute('aria-selected', 'true');
-    expect(within(feed).getByText('2 new')).toBeInTheDocument();
-    expect(within(sources).getByRole('option', {name: /instagram\.com · closed platform/})).toHaveTextContent('none');
+    // Counts are the number alone and "no monitor" a dashed ring; their words are on hover (30 Oct).
+    expect(within(feed).getByText('2')).toBeVisible();
+    expect(feed).toHaveAccessibleName(/2 new/);
+    expect(within(sources).getByRole('option', {name: /instagram\.com · closed platform.*no monitor/})).not.toHaveTextContent('none');
     expect(screen.getByText('1 of 1 working today')).toBeInTheDocument();
     const queue = screen.getByRole('region', {name: 'Most at risk first'});
     const rows = within(queue).getAllByRole('listitem');
     expect(rows[0]).toHaveTextContent('Statement on the Kestrel lease');
     expect(within(rows[0]).getByRole('button', {name: 'Record removal'})).toBeInTheDocument();
-    expect(within(rows[1]).getByText('At risk: edited twice since first seen')).toBeInTheDocument();
+    // A risk keeps a short alert word; its sentence is on hover. A calm status is a dot, named on hover.
+    expect(within(rows[1]).getByText('At risk')).toBeVisible();
+    expect(within(rows[1]).getByText('At risk: edited twice since first seen').closest('[hidden]')).not.toBeNull();
+    expect(within(rows[1]).getByRole('img', {name: 'Wire copy of 3 others'})).toBeInTheDocument();
+    expect(within(rows[2]).getByRole('img', {name: 'New · no sign of risk'})).toBeInTheDocument();
+    expect(within(queue).queryByText(/Captured: \d/, {selector: ':not([hidden])'})).toBeNull();
     expect(within(rows[1]).getByRole('button', {name: 'Capture'})).toBeInTheDocument();
     const leaves = screen.getByRole('region', {name: 'What leaves this computer'});
-    expect(leaves).toHaveTextContent('0 third-party services. 1 source is asked directly, 1 has no monitor.');
+    expect(leaves).toHaveTextContent('✓ 0 third-party services');
+    expect(within(leaves).getByText('Asked directly').nextSibling).toHaveTextContent('1');
+    expect(within(leaves).getByText('No monitor').nextSibling).toHaveTextContent('1');
     const chosen = screen.getByRole('region', {name: 'Selected source'});
     // What leaves this computer is one line on screen; its sentence is on hover (Ony, 29 Oct).
     expect(within(chosen).getByText('↗ 1 request · 30 min · direct')).toBeVisible();

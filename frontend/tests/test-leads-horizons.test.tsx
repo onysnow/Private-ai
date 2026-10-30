@@ -78,7 +78,8 @@ describe('Leads as Now / Next / Later', () => {
     // The status is its glyph; the word and the priority are revealed on it (the card's name carries both).
     expect(within(card).getByLabelText('Status: blocked')).toHaveTextContent(/^✕$/);
     expect(within(card).getByLabelText('Owner: A. Reporter')).toHaveTextContent('AR');
-    expect(within(card).getByText('Harbour Nominees paid Fernhill Ltd four times')).toBeInTheDocument();
+    // What it is for is the ↳ mark; its words are on hover (30 Oct).
+    expect(within(card).getByLabelText('For: Harbour Nominees paid Fernhill Ltd four times')).toHaveTextContent(/^↳$/);
     expect(within(card).getByLabelText('Tasks: Task t1 todo, Task t2 in progress, Task t3 done')).toHaveTextContent('○◐✓');
     expect(within(card).getByLabelText('2 supporting, 1 contradicting')).toHaveTextContent('✓ 2 · ✕ 1');
     expect(within(screen.getByRole('region', {name: 'Next, 1'})).getByText('Who owns Harbour Nominees?')).toBeInTheDocument();
