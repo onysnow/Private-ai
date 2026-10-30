@@ -8,7 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {FOLD_MS, InterruptNotice} from '../features/inbox/interrupt-notice';
 import {SavedQuestions} from '../features/ai/saved-questions';
 import {KeysPane} from '../features/settings/keys-pane';
-import {LookupsPane, shortSent, whatLeaves} from '../features/settings/lookups-pane';
+import {leavesShort, LookupsPane, shortSent, whatLeaves} from '../features/settings/lookups-pane';
 import {NotificationsPane} from '../features/settings/notifications-pane';
 import {ResearchPane} from '../features/settings/research-pane';
 import {ApiClient} from '../lib/api-client';
@@ -55,6 +55,10 @@ describe('Settings › Notifications', () => {
     expect(screen.getByText('in Everything else').previousSibling).toHaveTextContent('9');
     // Only what can mean danger is offered Interrupt.
     expect(within(screen.getByRole('radiogroup', {name: 'Faint Red Flag'})).queryByRole('radio', {name: /Interrupt/})).toBeNull();
+    // A grid of dots, kinds × places: the place is named on the dot, the default too; no wall of words.
+    expect(within(screen.getByRole('radiogroup', {name: 'Textbook Red Flag'})).getByRole('radio', {name: 'Interrupt (default)'})).toHaveAttribute('aria-checked', 'true');
+    expect(within(screen.getByRole('radiogroup', {name: 'Strong Red Flag'})).getByRole('radio', {name: 'Needs you (default)'})).toHaveAttribute('aria-checked', 'true');
+    expect(screen.queryByText('default')).toBeNull();
 
     await userEvent.setup().click(within(screen.getByRole('radiogroup', {name: 'Faint Red Flag'})).getByRole('radio', {name: 'Off'}));
     expect(api.lastBody('PUT /api/settings/notifications')).toMatchObject({routes: {flag_faint: 'off'}});
@@ -75,7 +79,12 @@ describe('Settings › Notifications › Outside the app', () => {
       'GET /api/investigations/inv-1/watches': [],
     });
     render(<QueryProvider><NotificationsPane investigationId="inv-1" caseName="Kestrel SA"/></QueryProvider>);
-    expect(await screen.findByText(/This server has no mail account/)).toBeInTheDocument();
+    // Plain words at rest; the server's setting name only on the reveal, for whoever sets up the server.
+    const notSet = await screen.findAllByText('Not set up on this server');
+    expect(notSet).toHaveLength(2);
+    expect(notSet[0].closest('.rv')).toHaveAccessibleDescription(/NOTIFY_MAIL_URL/);
+    expect(notSet[1].closest('.rv')).toHaveAccessibleDescription(/NOTIFY_PUSH_SUBJECT/);
+    for (const el of screen.queryAllByText(/NOTIFY_/)) expect(el.closest('[hidden]')).not.toBeNull();
     expect(screen.queryByLabelText('Your email address')).toBeNull();
     const user = userEvent.setup();
     await user.type(screen.getByLabelText('Your ntfy address'), 'ntfys://ntfy.example.org/desk');
@@ -97,6 +106,10 @@ describe('Settings › Outside lookups', () => {
     expect(whatLeaves([source(), source({key: 'firecrawl', label: 'Firecrawl', host: 'api.firecrawl.dev', mode: 'off'})]))
       .toBe('Nothing leaves this computer for an outside lookup except: the name of a party you choose to OpenSanctions (api.opensanctions.org), when you say so.');
     expect(whatLeaves([source({mode: 'off'})])).toBe('Nothing leaves this computer for an outside lookup.');
+    // At rest, a few words; the sentence above is revealed on them.
+    expect(leavesShort([source(), source({key: 'aleph', label: 'OpenAleph', mode: 'ask'}), source({key: 'firecrawl', label: 'Firecrawl', mode: 'automatic'})]))
+      .toBe('A party’s name, to OpenSanctions and OpenAleph, when you say so; to Firecrawl, as each new party joins.');
+    expect(leavesShort([source({mode: 'off'})])).toBe('Nothing leaves for an outside lookup.');
   });
 
   it('names the site of an address it sent, the full address revealed', async () => {

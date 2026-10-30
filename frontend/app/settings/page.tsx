@@ -10,11 +10,11 @@ import {investigationDeletionPreview, removeInvestigation, seedDemo as seedDemoI
 import type {InvestigationDeletionPreview, SettingsStatusOut} from '../../lib/generated/types.gen';
 import {isDemoHidden, setDemoHidden} from '../../lib/demo-preference';
 import {QueryProvider} from '../../lib/query-client';
-import {describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
+import {aiStateWord, describeAiStatus, whereModelRuns} from '../../components/ai-reasoning-panel';
 import {AppearancePanel, lookName, useAppearance} from '../../features/appearance/appearance-panel';
 import {HelpRow, KeptLine, SettingsNav, SettingsSearch, useSection, type SettingRow} from '../../features/settings/settings-index';
 import {Reveal} from '../../components/ui/reveal';
-import {NEW_CASE_EVENT, OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
+import {NEW_CASE_EVENT} from '../../components/frame/app-frame';
 import {SecurityPanel} from '../../features/security/security-panel';
 import {KeysPane} from '../../features/settings/keys-pane';
 import {LookupsPane} from '../../features/settings/lookups-pane';
@@ -276,10 +276,7 @@ function Settings(): ReactElement {
 
   const sections: Record<string, ReactElement> = {
     appearance: <AppearancePanel/>,
-    notifications: <>
-      <NotificationsPane investigationId={inv} caseName={caseName}/>
-      <button type="button" className="ap-btn st-open-inbox" onClick={() => window.dispatchEvent(new Event(OPEN_INBOX_EVENT))}>Open the inbox</button>
-    </>,
+    notifications: <NotificationsPane investigationId={inv} caseName={caseName}/>,
     keyboard: <div className={card}>
       <HelpRow help={<><span className="rv-row">[ opens the steps, ] the tools, ? the list of keys. They never fire while you type.</span>
         <span className="rv-row">Keys with ⌘ or Ctrl always work: ⌘K search and commands, ⌘O switch case, ⌘⇧H hide the screen.</span></>}>
@@ -298,8 +295,12 @@ function Settings(): ReactElement {
     lookups: <LookupsPane investigationId={inv} caseName={caseName} providers={providers}/>,
     ai: <ResearchPane
       model={<>
-        {/* A blocking state (off, no provider, no key) stays written out; once ready, its sentence is revealed on the model. */}
-        {!describeAiStatus(status?.ai).startsWith('Ready:') && <p className="st-line">{describeAiStatus(status?.ai)}</p>}
+        {/* Off, no provider or no key is a calm state in plain words (DECISIONS_LOG 27); the sentence with the server's
+            setting is revealed on it. A suite file missing stays written out: it is something to fix in the suite. */}
+        {!describeAiStatus(status?.ai).startsWith('Ready:') && (aiStateWord(status?.ai)
+          ? <p className="st-line ai-drafts-off" data-testid="ai-state"><Reveal detail={describeAiStatus(status?.ai)}><span><span className="ai-drafts-dot" aria-hidden="true"/><b>{aiStateWord(status?.ai)}</b></span></Reveal>
+            <span> · nothing runs or leaves this computer; the rest of the workbench works without it.</span></p>
+          : <p className="st-line">{describeAiStatus(status?.ai)}</p>)}
         {status?.ai?.model && <p className="st-line"><Reveal detail={describeAiStatus(status.ai)}><span>Model: <code>{status.ai.model}</code></span></Reveal>{whereModelRuns(status.ai)}
           {status.ai.remote_endpoint_allowed ? <> · <Reveal detail="AI_ALLOW_REMOTE_ENDPOINT is on."><span>remote endpoints allowed</span></Reveal></> : ''}</p>}
       </>}

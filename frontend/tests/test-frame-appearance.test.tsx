@@ -108,6 +108,10 @@ describe('Settings › Appearance', () => {
     render(<QueryProvider><AppearancePanel/></QueryProvider>);
     expect(screen.getByRole('radio', {name: 'Rain Noir theme, lowest contrast 5.90:1, has effects'})).toBeInTheDocument();
     expect(screen.getByRole('radio', {name: 'Forest Ledger theme, lowest contrast 4.84:1'})).toBeInTheDocument();
+    // At rest a card is its name and its preview; its mood and contrast line are revealed on it.
+    const archive = screen.getByRole('radio', {name: /^Archive theme/});
+    expect(archive).toHaveAccessibleDescription(/Lowest pair 4\.72:1 · AA/);
+    expect(archive.textContent).not.toMatch(/Lowest pair/);
   });
 
   it('crossfades a theme change where the browser can, 700 ms into Rain Noir', async () => {
@@ -135,7 +139,7 @@ describe('Settings › Appearance', () => {
     await userEvent.setup().hover(screen.getByRole('radio', {name: /^Indigo Clarity theme/}));
     const facts = screen.getByText('Lowest text pair 6.39:1 · AA').closest('dl')!;
     expect(facts).toHaveAttribute('aria-label', 'Indigo Clarity in four facts');
-    expect(within(facts).getByText('Inclusive Sans · Lexend · Plex Mono')).toBeInTheDocument();
+    expect(within(facts).getByText('Fonts on this computer').closest('.rv')).toHaveAccessibleDescription('Inclusive Sans · Lexend · Plex Mono');
     expect(await screen.findByText('Open or start a case to see its Case home here in each theme.')).toBeInTheDocument();
   });
 });

@@ -764,3 +764,28 @@ sometimes says it outright. Calls:
   proposal's kind becomes the link's.
 - **Mapping screen:** under a Payment link, one select, "Kind of payment: not said" or "Kind of payment from “column”";
   what happens to a cell that names no kind is on hover.
+
+## 43. Settings never scrolls; Notifications as a grid, server setting names behind a reveal (30 Oct 2026)
+
+The sweep at 1440×900 found the Settings page scrolling (Appearance 1105 px, Notifications 1390, Outside lookups 1363,
+AI and research 1060), a wall of "Needs you default" buttons, and deployment names (NOTIFY_MAIL_URL,
+NOTIFY_PUSH_SUBJECT, ENABLE_AI_FEATURES) in the panes. Calls:
+- **The page never scrolls.** Settings is the window's height under the frame's bar; the sidebar and the open section
+  scroll inside themselves, and a two-column pane (Appearance, Notifications) scrolls each column on its own. Appearance,
+  Notifications and AI and research fit 1440×900; Outside lookups scrolls in its section (it carries Look a name up now).
+- **Notifications: kinds × places.** One row per kind with last week's count, one column per place (Interrupt, Needs
+  you, Everything else, Off), each a mark in its colour named on hover with what it does; the choice is a filled dot,
+  the default a ring on its cell (named "(default)" in the dot's name). The per-kind choice is a route, not an outside
+  channel, because the server stores email, phone and Web Push per channel (off, Textbook Red Flags, once a day), not
+  per kind; those keep their own rows under Outside the app. "Open the inbox" moved into the Last week pane's head.
+- **Server setting names only on reveal.** A channel the server cannot use reads "Not set up on this server"; the
+  sentence naming what whoever runs the server sets is revealed on it. AI off reads "AI is off · nothing runs or leaves
+  this computer; the rest of the workbench works without it" (entry 27), the flag on hover; "Change it" still lists the
+  environment names on click. A suite file missing stays written out (something to fix in the suite).
+- **AI and research:** the model and Research without asking share the first row.
+- **Outside lookups:** the summary is a few words ("A party’s name, to OpenAleph, Firecrawl and OpenSanctions, when you
+  say so."), in the UI face; the full sentence with each source's address is revealed on it.
+- **Appearance:** a theme card is its name, swatches, type and marks; its mood and lowest contrast pair are revealed on
+  the card (and stay in its accessible name). "+ Make your own" explains itself on hover. Of the four facts, the check
+  result shows; the other three are names with their detail on hover. Calm motion joined the effect switches' grid and
+  Status marks' three choices sit on one line.

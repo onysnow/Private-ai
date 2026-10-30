@@ -46,6 +46,11 @@ async function dropBrowserSubscription(): Promise<string | null> {
   return endpoint;
 }
 
+/** A way out the server cannot use yet: said in plain words; what whoever runs the server sets is revealed on it. */
+function NotSetUp({detail}: {detail: string}): ReactElement {
+  return <Reveal detail={detail}><small className="st-notset">Not set up on this server</small></Reveal>;
+}
+
 export function OutsideChannels({prefs}: {prefs: NotificationPrefsOut}): ReactElement {
   const queryClient = useQueryClient();
   const [problem, setProblem] = useState<Partial<Record<Channel, string>>>({});
@@ -115,7 +120,7 @@ export function OutsideChannels({prefs}: {prefs: NotificationPrefsOut}): ReactEl
     <div className="st-route st-channel">
       {/* What a channel sends is revealed on its name; a channel the server cannot use says so, written out. */}
       <span className="st-route-what">{prefs.server.email ? <Reveal detail="A Textbook Red Flag as it happens, or once a day what is waiting (after 07:00 UTC)."><b>Email</b></Reveal>
-        : <><b>Email</b><small>This server has no mail account. Whoever runs it sets NOTIFY_MAIL_URL (a mailtos:// address) in its environment file.</small></>}</span>
+        : <><b>Email</b><NotSetUp detail="This server has no mail account. Whoever runs it sets NOTIFY_MAIL_URL (a mailtos:// address) in its environment file."/></>}</span>
       {prefs.server.email && <>
         <input aria-label="Your email address" type="email" className="st-input st-channel-input" placeholder="you@newsroom.org" autoComplete="email" value={address}
             onChange={e => setAddress(e.target.value)} disabled={busy === 'email'}/>
@@ -141,7 +146,7 @@ export function OutsideChannels({prefs}: {prefs: NotificationPrefsOut}): ReactEl
       <span className="st-route-what">{prefs.server.webpush ? <><Reveal detail="Web Push, through the browser maker’s push service."><b>This browser, even when the Workbench is closed</b></Reveal>
         <small>{prefs.push_devices ? `${prefs.push_devices} browser${prefs.push_devices === 1 ? '' : 's'} signed up` : 'No browser signed up yet'}</small></>
         : <><b>This browser, even when the Workbench is closed</b>
-        <small>This server cannot send Web Push yet. Whoever runs it sets NOTIFY_PUSH_SUBJECT (mailto: or https:) in its environment file.</small></>}</span>
+        <NotSetUp detail="This server cannot send Web Push yet. Whoever runs it sets NOTIFY_PUSH_SUBJECT (mailto: or https:) in its environment file."/></>}</span>
       {prefs.server.webpush && seg('webpush', ['off', 'interrupts'], !prefs.server.webpush_key)}
       {foot('webpush')}
     </div>
