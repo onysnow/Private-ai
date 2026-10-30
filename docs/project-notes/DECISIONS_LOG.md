@@ -670,3 +670,31 @@ BACKLOG "Documents have no kind/language field". Built on `documents` (migration
   detected" stays only where nothing is known.
 - Kind and language travel in a backup (they are columns of `documents`); a backup made before keeps none and the
   restored documents read as not known.
+
+## 38. Places: a place's pictures, by three stated rules, and a window you can scroll (30 Oct 2026)
+
+PLACE_1 draws "Pictures of this place" in the place card and a window under the map that scrolls. Both are built.
+- **A picture is of a place only by a rule, never a guess** (`app/services/place_pictures.py`, each place's `pictures`
+  on GET /places). Three rules, and each match carries its rule and what it rests on, shown on hover:
+  **gps**, the photo's own EXIF GPS within 250 m of a place known to the building (or with no precision noted), 500 m
+  for a street or square, 5 km for a town or wider (0, 0 is no fix); **linked**, a person tied it: evidence for a link
+  or a dated event at the place, the file the place's coordinates were read from, or a photo whose GPS proposal was
+  accepted as the place; **named**, a picture's caption or a saved capture's page names the house number and street,
+  as whole words. A place with no house number is never matched by name: a street or town alone names many places.
+  Why these radii: the GPS a phone writes is good to tens of metres, and a place's ring already says how exact the
+  place is; a wider radius would call a photo two streets away "taken here".
+- **A picture is a held photo file or a captured page** (shown by its screenshot). A picture evidence record with no
+  file is left out: there is nothing to open. A PDF is never a picture, even when its caption names the address.
+- **One click opens the source** (the photo room, or the captured page in the reading room). The rule is a mark on
+  the thumbnail (pin, chain, quote) and its sentence on hover; the date shown is the source's, else the camera's clock,
+  else the capture's day, and which on hover. The three rules are stated behind the `?` beside the heading.
+- **The window greys pictures taken outside it**, as it greys events; an undated picture is never greyed. The card's
+  event heading says "1 of 2 in the dates picked". **Compare 2017 ↔ 2021** sets the earliest dated picture beside the
+  latest when they are of different years.
+- **The window:** scrolling over the strip moves a picked window a month a notch (and the page does not scroll too;
+  with no window picked, the page scrolls as usual). The window itself takes focus: the arrows move it whole, Page
+  Up/Down a year, Escape lets it go. The arrows on an edge no longer also step to the next place (they did: the key
+  bubbled to the panel). Each row ends with how many of its events fall in the window. The window glides on keys and
+  scroll, never under the pointer, and not at all under reduced motion.
+- **The map's tooltip lookups do not compute pictures** (`pictures=False` in the map chart and the photo tool), so
+  their cost is unchanged.

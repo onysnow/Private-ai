@@ -2536,6 +2536,8 @@ export type {
   PlaceEventOut,
   PlaceLinkOut,
   PlaceOut,
+  PlacePictureMatchOut,
+  PlacePictureOut,
   PlaceProposalOut,
   PlacesOut,
   PlaceStoryClaimData,

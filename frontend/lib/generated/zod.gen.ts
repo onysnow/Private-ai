@@ -7204,6 +7204,38 @@ export const zPlaceLinkOut = z.object({
 });
 
 /**
+ * PlacePictureMatchOut
+ *
+ * Why a picture is of a place, by one stated rule (app/services/place_pictures.py): "gps" (the photo's own GPS is
+ * within the place's radius; `metres` is how far), "linked" (a person tied it to the place: evidence for a link or an
+ * event here, or the file the coordinates came from) or "named" (its caption or a captured page names the address).
+ */
+export const zPlacePictureMatchOut = z.object({
+  detail: z.string(),
+  metres: z.int().nullish(),
+  rule: z.enum(['gps', 'linked', 'named']),
+});
+
+/**
+ * PlacePictureOut
+ *
+ * A picture of a place: a photo file, or a captured web page (`capture_id`, shown by its screenshot). `taken` is
+ * when, to the precision known (a year, a month or a day), from its source, the camera's clock or the capture; the
+ * days it can mean are `first_day` to `last_day`. Opening it opens `document_id`.
+ */
+export const zPlacePictureOut = z.object({
+  capture_id: z.string().nullish(),
+  document_id: z.string(),
+  first_day: z.string().nullish(),
+  kind: z.enum(['photo', 'page']),
+  last_day: z.string().nullish(),
+  matches: z.array(zPlacePictureMatchOut),
+  taken: z.string().nullish(),
+  taken_from: z.enum(['source', 'camera', 'capture']).nullish(),
+  title: z.string(),
+});
+
+/**
  * PlaceOut
  *
  * A record that says where it is: its coordinates as recorded, and
@@ -7218,6 +7250,7 @@ export const zPlaceOut = z.object({
   latitude: z.number(),
   links: z.array(zPlaceLinkOut),
   longitude: z.number(),
+  pictures: z.array(zPlacePictureOut).optional(),
   placed_from: z.string().nullish(),
   precision: z.string().nullish(),
   schema: z.string(),

@@ -15,7 +15,7 @@ import {PlacesPanel, coordinates} from '../features/places/places-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {BASEMAP_PROTOCOL, PLACE_DOT, PLACE_RADIUS, PLACE_RING, basemapLoader, basemapStyle, dotImage, dotName, placesBounds, placesGeoJson} from '../lib/basemap-style';
-import type {PlaceOut} from '../lib/generated/types.gen';
+import type {PlaceOut, PlacePictureOut} from '../lib/generated/types.gen';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
@@ -237,7 +237,7 @@ describe('PlacesPanel', () => {
     const strip = within(await screen.findByTestId('places-timeline'));
     expect(screen.getByRole('group', {name: /Timeline of 2 places with dated events, from 4 Mar 2019 to 14 Nov 2023/})).toBeInTheDocument();
     // One readable row per place with dated events, in the places' order; the rest counted in one line.
-    expect(strip.getAllByRole('listitem').map(li => li.textContent)).toEqual(['Meridian registered office', 'Villa Kyrenia']);
+    expect(strip.getAllByRole('listitem').map(li => li.textContent)).toEqual(['Meridian registered office1', 'Villa Kyrenia2']);   // each ends with its events in the window
     expect(strip.getByText('+1 place with no dated event')).toBeInTheDocument();
     // A date known only to the month is a hollow mark.
     expect(strip.getByRole('button', {name: /^Stake starts, .*verified$/})).toHaveClass('hollow');
@@ -322,5 +322,108 @@ describe('PlacesPanel', () => {
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1')});
     wrap(<PlacesPanel investigationId="inv-1"/>);
     expect(await screen.findByText(/No record in this investigation holds both a latitude and a longitude/)).toBeInTheDocument();
+  });
+
+  const picture = (id: string, title: string, taken: string | null, first: string | null, last: string | null, matches: PlacePictureOut['matches'], extra: Partial<PlacePictureOut> = {}): PlacePictureOut => ({
+    document_id: id, kind: 'photo', title, capture_id: null, taken, taken_from: taken ? 'source' : null, first_day: first, last_day: last, matches, ...extra});
+  const PICTURES = [
+    picture('d-plot', 'plot.jpg', '2017-06', '2017-06-01', '2017-06-30', [{rule: 'gps', detail: 'Taken 120 m from here, by the photo\'s own GPS (within 250 m; what the file claims about itself)', metres: 120}]),
+    picture('d-page', 'Contact — Villa', '2021-02-03', '2021-02-03', '2021-02-03', [{rule: 'named', detail: 'Named on the captured page: “1 example street”', metres: null}],
+      {kind: 'page', capture_id: 'cap-1', taken_from: 'capture'}),
+    picture('d-sign', 'signage.jpg', null, null, null, [{rule: 'linked', detail: 'Evidence for the link with Alaric Voss (attached by the reporter)', metres: null}]),
+  ];
+
+  it('shows the place\'s pictures as a strip: each opens its source in one click, and says how it matched on hover', async () => {
+    Object.assign(URL, {createObjectURL: (blob: Blob) => `blob:${blob.type}`, revokeObjectURL: () => undefined});
+    const image = (type: string) => () => new Response('x', {headers: {'Content-Type': type}});
+    const api = mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, {...VILLA_DATED, pictures: PICTURES}]),
+      'GET /api/documents/d-plot/picture': image('image/jpeg'), 'GET /api/captures/cap-1/files/screenshot.png': image('image/png')});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    const card = within(await screen.findByRole('region', {name: 'Pictures of this place'}));
+    expect(card.getByText(/Pictures of this place · 3/)).toBeInTheDocument();
+    // The rule is stated, never guessed.
+    expect(screen.getByText('A picture is listed here only by one of three rules')).toBeInTheDocument();
+    const plot = card.getByRole('button', {name: 'plot.jpg, Jun 2017: open the photo'});
+    expect(plot).toHaveAccessibleDescription(/Taken here, by its own GPS: Taken 120 m from here.*Jun 2017, dated by its source/);
+    expect(card.getByRole('button', {name: 'Contact — Villa, 3 Feb 2021: open the captured page'})).toHaveAccessibleDescription(/Its caption or page names the address: Named on the captured page/);
+    expect(card.getByRole('button', {name: /^signage.jpg, no date/})).toHaveAccessibleDescription(/Tied to this place by a person.*No date is known for it/);
+    // The photo is shown from the document, the page from its capture's screenshot.
+    await vi.waitFor(() => expect(plot.querySelector('img')).toHaveAttribute('src', 'blob:image/jpeg'));
+    expect(api.calls('GET /api/captures/cap-1/files/screenshot.png')).toHaveLength(1);
+    expect(api.calls('GET /api/documents/d-sign/picture')).toHaveLength(1);   // no file to show: its kind stands in
+    await userEvent.setup().click(plot);
+    expect(useWorkbenchStore.getState().document?.documentId).toBe('d-plot');
+  });
+
+  it('greys the pictures taken outside the window, never an undated one, and compares the earliest with the latest', async () => {
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, {...VILLA_DATED, pictures: PICTURES}])});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    const card = within(await screen.findByRole('region', {name: 'Pictures of this place'}));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: /All dates; type/}));
+    fireEvent.change(screen.getByLabelText('From'), {target: {value: '2021-01-01'}});
+    fireEvent.change(screen.getByLabelText('To'), {target: {value: '2022-12-31'}});
+    await screen.findByTestId('places-window');
+    expect(card.getByRole('button', {name: /^plot.jpg/})).toHaveClass('out');
+    expect(card.getByRole('button', {name: /^Contact — Villa/})).not.toHaveClass('out');
+    expect(card.getByRole('button', {name: /^signage.jpg/})).not.toHaveClass('out');
+    expect(screen.getByText(/What happened here · 1 of 2 in the dates picked/)).toBeInTheDocument();
+    await user.click(card.getByRole('button', {name: 'Compare 2017 ↔ 2021'}));
+    expect(within(screen.getByTestId('place-compare')).getAllByRole('button').map(b => b.getAttribute('aria-label'))).toEqual([
+      'plot.jpg, Jun 2017: open the photo', 'Contact — Villa, 3 Feb 2021: open the captured page']);
+  });
+
+  it('states that no picture is of a place, rather than showing an empty strip', async () => {
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [VILLA_DATED])});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    expect(await screen.findByText('No picture in the case is of this place.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /^Compare/})).toBeNull();
+  });
+
+  it('moves a picked window on a scroll over the strip and on its own arrow keys, never stepping to the next place', async () => {
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, VILLA_DATED])});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    const strip = await screen.findByTestId('places-timeline');
+    const track = strip.querySelector('.pls-track') as HTMLElement;
+    // No window picked: a scroll is the page's.
+    expect(fireEvent.wheel(track, {deltaY: 100})).toBe(true);
+    fireEvent.keyDown(screen.getByRole('slider', {name: 'Window starts'}), {key: 'PageUp'});
+    expect(screen.getByRole('heading', {name: 'Villa Kyrenia'})).toBeInTheDocument();
+    const edge = () => screen.getByRole('slider', {name: 'Window starts'}).getAttribute('aria-valuetext');
+    expect(edge()).toBe('3 Mar 2020');
+    // The arrows on an edge move the edge, not to the next place.
+    fireEvent.keyDown(screen.getByRole('slider', {name: 'Window starts'}), {key: 'ArrowRight'});
+    expect(edge()).toBe('2 Apr 2020');
+    expect(screen.getByRole('heading', {name: 'Villa Kyrenia'})).toBeInTheDocument();
+    // A scroll moves the whole window back a month (it is kept inside the events' extent at its far end).
+    fireEvent.keyDown(screen.getByRole('slider', {name: 'Window ends'}), {key: 'PageDown'});
+    const end = () => screen.getByRole('slider', {name: 'Window ends'}).getAttribute('aria-valuetext');
+    const before = [edge(), end()];
+    expect(fireEvent.wheel(track, {deltaY: -100})).toBe(false);   // the page does not scroll too
+    expect([edge(), end()]).not.toEqual(before);
+    expect(edge()).toBe('3 Mar 2020');
+    // The window itself: the arrows move it whole, Escape lets it go.
+    const band = screen.getByTestId('places-window-band');
+    fireEvent.keyDown(band, {key: 'ArrowRight'});
+    expect(edge()).toBe('2 Apr 2020');
+    expect(screen.getByRole('heading', {name: 'Villa Kyrenia'})).toBeInTheDocument();
+    fireEvent.keyDown(band, {key: 'Escape'});
+    expect(screen.getByRole('button', {name: /All dates; type/})).toBeInTheDocument();
+  });
+
+  it('moves a window whole inside the extent, and reads a picture\'s day against it', async () => {
+    const {shiftWindow} = await import('../features/places/places-timeline');
+    const {pictureInWindow} = await import('../lib/place-times');
+    const {comparePair} = await import('../features/places/place-pictures');
+    const extent = {from: Date.UTC(2020, 0, 1), to: Date.UTC(2021, 0, 1)};
+    const w = {from: Date.UTC(2020, 2, 1), to: Date.UTC(2020, 5, 1)};
+    expect(shiftWindow(w, -365 * 86_400_000, extent)).toEqual({from: extent.from, to: extent.from + (w.to - w.from)});
+    expect(shiftWindow(w, 365 * 86_400_000, extent)).toEqual({from: extent.to - (w.to - w.from), to: extent.to});
+    expect(pictureInWindow({first_day: '2020-02-01', last_day: '2020-02-29'}, w)).toBe(false);
+    expect(pictureInWindow({first_day: '2020-01-01', last_day: '2020-12-31'}, w)).toBe(true);
+    expect(pictureInWindow({first_day: null, last_day: null}, w)).toBeNull();
+    expect(pictureInWindow({first_day: '2020-02-01', last_day: '2020-02-29'}, null)).toBe(true);
+    expect(comparePair(PICTURES)?.map(p => p.document_id)).toEqual(['d-plot', 'd-page']);
+    expect(comparePair([PICTURES[0], PICTURES[2]])).toBeNull();   // one dated picture: nothing to compare
   });
 });

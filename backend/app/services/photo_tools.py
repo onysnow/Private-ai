@@ -204,7 +204,7 @@ def photo_view(db: Session, document: Document) -> dict[str, Any]:
     if gps and gps.get("latitude") is not None and gps.get("longitude") is not None:
         lat, lon = float(gps["latitude"]), float(gps["longitude"])
         best: tuple[float, str, str] | None = None
-        for place in investigation_places(db, document.investigation_id)["places"]:
+        for place in investigation_places(db, document.investigation_id, pictures=False)["places"]:
             d_lat, d_lon = math.radians(place["latitude"] - lat), math.radians(place["longitude"] - lon)
             h = math.sin(d_lat / 2) ** 2 + math.cos(math.radians(lat)) * math.cos(math.radians(place["latitude"])) * math.sin(d_lon / 2) ** 2
             metres = 6_371_000 * 2 * math.asin(min(1.0, math.sqrt(h)))

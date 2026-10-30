@@ -4164,6 +4164,30 @@ class PlaceEventOut(ResponseModel):
     relationship_id: str | None = None
 
 
+class PlacePictureMatchOut(ResponseModel):
+    """Why a picture is of a place, by one stated rule (app/services/place_pictures.py): "gps" (the photo's own GPS is
+    within the place's radius; `metres` is how far), "linked" (a person tied it to the place: evidence for a link or an
+    event here, or the file the coordinates came from) or "named" (its caption or a captured page names the address)."""
+    rule: Literal["gps", "linked", "named"]
+    detail: str
+    metres: int | None = None
+
+
+class PlacePictureOut(ResponseModel):
+    """A picture of a place: a photo file, or a captured web page (`capture_id`, shown by its screenshot). `taken` is
+    when, to the precision known (a year, a month or a day), from its source, the camera's clock or the capture; the
+    days it can mean are `first_day` to `last_day`. Opening it opens `document_id`."""
+    document_id: str
+    kind: Literal["photo", "page"]
+    title: str
+    capture_id: str | None = None
+    taken: str | None = None
+    taken_from: Literal["source", "camera", "capture"] | None = None
+    first_day: str | None = None
+    last_day: str | None = None
+    matches: list[PlacePictureMatchOut]
+
+
 class PlaceOut(ResponseModel):
     """A record that says where it is: its coordinates as recorded, and
     when things happened there."""
@@ -4183,6 +4207,7 @@ class PlaceOut(ResponseModel):
     placed_from: str | None = None
     links: list[PlaceLinkOut]
     events: list[PlaceEventOut] = Field(default_factory=list)
+    pictures: list[PlacePictureOut] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
 
