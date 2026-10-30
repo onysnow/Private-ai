@@ -212,26 +212,28 @@ function BeforeSearch({investigationId, kind, onKind, onRun, recent}: {investiga
     claim_event: standing.claims.total + standing.timeline.events, lead_task: standing.leads.open, document: standing.documents.total,
   } : {};
   const kinds = KIND_ORDER.filter(k => k !== 'outside');
-  return <div className="sv-before">
+  return <div className={`sv-before${recent.length ? '' : ' no-recent'}`}>
     <section className="sv-b-kinds" aria-label="What can be searched">
       {kinds.map(k => <button key={k} type="button" className={`sv-kind${kind === k ? ' on' : ''}`} style={{['--edge' as string]: KIND[k].edge}}
         aria-pressed={kind === k} onClick={() => onKind(k)}>
         <b>{counts[k] ?? '·'}</b><span>{KIND[k].plural}</span></button>)}
     </section>
     <section className="sv-b-col" aria-label="Names to try">
-      <h4 className="sv-b-cap">Try</h4>
-      {parties.length ? <ul className="sv-b-list">{parties.map(p => <li key={p.id}>
-        <button type="button" onClick={() => onRun(p.caption)}><PartyMark schema={p.schema} tabbable={false}/><span>{p.caption}</span></button></li>)}</ul>
-        : <p className="sv-muted">No party in this case yet.</p>}
-    </section>
-    <section className="sv-b-col" aria-label="Recent searches">
-      <h4 className="sv-b-cap">Recent
+      {/* The keys live behind ? on the first list (Ony, 29 Oct: key hints behind ?). */}
+      <h4 className="sv-b-cap">Try
         <Reveal className="sv-b-keys" label="Keys" detail={<>{KEY_HINTS.map(([k, w]) => <span className="rv-row" key={k}><kbd>{k}</kbd> {w}</span>)}</>}>
           <span aria-hidden="true">?</span></Reveal></h4>
-      {recent.length ? <ul className="sv-b-list">{recent.map(r => <li key={r.q}>
-        <Reveal tabbable={false} describe={false} detail={`Searched ${timeWords(r.at)}`}><button type="button" onClick={() => onRun(r.q)}><span>{r.q}</span></button></Reveal></li>)}</ul>
-        : <p className="sv-muted">None yet.</p>}
+      {/* A long name ends in an ellipsis; the whole name is revealed on it. */}
+      {parties.length ? <ul className="sv-b-list">{parties.map(p => <li key={p.id}>
+        <Reveal tabbable={false} describe={false} detail={p.caption}><button type="button" onClick={() => onRun(p.caption)}><PartyMark schema={p.schema} tabbable={false}/><span>{p.caption}</span></button></Reveal></li>)}</ul>
+        : <p className="sv-muted">No party in this case yet.</p>}
     </section>
+    {/* The last searches, only once there are some: no empty card. */}
+    {recent.length > 0 && <section className="sv-b-col" aria-label="Recent searches">
+      <h4 className="sv-b-cap">Recent</h4>
+      <ul className="sv-b-list">{recent.map(r => <li key={r.q}>
+        <Reveal tabbable={false} describe={false} detail={`Searched ${timeWords(r.at)}`}><button type="button" onClick={() => onRun(r.q)}><span>{r.q}</span></button></Reveal></li>)}</ul>
+    </section>}
   </div>;
 }
 

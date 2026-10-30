@@ -8,6 +8,9 @@
 // Converted 30 Oct (Keep › Backup & restore, in the look of Safety & data): sealed or not as a chip, the last backup
 // and what a backup holds counted on the left with Download backup; the restore on the right, a target to drop a
 // backup on (or press to choose one), then its preview counted before Restore investigation.
+// Sweep 30 Oct: what a backup holds is counted by kind (parties, links, claims, evidence, sources, dated events, leads,
+// documents: the case's standing, the same counts as Search), each tile sized to its number, and what stays out of it
+// is named under them; sealed or not is the status colour, its word and meaning on hover.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ChangeEvent, DragEvent, ReactElement, ReactNode} from 'react';
@@ -17,13 +20,12 @@ import {Reveal} from '@/components/ui/reveal';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Input} from '@/components/ui/input';
 import {agoText} from '../act/red-flags-board';
-import {STORE_MARK, storeParts} from '../safety/safety-screen';
 import {errorMessage} from '../../lib/api-client';
 import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
 import {useLockStore} from '../../lib/app-lock';
-import {getSafetyDataOptions, listInvestigationsOptions, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
-import type {BackupPreviewOut, BackupRestoreResultOut} from '../../lib/generated/types.gen';
+import {getSafetyDataOptions, getStandingOptions, listInvestigationsOptions, listInvestigationsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import type {BackupPreviewOut, BackupRestoreResultOut, CaseStandingOut} from '../../lib/generated/types.gen';
 import {zBackupPreviewOut, zBackupRestoreResultOut} from '../../lib/generated/zod.gen';
 
 type Props = {
@@ -50,6 +52,28 @@ export function sizeWords(bytes: number): string {
   return `${i ? (n < 10 ? n.toFixed(1) : Math.round(n)) : n} ${units[i]}`;
 }
 
+/** One kind of thing a backup holds: its mark, how many, what they are, and (on hover) where they live. */
+export type Hold = {id: string; mark: string; n: number; unit: string; detail?: string};
+
+/** What a backup of the case holds, by kind, from the case's standing; the documents' size and place from Safety & data. */
+export function backupHolds(standing: CaseStandingOut | undefined, docs: {count: number; bytes: number; where: string} | null): Hold[] {
+  if (!standing) return [];
+  const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+  const db = 'In the database on this computer';
+  const documents = docs?.count ?? standing.documents.total;
+  return [
+    {id: 'parties', mark: '◉', n: standing.network.parties, unit: plural(standing.network.parties, 'party', 'parties'), detail: db},
+    {id: 'links', mark: '⟷', n: standing.network.links, unit: plural(standing.network.links, 'link', 'links'), detail: db},
+    {id: 'claims', mark: '❝', n: standing.claims.total, unit: plural(standing.claims.total, 'claim', 'claims'), detail: `${db}, with each claim's evidence links and review decisions`},
+    {id: 'evidence', mark: '▣', n: standing.evidence, unit: 'evidence', detail: `${db}, each piece with its exact quote and where it came from`},
+    {id: 'sources', mark: '◫', n: standing.sources, unit: plural(standing.sources, 'source', 'sources'), detail: db},
+    {id: 'events', mark: '◷', n: standing.timeline.events, unit: plural(standing.timeline.events, 'dated event', 'dated events'), detail: db},
+    {id: 'leads', mark: '➚', n: standing.leads.open, unit: plural(standing.leads.open, 'open lead', 'open leads'), detail: `${db}, with their tasks`},
+    {id: 'documents', mark: '▤', n: documents, unit: plural(documents, 'document', 'documents'),
+      detail: docs ? `${docs.bytes ? `${sizeWords(docs.bytes)} · ` : ''}${docs.where}, with their read text` : undefined},
+  ];
+}
+
 function archiveForm(file: File, secret: string): FormData {
   const body = new FormData();
   body.append('file', file);
@@ -73,6 +97,8 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
   const last = lastBackupOf(investigations.data?.find(i => i.id === investigationId)?.last_backup);
   // What a backup holds: the stores Safety & data counts that go into one (the same query, so the same cache).
   const safety = useQuery({...getSafetyDataOptions({path: {investigation_id: investigationId}, query: {period: '7d'}}), enabled: Boolean(investigationId), retry: false});
+  // ...counted by kind from the case's standing (the counts Search shows), one tile each.
+  const standing = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
 
   const download = useMutation({
     mutationFn: (id: string) => api.blob(`/api/investigations/${id}/export?include_documents=true`),
@@ -150,8 +176,10 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
     if (dropped) pick(dropped);
   };
 
-  const holds = (safety.data?.stores ?? []).filter(s => s.in_backups === true);
-  const leftOut = (safety.data?.stores ?? []).filter(s => s.in_backups === false).map(s => s.name);
+  const stores = safety.data?.stores ?? [];
+  const docs = stores.find(s => s.id === 'documents');
+  const leftOut = stores.filter(s => s.in_backups === false).map(s => s.name);
+  const holds = backupHolds(standing, docs ? {count: docs.count ?? 0, bytes: docs.bytes ?? 0, where: docs.where} : null);
   const records = preview ? Object.values(preview.record_counts).reduce((a, b) => a + b, 0) : 0;
   const lineageOk = Boolean(preview?.lineage_integrity && preview.lineage_integrity.valid === true);
 
@@ -159,10 +187,10 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
     <header className="sd-head">
       <h2 className="sd-title"><Reveal detail="Export FollowTheMoney JSONL, evidence and claim provenance, leads/tasks, timeline, extracted document text, review decisions, and stored source files in one checksum-verified archive.">
         <span>Keep a copy <em>off this computer</em>, bring one back</span></Reveal></h2>
-      {/* Sealed or not (ADR-0016): the chip's colour and mark; what it means and how to change it are revealed on it. */}
-      <Reveal detail={sealed ? 'Backups made now are encrypted with your passphrase. They open on any computer with it, or with the 12 recovery words.'
-        : 'Backups are not encrypted: anyone who has the file can read it. Lock the app with a passphrase (Settings › Your safety) and backups are sealed from then on.'}>
-        <span className={`sd-chip${sealed ? ' kp-sealed' : ' sd-chip-out'}`}>{sealed ? '🔒 sealed' : '▲ not sealed'}</span></Reveal>
+      {/* Sealed or not (ADR-0016): the status colour; the word, what it means and how to change it are revealed on it. */}
+      <Reveal label={sealed ? 'Sealed' : 'Not sealed'} detail={sealed ? <><b>Sealed</b><span className="rv-row">Backups made now are encrypted with your passphrase. They open on any computer with it, or with the 12 recovery words.</span></>
+        : <><b>Not sealed</b><span className="rv-row">Backups are not encrypted: anyone who has the file can read it. Lock the app with a passphrase (Settings › Your safety) and backups are sealed from then on.</span></>}>
+        <span className={`st kp-seal${sealed ? ' st-supported' : ' kp-unsealed'}`}><span className="st-mark" aria-hidden="true">{sealed ? '🔒' : '▲'}</span><span className="st-word">{sealed ? 'sealed' : 'not sealed'}</span></span></Reveal>
     </header>
 
     <div className="kp-grid">
@@ -175,13 +203,15 @@ export function BackupPanel({investigationId, onRestored, children}: Props): Rea
           <Reveal detail={`${sizeWords(last.bytes)} · checksum kept${last.encrypted ? ' · encrypted' : ' · not encrypted'}${last.sha256 ? ` · SHA-256 ${last.sha256}` : ''}`}><span>✓ checksum</span></Reveal>
           {last.documents_included ? null : <span className="sd-warn">without the stored files</span>}</p>}
         {holds.length > 0 && <>
-          <p className="sd-eyebrow kp-holds-head">What it holds {leftOut.length > 0 && <Reveal label="Not in a backup" detail={`Not in a backup: ${leftOut.join(', ')}. They stay on this computer.`}><span aria-hidden="true">ⓘ</span></Reveal>}</p>
-          {/* Each store the backup carries, its number big (fill the space); where it lives is revealed on its name. */}
-          <ul className="kp-holds">{holds.map(s => { const [big, unit] = storeParts(s); return <li key={s.id}>
-            <span className="sd-mark" aria-hidden="true">{STORE_MARK[s.id] ?? '·'}</span>
-            <span className="kp-n">{big}</span>
-            <Reveal detail={<span className="rv-mono">{s.where}</span>}><span className="kp-unit">{unit || s.name}</span></Reveal>
-          </li>; })}</ul>
+          <p className="sd-eyebrow kp-holds-head">What it holds</p>
+          {/* Each kind the backup carries, its number big in a tile sized to it; where it lives is revealed on its name. */}
+          <ul className="kp-holds" aria-label="What a backup holds">{holds.map(h => <li key={h.id}>
+            <span className="sd-mark" aria-hidden="true">{h.mark}</span>
+            <span className="kp-n">{h.n.toLocaleString()}</span>
+            {h.detail ? <Reveal detail={h.detail}><span className="kp-unit">{h.unit}</span></Reveal> : <span className="kp-unit">{h.unit}</span>}
+          </li>)}</ul>
+          {leftOut.length > 0 && <p className="kp-out"><Reveal detail="They stay on this computer: a restored case asks for its service keys again, and starts its own log.">
+            <span className="sd-eyebrow">Not in it</span></Reveal> {leftOut.join(' · ')}</p>}
         </>}
         <div className="kp-act">
           <Button onClick={downloadBackup} disabled={!investigationId}>Download backup</Button>

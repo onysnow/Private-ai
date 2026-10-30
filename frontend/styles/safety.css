@@ -169,7 +169,7 @@ html[data-motion='calm'] .sd-pulse .sd-line { animation: none; border-top-color:
    in the look of Safety & data: two panels filling the screen, numbers big, the sub-text revealed. The page never
    scrolls; a panel scrolls inside itself when it must. The alarm colour appears only on Delete (its allowed place). */
 .kp { height: 100%; box-sizing: border-box; padding: 4px 28px 18px; display: flex; flex-direction: column; gap: 14px; color: var(--text); font-family: var(--font-ui); overflow: hidden; }
-.kp-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.kp-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 14px; }
 .kp-grid > .sd-panel { display: flex; flex-direction: column; gap: 12px; overflow: auto; }
 .kp-big { margin: 0; font: 300 clamp(26px, 2.6vw, 38px)/1.1 var(--font-display); }
 .kp-big b { font-weight: inherit; }
@@ -203,12 +203,7 @@ html[data-motion='calm'] .sd-pulse .sd-line { animation: none; border-top-color:
 .kp-confirm { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; line-height: 1.4; }
 /* Delete: the alarm colour (deletion is one of its two allowed places), three steps on a rail. */
 .kp-alarm { color: var(--status-disputed) !important; font-style: normal; }
-.kp-steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
-.kp-steps li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; color: var(--text-muted); }
-.kp-steps li.now { color: var(--text); border-color: var(--status-disputed); }
-.kp-steps li.done { color: var(--text); }
 .kp-step-n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); font: 600 12px var(--font-mono); }
-.kp-steps li.now .kp-step-n { background: var(--status-disputed); color: var(--ground); }
 .kp-gone dd { color: var(--status-disputed); }
 .kp-also { margin: 0; font-size: 14px; }
 .kp-keep { margin: auto 0 0; font-size: 13px; color: var(--text-muted); }
@@ -218,28 +213,38 @@ html[data-motion='calm'] .sd-pulse .sd-line { animation: none; border-top-color:
 .kp-name code { display: block; margin-top: 8px; font: 500 24px/1.2 var(--font-mono); color: var(--text); word-break: break-word; }
 .kp-type { min-height: 52px; font: 18px var(--font-mono); }
 .kp-delete { min-height: 48px; font-size: 15px; }
-@media (max-width: 1100px) { .kp { overflow: auto; } .kp-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .kp { overflow: auto; } .kp-grid { grid-template-columns: 1fr; grid-template-rows: none; } }
 
 /* Keep › Access (features/security/access-screen.tsx): the people on the left, the ways in on the right. */
-.ax-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 340px); gap: 14px; }
+.ax-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 340px); grid-template-rows: minmax(0, 1fr); gap: 14px; }
 .ax-people { min-height: 0; overflow: auto; overscroll-behavior: contain; }
 .ax-people .lk-settings { grid-template-columns: minmax(0, 1fr) 320px; }
 .ax-side { min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
-.ax-doors { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.ax-door { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
-.ax-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--line); font-size: 17px; color: var(--text-muted); }
+.ax-doors { flex: 1 1 auto; list-style: none; margin: 0; padding: 0; display: grid; grid-auto-rows: minmax(64px, 1fr); gap: 10px; }
+.ax-door { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
+.ax-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--line); font-size: 19px; color: var(--text-muted); }
 .ax-shut .ax-mark { color: var(--accent-2); border-color: var(--accent-2); }
 .ax-open .ax-mark { color: var(--accent-1); border-color: var(--accent-1); }
 .ax-alert .ax-mark, .ax-alert .ax-word { color: var(--accent-1); }
 .ax-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.ax-word { font: 400 20px/1.15 var(--font-display); }
+.ax-word { font: 400 clamp(20px, 1.7vw, 26px)/1.15 var(--font-display); }
 .ax-go { font-size: 12.5px; color: var(--accent-2); text-decoration: none; white-space: nowrap; }
 .ax-go:hover { text-decoration: underline; }
 .ax-go:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .ax-alert { margin: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--accent-1); color: var(--accent-1); font-size: 13px; }
-.ax-setup { display: flex; flex-direction: column; gap: 8px; }
-.ax-house { margin-top: 6px; }
-@media (max-width: 1100px) { .ax-grid { grid-template-columns: 1fr; } }
+.ax-setup { display: flex; flex-direction: column; gap: 12px; }
+.ax-house { margin-top: 10px; }
+/* Keep › Access (sweep 30 Oct): the people's column runs the panel's height, the server's setup filling its foot with
+   bigger marks; the ways in share the right column's height. */
+.ax-people .lk-settings { min-height: 100%; align-items: stretch; }
+.ax-people .lk-stack { grid-template-rows: auto auto minmax(0, 1fr); }
+.ax-people .lk-settings > form { align-self: start; }
+.ax-setup .sec-marks { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); grid-auto-rows: minmax(44px, 60px); gap: 10px; }
+.ax-setup .sec-status { flex: 0 1 auto; }
+.ax-setup .sec-fact { min-width: 0; padding: 9px 18px; border-radius: 12px; }
+.ax-setup .sec-chip { font-size: 16px; }
+.ax-setup .sec-glyph { font-size: 16px; }
+@media (max-width: 1100px) { .ax-grid { grid-template-columns: 1fr; grid-template-rows: none; } .ax-doors { grid-auto-rows: auto; } }
 
 /* The server's setup as marks (features/security/security-panel.tsx), spaced, each value revealed on its mark; and the
    Settings › Security log pane: the events loaded with it, scrolling inside, the previews as small secondary actions. */
@@ -283,15 +288,40 @@ html[data-motion='calm'] .sd-pulse .sd-line { animation: none; border-top-color:
 .kp-n { font-size: 44px; }
 .kp-unit { font-size: 15px; }
 .kp-del .kp-tiles > div { min-width: 150px; padding: 18px 22px; }
-.kp-del .kp-tiles dd { font-size: 46px; }
 .kp-del .kp-tiles dt { font-size: 13px; }
-.kp-confirm-del { justify-content: center; gap: 18px !important; }
-.kp-confirm-del > .sd-eyebrow { position: absolute; }
-.kp-confirm-del { position: relative; padding-top: 44px; }
-.kp-confirm-del > .sd-eyebrow { top: 16px; left: 18px; }
-.kp-make .kp-holds { flex: 1 1 auto; min-height: 0; grid-auto-rows: minmax(120px, 1fr); align-content: stretch; }
-.kp-make .kp-holds li { align-content: center; }
-.kp-make .kp-n { font-size: clamp(44px, 4.4vw, 68px); }
-.kp-make .kp-act { margin-top: 0; }
-.kp-del .kp-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 560px; }
-.kp-make .kp-holds { grid-auto-rows: minmax(120px, 260px); align-content: start; }
+/* Keep › Delete (sweep 30 Oct): the four tiles across the panel's full width (the rows' figure the widest), the tables listed under them (biggest
+   first, scrolling inside); beside them the three steps fill the panel, each holding its own part. */
+.kp-del .kp-tiles { display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)); }
+.kp-del .kp-tiles dd { font-size: clamp(32px, 3vw, 46px); }
+.kp-del .kp-tiles > div { min-width: 0; }
+.kp-tables { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); align-content: start; gap: 2px 18px; }
+.kp-tables li { display: flex; align-items: baseline; gap: 10px; padding: 7px 2px; border-bottom: 1px solid color-mix(in srgb, var(--line) 30%, transparent); min-width: 0; }
+.kp-tables b { min-width: 3.5ch; font: 600 17px var(--font-mono); color: var(--status-disputed); text-align: right; }
+.kp-tables span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; color: var(--text-muted); }
+.kp-del .kp-keep { margin-top: 0; }
+.kp-vsteps { flex: 1 1 auto; list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; justify-content: space-evenly; gap: 18px; }
+.kp-vstep { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; align-items: start; color: var(--text-muted); }
+.kp-vstep:not(:last-child)::after { content: ''; position: absolute; left: 19px; top: 46px; bottom: -14px; width: 2px; background: color-mix(in srgb, var(--line) 50%, transparent); }
+.kp-vstep .kp-step-n { width: 40px; height: 40px; font-size: 16px; }
+.kp-vstep.now .kp-step-n { background: var(--status-disputed); color: var(--ground); }
+.kp-vstep.done .kp-step-n { color: var(--text); }
+.kp-vstep.now, .kp-vstep.done { color: var(--text); }
+.kp-vstep-body { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding-top: 6px; }
+.kp-vstep-body > b { font: 400 clamp(20px, 1.8vw, 26px)/1.15 var(--font-display); }
+.kp-vstep-sum { font: 500 15px var(--font-mono); color: var(--text-muted); }
+.kp-vstep .kp-name code { margin-top: 0; font-size: clamp(26px, 2.4vw, 34px); }
+.kp-vstep .kp-type { min-height: 60px; font-size: 22px; }
+.kp-vstep .kp-delete { min-height: 60px; font-size: 17px; }
+/* Keep › Backup & restore (sweep 30 Oct): what a backup holds, eight kinds in tiles sized to their number (no tile grows
+   to a screen's height for one figure), what stays out named under them, Download backup at the foot. */
+.kp-make .kp-holds { flex: 1 1 auto; min-height: 0; max-height: 440px; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(96px, 1fr); align-content: stretch; }
+.kp-make .kp-holds li { min-height: 0; padding: 14px 16px; align-content: center; }
+.kp-make .kp-holds .sd-mark { font-size: 20px; color: var(--accent-2); }
+.kp-make .kp-n { font-size: clamp(32px, 3.2vw, 54px); }
+.kp-make .kp-unit { font-size: 14px; }
+.kp-out { margin: 0; font-size: 14px; color: var(--text-muted); }
+.kp-out .sd-eyebrow { margin-right: 8px; }
+.kp-seal { align-self: center; }
+.kp-unsealed { color: var(--accent-1); }
+@media (max-width: 1300px) { .kp-make .kp-holds { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

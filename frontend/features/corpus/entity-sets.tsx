@@ -87,6 +87,8 @@ export function EntitySets({investigationId}: {investigationId: string}): ReactE
       <button type="button" className="wl-btn pri" onClick={() => void sendSet('list')} disabled={chosen.length === 0 || send.isPending}>Send the list ({chosen.length})</button>
     </div>}
     {sets.isError && <p className="muted">{errorMessage(sets.error, 'Could not load what was sent')}</p>}
+    {/* Nothing sent yet: what the box holds, in one quiet line. */}
+    {sets.data && sets.data.length === 0 && !listOpen && <p className="co-quiet">Diagrams, timelines and lists sent from this case: none yet.</p>}
     {(sets.data ?? []).length > 0 && <ul aria-label="Sent to OpenAleph" className="co-sets">
       {(sets.data ?? []).map(row => <li key={row.id}>
         {/* Its kind is its icon; the count and when it was sent are on hover. */}

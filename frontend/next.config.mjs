@@ -14,5 +14,10 @@ export default function nextConfig(phase) {
     // /review/ -> review/index.html, which any static file server resolves.
     trailingSlash: true,
     env: sameOrigin ? {NEXT_PUBLIC_API_URL: ''} : {},
+    // `next dev` only: Next 15.5's segment explorer wraps the page's segments in its own nodes, and on a page's first
+    // load the server's and the browser's trees differed by one of them, so every useId below (each Reveal's) differed
+    // and React reported a hydration mismatch (sweep 30 Oct, Keep › Access and Bring in › Search). Off, the trees match.
+    // The built app (output: 'export') never had it.
+    experimental: {devtoolSegmentExplorer: false},
   };
 }

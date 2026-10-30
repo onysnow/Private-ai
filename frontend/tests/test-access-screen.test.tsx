@@ -2,7 +2,7 @@
 // Keep › Access (30 Oct) and Settings › Security log, converted: who can reach the case (the people and their keys),
 // the ways in as big words with their detail revealed, the server's setup as spaced marks, the stray files as one quiet
 // action; and the log pane loading its events with the pane, the previews as small secondary actions.
-import {cleanup, render, screen} from '@testing-library/react';
+import {cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -66,6 +66,10 @@ describe('Keep › Access', () => {
     expect(screen.getByRole('link', {name: 'Connector keys ›'})).toHaveAttribute('href', '/settings#keys');
     // The people and their keys, as in Settings › People and access.
     expect(await screen.findByText('Who can reach 1MDB')).toBeInTheDocument();
+    // The server's setup sits in the people's column, under who decided what; the ways in have the right column alone.
+    const people = screen.getByRole('region', {name: 'People and access keys'});
+    expect(within(people).getByRole('list', {name: "This server's setup"})).toBeInTheDocument();
+    expect(within(screen.getByRole('complementary', {name: 'Ways in'})).queryByRole('list', {name: "This server's setup"})).toBeNull();
     // The stray files: one quiet action, the count after it.
     await userEvent.setup().click(screen.getByRole('button', {name: 'Look at stray files'}));
     expect(await screen.findByText('2 file(s) · 4 KB')).toBeInTheDocument();

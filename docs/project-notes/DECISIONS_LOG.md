@@ -1074,3 +1074,44 @@ A sweep of the 1MDB demo at 1440×900 found these screens saying too much, or cu
 - **Glossary: compact rows, the card never empty.** Rows are 34 px, not 46. With nothing pinned the card holds the
   first term shown (it is not written to the address, so it does not pin). The dot per area, which said nothing, is the
   area's short code (ML, BO, SF), up to three and "+n", each area's name on reveal; the safety area in its own colour.
+
+## 54. Keep and Bring in, after the visual check: cards filled, names whole on hover, the dev hydration mismatch (30 Oct 2026)
+
+A check of the running app at 1440×900 on the 1MDB demo found empty cards, cut names and a hydration mismatch on
+Keep (49) and Bring in (50). The calls:
+
+- **Backup & restore holds what a backup holds, by kind.** Eight tiles from the case's standing (the counts Search
+  shows): parties, links, claims, evidence, sources, dated events, open leads, documents, each sized to its number
+  (no tile grows to 260 px for one figure). The documents' size and place are on hover. What stays out (service keys,
+  security log) is one quiet line under them. Sealed or not is the status colour; "not sealed" and what it means are
+  on hover. It needs no action to use the app, so it is not an alert.
+- **"Records" were two different counts; each now says what it counts.** Backup's 496 was Safety & data's "case
+  records" (parties plus links). Delete's 4,526 is every database row the case owns, in every table (party facts,
+  evidence, joins, review history). Neither was wrong. Backup no longer shows a "records" figure (it counts by kind).
+  Delete's tile reads "database rows removed", and the tables are listed under the tiles, biggest first, with the
+  reporter's names for the ones a reporter knows (parties, links, facts about parties, link evidence).
+- **Delete: the three steps fill the panel beside what goes.** The step rail moved from the header into the confirm
+  panel as a vertical rail. Each step holds its own part: the count, the name and its box, the button. The step to do
+  now is in the alarm colour. "Preview ready…" is gone; a blocked deletion still says so. The four tiles span the
+  panel's width, the rows' tile the widest.
+- **Access: the server's setup moved under the people.** The right column ran off the screen and the left was empty
+  below the people. The setup marks are now a grid of tiles at the foot of the people's column. The five ways in share
+  the right column's height, each a bigger word. The grid's row is bounded, so a column scrolls inside itself and is
+  never cut off. "Network access is off" and "a person" keep their words; what they mean is on hover (also in
+  Settings › People and access).
+- **Connectors.** A party's name ends in an ellipsis, the whole name on hover. The list's grid column could grow past
+  the panel, so the ellipsis never showed. "Sent from this case" with nothing sent is one line ("nothing this week").
+  The room goes to the picked party: its note and the facts a lookup can match on (other names, jurisdiction,
+  registration, LEI, dates, address). A party with only a name says so in one line.
+- **OpenAleph corpus.** "In OpenAleph" with nothing sent says in one quiet line what it holds. "What stands out" with
+  nothing to list takes the rail's free height, its state ("OpenAleph off") big in the middle and the sentence on
+  hover. A watched name found nowhere is drawn bigger in the centre pane.
+- **Search.** No Recent card until there is a search; Try takes its width. The keys `?` moved to Try. A long name to
+  try ends in an ellipsis, the whole name on hover.
+- **The hydration mismatch came from `next dev`, not the screens.** React reported each Reveal's id differing between
+  the server and the browser. Decoding the two ids showed the server's tree had one extra two-child level above the
+  stage. That is Next 15.5's dev-only segment explorer, which wraps segments in its own nodes. The mismatch came on a
+  page's first load, not on every load. With `experimental.devtoolSegmentExplorer: false` in next.config.mjs, five
+  runs of the same pages (fifteen loads) showed none; with it on, the control runs showed it again. The built app
+  (`output: 'export'`) never had the explorer. Recent searches were already read from localStorage in an effect, so
+  they were not the cause.

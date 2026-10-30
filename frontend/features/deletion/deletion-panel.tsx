@@ -7,6 +7,9 @@
 // Converted 30 Oct (Keep › Delete): a deliberate step in the alarm colour (one of its two allowed places), its three
 // steps on a rail; what goes is counted when the screen opens, big, with the records by table revealed; the name is
 // typed in the panel beside it, and the button stays shut until it matches.
+// Sweep 30 Oct: the steps fill the panel beside what goes (each step holds its own part: the count, the name, the
+// button); what goes counts database rows (every row the case owns, in every table), so its tile says so, and the
+// tables are listed under the tiles, biggest first.
 import {useMutation} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
@@ -31,6 +34,11 @@ type Props = {
 /** Whether what was typed deletes the case: its name exactly, as the server checks it (spaces at either end aside). */
 export const confirmsDeletion = (typed: string, preview: InvestigationDeletionPreview): boolean =>
   typed.trim() !== '' && typed.trim() === preview.requires_confirmation.trim();
+
+/** A table's rows in words: the case's own names for the tables a reporter knows, the rest as their table name. */
+const TABLE_WORDS: Record<string, string> = {entities: 'parties', relationship_edges: 'links', statements: 'facts about parties', investigations: 'the case itself',
+  relationship_evidence_attachments: 'link evidence', relationship_evidence_review_events: 'link evidence reviews', claim_evidence_links: 'claim evidence'};
+export const tableWords = (table: string): string => TABLE_WORDS[table] ?? table.replace(/_/g, ' ');
 
 /** What happened to the investigation's OpenAleph casefile, as a sentence to
  * add to the status line (empty when it had none). */
@@ -59,7 +67,8 @@ export function DeletionPanel({investigationId, onDeleted, caseName = '', countO
     try {
       const value = await previewMutation.mutateAsync(investigationId);
       setPreview(value);
-      setStatus(value.can_delete ? 'Preview ready. Type the case’s name to enable deletion.' : 'Deletion is blocked by an unsafe document path.');
+      // Ready needs no sentence (the steps say it); a blocked deletion is an alert.
+      setStatus(value.can_delete ? '' : 'Deletion is blocked by an unsafe document path.');
     } catch (error) {
       setPreview(null);
       setStatus(errorMessage(error, 'Deletion preview failed'));
@@ -89,16 +98,14 @@ export function DeletionPanel({investigationId, onDeleted, caseName = '', countO
   const files = preview?.document_file_summary;
   const step = !preview ? 1 : !confirmsDeletion(confirmation, preview) ? 2 : 3;
   const name = preview?.investigation_name || caseName;
-  const Steps = <ol className="kp-steps" aria-label="Steps">
-    {['See what goes', 'Type its name', 'Delete'].map((w, i) => <li key={w} className={step > i + 1 ? 'done' : step === i + 1 ? 'now' : ''}
-      aria-current={step === i + 1 ? 'step' : undefined}><span className="kp-step-n" aria-hidden="true">{step > i + 1 ? '✓' : i + 1}</span>{w}</li>)}
-  </ol>;
+  const tables = preview ? Object.entries(preview.record_counts).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]) : [];
+  const stepClass = (n: number) => `kp-vstep${step > n ? ' done' : step === n ? ' now' : ''}`;
+  const stepMark = (n: number) => <span className="kp-step-n" aria-hidden="true">{step > n ? '✓' : n}</span>;
 
   return <div className="kp kp-del">
     <header className="sd-head">
       <h2 className="sd-title"><Reveal detail="Preview first. Shared document files are preserved; investigation-owned files and database records are removed together with rollback protection.">
         <span>Remove <em className="kp-alarm">{name || 'this case'}</em> from this computer</span></Reveal></h2>
-      {Steps}
     </header>
 
     <div className="kp-grid">
@@ -108,29 +115,44 @@ export function DeletionPanel({investigationId, onDeleted, caseName = '', countO
           <Button variant="outline" onClick={runPreview} disabled={!investigationId || previewMutation.isPending}>Preview deletion</Button>
         </div> : <>
           <p className="kp-big"><b>{preview.investigation_name}</b></p>
-          {/* What is removed, counted big; the records by table and the files' detail are revealed on their numbers. */}
+          {/* What is removed, counted big; the rows are every row the case owns in the database, listed by table below. */}
           <p className="st-sr">{preview.record_total} record(s) · {files!.delete} owned file(s) to delete · {files!.preserve_shared} shared file(s) preserved · {files!.already_missing} file(s) already missing</p>
           <dl className="sd-tiles kp-tiles" aria-hidden="true">
-            <div className="kp-gone"><dt><Reveal detail={Object.entries(preview.record_counts).filter(([, n]) => n).map(([t, n]) => `${t.replace(/_/g, ' ')} ${n}`).join(' · ') || 'none'}><span>records removed</span></Reveal></dt><dd>{preview.record_total.toLocaleString()}</dd></div>
+            <div className="kp-gone"><dt><Reveal detail="Every row this case owns in the database, in every table: its parties, links, claims and evidence, and the history and connections that join them. Listed by table below."><span>database rows removed</span></Reveal></dt><dd>{preview.record_total.toLocaleString()}</dd></div>
             <div className="kp-gone"><dt>files removed</dt><dd>{files!.delete}</dd></div>
             <div><dt><Reveal detail="Files another case also uses stay where they are."><span>shared files kept</span></Reveal></dt><dd>{files!.preserve_shared}</dd></div>
             <div><dt>already missing</dt><dd>{files!.already_missing}</dd></div>
           </dl>
+          {tables.length > 0 && <ul className="kp-tables" aria-label="Rows removed, by table">
+            {tables.map(([t, n]) => <li key={t} title={tableWords(t)}><b>{n.toLocaleString()}</b><span>{tableWords(t)}</span></li>)}
+          </ul>}
           {preview.openaleph_collection && <p className="kp-also">OpenAleph casefile “{preview.openaleph_collection.label}” is deleted too.</p>}
           {preview.unsafe_paths.map(x => <div key={x.document_id} className="kp-conflict"><small><b>Blocked:</b> {x.error}</small></div>)}
           <p className="kp-keep">Want a copy first? <a href="#backup-restore" className="sd-link">Back up this case</a></p>
         </>}
       </section>
 
+      {/* The three steps fill the panel, each holding its own part; the one to do now is in the alarm colour. */}
       <section className="sd-panel kp-confirm-del" aria-label="Delete this case">
         <p className="sd-eyebrow kp-alarm"><Reveal detail="Cannot be undone. The server asks for the same name, and still takes the ID from a script."><span>Type its name to delete</span></Reveal></p>
-        {preview?.can_delete ? <>
-          <p className="kp-name"><small>To delete, type the case’s name: <code>{preview.requires_confirmation}</code></small></p>
-          <Input className="kp-type" value={confirmation} onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmation(e.target.value)} placeholder="The case’s name"
-            aria-label="Type the case’s name to delete it" autoComplete="off" spellCheck={false}/>
-          <Button variant="destructive" className="kp-delete" onClick={runDelete} disabled={!confirmsDeletion(confirmation, preview)}>Permanently delete investigation</Button>
-        </> : <p className="sd-quiet">{preview ? 'Deletion is blocked until the unsafe document path is fixed.' : 'The name to type appears once what goes is counted.'}</p>}
-        {status && <p className="sd-quiet" role="status">{status}</p>}
+        <ol className="kp-vsteps" aria-label="Steps">
+          <li className={stepClass(1)} aria-current={step === 1 ? 'step' : undefined}>{stepMark(1)}
+            <div className="kp-vstep-body"><b>See what goes</b>
+              {preview && <span className="kp-vstep-sum">{preview.record_total.toLocaleString()} rows · {files!.delete} {files!.delete === 1 ? 'file' : 'files'}</span>}</div></li>
+          <li className={stepClass(2)} aria-current={step === 2 ? 'step' : undefined}>{stepMark(2)}
+            <div className="kp-vstep-body"><b>Type its name</b>
+              {preview?.can_delete ? <>
+                <p className="kp-name"><code>{preview.requires_confirmation}</code></p>
+                <Input className="kp-type" value={confirmation} onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmation(e.target.value)} placeholder="The case’s name"
+                  aria-label="Type the case’s name to delete it" autoComplete="off" spellCheck={false}/>
+              </> : <p className="sd-quiet">{preview ? 'Deletion is blocked until the unsafe document path is fixed.' : 'The name to type appears once what goes is counted.'}</p>}
+            </div></li>
+          <li className={stepClass(3)} aria-current={step === 3 ? 'step' : undefined}>{stepMark(3)}
+            <div className="kp-vstep-body"><b>Delete</b>
+              {preview?.can_delete && <Button variant="destructive" className="kp-delete" onClick={runDelete} disabled={!confirmsDeletion(confirmation, preview)}>Permanently delete investigation</Button>}
+            </div></li>
+        </ol>
+        {status && <p className={preview && !preview.can_delete ? 'kp-conflict' : 'sd-quiet'} role="status">{status}</p>}
       </section>
     </div>
   </div>;

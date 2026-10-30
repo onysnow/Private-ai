@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {ConnectorsPanel} from '../features/connectors/connectors-panel';
+import {ConnectorsPanel, PartyFacts} from '../features/connectors/connectors-panel';
 import {ReviewQueuePanel} from '../features/review-queue/review-queue-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -222,5 +222,28 @@ describe('ConnectorsPanel', () => {
     await waitFor(() => expect(useWorkbenchStore.getState().entityId).toBe('ent-7'));
     expect(screen.queryByText('Cross-provider candidates')).not.toBeInTheDocument();
     expect(screen.queryByText(/completed · aleph/)).not.toBeInTheDocument();
+  });
+
+  it('ends a long party name in an ellipsis with the whole name on hover, and shows the picked party\'s note and facts', async () => {
+    const long = entityFixture('ent-9', '1MDB ENERGY HOLDINGS SDN. BHD. (Malaysia 1020481-D, a subsidiary of the state fund)', 'Company', {
+      properties: {name: ['1MDB ENERGY HOLDINGS SDN. BHD.'], notes: ['Bought the Malaysian power plants.'], jurisdiction: ['my'],
+        registrationNumber: ['1020481-D'], alias: ['1MDB Energy', 'Edra']}});
+    await renderPanel({[ENTITIES]: [long, entityB]});
+    const name = screen.getAllByText(long.caption as string, {selector: '.cn-party-name'})[0];
+    expect(name.closest('.rv')).toHaveClass('cn-party-rv');
+    const facts = within(screen.getByRole('region', {name: 'What a lookup can match on'}));
+    expect(facts.getByText('Bought the Malaysian power plants.')).toBeInTheDocument();
+    expect(facts.getByText('Also').nextSibling).toHaveTextContent('1MDB Energy · Edra');
+    expect(facts.getByText('Registration').nextSibling).toHaveTextContent('1020481-D');
+    // Nothing sent this week is one quiet line, not a panel.
+    const sent = screen.getByRole('region', {name: 'Sent from this case'});
+    expect(sent).toHaveClass('none');
+    expect(within(sent).getByText('nothing this week')).toBeInTheDocument();
+    expect(within(sent).queryByRole('list')).toBeNull();
+  });
+
+  it('says a party with only a name is searched by it', () => {
+    wrap(<PartyFacts properties={{name: ['Jane Doe']}}/>);
+    expect(screen.getByText('Only its name: a lookup searches by that.')).toBeInTheDocument();
   });
 });

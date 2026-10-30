@@ -153,8 +153,10 @@ describe('Settings › Your safety and People and access', () => {
     const {QueryProvider} = await import('../lib/query-client');
     useLockStore.getState().set(OPEN as never);
     render(<QueryProvider><PeoplePane investigationId="inv-1" caseName="Kestrel harbour case" networkOn={false} onAccess={() => undefined}/></QueryProvider>);
-    expect(await screen.findByText('a person')).toBeInTheDocument();
-    expect(screen.getByText(/Network access is off/)).toBeInTheDocument();
+    // Why decisions read "a person", and what network access being off means, are revealed on them, not said at rest.
+    expect((await screen.findByText('a person')).closest('.rv')).toHaveAccessibleDescription('Decided before names were kept. They stay that way.');
+    expect(screen.queryByText(/before names were kept/, {selector: 'p'})).not.toBeInTheDocument();
+    expect(screen.getByText('Network access is off').closest('.rv')).toHaveAccessibleDescription(/Keys work only after you turn network access on/);
     await userEvent.type(screen.getByLabelText('Their name'), 'Jo Okafor');
     await userEvent.click(screen.getByRole('radio', {name: /Viewer/}));
     await userEvent.click(screen.getByRole('radio', {name: '90 days'}));

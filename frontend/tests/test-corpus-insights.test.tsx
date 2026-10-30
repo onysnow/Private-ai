@@ -63,6 +63,8 @@ describe('CorpusInsights', () => {
     wrap(<CorpusInsights investigationId="inv-1"/>);
     // The state is a short word; the sentence is on hover.
     expect(await screen.findByText('Nothing sent yet')).toBeInTheDocument();
+    // With nothing to list, the box takes the rail's free height and says why in big words.
+    expect(screen.getByRole('region', {name: 'What stands out in the corpus'})).toHaveClass('quiet');
     expect(screen.getByText('No document of this investigation has been sent to OpenAleph yet.').closest('[hidden]')).not.toBeNull();
   });
 

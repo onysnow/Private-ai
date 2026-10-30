@@ -52,13 +52,16 @@ export function CorpusInsights({investigationId}: {investigationId: string}): Re
   };
 
   const data = insights.data;
-  return <section className="co-box" aria-label="What stands out in the corpus">
+  // Nothing to list (OpenAleph off, nothing sent, or no names found): the box takes the rail's free height and says
+  // why in a few big words, the sentence on hover (sweep 30 Oct: the rail was empty below three small boxes).
+  const quiet = Boolean(data && (data.state !== 'ok' || data.groups.length === 0));
+  return <section className={`co-box co-stands${quiet ? ' quiet' : ''}`} aria-label="What stands out in the corpus">
     <h4 className="co-cap"><Reveal detail="The names OpenAleph's analysis found most often across this investigation's documents, and what they are mentioned alongside.">
-      <span>What stands out</span></Reveal>
-      {data && data.state !== 'ok' && <Reveal className="co-cap-r" detail={data.detail}><span className="co-state">{STATE_WORD[data.state] ?? data.state}</span></Reveal>}</h4>
+      <span>What stands out</span></Reveal></h4>
+    {data && data.state !== 'ok' && <Reveal className="co-big-state" detail={data.detail}><span className="co-state">{STATE_WORD[data.state] ?? data.state}</span></Reveal>}
     {insights.isPending && <p className="co-quiet">Asking OpenAleph…</p>}
     {insights.isError && <p className="co-alert">{errorMessage(insights.error, 'Could not load what stands out')}</p>}
-    {data?.state === 'ok' && data.groups.length === 0 && <p className="co-quiet">OpenAleph has not found names in these documents yet.</p>}
+    {data?.state === 'ok' && data.groups.length === 0 && <p className="co-big-state co-quiet">OpenAleph has not found names in these documents yet.</p>}
     {data?.groups.map(group => <div key={group.kind} className="co-group">
       <h5 className="co-sub">{group.label}</h5>
       <ul aria-label={group.label} className="co-terms">

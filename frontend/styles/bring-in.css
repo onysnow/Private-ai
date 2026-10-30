@@ -13,11 +13,13 @@
 .cn-find:focus-within { border-color: var(--accent-1); }
 .cn-find input { all: unset; flex: 1; min-width: 0; color: var(--text); font-size: 14px; }
 .cn-find input::placeholder { color: var(--text-muted); }
-.cn-parties { flex: 1 1 auto; min-height: 120px; overflow-y: auto; overscroll-behavior: contain; margin: 0 -4px; display: grid; gap: 2px; align-content: start; }
+.cn-parties { flex: 1 1 auto; min-height: 120px; overflow-y: auto; overscroll-behavior: contain; margin: 0 -4px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; align-content: start; }
 .cn-party { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; cursor: pointer; font-size: 14px; }
 .cn-party:hover { background: color-mix(in srgb, var(--surface-2) 60%, transparent); }
 .cn-party.on { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent-1); }
-.cn-party-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cn-party { min-width: 0; }
+.rv.cn-party-rv { flex: 1 1 auto; min-width: 0; display: block; overflow: hidden; }
+.cn-party-name { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cn-quiet, .cn-left .muted, .cn-right .muted { color: var(--text-muted); }
 .cn-quiet { margin: 6px 8px; font-size: 13px; }
 .cn-out { all: unset; box-sizing: border-box; cursor: pointer; flex: none; width: 100%; display: flex; align-items: center; gap: 8px; padding: 10px 12px;
@@ -54,7 +56,18 @@
 .cn-mode.automatic { color: var(--accent-2); } .cn-mode.off { color: var(--status-disputed); }
 .cn-card-body { display: flex; align-items: center; }
 .cn-card-body:empty { display: none; }
-.cn-sent { flex: 1 1 auto; min-height: 120px; display: flex; flex-direction: column; }
+.cn-sent { flex: 0 1 auto; min-height: 0; max-height: 40%; display: flex; flex-direction: column; }
+.cn-sent.none .cn-cap { margin: 0; }
+.cn-sent-none { margin-left: 10px; font: 400 12.5px var(--font-ui); letter-spacing: 0; text-transform: none; color: var(--text-muted); }
+/* The picked party's facts fill the room the sent list does not take (sweep 30 Oct). */
+.cn-facts { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 14px; }
+.cn-facts > .cn-cap { margin: 0; }
+.cn-note { margin: 0; max-width: 70ch; font: 400 clamp(17px, 1.4vw, 21px)/1.5 var(--font-read); color: var(--text); }
+.cn-facts-grid { margin: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px 22px; align-content: start; }
+.cn-facts-grid > div { min-width: 0; padding: 10px 14px; border-radius: 10px; background: var(--surface-2); }
+.cn-facts-grid dt { font: 500 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.cn-facts-grid dd { margin: 4px 0 0; font: 400 clamp(16px, 1.3vw, 19px)/1.3 var(--font-display); overflow-wrap: anywhere; }
+.cn-facts > .cn-quiet { margin: 0; font: 400 clamp(16px, 1.3vw, 19px) var(--font-display); }
 .cn-sent-n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-left: 8px; padding: 0 6px; border-radius: 10px; background: color-mix(in srgb, var(--accent-1) 22%, transparent); letter-spacing: 0; }
 .cn-sent-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; min-height: 0; display: grid; gap: 2px; align-content: start; }
 .cn-sent-list li { display: flex; align-items: baseline; gap: 12px; padding: 8px 4px; border-bottom: 1px solid color-mix(in srgb, var(--line) 25%, transparent); }
@@ -108,6 +121,11 @@
 .co-box { padding: 14px 16px; border-radius: 14px; background: var(--surface-1); border: 1px solid color-mix(in srgb, var(--line) 45%, transparent); }
 .co-cap { margin: 0 0 10px; display: flex; align-items: center; gap: 8px; font: 500 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-1); }
 .co-cap-r { margin-left: auto; }
+/* What stands out, with nothing to list: it takes the rail's free height, its state big in the middle (sweep 30 Oct). */
+.co-box.co-stands.quiet { flex: 1 1 auto; min-height: 140px; display: flex; flex-direction: column; }
+.rv.co-big-state, .co-stands .co-big-state { flex: 1 1 auto; display: grid; place-items: center; text-align: center; margin: 0; }
+.co-big-state .co-state { font: 400 clamp(20px, 1.8vw, 28px)/1.2 var(--font-display); letter-spacing: 0; text-transform: none; color: var(--text-muted); }
+p.co-big-state { font: 400 clamp(16px, 1.4vw, 20px)/1.35 var(--font-display); }
 .co-state { letter-spacing: .06em; color: var(--text-muted); }
 .co-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: color-mix(in srgb, var(--accent-1) 22%, transparent); letter-spacing: 0; }
 .co-quiet { margin: 0; font-size: 13px; color: var(--text-muted); }
@@ -153,11 +171,12 @@
 .sv-b-col { min-height: 0; display: flex; flex-direction: column; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--surface-3); }
 .sv-b-cap { margin: 0 0 8px; display: flex; align-items: center; font: 500 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-1); }
 .sv-b-keys { margin-left: auto; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--line); color: var(--text-muted); letter-spacing: 0; }
-.sv-b-list { list-style: none; margin: 0 -6px; padding: 0; overflow-y: auto; min-height: 0; display: grid; gap: 2px; align-content: start; }
+.sv-b-list { list-style: none; margin: 0 -6px; padding: 0; overflow-y: auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; align-content: start; }
+.sv-b-list li { min-width: 0; }
+.sv-before.no-recent { grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr); }
 .sv-b-list .rv { display: block; }
 .sv-b-list button { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 8px; border-radius: 8px; font-size: 15px; color: var(--text); }
 .sv-b-list button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sv-b-list button:hover { background: var(--surface-3); }
-@media (max-width: 1000px) { .sv-before { grid-template-columns: minmax(0, 1fr); } }
-.cn-sent > .cn-quiet { flex: 1 1 auto; display: grid; place-items: center; margin: 0; font: 400 clamp(17px, 1.5vw, 22px) var(--font-display); color: var(--text-muted); }
+@media (max-width: 1000px) { .sv-before, .sv-before.no-recent { grid-template-columns: minmax(0, 1fr); } }
 .sv-b-col > .sv-muted { flex: 1 1 auto; display: grid; place-items: center; margin: 0; font: 400 clamp(17px, 1.5vw, 22px) var(--font-display); }
