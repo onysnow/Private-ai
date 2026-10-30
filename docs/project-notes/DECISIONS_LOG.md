@@ -376,3 +376,16 @@ The 1MDB demo now has one deck, made by the app's own "New deck from the story" 
 - Over-long lines are one check ("4 lines over 7 words") with one fix, "Move the rest of each to notes".
 The builder puts each claim's full text on a bullet, so most section slides fail the 7-words check; that is the
 builder's own output, left as it is.
+
+## 22. Court filings' margin line numbers are not read as text (30 Oct 2026)
+
+US court filings carry a column of line numbers 1–28 down the left margin. The reader already had a rule for such
+runs, but it first dropped a top line matching the page number, which on page 1 is the margin's own "1", so the run
+started at "2" and was missed: page 1 of every filing began with "2 3 4 … 25". Calls:
+- Margin numbers are found by position (PyMuPDF word coordinates): a lone number 1–40, left of every other word and
+  in the left 11% of the page, at least five on the page, increasing down it. The text-only run rule stays as the
+  fallback, and the page-number line is looked for only after the margin is gone.
+- OCR text goes through the same furniture stripping.
+- No re-read of documents already read: their passages stay until they are read again. Saved quotes are re-anchored
+  on every read (ADR-0015), and one that cannot be found keeps its anchor marked lost, for a person to check.
+- The demo complaint was re-read with a one-off script; its 78 saved quotes stayed exactly where they were.

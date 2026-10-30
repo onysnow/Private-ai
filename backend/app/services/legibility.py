@@ -53,7 +53,12 @@ def scanned_pages(path: str, min_native_chars: int = 20) -> list[int]:
     import fitz
 
     from app.services.image_reader import IMAGE_EXTENSIONS
-    from app.services.pdf_ocr import _clean, _scan_with_stamp, strip_page_furniture
+    from app.services.pdf_ocr import (
+        _clean,
+        _scan_with_stamp,
+        margin_line_numbers,
+        strip_page_furniture,
+    )
 
     suffix = Path(path).suffix.lower()
     if suffix in IMAGE_EXTENSIONS:
@@ -63,7 +68,7 @@ def scanned_pages(path: str, min_native_chars: int = 20) -> list[int]:
     out: list[int] = []
     with fitz.open(path) as doc:
         for number, page in enumerate(doc, 1):
-            native = _clean(strip_page_furniture(page.get_text("text") or "", number))
+            native = _clean(strip_page_furniture(page.get_text("text") or "", number, margin_line_numbers(page)))
             if len(native) < min_native_chars or _scan_with_stamp(page, native):
                 out.append(number)
     return out
