@@ -189,11 +189,17 @@ def lanes(db: Session, investigation_id: str) -> dict[str, Any]:
     }
 
 
+# Fewer dated Story claims than this, and Replay walks the dated events instead (a single step is not a replay).
+STORY_STEPS_AT_LEAST = 2
+
+
 def replay_steps(db: Session, investigation_id: str, events: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], str, int]:
     """Replay's steps (mockup TIME_4): the Story's claims in the order things happened, each with the events that date
     it (the events that point at the claim, or at a passage linked to it). Nothing is generated: a step's words are the
     claim's own. A claim nothing dates is left out and counted. With no Story yet, each dated event is a step. Returns
-    the steps, where they come from ("story" or "events"), and how many claims had no date."""
+    the steps, where they come from ("story" or "events"), and how many claims had no date. A Story with fewer than
+    STORY_STEPS_AT_LEAST dated claims is too thin to walk: the dated events are the steps then, and the count of the
+    Story's undated claims still comes back, so the screen can say why."""
     dated = [e for e in events if e.get("date_start") and not e.get("placeholder")]
     story = db.scalar(select(Story).where(Story.investigation_id == investigation_id))
     placed: list[Claim] = []
@@ -206,10 +212,11 @@ def replay_steps(db: Session, investigation_id: str, events: list[dict[str, Any]
             if claim is not None and claim.id not in seen:
                 seen.add(claim.id)
                 placed.append(claim)
+    by_event = [{"key": e["id"], "title": e["title"], "claim_id": None, "claim_status": None, "event_ids": [e["id"]],
+                 "date_start": e["date_start"], "date_end": e.get("date_end"), "precision": e["precision"],
+                 "unresolved": e["fact"] != "shown"} for e in dated]
     if not placed:
-        return ([{"key": e["id"], "title": e["title"], "claim_id": None, "claim_status": None, "event_ids": [e["id"]],
-                  "date_start": e["date_start"], "date_end": e.get("date_end"), "precision": e["precision"],
-                  "unresolved": e["fact"] != "shown"} for e in dated], "events", 0)
+        return by_event, "events", 0
     links: dict[str, set[str]] = {}
     for link in db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id.in_([c.id for c in placed]))):
         links.setdefault(link.claim_id, set()).add(link.evidence_id)
@@ -229,6 +236,8 @@ def replay_steps(db: Session, investigation_id: str, events: list[dict[str, Any]
                       "precision": mine[0]["precision"],
                       "unresolved": claim.status not in ("supported", "confirmed") or any(e["fact"] != "shown" for e in mine)})
     steps.sort(key=lambda st: (sequence_rules._span({"date_start": st["date_start"]})[0], st["title"]))
+    if len(steps) < STORY_STEPS_AT_LEAST and len(by_event) > len(steps):
+        return by_event, "events", undated
     return steps, "story", undated
 
 

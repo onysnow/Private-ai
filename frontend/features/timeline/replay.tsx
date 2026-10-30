@@ -139,8 +139,12 @@ export function TimelineReplay({view, onShowInLanes}: Props): ReactElement {
           </button></li>)}
         {fold.late > 0 && !showLate && foldRow('late')}
       </ol>
-      {view.steps_undated > 0 && <p className="tl2-none"><Reveal detail={`${view.steps_undated === 1 ? 'A claim' : 'Claims'} in the Story with nothing that dates ${view.steps_undated === 1 ? 'it' : 'them'}: not a step.`}>
-        <span>{view.steps_undated} undated</span></Reveal></p>}
+      {view.steps_undated > 0 && (view.steps_from === 'story'
+        ? <p className="tl2-none"><Reveal detail={`${view.steps_undated === 1 ? 'A claim' : 'Claims'} in the Story with nothing that dates ${view.steps_undated === 1 ? 'it' : 'them'}: not a step.`}>
+          <span>{view.steps_undated} undated</span></Reveal></p>
+        // The Story is too thin to walk (at most one dated claim): the dated events are the steps, and this says why.
+        : <p className="tl2-none" data-testid="replay-thin-story"><Reveal detail={`${view.steps_undated} of the Story's claims have no dated event, so they cannot be put in order. Date them (Lanes, N, with the claim) and Replay walks the Story.`}>
+          <span>The record&apos;s events · the Story has {view.steps_undated} undated {view.steps_undated === 1 ? 'claim' : 'claims'}</span></Reveal></p>)}
     </aside>
 
     <section className="rp-stage" onWheel={onWheel} aria-live="polite">
@@ -197,6 +201,7 @@ export function TimelineReplay({view, onShowInLanes}: Props): ReactElement {
           locator: typeof shownCard.provenance.locator === 'string' ? shownCard.provenance.locator : undefined, detail: shownCard.description || shownCard.date_start})}>Open the source</button>}
       </div>
       <p className="tl2-none"><Reveal label="Where the steps come from" detail={view.steps_from === 'story' ? 'The steps are the Story’s claims in date order. Nothing here is generated; each step’s words are the claim’s own.'
+        : view.steps_undated > 0 ? 'The Story has too few dated claims to walk, so each dated event is a step. Once its claims are dated, the steps are those claims, in their own words.'
         : 'No Story yet, so each dated event is a step. Once claims are placed in the Story (Act › Story), the steps are those claims, in their own words.'}><span className="tl2-q" aria-hidden="true">ⓘ</span></Reveal></p>
     </aside>
   </div>;

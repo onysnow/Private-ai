@@ -143,6 +143,21 @@ def test_replay_steps_are_the_story_claims_in_the_order_things_happened():
     assert len(view["steps"][0]["event_ids"]) == 2
 
 
+def test_a_story_with_one_dated_claim_replays_the_dated_events_and_says_how_many_claims_had_no_date():
+    inv = _inv("Thin story")
+    dated = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "The deposit went across"}))["id"]
+    undated = ok(client.post("/api/claims", json={"investigation_id": inv, "text": "Nothing dates this"}))["id"]
+    story = ok(client.post(f"/api/investigations/{inv}/story/sections", json={"title": "The money"}))
+    for claim in (dated, undated):
+        ok(client.post(f"/api/investigations/{inv}/story/sections/{story['sections'][0]['id']}/claims", json={"claim_id": claim}))
+    _event(inv, "Deposit email", "2019-05", precision="month", claim_id=dated)
+    _event(inv, "Tender opens", "2019-01-15")
+    _event(inv, "Sale signed", "2019-10-02")
+    view = _lanes(inv)
+    assert view["steps_from"] == "events" and view["steps_undated"] == 1
+    assert [s["title"] for s in view["steps"]] == ["Tender opens", "Deposit email", "Sale signed"]
+
+
 def test_a_built_timeline_is_the_owners_order_of_this_cases_events():
     inv = _inv("Built")
     a = _event(inv, "Council opens the tender", "2019-01-15")

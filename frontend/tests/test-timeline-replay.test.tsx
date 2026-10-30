@@ -34,6 +34,15 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
+describe('Replay when the Story is too thin to walk', () => {
+  it('walks the record and says how many Story claims have no date', async () => {
+    mockApi({[LANES]: lanesBody('inv-1', events, {steps_undated: 12})});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    await userEvent.setup().click(await screen.findByRole('tab', {name: 'Replay'}));
+    expect(screen.getByTestId('replay-thin-story')).toHaveTextContent("The record's events · the Story has 12 undated claims");
+  });
+});
+
 describe('Replay in a case with far-off steps', () => {
   const wide = [ev('old', 'A bank is incorporated', '1952-11-10'), ...events, ev('x', 'Kestrel SA sells on', '2019-12-01')];
   it('folds the steps far before the busy stretch and opens on its first step', async () => {
