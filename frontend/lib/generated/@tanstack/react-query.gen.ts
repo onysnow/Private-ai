@@ -195,6 +195,7 @@ import {
   getPartyYears,
   getPhoto,
   getPlatformChecks,
+  getPreDecided,
   getRecordMarks,
   getRecordProvenanceTrace,
   getRedaction,
@@ -408,6 +409,7 @@ import {
   turnOff,
   turnOn,
   undoItem,
+  undoPreDecided,
   unlock,
   unlockPin,
   unsupersedeClaimEvidenceEndpoint,
@@ -986,6 +988,9 @@ import type {
   GetPlatformChecksData,
   GetPlatformChecksError,
   GetPlatformChecksResponse,
+  GetPreDecidedData,
+  GetPreDecidedError,
+  GetPreDecidedResponse,
   GetRecordMarksData,
   GetRecordMarksError,
   GetRecordMarksResponse,
@@ -1620,6 +1625,9 @@ import type {
   UndoItemData,
   UndoItemError,
   UndoItemResponse,
+  UndoPreDecidedData,
+  UndoPreDecidedError,
+  UndoPreDecidedResponse,
   UnlockData,
   UnlockError,
   UnlockPinData,
@@ -3977,6 +3985,63 @@ export const loadDemoCaseMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await loadDemoCase({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getPreDecidedQueryKey = (options: Options<GetPreDecidedData>) =>
+  createQueryKey('getPreDecided', options);
+
+/**
+ * Get Pre Decided
+ *
+ * The decisions the demo case made for itself ("Demo (pre-decided)"), by kind and outcome.
+ */
+export const getPreDecidedOptions = (options: Options<GetPreDecidedData>) =>
+  queryOptions<
+    GetPreDecidedResponse,
+    GetPreDecidedError,
+    GetPreDecidedResponse,
+    ReturnType<typeof getPreDecidedQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPreDecided({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPreDecidedQueryKey(options),
+  });
+
+/**
+ * Undo Pre Decided
+ *
+ * Undo the demo case's own decisions (all, one kind, or one item): each goes back to waiting in Decide.
+ * A person's decisions are never touched.
+ */
+export const undoPreDecidedMutation = (
+  options?: Partial<Options<UndoPreDecidedData>>,
+): UseMutationOptions<
+  UndoPreDecidedResponse,
+  UndoPreDecidedError,
+  Options<UndoPreDecidedData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UndoPreDecidedResponse,
+    UndoPreDecidedError,
+    Options<UndoPreDecidedData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await undoPreDecided({
         ...options,
         ...fnOptions,
         throwOnError: true,

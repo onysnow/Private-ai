@@ -48,3 +48,6 @@ class WatchlistHit(Base):
     lead_id: Mapped[str | None] = mapped_column(ForeignKey("leads.id"), nullable=True)
     found_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
     decided_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # Who decided it, as signed in when they did (app/db/decided_by.py); None while new, or before this was kept.
+    decided_by_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    decided_by_name: Mapped[str | None] = mapped_column(String(255), nullable=True)

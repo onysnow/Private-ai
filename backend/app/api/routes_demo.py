@@ -22,8 +22,9 @@ from app.jobs.handlers import EXTRACT_DOCUMENT
 from app.jobs.records import create_job, execute_job
 from app.jobs.runner import job_runner
 from app.models.domain import Investigation
-from app.schemas.responses import DemoCaseOut, DemoCaseProgressOut
-from app.services import demo_1mdb, demo_cases
+from app.schemas.api import DemoPreDecidedUndo
+from app.schemas.responses import DemoCaseOut, DemoCaseProgressOut, DemoPreDecidedOut
+from app.services import demo_1mdb, demo_cases, demo_decided
 from app.services.security import resolve_storage_root
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -186,3 +187,26 @@ async def load_demo_case(case_id: DemoCaseId, request: Request, db: Session = De
         await _read_in_background(request, db, inv.id, document_ids)
         demo_cases.set_state(case_id, state="idle")
         return demo_cases.progress(db, case_id)
+
+
+def _demo_case(db: Session, investigation_id: str) -> Investigation:
+    inv = db.get(Investigation, investigation_id)
+    if inv is None or not inv.is_demo:
+        raise HTTPException(404, "No demo case with this id")
+    return inv
+
+
+@router.get("/demo/pre-decided/{investigation_id}", response_model=DemoPreDecidedOut)
+def get_pre_decided(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    """The decisions the demo case made for itself ("Demo (pre-decided)"), by kind and outcome."""
+    _demo_case(db, investigation_id)
+    return demo_decided.summary(db, investigation_id)
+
+
+@router.post("/demo/pre-decided/{investigation_id}/undo", response_model=DemoPreDecidedOut)
+def undo_pre_decided(investigation_id: str, body: DemoPreDecidedUndo, db: Session = Depends(get_db)) -> Any:
+    """Undo the demo case's own decisions (all, one kind, or one item): each goes back to waiting in Decide.
+    A person's decisions are never touched."""
+    _demo_case(db, investigation_id)
+    undone = demo_decided.undo(db, investigation_id, body.kind, body.id)
+    return {**demo_decided.summary(db, investigation_id), "undone": undone}

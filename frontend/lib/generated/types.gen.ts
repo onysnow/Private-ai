@@ -8219,6 +8219,51 @@ export type DemoCaseProgressOut = {
 };
 
 /**
+ * DemoPreDecidedOut
+ *
+ * The decisions a demo case made for itself (app/services/demo_decided.py), by kind
+ * (proposal, check, watchlist) and by what each became; ``undone`` after an undo.
+ */
+export type DemoPreDecidedOut = {
+  /**
+   * Counts
+   */
+  counts: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  };
+  /**
+   * Decided By
+   */
+  decided_by: string;
+  /**
+   * Investigation Id
+   */
+  investigation_id: string;
+  /**
+   * Undone
+   */
+  undone?: number | null;
+};
+
+/**
+ * DemoPreDecidedUndo
+ *
+ * Which of a demo case's own decisions to undo (app/services/demo_decided.py): all of them, one kind, or one item.
+ */
+export type DemoPreDecidedUndo = {
+  /**
+   * Id
+   */
+  id?: string | null;
+  /**
+   * Kind
+   */
+  kind?: 'proposal' | 'check' | 'watchlist' | null;
+};
+
+/**
  * DemoSeedOut
  */
 export type DemoSeedOut = {
@@ -14648,6 +14693,14 @@ export type MissingValueOut = {
    * Decided At
    */
   decided_at: string | null;
+  /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
   /**
    * First Seen At
    *
@@ -23064,6 +23117,14 @@ export type ToCheckItemOut = {
    * Decided At
    */
   decided_at: string | null;
+  /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
   document: CheckDocumentOut | null;
   /**
    * Excerpt
@@ -24307,6 +24368,14 @@ export type WatchlistEntryOut = {
  * A document a watched name was found in (app/services/watchlists.py).
  */
 export type WatchlistHitOut = {
+  /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
   /**
    * Document Id
    */
@@ -27845,6 +27914,77 @@ export type LoadDemoCaseResponses = {
 
 export type LoadDemoCaseResponse =
   LoadDemoCaseResponses[keyof LoadDemoCaseResponses];
+
+export type GetPreDecidedData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/demo/pre-decided/{investigation_id}';
+};
+
+export type GetPreDecidedErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetPreDecidedError = GetPreDecidedErrors[keyof GetPreDecidedErrors];
+
+export type GetPreDecidedResponses = {
+  /**
+   * Successful Response
+   */
+  200: DemoPreDecidedOut;
+};
+
+export type GetPreDecidedResponse =
+  GetPreDecidedResponses[keyof GetPreDecidedResponses];
+
+export type UndoPreDecidedData = {
+  body: DemoPreDecidedUndo;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/demo/pre-decided/{investigation_id}/undo';
+};
+
+export type UndoPreDecidedErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UndoPreDecidedError =
+  UndoPreDecidedErrors[keyof UndoPreDecidedErrors];
+
+export type UndoPreDecidedResponses = {
+  /**
+   * Successful Response
+   */
+  200: DemoPreDecidedOut;
+};
+
+export type UndoPreDecidedResponse =
+  UndoPreDecidedResponses[keyof UndoPreDecidedResponses];
 
 export type SeedDemoData = {
   body?: never;

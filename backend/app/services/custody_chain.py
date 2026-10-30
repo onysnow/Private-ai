@@ -111,6 +111,13 @@ def _person(name: str | None) -> str:
     return name or "a person"
 
 
+def _decider_actor(candidate: dict[str, Any]) -> str:
+    """Who accepted a proposal: a person, or the demo case's own pre-made decision (app/services/demo_decided.py)."""
+    from app.db.decided_by import DEMO_DECIDER_ID
+
+    return "app" if candidate.get("decided_by_id") == DEMO_DECIDER_ID else "person"
+
+
 def _anchor(db: Session, ev: Evidence, doc: Document | None) -> tuple[dict[str, Any] | None, str | None]:
     """The quote's anchor as found now, with what happened to the stored one (app/services/anchor_text.py)."""
     if doc is None or not ev.quote:
@@ -209,7 +216,7 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
                           "lines": [f"{proposer} · {candidate.get('candidate_type')}{f' · {conf:.2f}' if isinstance(conf, (int, float)) else ''}",
                                     f"accepted by {_person(candidate.get('decided_by_name'))}" if accepted else "not yet decided"],
                           "who": _person(candidate.get("decided_by_name")) if accepted else proposer,
-                          "actor": "person" if accepted else _proposer_actor(candidate.get("payload")),
+                          "actor": _decider_actor(candidate) if accepted else _proposer_actor(candidate.get("payload")),
                           "when": candidate.get("reviewed_at") or candidate.get("created_at"),
                           "checks": [{"label": "accepted", "ok": accepted}],
                           "wire": {"style": "against" if against else ("confirmed" if accepted else "proposed"),
@@ -217,7 +224,7 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             log.append({"when": candidate.get("created_at"), "who": proposer, "actor": _proposer_actor(candidate.get("payload")),
                         "what": f"Proposed this {candidate.get('candidate_type')}{f' ({conf:.2f})' if isinstance(conf, (int, float)) else ''}", "card": f"decision:{ev.id}"})
             if accepted and candidate.get("reviewed_at"):
-                log.append({"when": candidate["reviewed_at"], "who": _person(candidate.get("decided_by_name")), "actor": "person",
+                log.append({"when": candidate["reviewed_at"], "who": _person(candidate.get("decided_by_name")), "actor": _decider_actor(candidate),
                             "what": "Accepted the proposal", "card": f"decision:{ev.id}"})
         else:
             cards.append({"id": f"decision:{ev.id}", "kind": "decision", "title": "Answered" if against and link.note else "Quote saved",
