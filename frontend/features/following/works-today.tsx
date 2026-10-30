@@ -15,6 +15,7 @@ import {errorMessage} from '../../lib/api-client';
 import {getPlatformChecksOptions, getPlatformChecksQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {changePlatformChecks, runPlatformChecks} from '../../lib/generated/sdk.gen';
 import type {PlatformOut} from '../../lib/generated/types.gen';
+import {timeDayWords, timeWords} from '../../lib/timestamps';
 
 const WORD = {works: '✓ works', partly: '◐ partly', broken: '✕ broken'} as const;
 const GLYPH = {works: '✓', partly: '◐', broken: '✕'} as const;
@@ -23,7 +24,6 @@ const DAY_WORD = {works: 'saved as expected', partly: 'saved, with something mis
 const MONO: Record<string, string> = {youtube: 'YT', instagram: 'IG', x: 'X', tiktok: 'TT', facebook: 'FB', telegram: 'TG', bluesky: 'BS',
   mastodon: 'MA', vimeo: 'VM', soundcloud: 'SC'};
 const mono = (p: PlatformOut) => MONO[p.key] ?? p.name.slice(0, 2).toUpperCase();
-const short = (iso?: string | null) => (iso ? iso.slice(0, 16).replace('T', ' ') : '');
 const daysSince = (iso: string) => Math.max(1, Math.round((Date.now() - Date.parse(`${iso}Z`)) / 86_400_000));
 
 export function WorksToday(): ReactElement {
@@ -58,7 +58,7 @@ export function WorksToday(): ReactElement {
       {!never && <button type="button" className="fl-btn" onClick={() => void run()}>Check all now</button>}</header>
     <section className="fl-panel wt-list" aria-label="Platforms">
       {/* The day squares' key, and when it was last checked, are on hover of the count; whether the daily check is on shows. */}
-      <p className="fl-cap"><Reveal detail={<><span className="rv-row">{data.last_checked_at ? `Last checked ${short(data.last_checked_at)} UTC` : 'Not checked yet'}{data.daily ? ' · next within a day' : ''}</span>
+      <p className="fl-cap"><Reveal detail={<><span className="rv-row">{data.last_checked_at ? `Last checked ${timeWords(data.last_checked_at)}` : 'Not checked yet'}{data.daily ? ' · next within a day' : ''}</span>
         <span className="rv-row wt-key"><span><i className="works"/>saved as expected</span><span><i className="partly"/>saved, with something missing</span><span><i className="broken"/>not saved</span><span><i className="none"/>not checked</span></span></>}>
         {platforms.length} platforms · {never ? 'not checked yet' : `${data.working} work today`}</Reveal><span className="r">{data.daily ? '' : 'the daily check is off'}</span></p>
       <div className="wt-row wt-head" aria-hidden="true"><span>Platform</span><span>Today</span><span>Last 14 days</span><span>What is saved from it</span></div>
@@ -82,7 +82,7 @@ export function WorksToday(): ReactElement {
         <div className="wt-acts"><button type="button" className="fl-btn pri" onClick={() => void run()}>Check all now</button></div>
       </section>}
       {selected && <section className={`fl-panel${selected.state === 'broken' ? ' wt-hot' : ''}`} aria-label={`${selected.name} in detail`}>
-        <p className="fl-cap">{selected.name}{selected.state === 'broken' && selected.broken_since ? ` · broken since ${short(selected.broken_since).slice(0, 10)}` : ''}
+        <p className="fl-cap">{selected.name}{selected.state === 'broken' && selected.broken_since ? ` · broken since ${timeDayWords(selected.broken_since)}` : ''}
           <span className="r">{selected.state === 'broken' && selected.broken_since ? `${daysSince(selected.broken_since)} day${daysSince(selected.broken_since) === 1 ? '' : 's'}` : ''}</span></p>
         <h3 className="fl-h3">{selected.state ? selected.detail : 'Not tried yet.'}</h3>
         <dl className="wt-kv">

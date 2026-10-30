@@ -10,6 +10,7 @@ import {HelpRow} from '../settings/settings-index';
 import {errorMessage} from '../../lib/api-client';
 import {lockNow, useLockStore} from '../../lib/app-lock';
 import type {LockStateOut} from '../../lib/generated/types.gen';
+import {timeDayWords} from '../../lib/timestamps';
 import {
   changePassphrase, closeCase, listInvestigations, locking, lockCase, me, newRecoveryKey, openCase, removeCaseLock, setPin, turnOff, turnOn,
 } from '../../lib/generated/sdk.gen';
@@ -20,7 +21,7 @@ import {RecoveryWords} from './recovery-words';
 const IDLE = [[5, '5 min'], [10, '10 min'], [30, '30 min'], [0, 'never']] as const;
 
 function dayOf(at: string | null | undefined): string {
-  return at ? new Date(at).toLocaleDateString(undefined, {day: 'numeric', month: 'short'}) : '';
+  return at ? timeDayWords(at) : '';
 }
 
 /** A small form asking for one or two secrets, in place of the button that opened it. */

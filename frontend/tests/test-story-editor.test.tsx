@@ -73,11 +73,11 @@ describe('AI-draft paragraphs', () => {
       para('Between March and June 2019 four sums were paid.', {aiDraft: '2026-10-10'}),
       para('Each was just under the threshold.', {aiDraft: '2026-10-10'}),
     ]});
-    expect(draftDay('2026-10-10')).toBe('10 Oct');
+    expect(draftDay('2026-10-10')).toBe('10 Oct 2026');
     expect(docInfo(editor.state.doc)).toMatchObject({paragraphs: 3, aiDrafted: 2, aiOpen: 2});
     const marked = editor.view.dom.querySelectorAll('p.ai-para');
     expect(marked).toHaveLength(2);
-    expect(marked[0].querySelector('.ai-tag')?.textContent).toBe('AI draft · 10 Oct');
+    expect(marked[0].querySelector('.ai-tag')?.textContent).toBe('AI draft · 10 Oct 2026');
     expect(marked[0].querySelector('.ai-bar')?.textContent).toContain('not yet kept by you');
 
     fireEvent.click(marked[0].querySelector('button[aria-label^="Keep"]')!);

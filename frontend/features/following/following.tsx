@@ -23,7 +23,7 @@ import {caseHref} from '../../lib/case-href';
 import {getFollowingOptions, getFollowingQueryKey, getVersionsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {captureAll, captureItem, checkMonitor, deleteMonitor, recordRemoval, skipItem, undoItem, updateMonitor} from '../../lib/generated/sdk.gen';
 import type {FollowingOut, MonitorItemOut, MonitorOut, PageVersionOut} from '../../lib/generated/types.gen';
-import {apiTime} from '../../lib/timestamps';
+import {apiTime, timeWords} from '../../lib/timestamps';
 import {FingerprintMark} from '../the-drop/kind-marks';
 import {EmptyFollowing, FollowForm} from './follow-form';
 import {HealthMark, KIND_NAME, KindIcon, KindMark} from './marks';
@@ -46,7 +46,7 @@ function when(iso?: string | null): string {
   const d = apiTime(iso);
   const today = new Date();
   return d.toDateString() === today.toDateString() ? `${hhmm(iso)} today`
-    : d.toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+    : timeWords(iso);
 }
 
 function health(m: MonitorOut): [string, string] {

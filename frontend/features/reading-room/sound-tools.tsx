@@ -17,6 +17,7 @@ import {api} from '../../lib/api-instance';
 import {getDocumentTranscriptOptions, getSoundOptions, getSoundQueryKey, listDerivedQueryKey, listDocumentsOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {acceptDocumentSync, findDocumentSync, makeCleanedCopy, makeClip} from '../../lib/generated/sdk.gen';
 import type {DerivedFileOut, DocumentDetailOut, SyncOut} from '../../lib/generated/types.gen';
+import {timeWords} from '../../lib/timestamps';
 
 export const clockOf = (s: number): string => {
   const m = Math.floor(s / 60), sec = s - m * 60;
@@ -195,7 +196,7 @@ export function SyncPanel({doc, investigationId}: {doc: DocumentDetailOut; inves
         {shown?.offset_seconds != null && <Reveal detail={matchWords(shown)}><span className={`snd-chip${shown.reliable ? '' : ' weak'}`}>
           Offset {shown.offset_seconds >= 0 ? '+' : ''}{shown.offset_seconds.toFixed(2)} s · {matchWords(shown).replace(/ \(.*\)$/, '')}</span></Reveal>}
         {shown?.offset_seconds != null && <p>{`${otherName} started ${Math.abs(shown.offset_seconds).toFixed(2)} s ${shown.offset_seconds >= 0 ? 'after' : 'before'} ${doc.filename}.`}
-          {shown.accepted_by ? ` Accepted by ${shown.accepted_by === 'local-owner' ? 'you' : shown.accepted_by}, ${String(shown.accepted_at).slice(0, 16).replace('T', ' ')}.` : ''}</p>}
+          {shown.accepted_by ? ` Accepted by ${shown.accepted_by === 'local-owner' ? 'you' : shown.accepted_by}, ${timeWords(String(shown.accepted_at))}.` : ''}</p>}
         <div className="tl2-acts">
           <Reveal tabbable={false} detail="Compares the two to find where one lines up in the other.">
             <button onClick={() => find.mutate()} disabled={!pick || find.isPending}>{find.isPending ? 'Listening…' : shown ? 'Compare again' : 'Find the offset'}</button></Reveal>

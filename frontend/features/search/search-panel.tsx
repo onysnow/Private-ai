@@ -16,6 +16,7 @@ import {StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
+import {dateWords} from '../../lib/dates';
 import {peekAtRecordOptions, searchWorkbenchOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {SearchHitOut, SearchWorkbenchData} from '../../lib/generated/types.gen';
 import {KIND, KIND_ORDER, SURE, SURE_ORDER, TYPE_LABEL} from '../../lib/record-kinds';
@@ -130,7 +131,7 @@ function Peek({investigationId, hit}: {investigationId: string; hit: SearchHitOu
       <i style={{borderColor: PARTY[partyKind(n.schema)].ring, background: PARTY[partyKind(n.schema)].fill}}/>{n.outgoing ? '→' : '←'} {n.name} <small>{n.link}</small>
     </div>)}
     <div className="sv-pr"><span>Evidence</span><span>{stances.length ? stances.map(([s, n]) => `${n} ${s}`).join(' · ') : 'none attached'}</span></div>
-    <div className="sv-pr"><span>Latest event</span><span>{card.latest_event ? `${card.latest_event.date ?? ''} ${card.latest_event.title}` : 'none dated'}</span></div>
+    <div className="sv-pr"><span>Latest event</span><span>{card.latest_event ? `${card.latest_event.date ? dateWords(card.latest_event.date) : ''} ${card.latest_event.title}` : 'none dated'}</span></div>
   </div>;
 }
 
@@ -156,7 +157,7 @@ function ResultCard({hit, words, selected, onSelect, onTrace, onMark, peek}: {hi
       </>}><Highlight value={hit.title} words={words}/></Reveal></div>
       <div className="sv-meta">
         {hit.sure && <SurePill sure={hit.sure}/>}
-        {hit.date && <span>{hit.date}</span>}
+        {hit.date && <span>{dateWords(hit.date)}</span>}
         {hit.parties?.map(p => <span key={p.id} className="sv-pd"><PartyMark schema={p.schema}/>{p.name}</span>)}
       </div>
       {hit.snippet && hit.snippet !== hit.title && <div className="sv-sn"><Highlight value={hit.snippet} words={words}/></div>}

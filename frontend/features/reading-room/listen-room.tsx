@@ -23,6 +23,7 @@ import {createEvidenceEndpoint, findVoices, makeCleanedCopy, makeClip, nameVoice
 import type {DerivedFileOut, DocumentDetailOut, TranscriptCompareRowOut, TranscriptOut, TranscriptSegmentOut, VoiceOut,
   VoicesOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {timeWords, utcStamp} from '../../lib/timestamps';
 import {FingerprintMark} from '../the-drop/kind-marks';
 import {CleanAndCut, SyncPanel} from './sound-tools';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -154,7 +155,7 @@ function Voices({doc, v, onChanged, onListening}: {doc: DocumentDetailOut; v: Vo
     : <div className="lr-acts"><button type="button" onClick={() => void listen()} disabled={busy || doc.extraction_status !== 'complete'}>Listen for voices</button></div>}
     {voices.length > 0 && v?.found_by && <details className="lr-note"><summary>How they were found</summary>
       {String(v.found_by.tool ?? '')} · {String(v.found_by.segmentation ?? '')} · {String(v.found_by.embedding ?? '')}
-      {(v.history ?? []).length > 0 && <ul>{(v.history ?? []).map((h, i) => <li key={i}>{String(h.at ?? '').slice(0, 16).replace('T', ' ')} · voice {String(h.voice)}: “{String(h.name ?? '')}” {String(h.what ?? '')}</li>)}</ul>}
+      {(v.history ?? []).length > 0 && <ul>{(v.history ?? []).map((h, i) => <li key={i}>{h.at ? timeWords(String(h.at)) : ''} · voice {String(h.voice)}: “{String(h.name ?? '')}” {String(h.what ?? '')}</li>)}</ul>}
       <div className="lr-acts"><button type="button" onClick={() => void listen()} disabled={busy}>Listen again (names are cleared, kept in history)</button></div>
     </details>}
   </section>;
@@ -575,7 +576,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
         <div className="lr-file orig"><Reveal detail="Never changed. Quotes play from these bytes."><span className="lr-chip teal">Original</span></Reveal> <b>{doc.filename}</b> <FingerprintMark hash={doc.sha256}/></div>
         {files.length ? <ol className="lr-tree">{files.map(f => { const line = derivedLine(f); return <li key={f.id} className="lr-file der">
           <span className="lr-chip plum">Derived</span> <Reveal detail={<><span className="rv-row">{line.note}</span>
-            <span className="rv-row">{f.tool} · made by {by(f.created_by)}, {f.created_at.slice(0, 16).replace('T', ' ')} UTC</span>
+            <span className="rv-row">{f.tool} · made by {by(f.created_by)}, {utcStamp(f.created_at)}</span>
             <span className="rv-row rv-mono">from {f.parent_id ? 'the cleaned copy' : 'the original'} {fingerprint(f.parent_sha256)} · SHA-256 {fingerprint(f.sha256)}</span></>}><b>{line.name}</b></Reveal><em>{line.right}</em>
           <DerivedPlayer file={f}/>
         </li>; })}</ol> : <p className="lr-note">Nothing has been made from this recording yet.</p>}
@@ -588,7 +589,7 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
         <div><dt>Streams</dt><dd><Reveal detail={<>{(t?.streams ?? []).map((s, i) => <span className="rv-row" key={i}>{String(s.type)} · {String(s.codec ?? '')}{s.sample_rate ? ` · ${String(s.sample_rate)} Hz` : ''}{s.width ? ` · ${String(s.width)}×${String(s.height)}` : ''}</span>)}</>}>
           {(t?.streams ?? []).map(s => String(s.type)).join(' · ') || '–'}</Reveal></dd></div>
         {/* Where it was transcribed stays on screen (what leaves this computer); the tool, model and time are on hover. */}
-        <div><dt>Transcribed</dt><dd><Reveal detail={`${about.tool} · ${about.model} · on this computer${about.ran_at ? ` · ${about.ran_at.slice(0, 16).replace('T', ' ')} UTC` : ''}`}>⌂ on this computer</Reveal></dd></div>
+        <div><dt>Transcribed</dt><dd><Reveal detail={`${about.tool} · ${about.model} · on this computer${about.ran_at ? ` · ${utcStamp(about.ran_at)}` : ''}`}>⌂ on this computer</Reveal></dd></div>
         {(doc.extraction_issues ?? []).map(i => <div key={i}><dt>Note</dt><dd>{i}</dd></div>)}
       </dl> : <>
         <div className="lr-rbar">
@@ -599,9 +600,9 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
             <button type="button" role="tab" aria-selected={which === 'compare'} onClick={() => setWhich('compare')} disabled={!t?.publisher?.cues?.length}>Compare</button>
           </span>
           {which === 'compare' ? <p className="lr-meta">Outlined words differ between the two. Neither is right by default: listen.</p>
-            : which === 'publisher' && t?.publisher ? <p className="lr-meta"><Reveal detail={<><span className="rv-row">Fetched {t.publisher.fetched_at?.slice(0, 16).replace('T', ' ')} UTC</span>
+            : which === 'publisher' && t?.publisher ? <p className="lr-meta"><Reveal detail={<><span className="rv-row">Fetched {t.publisher.fetched_at ? utcStamp(t.publisher.fetched_at) : ''}</span>
               <span className="rv-row rv-mono">SHA-256 {t.publisher.sha256 ?? '–'}</span></>}>As its publisher offers it</Reveal></p>
-            : <p className="lr-meta"><Reveal detail={`${about.tool} · ${about.model} · run on this computer${about.ran_at ? ` ${about.ran_at.slice(0, 16).replace('T', ' ')} UTC` : ''}${about.language ? ` · ${about.language} ${Math.round((about.language_probability ?? 0) * 100)}%` : ''}`}>
+            : <p className="lr-meta"><Reveal detail={`${about.tool} · ${about.model} · run on this computer${about.ran_at ? ` ${utcStamp(about.ran_at)}` : ''}${about.language ? ` · ${about.language} ${Math.round((about.language_probability ?? 0) * 100)}%` : ''}`}>
               ⌂ on this computer</Reveal></p>}
         </div>
         {which === 'compare' ? (compared.data ? <Compare rows={compared.data} onSeek={seek}/> : compared.isError

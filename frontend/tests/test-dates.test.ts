@@ -18,4 +18,9 @@ describe('dateWords', () => {
     expect(dateWords('2014', 'estimated')).toBe('about 2014');
     expect(dateWords('2014-06')).toBe('Jun 2014');
   });
+
+  it('writes September as "Sep", as every other month is three letters (the browser\'s en-GB says "Sept")', () => {
+    expect(dateWords('2018-09')).toBe('Sep 2018');
+    expect(dateWords('2018-09-04')).toBe('4 Sep 2018');
+  });
 });

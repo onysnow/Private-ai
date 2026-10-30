@@ -21,7 +21,7 @@ import {submitWith, useZodForm} from '../../lib/forms';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {api} from '../../lib/api-instance';
 import {describeJob, waitForJob} from '../../lib/jobs';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {
   getCaseResearchQueryKey, investigationRunPlanMutation, investigationRunProfileOptions, investigationRunProfileQueryKey, saveInvestigationRunProfileMutation,
   saveQuestionMutation,
@@ -156,7 +156,7 @@ function runState(r: AiRunOut): {key: 'live' | 'failed' | 'problems' | 'clean'; 
   return {key: 'clean', word: 'Finished, no problem listed'};
 }
 const SYSTEM_DOTS = ['RAS', 'TAS', 'QAS', 'LAS', 'DAS'] as const;
-const runWhen = (iso: string) => apiTime(iso).toLocaleString(undefined, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+const runWhen = timeWords;
 
 /** Step 1's right-hand column: this case's earlier runs, newest first, or, before the first run, what a run is and
  *  (when AI is off) what turning it on would send. Nothing here is invented: an empty case says it is empty. */

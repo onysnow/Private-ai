@@ -9,7 +9,7 @@ import type {ReactElement} from 'react';
 
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {
   deleteSavedQuestionMutation, getCaseResearchOptions, getCaseResearchQueryKey, listAiRunsQueryKey, putCaseResearchMutation, runSavedQuestionMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
@@ -48,7 +48,7 @@ export function SavedQuestions({investigationId, onAsk}: {investigationId: strin
     {!d.questions.length ? <p className="br-quietline">None yet. Save a question from its plan to ask it again{mode === 'automatic' ? ', or by itself after each import' : ''}.</p>
       : <ul>{d.questions.map(q => <li key={q.id}>
         {/* When it last ran is revealed on the question. */}
-        <Reveal detail={q.last_run_at ? `Last run ${apiTime(q.last_run_at).toLocaleString(undefined, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}` : 'Not run yet'}>
+        <Reveal detail={q.last_run_at ? `Last run ${timeWords(q.last_run_at)}` : 'Not run yet'}>
           <span>{q.question}{q.module === 'hypothesis_test' && q.working_theory ? <em> · testing “{q.working_theory}”</em> : null}</span></Reveal>
         <button type="button" className="br-quiet" onClick={() => onAsk(q)}>Ask it</button>
         <button type="button" className="br-quiet" disabled={!d.ai_enabled || runNow.isPending} onClick={() => runNow.mutate({path: {saved_question_id: q.id}})}>Run now</button>

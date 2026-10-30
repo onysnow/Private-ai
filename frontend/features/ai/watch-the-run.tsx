@@ -23,7 +23,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {AiRunEventOut} from '../../lib/generated/types.gen';
 import {currentAppearance, onAppearanceChange} from '../../lib/theme';
-import {apiTime} from '../../lib/timestamps';
+import {apiTime, timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {RunBloom} from '../effects/run-bloom';
 import type {Flight} from '../effects/run-bloom';
@@ -118,7 +118,7 @@ const nodeFor = (routeNode: string | null | undefined) => (e: Ev): string => {
 };
 const words = (v: string | null | undefined) => (v ? (v.charAt(0) + v.slice(1).toLowerCase()).replace(/_/g, ' ') : '');
 const utc = (iso: string) => apiTime(iso).getTime();
-const stamp = (iso: string) => new Date(utc(iso)).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false}).replace(',', '');
+const stamp = timeWords;
 const clock = (ms: number) => new Date(ms).toLocaleTimeString('en-GB', {hour12: false});
 const who = (e: Ev) => (e.node === 'review' ? 'you' : e.self_reported ? 'model says' : e.system === 'app' ? 'app · enforced' : e.system);
 const lines = (text: string, width: number, max: number): string[] => {

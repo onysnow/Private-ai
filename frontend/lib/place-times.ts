@@ -2,6 +2,7 @@
 // app/services/places.py, each place's `events`), as stretches of time, and
 // the places a stretch of time picks. No ECharts here: the places panel uses
 // these without pulling the timeline strip into the page's first load.
+import {dateWords} from './dates';
 import type {PlaceEventOut, PlaceOut} from './generated/types.gen';
 
 export const DAY_MS = 86_400_000;
@@ -34,7 +35,7 @@ export function placesInWindow(places: PlaceOut[], span: TimeWindow | null): Pla
 
 /** A day in words, as the timeline chart writes it: 14 Nov 2023 (UTC). */
 export function dayText(ms: number): string {
-  return new Date(ms).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'});
+  return dateWords(isoDay(ms));
 }
 
 

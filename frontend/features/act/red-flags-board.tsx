@@ -27,7 +27,8 @@ import {submitWith, useZodForm} from '../../lib/forms';
 import {getInvestigationFinancialFlowsOptions, getRedFlagsQueryKey, markRedFlagInnocentMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {FinancialTransactionOut, FlagInnocentOut, IncompleteTransactionOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {apiTime} from '../../lib/timestamps';
+import {MONTHS, dateWords} from '../../lib/dates';
+import {apiTime, timeDayWords, timeWords} from '../../lib/timestamps';
 import {useWheelStep} from '../case-home/wheel-step';
 import {GlossaryText} from '../glossary/glossary-text';
 import {InvestigationType, LEVEL, LEVEL_ORDER, dismissSchema, flagsByArea, useRedFlags} from '../red-flags/red-flags-panel';
@@ -146,14 +147,13 @@ function WhatChanged({changes, since, ready, onLight}: {changes: Change[]; since
   if (!changes.length) return null;
   const fresh = changes.filter(c => c.kind === 'new').length;
   const stopped = changes.length - fresh;
-  const day = new Date(utcTime(since));
   // The change is its shape (✚ new, − no longer fires); the word and the indicator's code are revealed on it.
   const line = (c: Change & {n: number}) => <><Reveal label={c.kind === 'new' ? 'New' : 'No longer fires'}
     detail={<><b>{c.kind === 'new' ? 'New' : 'No longer fires'}</b> · <span className="rv-mono">{c.flag.indicator_id}</span></>}>
     <b className={`rb-change-word ch-${c.kind}`} aria-hidden="true">{c.kind === 'new' ? '✚' : '−'}</b></Reveal>{' '}
     {c.flag.indicator?.name ?? c.flag.indicator_id}{c.n > 1 && <span className="rb-mono"> ×{c.n}</span>}</>;
   return <div className={`rb-changed${current ? ' playing' : ''}`} role="group" aria-label="What changed since your last visit">
-    <span className="rb-changed-head">Since your last visit · {day.getUTCDate()} {day.toLocaleString('en-GB', {month: 'short', timeZone: 'UTC'})}:
+    <span className="rb-changed-head">Since your last visit · {timeDayWords(since)}:
       {' '}{fresh > 0 && <>{fresh} new</>}{fresh > 0 && stopped > 0 && ' · '}{stopped > 0 && <>{stopped} no longer fire{stopped === 1 ? 's' : ''}</>}</span>
     {current ? <span className="rb-changed-now" aria-live="polite"><span className="rb-mono">{at + 1} of {shown.length}</span> {line(current)}</span>
       : still ? <ul className="rb-changed-all">{shown.map(c => <li key={`${c.kind}-${c.flag.id}`}>{line(c)}</li>)}</ul> : null}
@@ -302,7 +302,7 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
           <button type="button" onClick={runNow} disabled={running || !investigationId} aria-busy={running}>{running ? 'Running the rules…' : 'Run the rules'}</button>
           {/* When they ran is on hover; that the records changed since (the results may be out of date) stays as an amber dot. */}
           {ranAt ? <Reveal label={query.data?.stale && !running ? 'The records changed since the rules ran' : 'When the rules ran'}
-            detail={<>ran <time dateTime={ranAt}>{agoText(ranAt)}</time> · {new Date(utcTime(ranAt)).toLocaleString('en-GB')}{query.data?.stale && !running && ' · the records changed since'}</>}>
+            detail={<>ran <time dateTime={ranAt}>{agoText(ranAt)}</time> · {timeWords(ranAt)}{query.data?.stale && !running && ' · the records changed since'}</>}>
             <span className={`rb-ran${query.data?.stale && !running ? ' stale' : ''}`} aria-hidden="true">{query.data?.stale && !running ? '●' : '◷'}</span></Reveal>
             : <small>{running ? 'first run' : 'not run yet'}</small>}
           {run.isError && <small role="alert" className="rb-warn">{errorMessage(run.error, 'Could not run the rules')}</small>}
@@ -392,7 +392,6 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
 }): ReactElement {
   const ind = flag.indicator;
   const form = useZodForm<DismissValues>(dismissSchema, {defaultValues: {reason: ''}, mode: 'onSubmit'});
-  const first = apiTime(flag.first_seen_at);
   const payments = flag.links.length > 0 && ['count_in_band', 'missing_property'].includes((flag.facts as {family?: string})?.family ?? '');
   const moneyFlag = flag.indicator_id.startsWith('ML') || payments;
   return <>
@@ -400,7 +399,7 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
     <div className="rb-open-head">
       <span><FlagMark level={flag.level} focusable={!preview}/> <Reveal label="About this flag" detail={<><span className="rv-row rv-mono">{flag.indicator_id}</span>
         {ind?.area_name && <span className="rv-row">{ind.area_name}</span>}
-        <span className="rv-row">rule v{flag.rule_version} · first seen {first.getUTCDate()} {first.toLocaleString('en-GB', {month: 'short', timeZone: 'UTC'})}</span></>}>
+        <span className="rv-row">rule v{flag.rule_version} · first seen {timeDayWords(flag.first_seen_at)}</span></>}>
         <span className="rb-info" aria-hidden="true">ⓘ</span></Reveal></span>
       {kind.flags.length > 1 && !preview && <span className="rb-step" role="group" aria-label="Flags of this kind">
         <button type="button" onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0} aria-label="Previous of this kind">‹</button>
@@ -532,7 +531,7 @@ export function monthTicks(t0: number, t1: number): {t: number; label: string; y
   const d = new Date(t0); let m = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
   while (m <= t1) {
     const at = new Date(m);
-    out.push({t: m, label: at.toLocaleDateString('en-GB', {month: 'short', timeZone: 'UTC'}), year: at.getUTCFullYear()});
+    out.push({t: m, label: MONTHS[at.getUTCMonth()], year: at.getUTCFullYear()});
     m = Date.UTC(at.getUTCFullYear(), at.getUTCMonth() + 1, 1);
   }
   const every = Math.ceil(out.length / 8);
@@ -550,7 +549,7 @@ const LIST_FIRST = 6;
 export function PaymentList({names, rows, count}: {names: string[]; rows: LedgerRow[]; count: number}): ReactElement {
   const [all, setAll] = useState(false);
   const shown = all ? rows : rows.slice(0, LIST_FIRST);
-  const day = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'});
+  const day = (iso: string) => dateWords(iso.slice(0, 10));
   return <figure className="rb-picture rb-pay-list" aria-label={`${count} payments from ${names.join(' to ')}`}>
     <figcaption><span>The payments it rests on</span><small>{count} payments</small></figcaption>
     <p>{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}<b>{n}</b></span>)}</p>
@@ -588,8 +587,8 @@ function Payments({pays}: {pays: FinancialTransactionOut[]}): ReactElement {
   const t0 = Math.min(...ts) - 864e5 * 10; const t1 = Math.max(...ts) + 864e5 * 10;
   const x = (t: number) => L + ((t - t0) / (t1 - t0)) * (W - L - R);
   const y = (a: number) => TOP + (1 - (Math.min(hi, Math.max(lo, a)) - lo) / (hi - lo)) * (H - TOP - BOTTOM);
-  const day = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'});
-  const short = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', timeZone: 'UTC'});
+  const day = (iso: string) => dateWords(iso.slice(0, 10));
+  const short = (iso: string) => day(iso).replace(/ \d{4}$/, '');
   const months = monthTicks(t0, t1);
   // Each label takes the first of six places (above, beside or below its payment, right then left) that crosses no other
   // label, no payment and not the reporting line, so no two overlap.

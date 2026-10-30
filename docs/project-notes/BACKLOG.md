@@ -347,7 +347,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
   - ~~The graph's "Linked groups" layout freezes the page for about 20 s.~~ Checked 30 Oct in Chromium on 1MDB (152 parties, 172 links): the click costs about 1.2 s of main-thread work with motion reduced, the longest task 0.5 s. Group names no longer sit over other groups' parties (DECISIONS_LOG 30).
   - ~~The Chain of Custody drawer ignores Esc.~~ Fixed 28 Oct (`case-workbench.tsx`; `tests/test-custody-drawer.test.tsx`).
   - The upload's "Document title" is never saved. Checked 28 Oct: it is saved as the document's source title (`store_document`), which is what the custody chain, the evidence pack and Is it real? show; the document lists still show the file name.
-  - ~~Times disagree (UTC vs local)~~: every screen reads API times through `lib/timestamps.ts` (`tests/test-api-times-on-screen.test.tsx` holds it); date formats still differ between screens.
+  - ~~Times disagree (UTC vs local)~~: every screen reads API times through `lib/timestamps.ts` (`tests/test-api-times-on-screen.test.tsx` holds it); ~~date formats still differ between screens~~: one house style through `lib/dates.ts` and `lib/timestamps.ts` (DECISIONS_LOG 34).
 - **Inert controls:**
   - Timeline marks (hover only) and legend items do nothing. Left for the Timeline rebuild (TIME_1/TIME_2, waiting for approval).
   - ~~Chart-builder bars do nothing.~~ Fixed 28 Oct: a bar, slice or point traces the first record behind its value (`pickedRow`, `chart-builder-panel.tsx`).

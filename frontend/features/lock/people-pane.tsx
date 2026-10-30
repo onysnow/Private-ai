@@ -11,6 +11,7 @@ import {errorMessage} from '../../lib/api-client';
 import {useLockStore} from '../../lib/app-lock';
 import {investigationDecidersOptions, listAppUsersOptions, listAppUsersQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import type {AppUserOut} from '../../lib/generated/types.gen';
+import {apiTime, timeDayWords} from '../../lib/timestamps';
 import {
   createAppUser, deleteInvestigationMembership, putInvestigationMembership, revokeAppUserToken, rotateAppUserToken,
 } from '../../lib/generated/sdk.gen';
@@ -31,12 +32,12 @@ function RoleMark({role, extra}: {role: Role | 'owner'; extra?: string}): ReactE
 }
 
 function day(at: string | null | undefined): string {
-  return at ? new Date(at).toLocaleDateString(undefined, {day: 'numeric', month: 'short'}) : '';
+  return at ? timeDayWords(at) : '';
 }
 
 function ago(at: string | null | undefined): string {
   if (!at) return 'not yet';
-  const mins = Math.round((Date.now() - new Date(at).getTime()) / 60000);
+  const mins = Math.round((Date.now() - apiTime(at).getTime()) / 60000);
   if (mins < 60) return `${Math.max(1, mins)} min ago`;
   if (mins < 60 * 24) return `${Math.round(mins / 60)} h ago`;
   const days = Math.round(mins / 1440);
