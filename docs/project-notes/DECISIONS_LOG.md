@@ -498,3 +498,28 @@ source already holds, never invented:
 The full title and the place in the record stay on hover. Chips are now one per source (two sources with the same
 title are two chips) and wrap onto a second line, as ACT_2 draws them, instead of being cut on one line. The Cited tab
 and the citation hover keep the full title: they have the room.
+
+## 32. A party's dossier opens where you are: the inspector slot finished (30 Oct 2026)
+
+BACKLOG "Asked for: navigation": clicking a party used to carry you to Bring in, where the dossier sat in Connectors.
+The inspector slot (entry 16) already opened the dossier at the right of the current screen; this finishes it so it
+works as a panel should, rather than adding a second dossier drawer beside it.
+- **Every request goes to the slot.** Every "open dossier" in the app goes through the store's `openDossier` (The Wire,
+  All links, Red Flags, Places, the corpus, Connectors, a party inside a dossier); none of them changes the screen.
+  Case home's and Decide's party chips point at a party (light it everywhere) and stay as they are.
+- **Focus.** Opening moves focus to the slot's close button; closing gives it back to what had it, unless the reporter
+  has already clicked somewhere else on the page.
+- **The browser's Back closes it.** Opening pushes one history entry; Back closes the slot, and Forward opens the party
+  again. Steps inside the slot replace that entry, not add to it: the slot's own ‹ Back and Esc walk the trail, and the
+  browser's Back leaves the slot in one press, so it never takes several presses to get back to the page. Closing with
+  × or Esc goes back over that entry, so the history stays as it was.
+- **The address names the party** (`?dossier=<id>`), so a reload or a shared link opens the same dossier. A Chain of
+  Custody step has no address of its own yet (its request is not a single id) and is not reopened on reload.
+- **"Open in Bring in › Connectors"** on a dossier takes you to Connectors with that party selected, to enrich it from
+  outside sources, and the slot stays open beside it. There is no longer a second, inline dossier in Connectors, so the
+  link names where you go, not a "full view".
+- **Width.** Docked at min(520 px, 40 vw) as before (at 1440 × 900: 520 px, the page keeps 920 px); a handle on its left
+  edge drags it between 360 px and 70% of the window, the arrow keys on the handle move it 40 px, and the width is kept
+  per device. Up to 900 px wide the slot fills the screen, as before; at phone width (640 px and under) it is a bottom
+  sheet, 86% of the height, with a grab bar, and a swipe down closes it.
+- **Motion.** It slides in from the right (up, as a sheet); with reduced motion or the calm setting it appears at once.

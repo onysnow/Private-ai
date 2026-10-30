@@ -317,7 +317,7 @@ Cards that fail this today: "Keep this passage as evidence?" with no preview, fo
 - **Proofs alongside tests (25 Oct).** Tests check the inputs someone thought to try; a proof is a machine-checked argument that a property holds for every input. Add proofs to the ways the app is checked. Not yet decided: which parts of the app to prove, what each proof must show (its specification), and which proof tool to use.
 
 ## Asked for: navigation
-- **Clicking a party anywhere jumps to Bring in** (the dossier lives in Connectors; `case-workbench.tsx` `STAGE_OF_REQUEST.dossier = 'collect'`). Proposed: open the dossier as a side panel over the current screen. Ony has not answered this yet.
+- ~~**Clicking a party anywhere jumps to Bring in** (the dossier lives in Connectors; `case-workbench.tsx` `STAGE_OF_REQUEST.dossier = 'collect'`).~~ Done 29–30 Oct (DECISIONS_LOG 16 and 32): a party clicked anywhere opens its dossier in the inspector slot at the right of the screen you are on, with no jump. Esc and × close it, focus moves in and back, the browser's Back closes it, `?dossier=` reopens it on reload, it is resizable from its left edge and a bottom sheet at phone width; "Open in Bring in › Connectors" goes there with the party selected.
 
 ## Found by the data audit (11 Oct) — Ony, 29 Oct: "Fix". Each checked against the code on 29 Oct, then fixed with tests
 1. ~~**"Add 'United States' as a Person?"**~~ Fixed 29 Oct: a name whose kind the text gives no sign of is offered as "Add it, kind not known" (LegalEntity), never as the guess; accepting one without a kind is refused (`case_home.py` `_entity_question`, `documents.py` `review_candidate`). Not done: a place or country kind among the choices (FollowTheMoney has none).

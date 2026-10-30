@@ -4,7 +4,7 @@
 // configured provider in one auditable session, and review the
 // cross-provider clusters a session produces. What a connector finds stays
 // a finding until a reporter decides what it means (the review queue). The
-// card also holds the open entity's dossier (features/dossier). Moved out
+// card's "Open dossier" opens the entity in the inspector slot. Moved out
 // of app/page.tsx (Foundation Fixes fix 3); the calls and their reply
 // checks are generated from the API schema (fix 2). The selected entity
 // is shared state (lib/workbench-store.ts): the graph and the dossier move it.
