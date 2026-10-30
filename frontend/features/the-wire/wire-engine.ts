@@ -16,7 +16,7 @@
 // code mounted by the-wire.tsx; every listener is removed by the returned destroy().
 import type {WireEntityOut, WireLinkOut, WireOut} from '../../lib/generated/types.gen';
 import {dateWords} from '../../lib/dates';
-import {onScreen} from '../../lib/on-screen';
+import {escapeTaken, onScreen} from '../../lib/on-screen';
 
 /** How sure a link is (the status grammar): read from the case's review advisory by the-wire.tsx. */
 export type LinkSure = 'shown' | 'unshown' | 'disputed' | 'worked';
@@ -1867,7 +1867,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     if (t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName))) return;
     if (e.key === '/') { e.preventDefault(); sIn.focus(); } else if (e.key === 'l' || e.key === 'L') toggleLens();
     else if (e.key === 'f' || e.key === 'F') togglePath(mode !== 'path');
-    else if (e.key === 'Escape') back();
+    else if (e.key === 'Escape') { if (!escapeTaken(e, root)) back(); }
     else if (e.key === 'Backspace' && trail.length > 1) { trail.pop(); go('party', {id: trail[trail.length - 1], noTrail: true}); }
     else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && mode === 'party') {
       const r = ringOrder();

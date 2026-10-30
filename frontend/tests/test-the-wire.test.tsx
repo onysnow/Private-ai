@@ -6,6 +6,7 @@
 import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {InspectorSlot} from '../features/inspector/inspector-slot';
 import {TheWire, linkInfo} from '../features/the-wire/the-wire';
 import {brighten, clipWords, fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
 import {ApiClient} from '../lib/api-client';
@@ -13,7 +14,10 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
-import {emptyGraph, plainAdvisory, relationshipFixture} from '../test-support/page-routes';
+import {dossierFixture, dossierRoutes, emptyGraph, entityFixture, plainAdvisory, relationshipFixture} from '../test-support/page-routes';
+
+// The store's own openDossier, before a test swaps in a spy.
+const storeOpenDossier = useWorkbenchStore.getState().openDossier;
 
 const ent = (id: string, name: string, extra: Record<string, unknown> = {}) => ({
   id, name, short: name, kind: 'company', schema: 'Company', note: '', deg: 1, holder: null, c: 0, x: 400, y: 400, jur: '', flags: null, ...extra,
@@ -320,5 +324,33 @@ describe('The Wire', () => {
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByLabelText('The Wire').classList.contains('tw-tags-off')).toBe(true);
     expect(key.textContent).not.toContain('Owner');
+  });
+
+  it('leaves Esc to the inspector slot while a dossier is open over it, then steps back itself', async () => {
+    // DECISIONS_LOG 38: the slot is the layer on top. The Wire's key handler was added first, so without the layer check
+    // it would act on the same Esc (closing its drawer) before the slot took the key.
+    mockApi({'GET /api/investigations/inv-1/wire': WIRE, ...dossierRoutes('a', dossierFixture(entityFixture('a', 'Meridian Holdings Ltd', 'Company')))});
+    useWorkbenchStore.setState({openDossier: storeOpenDossier, inspector: []});
+    if (!window.matchMedia) {
+      window.matchMedia = ((query: string) => ({matches: false, media: query, onchange: null, addListener: () => {}, removeListener: () => {},
+        addEventListener: () => {}, removeEventListener: () => {}, dispatchEvent: () => false})) as unknown as typeof window.matchMedia;
+    }
+    render(<QueryProvider><TheWire investigationId="inv-1"/><InspectorSlot investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    await waitFor(() => expect(map.querySelectorAll('g.node').length).toBe(4));
+    fireEvent.click(map.querySelectorAll('g.node')[0]);
+    const drawer = document.querySelector('.tw-drawer')!;
+    await waitFor(() => expect(drawer.classList.contains('open')).toBe(true));
+    fireEvent.click(screen.getByRole('button', {name: 'Open the dossier'}));
+    const slot = document.querySelector<HTMLElement>('aside[aria-label="Inspector"]')!;
+    expect(slot).toBeVisible();
+
+    // One Esc: the slot closes, The Wire's drawer stays open.
+    fireEvent.keyDown(window, {key: 'Escape'});
+    expect(slot).not.toBeVisible();
+    expect(drawer.classList.contains('open')).toBe(true);
+    // The next Esc is The Wire's: its drawer closes.
+    fireEvent.keyDown(window, {key: 'Escape'});
+    expect(drawer.classList.contains('open')).toBe(false);
   });
 });

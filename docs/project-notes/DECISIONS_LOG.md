@@ -670,3 +670,18 @@ BACKLOG "Documents have no kind/language field". Built on `documents` (migration
   detected" stays only where nothing is known.
 - Kind and language travel in a backup (they are columns of `documents`); a backup made before keeps none and the
   restored documents read as not known.
+
+## 38. Esc goes to the topmost layer only (30 Oct 2026)
+
+With a party's dossier open in the inspector slot over The Wire, one Esc both stepped the slot back and did The Wire's
+own Esc (closed its drawer, or went up a level): both listen on the window, and the slot did not mark the key as taken.
+Calls:
+- **One mechanism, in `lib/on-screen.ts`** beside `onScreen` and `typingInto`, which every window key handler already
+  uses: a layer is an open dialog or anything marked `data-layer` (the slot is). The layer that acts on Esc calls
+  `preventDefault`; a screen acts on Esc only when `escapeTaken(e, itsRoot)` is false, that is the key was not taken and
+  no layer is open above it. The second half is what makes it hold whatever order the listeners were added in (The
+  Wire's is added before the slot's, so `defaultPrevented` alone would come too late).
+- **Who uses it:** the slot (it steps back only when no dialog is open above it, then takes the key), The Wire, Chain of
+  Custody's "Back to the claim" (which had its own dialog check), and the theme trial bar (which had one too). The
+  screens' other keys are left as they were: only Esc is shared between layers.
+- **Unchanged:** the slot's Back still closes it, its Esc still walks the trail and closes from the first step.

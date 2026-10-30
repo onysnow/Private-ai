@@ -12,6 +12,7 @@ import {STATUS_WORDS, LEVEL_WORDS} from '../../components/status';
 import {Reveal} from '../../components/ui/reveal';
 import {HelpRow} from '../settings/settings-index';
 import {clearHeroPhoto, loadHeroPhoto, onHeroPhotoChange, saveHeroPhoto, type HeroPhoto} from '../../lib/hero-photo';
+import {escapeTaken} from '../../lib/on-screen';
 import {webglAvailable} from '../effects/webgl';
 import {ThemeCompare, type Look} from './theme-compare';
 import {draftFrom, draftOf, ThemeMaker, type ThemeDraft} from './theme-maker';
@@ -73,7 +74,7 @@ export function TryingBar(): ReactElement | null {
   useEffect(() => {
     if (!trying) return undefined;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape' || e.defaultPrevented || document.querySelector('[role="dialog"]')) return;
+      if (e.key !== 'Escape' || escapeTaken(e)) return;
       fadeTheme(() => tryTheme(null), kept.theme);
     };
     window.addEventListener('keydown', onKey);

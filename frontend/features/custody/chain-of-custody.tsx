@@ -18,7 +18,7 @@ import {LevelChip, StatusChip, type ClaimStatus, type FlagLevel} from '../../com
 import {Reveal} from '../../components/ui/reveal';
 import {useWheelStep} from '../case-home/wheel-step';
 import {errorMessage} from '../../lib/api-client';
-import {onScreen, typingInto} from '../../lib/on-screen';
+import {escapeTaken, onScreen, typingInto} from '../../lib/on-screen';
 import {getClaimCustodyChainOptions, listClaimsOptions, recheckHashMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {ClaimDoneOut, CustodyAnchorOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
@@ -196,7 +196,7 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
     const onKey = (e: KeyboardEvent) => {
       if (!onScreen(rootRef.current) || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || typingInto(e.target)) return;
       if (e.key === 'l' || e.key === 'L') { e.preventDefault(); setAsList(v => !v); }
-      else if (e.key === 'Escape' && chosen && !document.querySelector('[role="dialog"]:not([hidden])')) openClaim(chosen);
+      else if (e.key === 'Escape' && chosen && !escapeTaken(e, rootRef.current)) openClaim(chosen);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
