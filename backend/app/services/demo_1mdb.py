@@ -477,6 +477,10 @@ def build(db: Session, documents: list[tuple[dict[str, Any], bytes | None]], *, 
     from app.services.demo_deck import seed_deck
 
     seed_deck(db, inv.id)
+    # Pages the loader brought in, kept again as web captures (Bring in › The Drop › Links & captures; nothing fetched).
+    from app.services.demo_captures import seed_captures
+
+    seed_captures(db, inv.id, storage_dir=storage_dir)
 
     LAST_PROBLEMS[:] = problems
     if problems:

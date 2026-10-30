@@ -5,7 +5,7 @@ import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-libr
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {captureState, isWebAddress, laneSummary, sameLink, timeProofWords} from '../features/the-drop/captures';
+import {Captures, captureState, isWebAddress, laneSummary, sameLink, timeProofWords} from '../features/the-drop/captures';
 import {TheDrop} from '../features/the-drop/the-drop';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -426,5 +426,34 @@ describe('Pin a quote · finds itself again (INTAKE_3)', () => {
     expect(await within(pin).findByText(/Nothing pinned from this page yet/)).toBeInTheDocument();
     await user.click(within(pin).getByRole('button', {name: 'Pin a quote in the reading room'}));
     expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1'});
+  });
+  it('with nothing captured, puts the link field first and large, with what a capture keeps and what leaves', async () => {
+    mockApi({...BASE, 'GET /api/investigations/inv-1/captures': []});
+    render(<QueryProvider><Captures investigationId="inv-1" picked={null} onPick={vi.fn()} onAddFile={vi.fn()}/></QueryProvider>);
+    const main = await screen.findByRole('region', {name: 'The chosen capture'});
+    const paste = await within(main).findByRole('region', {name: 'Paste a link'});
+    expect(paste).toHaveClass('big');
+    // One link field only, and no empty list of links.
+    expect(screen.getAllByRole('region', {name: 'Paste a link'})).toHaveLength(1);
+    expect(screen.queryByRole('region', {name: 'Links in this case'})).toBeNull();
+    // What a capture keeps: each a mark with its file's name; what it is, on hover.
+    const keeps = within(main).getByRole('list', {name: 'What a capture keeps'});
+    expect(within(keeps).getAllByRole('listitem')).toHaveLength(5);
+    for (const name of ['page.html', 'screenshot.png', 'page.warc.gz', 'SHA-256']) expect(within(keeps).getByText(name)).toBeVisible();
+    expect(within(keeps).getByText(/A fingerprint of each kept file/).closest('[hidden]')).not.toBeNull();
+    // The floor stays on screen: one visit, from this computer.
+    expect(within(main).getByText(/1 visit to the page’s site · from this computer · no login/)).toBeVisible();
+    expect(screen.getByRole('region', {name: 'What leaves this computer'})).toHaveTextContent('Nothing third-party is contacted.');
+  });
+
+  it('draws a dashed page card where the picture would be when a capture kept none', async () => {
+    const files = capture().files.filter(f => f.name !== 'screenshot.png');
+    mockApi({...BASE, 'GET /api/investigations/inv-1/captures': [capture({files, stages: stages(['done', 'done', 'done', 'skipped', 'done', 'done', 'done'])})],
+      'GET /api/captures/c1/quotes': []});
+    render(<QueryProvider><Captures investigationId="inv-1" picked={null} onPick={vi.fn()} onAddFile={vi.fn()}/></QueryProvider>);
+    const receipt = await screen.findByRole('region', {name: 'Capture receipt'});
+    expect(within(receipt).getByText(/no picture · 2026-10-19 10:14/)).toBeInTheDocument();
+    expect(within(receipt).getByText(/No picture of the page was kept/).closest('[hidden]')).not.toBeNull();
+    expect(within(receipt).queryByRole('img', {name: /The page as captured/})).toBeNull();
   });
 });

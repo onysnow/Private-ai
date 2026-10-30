@@ -389,3 +389,16 @@ started at "2" and was missed: page 1 of every filing began with "2 3 4 … 25".
 - No re-read of documents already read: their passages stay until they are read again. Saved quotes are re-anchored
   on every read (ADR-0015), and one that cannot be found keeps its anchor marked lost, for a person to check.
 - The demo complaint was re-read with a one-off script; its 78 saved quotes stayed exactly where they were.
+
+## 23. Demo captures from the pages the loader already holds; Check a pack can be tried on the case (30 Oct 2026)
+
+Links & captures and Check a pack were empty in the demo. Calls:
+- **Demo captures use real bytes only** (`app/services/demo_captures.py`): the Sarawak Report "Heist of the century"
+  article and FINMA's BSI release, both already downloaded by the demo loader, are captures (saved); MAS's BSI page is
+  a link only, with the loader's own reason (the publisher did not answer). No DOJ press release is captured: the case
+  holds none, and its text would have to be made up. They say what they are: tool "1MDB demo loader: the page as
+  downloaded with the case (no browser visit, no screenshot)", no stage timings, the screenshot stage "not run", and a
+  drawn, dashed page card instead of a picture. No custody record is written for them.
+- **Check a pack offers "Make a pack from this case and check it"**, and a version with one file changed in the
+  browser, so the result view can be reached in the demo. Each records a new pack in the case, as an export does.
+- **An added file inside an exhibit folder is only "not in the list"**, no longer also a second "exhibit changed".

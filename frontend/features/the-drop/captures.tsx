@@ -16,6 +16,8 @@
 // custody verdict, what may be quoted and every error stay on screen.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import type {UseQueryResult} from '@tanstack/react-query';
+import {Archive, Camera, FileCode2, Fingerprint, TextQuote} from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import type {FormEvent, ReactElement} from 'react';
 
@@ -129,10 +131,23 @@ function Shot({capture}: {capture: CaptureOut}): ReactElement | null {
     setUrl(made);
     return () => URL.revokeObjectURL(made);
   }, [image.data]);
-  if (!has || image.isError) return null;
+  if (!has || image.isError) return capture.outcome === 'saved' ? <PageCard capture={capture} missing={has}/> : null;
   // A blob of the kept picture, so next/image has nothing to optimise.
   // eslint-disable-next-line @next/next/no-img-element
   return <span className="cp-shot">{url ? <img src={url} alt={`The page as captured, under a band with its address and the clock, ${clock(capture.captured_at)}`}/> : <span className="cp-wait" aria-busy="true"/>}</span>;
+}
+
+/** Where the picture would be when none was kept: a card drawn from what the capture did keep (its title, address and
+ *  clock), dashed so it is never taken for a picture of the page. */
+function PageCard({capture, missing}: {capture: CaptureOut; missing: boolean}): ReactElement {
+  return <Reveal tabbable={false} className="cp-shot cp-shot-none" detail={missing
+    ? 'The picture could not be read from this computer. This card is drawn from what the capture kept.'
+    : 'No picture of the page was kept with this capture. This card is drawn from what it did keep: its title, address and clock.'}>
+    <span className="cp-pc-host">{host(capture.final_url || capture.url)}</span>
+    <span className="cp-pc-title">{captureTitle(capture)}</span>
+    <span className="cp-pc-lines" aria-hidden="true"><i/><i/><i/><i/><i/></span>
+    <span className="cp-pc-band">no picture · {utc(capture.captured_at ?? capture.finished_at).slice(0, 16)} UTC</span>
+  </Reveal>;
 }
 
 function Lane({capture}: {capture: CaptureOut}): ReactElement {
@@ -516,8 +531,8 @@ function Outcome({capture, onAddFile, investigationId, onPick}: {capture: Captur
 export type Witnesses = {time_proof: boolean; second_witness: boolean};
 const NO_WITNESS: Witnesses = {time_proof: false, second_witness: false};
 
-export function CaptureLinkField({investigationId, captures, onCaptured, witnesses = NO_WITNESS, onStarted}: {investigationId: string; captures: CaptureOut[];
-  onCaptured: (id: string) => void; witnesses?: Witnesses; onStarted?: () => void}): ReactElement {
+export function CaptureLinkField({investigationId, captures, onCaptured, witnesses = NO_WITNESS, onStarted, big = false}: {investigationId: string; captures: CaptureOut[];
+  onCaptured: (id: string) => void; witnesses?: Witnesses; onStarted?: () => void; big?: boolean}): ReactElement {
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
   const [status, setStatus] = useState('');
@@ -543,10 +558,10 @@ export function CaptureLinkField({investigationId, captures, onCaptured, witness
     if (!isWebAddress(text)) { setStatus('Give a web address that starts with http:// or https://'); return; }
     void capture(text);
   };
-  return <section className="cp-card cp-paste" aria-label="Paste a link">
+  return <section className={`cp-card cp-paste${big ? ' big' : ''}`} aria-label="Paste a link">
     <Reveal className="dp-eyebrow" detail="Links, files and pasted text share one drop: a link pasted into the drop is captured too.">Paste a link</Reveal>
     <form className="cp-linkfield" onSubmit={submit}>
-      <input type="url" inputMode="url" value={text} onChange={e => { setText(e.target.value); setAlready(null); }} placeholder="https://…" aria-label="Web address to capture"/>
+      <input type="url" inputMode="url" value={text} onChange={e => { setText(e.target.value); setAlready(null); }} placeholder={big ? 'https://… paste the page’s address' : 'https://…'} aria-label="Web address to capture"/>
       <button type="submit" className="p">Capture</button>
     </form>
     <PlatformWarning url={text}/>
@@ -577,6 +592,28 @@ export function useCaptures(investigationId: string): UseQueryResult<CaptureOut[
       ? 1500 : false)});
 }
 
+/** What a capture keeps, as marks: each file's name on screen, what it is on hover (ADR-0018). */
+const KEEPS: [LucideIcon, string, string][] = [
+  [FileCode2, 'page.html', 'The page source as the browser received it, and the page as it stood once its scripts ran.'],
+  [Camera, 'screenshot.png', 'The full page as a picture, under a band with its address and this computer’s clock.'],
+  [Archive, 'page.warc.gz', 'Every request and answer of the visit, as WARC 1.1 (the archival standard) and page.har.'],
+  [Fingerprint, 'SHA-256', 'A fingerprint of each kept file: proof it has not changed since.'],
+  [TextQuote, 'text', 'The page’s main text, read on this computer: quotes are made from it, never from the live page.'],
+];
+
+/** No capture yet: the link field first and large, what a capture keeps, and the one visit that leaves this computer. */
+function NoCaptures({field}: {field: ReactElement}): ReactElement {
+  return <div className="cp-none">
+    <Reveal className="cp-none-h" detail="A pasted link becomes a source: the page as it was, when, and proof it has not changed since."><h2>Capture a web page</h2></Reveal>
+    {field}
+    <ul className="cp-keeps" aria-label="What a capture keeps">{KEEPS.map(([Icon, name, what]) => <li key={name}>
+      <Reveal label={name} detail={what}><Icon size={26} strokeWidth={1.5} aria-hidden="true"/><span>{name}</span></Reveal></li>)}</ul>
+    {/* The floor: what leaves this computer, always on screen. */}
+    <p className="cp-floor"><Reveal detail="One visit to the page’s site, from this computer, in a fresh browser: no login, no stored cookies. Written in Safety & data’s outbound log before it goes. Nothing goes to anyone else unless you switch it on.">
+      <span>↗ 1 visit to the page’s site · from this computer · no login</span></Reveal></p>
+  </div>;
+}
+
 /** The tab's three columns, set in The Drop's own grid. */
 export function Captures({investigationId, picked, onPick, onAddFile, notice = ''}: {investigationId: string; picked: string | null; onPick: (id: string) => void;
   onAddFile: () => void; notice?: string}): ReactElement {
@@ -588,11 +625,14 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
   // Per capture and off by default: the next capture asks them once its page is kept, then they are off again.
   const [witnesses, setWitnesses] = useState<Witnesses>(NO_WITNESS);
   const asked = (witnesses.second_witness ? 1 : 0) + (witnesses.time_proof ? 1 : 0);
+  // Nothing captured yet: the link field moves to the middle, large and first, and the empty list is not shown.
+  const none = !query.isPending && !query.isError && captures.length === 0;
+  const field = <CaptureLinkField investigationId={investigationId} captures={captures} onCaptured={onPick} witnesses={witnesses} onStarted={() => setWitnesses(NO_WITNESS)} big={none}/>;
   return <>
     <div className="dp-left">
-      <CaptureLinkField investigationId={investigationId} captures={captures} onCaptured={onPick} witnesses={witnesses} onStarted={() => setWitnesses(NO_WITNESS)}/>
+      {!none && field}
       {notice && <p role="status" className="cp-card dp-status">{notice}</p>}
-      <section className="cp-card" aria-label="Links in this case">
+      {!none && <section className="cp-card" aria-label="Links in this case">
         <p className="dp-eyebrow cp-row">This case <span>{captures.length} link{captures.length === 1 ? '' : 's'}</span></p>
         {captures.length ? <ul className="cp-list">{captures.map(c => { const s = captureState(c); return <li key={c.id}>
           {/* The outcome is its glyph; its word and the address are on hover or focus. */}
@@ -602,7 +642,7 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
             <span className="cp-li"><b>{captureTitle(c)}</b></span>
           </button></Reveal></li>; })}</ul>
           : <p className="dp-quiet">{query.isPending ? 'Looking…' : 'No links yet. Paste one above.'}</p>}
-      </section>
+      </section>}
       <section className="cp-card" aria-label="What leaves this computer">
         <p className="dp-eyebrow cp-row">What leaves this computer <span className="cp-chip dash">ask first</span></p>
         {asked ? <p className="cp-warn"><b>{asked} outside service{asked > 1 ? 's' : ''} will be asked.</b>{' '}
@@ -627,7 +667,7 @@ export function Captures({investigationId, picked, onPick, onAddFile, notice = '
         {running(chosen) ? <p className="cp-note" role="status"><Reveal detail="Visiting the page once, from this computer, in a fresh browser with no stored cookies. The receipt appears when it is kept.">Capturing…</Reveal></p>
           : chosen.outcome === 'saved' ? <>{chosen.follow?.state === 'same' && <Recheck capture={chosen} follow={chosen.follow}/>}<Receipt capture={chosen} investigationId={investigationId}/><MediaPanel capture={chosen} investigationId={investigationId}/></>
           : <Outcome capture={chosen} onAddFile={onAddFile} investigationId={investigationId} onPick={onPick}/>}
-      </> : <div className="cp-none"><Reveal detail="A pasted link becomes a source: the page as it was, when, and proof it has not changed since."><h2>Capture a web page</h2></Reveal></div>}
+      </> : none ? <NoCaptures field={field}/> : null}
       {query.isError && <p role="alert">{errorMessage(query.error, 'Could not list the captures')}</p>}
     </div>
 
