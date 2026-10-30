@@ -52,6 +52,22 @@ async function renderPanel(routes: Record<string, unknown> = {}) {
   return api;
 }
 
+describe('Leads at rest (30 Oct sweep)', () => {
+  it('keeps the add form folded to "+ New lead", counts in the column titles, the move mark named on hover, and no empty lines on a card', async () => {
+    await renderPanel();
+    expect(screen.queryByRole('form', {name: 'New lead'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: '+ New lead'})).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('img', {name: 'Moving a lead'})).toHaveAccessibleDescription(/drag a card between horizons/);
+    const next = screen.getByRole('region', {name: 'Next, 1'});
+    expect(next.querySelector('header')).toHaveTextContent(/^Next1$/);
+    expect(screen.getByRole('button', {name: 'Done, 1'})).toHaveTextContent(/^Done1$/);
+    // A lead with nothing but a title: its status mark sits beside the title, and no other line is drawn.
+    const card = within(next).getByRole('button', {name: /^Who owns Harbour Nominees\?/});
+    expect(card.children).toHaveLength(1);
+    expect(within(card.children[0] as HTMLElement).getByLabelText('Status: active')).toBeInTheDocument();
+  });
+});
+
 describe('Leads as Now / Next / Later', () => {
   it('places open leads by horizon, with the inbox above, Now’s cap, and status as a mark on the card', async () => {
     await renderPanel();
@@ -102,7 +118,7 @@ describe('Leads as Now / Next / Later', () => {
   it('lists finished leads with their outcome and reason in the Done view, and reopens one', async () => {
     const api = await renderPanel({'PATCH /api/leads/l4': lead('l4', 'Ask the registry for the 2018 filing')});
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', {name: 'Done (1)'}));
+    await user.click(screen.getByRole('button', {name: 'Done, 1'}));
     const done = screen.getByRole('list', {name: 'Done leads'});
     const row = within(done).getByText('Ask the registry for the 2018 filing').closest('li')!;
     expect(within(row).getByRole('img', {name: 'resolved'})).toHaveTextContent('✓');

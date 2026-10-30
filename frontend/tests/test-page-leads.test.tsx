@@ -126,6 +126,7 @@ describe('Home questions & reporting leads', () => {
     });
 
     const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
     await user.type(
       screen.getByPlaceholderText('Who approved this contract?'),
       'Second question',
@@ -153,7 +154,9 @@ describe('Home questions & reporting leads', () => {
     const api = await bootstrapWithOneLead();
     const callsBefore = api.fetch.mock.calls.length;
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Add lead'}));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
+    await user.click(screen.getByRole('button', {name: 'Add lead'}));
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(api.calls('POST /api/leads')).toHaveLength(0);

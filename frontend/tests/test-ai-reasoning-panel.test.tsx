@@ -8,6 +8,9 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiReasoningPanel, WritingReport, describeAiStatus} from '../components/ai-reasoning-panel';
+import {DraftableClaims, draftQuestion} from '../features/ai/draftable-claims';
+import {QueryProvider} from '../lib/query-client';
+import {mockApi} from '../test-support/mock-api';
 import {askBeforeYouRun} from '../features/ai/before-you-run';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -142,6 +145,21 @@ describe('AiReasoningPanel', () => {
     expect(screen.queryByLabelText('Question')).toBeNull();
     await screen.findByText('Auto-rejected: invented citation');
     expect(requestUrl(fetchMock.mock.calls[0])).toBe('http://api.test/api/investigations/inv-1/ai-analysis-candidates');
+  });
+
+  it('with no drafts and AI off: the AI mark (its sentence on reveal), what a draft is as its path, and the aside filling the space', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(jsonResponse({candidates: []})));
+    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={{...readyStatus, enabled: false, endpoints_callable: false}}
+      emptyAside={<p>the claims</p>}/>);
+    await screen.findByText('No drafts yet');
+    const mark = screen.getByRole('img', {name: 'AI is off'});
+    expect(mark).toHaveAccessibleDescription(/AI is off · nothing runs or leaves this computer/);
+    expect(mark).toHaveTextContent('AI');
+    expect(screen.getByRole('link', {name: 'Settings › AI and research'})).toHaveAttribute('href', '/settings#ai');
+    const what = screen.getByRole('region', {name: 'What a draft is'});
+    expect(within(what).getAllByRole('listitem').map(li => li.querySelector('b')?.textContent)).toEqual(['Ask', 'Draft', 'You decide']);
+    expect(within(what).getByRole('link', {name: 'Ask the case'})).toHaveAttribute('href', '#ai-runs');
+    expect(screen.getByText('the claims')).toBeInTheDocument();
   });
 
   it('asks for an investigation before doing anything', () => {
@@ -481,5 +499,20 @@ describe('AiReasoningPanel', () => {
     expect(screen.getByLabelText('Goal')).not.toBeDisabled();
     expect(screen.getByLabelText('Search records to add')).not.toBeDisabled();
     expect(screen.queryByLabelText('Question')).not.toBeInTheDocument();
+  });
+});
+
+describe('DraftableClaims', () => {
+  it('lists the claims a draft could test, disputed and not yet shown first, ruled out left out; Ask opens Ask the case with the claim', async () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    const claim = (id: string, text: string, status: string) => ({id, investigation_id: 'inv-1', text, status, confidence: 0, created_at: '2026-10-01T00:00:00'});
+    mockApi({'GET /api/investigations/inv-1/claims': [claim('c1', 'Najib received the money', 'confirmed'), claim('c2', 'Tanore is a shell', 'disputed'),
+      claim('c3', 'The bonds were overpriced', 'unverified'), claim('c4', 'An old idea', 'rejected')]});
+    render(<QueryProvider><DraftableClaims investigationId="inv-1"/></QueryProvider>);
+    const list = await screen.findByRole('region', {name: 'Claims a draft could test'});
+    await waitFor(() => expect(list.querySelectorAll('li')).toHaveLength(3));
+    expect([...list.querySelectorAll('.ai-drafts-claim')].map(e => e.textContent)).toEqual(['Tanore is a shell', 'The bonds were overpriced', 'Najib received the money']);
+    await userEvent.setup().click(within(list).getByRole('button', {name: 'Ask the case about: Tanore is a shell'}));
+    expect(askBeforeYouRun).toHaveBeenCalledWith('inv-1', {module: 'case_synthesis', question: draftQuestion('Tanore is a shell'), theory: ''});
   });
 });

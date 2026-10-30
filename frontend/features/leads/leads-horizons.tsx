@@ -77,21 +77,20 @@ function Card({lead, actions, onKeyMove}: {lead: HorizonLead; actions: Actions; 
     aria-roledescription="lead" aria-label={`${lead.title}, ${word}, ${lead.priority} priority. Press M then 1, 2 or 3 to move it to Now, Next or Later.`}
     style={transform ? {transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 10, opacity: isDragging ? 0.6 : 1} : undefined}
     className={`grid gap-1 rounded-lg border ${edge} border-l-foreground/70 bg-card p-2.5 text-card-foreground shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-primary/50`}>
+    {/* Status is the glyph before the title and priority the left edge (thick urgent, medium high, dashed low): both
+        named on reveal. Owner, source and tasks share the last line; a line with nothing in it is not drawn. */}
     <div className="flex items-start gap-2">
+      <Reveal tabbable={false} describe={false} detail={<><b>{word}</b> · {lead.priority} priority</>}>
+        <span aria-label={`Status: ${word}`} className="text-sm leading-snug text-muted-foreground"><span aria-hidden="true">{status}</span></span></Reveal>
       <b className="flex-1 text-sm font-medium leading-snug">{lead.title}</b>
       <Menu lead={lead} actions={actions}/>
     </div>
-    {/* The priority is the left edge (thick urgent, medium high, dashed low) and the status a glyph: both named on reveal. */}
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-muted-foreground">
-      <Reveal tabbable={false} describe={false} detail={<><b>{word}</b> · {lead.priority} priority</>}>
-        <span aria-label={`Status: ${word}`}><span aria-hidden="true">{status}</span></span></Reveal>
+    {forLink?.label && <div className="text-xs"><Reveal tabbable={false} describe={false} detail="For"><span className="text-muted-foreground" aria-label="For:">↳</span></Reveal> {forLink.label}</div>}
+    {(lead.owner || lead.provider || lead.tasks.length > 0 || counts.supports + counts.contradicts > 0) && <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
       {lead.owner && <Reveal tabbable={false} describe={false} detail={lead.owner}>
         <span aria-label={`Owner: ${lead.owner}`} className="rounded-full border px-1.5 text-[11px]">{initials(lead.owner)}</span></Reveal>}
       {lead.provider && <Reveal tabbable={false} describe={false} detail={`From ${lead.provider.replace(/_/g, ' ')}`}>
         <span aria-label={`From ${lead.provider.replace(/_/g, ' ')}`}>↗</span></Reveal>}
-    </div>
-    {forLink?.label && <div className="text-xs"><Reveal tabbable={false} describe={false} detail="For"><span className="text-muted-foreground" aria-label="For:">↳</span></Reveal> {forLink.label}</div>}
-    {(lead.tasks.length > 0 || counts.supports + counts.contradicts > 0) && <div className="flex flex-wrap items-center gap-x-3 text-xs text-muted-foreground">
       {lead.tasks.length > 0 && <span aria-label={`Tasks: ${lead.tasks.map(t => `${t.title ?? 'task'} ${(t.status ?? 'todo').replace('_', ' ')}`).join(', ')}`}>
         {lead.tasks.map(t => <Reveal key={t.id} tabbable={false} describe={false} detail={`${t.title ?? 'Task'} · ${(t.status ?? 'todo').replace('_', ' ')}`}>
           <span aria-hidden="true">{TASK_DOT[t.status ?? 'todo'] ?? '○'}</span></Reveal>)}</span>}
@@ -100,19 +99,20 @@ function Card({lead, actions, onKeyMove}: {lead: HorizonLead; actions: Actions; 
   </article>;
 }
 
-function Column({id, label, count, cap, wide, children}: {id: Place; label: string; count: number; cap?: number; wide?: string; children: ReactNode}): ReactElement {
+function Column({id, label, title, count, cap, wide, children}: {id: Place; label: string; title?: ReactNode; count: number; cap?: number; wide?: string; children: ReactNode}): ReactElement {
   const {setNodeRef, isOver} = useDroppable({id});
+  // The count is part of the title ("Now 4 / 5"), not a badge at the far end.
   return <section ref={setNodeRef} aria-label={`${label}${cap ? `, ${count} of ${cap}` : `, ${count}`}`}
     className={`flex min-w-0 flex-col gap-2 rounded-lg border bg-muted/30 p-2 ${wide ?? ''} ${isOver ? 'bg-muted/70 ring-2 ring-primary/40' : ''}`}>
-    <header className="flex items-baseline justify-between px-1">
-      <span className="text-sm font-semibold">{label}</span>
-      <span className={`text-xs ${cap && count >= cap ? 'font-semibold' : 'text-muted-foreground'}`}>{cap ? `${count} / ${cap}` : count}</span>
+    <header className="flex items-baseline gap-1.5 px-1" aria-hidden="true">
+      <span className="text-sm font-semibold">{title ?? label}</span>
+      <span className={`text-sm tabular-nums ${cap && count >= cap ? 'font-semibold' : 'text-muted-foreground'}`}>{cap ? `${count} / ${cap}` : count}</span>
     </header>
     <div className={id === 'inbox' ? 'grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2' : 'flex min-h-[70px] flex-col gap-2'}>{children}</div>
   </section>;
 }
 
-export function LeadsHorizons({leads, onMove, onStatus, onConvert}: {leads: HorizonLead[]} & Actions): ReactElement {
+export function LeadsHorizons({leads, onMove, onStatus, onConvert, tools}: {leads: HorizonLead[]; tools?: ReactNode} & Actions): ReactElement {
   const [done, setDone] = useState(false);
   const [said, setSaid] = useState('');
   const sensors = useSensors(useSensor(PointerSensor, {activationConstraint: {distance: 4}}), useSensor(KeyboardSensor));
@@ -133,9 +133,14 @@ export function LeadsHorizons({leads, onMove, onStatus, onConvert}: {leads: Hori
   const card = (lead: HorizonLead) => <Card key={lead.id} lead={lead} actions={actions} onKeyMove={move}/>;
 
   return <div className="grid gap-3" aria-label="Leads by when to chase them">
-    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-      <Reveal label="How to move a lead" detail="Drag a card between horizons, or focus it and press M then 1 Now · 2 Next · 3 Later · 0 inbox."><span aria-hidden="true">⇄</span></Reveal>
-      <button type="button" className="rounded border px-2 py-0.5" aria-pressed={done} onClick={() => setDone(d => !d)}>Done ({finished.length})</button>
+    <div className="flex flex-wrap items-center gap-2">
+      {tools}
+      {/* The move mark is named on hover, with how to move a lead (the keys). */}
+      <Reveal label="Moving a lead" detail={<><b>Moving a lead</b> · drag a card between horizons, or focus it and press M then 1 Now · 2 Next · 3 Later · 0 inbox.</>}>
+        <span className="px-1 text-base text-muted-foreground" aria-hidden="true">⇄</span></Reveal>
+      <button type="button" className={`ml-auto flex items-baseline gap-1.5 rounded-md px-2 py-1 text-sm ${done ? 'bg-muted font-semibold' : 'font-medium text-muted-foreground hover:bg-muted/60'}`}
+        aria-pressed={done} aria-label={`Done, ${finished.length}`} onClick={() => setDone(d => !d)}>
+        <span>Done</span><span className="tabular-nums">{finished.length}</span></button>
     </div>
     <p className="sr-only" aria-live="polite">{said}</p>
     {done ? <ul className="grid gap-1.5" aria-label="Done leads">
@@ -152,7 +157,9 @@ export function LeadsHorizons({leads, onMove, onStatus, onConvert}: {leads: Hori
       }) : <li className="text-sm text-muted-foreground">Nothing finished yet.</li>}
     </ul> : !open.length ? <p className="text-sm text-muted-foreground">No leads yet — add one, or turn a Red Flag into a lead.</p>
       : <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-        {at('inbox').length > 0 && <Column id="inbox" label="Inbox · not yet placed" count={at('inbox').length}>{at('inbox').map(card)}</Column>}
+        {at('inbox').length > 0 && <Column id="inbox" label="Inbox · not yet placed"
+          title={<Reveal tabbable={false} describe={false} detail="Not yet placed: every lead that arrives (by hand, from a connector, the watchlist or a Red Flag) waits here for a person to put it in Now, Next or Later.">
+            <span>Inbox</span></Reveal>} count={at('inbox').length}>{at('inbox').map(card)}</Column>}
         <div className="grid gap-3 md:grid-cols-[1.25fr_1fr_0.85fr]">
           {COLUMNS.map(c => <Column key={c.id} id={c.id} label={c.label} count={at(c.id).length} cap={c.id === 'now' ? NOW_CAP : undefined}>
             {at(c.id).length ? at(c.id).map(card) : <p className="px-1 text-xs text-muted-foreground">{c.id === 'now' ? 'Nothing being chased now.' : 'Empty.'}</p>}

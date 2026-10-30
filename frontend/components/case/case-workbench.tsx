@@ -22,6 +22,7 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Toaster} from '@/components/ui/sonner';
 import {AiReasoningPanel} from '../ai-reasoning-panel';
+import {DraftableClaims} from '../../features/ai/draftable-claims';
 import {BeforeYouRun} from '../../features/ai/before-you-run';
 import {PanelErrorBoundary} from '../panel-error-boundary';
 import {ApiAccessPanel} from '../../features/api-access/api-access-panel';
@@ -270,7 +271,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         <PanelErrorBoundary name="Red Flags"><RedFlagsPanel investigationId={inv}/></PanelErrorBoundary>
         <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>
         <div id="chart-builder"><PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary></div>
-        <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>
+        <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation} emptyAside={<DraftableClaims investigationId={inv}/>}/>
       </>)}
 
       {stage('keep', <>
@@ -314,7 +315,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'chart-builder', label: 'Charts', fill: true, render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'decks', label: 'Decks', fill: true, render: () => <PanelErrorBoundary name="Decks"><DecksScreen investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'ai-runs', label: 'AI runs', render: () => <PanelErrorBoundary name="AI runs"><BeforeYouRun investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
-        {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},
+        {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation} emptyAside={<DraftableClaims investigationId={inv}/>}/>},
       ])}
       {screen('keep', [
         {anchor: 'safety-data', label: 'Safety & data', fill: true, render: () => <PanelErrorBoundary name="Safety & data"><SafetyScreen investigationId={inv} caseName={investigationName} active={view === 'keep'}/></PanelErrorBoundary>},

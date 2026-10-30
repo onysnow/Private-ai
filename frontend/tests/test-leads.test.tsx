@@ -91,6 +91,9 @@ describe('LeadsPanel', () => {
       [QUEUE]: leadQueueBody('inv-1', [leadFixture(), second]),
     });
     const user = userEvent.setup();
+    // The form is one line at rest: "+ New lead" unfolds it in place.
+    expect(screen.queryByPlaceholderText('Who approved this contract?')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
     await user.type(screen.getByPlaceholderText('Who approved this contract?'), 'Second question');
     await user.type(screen.getByPlaceholderText('What is known, what is missing, and why it matters?'), 'The signature is unclear.');
     await user.type(screen.getByPlaceholderText('Owner'), 'B. Reporter');
@@ -102,6 +105,9 @@ describe('LeadsPanel', () => {
     expect(api.lastBody('POST /api/leads')).toEqual({investigation_id: 'inv-1', title: 'Second question', detail: 'The signature is unclear.', status: 'unreviewed'});
     expect(api.lastBody('PATCH /api/leads/lead-2')).toEqual({priority: 'urgent', owner: 'B. Reporter'});
     expect(api.calls(QUEUE)).toHaveLength(2);
+    // Added, it folds away again; opened again, it is empty.
+    await waitFor(() => expect(screen.queryByRole('form', {name: 'New lead'})).not.toBeInTheDocument());
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
     expect(screen.getByPlaceholderText('Who approved this contract?')).toHaveValue('');
     expect(screen.getByPlaceholderText('What is known, what is missing, and why it matters?')).toHaveValue('');
     expect(api.unmatched()).toEqual([]);
@@ -110,10 +116,17 @@ describe('LeadsPanel', () => {
   it('does not create a lead with a blank title', async () => {
     const api = await renderPanel();
     const before = api.fetch.mock.calls.length;
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Add lead'}));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
+    await user.click(screen.getByRole('button', {name: 'Add lead'}));
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(api.calls('POST /api/leads')).toHaveLength(0);
     expect(api.fetch.mock.calls.length).toBe(before);
+    // Nothing was added, so the form stays open; Esc folds it.
+    expect(screen.getByRole('form', {name: 'New lead'})).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('form', {name: 'New lead'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: '+ New lead'})).toHaveFocus();
   });
 
   it('moves a lead to another column and reloads the queue', async () => {

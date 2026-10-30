@@ -44,8 +44,12 @@
 .cb-q:disabled { cursor: default; color: var(--text-muted); opacity: .5; }
 .cb-q:disabled svg { color: var(--text-muted); }
 
-.cb-ask { padding: 18px 4px; }
-.cb-ask p { margin: 0 0 6px; font: 400 22px/1.35 var(--font-display); color: var(--text-muted); }
+/* No question chosen yet: the catalogue's charts as a gallery of cards, grouped by question. */
+.cb-gallery { display: grid; gap: 18px; align-content: start; }
+.cb-gallery-head { margin: 0; font: 400 22px/1.35 var(--font-display); color: var(--text-muted); }
+.cb-gallery-group { display: grid; gap: 8px; }
+.cb-gallery-group h3 { margin: 0; display: flex; align-items: center; gap: 8px; font: 600 14px var(--font-ui); color: var(--text); }
+.cb-gallery-group h3 svg { color: var(--accent-2); }
 .cb-step { border: none; margin: 0; padding: 0 0 20px; }
 .cb-step + .cb-step { padding-top: 18px; border-top: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
 .cb-data { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
