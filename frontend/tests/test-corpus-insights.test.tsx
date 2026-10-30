@@ -41,9 +41,8 @@ describe('CorpusInsights', () => {
       'POST /api/leads': leadBody({title: 'Alaric Voss', provider: 'openaleph', provider_record_id: voss.lead_key, kind: 'connector'}),
     });
     wrap(<CorpusInsights investigationId="inv-1"/>);
-    expect(api.calls(INSIGHTS)).toHaveLength(0);   // asked for only when opened
+    // Asked for when the screen opens: no button stands between the reporter and the names (sweep, 30 Oct).
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', {name: 'Show what stands out'}));
 
     const people = within(await screen.findByRole('list', {name: 'People'}));
     expect(people.getByText('Alaric Voss')).toBeInTheDocument();
@@ -62,8 +61,9 @@ describe('CorpusInsights', () => {
   it('says why there is nothing to show', async () => {
     mockApi({[INSIGHTS]: insights([], {state: 'no_collection', detail: 'No document of this investigation has been sent to OpenAleph yet.', collection_id: null})});
     wrap(<CorpusInsights investigationId="inv-1"/>);
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Show what stands out'}));
-    expect(await screen.findByText('No document of this investigation has been sent to OpenAleph yet.')).toBeInTheDocument();
+    // The state is a short word; the sentence is on hover.
+    expect(await screen.findByText('Nothing sent yet')).toBeInTheDocument();
+    expect(screen.getByText('No document of this investigation has been sent to OpenAleph yet.').closest('[hidden]')).not.toBeNull();
   });
 
   it('writes the lead without an alongside list when there is none', () => {

@@ -30,6 +30,8 @@ const SYNC = 'GET /api/investigations/inv-1/corpus/sync';
 const XREFS = 'GET /api/investigations/inv-1/cross-references';
 const WATCHLIST = 'GET /api/investigations/inv-1/watchlist';
 const SETS = 'GET /api/investigations/inv-1/corpus/entity-sets';
+const INSIGHTS = 'GET /api/investigations/inv-1/corpus/insights';
+const quietInsights = {investigation_id: 'inv-1', state: 'disabled', detail: 'OpenAleph is turned off here.', collection_id: null, groups: []};
 
 function syncLine(overrides: Record<string, unknown> = {}) {
   return corpusSyncBody('inv-1', {
@@ -58,7 +60,7 @@ function crossReference(overrides: Record<string, unknown> = {}) {
 }
 
 async function renderPanel(routes: Record<string, unknown> = {}) {
-  const api = mockApi({[SYNC]: syncLine(), [XREFS]: [crossReference()], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], ...routes});
+  const api = mockApi({[SYNC]: syncLine(), [XREFS]: [crossReference()], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], [INSIGHTS]: quietInsights, ...routes});
   wrap(<CorpusPanel investigationId="inv-1"/>);
   await screen.findByText('Meridian Holdings Limited');
   return api;
@@ -142,14 +144,14 @@ describe('CorpusPanel', () => {
       cross_reference: {...(syncLine().cross_reference as Record<string, unknown>), status: 'failed', error: 'CrossReferenceTimeout: still busy'},
       failures: [{id: 'f-1', investigation_id: 'inv-1', document_id: null, operation: 'corpus_push', error: 'ConnectError: refused', created_at: '2026-10-02T10:00:05'}],
     });
-    mockApi({[SYNC]: failing, [XREFS]: [], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: []});
+    mockApi({[SYNC]: failing, [XREFS]: [], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], [INSIGHTS]: quietInsights});
     wrap(<CorpusPanel investigationId="inv-1"/>);
     await screen.findByText('Failures: 2 in a row — latest corpus_push: ConnectError: refused');
     expect(screen.getByText('Last error: ConnectError: refused')).toBeInTheDocument();
     expect(screen.getByText('Cross-referencing error: CrossReferenceTimeout: still busy')).toBeInTheDocument();
 
     cleanup();
-    mockApi({[SYNC]: corpusSyncBody('inv-1'), [XREFS]: [], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: []});
+    mockApi({[SYNC]: corpusSyncBody('inv-1'), [XREFS]: [], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], [INSIGHTS]: quietInsights});
     wrap(<CorpusPanel investigationId="inv-1"/>);
     await screen.findByText('OpenAleph integration is disabled on this deployment.');
     expect(screen.getByRole('button', {name: 'Sync now'})).toBeDisabled();
@@ -167,7 +169,7 @@ describe('CorpusPanel', () => {
   });
 
   it('shows load errors', async () => {
-    mockApi({[SYNC]: {status: 500, body: {detail: 'boom'}}, [XREFS]: {status: 500, body: {detail: 'bang'}}, [WATCHLIST]: watchlistBody('inv-1'), [SETS]: []});
+    mockApi({[SYNC]: {status: 500, body: {detail: 'boom'}}, [XREFS]: {status: 500, body: {detail: 'bang'}}, [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], [INSIGHTS]: quietInsights});
     wrap(<CorpusPanel investigationId="inv-1"/>);
     await screen.findByText(/boom/);
     await screen.findByText(/bang/);
