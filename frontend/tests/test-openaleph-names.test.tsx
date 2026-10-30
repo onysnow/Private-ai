@@ -16,6 +16,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
+import {dropBody} from '../test-support/library';
 import {corpusStatusBody, documentFormatsBody, emptyGraph, entityFixture} from '../test-support/page-routes';
 
 const {searchParamsRef, mockPush} = vi.hoisted(() => ({searchParamsRef: {current: new URLSearchParams()}, mockPush: vi.fn()}));
@@ -173,15 +174,26 @@ describe('Which entity does this belong to?', () => {
 describe('DocumentsPanel and OpenAleph\'s names', () => {
   async function renderPanel(documents: unknown[] = [docFixture()]) {
     const api = mockApi({[DOCUMENTS]: documents, 'GET /api/investigations/inv-1/entities': [entityFixture('ent-jane', 'Jane Doe', 'Person')],
-      'GET /api/investigations/inv-1/graph': emptyGraph(), 'GET /api/investigations/inv-1/corpus/status': corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody()});
+      'GET /api/investigations/inv-1/graph': emptyGraph(), 'GET /api/investigations/inv-1/corpus/status': corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody(),
+      'GET /api/investigations/inv-1/drop': dropBody('inv-1')});
     wrap(<DocumentsPanel investigationId="inv-1"/>);
-    await screen.findByText('memo.txt');
+    await screen.findByTestId('document-doc-1');
     return api;
+  }
+  /** The OpenAleph actions the chosen file's menu offers, the menu left open. */
+  async function openAlephMenu(user: ReturnType<typeof userEvent.setup>): Promise<string[]> {
+    await user.click(within(screen.getByTestId('library-pane')).getByRole('button', {name: /^OpenAleph/}));
+    return screen.getAllByRole('menuitem').map(item => item.textContent ?? '');
   }
 
   it('finds names again for a document OpenAleph holds, following the job, then shows the new proposals', async () => {
     const api = await renderPanel([docFixture(), docFixture({id: 'doc-2', filename: 'local.txt', openaleph_document_id: null})]);
-    expect(screen.getAllByRole('button', {name: 'Find names again'})).toHaveLength(1);
+    const user = userEvent.setup();
+    // Only a document OpenAleph holds offers it, in its pane's OpenAleph menu.
+    await user.click(screen.getByRole('button', {name: 'local.txt'}));
+    expect(await openAlephMenu(user)).not.toContain('Find names again');
+    await user.click(screen.getByRole('button', {name: 'memo.txt'}));
+    expect(await openAlephMenu(user)).toContain('Find names again');
     const analyze = 'POST /api/documents/doc-1/openaleph/analyze';
     let polls = 0;
     api.add({
@@ -190,7 +202,7 @@ describe('DocumentsPanel and OpenAleph\'s names', () => {
         : job({status: 'succeeded', finished: true, progress: 100, message: '1 name(s) from OpenAleph'})),
       [CANDIDATES]: [candidate('cand-new', 'entity', {caption: 'Angela Merkel', suggested_schema: 'Person'})],
     });
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Find names again'}));
+    await user.click(screen.getByRole('menuitem', {name: 'Find names again'}));
     await screen.findByText('Angela Merkel', {}, {timeout: 4000});
     expect(api.calls(analyze)).toHaveLength(1);
     expect(api.calls('GET /api/jobs/job-a')).toHaveLength(2);
@@ -201,10 +213,13 @@ describe('DocumentsPanel and OpenAleph\'s names', () => {
   it('says why OpenAleph could not find names again', async () => {
     const api = await renderPanel();
     api.add({'POST /api/documents/doc-1/openaleph/analyze': job({status: 'failed', finished: true, error: "OpenAleph's name-finding is switched off on this OpenAleph"})});
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Find names again'}));
+    const user = userEvent.setup();
+    await openAlephMenu(user);
+    await user.click(screen.getByRole('menuitem', {name: 'Find names again'}));
     await screen.findByText("memo.txt: Failed: OpenAleph's name-finding is switched off on this OpenAleph");
     api.add({'POST /api/documents/doc-1/openaleph/analyze': {status: 409, body: {detail: 'This document is not in OpenAleph, so OpenAleph cannot look for names in it'}}});
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Find names again'}));
+    await openAlephMenu(user);
+    await user.click(screen.getByRole('menuitem', {name: 'Find names again'}));
     await screen.findByText(/This document is not in OpenAleph/);
   });
 

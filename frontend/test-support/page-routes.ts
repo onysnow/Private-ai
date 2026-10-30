@@ -16,6 +16,7 @@
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
 import type {BasemapStatusOut, ClaimDoneByStatusOut, CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, OwnershipChainOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
+import {dropBody} from './library';
 
 /** A reply as a test writes it: the generated shape, with whatever a test overrides. */
 export type Fixture = Record<string, unknown>;
@@ -342,6 +343,8 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/sources`]: records.sources ?? [],
     [`GET ${base}/documents`]: records.documents ?? [],
     [`GET ${base}/corpus/status`]: corpusStatusBody(id),
+    // The Drop's line, which the Library reads for where each file is in its reading.
+    [`GET ${base}/drop`]: dropBody(id),
     [`GET ${base}/ai-analysis-candidates`]: {candidates: records.aiCandidates ?? []},
     [`GET ${base}/corpus/sync`]: corpusSyncBody(id),
     [`GET ${base}/cross-references`]: [],

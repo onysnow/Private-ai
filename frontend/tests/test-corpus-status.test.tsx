@@ -14,6 +14,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
+import {dropBody} from '../test-support/library';
 import {corpusStatusBody, documentFormatsBody, emptyGraph} from '../test-support/page-routes';
 
 vi.mock('next/navigation', () => ({
@@ -89,7 +90,7 @@ describe('Reading progress for the corpus', () => {
     const api = mockApi({
       'GET /api/investigations/inv-1/documents': [queued], 'GET /api/investigations/inv-1/entities': [],
       'GET /api/investigations/inv-1/graph': emptyGraph(), [STATUS]: working,
-      'GET /api/document-formats': documentFormatsBody(),
+      'GET /api/document-formats': documentFormatsBody(), 'GET /api/investigations/inv-1/drop': dropBody('inv-1'),
     });
     wrap(<DocumentsPanel investigationId="inv-1"/>);
     const box = await screen.findByRole('status', {name: 'OpenAleph progress'});

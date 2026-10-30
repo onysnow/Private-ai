@@ -16,6 +16,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
+import {dropBody} from '../test-support/library';
 import {corpusSearchBody, corpusStatusBody, documentFormatsBody, emptyGraph} from '../test-support/page-routes';
 
 vi.mock('next/navigation', () => ({
@@ -85,15 +86,16 @@ describe('Documents in the corpus', () => {
       'GET /api/investigations/inv-1/corpus/status': corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody(),
       'GET /api/documents/memo/similar': {document_id: 'memo', state: 'ok', detail: null, results: [
         {openaleph_entity_id: 'oa-minutes-p2', schema: 'Page', title: 'minutes.pdf', document_id: 'minutes', filename: 'minutes.pdf', page_number: 2, score: 3}]},
-      'GET /api/documents/minutes/candidates': [],
+      'GET /api/documents/minutes/candidates': [], 'GET /api/investigations/inv-1/drop': dropBody('inv-1'),
     });
     wrap(<DocumentsPanel investigationId="inv-1"/>);
-    await screen.findByText('memo.txt');
+    await screen.findByTestId('document-memo');
     const user = userEvent.setup();
-    await user.click(within(screen.getByTestId('document-memo')).getByRole('button', {name: 'Similar documents'}));
+    // The first file is chosen; its tools are in its pane.
+    await user.click(within(screen.getByTestId('library-pane')).getByRole('button', {name: 'Similar documents'}));
     const similar = await screen.findByLabelText('Similar documents');
     await user.click(await within(similar).findByRole('button', {name: 'Open document'}));
-    await screen.findByText('minutes.pdf opened at page 2: its proposals are below.');
+    await screen.findByText('minutes.pdf opened at page 2: its proposals are in its pane.');
     expect(api.calls('GET /api/documents/minutes/candidates')).toHaveLength(1);
     expect(screen.getByTestId('document-minutes')).toHaveAttribute('aria-current', 'true');
     expect(api.unmatched()).toEqual([]);

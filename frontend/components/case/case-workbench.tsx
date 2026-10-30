@@ -285,7 +285,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'the-drop', label: 'The Drop', fill: true, render: () => <PanelErrorBoundary name="The Drop"><TheDrop investigationId={inv} active={view === 'collect'}/></PanelErrorBoundary>},
         {anchor: 'following', label: 'Following', fill: true, render: () => <PanelErrorBoundary name="Following"><Following investigationId={inv} active={view === 'collect'}/></PanelErrorBoundary>},
         {anchor: 'investigation-search', label: 'Search', render: () => <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'document-ingestion', label: 'Library', render: () => <PanelErrorBoundary name="Library"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'document-ingestion', label: 'Library', fill: true, render: () => <PanelErrorBoundary name="Library"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'source-capture', label: 'Sources & evidence', fill: true, render: () => <PanelErrorBoundary name="Sources & evidence">
           <SourcesBrowser investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'connectors', label: 'Connectors', render: () => <PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary>},

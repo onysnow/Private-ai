@@ -113,7 +113,7 @@ async function bootstrapWithOneDocument(document: Record<string, unknown> = docF
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText(String(document.filename));
+  await screen.findByTestId(`document-${String(document.id)}`);
   return api;
 }
 
@@ -156,8 +156,8 @@ describe('Home document ingestion & extraction', () => {
     // uploadDocument() sets "Extracted N chunk(s)..." and keeps it once the
     // proposals are in (loading them used to clear it). What persists: that
     // line, the reloaded documents list and the newly loaded proposals.
-    await screen.findByText('contract.pdf');
-    expect(screen.getByText('Kestrelwood Holdings Ltd')).toBeInTheDocument();
+    await screen.findByTestId('document-doc-2');
+    await screen.findByText('Kestrelwood Holdings Ltd');
     expect(screen.getByText('Extracted 4 chunk(s). Review proposals before canonicalizing.')).toBeInTheDocument();
 
     expect(api.calls(UPLOAD)).toHaveLength(1);
@@ -281,9 +281,9 @@ describe('Home document reading runs as a background job (ADR-0004)', () => {
       [DOCUMENTS]: [docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'complete'})], // the list the reload finds
     });
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Retry reading'}));
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Try reading again'}));
     await screen.findByText('broken.pdf: Document read');
-    expect(screen.queryByRole('button', {name: 'Retry reading'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Try reading again'})).not.toBeInTheDocument();
     expect(api.calls('GET /api/jobs')).toHaveLength(1);
     expect(api.lastUrl('GET /api/jobs').searchParams.get('subject_id')).toBe('doc-9');
     expect(api.calls(retry)).toHaveLength(1);
@@ -300,7 +300,7 @@ describe('Home remembers the open investigation in the address bar (?inv=)', () 
     const api = mockApi(pageRoutes({investigations: [investigation, second], documents: [docFixture({id: 'doc-9', filename: 'harbor.pdf'})]}));
     const Home = await importHome();
     render(<Home />);
-    await screen.findByText('harbor.pdf');
+    await screen.findByTestId('document-doc-9');
     expect(api.calls('GET /api/investigations/inv-2/documents')).toHaveLength(1);
     expect(api.calls(DOCUMENTS)).toHaveLength(0);
     expect(window.location.search).toBe('?inv=inv-2');

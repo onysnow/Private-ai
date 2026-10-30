@@ -34,7 +34,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.time import utcnow_naive
-from app.models.domain import Document, DocumentCorpusSync
+from app.models.domain import Document, DocumentCorpusSync, Source
 from app.services import openaleph_http
 from app.services.openaleph_corpus import PROVIDER, _first_property
 from app.services.openaleph_status import fetch_collection_status, stages
@@ -111,6 +111,30 @@ def _search_children(collection_id: str, entity_id: str) -> list[dict[str, Any]]
             return list(rows.values())
 
 
+def child_name(entity_id: str, properties: dict[str, Any]) -> str:
+    """What a file inside a container is called in the Workbench.
+
+    Its own file name or title when OpenAleph has one. A message ingest-file
+    splits out of a mailbox (.mbox) has neither: it is named by its subject,
+    else by who sent it and when, so the list does not show OpenAleph's
+    entity id (a hash) as its title. A "/" in a subject is not a folder."""
+    name = _first_property(properties, "fileName", "title")
+    if name:
+        return name
+    subject = _first_property(properties, "subject", "threadTopic")
+    sender = _first_property(properties, "from", "sender")
+    day = (_first_property(properties, "date") or "")[:10]
+    if subject:
+        named = subject
+    elif sender:
+        named = f"Message from {sender}" + (f", {day}" if day else "")
+    elif day:
+        named = f"Message of {day}"
+    else:
+        return entity_id
+    return named.replace("/", "∕")
+
+
 def list_children(
     collection_id: str, entity_id: str, *,
     search: Callable[[str, str], list[dict[str, Any]]] | None = None, prefix: str = "",
@@ -121,7 +145,7 @@ def list_children(
     for row in search(collection_id, entity_id):
         raw = row.get("properties")
         properties: dict[str, Any] = raw if isinstance(raw, dict) else {}
-        name = _first_property(properties, "fileName", "title") or str(row["id"])
+        name = child_name(str(row["id"]), properties)
         path = f"{prefix}{name}"
         if row.get("schema") == FOLDER_SCHEMA:
             found.extend(list_children(collection_id, str(row["id"]), search=search, prefix=f"{path}/"))
@@ -183,12 +207,23 @@ def fetch_child_file(entity_id: str, *, max_bytes: int) -> bytes | None:
     return data
 
 
-def _held(db: Session, parent: Document) -> set[str]:
-    """OpenAleph ids of the files already added under this container."""
-    rows = db.scalars(select(DocumentCorpusSync.provider_record_id).join(
+def _held(db: Session, parent: Document) -> dict[str, Document]:
+    """The files already added under this container, by their OpenAleph id."""
+    rows = db.execute(select(DocumentCorpusSync.provider_record_id, Document).join(
         Document, Document.id == DocumentCorpusSync.document_id,
     ).where(Document.parent_document_id == parent.id, DocumentCorpusSync.provider == PROVIDER)).all()
-    return {str(row) for row in rows if row}
+    return {str(entity_id): doc for entity_id, doc in rows if entity_id}
+
+
+def _retitle(db: Session, doc: Document, child: Child) -> None:
+    """A file added before it could be named (a mailbox's message titled by
+    its OpenAleph id, a hash) takes the name it has now."""
+    if child.path == child.entity_id:
+        return
+    source = db.get(Source, doc.source_id)
+    if source is not None and source.title in {child.entity_id, doc.filename} and doc.filename.endswith(child.entity_id):
+        source.title = child.path
+        db.commit()
 
 
 def _megabytes(size: int) -> str:
@@ -225,6 +260,7 @@ def add_children(
     for number, child in enumerate(children, 1):
         report(None, f"Copying the files inside from OpenAleph: {number} of {len(children)}")
         if child.entity_id in held:
+            _retitle(db, held[child.entity_id], child)
             result.already += 1
             continue
         if not child.has_file:

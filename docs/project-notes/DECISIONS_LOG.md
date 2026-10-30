@@ -427,3 +427,19 @@ full-width text. No mockups; designed from the research. Calls:
   When OpenAleph cannot be asked, a check searches the case's own read documents (`search_local`), so the watchlist
   works for every case rather than only with OpenAleph or seeded demo hits. Other names are written
   `Name (Other, Other)` and searched as `"Name" OR "Other"`. "New since you last looked" is kept in this browser only.
+
+## 26. The Library: a dense list and a pane, one OpenAleph menu, mailbox messages titled (30 Oct 2026)
+
+Ony asked (BACKLOG, "Bring in › Documents"): progress, stuck and errors per file; no wall of nine OpenAleph buttons
+per row; .mbox children titled by raw hashes; no full-width text. No mockup; calls:
+- A dense list of files with a pane beside it, not the research's contact-sheet grid (a grid needs a first-page image
+  for every file, and a list scans numbers better; a grid can come later).
+- Each file's progress and state come from The Drop's own record (`GET /drop`), refreshed while files are read; no
+  new endpoint. States are colour only (could not be read, stuck, being read, waiting for you, done), word on hover;
+  a failure's reason, a stuck notice and the progress strip stay visible.
+- Every per-file action lives in the pane; the main button names the next step; the OpenAleph actions are one menu;
+  proposals load only on "Review proposals" (some files have over 3,000).
+- Upload moves into an "Add files" popover: The Drop is the way to bring files in.
+- Look-alike titles: a long shared opening is drawn faint and shrinks first.
+- Mailbox messages are titled by subject, else "Message from <sender>, <date>", else the date; old hash titles are
+  renamed the next time "Look for files inside again" runs.
