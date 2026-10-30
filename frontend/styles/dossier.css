@@ -1,0 +1,154 @@
+/* A party's dossier (features/dossier/*) in the inspector slot, ~520 px wide or a phone's bottom sheet (DECISIONS_LOG
+   35, 38). At rest: who or what, what waits on a person, the figures; each section only when it holds something; a
+   row's actions show on hover or focus (always on a touch screen, which has no hover). */
+.dsr { display: grid; gap: 14px; font-size: 13px; color: var(--text); }
+/* A section with nothing in it leaves its wrapper empty: it takes no gap. */
+.dsr > div:empty { display: none; }
+
+/* Who or what. */
+.dsr-id { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; }
+.dsr-id > .rv .km-party { width: 34px; height: 34px; border-width: 2px; }
+.dsr-id > .rv .km-party svg { width: 17px; height: 17px; }
+.dsr-who { display: grid; gap: 6px; min-width: 0; }
+.dsr-name { margin: 0; font: 600 21px/1.2 var(--font-display); overflow-wrap: anywhere; }
+.dsr-name .ds-state { font-size: 15px; margin-left: 4px; }
+.dsr-keys { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 0; }
+.dsr-key { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 1px 8px; border-radius: 99px;
+  font: 500 12px var(--font-mono); color: var(--text); background: var(--surface-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dsr-key.country { color: var(--accent-2); }
+.dsr-key.more { cursor: default; color: var(--text-muted); background: none; box-shadow: inset 0 0 0 1px var(--line); }
+.dsr-key:hover { background: var(--surface-3); }
+.dsr-key:focus-visible, .dsr-act:focus-visible, .dsr-fig:focus-visible, .dsr-party:focus-visible, .dsr-open:focus-visible, .dsr-val:focus-visible,
+.dsr-pri:focus-visible, .dsr-chip-alert:focus-visible, .dsr-more-rows:focus-visible, .dsr-fold > summary:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.dsr-edit { padding: 10px; border-radius: 12px; background: var(--surface-1); }
+
+/* Small icon actions: named on hover and to screen readers. */
+.dsr-acts { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; flex: none; }
+.dsr-acts > .rv { display: inline-flex; }
+.dsr-act { all: unset; box-sizing: border-box; cursor: pointer; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; color: var(--text-muted); }
+.dsr-act:hover { color: var(--text); background: var(--surface-2); }
+.dsr-act[aria-pressed='true'] { color: var(--accent-2); box-shadow: inset 0 0 0 1px var(--accent-2); }
+.dsr-act.yes[aria-pressed='true'] { color: var(--status-supported); box-shadow: inset 0 0 0 1px var(--status-supported); }
+.dsr-act.no[aria-pressed='true'] { color: var(--status-disputed); box-shadow: inset 0 0 0 1px var(--status-disputed); }
+.dsr-act:disabled { cursor: default; opacity: .35; background: none; }
+.dsr-digit { font: 700 13px var(--font-mono); }
+.dsr-row .dsr-acts { opacity: 0; transition: opacity .12s; }
+.dsr-row:hover .dsr-acts, .dsr-row:focus-within .dsr-acts, .dsr-row.held .dsr-acts { opacity: 1; }
+@media (hover: none) { .dsr-row .dsr-acts { opacity: 1; } }
+
+/* What waits on a person: the one primary action. */
+.dsr-alerts { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 0; }
+.dsr-pri { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 99px;
+  font: 650 13px var(--font-ui); background: var(--accent-1); color: var(--ground); }
+.dsr-pri:disabled { cursor: default; opacity: .5; }
+.dsr-chip-alert { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px;
+  font: 600 12.5px var(--font-ui); color: var(--accent-1); box-shadow: inset 0 0 0 1px var(--accent-1); }
+
+/* The figures: numbers that open their sections. */
+.dsr-figs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); gap: 6px; }
+.dsr-figs > li > .rv { display: block; height: 100%; }
+.dsr-fig { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 2px; align-content: start; width: 100%; height: 100%; padding: 8px 9px 7px; border-radius: 10px; background: var(--surface-1); }
+.dsr-fig:hover { background: var(--surface-2); }
+.dsr-fig.zero { cursor: default; background: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 45%, transparent); color: var(--text-muted); }
+.dsr-fig-top { display: inline-flex; align-items: center; gap: 5px; color: var(--text-muted); }
+.dsr-fig-top b { font: 600 19px/1.1 var(--font-mono); color: var(--text); white-space: nowrap; }
+.dsr-fig.zero .dsr-fig-top b { color: var(--text-muted); font-weight: 400; }
+.dsr-fig-unit { font: 500 10.5px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); }
+.dsr-fig-bar { display: flex; gap: 2px; height: 4px; margin-top: 3px; border-radius: 2px; overflow: hidden; }
+.dsr-fig-bar i { display: block; height: 100%; min-width: 3px; background: currentColor; }
+.dsr-fig-bar .lvb-textbook { background: var(--flag-textbook-edge); }
+.dsr-fig-bar .lvb-strong { background: var(--flag-strong); }
+.dsr-fig-bar .lvb-faint { background: var(--flag-faint); }
+.dsr-fig-bar .st-ruled_out { background: var(--text-muted); }
+.dsr-money { display: inline-flex; align-items: center; gap: 1px; font-size: 14px !important; }
+.dsr-money svg:last-of-type { margin-left: 5px; }
+
+.dsr-quiet { margin: 0; font-size: 12px; color: var(--text-muted); }
+.dsr-alert { margin: 0; font-size: 12.5px; color: var(--status-disputed); }
+
+/* Sections. */
+.dsr-sec { display: grid; gap: 6px; scroll-margin-top: 64px; }
+.dsr-sec-head { display: flex; align-items: center; gap: 8px; min-height: 26px; border-bottom: 1px solid color-mix(in srgb, var(--line) 45%, transparent); padding-bottom: 4px; }
+.dsr-sec-head > .rv { display: inline-flex; }
+.dsr-sec-title { margin: 0; display: inline-flex; align-items: center; gap: 6px; font: 600 14px var(--font-ui); outline: none; }
+.dsr-sec-title svg { color: var(--text-muted); }
+.dsr-sec-n { font: 500 12px var(--font-mono); color: var(--text-muted); }
+.dsr-sec-tools { margin-left: auto; display: inline-flex; gap: 2px; }
+.arrived > .dsr-sec, .arrived.dsr-group, .arrived > .dsr-sec > .dsr-sec-head { animation: dsr-lit 1.2s ease-out; }
+@keyframes dsr-lit { from { background: color-mix(in srgb, var(--accent-2) 16%, transparent); } to { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .arrived > .dsr-sec, .arrived.dsr-group { animation: none; } }
+.dsr-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.dsr-row { border-radius: 8px; }
+.dsr-row:hover, .dsr-row:focus-within { background: var(--surface-1); }
+.dsr-line { display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 2px 4px 2px 6px; min-width: 0; }
+.dsr-line.top { align-items: flex-start; padding-top: 6px; padding-bottom: 6px; }
+.dsr-line > .rv { display: inline-flex; align-items: center; min-width: 0; }
+.dsr-grow { flex: 1 1 auto; min-width: 0; }
+.rv.dsr-grow { display: flex !important; }
+.dsr-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13.5px; }
+.dsr-party { all: unset; cursor: pointer; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 13.5px var(--font-ui);
+  border-bottom: 1px dotted color-mix(in srgb, var(--text-muted) 60%, transparent); }
+.dsr-party:hover { color: var(--accent-2); }
+.dsr-open { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 32px; padding: 3px 6px; border-radius: 8px; font-size: 13.5px; }
+.dsr-row > .rv { display: block; }
+.dsr-open .dsr-text { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.dsr-arrow { font: 600 15px var(--font-mono); color: var(--text-muted); width: 16px; text-align: center; }
+.dsr-warn { color: var(--flag-strong); display: inline-flex; }
+.dsr-evid { font: 500 12px var(--font-mono); color: var(--text-muted); }
+.dsr-fam { display: grid; gap: 1px; }
+.dsr-fam + .dsr-fam { margin-top: 6px; }
+.dsr-fam-name { display: flex; align-items: center; gap: 6px; font: 500 10.5px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); padding-left: 6px; }
+.dsr-dir { display: inline-grid; place-items: center; }
+.dsr-dir.in { color: var(--status-supported); }
+.dsr-dir.out { color: var(--accent-1); }
+.dsr-amt { margin-left: auto; font: 600 13.5px var(--font-mono); white-space: nowrap; }
+.dsr-when { font: 500 11.5px var(--font-mono); color: var(--text-muted); white-space: nowrap; }
+.dsr-when.lead { min-width: 84px; color: var(--text); }
+.dsr-src { font-weight: 600; font-size: 13.5px; }
+.dsr-loc { font: 500 11.5px var(--font-mono); color: var(--text-muted); }
+.dsr-quote { display: block; margin-top: 3px; font: 400 13px/1.45 var(--font-read); color: var(--text-muted); quotes: '“' '”'; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.dsr-owner { font: 600 11px var(--font-mono); color: var(--text-muted); padding: 0 6px; border-radius: 99px; box-shadow: inset 0 0 0 1px var(--line); }
+.dsr-more-rows { all: unset; cursor: pointer; justify-self: start; padding: 2px 6px; font: 500 12px var(--font-ui); color: var(--accent-2); }
+.dsr .ds-state { font-size: 14px; }
+
+/* Identity work: values that disagree, the same party?, pairs left by a merge. */
+.dsr-group { display: grid; gap: 4px; }
+.dsr-group + .dsr-group { margin-top: 8px; }
+.dsr-group-title { margin: 0; font: 600 12.5px var(--font-ui); color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; }
+.dsr-group > .rv { display: inline-flex; width: fit-content; }
+.dsr-group > .dsr-line { padding-left: 0; }
+.dsr-prop { font: 500 12px var(--font-mono); color: var(--text-muted); white-space: nowrap; }
+.dsr-vals { display: inline-flex; flex-wrap: wrap; gap: 4px; min-width: 0; flex: 1 1 auto; }
+.dsr-vals > .rv { display: inline-flex; }
+.dsr-val { all: unset; box-sizing: border-box; cursor: pointer; padding: 1px 9px; border-radius: 99px; font: 500 12.5px var(--font-mono); box-shadow: inset 0 0 0 1px var(--line); }
+.dsr-val:hover { background: var(--surface-2); }
+.dsr-val.on { color: var(--accent-2); box-shadow: inset 0 0 0 1.5px var(--accent-2); }
+.dsr-score { font: 600 12.5px var(--font-mono); color: var(--text-muted); }
+.dsr-decided { display: inline-grid; place-items: center; width: 18px; font-weight: 700; color: var(--text-muted); }
+.dsr-decided.yes { color: var(--status-supported); }
+.dsr-decided.no { color: var(--status-disputed); }
+.dsr-decided.maybe { color: var(--flag-strong); }
+.dsr-preview { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; margin: 0 4px 6px 32px; padding: 6px 8px 6px 10px; border-radius: 8px;
+  background: var(--surface-2); font-size: 12.5px; }
+
+/* More: history, OpenAleph, every recorded value. */
+.dsr-fold { border-top: 1px solid color-mix(in srgb, var(--line) 45%, transparent); padding-top: 8px; }
+.dsr-fold > summary { cursor: pointer; list-style: none; display: inline-flex; align-items: baseline; gap: 8px; font: 600 13px var(--font-ui); color: var(--accent-2); }
+.dsr-fold > summary::-webkit-details-marker { display: none; }
+.dsr-fold > summary::before { content: '▸'; color: var(--text-muted); }
+.dsr-fold[open] > summary::before { content: '▾'; }
+.dsr-fold-what { font: 400 11.5px var(--font-ui); color: var(--text-muted); }
+.dsr-fold[open] > summary { margin-bottom: 10px; }
+.dsr-props { margin: 4px 0 0; display: grid; gap: 4px; }
+.dsr-props > div { display: grid; grid-template-columns: minmax(90px, 34%) minmax(0, 1fr); gap: 8px; align-items: baseline; }
+.dsr-props dt { font: 500 11.5px var(--font-mono); color: var(--text-muted); }
+.dsr-props dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.dsr-props dd > .rv { display: inline-flex; max-width: 100%; }
+
+/* A phone's bottom sheet: bigger touch targets, the figures three to a row. */
+@media (max-width: 640px) {
+  .dsr-figs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dsr-act { width: 36px; height: 36px; }
+  .dsr-line { min-height: 40px; }
+  .dsr-props > div { grid-template-columns: 1fr; gap: 2px; }
+}

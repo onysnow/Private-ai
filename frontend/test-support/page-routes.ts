@@ -168,6 +168,15 @@ export function dossierRoutes(entityId: string, dossier: unknown, duplicates: un
   };
 }
 
+/** The case-wide reads a dossier works its own share out of (its party's Red Flags and payments): none by default. */
+export function dossierCaseRoutes(investigationId: string, flags: unknown[] = [], transactions: unknown[] = []): Routes {
+  const base = `/api/investigations/${investigationId}`;
+  return {
+    [`GET ${base}/red-flags`]: {investigation_id: investigationId, rules: [], flags, gone: [], cannot_run: [], investigation_type: {set_by: 'app', areas: [], suggested: []}},
+    [`GET ${base}/financial-flows`]: {investigation_id: investigationId, transactions, incomplete: [], currencies: [], flow_type_rule: '', duplicate_rule: ''},
+  };
+}
+
 export type GraphBody = {
   nodes: unknown[];
   edges: unknown[];

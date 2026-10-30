@@ -130,9 +130,8 @@ describe('Home entity dossier: identity history & property conflicts', () => {
     const api = await bootstrapAndOpenDossier(dossierFixture());
 
     expect(screen.getByText('Identity / merge history')).toBeInTheDocument();
-    expect(
-      screen.getByText((_, node) => node?.textContent === ' · 1 merged alias(es) · 1 reporter identity decision(s)', {selector: 'small'}),
-    ).toBeInTheDocument();
+    // The history is folded under the dossier's "More".
+    expect(screen.getByText('Identity / merge history').closest('details')).not.toBeNull();
     expect(screen.getByText('Alias: Kestrelwood Holdings LLC', {exact: false})).toBeInTheDocument();
     expect(screen.getByText('same: Kestrelwood Holdings LLC', {exact: false})).toBeInTheDocument();
     expect(screen.getByText('Merge audit: ent-2 → ent-1', {exact: false})).toBeInTheDocument();
