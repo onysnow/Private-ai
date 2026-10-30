@@ -46,3 +46,43 @@
 /* Show only what matters (29 Oct): each row is its mark, its name and, when not as made, its word; the fingerprints on reveal. */
 .pk-row > .rv { min-width: 0; overflow: hidden; }
 .pk-row .pk-name { display: block; font-size: 12.5px; }
+/* With no pack yet (30 Oct): a large drop target, what the check does as three marks, the floor, and a way to try it. */
+.pk-start { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 14px; align-items: stretch; }
+@media (max-width: 980px) { .pk-start { grid-template-columns: minmax(0, 1fr); } }
+.pk-start > .pk-error { grid-column: 1 / -1; }
+.pk-drop.big { flex-direction: column; justify-content: center; gap: 12px; min-height: 380px; padding: 32px; border-width: 2px; border-radius: 18px; text-align: center; }
+.pk-drop.big .pk-ico { width: 72px; height: 72px; font-size: 32px; border-width: 1.5px; transition: transform .2s; }
+.pk-drop.big:hover .pk-ico, .pk-drop.big.over .pk-ico { transform: translateY(4px); }
+.pk-drop.big.busy .pk-ico { animation: pk-pulse 1.2s ease-in-out infinite; }
+@keyframes pk-pulse { 50% { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .pk-drop.big .pk-ico { transition: none; animation: none; } }
+.pk-drop-title { font: 400 30px/1.2 var(--font-display); }
+.pk-choose { padding: 5px 14px; border-radius: 99px; border: 1px solid var(--accent-1); color: var(--accent-1); font: 600 13px var(--font-ui); }
+.pk-floor { margin-top: 18px; font-size: 13.5px; color: var(--text); display: inline-flex; gap: 8px; align-items: center; }
+.pk-floor > span { color: var(--accent-2); font-size: 16px; }
+.pk-aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.pk-aside > .pk-panel { flex: 1 1 auto; }
+.pk-try { flex: 0 0 auto !important; }
+.pk-how { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.pk-how li { display: flex; gap: 14px; align-items: center; font-size: 16px; }
+.pk-how-mark { flex: none; min-width: 44px; height: 44px; padding: 0 6px; border-radius: 12px; display: inline-grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent-1) 50%, transparent); color: var(--accent-1); font: 500 20px var(--font-mono); }
+.pk-how-mark.states { display: inline-flex; gap: 3px; }
+.pk-how-mark.states i { font: 600 12px var(--font-mono); font-style: normal; width: 17px; height: 17px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; }
+.pk-how-mark .ok { --tone: var(--status-supported); } .pk-how-mark .bad { --tone: var(--status-disputed); } .pk-how-mark .add { --tone: var(--accent-1); }
+.pk-how-mark.states i { color: var(--tone); }
+.pk-try .pk-acts button { height: auto; min-height: 34px; padding: 6px 13px; text-align: left; }
+.pk-acts button:disabled { opacity: .5; cursor: progress; }
+.pk-acts button.teal { border-color: color-mix(in srgb, var(--accent-2) 60%, transparent); color: var(--accent-2); }
+/* With a pack read: the file, its floor line and Check another; the as-made rows fold; counts carry their colour. */
+.pk-drop-text { flex: 1; min-width: 0; }
+.pk-another { position: relative; z-index: 1; pointer-events: none; height: 30px; padding: 0 13px; display: inline-grid; place-items: center; border-radius: 8px; border: 1px solid var(--line, rgba(127,127,127,.35)); font: 600 12px var(--font-ui); }
+.pk-more { all: unset; cursor: pointer; display: block; padding: 8px 8px 2px 40px; font-size: 12.5px; color: var(--text-muted); }
+.pk-more:hover { color: var(--text); }
+.pk-counts div.bad dd { color: var(--status-disputed); } .pk-counts div.add dd { color: var(--accent-1); }
+.pk-list li > span { min-width: 0; }
+.pk-list li.warn b { color: var(--accent-1); } .pk-list li.ok b { color: var(--status-supported); } .pk-list li.bad b { color: var(--status-disputed); }
+.pk-row { grid-template-columns: 22px minmax(0, 1fr) 120px; padding: 9px 8px; }
+.pk-row .pk-name { font-size: 13px; }
+.pk-how-mark.states { display: inline-grid; grid-template-columns: repeat(2, 15px); gap: 3px; place-content: center; padding: 0; width: 44px; }
+.pk-how-mark.states i { width: 15px; height: 15px; font-size: 9px; }
+.pk-try .pk-acts { flex-direction: column; } .pk-try .pk-acts > *, .pk-try .pk-acts button { width: 100%; }

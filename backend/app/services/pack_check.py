@@ -142,7 +142,8 @@ def check(db: Session, investigation_id: str, data: bytes, filename: str = "") -
     by_number = {int(e["number"]): e for e in (record.exhibits if record is not None else [])}
     for r in rows:
         m = re.match(r"^exhibits/(\d{3})/(.+)$", r["name"])
-        if not m or r["state"] == "as_made" or record is None:
+        # An exhibit changed or gone; a file added beside it (a copy, a note) is only "not in the list".
+        if not m or r["state"] not in ("changed", "missing") or record is None:
             continue
         kept = by_number.get(int(m.group(1)))
         if kept is None:

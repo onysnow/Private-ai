@@ -61,7 +61,7 @@ function PartySlot({investigationId, label, value, onChange, autoFocus}: {invest
       <small>{label}</small>
       <input value={value.text} autoFocus={autoFocus} aria-label={label} placeholder="type a name" style={{width: `${Math.max(10, value.text.length + 1)}ch`}}
         onChange={e => { onChange({id: null, text: e.target.value, kind: value.kind}); setOpen(true); }} onFocus={() => setOpen(true)}/>
-      {value.id && <Reveal detail="A record of this case"><span className="bh-chip teal">in the case</span></Reveal>}
+      {value.id && <Reveal label="in the case" detail="In the case: a record of this case."><span className="bh-known" aria-hidden="true">●</span></Reveal>}
     </label>
     {open && !value.id && typed.trim().length >= 2 && <span className="bh-suggest" role="listbox" aria-label={`Parties matching ${typed}`}>
       {found.map(s => <button key={s.id} type="button" role="option" aria-selected="false" onClick={() => pick(s)}>
@@ -79,6 +79,7 @@ function PartySlot({investigationId, label, value, onChange, autoFocus}: {invest
   </span>;
 }
 
+const clip = (t: string) => (t.length > 22 ? `${t.slice(0, 21)}…` : t);
 const end = (s: Slot) => (s.id ? {entity_id: s.id} : {new: {caption: s.text.trim(), schema: s.kind ?? 'LegalEntity'}});
 const ready = (s: Slot) => Boolean(s.id || (s.text.trim() && s.kind));
 
@@ -164,10 +165,11 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
               {Object.entries(LINK_WORDS).map(([s, w]) => <option key={s} value={s}>{w}</option>)}</select></label>
             <PartySlot investigationId={investigationId} label="party" value={b} onChange={setB}/>
             {(schema === 'Payment' || schema === 'Ownership') && <label className={`bh-slot${amount ? '' : ' empty'}`}><small>{schema === 'Payment' ? 'amount' : 'per cent'}</small>
-              <input value={amount} onChange={e => setAmount(e.target.value)} aria-label={schema === 'Payment' ? 'Amount' : 'Per cent'} placeholder={schema === 'Payment' ? '29,400' : '60'} inputMode="decimal"/>
+              <input value={amount} onChange={e => setAmount(e.target.value)} aria-label={schema === 'Payment' ? 'Amount' : 'Per cent'} placeholder={schema === 'Payment' ? '29,400' : '60'} inputMode="decimal"
+                style={{width: `${Math.max(6, amount.length + 1)}ch`}}/>
               {schema === 'Payment' && <input className="bh-cur" value={currency} onChange={e => setCurrency(e.target.value)} aria-label="Currency" maxLength={3}/>}</label>}
             <span>{schema === 'Payment' ? 'on' : 'from'}</span>
-            <label className={`bh-slot${date ? '' : ' empty'}`}><small>date</small><input value={date} onChange={e => setDate(e.target.value)} aria-label="Date" placeholder="2019-03-03, 2019-03 or 2019"/></label>
+            <label className={`bh-slot${date ? '' : ' empty'}`}><small>date</small><input value={date} onChange={e => setDate(e.target.value)} aria-label="Date" placeholder="2019-03-03"/></label>
             <Precision value={precision} date={date}/>
             {schema === 'Payment' && <><span>, for</span><label className={`bh-slot${purpose ? '' : ' empty'}`}><small>purpose</small>
               <input value={purpose} onChange={e => setPurpose(e.target.value)} aria-label="Purpose" placeholder="not known"/></label></>}
@@ -182,7 +184,7 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
           : <p className="bh-sentence">
             <label className={`bh-slot${title ? '' : ' empty'}`}><small>what happened</small><input value={title} autoFocus onChange={e => setTitle(e.target.value)} aria-label="What happened" placeholder="the board met on the lease"/></label>
             <span>on</span>
-            <label className={`bh-slot${date ? '' : ' empty'}`}><small>date</small><input value={date} onChange={e => setDate(e.target.value)} aria-label="Date" placeholder="2019-03-03, 2019-03 or 2019"/></label>
+            <label className={`bh-slot${date ? '' : ' empty'}`}><small>date</small><input value={date} onChange={e => setDate(e.target.value)} aria-label="Date" placeholder="2019-03-03"/></label>
             <Precision value={precision} date={date}/>
             <span>at</span>
             <label className={`bh-slot${where ? '' : ' empty'}`}><small>place</small><input value={where} onChange={e => setWhere(e.target.value)} aria-label="Place" placeholder="not known"/></label>
@@ -224,23 +226,23 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
       <div className="bh-col">
         {kind === 'link' && <section className="bh-panel" aria-label="Where it lands">
           <p className="bh-cap t"><Reveal detail="Before you add it."><span>Where it lands</span></Reveal></p>
-          <svg className="bh-wire" viewBox="0 0 400 120" role="img" aria-label={`${a.text || 'a party'} ${LINK_WORDS[schema]} ${b.text || 'a party'}`}>
-            <line x1="90" y1="60" x2="310" y2="60" className="bh-new-line"/>
+          <svg className="bh-wire" viewBox="0 10 400 84" role="img" aria-label={`${a.text || 'a party'} ${LINK_WORDS[schema]} ${b.text || 'a party'}`}>
+            <line x1="170" y1="60" x2="230" y2="60" className="bh-new-line"/>
             <text x="200" y="30" textAnchor="middle" className="bh-line-label">{LINK_WORDS[schema]}{amount ? ` ${amount}${schema === 'Payment' ? ` ${currency}` : '%'}` : ''} · new</text>
-            <rect x="20" y="44" width="140" height="32" rx="8" className={a.id ? 'bh-node known' : 'bh-node'}/><text x="90" y="64" textAnchor="middle">{(a.text || 'party').slice(0, 20)}</text>
-            <rect x="240" y="44" width="140" height="32" rx="8" className={b.id ? 'bh-node known' : 'bh-node'}/><text x="310" y="64" textAnchor="middle">{(b.text || 'party').slice(0, 20)}</text>
+            <rect x="6" y="44" width="164" height="32" rx="8" className={a.id ? 'bh-node known' : a.text ? 'bh-node' : 'bh-node empty'}/><text x="88" y="64" textAnchor="middle">{clip(a.text || 'party')}</text>
+            <rect x="230" y="44" width="164" height="32" rx="8" className={b.id ? 'bh-node known' : b.text ? 'bh-node' : 'bh-node empty'}/><text x="312" y="64" textAnchor="middle">{clip(b.text || 'party')}</text>
           </svg>
         </section>}
-        <section className="bh-panel" aria-label="What it changes">
-          <p className="bh-cap"><Reveal detail="A dry run: nothing is saved yet."><span>What it changes</span></Reveal></p>
-          {!entry ? <p className="bh-note">Fill in the blanks to see.</p>
+        <section className={`bh-panel${entry ? '' : ' idle'}`} aria-label="What it changes">
+          <p className="bh-cap"><Reveal detail="A dry run: nothing is saved yet."><span>What it changes</span></Reveal>{!entry && <span>once the blanks are filled</span>}</p>
+          {!entry ? null : !preview.data ? <p className="bh-note">{preview.isError ? '' : 'Checking…'}</p>
             : changes.length ? <ul className="bh-list">{changes.map(c => <li key={c}><b className="bh-ico amber" aria-hidden="true">◆</b><span>{c}</span></li>)}</ul>
             : <p className="bh-note">{kind === 'link' ? 'No Red Flag rises with it.' : 'It raises no Red Flag on its own.'}{mode === 'none' ? ' With no source it stays Not yet shown.' : ''}</p>}
         </section>
-        <section className="bh-panel" aria-label="Already in the case?">
-          <p className="bh-cap"><Reveal detail="Checked as you type."><span>Already in the case?</span></Reveal></p>
-          {!entry ? <p className="bh-note">Fill in the blanks to see.</p> : preview.isError ? <p role="alert">{errorMessage(preview.error, 'Could not check')}</p>
-            : preview.data && !preview.data.already.length && !preview.data.waiting.length ? <p className="bh-note"><b className="bh-ico ok" aria-hidden="true">✓</b> Nothing like it yet.</p>
+        <section className={`bh-panel${entry ? '' : ' idle'}`} aria-label="Already in the case?">
+          <p className="bh-cap"><Reveal detail="Checked as you type."><span>Already in the case?</span></Reveal>{!entry && <span>checked as you type</span>}</p>
+          {!entry ? null : preview.isPending && !preview.isError ? <p className="bh-note">Checking…</p> : preview.isError ? <p role="alert">{errorMessage(preview.error, 'Could not check')}</p>
+            : preview.data && !preview.data.already.length && !preview.data.waiting.length ? <p className="bh-note bh-clear"><b className="bh-ico ok" aria-hidden="true">✓</b> {kind === 'link' ? 'No link between these two yet.' : 'Nothing like it yet.'}</p>
             : <><Hits title="In the case" hits={preview.data?.already ?? []}/><Hits title="Waiting in Decide" hits={preview.data?.waiting ?? []}/></>}
         </section>
       </div>

@@ -73,9 +73,12 @@ def test_a_changed_picture_is_drawn_again_and_what_rests_on_it_is_named(tmp_path
                 edited.putpixel((x, y), (250, 250, 250))
         buf = io.BytesIO()
         edited.save(buf, "JPEG", quality=95)
-    sent_back = _repack(z, {"exhibits/001/picture.jpg": buf.getvalue(), f"custody/{claim_id}.txt": None, "notes.txt": b"added"})
+    sent_back = _repack(z, {"exhibits/001/picture.jpg": buf.getvalue(), f"custody/{claim_id}.txt": None, "notes.txt": b"added",
+                            "exhibits/001/picture (1).jpg": buf.getvalue()})
     out = _check(inv, sent_back)
-    assert not out["whole"] and out["counts"]["changed"] == 1 and out["counts"]["missing"] == 1 and out["counts"]["extra"] == 1
+    assert not out["whole"] and out["counts"]["changed"] == 1 and out["counts"]["missing"] == 1 and out["counts"]["extra"] == 2
+    # A copy added beside the exhibit is not in the list, and not the exhibit changing a second time.
+    assert [e["file"] for e in out["exhibits"]] == ["picture.jpg"]
     states = {r["name"]: r for r in out["rows"]}
     assert states["exhibits/001/picture.jpg"]["state"] == "changed"
     assert states[f"custody/{claim_id}.txt"]["about"] == "the chain of custody of “Harbour Nominees held 40% of Fernhill Ltd.”"

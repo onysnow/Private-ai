@@ -63,3 +63,21 @@
 .bh-src button { width: 100%; height: 100%; }
 .bh-src b { font-size: 14.5px; margin: 0; }
 .bh-info { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid currentColor; font: 600 12px var(--font-mono); }
+/* The sentence reads as big type (mockup ENTRY_1, 30 Oct): larger blanks, the words between them a size up; a party
+   found in the case is its teal edge and dot, named on hover; the right column stays compact until the blanks fill. */
+.bh-sentence { font-size: 26px; gap: 10px 8px; }
+.bh-slot { font-size: 21px; line-height: 2; padding: 0 12px; border-radius: 10px; }
+.bh-slot small { font-size: 10px; }
+.bh-slot select { field-sizing: content; width: auto; min-width: 4ch; }
+.bh-slot input::placeholder { color: color-mix(in srgb, var(--text-muted) 85%, transparent); font-weight: 500; }
+.bh-slot.known { border-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 8%, var(--surface-2)); }
+.bh-known { color: var(--accent-2); font-size: 10px; line-height: 1; }
+.bh-prec > span { font-size: 13px; padding: 2px 9px; }
+.bh-suggest { font-size: 14px; }
+.bh-panel.idle { padding-bottom: 5px; }
+.bh-panel.idle .bh-cap { margin-bottom: 6px; }
+.bh-panel.idle .bh-cap > span:not(.rv) { font-style: italic; }
+.bh-wire { font-size: 13px; }
+.bh-node.empty { stroke-dasharray: 4 4; stroke: var(--text-muted); }
+.bh-list li, .bh-clear { font-size: 14px; }
+.bh-clear { display: flex; gap: 9px; align-items: center; color: var(--text); }

@@ -53,9 +53,40 @@ describe('Check a pack', () => {
     await user.click(within(files).getByRole('button', {name: 'Not in the list 1'}));
     expect(within(files).getAllByRole('listitem')).toHaveLength(1);
     const exhibit = screen.getByRole('region', {name: 'Exhibit 7 changed'});
-    expect(exhibit).toHaveTextContent('Rests on it: “Fernhill paid Loop Two €29,400 in March 2019”');
-    expect(exhibit).toHaveTextContent('statement.pdf: SHA-256 checked now, matches');
     expect(exhibit).toHaveTextContent('The pictures differ inside the marked band.');
+    const rests = screen.getByRole('region', {name: 'What rests on it'});
+    expect(rests).toHaveTextContent('Exhibit 7: “Fernhill paid Loop Two €29,400 in March 2019”');
+    expect(rests).toHaveTextContent('statement.pdf: SHA-256 checked now, matches');
+    expect(rests).toHaveTextContent('Missing: the chain of custody of “Fernhill paid Loop Two”');
+    expect(screen.getByText('Check another')).toBeInTheDocument();
+  });
+
+  it('with no pack yet, shows a large drop target, what the check does, the floor, and a way to try it', async () => {
+    const api = mockApi({'GET /api/investigations/inv-1/evidence-pack.zip': {status: 200, body: 'zip'},
+      'POST /api/investigations/inv-1/evidence-pack/check': {...RESULT, whole: true}});
+    render(<QueryProvider><CheckAPack investigationId="inv-1"/></QueryProvider>);
+    expect(screen.getByText('Drop an evidence pack here')).toBeInTheDocument();
+    const how = screen.getByRole('region', {name: 'What the check does'});
+    expect(within(how).getAllByRole('listitem').map(li => li.textContent)).toEqual([
+      expect.stringContaining('Recomputes each file’s fingerprint'), expect.stringContaining('Compares it with the pack’s own list'),
+      expect.stringContaining('Says what changed, is missing or was added')]);
+    expect(screen.getByText(/Read on this computer\. Nothing is sent anywhere/)).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Make a pack from this case and check it'}));
+    await waitFor(() => expect(api.calls('POST /api/investigations/inv-1/evidence-pack/check')).toHaveLength(1));
+    expect(api.calls('GET /api/investigations/inv-1/evidence-pack.zip')).toHaveLength(1);
+    expect(await screen.findByRole('region', {name: 'Result'})).toHaveTextContent('As it was made');
+  });
+
+  it('folds the files as made past the first few into one line', async () => {
+    const many = Array.from({length: 12}, (_, i) => ({name: `f${String(i).padStart(2, '0')}.txt`, state: 'as_made' as const, listed: A, now: A}));
+    mockApi({'POST /api/investigations/inv-1/evidence-pack/check': {...RESULT, rows: [...RESULT.rows, ...many]}});
+    render(<QueryProvider><CheckAPack investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.upload(screen.getByLabelText('Choose an evidence pack'), new File(['PK'], 'p.zip'));
+    const files = await screen.findByRole('region', {name: 'Every file against the list'});
+    expect(within(files).getAllByRole('listitem')).toHaveLength(3 + 8);
+    await user.click(within(files).getByRole('button', {name: '… 6 more, all as made'}));
+    expect(within(files).getAllByRole('listitem')).toHaveLength(17);
   });
 
   it('says a refused file in words', async () => {

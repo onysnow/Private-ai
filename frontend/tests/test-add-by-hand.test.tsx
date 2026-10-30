@@ -31,6 +31,9 @@ describe('Add by hand', () => {
       'GET /api/investigations/inv-1/documents': [],
     });
     render(<QueryProvider><AddByHand investigationId="inv-1"/></QueryProvider>);
+    // Before the blanks are filled the right column is its titles, not placeholders.
+    expect(screen.getByRole('region', {name: 'What it changes'})).toHaveTextContent('once the blanks are filled');
+    expect(screen.getByRole('region', {name: 'Already in the case?'})).not.toHaveTextContent('Fill in the blanks');
     const user = userEvent.setup();
     const [first, second] = screen.getAllByLabelText('party');
     await user.type(first, 'Fern');
@@ -52,5 +55,24 @@ describe('Add by hand', () => {
       source: {entity_id: 'e-fern'}, target: {new: {caption: 'Marsh Holdings', schema: 'Company'}},
       properties: {amount: ['29400'], currency: ['EUR'], date: ['2019-03-03']}}});
     expect(await screen.findByRole('status')).toHaveTextContent('Added: the link, and a lead to find its source, and 1 new party.');
+  });
+
+  it('says plainly when no link joins the two parties yet', async () => {
+    mockApi({
+      'GET /api/investigations/inv-1/by-hand/suggest': ({url}: {url: URL}) => (url.searchParams.get('q')?.toLowerCase().startsWith('good')
+        ? [{id: 'e-gs', caption: 'Good Star Limited', schema: 'Company', matched: 'Good Star Limited', as: 'its name'}]
+        : [{id: 'e-ab', caption: 'Aabar Investments PJS Limited', schema: 'Company', matched: 'Aabar Investments PJS Limited', as: 'its name'}]),
+      'POST /api/investigations/inv-1/by-hand/preview': {already: [], waiting: [], changes: []},
+      'GET /api/investigations/inv-1/documents': [],
+    });
+    render(<QueryProvider><AddByHand investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    const [first, second] = screen.getAllByLabelText('party');
+    await user.type(first, 'Good');
+    await user.click(await screen.findByRole('option', {name: /Good Star Limited/}));
+    await user.type(second, 'Aabar');
+    await user.click(await screen.findByRole('option', {name: /Aabar Investments/}));
+    expect(await within(screen.getByRole('region', {name: 'Already in the case?'})).findByText('No link between these two yet.')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('in the case')).toHaveLength(2);
   });
 });
