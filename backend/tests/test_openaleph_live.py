@@ -305,8 +305,10 @@ def test_the_corpus_is_searched_with_highlights_and_similar_documents_are_found(
 
     # more_like_this reads Elasticsearch's term statistics, which can lag the
     # indexing a search already sees (run 69 of this workflow found none), so ask
-    # again for a while before calling it a miss.
-    deadline = time.monotonic() + 30
+    # again for a while before calling it a miss. 30 s was not always enough on a
+    # slow runner (PR #117: three misses in runs that took twice the usual time);
+    # the loop stops at the first hit, so a longer limit costs a passing run nothing.
+    deadline = time.monotonic() + 120
     while True:
         similar = client.get(f"/api/documents/{other['id']}/similar").json()
         assert similar["state"] == "ok", similar
