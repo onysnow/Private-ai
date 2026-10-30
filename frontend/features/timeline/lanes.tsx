@@ -17,11 +17,11 @@ import {Reveal} from '../../components/ui/reveal';
 import {PARTY, eventKind, partyKind} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {LaneDetail} from './lane-detail';
-import {FACT, FACT_ORDER, bounds, isFuzzy, justUnder, lanesOf, mainStart, parseWhen, quarters, span, windowFor} from './lanes-model';
+import {FACT, FACT_ORDER, bounds, denseStretch, isFuzzy, justUnder, lanesOf, layoutLabels, parseWhen, quarters, span, windowFor, wrapName, yearStep} from './lanes-model';
 import type {Fact, LanesBy, Zoom} from './lanes-model';
 import {Aside, FactMark, KeysMark, KindDot, factWord} from './marks';
 
-const LABEL_W = 170;
+const LABEL_W = 184;
 const ROW = 44;
 const TOP = 74; // quarter bars and period names
 const AXIS = 26;
@@ -29,6 +29,7 @@ const MONEY = 46;
 const LINE = 10_000;
 const LANES_SHOWN = 7;
 const MONTH = 30.44 * 86_400_000;
+const LATER_W = 118; // the chip for records after the window, at the axis's right end
 
 type Lane = {key: string; name: string; sub: string; party?: string; schema?: string; mine?: boolean};
 
@@ -66,6 +67,8 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   const [selected, setSelected] = useState<string | null>(null);
   const [lit, setLit] = useState<string | null>(null);
   const [allLanes, setAllLanes] = useState(false);
+  // Far outliers (a 1952 founding in a 2009–2016 case) are folded into a chip at the lane's edge until it is clicked.
+  const [unfold, setUnfold] = useState<{early: boolean; late: boolean}>({early: false, late: false});
   const [asOf, setAsOf] = useState<number | null>(null);
   const [playing, setPlaying] = useState(false);
   const [why, setWhy] = useState(false);
@@ -98,15 +101,25 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   const events = useMemo(() => (view?.events ?? []).filter(e => e.date_start && e.precision !== 'unknown' && !hidden.has(e.fact) && !(hideFuzzy && isFuzzy(e) && !e.date_end)), [view, hidden, hideFuzzy]);
   // A date nobody knows (a placeholder's "when not known") is never drawn on a day.
   const allDated = useMemo(() => (view?.events ?? []).filter(e => e.date_start && e.precision !== 'unknown'), [view]);
-  // The axis spans the case's own years: a record far before the rest (a 1952 founding) is a stub at the left edge.
-  const firstAt = mainStart(allDated.map(e => span(e)[0])) ?? Date.UTC(2020, 0, 1);
-  const lastAt = allDated.length ? Math.max(...allDated.map(e => span(e)[1])) : Date.UTC(2021, 0, 1);
+  // The axis opens on the case's dense stretch: records far before or after it (a 1952 founding) fold into a chip at
+  // the lane's edge, and clicking the chip extends the view to them.
+  const dense = useMemo(() => denseStretch(allDated.map(e => span(e)[0])), [allDated]);
+  const allFirst = allDated.length ? Math.min(...allDated.map(e => span(e)[0])) : Date.UTC(2020, 0, 1);
+  const allLast = allDated.length ? Math.max(...allDated.map(e => span(e)[1])) : Date.UTC(2021, 0, 1);
+  const denseLast = dense ? dense[1] : allLast;
+  const firstAt = unfold.early || !dense ? allFirst : dense[0];
+  const lastAt = unfold.late || !dense ? allLast : denseLast;
+  const foldsEarly = Boolean(dense) && new Date(allFirst).getUTCFullYear() < new Date(dense![0]).getUTCFullYear();
+  const foldsLate = Boolean(dense) && new Date(allLast).getUTCFullYear() > new Date(denseLast).getUTCFullYear();
   const sel = view?.events.find(e => e.id === selected) ?? null;
   const focus = sel ? (span(sel)[0] + span(sel)[1]) / 2 : asOf ?? lastAt;
   const [from, to] = windowFor(zoom, firstAt, lastAt, focus);
   const [caseFrom, caseTo] = windowFor('all', firstAt, lastAt, lastAt);
 
   const earlier = events.filter(e => span(e)[1] < from).sort((a, b) => span(a)[0] - span(b)[0]);
+  const later = events.filter(e => span(e)[0] > to).sort((a, b) => span(b)[1] - span(a)[1]);
+  /** A chip at the lane's edge: zoomed in, it goes back to the whole stretch; on the whole stretch, it unfolds. */
+  const reach = (side: 'early' | 'late') => { if (zoom !== 'all') setZoom('all'); else setUnfold(u => ({...u, [side]: true})); };
   const chartW = Math.max(200, width - LABEL_W - 16);
   // The view opens on the next event nobody has resolved, within the case's own years (not a 1952 stub).
   const opensOn = useMemo(() => {
@@ -165,17 +178,6 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   const moreRow = laneKeys.length > LANES_SHOWN ? 22 : 0;
   const axisY = TOP + lanesH + moreRow;
   const height = axisY + AXIS + (moneyRow ? MONEY : 0) + 6;
-  const usedLabels = new Map<string, Array<[number, number]>>();
-  /** Whether a label fits beside its mark in this lane without covering another; it is kept if so. */
-  const fits = (laneKey: string, x0: number, text: string): boolean => {
-    const x1 = x0 + text.length * 6.2;
-    if (x1 > LABEL_W + chartW + 40) return false;
-    const taken = usedLabels.get(laneKey) ?? [];
-    if (taken.some(([a, b]) => x0 < b + 6 && x1 > a - 6)) return false;
-    usedLabels.set(laneKey, [...taken, [x0, x1]]);
-    return true;
-  };
-
   const inLane = (e: TimelineLaneEventOut, lane: Lane) => lane.mine ? e.kind === 'reporter_event' : lanesOf(e, by).includes(lane.key) && !(by === 'party' && e.kind === 'reporter_event' && !e.parties.length);
   const sequence = view?.sequence ?? [];
   const outOfOrder = new Map(sequence.map(s => [s.event_id, s]));
@@ -275,6 +277,9 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   for (const e of view.events) kindCounts.set(e.kind, (kindCounts.get(e.kind) ?? 0) + 1);
   const years: number[] = [];
   for (let y = new Date(from).getUTCFullYear(); Date.UTC(y, 0, 1) <= to; y += 1) years.push(y);
+  const pxYear = chartW / Math.max(1, (to - from) / (365.25 * 86_400_000));
+  const yearEvery = yearStep(1, pxYear);
+  const tickEnd = LABEL_W + chartW - (later.length || (zoom === 'all' && unfold.late && foldsLate) ? LATER_W + 34 : 30);
   const months = zoom === '1y' ? Array.from({length: 13}, (_, i) => Date.UTC(new Date(from).getUTCFullYear(), new Date(from).getUTCMonth() + i, 1)).filter(t => t > from && t < to) : [];
 
   return <div className="tl2" onKeyDown={onKey} tabIndex={-1} aria-label="Timeline lanes">
@@ -356,26 +361,41 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
                       {lane.schema && (() => { const kind = partyKind(lane.schema); const Icon = KIND_ICON[kind];
                         return <g aria-hidden="true"><circle cx={17} cy={y} r={10} fill="none" stroke={PARTY[kind].ring} strokeWidth={1.5}/>
                           {Icon && <Icon x={11} y={y - 6} width={12} height={12} color={PARTY[kind].ring} strokeWidth={2.2}/>}</g>; })()}
-                      <text x={lane.schema ? 33 : 8} y={y + 5} className="tl2-lanename big">{shortTitle(lane.name, lane.schema ? 17 : 20)}</text>
+                      {(() => { const lines = wrapName(lane.name, lane.schema ? 18 : 22);
+                        return <text x={lane.schema ? 33 : 8} y={lines.length > 1 ? y - 3 : y + 5} className={`tl2-lanename big${lines.length > 1 ? ' two' : ''}`}>
+                          {lines.map((l, j) => <tspan key={j} x={lane.schema ? 33 : 8} dy={j ? 15 : 0}>{l}</tspan>)}</text>; })()}
                     </g>
                     <g clipPath={`url(#${clipId})`}>
-                    {(() => { const ms = marksFor(lane); usedLabels.set(lane.key, ms.map(m => [m.x0 - 9, Math.max(m.x1, m.x0) + 5] as [number, number])); return ms; })().map(m => {
-                      const e = m.e;
-                      const many = m.ids.length > 1;
-                      const ranged = Boolean(e.date_end);
-                      const fuzzy = !ranged && isFuzzy(e);
-                      const cx = fuzzy ? (m.x0 + m.x1) / 2 : m.x0;
+                    {(() => {
+                      // Each label beside its mark, never over another label or a mark: the selected one first, then
+                      // left to right; a label with no room is shown when its mark is hovered.
+                      const drawn = marksFor(lane).map(m => {
+                        const e = m.e;
+                        const many = m.ids.length > 1;
+                        const ranged = Boolean(e.date_end);
+                        const fuzzy = !ranged && isFuzzy(e);
+                        const cx = fuzzy ? (m.x0 + m.x1) / 2 : m.x0;
+                        const label = many ? (e.schema === 'Payment' && e.amount ? `${m.ids.length} payments · ${money(e.amount, e.currency)}${m.ids.every(id => view.events.find(v => v.id === id)?.amount === e.amount) ? ' each' : '…'}` : `${m.ids.length} events`)
+                          : `${e.schema === 'Payment' && e.amount ? `${money(e.amount, e.currency)} ` : ''}${shortTitle(e.title)}`;
+                        const w = label.length * (ranged ? 5.7 : 6.4);
+                        // A range is a thin line with its label above; anything else has its label after it, or before it.
+                        const after = ranged ? Math.max(cx, LABEL_W) + 10 : many ? m.x1 + 12 : fuzzy ? Math.max(cx + 12, m.x1 + 12) : cx + 12;
+                        const before = ranged ? cx - 10 : many ? m.x0 - 12 : fuzzy ? m.x0 - 6 : cx - 12;
+                        const row = ranged ? 'above' : 'main';
+                        const at = [{row, x0: after, x1: after + w}, {row, x0: before - w, x1: before}];
+                        const body: [number, number] = ranged ? [m.x0 - 7, Math.max(m.x1, m.x0) + 7] : many ? [m.x0 - 9, m.x1 + 9] : fuzzy ? [m.x0 - 2, Math.max(m.x0 + 6, m.x1) + 2] : [cx - 9, cx + 9];
+                        return {m, e, many, ranged, fuzzy, cx, label, at, body, on: m.ids.includes(selected ?? '')};
+                      });
+                      const taken = new Map<string, Array<[number, number]>>([['main', drawn.map(d => d.body)]]);
+                      const placed = layoutLabels([...drawn.filter(d => d.on), ...drawn.filter(d => !d.on)].map(d => ({id: d.m.ids.join(), at: d.at})), taken, LABEL_W + 2, LABEL_W + chartW - 2);
+                      return drawn.map(({m, e, many, ranged, fuzzy, cx, label, at, on}) => {
                       const later = asOf !== null && span(e)[0] > asOf;
-                      const on = m.ids.includes(selected ?? '');
                       const lightOn = lit ? m.ids.some(id => view.events.find(v => v.id === id)?.parties.includes(lit)) : true;
                       const seq = outOfOrder.get(e.id);
                       const placeholder = Boolean(e.placeholder) || (lane.mine && !e.refs.source_id && !e.refs.evidence_id && !e.refs.entity_id && !e.refs.relationship_entity_id && !e.refs.claim_id);
-                      const label = many ? (e.schema === 'Payment' && e.amount ? `${m.ids.length} payments · ${money(e.amount, e.currency)}${m.ids.every(id => view.events.find(v => v.id === id)?.amount === e.amount) ? ' each' : '…'}` : `${m.ids.length} events`)
-                        : `${e.schema === 'Payment' && e.amount ? `${money(e.amount, e.currency)} ` : ''}${shortTitle(e.title)}`;
-                      // A range is a thin line with its label above; a month or year a band with its label after it.
-                      const lx = ranged ? cx + 10 : many ? m.x1 + 12 : fuzzy ? Math.max(cx + 12, m.x1 + 12) : cx + 12;
-                      const ly = ranged ? y - 9 : y + 4;
-                      const showLabel = fits(`${lane.key}${ranged ? ':above' : ''}`, lx, label) || on;
+                      const where = placed.get(m.ids.join());
+                      const spot = at[where ?? 0];
+                      const ly = ranged ? y - 11 : y + 4;
                       return <g key={m.ids.join()} className={`tl2-mark f-${FACT[e.fact].tone}${later ? ' later' : ''}${on ? ' on' : ''}${lightOn ? '' : ' dim'}${placeholder ? ' placeholder' : ''}${seq ? ' seq' : ''}`}
                         onClick={() => setSelected(m.ids[0])} role="button" tabIndex={-1}
                         aria-label={`${dateWords(e.date_start, e.precision)}: ${e.title}, ${FACT[e.fact].name}`}>
@@ -389,10 +409,13 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
                           <circle cx={cx} cy={y} r={ranged ? 5.5 : 7.5} className="tl2-ring"/>
                           {!ranged && <text x={cx} y={y + 3.5} className="tl2-glyph-t">{FACT[e.fact].glyph}</text>}
                         </>}
-                        {showLabel && <text x={lx} y={ly} className={`tl2-label${ranged ? ' above' : ''}`}>{label}</text>}
+                        {where === undefined
+                          ? <text x={Math.max(LABEL_W + 4, Math.min(spot.x0, LABEL_W + chartW - (spot.x1 - spot.x0)))} y={ly} className={`tl2-label peek${ranged ? ' above' : ''}`} aria-hidden="true">{label}</text>
+                          : <text x={where === 1 ? spot.x1 : spot.x0} y={ly} textAnchor={where === 1 ? 'end' : 'start'} className={`tl2-label${ranged ? ' above' : ''}`}>{label}</text>}
                         {seq && <text x={cx + 12} y={y + 18} className="tl2-seqword">no {seq.missing} recorded</text>}
                       </g>;
-                    })}
+                      });
+                    })()}
                     </g>
                   </g>;
                 })}
@@ -426,14 +449,32 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
 
                 {/* The axis, and the as-of handle. */}
                 <line x1={LABEL_W} x2={LABEL_W + chartW} y1={axisY + 2} y2={axisY + 2} className="tl2-axis"/>
-                {years.map(y => { const t = Date.UTC(y, 0, 1); return t >= from && t <= to ? <g key={y}>
-                  <line x1={x(t)} x2={x(t)} y1={axisY - 4} y2={axisY + 8} className="tl2-axis"/>
-                  {x(t) < LABEL_W + chartW - 30 && <text x={x(t) + 4} y={axisY + 18} className="tl2-tick">{y}</text>}</g> : null; })}
+                {/* A year is named every `yearEvery` years, so the names never run together; the other years keep a short tick. */}
+                {years.map(y => { const t = Date.UTC(y, 0, 1); const named = y % yearEvery === 0;
+                  if (t < from || t > to || (!named && pxYear < 5)) return null;
+                  return <g key={y}>
+                  <line x1={x(t)} x2={x(t)} y1={named ? axisY - 4 : axisY} y2={named ? axisY + 8 : axisY + 5} className="tl2-axis"/>
+                  {named && x(t) < tickEnd && <text x={x(t) + 4} y={axisY + 18} className="tl2-tick">{y}</text>}</g>; })}
                 {months.map(t => <line key={t} x1={x(t)} x2={x(t)} y1={axisY} y2={axisY + 5} className="tl2-axis"/>)}
-                {earlier.length > 0 && <g className="tl2-earlier click" role="button" onClick={() => setSelected(earlier[0].id)}
-                  aria-label={`${earlier.length} earlier: ${earlier[0].title}`}>
-                  <rect x={8} y={axisY - 4} width={LABEL_W - 24} height={18} rx={9}/>
-                  <text x={18} y={axisY + 9}>‹ {new Date(span(earlier[0])[0]).getUTCFullYear()} · {earlier.length} earlier</text>
+                {earlier.length > 0 ? <g className="tl2-earlier click" role="button" onClick={() => reach('early')}
+                  aria-label={`${earlier.length} earlier, from ${new Date(span(earlier[0])[0]).getUTCFullYear()}: show them`}>
+                  <title>{earlier.slice(0, 8).map(e => `${dateWords(e.date_start, e.precision)} · ${e.title}`).join('\n')}{earlier.length > 8 ? `\n+ ${earlier.length - 8} more` : ''}</title>
+                  <rect x={8} y={axisY + 7} width={LABEL_W - 24} height={18} rx={9}/>
+                  <text x={18} y={axisY + 20}>‹ {new Date(span(earlier[0])[0]).getUTCFullYear()} · {earlier.length} earlier</text>
+                </g> : zoom === 'all' && unfold.early && foldsEarly && <g className="tl2-earlier click" role="button" onClick={() => setUnfold(u => ({...u, early: false}))}
+                  aria-label="Fold the early records back">
+                  <rect x={8} y={axisY + 7} width={LABEL_W - 24} height={18} rx={9}/>
+                  <text x={18} y={axisY + 20}>› fold to {new Date(dense![0]).getUTCFullYear()}</text>
+                </g>}
+                {later.length > 0 ? <g className="tl2-earlier click" role="button" onClick={() => reach('late')}
+                  aria-label={`${later.length} later, to ${new Date(span(later[0])[1]).getUTCFullYear()}: show them`}>
+                  <title>{later.slice(0, 8).map(e => `${dateWords(e.date_start, e.precision)} · ${e.title}`).join('\n')}{later.length > 8 ? `\n+ ${later.length - 8} more` : ''}</title>
+                  <rect x={LABEL_W + chartW - LATER_W} y={axisY + 7} width={LATER_W} height={18} rx={9}/>
+                  <text x={LABEL_W + chartW - 10} y={axisY + 20} textAnchor="end">{later.length} later · {new Date(span(later[0])[1]).getUTCFullYear()} ›</text>
+                </g> : zoom === 'all' && unfold.late && foldsLate && <g className="tl2-earlier click" role="button" onClick={() => setUnfold(u => ({...u, late: false}))}
+                  aria-label="Fold the late records back">
+                  <rect x={LABEL_W + chartW - LATER_W} y={axisY + 7} width={LATER_W} height={18} rx={9}/>
+                  <text x={LABEL_W + chartW - 10} y={axisY + 20} textAnchor="end">fold to {new Date(denseLast).getUTCFullYear()} ‹</text>
                 </g>}
                 <rect x={LABEL_W} y={axisY - 6} width={chartW} height={AXIS + 4} className="tl2-scrub" onPointerDown={dragFrom}>
                   <title>Drag to move the as-of handle</title></rect>

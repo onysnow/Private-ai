@@ -44,6 +44,7 @@
 .tl2-period.t0 { fill: color-mix(in srgb, var(--text-muted) 7%, transparent); } .tl2-period.t1 { fill: color-mix(in srgb, var(--accent-2) 6%, transparent); }
 .tl2-rule { stroke: var(--line, rgba(127,127,127,.18)); stroke-dasharray: 2 4; }
 .tl2-lanename { font: 600 13px var(--font-ui); fill: var(--text); }
+.tl2-lanename.two { font-size: 12.5px; }
 .tl2-lane.mine .tl2-lanename { fill: var(--accent-1); }
 .tl2-lane.lit .tl2-lanename { fill: var(--accent-2); }
 .click { cursor: pointer; }
@@ -59,6 +60,9 @@
 .tl2-dot { fill: currentColor; }
 .tl2-label { font: 500 11.5px var(--font-ui); fill: var(--text); pointer-events: none; }
 .tl2-label.above { font-size: 10.5px; fill: var(--text-muted); }
+.tl2-label.peek { display: none; paint-order: stroke; stroke: var(--surface-1); stroke-width: 4px; stroke-linejoin: round; }
+.tl2-mark:hover .tl2-label.peek, .tl2-mark.on .tl2-label.peek { display: inline; }
+.tl2-mark:hover .tl2-label.above.peek { fill: var(--text); }
 .tl2-range { fill: none; stroke: color-mix(in srgb, currentColor 55%, transparent); stroke-width: 3; stroke-linecap: round; }
 .tl2-more text { font: 600 11px var(--font-ui); fill: var(--accent-1); }
 .tl2-mark.placeholder .tl2-ring { stroke: var(--text-muted); stroke-dasharray: 2 3; fill: transparent; }

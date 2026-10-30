@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TimelinePanel} from '../features/timeline/timeline-panel';
-import {bounds, justUnder, mainStart, parseWhen, quarters, windowFor} from '../features/timeline/lanes-model';
+import {bounds, denseStretch, justUnder, layoutLabels, parseWhen, quarters, windowFor, wrapName, yearStep} from '../features/timeline/lanes-model';
 import type {TimelineLaneEventOut} from '../lib/generated/types.gen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -47,13 +47,39 @@ describe('lanes model', () => {
     expect(bounds('2019').map(t => new Date(t).toISOString().slice(0, 10))).toEqual(['2019-01-01', '2019-12-31']);
   });
 
-  it('leaves a record far before the rest to a stub, and zooms a window that stays in the case', () => {
-    const t = (y: number) => Date.UTC(y, 0, 1);
-    expect(mainStart([t(1952), t(2016), t(2017), t(2018), t(2019)])).toBe(t(2016));
-    expect(mainStart([t(2016), t(2017)])).toBe(t(2016));
+  it('opens on the dense stretch, folding far records either side, and zooms a window that stays in the case', () => {
+    const t = (y: number, m = 0) => Date.UTC(y, m, 1);
+    const busy = [2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016].flatMap(y => [t(y), t(y, 4), t(y, 8)]);
+    expect(denseStretch([t(1952), t(1969), t(1988), ...busy, t(2024)])).toEqual([t(2009), t(2016, 8)]);
+    expect(denseStretch([t(1952), t(2016), t(2017), t(2019)])).toEqual([t(1952), t(2019)]); // too few to fold
+    expect(denseStretch([t(1952), t(2016), t(2017), t(2018), t(2019)])).toEqual([t(2016), t(2019)]);
+    expect(denseStretch([t(1952), t(2016), t(2016, 3), t(2017), t(2018), t(2019), t(2020), t(2021)])).toEqual([t(2016), t(2021)]);
+    expect(denseStretch([])).toBeNull();
     const [a, b] = windowFor('2y', t(2016), t(2021), t(2016));
     expect(new Date(a).getUTCFullYear()).toBe(2016);
     expect(Math.round((b - a) / (365.25 * 86_400_000))).toBe(2);
+  });
+
+  it('names a year on the axis only as often as the names fit', () => {
+    expect(yearStep(8, 1000)).toBe(1);
+    expect(yearStep(75, 1000)).toBe(5);
+    expect(yearStep(75, 300)).toBe(20);
+  });
+
+  it('lays labels out so none covers another or a mark, trying the left side when the right is taken', () => {
+    const taken = new Map<string, Array<[number, number]>>([['main', [[100, 118], [140, 158]]]]);
+    const placed = layoutLabels([
+      {id: 'a', at: [{row: 'main', x0: 122, x1: 200}, {row: 'main', x0: 20, x1: 92}]},
+      {id: 'b', at: [{row: 'main', x0: 162, x1: 240}, {row: 'main', x0: 60, x1: 136}]},
+      {id: 'c', at: [{row: 'above', x0: 150, x1: 230}]},
+    ], taken, 0, 1000);
+    expect([...placed]).toEqual([['a', 1], ['c', 0]]);
+  });
+
+  it('wraps a long lane name into two lines between words, never more', () => {
+    expect(wrapName('Kestrel SA', 18)).toEqual(['Kestrel SA']);
+    expect(wrapName('Mohd Najib bin Abdul Razak', 18)).toEqual(['Mohd Najib bin', 'Abdul Razak']);
+    expect(wrapName('1Malaysia Development Berhad (1MDB)', 18)).toEqual(['1Malaysia', 'Development Berha…']);
   });
 
   it('counts each quarter and how many in it are shown', () => {
@@ -112,6 +138,26 @@ describe('Lanes', () => {
     await userEvent.setup().click(screen.getByRole('button', {name: 'Place it'}));
     await vi.waitFor(() => expect(api.lastBody('POST /api/timeline-events')).toEqual({investigation_id: 'inv-1', verification_status: 'asserted',
       title: 'Loop Two BV annual accounts', date_start: '2020', precision: 'year', source_id: 'src-9'}));
+  });
+
+  it('folds a record far before the rest into a chip at the lane edge, and the chip unfolds and folds it back', async () => {
+    const old = ev('old', 'Fernhill Ltd incorporated', '1952-11-10', {parties: ['fern']});
+    const busy = ['2016-03-01', '2016-09-01', '2017-04-01', '2018-02-01', '2019-06-01'].map((d, i) => ev(`b${i}`, `Step ${i}`, d, {parties: ['fern']}));
+    mockApi({[LANES]: lanesBody('inv-1', [old, ...busy], {parties})});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    const chip = await screen.findByRole('button', {name: '1 earlier, from 1952: show them'});
+    expect(chip).toHaveTextContent('‹ 1952 · 1 earlier');
+    const ticks = () => [...document.querySelectorAll('.tl2-tick')].map(t => t.textContent);
+    expect(ticks()[0]).toBe('2016');
+    const user = userEvent.setup();
+    await user.click(chip);
+    expect(await screen.findByRole('button', {name: 'Fold the early records back'})).toHaveTextContent('fold to 2016');
+    // 68 years on a 960-wide chart: a year named every five, never all of them run together.
+    expect(ticks()[0]).toBe('1955');
+    expect(ticks().every(y => Number(y) % 5 === 0)).toBe(true);
+    expect(screen.getAllByRole('button', {name: /Fernhill Ltd incorporated/}).length).toBeGreaterThan(0);
+    await user.click(screen.getByRole('button', {name: 'Fold the early records back'}));
+    expect(await screen.findByRole('button', {name: '1 earlier, from 1952: show them'})).toBeInTheDocument();
   });
 
   it('hides a mark from the key, and lights a party in every lane', async () => {
