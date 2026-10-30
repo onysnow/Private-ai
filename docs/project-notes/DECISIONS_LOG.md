@@ -1099,3 +1099,28 @@ person on the demo case can see what the demo decided and take it back. Built in
   does not know (a screen rendered alone), the counts endpoint's 404 says so and nothing shows. A status that waits
   again (proposed, open, new) is never counted as decided. Page tests answer the counts route for a demo case with no
   decisions by default (`frontend/test-support/page-routes.ts`); a case that is not a demo is not asked.
+
+## 54. Act and Following resweep: no key hints over the work, every met rung its rule, statuses as colour (30 Oct 2026)
+
+A second look at 1440×900 found these, and the calls:
+- **Frame hint chips gone.** The first-use "Steps and pages [" and "Tools ]" chips floated over content (over
+  Correlation in Act › Charts). They are removed, with the "learned" flag that drove them. Each edge's handle names its
+  edge and key on hover (the top handle gained the same reveal the left one had), and every key is in the `?` sheet,
+  which is where Ony put key hints.
+- **Red Flags ladder:** every met rung shows its rule and the facts. A rung below the flag's own level with no rule in
+  the catalogue says "Met through the Textbook rule above" (the level named), and carries the same Found facts, since
+  what meets the higher rung meets the lower. **Parties carrying flags** is a list, not rings: a bar in the heaviest
+  flag's colour, the name (cut only when it must be, the whole name on hover) and the count; it scrolls inside itself
+  past about six rows. "A flag is a lead, not a finding…" is an ⓘ mark with the sentence on hover.
+- **Following:** a source's waiting count is the number alone ("new" on hover); a closed platform's "none" is a dashed
+  empty ring ("No monitor: link capture only" on hover); "fix" stays as an alert. In the queue a risk that asks for
+  action keeps a short alert word in its colour ("At risk", "Removed", "Changed", "Deleted", the full sentence on
+  hover); a calm status (wire copy, transcript offered, no sign of risk) is a coloured dot named on hover.
+  "Captured · Skipped" is behind an ⓘ. The screen now fills its tab: each column scrolls inside itself (the queue
+  inside its panel; before, the tab clipped it), the sources list grows to the column's height with bigger rows, and
+  "What leaves this computer" takes the rest of the right column with its counts large (third-party services, then
+  asked directly / through Tor / a public server / no monitor, each a number).
+- **AI drafts, none yet:** the path (Ask → Draft → You decide) runs down the panel, larger, from the head at the top to
+  Ask the case at the foot, so the panel is filled rather than half empty.
+- **Leads:** a card's "↳ what it is for" line is the ↳ mark in the card's last line, the words on hover. An empty
+  Now / Next / Later is a dashed slot sized to its content saying what to drop there, not a tall empty box.

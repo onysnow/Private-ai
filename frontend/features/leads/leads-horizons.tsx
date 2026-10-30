@@ -24,6 +24,7 @@ const COLUMNS: {id: Horizon; label: string; key: string}[] = [{id: 'now', label:
 const PLACE_WORD: Record<Place, string> = {now: 'Now', next: 'Next', later: 'Later', inbox: 'the inbox'};
 const STATUS_MARK: Record<string, [string, string]> = {unreviewed: ['◌', 'unreviewed'], active: ['●', 'active'], blocked: ['✕', 'blocked'],
   resolved: ['✓', 'resolved'], rejected: ['⊘', 'rejected']};
+const EMPTY_WORDS: Record<Horizon, string> = {now: 'Drop the leads to chase now here', next: 'Drop what comes after Now here', later: 'Drop what can wait here'};
 const TASK_DOT: Record<string, string> = {todo: '○', in_progress: '◐', blocked: '✕', done: '✓', cancelled: '–'};
 
 const initials = (name: string) => name.split(/\s+/).filter(Boolean).map(w => w[0]?.toUpperCase()).join('').slice(0, 3);
@@ -85,8 +86,10 @@ function Card({lead, actions, onKeyMove}: {lead: HorizonLead; actions: Actions; 
       <b className="flex-1 text-sm font-medium leading-snug">{lead.title}</b>
       <Menu lead={lead} actions={actions}/>
     </div>
-    {forLink?.label && <div className="text-xs"><Reveal tabbable={false} describe={false} detail="For"><span className="text-muted-foreground" aria-label="For:">↳</span></Reveal> {forLink.label}</div>}
-    {(lead.owner || lead.provider || lead.tasks.length > 0 || counts.supports + counts.contradicts > 0) && <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+    {(forLink?.label || lead.owner || lead.provider || lead.tasks.length > 0 || counts.supports + counts.contradicts > 0) && <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+      {/* What the lead is for is the ↳ mark; its words are on hover (30 Oct). */}
+      {forLink?.label && <Reveal tabbable={false} describe={false} detail={<><b>For</b> · {forLink.label}</>}>
+        <span aria-label={`For: ${forLink.label}`} className="text-sm">↳</span></Reveal>}
       {lead.owner && <Reveal tabbable={false} describe={false} detail={lead.owner}>
         <span aria-label={`Owner: ${lead.owner}`} className="rounded-full border px-1.5 text-[11px]">{initials(lead.owner)}</span></Reveal>}
       {lead.provider && <Reveal tabbable={false} describe={false} detail={`From ${lead.provider.replace(/_/g, ' ')}`}>
@@ -108,7 +111,7 @@ function Column({id, label, title, count, cap, wide, children}: {id: Place; labe
       <span className="text-sm font-semibold">{title ?? label}</span>
       <span className={`text-sm tabular-nums ${cap && count >= cap ? 'font-semibold' : 'text-muted-foreground'}`}>{cap ? `${count} / ${cap}` : count}</span>
     </header>
-    <div className={id === 'inbox' ? 'grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2' : 'flex min-h-[70px] flex-col gap-2'}>{children}</div>
+    <div className={id === 'inbox' ? 'grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2' : 'flex flex-col gap-2'}>{children}</div>
   </section>;
 }
 
@@ -162,7 +165,9 @@ export function LeadsHorizons({leads, onMove, onStatus, onConvert, tools}: {lead
             <span>Inbox</span></Reveal>} count={at('inbox').length}>{at('inbox').map(card)}</Column>}
         <div className="grid gap-3 md:grid-cols-[1.25fr_1fr_0.85fr]">
           {COLUMNS.map(c => <Column key={c.id} id={c.id} label={c.label} count={at(c.id).length} cap={c.id === 'now' ? NOW_CAP : undefined}>
-            {at(c.id).length ? at(c.id).map(card) : <p className="px-1 text-xs text-muted-foreground">{c.id === 'now' ? 'Nothing being chased now.' : 'Empty.'}</p>}
+            {/* Empty, a horizon is the drop target it is, sized to it: a dashed slot saying what goes there. */}
+            {at(c.id).length ? at(c.id).map(card) : <p className="m-0 rounded-md border border-dashed px-3 py-2.5 text-center text-sm text-muted-foreground">
+              {EMPTY_WORDS[c.id]}</p>}
           </Column>)}
         </div>
       </DndContext>}

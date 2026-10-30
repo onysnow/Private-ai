@@ -42,7 +42,6 @@ export const NEW_CASE_EVENT = 'pai:new-case';
 
 const DWELL_MS = 250;
 const PIN_KEY = 'pai:edge-pins';
-const LEARNED_KEY = 'pai:edges-learned';
 const TRAIL_KEY = 'pai:trail';
 
 type Pins = {left: boolean; top: boolean};
@@ -51,8 +50,6 @@ function readPins(): Pins {
   catch { return {left: false, top: false}; }
 }
 function writePins(p: Pins): void { try { window.localStorage.setItem(PIN_KEY, JSON.stringify(p)); } catch { /* private window */ } }
-function learned(): boolean { try { return window.localStorage.getItem(LEARNED_KEY) === '1'; } catch { return true; } }
-function markLearned(): void { try { window.localStorage.setItem(LEARNED_KEY, '1'); } catch { /* private window */ } }
 
 /** Where you last were in each case, so opening it again goes back there. */
 const CASE_PLACE_KEY = 'pai:case-places';
@@ -346,15 +343,12 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
   const [leftOpen, setLeft] = useEdge('[', leftAt, 'ArrowRight', 'ArrowLeft');
   const [topOpen, setTop] = useEdge(']', topAt, 'ArrowDown', 'ArrowUp');
   const [pins, setPins] = useState<Pins>({left: false, top: false});
-  const [fresh, setFresh] = useState(false);
-  // The first-use hints name the edges for a few seconds on each page, then fade, so they never sit over the work.
-  const [hintShown, setHintShown] = useState(true);
-  useEffect(() => { setHintShown(true); const t = window.setTimeout(() => setHintShown(false), 6000); return () => window.clearTimeout(t); }, [pathname]);
+  // No floating hint chips name the edges (they sat over the work, 30 Oct): each handle names its edge on hover, and
+  // the keys live behind ? (DECISIONS_LOG 54).
   const [places, setPlaces] = useState<Place[]>([]);
-  useEffect(() => { setPins(readPins()); setFresh(!learned()); setPlaces(readPlaces()); }, []);
+  useEffect(() => { setPins(readPins()); setPlaces(readPlaces()); }, []);
   const left = leftOpen || pins.left;
   const top = topOpen || pins.top;
-  useEffect(() => { if ((leftOpen || topOpen) && fresh) { markLearned(); setFresh(false); } }, [leftOpen, topOpen, fresh]);
   const pin = (edge: keyof Pins) => setPins(p => { const next = {...p, [edge]: !p[edge]}; writePins(next); return next; });
   // Where you have been: every place the breadcrumb names, newest first.
   const trailLabel = trail.map(t => t.label).join(' › ');
@@ -421,8 +415,6 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     <Reveal tabbable={false} className="fr-handle-rv" detail={<><b>Case · Steps</b><span className="rv-row">The case’s steps and the app’s pages <kbd>[</kbd></span></>}>
       <button type="button" className={`fr-handle fr-handle-left${left ? ' on' : ''}`} aria-label="Open steps and pages" aria-expanded={left} aria-controls="fr-left" onClick={() => setLeft(o => !o)}/>
     </Reveal>
-    {fresh && !left && <span className={`fr-hint fr-hint-left${hintShown ? '' : ' gone'}`} aria-hidden="true">Steps and pages <kbd>[</kbd></span>}
-    {fresh && !top && <span className={`fr-hint fr-hint-top${hintShown ? '' : ' gone'}`} aria-hidden="true">Tools <kbd>]</kbd></span>}
     <aside id="fr-left" className={`fr-left${left ? ' open' : ''}`} aria-label="Steps and pages" aria-hidden={!left} onMouseLeave={() => setLeft(false)} inert={!left ? true : undefined}>
       <div className="fr-left-head"><b>Journalism Workbench</b>
         <span><Reveal tabbable={false} detail={pins.left ? 'Let it hide again' : 'Keep it open on this computer'}>
@@ -441,7 +433,9 @@ export function AppFrame({children}: {children: ReactNode}): ReactElement {
     </aside>
 
     {/* Top edge: tools. */}
-    <button type="button" className={`fr-handle fr-handle-top${top ? ' on' : ''}`} aria-label="Open tools" aria-expanded={top} aria-controls="fr-top" onClick={() => setTop(o => !o)}/>
+    <Reveal tabbable={false} className="fr-handle-rv-top" detail={<><b>Tools</b><span className="rv-row">Search, switch case, keys, hide the screen <kbd>]</kbd></span></>}>
+      <button type="button" className={`fr-handle fr-handle-top${top ? ' on' : ''}`} aria-label="Open tools" aria-expanded={top} aria-controls="fr-top" onClick={() => setTop(o => !o)}/>
+    </Reveal>
     <div id="fr-top" className={`fr-top${top ? ' open' : ''}`} role="toolbar" aria-label="Tools" aria-hidden={!top} onMouseLeave={() => setTop(false)} inert={!top ? true : undefined}>
       <Reveal tabbable={false} detail={<kbd>⌘O</kbd>}><button type="button" className="fr-tool" onClick={() => { setTop(false); setCases(true); }}>Switch case</button></Reveal>
       <button type="button" className="fr-tool wide" onClick={() => { setTop(false); setPalette(true); }}>Search the case, or type a command… <kbd>⌘K</kbd></button>

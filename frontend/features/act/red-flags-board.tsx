@@ -63,8 +63,8 @@ export function groupFlags(flags: RedFlagOut[]): Kind[] {
 }
 
 /** Each rung of the ladder: met, next (with the catalogue's wording), not set, or needing facts only a person can give.
- *  A met rung carries its rule (empty when the catalogue sets none for it: it is met because a rung above it is) and,
- *  on the flag's own level, the facts in the records that meet it. */
+ *  Every met rung carries its rule (for a rung below the flag's own with none in the catalogue, that it is met through
+ *  the rule above) and the facts in the records that meet it, when the flag's measurement has them. */
 export type Rung = {level: 'textbook' | 'strong' | 'faint'; state: 'met' | 'next' | 'not_set' | 'needs'; text: string; needs: string[]; found?: string[]};
 export function ladder(flag: RedFlagOut): Rung[] {
   const at = LEVEL_ORDER.indexOf(flag.level);
@@ -73,8 +73,13 @@ export function ladder(flag: RedFlagOut): Rung[] {
   return (['textbook', 'strong', 'faint'] as const).map(level => {
     const text = (lv?.[level] ?? '') as string;
     const reached = LEVEL_ORDER.indexOf(level) >= at;
-    if (reached) return {level, state: 'met', text: level === flag.level && band ? band : UNSET.test(text) ? '' : text, needs: [],
-      found: level === flag.level ? metBy(flag) : undefined};
+    if (reached) {
+      // A rung below the flag's own with no rule of its own is met through the rule above, and by the same facts.
+      const own = level === flag.level && band ? band : UNSET.test(text) ? '' : text;
+      const facts = metBy(flag);
+      return {level, state: 'met', text: own || (level === flag.level ? '' : `Met through the ${LEVEL[flag.level]?.name ?? flag.level} rule above`),
+        needs: [], found: facts.length ? facts : undefined};
+    }
     if (UNSET.test(text) || !text) return {level, state: 'not_set', text: 'No published threshold for this rung yet.', needs: []};
     if (level === 'textbook' && flag.not_shown.length) return {level, state: 'needs', text, needs: flag.not_shown};
     return {level, state: 'next', text, needs: []};
@@ -394,10 +399,11 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
         </div>
         {carriers.length > 0 && <section className="rb-carriers" aria-label="Parties carrying flags">
           <p className="rb-eyebrow">Parties carrying flags</p>
-          {/* One line per name, cut; the full name on hover. */}
-          <div>{carriers.map(c => <Reveal key={c.id} tabbable={false} describe={false} detail={<><b>{c.name}</b> · {c.n} flag{c.n === 1 ? '' : 's'}</>}><button type="button" className={`rb-carrier rk-${c.top}${party === c.id ? ' on' : ''}`} aria-pressed={party === c.id}
+          {/* A list, a row a party: the heaviest flag's colour, the name (cut only when it must be; the whole name on
+              hover) and the count. Scrolls inside itself when long. */}
+          <ul>{carriers.map(c => <li key={c.id}><Reveal tabbable={false} describe={false} detail={<><b>{c.name}</b> · {c.n} flag{c.n === 1 ? '' : 's'}</>}><button type="button" className={`rb-carrier rk-${c.top}${party === c.id ? ' on' : ''}`} aria-pressed={party === c.id}
             onClick={() => setParty(p => (p === c.id ? '' : c.id))} aria-label={`${c.name}: ${c.n} flag${c.n === 1 ? '' : 's'}`}>
-            <span className="rb-ring">{c.n}</span><small aria-hidden="true">{c.name}</small></button></Reveal>)}</div>
+            <i aria-hidden="true"/><span className="rb-carrier-name" aria-hidden="true">{c.name}</span><b aria-hidden="true">{c.n}</b></button></Reveal></li>)}</ul>
         </section>}
       </div>
 
@@ -449,8 +455,8 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
         <ol>{ladder(flag).map(r => <li key={r.level} className={`rung rung-${r.state} rk-${r.level}`}>
           {/* The ladder teaches the levels, so its rungs keep their words whatever Status marks says. */}
           <span className="rung-head"><FlagMark level={r.level} showWord/>
-            {/* Every rung shows its rule; a met rung with no rule of its own says why on hover. */}
-            {r.state === 'met' ? (r.text ? <b>✓ Met</b> : <Reveal detail="No separate threshold for this rung: it is met because a rung above it is."><b>✓ Met</b></Reveal>)
+            {/* Every rung shows its rule; a met rung below the flag's own with no rule of its own says it is met through the one above. */}
+            {r.state === 'met' ? <b>✓ Met</b>
               : r.state === 'needs' ? <Reveal detail="Only a person can decide these."><b>Needs {r.needs.length} fact{r.needs.length === 1 ? '' : 's'}</b></Reveal>
               : <b>{r.state === 'not_set' ? 'Not set' : 'Next'}</b>}</span>
           {r.text && <span className="rung-text">{r.text}</span>}
@@ -733,7 +739,8 @@ function BeforeYouCallIt({flag, investigationId, ranAt}: {flag: RedFlagOut; inve
       {sources.map((s, i) => <div key={i} className="rb-quote"><Reveal detail={<><span className="rv-row">“{s.quote}”</span>{s.locator && <span className="rv-row">{s.locator}</span>}</>}>
         <span>{s.publisher}, {s.title}</span></Reveal> {s.url && <a href={s.url} target="_blank" rel="noreferrer" aria-label={`Open ${s.title}`}>↗</a>}</div>)}
     </section>}
-    <p className="rb-foot">A flag is a lead, not a finding. Verify before any publication.{ranAt && <> <Reveal label="When the rules ran" detail={`Rules ran ${agoText(ranAt)}`}>
+    {/* The reminder is a mark at rest, its sentence on hover (29 Oct). */}
+    <p className="rb-foot"><Reveal label="A flag is a lead" detail="A flag is a lead, not a finding. Verify before any publication."><span aria-hidden="true">ⓘ</span></Reveal>{ranAt && <> <Reveal label="When the rules ran" detail={`Rules ran ${agoText(ranAt)}`}>
       <span aria-hidden="true">◷</span></Reveal></>}</p>
   </>;
 }

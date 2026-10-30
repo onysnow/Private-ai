@@ -37,6 +37,9 @@ const ROUTE_WORDS = {direct: 'The site sees a visit from this computer’s addre
   tor: 'Through a Tor you run on this computer; the app ships none. The site sees a Tor exit address.'} as const;
 const BULK_REASONS = ['Account is deleting posts', 'Page is being edited now', 'Too many in the same hour'];
 const MARK = {ok: '✓', warn: '!', bad: '✕', wait: '·'} as const;
+/** A risk's short alert word: the words before a colon ("At risk", "Removed"), or its first word ("Changed",
+ *  "Deleted"). */
+export const riskWord = (text: string): string => (text.includes(':') ? text.split(':')[0] : text.split(/\s/)[0]).trim();
 const host = (url: string) => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; } };
 type Tab = 'sources' | 'risk' | 'changes' | 'history' | 'works';
 
@@ -61,15 +64,18 @@ function health(m: MonitorOut): [string, string] {
 function SourceRow({m, picked, onPick}: {m: MonitorOut; picked: boolean; onPick: () => void}): ReactElement {
   const [, words] = health(m);
   const route = m.kind === 'closed' ? 'files you supply' : `${everyWord(m.every_minutes)} · ${m.route}`;
-  const badge = m.kind === 'closed' ? <span className="fl-badge z">none</span>
+  // The count is the number alone, "new" on hover; a closed platform's "no monitor" is a dashed empty ring. A broken
+  // source keeps its alert word, since it asks for action.
+  const badge = m.kind === 'closed' ? <Reveal tabbable={false} describe={false} detail="No monitor: link capture only"><span className="fl-badge z none" aria-hidden="true"/></Reveal>
     : m.health === 'broken' || m.health === 'moved' ? <span className="fl-badge bd">fix</span>
-      : <span className={`fl-badge${m.waiting ? '' : ' z'}`}>{m.waiting ? `${m.waiting} new` : '0'}</span>;
+      : <Reveal tabbable={false} describe={false} detail={m.waiting ? `${m.waiting} new, waiting for a person` : 'Nothing new waits'}>
+        <span className={`fl-badge${m.waiting ? '' : ' z'}`}>{m.waiting}</span></Reveal>;
   return <button type="button" role="option" aria-selected={picked} className="fl-mon" onClick={onPick}>
     {/* The kind is its icon and the health its shape and colour; their words, the schedule and the route are on hover
         (and in the row for screen readers). */}
     <span className="fl-tag"><KindMark kind={m.kind}/></span>
     <span className="fl-mon-text"><span className="fl-t">{m.name}</span>
-      <span className="st-sr">{KIND_NAME[m.kind][0]} · {words} · {route}</span></span>
+      <span className="st-sr">{KIND_NAME[m.kind][0]} · {words} · {route}{m.kind === 'closed' ? ' · no monitor' : m.waiting ? ` · ${m.waiting} new` : ''}</span></span>
     <span className="fl-mon-end"><HealthMark health={m.health} detail={<span className="rv-row">{words} · {route}</span>}/>{badge}</span>
   </button>;
 }
@@ -141,6 +147,8 @@ function QueueItem({q, investigationId, onDo}: {q: MonitorItemOut; investigation
   const meta = [q.source, q.kind === 'page' ? `seen ${hhmm(q.first_seen_at)}` : q.published_at ? `posted ${when(q.published_at)}` : `first seen ${when(q.first_seen_at)}`,
     ...(audio?.bytes ? [`audio file ${Math.round(audio.bytes / (1024 * 1024))} MB`] : []),
     ...(q.decision?.by && q.state !== 'waiting' && q.state !== 'gone' ? [`${q.state === 'skipped' ? 'skipped' : 'by'} ${q.decision.by}`] : [])];
+  const alerts = q.risks.filter(r => r.tone === 'bad' || r.tone === 'amber');
+  const calm = q.risks.filter(r => r.tone !== 'bad' && r.tone !== 'amber');
   let acts: ReactElement;
   if (q.state === 'waiting' || q.state === 'gone') acts = <>
     {q.state === 'gone' ? <Reveal tabbable={false} detail="Records that the site removed this page: your capture is the copy that remains.">
@@ -158,9 +166,14 @@ function QueueItem({q, investigationId, onDo}: {q: MonitorItemOut; investigation
     <div className="fl-qi-text"><p className="fl-qt">{isKind(q.kind) && <><KindMark kind={q.kind}/> </>}<Reveal detail={<>
       {meta.map(line => <span key={line} className="rv-row">{line}</span>)}
       <span className="rv-row rv-mono">{q.url}</span>
-      {typeof q.decision?.reason === 'string' && <span className="rv-row">Reason: {q.decision.reason}</span>}</>}>{q.title}</Reveal></p></div>
+      {typeof q.decision?.reason === 'string' && <span className="rv-row">Reason: {q.decision.reason}</span>}</>}>{q.title}</Reveal>
+      {/* Statuses that ask nothing of you (a wire copy, a transcript offered, no sign of risk) are a coloured dot,
+          their words on hover. */}
+      {calm.map(r => <Reveal key={r.text} label={r.text} detail={r.text}><i className={`fl-dot ${r.tone || 'quiet'}`} aria-hidden="true"/></Reveal>)}</p></div>
     <div className="fl-acts">{acts}</div>
-    <div className="fl-why">{q.risks.map(r => <span key={r.text} className={`fl-chip ${r.tone}`}>{r.text}</span>)}</div>
+    {/* A risk asks for action: it keeps a short alert word in its colour; the whole sentence is on hover. */}
+    {alerts.length > 0 && <div className="fl-why">{alerts.map(r => <Reveal key={r.text} detail={r.text}>
+      <span className={`fl-chip ${r.tone}`} aria-hidden="true">{riskWord(r.text)}</span></Reveal>)}</div>}
   </li>;
 }
 
@@ -279,7 +292,7 @@ export function Following({investigationId, active = true}: {investigationId: st
           </div>}
         </section>
         <section className="fl-panel fl-queue" aria-label={tab === 'history' ? 'What was decided' : 'Most at risk first'}>
-          <p className="fl-cap">{tab === 'history' ? 'Decided this week' : 'Most at risk first'}<span className="r">Captured: {data.captured} · Skipped: {data.skipped}</span></p>
+          <p className="fl-cap">{tab === 'history' ? 'Decided this week' : 'Most at risk first'}<span className="r"><Reveal label="Decided this week" detail={`Captured: ${data.captured} · Skipped: ${data.skipped}`}><span aria-hidden="true">ⓘ</span></Reveal></span></p>
           {notice && <p role="status" className="fl-note">{notice}</p>}
           {!queue.length ? <p className="fl-note">{tab === 'history' ? 'Nothing decided this week.' : tab === 'risk' ? 'Nothing at risk waits.' : 'Nothing waits for you.'}</p>
             : <ul className="fl-qlist">{queue.map(q => <QueueItem key={q.id} q={q} investigationId={investigationId} onDo={(i, a) => void onDo(i, a)}/>)}</ul>}
@@ -298,13 +311,17 @@ export function Following({investigationId, active = true}: {investigationId: st
           {!mem.original && <span className="fl-bar" aria-hidden="true"><i style={{width: `${Math.round((mem.similarity ?? 0) * 100)}%`}}/></span>}
         </li>)}</ul>
       </section>)}
-      <section className="fl-panel" aria-label="What leaves this computer">
+      <section className="fl-panel fl-leaves" aria-label="What leaves this computer">
         <p className="fl-cap">What leaves this computer<span className="r">all {e.sources}</span></p>
-        {/* The counts stay; how each site sees it is on hover. */}
-        <Reveal detail="Each site sees a visit from this computer’s address, unless its route is Tor. The list of what you follow is never sent. Every request is in the outbound log.">
-        <p className="fl-safe"><b>✓ {e.third_party} third-party services.</b> {e.direct} source{e.direct === 1 ? ' is' : 's are'} asked directly
-          {e.tor ? `, ${e.tor} through Tor` : ''}{e.public_server ? `, ${e.public_server} read${e.public_server === 1 ? 's' : ''} a public server` : ''}
-          {e.no_monitor ? `, ${e.no_monitor} ha${e.no_monitor === 1 ? 's' : 've'} no monitor` : ''}.</p></Reveal>
+        {/* The counts stay, big enough to fill the column; how each site sees it is on hover. */}
+        <Reveal className="fl-safe-rv" detail="Each site sees a visit from this computer’s address, unless its route is Tor. The list of what you follow is never sent. Every request is in the outbound log.">
+          <p className={`fl-safe${e.third_party ? ' some' : ''}`}><span className="fl-safe-n">{e.third_party ? e.third_party : '✓ 0'}</span> third-party services</p></Reveal>
+        <ul className="fl-routes">
+          <li><span>Asked directly</span><b>{e.direct}</b></li>
+          {e.tor > 0 && <li><span>Through Tor</span><b>{e.tor}</b></li>}
+          {e.public_server > 0 && <li><span>Read a public server</span><b>{e.public_server}</b></li>}
+          {e.no_monitor > 0 && <li><span>No monitor</span><b>{e.no_monitor}</b></li>}
+        </ul>
       </section>
     </div>
     </>}

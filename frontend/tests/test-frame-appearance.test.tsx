@@ -223,10 +223,10 @@ describe('AppFrame', () => {
   it('opens edges with Alt and an arrow, pins one on this computer, and lists where you have been', async () => {
     render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
     const left = document.getElementById('fr-left')!;
-    expect(screen.getByText('Steps and pages', {selector: '.fr-hint'})).toBeInTheDocument();
+    // No hint chip floats over the work: the keys live behind ?.
+    expect(document.querySelector('.fr-hint')).toBeNull();
     fireEvent.keyDown(window, {key: 'ArrowRight', altKey: true});
     expect(left).toHaveClass('open');
-    expect(screen.queryByText('Steps and pages', {selector: '.fr-hint'})).not.toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'ArrowLeft', altKey: true});
     expect(left).not.toHaveClass('open');
     fireEvent.keyDown(window, {key: '['});
