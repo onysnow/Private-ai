@@ -61,7 +61,7 @@ def test_an_amount_owed_is_listed_apart_and_never_counted_as_money_that_moved():
     price = _pay(inv, fund, shell, "8500000000", "MYR", kind="price")
     ledger = ok(client.get(f"/api/investigations/{inv}/financial-flows"))
     assert [t["id"] for t in ledger["transactions"]] == [moved] and ledger["transactions"][0]["paymentKind"] == "loan"
-    assert [(t["id"], t["paymentKind"]) for t in ledger["owed"]] == [(price, "price"), (fine, "fine")]
+    assert [(t["id"], t["paymentKind"]) for t in ledger["owed"]] == [(fine, "fine"), (price, "price")]  # by date, the undated price last
     assert ledger["currencies"] == ["USD"] and "not a record that the money moved" in ledger["owed_rule"]
     # The Case home's money traced, the money checks and the charts read only the money that moved.
     money = ok(client.get(f"/api/investigations/{inv}/standing"))["money"]

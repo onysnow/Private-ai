@@ -151,8 +151,9 @@ def investigation_financial_ledger(db: Session, investigation_id: str) -> dict[s
             owed.append(record)
         else:
             transactions.append(record)
-    transactions.sort(key=lambda t: (t["dateTime"] or "", t["id"]))
-    owed.sort(key=lambda t: (t["dateTime"] or "", t["id"]))
+    # In date order, a payment with no date last (it was drawn first, as "—", above the dated ones).
+    transactions.sort(key=lambda t: (not t["dateTime"], t["dateTime"] or "", t["id"]))
+    owed.sort(key=lambda t: (not t["dateTime"], t["dateTime"] or "", t["id"]))
     return {
         "investigation_id": investigation_id,
         "transactions": transactions,

@@ -563,7 +563,7 @@ def test_claim_replies(demo):
     from app.models.domain import Claim, Evidence, Source
     from app.schemas.api import ClaimCreate
     from app.services.claims import (
-        claim_review_workspace, create_claim, link_claim_evidence, list_claim_evidence, review_claim, update_claim,
+        claim_review_workspace, create_claim, link_claim_evidence, link_out, list_claim_evidence, review_claim, update_claim,
     )
     from app.services.investigations import list_investigation_claims
 
@@ -585,7 +585,8 @@ def test_claim_replies(demo):
     _same_through_model(r.ClaimOut, update_claim(db, created, {"status": "disputed", "confidence": 0.6}))
     evidence = db.query(Evidence).join(Source, Source.id == Evidence.source_id).filter(Source.investigation_id == inv.id).first()
     link = link_claim_evidence(db, created, evidence, stance="supports", note="matches the ledger")
-    _same_through_model(r.ClaimEvidenceLinkOut, link)
+    # The route replies with the link and its superseded mark (link_out), not the bare stored row.
+    _same_through_model(r.ClaimEvidenceLinkOut, link_out(db, link))
     claim, event = review_claim(db, db.get(Claim, created.id), status="confirmed", confidence=0.9, rationale="Two sources agree.",
                                override_reason="The response models test: one demo source.")
     _same_through_model(r.ClaimReviewResultOut, {"claim": claim, "review": event, "workspace": claim_review_workspace(db, claim)})
