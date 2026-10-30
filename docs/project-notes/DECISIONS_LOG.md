@@ -472,3 +472,11 @@ the screen sends you to Bring in › Connectors. Charts still loads its catalogu
 query; 38 s on the demo case, a backend speed item), but the closed state now says what the builder makes; the data
 choice is cards with record counts, empty ones disabled. All three fill the height. Leads and To check stay as they
 are: already closer to the 29 Oct rules.
+
+## 30. The Wire's group names keep off the parties; shown on hover where there is no room (30 Oct 2026)
+
+Call: in Linked groups a group's name goes above its group, else below, only where it covers no party, no other name
+and no panel; on 1MDB at the whole-case view that leaves most names out at rest, and pointing at any party shows its
+group's name, drawn above the parties. Before, the names sat over the next group's dots. The other arrangements'
+headings sit beside their own parties by design, so they only keep clear of other names and the panels (a column under
+the Altitude panel loses its heading, which was drawn under the panel before).

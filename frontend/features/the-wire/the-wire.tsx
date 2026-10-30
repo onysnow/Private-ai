@@ -148,6 +148,7 @@ export function TheWire({investigationId, active = true}: {investigationId: stri
         <g className="tw-sec"/>
         <g className="tw-edges"/>
         <g className="tw-nodes"/>
+        <g className="tw-terr-l tw-terr-top"/>
         <g className="tw-elabs"/>
         <g className="tw-more"/>
       </g>

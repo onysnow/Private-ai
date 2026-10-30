@@ -434,8 +434,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       // An opened name chip comes to the front of the map.
       if (!g.classList.contains('hovering') && g.nextSibling) g.parentNode?.appendChild(g);
       g.classList.add('hovering'); showTip(ev, id); revealName(N, true);
+      if (mode === 'case' && terrEls.length) { hotParty = id; kick(); }
     });
-    on(g, 'pointerleave', () => { g.classList.remove('hovering'); hideTip(); revealName(N, false); });
+    on(g, 'pointerleave', () => {
+      g.classList.remove('hovering'); hideTip(); revealName(N, false);
+      if (hotParty === id) { hotParty = null; kick(); }
+    });
     node[id] = N;
     return N;
   }
@@ -686,7 +690,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
 
   let edgeEls: Record<string, EdgeEl> = {};
   let rtEls: {k: string; g: SVGGElement; o: string}[] = [];
-  let terrEls: {g: SVGGElement; a: SVGTextElement; b: SVGTextElement; x: number; top: number; big: boolean; n: number}[] = [];
+  let terrEls: {g: SVGGElement; a: SVGTextElement; b: SVGTextElement; x: number; top: number; bottom: number | null; big: boolean; n: number; members: string[]}[] = [];
+  // The party under the pointer: its group's name is shown even where names are left out for room.
+  let hotParty: string | null = null;
   let terrBoxes: Box[] = [], cardBoxes: Box[] = [], secBoxes: Box[] = [];
   let secEls: {t: SVGTextElement; a: number; r: number; rx: number; cx: number; cy: number}[] = [];
   let hopEls: {k: string; g: SVGGElement}[] = [];
@@ -820,12 +826,45 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       }
     });
     terrBoxes = [];
-    for (const t of terrEls.slice().sort((a, b) => Number(b.big) - Number(a.big))) {
-      const fs = t.big ? 17 : 14, s = toScreen(t.x, t.top), sy = s.y - 60 * C.k - 6, w = t.n * fs * 0.5;
-      const bx = {x0: s.x - w / 2, x1: s.x + w / 2, y0: sy - fs, y1: sy + 16};
-      const clash = overlap(bx, terrBoxes);
-      t.g.style.display = clash ? 'none' : '';
-      if (clash) continue;
+    // A group's name goes above the group, else below it, at the first spot clear of the other names, of every party
+    // drawn (it used to sit over the next group's dots) and of the panels over the map. A band's heading (the other
+    // arrangements) sits beside its own parties by design, so it only keeps clear of the names and the panels. With no clear spot it is left
+    // out at rest, and shown while the pointer is on one of the group's parties.
+    const partyBoxes: Box[] = [], panelBoxes: Box[] = [];
+    if (terrEls.length) {
+      const rb = root.getBoundingClientRect();
+      for (const e of Array.from(root.querySelectorAll<HTMLElement>('.tw-glass, .tw-tools'))) {
+        if (!e.offsetParent || getComputedStyle(e).opacity === '0') continue;   // a closed drawer is laid out but unseen
+        const r = e.getBoundingClientRect();
+        panelBoxes.push({x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top});
+      }
+    }
+    if (terrEls.length) for (const id in node) {
+      const N = node[id];
+      if (N.cur.v < 1 || N.cur.o < 0.5 || !P[id]) continue;
+      const s = toScreen(P[id].x, P[id].y);
+      if (N.cur.v === 2) partyBoxes.push({x0: s.x - N.hw * C.k * curCs, x1: s.x + N.hw * C.k * curCs, y0: s.y - N.hh * C.k * curCs, y1: s.y + N.hh * C.k * curCs});
+      else {
+        const r = DOT_R * curCs * C.k, half = r + 12 + Math.min(PEEK, E[id]?.short.length ?? 8) * 6.5;
+        partyBoxes.push({x0: s.x - half, x1: s.x + half, y0: s.y - r - 4, y1: s.y + r + 4});
+      }
+    }
+    const isHot = (t: typeof terrEls[number]) => hotParty !== null && t.members.includes(hotParty);
+    for (const t of terrEls.slice().sort((a, b) => Number(isHot(b)) - Number(isHot(a)) || Number(b.big) - Number(a.big))) {
+      const fs = t.big ? 17 : 14, w = t.n * fs * 0.56, s = toScreen(t.x, t.top), hot = isHot(t);
+      const spots = [s.y - 60 * C.k - 6];
+      if (t.bottom !== null) spots.push(toScreen(t.x, t.bottom).y + 40 * C.k + fs + 6);
+      let sy = NaN, bx: Box | null = null;
+      for (const y of spots) {
+        const b = {x0: s.x - w / 2, x1: s.x + w / 2, y0: y - fs, y1: y + 16};
+        if (!overlap(b, panelBoxes) && (hot || (!overlap(b, terrBoxes) && (t.bottom === null || !overlap(b, partyBoxes))))) { sy = y; bx = b; break; }
+      }
+      t.g.classList.toggle('terr-hot', hot && Boolean(bx));
+      // The named group's title rides above the parties while the pointer is on one of them, so no dot cuts it.
+      const layer = q<SVGGElement>(hot ? '.tw-terr-top' : '.tw-terr-l:not(.tw-terr-top)');
+      if (t.g.parentNode !== layer) layer.appendChild(t.g);
+      t.g.style.display = bx ? '' : 'none';
+      if (!bx) continue;
       terrBoxes.push(bx);
       const wy = (sy - H / 2) / C.k + C.y;
       t.a.setAttribute('x', String(t.x)); t.a.setAttribute('y', String(wy)); t.a.setAttribute('font-size', String(fs / C.k)); t.a.setAttribute('stroke-width', String(5 / C.k));
@@ -918,7 +957,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     placeLinkLabels(taken);
     const lensOn = lens.on && mode === 'case';
     q<SVGGElement>('.tw-nodes').style.setProperty('--lo', lensOn ? '.28' : '1');
-    q<SVGGElement>('.tw-terr-l').style.opacity = lensOn ? '.3' : '1';
+    root.querySelectorAll<SVGGElement>('.tw-terr-l').forEach(g => { g.style.opacity = lensOn ? '.3' : '1'; });
     renderLens(P);
     q('.tw-zoom').textContent = `${Math.round(C.k * 100)}%`;
   }
@@ -1162,8 +1201,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       }
     }
     // Territories.
-    const gT = q<SVGGElement>('.tw-terr'), gL = q<SVGGElement>('.tw-terr-l');
-    gT.textContent = ''; gL.textContent = ''; terrEls = [];
+    const gT = q<SVGGElement>('.tw-terr'), gL = q<SVGGElement>('.tw-terr-l:not(.tw-terr-top)');
+    gT.textContent = ''; gL.textContent = ''; q<SVGGElement>('.tw-terr-top').textContent = ''; terrEls = [];
     if (mode === 'case' && layout) {
       for (const band of layout.bands) {
         const g = el('g', {}, gL);
@@ -1171,13 +1210,13 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         a.textContent = band.name;
         const b = el('text', {class: 'terr-s', 'text-anchor': 'middle'}, g);
         b.textContent = band.sub;
-        terrEls.push({g, a, b, x: band.x, top: band.top, big: true, n: band.name.length});
+        terrEls.push({g, a, b, x: band.x, top: band.top, bottom: null, big: true, n: band.name.length, members: []});
       }
     } else if (mode === 'case') {
       for (const t of Object.values(terr)) {
         const ms = t.members;
-        let x = 0, top = 1e9;
-        ms.forEach(m => { x += E[m].x; top = Math.min(top, E[m].y); });
+        let x = 0, top = 1e9, bottom = -1e9;
+        ms.forEach(m => { x += E[m].x; top = Math.min(top, E[m].y); bottom = Math.max(bottom, E[m].y); });
         x /= ms.length;
         ms.forEach(m => el('circle', {cx: E[m].x, cy: E[m].y, r: t.id === 'loose' ? 70 : 88, fill: t.tint, 'fill-opacity': 0.75}, gT));
         const g = el('g', {}, gL);
@@ -1186,7 +1225,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         const b = el('text', {class: 'terr-s', 'text-anchor': 'middle'}, g);
         b.textContent = `${ms.length} ${ms.length === 1 ? 'PARTY' : 'PARTIES'}${t.flags ? ` · ${t.flags} OPEN FLAGS` : ''}`;
         if (t.flags) b.setAttribute('fill', '#F6966A');
-        terrEls.push({g, a, b, x, top, big: ms.length > 6, n: t.name.length});
+        terrEls.push({g, a, b, x, top, bottom, big: ms.length > 6, n: t.name.length, members: ms});
       }
     }
     // Sectors and "more" chips.
@@ -1897,7 +1936,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     if (playing) cancelAnimationFrame(playing);
     ro?.disconnect();
     cleanups.forEach(f => f());
-    for (const sel of ['.tw-nodes', '.tw-edges', '.tw-terr', '.tw-terr-l', '.tw-sec', '.tw-more', '.tw-lens', '.tw-wsvg', '.tw-tsvg']) { const x = root.querySelector(sel); if (x) x.textContent = ''; }
+    for (const sel of ['.tw-nodes', '.tw-edges', '.tw-terr', '.tw-terr-l', '.tw-terr-top', '.tw-sec', '.tw-more', '.tw-lens', '.tw-wsvg', '.tw-tsvg']) { const x = root.querySelector(sel); if (x) x.textContent = ''; }
     root.querySelectorAll('datalist option, .tw-pfrom option, .tw-pto option, .tw-wire .end, .tw-wire .tag').forEach(x => x.remove());
   };
 }

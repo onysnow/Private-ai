@@ -195,6 +195,8 @@
 
 /* svg */
 .tw .terr-l { font-family: var(--font-display); font-style: italic; fill: var(--text); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
+.tw .tw-terr-l { pointer-events: none; }
+.tw .terr-hot .terr-l { stroke-opacity: .95; }
 .tw .terr-s { font-family: var(--font-mono); fill: var(--text-muted); paint-order: stroke; stroke: var(--ground); stroke-opacity: .6; }
 .tw .lbl { font-family: var(--font-ui); fill: var(--text); opacity: var(--lo, 1); paint-order: stroke; stroke: var(--ground); stroke-linejoin: round; pointer-events: none; }
 /* A dot's name chip. It grows out from behind the circle; on hover every part of it moves together: the chip slides
