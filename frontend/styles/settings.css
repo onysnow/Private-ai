@@ -272,3 +272,10 @@ html[data-theme-fade='calm']::view-transition-old(root), html[data-theme-fade='c
 .ap-formats > .rv { display: grid; } .ap-formats > .rv > .ap-fmt { width: 100%; }
 .ap-fmt b { font-size: 14px; }
 .ap-seg > .rv { display: inline-flex; margin-left: 0; font-size: inherit; color: inherit; }
+/* Access and token: the access mode is the pane's main fact, so it reads at the size of one. */
+.st-access-mark { font: 400 22px/1.2 var(--font-display); color: var(--text); }
+/* A long line (an address someone sent) wraps inside its row instead of running out of the pane. */
+.st-route-what b { overflow-wrap: anywhere; }
+/* Connector keys: the key's state is a colour dot (colour-only by default, as every status); no key is an empty ring. */
+.st-key-top .st.st-state:not(.st-always) { margin-left: 0; }
+html:not([data-status]) .st.st-state-none:not(.st-always), html[data-status='colour'] .st.st-state-none:not(.st-always) { background: transparent; border: 1.5px solid currentColor; }

@@ -156,9 +156,10 @@ export function PeoplePane({investigationId, caseName, networkOn, onAccess}: {
     </div>
 
     <form className="lk-panel" onSubmit={add} aria-label="Add a person">
-      <p className="lk-eyebrow">Add a person</p>
-      <input className="lk-input" style={{marginTop: 10, font: '400 20px var(--font-display)'}} value={name} onChange={e => setName(e.target.value)}
-        placeholder="Their name, as it goes on their work" aria-label="Their name"/>
+      <p className="lk-eyebrow"><Reveal detail="Their name goes on their work, as yours does."><span>Add a person</span></Reveal></p>
+      {/* The name the person signs with; that it goes on their work is revealed on the heading. */}
+      <input className="lk-input" style={{marginTop: 10, font: '400 18px var(--font-display)'}} value={name} onChange={e => setName(e.target.value)}
+        placeholder="Their name" aria-label="Their name"/>
       <div className="lk-roles" role="radiogroup" aria-label="Role in this case">
         {/* What each role may do is revealed on it. */}
         {(['reporter', 'viewer', 'admin'] as Role[]).map(k => <Reveal key={k} tabbable={false} detail={k === 'viewer' ? 'Reads only. Good for an editor or a lawyer.'

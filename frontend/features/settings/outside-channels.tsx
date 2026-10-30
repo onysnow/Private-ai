@@ -127,8 +127,8 @@ export function OutsideChannels({prefs}: {prefs: NotificationPrefsOut}): ReactEl
     </div>
 
     <div className="st-route st-channel">
-      <span className="st-route-what"><b>Phone, through ntfy</b>
-        <small>A Textbook Red Flag as it happens, on the ntfy app. Use your newsroom’s ntfy server, or on ntfy.sh a long random topic: anyone who guesses it can read it.</small></span>
+      <span className="st-route-what"><Reveal detail="A Textbook Red Flag as it happens, on the ntfy app. Use your newsroom’s ntfy server, or on ntfy.sh a long random topic: anyone who guesses it can read it.">
+        <b>Phone, through ntfy</b></Reveal></span>
       <input aria-label="Your ntfy address" type="text" className="st-input st-mono st-channel-input" placeholder="ntfys://ntfy.sh/a-long-random-topic" spellCheck={false} value={url}
           onChange={e => setUrl(e.target.value)} disabled={busy === 'phone'}/>
       {seg('phone', ['off', 'interrupts'], false)}

@@ -37,6 +37,11 @@ const KIND_WORDS: Record<string, string> = {
 const OUTCOME_WORDS: Record<string, string> = {refused: ' · refused: the key was not accepted', failed: ' · did not answer'};
 const when = (iso: string): string => apiTime(iso).toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
 
+/** A web address in what was sent, as its site only; the full address is revealed on it. */
+export function shortSent(sent: string): string {
+  return sent.replace(/https?:\/\/(?:www\.)?([^/\s]+)\S*/g, '$1');
+}
+
 /** "Nothing leaves this computer except: …", from each source's mode in this case. */
 export function whatLeaves(sources: LookupSourceOut[]): string {
   const parts = sources.flatMap(s => {
@@ -133,7 +138,8 @@ export function LookupsPane({investigationId, caseName, providers}: {investigati
                 onPick={m => defaults.mutate({body: {defaults: {[s.key]: m}}, query: investigationId ? {investigation_id: investigationId} : {}})}/></div>
             <p className="st-wire" aria-label="What is sent"><i>Your case</i><s aria-hidden="true">──</s><i className="st-wire-what">a party’s name</i><s aria-hidden="true">──▶</s><i>{s.host || s.label}</i></p>
             <dl className="st-dl">
-              {investigationId && <><dt>In this case</dt><dd>{MODE_WORDS[mode]}{s.mode !== s.default ? ' (its own choice)' : ''}: {MODE_DOES[mode]}</dd></>}
+              {/* The mode shows; what it does is revealed on it. */}
+              {investigationId && <><dt>In this case</dt><dd><Reveal detail={MODE_DOES[mode]}><span>{MODE_WORDS[mode]}</span></Reveal>{s.mode !== s.default ? ' (its own choice)' : ''}</dd></>}
               <dt>Key</dt><dd>{s.key_saved ? 'Saved' : 'None saved'} · <a href="#keys">Connector keys</a></dd>
               <dt>Last sent</dt><dd>{s.last ? `“${s.last.sent}” · ${s.last.case} · ${when(s.last.at)}${s.last.status === 'refused' ? ' · refused: the key was not accepted' : s.last.status === 'failed' ? ' · did not answer' : ''}` : 'never'}</dd>
             </dl>
@@ -158,8 +164,8 @@ export function LookupsPane({investigationId, caseName, providers}: {investigati
           {!d.week.length ? <p className="st-hint">Nothing was sent outside this week.</p>
             : <ul className="st-list">{d.week.slice(0, 12).map(r => <li key={r.id} className="st-route">
               {/* What was sent shows, and a failure; the kind, service, destination, case and time are revealed on it. */}
-              <span className="st-route-what"><Reveal detail={`${KIND_WORDS[r.kind] ?? r.kind} · ${d.sources.find(s => s.key === r.service)?.label ?? r.service} · ${r.destination}${r.case ? ` · ${r.case}` : ''} · ${when(r.at)}`}>
-                <b className={r.kind === 'lookup' ? 'st-mono' : ''}>{r.kind === 'lookup' ? `“${r.sent}”` : r.sent}</b></Reveal>
+              <span className="st-route-what"><Reveal detail={<>{shortSent(r.sent) !== r.sent && <span className="rv-row rv-mono">{r.sent}</span>}<span className="rv-row">{`${KIND_WORDS[r.kind] ?? r.kind} · ${d.sources.find(s => s.key === r.service)?.label ?? r.service} · ${r.destination}${r.case ? ` · ${r.case}` : ''} · ${when(r.at)}`}</span></>}>
+                <b className={r.kind === 'lookup' ? 'st-mono' : ''}>{r.kind === 'lookup' ? `“${r.sent}”` : shortSent(r.sent)}</b></Reveal>
                 {OUTCOME_WORDS[r.outcome] ? <small className="st-problem">{OUTCOME_WORDS[r.outcome].replace(/^ · /, '')}</small> : null}</span>
             </li>)}</ul>}
         </section>

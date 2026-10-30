@@ -451,3 +451,12 @@ reads as a calm state on both screens ("Nothing: AI is off"), with what turning 
 the plan's records, counted by the server) and a link to Settings. AI drafts hides its run controls when nothing can
 run; its empty state links to Ask the case. Ask puts Earlier runs beside the question so the page uses its width; with
 no runs it shows the five systems unlit and the sample run. A run's state is a colour, the word on hover.
+
+## 28. Settings panes to the account mockups and the hover rule (30 Oct 2026)
+
+Calls: the disk-encryption explanation goes behind a reveal everywhere (first open too), though ACCOUNT_1 writes it
+out (the 29 Oct sub-text rule wins; the how-to-fix line stays visible when the disk is not encrypted). "Hide the
+screen now" joins the passphrase actions in Your safety's status row. "Sent this week" shows the site, the full
+address on hover. A connector key's state is colour-only ("no key" a hollow ring; "refused" keeps its word as an
+alert). A working Access state is the mark with its sentence on hover; states that need action stay written out.
+"Kept · Leaves this computer" stays on every pane. No security behaviour changed.

@@ -78,21 +78,26 @@ export function LockingPane(): ReactElement {
   return <div className="lk-settings">
     <div style={{display: 'grid', gap: 14}}>
       <div className="lk-panel">
+        {/* As in mockup ACCOUNT_4: the state, its line beneath, and what can be done with it at the right. */}
         <div className="lk-status">
-          <span style={{fontSize: 20, color: on ? 'var(--accent-2)' : 'var(--text-muted)'}} aria-hidden="true">{on ? '■' : '○'}</span>
-          <span className="lk-big">{on ? 'Protected with a passphrase' : 'Nothing to unlock'}</span>
-          <span className="lk-muted">{on
-            ? `Passphrase set ${dayOf(state.passphrase_set_at)} · recovery words ${dayOf(state.recovery_set_at)} · backups encrypted`
-            : 'Anyone at this computer can open the app and acts as you.'}</span>
+          <span className="lk-state" style={{color: on ? 'var(--accent-2)' : 'var(--text-muted)'}} aria-hidden="true">{on ? '■' : '○'}</span>
+          <span className="lk-state-words">
+            <span className="lk-big">{on ? 'Protected with a passphrase' : 'Nothing to unlock'}</span>
+            <span className="lk-muted">{on
+              ? `Passphrase set ${dayOf(state.passphrase_set_at)} · recovery words ${dayOf(state.recovery_set_at)} · backups encrypted`
+              : 'Anyone at this computer can open the app and acts as you.'}</span>
+          </span>
+          {!asking && <span className="lk-acts lk-state-acts">
+            {on ? <>
+              <button type="button" className="ap-btn" onClick={() => setAsking('change')}>Change passphrase</button>
+              <button type="button" className="ap-btn" onClick={() => setAsking('words')}>New recovery words</button>
+              <button type="button" className="ap-btn" onClick={() => void lockNow('button')}>Lock now</button>
+              <button type="button" className="ap-btn" onClick={() => setAsking('off')}>Turn it off</button>
+            </> : <button type="button" className="ap-btn p" onClick={() => setAsking('on')}>Protect with a passphrase</button>}
+            <Reveal tabbable={false} detail={`Hide screen covers everything at once with a plain page, for when someone walks up. ⌘⇧H from anywhere, or the button on Case home; your place is kept until you ask for it back.${on && state.lock_on_hide ? ' The app locks behind it.' : ''}`}>
+              <button type="button" className="ap-btn" onClick={hideScreen}>Hide the screen now</button></Reveal>
+          </span>}
         </div>
-        {!asking && <div className="lk-acts" style={{marginTop: 12}}>
-          {on ? <>
-            <button type="button" className="ap-btn" onClick={() => setAsking('change')}>Change passphrase</button>
-            <button type="button" className="ap-btn" onClick={() => setAsking('words')}>New recovery words</button>
-            <button type="button" className="ap-btn" onClick={() => void lockNow('button')}>Lock now</button>
-            <button type="button" className="ap-btn" onClick={() => setAsking('off')}>Turn it off</button>
-          </> : <button type="button" className="ap-btn p" onClick={() => setAsking('on')}>Protect with a passphrase</button>}
-        </div>}
         {asking === 'on' && <Ask label="Protect now" onCancel={() => setAsking('')}
           fields={[{name: 'p', label: 'Passphrase, 12 characters or more', kind: 'new'}, {name: 'a', label: 'Again'}]}
           submit={async v => {
@@ -197,10 +202,6 @@ export function LockingPane(): ReactElement {
         </Ask>}
       </div>
       {error && <p className="lk-err" role="alert">{error}</p>}
-      <div className="lk-panel">
-        <Reveal tabbable={false} detail={`Hide screen covers everything at once with a plain page, for when someone walks up. ⌘⇧H from anywhere, or the button on Case home; your place is kept until you ask for it back.${on && state.lock_on_hide ? ' The app locks behind it.' : ''}`}>
-          <button type="button" className="ap-btn" onClick={hideScreen}>Hide the screen now</button></Reveal>
-      </div>
     </div>
 
     <div className="lk-panel lk-preview" aria-label="What the lock looks like">

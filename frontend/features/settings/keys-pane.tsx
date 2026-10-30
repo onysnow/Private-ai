@@ -31,18 +31,20 @@ export const keySchema = z.object({
 });
 type KeyIn = z.infer<typeof keySchema>;
 
+const STATE_MARK: Record<string, string> = {ok: '✓', saved: '●', none: '○'};
+
 /** Works, refused, not tried yet, or no key: from the newer of the source's last lookup and its last key check. */
 function state(s: LookupSourceOut): {cls: string; words: string; line: string} {
   if (!s.key_saved) return {cls: 'none', words: 'no key', line: 'Without one: only what the source gives without a key, if anything.'};
   const check = s.key_check;
   if (check && check.state !== 'not_supported' && check.state !== 'no_key' && (!s.last || apiTime(check.at) >= apiTime(s.last.at))) {
     const credits = check.credits != null ? ` ${check.credits.toLocaleString()} credits left.` : '';
-    if (check.state === 'works') return {cls: 'ok', words: '✓ works', line: `Checked ${when(check.at)}: the source accepts it.${credits}`};
+    if (check.state === 'works') return {cls: 'ok', words: 'works', line: `Checked ${when(check.at)}: the source accepts it.${credits}`};
     if (check.state === 'refused') return {cls: 'bad', words: '! refused', line: `Checked ${when(check.at)}: the source refused this key. Lookups to it fail until the key is replaced.`};
     return {cls: 'saved', words: 'unknown', line: `Checked ${when(check.at)}: ${check.detail}`};
   }
   if (s.last?.status === 'refused') return {cls: 'bad', words: '! refused', line: `The source refused this key on ${when(s.last.at)}. Lookups to it fail until the key is replaced.`};
-  if (s.last?.status === 'completed') return {cls: 'ok', words: '✓ works', line: `Last accepted ${when(s.last.at)}.`};
+  if (s.last?.status === 'completed') return {cls: 'ok', words: 'works', line: `Last accepted ${when(s.last.at)}.`};
   return {cls: 'saved', words: 'saved', line: 'Not used yet: the first lookup shows whether the source accepts it.'};
 }
 
@@ -61,8 +63,10 @@ function KeyCard({s, onChanged}: {s: LookupSourceOut; onChanged: () => void}): R
   }, 'Could not save the key.', {credential: 'credential'});
   const st = state(s);
   return <section className="ap-pane st-key" aria-labelledby={`key-${s.key}`}>
-    <div className="st-key-top"><b id={`key-${s.key}`}>{s.label}</b>{st.cls === 'bad' ? <span className={`st-state st-state-${st.cls}`}>{st.words}</span>
-      : <Reveal detail={st.line}><span className={`st-state st-state-${st.cls}`}>{st.words}</span></Reveal>}</div>
+    {/* The key's state is a colour (Ony, 29 Oct), its word and line revealed on it; a refused key is an alert and keeps its word. */}
+    <div className="st-key-top"><b id={`key-${s.key}`}>{s.label}</b>{st.cls === 'bad' ? <span className={`st st-always st-state st-state-${st.cls}`}>{st.words}</span>
+      : <Reveal label={st.words} detail={<><b>{st.words}</b> · {st.line}</>}><span className={`st st-state st-state-${st.cls}`}>
+        <span className="st-mark" aria-hidden="true">{STATE_MARK[st.cls]}</span><span className="st-word">{st.words}</span></span></Reveal>}</div>
     {s.key_saved && <p className="st-slot"><Reveal label="Key saved" detail="Key saved · never shown again"><span aria-hidden="true">✓ ⚿</span></Reveal></p>}
     <dl className="st-dl">
       <dt>Goes to</dt><dd>{s.host || s.label}, with each lookup</dd>

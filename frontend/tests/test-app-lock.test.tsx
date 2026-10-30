@@ -123,6 +123,24 @@ describe('Settings › Your safety and People and access', () => {
     await userEvent.click(screen.getByRole('button', {name: 'It is encrypted'}));
     expect(await screen.findByText(/as you said/)).toBeInTheDocument();
     expect(api.lastBody('PUT /api/me/disk')).toEqual({answer: 'encrypted'});
+    // Why the disk matters is revealed on its state; Hide the screen sits with the passphrase's actions.
+    expect(screen.getByText('This computer’s disk is encrypted').closest('.rv')).toHaveAccessibleDescription(/operating system’s job/);
+    expect(screen.getByRole('button', {name: 'Hide the screen now'}).closest('.lk-status')).not.toBeNull();
+  });
+
+  it('shows how your name will read as you type it, and how many decisions stay “a person”', async () => {
+    mockApi({});
+    vi.resetModules();
+    const {useLockStore} = await import('../lib/app-lock');
+    const {NamePane} = await import('../features/lock/name-pane');
+    useLockStore.getState().set({...OPEN, name: '', unsigned_decisions: 214} as never);
+    render(<NamePane/>);
+    expect(screen.getAllByText('your name')).toHaveLength(3);
+    await userEvent.type(screen.getByLabelText('Your name'), 'Jo Okafor');
+    expect(screen.getAllByText('Jo Okafor')).toHaveLength(3);
+    expect(screen.getByText('214')).toBeInTheDocument();
+    // What happens to past decisions is revealed on the heading.
+    expect(screen.getByText('Your name, as it goes on your work').closest('.rv')).toHaveAccessibleDescription(/Past decisions keep the name/);
   });
 
   it('adds a person to this case with a one-time key, and says network access is off', async () => {

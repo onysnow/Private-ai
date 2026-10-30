@@ -95,7 +95,18 @@
 .lk-keybox { margin-top: 14px; padding: 12px; border: 1px dashed var(--accent-1); border-radius: 10px; background: var(--ground); }
 .lk-keybox code { font: 500 14px var(--font-mono); color: var(--accent-1); word-break: break-all; }
 .lk-banner { display: flex; gap: 10px; align-items: center; margin-top: 14px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); font-size: 13px; color: var(--text-muted); }
-.lk-role { font-size: 16px; }
+.lk-role { font-size: 20px; }
 /* First open: where each line appears is revealed on it, so the line fills the row. */
 .lk-reads > .rv { display: block; }
 .lk-reads .lk-read { grid-template-columns: 1fr; font-size: 14px; }
+/* Settings › Your safety: the state at the left, its actions at the right (mockup ACCOUNT_4). */
+.lk-status { flex-wrap: nowrap; align-items: center; }
+.lk-status .lk-state { font-size: 22px; flex: none; }
+.lk-status .lk-state-words { display: flex; flex-direction: column; gap: 4px; flex: 1 1 auto; min-width: 0; }
+.lk-status .lk-big { font-size: 26px; }
+.lk-status .lk-state-acts { flex: 0 1 auto; justify-content: flex-end; }
+@media (max-width: 900px) { .lk-status { flex-wrap: wrap; } }
+/* Settings › Your name: the name, how it reads, and the decisions that stay "a person" (mockup ACCOUNT_1). */
+.lk-namepane { display: grid; gap: 14px; max-width: 680px; }
+.lk-namepane .lk-acts { align-items: center; }
+.lk-namepane .lk-before { margin-top: 0; }

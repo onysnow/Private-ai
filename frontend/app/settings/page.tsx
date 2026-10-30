@@ -431,7 +431,8 @@ function Settings(): ReactElement {
         <h2 className="text-lg font-semibold" style={{fontFamily: 'var(--font-heading)'}}>
           API access
         </h2>
-        <div className={`mt-3 rounded-md border px-3 py-2 text-sm ${stateTone[state]}`}>{message}</div>
+        {/* A state that asks something of you (a token, or a fault) is written out; a working one is the mark below, its sentence revealed on it. */}
+        {(state === 'needs_token' || state === 'remote_disabled' || state === 'error') && <div className={`mt-3 rounded-md border px-3 py-2 text-sm ${stateTone[state]}`}>{message}</div>}
 
         {(state === 'needs_token' || state === 'authenticated') && (
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
@@ -465,10 +466,10 @@ function Settings(): ReactElement {
         )}
 
         {/* The access mode as a mark (⌂ local only, ↗ shared); the API's address and the token state are revealed on it. */}
-        <div className="mt-4 text-sm text-muted-foreground">
-          <Reveal detail={<><span className="rv-row rv-mono">API base URL: {API}</span>{status && <span className="rv-row">Access mode: {status.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} ·
+        <div className="mt-3 text-muted-foreground">
+          <Reveal detail={<>{(state === 'local' || state === 'authenticated' || state === 'checking') && <span className="rv-row">{message}</span>}<span className="rv-row rv-mono">API base URL: {API}</span>{status && <span className="rv-row">Access mode: {status.access.mode === 'local_only' ? 'local only' : 'shared bearer for remote clients'} ·
               token configured on backend: {status.access.token_configured ? 'yes' : 'no'}</span>}</>}>
-            <span>{!status ? 'API' : status.access.mode === 'local_only' ? '⌂ Local only' : '↗ Shared with remote clients'}</span></Reveal>
+            <span className="st-access-mark">{!status ? 'API' : status.access.mode === 'local_only' ? '⌂ Local only' : '↗ Shared with remote clients'}</span></Reveal>
         </div>
       </div>,
     keys: <KeysPane/>,

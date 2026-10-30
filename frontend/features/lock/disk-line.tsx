@@ -3,6 +3,7 @@
 // FileVault, LUKS). The app says what it can see, and where it cannot tell it asks, rather than guess.
 import type {ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {useLockStore} from '../../lib/app-lock';
 import type {DiskStatusOut} from '../../lib/generated/types.gen';
 import {diskAnswer} from '../../lib/generated/sdk.gen';
@@ -23,11 +24,9 @@ export function DiskLine({disk}: {disk: DiskStatusOut | null | undefined}): Reac
   return <div className={`lk-disk ${ok ? 'ok' : disk.state === 'unknown' ? '' : 'no'}`}>
     <span className="lk-shape" aria-hidden="true">{ok ? '■' : disk.state === 'unknown' ? '○' : '◆'}</span>
     <div>
-      <b>{SAYS[disk.state]}</b>{disk.system ? ` · ${disk.system}` : ''}{disk.answered ? ' · as you said' : ''}
-      <div className="lk-muted" style={{marginTop: 4}}>
-        Encrypting the files on disk is the operating system’s job: if the laptop is taken, that is what keeps them unreadable.
-        {disk.why ? ` ${disk.why}` : ''}
-      </div>
+      {/* Why the disk matters is revealed on the state; what to do about it, when it is not encrypted, stays written out. */}
+      <Reveal detail={`Encrypting the files on disk is the operating system’s job: if the laptop is taken, that is what keeps them unreadable.${disk.why ? ` ${disk.why}` : ''}`}>
+        <b>{SAYS[disk.state]}</b></Reveal>{disk.system ? ` · ${disk.system}` : ''}{disk.answered ? ' · as you said' : ''}
       {!ok && disk.how_to && <div className="lk-muted" style={{marginTop: 4}}>{disk.how_to}</div>}
       {disk.state === 'unknown' && !disk.answered && <div className="lk-acts" style={{marginTop: 8}}>
         <button type="button" className="ap-btn" onClick={() => void answer('encrypted')}>It is encrypted</button>

@@ -24,6 +24,18 @@ function Signed({name}: {name: string}): ReactElement {
   return name.trim() ? <span className="lk-signed">{name.trim()}</span> : <span className="lk-slot">your name</span>;
 }
 
+/** How a name will read on the work, filling in as it is typed (mockup ACCOUNT_1); where each line appears is revealed on it. */
+export function HowItReads({name}: {name: string}): ReactElement {
+  return <>
+    <p className="lk-eyebrow" style={{marginTop: 16}}><Reveal detail="It fills in as you type."><span>How it will read</span></Reveal></p>
+    <div className="lk-reads">
+      <Reveal detail="In the custody log"><div className="lk-read"><span className="lk-mono">today · <Signed name={name}/> · Accepted the proposal</span></div></Reveal>
+      <Reveal detail="On a decision card"><div className="lk-read"><span>✓ Accepted by <Signed name={name}/></span></div></Reveal>
+      <Reveal detail="For a lawyer"><div className="lk-read"><span className="lk-mono">decided_by: <Signed name={name}/> (owner) · human</span></div></Reveal>
+    </div>
+  </>;
+}
+
 type Step = 'name' | 'passphrase' | 'words';
 
 export function FirstOpen({state}: {state: LockStateOut}): ReactElement {
@@ -94,13 +106,7 @@ export function FirstOpen({state}: {state: LockStateOut}): ReactElement {
                 maxLength={120} autoFocus autoComplete="name"/>
               <span className={`lk-initials${name.trim() ? ' on' : ''}`} aria-hidden="true">{initials(name)}</span>
             </div>
-            <p className="lk-eyebrow" style={{marginTop: 16}}><Reveal detail="It fills in as you type."><span>How it will read</span></Reveal></p>
-            {/* Where each line appears is revealed on it. */}
-            <div className="lk-reads">
-              <Reveal detail="In the custody log"><div className="lk-read"><span className="lk-mono">today · <Signed name={name}/> · Accepted the proposal</span></div></Reveal>
-              <Reveal detail="On a decision card"><div className="lk-read"><span>✓ Accepted by <Signed name={name}/></span></div></Reveal>
-              <Reveal detail="For a lawyer"><div className="lk-read"><span className="lk-mono">decided_by: <Signed name={name}/> (owner) · human</span></div></Reveal>
-            </div>
+            <HowItReads name={name}/>
           </div>
           {before > 0 && <div className="lk-panel lk-before">
             <span className="lk-count">{before}</span>

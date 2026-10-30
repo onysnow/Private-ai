@@ -8,7 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {FOLD_MS, InterruptNotice} from '../features/inbox/interrupt-notice';
 import {SavedQuestions} from '../features/ai/saved-questions';
 import {KeysPane} from '../features/settings/keys-pane';
-import {LookupsPane, whatLeaves} from '../features/settings/lookups-pane';
+import {LookupsPane, shortSent, whatLeaves} from '../features/settings/lookups-pane';
 import {NotificationsPane} from '../features/settings/notifications-pane';
 import {ResearchPane} from '../features/settings/research-pane';
 import {ApiClient} from '../lib/api-client';
@@ -99,6 +99,16 @@ describe('Settings › Outside lookups', () => {
     expect(whatLeaves([source({mode: 'off'})])).toBe('Nothing leaves this computer for an outside lookup.');
   });
 
+  it('names the site of an address it sent, the full address revealed', async () => {
+    expect(shortSent('a request for https://www.malaymail.com/news/malaysia/2025/12/26/x')).toBe('a request for malaymail.com');
+    expect(shortSent('Fernhill Ltd')).toBe('Fernhill Ltd');
+    mockApi({'GET /api/settings/lookups': {sources: [source()], cases: [], can_change_defaults: true,
+      week: [{id: 'w1', kind: 'download', service: 'web', destination: 'www.malaymail.com', sent: 'a request for https://www.malaymail.com/news/a-long-path', outcome: 'ok', case: 'Kestrel SA', at: '2026-10-19T10:00:00'}]},
+    'GET /api/connectors': {providers: [], status: {}}});
+    render(<QueryProvider><LookupsPane investigationId="" caseName="" providers={[]}/></QueryProvider>);
+    expect((await screen.findByText('a request for malaymail.com')).closest('.rv')).toHaveAccessibleDescription(/https:\/\/www\.malaymail\.com\/news\/a-long-path/);
+  });
+
   it('asks why before a case looks up differently', async () => {
     const looks = {sources: [source()], cases: [], week: [], can_change_defaults: true};
     const api = mockApi({
@@ -158,7 +168,8 @@ describe('Settings › Connector keys › Check the key', () => {
       'POST /api/settings/connectors/opensanctions/check': () => { checked = true; return after.sources[0].key_check; },
     });
     render(<QueryProvider><KeysPane/></QueryProvider>);
-    expect(await screen.findByText('saved')).toBeInTheDocument();
+    // A key's state is a colour; its word and what it means are revealed on it.
+    expect(await screen.findByRole('img', {name: 'saved'})).toHaveAccessibleDescription(/^saved · Not used yet/);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Check the key'}));
     expect(api.calls('POST /api/settings/connectors/opensanctions/check')).toHaveLength(1);
     expect(await screen.findByText('! refused')).toBeInTheDocument();
