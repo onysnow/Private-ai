@@ -59,6 +59,30 @@ const NO_ENTITIES: EntityOut[] = [];
 const clock = (iso: string) => { const t = timeWords(iso); return t.slice(t.lastIndexOf(',') + 2); };
 const shortWhen = (iso: string) => (compactDay(iso) === compactDay(new Date().toISOString()) ? clock(iso) : compactDay(iso));
 
+// The facts a lookup can match a party on, in the order a reporter reads them; anything else is in its dossier.
+const FACTS: [string, string][] = [['alias', 'Also'], ['previousName', 'Was'], ['jurisdiction', 'Jurisdiction'], ['country', 'Country'],
+  ['nationality', 'Nationality'], ['registrationNumber', 'Registration'], ['leiCode', 'LEI'], ['incorporationDate', 'Incorporated'],
+  ['dissolutionDate', 'Dissolved'], ['birthDate', 'Born'], ['birthPlace', 'Birthplace'], ['position', 'Position'], ['legalForm', 'Legal form'],
+  ['status', 'Status'], ['address', 'Address'], ['bankName', 'Bank']];
+
+/** The picked party's note and the facts a lookup can match on, each a label and its values; none says so in one quiet line. */
+export function PartyFacts({properties}: {properties: Record<string, string[] | undefined>}): ReactElement {
+  const rows = FACTS.map(([key, label]) => {
+    const raw = properties[key];
+    const values = (raw ?? []).map(String).filter(Boolean);
+    return {key, label, values};
+  }).filter(r => r.values.length > 0);
+  const notes = (properties.notes ?? []).map(String).filter(Boolean);
+  return <section className="cn-facts" aria-label="What a lookup can match on">
+    {/* The party's own note (who or what it is, as the case recorded it), read before its facts. */}
+    {notes.length > 0 && <p className="cn-note">{notes[0]}</p>}
+    <h3 className="cn-cap"><Reveal detail="What the connectors can match this party on besides its name. Everything else about it is in its dossier."><span>What a lookup can match on</span></Reveal></h3>
+    {rows.length ? <dl className="cn-facts-grid">{rows.map(r => <div key={r.key}><dt>{r.label}</dt>
+      <dd>{r.values.slice(0, 4).join(' · ')}{r.values.length > 4 ? ` · +${r.values.length - 4}` : ''}</dd></div>)}</dl>
+      : <p className="cn-quiet">Only its name: a lookup searches by that.</p>}
+  </section>;
+}
+
 export function ConnectorsPanel({investigationId, providers, picker}: Props): ReactElement {
   const queryClient = useQueryClient();
   const entityId = useWorkbenchStore(state => state.entityId);
@@ -192,7 +216,9 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
       <div className="cn-parties" role="listbox" aria-label="Parties of the case">
         {shown.map(e => <div key={e.id} role="option" aria-selected={e.id === entityId} tabIndex={-1}
           className={`cn-party${e.id === entityId ? ' on' : ''}`} onClick={() => setEntityId(e.id)}>
-          <PartyMark schema={e.schema} tabbable={false}/><span className="cn-party-name">{e.caption}</span></div>)}
+          <PartyMark schema={e.schema} tabbable={false}/>
+          {/* A long name ends in an ellipsis; the whole name is revealed on it. */}
+          <Reveal tabbable={false} describe={false} className="cn-party-rv" detail={e.caption}><span className="cn-party-name">{e.caption}</span></Reveal></div>)}
         {entitiesQuery.data && !entities.length && <p className="cn-quiet">No party in this case yet.</p>}
         {entities.length > 0 && typed && !shown.length && <p className="cn-quiet">No party of the case is called that.</p>}
       </div>
@@ -247,16 +273,20 @@ export function ConnectorsPanel({investigationId, providers, picker}: Props): Re
         })}
       </div>
 
+      {/* The picked party's facts a lookup can match on (other names, where, numbers, dates), filling the panel. */}
+      {entity && <PartyFacts properties={entity.properties}/>}
+
       {/* What left this computer from this case this week, one line per lookup: the words sent, to which connector,
-          when (in full on hover); a refused or unanswered lookup says so. */}
-      <section className="cn-sent" aria-label="Sent from this case">
-        <h3 className="cn-cap">Sent from this case{sent.length > 0 && <span className="cn-sent-n">{sent.length}</span>}</h3>
-        {sent.length ? <ul className="cn-sent-list">{sent.map(r => <li key={r.id}>
+          when (in full on hover); a refused or unanswered lookup says so. Nothing sent is one quiet line. */}
+      <section className={`cn-sent${sent.length ? '' : ' none'}`} aria-label="Sent from this case">
+        <h3 className="cn-cap">Sent from this case{sent.length > 0 && <span className="cn-sent-n">{sent.length}</span>}
+          {!sent.length && <span className="cn-sent-none">nothing this week</span>}</h3>
+        {sent.length > 0 && <ul className="cn-sent-list">{sent.map(r => <li key={r.id}>
           <b className="cn-sent-what">“{r.sent}”</b>
           <span className="cn-sent-to">{nameOf(r.service)}</span>
           {r.outcome === 'refused' ? <span className="cn-sent-bad">refused</span> : r.outcome === 'failed' ? <span className="cn-sent-bad">no answer</span> : null}
           <Reveal detail={`${timeWords(r.at)} · ${r.destination}`}><span className="cn-sent-at">{shortWhen(r.at)}</span></Reveal>
-        </li>)}</ul> : <p className="cn-quiet">Nothing looked up from this case this week.</p>}
+        </li>)}</ul>}
       </section>
 
       {/* The session's line for screen readers; on screen each card carries its own result, its words on hover. */}

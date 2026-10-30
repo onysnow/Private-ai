@@ -3,7 +3,7 @@
 // word, how each gets in (this computer, or a key that expires), who decided what, and adding a person with a one-time
 // key. Keys work from other computers only once network access is on in Access and token.
 import {useState} from 'react';
-import type {FormEvent, ReactElement} from 'react';
+import type {FormEvent, ReactElement, ReactNode} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {Reveal} from '../../components/ui/reveal';
@@ -59,8 +59,10 @@ function KeyShown({name, token, expires}: {name: string; token: string; expires:
   </div>;
 }
 
-export function PeoplePane({investigationId, caseName, networkOn, onAccess}: {
+export function PeoplePane({investigationId, caseName, networkOn, onAccess, below}: {
   investigationId: string; caseName: string; networkOn: boolean; onAccess: () => void;
+  /** Shown under who decided what, in the same column (Keep › Access puts the server's setup there). */
+  below?: ReactNode;
 }): ReactElement {
   const queryClient = useQueryClient();
   const myName = useLockStore(s => s.state?.name) ?? '';
@@ -92,7 +94,7 @@ export function PeoplePane({investigationId, caseName, networkOn, onAccess}: {
   const people = deciders.data?.people ?? [];
   const most = Math.max(1, ...people.map(p => p.decisions));
   return <div className="lk-settings">
-    <div style={{display: 'grid', gap: 14}}>
+    <div className="lk-stack" style={{display: 'grid', gap: 14}}>
       <div className="lk-panel">
         {/* A role is its shape (◆ owner · ■ admin · ● reporter · ○ viewer); its word and what it may do are revealed on it. */}
         <p className="lk-eyebrow">Who can reach {caseName || 'this case'}</p>
@@ -147,13 +149,14 @@ export function PeoplePane({investigationId, caseName, networkOn, onAccess}: {
         <p className="lk-eyebrow">Who decided what · this case, last {deciders.data?.days ?? 30} days</p>
         {people.length === 0 ? <p className="lk-muted" style={{marginTop: 8}}>No decisions in this case in that time.</p> : <div className="lk-bars">
           {people.map(p => <div key={p.name ?? ''} className="lk-bar">
-            <span>{p.name ?? 'a person'}</span>
+            {/* Decisions made before names were kept read "a person"; why is revealed on it. */}
+            {p.name ? <span>{p.name}</span> : <Reveal detail="Decided before names were kept. They stay that way."><span>a person</span></Reveal>}
             <span className="lk-track"><i className={p.name && p.name === myName ? 'me' : ''} style={{width: `${(p.decisions / most) * 100}%`}}/></span>
             <span className="lk-mono" style={{textAlign: 'right'}}>{p.decisions}</span>
           </div>)}
         </div>}
-        {people.some(p => !p.name) && <p className="lk-muted" style={{marginTop: 8}}>“a person”: decided before names were kept. They stay that way.</p>}
       </div>
+      {below}
     </div>
 
     <form className="lk-panel" onSubmit={add} aria-label="Add a person">
@@ -179,9 +182,11 @@ export function PeoplePane({investigationId, caseName, networkOn, onAccess}: {
       </div>
       <button type="submit" className="ap-btn p" disabled={!name.trim() || !investigationId} style={{width: '100%', justifyContent: 'center'}}>
         Make a one-time key{name.trim() ? ` for ${name.trim().split(/\s+/)[0]}` : ''}</button>
+      {/* Keys made now need network access to work: the state says so at rest, what it means on hover. */}
       {!networkOn && <div className="lk-banner"><span aria-hidden="true">○</span>
-        <span><b>Network access is off</b>: keys work only after you turn it on in Access and token. Until then only this computer reaches the app.{' '}
-          <button type="button" className="lk-link" onClick={onAccess}>Access and token ›</button></span></div>}
+        <Reveal detail="Keys work only after you turn network access on in Access and token. Until then only this computer reaches the app.">
+          <b>Network access is off</b></Reveal>
+        <button type="button" className="lk-link" onClick={onAccess}>Access and token ›</button></div>}
     </form>
   </div>;
 }

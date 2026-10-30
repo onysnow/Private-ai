@@ -2,7 +2,7 @@
 // The first panels moved out of app/page.tsx onto the generated API client
 // (Foundation Fixes fixes 2 and 3): local deletion and source & evidence
 // capture, plus the wiring that sends generated calls through ApiClient.
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import type {ReactElement} from 'react';
@@ -66,9 +66,15 @@ describe('DeletionPanel', () => {
     vi.stubGlobal('fetch', fetchMock);
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={onDeleted}/>);
 
-    // What goes is counted as the screen opens: no button to press first.
-    await screen.findByText('Preview ready. Type the case’s name to enable deletion.');
-    expect(screen.getByText(/3 record\(s\) · 1 owned file\(s\) to delete/)).toBeInTheDocument();
+    // What goes is counted as the screen opens: no button to press first, and no sentence at rest (the steps say it).
+    await screen.findByText(/3 record\(s\) · 1 owned file\(s\) to delete/);
+    expect(screen.queryByText(/Preview ready/)).not.toBeInTheDocument();
+    // The tile says what it counts (every row the case owns), and the rows are listed by table, biggest first.
+    expect(screen.getByText('database rows removed')).toBeInTheDocument();
+    const tables = within(screen.getByRole('list', {name: 'Rows removed, by table'}));
+    expect(tables.getAllByRole('listitem').map(li => li.textContent)).toEqual(['2sources', '1the case itself']);
+    // The step to do now is to type the name.
+    expect(screen.getByRole('list', {name: 'Steps'}).querySelector('[aria-current="step"]')).toHaveTextContent('Type its name');
     expect(screen.queryByRole('button', {name: 'Preview deletion'})).not.toBeInTheDocument();
     const remove = screen.getByRole('button', {name: 'Permanently delete investigation'});
     expect(remove).toBeDisabled();
@@ -110,7 +116,7 @@ describe('DeletionPanel', () => {
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()} countOnOpen={false}/>);
     expect(fetchMock).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
-    await screen.findByText('Preview ready. Type the case’s name to enable deletion.');
+    await screen.findByRole('textbox', {name: 'Type the case’s name to delete it'});
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 

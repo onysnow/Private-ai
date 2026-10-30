@@ -40,15 +40,15 @@
 .wl-count b { font: 600 17px/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--text); }
 .wl-unchecked { flex: none; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--status-unshown); }
 .wl.solo { grid-template-columns: minmax(260px, 310px) minmax(0, 1fr); }
-.wl-none { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 12px; padding: 0 8% 8%; }
+.wl-none { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 18px; padding: 0 8% 8%; }
 .wl-none p { margin: 0; }
-.wl-none-name { font: 400 clamp(26px, 2.6vw, 40px)/1.15 var(--font-display); color: var(--text); overflow-wrap: anywhere; }
+.wl-none-name { font: 400 clamp(34px, 4vw, 64px)/1.1 var(--font-display); color: var(--text); overflow-wrap: anywhere; }
 .wl-none-name.muted { color: var(--text-muted); }
 .wl-none-aka { display: flex; flex-wrap: wrap; gap: 6px; }
-.wl-none-aka span { padding: 3px 9px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); font-size: 13px; color: var(--text-muted); }
-.wl-none-note { font: 400 16px/1.5 var(--font-read); color: var(--text-muted); max-width: 52ch; }
-.wl-none-state { font: 500 12px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--status-unshown); }
-.wl-none .wl-btn { display: inline-flex; align-items: center; gap: 7px; }
+.wl-none-aka span { padding: 5px 13px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); font-size: 16px; color: var(--text-muted); }
+.wl-none-note { font: 400 clamp(17px, 1.4vw, 21px)/1.5 var(--font-read); color: var(--text-muted); max-width: 52ch; }
+.wl-none-state { font: 500 14px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--status-unshown); }
+.wl-none .wl-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; font-size: 16px; }
 .wl-new { flex: none; display: inline-flex; align-items: center; gap: 4px; color: var(--accent-2); font: 700 12px var(--font-ui); font-variant-numeric: tabular-nums; }
 .wl-new i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .wl-stop { all: unset; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); cursor: pointer; display: grid; place-items: center;

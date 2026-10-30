@@ -2,12 +2,12 @@
 // The portable backup & restore panel, moved out of app/page.tsx onto the
 // generated reply checks (Foundation Fixes fixes 2 and 3): download the
 // archive, preview a restore, restore only after the reporter confirms.
-import {cleanup, fireEvent, render, screen} from '@testing-library/react';
+import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {BackupPanel} from '../features/backups/backup-panel';
+import {BackupPanel, backupHolds} from '../features/backups/backup-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -29,6 +29,7 @@ const RESTORE = 'POST /api/backups/restore';
 const EXPORT = 'GET /api/investigations/inv-1/export';
 const CASES = 'GET /api/investigations';
 const SAFETY = 'GET /api/investigations/inv-1/safety-data';
+const STANDING = 'GET /api/investigations/inv-1/standing';
 const caseRow = (last_backup: unknown) => [{id: 'inv-1', name: 'Harbour land', is_demo: false, created_at: '2026-10-01T00:00:00Z', last_backup}];
 const CONFIRMATION = 'I understand this creates a separate investigation and will not merge with existing records.';
 
@@ -171,6 +172,7 @@ describe('BackupPanel preview and restore', () => {
       [PREVIEW]: restorablePreview(),
       [RESTORE]: {investigation_id: 'inv-restored', restored_counts: {entities: 4}, manifest: {format: 'jwbackup', version: 1}},
       [SAFETY]: {status: 404, body: {detail: 'Investigation not found'}},
+      [STANDING]: {status: 404, body: {detail: 'Investigation not found'}},
     });
     const onRestored = vi.fn();
     wrap(<BackupPanel investigationId="inv-1" onRestored={onRestored}/>);
@@ -222,14 +224,37 @@ describe('BackupPanel at rest (Keep › Backup & restore)', () => {
     housekeeping: {stray_files: 0, stray_bytes: 0}, outbound: [], outbound_total: 0,
   };
 
-  it('counts what a backup holds, names what it leaves out on hover, and says it is not sealed', async () => {
-    mockApi({[CASES]: caseRow(null), [SAFETY]: safety});
+  const standing = {
+    investigation_id: 'inv-1', claims: {total: 37, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, to_check: 0, missing: 0, to_decide: 0,
+    to_decide_by_kind: {}, money: {currency: null, amount: 0, payments: 0, starting_payers: 0, others: []},
+    timeline: {events: 12, from: null, to: null, years: []}, documents: {total: 86, unread: 0, failed: 0}, sources: 9, evidence: 140,
+    network: {parties: 4812, links: 1}, flags: {open: 0, textbook: 0, strong: 0, faint: 0}, leads: {open: 3}, watchlist: {names: 0, new_hits: 0},
+  };
+
+  it('counts what a backup holds by kind, names what stays out, and shows sealed or not as a colour with its word on hover', async () => {
+    mockApi({[CASES]: caseRow(null), [SAFETY]: safety, [STANDING]: standing});
     wrap(<BackupPanel investigationId="inv-1" onRestored={vi.fn()}/>);
-    expect(await screen.findByText('4,812')).toBeInTheDocument();
-    expect(screen.getByText('86')).toBeInTheDocument();
-    expect(screen.getByText('records').closest('.rv')).toHaveAccessibleDescription('Database on this machine');
-    expect(screen.getByRole('img', {name: 'Not in a backup'})).toHaveAccessibleDescription('Not in a backup: Service keys, Security log. They stay on this computer.');
-    expect(screen.getByText('▲ not sealed').closest('.rv')).toHaveAccessibleDescription(/not encrypted/);
+    const holds = within(await screen.findByRole('list', {name: 'What a backup holds'}));
+    expect(await holds.findByText('4,812')).toBeInTheDocument();
+    expect(holds.getByText('parties')).toBeInTheDocument();
+    // One of each reads in the singular.
+    expect(holds.getByText('link')).toBeInTheDocument();
+    expect(holds.getByText('37').nextSibling).toHaveTextContent('claims');
+    expect(holds.getByText('140').nextSibling).toHaveTextContent('evidence');
+    expect(holds.getByText('3').nextSibling).toHaveTextContent('open leads');
+    // The documents' size and where they live are revealed on their name.
+    expect(await holds.findByText('documents')).toBeInTheDocument();
+    await waitFor(() => expect(holds.getByText('documents').closest('.rv')).toHaveAccessibleDescription('1.4 GB · Kept as received, checksummed, with their read text'));
+    expect(screen.getByText('Service keys · Security log', {exact: false})).toBeInTheDocument();
+    // Not sealed is the status colour; its word is there for screen readers and on hover with what it means.
+    const seal = screen.getByRole('img', {name: 'Not sealed'});
+    expect(seal).toHaveAccessibleDescription(/not encrypted/);
+    expect(seal.querySelector('.st.kp-unsealed .st-word')).toHaveTextContent('not sealed');
+  });
+
+  it('holds nothing to count until the case\'s standing is in', () => {
+    expect(backupHolds(undefined, null)).toEqual([]);
+    expect(backupHolds(standing as never, null).find(h => h.id === 'documents')).toMatchObject({n: 86, unit: 'documents', detail: undefined});
   });
 
   it('takes a backup dropped on the target, and previews it from there', async () => {

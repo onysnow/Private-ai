@@ -5,6 +5,8 @@
 // with a key), the app lock, the refusals of the last day, whether backups are sealed. Below them the server's setup as
 // marks (each value revealed on its mark), the stray files as one quiet action (Safety & data's "Look at them" opens
 // here), and the settings that change each of these. The page never scrolls; the people scroll inside their panel.
+// Sweep 30 Oct: the server's setup moved under the people (that column was empty below them, and the right one ran off
+// the screen); the ways in share the right column's height, each a bigger word.
 import Link from 'next/link';
 import type {ReactElement} from 'react';
 
@@ -42,6 +44,14 @@ export function AccessScreen({investigationId, caseName, settingsStatus}: Props)
       lock.locked_cases?.length ? `${lock.locked_cases.length} case(s) with a lock of their own` : ''].filter(Boolean).join(' · ')
       : 'Anyone at this computer can open the app. Lock it with a passphrase in Settings › Your safety.';
 
+  // The server's setup sits under the people (filling that column); the ways in fill the right column on their own.
+  const setup = <div className="lk-panel ax-setup">
+    <p className="sd-eyebrow">This server</p>
+    <ServerStatus settingsStatus={settingsStatus} denials={false}/>
+    <p className="sd-eyebrow ax-house">Housekeeping</p>
+    <StrayFiles label="Look at stray files"/>
+  </div>;
+
   return <div className="sd ax">
     <header className="sd-head">
       <h2 className="sd-title"><Reveal detail="Who can reach this case, by role and key; how the app is locked; and what the server is set up with. Nothing here leaves this computer.">
@@ -52,8 +62,8 @@ export function AccessScreen({investigationId, caseName, settingsStatus}: Props)
     <div className="ax-grid">
       <section className="ax-people" aria-label="People and access keys">
         {investigationId ? <PeoplePane investigationId={investigationId} caseName={caseName ?? ''} networkOn={!local}
-          onAccess={() => { window.location.assign('/settings#access'); }}/>
-          : <p className="sd-quiet">Open a case to see who can reach it.</p>}
+          onAccess={() => { window.location.assign('/settings#access'); }} below={setup}/>
+          : <><p className="sd-quiet">Open a case to see who can reach it.</p>{setup}</>}
       </section>
 
       <aside className="ax-side" aria-label="Ways in">
@@ -72,12 +82,6 @@ export function AccessScreen({investigationId, caseName, settingsStatus}: Props)
             detail="Keys for outside sources, stored on this computer and never shown again. They are not in a backup." href="/settings#keys" go="Connector keys"/>
         </ul>
         {sec.needs_attention && <p className="ax-alert" role="alert">⚠ {denialWords(settingsStatus)}</p>}
-        <div className="sd-panel ax-setup">
-          <p className="sd-eyebrow">This server</p>
-          <ServerStatus settingsStatus={settingsStatus} denials={false}/>
-          <p className="sd-eyebrow ax-house">Housekeeping</p>
-          <StrayFiles label="Look at stray files"/>
-        </div>
       </aside>
     </div>
   </div>;

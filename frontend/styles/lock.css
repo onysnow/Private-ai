@@ -110,3 +110,6 @@
 .lk-namepane { display: grid; gap: 14px; max-width: 680px; }
 .lk-namepane .lk-acts { align-items: center; }
 .lk-namepane .lk-before { margin-top: 0; }
+.lk-banner { flex-wrap: wrap; }
+.lk-banner .lk-link { margin-left: auto; white-space: nowrap; }
+.lk-banner b { color: var(--text); }

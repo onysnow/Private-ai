@@ -49,7 +49,10 @@ describe('Search before a search', () => {
     await waitFor(() => expect(kinds.getByRole('button', {name: /Parties/})).toHaveTextContent('31'));
     expect(kinds.getByRole('button', {name: /Claims and events/})).toHaveTextContent('68');
     expect(kinds.getByRole('button', {name: /Documents/})).toHaveTextContent('14');
-    expect(within(screen.getByRole('region', {name: 'Recent searches'})).getByText('None yet.')).toBeInTheDocument();
+    // No search yet: no empty Recent card; a long name to try ends in an ellipsis with the whole name on hover.
+    expect(screen.queryByRole('region', {name: 'Recent searches'})).not.toBeInTheDocument();
+    const tryName = await within(screen.getByRole('region', {name: 'Names to try'})).findByRole('button', {name: /Jho Low/});
+    expect(tryName.closest('.rv')).not.toBeNull();
 
     const user = userEvent.setup();
     // A kind narrows the next search.
