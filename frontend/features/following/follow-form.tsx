@@ -114,7 +114,7 @@ export function EmptyFollowing({investigationId, onDone, atRest}: {investigation
           <button type="button" role="radio" aria-checked={kind === k} aria-label={KIND_NAME[k][0]} className={`fl-kind-tile${k === 'closed' ? ' closed' : ''}`}
             onClick={() => setKind(c => (c === k ? undefined : k))}><KindIcon kind={k}/></button></Reveal>)}
       </div>
-      {atRest}
+      {atRest && <p className="fl-note fl-atrest-line">{atRest}</p>}
     </div>
     <ol className="fl-steps" aria-label="How following works">
       {STEPS.map(([key, title, words], i) => <li key={key}>

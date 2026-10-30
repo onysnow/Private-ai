@@ -5,7 +5,7 @@
 // the cross-provider clusters a session produces, and the selected entity
 // shared through the store. The review queue is rendered beside it where a
 // test checks that the findings it changed are read again.
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -29,6 +29,15 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 const ENTITIES = 'GET /api/investigations/inv-1/entities';
+const LOOKUPS = 'GET /api/settings/lookups';
+const source = (key: string, label: string, extra: Record<string, unknown> = {}) => ({key, label, host: `${key}.test`, kind: 'records', default: 'ask', mode: 'ask',
+  key_saved: false, key_check: null, last: null, cases_this_month: 0, ...extra});
+const lookups = {can_change_defaults: true, cases: [], week: [], sources: [
+  source('aleph', 'OpenAleph', {key_saved: true, last: {id: 'l-1', at: '2026-10-01T09:00:00', case: '1MDB', investigation_id: 'inv-1', is_party: true, provider: 'aleph',
+    results: 4, sent: 'Kestrelwood', status: 'completed'}}),
+  source('opensanctions', 'OpenSanctions', {key_saved: true, last: {id: 'l-2', at: '2026-10-01T09:00:00', case: '1MDB', investigation_id: 'inv-1', is_party: true,
+    provider: 'opensanctions', results: 0, sent: 'Kestrelwood', status: 'refused'}}),
+]};
 const FINDINGS = 'GET /api/investigations/inv-1/connector-findings';
 const ENRICH_ALL = 'POST /api/entities/ent-1/enrich';
 const CLUSTERS = 'GET /api/enrichment-sessions/session-1/clusters';
@@ -57,7 +66,7 @@ function sessionFixture(runs: {provider: string; status: string; result_count?: 
 }
 
 async function renderPanel(routes: Routes = {}, {withQueue = false, providers = ['aleph', 'opensanctions']} = {}) {
-  const api = mockApi({[ENTITIES]: [entityA, entityB], [FINDINGS]: [], ...routes});
+  const api = mockApi({[ENTITIES]: [entityA, entityB], [FINDINGS]: [], [LOOKUPS]: lookups, ...routes});
   wrap(<>
     <ConnectorsPanel investigationId="inv-1" providers={providers} picker={<span data-testid="picker">picker</span>}/>
     {withQueue && <ReviewQueuePanel investigationId="inv-1"/>}
@@ -68,14 +77,42 @@ async function renderPanel(routes: Routes = {}, {withQueue = false, providers = 
 }
 
 describe('ConnectorsPanel', () => {
-  it('lists the providers, shows the page\'s picker, and selects the first entity', async () => {
+  it('shows each connector as a card with its key and last lookup, the page\'s picker, and picks the first party', async () => {
     await renderPanel();
     expect(screen.getByTestId('picker')).toBeInTheDocument();
-    expect(screen.getAllByRole('combobox').find(el => el.textContent === 'aleph')).toBeTruthy();
-    expect(screen.getAllByRole('combobox').find(el => el.textContent === 'Kestrelwood Holdings Ltd · Company')).toBeTruthy();
+    const cards = screen.getAllByRole('radio');
+    expect(cards).toHaveLength(2);
+    expect(cards[0]).toHaveAttribute('aria-checked', 'true');
+    expect(cards[0]).toHaveTextContent('OpenAleph');
+    // The key that works is a colour, its word on hover; a refused key stays an alert in words, with the way to fix it.
+    await waitFor(() => expect(within(cards[0]).getByRole('img', {name: 'Key: works'})).toBeInTheDocument());
+    expect(within(cards[1]).getByText('! refused')).toBeInTheDocument();
+    expect(within(cards[1]).getByRole('link', {name: 'Key'})).toHaveAttribute('href', '/settings#keys');
+    // What the last lookup sent is on hover.
+    expect(within(cards[0]).getByText('“Kestrelwood” · 4 found').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('option', {name: /Kestrelwood Holdings Ltd/})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('heading', {name: 'Kestrelwood Holdings Ltd'})).toBeInTheDocument();
     expect(useWorkbenchStore.getState().entityId).toBe('ent-1');
     expect(screen.getByRole('button', {name: 'Enrich with aleph'})).toBeEnabled();
     expect(screen.getByRole('button', {name: 'Enrich all providers'})).toBeEnabled();
+  });
+
+  it('filters the parties as you type, picks one, and picks the connector from its card', async () => {
+    await renderPanel();
+    const user = userEvent.setup();
+    await user.type(screen.getByPlaceholderText('Search people, companies, identifiers...'), 'jane');
+    expect(screen.getAllByRole('option')).toHaveLength(1);
+    await user.click(screen.getByRole('option', {name: /Jane Doe/}));
+    expect(useWorkbenchStore.getState().entityId).toBe('ent-2');
+    await user.click(screen.getAllByRole('radio')[1]);
+    expect(screen.getByRole('button', {name: 'Enrich with opensanctions'})).toBeInTheDocument();
+  });
+
+  it('counts the findings waiting and links them to Check', async () => {
+    await renderPanel({[FINDINGS]: [findingFixture(), findingFixture({id: 'find-2', review_status: 'accepted'})]});
+    const link = await screen.findByRole('link', {name: /findings? to review/});
+    await waitFor(() => expect(link).toHaveTextContent('1finding to review'));
+    expect(link).toHaveAttribute('href', '/check?inv=inv-1#review-queue');
   });
 
   it('keeps the selected entity when the list still holds it, and moves to the first one when it does not', async () => {
@@ -105,7 +142,8 @@ describe('ConnectorsPanel', () => {
 
   it('does not search without a query', async () => {
     const api = await renderPanel();
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Search'}));
+    expect(screen.queryByRole('button', {name: 'Search'})).not.toBeInTheDocument();
+    await userEvent.setup().type(screen.getByPlaceholderText('Search people, companies, identifiers...'), '{Enter}');
     expect(api.calls('POST /api/connectors/aleph/search')).toHaveLength(0);
   });
 
@@ -176,7 +214,8 @@ describe('ConnectorsPanel', () => {
     await userEvent.setup().click(screen.getByRole('button', {name: 'Enrich all providers'}));
     await screen.findByText('Cross-provider candidates');
 
-    api.add({'GET /api/investigations/inv-2/entities': [entityFixture('ent-7', 'Harbor Trust', 'Company', {investigation_id: 'inv-2'})]});
+    api.add({'GET /api/investigations/inv-2/entities': [entityFixture('ent-7', 'Harbor Trust', 'Company', {investigation_id: 'inv-2'})],
+      'GET /api/investigations/inv-2/connector-findings': []});
     useWorkbenchStore.getState().setInvestigationId('inv-2');
     cleanup();
     wrap(<ConnectorsPanel investigationId="inv-2" providers={['aleph']}/>);

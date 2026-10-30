@@ -972,3 +972,36 @@ running together ("EnvironmentDatabaseDocument storage…"). Calls, all in the l
   actions at its foot (the prune still needs the typed phrase).
 - The pieces live in `features/security/security-panel.tsx` (ServerStatus, StrayFiles, SecurityLog) and
   `features/security/access-screen.tsx`; the old collapsed block remains only on the all-stages page.
+
+## 50. Bring in › Connectors, OpenAleph corpus, Search and Following's at-rest notice converted (30 Oct 2026)
+
+A sweep of the running app found four Bring in screens still in the old panel style or half empty. Each now fills its
+tab (the page does not scroll; parts scroll inside) and follows the 29 Oct rule.
+
+- **Connectors** (`features/connectors/connectors-panel.tsx`): no "External connectors" heading, no raw provider and
+  case dropdowns, no "Enrich a canonical entity" label. Left: the case's parties as a searchable picker (kind as the
+  party mark, ↑↓ to move); a typed name that is no party is searched outside with Enter or the dashed row under the
+  list, which says on hover what is sent where. Right: the picked party's name large, Open dossier, Enrich with the
+  chosen connector, Enrich all providers. One card per connector, chosen by clicking it: its key state as colour (the
+  word and Settings › Connector keys' line on hover; a refused key stays an alert in words with a link to fix it), the
+  case's mode, when it was last used (what was sent on hover), and after a lookup its health and count. Below: what was
+  sent from this case this week (from the outbound log Settings › Outside lookups reads), and the count of findings
+  waiting, linking to Check › Connector findings. The case switcher is left to the frame on the stage screen (the
+  all-in-one page still passes it). Why: the connectors' state was already known to Settings; showing it where the
+  lookup is made says before you press whether it can work, and what leaves the computer.
+- **OpenAleph corpus** (`features/corpus/*`): no repeated title. One strip holds the sync as a status colour (Status
+  marks apply), when it last went and what waits; what the corpus is and every sync line are on hover; failures stay.
+  What stands out is asked for when the screen opens, not behind a button: the server answers "off" and "nothing sent
+  yet" itself, and only a case already sent asks its own OpenAleph collection. It, the cross-references and the
+  OpenAleph sets (now three icon buttons, named on hover) sit in a right rail; the watchlist takes the rest. A watched
+  name shows "N hits", nothing at zero, a hollow ring if never searched; a name found nowhere gets the whole pane (name
+  large, other names, why it is watched, "In no document yet", Search for it now) instead of a sentence and an empty
+  third pane.
+- **Search** (`features/search/search-panel.tsx`): before a search the screen shows what can be searched, each kind of
+  record with its count from the case's standing (pick one to search only it), names to try from the case's parties
+  (real names before anonymised labels), and the last eight searches (this browser only; key hints behind `?`). The
+  orange "Search records" button is a quiet ↵ beside the box: Enter searches. A × clears back to this screen. Documents
+  have no passage count in the API, so passages are not counted.
+- **Following** (`features/following/following.tsx`): the at-rest paragraph is a lock mark beside "Sources followed",
+  the sentence on hover. Only an unencrypted disk (the list readable on this computer; the person must turn encryption
+  on) stays on screen, as a short "▲ List not encrypted" alert with the sentence and what to do on hover.

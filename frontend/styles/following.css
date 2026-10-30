@@ -147,8 +147,12 @@
 .wt-acts form { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; } .wt-acts input { flex: 1 1 200px; min-width: 0; }
 .wt-switch { display: flex; gap: 8px; align-items: center; font-size: 12.5px; margin-top: 6px; }
 .fl-works { grid-column: 1 / -1; min-width: 0; }
-.fl-atrest { font-size: 12px; margin: 2px 0 8px; }
-.fl-atrest.warn::before { content: "▲ "; color: var(--status-provisional, var(--accent-1)); }
+.fl-atrest { font: 500 10.5px var(--font-mono); letter-spacing: .06em; text-transform: none; }
+.fl-atrest.warn { color: var(--status-provisional, var(--accent-1)); }
+.fl-atrest.warn::before { content: "▲ "; }
+.fl-atrest-mark { width: 14px; height: 14px; display: block; }
+.fl-atrest-mark.ok { color: var(--status-supported, var(--text-muted)); }
+.fl-atrest-mark.part { color: var(--text-muted); }
 .fl-mail { display: flex; flex-direction: column; gap: 3px; }
 
 /* Converted to the 29 Oct rule (features/following/marks.tsx): a source's kind is its icon, its health a shape and
@@ -199,7 +203,7 @@
 .fl-kind-tile[aria-checked="true"] { border-color: var(--accent-1); color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 12%, var(--surface-2)); }
 .fl-kind-tile.closed { border-style: dashed; color: var(--text-muted); }
 .fl .fl-kind-tile .fl-kind { width: 30px; height: 30px; color: inherit; }
-.fl-empty .fl-atrest { margin: 16px 0 0; }
+.fl-empty .fl-atrest-line { margin: 16px 0 0; display: flex; }
 .fl-steps { list-style: none; margin: 0; padding: 22px 22px; border-radius: 16px; background: var(--surface-1); box-shadow: var(--shadow-panel);
   border: 1px solid color-mix(in srgb, var(--accent-1) 18%, transparent); display: flex; flex-direction: column; justify-content: space-around; gap: 18px; counter-reset: none; }
 .fl-steps li { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 14px; }

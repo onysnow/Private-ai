@@ -254,9 +254,8 @@ export function Following({investigationId, active = true}: {investigationId: st
     <div className="fl-left">
       {adding && <FollowForm investigationId={investigationId} onDone={m => { setAdding(false); if (m) { setPicked(m.id); void refresh(); } }}/>}
       <section className="fl-panel" aria-label="Sources followed">
-        <p className="fl-cap">Sources followed<span className="r">{monitors.some(m => m.last_checked_at)
+        <p className="fl-cap">Sources followed<ListAtRest/><span className="r">{monitors.some(m => m.last_checked_at)
           ? <Reveal detail={`Health checked ${hhmm(monitors.map(m => m.last_checked_at ?? '').sort().at(-1))}`}>{monitors.length}</Reveal> : monitors.length}</span></p>
-        <ListAtRest/>
         <div role="listbox" aria-label="Sources" className="fl-mons">{monitors.map(m =>
           <SourceRow key={m.id} m={m} picked={m.id === selected?.id} onPick={() => setPicked(m.id)}/>)}</div>
       </section>
@@ -314,8 +313,9 @@ export function Following({investigationId, active = true}: {investigationId: st
 
 /** Who you follow says what the story is about (source intake research, source protection). The list is in the case
  *  database, protected at rest by the disk's encryption as ADR-0016 decides; backups are sealed once a passphrase is set
- *  (DECISIONS_LOG 10). Says which of those holds now. */
-function ListAtRest(): ReactElement | null {
+ *  (DECISIONS_LOG 10). A lock mark beside the list's count says which of those holds, the sentence on hover. Only an
+ *  unencrypted disk, where the list sits readable on this computer and the person must act, stays on screen as an alert. */
+export function ListAtRest(): ReactElement | null {
   const state = useLockStore(s => s.state);
   if (!state) return null;
   const disk = state.disk?.state;
@@ -323,7 +323,10 @@ function ListAtRest(): ReactElement | null {
     : 'the app cannot tell whether the disk is encrypted';
   const sealed = state.protection === 'passphrase';
   const words = `This list says what the story is about. On this computer ${diskWords}; backups ${sealed ? 'are encrypted with your passphrase' : 'are not encrypted until you set a passphrase (Settings › Your safety)'}.`;
-  // A gap in its protection is a warning and stays on screen; when both hold, a short mark with the sentence on hover.
-  if (disk === 'encrypted' && sealed) return <p className="fl-note fl-atrest"><Reveal detail={words}><span>✓ protected at rest</span></Reveal></p>;
-  return <p className="fl-note fl-atrest warn">{words}</p>;
+  if (disk === 'not_encrypted') return <Reveal detail={<>{words} Turn on the disk’s encryption (FileVault, BitLocker or LUKS) to protect it.</>}>
+    <span className="fl-atrest warn" role="alert">List not encrypted</span></Reveal>;
+  const whole = (disk === 'encrypted' || disk === 'encrypting') && sealed;
+  return <Reveal label={whole ? 'Protected at rest' : 'Partly protected at rest'} detail={words}>
+    <svg className={`fl-atrest-mark${whole ? ' ok' : ' part'}`} viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <rect x="3.5" y="7" width="9" height="6.5" rx="1.2"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg></Reveal>;
 }

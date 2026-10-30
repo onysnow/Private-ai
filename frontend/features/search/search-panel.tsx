@@ -7,7 +7,7 @@
 // to tag, note or collect. Outside findings stay leads until reviewed. The
 // call and its reply check are generated from the API schema.
 import {keepPreviousData, useQuery} from '@tanstack/react-query';
-import {ChevronDown, ChevronRight, StickyNote} from 'lucide-react';
+import {ChevronDown, ChevronRight, CornerDownLeft, StickyNote, X} from 'lucide-react';
 import {Fragment, useEffect, useMemo, useRef, useState} from 'react';
 import type {ChangeEvent, KeyboardEvent, ReactElement, ReactNode} from 'react';
 
@@ -17,11 +17,12 @@ import type {ClaimStatus} from '../../components/status';
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {dateWords} from '../../lib/dates';
-import {peekAtRecordOptions, searchWorkbenchOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getStandingOptions, listEntitiesOptions, peekAtRecordOptions, searchWorkbenchOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {SearchHitOut, SearchWorkbenchData} from '../../lib/generated/types.gen';
 import {KIND, KIND_ORDER, SURE, SURE_ORDER, TYPE_LABEL} from '../../lib/record-kinds';
 import type {RecordKind, Sure} from '../../lib/record-kinds';
 import {SEARCH_EVENT, takePendingSearch} from '../../lib/search-handoff';
+import {timeWords} from '../../lib/timestamps';
 import {PARTY, PARTY_ORDER, partyKind} from '../../lib/viz-tokens';
 import type {PartyKind} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -181,6 +182,58 @@ function ResultCard({hit, words, selected, onSelect, onTrace, onMark, peek}: {hi
   </div>;
 }
 
+// The searches run in this case, in this browser only (a convenience; nothing is sent or kept elsewhere).
+type Recent = {q: string; at: string};
+const RECENT_KEY = (investigationId: string) => `sv-recent:${investigationId || 'all'}`;
+function readRecent(investigationId: string): Recent[] {
+  try { const rows = JSON.parse(window.localStorage.getItem(RECENT_KEY(investigationId)) ?? '[]') as Recent[]; return Array.isArray(rows) ? rows : []; } catch { return []; }
+}
+function keepRecent(investigationId: string, q: string): Recent[] {
+  const rows = [{q, at: new Date().toISOString()}, ...readRecent(investigationId).filter(r => r.q.toLowerCase() !== q.toLowerCase())].slice(0, 8);
+  try { window.localStorage.setItem(RECENT_KEY(investigationId), JSON.stringify(rows)); } catch { /* private window or blocked storage */ }
+  return rows;
+}
+
+const KEY_HINTS: [string, string][] = [['⌘K', 'search from anywhere'], ['Enter', 'search, or trace the chosen result'], ['↑ ↓', 'move through the results'],
+  ['T  N  C', 'tag, note or collect the chosen result']];
+
+/** Before a search: what this case holds that can be searched (each kind with its count; pick one to search only it),
+ *  names to try from the case's parties, and the last searches. Fills the screen instead of leaving it empty. */
+function BeforeSearch({investigationId, kind, onKind, onRun, recent}: {investigationId: string; kind?: RecordKind; onKind: (k: RecordKind) => void;
+  onRun: (q: string) => void; recent: Recent[]}): ReactElement {
+  const path = {investigation_id: investigationId};
+  const standing = useQuery({...getStandingOptions({path}), enabled: Boolean(investigationId)}).data;
+  // Names to try: real names before the labels a source gave anonymised parties ("A.", "Shell Company Account 2").
+  const rows = useQuery({...listEntitiesOptions({path, query: {limit: 60}}), enabled: Boolean(investigationId)}).data;
+  const parties = useMemo(() => [...(rows ?? [])].sort((a, b) => Number(/^["“']/.test(a.caption)) - Number(/^["“']/.test(b.caption))).slice(0, 12), [rows]);
+  const counts: Partial<Record<RecordKind, number | undefined>> = standing ? {
+    party: standing.network.parties, link: standing.network.links, evidence: standing.evidence + standing.sources,
+    claim_event: standing.claims.total + standing.timeline.events, lead_task: standing.leads.open, document: standing.documents.total,
+  } : {};
+  const kinds = KIND_ORDER.filter(k => k !== 'outside');
+  return <div className="sv-before">
+    <section className="sv-b-kinds" aria-label="What can be searched">
+      {kinds.map(k => <button key={k} type="button" className={`sv-kind${kind === k ? ' on' : ''}`} style={{['--edge' as string]: KIND[k].edge}}
+        aria-pressed={kind === k} onClick={() => onKind(k)}>
+        <b>{counts[k] ?? '·'}</b><span>{KIND[k].plural}</span></button>)}
+    </section>
+    <section className="sv-b-col" aria-label="Names to try">
+      <h4 className="sv-b-cap">Try</h4>
+      {parties.length ? <ul className="sv-b-list">{parties.map(p => <li key={p.id}>
+        <button type="button" onClick={() => onRun(p.caption)}><PartyMark schema={p.schema} tabbable={false}/><span>{p.caption}</span></button></li>)}</ul>
+        : <p className="sv-muted">No party in this case yet.</p>}
+    </section>
+    <section className="sv-b-col" aria-label="Recent searches">
+      <h4 className="sv-b-cap">Recent
+        <Reveal className="sv-b-keys" label="Keys" detail={<>{KEY_HINTS.map(([k, w]) => <span className="rv-row" key={k}><kbd>{k}</kbd> {w}</span>)}</>}>
+          <span aria-hidden="true">?</span></Reveal></h4>
+      {recent.length ? <ul className="sv-b-list">{recent.map(r => <li key={r.q}>
+        <Reveal tabbable={false} describe={false} detail={`Searched ${timeWords(r.at)}`}><button type="button" onClick={() => onRun(r.q)}><span>{r.q}</span></button></Reveal></li>)}</ul>
+        : <p className="sv-muted">None yet.</p>}
+    </section>
+  </div>;
+}
+
 export function SearchPanel({investigationId}: Props): ReactElement {
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
   const marks = useMarks(investigationId);
@@ -193,6 +246,9 @@ export function SearchPanel({investigationId}: Props): ReactElement {
   const marksRef = useRef<HTMLDivElement>(null);
   // The query runs for the last submitted search, not for every keystroke.
   const [submitted, setSubmitted] = useState<{q: string; investigationId: string; includeReconciledDuplicates: boolean} | null>(null);
+  const [recent, setRecent] = useState<Recent[]>([]);
+  useEffect(() => { setRecent(readRecent(investigationId)); }, [investigationId]);
+  useEffect(() => { if (submitted?.q) setRecent(keepRecent(submitted.investigationId, submitted.q)); }, [submitted]);
 
   const query: Query = {
     q: submitted?.q ?? '',
@@ -224,12 +280,14 @@ export function SearchPanel({investigationId}: Props): ReactElement {
     return () => window.removeEventListener(SEARCH_EVENT, onSearch);
   }, [investigationId, includeReconciledDuplicates]);
 
-  const submit = () => {
-    const q = draft.trim();
+  const submit = (value = draft) => {
+    const q = value.trim();
     if (!q) return;
+    setDraft(q);
     setSubmitted({q, investigationId, includeReconciledDuplicates});
     setSelected(null);
   };
+  const clear = () => { setDraft(''); setSubmitted(null); setSelected(null); inputRef.current?.focus(); };
 
   const results = useMemo(() => search.data?.results ?? [], [search.data]);
   const words = useMemo(() => (submitted?.q ?? '').split(/\s+/).filter(w => w.length > 1), [submitted]);
@@ -268,17 +326,23 @@ export function SearchPanel({investigationId}: Props): ReactElement {
 
   return <section className="card sv" id="investigation-search" aria-labelledby="search-title">
     <div className="sv-head">
-      <h3 id="search-title">Search</h3>
+      <h3 id="search-title" className="st-sr">Search</h3>
       <label className="sv-sbox">
         <input ref={inputRef} value={draft} onChange={(e: ChangeEvent<HTMLInputElement>) => setDraft(e.target.value)}
-          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') submit(); }} placeholder="Search this investigation…"
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') submit(); }}
+          placeholder={filters.kind ? `Search ${KIND[filters.kind].plural.toLowerCase()}…` : 'Search this investigation…'}
           aria-label="Search this investigation"/>
+        {(draft || submitted) && <button type="button" className="sv-clear" aria-label="Clear the search" onClick={clear}><X size={14} aria-hidden="true"/></button>}
       </label>
-      <button type="button" className="sv-btn p" onClick={submit}>Search records</button>
+      {/* Enter searches; the button is there for a pointer, quiet. */}
+      <Reveal tabbable={false} describe={false} detail="Search (Enter)">
+        <button type="button" className="sv-btn sv-go" aria-label="Search records" onClick={() => submit()}><CornerDownLeft size={15} aria-hidden="true"/></button></Reveal>
       <Reveal tabbable={false} describe={false} detail="Include reviewed duplicate copies: records a person has already marked as copies of another.">
         <label className="sv-check"><Checkbox checked={includeReconciledDuplicates} aria-label="Include reviewed duplicate copies"
           onCheckedChange={(checked: boolean | 'indeterminate') => setIncludeReconciledDuplicates(checked === true)}/> Duplicates</label></Reveal>
     </div>
+    {!submitted && <BeforeSearch investigationId={investigationId} kind={filters.kind} recent={recent}
+      onKind={k => { setFilters(f => ({...f, kind: f.kind === k ? undefined : k})); inputRef.current?.focus(); }} onRun={q => submit(q)}/>}
     {search.isError && <p className="sv-error">{errorMessage(search.error, 'Search failed')}</p>}
     {submitted && search.data && <div className="sv-wrap">
       <Facets facets={facets} filters={filters} setFilters={f => { setFilters(f); setSelected(null); }} tagNames={marks.tags}/>

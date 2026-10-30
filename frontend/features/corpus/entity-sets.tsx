@@ -9,7 +9,6 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
-import {Button} from '@/components/ui/button';
 import {GitFork, List, CalendarRange} from 'lucide-react';
 import type {LucideIcon} from 'lucide-react';
 
@@ -58,30 +57,37 @@ export function EntitySets({investigationId}: {investigationId: string}): ReactE
   };
 
   const shown = (entities.data ?? []).filter(e => e.caption.toLowerCase().includes(filter.trim().toLowerCase()));
-  return <div className="candidate" aria-label="Diagrams, timelines and lists in OpenAleph">
-    <Reveal detail="Made from the confirmed records the sync sent to the investigation's collection. Sending again updates the same one; where you moved things in OpenAleph's diagram stays."><b>Diagrams, timelines and lists in OpenAleph</b></Reveal>
-    <div className="actions">
-      <Button variant="outline" onClick={() => void sendSet('diagram')} disabled={send.isPending}>Send the relationships as a diagram</Button>
-      <Button variant="outline" onClick={() => void sendSet('timeline')} disabled={send.isPending}>Send the dated records as a timeline</Button>
-      <Button variant="outline" aria-expanded={listOpen} onClick={() => setListOpen(open => !open)}>Make a list…</Button>
-    </div>
-    {listOpen && <div className="statement" aria-label="Make a list">
+  // Each set's kind is its icon; what it sends is the button's name, read on hover.
+  const sendButton = (kind: 'diagram' | 'timeline', name: string) => {
+    const Icon = KIND_ICON[kind];
+    return <Reveal tabbable={false} describe={false} detail={name}>
+      <button type="button" className="co-icon" aria-label={name} onClick={() => void sendSet(kind)} disabled={send.isPending}><Icon size={16} aria-hidden="true"/></button></Reveal>;
+  };
+  return <section className="co-box" aria-label="Diagrams, timelines and lists in OpenAleph">
+    <h4 className="co-cap"><Reveal detail="Made from the confirmed records the sync sent to the investigation's collection. Sending again updates the same one; where you moved things in OpenAleph's diagram stays."><span>In OpenAleph</span></Reveal>
+      <span className="co-cap-r co-icons">
+        {sendButton('diagram', 'Send the relationships as a diagram')}
+        {sendButton('timeline', 'Send the dated records as a timeline')}
+        <Reveal tabbable={false} describe={false} detail="Make a list…"><button type="button" className="co-icon" aria-label="Make a list…" aria-expanded={listOpen}
+          onClick={() => setListOpen(open => !open)}><List size={16} aria-hidden="true"/></button></Reveal>
+      </span></h4>
+    {listOpen && <div className="co-list" aria-label="Make a list">
       <Input aria-label="List name" placeholder="List name, e.g. People to call" value={listLabel}
         onChange={(e: ChangeEvent<HTMLInputElement>) => setListLabel(e.target.value)}/>
       <Input aria-label="Find an entity" placeholder="Find an entity" value={filter}
         onChange={(e: ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}/>
-      {entities.isPending && <p className="muted">Loading the entities…</p>}
+      {entities.isPending && <p className="co-quiet">Loading the entities…</p>}
       {entities.isError && <p className="muted">{errorMessage(entities.error, 'Could not load the entities')}</p>}
-      <ul aria-label="Entities for the list">
+      <ul aria-label="Entities for the list" className="co-pick">
         {shown.map(e => <li key={e.id}><label>
           <input type="checkbox" checked={chosen.includes(e.id)}
             onChange={() => setChosen(cur => (cur.includes(e.id) ? cur.filter(id => id !== e.id) : [...cur, e.id]))}/> {e.caption} <small>({e.schema})</small>
         </label></li>)}
       </ul>
-      <Button onClick={() => void sendSet('list')} disabled={chosen.length === 0 || send.isPending}>Send the list ({chosen.length})</Button>
+      <button type="button" className="wl-btn pri" onClick={() => void sendSet('list')} disabled={chosen.length === 0 || send.isPending}>Send the list ({chosen.length})</button>
     </div>}
     {sets.isError && <p className="muted">{errorMessage(sets.error, 'Could not load what was sent')}</p>}
-    {(sets.data ?? []).length > 0 && <ul aria-label="Sent to OpenAleph">
+    {(sets.data ?? []).length > 0 && <ul aria-label="Sent to OpenAleph" className="co-sets">
       {(sets.data ?? []).map(row => <li key={row.id}>
         {/* Its kind is its icon; the count and when it was sent are on hover. */}
         {(() => { const Icon = KIND_ICON[row.kind]; return <Reveal label={KIND_NAME[row.kind]} detail={<><b>{KIND_NAME[row.kind]}</b> · {row.items} record(s) · sent {timeWords(row.sent_at)}</>}>
@@ -89,6 +95,6 @@ export function EntitySets({investigationId}: {investigationId: string}): ReactE
         <a href={row.url} target="_blank" rel="noreferrer" aria-label={`${KIND_NAME[row.kind]}: ${row.label}`}>{row.label}</a>
       </li>)}
     </ul>}
-    {status && <p className="muted" role="status">{status}</p>}
-  </div>;
+    {status && <p className="co-status" role="status">{status}</p>}
+  </section>;
 }

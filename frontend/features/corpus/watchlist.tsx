@@ -181,7 +181,9 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
   const totalNew = entries.reduce((sum, e) => sum + toDecide(e).length, 0);
   const lastChecked = entries.map(e => e.checked_at).filter((at): at is string => Boolean(at)).sort().at(-1);
 
-  return <section className="wl" aria-label="Watchlist">
+  // A name that turned up nowhere has no passage to read: its pane takes the room of both.
+  const solo = !entry || entry.hits.length === 0;
+  return <section className={`wl${solo ? ' solo' : ''}`} aria-label="Watchlist">
     <div className="wl-names">
       <header className="wl-head">
         <Reveal detail="Names searched whenever a document of this investigation is read. Each document a name turns up in shows here once; nothing becomes a lead on its own.">
@@ -211,7 +213,9 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
               </Reveal>
               {aliases.length > 0 && <i className="wl-aka" aria-label={`also ${aliases.join(', ')}`}>aka</i>}
               {fresh > 0 && <span className="wl-new" aria-label={`${fresh} new since you last looked`}><i aria-hidden="true"/>{fresh}</span>}
-              <b className={e.hits.length ? 'wl-count' : 'wl-count zero'}>{e.hits.length}</b>
+              {/* How many documents it turned up, named; nothing at zero. A name never searched is a hollow ring. */}
+              {e.hits.length > 0 ? <span className="wl-count"><b>{e.hits.length}</b> {e.hits.length === 1 ? 'hit' : 'hits'}</span>
+                : !e.checked_at && <i className="wl-unchecked" aria-label="Not checked yet"/>}
             </button>
             <button type="button" className="wl-stop" aria-label={`Stop watching ${e.query}`} onClick={() => void stopWatching(e)}><X size={13} aria-hidden="true"/></button>
           </li>;
@@ -238,16 +242,18 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
     </div>
 
     <div className="wl-hits">
+      {!entry && watchlist.data && <div className="wl-none"><p className="wl-none-name muted">Watch a name</p>
+        <p className="wl-none-note">Each document a watched name turns up in shows here, with the passage around it.</p></div>}
       {entry && <>
-        <header className="wl-head">
+        {entry.hits.length > 0 && <header className="wl-head">
           <h4 className="wl-sub">{splitAliases(entry.query).name}</h4>
-          <div className="wl-scope" role="group" aria-label="Which hits">
+          {entry.hits.length > 0 && <div className="wl-scope" role="group" aria-label="Which hits">
             <button type="button" aria-pressed={view === 'open'} onClick={() => setScope('open')}>To decide <b>{open.length}</b></button>
             <button type="button" aria-pressed={view === 'all'} onClick={() => setScope('all')}>All <b>{entry.hits.length}</b></button>
-          </div>
-        </header>
-        {hits.length === 0 && <p className="wl-empty">{entry.hits.length === 0
-          ? (entry.checked_at ? `${lastCheck(entry)} Nothing yet.` : lastCheck(entry)) : 'Every hit is decided.'}</p>}
+          </div>}
+        </header>}
+        {hits.length === 0 && (entry.hits.length === 0 ? <EmptyName entry={entry} onCheck={() => void checkNow()} checking={check.isPending}/>
+          : <p className="wl-empty">Every hit is decided.</p>)}
         {hits.length > 0 && <ul className="wl-hitlist" aria-label={`Where “${entry.query}” was found`}>
           {hits.map(h => <li key={h.id}>
             <button type="button" className={h.id === hit?.id ? 'wl-hit on' : 'wl-hit'} aria-pressed={h.id === hit?.id} onClick={() => setPickedHit(h.id)}>
@@ -266,7 +272,7 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
       </>}
     </div>
 
-    <div className="wl-read" aria-label="The picked passage">
+    {!solo && <div className="wl-read" aria-label="The picked passage">
       {hit && entry ? <>
         <header className="wl-read-head">
           <DocMark title={hit.title}/>
@@ -284,7 +290,20 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
             <button type="button" className="wl-btn" onClick={() => void dismissHit(hit)} disabled={busy}>Dismiss</button>
           </> : <span className={`wl-decided ${hit.status}`}>{hit.status === 'lead' ? 'In leads' : 'Dismissed'}</span>}
         </div>
-      </> : <p className="wl-empty">{entries.length ? 'Pick a hit to read it here.' : ''}</p>}
-    </div>
+      </> : <p className="wl-empty">Pick a hit to read it here.</p>}
+    </div>}
   </section>;
+}
+
+/** A watched name that no document holds yet, filling its pane: the name large, its other names, why it is watched,
+ *  whether and where it was searched (on hover), and Check now. */
+function EmptyName({entry, onCheck, checking}: {entry: WatchlistEntryOut; onCheck: () => void; checking: boolean}): ReactElement {
+  const {name, aliases} = splitAliases(entry.query);
+  return <div className="wl-none">
+    <p className="wl-none-name">{name}</p>
+    {aliases.length > 0 && <p className="wl-none-aka">{aliases.map(a => <span key={a}>{a}</span>)}</p>}
+    {entry.note && <p className="wl-none-note">{entry.note}</p>}
+    <p className="wl-none-state"><Reveal detail={lastCheck(entry)}><span>{entry.checked_at ? 'In no document yet' : 'Not searched yet'}</span></Reveal></p>
+    <button type="button" className="wl-btn" onClick={onCheck} disabled={checking}><RefreshCw size={14} aria-hidden="true" className={checking ? 'wl-spin' : undefined}/> Search for it now</button>
+  </div>;
 }
