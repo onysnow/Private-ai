@@ -134,9 +134,12 @@ export function WhatHappens({item}: {item: DecisionItemOut}): ReactElement | nul
   </div>;
 }
 
-export function DecisionCard({item, position, total, keys, active, onDecide, showWhatHappens = true}: {
+export function DecisionCard({item, position, total, keys, active, onDecide, showWhatHappens = true, aside}: {
   item: DecisionItemOut; position: number; total: number; keys: 'home' | 'decide'; active: boolean;
   onDecide: (choice: DecisionChoiceOut, note: string) => void; showWhatHappens?: boolean;
+  /** What the records hold for an item that has no passage of its own (Case home: the links between its parties).
+   *  It names the parties itself, so their chips are left out. */
+  aside?: ReactNode;
 }): ReactElement {
   const [noOpen, setNoOpen] = useState(false);
   const [note, setNote] = useState('');
@@ -177,7 +180,7 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
     {/* No passage to show here (an AI draft, a missing record): the thing itself is one click away. */}
     {keys === 'home' && !ev && item.choices.length > 0 && <Link className="ch-source-link" href={caseHref(item.open.href, inv)}>{item.open.label} <span aria-hidden="true">↗</span></Link>}
     {ev && !ev.excerpt && locator && <p className="ch-locator"><Reveal detail={<span className="rv-mono">{locator}</span>}><span>{ev.filename || 'Source'}</span></Reveal></p>}
-    <PartyChips parties={item.parties}/>
+    {aside ?? <PartyChips parties={item.parties}/>}
   </>;
   const extras = <>
     {item.known && item.known.length > 0 && <ul className="ch-known" aria-label="Already in the case">{item.known.map(k => <li key={k}>{k}</li>)}</ul>}

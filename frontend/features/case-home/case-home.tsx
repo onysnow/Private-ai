@@ -27,7 +27,7 @@ import {
   listInvestigationsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
-import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../lib/generated/types.gen';
+import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut, RelationshipOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {HIDE_SCREEN_EVENT, OPEN_INBOX_EVENT, OPEN_PALETTE_EVENT, SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
@@ -36,10 +36,10 @@ import {caseHref} from '../../lib/case-href';
 import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
 import {NewCaseSetup} from '../new-case/new-case-setup';
-import {DecisionCard, KindMark} from './decision-card';
+import {DecisionCard, Excerpt, KindMark, pageOf} from './decision-card';
 import {FrostPanel, FrostStill} from '../effects/frost-panel';
 import {RainPane} from '../effects/rain-pane';
-import {MiniNetwork} from './mini-network';
+import {MiniNetwork, linkWord, linkYear} from './mini-network';
 import {PagePicture} from './decision-card';
 import {HOLD_MS, useDecisions} from './use-decisions';
 import {useWheelStep} from './wheel-step';
@@ -215,7 +215,8 @@ export function proposedLine(doc: {candidate_counts?: Record<string, number> | n
 
 function BringIn({investigationId}: {investigationId: string}): ReactElement {
   const queryClient = useQueryClient();
-  const docs = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data ?? [];
+  const docsQuery = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  const docs = useMemo(() => docsQuery.data ?? [], [docsQuery.data]);
   const standing = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
   const [over, setOver] = useState(false);
   const [dropped, setDropped] = useState('');
@@ -242,12 +243,22 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
     setDropped(`${done} document${done === 1 ? '' : 's'} saved. Reading starts now.`);
     await queryClient.invalidateQueries();
   };
-  // A row is its count and its kind's mark; the kind is named on hover or focus (Ony, 29 Oct).
-  const row = (count: number, mark: ReactNode, href: string, verb: string) =>
-    <li><b>{count}</b>{mark}<Link href={caseHref(href, investigationId)}>{verb} →</Link></li>;
+  // What waits, each as its count, its mark and a few words; a row at zero is left out, and when every one is
+  // at zero a single quiet line says so (mockup HOME_1: a row of zeros reads as broken).
+  const waiting = [
+    {key: 'unread', count: unread, mark: <span className="ch-row-mark" aria-hidden="true"><StripIcon name="page"/></span>,
+      words: `document${unread === 1 ? '' : 's'} not read yet`, href: '/bring-in#document-ingestion', verb: 'Read'},
+    {key: 'outside', count: kinds.outside ?? 0, mark: <KindMark kind="outside" bare/>,
+      words: `outside finding${kinds.outside === 1 ? '' : 's'} to review`, href: '/decide?kind=outside', verb: 'Review'},
+    {key: 'watchlist', count: kinds.watchlist ?? 0, mark: <KindMark kind="watchlist" bare/>,
+      words: `watchlist hit${kinds.watchlist === 1 ? '' : 's'}`, href: '/decide?kind=watchlist', verb: 'See'},
+  ].filter(r => r.count > 0);
   const state = shown ? (shown === reading ? (busy ? (job?.status === 'running' && job.message ? job.message : 'Reading now') : 'Waiting to be read')
     : shown.extraction_status === 'failed' ? 'Could not be read' : `Read · ${shown.chunk_count} passage${shown.chunk_count === 1 ? '' : 's'}`) : '';
   return <Module n="01" name="Bring in" href="/bring-in">
+    {/* Files dropped anywhere on the module's body are brought in; the line at its foot says so and opens The Drop. */}
+    <div className={`ch-bring${over ? ' over' : ''}`} data-testid="bring-in-drop" onDragOver={e => { e.preventDefault(); setOver(true); }}
+      onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOver(false); }} onDrop={e => void onDrop(e)}>
     {/* The file's state and what was proposed from it are on hover or focus; a file that could not be read says so. */}
     {shown ? <Reveal tabbable={false} className="ch-reading-rv" detail={<><b>{state}</b>{proposedLine(shown) && <span className="rv-row">{proposedLine(shown)}</span>}</>}>
     <button type="button" className="ch-reading" onClick={() => openDocument(shown.id)} aria-label={`Open ${shown.filename} in the reading room`}>
@@ -259,16 +270,15 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
           aria-valuenow={progress ?? undefined} aria-valuemin={progress === null ? undefined : 0} aria-valuemax={progress === null ? undefined : 100} aria-hidden={progress === null}>
           <i className={busy && progress === null ? 'busy' : ''} style={progress === null ? undefined : {width: `${progress}%`}}/></span>}
       </span>
-    </button></Reveal> : <p className="ch-quiet">Nothing brought in yet.</p>}
-    <ul className="ch-rows">
-      {row(unread, <Reveal label={`Document${unread === 1 ? '' : 's'} not read yet`} detail={`Document${unread === 1 ? '' : 's'} not read yet`}>
-        <span className="ch-row-mark" aria-hidden="true"><StripIcon name="page"/></span></Reveal>, '/bring-in#document-ingestion', 'Read')}
-      {row(kinds.outside ?? 0, <KindMark kind="outside"/>, '/decide?kind=outside', 'Review')}
-      {row(kinds.watchlist ?? 0, <KindMark kind="watchlist"/>, '/decide?kind=watchlist', 'See')}
-    </ul>
-    <div className={`ch-drop${over ? ' over' : ''}`} onDragOver={e => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={e => void onDrop(e)}>
-      {dropped ? <span role="status">{dropped}</span> : <Reveal tabbable={false} describe={false} detail="Drop documents anywhere on this box, or open The Drop.">
-        <Link href={caseHref('/bring-in#the-drop', investigationId)} aria-label="Drop documents anywhere"><span aria-hidden="true" className="ch-drop-mark">+ <StripIcon name="page"/></span></Link></Reveal>}
+    </button></Reveal> : docsQuery.isPending ? <div className="ch-skeleton ch-reading-wait" aria-busy="true" aria-label="Looking for documents"/>
+      : <p className="ch-quiet">Nothing brought in yet.</p>}
+    {waiting.length ? <ul className="ch-rows">
+      {waiting.map(r => <li key={r.key}><Link href={caseHref(r.href, investigationId)}>
+        <b>{r.count.toLocaleString('en-GB')}</b>{r.mark}<span className="ch-row-words">{r.words}</span><span className="ch-row-verb" aria-hidden="true">{r.verb} →</span>
+      </Link></li>)}
+    </ul> : standing ? <p className="ch-all-read"><span aria-hidden="true">✓</span> All read · nothing to review</p> : null}
+    <p className="ch-drop" role={dropped ? 'status' : undefined}>{dropped
+      || <Link href={caseHref('/bring-in#the-drop', investigationId)}><span aria-hidden="true">+</span> Drop documents anywhere</Link>}</p>
     </div>
   </Module>;
 }
@@ -384,18 +394,83 @@ function SinceStrip({investigationId, markVisit = true}: {investigationId: strin
   const when = after ? new Date(after).toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short'}) : '';
   const [all, setAll] = useState(false);
   const changes = since?.changes ?? [];
-  return <section className="ch-since-strip" aria-label="What changed while you were away">
+  // With nothing to list, the strip is one slim line, and Next up keeps the room.
+  const quiet = !after || !changes.length;
+  return <section className={`ch-since-strip${quiet ? ' quiet' : ''}`} aria-label="What changed while you were away">
     <header><h2><Reveal detail={after ? <b>Since {when}</b> : <><b>First visit on this computer</b>
       <span className="rv-row">Next time you open this case, what moved in between shows here: who did it, and where.</span></>}>What changed while you were away</Reveal></h2>
-      {changes.length > 4 && <button type="button" className="ch-show-all" aria-expanded={all} onClick={() => setAll(!all)}>{all ? 'Show fewer' : 'Show all'}</button>}</header>
-    {!after ? <p className="ch-quiet">First visit on this computer.</p>
-      : !changes.length ? <p className="ch-quiet">Nothing has changed since then.</p>
+      {changes.length > 4 && <button type="button" className="ch-show-all" aria-expanded={all} onClick={() => setAll(!all)}>{all ? 'Show fewer' : 'Show all'}</button>}
+      {/* While the changes are still being counted it says nothing, rather than "nothing has changed". */}
+      {quiet && (!after || since) && <p className="ch-quiet"><span aria-hidden="true" className="ch-since-mark">✓</span>{!after ? 'First visit on this computer' : `Nothing has changed since ${when}`}</p>}</header>
+    {quiet ? null
       : <ul>{(all ? changes : changes.slice(0, 4)).map(c => <li key={c.key}><Reveal tabbable={false} className="ch-change-rv" detail={ACTOR[c.actor_kind] ?? c.actor_kind}>
         <Link href={caseHref(c.href, investigationId)} className={`ch-change ch-actor-${c.actor_kind}`}>
         <b>{c.count}</b><span>{c.label}</span>
         {c.actor_kind === 'ai' ? <span className="ai-tag">AI</span> : ACTOR_MARK[c.actor_kind] ? <span className="ch-actor-mark" aria-hidden="true">{ACTOR_MARK[c.actor_kind]}</span> : null}
       </Link></Reveal></li>)}</ul>}
   </section>;
+}
+
+/** One link between two of a decision's parties: who, what (a word or two), when, and the passage that shows it. */
+export type PartyLink = {key: string; from: {id: string; name: string; schema: string}; to: {id: string; name: string; schema: string}; word: string; year: string | null;
+  quote: string | null; where: string; documentId: string | null; page: number | null};
+
+/** The links the records hold between a decision's parties, a pair a row (each way apart), the ones with a passage first. */
+export function partyLinks(edges: RelationshipOut[], parties: {id: string}[]): PartyLink[] {
+  const ids = new Set(parties.map(p => p.id));
+  const pairs = new Map<string, RelationshipOut[]>();
+  for (const e of edges) {
+    if (!e.source || !e.target || e.source.id === e.target.id || !ids.has(e.source.id) || !ids.has(e.target.id)) continue;
+    const key = `${e.source.id}>${e.target.id}`;
+    pairs.set(key, [...(pairs.get(key) ?? []), e]);
+  }
+  const rows = [...pairs.entries()].map(([key, list]): PartyLink => {
+    // Both ends are present: the loop above kept only edges that have them.
+    const source = list[0].source as NonNullable<RelationshipOut['source']>;
+    const target = list[0].target as NonNullable<RelationshipOut['target']>;
+    const attached = list.flatMap(e => e.provenance.evidence_attachments ?? []).map(a => a.evidence).find(ev => ev?.quote);
+    // A source names its document as "document:<id>#page 94" (backend provenance).
+    const cited = list.flatMap(e => e.provenance.sources).map(x => /document:([0-9a-f-]{36})(?:#page (\d+))?/i.exec(x)).find(Boolean);
+    const years = list.map(linkYear).filter((y): y is string => Boolean(y)).sort();
+    return {key, from: {id: source.id, name: source.caption, schema: source.schema}, to: {id: target.id, name: target.caption, schema: target.schema},
+      word: linkWord(list) || 'linked', year: years[0] ?? null, quote: attached?.quote ?? null,
+      where: [attached?.source?.title, attached?.locator].filter(Boolean).join(' · '),
+      documentId: cited?.[1] ?? null, page: cited?.[2] ? Number(cited[2]) : pageOf(attached?.locator)};
+  });
+  return rows.sort((a, b) => Number(Boolean(b.quote)) - Number(Boolean(a.quote)));
+}
+
+/** Words of a party's name worth marking in a passage: the name, and a company's first word ("Tanore"). */
+function nameTerms(names: string[]): string[] {
+  return names.flatMap(n => [n, n.replace(/\s*\(.*\)$/, ''), ...(/^\S{5,}/.test(n) ? [n.split(/\s/)[0]] : [])]);
+}
+
+/** For a decision with no passage of its own (a Red Flag's "records cannot show" part): what the records do show
+ *  between its parties, the first link's passage beside the question as a document's would be (mockup HOME_1). */
+function LinkEvidence({links, parties}: {links: PartyLink[]; parties: DecisionItemOut['parties']}): ReactElement {
+  const openDocument = useWorkbenchStore(state => state.openDocument);
+  const point = useWorkbenchStore(state => state.setPointedParty);
+  const lead = links.find(l => l.quote);
+  const shown = links.slice(0, 4);
+  const end = (p: PartyLink['from']) => <span className="ch-link-end" onMouseEnter={() => point(p.id)}>
+    <PartyGlyph kind={partyKind(p.schema)} size={14}/><span>{p.name}</span></span>;
+  const open = (l: PartyLink) => { if (l.documentId) openDocument(l.documentId, l.page); };
+  return <div className="ch-links-wrap">
+    {lead?.quote && <blockquote className="ch-excerpt ch-link-quote">
+      <Reveal detail={<span className="rv-mono">{lead.where || 'Source'}</span>}><Excerpt text={`“${lead.quote.trim()}”`} terms={nameTerms(parties.map(p => p.name))}/></Reveal>
+      {lead.documentId && <button type="button" className="ch-link-page" onClick={() => open(lead)}>{lead.page ? `Page ${lead.page}` : 'Open'} <span aria-hidden="true">↗</span></button>}
+    </blockquote>}
+    <ul className="ch-links" aria-label="What the records show between them">
+      {shown.map(l => <li key={l.key}><Reveal tabbable={false} describe={Boolean(l.quote)} className="ch-link-rv"
+        detail={l.quote ? <><b>{l.where || 'Source'}</b><span className="rv-row">“{l.quote.trim()}”</span></> : <b>No passage attached yet</b>}>
+        {/* A link with a document behind it opens it at the page; one without is words only. */}
+        {l.documentId
+          ? <button type="button" className="ch-link" onClick={() => open(l)}>{end(l.from)}<span className="ch-link-word">{l.word}{l.year ? ` · ${l.year}` : ''} <span aria-hidden="true">→</span></span>{end(l.to)}</button>
+          : <span className="ch-link">{end(l.from)}<span className="ch-link-word">{l.word}{l.year ? ` · ${l.year}` : ''} <span aria-hidden="true">→</span></span>{end(l.to)}</span>}
+      </Reveal></li>)}
+    </ul>
+    {links.length > shown.length && <p className="ch-quiet ch-links-more">{links.length - shown.length} more link{links.length - shown.length === 1 ? '' : 's'} between them</p>}
+  </div>;
 }
 
 function NextUp({investigationId, active}: {investigationId: string; active: boolean}): ReactElement {
@@ -407,6 +482,9 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
   const total = Object.values(counts).reduce((n, v) => n + v, 0);
   const onDecide = useCallback((choice: DecisionChoiceOut, note: string) => { if (item) decide(item, choice, note); }, [decide, item]);
   const inv = investigationId;
+  // An item with no passage of its own (most "To check" items) rests on the links between its parties instead.
+  const graph = useQuery({...getInvestigationGraphOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId && item && !item.evidence)}).data;
+  const links = useMemo(() => (item && !item.evidence && item.parties.length > 1 && graph ? partyLinks(graph.edges, item.parties) : []), [item, graph]);
   useEffect(() => {
     if (!active) return undefined;
     const handle = (event: KeyboardEvent) => { if ((event.key === 'z' || event.key === 'Z') && !event.metaKey && !event.ctrlKey && held) { event.preventDefault(); undo(); } };
@@ -421,7 +499,8 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
     </header>
     {query.isError ? <p role="alert">{errorMessage(query.error, 'Could not load what waits for you')} <button type="button" onClick={() => void query.refetch()}>Retry</button></p>
       : query.isPending && investigationId ? <div className="ch-skeleton" aria-busy="true"/>
-      : item ? <DecisionCard key={item.id} item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}/>
+      : item ? <DecisionCard key={item.id} item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}
+        aside={links.length ? <LinkEvidence links={links} parties={item.parties}/> : undefined}/>
       : <div className="ch-clear"><p>Nothing waits for you.</p><Link href={caseHref('/bring-in#document-ingestion', inv)}>Drop documents</Link></div>}
     <footer className="ch-next-foot">
       <span className="ch-dots" aria-hidden="true">{items.slice(0, 9).map((d, i) => <i key={d.id} className={i === index ? 'on' : ''}/>)}</span>

@@ -5,7 +5,7 @@ import {act, cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {InterruptNotice} from '../features/inbox/interrupt-notice';
+import {FOLD_MS, InterruptNotice} from '../features/inbox/interrupt-notice';
 import {SavedQuestions} from '../features/ai/saved-questions';
 import {KeysPane} from '../features/settings/keys-pane';
 import {LookupsPane, whatLeaves} from '../features/settings/lookups-pane';
@@ -230,6 +230,36 @@ describe('The top-band notice', () => {
     render(<QueryProvider><InterruptNotice/></QueryProvider>);
     await act(async () => { await new Promise(r => setTimeout(r, 50)); });
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('docks in a corner, folds to its mark by hand or after a while, and opens again from the mark', async () => {
+    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+    render(<QueryProvider><InterruptNotice/></QueryProvider>);
+    const user = userEvent.setup();
+    const alarm = await screen.findByRole('alert');
+    await user.click(within(alarm).getByRole('button', {name: 'Fold to its mark'}));
+    expect(screen.queryByRole('alert')).toBeNull();
+    const mark = screen.getByRole('button', {name: 'Textbook Red Flag: round trip. Show the notice'});
+    expect(mark).toHaveFocus();
+    await user.click(mark);
+    // Opened again by hand it is a plain region (it was announced once), with Open in focus and Dismiss beside it.
+    const region = screen.getByRole('region', {name: 'Textbook Red Flag notice'});
+    expect(within(region).getByRole('link', {name: 'Open'})).toHaveFocus();
+    await user.click(within(region).getByRole('button', {name: 'Dismiss'}));
+    expect(screen.queryByRole('region', {name: 'Textbook Red Flag notice'})).toBeNull();
+    expect(screen.queryByRole('button', {name: /Show the notice/})).toBeNull();
+  });
+
+  it('folds by itself after a few seconds when nothing holds it open', async () => {
+    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    render(<QueryProvider><InterruptNotice/></QueryProvider>);
+    await screen.findByRole('alert');
+    try {
+      act(() => { vi.advanceTimersByTime(FOLD_MS + 10); });
+      expect(screen.queryByRole('alert')).toBeNull();
+      expect(screen.getByRole('button', {name: /Show the notice/})).toBeInTheDocument();
+    } finally { vi.useRealTimers(); }
   });
 
   it('waits while a calm zone is on screen', async () => {

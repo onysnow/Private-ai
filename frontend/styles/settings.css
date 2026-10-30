@@ -225,15 +225,28 @@
 .ib-acts { display: flex; align-items: center; gap: 12px; }
 .ib-seen { all: unset; cursor: pointer; font-size: 11.5px; font-weight: 600; color: var(--accent-1); }
 .ib footer a { color: var(--accent-2); }
-.fr-alarm { position: fixed; z-index: 95; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  max-width: min(760px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 12px; background: var(--flag-textbook-fill); color: #fff;
-  box-shadow: 0 0 0 1.5px var(--flag-textbook-edge), var(--shadow-lifted); font-size: 13px; animation: fr-alarm-rise .4s ease-out 1; }
-.fr-alarm b { font-weight: 650; }
-.fr-alarm a, .fr-alarm button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 8px; border: 1px solid rgb(255 255 255 / .6); font-weight: 600; }
-.fr-alarm a:focus-visible, .fr-alarm button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-@keyframes fr-alarm-rise { from { transform: translate(-50%, -12px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .fr-alarm { animation: none; } }
-html[data-motion='calm'] .fr-alarm { animation: none; }
+.fr-alarm { position: fixed; z-index: 95; right: 16px; bottom: 16px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: start;
+  width: min(380px, calc(100vw - 32px)); box-sizing: border-box; padding: 11px 12px 10px; border-radius: 14px; background: var(--flag-textbook-fill); color: #fff;
+  box-shadow: 0 0 0 1.5px var(--flag-textbook-edge), var(--shadow-lifted); font-size: 12.5px; line-height: 1.4; animation: fr-alarm-rise .4s ease-out 1; }
+.fr-alarm b { font-weight: 650; font-size: 13.5px; }
+.fr-alarm-mark-in { grid-row: span 2; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: rgb(255 255 255 / .16); }
+.fr-alarm-words { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fr-alarm-words > span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; opacity: .92; }
+.fr-alarm-acts { display: flex; align-items: center; gap: 8px; }
+.fr-alarm a, .fr-alarm button { all: unset; cursor: pointer; padding: 3px 10px; border-radius: 8px; border: 1px solid rgb(255 255 255 / .6); font-weight: 600; }
+.fr-alarm a { background: #fff; color: var(--flag-textbook-fill); border-color: #fff; }
+.fr-alarm .fr-alarm-fold { margin-left: auto; border-color: transparent; padding: 3px 8px; font-size: 15px; line-height: 1; }
+.fr-alarm a:focus-visible, .fr-alarm button:focus-visible, .fr-alarm-mark:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* Folded: the flag's mark alone in the corner, still in the alarm colour; a click opens the notice again. */
+.fr-alarm-mark { all: unset; position: fixed; z-index: 95; right: 16px; bottom: 16px; cursor: pointer; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--flag-textbook-fill); color: #fff; box-shadow: 0 0 0 1.5px var(--flag-textbook-edge), var(--shadow-lifted); animation: fr-alarm-fold .3s ease-out 1; }
+.fr-alarm-mark b { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border-radius: 99px; display: grid; place-items: center;
+  background: #fff; color: var(--flag-textbook-fill); font: 700 10.5px var(--font-ui); }
+.fr-alarm-mark:hover { transform: translateY(-2px); }
+@keyframes fr-alarm-rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fr-alarm-fold { from { transform: scale(1.6); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fr-alarm, .fr-alarm-mark { animation: none; } }
+html[data-motion='calm'] .fr-alarm, html[data-motion='calm'] .fr-alarm-mark { animation: none; }
 
 /* Settings › Notifications › Outside the app: one row per way out, its address beside its mode. */
 .st-channel { align-items: flex-start; }

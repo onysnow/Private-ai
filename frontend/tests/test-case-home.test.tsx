@@ -128,6 +128,69 @@ describe('Case home', () => {
     expect(screen.getByText('✕ 2')).toBeInTheDocument();
   });
 
+  it('Bring in lists only what waits, in words, and says so in one quiet line when nothing does', async () => {
+    routes();
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const bring = screen.getByRole('region', {name: 'Bring in'});
+    expect(await within(bring).findByText('All read · nothing to review')).toBeInTheDocument();
+    expect(within(bring).queryByText('0')).toBeNull();
+    expect(within(bring).getByRole('link', {name: /Drop documents anywhere/})).toHaveAttribute('href', '/bring-in?inv=inv-1#the-drop');
+    cleanup();
+    routes({'GET /api/investigations/inv-1/standing': {...standing, to_decide_by_kind: {to_check: 1, outside: 3}}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const again = screen.getByRole('region', {name: 'Bring in'});
+    const outside = await within(again).findByRole('link', {name: /3\s*outside findings to review/});
+    expect(outside).toHaveAttribute('href', '/decide?kind=outside&inv=inv-1');
+    expect(within(again).queryByRole('link', {name: /watchlist/})).toBeNull();
+    expect(within(again).queryByText('All read · nothing to review')).toBeNull();
+  });
+
+  it('rests a decision with no passage on the links between its parties, the first link\'s passage beside the question', async () => {
+    const doc = '4e353a15-afd6-44f1-8df0-e49cccccb8a0';
+    const edge = (id: string, schema: string, from: [string, string], to: [string, string], props: Record<string, string[]>, quote: string | null) => ({
+      id, investigation_id: 'inv-1', relationship_entity_id: `r-${id}`, ftm_id: id, schema, properties: props, statements: [],
+      source: {id: from[0], ftm_id: from[0], schema: 'Company', caption: from[1]}, target: {id: to[0], ftm_id: to[0], schema: 'Company', caption: to[1]},
+      provenance: {statement_count: 1, sources: quote ? [`demo|document:${doc}#page 94`] : [], evidence_attachments: quote ? [{attachment_id: `a-${id}`, created_at: '2026-10-01T00:00:00',
+        evidence: {id: `ev-${id}`, quote, locator: 'page 94', source: {id: 's1', title: 'US v. assets', url: null, source_type: 'public_record'}}}] : []},
+      advisory: {needs_review: false, support_state: 'no_claim_dependency', has_independent_support: false, healthy_supporting_claim_count: 0,
+        challenged_supporting_claim_count: 0, disputed_claim_count: 0, rejected_claim_count: 0, claim_dependencies: [],
+        relationship_evidence_review: null, relationship_evidence_needs_review: false, relationship_evidence_attachment_count: quote ? 1 : 0,
+        relationship_evidence_review_counts: {supports: 0, contradicts: 0, context: 0, superseded: 0, unresolved: 0, unreviewed: 0}, presentation_aggregate: false},
+      created_at: '2026-10-01T00:00:00'});
+    const item = {...checkItem, id: 'chk-2', evidence: null, question: 'Was there a business reason for the payments?',
+      parties: [{id: 'e1', name: 'Fernhill Ltd', schema: 'Company'}, {id: 'e2', name: 'Kestrel SA', schema: 'Company'}]};
+    routes({
+      'GET /api/investigations/inv-1/decisions': {investigation_id: 'inv-1', counts: {to_check: 1}, total: 1, offset: 0, items: [item]},
+      'GET /api/investigations/inv-1/graph': {nodes: [], schemas: ['Payment', 'Ownership'],
+        reconciliation: {collapsed_by_default: true, suppressed_duplicate_count: 0, underlying_edge_count: 3, visible_edge_count: 3}, edges: [
+        edge('x1', 'Payment', ['e1', 'Fernhill Ltd'], ['e2', 'Kestrel SA'], {amount: ['29400'], currency: ['EUR'], date: ['2018-02-01']}, 'Fernhill transferred EUR 29,400 to Kestrel SA.'),
+        edge('x2', 'Ownership', ['e2', 'Kestrel SA'], ['e1', 'Fernhill Ltd'], {}, null),
+        edge('x3', 'Ownership', ['e2', 'Kestrel SA'], ['e9', 'Someone else'], {}, 'Not between the parties.'),
+      ]},
+    });
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const card = await screen.findByTestId('decision-card');
+    const links = await within(card).findByRole('list', {name: 'What the records show between them'});
+    expect(within(links).getAllByRole('listitem')).toHaveLength(2);
+    expect(within(links).getByText('paid €29,400 · 2018', {exact: false})).toBeInTheDocument();
+    expect(within(links).getByText('owns', {exact: false})).toBeInTheDocument();
+    expect(within(card).getByText('Fernhill', {selector: 'mark'})).toBeInTheDocument();
+    // The parties are named in the links, so their chips are left out.
+    expect(within(card).queryByRole('list', {name: 'Parties'})).toBeNull();
+    await userEvent.setup().click(within(card).getByRole('button', {name: /Page 94/}));
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: doc, pageNumber: 94});
+  });
+
+  it('keeps "while you were away" to one slim line when there is nothing to list', async () => {
+    routes({'GET /api/investigations/inv-1/since': {investigation_id: 'inv-1', after: '2026-10-01T00:00:00', changes: []}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const since = screen.getByRole('region', {name: 'What changed while you were away'});
+    expect(since).toHaveClass('quiet');
+    // The visit this page load first read is kept for the whole load, so an earlier test may have set one.
+    expect(await within(since).findByText(/First visit on this computer|Nothing has changed since/, {selector: 'p'})).toBeInTheDocument();
+    expect(within(since).queryByRole('list')).toBeNull();
+  });
+
   it('focuses a module with 1–4 and steps inside it with J / K', async () => {
     routes({
       'GET /api/investigations/inv-1/claims': [
