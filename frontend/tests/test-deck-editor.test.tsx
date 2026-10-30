@@ -26,6 +26,9 @@ const CATALOG = {defaults: {theme: 'dark_academia', fonts: 'theme'}, font_pairs:
     {...THEME, id: 'newsprint', label: 'Newsprint', description: 'White pages, black type, a red accent.', cover_bg: '111111', accent: 'C8102E', alert: '8B0A1E', page: 'FFFFFF'}],
   visual_presets: {bar: [], figures: [], timeline: []}, visual_options: {bar: {}, figures: {}, timeline: {}}, chart_families: {}, chart_options: {}, chart_presets: {}};
 const CLAIMS = [{id: 'c2', investigation_id: 'inv-1', text: LONG, status: 'unverified'}];
+// A story as GET /story answers it; only the thesis and the sections matter to the deck screen.
+const storyOf = (thesis: string, sections: unknown[]) => ({investigation_id: 'inv-1', thesis, sections, can_ready: false, critical: [], gates: [], gates_passed: 0,
+  counts: {claims: 0, disputed: 0, shown: 0, unshown: 0}, sentences: {total: 0, uncited: 0}, unplaced: []});
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
@@ -62,12 +65,53 @@ describe('decks', () => {
     expect(screen.getByText(/If they ask · 1 claim behind this slide/)).toBeInTheDocument();
   });
 
-  it('makes a deck from the story when there is none', async () => {
-    const api = mockApi({'GET /api/investigations/inv-1/decks': {decks: []}, 'POST /api/investigations/inv-1/decks': {status: 201, body: DECK}});
+  it('shows what a deck from the story would hold when there is none, and makes it', async () => {
+    const story = storyOf('Who bought the harbour land', [
+      {id: 's1', title: 'The sale', position: 0, status: 'unshown', shown: 1, total: 2, claims: []},
+      {id: 's2', title: 'The money', position: 1, status: 'shown', shown: 3, total: 3, claims: []}]);
+    const api = mockApi({'GET /api/investigations/inv-1/decks': {decks: []}, 'GET /api/investigations/inv-1/story': story,
+      'POST /api/investigations/inv-1/decks': {status: 201, body: DECK}});
     render(<QueryProvider><DecksScreen investigationId="inv-1"/></QueryProvider>);
-    expect(await screen.findByText(/No deck yet/)).toBeInTheDocument();
-    await userEvent.setup().click(screen.getByRole('button', {name: 'New deck from the story'}));
+    const empty = await screen.findByRole('region', {name: 'No deck yet'});
+    // A title slide and a slide per part; the part with a claim not yet shown would be a draft.
+    const fromStory = await within(empty).findByRole('button', {name: 'New deck from the story: 3 slides'});
+    expect(fromStory.querySelectorAll('.dk-ghost')).toHaveLength(3);
+    expect(fromStory.querySelectorAll('.dk-ghost.draft')).toHaveLength(1);
+    expect(within(fromStory).getByText('claims cited').parentElement).toHaveTextContent('5 claims cited');
+    await userEvent.setup().click(fromStory);
     expect(api.lastBody('POST /api/investigations/inv-1/decks')).toEqual({source: 'story', title: ''});
+  });
+
+  it('cannot make a deck from a story with no parts, but can start blank', async () => {
+    const api = mockApi({'GET /api/investigations/inv-1/decks': {decks: []}, 'GET /api/investigations/inv-1/story': storyOf('', []),
+      'POST /api/investigations/inv-1/decks': {status: 201, body: DECK}});
+    render(<QueryProvider><DecksScreen investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByRole('button', {name: /New deck from the story/})).toBeDisabled();
+    await userEvent.setup().click(screen.getByRole('button', {name: /Blank deck/}));
+    expect(api.lastBody('POST /api/investigations/inv-1/decks')).toEqual({source: 'blank', title: ''});
+  });
+
+  it('names where each claim comes from and where the slide was made from, and fixes every long line at once', async () => {
+    const two = {...DECK, slides: [DECK.slides[0], {...DECK.slides[1], bullets: [LONG, `${LONG} again`]}]};
+    const checks = {...CHECKS, slides: [CHECKS.slides[0], {...CHECKS.slides[1], problems: [CHECKS.slides[1].problems[0],
+      {kind: '7x7', text: 'Line 1 has 15 words: at most 7 (7×7)', fix: 'words_to_notes', line: 1},
+      {kind: '7x7', text: 'Line 2 has 16 words: at most 7 (7×7)', fix: 'words_to_notes', line: 2}]}]};
+    const story = storyOf('', [{id: 's1', title: 'The sale', position: 0, status: 'unshown', shown: 0, total: 1,
+      claims: [{id: 'c2', text: LONG, status: 'unverified', state: 'unshown', single_source: true, evidence: [{id: 'e1', stance: 'supports', label: 'Council minutes', locator: 'page 4', quote: ''}]}]}]);
+    const api = mockApi({'GET /api/investigations/inv-1/decks': {decks: [two]}, 'GET /api/decks/d1/checks': checks,
+      'GET /api/investigations/inv-1/claims': CLAIMS, 'GET /api/investigations/inv-1/story': story, 'PATCH /api/decks/d1': two});
+    render(<QueryProvider><DecksScreen investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await within(await screen.findByRole('navigation', {name: 'Slides'})).findByRole('button', {name: /Slide 2: The sale/}));
+    const side = screen.getByRole('complementary', {name: 'This slide'});
+    expect((await within(side).findAllByText('Council minutes · page 4'))[0]).toBeInTheDocument();
+    expect(within(side).getByText(/Story tree · part “The sale”/)).toBeInTheDocument();
+    expect(within(side).getByText('2 lines over 7 words')).toBeInTheDocument();
+    await user.click(within(side).getByRole('button', {name: 'Move the rest of each to notes'}));
+    await user.click(screen.getByRole('button', {name: 'Save'}));
+    const sent = api.lastBody('PATCH /api/decks/d1') as {slides_json: Array<{bullets: string[]; notes: string}>};
+    expect(sent.slides_json[1].bullets).toEqual(['Kestrel SA was told the price before…', 'Kestrel SA was told the price before…']);
+    expect(sent.slides_json[1].notes.split('\n').sort()).toEqual([LONG, `${LONG} again`].sort());
   });
 
   it('restyles the whole deck from Style and exports the handout PDF, saving first', async () => {

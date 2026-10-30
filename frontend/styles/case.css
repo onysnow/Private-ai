@@ -646,3 +646,8 @@ button.ch-link:focus-visible { outline: 2px solid var(--accent-1); }
 .ch-link-word { font: 600 12px var(--font-mono); color: var(--accent-1); white-space: nowrap; }
 .ch-links-more { font-size: 12px; }
 .ch-skeleton.ch-reading-wait { flex: 0 0 120px; min-height: 120px; }
+/* Fill the space (29 Oct): the document card takes the module's spare height, its thumbnail growing with it,
+   so the drop line sits under it rather than under an empty band. */
+.ch-bring > .rv.ch-reading-rv { flex: 1 1 auto; min-height: 0; }
+.ch-bring .ch-reading-rv > .ch-reading { flex: 1 1 auto; }
+.ch-bring .ch-reading .ch-thumb { height: auto; align-self: stretch; min-height: 120px; max-height: 190px; flex-basis: 108px; }

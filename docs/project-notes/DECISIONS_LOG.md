@@ -364,3 +364,15 @@ invented), and a short write-up citing them. Calls:
   a tall tree.
 Not done: the evidence chips show long source titles cut short, not the mockup's short labels; that needs a short
 label on sources, which the data does not have.
+
+## 21. The demo deck, and the deck editor laid out like DECK_1 (30 Oct 2026)
+
+The 1MDB demo now has one deck, made by the app's own "New deck from the story" (`app/services/demo_deck.py` calls
+`deck_editor.new_deck(source="story")`; no slide is written by hand). Calls:
+- The seeded deck takes the story's title ("Where 1MDB's money went"); the builder alone would use the whole thesis.
+- The right panel says "Claims on this slide", not the mockup's "Figures on this slide": slides cite claims.
+- The mockup's "Contrast passes" check is not shown: the backend has no such check.
+- "Edit the words" is closed by default; the mockup shows no edit fields, and editing is one click away.
+- Over-long lines are one check ("4 lines over 7 words") with one fix, "Move the rest of each to notes".
+The builder puts each claim's full text on a bullet, so most section slides fail the 7-words check; that is the
+builder's own output, left as it is.

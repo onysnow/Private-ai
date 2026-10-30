@@ -473,6 +473,10 @@ def build(db: Session, documents: list[tuple[dict[str, Any], bytes | None]], *, 
     from app.services.demo_story import seed_story
 
     seed_story(db, inv.id)
+    # One deck made from that story by the app's own "New deck from the story" (Act › Decks).
+    from app.services.demo_deck import seed_deck
+
+    seed_deck(db, inv.id)
 
     LAST_PROBLEMS[:] = problems
     if problems:

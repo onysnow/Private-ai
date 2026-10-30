@@ -12,25 +12,39 @@
 .dk-btn:disabled { opacity: .45; cursor: not-allowed; }
 .dk-btn kbd { margin-left: 4px; font: 600 10px var(--font-mono); border: 1px solid currentColor; border-radius: 4px; padding: 0 4px; }
 .dk-note, .dk-none { color: var(--text-muted); font-size: 13px; }
-.dk-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px; grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px 14px; }
+.dk-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px 14px; }
 .dk-bar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.dk-title { flex: 1; min-width: 220px; font-size: 15px; font-weight: 600; }
+.dk-bar .dk-title { flex: 1 1 260px; min-width: 200px; font: 300 26px var(--font-display, var(--font-ui)); padding: 2px 8px; margin-left: -8px; border-color: transparent; background: transparent; text-overflow: ellipsis; }
+.dk-bar .dk-title:hover, .dk-bar .dk-title:focus { border-color: var(--line, rgba(127,127,127,.35)); background: var(--surface-2); }
+.dk-sum { font: 600 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--status-supported, #6fb3a6); white-space: nowrap; }
+.dk-sum i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 7px; vertical-align: 1px; }
+.dk-sum .w { color: var(--accent-1); }
+.dk-sum .d { color: var(--status-disputed, #c4553c); }
+.dk-pick { max-width: 200px; }
 .dk-kinds { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--surface-2); }
 .dk-kinds button { border: 0; background: transparent; color: var(--text-muted); font: 600 12px var(--font-ui); padding: 5px 10px; border-radius: 8px; cursor: pointer; }
 .dk-kinds button[aria-checked="true"] { background: var(--surface-3, var(--surface-1)); color: var(--text); }
 .dk-msg { font-size: 12px; color: var(--text-muted); }
-.dk-stage { grid-column: 1; grid-row: 2; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 8px; align-items: center; padding: 14px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
-.dk-canvas { width: 100%; max-width: min(100%, calc((100vh - 360px) * 16 / 9)); }
+/* The slide at the largest 16:9 that fits the stage (its height less the notes line). */
+.dk-stage { grid-column: 1; grid-row: 2; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: space-between; padding: 14px 14px 10px; border-radius: 12px 12px 0 0; background: var(--surface-1); box-shadow: var(--shadow-panel); container-type: size; }
+.dk-canvas { width: 100%; max-width: min(100%, calc((100cqh - 74px) * 16 / 9)); margin: auto 0; }
+.dk-stage .dk-canvas.side { overflow: auto; max-height: calc(100cqh - 74px); }
 .dk-canvas.side { display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; max-width: 100%; align-items: start; }
 .dk-slide { position: relative; }
-.dk-draft { position: absolute; top: 14px; right: -6px; padding: 3px 14px; background: var(--status-disputed, #c4553c); color: #fff; font: 700 11px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; transform: rotate(0deg); box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+/* The Draft band: a ribbon across the slide's top-right corner. */
+.dk-draft { position: absolute; top: 0; right: 0; width: 130px; height: 130px; overflow: hidden; pointer-events: none; border-radius: 0 6px 0 0; }
+.dk-draft span { position: absolute; top: 26px; right: -44px; width: 190px; padding: 5px 0; text-align: center; transform: rotate(38deg); background: #7a2e1c; color: #f6e7d8; font: 700 12px var(--font-mono); letter-spacing: .22em; text-transform: uppercase; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
 .dk-doc { padding: 14px 18px; border-radius: 8px; background: var(--surface-2); font-size: 14px; line-height: 1.6; }
 .dk-doc h3 { margin: 0 0 8px; font: 600 17px var(--font-ui); }
 .dk-doc p { margin: 0 0 8px; }
 .dk-doc-notes { color: var(--text-muted); border-left: 2px solid var(--line); padding-left: 10px; }
-.dk-notes { width: 100%; display: flex; flex-direction: column; gap: 4px; font: 600 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
-.dk-notes textarea { text-transform: none; letter-spacing: 0; font-weight: 400; resize: vertical; }
-.dk-side { grid-column: 2; grid-row: 2; min-height: 0; overflow-y: auto; padding: 14px 16px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); display: flex; flex-direction: column; gap: 8px; }
+/* Speaker notes: one line under the slide, the label inside the box (it grows while typing). */
+.dk-notes { flex: none; width: 100%; display: flex; align-items: baseline; gap: 10px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--line, rgba(127,127,127,.35)); background: var(--surface-2); font: 600 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.dk-notes > span { flex: none; }
+.dk-notes textarea { flex: 1; min-height: 40px; max-height: 120px; field-sizing: content; border: 0; background: transparent; padding: 11px 0; text-transform: none; letter-spacing: 0; font: 400 15px/1.3 var(--font-serif, Georgia, serif); resize: none; }
+.dk-notes textarea:focus { outline: none; }
+.dk-notes:focus-within { border-color: var(--accent-1); }
+.dk-side { grid-column: 2; grid-row: 2 / 4; min-height: 0; overflow-y: auto; padding: 14px 16px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); display: flex; flex-direction: column; gap: 8px; }
 .dk-cap { margin: 4px 0 0; font: 600 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-1); }
 .dk-field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-muted); }
 .dk-field textarea { resize: vertical; }
@@ -57,13 +71,19 @@
 .dk-checks li.draft, .dk-checks li.changed, .dk-checks li.gone { border-left-color: var(--status-disputed); }
 .dk-checks li.ok { border-left-color: var(--status-supported); }
 .dk-row { display: flex; flex-wrap: wrap; gap: 6px; }
-.dk-strip { grid-column: 1 / -1; display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 6px; }
-.dk-strip button { flex: 0 0 150px; display: grid; grid-template-columns: auto 1fr auto; gap: 6px; align-items: center; padding: 8px 10px; border-radius: 9px;
-  border: 1px solid var(--line); background: var(--surface-1); color: var(--text); cursor: pointer; text-align: left; font-size: 12px; }
-.dk-strip button[aria-current="true"] { border-color: var(--accent-1); box-shadow: 0 0 0 1px var(--accent-1); }
-.dk-n { font: 600 11px var(--font-mono); color: var(--text-muted); }
+/* The filmstrip on the bottom edge of the slide's panel: each slide drawn small, its number and heading, its check badge. */
+.dk-films { grid-column: 1; grid-row: 3; min-width: 0; padding: 0 14px 12px; margin-top: -10px; border-radius: 0 0 12px 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
+.dk-films > .dk-cap { display: flex; align-items: center; justify-content: space-between; margin: 0 0 6px; padding-top: 4px; border-top: 1px solid var(--line, rgba(127,127,127,.25)); padding-top: 8px; }
+.dk-strip { display: flex; gap: 10px; overflow-x: auto; padding: 3px 3px 4px; }
+.dk-strip button { flex: 0 0 136px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 6px; align-items: center; padding: 0; border: 0; background: transparent; color: var(--text); cursor: pointer; text-align: left; }
+.dk-thumb { grid-column: 1 / -1; display: block; border-radius: 6px; outline: 1px solid var(--line, rgba(127,127,127,.35)); overflow: hidden; pointer-events: none; }
+.dk-thumb > * { box-shadow: none !important; }
+.dk-strip button[aria-current="true"] .dk-thumb { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.dk-strip button:hover .dk-thumb { outline-color: var(--accent-1); }
+.dk-n { font: 500 11px var(--font-mono); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dk-strip button[aria-current="true"] .dk-n { color: var(--text); }
 .dk-h { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dk-badge { min-width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; font: 700 10.5px var(--font-mono); border: 1px solid var(--line); }
+.dk-badge { min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; display: grid; place-items: center; font: 700 10.5px var(--font-mono); border: 1px solid var(--line); }
 .dk-badge.ok { color: var(--status-supported); border-color: var(--status-supported); }
 .dk-badge.warn { color: var(--accent-1); border-color: var(--accent-1); }
 .dk-badge.changed { color: var(--status-disputed); border-color: var(--status-disputed); }
@@ -89,3 +109,61 @@
 .dk-q { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line, rgba(127,127,127,.4)); font: 600 12px var(--font-mono); color: var(--text-muted); }
 .dk-claims li { display: flex; gap: 8px; align-items: baseline; }
 .dk-themes button b { font-size: 15px; }
+/* DECK_1's right panel: the slide's name and Draft tag, its claims with their status and source, checks marked, where it was made from. */
+.dk-head { display: flex; align-items: center; gap: 8px; margin: 0; }
+.dk-head .dk-cap { margin: 0; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+.dk-head .rv { min-width: 0; }
+.dk-tag { flex: none; padding: 1px 8px; border-radius: 9px; border: 1px solid var(--status-disputed, #c4553c); color: var(--status-disputed, #c4553c); font: 700 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.dk-jk { margin-left: auto; font: 600 10.5px var(--font-mono); letter-spacing: .12em; color: var(--text-muted); }
+.dk-side > .dk-cap { margin-top: 10px; }
+.dk-claims li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 9px; align-items: start; padding: 0 0 8px; border: 0; border-bottom: 1px solid var(--line, rgba(127,127,127,.25)); border-radius: 0; font-size: 13.5px; line-height: 1.35; }
+.dk-claims li:last-child { border-bottom: 0; }
+.dk-claims li .st { margin-top: 2px; }
+.dk-ctext { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dk-claims small { display: block; margin-top: 2px; color: var(--text-muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
+.dk-checks li { flex-direction: row; gap: 9px; padding: 2px 0; border: 0; background: transparent; font-size: 13.5px; }
+.dk-mark { flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 700 11px var(--font-mono); border: 1.5px solid var(--accent-1); color: var(--accent-1); }
+.dk-checks li.draft .dk-mark, .dk-checks li.changed .dk-mark, .dk-checks li.gone .dk-mark { border-color: var(--status-disputed, #c4553c); color: var(--status-disputed, #c4553c); }
+.dk-checks li.ok .dk-mark { border-color: var(--status-supported); color: var(--status-supported); }
+.dk-ck { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding-top: 1px; }
+.dk-ck .dk-btn.sm { background: var(--accent-1); border-color: var(--accent-1); color: var(--on-accent, #1c1208); font-weight: 600; }
+.dk-from { margin: 0; font-size: 13px; line-height: 1.45; color: var(--text-muted); }
+.dk-words { margin-top: 8px; border-top: 1px solid var(--line, rgba(127,127,127,.25)); padding-top: 8px; }
+.dk-words summary { cursor: pointer; font-size: 13px; color: var(--text-muted); }
+.dk-words[open] summary { margin-bottom: 8px; color: var(--text); }
+.dk-words .dk-field + .dk-field { margin-top: 8px; }
+.dk-btn.pri kbd { border-color: currentColor; }
+
+/* No deck yet: the two ways to start, as large actions; the story one draws the deck it would make. */
+.dk-empty { flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.dk-empty h2 { margin: 0; font: 300 26px var(--font-display, var(--font-ui)); }
+.dk-empty-grid { display: grid; align-items: start; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr); gap: 16px; }
+.dk-start { display: flex; flex-direction: column; gap: 18px; padding: 22px 24px; border-radius: 14px; border: 1px solid var(--line, rgba(127,127,127,.35)); background: var(--surface-1); box-shadow: var(--shadow-panel); color: var(--text); text-align: left; cursor: pointer; font: inherit; }
+.dk-start:hover:not(:disabled), .dk-start:focus-visible { border-color: var(--accent-1); }
+.dk-start:disabled { opacity: .55; cursor: not-allowed; }
+.dk-start.blank { border-style: dashed; }
+.dk-start-head { display: flex; align-items: center; gap: 12px; }
+.dk-start-head b { font: 400 24px var(--font-display, var(--font-ui)); }
+.dk-start-head .rv { margin-left: auto; }
+.dk-start-mark { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 24px; background: color-mix(in srgb, var(--accent-1) 18%, transparent); color: var(--accent-1); }
+.dk-start.blank .dk-start-mark { background: var(--surface-2); color: var(--text-muted); }
+.dk-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.dk-start.blank .dk-preview { grid-template-columns: minmax(0, 1fr); }
+.dk-ghost { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 6px; background: #f3ecdf; color: #2a241c; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
+.dk-ghost.draft i { padding-right: 48px; }
+.dk-ghost i { font: 500 21px/1.25 Georgia, serif; font-style: normal; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.dk-ghost em { display: flex; flex-direction: column; gap: 9px; }
+.dk-ghost u { display: block; height: 5px; width: 82%; border-radius: 2px; background: #cbbfa9; }
+.dk-ghost u:nth-child(2n) { width: 64%; }
+.dk-ghost small { position: absolute; right: 14px; bottom: 10px; font: 600 12px var(--font-mono); color: #8a7a62; }
+.dk-ghost.cover { background: #141b1f; color: #ece3d2; border-left: 4px solid #b98d34; }
+.dk-ghost.cover { justify-content: center; }
+.dk-ghost.cover i { font-size: 22px; -webkit-line-clamp: 4; }
+.dk-ghost.draft::after { content: 'Draft'; position: absolute; top: 20px; right: -34px; width: 130px; padding: 4px 0; text-align: center; transform: rotate(38deg); background: #7a2e1c; color: #f6e7d8; font: 700 8px var(--font-mono); letter-spacing: .18em; text-transform: uppercase; font-size: 10px; }
+.dk-ghost.empty { background: transparent; border: 1px dashed var(--line, rgba(127,127,127,.5)); box-shadow: none; }
+.dk-start-nums { display: flex; gap: 28px; font-size: 14px; color: var(--text-muted); }
+.dk-start-nums b { font: 400 34px var(--font-display, var(--font-ui)); color: var(--text); margin-right: 5px; }
+.dk-start-nums .warn b { color: var(--status-disputed, #c4553c); }
+@media (max-width: 1100px) { .dk-empty-grid { grid-template-columns: 1fr; } .dk-films { grid-column: 1; grid-row: auto; margin-top: 0; } .dk-side { grid-row: auto; } }
+.dk-films > .dk-cap .dk-btn { font: 500 12px var(--font-ui); letter-spacing: 0; text-transform: none; }
+.dk-jk { white-space: nowrap; }
