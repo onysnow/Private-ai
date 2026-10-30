@@ -46,7 +46,8 @@ describe('ToCheckPanel', () => {
     // revealed too (in the page for screen readers, hidden on screen until asked).
     expect(within(first).getByRole('img', {name: 'Checklist'})).toBeInTheDocument();
     expect(within(first).getByText(/Layered ownership · BO-002/).closest('[hidden]')).not.toBeNull();
-    expect(screen.getByText('2 open · 0 decided')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '2 open'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '0 decided'})).toBeInTheDocument();
     expect(screen.queryByText('What the records cannot show. A person decides each one; the app never does.')?.closest('[hidden]')).not.toBeNull();
     const second = screen.getByRole('article', {name: 'To check: Does the passage describe layers hiding the owner?'});
     expect(within(second).getByText('Nominee Director').tagName).toBe('MARK');
@@ -75,7 +76,7 @@ describe('ToCheckPanel', () => {
     await user.click(within(card).getByRole('button', {name: 'Shows it'}));
     await waitFor(() => expect(api.lastBody('POST /api/checks/c-1/decide')).toEqual({status: 'shows', note: 'No reason in the annual report'}));
     expect(await screen.findByText('Decided (1)')).toBeInTheDocument();
-    expect(screen.getByText('0 open · 1 decided')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '1 decided'})).toBeInTheDocument();
     // The decision is its shape, named on reveal; the person's note shows.
     expect(screen.getByRole('img', {name: 'Shows it'})).toBeInTheDocument();
     expect(screen.getByText('No reason in the annual report')).toBeInTheDocument();
@@ -93,6 +94,25 @@ describe('ToCheckPanel', () => {
     expect(within(card).getByText(/1,358,600 EUR has no recorded source/)).toBeInTheDocument();
     expect(within(card).queryByRole('button', {name: 'Its Red Flag'})).toBeNull();
     expect(within(card).getByRole('button', {name: 'Shows it'})).toBeEnabled();
+  });
+
+  it('answers the card in hand with the keys S, D and U', async () => {
+    const api = mockApi({
+      'GET /api/investigations/inv-1/checks': body([checklist, passage]),
+      'POST /api/checks/c-2/decide': body([checklist, {...passage, status: 'does_not'}]),
+      'GET /api/investigations/inv-1/red-flags': {investigation_id: 'inv-1', rules: [], cannot_run: [], flags: [], gone: [],
+        investigation_type: {set_by: 'app', areas: [], suggested: []}},
+    });
+    wrap(<ToCheckPanel investigationId="inv-1"/>);
+    const first = await screen.findByRole('article', {name: /business reason/});
+    // The first open card is in hand: its answers carry their keys.
+    expect(within(first).getByRole('button', {name: 'Shows it'})).toHaveAttribute('aria-keyshortcuts', 'S');
+    const second = screen.getByRole('article', {name: /layers hiding the owner/});
+    expect(within(second).getByRole('button', {name: 'Shows it'})).not.toHaveAttribute('aria-keyshortcuts');
+    const user = userEvent.setup();
+    await user.hover(second);
+    await user.keyboard('d');
+    await waitFor(() => expect(api.lastBody('POST /api/checks/c-2/decide')).toEqual({status: 'does_not', note: null}));
   });
 
   it('says when there is nothing to check yet', async () => {

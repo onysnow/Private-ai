@@ -55,7 +55,7 @@ describe('ClaimsPanel', () => {
     const api = await renderPanel({[WORKSPACE]: workspace(claimFixture(), {source_count: 2})});
     const user = userEvent.setup();
     await user.click(screen.getByText('The contract was approved on March 3.'));
-    expect(await screen.findByText('From 2 sources')).toBeInTheDocument();
+    expect(await screen.findByRole('img', {name: 'From 2 sources'})).toBeInTheDocument();
     await user.type(screen.getByPlaceholderText('Required rationale for this review'), 'Two independent filings agree.');
     // One half alone is refused before anything is sent.
     screen.getByRole('combobox', {name: 'Evidence'}).focus();
@@ -125,6 +125,25 @@ describe('ClaimsPanel', () => {
     expect(screen.getByRole('button', {name: 'Add unverified claim'})).toBeDisabled();
   });
 
+  it('draws no empty section: one quiet line says what is empty; the status is a radio group in its colours', async () => {
+    await renderPanel({[WORKSPACE]: workspace(claimFixture())});
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: /The contract was approved/}));
+    await screen.findByText('No evidence is linked to this claim yet.');
+    expect(screen.getByText('No review recorded yet.')).toBeInTheDocument();
+    expect(screen.getByText('Nothing rests on it.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', {name: /Linked evidence|Review history|Relationships resting on it/})).toBeNull();
+    // A zero figure is quiet; each figure is named on reveal.
+    expect(screen.getByRole('img', {name: '0 supporting · 0 contradicting · 0 context'}).querySelectorAll('.cw-num.zero')).toHaveLength(3);
+    const status = screen.getByRole('radiogroup', {name: 'Status'});
+    expect(within(status).getAllByRole('radio')).toHaveLength(6);
+    expect(within(status).getByRole('radio', {name: 'Unverified'})).toHaveAttribute('aria-checked', 'true');
+    within(status).getByRole('radio', {name: 'Unverified'}).focus();
+    await user.keyboard('{ArrowRight}');
+    expect(within(status).getByRole('radio', {name: 'Supported'})).toHaveAttribute('aria-checked', 'true');
+    expect(within(status).getByRole('radio', {name: 'Supported'})).toHaveClass('t-supported');
+  });
+
   it('creates a claim, reloads the list, and opens its review workspace', async () => {
     const api = await renderPanel();
     const created = claimFixture({id: 'claim-2', text: 'The vendor was paid twice.'});
@@ -138,7 +157,7 @@ describe('ClaimsPanel', () => {
 
     await screen.findByRole('heading', {name: 'The vendor was paid twice.', level: 4});
     expect(screen.getByText('No evidence is linked to this claim yet.')).toBeInTheDocument();
-    expect(screen.getByText('No reporter review has been recorded yet.')).toBeInTheDocument();
+    expect(screen.getByText('No review recorded yet.')).toBeInTheDocument();
     expect(screen.getByRole('img', {name: '0 supporting · 0 contradicting · 0 context'})).toBeInTheDocument();
     expect(api.lastBody('POST /api/claims')).toEqual({investigation_id: 'inv-1', text: 'The vendor was paid twice.', status: 'unverified', confidence: 0});
     expect(api.calls(CLAIMS)).toHaveLength(2);
@@ -151,8 +170,8 @@ describe('ClaimsPanel', () => {
     const api = await renderPanel({[WORKSPACE]: workspace(claimFixture())});
     useWorkbenchStore.getState().openClaim('claim-1');
     await screen.findByRole('heading', {name: 'The contract was approved on March 3.', level: 4});
-    expect(screen.getByText('Confidence 40%')).toBeInTheDocument();
-    expect(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')).toBeTruthy();
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '0.4');
+    expect(screen.getByRole('radio', {name: 'Unverified'})).toHaveAttribute('aria-checked', 'true');
     expect(api.calls(WORKSPACE)).toHaveLength(1);
 
     // A claim the panel does not hold is not opened.
@@ -172,8 +191,7 @@ describe('ClaimsPanel', () => {
     const updated = claimFixture({status: 'confirmed', confidence: 0.9});
     const review = {id: 'rev-1', claim_id: 'claim-1', from_status: 'unverified', to_status: 'confirmed', from_confidence: 0.4, to_confidence: 0.9, rationale: 'Board minutes confirm the date directly.', created_at: '2026-10-02T00:00:00'};
     api.add({'POST /api/claims/claim-1/reviews': {claim: updated, review, workspace: workspace(updated, {review_history: [review]})}});
-    await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
-    await user.click(await screen.findByRole('option', {name: 'confirmed'}));
+    await user.click(screen.getByRole('radio', {name: 'Confirmed'}));
     await user.type(screen.getByPlaceholderText('Required rationale for this review'), 'Board minutes confirm the date directly.');
     await user.click(screen.getByRole('button', {name: 'Record review'}));
 
@@ -343,8 +361,7 @@ describe('ClaimsPanel', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText("No canonical relationship currently depends on this claim's linked evidence.");
-    await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
-    await user.click(await screen.findByRole('option', {name: 'supported'}));
+    await user.click(screen.getByRole('radio', {name: 'Supported'}));
     const done = await screen.findByTestId('claim-done');
     expect(done).toHaveTextContent('Supported means');
     // A publication gate: the rules stay on screen; each rule's state is its shape, named (with its detail) on reveal.

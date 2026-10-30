@@ -152,8 +152,9 @@ describe('LeadsPanel', () => {
       expect(api.calls('GET /api/investigations/inv-1/claims')).toHaveLength(2);
     });
     expect(api.lastBody('POST /api/leads/lead-1/convert')).toEqual({kind: 'claim'});
-    // The claim row's confidence words are revealed on it (features/claims/claims-panel.tsx).
-    await waitFor(() => expect(document.querySelector('button.cl-row')).toHaveAccessibleDescription(/^0% confidence/));
+    // A new claim has no confidence and no grade, so its row has nothing to reveal (features/claims/claims-panel.tsx).
+    await waitFor(() => expect(document.querySelector('button.cl-row')).toBeInTheDocument());
+    expect(document.querySelector('button.cl-row')).not.toHaveAccessibleDescription();
     expect(document.querySelector('button.cl-row')).toHaveClass('cl-unshown');
     expect(api.unmatched()).toEqual([]);
   });

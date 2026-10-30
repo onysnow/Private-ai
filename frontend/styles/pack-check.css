@@ -86,3 +86,18 @@
 .pk-how-mark.states { display: inline-grid; grid-template-columns: repeat(2, 15px); gap: 3px; place-content: center; padding: 0; width: 44px; }
 .pk-how-mark.states i { width: 15px; height: 15px; font-size: 9px; }
 .pk-try .pk-acts { flex-direction: column; } .pk-try .pk-acts > *, .pk-try .pk-acts button { width: 100%; }
+
+/* The screen fills the stage (Ony, 29 Oct): before a pack, the drop and the steps take the full height, the steps
+   spread down their panel at a larger size; after one, the result scrolls inside the screen. */
+.pk { height: 100%; box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px; }
+.pk-start { grid-template-rows: minmax(0, 1fr); overflow: hidden; padding-bottom: 12px; }
+.pk-start > .pk-drop.big { min-height: 0; height: 100%; box-sizing: border-box; }
+.pk-start .pk-drop.big .pk-ico { width: 96px; height: 96px; font-size: 42px; }
+.pk-start .pk-drop-title { font-size: clamp(26px, 2.4vw, 34px); }
+.pk-start .pk-aside { min-height: 0; overflow-y: auto; }
+.pk-start .pk-aside > .pk-panel:first-child { display: flex; flex-direction: column; }
+.pk-start .pk-how { flex: 1; justify-content: space-evenly; }
+.pk-start .pk-how li { font-size: clamp(16px, 1.3vw, 19px); }
+.pk-start .pk-how-mark { min-width: 56px; height: 56px; font-size: 24px; }
+.pk-start .pk-how-mark.states { width: 56px; grid-template-columns: repeat(2, 19px); }
+.pk-start .pk-how-mark.states i { width: 19px; height: 19px; font-size: 11px; }

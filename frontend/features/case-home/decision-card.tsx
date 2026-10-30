@@ -121,17 +121,23 @@ export function WhatHappens({item}: {item: DecisionItemOut}): ReactElement | nul
   const answers = item.choices.filter(c => c.happens);
   const unlocks = item.unlocks ?? [];
   if (!answers.length && !item.consequences.length && !unlocks.length) return null;
-  return <div className="ch-happens" aria-label="What happens">
-    <p className="ch-eyebrow">What happens</p>
+  // Ony, 29 Oct: the explanation is revealed, on one quiet line; a Yes that unlocks something keeps its mark and count
+  // in sight. Each answer's own line is also revealed on its button.
+  return <div className="ch-happens-line"><Reveal detail={<WhatHappensBox answers={answers} unlocks={unlocks} consequences={item.consequences}/>}>
+    <span>{unlocks.length > 0 && <span className="ch-happens-unlock" aria-hidden="true">◆{unlocks.length > 1 ? unlocks.length : ''}</span>}What happens</span></Reveal></div>;
+}
+
+function WhatHappensBox({answers, unlocks, consequences}: {answers: DecisionChoiceOut[]; unlocks: string[]; consequences: string[]}): ReactElement {
+  return <span className="ch-happens" aria-label="What happens" role="group">
     {answers.length > 0 && <dl>{answers.map(c => <div key={c.key} className={`ch-happens-${c.key}`}>
       <dt><span aria-hidden="true">{MARK[c.key]}</span> {c.label}</dt><dd>{c.happens}</dd>
     </div>)}</dl>}
-    {unlocks.length > 0 && <div className="ch-unlocks" aria-label="What a Yes unlocks">
+    {unlocks.length > 0 && <span className="ch-unlocks" aria-label="What a Yes unlocks" role="group">
       <p><span aria-hidden="true">◆</span> A Yes unlocks <small>(a dry run of the rules; nothing is saved until you answer)</small></p>
       <ul>{unlocks.map(u => <li key={u}>{u}</li>)}</ul>
-    </div>}
-    {item.consequences.length > 0 && <ul>{item.consequences.map(c => <li key={c}>{c}</li>)}</ul>}
-  </div>;
+    </span>}
+    {consequences.length > 0 && <ul>{consequences.map(c => <li key={c}>{c}</li>)}</ul>}
+  </span>;
 }
 
 export function DecisionCard({item, position, total, keys, active, onDecide, showWhatHappens = true, aside}: {
@@ -200,10 +206,15 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
     </>}
     {item.choices.length > 0 ? <>
       <div className="ch-choices" role="group" aria-label="Your answer">
-        {item.choices.map(c => <button key={c.key} type="button" className={`ch-choice ch-${c.key}`} aria-keyshortcuts={keyOf[c.key].toUpperCase()}
-          onClick={() => (c.key === 'no' && !noOpen && NO_REASONS[item.kind].length ? setNoOpen(true) : onDecide(c, note))}>
-          <span aria-hidden="true">{MARK[c.key]}</span>{c.label}<kbd>{keyOf[c.key].toUpperCase()}</kbd>
-        </button>)}
+        {item.choices.map(c => {
+          const button = <button type="button" className={`ch-choice ch-${c.key}`} aria-keyshortcuts={keyOf[c.key].toUpperCase()}
+            onClick={() => (c.key === 'no' && !noOpen && NO_REASONS[item.kind].length ? setNoOpen(true) : onDecide(c, note))}>
+            <span aria-hidden="true">{MARK[c.key]}</span>{c.label}<kbd>{keyOf[c.key].toUpperCase()}</kbd>
+          </button>;
+          // What this answer does is revealed on it (Decide; Case home keeps its card bare).
+          return showWhatHappens && c.happens ? <Reveal key={c.key} tabbable={false} describe={false} className="ch-choice-rv" detail={c.happens}>{button}</Reveal>
+            : <span key={c.key} className="rv ch-choice-rv">{button}</span>;
+        })}
       </div>
       {noOpen && <div className="ch-reasons" role="group" aria-label="Why not">
         {NO_REASONS[item.kind].map(r => <button key={r} type="button" className="ch-chip" onClick={() => {

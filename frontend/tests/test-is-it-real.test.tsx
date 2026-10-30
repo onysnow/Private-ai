@@ -80,7 +80,9 @@ describe('Is it real?', () => {
     const decide = screen.getByRole('region', {name: 'Status and your reasons'});
     const record = within(decide).getByRole('button', {name: 'Record decision'});
     expect(record).toBeDisabled();
-    expect(within(decide).getByText('Pick a different status to record a decision.')).toBeInTheDocument();
+    // Why it is disabled, and what each status means, are revealed (in the page for screen readers).
+    expect(record).toHaveAccessibleDescription('Pick a different status to record a decision.');
+    expect(within(decide).getByRole('radio', {name: 'Unverified'})).toHaveAccessibleDescription(/The default\. Nothing either way/);
     await user.click(within(decide).getByRole('radio', {name: 'Likely synthetic'}));
     const claims = screen.getByRole('region', {name: 'Which claims lean on it'});
     expect(await within(claims).findByText('These 2 claims lose support from this item')).toBeInTheDocument();

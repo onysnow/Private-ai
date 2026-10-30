@@ -9,3 +9,34 @@
 .tc-mark-shows { color: var(--status-supported); }
 .tc-mark-does_not { color: var(--status-disputed); }
 .tc-mark-unclear { color: var(--status-unshown); }
+
+/* The screen fills the stage (Ony, 29 Oct: fill the space): the title and the counts as figures on top, the cards
+   below sharing the height (a few items grow to fill it, many keep their size and the list scrolls inside). The
+   answers are Case home's Next-up answers (styles/case.css .ch-choice). */
+.tc { height: 100%; display: flex; flex-direction: column; gap: 12px; padding: 4px 2px 0; color: var(--text); }
+.tc-top { display: flex; align-items: flex-end; gap: 28px; padding: 0 4px; }
+.tc-top h3 { margin: 0; font: 400 clamp(22px, 2.1vw, 28px)/1.1 var(--font-display, var(--font-ui)); }
+.tc-figs { display: flex; gap: 22px; margin: 0; }
+.tc-fig { display: inline-flex; align-items: baseline; gap: 7px; }
+.tc-fig b { font: 300 clamp(26px, 2.4vw, 34px)/1 var(--font-display, var(--font-ui)); font-variant-numeric: tabular-nums; color: var(--text); }
+.tc-fig i { font-style: normal; font-weight: 700; font-size: 15px; }
+.tc-fig.f-open i { color: var(--status-unshown); } .tc-fig.f-decided i { color: var(--status-supported); }
+.tc-fig.zero { opacity: .45; }
+.tc-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 12px; padding: 2px 4px 12px; }
+.tc-list > .tc-card { flex: 1 0 auto; margin: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 16px 20px; border-radius: 14px; box-shadow: var(--shadow-panel); }
+.tc-list .rf-gone .tc-card { margin-top: 10px; }
+.tc-card.in-hand { border-color: color-mix(in srgb, var(--accent-1) 45%, transparent); }
+.tc-list > .tc-card .tc-head h4 { font-size: clamp(16px, 1.35vw, 19px); line-height: 1.3; font-weight: 550; }
+.tc-list > .tc-card .tc-icon { width: 22px; height: 22px; }
+.tc-list > .tc-card .tc-from, .tc-list > .tc-card .rf-who { font-size: 13px; }
+.tc-decide { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.tc-decide .ch-choices { flex: 1; max-width: 720px; }
+.tc-decide .ch-choice { min-height: 48px; }
+.tc-decide .ch-choice.on { box-shadow: 0 0 0 2px var(--ground), 0 0 0 4px currentColor; }
+.tc-decide .ch-no.on, .tc-decide .ch-unsure.on { background: color-mix(in srgb, currentColor 14%, transparent); }
+.tc-tools { display: inline-flex; gap: 6px; align-items: center; }
+.tc-icon-btn { all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; color: var(--text-muted); box-shadow: inset 0 0 0 1px var(--line); }
+.tc-icon-btn:hover { color: var(--text); background: var(--surface-2); }
+.tc-icon-btn:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+.tc-none { margin: auto; font-size: 18px; color: var(--text-muted); }
+.tc-list > .tc-card.open { box-shadow: 0 0 0 2px var(--accent-1); }

@@ -57,6 +57,8 @@ const EVIDENCE_GRADES = ['limited', 'medium', 'robust'] as const;
 const AGREEMENT_GRADES = ['low', 'medium', 'high'] as const;
 const UNGRADED = 'none';
 const STANCE_BUTTON: Record<Stance, string> = {supports: 'Supports', contradicts: 'Contradicts', context: 'Context'};
+// Each stance figure's name, revealed on it.
+const STANCE_NAME: Record<Stance, string> = {supports: 'supporting', contradicts: 'contradicting', context: 'context'};
 // The evidence pool can hold hundreds of records: the first ones show, the search finds the rest.
 const POOL_PAGE = 30;
 
@@ -314,14 +316,18 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
           {!loading && !claimsQuery.isError && claims.length === 0 && <div className="cw-none"><b>No claims yet.</b><span>Write the first one above: one fact, stated so evidence can prove or disprove it.</span></div>}
           {claims.length > 0 && shown.length === 0 && <p className="cw-muted">Nothing matches. <button type="button" className="cw-link" onClick={clearFilters}>Clear the filters</button></p>}
           {/* The confidence is a number and shows when there is one; its words and the IPCC grade are revealed on the row. */}
-          {shown.map(c => <Reveal key={c.id} tabbable={false} className="cl-row-wrap"
-            detail={`${pct(c.confidence)}% confidence${gradeText(c) ? ` · ${gradeText(c)}` : ''}`}>
-            <button type="button" data-claim={c.id} className={`cl-row cl-${shapeOf(c.status)}`} onClick={() => openClaim(c.id)}
+          {/* A claim with no confidence and no grade has nothing to reveal, so it carries no card. */}
+          {shown.map(c => {
+            const row = <button type="button" data-claim={c.id} className={`cl-row cl-${shapeOf(c.status)}`} onClick={() => openClaim(c.id)}
               aria-current={c.id === selectedId ? 'true' : undefined}>
               <ClaimStatusChip status={c.status}/>
               <strong>{c.text}</strong>
               <small className={`cl-conf${c.confidence ? '' : ' none'}`}>{c.confidence ? `${pct(c.confidence)}%` : ''}</small>
-            </button></Reveal>)}
+            </button>;
+            return c.confidence || gradeText(c) ? <Reveal key={c.id} tabbable={false} className="cl-row-wrap"
+              detail={`${pct(c.confidence)}% confidence${gradeText(c) ? ` · ${gradeText(c)}` : ''}`}>{row}</Reveal>
+              : <span key={c.id} className="cl-row-wrap">{row}</span>;
+          })}
         </div>
       </aside>
 
@@ -336,28 +342,40 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
             </div>
           </header>
 
+          {/* The figures; each is named on reveal, and a zero is quiet. */}
           {workspace && <div className="cw-nums">
-            <Reveal tabbable={false} describe={false} detail={gradeText(selectedClaim) ? <><b>Graded</b><span className="rv-row">{gradeText(selectedClaim)}</span></> : 'Not graded yet'}>
-              <span className="cw-num"><b>{pct(selectedClaim.confidence)}<small>%</small></b><span>confidence</span></span></Reveal>
-            {/* Counts by stance, each drawn in its stance's line; the words are read with them and revealed. */}
-            <Reveal label={`${workspace.stance_counts.supports} supporting · ${workspace.stance_counts.contradicts} contradicting · ${workspace.stance_counts.context} context`} describe={false}
-              detail={<><b>Evidence balance</b><span className="rv-row">{workspace.stance_counts.supports} supporting · {workspace.stance_counts.contradicts} contradicting · {workspace.stance_counts.context} context</span>
-                <span className="rv-row">Grade the claim on the IPCC grid from this: evidence is limited, medium or robust by its type, amount, quality and consistency; agreement is low, medium or high by how far the evidence agrees.</span></>}>
-              <span className="cl-counts" aria-hidden="true">
-                {(['supports', 'contradicts', 'context'] as const).map(k => <span key={k} className={`cw-num s-${k}`}><b>{workspace.stance_counts[k]}</b><StanceGlyph stance={k} width={34}/></span>)}</span></Reveal>
+            <Reveal tabbable={false} describe={false} detail={<><b>{pct(selectedClaim.confidence)}% confidence</b>
+              <span className="rv-row">{gradeText(selectedClaim) ? `Graded: ${gradeText(selectedClaim)}` : 'Not graded yet'}</span></>}>
+              <span className={`cw-num${selectedClaim.confidence ? '' : ' zero'}`}><b>{pct(selectedClaim.confidence)}<small>%</small></b></span></Reveal>
+            {/* Counts by stance, each drawn in its stance's line and named on reveal. */}
+            <span className="cl-counts" role="img" aria-label={`${workspace.stance_counts.supports} supporting · ${workspace.stance_counts.contradicts} contradicting · ${workspace.stance_counts.context} context`}>
+              {(['supports', 'contradicts', 'context'] as const).map(k => <Reveal key={k} tabbable={false} describe={false}
+                detail={<><b>{workspace.stance_counts[k]} {STANCE_NAME[k]}</b>{k === 'supports' && <span className="rv-row">Grade the claim on the IPCC grid from this balance: evidence is limited, medium or robust by its type, amount, quality and consistency; agreement is low, medium or high by how far the evidence agrees.</span>}</>}>
+                <span className={`cw-num s-${k}${workspace.stance_counts[k] ? '' : ' zero'}`} aria-hidden="true"><b>{workspace.stance_counts[k]}</b><StanceGlyph stance={k} width={34}/></span></Reveal>)}</span>
             {(workspace.superseded_count ?? 0) > 0 && <Reveal tabbable={false} describe={false}
               detail={<><b>Superseded</b><span className="rv-row">Replaced by a newer record: shown struck below, not counted for or against the claim.</span></>}>
               <span className="cw-num cl-gone-n"><b>{workspace.superseded_count}</b><span>superseded</span></span></Reveal>}
-            <span className="cw-num cl-sources"><b>{workspace.source_count ?? 0}</b><span>From {workspace.source_count ?? 0} source{workspace.source_count === 1 ? '' : 's'}</span></span>
+            <Reveal tabbable={false} describe={false} detail={<b>From {workspace.source_count ?? 0} source{workspace.source_count === 1 ? '' : 's'}</b>}>
+              <span className={`cw-num cl-sources${workspace.source_count ? '' : ' zero'}`} role="img" aria-label={`From ${workspace.source_count ?? 0} source${workspace.source_count === 1 ? '' : 's'}`}>
+                <b>{workspace.source_count ?? 0}</b><SourcesIcon/></span></Reveal>
           </div>}
+          {/* Sections with nothing in them are not drawn: one quiet line says what is empty. */}
+          {workspace && (claimEvidence.length === 0 || workspace.review_history.length === 0 || workspace.dependent_relationships.length === 0) &&
+            <p className="cw-quiet">
+              {claimEvidence.length === 0 && <span>No evidence is linked to this claim yet.</span>}
+              {workspace.review_history.length === 0 && <span>No review recorded yet.</span>}
+              {workspace.dependent_relationships.length === 0 && <Reveal detail="No canonical relationship currently depends on this claim's linked evidence."><span>Nothing rests on it.</span></Reveal>}
+              {claimEvidence.length === 0 && <button type="button" className={`cw-btn${attaching ? ' on' : ''}`} aria-expanded={attaching} onClick={() => setAttaching(v => !v)}>
+                <Link2 size={15} aria-hidden="true"/> Attach evidence</button>}
+            </p>}
           {statusLine && <p className="cw-status" role="status">{statusLine}</p>}
 
-          <section className="cw-sec">
-            <h5 className="cw-sec-h">Linked evidence <span className="cw-sec-n">{claimEvidence.length}</span>
+          {(claimEvidence.length > 0 || attaching) && <section className="cw-sec">
+            {claimEvidence.length > 0 && <h5 className="cw-sec-h">Linked evidence <span className="cw-sec-n">{claimEvidence.length}</span>
               <button type="button" className={`cw-btn${attaching ? ' on' : ''}`} aria-expanded={attaching} onClick={() => setAttaching(v => !v)}>
-                <Link2 size={15} aria-hidden="true"/> Attach evidence</button></h5>
+                <Link2 size={15} aria-hidden="true"/> Attach evidence</button></h5>}
             {/* Each link's stance is its line (Chain of Custody's styles), named on reveal; locator and note on the quote. */}
-            {claimEvidence.length === 0 ? <p className="cw-muted">No evidence is linked to this claim yet.</p> : <ol className="cw-evs">{claimEvidence.map(row => {
+            {claimEvidence.length > 0 && <ol className="cw-evs">{claimEvidence.map(row => {
               const gone = row.superseded ?? null;
               const words = row.evidence?.quote || row.evidence?.notes || 'Evidence record';
               const quote = <blockquote className="cw-quote">{gone ? <s>{words}</s> : words}</blockquote>;
@@ -420,15 +438,14 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                 </li>)}</ul>}
               {pool.length > POOL_PAGE && <p className="cw-muted">{pool.length - POOL_PAGE} more: search to find them.</p>}
             </div>}
-          </section>
+          </section>}
 
           <section className="cw-sec">
             <h5 className="cw-sec-h">Review</h5>
             <div className="cw-form">
-              <Select value={claimStatus} onValueChange={setClaimStatus}>
-                <SelectTrigger className="w-auto" aria-label="Status"><SelectValue/></SelectTrigger>
-                <SelectContent>{CLAIM_STATUSES.map(status => <SelectItem value={status} key={status}>{status}</SelectItem>)}</SelectContent>
-              </Select>
+              <StatusPicker value={claimStatus} current={selectedClaim.status} onChange={setClaimStatus}/>
+            </div>
+            <div className="cw-form">
               <Select value={evidenceGrade} onValueChange={setEvidenceGrade}>
                 <SelectTrigger className="w-auto" aria-label="Evidence"><SelectValue/></SelectTrigger>
                 <SelectContent>
@@ -443,7 +460,11 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                   {AGREEMENT_GRADES.map(grade => <SelectItem value={grade} key={grade}>{`Agreement: ${grade}`}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <label className="cw-conf">Confidence {pct(claimConfidence)}% <Slider className="w-32" value={[claimConfidence]} min={0} max={1} step={0.05} onValueChange={(vals: number[]) => setClaimConfidence(vals[0])}/></label>
+              {/* The confidence is its figure; the slider under it sets it, and its name is revealed. */}
+              <Reveal tabbable={false} describe={false} detail="Confidence: how sure you are, from 0 to 100%">
+                <span className="cw-conf"><b className={claimConfidence ? '' : 'zero'}>{pct(claimConfidence)}<small>%</small></b>
+                  <Slider className="w-40" value={[claimConfidence]} min={0} max={1} step={0.05}
+                    onValueChange={(vals: number[]) => setClaimConfidence(vals[0])}/></span></Reveal>
             </div>
             <div className="cw-form">
               <Input value={rationale} onChange={(e: ChangeEvent<HTMLInputElement>) => setRationale(e.target.value)} placeholder="Required rationale for this review"/>
@@ -466,10 +487,10 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
           </section>
 
           {workspace && <>
-            <section className="cw-sec">
+            {workspace.review_history.length > 0 && <section className="cw-sec">
               <h5 className="cw-sec-h">Review history <span className="cw-sec-n">{workspace.review_history.length}</span></h5>
               {/* The status shapes and the rationale show; the words, confidences, grades and time are revealed on the rationale. */}
-              {workspace.review_history.length === 0 ? <p className="cw-muted">No reporter review has been recorded yet.</p> : <ol className="cw-hist">{workspace.review_history.map(event => <li key={event.id}>
+              {<ol className="cw-hist">{workspace.review_history.map(event => <li key={event.id}>
                 <span className="cl-move"><ClaimStatusChip status={event.from_status}/><span aria-hidden="true">→</span><ClaimStatusChip status={event.to_status}/></span>
                 <div>
                   <Reveal detail={<>
@@ -481,12 +502,11 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                   {event.override_reason && <div className="done-overridden">Marked without: {(event.unmet_rules ?? []).join(', ')}. Reason: {event.override_reason}</div>}
                 </div>
               </li>)}</ol>}
-            </section>
+            </section>}
 
-            <section className="cw-sec">
+            {workspace.dependent_relationships.length > 0 && <section className="cw-sec">
               <h5 className="cw-sec-h">Relationships resting on it <span className="cw-sec-n">{workspace.dependent_relationships.length}</span></h5>
-              {workspace.dependent_relationships.length === 0 ? <p className="cw-muted"><Reveal detail="No canonical relationship currently depends on this claim's linked evidence.">None</Reveal></p>
-                : <ul className="cw-rels">{workspace.dependent_relationships.map(dep => {
+              {<ul className="cw-rels">{workspace.dependent_relationships.map(dep => {
                   const rel = relationships.find(r => r.id === dep.id);
                   const trace = () => openProvenance({title: selectedClaim.text, kind: 'claim-dependent relationship', traceRecordType: 'relationship', acceptedRecordId: dep.id});
                   return <li key={dep.id}>
@@ -497,7 +517,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                     <button type="button" className="cw-btn" onClick={trace}>Trace relationship</button>
                   </li>;
                 })}</ul>}
-            </section>
+            </section>}
           </>}
         </>}
       </section>
@@ -515,4 +535,29 @@ function ClaimsOverview({counts, total, onShape}: {counts: Record<ClaimStatus, n
         <span className="cw-over-track" aria-hidden="true"><i style={{width: `${(counts[s] / total) * 100}%`}}/></span>
       </button></li>)}</ul>}
   </div>;
+}
+
+const STATUS_WORD: Record<string, string> = {lead: 'Lead', unverified: 'Unverified', supported: 'Supported', confirmed: 'Confirmed', disputed: 'Disputed', rejected: 'Rejected'};
+
+/** The claim's status to record, as the app's status control: one choice per status, each its status colour and its
+ *  word (a control keeps its words); the one picked fills with its colour, the claim's status now is ringed. Arrows move. */
+function StatusPicker({value, current, onChange}: {value: string; current: string; onChange: (status: string) => void}): ReactElement {
+  const move = (e: KeyboardEvent<HTMLDivElement>): void => {
+    const by = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+    if (!by) return;
+    e.preventDefault();
+    const next = CLAIM_STATUSES[(CLAIM_STATUSES.indexOf(value) + by + CLAIM_STATUSES.length) % CLAIM_STATUSES.length];
+    onChange(next);
+    e.currentTarget.querySelector<HTMLButtonElement>(`[data-status="${next}"]`)?.focus();
+  };
+  return <div className="cw-statuses" role="radiogroup" aria-label="Status" onKeyDown={move}>{CLAIM_STATUSES.map(st =>
+    <button key={st} type="button" role="radio" aria-checked={value === st} tabIndex={value === st ? 0 : -1} data-status={st}
+      data-current={current === st || undefined} className={`t-${shapeOf(st)}`} onClick={() => onChange(st)}>
+      <i aria-hidden="true"/>{STATUS_WORD[st]}</button>)}</div>;
+}
+
+/** The number of sources, as a mark: two stacked pages. */
+function SourcesIcon(): ReactElement {
+  return <svg className="cl-src-icon" viewBox="0 0 20 20" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round">
+    <path d="M6 3.5h7l3 3v10H6z"/><path d="M13 3.5v3h3"/><path d="M4 6v12h9"/></svg>;
 }

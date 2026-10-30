@@ -137,8 +137,7 @@ describe('Home claim verification workspace', () => {
     api.add({'POST /api/claims/claim-1/reviews': {claim: updated, review, workspace: {...emptyWorkspace(updated), review_history: [review]}}});
 
     const user = userEvent.setup();
-    await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
-    await user.click(await screen.findByRole('option', {name: 'confirmed'}));
+    await user.click(screen.getByRole('radio', {name: 'Confirmed'}));
     await user.type(
       screen.getByPlaceholderText('Required rationale for this review'),
       'Board minutes confirm the date directly.',
