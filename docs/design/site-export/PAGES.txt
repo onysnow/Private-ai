@@ -13,22 +13,25 @@ Workbench-site-mockup: one page per screen, in this order
 11. Check › Claims
 12. Check › To check
 13. Check › Connector findings
-14. Check › Chain of Custody
-15. See › The Wire
-16. See › Relationships
-17. See › Timeline
-18. See › Money
-19. See › Places
-20. Act › Red Flags
-21. Act › Story
-22. Act › Leads
-23. Act › Charts
-24. Act › AI drafts
-25. Keep › Safety & data
-26. Keep › Backup & restore
-27. Keep › Delete
-28. Keep › Access
-29. Learn › Red Flags catalogue
-30. Learn › Glossary
-31. Settings
-32. About
+14. Check › Is it real?
+15. Check › Chain of Custody
+16. Check › Check a pack
+17. See › The Wire
+18. See › Timeline
+19. See › Money
+20. See › Places
+21. See › Add by hand
+22. Act › Red Flags
+23. Act › Story
+24. Act › Leads
+25. Act › Charts
+26. Act › Decks
+27. Act › AI drafts
+28. Keep › Safety & data
+29. Keep › Backup & restore
+30. Keep › Delete
+31. Keep › Access
+32. Learn › Red Flags catalogue
+33. Learn › Glossary
+34. Settings
+35. About
