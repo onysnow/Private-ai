@@ -35,7 +35,11 @@ describe('your safety', () => {
     const api = mockApi({'GET /api/investigations/inv-1/your-safety': BODY});
     render(<QueryProvider><YourSafety investigationId="inv-1"/><SafetyNotice investigationId="inv-1" onOpen={() => undefined}/></QueryProvider>);
     expect(await screen.findByText('1 sign about danger to you or your sources')).toBeInTheDocument();
-    expect(screen.getByText('level not set')).toBeInTheDocument();
+    // No level: a hollow mark, its words for screen readers and on reveal.
+    expect(screen.getByText('level not set')).toHaveClass('st-sr');
+    expect(screen.getByText('level not set').closest('.ys-level')).toHaveTextContent('◌');
+    // That the answers stay private is on reveal of the lock.
+    expect(screen.getByLabelText('Kept private')).toHaveAccessibleDescription(/never sent, not in backups/);
     expect(screen.queryByRole('status')).toBeNull();
     const user = userEvent.setup();
     await user.click(screen.getAllByRole('radio', {name: 'Yes'})[0]);

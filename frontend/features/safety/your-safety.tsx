@@ -78,13 +78,16 @@ export function YourSafety({investigationId}: {investigationId: string}): ReactE
     <ul className="ys-signs">
       {signs.map(s => <li key={s.id}>
         <span className="ys-id" aria-hidden="true">!</span>
-        <div><p className="ys-name"><Reveal detail={<span className="rv-mono">{s.id}</span>}><span>{s.name}</span></Reveal></p><p className="ys-ev">{s.evidence}</p>
+        {/* The name shows; the evidence from the records is two lines, in full on reveal. No level yet: a hollow mark,
+            named on reveal (levels are a mark by default, the word on reveal). */}
+        <div><p className="ys-name"><Reveal detail={<span className="rv-mono">{s.id}</span>}><span>{s.name}</span></Reveal></p>
+          <p className="ys-ev"><Reveal tabbable={false} detail={s.evidence}><span>{s.evidence}</span></Reveal></p>
           <details><summary>It may be nothing</summary><p>{s.innocent[0]}</p><p className="ys-src">{s.source.publisher}: {s.source.title}</p></details></div>
-        <Reveal detail="The catalogue has no Faint or Strong level for safety signs yet: none is made up here."><span className="ys-level">level not set</span></Reveal>
+        <Reveal describe={false} detail="Level not set: the catalogue has no Faint or Strong level for safety signs yet, and none is made up here."><span className="ys-level"><span aria-hidden="true">◌</span><span className="st-sr">level not set</span></span></Reveal>
       </li>)}
     </ul>
     {data && <fieldset className="ys-ask">
-      <legend>Only you can say <span>kept private: in this browser only, never sent, not in backups</span></legend>
+      <legend>Only you can say <Reveal label="Kept private" detail="Kept private: in this browser only, never sent, not in backups."><span aria-hidden="true">🔒</span></Reveal></legend>
       {data.questions.map(q => <div key={q.id} role="radiogroup" aria-label={q.question} className="ys-q">
         <p>{q.question}</p>
         <span>{(['yes', 'no', 'not_sure'] as Answer[]).map(a => <label key={a} className={kept.answers[q.id] === a ? 'on' : ''}>
