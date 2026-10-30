@@ -570,7 +570,7 @@ def propose_relationship_from_extracted_claim(db: Session, *, claim_id: str, sch
         raise ValueError('Relationship endpoints must be different entities')
     if evidence_id is None:
         support = db.scalar(select(ClaimEvidenceLink).where(
-            ClaimEvidenceLink.claim_id == claim_id, ClaimEvidenceLink.stance == 'supports'
+            ClaimEvidenceLink.claim_id == claim_id, ClaimEvidenceLink.stance == 'supports', ClaimEvidenceLink.superseded_at.is_(None)
         ).order_by(ClaimEvidenceLink.created_at))
         evidence_id = support.evidence_id if support else None
     payload = {

@@ -47,6 +47,8 @@ def app_vocabularies() -> dict[str, tuple[str, ...]]:
     return {
         "claim_status": tuple(sorted(CLAIM_STATUSES)),
         "claim_evidence_stance": ("supports", "contradicts", "context"),
+        # A mark on a claim's evidence link beside its stance (app/models/claims.py ClaimEvidenceLink.superseded_at).
+        "claim_evidence_mark": ("superseded",),
         "relationship_evidence_stance": tuple(sorted(RELATIONSHIP_EVIDENCE_STANCES)),
         "source_type": SOURCE_TYPES,
         "red_flag_level": LEVELS,
@@ -68,7 +70,8 @@ def app_vocabularies() -> dict[str, tuple[str, ...]]:
 
 
 VOCABULARY_NAMES = {
-    "claim_status": "Claim status", "claim_evidence_stance": "Evidence on a claim", "relationship_evidence_stance": "Evidence on a link",
+    "claim_status": "Claim status", "claim_evidence_stance": "Evidence on a claim", "claim_evidence_mark": "Evidence on a claim, marked",
+    "relationship_evidence_stance": "Evidence on a link",
     "source_type": "Source type", "red_flag_level": "Red Flag level", "check_answer": "To check answer", "missing_value_answer": "Missing value answer",
     "event_verification_status": "Event date status", "event_grade": "Event grade", "claim_evidence_grade": "Evidence grade (IPCC)",
     "claim_agreement_grade": "Agreement grade (IPCC)", "claim_confidence": "Claim confidence", "outside_finding_decision": "Outside record decision",

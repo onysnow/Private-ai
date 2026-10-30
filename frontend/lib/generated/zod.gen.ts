@@ -1963,6 +1963,36 @@ export const zClaimEvidenceLinkCreate = z.object({
 });
 
 /**
+ * ClaimEvidenceSupersede
+ *
+ * Mark a claim's evidence link superseded: why (required), and the newer record that replaces it, when it is in
+ * the case.
+ */
+export const zClaimEvidenceSupersede = z.object({
+  by_evidence_id: z.string().nullish(),
+  reason: z.string(),
+});
+
+/**
+ * ClaimEvidenceSupersededOut
+ *
+ * A link marked superseded by a newer record: shown, no longer counted for or against the claim.
+ */
+export const zClaimEvidenceSupersededOut = z.object({
+  at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  by_evidence_id: z.string().nullish(),
+  by_label: z.string().nullish(),
+  by_locator: z.string().nullish(),
+  decided_by_id: z.string().nullish(),
+  decided_by_name: z.string().nullish(),
+  reason: z.string(),
+});
+
+/**
  * ClaimEvidenceLinkOut
  *
  * The link itself, as stored (the reply to linking evidence to a claim).
@@ -1980,6 +2010,7 @@ export const zClaimEvidenceLinkOut = z.object({
   id: z.string(),
   note: z.string().nullish(),
   stance: z.string(),
+  superseded: zClaimEvidenceSupersededOut.nullish(),
 });
 
 /**
@@ -2984,6 +3015,7 @@ export const zCustodyRowOut = z.object({
   rests_on: z.array(zCustodyRestingOut).optional().default([]),
   source: zCustodySourceOut.nullish(),
   stance: z.enum(['supports', 'contradicts']),
+  superseded: zClaimEvidenceSupersededOut.nullish(),
 });
 
 /**
@@ -4109,6 +4141,7 @@ export const zEvidenceClaimLinkOut = z.object({
   claim_id: z.string(),
   evidence_id: z.string(),
   stance: z.string(),
+  superseded: z.boolean().optional().default(false),
 });
 
 /**
@@ -8973,6 +9006,7 @@ export const zClaimEvidenceRowOut = z.object({
   note: z.string().nullish(),
   source: zSourceOut.nullish(),
   stance: z.string(),
+  superseded: zClaimEvidenceSupersededOut.nullish(),
 });
 
 /**
@@ -9025,6 +9059,7 @@ export const zClaimReviewWorkspaceOut = z.object({
   review_history: z.array(zClaimReviewEventOut),
   source_count: z.int().optional().default(0),
   stance_counts: zStanceCountsOut,
+  superseded_count: z.int().optional().default(0),
 });
 
 /**
@@ -9340,6 +9375,7 @@ export const zStoryEvidenceOut = z.object({
   short: z.string().optional().default(''),
   source_id: z.string().nullish(),
   stance: z.string(),
+  superseded: zClaimEvidenceSupersededOut.nullish(),
 });
 
 /**
@@ -12095,6 +12131,29 @@ export const zLinkClaimEvidenceEndpointPath = z.object({
  * Successful Response
  */
 export const zLinkClaimEvidenceEndpointResponse = zClaimEvidenceLinkOut;
+
+export const zUnsupersedeClaimEvidenceEndpointPath = z.object({
+  claim_id: z.string(),
+  link_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUnsupersedeClaimEvidenceEndpointResponse =
+  zClaimReviewWorkspaceOut;
+
+export const zSupersedeClaimEvidenceEndpointBody = zClaimEvidenceSupersede;
+
+export const zSupersedeClaimEvidenceEndpointPath = z.object({
+  claim_id: z.string(),
+  link_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSupersedeClaimEvidenceEndpointResponse = zClaimReviewWorkspaceOut;
 
 export const zCreateExtractedRelationshipProposalBody =
   zExtractedRelationshipProposalCreate;

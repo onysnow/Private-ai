@@ -52,6 +52,20 @@ class ClaimEvidenceLink(Base):
     decided_by_id: Mapped[str | None] = mapped_column(String, nullable=True)
     decided_by_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
+    # Superseded (TAS §7.3's document state, read for one link): a newer record replaces what this one says for the
+    # claim (a judgment replaces an indictment's figure; a corrected filing). The link stays, with its stance, and is
+    # shown struck; it no longer counts for or against the claim. When it was marked, the record that replaces it (none
+    # when that record is not in the case), the reason, and who marked it (app/db/decided_by.py). Undo clears all five.
+    superseded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    superseded_by_evidence_id: Mapped[str | None] = mapped_column(ForeignKey("evidence.id"), nullable=True)
+    superseded_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    superseded_decided_by_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    superseded_decided_by_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    @property
+    def counts_toward_claim(self) -> bool:
+        """Whether the link counts toward the claim: every link does until it is marked superseded."""
+        return self.superseded_at is None
 
 
 class ClaimReviewEvent(Base):

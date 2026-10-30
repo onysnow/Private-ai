@@ -1,6 +1,7 @@
 """Stamped on records as they are saved, whichever code path saves them (mockup CHECK_2):
 
-* who made a decision: a claim review by a person, a quote linked to a claim, a proposal accepted or rejected. The
+* who made a decision: a claim review by a person, a quote linked to a claim (and marked superseded), a proposal
+  accepted or rejected. The
   person is the request's signed-in account (app/core/authorization.py): its id, and its name as it was then. On
   this computer without an account the id is "local-owner" and there is no name; outside a request (seeding a demo
   case, a restore) nothing is stamped.
@@ -50,10 +51,15 @@ def _stamp_before_flush(db: Session, _flush_context: object, _instances: object)
         # A proposal decided again (reopened, then decided) is stamped with whoever decided it last.
         decisions += [o for o in (*db.new, *db.dirty) if isinstance(o, ExtractionCandidate)
                       and o.review_status not in (None, "proposed") and _changed(o, "review_status")]
-        actor = _actor(db) if decisions else None
+        # A link marked superseded (again, after an undo) is stamped with whoever marked it; undone, the stamp goes too.
+        superseded = [o for o in (*db.new, *db.dirty) if isinstance(o, ClaimEvidenceLink) and o.superseded_at is not None
+                      and (o in db.new or _changed(o, "superseded_at")) and o.superseded_decided_by_id is None]
+        actor = _actor(db) if decisions or superseded else None
         if actor is not None:
             for obj in decisions:
                 obj.decided_by_id, obj.decided_by_name = actor
+            for link in superseded:
+                link.superseded_decided_by_id, link.superseded_decided_by_name = actor
         passages: dict = {}
         for obj in db.new:
             if isinstance(obj, Evidence) and obj.anchor is None and obj.quote:

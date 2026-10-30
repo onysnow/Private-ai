@@ -4827,6 +4827,7 @@ export type ClaimEvidenceLinkOut = {
    * Stance
    */
   stance: string;
+  superseded?: ClaimEvidenceSupersededOut | null;
 };
 
 /**
@@ -4856,6 +4857,62 @@ export type ClaimEvidenceRowOut = {
    * Stance
    */
   stance: string;
+  superseded?: ClaimEvidenceSupersededOut | null;
+};
+
+/**
+ * ClaimEvidenceSupersede
+ *
+ * Mark a claim's evidence link superseded: why (required), and the newer record that replaces it, when it is in
+ * the case.
+ */
+export type ClaimEvidenceSupersede = {
+  /**
+   * By Evidence Id
+   */
+  by_evidence_id?: string | null;
+  /**
+   * Reason
+   */
+  reason: string;
+};
+
+/**
+ * ClaimEvidenceSupersededOut
+ *
+ * A link marked superseded by a newer record: shown, no longer counted for or against the claim.
+ */
+export type ClaimEvidenceSupersededOut = {
+  /**
+   * At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  at: string;
+  /**
+   * By Evidence Id
+   */
+  by_evidence_id?: string | null;
+  /**
+   * By Label
+   */
+  by_label?: string | null;
+  /**
+   * By Locator
+   */
+  by_locator?: string | null;
+  /**
+   * Decided By Id
+   */
+  decided_by_id?: string | null;
+  /**
+   * Decided By Name
+   */
+  decided_by_name?: string | null;
+  /**
+   * Reason
+   */
+  reason: string;
 };
 
 /**
@@ -5085,6 +5142,10 @@ export type ClaimReviewWorkspaceOut = {
    */
   source_count?: number;
   stance_counts: StanceCountsOut;
+  /**
+   * Superseded Count
+   */
+  superseded_count?: number;
 };
 
 /**
@@ -7178,6 +7239,7 @@ export type CustodyRowOut = {
    * Stance
    */
   stance: 'supports' | 'contradicts';
+  superseded?: ClaimEvidenceSupersededOut | null;
 };
 
 /**
@@ -10319,6 +10381,10 @@ export type EvidenceClaimLinkOut = {
    * Stance
    */
   stance: string;
+  /**
+   * Superseded
+   */
+  superseded?: boolean;
 };
 
 /**
@@ -21003,6 +21069,7 @@ export type StoryEvidenceOut = {
    * Stance
    */
   stance: string;
+  superseded?: ClaimEvidenceSupersededOut | null;
 };
 
 /**
@@ -26299,6 +26366,86 @@ export type LinkClaimEvidenceEndpointResponses = {
 
 export type LinkClaimEvidenceEndpointResponse =
   LinkClaimEvidenceEndpointResponses[keyof LinkClaimEvidenceEndpointResponses];
+
+export type UnsupersedeClaimEvidenceEndpointData = {
+  body?: never;
+  path: {
+    /**
+     * Claim Id
+     */
+    claim_id: string;
+    /**
+     * Link Id
+     */
+    link_id: string;
+  };
+  query?: never;
+  url: '/api/claims/{claim_id}/evidence/{link_id}/supersede';
+};
+
+export type UnsupersedeClaimEvidenceEndpointErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type UnsupersedeClaimEvidenceEndpointError =
+  UnsupersedeClaimEvidenceEndpointErrors[keyof UnsupersedeClaimEvidenceEndpointErrors];
+
+export type UnsupersedeClaimEvidenceEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  200: ClaimReviewWorkspaceOut;
+};
+
+export type UnsupersedeClaimEvidenceEndpointResponse =
+  UnsupersedeClaimEvidenceEndpointResponses[keyof UnsupersedeClaimEvidenceEndpointResponses];
+
+export type SupersedeClaimEvidenceEndpointData = {
+  body: ClaimEvidenceSupersede;
+  path: {
+    /**
+     * Claim Id
+     */
+    claim_id: string;
+    /**
+     * Link Id
+     */
+    link_id: string;
+  };
+  query?: never;
+  url: '/api/claims/{claim_id}/evidence/{link_id}/supersede';
+};
+
+export type SupersedeClaimEvidenceEndpointErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SupersedeClaimEvidenceEndpointError =
+  SupersedeClaimEvidenceEndpointErrors[keyof SupersedeClaimEvidenceEndpointErrors];
+
+export type SupersedeClaimEvidenceEndpointResponses = {
+  /**
+   * Successful Response
+   */
+  200: ClaimReviewWorkspaceOut;
+};
+
+export type SupersedeClaimEvidenceEndpointResponse =
+  SupersedeClaimEvidenceEndpointResponses[keyof SupersedeClaimEvidenceEndpointResponses];
 
 export type CreateExtractedRelationshipProposalData = {
   body: ExtractedRelationshipProposalCreate;

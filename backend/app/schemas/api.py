@@ -68,6 +68,12 @@ class ClaimEvidenceLinkCreate(BaseModel):
     stance: str
     note: str | None = None
 
+class ClaimEvidenceSupersede(BaseModel):
+    """Mark a claim's evidence link superseded: why (required), and the newer record that replaces it, when it is in
+    the case."""
+    reason: str
+    by_evidence_id: str | None = None
+
 class TimelineEventGradeUpdate(BaseModel):
     """A reporter's grade for an event they recorded; null clears it."""
     grade: Literal["confirmed", "likely", "weak", "unsubstantiated", "unknown"] | None

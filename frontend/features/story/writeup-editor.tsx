@@ -74,10 +74,12 @@ function SentenceMarks(states: {current: Record<string, CitableClaim['state']>})
 
 const stamp = (d: Date) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
-/** The passage a citation's hover card quotes: the claim's first supporting passage with words, else its first. */
+/** The passage a citation's hover card quotes: the claim's first supporting passage with words, else its first; a
+ * passage marked superseded only when nothing else is linked. */
 export function passageOf(claim: CitableClaim | undefined): CitablePassage | undefined {
-  const ev = claim?.evidence ?? [];
-  return ev.find(e => e.stance === 'supports' && e.quote) ?? ev.find(e => e.quote) ?? ev[0];
+  const all = claim?.evidence ?? [];
+  const ev = all.filter(e => !e.superseded);
+  return ev.find(e => e.stance === 'supports' && e.quote) ?? ev.find(e => e.quote) ?? ev[0] ?? all[0];
 }
 
 type Hover = {id: string; x: number; y: number};

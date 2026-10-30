@@ -113,11 +113,17 @@ def _evidence_gaps(db: Session, inv: str) -> Iterator[Gap]:
 
 def _claim_gaps(db: Session, inv: str) -> Iterator[Gap]:
     supported = {cid for (cid,) in db.execute(select(ClaimEvidenceLink.claim_id).join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
-                                              .where(Claim.investigation_id == inv, ClaimEvidenceLink.stance == "supports"))}
+                                              .where(Claim.investigation_id == inv, ClaimEvidenceLink.stance == "supports",
+                                                     ClaimEvidenceLink.superseded_at.is_(None)))}
+    # Support marked superseded by a newer record does not count; the gap says so, so the replacement is what is sought.
+    superseded = {cid for (cid,) in db.execute(select(ClaimEvidenceLink.claim_id).join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
+                                               .where(Claim.investigation_id == inv, ClaimEvidenceLink.stance == "supports",
+                                                      ClaimEvidenceLink.superseded_at.is_not(None)))}
     for c in db.scalars(select(Claim).where(Claim.investigation_id == inv, Claim.status.in_(("supported", "confirmed")))):
         if c.id not in supported:
+            why = "its supporting evidence all marked superseded" if c.id in superseded else "no supporting evidence linked"
             yield Gap("MV-CLM-EV", "claim", c.id, c.text[:120], f"What shows “{c.text[:120]}”?",
-                      f"It is marked {c.status.capitalize()} with no supporting evidence linked: it cannot be defended as it stands.", (), 60)
+                      f"It is marked {c.status.capitalize()} with {why}: it cannot be defended as it stands.", (), 60)
 
 
 def _event_gaps(db: Session, inv: str) -> Iterator[Gap]:

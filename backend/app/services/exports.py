@@ -596,6 +596,16 @@ def preview_investigation_restore(
                 "id": str(row.get("id") or "<missing-id>"),
                 "message": "ingestion_batch_items record points at a batch or document outside this backup",
             })
+    # A claim's evidence link marked superseded names the record that replaces it: one inside this same backup.
+    backup_evidence = {row.get("id") for row in records.get("evidence", [])}
+    for row in records.get("claim_evidence_links", []):
+        if row.get("superseded_by_evidence_id") is not None and row["superseded_by_evidence_id"] not in backup_evidence:
+            conflicts.append({
+                "kind": "foreign_investigation",
+                "table": "claim_evidence_links",
+                "id": str(row.get("id") or "<missing-id>"),
+                "message": "claim_evidence_links record is marked superseded by evidence outside this backup",
+            })
 
     storage_root = resolve_storage_root(document_storage_dir)
     for entry in manifest.get("document_files", []):

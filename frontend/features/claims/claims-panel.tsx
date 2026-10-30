@@ -8,8 +8,10 @@
 //
 // Shown by default: the counts, each claim's status colour, its words and its confidence when it has one, the open
 // claim's numbers and evidence. On hover or focus: the status words, grades, explanations, locators and notes.
+// Evidence a newer record replaces is marked superseded (./superseded.tsx): struck and faded, not counted; what
+// replaced it, why and who on hover, where the record that replaced it lights up in the list; Undo counts it again.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {Link2, Plus, Route, Search, X} from 'lucide-react';
+import {Link2, Plus, Replace, Route, Search, Undo2, X} from 'lucide-react';
 import {useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
 import type {ChangeEvent, KeyboardEvent, ReactElement} from 'react';
 
@@ -25,11 +27,14 @@ import {errorMessage} from '../../lib/api-client';
 import {
   getClaimReviewWorkspaceOptions, getClaimReviewWorkspaceQueryKey, listClaimsOptions, listClaimsQueryKey, listInvestigationEvidenceOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import {createClaimEndpoint, createClaimReview, linkClaimEvidenceEndpoint} from '../../lib/generated/sdk.gen';
+import {
+  createClaimEndpoint, createClaimReview, linkClaimEvidenceEndpoint, supersedeClaimEvidenceEndpoint, unsupersedeClaimEvidenceEndpoint,
+} from '../../lib/generated/sdk.gen';
 import type {ClaimOut, ClaimReviewWorkspaceOut, EvidencePoolRow} from '../../lib/generated/types.gen';
 import {timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {WatchButton} from '../inbox/watch-button';
+import {SupersedeForm, supersededDetail} from './superseded';
 import './claims.css';
 
 /** The canonical relationships the page still holds, as far as this panel
@@ -117,6 +122,10 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const q = useDeferredValue(typed.trim().toLowerCase());
   const [attaching, setAttaching] = useState(false);
   const [poolTyped, setPoolTyped] = useState('');
+  // The link whose superseded form is open, the call in flight, and the replacing record pointed at.
+  const [superseding, setSuperseding] = useState<string | null>(null);
+  const [supersedeBusy, setSupersedeBusy] = useState(false);
+  const [replacer, setReplacer] = useState<string | null>(null);
   const poolQ = useDeferredValue(poolTyped.trim().toLowerCase());
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -132,7 +141,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const claimEvidence = useMemo(() => workspace?.evidence ?? [], [workspace]);
 
   // A new case starts with no claim open and nothing filtered.
-  useEffect(() => { setSelectedId(null); setReviewStatus(''); setShapes(new Set()); setTyped(''); setAttaching(false); }, [investigationId]);
+  useEffect(() => { setSelectedId(null); setReviewStatus(''); setShapes(new Set()); setTyped(''); setAttaching(false); setSuperseding(null); }, [investigationId]);
 
   // Opening a claim (from the list here or from a dossier) starts the review
   // form from the claim's current status and confidence. Each request is
@@ -231,6 +240,24 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
     }
   };
 
+  // The reply is the claim's workspace as it now stands: its counts and Done rules leave the superseded record out.
+  const markSuperseded = async (linkId: string, reason: string | null, byEvidenceId: string | null) => {
+    if (!selectedClaim) return;
+    setSupersedeBusy(true);
+    try {
+      const reply = reason === null
+        ? await unsupersedeClaimEvidenceEndpoint({path: {claim_id: selectedClaim.id, link_id: linkId}, throwOnError: true})
+        : await supersedeClaimEvidenceEndpoint({path: {claim_id: selectedClaim.id, link_id: linkId}, body: {reason, by_evidence_id: byEvidenceId}, throwOnError: true});
+      queryClient.setQueryData(getClaimReviewWorkspaceQueryKey({path: {claim_id: selectedClaim.id}}), reply.data);
+      setSuperseding(null);
+      setReviewStatus(reason === null ? 'Counted again: the superseded mark is undone.' : 'Marked superseded: shown, no longer counted toward the claim.');
+    } catch (error) {
+      setReviewStatus(errorMessage(error, reason === null ? 'Could not undo the mark' : 'Could not mark it superseded'));
+    } finally {
+      setSupersedeBusy(false);
+    }
+  };
+
   const hasLink = (evidenceId: string, stance: Stance) => claimEvidence.some(row => row.evidence?.id === evidenceId && row.stance === stance);
 
   // The pool, searched, the records that share the most words with the open claim first; what is already linked to
@@ -318,6 +345,9 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                 <span className="rv-row">Grade the claim on the IPCC grid from this: evidence is limited, medium or robust by its type, amount, quality and consistency; agreement is low, medium or high by how far the evidence agrees.</span></>}>
               <span className="cl-counts" aria-hidden="true">
                 {(['supports', 'contradicts', 'context'] as const).map(k => <span key={k} className={`cw-num s-${k}`}><b>{workspace.stance_counts[k]}</b><StanceGlyph stance={k} width={34}/></span>)}</span></Reveal>
+            {(workspace.superseded_count ?? 0) > 0 && <Reveal tabbable={false} describe={false}
+              detail={<><b>Superseded</b><span className="rv-row">Replaced by a newer record: shown struck below, not counted for or against the claim.</span></>}>
+              <span className="cw-num cl-gone-n"><b>{workspace.superseded_count}</b><span>superseded</span></span></Reveal>}
             <span className="cw-num cl-sources"><b>{workspace.source_count ?? 0}</b><span>From {workspace.source_count ?? 0} source{workspace.source_count === 1 ? '' : 's'}</span></span>
           </div>}
           {statusLine && <p className="cw-status" role="status">{statusLine}</p>}
@@ -327,23 +357,41 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
               <button type="button" className={`cw-btn${attaching ? ' on' : ''}`} aria-expanded={attaching} onClick={() => setAttaching(v => !v)}>
                 <Link2 size={15} aria-hidden="true"/> Attach evidence</button></h5>
             {/* Each link's stance is its line (Chain of Custody's styles), named on reveal; locator and note on the quote. */}
-            {claimEvidence.length === 0 ? <p className="cw-muted">No evidence is linked to this claim yet.</p> : <ol className="cw-evs">{claimEvidence.map(row => <li className={`cl-ev cl-ev-${row.stance}`} key={row.id}>
-              <StanceMark stance={row.stance}/>
-              <div className="cl-ev-body">
-                {row.evidence?.locator || row.note ? <Reveal detail={<>
-                  {row.evidence?.locator && <span className="rv-row">Exact locator: {row.evidence.locator}</span>}
-                  {row.note && <span className="rv-row">Reporter note: {row.note}</span>}
-                </>}><blockquote className="cw-quote">{row.evidence?.quote || row.evidence?.notes || 'Evidence record'}</blockquote></Reveal>
-                  : <blockquote className="cw-quote">{row.evidence?.quote || row.evidence?.notes || 'Evidence record'}</blockquote>}
-                {row.source?.title && <span className="cl-ev-src">{row.source.url ? <a href={row.source.url} target="_blank" rel="noreferrer">{row.source.title}</a> : row.source.title}</span>}
-              </div>
-              <Reveal tabbable={false} describe={false} detail="Trace its provenance">
-                <button type="button" className="cw-icon" aria-label="Trace provenance" onClick={() => openProvenance({
-                  title: selectedClaim.text, kind: `claim evidence: ${row.stance}`, sourceId: row.evidence?.source_id, sourceUrl: row.source?.url ?? undefined,
-                  locator: row.evidence?.locator ?? undefined, detail: row.evidence?.quote || row.evidence?.notes || undefined,
-                  acceptedRecordType: 'evidence', acceptedRecordId: row.evidence?.id,
-                })}><Route size={15} aria-hidden="true"/></button></Reveal>
-            </li>)}</ol>}
+            {claimEvidence.length === 0 ? <p className="cw-muted">No evidence is linked to this claim yet.</p> : <ol className="cw-evs">{claimEvidence.map(row => {
+              const gone = row.superseded ?? null;
+              const words = row.evidence?.quote || row.evidence?.notes || 'Evidence record';
+              const quote = <blockquote className="cw-quote">{gone ? <s>{words}</s> : words}</blockquote>;
+              const lit = Boolean(replacer && row.evidence?.id === replacer && !gone);
+              return <li className={`cl-ev cl-ev-${row.stance}${gone ? ' cl-ev-gone' : ''}${lit ? ' cl-ev-replacer' : ''}`} key={row.id}
+                onPointerEnter={gone?.by_evidence_id ? () => setReplacer(gone.by_evidence_id ?? null) : undefined}
+                onPointerLeave={gone?.by_evidence_id ? () => setReplacer(null) : undefined}>
+                <StanceMark stance={row.stance}/>
+                <div className="cl-ev-body">
+                  {gone || row.evidence?.locator || row.note ? <Reveal detail={<>
+                    {gone && supersededDetail(gone)}
+                    {row.evidence?.locator && <span className="rv-row">Exact locator: {row.evidence.locator}</span>}
+                    {row.note && <span className="rv-row">Reporter note: {row.note}</span>}
+                  </>}>{quote}</Reveal> : quote}
+                  {row.source?.title && <span className="cl-ev-src">{row.source.url ? <a href={row.source.url} target="_blank" rel="noreferrer">{row.source.title}</a> : row.source.title}</span>}
+                  {superseding === row.id && <SupersedeForm row={row} linked={claimEvidence} pool={pool} busy={supersedeBusy}
+                    onSave={(reason, by) => void markSuperseded(row.id, reason, by)} onCancel={() => setSuperseding(null)}/>}
+                </div>
+                <span className="cl-ev-acts">
+                  {gone && <Reveal tabbable={false} describe={false} detail="Undo: count it toward the claim again">
+                    <button type="button" className="cw-icon" aria-label="Undo superseded" disabled={supersedeBusy}
+                      onClick={() => void markSuperseded(row.id, null, null)}><Undo2 size={15} aria-hidden="true"/></button></Reveal>}
+                  <Reveal tabbable={false} describe={false} detail={gone ? 'Change what replaced it, or why' : 'Mark superseded by a newer record'}>
+                    <button type="button" className="cw-icon" aria-label={gone ? 'Change the superseded mark' : 'Mark superseded'} aria-expanded={superseding === row.id}
+                      onClick={() => setSuperseding(v => (v === row.id ? null : row.id))}><Replace size={15} aria-hidden="true"/></button></Reveal>
+                  <Reveal tabbable={false} describe={false} detail="Trace its provenance">
+                    <button type="button" className="cw-icon" aria-label="Trace provenance" onClick={() => openProvenance({
+                      title: selectedClaim.text, kind: `claim evidence: ${row.stance}`, sourceId: row.evidence?.source_id, sourceUrl: row.source?.url ?? undefined,
+                      locator: row.evidence?.locator ?? undefined, detail: row.evidence?.quote || row.evidence?.notes || undefined,
+                      acceptedRecordType: 'evidence', acceptedRecordId: row.evidence?.id,
+                    })}><Route size={15} aria-hidden="true"/></button></Reveal>
+                </span>
+              </li>;
+            })}</ol>}
 
             {attaching && <div className="cw-pool">
               <div className="cw-pool-bar">

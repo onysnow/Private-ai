@@ -1817,6 +1817,18 @@ class StanceCountsOut(ResponseModel):
     context: int
 
 
+class ClaimEvidenceSupersededOut(ResponseModel):
+    """A link marked superseded by a newer record: shown, no longer counted for or against the claim."""
+    at: Timestamp
+    by_evidence_id: str | None = None  # the record that replaces it; null when that record is not in the case
+    by_label: str | None = None  # its source's title
+    by_locator: str | None = None
+    reason: str
+    # Who marked it, as signed in then; null outside a request.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
+
+
 class ClaimEvidenceLinkOut(ResponseModel):
     """The link itself, as stored (the reply to linking evidence to a claim)."""
     id: str
@@ -1828,6 +1840,7 @@ class ClaimEvidenceLinkOut(ResponseModel):
     decided_by_id: str | None = None
     decided_by_name: str | None = None
     created_at: Timestamp
+    superseded: ClaimEvidenceSupersededOut | None = None
 
 
 class EvidenceClaimLinkOut(ResponseModel):
@@ -1835,6 +1848,7 @@ class EvidenceClaimLinkOut(ResponseModel):
     evidence_id: str
     claim_id: str
     stance: str  # supports | contradicts | context
+    superseded: bool = False  # marked superseded by a newer record: no longer counts toward the claim
 
 
 class ClaimEvidenceRowOut(ResponseModel):
@@ -1846,6 +1860,7 @@ class ClaimEvidenceRowOut(ResponseModel):
     created_at: Timestamp
     evidence: EvidenceOut | None = None
     source: SourceOut | None = None
+    superseded: ClaimEvidenceSupersededOut | None = None
 
 
 class ClaimDependentRelationshipOut(ResponseModel):
@@ -1906,7 +1921,8 @@ class ClaimReviewWorkspaceOut(ResponseModel):
     evidence: list[ClaimEvidenceRowOut]
     dependent_relationships: list[ClaimDependentRelationshipOut]
     review_history: list[ClaimReviewEventOut]
-    stance_counts: StanceCountsOut
+    stance_counts: StanceCountsOut  # links that count: a superseded link is in none of them
+    superseded_count: int = 0
     # How many separate sources the linked evidence comes from (what the evidence grade is judged on, with the stances).
     source_count: int = 0
     # What Supported and Confirmed still need.
@@ -2908,6 +2924,7 @@ class CustodyRowOut(ResponseModel):
     source: CustodySourceOut | None = None
     anchor: CustodyAnchorOut | None = None
     rests_on: list[CustodyRestingOut] = []
+    superseded: ClaimEvidenceSupersededOut | None = None  # still in the chain, no longer counted in the seal
 
 
 class CustodyAiOut(ResponseModel):
@@ -2990,6 +3007,7 @@ class StoryEvidenceOut(ResponseModel):
     source_id: str | None = None
     locator: str | None = None
     quote: str | None = None  # the passage's own words (shown on a citation's hover, and beside the text)
+    superseded: ClaimEvidenceSupersededOut | None = None  # shown struck, not counted (single-source and the gates)
 
 
 class StoryClaimOut(ResponseModel):

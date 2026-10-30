@@ -50,10 +50,13 @@ export function PassagePane({claim, onClose}: {claim: CitableClaim | undefined; 
     {!claim ? <p className="sy-quiet">This citation’s claim is no longer in the story.</p> : <>
       <p className="sy-pane-claim"><StatusChip status={STATE_CHIP[claim.state]}/> {claim.text}</p>
       {(claim.evidence ?? []).length ? <ol className="sy-passages">
-        {(claim.evidence ?? []).map(e => <li key={e.id} className={e.stance === 'contradicts' ? 'against' : ''}>
+        {(claim.evidence ?? []).map(e => <li key={e.id} className={`${e.stance === 'contradicts' ? 'against' : ''}${e.superseded ? ' gone' : ''}`}>
           <small><Reveal label={STANCE[e.stance]?.word ?? 'Context only'} detail={STANCE[e.stance]?.word ?? 'Context only'}><span className="sy-stance" aria-hidden="true">{STANCE[e.stance]?.mark ?? '·'}</span></Reveal>{' '}
             {e.locator ? <Reveal detail={e.locator}><span>{e.label}</span></Reveal> : e.label}</small>
-          {e.quote ? <blockquote>{e.quote}</blockquote> : <p className="sy-quiet">No words quoted from this passage yet.</p>}
+          {e.superseded && <Reveal detail={<><b>Superseded{e.superseded.by_label ? ` by ${e.superseded.by_label}` : ''}</b>
+            <span className="rv-row">{e.superseded.reason}</span><span className="rv-row">Not counted toward the claim.</span></>}>
+            <small className="sy-gone">superseded</small></Reveal>}
+          {e.quote ? <blockquote>{e.superseded ? <s>{e.quote}</s> : e.quote}</blockquote> : <p className="sy-quiet">No words quoted from this passage yet.</p>}
         </li>)}
       </ol> : <p className="sy-quiet">No passage linked to this claim yet.</p>}
     </>}

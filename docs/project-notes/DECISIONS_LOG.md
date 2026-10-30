@@ -615,3 +615,30 @@ works as a panel should, rather than adding a second dossier drawer beside it.
   per device. Up to 900 px wide the slot fills the screen, as before; at phone width (640 px and under) it is a bottom
   sheet, 86% of the height, with a grab bar, and a swipe down closes it.
 - **Motion.** It slides in from the right (up, as a sheet); with reduced motion or the calm setting it appears at once.
+
+## 36. Claim evidence can be marked superseded by a newer record (30 Oct 2026)
+
+A claim's evidence could only support, contradict or give context, so a figure a later judgment corrected kept counting
+as support. Calls:
+- **A mark beside the stance, not a fourth stance.** The link keeps what it said (supports, contradicts, context) and is
+  marked superseded, with why (required: the suite changes no status without a stated basis) and the record that
+  replaces it (optional: it may not be in the case yet; it must be another record of the same case, and two records
+  cannot replace each other). Who marked it and when are stamped like every decision (`app/db/decided_by.py`); marking
+  again after an undo stamps again. Undo clears the mark: the link counts again.
+- **Shown, never counted.** A superseded link stays on every screen, struck and faded, and counts nowhere support is
+  counted: the stance counts and sources on Claims, the Done rules (a superseded contradiction needs no answer either, as
+  RAS Module 07 rule 5 has it for a superseded dissenting source), the Story's single-source gate (a claim left on one
+  record is single-source), Chain of Custody's seal and "what rests on it" (the row stays, its wire faded and saying
+  "superseded", the mark in the log), the evidence pack (an exhibit still, said to be superseded, with what replaced it
+  and why; a claim resting only on superseded evidence is listed as a gap), Missing values (a Supported claim whose
+  support is all superseded), a link's claim dependencies, a lead's stance counts, the case home's sources for and against,
+  the evidence-by-stance chart (its own bar) and the authenticity preview.
+- **On screen:** Claims shows the struck quote; what replaced it, why, who and when on hover, and pointing at it lights
+  the record that replaced it in the list. "Mark superseded" is a row icon on hover; Undo stays in sight on a superseded
+  row. A superseded count shows beside the stance counts only when there is one. The Story's chips put a superseded
+  record after the ones that count, struck, its replacement on hover.
+- **Backups** carry the five new columns as they are; a restore refuses a link marked superseded by evidence outside the
+  backup.
+- **Suite gap** (logged in `suite_map.json`, `SUITE_GAPS.md`): TAS §7.3 has superseded as a document state and RAS
+  Module 07 a research source's `currency_status`; neither names the record that replaces it, nor marks one claim's
+  evidence. The app uses the suite's word and rules, but the TAS Claim record would need a `superseded_by` on its evidence.

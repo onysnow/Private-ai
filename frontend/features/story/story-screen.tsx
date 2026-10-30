@@ -338,22 +338,27 @@ function Tree({story, lit, setLit, byId, canDrag, gates, thesisForm, tray, onRem
 /** A claim's records as one-line chips: each record once (a source quoted twice is one chip), named by its short
  * label, the first two on the card, the rest counted; a chip's full title and place in the record on hover. */
 function EvidenceChips({evidence}: {evidence: StoryOut['sections'][number]['claims'][number]['evidence']}): ReactElement {
+  // A record a newer one replaces (marked superseded on the Claims screen) is its own chip, struck, after the records
+  // that count: it rests nothing, so it never takes one of the two places shown. What replaced it is on hover.
   const seen = new Map<string, typeof evidence>();
-  for (const e of evidence) {
-    const key = `${e.source_id ?? e.label}|${e.stance === 'contradicts'}`;
+  for (const e of [...evidence].sort((a, b) => Number(Boolean(a.superseded)) - Number(Boolean(b.superseded)))) {
+    const key = `${e.source_id ?? e.label}|${e.stance === 'contradicts'}|${Boolean(e.superseded)}`;
     seen.set(key, [...(seen.get(key) ?? []), e]);
   }
   const records = [...seen.values()];
+  const replaced = (e: typeof evidence[number]) => e.superseded
+    ? <span className="rv-row">Superseded{e.superseded.by_label ? ` by ${e.superseded.by_label}` : ''}: {e.superseded.reason} · not counted</span> : null;
   const chip = (group: typeof evidence) => {
     const e = group[0];
     const where = group.map(x => x.locator).filter(Boolean).join(' · ');
-    return <Reveal key={e.id} tabbable={false} describe={false} detail={<>{e.stance === 'contradicts' && <b>Against · </b>}{e.label}{where ? <> · {where}</> : null}</>}>
-      <span className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>{e.short || e.label}</span></Reveal>;
+    return <Reveal key={e.id} tabbable={false} describe={false} detail={<>{e.stance === 'contradicts' && <b>Against · </b>}{e.label}{where ? <> · {where}</> : null}{replaced(e)}</>}>
+      <span className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}${e.superseded ? ' gone' : ''}`}>{e.superseded ? <s>{e.short || e.label}</s> : e.short || e.label}</span></Reveal>;
   };
   const rest = records.slice(2);
   return <>{records.slice(0, 2).map(chip)}
     {rest.length > 0 && <Reveal tabbable={false} describe={false} detail={<span className="sy-ev-more">{rest.map(g => <span key={g[0].id} className="rv-row">
-      {g[0].stance === 'contradicts' ? 'Against · ' : ''}{g[0].label}</span>)}</span>}><span className="sy-ev-chip sy-ev-n">+{rest.length}</span></Reveal>}</>;
+      {g[0].stance === 'contradicts' ? 'Against · ' : ''}{g[0].superseded ? <s>{g[0].label}</s> : g[0].label}{g[0].superseded ? ' · superseded' : ''}</span>)}</span>}>
+      <span className="sy-ev-chip sy-ev-n">+{rest.length}</span></Reveal>}</>;
 }
 
 /** The case's claims not yet in the story, grouped by the party they name (the server's `about`), so a group becomes a
@@ -392,7 +397,7 @@ function Outline({story}: {story: StoryOut}): ReactElement {
     <li><b>Thesis:</b> {story.thesis}
       <ol>{story.sections.map(s => <li key={s.id}><b>{s.title}</b> · {s.shown} of {s.total} shown
         <ol>{s.claims.map(c => <li key={c.id}>{c.state === 'shown' ? '✓' : c.state === 'disputed' ? '✕' : '○'} {c.text}
-          <ul>{c.evidence.map(e => <li key={e.id}>{e.stance === 'contradicts' ? 'against: ' : ''}{e.label}{e.locator ? `, ${e.locator}` : ''}</li>)}</ul></li>)}</ol></li>)}</ol>
+          <ul>{c.evidence.map(e => <li key={e.id}>{e.stance === 'contradicts' ? 'against: ' : ''}{e.label}{e.locator ? `, ${e.locator}` : ''}{e.superseded ? ' (superseded)' : ''}</li>)}</ul></li>)}</ol></li>)}</ol>
     </li>
   </ol>;
 }

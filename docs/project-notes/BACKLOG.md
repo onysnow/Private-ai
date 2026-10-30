@@ -377,7 +377,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
 
 ## Still open from before
 - See ("The Wire") prototype awaits approval: SEE_THE_WIRE_PROTOTYPE.md.
-- Documents have no kind/language field. Claim evidence can't be "superseded". ~~Payments can't be typed.~~ Done 30 Oct: a payment has a kind (a transfer, loan, fee, settlement, agreed price, fine, or ordered); a fine, an order or an agreed price is owed, not money that moved (DECISIONS_LOG 33).
+- Documents have no kind/language field. ~~Claim evidence can't be "superseded".~~ Done 30 Oct: a claim's evidence can be marked superseded, with a reason and what replaced it, and stops counting as support (DECISIONS_LOG 36). ~~Payments can't be typed.~~ Done 30 Oct: a payment has a kind (a transfer, loan, fee, settlement, agreed price, fine, or ordered); a fine, an order or an agreed price is owed, not money that moved (DECISIONS_LOG 33).
 
 ## Case home: built vs the approved mockup (Ony sent both, 12 Oct)
 The mockup is the Kestrel SA screen in the redesign PDF; the built one is the Demo Investigation home. To match:
