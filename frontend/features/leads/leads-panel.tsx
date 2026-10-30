@@ -11,7 +11,7 @@ import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
 
-import {LeadsKanbanBoard} from '../../components/leads-kanban-board';
+import {LeadsKanbanBoard, NewLead} from '../../components/leads-kanban-board';
 import {LeadsHorizons} from './leads-horizons';
 import type {Horizon} from './leads-horizons';
 import type {LeadCard, LeadLinkCard, TaskCard} from '../../components/leads-kanban-board';
@@ -42,8 +42,8 @@ export function LeadsPanel({investigationId}: Props): ReactElement {
   const leads: LeadOut[] = queue.data?.items ?? [];
   const reloadLeads = () => queryClient.invalidateQueries({queryKey: leadQueueKey(investigationId)});
 
-  const createLead = async () => {
-    if (!investigationId || !leadTitle.trim()) return;
+  const createLead = async (): Promise<boolean> => {
+    if (!investigationId || !leadTitle.trim()) return false;
     try {
       const created = (await createLeadEndpoint({body: {investigation_id: investigationId, title: leadTitle.trim(), detail: leadDetail.trim() || null, status: 'unreviewed'}, throwOnError: true})).data;
       await updateLeadEndpoint({path: {lead_id: created.id}, body: {priority: leadPriority, owner: leadOwner.trim() || null}, throwOnError: true});
@@ -51,8 +51,10 @@ export function LeadsPanel({investigationId}: Props): ReactElement {
       setLeadDetail('');
       setProblem('');
       await reloadLeads();
+      return true;
     } catch (error) {
       setProblem(errorMessage(error, 'Could not add the lead'));
+      return false;
     }
   };
 
@@ -120,9 +122,13 @@ export function LeadsPanel({investigationId}: Props): ReactElement {
       className={`rounded-md border px-2.5 py-1 ${view === id ? 'bg-muted font-medium' : 'text-muted-foreground'}`} onClick={() => setView(id)}>{label}</button>)}
   </div>;
 
+  const newLead = <NewLead leadTitle={leadTitle} setLeadTitle={setLeadTitle} leadDetail={leadDetail} setLeadDetail={setLeadDetail}
+    leadPriority={leadPriority} setLeadPriority={setLeadPriority} leadOwner={leadOwner} setLeadOwner={setLeadOwner} onCreateLead={createLead}/>;
+
   return <LeadsKanbanBoard
     leads={leads} problem={trouble} viewSwitch={viewSwitch}
-    board={view === 'horizons' ? <LeadsHorizons leads={leads} onMove={setLeadHorizon} onStatus={setLeadStatus} onConvert={convertLead}/> : undefined}
+    board={view === 'horizons' ? <LeadsHorizons leads={leads} onMove={setLeadHorizon} onStatus={setLeadStatus} onConvert={convertLead}
+      tools={<>{viewSwitch}{newLead}</>}/> : undefined}
     leadTitle={leadTitle} setLeadTitle={setLeadTitle} leadDetail={leadDetail} setLeadDetail={setLeadDetail}
     leadPriority={leadPriority} setLeadPriority={setLeadPriority} leadOwner={leadOwner} setLeadOwner={setLeadOwner}
     onCreateLead={createLead} onStatusChange={setLeadStatus} onTraceLink={traceLink} onTraceTask={traceTask} onTaskStatus={setTaskStatus} onConvert={convertLead}

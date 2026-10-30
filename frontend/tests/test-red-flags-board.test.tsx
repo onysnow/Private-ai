@@ -5,7 +5,7 @@ import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-libr
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {RedFlagsBoard, changesSince, ladder, monthTicks, placeLabels} from '../features/act/red-flags-board';
+import {RedFlagsBoard, changesSince, ladder, metBy, monthTicks, placeLabels, shortInnocent} from '../features/act/red-flags-board';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -50,6 +50,29 @@ describe('the level ladder', () => {
     expect(rungs[0].needs).toEqual(['whether the money was cash', 'whether it was split']);
     expect(rungs[1].text).toBe('No published threshold for this rung yet.');
     expect(rungs[2].text).toBe('Found 4.');
+  });
+});
+
+describe('the ladder says what met it (30 Oct sweep)', () => {
+  it('gives the reached rung its rule and the facts that meet it; a rung with no rule of its own is met by the one above', () => {
+    const loop = flag('f9', BO, 'textbook', 1, {facts: {family: 'cycle', parties_in_loop: 2, amounts: ['378000000 USD', '430000000 USD'], band_reason: ''}});
+    const rungs = ladder(loop as never);
+    expect(rungs.map(r => r.state)).toEqual(['met', 'met', 'met']);
+    expect(rungs[0].text).toBe('Meets the published definition as worded');
+    expect(rungs[0].found).toEqual(['2 parties in the loop', '378,000,000 USD · 430,000,000 USD']);
+    expect(rungs[1].text).toBe('');
+    expect(rungs[1].found).toBeUndefined();
+  });
+  it('reads counts, dates and holders from the rule\'s facts', () => {
+    expect(metBy(flag('a', BO, 'faint', 1, {facts: {count_text: '2 payments', holders: 'Eric Tan (ownership)'}}) as never)).toEqual(['2 payments', 'held by Eric Tan (ownership)']);
+    expect(metBy(flag('b', BO, 'faint', 1, {facts: {payments: 1, amount: '210,000,000 USD', date_from: '2013-03-21', date_to: '2013-03-21'}}) as never))
+      .toEqual(['1 payment', '210,000,000 USD', '21 Mar 2013']);
+    expect(metBy(flag('c', BO, 'faint', 1, {facts: {}}) as never)).toEqual([]);
+  });
+  it('cuts an innocent explanation to a short title', () => {
+    expect(shortInnocent('Group cash pooling')).toBe('Group cash pooling');
+    expect(shortInnocent('Round-trip foreign investment for tax or regulatory reasons (may itself be problematic but is not necessarily laundering)'))
+      .toBe('Round-trip foreign investment for tax or…');
   });
 });
 
@@ -336,6 +359,35 @@ describe('scroll over the picture', () => {
     expect(list.querySelectorAll('li')).toHaveLength(8);
     expect(list.querySelectorAll('li')[7]).toHaveTextContent('1 Aug 2019 no amount “None stated”');
     expect(screen.getByRole('link', {name: 'Show in money flows'})).toBeInTheDocument();
+  });
+});
+
+describe('the centre and the sides (30 Oct sweep)', () => {
+  const pay = (id: string, amount: number, date: string, certainty: string) => ({id, relationship_id: id, amount, currency: 'USD', dateTime: date, certainty,
+    evidence: null, evidence_count: 0, supporting_evidence_count: 0, status: 'no_claim_dependency',
+    flowType: 'direct', from: 'Harbour Nominees', from_entity_id: 'hn', to: 'Fernhill Ltd', to_entity_id: 'fh', statedPurpose: null, transactionNumber: null, locator: null});
+  it('draws a loop\'s payments under the loop, a met rung with what met it, and long innocent explanations short with the text on reveal', async () => {
+    const long = 'Round-trip foreign investment for tax or regulatory reasons (may itself be problematic but is not necessarily laundering)';
+    const loop = flag('f5', indicator('ML-023', 'Circular payments', {}), 'textbook', 2, {
+      parties: [{id: 'hn', name: 'Harbour Nominees', schema: 'Company'}, {id: 'fh', name: 'Fernhill Ltd', schema: 'Company'}],
+      links: ['p1', 'p2'], facts: {family: 'cycle', parties_in_loop: 2, amounts: ['378000000 USD', '430000000 USD'], band_reason: ''},
+      innocent: [{text: 'Group cash pooling', state: 'not_looked_at', note: null}, {text: long, state: 'not_looked_at', note: null}]});
+    mockApi({...routes, 'GET /api/investigations/inv-1/red-flags': body([loop]),
+      'GET /api/investigations/inv-1/financial-flows': {investigation_id: 'inv-1', currencies: [], flow_type_rule: '', duplicate_rule: '', incomplete: [],
+        transactions: [{...pay('p2', 430000000, '2013-04-01', 'shown'), from: 'Fernhill Ltd', to: 'Harbour Nominees'}, {...pay('p1', 378000000, '2013-03-01', 'shown'), from: 'Harbour Nominees', to: 'Fernhill Ltd'}]}});
+    renderBoard();
+    expect(await screen.findByRole('figure', {name: /^A loop:/})).toBeInTheDocument();
+    const pays = await screen.findByRole('figure', {name: 'The 2 payments it rests on'});
+    expect(pays.querySelectorAll('li')[0]).toHaveTextContent('1 Mar 2013 378,000,000 USD Harbour Nominees → Fernhill Ltd');
+    const rung = screen.getByRole('region', {name: 'Level ladder: what would raise it'}).querySelector('.rung-met.rk-textbook')!;
+    expect(seen(rung)).toContain('Meets the published definition as worded');
+    expect(within(rung as HTMLElement).getByLabelText('Found: 2 parties in the loop, 378,000,000 USD · 430,000,000 USD')).toBeInTheDocument();
+    const before = screen.getByRole('complementary', {name: 'Before you call it'});
+    expect(within(before).getByText('Round-trip foreign investment for tax or…').closest('.rv')).toHaveAccessibleDescription(long);
+    expect(within(before).getByText('Group cash pooling').closest('.rv')).toBeNull();
+    // The carriers' names are one line; the whole name is revealed on the ring.
+    const carrier = screen.getByRole('button', {name: 'Harbour Nominees: 1 flag'});
+    expect(carrier.closest('.rv')).not.toBeNull();
   });
 });
 

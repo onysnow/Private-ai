@@ -914,3 +914,28 @@ NOTIFY_PUSH_SUBJECT, ENABLE_AI_FEATURES) in the panes. Calls:
   the card (and stay in its accessible name). "+ Make your own" explains itself on hover. Of the four facts, the check
   result shows; the other three are names with their detail on hover. Calm motion joined the effect switches' grid and
   Status marks' three choices sit on one line.
+
+## 48. Act sweep: Leads, AI drafts, Red Flags and Charts to the hover and fill rules (30 Oct 2026)
+
+A read-only sweep of Act at 1440×900 on the 1MDB demo found chrome at rest and empty space. Calls:
+- **Leads:** the add-lead form (inputs and a big textarea, a third of the screen) folds into one "+ New lead" button
+  beside the view switch; it unfolds in place, folds on Cancel or Esc, and folds by itself once the lead is added. The
+  lone ⇄ is named on hover ("Moving a lead", with the keys). Counts are part of column titles ("Next 1", "Now 4 / 5",
+  "Done 0" as a title-styled toggle, not "Done (0)"); "not yet placed" is the Inbox title's reveal. A card's status
+  glyph sits before its title, and owner, source, tasks and evidence counts share one last line, so a lead with only
+  a title is one line, not a lone "○".
+- **AI drafts:** AI off (or no model chosen) is the AI mark, hollow and grey, its sentence on hover, with "Settings ›"
+  beside it, as DECISIONS_LOG 27 decided for AI runs. With no drafts, the screen shows what a draft is as its path
+  (Ask → AI draft → You decide, each step's explanation on hover) and, beside it, the case's claims a draft could test
+  (disputed and not-yet-shown first, ruled-out left out; `features/ai/draftable-claims.tsx`), each with "Ask ›",
+  which opens Ask the case with the claim as the question. Nothing runs from here.
+- **Red Flags vs ACT_1:** every rung shows its rule; the rung at the flag's level adds "Found" with the facts in the
+  records that meet it, read from the rule's own measurement (counts, parties in the loop, amounts, dates, holders).
+  A rung with no rule of its own says on hover that the rung above meets it. The centre draws the payments a flag
+  rests on for every family whose links are payments (the loop's payments, the payments between companies with one
+  holder, a single payment with no stated purpose), not only for the band rule. "Parties carrying flags" names are
+  one line, cut, the full name on hover. "Could be innocent" items show a short title (the text before a
+  parenthesis or semicolon, about 48 characters), the full text on reveal; the checklist actions are unchanged.
+- **Charts:** layout only. Before a question is chosen, the main area is a gallery of every chart the catalogue can
+  make, grouped by question with their record counts; a card chooses its question and its data at once. The rail
+  still works step by step.

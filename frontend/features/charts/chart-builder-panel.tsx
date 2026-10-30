@@ -188,10 +188,23 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
       </fieldset>
 
       <div className="cb-main">
-        {!question ? <div className="cb-ask">
-          <p>Start with the question the chart answers.</p>
-          <span className="cb-muted">The data and the kinds of chart that can answer it follow from it.</span>
-        </div> : <>
+        {!question ? <section className="cb-gallery" aria-label="Charts you can make">
+          {/* Before a question is chosen: every chart the catalogue can make, as cards by question with their record
+              counts; a card chooses its question and its data at once. The rail does the same one step at a time. */}
+          <p className="cb-gallery-head"><Reveal detail="Choose a card, or a question on the left. The data and the kinds of chart that can answer it follow from it.">
+            <span>Start with the question the chart answers.</span></Reveal></p>
+          {questions.filter(q => q.drawn_kinds.length && queriesFor(catalog.data, q).length).map(q => {
+            const Icon = QUESTION_ICON[q.id] ?? ChartColumn;
+            return <div key={q.id} className="cb-gallery-group" role="group" aria-label={q.label}>
+              <h3><Icon size={18} aria-hidden="true"/>{q.label}</h3>
+              <div className="cb-data">{queriesFor(catalog.data, q).map(d => <button type="button" key={d.name} disabled={!d.has_data}
+                className="cb-d" onClick={() => { setQuestionId(q.id); chooseQuery(d.name, queriesFor(catalog.data, q), q); }}
+                aria-label={`${q.label}: ${d.label}${d.has_data ? ` · ${d.record_count} ${d.record_noun}` : ' · no records yet'}`}>
+                <b>{d.has_data ? d.record_count : '0'}</b><span className="cb-d-noun">{d.has_data ? d.record_noun : 'no records yet'}</span><span className="cb-d-label">{d.label}</span>
+              </button>)}</div>
+            </div>;
+          })}
+        </section> : <>
           <fieldset className="cb-step">
             <legend>{query ? <Reveal detail={query.description}><span>2. Which data answers it?</span></Reveal> : '2. Which data answers it?'}</legend>
             {queries.length === 0 ? <p className="cb-muted">No data in the catalogue answers this question yet.</p> : <>

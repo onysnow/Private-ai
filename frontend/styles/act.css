@@ -245,3 +245,10 @@ html[data-motion='calm'] .rb-open[data-dir] > *, html[data-motion='calm'] .rb-op
 .rung-head b { font-size: 11.5px; }
 .rb-acts { gap: 8px; }
 .rb-acts > button, .rb-acts > .rv > button, .rb-link-btn { padding: 11px 14px; font-size: 14px; }
+
+/* Red Flags, 30 Oct sweep: a met rung shows its rule and what met it; the carriers' names one line, cut. */
+.rung-found { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: baseline; font-size: 12px; }
+.rung-found b { font: 700 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--status-supported); }
+.rung-found span { padding: 1px 7px; border-radius: 999px; background: var(--surface-1); box-shadow: inset 0 0 0 1px var(--line); font-family: var(--font-mono); font-size: 11.5px; }
+.rb-carrier small { display: block; max-width: 62px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inn-title { line-height: 1.4; }

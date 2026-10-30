@@ -116,6 +116,24 @@ describe('ChartBuilderPanel', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
+  it('fills the screen with every chart it can make, as cards by question with their record counts; a card chooses both', async () => {
+    const {user} = await openBuilder();
+    // (Another branch opens the catalogue with the screen; either way the gallery is what shows first.)
+    const build = screen.queryByRole('button', {name: 'Build a chart'});
+    if (build) await user.click(build);
+    const gallery = await screen.findByRole('region', {name: 'Charts you can make'});
+    const groups = within(gallery).getAllByRole('group').map(g => g.getAttribute('aria-label'));
+    expect(groups).toEqual(['Ranking', 'Change over time', 'Part of a whole', 'Distribution', 'Correlation']);   // Flow is not drawn yet
+    const ranking = within(within(gallery).getByRole('group', {name: 'Ranking'}));
+    expect(ranking.getByRole('button', {name: 'Ranking: Payments by party · 5 payments'})).toHaveTextContent('5payments');
+    expect(ranking.getByRole('button', {name: 'Ranking: Documents by status · no records yet'})).toBeDisabled();
+    await user.click(within(within(gallery).getByRole('group', {name: 'Part of a whole'})).getByRole('button', {name: /^Part of a whole: Payments by party/}));
+    expect(screen.queryByRole('region', {name: 'Charts you can make'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Part of a whole'})).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('radio', {name: 'Payments by party · 5 payments'})).toHaveAttribute('aria-checked', 'true');
+    expect(within(screen.getByRole('group', {name: 'Chart kind'})).getAllByRole('button')[0]).toHaveTextContent('100% bar');
+  });
+
   it('offers only the data that answers the question and the kinds that can draw it', async () => {
     const {user} = await openBuilder();
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));

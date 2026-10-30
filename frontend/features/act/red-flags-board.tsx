@@ -62,8 +62,10 @@ export function groupFlags(flags: RedFlagOut[]): Kind[] {
   return [...kinds.values()].sort((a, b) => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level) || b.weight - a.weight || a.name.localeCompare(b.name));
 }
 
-/** Each rung of the ladder: met, next (with the catalogue's wording), not set, or needing facts only a person can give. */
-export type Rung = {level: 'textbook' | 'strong' | 'faint'; state: 'met' | 'next' | 'not_set' | 'needs'; text: string; needs: string[]};
+/** Each rung of the ladder: met, next (with the catalogue's wording), not set, or needing facts only a person can give.
+ *  A met rung carries its rule (empty when the catalogue sets none for it: it is met because a rung above it is) and,
+ *  on the flag's own level, the facts in the records that meet it. */
+export type Rung = {level: 'textbook' | 'strong' | 'faint'; state: 'met' | 'next' | 'not_set' | 'needs'; text: string; needs: string[]; found?: string[]};
 export function ladder(flag: RedFlagOut): Rung[] {
   const at = LEVEL_ORDER.indexOf(flag.level);
   const lv = flag.indicator?.levels;
@@ -71,11 +73,41 @@ export function ladder(flag: RedFlagOut): Rung[] {
   return (['textbook', 'strong', 'faint'] as const).map(level => {
     const text = (lv?.[level] ?? '') as string;
     const reached = LEVEL_ORDER.indexOf(level) >= at;
-    if (reached) return {level, state: 'met', text: level === flag.level && band ? band : UNSET.test(text) ? 'Reached' : text, needs: []};
+    if (reached) return {level, state: 'met', text: level === flag.level && band ? band : UNSET.test(text) ? '' : text, needs: [],
+      found: level === flag.level ? metBy(flag) : undefined};
     if (UNSET.test(text) || !text) return {level, state: 'not_set', text: 'No published threshold for this rung yet.', needs: []};
     if (level === 'textbook' && flag.not_shown.length) return {level, state: 'needs', text, needs: flag.not_shown};
     return {level, state: 'next', text, needs: []};
   });
+}
+
+const MONEY = /^(-?\d+(?:\.\d+)?)\s*([A-Z]{3})$/;
+/** "378000000 USD" as "378,000,000 USD"; other text as it is. */
+const money = (v: string): string => { const m = MONEY.exec(v.trim()); return m ? `${Number(m[1]).toLocaleString('en-GB')} ${m[2]}` : v.trim(); };
+/** What in the records meets the flag's level, from the rule's own measurement (its facts), a few short items. */
+export function metBy(flag: RedFlagOut): string[] {
+  const f = flag.facts as {count_text?: string; payments?: number; parties_in_loop?: number; amounts?: string[]; amount?: string;
+    date?: string; date_from?: string; date_to?: string; holders?: string; kind?: string; value?: string};
+  const out: string[] = [];
+  if (f.count_text) out.push(f.count_text);
+  else if (typeof f.payments === 'number' && f.payments > 0) out.push(`${f.payments} payment${f.payments === 1 ? '' : 's'}`);
+  if (typeof f.parties_in_loop === 'number') out.push(`${f.parties_in_loop} parties in the loop`);
+  const amounts = Array.isArray(f.amounts) ? f.amounts.filter(a => typeof a === 'string') : f.amount ? [f.amount] : [];
+  if (amounts.length) out.push(amounts.slice(0, 3).map(money).join(' · ') + (amounts.length > 3 ? ` +${amounts.length - 3}` : ''));
+  const from = f.date_from ?? f.date; const to = f.date_to;
+  if (from && /^\d{4}-\d{2}-\d{2}/.test(from)) out.push(to && to !== from && /^\d{4}-\d{2}-\d{2}/.test(to) ? `${dateWords(from.slice(0, 10))} – ${dateWords(to.slice(0, 10))}` : dateWords(from.slice(0, 10)));
+  if (f.holders) out.push(`held by ${f.holders}`);
+  if (f.kind && f.value) out.push(`same ${f.kind}: “${f.value}”`);
+  return out.slice(0, 4);
+}
+
+/** An innocent explanation's short title: the text before a parenthesis, a semicolon or a dash, cut at a word near 48
+ *  characters. The full text is revealed on it when they differ. */
+export function shortInnocent(text: string): string {
+  const head = text.split(/\s*(?:\(|;|\s[—–-]\s|:\s)/)[0].trim() || text.trim();
+  if (head.length <= 48) return head;
+  const cut = head.slice(0, 48); const sp = cut.lastIndexOf(' ');
+  return `${(sp > 24 ? cut.slice(0, sp) : cut).replace(/[,.]$/, '')}…`;
 }
 
 function lastVisitKey(inv: string): string { return `pai:flags-visit:${inv}`; }
@@ -362,9 +394,10 @@ export function RedFlagsBoard({investigationId}: {investigationId: string}): Rea
         </div>
         {carriers.length > 0 && <section className="rb-carriers" aria-label="Parties carrying flags">
           <p className="rb-eyebrow">Parties carrying flags</p>
-          <div>{carriers.map(c => <button key={c.id} type="button" className={`rb-carrier rk-${c.top}${party === c.id ? ' on' : ''}`} aria-pressed={party === c.id}
+          {/* One line per name, cut; the full name on hover. */}
+          <div>{carriers.map(c => <Reveal key={c.id} tabbable={false} describe={false} detail={<><b>{c.name}</b> · {c.n} flag{c.n === 1 ? '' : 's'}</>}><button type="button" className={`rb-carrier rk-${c.top}${party === c.id ? ' on' : ''}`} aria-pressed={party === c.id}
             onClick={() => setParty(p => (p === c.id ? '' : c.id))} aria-label={`${c.name}: ${c.n} flag${c.n === 1 ? '' : 's'}`}>
-            <span className="rb-ring">{c.n}</span><small>{c.name}</small></button>)}</div>
+            <span className="rb-ring">{c.n}</span><small aria-hidden="true">{c.name}</small></button></Reveal>)}</div>
         </section>}
       </div>
 
@@ -416,11 +449,13 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
         <ol>{ladder(flag).map(r => <li key={r.level} className={`rung rung-${r.state} rk-${r.level}`}>
           {/* The ladder teaches the levels, so its rungs keep their words whatever Status marks says. */}
           <span className="rung-head"><FlagMark level={r.level} showWord/>
-            {/* A met rung's wording is on hover; the rungs still to reach keep theirs (what would raise it). */}
-            {r.state === 'met' ? <Reveal detail={r.text}><b>✓ Met</b></Reveal>
+            {/* Every rung shows its rule; a met rung with no rule of its own says why on hover. */}
+            {r.state === 'met' ? (r.text ? <b>✓ Met</b> : <Reveal detail="No separate threshold for this rung: it is met because a rung above it is."><b>✓ Met</b></Reveal>)
               : r.state === 'needs' ? <Reveal detail="Only a person can decide these."><b>Needs {r.needs.length} fact{r.needs.length === 1 ? '' : 's'}</b></Reveal>
               : <b>{r.state === 'not_set' ? 'Not set' : 'Next'}</b>}</span>
-          {r.state !== 'met' && <span className="rung-text">{r.text}</span>}
+          {r.text && <span className="rung-text">{r.text}</span>}
+          {r.found && r.found.length > 0 && <span className="rung-found" aria-label={`Found: ${r.found.join(', ')}`}>
+            <b aria-hidden="true">Found</b>{r.found.map(x => <span key={x} aria-hidden="true">{x}</span>)}</span>}
           {r.needs.length > 0 && <><ul>{r.needs.map(n => <li key={n}>○ {n}</li>)}</ul>
             <small><Link href={caseHref('/check#to-check', investigationId)}>Open them in To check</Link></small></>}
         </li>)}</ol>
@@ -459,7 +494,9 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
 function Picture({flag, investigationId, onParty, filtered = ''}: {flag: RedFlagOut; investigationId: string; onParty?: (id: string) => void; filtered?: string}): ReactElement {
   const family = (flag.facts as {family?: string})?.family;
   const listed = family === 'missing_property' && flag.links.length > 1;
-  const ledger = useQuery({...getInvestigationFinancialFlowsOptions({path: {investigation_id: investigationId}}), enabled: family === 'count_in_band' || listed});
+  // Any flag whose links include payments draws them too (the loop's payments, the payments between two companies
+  // with one holder, a single payment with no stated purpose): the payments it rests on (mockup ACT_1).
+  const ledger = useQuery({...getInvestigationFinancialFlowsOptions({path: {investigation_id: investigationId}}), enabled: flag.links.length > 0});
   if (family === 'count_in_band') {
     const ids = new Set(flag.links);
     const pays = (ledger.data?.transactions ?? []).filter(t => ids.has(t.id) && t.dateTime).sort((a, b) => (a.dateTime! < b.dateTime! ? -1 : 1));
@@ -482,25 +519,30 @@ function Picture({flag, investigationId, onParty, filtered = ''}: {flag: RedFlag
     if (!rows.length && ledger.isPending) return <p className="rb-quiet">Reading the payments…</p>;
     return <PaymentList names={names} rows={rows} count={flag.links.length}/>;
   }
+  const linkedIds = new Set(flag.links);
+  const linked = [...(ledger.data?.transactions ?? []), ...(ledger.data?.incomplete ?? [])].filter(t => linkedIds.has(t.id))
+    .sort((a, b) => ((a.dateTime ?? '9') < (b.dateTime ?? '9') ? -1 : 1));
+  const withPayments = (figure: ReactElement): ReactElement => linked.length
+    ? <>{figure}<PaymentList names={[]} rows={linked} count={linked.length}/></> : figure;
   if (family === 'shared_property') {
     // Two (or more) parties and the one detail they share, with no link drawn between them: none is in the records.
     const facts = flag.facts as {kind?: string; value?: string; spellings?: string[]};
     const others = (facts.spellings ?? []).filter(v => v !== facts.value);
-    return <figure className="rb-picture rb-shared" aria-label={`${names.join(' and ')} share the ${facts.kind ?? 'detail'} ${facts.value ?? ''}`}>
+    return withPayments(<figure className="rb-picture rb-shared" aria-label={`${names.join(' and ')} share the ${facts.kind ?? 'detail'} ${facts.value ?? ''}`}>
       <figcaption><Reveal detail="No link joins them in the records."><span>What they share</span></Reveal></figcaption>
       <p className="rb-shared-row">{names.map((_n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> · </i>}{who(i)}</span>)}</p>
       <p className="rb-shared-value"><small>{facts.kind ?? 'detail'}</small> “{facts.value}”{others.length > 0 && <i> also written “{others.join('”, “')}”</i>}</p>
-    </figure>;
+    </figure>);
   }
-  if (family === 'cycle') return <figure className="rb-picture rb-loop" aria-label={`A loop: ${names.join(' → ')} → ${names[0]}`}>
+  if (family === 'cycle') return withPayments(<figure className="rb-picture rb-loop" aria-label={`A loop: ${names.join(' → ')} → ${names[0]}`}>
     <figcaption><span>The loop it rests on</span></figcaption>
     <p>{names.map((_n, i) => <span key={i}>{who(i)} → </span>)}<b>{names[0]}</b> ↺</p>
-  </figure>;
-  return <figure className="rb-picture rb-chain" aria-label={`The parties it rests on: ${names.join(', ')}`}>
+  </figure>);
+  return withPayments(<figure className="rb-picture rb-chain" aria-label={`The parties it rests on: ${names.join(', ')}`}>
     <figcaption><span>The parties it rests on</span>{unshown(flag) > 0 && <Reveal detail={`${unshown(flag)} link${unshown(flag) === 1 ? '' : 's'} not yet shown`}>
       <small className="rb-rests">○ {unshown(flag)}</small></Reveal>}</figcaption>
     <p>{names.map((_n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}{who(i)}</span>)}</p>
-  </figure>;
+  </figure>);
 }
 
 type Box = {x0: number; x1: number; y0: number; y1: number};
@@ -550,15 +592,15 @@ export function PaymentList({names, rows, count}: {names: string[]; rows: Ledger
   const [all, setAll] = useState(false);
   const shown = all ? rows : rows.slice(0, LIST_FIRST);
   const day = (iso: string) => dateWords(iso.slice(0, 10));
-  return <figure className="rb-picture rb-pay-list" aria-label={`${count} payments from ${names.join(' to ')}`}>
-    <figcaption><span>The payments it rests on</span><small>{count} payments</small></figcaption>
-    <p>{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}<b>{n}</b></span>)}</p>
+  return <figure className="rb-picture rb-pay-list" aria-label={names.length ? `${count} payments from ${names.join(' to ')}` : `The ${count === 1 ? 'payment' : `${count} payments`} it rests on`}>
+    <figcaption><span>The payment{count === 1 ? '' : 's'} it rests on</span><small>{count} payment{count === 1 ? '' : 's'}</small></figcaption>
+    {names.length > 0 && <p>{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}<b>{n}</b></span>)}</p>}
     <ol>{shown.map(t => <li key={t.id}>
       <span className={`rb-pay-dot c-${t.certainty}`} role="img" title={CERTAINTY_WORD[t.certainty]} aria-label={CERTAINTY_WORD[t.certainty]}/>
       {/* The spaces keep the words apart for a screen reader; a grid draws no space-only text. */}
       {' '}<span className="rb-pay-day">{t.dateTime ? day(t.dateTime) : 'no date'}</span>
       {' '}<b>{t.amount != null ? `${t.amount.toLocaleString('en-GB')} ${t.currency ?? ''}`.trim() : 'no amount'}</b>
-      {t.statedPurpose && <>{' '}<i>“{t.statedPurpose}”</i></>}
+      {t.statedPurpose ? <>{' '}<i>“{t.statedPurpose}”</i></> : !names.length && (t.from || t.to) ? <>{' '}<i>{t.from ?? '?'} → {t.to ?? '?'}</i></> : null}
     </li>)}</ol>
     {rows.length > LIST_FIRST && <button type="button" className="rb-link-btn" onClick={() => setAll(v => !v)}>
       {all ? 'Show fewer' : `Show all ${rows.length}`}</button>}
@@ -659,7 +701,8 @@ function BeforeYouCallIt({flag, investigationId, ranAt}: {flag: RedFlagOut; inve
         <Reveal label={INNOCENT_WORD[i.state]} detail={<><b>{INNOCENT_WORD[i.state]}</b>{i.note && i.state !== 'not_looked_at' ? `: ${i.note}` : ''}</>}>
           <span className="inn-mark" aria-hidden="true">{i.state === 'ruled_out' ? '✓' : i.state === 'could_apply' ? '!' : '○'}</span></Reveal>
         <span className="inn-body">
-          <span>{i.text}</span>
+          {shortInnocent(i.text) === i.text.trim() ? <span className="inn-title">{i.text}</span>
+            : <Reveal detail={i.text}><span className="inn-title">{shortInnocent(i.text)}</span></Reveal>}
           {ruling === i.text ? <Form {...ruleOut}><form className="inn-why" noValidate onSubmit={submitWith(ruleOut, async ({note}) => {
             // The failure shows in this form, so not again under the list.
             try { await mark.mutateAsync({path: {flag_id: flag.id}, body: {text: i.text, state: 'ruled_out', note}}); } catch (error) { mark.reset(); throw error; }
