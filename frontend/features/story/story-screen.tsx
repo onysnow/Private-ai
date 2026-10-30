@@ -79,6 +79,9 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   const put = (data: StoryOut) => queryClient.setQueryData(getStoryQueryKey({path}), data);
   const thesisM = useMutation({...setStoryThesisMutation(), onSuccess: put});
   const sectionM = useMutation({...addStorySectionMutation(), onSuccess: put});
+  // A group made a section in one move has its own save, so its failure shows over the tree while the Add section form keeps
+  // reporting its own failure in the form, once.
+  const groupSectionM = useMutation({...addStorySectionMutation(), onSuccess: put});
   const placeM = useMutation({...placeStoryClaimMutation(), onSuccess: put});
   const removeM = useMutation({...removeStoryClaimMutation(), onSuccess: put});
   const gateM = useMutation({...recordStoryGateMutation(), onSuccess: put});
@@ -98,7 +101,7 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   const [moreOpen, setMoreOpen] = useState(false);
   const [building, setBuilding] = useState(false);
   // The thesis, a new section, a gate and "Ready to run" show a failed save in their own forms.
-  const problem = [placeM, removeM, gateM, writeM, sectionM].find(m => m.isError)?.error;
+  const problem = [placeM, removeM, gateM, writeM, groupSectionM].find(m => m.isError)?.error;
   const notes = useQuery({...getNotesOptions({path, query: {record_type: 'story', record_id: story?.id ?? ''}}), enabled: Boolean(story?.id)});
 
   // Claims of the story, numbered in the tree's order: the numbers on the citation chips.
@@ -110,12 +113,12 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   const makeSection = useCallback(async (title: string, claimIds: string[]) => {
     setBuilding(true);
     try {
-      const made = await sectionM.mutateAsync({path, body: {title}});
+      const made = await groupSectionM.mutateAsync({path, body: {title}});
       const section = [...made.sections].reverse().find(x => x.title === title);
       for (const id of section ? claimIds : []) await placeM.mutateAsync({path: {...path, section_id: section!.id}, body: {claim_id: id}});
     } catch { /* the failure shows over the tree */ } finally { setBuilding(false); }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- path is rebuilt each render from investigationId
-  }, [investigationId, sectionM, placeM]);
+  }, [investigationId, groupSectionM, placeM]);
 
   useEffect(() => {
     if (!active) return;
