@@ -80,7 +80,7 @@ export function dotRadius(name: string): number | null {
 export const PLACE_DOT = dotName(PLACE_RADIUS);
 
 /** What each place on a map carries: its name, its dot, and whether it is picked out. */
-export type PlaceMark = {entity_id?: string; caption: string; dot: string; picked: boolean; sure?: string};
+export type PlaceMark = {entity_id?: string; caption: string; dot: string; picked: boolean; sure?: string; marked?: boolean};
 export type PlaceMarks = GeoJSON.FeatureCollection<GeoJSON.Point, PlaceMark>;
 
 /**
@@ -128,13 +128,14 @@ export function basemapLoader(client: Pick<ApiClient, 'blob'>) {
 export const PICKED_RADIUS = 10;   // px: a picked place's dot
 
 /** The places as GeoJSON points, each carrying its record's id and name;
- * the picked place's dot is larger and its name larger, as on a chart. */
-export function placesGeoJson(places: PlaceOut[], picked: string | null = null): PlaceMarks {
+ * the picked place's dot is larger and its name larger, as on a chart.
+ * `marked`: the places a picked party was seen at (Places' Path), ringed. */
+export function placesGeoJson(places: PlaceOut[], picked: string | null = null, marked: readonly string[] = []): PlaceMarks {
   return {
     type: 'FeatureCollection',
     features: places.map(p => ({type: 'Feature', geometry: {type: 'Point', coordinates: [p.longitude, p.latitude]},
       properties: {entity_id: p.entity_id, caption: p.caption, dot: p.entity_id === picked ? dotName(PICKED_RADIUS) : PLACE_DOT,
-        picked: p.entity_id === picked, sure: p.sure ?? 'not_yet'}})),
+        picked: p.entity_id === picked, sure: p.sure ?? 'not_yet', marked: marked.includes(p.entity_id)}})),
   };
 }
 
@@ -169,6 +170,9 @@ export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks,
     {id: 'places-area', type: 'circle', source: PLACES_SOURCE, filter: ['==', ['get', 'sure'], 'approximate'],
       paint: {'circle-radius': 26, 'circle-color': dark ? '#E8B04B' : PLACE_COLOUR, 'circle-opacity': 0.16,
         'circle-stroke-width': 1, 'circle-stroke-color': dark ? '#E8B04B' : PLACE_COLOUR, 'circle-stroke-opacity': 0.5}},
+    // The places a picked party was seen at (Places' Path): a ring around each dot.
+    {id: 'places-mark', type: 'circle', source: PLACES_SOURCE, filter: ['==', ['get', 'marked'], true],
+      paint: {'circle-radius': 15, 'circle-opacity': 0, 'circle-stroke-width': 2.5, 'circle-stroke-color': dark ? '#E8B04B' : PLACE_COLOUR}},
     // Every dot is drawn, and the base map's labels give way to it (see dotImage).
     {id: 'places-dot', type: 'symbol', source: PLACES_SOURCE,
       layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true}},
@@ -176,7 +180,10 @@ export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks,
     {id: 'places-name', type: 'symbol', source: PLACES_SOURCE,
       layout: {'text-field': ['get', 'caption'], 'text-font': PLACE_LABEL_FONT,
         'text-size': ['case', ['boolean', ['get', 'picked'], false], PICKED_LABEL_PX, PLACE_LABEL_PX], 'text-offset': [NAME_OFFSET_EM, 0],
-        'text-anchor': 'left', 'text-max-width': NAME_MAX_EM, 'text-allow-overlap': everyName},
+        'text-anchor': 'left', 'text-max-width': NAME_MAX_EM, 'text-allow-overlap': everyName,
+        // Where names collide, the picked place's and a marked place's name win; the others wait for a closer zoom
+        // (and every dot is named on hover, places-map.tsx).
+        'symbol-sort-key': ['case', ['boolean', ['get', 'picked'], false], 0, ['boolean', ['get', 'marked'], false], 1, 2]},
       paint: dark ? {'text-color': '#F2EEE6', 'text-halo-color': '#0B1220', 'text-halo-width': 1.5}
         : {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
   ];

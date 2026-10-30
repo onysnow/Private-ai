@@ -544,12 +544,13 @@ export function ListenRoom({doc, caseName, decideHref, onClose}: {doc: DocumentD
       </section>}
       <Voices doc={doc} v={t?.voices} onListening={() => setListeningSince(Date.now())} onChanged={words => { setStatus(words); void queryClient.invalidateQueries({queryKey: getDocumentTranscriptQueryKey({path: {document_id: doc.id}})}); }}/>
       <section className="lr-panel lr-facts-panel" aria-label="In this recording">
-        <p className="lr-cap"><Reveal detail={<dl className="lr-facts">
+        {/* A div, not a p: the reveal holds a list, which a paragraph cannot. */}
+        <div className="lr-cap"><Reveal detail={<dl className="lr-facts">
           <div><dt>Spoken parts</dt><dd>{spoken.length}</dd></div>
           <div><dt>No speech</dt><dd>{silent.length}</dd></div>
           <div><dt>Machine unsure</dt><dd>{unsureCount} word{unsureCount === 1 ? '' : 's'}</dd></div>
           <div><dt>Language</dt><dd>{about.language ? `${about.language.length <= 3 ? about.language.toUpperCase() : about.language} · ${Math.round((about.language_probability ?? 0) * 100)}%` : '–'}</dd></div>
-        </dl>}>In this recording</Reveal>{about.language && <span>{about.language.length <= 3 ? about.language.toUpperCase() : about.language}</span>}</p>
+        </dl>}>In this recording</Reveal>{about.language && <span>{about.language.length <= 3 ? about.language.toUpperCase() : about.language}</span>}</div>
         {waiting > 0 && <p className="lr-note"><a href={decideHref}>{waiting} proposal{waiting === 1 ? '' : 's'} from this transcript</a> wait in Decide.</p>}
       </section>
     </aside>

@@ -22,10 +22,10 @@ import {mockApi} from '../test-support/mock-api';
 import {basemapStatusBody, placesBody} from '../test-support/page-routes';
 import {placeEventWhen} from '../features/places/places-timeline';
 
-type Handler = (event: {features?: {properties: Record<string, unknown>}[]}) => void;
-const {maps, protocols} = vi.hoisted(() => ({maps: [] as FakeMapInstance[], protocols: [] as string[]}));
+type Handler = (event: {features?: {properties: Record<string, unknown>; geometry?: {type: string; coordinates: number[]}}[]}) => void;
+const {maps, protocols, popups} = vi.hoisted(() => ({maps: [] as FakeMapInstance[], protocols: [] as string[], popups: [] as {text: string; at: unknown; shown: boolean}[]}));
 type FakeMapInstance = {options: {style: {sources: Record<string, unknown>; layers: {id: string}[]}; bounds?: number[]; center?: number[]};
-  handlers: Record<string, Handler>; removed: boolean; data: unknown[]; images: Record<string, {image: {width: number}; options: unknown}>; resolver: (id: string) => void};
+  handlers: Record<string, Handler>; removed: boolean; data: unknown[]; fitted: {points: number[][]}[]; images: Record<string, {image: {width: number}; options: unknown}>; resolver: (id: string) => void};
 
 vi.mock('maplibre-gl', () => {
   class FakeMap {
@@ -42,9 +42,20 @@ vi.mock('maplibre-gl', () => {
     addImage(id: string, image: {width: number}, options: unknown) { this.images[id] = {image, options}; }
     getCanvas() { return {style: {cursor: ''}}; }
     getSource() { return {setData: (d: unknown) => this.data.push(d)}; }
+    fitted: unknown[] = [];
+    fitBounds(bounds: unknown) { this.fitted.push(bounds); return this; }
     remove() { this.removed = true; }
   }
-  return {Map: FakeMap, NavigationControl: class {}, addProtocol: (name: string) => protocols.push(name), setWorkerUrl: () => undefined};
+  class FakePopup {
+    text = ''; at: unknown = null; shown = false;
+    constructor() { popups.push(this); }
+    setLngLat(at: unknown) { this.at = at; return this; }
+    setText(text: string) { this.text = text; return this; }
+    addTo() { this.shown = true; return this; }
+    remove() { this.shown = false; return this; }
+  }
+  class FakeBounds { points: number[][] = []; extend(p: number[]) { this.points.push(p); return this; } }
+  return {Map: FakeMap, NavigationControl: class {}, Popup: FakePopup, LngLatBounds: FakeBounds, addProtocol: (name: string) => protocols.push(name), setWorkerUrl: () => undefined};
 });
 vi.mock('maplibre-gl/dist/maplibre-gl.css', () => ({}));
 // next/dynamic resolves the import as React.lazy would, so the tests see the real components once loaded.
@@ -54,11 +65,6 @@ vi.mock('next/dynamic', () => ({
     return (props: Record<string, unknown>) => <Suspense fallback={null}><Lazy {...props}/></Suspense>;
   },
 }));
-// The timeline strip's ECharts: the fake keeps the props it is handed (the option, the events, the ready callback).
-const {strips} = vi.hoisted(() => ({strips: [] as Record<string, unknown>[]}));
-vi.mock('echarts-for-react/lib/core', () => ({
-  default: (props: Record<string, unknown>) => { strips.push(props); return <canvas data-testid="echarts-canvas"/>; },
-}));
 
 const place = (id: string, caption: string, latitude: number, longitude: number, extra: Partial<PlaceOut> = {}): PlaceOut => ({
   entity_id: id, caption, schema: 'RealEstate', latitude, longitude, address: null, country: null, links: [], ...extra});
@@ -67,7 +73,7 @@ const VILLA = place('villa', 'Villa Kyrenia', 35.3364, 33.3199, {country: 'cy', 
 const OFFICE = place('office', 'Meridian registered office', 51.5072, -0.1276, {schema: 'Address', address: '1 Example Street, London'});
 const STATUS = basemapStatusBody(true);
 
-beforeEach(() => { maps.length = 0; strips.length = 0; connectGeneratedClient(new ApiClient('http://api.test')); useWorkbenchStore.setState({investigationId: 'inv-1', dossier: null}); });
+beforeEach(() => { maps.length = 0; popups.length = 0; connectGeneratedClient(new ApiClient('http://api.test')); useWorkbenchStore.setState({investigationId: 'inv-1', dossier: null}); });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
 describe('placeEventWhen', () => {
@@ -127,6 +133,11 @@ describe('PlacesMap', () => {
     expect(maps[0].options.bounds).toEqual([-0.1276, 35.3364, 33.3199, 51.5072]);
     act(() => maps[0].handlers['click:places-dot']({features: [{properties: {entity_id: 'villa'}}]}));
     expect(onPlace).toHaveBeenCalledWith('villa');
+    // Every dot can be named: hovering it names it, even where its label gave way to another's.
+    act(() => maps[0].handlers['mouseenter:places-dot']({features: [{properties: {caption: 'Villa Kyrenia'}, geometry: {type: 'Point', coordinates: [33.3199, 35.3364]}}]}));
+    expect(popups.at(-1)).toMatchObject({text: 'Villa Kyrenia', at: [33.3199, 35.3364], shown: true});
+    act(() => maps[0].handlers['mouseleave:places-dot']({}));
+    expect(popups.at(-1)!.shown).toBe(false);
     // MapLibre asks for the dot once it draws the places; it is made then, once.
     maps[0].resolver(PLACE_DOT);
     maps[0].resolver(PLACE_DOT);
@@ -213,55 +224,82 @@ describe('PlacesPanel', () => {
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [council, land]), 'GET /api/basemap': STATUS});
     wrap(<PlacesPanel investigationId="inv-1"/>);
     await screen.findByRole('region', {name: /Map of 2 places/});
-    await userEvent.setup().click(await screen.findByRole('button', {name: 'M. Ross'}));
+    await userEvent.setup().click(within(await screen.findByRole('group', {name: 'Path'})).getByRole('button', {name: 'M. Ross'}));
     expect(screen.getByText(/^Council House 15 Jan 2019 → The harbour land 14 Aug 2019/)).toBeInTheDocument();
     expect(screen.getByText('Dashed hops rest on records not yet verified.')).toBeInTheDocument();
     const line = maps.at(-1)!.data.at(-1) as {features: {geometry: {coordinates: number[][]}}[]};
     expect(line.features[0].geometry.coordinates).toEqual([[-4.133, 50.353], [-4.129, 50.35]]);
   });
 
-  it('draws a strip of the events at each place, and two dates keep the places with an event between them', async () => {
-    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, VILLA_DATED]), 'GET /api/basemap': STATUS});
+  it('draws a strip with a row per place, and two typed dates keep the places with an event between them', async () => {
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, VILLA_DATED, place('bare', 'No dates here', 1, 1)]), 'GET /api/basemap': STATUS});
     wrap(<PlacesPanel investigationId="inv-1"/>);
-    await screen.findByTestId('places-timeline');
-    const strip = strips.at(-1)!;
-    const option = strip.option as {yAxis: {data: string[]}; series: {data: {placeId: string; value: number[]}[]}[]; useUTC: boolean};
-    expect(option.useUTC).toBe(true);
-    expect(option.yAxis.data).toEqual(['Villa Kyrenia', 'Meridian registered office']);   // the axis runs upward: the first place reads at the top
-    // A month-only date covers the month: from its first day to the end of its last.
-    const stake = option.series[0].data.find(mark => mark.value[1] === Date.UTC(2021, 1, 1))!;
-    expect(stake.value.slice(2)).toEqual([Date.UTC(2021, 2, 1), 0]);
-    expect(screen.getByRole('img', {name: /Timeline of 2 places with dated events, from 4 Mar 2019 to 14 Nov 2023/})).toBeInTheDocument();
+    const strip = within(await screen.findByTestId('places-timeline'));
+    expect(screen.getByRole('group', {name: /Timeline of 2 places with dated events, from 4 Mar 2019 to 14 Nov 2023/})).toBeInTheDocument();
+    // One readable row per place with dated events, in the places' order; the rest counted in one line.
+    expect(strip.getAllByRole('listitem').map(li => li.textContent)).toEqual(['Meridian registered office', 'Villa Kyrenia']);
+    expect(strip.getByText('+1 place with no dated event')).toBeInTheDocument();
+    // A date known only to the month is a hollow mark.
+    expect(strip.getByRole('button', {name: /^Stake starts, .*verified$/})).toHaveClass('hollow');
+    expect(strip.getByText('2020')).toBeInTheDocument();   // year ticks
 
-    // From 2021 to 2022: only the villa had an event then.
+    // From 2021 to 2022, typed in the window's own control: only the villa had an event then.
     const user = userEvent.setup();
+    await user.click(strip.getByRole('button', {name: /All dates; type/}));
     fireEvent.change(screen.getByLabelText('From'), {target: {value: '2021-01-01'}});
     fireEvent.change(screen.getByLabelText('To'), {target: {value: '2022-12-31'}});
-    expect(await screen.findByTestId('places-window')).toHaveTextContent('Showing 1 of 2 places with events between 2021 and 2022');
+    expect(await screen.findByTestId('places-window')).toHaveTextContent('Showing 1 of 3 places with events between 2021 and 2022');
     expect(screen.getByText(/Showing the places with an event between 1 Jan 2021 and 31 Dec 2022/)).toBeInTheDocument();
     await screen.findByRole('region', {name: /Map of 1 place/});
-    expect(maps.at(-1)!.options.style.sources).toBeDefined();
-    // The strip shades the stretch and greys the events outside it.
-    const shaded = strips.at(-1)!.option as {series: {markArea?: {data: {xAxis: number}[][]}}[]};
-    expect(shaded.series[0].markArea?.data[0].map(end => end.xAxis)).toEqual([Date.UTC(2021, 0, 1), Date.UTC(2023, 0, 1) - 1]);
+    // The events outside the window grey.
+    expect(strip.getByRole('button', {name: /^Office registered/})).toHaveClass('out');
+    expect(strip.getByRole('button', {name: /^Stake starts/})).not.toHaveClass('out');
+    expect(strip.getByRole('slider', {name: 'Window starts'})).toHaveAttribute('aria-valuetext', '1 Jan 2021');
 
     // Reset dates.
     await user.click(screen.getByRole('button', {name: 'Reset dates'}));
     expect(screen.queryByTestId('places-window')).toBeNull();
   });
 
-  it('picks a place on the strip: the panel tells it, and its dot stands out on the base map', async () => {
+  it('moves the window\'s edges from the keyboard: a month on the arrows, the ends on Home and End', async () => {
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, VILLA_DATED])});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    const start = await screen.findByRole('slider', {name: 'Window starts'});
+    expect(start).toHaveAttribute('aria-valuetext', '4 Mar 2019');
+    fireEvent.keyDown(start, {key: 'PageUp'});
+    expect(screen.getByRole('slider', {name: 'Window starts'})).toHaveAttribute('aria-valuetext', '3 Mar 2020');
+    expect(screen.getByRole('button', {name: /^Window 3 Mar 2020 – 14 Nov 2023/})).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole('slider', {name: 'Window starts'}), {key: 'Home'});
+    expect(screen.getByRole('button', {name: /All dates; type/})).toBeInTheDocument();   // the whole extent is no window
+  });
+
+  it('opens on the place with most dated events, and picks a place on the strip: the panel tells it, its dot stands out', async () => {
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, VILLA_DATED]), 'GET /api/basemap': STATUS});
     wrap(<PlacesPanel investigationId="inv-1"/>);
     await screen.findByTestId('places-timeline');
     await screen.findByRole('region', {name: /Map of 2 places/});
-    const strip = strips.at(-1)!;
-    const mark = (strip.option as {series: {data: unknown[]}[]}).series[0].data[0];
-    act(() => (strip.onEvents as Record<string, (p: unknown) => void>).click({data: mark}));
+    expect(screen.getByRole('heading', {name: 'Villa Kyrenia'})).toBeInTheDocument();   // two events, against the office's one
+    expect(screen.getByText('What happened here · 2')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: /^Office registered/}));
     expect(screen.getByRole('heading', {name: 'Meridian registered office'})).toBeInTheDocument();
     const dots = (maps.at(-1)!.data.at(-1) as {features: {properties: {entity_id: string; dot: string; picked: boolean}}[]}).features;
     expect(dots.find(f => f.properties.entity_id === 'office')?.properties).toMatchObject({dot: dotName(10), picked: true});
     expect(dots.find(f => f.properties.entity_id === 'villa')?.properties).toMatchObject({dot: PLACE_DOT, picked: false});
+  });
+
+  it('rings the places of a party seen at several places with no date to order them, and draws no line', async () => {
+    const yacht = (id: string, caption: string, lat: number, lon: number, rel: string) => place(id, caption, lat, lon, {links: [
+      {relationship_id: rel, schema: 'UnknownLink', direction: 'incoming', entity_id: 'boat', caption: 'M/Y Equanimity', entity_schema: 'Vessel'}]});
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [yacht('a', 'Villefranche', 43.7, 7.3, 'y1'), yacht('b', 'Benoa', -8.7, 115.2, 'y2')]), 'GET /api/basemap': STATUS});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    await screen.findByRole('region', {name: /Map of 2 places/});
+    await userEvent.setup().click(within(screen.getByRole('group', {name: 'Path'})).getByRole('button', {name: 'M/Y Equanimity'}));
+    expect(screen.getByText('Seen at 2 places · no dates to order them')).toBeInTheDocument();
+    const dots = (maps.at(-1)!.data.at(-1) as {features: {properties: {marked: boolean}}[]}).features;
+    expect(dots.map(f => f.properties.marked)).toEqual([true, true]);
+    expect(maps.at(-1)!.fitted.at(-1)!.points).toEqual([[7.3, 43.7], [115.2, -8.7]]);
+    const lines = maps.at(-1)!.data.filter(d => (d as {features: {geometry: {type: string}}[]}).features.every(f => f.geometry.type === 'LineString'));
+    expect((lines.at(-1) as {features: unknown[]}).features).toEqual([]);
   });
 
   it('reads the two dates as a stretch of time, and both ends at the events\' own as all of it', async () => {

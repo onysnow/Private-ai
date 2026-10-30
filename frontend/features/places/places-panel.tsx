@@ -18,13 +18,13 @@ import type {BasemapStatusOut, PlaceOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {dayText, eventWindow, placesInWindow} from '../../lib/place-times';
 import type {TimeWindow} from '../../lib/place-times';
-import {pathOf, travellers} from './places-model';
-import {FamilyMark, PartyMark} from '../../components/network/marks';
+import {pathOf, placeToOpen, travellers} from './places-model';
+import {FamilyMark, PartyGlyph, PartyMark} from '../../components/network/marks';
 import {Reveal} from '../../components/ui/reveal';
 import {Aside, FactMark, KeysMark} from '../timeline/marks';
+import {partyKind} from '../../lib/viz-tokens';
 
-const PlacesTimeline = dynamic(() => import('./places-timeline').then(m => m.PlacesTimeline),
-  {ssr: false, loading: () => <p className="muted">Loading timeline…</p>});
+import {PlacesTimeline} from './places-timeline';
 const PlacesMap = dynamic(() => import('../../components/places-map').then(m => m.PlacesMap),
   {ssr: false, loading: () => <p className="muted">Loading map…</p>});
 
@@ -61,12 +61,15 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
   const status = statusQuery.data;
   const flavor = useMapFlavor();
   const people = useMemo(() => travellers(all), [all]);
+  const traveller = people.find(t => t.id === path) ?? null;
   const hops = path ? pathOf(places, path) : [];
   const countries = new Set(all.map(p => p.country).filter(Boolean));
-  const sel = all.find(p => p.entity_id === picked) ?? null;
+  // The panel opens on a place worth seeing (the most dated events), never on an empty column.
+  const sel = all.find(p => p.entity_id === picked) ?? placeToOpen(places) ?? placeToOpen(all);
+  const shownPick = sel?.entity_id ?? null;
   const pick = (id: string) => setPicked(id);
   const step = (d: 1 | -1) => {
-    const i = places.findIndex(p => p.entity_id === picked);
+    const i = places.findIndex(p => p.entity_id === shownPick);
     const next = places[(i + d + places.length) % places.length];
     if (next) setPicked(next.entity_id);
   };
@@ -75,7 +78,7 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
     if (ev.key === 'l' || ev.key === 'L') { ev.preventDefault(); setList(v => !v); }
     if (ev.key === 'ArrowRight') { ev.preventDefault(); step(1); }
     if (ev.key === 'ArrowLeft') { ev.preventDefault(); step(-1); }
-    if (ev.key === 'Enter' && picked) { ev.preventDefault(); openDossier(picked); }
+    if (ev.key === 'Enter' && shownPick && !(ev.target as HTMLElement).closest('button, a')) { ev.preventDefault(); openDossier(shownPick); }
   };
 
   if (placesQuery.isError) return <p className="muted">{errorMessage(placesQuery.error, 'Could not read the places')}</p>;
@@ -101,16 +104,9 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
     {(all.length > 0 || omitted.length > 0) && <div className="pl-body">
       <div className="pl-main">
         {list ? <PlacesList places={places} omitted={omitted} onPick={pick} openDossier={openDossier}/> : <>
-          {people.length > 0 && <div className="pl-tools">
-            <div className="tl2-views" role="group" aria-label="Path">
-              <span className="tl2-cap">Path</span>
-              {people.slice(0, 4).map(t => <button key={t.id} aria-pressed={path === t.id} onClick={() => setPath(p => (p === t.id ? null : t.id))}>{t.caption}</button>)}
-              <button aria-pressed={path === null} onClick={() => setPath(null)}>None</button>
-            </div>
-          </div>}
           <div className="pl-map">
-            {status?.available ? <PlacesMap status={status} places={places} onPlace={pick} picked={picked} height="100%" flavor={flavor}
-              path={hops.map(h => [h.place.longitude, h.place.latitude] as [number, number])}/>
+            {status?.available ? <PlacesMap status={status} places={places} onPlace={pick} picked={shownPick} height="100%" flavor={flavor}
+              path={hops.map(h => [h.place.longitude, h.place.latitude] as [number, number])} marked={traveller?.places ?? []}/>
               : <MapComing status={status} onRetry={() => void statusQuery.refetch()}/>}
             {timeWindow && <p className="pl-window" data-testid="places-window">Showing {places.length} of {all.length} places with events between {years}.
               <button className="tp-link" onClick={() => setTimeWindow(null)}>Reset dates</button></p>}
@@ -123,9 +119,23 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
               {omitted.length > 6 && <button className="tp-link" onClick={() => setList(true)}>{omitted.length - 6} more in the List view</button>}</>}
             </div>}
           </div>
-          {hops.length > 1 && <p className="pl-hops">{hops.map(h => `${h.place.caption} ${dayText(Date.parse(`${h.day}T00:00:00Z`))}`).join(' → ')}
-            {hops.some(h => !h.shown) ? <> <Aside label="Dashed hops">Dashed hops rest on records not yet verified.</Aside></> : null}</p>}
-          <div className="pl-strip"><PlacesTimeline places={all} picked={picked} timeWindow={timeWindow} onWindow={setTimeWindow} onPick={pick}/></div>
+          {/* Path: a party moving between places. Dated hops draw a line in date order; a party seen at several
+              places with no date to order them has its places ringed, with no line. */}
+          {people.length > 0 && <div className="pl-tools">
+            <div className="tl2-views" role="group" aria-label="Path">
+              <span className="tl2-cap">Path</span>
+              {people.slice(0, 4).map(t => <button key={t.id} aria-pressed={path === t.id} onClick={() => setPath(p => (p === t.id ? null : t.id))}>{t.caption}</button>)}
+              <button aria-pressed={path === null} onClick={() => setPath(null)}>None</button>
+            </div>
+            {hops.length > 1 && <p className="pl-hops">{hops.map(h => `${h.place.caption} ${dayText(Date.parse(`${h.day}T00:00:00Z`))}`).join(' → ')}
+              {hops.some(h => !h.shown) ? <> <Aside label="Dashed hops">Dashed hops rest on records not yet verified.</Aside></> : null}</p>}
+            {traveller && hops.length < 2 && <p className="pl-hops">
+              <Reveal detail="No dated event orders these places, so no line is drawn between them: the places are ringed on the map.">
+                <span>Seen at {traveller.places.length} places · no dates to order them</span></Reveal>
+              {all.filter(p => traveller.places.includes(p.entity_id)).map(p =>
+                <button key={p.entity_id} className="tp-link" onClick={() => pick(p.entity_id)}>{p.caption}</button>)}</p>}
+          </div>}
+          <div className="pl-strip"><PlacesTimeline places={all} picked={shownPick} timeWindow={timeWindow} onWindow={setTimeWindow} onPick={pick}/></div>
         </>}
       </div>
       <PlaceDetail place={sel} onStep={step} openDossier={openDossier} timeWindow={timeWindow}/>
@@ -168,27 +178,32 @@ function MapComing({status, onRetry}: {status: BasemapStatusOut | undefined; onR
 }
 
 function PlaceDetail({place, onStep, openDossier, timeWindow}: {place: PlaceOut | null; onStep: (d: 1 | -1) => void; openDossier: (id: string) => void; timeWindow: TimeWindow | null}): ReactElement {
-  if (!place) return <aside className="tl2-side" aria-label="Place"><p className="tl2-cap">Place</p>
-    <p className="tl2-none">Click a place on the map, the list or the strip.</p></aside>;
+  if (!place) return <aside className="tl2-side pl-side" aria-label="Place"><p className="tl2-cap">Place</p>
+    <p className="tl2-none">Every place on the map is listed under List.</p></aside>;
   const events = [...(place.events ?? [])].sort((a, b) => a.first_day.localeCompare(b.first_day));
   const parties = Array.from(new Map(place.links.map(l => [l.entity_id, l])).values());
-  return <aside className="tl2-side" aria-label="Place">
+  const sure = SURE[place.sure ?? 'not_yet'];
+  return <aside className="tl2-side pl-side" aria-label="Place">
     <p className="tl2-cap">Place <span><button className="tp-link" onClick={() => onStep(-1)} aria-label="Previous place">←</button> <button className="tp-link" onClick={() => onStep(1)} aria-label="Next place">→</button></span></p>
-    <h3>{place.caption}</h3>
-    {place.address && <p className="tl2-none">{place.address}</p>}
-    {/* How sure is the ring's colour; its word and the precision on reveal. */}
-    <div className="tl2-chips"><Reveal label={SURE[place.sure ?? 'not_yet'].chip} detail={<><b>{SURE[place.sure ?? 'not_yet'].word}</b>{place.precision ? <span className="rv-row">exact to the {place.precision}</span> : null}</>}>
-      <svg width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" className={`pl-ring s-${place.sure ?? 'not_yet'}`}/></svg></Reveal></div>
-    <dl className="tl2-dl"><dt>Placed from</dt><dd>{place.placed_from ?? 'its record, with no document behind the coordinates'}</dd>
-      <dt>Where</dt><dd><Reveal detail={coordinates(place)}><span>{place.country ? place.country.toUpperCase() : 'coordinates'}</span></Reveal></dd></dl>
+    <div className="pl-name">
+      {/* How sure is the ring's colour and shape (the map's own mark); its word and the precision on reveal. */}
+      <Reveal label={sure.chip} detail={<><b>{sure.word}</b>{place.precision ? <span className="rv-row">exact to the {place.precision}</span> : null}</>}>
+        <svg width="30" height="30" aria-hidden="true"><circle cx="15" cy="15" r="10" className={`pl-ring s-${place.sure ?? 'not_yet'}`}/><circle cx="15" cy="15" r="4" className="pl-ring-dot"/></svg></Reveal>
+      <h3>{place.caption}</h3>
+    </div>
+    {place.address && <Reveal className="block" detail={<>{place.address}<span className="rv-row">{coordinates(place)}</span></>}>
+      <p className="pl-addr">{place.address}</p></Reveal>}
+    <dl className="tl2-dl pl-dl"><dt>Placed from</dt><dd className="pl-from">{place.placed_from ?? 'its record, with no document behind the coordinates'}</dd>
+      <dt>Where</dt><dd><Reveal detail={coordinates(place)}><span>{place.country ? place.country.toUpperCase() : coordinates(place)}</span></Reveal></dd></dl>
     <p className="tl2-cap">What happened here · {events.length}</p>
     {events.length ? <ul className="pl-events">{events.map(e => {
       const inside = !timeWindow || (eventWindow(e).from < timeWindow.to && eventWindow(e).to > timeWindow.from);
       return <li key={e.id} className={inside ? '' : 'out'}><FactMark fact={e.verification_status === 'verified' ? 'shown' : 'not_yet'} note={e.verification_status}/>
         <time>{e.exact ? dayText(Date.parse(`${e.first_day}T00:00:00Z`)) : e.date_start}</time><span>{e.title}</span></li>; })}</ul>
-      : <p className="tl2-none">No dated event on the timeline points at this place yet.</p>}
-    {parties.length > 0 && <><p className="tl2-cap">Parties seen here</p>
-      <div className="pl-parties">{parties.map(l => <button key={l.entity_id} onClick={() => openDossier(l.entity_id)}>{l.caption}</button>)}</div></>}
+      : <p className="tl2-none">No dated event here yet.</p>}
+    {parties.length > 0 && <><p className="tl2-cap">Parties seen here · {parties.length}</p>
+      <div className="pl-parties">{parties.map(l => <button key={l.entity_id} onClick={() => openDossier(l.entity_id)} title={`${l.entity_schema ?? 'Record'}: open its record`}>
+        <PartyGlyph kind={partyKind(l.entity_schema)} size={12}/>{l.caption}</button>)}</div></>}
     <div className="tl2-acts"><button className="pri" onClick={() => openDossier(place.entity_id)}>Open the record</button></div>
   </aside>;
 }

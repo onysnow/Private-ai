@@ -66,12 +66,25 @@ export function pathOf(places: PlaceOut[], partyId: string): Hop[] {
   return hops.filter((h, i) => i === 0 || h.place.entity_id !== hops[i - 1].place.entity_id);
 }
 
-/** The parties whose path visits two places or more: the ones a path can be drawn for. */
-export function travellers(places: PlaceOut[]): Array<{id: string; caption: string; hops: number}> {
-  const seen = new Map<string, string>();
-  for (const p of places) for (const l of p.links) seen.set(l.entity_id, l.caption);
-  return [...seen].map(([id, caption]) => ({id, caption, hops: pathOf(places, id).length})).filter(t => t.hops >= 2)
-    .sort((a, b) => b.hops - a.hops || a.caption.localeCompare(b.caption));
+/** The parties a path can be drawn for: linked to two places or more. `hops` counts the dated hops that order the
+ *  path; a party seen at several places with no date to order them is still listed (its places are marked, no line). */
+export function travellers(places: PlaceOut[]): Array<{id: string; caption: string; hops: number; places: string[]}> {
+  const seen = new Map<string, {caption: string; places: Set<string>}>();
+  for (const p of places) for (const l of p.links) {
+    const entry = seen.get(l.entity_id) ?? {caption: l.caption, places: new Set<string>()};
+    entry.places.add(p.entity_id);
+    seen.set(l.entity_id, entry);
+  }
+  return [...seen].filter(([, e]) => e.places.size >= 2)
+    .map(([id, e]) => ({id, caption: e.caption, hops: pathOf(places, id).length, places: [...e.places]}))
+    .sort((a, b) => b.hops - a.hops || b.places.length - a.places.length || a.caption.localeCompare(b.caption));
+}
+
+/** The place worth opening on: the one with the most dated events, then the surest, then the most linked. */
+export function placeToOpen(places: PlaceOut[]): PlaceOut | null {
+  const rank = {document: 2, approximate: 1, not_yet: 0} as const;
+  return [...places].sort((a, b) => (b.events?.length ?? 0) - (a.events?.length ?? 0)
+    || rank[b.sure ?? 'not_yet'] - rank[a.sure ?? 'not_yet'] || b.links.length - a.links.length)[0] ?? null;
 }
 
 /** An address that holds several parties (companies registered there): how many. */
