@@ -353,7 +353,8 @@ def build(db: Session, documents: list[tuple[dict[str, Any], bytes | None]], *, 
         mime = "text/html" if meta["filename"].endswith(".html") else "application/pdf"
         doc = store_document(db, investigation_id=inv.id, title=meta["title"], filename=meta["filename"], mime_type=mime, data=data,
                              storage_dir=storage_dir, source_metadata={"url": meta["url"], "publisher": meta["publisher"], "date": meta["date"],
-                                                                       "licence": meta["licence_note"], "demo": "1mdb"})
+                                                                       "licence": meta["licence_note"], "demo": "1mdb",
+                                                                       **{k: meta[k] for k in ("kind", "language") if meta.get(k)}})
         source = db.get(Source, doc.source_id)
         if source is not None:
             source.url = meta["url"]

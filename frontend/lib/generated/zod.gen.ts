@@ -3427,6 +3427,32 @@ export const zDiskStatusOut = z.object({
 });
 
 /**
+ * DocumentAboutUpdate
+ *
+ * What a person says a document is and its language. Only the fields sent change; null clears one, and a value a
+ * person set is never replaced by the machine.
+ */
+export const zDocumentAboutUpdate = z.object({
+  kind: z
+    .enum([
+      'court_filing',
+      'judgment',
+      'official_record',
+      'article',
+      'press_release',
+      'email',
+      'social_post',
+      'spreadsheet',
+      'recording',
+      'photo',
+      'web_capture',
+      'other',
+    ])
+    .nullish(),
+  language: z.string().max(32).nullish(),
+});
+
+/**
  * DocumentChunkOut
  */
 export const zDocumentChunkOut = z.object({
@@ -3487,6 +3513,29 @@ export const zDocumentDetailOut = z.object({
   filename: z.string(),
   id: z.string(),
   investigation_id: z.string(),
+  kind: z
+    .enum([
+      'court_filing',
+      'judgment',
+      'official_record',
+      'article',
+      'press_release',
+      'email',
+      'social_post',
+      'spreadsheet',
+      'recording',
+      'photo',
+      'web_capture',
+      'other',
+    ])
+    .nullish(),
+  kind_by: z.string().nullish(),
+  kind_set_by: z.enum(['reader', 'source', 'detected', 'person']).nullish(),
+  language: z.string().nullish(),
+  language_by: z.string().nullish(),
+  language_confidence: z.number().nullish(),
+  language_name: z.string().nullish(),
+  language_set_by: z.enum(['reader', 'source', 'detected', 'person']).nullish(),
   languages: z.array(zDocumentLanguageOut).optional().default([]),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
@@ -3514,6 +3563,29 @@ export const zDocumentOut = z.object({
   filename: z.string(),
   id: z.string(),
   investigation_id: z.string(),
+  kind: z
+    .enum([
+      'court_filing',
+      'judgment',
+      'official_record',
+      'article',
+      'press_release',
+      'email',
+      'social_post',
+      'spreadsheet',
+      'recording',
+      'photo',
+      'web_capture',
+      'other',
+    ])
+    .nullish(),
+  kind_by: z.string().nullish(),
+  kind_set_by: z.enum(['reader', 'source', 'detected', 'person']).nullish(),
+  language: z.string().nullish(),
+  language_by: z.string().nullish(),
+  language_confidence: z.number().nullish(),
+  language_name: z.string().nullish(),
+  language_set_by: z.enum(['reader', 'source', 'detected', 'person']).nullish(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
   openaleph_schema: z.string().nullish(),
@@ -5171,6 +5243,29 @@ export const zIngestionBatchDocumentOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   job: zBackgroundJobOut.nullable(),
+  kind: z
+    .enum([
+      'court_filing',
+      'judgment',
+      'official_record',
+      'article',
+      'press_release',
+      'email',
+      'social_post',
+      'spreadsheet',
+      'recording',
+      'photo',
+      'web_capture',
+      'other',
+    ])
+    .nullish(),
+  kind_by: z.string().nullish(),
+  kind_set_by: z.enum(['reader', 'source', 'detected', 'person']).nullish(),
+  language: z.string().nullish(),
+  language_by: z.string().nullish(),
+  language_confidence: z.number().nullish(),
+  language_name: z.string().nullish(),
+  language_set_by: z.enum(['reader', 'source', 'detected', 'person']).nullish(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
   openaleph_schema: z.string().nullish(),
@@ -6651,6 +6746,29 @@ export const zDocumentUploadOut = z.object({
   id: z.string(),
   investigation_id: z.string(),
   job: zBackgroundJobOut.nullish(),
+  kind: z
+    .enum([
+      'court_filing',
+      'judgment',
+      'official_record',
+      'article',
+      'press_release',
+      'email',
+      'social_post',
+      'spreadsheet',
+      'recording',
+      'photo',
+      'web_capture',
+      'other',
+    ])
+    .nullish(),
+  kind_by: z.string().nullish(),
+  kind_set_by: z.enum(['reader', 'source', 'detected', 'person']).nullish(),
+  language: z.string().nullish(),
+  language_by: z.string().nullish(),
+  language_confidence: z.number().nullish(),
+  language_name: z.string().nullish(),
+  language_set_by: z.enum(['reader', 'source', 'detected', 'person']).nullish(),
   mime_type: z.string().nullish(),
   openaleph_document_id: z.string().nullish(),
   openaleph_schema: z.string().nullish(),
@@ -12548,6 +12666,17 @@ export const zGetDocumentPath = z.object({
  * Successful Response
  */
 export const zGetDocumentResponse = zDocumentDetailOut;
+
+export const zUpdateDocumentAboutBody = zDocumentAboutUpdate;
+
+export const zUpdateDocumentAboutPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateDocumentAboutResponse = zDocumentOut;
 
 export const zGetAuthenticityPath = z.object({
   document_id: z.string(),

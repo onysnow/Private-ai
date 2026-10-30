@@ -418,6 +418,7 @@ import {
   updateCapture,
   updateClaimEndpoint,
   updateDeckEndpoint,
+  updateDocumentAbout,
   updateEntity,
   updateLeadEndpoint,
   updateMonitor,
@@ -1649,6 +1650,9 @@ import type {
   UpdateDeckEndpointData,
   UpdateDeckEndpointError,
   UpdateDeckEndpointResponse,
+  UpdateDocumentAboutData,
+  UpdateDocumentAboutError,
+  UpdateDocumentAboutResponse,
   UpdateEntityData,
   UpdateEntityError,
   UpdateEntityResponse,
@@ -4212,6 +4216,36 @@ export const getDocumentOptions = (options: Options<GetDocumentData>) =>
     },
     queryKey: getDocumentQueryKey(options),
   });
+
+/**
+ * Update Document About
+ *
+ * A person sets what the document is and its language (the Library pane, the reading room). Only the fields sent
+ * change; null clears one. Who set it is kept with it, and the machine never replaces it.
+ */
+export const updateDocumentAboutMutation = (
+  options?: Partial<Options<UpdateDocumentAboutData>>,
+): UseMutationOptions<
+  UpdateDocumentAboutResponse,
+  UpdateDocumentAboutError,
+  Options<UpdateDocumentAboutData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UpdateDocumentAboutResponse,
+    UpdateDocumentAboutError,
+    Options<UpdateDocumentAboutData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateDocumentAbout({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const getAuthenticityQueryKey = (
   options: Options<GetAuthenticityData>,

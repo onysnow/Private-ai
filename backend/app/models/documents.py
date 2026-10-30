@@ -32,6 +32,16 @@ class Document(Base):
     # The archive or email this file was found in (ADR-0006, Wave A):
     # OpenAleph read the container and the file is one of its children.
     parent_document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
+    # What the document is (a court filing, a judgment, an article...) and its language (ISO 639-1), each with how it
+    # was set: reader / source / detected / person, and who or what set it (the tool, or the person's name); a
+    # detection keeps how sure it was, 0-1 (app/services/document_facts.py). None until known.
+    kind: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    kind_set_by: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    kind_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    language: Mapped[str | None] = mapped_column(String(16), nullable=True, index=True)
+    language_set_by: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    language_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    language_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
 
 
 class InvestigationCorpusBinding(Base):

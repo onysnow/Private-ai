@@ -3,6 +3,7 @@
 import {describe, expect, it} from 'vitest';
 
 import {fileKind, fileState, lanesById, libraryRows, sharedOpenings, sharedPrefix, tally} from '../features/documents/library-model';
+import {setByWords} from '../features/documents/document-kinds';
 import type {DocumentOut, DropLaneOut} from '../lib/generated/types.gen';
 import {dropLane} from '../test-support/library';
 
@@ -59,6 +60,18 @@ describe('The Library list', () => {
     const {kinds, states} = tally([doc('a', 'a.pdf'), doc('b', 'b.pdf', {extraction_status: 'failed'}), doc('c', 'c.eml')], new Map());
     expect(Object.fromEntries(kinds)).toEqual({pdf: 2, email: 1});
     expect(Object.fromEntries(states)).toEqual({clean: 2, problem: 1});
+  });
+
+  it('knows what each document is: as kept, else what its file type says, and filters and counts by it', () => {
+    const documents = [doc('j', 'judgment.pdf', {kind: 'judgment', kind_set_by: 'source'}), doc('m', 'minutes.pdf'), doc('e', 'mail.eml'),
+      doc('x', 'note.eml', {kind: null, kind_set_by: 'person'})];
+    expect(libraryRows(documents, new Map(), none, byAdded).map(r => [r.document.id, r.docKind])).toEqual([
+      ['j', 'judgment'], ['m', null], ['e', 'email'], ['x', null]]);
+    expect(ids(libraryRows(documents, new Map(), {...none, docKinds: new Set(['judgment', 'email'])}, byAdded))).toEqual(['j', 'e']);
+    expect(ids(libraryRows(documents, new Map(), {...none, docKinds: new Set(['unset'])}, byAdded))).toEqual(['m', 'x']);
+    expect(Object.fromEntries(tally(documents, new Map()).docKinds)).toEqual({judgment: 1, unset: 2, email: 1});
+    expect(setByWords('detected', 'py3langid', 0.987)).toBe('Detected by py3langid · 99% sure');
+    expect(setByWords('person', 'Ony')).toBe('Set by Ony');
   });
 
   it('finds the long opening titles share with the files around them, so their ends tell them apart', () => {

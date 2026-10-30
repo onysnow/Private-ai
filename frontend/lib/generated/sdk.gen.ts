@@ -1236,6 +1236,9 @@ import type {
   UpdateDeckEndpointData,
   UpdateDeckEndpointErrors,
   UpdateDeckEndpointResponses,
+  UpdateDocumentAboutData,
+  UpdateDocumentAboutErrors,
+  UpdateDocumentAboutResponses,
   UpdateEntityData,
   UpdateEntityErrors,
   UpdateEntityResponses,
@@ -2199,6 +2202,9 @@ import {
   zUpdateDeckEndpointBody,
   zUpdateDeckEndpointPath,
   zUpdateDeckEndpointResponse,
+  zUpdateDocumentAboutBody,
+  zUpdateDocumentAboutPath,
+  zUpdateDocumentAboutResponse,
   zUpdateEntityBody,
   zUpdateEntityPath,
   zUpdateEntityResponse,
@@ -4737,6 +4743,42 @@ export const getDocument = <ThrowOnError extends boolean = false>(
       await zGetDocumentResponse.parseAsync(data),
     url: '/api/documents/{document_id}',
     ...options,
+  });
+
+/**
+ * Update Document About
+ *
+ * A person sets what the document is and its language (the Library pane, the reading room). Only the fields sent
+ * change; null clears one. Who set it is kept with it, and the machine never replaces it.
+ */
+export const updateDocumentAbout = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateDocumentAboutData, ThrowOnError>,
+): RequestResult<
+  UpdateDocumentAboutResponses,
+  UpdateDocumentAboutErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).patch<
+    UpdateDocumentAboutResponses,
+    UpdateDocumentAboutErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUpdateDocumentAboutBody,
+          path: zUpdateDocumentAboutPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUpdateDocumentAboutResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/about',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

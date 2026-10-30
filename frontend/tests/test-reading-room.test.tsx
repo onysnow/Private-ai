@@ -108,6 +108,21 @@ describe('ReadingRoom', () => {
     expect(within(again).getByText('Language not detected').closest('[hidden]')).not.toBeNull();
   });
 
+  it('names the document’s own language first, with how it was set, and the others OpenAleph found', async () => {
+    routes({'GET /api/documents/d1': {...doc, language: 'fr', language_name: 'French', language_set_by: 'detected', language_by: 'py3langid',
+      language_confidence: 0.97, languages: [{code: 'fra', name: 'French'}, {code: 'eng', name: 'English'}]}});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    expect(await within(room).findByText('FR · EN')).toBeVisible();
+    expect(within(room).getByText('Detected by py3langid · 97% sure').closest('[hidden]')).not.toBeNull();
+    expect(within(room).getByText('OpenAleph also found English').closest('[hidden]')).not.toBeNull();
+    expect(within(room).queryByText('Language not detected')).not.toBeInTheDocument();
+    // Details: the kind and language as chips a person presses to change.
+    await userEvent.setup().click(within(room).getByRole('tab', {name: 'Details'}));
+    expect(within(room).getByRole('button', {name: 'Language: French. Change it'})).toBeInTheDocument();
+    expect(within(room).getByRole('button', {name: 'Kind: not set. Change it'})).toBeInTheDocument();
+  });
+
   it('shows a proposal held back by the OCR quality gate, with why, and still lets a person decide it', async () => {
     const note = 'Held back: read by OCR from a page only 38% legible (under 60%). Check it against the page before using it.';
     routes({'GET /api/documents/d1': {...doc, chunks: [{...doc.chunks[0], locator: 'page 4 (OCR)', ocr_legibility: 38.2}]},

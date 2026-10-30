@@ -18685,6 +18685,51 @@
         "title": "DiskStatusOut",
         "type": "object"
       },
+      "DocumentAboutUpdate": {
+        "description": "What a person says a document is and its language. Only the fields sent change; null clears one, and a value a\nperson set is never replaced by the machine.",
+        "properties": {
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "court_filing",
+                  "judgment",
+                  "official_record",
+                  "article",
+                  "press_release",
+                  "email",
+                  "social_post",
+                  "spreadsheet",
+                  "recording",
+                  "photo",
+                  "web_capture",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ISO 639-1 code (or a BCP-47 tag, an ISO 639-3 code)",
+            "title": "Language"
+          }
+        },
+        "title": "DocumentAboutUpdate",
+        "type": "object"
+      },
       "DocumentChunkOut": {
         "properties": {
           "created_at": {
@@ -18807,6 +18852,121 @@
           "investigation_id": {
             "title": "Investigation Id",
             "type": "string"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "court_filing",
+                  "judgment",
+                  "official_record",
+                  "article",
+                  "press_release",
+                  "email",
+                  "social_post",
+                  "spreadsheet",
+                  "recording",
+                  "photo",
+                  "web_capture",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "kind_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind By"
+          },
+          "kind_set_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "reader",
+                  "source",
+                  "detected",
+                  "person"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind Set By"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "language_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language By"
+          },
+          "language_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How sure the detector was, 0-1, for a detected language.",
+            "title": "Language Confidence"
+          },
+          "language_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Name"
+          },
+          "language_set_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "reader",
+                  "source",
+                  "detected",
+                  "person"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Set By"
           },
           "languages": {
             "default": [],
@@ -19114,6 +19274,121 @@
             "title": "Investigation Id",
             "type": "string"
           },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "court_filing",
+                  "judgment",
+                  "official_record",
+                  "article",
+                  "press_release",
+                  "email",
+                  "social_post",
+                  "spreadsheet",
+                  "recording",
+                  "photo",
+                  "web_capture",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "kind_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind By"
+          },
+          "kind_set_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "reader",
+                  "source",
+                  "detected",
+                  "person"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind Set By"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "language_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language By"
+          },
+          "language_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How sure the detector was, 0-1, for a detected language.",
+            "title": "Language Confidence"
+          },
+          "language_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Name"
+          },
+          "language_set_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "reader",
+                  "source",
+                  "detected",
+                  "person"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Set By"
+          },
           "mime_type": {
             "anyOf": [
               {
@@ -19375,6 +19650,121 @@
                 "type": "null"
               }
             ]
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "court_filing",
+                  "judgment",
+                  "official_record",
+                  "article",
+                  "press_release",
+                  "email",
+                  "social_post",
+                  "spreadsheet",
+                  "recording",
+                  "photo",
+                  "web_capture",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "kind_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind By"
+          },
+          "kind_set_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "reader",
+                  "source",
+                  "detected",
+                  "person"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind Set By"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "language_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language By"
+          },
+          "language_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How sure the detector was, 0-1, for a detected language.",
+            "title": "Language Confidence"
+          },
+          "language_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Name"
+          },
+          "language_set_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "reader",
+                  "source",
+                  "detected",
+                  "person"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Set By"
           },
           "mime_type": {
             "anyOf": [
@@ -26162,6 +26552,121 @@
                 "type": "null"
               }
             ]
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "court_filing",
+                  "judgment",
+                  "official_record",
+                  "article",
+                  "press_release",
+                  "email",
+                  "social_post",
+                  "spreadsheet",
+                  "recording",
+                  "photo",
+                  "web_capture",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "kind_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind By"
+          },
+          "kind_set_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "reader",
+                  "source",
+                  "detected",
+                  "person"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind Set By"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "language_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language By"
+          },
+          "language_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How sure the detector was, 0-1, for a detected language.",
+            "title": "Language Confidence"
+          },
+          "language_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Name"
+          },
+          "language_set_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "reader",
+                  "source",
+                  "detected",
+                  "person"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Set By"
           },
           "mime_type": {
             "anyOf": [
@@ -58754,6 +59259,84 @@
           }
         },
         "summary": "Get Document"
+      }
+    },
+    "/api/documents/{document_id}/about": {
+      "patch": {
+        "description": "A person sets what the document is and its language (the Library pane, the reading room). Only the fields sent\nchange; null clears one. Who set it is kept with it, and the machine never replaces it.",
+        "operationId": "update_document_about",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentAboutUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Update Document About"
+                }
+              }
+            },
+            "description": "Not a kind this app knows, or not a language"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Update Document About"
       }
     },
     "/api/documents/{document_id}/authenticity": {
