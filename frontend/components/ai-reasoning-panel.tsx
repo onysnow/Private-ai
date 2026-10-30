@@ -115,6 +115,15 @@ export function describeAiStatus(status:AiReasoningStatus|null|undefined):string
   return `Ready: provider ${status.provider}${status.model?`, model ${status.model}`:''}${whereItRuns(status)}, Authority System Suite (TAS v${suite.tas_version||'?'}).`;
 }
 
+/** The AI's state in two words, for the panel's status mark; the full sentence (describeAiStatus) is revealed on it.
+ *  Null when the state needs its sentence on screen (a suite file missing: something to fix in the suite). */
+export function aiStateWord(status:AiReasoningStatus|null|undefined):string|null{
+  if(!status)return 'AI state unknown';
+  if(!status.enabled)return 'AI is off';
+  if(!status.provider||!status.provider_key_configured)return 'No model chosen';
+  return null;
+}
+
 export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Props):ReactElement{
   const [module,setModule]=useState<AiModuleName>('case_synthesis');
   const [question,setQuestion]=useState('');
@@ -305,9 +314,12 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   return <Card className="card" data-testid="ai-reasoning-panel"><CardHeader className="pb-3"><CardTitle>
     <Reveal detail="Bounded reasoning over this investigation’s own evidence, and briefs or decks drafted from evidence you pick. Every run is checked for invented citations and a malformed shape, then parked in a review queue. Accepting marks it as trusted analysis for reporters; it never creates or edits a canonical record.">
       <span>AI reasoning &amp; presentations</span></Reveal></CardTitle>
-    <p className="muted text-sm" data-testid="ai-status">{aiStatus.startsWith('Ready:')?<Reveal label="AI ready" detail={aiStatus}><span className="ai-notice" aria-hidden="true">AI ✓</span></Reveal>:aiStatus}</p></CardHeader><CardContent>
+    <p className="muted text-sm" data-testid="ai-status">{aiStatus.startsWith('Ready:')?<Reveal label="AI ready" detail={aiStatus}><span className="ai-notice" aria-hidden="true">AI ✓</span></Reveal>
+      :aiStateWord(status)?<span className="ai-drafts-off"><Reveal detail={aiStatus}><span><span className="ai-drafts-dot" aria-hidden="true"/><b>{aiStateWord(status)}</b></span></Reveal>
+        <span> · nothing runs or leaves this computer; drafts already made stay here to review. </span><a href="/settings#ai">Settings › AI and research</a></span>
+      :aiStatus}</p></CardHeader><CardContent>
     {!investigationId?<p className="muted">Select an investigation to run or review AI analysis.</p>:<>
-      <div className="searchrow">
+      {anyCallable&&<><div className="searchrow">
         <Select value={module} onValueChange={(v:string)=>setModule(v as AiModuleName)} disabled={!anyCallable||running}><SelectTrigger aria-label="Reasoning module" className="w-auto"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="case_synthesis">Case synthesis</SelectItem><SelectItem value="hypothesis_test">Hypothesis test</SelectItem><SelectItem value="presentation_draft">Presentation draft</SelectItem></SelectContent></Select>
         {module!=='presentation_draft'&&<>
           <Input aria-label="Question" value={question} onChange={(e:ChangeEvent<HTMLInputElement>)=>setQuestion(e.target.value)} placeholder="What does the evidence establish about …?" disabled={!callable||running} className="min-w-[12rem] flex-1"/>
@@ -320,13 +332,17 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
       {module==='presentation_draft'&&<div className="mt-3 space-y-3">
         <Textarea aria-label="Goal" value={goal} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setGoal(e.target.value)} rows={2} placeholder="What should this brief or deck accomplish? e.g. “Brief my editor on what we can and can’t say about the Bellcastle payment.”" disabled={!callable||running}/>
         <RecordPicker investigationId={investigationId} selected={selectedRefs} onChange={setSelectedRefs} disabled={!callable||running}/>
-      </div>}
+      </div>}</>}
       {runStatus&&<p className="muted" data-testid="ai-run-status">{runStatus}</p>}
       <div className="twocol" style={isPresentationDraft?{gridTemplateColumns:'minmax(220px,0.55fr) minmax(0,2fr)'}:undefined}>
         <div>
-          <div className="searchrow"><b>Review queue</b><select aria-label="Queue filter" className="h-8 rounded-md border border-input bg-transparent px-2 text-sm text-foreground" value={filter} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setFilter(e.target.value as typeof filter)}><option value="all">all</option><option value="proposed">proposed</option><option value="accepted">accepted</option><option value="rejected">rejected</option></select><Button size="sm" variant="outline" onClick={()=>void loadQueue()}>Refresh</Button></div>
+          {(queue.length>0||filter!=='all'||queueStatus)&&<div className="searchrow"><b>Review queue</b><select aria-label="Queue filter" className="h-8 rounded-md border border-input bg-transparent px-2 text-sm text-foreground" value={filter} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setFilter(e.target.value as typeof filter)}><option value="all">all</option><option value="proposed">proposed</option><option value="accepted">accepted</option><option value="rejected">rejected</option></select><Button size="sm" variant="outline" onClick={()=>void loadQueue()}>Refresh</Button></div>}
           {queueStatus&&<p className="muted">{queueStatus}</p>}
-          {!queue.length&&!queueStatus&&<p className="muted">No AI analysis candidates yet for this investigation.</p>}
+          {!queue.length&&!queueStatus&&(filter==='all'?<div className="ai-drafts-empty">
+            <p className="ai-drafts-empty-head">No drafts yet</p>
+            <Reveal detail="Each answer a run gives lands here as a draft, checked for invented citations. Nothing joins the case until you accept it."><span className="muted">Answers from Ask the case wait here for you.</span></Reveal>
+            <a href="#ai-runs" className="ai-drafts-ask">Ask the case</a>
+          </div>:<p className="muted">No {filter} drafts.</p>)}
           {queue.map(c=><div className="candidate" key={c.id} style={selected?.id===c.id?{outline:'2px solid hsl(var(--primary))',outlineOffset:2}:undefined} aria-current={selected?.id===c.id?'true':undefined}><Reveal detail={`${c.checked_citation_count} citation(s) checked · ${shortStamp(c.created_at)}`}><b>{moduleLabel(c.module)}</b></Reveal> <small>{c.review_status}</small>
             <div>{asStr(c.request.question??'')||<i>no question recorded</i>}</div>
             {c.reviewer_note&&<small>{c.reviewer_note}</small>}
@@ -334,7 +350,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
           </div>)}
         </div>
         <div>
-          {!selected?<p className="muted">Open a candidate to read its claims and citations.</p>:<div data-testid="ai-candidate-detail">
+          {!selected?(queue.length?<p className="muted">Open a draft to read its claims and citations.</p>:null):<div data-testid="ai-candidate-detail">
             <h2 style={{fontSize:20}}>{moduleLabel(selected.module)} · {selected.review_status}</h2>
             <div className="muted"><b>{isPresentationDraft?'Goal:':'Question:'}</b> {asStr(selected.request.question??'')}{selected.request.working_theory?<><br/><b>Working theory:</b> {asStr(selected.request.working_theory)}</>:null}</div>
             {payload&&'executive_summary' in payload&&<p><b>Summary:</b> {asStr(payload.executive_summary)}</p>}

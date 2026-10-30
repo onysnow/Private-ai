@@ -136,9 +136,10 @@ describe('AiReasoningPanel', () => {
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={{...readyStatus, enabled: false, endpoints_callable: false}} />);
 
-    expect(screen.getByTestId('ai-status')).toHaveTextContent(/disabled/);
-    expect(screen.getByRole('button', {name: 'Run module'})).toBeDisabled();
-    expect(screen.getByLabelText('Question')).toBeDisabled();
+    // AI off is a state, said in two words (the deployment's sentence on reveal), not run controls that cannot be used.
+    expect(screen.getByTestId('ai-status')).toHaveTextContent(/AI is off.*nothing runs or leaves this computer/);
+    expect(screen.queryByRole('button', {name: 'Run module'})).toBeNull();
+    expect(screen.queryByLabelText('Question')).toBeNull();
     await screen.findByText('Auto-rejected: invented citation');
     expect(requestUrl(fetchMock.mock.calls[0])).toBe('http://api.test/api/investigations/inv-1/ai-analysis-candidates');
   });
@@ -201,7 +202,7 @@ describe('AiReasoningPanel', () => {
   const searchHit = {results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}, kind: 'claim_event'}],
     query: 'Bellcastle', investigation_id: 'inv-1', total: 1, returned: 1, counts: {claim: 1}, group_counts: {reporting: 1}};
   const runDraft = async (user: ReturnType<typeof userEvent.setup>) => {
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('No drafts yet');
     screen.getByLabelText('Reasoning module').focus();
     await user.keyboard('{ArrowDown}{ArrowDown}');
     await user.click(await screen.findByRole('option', {name: 'Presentation draft'}));
@@ -313,7 +314,7 @@ describe('AiReasoningPanel', () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(jsonResponse({candidates: []}));
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('No drafts yet');
 
     const moduleTrigger = screen.getByLabelText('Reasoning module');
     moduleTrigger.focus();
@@ -396,7 +397,7 @@ describe('AiReasoningPanel', () => {
         style: {theme: 'newsprint', fonts: 'theme'}, source_ai_candidate_id: 'cand-9', created_by: null})); // POST promote-to-deck
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} onTraceRecord={d => traced.push(`${d.trace_record_type}:${d.record_id}`)} />);
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('No drafts yet');
 
     const moduleTrigger = screen.getByLabelText('Reasoning module');
     moduleTrigger.focus();
@@ -475,7 +476,7 @@ describe('AiReasoningPanel', () => {
       }},
     };
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={noTas} />);
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('No drafts yet');
     expect(screen.getByTestId('ai-status')).toHaveTextContent(/Presentation drafts do not use it and are available/);
     expect(screen.getByLabelText('Goal')).not.toBeDisabled();
     expect(screen.getByLabelText('Search records to add')).not.toBeDisabled();

@@ -124,6 +124,36 @@ describe('BeforeYouRun', () => {
     await waitFor(() => expect(api.lastBody(`PUT ${BASE}/profile`)).toMatchObject({reason: 'Named people', source_tier_floor: 'D', premises: []}));
   });
 
+  it('says AI is off and what turning it on would send, before the first run, without an error', async () => {
+    mockApi({'GET /api/investigations/inv-1/ai-runs': {runs: []}, [`GET ${BASE}/profile`]: PLAN.profile, 'GET /api/capabilities': {product: 'Journalism Workbench', mode: 'core_preview', ai_features_enabled: false,
+      core: {investigations: true, documents: true, sources: true, evidence: true, claims: true, relationships: true, search: true, dossiers: true,
+        timeline: true, leads_and_tasks: true, provenance: true, connectors: true, backup_restore: true},
+      platforms: {openaleph: {enabled: false, role: 'local_corpus_search_ingestion_platform'}}, note: 'AI is optional.'}});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByText('No runs yet in this case')).toBeInTheDocument();
+    const note = await screen.findByRole('note');
+    expect(note).toHaveTextContent(/AI is off · nothing leaves this computer/);
+    expect(note).toHaveTextContent(/sends your question and up to 30 records from this case to the model you choose/);
+    expect(within(note).getByRole('link', {name: 'Settings › AI and research'})).toHaveAttribute('href', '/settings#ai');
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('lists earlier runs with their problem count, the state as a colour, and watches one again', async () => {
+    mockApi({'GET /api/investigations/inv-1/ai-runs': {runs: [RUN, {...RUN, run_id: 'job-2', question: 'Who paid?', problems: 2}]}, [`GET ${BASE}/profile`]: PLAN.profile,
+      'GET /api/investigations/inv-1/ai-runs/job-2/events': {run: {...RUN, run_id: 'job-2'}, events: []}});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const list = (await screen.findByText('Who paid?')).closest('ul')!;
+    const rows = within(list as HTMLElement).getAllByRole('listitem');
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveAttribute('data-state', 'clean');
+    expect(rows[1]).toHaveAttribute('data-state', 'problems');
+    expect(within(rows[1]).getByLabelText('2 problems')).toHaveTextContent('2');
+    expect(screen.queryByText('No runs yet in this case')).toBeNull();
+    const user = userEvent.setup();
+    await user.click(within(rows[1]).getByRole('button', {name: 'Watch it again'}));
+    expect(await screen.findByRole('region', {name: 'Watch the run'})).toBeInTheDocument();
+  });
+
   it('offers a sample run when the case has none yet', async () => {
     mockApi({'GET /api/investigations/inv-1/ai-runs': {runs: []}, [`GET ${BASE}/profile`]: PLAN.profile});
     render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);

@@ -443,3 +443,11 @@ per row; .mbox children titled by raw hashes; no full-width text. No mockup; cal
 - Look-alike titles: a long shared opening is drawn faint and shrinks first.
 - Mailbox messages are titled by subject, else "Message from <sender>, <date>", else the date; old hash titles are
   renamed the next time "Look for files inside again" runs.
+
+## 27. AI off is a state, not an error (30 Oct 2026)
+
+AI runs and AI drafts showed "AI is off. Turn it on in Settings." in red and a deployment flag name. Calls: AI off
+reads as a calm state on both screens ("Nothing: AI is off"), with what turning it on would send (the question and
+the plan's records, counted by the server) and a link to Settings. AI drafts hides its run controls when nothing can
+run; its empty state links to Ask the case. Ask puts Earlier runs beside the question so the page uses its width; with
+no runs it shows the five systems unlit and the sample run. A run's state is a colour, the word on hover.
