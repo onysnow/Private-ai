@@ -374,6 +374,14 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
   const settings = useQuery({...settingsStatusOptions()}).data;
   const data = query.data;
   const [tab, setTab] = useState<'line' | 'links' | 'history'>('line');
+  // ?drop=links opens Links & captures (Check › Is it real?'s way in to a pasted post).
+  useEffect(() => {
+    const fromAddress = () => { if (new URLSearchParams(window.location.search).get('drop') === 'links') setTab('links'); };
+    fromAddress();
+    window.addEventListener('popstate', fromAddress);
+    window.addEventListener('hashchange', fromAddress);
+    return () => { window.removeEventListener('popstate', fromAddress); window.removeEventListener('hashchange', fromAddress); };
+  }, []);
   const captures = useCaptures(investigationId).data ?? [];
   // A capture that finishes adds its page to the case as a document: the line and the Library count follow.
   const capturing = captures.filter(c => c.status === 'queued' || c.status === 'capturing').length;

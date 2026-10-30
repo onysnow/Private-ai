@@ -9,7 +9,7 @@ import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {RedFlagsPanel} from '../features/red-flags/red-flags-panel';
-import {marked, ToCheckPanel} from '../features/to-check/to-check-panel';
+import {checkTitle, marked, ToCheckPanel} from '../features/to-check/to-check-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -156,5 +156,16 @@ describe('a Red Flag and its items in To check', () => {
     await screen.findByRole('article', {name: 'Red Flag: BO-002'});
     useWorkbenchStore.getState().openFlag('f-1');
     expect(await screen.findByRole('complementary', {name: 'Red Flag details: BO-002'})).toBeInTheDocument();
+  });
+});
+
+describe('checkTitle', () => {
+  it('titles a card by what its flag found and when, with the question and why under it', () => {
+    const t = checkTitle({question: 'whether there was a business reason for the payments'},
+      {summary: '3 payments between Tanore Finance Corporation and Granton Property Holdings Limited; both are held or run by Tan Kim Loong (directorship).', years: [2013, 2012, 2013]});
+    expect(t).toEqual({head: '3 payments between Tanore Finance Corporation and Granton Property Holdings Limited', when: '2012–2013',
+      why: 'Both are held or run by Tan Kim Loong (directorship).', ask: 'Whether there was a business reason for the payments'});
+    expect(checkTitle({question: 'is it so?'}, null)).toEqual({head: 'Is it so?', when: null, why: null, ask: null});
+    expect(checkTitle({question: 'q'}, {summary: 'One clause only.', years: [2015]}).head).toBe('One clause only');
   });
 });

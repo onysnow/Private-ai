@@ -59,6 +59,29 @@ const DONE_STATE: Record<ClaimDoneOut['rules'][number]['state'], {mark: string; 
   met: {mark: '✓', word: 'met'}, not_met: {mark: '✕', word: 'not met'}, unknown: {mark: '○', word: 'cannot be checked here'}};
 /** How long the pointer rests on the log before the wheel replays it (as features/case-home/wheel-step.ts). */
 const LOG_DWELL_MS = 220;
+/** How far a chain grows to fill the room it has (Ony, 29 Oct: fill the space): the zoom `now` scaled so the content
+ * (`used` px tall at that zoom) fills `room` px, never below 1 (Fit scales down), never above 1.5 or what the width
+ * allows (`widthCap`). Small changes are ignored, so measuring after a zoom does not set it swinging. */
+export function growScale(now: number, room: number, used: number, widthCap: number): number {
+  if (!(room > 0) || !(used > 0)) return now;
+  const next = Math.max(1, Math.min(1.5, widthCap, (now * room) / used));
+  const rounded = Math.floor(next * 20) / 20;
+  return Math.abs(rounded - now) < 0.05 ? now : rounded;
+}
+/** The room the chain has: its column's height less the log under it (and the gap), and its width. */
+function roomFor(host: HTMLElement): {height: number; width: number} | null {
+  const main = host.parentElement;
+  if (!main) return null;
+  const others = Array.from(main.children).filter(c => c !== host).reduce((n, c) => n + (c as HTMLElement).offsetHeight + 14, 0);
+  return {height: main.clientHeight - others, width: main.clientWidth};
+}
+/** How tall the chain's content is on screen at zoom `now`: from the highest column head to the lowest card, with the
+ * box's padding. */
+function usedHeight(host: HTMLElement, now: number): number {
+  const rects = Array.from(host.querySelectorAll<HTMLElement>('.cc-card, .cc-col')).map(el => el.getBoundingClientRect());
+  if (!rects.length) return 0;
+  return Math.max(...rects.map(r => r.bottom)) - Math.min(...rects.map(r => r.top)) + 28 * now;
+}
 /** Motion off: the person's calm setting or the system's reduced motion. */
 function calmNow(): boolean {
   if (typeof window === 'undefined') return true;
@@ -235,7 +258,8 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
       </div>
     </header>
     {(claims.data?.length ?? 0) > 1 && <label className="cc-pick">Claim
-      <select value={chosen} onChange={e => setClaimId(e.target.value)} aria-label="Which claim">
+      {/* Wide enough for most claims; a longer one ends in an ellipsis, its whole sentence on hover. */}
+      <select value={chosen} onChange={e => setClaimId(e.target.value)} aria-label="Which claim" title={claims.data!.find(c => c.id === chosen)?.text}>
         {claims.data!.map(c => <option key={c.id} value={c.id}>{c.text.length > 90 ? `${c.text.slice(0, 90)}…` : c.text}</option>)}
       </select></label>}
     {status && <p className="cc-muted">{status}</p>}
@@ -275,13 +299,27 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
 }): ReactElement {
   const box = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<{key: string; d: string; style: string; words: string; x: number; y: number}[]>([]);
-  // Fit: the whole chain at once, scaled down to the width it has.
+  // Fit: the whole chain at once, scaled down to the width it has. Otherwise a small chain grows to fill the room the
+  // log leaves it (Ony, 29 Oct: fill the space), never wider than its columns allow.
   const [scale, setScale] = useState(1);
+  const minWidth = useMemo(() => {
+    const used = chain.rows.length ? [0, 1, 2, 3].filter(i => chain.rows.some(r => r.cards.some(c => COL[c.kind] === i))).length : 4;
+    return used * 140 + (used < 4 ? 220 : 200) + used * 52 + 28;
+  }, [chain]);
   useLayoutEffect(() => {
     const host = box.current;
-    if (!host || !fit) { setScale(1); return; }
-    setScale(Math.min(1, host.clientWidth / host.scrollWidth, (window.innerHeight * 0.62) / host.scrollHeight));
-  }, [fit, chain]);
+    if (!host) return undefined;
+    if (fit) { setScale(Math.min(1, host.clientWidth / host.scrollWidth, (window.innerHeight * 0.62) / host.scrollHeight)); return undefined; }
+    const grow = () => setScale(s => {
+      const room = roomFor(host);
+      const used = usedHeight(host, s);
+      return room && used ? growScale(s, room.height, used, room.width / minWidth) : s;
+    });
+    grow();
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(grow);
+    if (host.parentElement) ro?.observe(host.parentElement);
+    return () => ro?.disconnect();
+  }, [fit, chain, minWidth]);
   // More AI steps than fit under the claim fold into one card; it opens them all.
   const [allAi, setAllAi] = useState(false);
   useEffect(() => { setAllAi(false); }, [chain.claim.id]);
@@ -348,7 +386,7 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
   const claimAt = used.length + 1;
   const gridStyle: CSSProperties = {gridTemplateColumns: `repeat(${used.length}, minmax(140px, ${used.length < 4 ? '250px' : '1fr'})) ${used.length < 4 ? 'minmax(220px, 300px)' : 'minmax(200px, 1.2fr)'}`,
     ...(used.length < 4 ? {justifyContent: 'space-between'} : {}),
-    ...(scale < 1 ? {zoom: scale} : {})};
+    ...(scale !== 1 ? {zoom: scale} : {})};
   return <div className={`cc-wires${breaking ? ' breaking' : ''}${draw ? ' draw' : ''}`} ref={box} style={gridStyle} data-columns={used.length + 1}>
     <svg key={chain.claim.id} className={`cc-lines${draw ? ' draw' : ''}`} aria-hidden="true">
       {lines.map(l => <g key={l.key} className={`cc-wire w-${l.style}${wireLit(l.key) ? ' lit' : ''}`}>
@@ -390,14 +428,17 @@ function DoneList({done}: {done: ClaimDoneOut}): ReactElement {
     : `${done.left} left${done.unknown ? ` · ○ ${done.unknown} not checkable here` : ''}`;
   return <div className="cc-done" aria-label="Done for Supported">
     <p className="cc-done-head"><Reveal detail={<><b>Done for Supported</b><span className="rv-row">{summary}</span>
-      <span className="rv-row">The rules a review to Supported is held to.</span></>}>Done for Supported</Reveal>
+      <span className="rv-row">The rules a review to Supported is held to.</span>
+      <span className="cc-done-all">{done.rules.map(r => <span key={r.key} className={`rv-row done-${r.state}`}>
+        <span className="cc-done-mark" aria-hidden="true">{DONE_STATE[r.state].mark}</span> {DONE_SHORT[r.key] ?? r.label}<span className="sr-only">: {DONE_STATE[r.state].word}</span></span>)}</span></>}>Done for Supported</Reveal>
       {done.met ? <span className="ok" aria-hidden="true"> ✓</span> : <span className="bad"> · {done.left} left</span>}</p>
-    {/* A publication gate: the rules stay; each rule's full wording and what it waits on are revealed on its name. */}
-    <ul>{done.rules.map(r => <li key={r.key} className={`done-${r.state}`}
+    {/* What is not met is an alert and stays; the whole checklist, each rule's state, wording and what it waits on, is
+        revealed on the name (Ony, 29 Oct: secondary detail on hover). */}
+    {done.rules.some(r => r.state === 'not_met') && <ul>{done.rules.filter(r => r.state === 'not_met').map(r => <li key={r.key} className={`done-${r.state}`}
       aria-label={`${r.label}: ${DONE_STATE[r.state].word}. ${r.detail}`}>
       <span className="cc-done-mark" aria-hidden="true">{DONE_STATE[r.state].mark}</span>{' '}<Reveal detail={<><b>{r.label}</b>
         <span className="rv-row">{r.state === 'not_met' ? 'waits on: ' : ''}{r.detail}</span></>}>{DONE_SHORT[r.key] ?? r.label}</Reveal>
-    </li>)}</ul>
+    </li>)}</ul>}
   </div>;
 }
 
@@ -486,12 +527,11 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
     {breaks && row && <div className="cc-breaks" role="status"><b>If this step breaks</b>, everything after it in this row falls, and with it:
       <ul>{rests.map(r => <li key={r.id}>{r.kind === 'claim' ? 'Claim' : r.kind === 'link' ? 'Link' : 'Flag'}: {r.label}</li>)}</ul></div>}
     {/* The line key, drawn (mockup CHECK_2): each line style beside what it means. */}
-    <div className="cc-key-box" aria-label="Key to the lines" role="group">
-      <p className="cc-eyebrow">Key</p>
-      <span className="cc-key">
+    {/* The line key, drawn (mockup CHECK_2), behind its mark: each line style beside what it means. */}
+    <p className="cc-key-mark"><Reveal label="Key to the lines" detail={<span className="cc-key" role="group" aria-label="Key to the lines">
         <span className="cc-k-confirmed">confirmed by a person</span><span className="cc-k-proposed">proposed, not yet confirmed</span>
         <span className="cc-k-worked">worked out by the app</span><span className="cc-k-against">against the claim · ✕ check failed</span><span className="cc-k-ai">AI step</span>
-      </span></div>
+      </span>}><span className="cc-key-glyph" aria-hidden="true"><i/><i/><i/>Key</span></Reveal></p>
     <div className="cc-acts">
       {file?.document_id && <button type="button" className="primary" onClick={() => onOpen(file.document_id!, passage?.page ?? null)}>
         {passage?.page ? `Open page ${passage.page}` : 'Open the file'}</button>}

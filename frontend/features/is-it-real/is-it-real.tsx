@@ -6,6 +6,7 @@
 // with what was checked and why. Right: before anything is sent (a local comparison, or one outside check allowed
 // once with exactly what goes; nothing for a source-protected item) and the append-only history.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
+import Link from 'next/link';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 
@@ -13,9 +14,10 @@ import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
 import {apiTime, compactDay, timeWords} from '../../lib/timestamps';
-import {getAuthenticityOptions, getAuthenticityQueryKey, listAuthenticityOptions, listAuthenticityQueryKey, listDocumentsOptions, previewAuthenticityOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getAuthenticityOptions, getAuthenticityQueryKey, listAuthenticityOptions, listAuthenticityQueryKey, listDocumentsOptions, listSourcesOptions, previewAuthenticityOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {addAboutClaim, compareAuthenticity, decideAuthenticity, examineAgain, outsideAuthenticity, updateAuthenticity} from '../../lib/generated/sdk.gen';
-import type {AuthenticityHistoryOut, AuthenticityOut, AuthenticityPreviewOut} from '../../lib/generated/types.gen';
+import type {AuthenticityHistoryOut, AuthenticityOut, AuthenticityPreviewOut, SourceOut} from '../../lib/generated/types.gen';
+import {caseHref} from '../../lib/case-href';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 type Status = 'verified_origin' | 'unverified' | 'likely_synthetic' | 'confirmed_synthetic' | 'disputed';
@@ -478,7 +480,7 @@ export function RealnessList({investigationId}: {investigationId: string}): Reac
   }, [overlay]);
 
   if (!docs) return <div className="ir-desk"><p className="ir-quiet">Opening the case’s files…</p></div>;
-  if (!all.length) return <div className="ir-desk"><p className="ir-small">No files in this case yet.</p></div>;
+  if (!all.length) return <RealnessEmpty investigationId={investigationId}/>;
   return <div className="ir-desk" ref={root}>
     <nav className="ir-rail" aria-label="The case’s files">
       <div className="ir-rail-head">
@@ -516,5 +518,71 @@ export function RealnessList({investigationId}: {investigationId: string}): Reac
       </ul>
     </nav>
     {current && <Screen key={current} investigationId={investigationId} documentId={current} embedded/>}
+  </div>;
+}
+
+/** A source's kind (the demo loader's and a capture's `metadata_json.kind`) as an item kind, when it is one this screen
+ *  checks: a picture, a video, a recording, or a social post. */
+const SOURCE_KIND: Record<string, Kind> = {photo: 'image', image: 'image', picture: 'image', video: 'video', audio: 'audio', social: 'text'};
+
+/** The sources the case records without their file on this computer (a picture, video, recording or post kept as a link,
+ *  or not downloaded when the case was loaded): what Is it real? cannot examine until the file is here. */
+export function withoutFiles(sources: SourceOut[]): {id: string; title: string; kind: Kind; why: string; url: string | null}[] {
+  return sources.flatMap(s => {
+    const meta = (s.metadata_json ?? {}) as {kind?: unknown; not_downloaded?: unknown; link_only?: unknown};
+    const kind = typeof meta.kind === 'string' ? SOURCE_KIND[meta.kind] : undefined;
+    const why = typeof meta.not_downloaded === 'string' ? meta.not_downloaded : typeof meta.link_only === 'string' ? meta.link_only : null;
+    return kind && why ? [{id: s.id, title: s.title, kind, why, url: s.url ?? null}] : [];
+  });
+}
+
+/** The four layers of the item view (mockup CHECK_3), drawn quietly: what each one will hold once a file is here. */
+const LAYERS: {n: string; name: string; title: string; detail: string; ghost: string[]}[] = [
+  {n: '1', name: 'Provenance', title: 'Content credentials', ghost: ['Valid · signer trusted', 'Valid · signer not trusted', 'Invalid', 'Absent'],
+    detail: 'The C2PA credentials a picture, video or recording carries, validated on this computer against a trust list. Absence proves nothing.'},
+  {n: '2', name: 'Source', title: 'Outlet and account reputation', ghost: ['Account age', 'Ownership', 'Byline history', 'First seen'],
+    detail: 'What the case already records about who posted it: the account, the outlet, and the earliest copy you hold.'},
+  {n: '3', name: 'Hints', title: 'Detectors', ghost: ['Off by default'],
+    detail: 'Detector scores are hints, never a finding. They are off for pictures a platform has re-saved and hidden on short text, where they fall to chance.'},
+  {n: '4', name: 'You decide', title: 'Status and your reasons', ghost: STATUSES.map(st => st.label),
+    detail: 'Only you set the status, with what you checked and why. Nothing is sent outside this computer unless you allow it, once.'},
+];
+
+/** No file in the case yet: what Is it real? checks (its four layers, drawn quietly), the ways a file comes in, and
+ *  what the case records without its file. */
+function RealnessEmpty({investigationId}: {investigationId: string}): ReactElement {
+  const sources = useQuery({...listSourcesOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
+  const missing = useMemo(() => withoutFiles(sources ?? []), [sources]);
+  const ways = [
+    {key: 'drop', mark: '⤓', title: 'The Drop', line: 'Drop a picture, video, recording or document', href: '/bring-in#the-drop',
+      detail: 'Each file is read where it lands: its fingerprint, the credentials it carries, the words in it. Then it is listed here.'},
+    {key: 'links', mark: '↗', title: 'Links & captures', line: 'Paste the address of a post or page', href: '/bring-in?drop=links#the-drop',
+      detail: 'The page is kept as it was, with proof (its files and their fingerprints), and its picture comes here to be checked.'},
+  ];
+  return <div className="ir-desk ir-empty" aria-label="Is it real?">
+    <section className="ir-empty-in" aria-label="Bring a file in">
+      <h2><Reveal detail="The system records what it finds about a file. A detector cannot decide whether it is real; only you can, with reasons.">
+        <span>Nothing to check yet</span></Reveal></h2>
+      <ul className="ir-ways">{ways.map(w => <li key={w.key}>
+        <Reveal tabbable={false} describe={false} className="ir-way-rv" detail={<><b>{w.title}</b><span className="rv-row">{w.detail}</span></>}>
+          <Link className="ir-way" href={caseHref(w.href, investigationId)}>
+            <span className="ir-way-mark" aria-hidden="true">{w.mark}</span>
+            <b>{w.title}</b><span>{w.line}</span></Link></Reveal>
+      </li>)}</ul>
+      {missing.length > 0 && <div className="ir-missing">
+        <p className="ir-cap"><Reveal detail="The case records these, but their files are not on this computer, so there is nothing to examine. Bring the file in to check it.">
+          <span>Recorded without their files</span></Reveal><b className="ir-missing-n">{missing.length}</b></p>
+        <ul>{missing.map(m => <li key={m.id}>
+          <Reveal tabbable={false} className="ir-missing-rv" detail={<><span className="rv-row">{m.why}</span>{m.url && <span className="rv-row rv-mono">{m.url}</span>}</>}>
+            <span className="ir-missing-row" title={m.title}><span className="ir-rail-mark" aria-hidden="true">{KIND_MARK[m.kind]}</span><span className="ir-rail-name">{m.title}</span></span></Reveal>
+        </li>)}</ul>
+      </div>}
+    </section>
+    <section className="ir-layers" aria-label="What Is it real? checks">
+      {LAYERS.map(l => <article key={l.n} className="ir-panel ir-layer">
+        <p className="ir-cap"><span className="ir-cap-title"><i>{l.n} {l.name}</i> <Reveal detail={l.detail}><span>{l.title}</span></Reveal></span></p>
+        <div className="ir-ghosts" aria-hidden="true">{l.ghost.map(g => <span key={g}>{g}</span>)}</div>
+      </article>)}
+    </section>
   </div>;
 }

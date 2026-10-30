@@ -93,7 +93,8 @@ export function useUndoPreDecided(investigationId: string): {run: (body: DemoPre
   return {run, pending: mutation.isPending};
 }
 
-/** The quiet line where the queue is: "n decided ahead by the demo · Undo them". Nothing when the demo decided none. */
+/** The quiet line where the queue is: the demo's mark, "n pre-decided" and Undo them; that the demo decided them, why,
+ *  and the counts by kind are on hover (DECISIONS_LOG 53). Nothing when the demo decided none. */
 export function PreDecidedLine({investigationId, isDemo, className}: {investigationId: string; isDemo?: boolean; className?: string}): ReactElement | null {
   const query = usePreDecided(investigationId, isDemo);
   const undo = useUndoPreDecided(investigationId);
@@ -139,7 +140,7 @@ export function PreDecidedLine({investigationId, isDemo, className}: {investigat
         {kinds.map(k => <span key={k} className="rv-row pd-kind"><span><b>{words(byKind[k], k)}</b>{outcomes(k) && <small>{outcomes(k)}</small>}</span>
           <button type="button" className="pd-undo-kind" onClick={() => ask(k)} aria-label={`Undo the ${KIND_WORDS[k][1]}`}>Undo</button></span>)}
       </>}>
-        <span className="pd-count"><DemoGlyph/><b>{total}</b> decided ahead by the demo</span></Reveal>
+        <span className="pd-count"><DemoGlyph/><b>{total}</b> pre-decided</span></Reveal>
       <button type="button" className="pd-undo" onClick={() => ask('all')}>Undo them</button>
     </>}
     {said && <span role="status" className="pd-quiet">{said}</span>}

@@ -3,6 +3,7 @@
 // only a person can make, on one whole screen. Queue on the left, grouped by where
 // it comes from; the evidence in the middle, still; the card on the right. Keys:
 // J/K move, 1/2/3 answer, Z undo, O open the source. An answer waits a few seconds before it is sent.
+import {useQuery} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {ReactElement} from 'react';
@@ -16,7 +17,9 @@ import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
 import {PreDecidedLine} from '../demo/pre-decided';
-import {DecisionCard, Excerpt, KindMark, PartyChips, RowCells, pageOf} from './decision-card';
+import {getInvestigationGraphOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {DecisionCard, Excerpt, KindMark, RowCells, pageOf} from './decision-card';
+import {LinkEvidence, partyLinks} from './party-links';
 import {HOLD_MS, KIND_LABEL, KIND_MEANING, acceptsInBulk, undoBlocked, useDecisions} from './use-decisions';
 import type {DecisionKind, DecisionOrder} from './use-decisions';
 
@@ -51,6 +54,8 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
   const inv = useWorkbenchStore(state => state.investigationId);
   const ev = item.evidence;
+  const graph = useQuery({...getInvestigationGraphOptions({path: {investigation_id: inv}}), enabled: Boolean(inv && !ev && item.parties.length > 1)}).data;
+  const links = useMemo(() => (!ev && item.parties.length > 1 && graph ? partyLinks(graph.edges, item.parties) : []), [ev, item.parties, graph]);
   return <section className="dc-evidence" aria-label="What it rests on">
     {ev ? <>
       <header className="dc-doc">
@@ -68,9 +73,16 @@ function EvidencePane({item}: {item: DecisionItemOut}): ReactElement {
             : <Excerpt text={ev.excerpt} terms={ev.terms}/>}</p> : <p className="ch-quiet">No passage is stored with this item.</p>}
       </div>
     </> : <div className="dc-read dc-noevidence">
-      <p className="ch-eyebrow"><KindMark kind={item.kind}/></p>
-      <p className="dc-proposal">{item.proposal}</p>
-      <PartyChips parties={item.parties}/>
+      {/* No passage of its own: what the records hold between its parties fills the pane (the card beside it has the
+          question, the proposal and the parties); with no link between them, why it is asked and what the case holds. */}
+      {links.length ? <>
+        <p className="dc-links-head"><Reveal detail="What the records show between this item's parties. Each link opens the page it was read from.">
+          <span>Between them in the records</span></Reveal><b>{links.length}</b></p>
+        <LinkEvidence links={links} parties={item.parties} limit={8}/>
+      </> : <>
+        {item.reason && item.kind !== 'missing' && <p className="dc-proposal dc-why">{item.reason}</p>}
+        {item.known && item.known.length > 0 && <ul className="ch-known" aria-label="Already in the case">{item.known.map(k => <li key={k}>{k}</li>)}</ul>}
+      </>}
       {item.kind === 'missing'
         ? <p className="ch-quiet">{item.reason}. <Reveal tabbable={false} detail="When the value is filled in where the record lives, this goes by itself.">
           <Link href={caseHref(item.open.href, inv)}>{item.open.label} →</Link></Reveal></p>

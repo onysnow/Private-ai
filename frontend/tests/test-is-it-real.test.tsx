@@ -6,7 +6,7 @@ import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-libr
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {IsItReal, RealnessList} from '../features/is-it-real/is-it-real';
+import {IsItReal, RealnessList, withoutFiles} from '../features/is-it-real/is-it-real';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import type {AuthenticityOut, AuthenticityPreviewOut} from '../lib/generated/types.gen';
@@ -208,5 +208,36 @@ describe('Is it real?', () => {
     render(<QueryProvider><RealnessList investigationId="inv-1"/></QueryProvider>);
     const again = await screen.findByRole('listbox', {name: 'Files'});
     expect(within(again).getByRole('option', {name: /e01-official\.eml/})).toHaveAttribute('aria-selected', 'true');
+  });
+});
+
+describe('Is it real? with no file in the case', () => {
+  afterEach(cleanup);
+  it('draws the four layers quietly, the ways in, and what the case records without its file', async () => {
+    mockApi({
+      'GET /api/investigations/inv-1/documents': [],
+      'GET /api/investigations/inv-1/authenticity': [],
+      'GET /api/investigations/inv-1/sources': [
+        {id: 's1', investigation_id: 'inv-1', title: 'Jho Low on a yacht', source_type: 'web', created_at: '2026-10-01T00:00:00', url: 'https://example.org/p.jpg',
+          metadata_json: {kind: 'photo', not_downloaded: 'Not fetched for this load.'}},
+        {id: 's2', investigation_id: 'inv-1', title: 'A court filing', source_type: 'document', created_at: '2026-10-01T00:00:00', metadata_json: {kind: 'judgment', not_downloaded: 'x'}},
+        {id: 's3', investigation_id: 'inv-1', title: 'A held photo', source_type: 'web', created_at: '2026-10-01T00:00:00', metadata_json: {kind: 'photo'}},
+      ],
+    });
+    render(<QueryProvider><RealnessList investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByText('Nothing to check yet')).toBeInTheDocument();
+    const layers = screen.getByRole('region', {name: 'What Is it real? checks'});
+    for (const t of ['Content credentials', 'Outlet and account reputation', 'Detectors', 'Status and your reasons']) expect(within(layers).getByText(t)).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: /The Drop/})).toHaveAttribute('href', '/bring-in?inv=inv-1#the-drop');
+    expect(screen.getByRole('link', {name: /Links & captures/})).toHaveAttribute('href', '/bring-in?drop=links&inv=inv-1#the-drop');
+    expect(await screen.findByText('Jho Low on a yacht')).toBeInTheDocument();
+    expect(screen.queryByText('A court filing')).toBeNull();
+    expect(screen.queryByText('A held photo')).toBeNull();
+  });
+
+  it('keeps only pictures, video, recordings and posts recorded without their file', () => {
+    const src = (kind: string, extra: Record<string, unknown>) => ({id: kind, investigation_id: 'i', title: kind, source_type: 'web', created_at: '', metadata_json: {kind, ...extra}});
+    expect(withoutFiles([src('photo', {link_only: 'a link'}), src('video', {not_downloaded: 'later'}), src('social', {link_only: 'post'}), src('article', {link_only: 'x'}), src('audio', {})])
+      .map(m => [m.kind, m.why])).toEqual([['image', 'a link'], ['video', 'later'], ['text', 'post']]);
   });
 });

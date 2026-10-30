@@ -40,3 +40,22 @@
 .tc-icon-btn:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
 .tc-none { margin: auto; font-size: 18px; color: var(--text-muted); }
 .tc-list > .tc-card.open { box-shadow: 0 0 0 2px var(--accent-1); }
+
+/* 30 Oct: each card says what tells it apart (Ony's card rule): its title is what its Red Flag found, with the years;
+   the question and why it is there under it. Cards keep to their content (no padding to share the height); the text
+   sits beside the answers, which keep to the right, so a card is one band wide rather than tall. The keys are behind ?. */
+.tc-list > .tc-card { flex: 0 0 auto; flex-direction: row; align-items: center; gap: 24px; padding: 16px 20px; }
+.tc-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.tc-list > .tc-card > .tc-decide { flex: 0 0 auto; margin-top: 0; }
+.tc-list > .tc-card .tc-decide .ch-choices { width: 440px; }
+.tc-list > .tc-card .tc-head h4 { font-size: clamp(17px, 1.45vw, 21px); }
+.tc-head { display: flex; gap: 10px; }
+.tc-when { margin-left: 4px; flex: none; font: 500 13px var(--font-mono); color: var(--accent-1); font-variant-numeric: tabular-nums; }
+.tc-ask { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 14px; color: var(--text-muted); padding-left: 32px; }
+.tc-ask b { color: var(--text); font-weight: 550; }
+.tc-keys { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); font: 600 11.5px var(--font-mono); color: var(--text-muted); cursor: help; }
+.tc-top > .rv:has(.tc-keys) { margin-left: auto; align-self: center; }
+@media (max-width: 1100px) {
+  .tc-list > .tc-card { flex-direction: column; align-items: stretch; }
+  .tc-list > .tc-card .tc-decide .ch-choices { width: auto; }
+}

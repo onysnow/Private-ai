@@ -190,3 +190,35 @@
 .ir-media span { max-width: 90%; font: 11px var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* A status or an option wrapped in its reveal stays the grid's cell. */
 .ir-statuses > .rv, .ir-options > .rv { display: grid; }
+
+/* No file in the case yet (30 Oct): the ways in on the left, as large as the room allows, with what the case records
+   without its file under them; the four layers of the item view drawn quietly on the right, their explanations on
+   their titles. */
+.ir-empty { grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); }
+.ir-empty-in { min-height: 0; display: flex; flex-direction: column; gap: 14px; }
+.ir-empty-in h2 { margin: 4px 0 0; font: 400 clamp(22px, 2.2vw, 30px)/1.15 var(--font-display, var(--font-ui)); }
+.ir-ways { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ir-way-rv { display: block; }
+.ir-way { display: grid; grid-template-columns: 44px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 16px 18px;
+  border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel), inset 0 0 0 1px var(--line); color: var(--text); text-decoration: none; }
+.ir-way:hover { box-shadow: var(--shadow-panel), inset 0 0 0 1px var(--accent-1); }
+.ir-way:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+.ir-way-mark { grid-row: 1 / 3; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; font-size: 22px; color: var(--accent-1);
+  background: color-mix(in srgb, var(--accent-1) 12%, transparent); }
+.ir-way b { font: 500 17px var(--font-ui); }
+.ir-way span:last-child { font-size: 12.5px; color: var(--text-muted); }
+.ir-missing { min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; padding: 12px 10px 8px 14px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
+.ir-missing .ir-cap { color: var(--text-muted); }
+.ir-missing-n { font: 500 15px var(--font-mono); color: var(--text); letter-spacing: 0; }
+.ir-missing ul { list-style: none; margin: 0; padding: 0 4px 0 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; align-content: start; gap: 1px; }
+.ir-missing-rv { display: block; min-width: 0; }
+.ir-missing-row { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 6px; align-items: center; padding: 5px 6px; border-radius: 8px; font-size: 12.5px; color: var(--text-muted); }
+.ir-missing-row:hover { background: var(--surface-2); color: var(--text); }
+.ir-missing-row .ir-rail-mark { opacity: .55; }
+.ir-layers { min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.ir-layer { display: flex; flex-direction: column; gap: 14px; opacity: .78; }
+.ir-layer .ir-cap-title { font-size: clamp(15px, 1.3vw, 18px); }
+.ir-ghosts { flex: 1; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 10px; }
+.ir-ghosts span { padding: 10px 16px; border-radius: 10px; border: 1px dashed color-mix(in srgb, var(--line) 90%, transparent); color: color-mix(in srgb, var(--text-muted) 75%, transparent);
+  font: 500 12px var(--font-mono); letter-spacing: .06em; }
+@media (max-width: 1100px) { .ir-empty { grid-template-columns: 1fr; } .ir-layers { grid-template-columns: 1fr; grid-template-rows: none; } }

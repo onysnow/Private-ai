@@ -1099,3 +1099,37 @@ person on the demo case can see what the demo decided and take it back. Built in
   does not know (a screen rendered alone), the counts endpoint's 404 says so and nothing shows. A status that waits
   again (proposed, open, new) is never counted as decided. Page tests answer the counts route for a demo case with no
   decisions by default (`frontend/test-support/page-routes.ts`); a case that is not a demo is not asked.
+
+## 54. Check's screens and Decide: each pane shows something of its own, and fills its room (30 Oct 2026)
+
+A visual sweep of the 1MDB demo at 1440×900 found these, and each is changed so:
+
+- **Is it real? with no file** was one line. It now fills the screen: "Nothing to check yet", the two ways in as large
+  cards (The Drop; Links & captures, which `?drop=links` now opens on The Drop's second tab), and the four layers of the
+  item view (CHECK_3: provenance, source, hints, you decide) drawn quietly, each one's explanation on its title. Under
+  the ways in, "Recorded without their files" lists the case's pictures, video, recordings and posts that the case
+  records as links or that were not downloaded (a source's `metadata_json` has `not_downloaded` or `link_only`), with
+  why on hover. They are listed there, not in the item rail: with no file there is nothing for the four layers to
+  examine (no credentials, no fingerprint), so they are a to-do, not an item.
+- **Decide**: the evidence pane and the card no longer say the same thing. A decision with no passage of its own (a
+  Red Flag's "records cannot show" part) has, in the evidence pane, what the records show between its parties (Case
+  home's link rows, now `party-links.tsx`, up to eight, larger), or else why it is asked and what the case holds; the
+  card has the question, the proposal, the parties and the answers. With a passage, the pane has the passage and the card
+  the proposal (it no longer repeats the passage). "What happens" is a mark in the card's top line, its words on hover,
+  instead of a heading over 250 px of nothing. The answer keys (1/2/3 on Decide, S/D/U on Case home) are behind a `?`
+  in the card's top line. The demo's line is its mark, the count, "pre-decided" and Undo them; that the demo decided
+  them, why, and the counts by kind stay on hover.
+- **Chain of Custody**: a small chain grows (CSS zoom, up to 1.5, never past what its columns' width allows) to fill
+  the room the log leaves it, instead of floating centred in empty space (`growScale`, unit-tested; Fit still scales
+  down). The claim picker is wider (up to 760 px), a longer claim ends in an ellipsis with the whole sentence on hover.
+  The claim card's Done checklist keeps only the rules not met in sight (an alert); the whole list is on the name. The
+  line key is a mark in the drawer, drawn on hover.
+- **To check**: one indicator asks each group the same question, so three cards had the same title. A card's title is
+  now what its Red Flag found, as the flag's summary words it ("3 payments between Tanore Finance Corporation and
+  Granton Property Holdings Limited"), with the years the flag covers; under it the question and why it is there (the
+  rest of the summary: "Both are held or run by …"). An item with no flag keeps its question. The amount is not there:
+  the item and its flag's facts carry the number of payments, not their sum (BO-031's facts: count, the two parties,
+  the holders). The S/D/U keys are behind a `?` by the counts. Cards keep to their content, the answers beside the text.
+- **Claims** with no claim open: under the status bars, "Left to do": near done (not yet shown, 70 % or more), under
+  50 %, not graded, leads, each a large count that filters the list (one at a time, with the status and the words;
+  Clear clears it). A list of claims was tried first; it repeated the left list's sentences on the same screen.
