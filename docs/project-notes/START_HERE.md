@@ -20,8 +20,13 @@ a Board note pinned to a single year shows on the board that now holds that year
 Built later on 30 Oct (DECISIONS_LOG 32–37): BO-033 raises one flag per payer and payee; a payment has a kind (a fine,
 an order or an agreed price is owed, not money that moved); one date and time style on every screen; a party's
 dossier opens in the inspector slot over the current screen (Esc, Back, a drag handle, a bottom sheet on a phone);
-claim evidence can be marked superseded; documents keep their kind and language (py3langid, ADR-0027). None of these
-has been looked at in a browser yet. Migrations chain a7d3f9c2e614 → a7f3c9e2d641 → a8d2f6c4e913.
+claim evidence can be marked superseded; documents keep their kind and language (py3langid, ADR-0027). Looked at in
+Chromium at 1440×900 on the 1MDB demo (30 Oct, later): Money's Ledger with "Owed, not paid: 19" folded under it; a
+claim's evidence marked superseded (struck, the counts drop, undo beside it); the dossier opening over Places with
+`?dossier=` and Esc closing it; Library kind marks and "EN English" detected on an uploaded text. Not looked at: the
+BO-033 payment list (1MDB has no pair with two payments; Anise needs its documents) and the dossier's drag handle and
+phone sheet. A dev server started with `npx next dev` skips `predev`, which copies MapLibre's worker: run
+`npm run dev`, or `node scripts/copy-maplibre-worker.mjs` first, or Places draws no map. Migrations chain a7d3f9c2e614 → a7f3c9e2d641 → a8d2f6c4e913.
 Open: openaleph-live's similar-documents test fails on some runs for a reason not established (PR #117 comments); The
 Wire is Ony's own redesign.
 
