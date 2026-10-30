@@ -413,3 +413,17 @@ session closing rolled back what the job had flushed but not committed. The read
 file, each inline job and scheduler tick runs on its own connection with a 60 s busy timeout
 (`app/db/session.py own_connection`), so SQLite's file lock keeps it apart, as PostgreSQL already does. Requests still
 share one connection with each other, as before. `tests/test_job_own_connection.py` reproduces the old failure.
+
+## 25. Sources & evidence is a browser; the watchlist searches the case when OpenAleph cannot (30 Oct 2026)
+
+Ony asked (BACKLOG): Sources & evidence was only a capture form; watchlist hits had bright yellow highlights and
+full-width text. No mockups; designed from the research. Calls:
+- **Sources & evidence**: every source, kind as a mark (worked out from stored data: document, web capture, web link
+  not downloaded, typed by hand, feed/mailbox/connector, OpenAleph), ordered by claims backed then evidence; a "shelf"
+  bar of all sources sized by their evidence; the picked source's pieces with one status-colour mark per claim and the
+  stance as a sign (+ backs, − cuts against, · context). The capture form is behind "Add a source". A new endpoint,
+  `GET /api/investigations/{id}/evidence-claim-links`, gives every link in one call instead of one per claim.
+- **Watchlist**: names | hits | passage side by side; matches tinted in the theme's accent with an underline.
+  When OpenAleph cannot be asked, a check searches the case's own read documents (`search_local`), so the watchlist
+  works for every case rather than only with OpenAleph or seeded demo hits. Other names are written
+  `Name (Other, Other)` and searched as `"Name" OR "Other"`. "New since you last looked" is kept in this browser only.

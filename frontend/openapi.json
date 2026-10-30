@@ -21947,6 +21947,30 @@
         "title": "EventIn",
         "type": "object"
       },
+      "EvidenceClaimLinkOut": {
+        "description": "One evidence record's link to one claim, and the stance it takes.",
+        "properties": {
+          "claim_id": {
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "stance": {
+            "title": "Stance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "claim_id",
+          "stance"
+        ],
+        "title": "EvidenceClaimLinkOut",
+        "type": "object"
+      },
       "EvidenceCreate": {
         "properties": {
           "captured_on": {
@@ -67560,6 +67584,59 @@
           }
         },
         "summary": "List Investigation Evidence"
+      }
+    },
+    "/api/investigations/{investigation_id}/evidence-claim-links": {
+      "get": {
+        "operationId": "list_investigation_evidence_claim_links",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EvidenceClaimLinkOut"
+                  },
+                  "title": "Response List Investigation Evidence Claim Links",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "List Investigation Evidence Claim Links"
       }
     },
     "/api/investigations/{investigation_id}/evidence-pack.zip": {

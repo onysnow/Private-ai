@@ -68,3 +68,30 @@ def test_investigation_evidence_pool_and_claim_link_safeguards():
     })
     assert cross.status_code == 400
     assert 'same investigation' in cross.json()['detail']
+
+
+def test_investigation_evidence_claim_links_lists_each_link_in_the_case_only():
+    client = client_for_test()
+    inv_a = client.post('/api/investigations', json={'name': 'Links A'}).json()['id']
+    inv_b = client.post('/api/investigations', json={'name': 'Links B'}).json()['id']
+    src_a = client.post('/api/sources', json={'investigation_id': inv_a, 'title': 'Filing A', 'source_type': 'document'}).json()
+    src_b = client.post('/api/sources', json={'investigation_id': inv_b, 'title': 'Filing B', 'source_type': 'document'}).json()
+    ev_a = client.post('/api/evidence', json={'source_id': src_a['id'], 'quote': 'Sentence A', 'locator': 'page 1'}).json()
+    ev_unlinked = client.post('/api/evidence', json={'source_id': src_a['id'], 'quote': 'Never used'}).json()
+    ev_b = client.post('/api/evidence', json={'source_id': src_b['id'], 'quote': 'Sentence B'}).json()
+    claim_1 = client.post('/api/claims', json={'investigation_id': inv_a, 'text': 'One', 'status': 'unverified', 'confidence': 0}).json()
+    claim_2 = client.post('/api/claims', json={'investigation_id': inv_a, 'text': 'Two', 'status': 'unverified', 'confidence': 0}).json()
+    claim_b = client.post('/api/claims', json={'investigation_id': inv_b, 'text': 'Other', 'status': 'unverified', 'confidence': 0}).json()
+    assert client.post(f"/api/claims/{claim_1['id']}/evidence", json={'evidence_id': ev_a['id'], 'stance': 'supports'}).status_code == 200
+    assert client.post(f"/api/claims/{claim_2['id']}/evidence", json={'evidence_id': ev_a['id'], 'stance': 'contradicts'}).status_code == 200
+    assert client.post(f"/api/claims/{claim_b['id']}/evidence", json={'evidence_id': ev_b['id'], 'stance': 'supports'}).status_code == 200
+
+    reply = client.get(f'/api/investigations/{inv_a}/evidence-claim-links')
+    assert reply.status_code == 200
+    links = reply.json()
+    assert sorted((x['evidence_id'], x['claim_id'], x['stance']) for x in links) == sorted([
+        (ev_a['id'], claim_1['id'], 'supports'), (ev_a['id'], claim_2['id'], 'contradicts'),
+    ])
+    assert all(set(x) == {'evidence_id', 'claim_id', 'stance'} for x in links)
+    assert ev_unlinked['id'] not in {x['evidence_id'] for x in links}
+    assert client.get('/api/investigations/no-such-case/evidence-claim-links').status_code == 404

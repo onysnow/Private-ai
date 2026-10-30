@@ -63,6 +63,7 @@ from app.schemas.responses import (
     DemoSeedOut,
     DocumentOut,
     ErrorOut,
+    EvidenceClaimLinkOut,
     EvidencePoolRow,
     FinancialLedgerOut,
     GraphOut,
@@ -99,6 +100,9 @@ from app.services.investigations import (
 )
 from app.services.investigations import (
     list_investigation_claims as _list_investigation_claims,
+)
+from app.services.investigations import (
+    list_investigation_evidence_claim_links as _list_investigation_evidence_claim_links,
 )
 from app.services.investigations import (
     list_investigation_connector_findings as _list_investigation_connector_findings,
@@ -632,6 +636,13 @@ def list_investigation_evidence(
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return _list_investigation_evidence(db, investigation_id, limit=limit, offset=offset)
+
+
+@router.get("/investigations/{investigation_id}/evidence-claim-links", response_model=list[EvidenceClaimLinkOut])
+def list_investigation_evidence_claim_links(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return _list_investigation_evidence_claim_links(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/sources", response_model=list[SourceOut])

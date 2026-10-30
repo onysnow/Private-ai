@@ -825,6 +825,9 @@ import type {
   ListInvestigationCrossReferencesData,
   ListInvestigationCrossReferencesErrors,
   ListInvestigationCrossReferencesResponses,
+  ListInvestigationEvidenceClaimLinksData,
+  ListInvestigationEvidenceClaimLinksErrors,
+  ListInvestigationEvidenceClaimLinksResponses,
   ListInvestigationEvidenceData,
   ListInvestigationEvidenceErrors,
   ListInvestigationEvidenceResponses,
@@ -1859,6 +1862,8 @@ import {
   zListInvestigationCrossReferencesPath,
   zListInvestigationCrossReferencesQuery,
   zListInvestigationCrossReferencesResponse,
+  zListInvestigationEvidenceClaimLinksPath,
+  zListInvestigationEvidenceClaimLinksResponse,
   zListInvestigationEvidencePath,
   zListInvestigationEvidenceQuery,
   zListInvestigationEvidenceResponse,
@@ -9123,6 +9128,37 @@ export const listInvestigationEvidence = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zListInvestigationEvidenceResponse.parseAsync(data),
     url: '/api/investigations/{investigation_id}/evidence',
+    ...options,
+  });
+
+/**
+ * List Investigation Evidence Claim Links
+ */
+export const listInvestigationEvidenceClaimLinks = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ListInvestigationEvidenceClaimLinksData, ThrowOnError>,
+): RequestResult<
+  ListInvestigationEvidenceClaimLinksResponses,
+  ListInvestigationEvidenceClaimLinksErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ListInvestigationEvidenceClaimLinksResponses,
+    ListInvestigationEvidenceClaimLinksErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zListInvestigationEvidenceClaimLinksPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zListInvestigationEvidenceClaimLinksResponse.parseAsync(data),
+    url: '/api/investigations/{investigation_id}/evidence-claim-links',
     ...options,
   });
 

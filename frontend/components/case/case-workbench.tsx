@@ -62,6 +62,7 @@ import {ReviewQueuePanel} from '../../features/review-queue/review-queue-panel';
 import {SearchPanel} from '../../features/search/search-panel';
 import {SecurityPanel} from '../../features/security/security-panel';
 import {SourceCapturePanel} from '../../features/source-capture/source-capture-panel';
+import {SourcesBrowser} from '../../features/source-capture/sources-browser';
 import {TimelinePanel} from '../../features/timeline/timeline-panel';
 import {api} from '../../lib/api-instance';
 import type {CitationDetail} from '../../lib/api-types';
@@ -285,8 +286,8 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         {anchor: 'following', label: 'Following', fill: true, render: () => <PanelErrorBoundary name="Following"><Following investigationId={inv} active={view === 'collect'}/></PanelErrorBoundary>},
         {anchor: 'investigation-search', label: 'Search', render: () => <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'document-ingestion', label: 'Library', render: () => <PanelErrorBoundary name="Library"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'source-capture', label: 'Sources & evidence', render: () => <PanelErrorBoundary name="Source & exact evidence capture">
-          <SourceCapturePanel investigationId={inv} sourceCount={sourcesQuery.data?.length ?? 0} evidenceCount={evidenceQuery.data?.length ?? 0}/></PanelErrorBoundary>},
+        {anchor: 'source-capture', label: 'Sources & evidence', fill: true, render: () => <PanelErrorBoundary name="Sources & evidence">
+          <SourcesBrowser investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'connectors', label: 'Connectors', render: () => <PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary>},
         {anchor: 'corpus', label: 'OpenAleph corpus', render: () => <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>},
       ])}

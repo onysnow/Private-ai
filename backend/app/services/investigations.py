@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.authorization import AuthorizationScope
 from app.models.domain import (
-    Claim, ConnectorFinding, ConnectorRun, Document, Evidence, Investigation,
+    Claim, ClaimEvidenceLink, ConnectorFinding, ConnectorRun, Document, Evidence, Investigation,
     Lead, ReportingTask, Source,
 )
 from app.schemas.api import InvestigationCreate
@@ -105,6 +105,19 @@ def list_investigation_sources(
     if limit is not None:
         stmt = stmt.limit(limit)
     return list(db.scalars(stmt).all())
+
+
+def list_investigation_evidence_claim_links(db: Session, investigation_id: str) -> list[dict]:
+    """Every evidence-to-claim link in the investigation, one row per link: which
+    evidence record backs, contradicts or gives context to which claim. Lets the
+    Sources & evidence browser show each record's claims without a call per claim."""
+    rows = db.execute(
+        select(ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance)
+        .join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
+        .where(Claim.investigation_id == investigation_id)
+        .order_by(ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance)
+    ).all()
+    return [{"evidence_id": e, "claim_id": c, "stance": st} for e, c, st in rows]
 
 
 def list_investigation_claims(

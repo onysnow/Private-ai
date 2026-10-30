@@ -10290,6 +10290,26 @@ export type EventIn = {
 };
 
 /**
+ * EvidenceClaimLinkOut
+ *
+ * One evidence record's link to one claim, and the stance it takes.
+ */
+export type EvidenceClaimLinkOut = {
+  /**
+   * Claim Id
+   */
+  claim_id: string;
+  /**
+   * Evidence Id
+   */
+  evidence_id: string;
+  /**
+   * Stance
+   */
+  stance: string;
+};
+
+/**
  * EvidenceCreate
  */
 export type EvidenceCreate = {
@@ -33359,6 +33379,44 @@ export type ListInvestigationEvidenceResponses = {
 
 export type ListInvestigationEvidenceResponse =
   ListInvestigationEvidenceResponses[keyof ListInvestigationEvidenceResponses];
+
+export type ListInvestigationEvidenceClaimLinksData = {
+  body?: never;
+  path: {
+    /**
+     * Investigation Id
+     */
+    investigation_id: string;
+  };
+  query?: never;
+  url: '/api/investigations/{investigation_id}/evidence-claim-links';
+};
+
+export type ListInvestigationEvidenceClaimLinksErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type ListInvestigationEvidenceClaimLinksError =
+  ListInvestigationEvidenceClaimLinksErrors[keyof ListInvestigationEvidenceClaimLinksErrors];
+
+export type ListInvestigationEvidenceClaimLinksResponses = {
+  /**
+   * Response List Investigation Evidence Claim Links
+   *
+   * Successful Response
+   */
+  200: Array<EvidenceClaimLinkOut>;
+};
+
+export type ListInvestigationEvidenceClaimLinksResponse =
+  ListInvestigationEvidenceClaimLinksResponses[keyof ListInvestigationEvidenceClaimLinksResponses];
 
 export type ExportEvidencePackData = {
   body?: never;

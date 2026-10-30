@@ -4101,6 +4101,17 @@ export const zEventIn = z.object({
 });
 
 /**
+ * EvidenceClaimLinkOut
+ *
+ * One evidence record's link to one claim, and the stance it takes.
+ */
+export const zEvidenceClaimLinkOut = z.object({
+  claim_id: z.string(),
+  evidence_id: z.string(),
+  stance: z.string(),
+});
+
+/**
  * EvidenceCreate
  */
 export const zEvidenceCreate = z.object({
@@ -14041,6 +14052,19 @@ export const zListInvestigationEvidenceQuery = z.object({
  * Successful Response
  */
 export const zListInvestigationEvidenceResponse = z.array(zEvidencePoolRow);
+
+export const zListInvestigationEvidenceClaimLinksPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Response List Investigation Evidence Claim Links
+ *
+ * Successful Response
+ */
+export const zListInvestigationEvidenceClaimLinksResponse = z.array(
+  zEvidenceClaimLinkOut,
+);
 
 export const zExportEvidencePackPath = z.object({
   investigation_id: z.string(),

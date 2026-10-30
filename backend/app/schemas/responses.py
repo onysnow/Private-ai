@@ -1828,6 +1828,13 @@ class ClaimEvidenceLinkOut(ResponseModel):
     created_at: Timestamp
 
 
+class EvidenceClaimLinkOut(ResponseModel):
+    """One evidence record's link to one claim, and the stance it takes."""
+    evidence_id: str
+    claim_id: str
+    stance: str  # supports | contradicts | context
+
+
 class ClaimEvidenceRowOut(ResponseModel):
     """One linked evidence record with the source it came from, as the
     claim's evidence list and review workspace show it."""

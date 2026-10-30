@@ -6,14 +6,14 @@ from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
+from openaleph_fake import FakeOpenAleph, entity, page
 
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.main import app
 from app.models.domain import Investigation, Lead, LeadLink
 from app.services import openaleph_analysis
-from app.services.watchlists import search_text
-from openaleph_fake import FakeOpenAleph, entity, page
+from app.services.watchlists import names_of, search_text
 
 client = TestClient(app)
 
@@ -117,6 +117,34 @@ def test_openaleph_off_is_the_entrys_check_state(fake, monkeypatch):
     monkeypatch.setattr(settings, "openaleph_enabled", False)
     checked = client.post(f"/api/investigations/{inv}/watchlist/check").json()
     assert checked["new_hits"] == 0
-    assert checked["entries"][0]["check_state"] == "not_configured"
+    assert checked["entries"][0]["check_state"] == "local"   # the investigation's own documents were searched instead
+    assert checked["entries"][0]["check_detail"].startswith("OpenAleph is not switched on")
     assert client.get("/api/investigations/nope/watchlist").status_code == 404
     assert client.post("/api/watchlist-hits/nope/lead").status_code == 404
+
+
+def test_a_name_with_its_other_names_is_searched_as_each_of_them():
+    assert search_text("Low Taek Jho (Jho Low, Jho)") == '"Low Taek Jho" OR "Jho Low" OR "Jho"'
+    assert names_of("Low Taek Jho (Jho Low; Jho)") == ["Low Taek Jho", "Jho Low", "Jho"]
+    assert names_of('"Jane Doe" OR Zanzibar') == ["Jane Doe", "Zanzibar"]
+    assert names_of("Zanzi*") == [] and names_of("Jane AND Doe") == []
+
+
+def test_without_openaleph_the_investigations_own_documents_are_searched(fake, monkeypatch):
+    monkeypatch.setattr(settings, "openaleph_enabled", False)
+    inv = _investigation()
+    filler = "The board met. " * 20
+    memo = _upload(inv, "memo.txt", f"{filler}Jane Doe paid Zanzibar   Trading, and zanzibar trading paid back. {filler}".encode())
+    _upload(inv, "other.txt", b"Nothing about it here.")
+    client.post(f"/api/investigations/{inv}/watchlist", json={"query": "Zanzibar Trading (ZT Ltd)"})
+    checked = client.post(f"/api/investigations/{inv}/watchlist/check").json()
+    assert checked["new_hits"] == 1
+    entry = checked["entries"][0]
+    assert entry["check_state"] == "local" and entry["check_detail"].endswith("the investigation's own read documents were searched")
+    [hit] = entry["hits"]
+    assert hit["document_id"] == memo["id"] and hit["title"] == "memo.txt"
+    assert len(hit["highlights"]) == 1   # one short text is one chunk, so one passage
+    pieces = hit["highlights"][0]
+    assert [p["text"] for p in pieces if p["match"]] == ["Zanzibar Trading", "zanzibar trading"]
+    assert pieces[0]["text"] == "… " and pieces[-1]["text"] == " …"
+    assert client.post(f"/api/investigations/{inv}/watchlist/check").json()["new_hits"] == 0

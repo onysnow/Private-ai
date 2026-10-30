@@ -281,6 +281,7 @@ import {
   listInvestigationAiAnalysisCandidates,
   listInvestigationCrossReferences,
   listInvestigationEvidence,
+  listInvestigationEvidenceClaimLinks,
   listInvestigationRelationships,
   listInvestigations,
   listJobsEndpoint,
@@ -1235,6 +1236,9 @@ import type {
   ListInvestigationCrossReferencesData,
   ListInvestigationCrossReferencesError,
   ListInvestigationCrossReferencesResponse,
+  ListInvestigationEvidenceClaimLinksData,
+  ListInvestigationEvidenceClaimLinksError,
+  ListInvestigationEvidenceClaimLinksResponse,
   ListInvestigationEvidenceData,
   ListInvestigationEvidenceError,
   ListInvestigationEvidenceResponse,
@@ -8899,6 +8903,34 @@ export const listInvestigationEvidenceInfiniteOptions = (
   );
   return opts as Omit<typeof opts, 'initialData'>;
 };
+
+export const listInvestigationEvidenceClaimLinksQueryKey = (
+  options: Options<ListInvestigationEvidenceClaimLinksData>,
+) => createQueryKey('listInvestigationEvidenceClaimLinks', options);
+
+/**
+ * List Investigation Evidence Claim Links
+ */
+export const listInvestigationEvidenceClaimLinksOptions = (
+  options: Options<ListInvestigationEvidenceClaimLinksData>,
+) =>
+  queryOptions<
+    ListInvestigationEvidenceClaimLinksResponse,
+    ListInvestigationEvidenceClaimLinksError,
+    ListInvestigationEvidenceClaimLinksResponse,
+    ReturnType<typeof listInvestigationEvidenceClaimLinksQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listInvestigationEvidenceClaimLinks({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listInvestigationEvidenceClaimLinksQueryKey(options),
+  });
 
 export const exportEvidencePackQueryKey = (
   options: Options<ExportEvidencePackData>,

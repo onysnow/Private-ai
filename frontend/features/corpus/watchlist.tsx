@@ -1,17 +1,20 @@
 'use client';
-// The watchlist (ADR-0006, Wave C; backend app/services/watchlists.py): names
-// or searches the reporter wants to know about. Each is searched in the
-// investigation's OpenAleph collection whenever OpenAleph has read a new
-// document of it, and on "Check now". Every document a name is found in shows
-// once, with OpenAleph's highlighted snippet; the reporter opens it, makes it
-// a lead (linked to the document's source) or dismisses it. Nothing becomes a
-// lead on its own.
+// The watchlist (ADR-0006, Wave C; backend app/services/watchlists.py): names the reporter wants to know about. Each is
+// searched whenever a document of the investigation has been read, and on "Check now": in OpenAleph when it is set up,
+// otherwise in the investigation's own read documents. Every document a name turns up in shows once, with the passage
+// around it; the reporter opens it at that page, makes it a lead (linked to the document's source) or dismisses it.
+// Nothing becomes a lead on its own.
+//
+// Laid out side by side rather than as full-width text (Ony, BACKLOG "Watchlist hits"): the watched names with how many
+// documents each turned up and how many are new since the reporter last looked | that name's hits, one compact snippet
+// each | the picked hit's passage, read in the reading face, with the document and page as a link into the reading
+// room. Matches are marked with a low tint of the theme's accent and an underline, never a bright highlighter.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {ArrowUpRight, FileArchive, FileAudio, FileImage, FileSpreadsheet, FileText, FileVideo, Globe, Mail, Plus, RefreshCw, X} from 'lucide-react';
+import {useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
 import {z} from 'zod';
 
-import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Reveal} from '../../components/ui/reveal';
@@ -21,14 +24,15 @@ import {
   addWatchlistEntryMutation, checkWatchlistNowMutation, dismissHitMutation, getWatchlistOptions, getWatchlistQueryKey,
   listLeadsQueryKey, makeLeadFromHitMutation, removeWatchlistEntryMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import type {WatchlistEntryOut, WatchlistHitOut, WatchlistOut} from '../../lib/generated/types.gen';
+import type {HighlightSegmentOut, WatchlistEntryOut, WatchlistHitOut, WatchlistOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {Snippet} from '../search/corpus-results';
 
-// What the reporter types to watch a name (backend WatchlistEntryCreate: query 1–512, note up to 2000).
+// What the reporter types to watch a name (backend WatchlistEntryCreate: query 1–512, note up to 2000). Other names are
+// kept in the query as "Name (Other, Other)", which the backend searches as each of them.
 const watchSchema = z.object({
-  query: z.string().trim().min(1, 'Type a name or a search to watch.').max(512, 'Keep it under 512 characters.'),
+  query: z.string().trim().min(1, 'Type a name or a search to watch.').max(400, 'Keep it under 400 characters.'),
+  aliases: z.string().trim().max(100, 'Keep the other names under 100 characters.'),
   note: z.string().trim().max(2000, 'Keep the reason under 2,000 characters.'),
 });
 type WatchValues = z.infer<typeof watchSchema>;
@@ -37,37 +41,89 @@ const CHECK_STATE: Record<string, string> = {
   not_configured: 'OpenAleph is not set up here, so the name was not searched.',
   no_collection: 'No document of this investigation has been sent to OpenAleph yet.',
 };
+const SEARCHED_OK = new Set(['ok', 'local']);
 
 /** The entry's last check in plain words. */
 export function lastCheck(entry: WatchlistEntryOut): string {
-  if (!entry.checked_at) return 'Not checked yet: it is searched when OpenAleph next reads a document, or on “Check now”.';
+  if (!entry.checked_at) return 'Not checked yet: it is searched when a document is next read, or on “Check now”.';
   const at = apiTime(entry.checked_at).toLocaleString();
-  if (entry.check_state === 'ok') return `Last checked ${at}.`;
+  if (entry.check_state === 'ok') return `Last checked ${at} in OpenAleph.`;
+  if (entry.check_state === 'local') return `Last checked ${at} in this investigation's own read documents (OpenAleph could not be asked).`;
   return `Last checked ${at}: ${CHECK_STATE[entry.check_state ?? ''] ?? entry.check_detail ?? 'OpenAleph could not be asked.'}`;
 }
 
-function Hit({hit, onOpen, onLead, onDismiss, busy}: {hit: WatchlistHitOut; onOpen: () => void; onLead: () => void;
-  onDismiss: () => void; busy: boolean}): ReactElement {
-  return <li>
-    {hit.page_number ? <Reveal detail={`· page ${hit.page_number}`}><b>{hit.title}</b></Reveal> : <b>{hit.title}</b>}
-    {hit.highlights.slice(0, 2).map((pieces, index) => <Snippet key={index} pieces={pieces}/>)}
-    <div className="actions">
-      {hit.document_id && <Button variant="link" onClick={onOpen}>Open document</Button>}
-      {hit.status === 'new' ? <>
-        <Button size="sm" variant="outline" onClick={onLead} disabled={busy}>Add to leads</Button>
-        <Button size="sm" variant="ghost" onClick={onDismiss} disabled={busy}>Dismiss</Button>
-      </> : <small>{hit.status === 'lead' ? 'In leads' : 'Dismissed'}</small>}
-    </div>
-  </li>;
+/** A watched entry as its name and other names: "Low Taek Jho (Jho Low)" is Low Taek Jho, also Jho Low. */
+export function splitAliases(query: string): {name: string; aliases: string[]} {
+  const bracketed = /^([^()"]+?)\s*\(([^()"]+)\)$/.exec(query.trim());
+  if (!bracketed) return {name: query, aliases: []};
+  return {name: bracketed[1].trim(), aliases: bracketed[2].split(/[,;]/).map(a => a.trim()).filter(Boolean)};
 }
+
+/** What is sent: the name, with any other names in brackets. */
+export function watchQuery(name: string, aliases: string): string {
+  const others = aliases.split(/[,;]/).map(a => a.trim()).filter(Boolean);
+  return others.length ? `${name.trim()} (${others.join(', ')})` : name.trim();
+}
+
+// The document's kind as a mark, named on hover (Ony, 29 Oct: types are marks).
+const KINDS: [RegExp, string, typeof FileText][] = [
+  [/\.(eml|msg|mbox)$/i, 'Email', Mail], [/\.(zip|7z|tar|gz|rar)$/i, 'Archive', FileArchive],
+  [/\.(html?|warc|mhtml)$/i, 'Web page', Globe], [/\.(csv|xlsx?|ods|tsv)$/i, 'Spreadsheet', FileSpreadsheet],
+  [/\.(png|jpe?g|gif|tiff?|webp|heic)$/i, 'Picture', FileImage], [/\.(mp3|wav|m4a|ogg|flac)$/i, 'Recording', FileAudio],
+  [/\.(mp4|mov|webm|mkv)$/i, 'Video', FileVideo],
+];
+function DocMark({title}: {title: string}): ReactElement {
+  const [, word, Icon] = KINDS.find(([test]) => test.test(title)) ?? [null, 'Document', FileText];
+  return <Reveal label={word} detail={word} tabbable={false} className="wl-kind"><Icon size={15} aria-hidden="true"/></Reveal>;
+}
+
+/** The pieces cut to start shortly before the first match, so a two-line snippet shows the name, not what leads up to it. */
+export function aroundMatch(pieces: HighlightSegmentOut[], lead = 60): HighlightSegmentOut[] {
+  const first = pieces.findIndex(piece => piece.match);
+  if (first < 0) return pieces;
+  const before = pieces.slice(0, first).map(piece => piece.text).join('');
+  if (before.length <= lead) return pieces;
+  const cut = before.slice(-lead);
+  const word = cut.indexOf(' ');
+  return [{text: `… ${word >= 0 ? cut.slice(word + 1) : cut}`, match: false}, ...pieces.slice(first)];
+}
+
+function Passage({pieces, className}: {pieces: HighlightSegmentOut[]; className: string}): ReactElement {
+  return <p className={className}>{pieces.map((piece, index) => piece.match
+    ? <mark key={index} className="wl-mark">{piece.text}</mark>
+    : <span key={index}>{piece.text}</span>)}</p>;
+}
+
+// When the reporter last looked at each name, in this browser only (a convenience: what counts as new to them).
+const LOOK_KEY = (investigationId: string) => `wl-looked:${investigationId}`;
+function readLooks(investigationId: string): Record<string, number> {
+  try { return JSON.parse(window.localStorage.getItem(LOOK_KEY(investigationId)) ?? '{}') as Record<string, number>; } catch { return {}; }
+}
+function writeLook(investigationId: string, entryId: string): void {
+  try {
+    const looks = readLooks(investigationId);
+    window.localStorage.setItem(LOOK_KEY(investigationId), JSON.stringify({...looks, [entryId]: Date.now()}));
+  } catch { /* private window or blocked storage: nothing is marked as seen */ }
+}
+
+const isNew = (hit: WatchlistHitOut, since: number | undefined) => since === undefined || apiTime(hit.found_at).getTime() > since;
+const pageWord = (hit: WatchlistHitOut) => (hit.page_number ? `p. ${hit.page_number}` : '');
 
 export function Watchlist({investigationId}: {investigationId: string}): ReactElement {
   const queryClient = useQueryClient();
   const openDocument = useWorkbenchStore(state => state.openDocument);
   const path = {investigation_id: investigationId};
   const key = getWatchlistQueryKey({path});
-  const form = useZodForm<WatchValues>(watchSchema, {defaultValues: {query: '', note: ''}, mode: 'onSubmit'});
+  const form = useZodForm<WatchValues>(watchSchema, {defaultValues: {query: '', aliases: '', note: ''}, mode: 'onSubmit'});
+  const typed = form.watch('query');
   const [status, setStatus] = useState('');
+  const [picked, setPicked] = useState<string | null>(null);
+  const [pickedHit, setPickedHit] = useState<string | null>(null);
+  const [scope, setScope] = useState<'open' | 'all' | null>(null);
+  // The looks as they were when the screen opened: what was new stays marked while the reporter reads it.
+  const [looks, setLooks] = useState<Record<string, number>>({});
+  useEffect(() => { setLooks(readLooks(investigationId)); }, [investigationId]);
+
   const watchlist = useQuery({...getWatchlistOptions({path}), enabled: Boolean(investigationId)});
   const add = useMutation({...addWatchlistEntryMutation()});
   const check = useMutation({...checkWatchlistNowMutation()});
@@ -82,10 +138,11 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
   };
 
   // An empty name is refused under the field; a refused save stays in the form, under the field the server names.
-  const submit = submitWith(form, async ({query, note}) => {
-    keep(await add.mutateAsync({path, body: {query, note: note || null}}));
+  const submit = submitWith(form, async ({query, aliases, note}) => {
+    const watched = watchQuery(query, aliases);
+    keep(await add.mutateAsync({path, body: {query: watched, note: note || null}}));
     form.reset();
-    setStatus(`Watching “${query}”.`);
+    setStatus(`Watching “${watched}”.`);
   }, 'Could not watch the name');
   const checkNow = () => attempt(async () => {
     const reply = await check.mutateAsync({path});
@@ -94,6 +151,7 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
   }, 'Could not check the watchlist');
   const stopWatching = (entry: WatchlistEntryOut) => attempt(async () => {
     keep(await remove.mutateAsync({path: {watch_id: entry.id}}));
+    if (picked === entry.id) setPicked(null);
     return `Stopped watching “${entry.query}”.`;
   }, 'Could not stop watching the name');
   const makeLead = (hit: WatchlistHitOut) => attempt(async () => {
@@ -107,39 +165,126 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
   }, 'Could not dismiss it');
 
   const entries = watchlist.data?.entries ?? [];
-  return <div className="candidate">
-    <Reveal detail="Names searched in this investigation's documents whenever OpenAleph reads a new one. Each document a name turns up in shows here once."><b>Watchlist</b></Reveal>
-    <Form {...form}><form onSubmit={submit} className="actions" aria-label="Watch a name" noValidate>
-      <FormField control={form.control} name="query" render={({field}) => <FormItemBare>
-        <FormControl><Input {...field} aria-label="Name or search to watch" placeholder="A name, or a search like “Jane Doe” OR Zanzibar"/></FormControl>
-        <FormMessage className="field-msg next-line"/></FormItemBare>}/>
-      <FormField control={form.control} name="note" render={({field}) => <FormItemBare>
-        <FormControl><Input {...field} aria-label="Why it is watched" placeholder="Why (optional)"/></FormControl>
-        <FormMessage className="field-msg next-line"/></FormItemBare>}/>
-      <FormRootError className="field-msg next-line"/>
-      <Button type="submit" disabled={add.isPending}>Watch</Button>
-    </form></Form>
-    {watchlist.isError && <p className="muted">{errorMessage(watchlist.error, 'Could not load the watchlist')}</p>}
-    {watchlist.data && entries.length === 0 && <p className="muted">No name is watched yet.</p>}
-    {entries.length > 0 && <Button variant="outline" onClick={() => void checkNow()} disabled={check.isPending}>{check.isPending ? 'Checking…' : 'Check now'}</Button>}
-    {entries.map(entry => {
-      const open = entry.hits.filter(hit => hit.status === 'new');
-      return <div className="statement" key={entry.id}>
-        <div>
-          {/* The counts show; the note and the last check are on hover. A check that failed stays on screen. */}
-          <Reveal detail={<>{entry.note && <span className="rv-row">{entry.note}</span>}<span className="rv-row">{lastCheck(entry)}</span>
-            <span className="rv-row">{entry.hits.length === 0 ? 'Not found in any document yet.' : `Found in ${entry.hits.length} document(s), ${open.length} to decide.`}</span></>}>
-            <b>{entry.query}</b></Reveal>
-          {' '}<small><b>{entry.hits.length}</b>{open.length > 0 && <> · <b>{open.length}</b> to decide</>}</small>
-          {entry.checked_at && entry.check_state !== 'ok' && <div><small className="co-warn">{lastCheck(entry)}</small></div>}
+  const toDecide = (entry: WatchlistEntryOut) => entry.hits.filter(hit => hit.status === 'new');
+  // The picked name: the reporter's, else the first with hits to decide, else the first.
+  const entry = entries.find(e => e.id === picked) ?? entries.find(e => toDecide(e).length > 0) ?? entries[0];
+  const open = entry ? toDecide(entry) : [];
+  const view = scope ?? (open.length > 0 ? 'open' : 'all');
+  const hits = entry ? (view === 'open' ? open : entry.hits) : [];
+  const hit = hits.find(h => h.id === pickedHit) ?? hits[0];
+  const pick = (next: WatchlistEntryOut) => { setPicked(next.id); setPickedHit(null); setScope(null); writeLook(investigationId, next.id); };
+  // The name shown first counts as looked at too.
+  useEffect(() => { if (entry && picked === null) writeLook(investigationId, entry.id); }, [entry, picked, investigationId]);
+
+  // A check that could not search is an alert: said once for the whole list when every name shares it.
+  const failing = entries.filter(e => e.checked_at && !SEARCHED_OK.has(e.check_state ?? ''));
+  const totalNew = entries.reduce((sum, e) => sum + toDecide(e).length, 0);
+  const lastChecked = entries.map(e => e.checked_at).filter((at): at is string => Boolean(at)).sort().at(-1);
+
+  return <section className="wl" aria-label="Watchlist">
+    <div className="wl-names">
+      <header className="wl-head">
+        <Reveal detail="Names searched whenever a document of this investigation is read. Each document a name turns up in shows here once; nothing becomes a lead on its own.">
+          <h4 className="wl-title">Watchlist</h4></Reveal>
+        {totalNew > 0 && <Reveal detail={`${totalNew} document(s) to decide across every name.`}><span className="wl-total">{totalNew}</span></Reveal>}
+        {entries.length > 0 && <Reveal tabbable={false} className="wl-push" detail={lastChecked ? `Last checked ${apiTime(lastChecked).toLocaleString()}.` : 'Not checked yet.'}>
+          <button type="button" className="wl-icon" aria-label="Check now" onClick={() => void checkNow()} disabled={check.isPending}>
+            <RefreshCw size={15} aria-hidden="true" className={check.isPending ? 'wl-spin' : undefined}/></button></Reveal>}
+      </header>
+      {watchlist.isError && <p className="wl-alert">{errorMessage(watchlist.error, 'Could not load the watchlist')}</p>}
+      {failing.length > 0 && <p className="wl-alert">{failing.length === entries.length && failing.every(e => e.check_state === failing[0].check_state)
+        ? lastCheck(failing[0]) : `${failing.length} name(s) could not be searched: ${failing.map(e => splitAliases(e.query).name).join(', ')}.`}</p>}
+      {watchlist.data && entries.length === 0 && <p className="wl-empty">No name is watched yet. Try a person or a company, with the other names they go by.</p>}
+      <ul className="wl-list" aria-label="Watched names">
+        {entries.map(e => {
+          const {name, aliases} = splitAliases(e.query);
+          const fresh = e.hits.filter(h => isNew(h, looks[e.id]) && h.status === 'new').length;
+          const undecided = toDecide(e).length;
+          return <li key={e.id} className={e.id === entry?.id ? 'on' : undefined}>
+            <button type="button" className="wl-name" aria-pressed={e.id === entry?.id} onClick={() => pick(e)}>
+              <Reveal tabbable={false} className="wl-grow" detail={<>
+                {aliases.length > 0 && <span className="rv-row">Also: {aliases.join(', ')}</span>}
+                {e.note && <span className="rv-row">{e.note}</span>}
+                <span className="rv-row">{e.hits.length === 0 ? 'Not found in any document yet.' : `Found in ${e.hits.length} document(s), ${undecided} to decide.`}</span>
+                <span className="rv-row">{lastCheck(e)}</span></>}>
+                <span className="wl-name-text">{name}</span>
+              </Reveal>
+              {aliases.length > 0 && <i className="wl-aka" aria-label={`also ${aliases.join(', ')}`}>aka</i>}
+              {fresh > 0 && <span className="wl-new" aria-label={`${fresh} new since you last looked`}><i aria-hidden="true"/>{fresh}</span>}
+              <b className={e.hits.length ? 'wl-count' : 'wl-count zero'}>{e.hits.length}</b>
+            </button>
+            <button type="button" className="wl-stop" aria-label={`Stop watching ${e.query}`} onClick={() => void stopWatching(e)}><X size={13} aria-hidden="true"/></button>
+          </li>;
+        })}
+      </ul>
+      <Form {...form}><form onSubmit={submit} className="wl-add" aria-label="Watch a name" noValidate>
+        <div className="wl-add-row">
+          <FormField control={form.control} name="query" render={({field}) => <FormItemBare>
+            <FormControl><Input {...field} aria-label="Name or search to watch" placeholder="Watch a name…"/></FormControl>
+            <FormMessage className="field-msg"/></FormItemBare>}/>
+          <button type="submit" className="wl-icon pri" aria-label="Watch" disabled={add.isPending}><Plus size={16} aria-hidden="true"/></button>
         </div>
-        {entry.hits.length > 0 && <ul aria-label={`Where “${entry.query}” was found`}>
-          {entry.hits.map(hit => <Hit key={hit.id} hit={hit} busy={busy} onOpen={() => openDocument(hit.document_id as string, hit.page_number)}
-            onLead={() => void makeLead(hit)} onDismiss={() => void dismissHit(hit)}/>)}
+        {typed.trim() && <>
+          <FormField control={form.control} name="aliases" render={({field}) => <FormItemBare>
+            <FormControl><Input {...field} aria-label="Other names" placeholder="Other names, with commas (optional)"/></FormControl>
+            <FormMessage className="field-msg"/></FormItemBare>}/>
+          <FormField control={form.control} name="note" render={({field}) => <FormItemBare>
+            <FormControl><Input {...field} aria-label="Why it is watched" placeholder="Why (optional)"/></FormControl>
+            <FormMessage className="field-msg"/></FormItemBare>}/>
+        </>}
+        <FormRootError className="field-msg"/>
+      </form></Form>
+      {status && <p className="wl-status" role="status">{status}</p>}
+    </div>
+
+    <div className="wl-hits">
+      {entry && <>
+        <header className="wl-head">
+          <h4 className="wl-sub">{splitAliases(entry.query).name}</h4>
+          <div className="wl-scope" role="group" aria-label="Which hits">
+            <button type="button" aria-pressed={view === 'open'} onClick={() => setScope('open')}>To decide <b>{open.length}</b></button>
+            <button type="button" aria-pressed={view === 'all'} onClick={() => setScope('all')}>All <b>{entry.hits.length}</b></button>
+          </div>
+        </header>
+        {hits.length === 0 && <p className="wl-empty">{entry.hits.length === 0
+          ? (entry.checked_at ? `${lastCheck(entry)} Nothing yet.` : lastCheck(entry)) : 'Every hit is decided.'}</p>}
+        {hits.length > 0 && <ul className="wl-hitlist" aria-label={`Where “${entry.query}” was found`}>
+          {hits.map(h => <li key={h.id}>
+            <button type="button" className={h.id === hit?.id ? 'wl-hit on' : 'wl-hit'} aria-pressed={h.id === hit?.id} onClick={() => setPickedHit(h.id)}>
+              <span className="wl-hit-top">
+                <DocMark title={h.title}/>
+                <span className="wl-doc">{h.title}</span>
+                {h.page_number ? <span className="wl-page">{pageWord(h)}</span> : null}
+                {h.status !== 'new'
+                  ? <Reveal tabbable={false} className="wl-push" detail={h.status === 'lead' ? 'In leads' : 'Dismissed'}><i className={`wl-dot ${h.status}`} aria-label={h.status === 'lead' ? 'In leads' : 'Dismissed'}/></Reveal>
+                  : isNew(h, looks[entry.id]) && <Reveal tabbable={false} className="wl-push" detail="New since you last looked"><i className="wl-dot fresh" aria-label="New since you last looked"/></Reveal>}
+              </span>
+              {h.highlights[0] && <Passage pieces={aroundMatch(h.highlights[0])} className="wl-snip"/>}
+            </button>
+          </li>)}
         </ul>}
-        <div className="actions"><Button size="sm" variant="ghost" onClick={() => void stopWatching(entry)}>Stop watching</Button></div>
-      </div>;
-    })}
-    {status && <p className="muted" role="status">{status}</p>}
-  </div>;
+      </>}
+    </div>
+
+    <div className="wl-read" aria-label="The picked passage">
+      {hit && entry ? <>
+        <header className="wl-read-head">
+          <DocMark title={hit.title}/>
+          <Reveal className="wl-grow" detail={<><span className="rv-row">{hit.title}</span><span className="rv-row">Found {apiTime(hit.found_at).toLocaleString()}</span></>}>
+            <h4 className="wl-read-title">{hit.title}</h4></Reveal>
+        </header>
+        {hit.document_id
+          ? <button type="button" className="wl-open" onClick={() => openDocument(hit.document_id as string, hit.page_number)}>
+            {hit.page_number ? `Open at page ${hit.page_number}` : 'Open document'} <ArrowUpRight size={15} aria-hidden="true"/></button>
+          : <Reveal detail="In OpenAleph, not uploaded to this investigation."><span className="wl-only">Only in OpenAleph</span></Reveal>}
+        <div className="wl-passages">{hit.highlights.map((pieces, index) => <Passage key={index} pieces={pieces} className="wl-passage"/>)}</div>
+        <div className="wl-actions">
+          {hit.status === 'new' ? <>
+            <button type="button" className="wl-btn pri" onClick={() => void makeLead(hit)} disabled={busy}>Add to leads</button>
+            <button type="button" className="wl-btn" onClick={() => void dismissHit(hit)} disabled={busy}>Dismiss</button>
+          </> : <span className={`wl-decided ${hit.status}`}>{hit.status === 'lead' ? 'In leads' : 'Dismissed'}</span>}
+        </div>
+      </> : <p className="wl-empty">{entries.length ? 'Pick a hit to read it here.' : ''}</p>}
+    </div>
+  </section>;
 }
