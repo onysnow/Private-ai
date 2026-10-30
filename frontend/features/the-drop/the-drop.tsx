@@ -65,13 +65,21 @@ function typing(target: EventTarget | null): boolean {
 /** A stage's detail as the box shows it (mockup INTAKE_1: "✓ 214", "✓ 37"); the full words stay in its title. */
 export function boxDetail(stage: DropStageOut): string {
   if (stage.key === 'received' || (stage.key === 'checked' && stage.detail !== '= same')) return '';
-  if (stage.key === 'inside' && stage.state === 'skipped') return 'none';
-  // A stopped box shows only its ✕ (mockup INTAKE_1); the reason is in its title, its name and the line under the file.
+  // A stage that does not apply to the file (files inside a PDF, passages in a picture) is "– none", never a failure.
+  if (stage.state === 'skipped' && stage.detail !== 'In the files inside') return 'none';
+  // A scan this computer cannot OCR says so in the box (a bare ✕ would read as a broken file); its full words are on hover.
+  if (stage.state === 'stopped' && stage.key === 'read' && stage.detail.startsWith('Needs OCR')) return 'no OCR';
+  if (stage.state === 'stopped' && stage.key === 'read' && /transcription model .* not on this computer/.test(stage.detail)) return 'no model';
+  // Any other stopped box shows only its ✕ (mockup INTAKE_1); the reason is in its title, its name and the line under the file.
   if (stage.state === 'stopped' && stage.key !== 'inside') return '';
+  if (stage.key === 'ready' && stage.state === 'done') return '';  // "Nothing waits" is its ✓; the words are on hover
   const n = /^(\d+)( of \d+)?/.exec(stage.detail);
   if (n && ['passages', 'names', 'ready', 'inside'].includes(stage.key)) return n[2] ? `${n[1]}${n[2].replace(' of ', '/')}` : n[1];
   return stage.detail;
 }
+
+/** A stopped Read whose box names the tool this computer lacks ("no OCR") rather than showing a ✕. */
+const needsTool = (stage: DropStageOut) => stage.state === 'stopped' && ['no OCR', 'no model'].includes(boxDetail(stage));
 
 /** Every lane, the files inside each after it, in the order they are drawn. */
 export function flatLanes(lanes: DropLaneOut[]): DropLaneOut[] {
@@ -148,7 +156,8 @@ function Lane({lane, on, onPick, actions, tab, fresh, depth = 0}: {lane: DropLan
         const stalled = isStalled(lane, s);
         return <Reveal key={s.key} tabbable={false} describe={false} detail={<><b>{s.label}</b> · {stalled ? STALLED_WORD : WORD[s.state]}{s.detail ? <span className="rv-row">{s.detail}</span> : null}</>}>
           <span role="gridcell" tabIndex={tab(id, i + 1)} aria-label={boxName(lane, s)} className={`dp-stage dp-${s.state}${stalled ? ' dp-stalled' : ''}`}>
-            <Mark key={stalled ? 'stalled' : s.state} step={drawn.current}>{stalled ? STALLED_MARK : MARK[s.state]}</Mark><small aria-hidden="true">{stalled ? `${lane.stalled_minutes} min` : boxDetail(s)}</small></span>
+            {/* A read this computer cannot do yet (no OCR, no transcription model) says what it needs in place of a bare ✕. */}
+            {needsTool(s) ? null : <Mark key={stalled ? 'stalled' : s.state} step={drawn.current}>{stalled ? STALLED_MARK : MARK[s.state]}</Mark>}<small aria-hidden="true">{stalled ? `${lane.stalled_minutes} min` : boxDetail(s)}</small></span>
         </Reveal>;
       })}
       <span role="gridcell" tabIndex={tab(id, 8)} className="dp-waiting-cell"><WaitingCell lane={lane} actions={actions}/></span>
@@ -249,6 +258,7 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
   const queryClient = useQueryClient();
   const [stopping, setStopping] = useState('');
   const reading = lane.stages.some(s => s.key === 'read' && (s.state === 'active' || s.state === 'waiting'));
+  const readStage = lane.stages.find(s => s.key === 'read');
   const stop = async () => {
     if (!lane.job_id) return;
     setStopping('Stopping…');
@@ -278,7 +288,7 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
       <div><dt>Fingerprint</dt><dd><FingerprintMark hash={r.fingerprint}/></dd></div>
       {r.pages !== null && r.pages !== undefined && <div><dt>Pages</dt><dd>{r.pages}</dd></div>}
       <div><dt>Read</dt><dd>{r.how_read ? (lane.seconds !== null && lane.seconds !== undefined
-        ? <Reveal detail={`${r.how_read} · ${lane.seconds} s`}>{r.how_read}</Reveal> : r.how_read) : lane.problem ? 'Not read' : 'Not yet'}</dd></div>
+        ? <Reveal detail={`${r.how_read} · ${lane.seconds} s`}>{r.how_read}</Reveal> : r.how_read) : lane.problem ? 'Not read' : readStage?.state === 'done' ? (readStage.detail === 'picture' ? 'Picture' : 'Read') : 'Not yet'}</dd></div>
       <div><dt>Passages</dt><dd>{r.passages}</dd></div>
       {r.files_inside > 0 && <div><dt>Files inside</dt><dd>{r.files_inside}</dd></div>}
       {/* What each proposer's proposals came to is on hover of the proposals (research §05 "revision rate"). */}
@@ -290,6 +300,8 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
       {r.flags_fed.length > 0 && <div><dt>Feeds</dt><dd><Reveal detail={<>Feeds the Red Flag indicator{r.flags_fed.length === 1 ? '' : 's'} <span className="rv-mono">{r.flags_fed.join(', ')}</span></>}>
         <span>⚑ {r.flags_fed.length}</span></Reveal></dd></div>}
     </dl>
+    {/* Why a file could not be read is an alert: it stays on screen. */}
+    {lane.problem && lane.note && <p className="dp-why" role="note"><i aria-hidden="true">✕</i>{lane.note}</p>}
     {lane.issues.length > 0 && <ul className="dp-issues">{lane.issues.map(i => <li key={i}>{i}</li>)}</ul>}
     {lane.stalled_minutes !== null && lane.stalled_minutes !== undefined && <p className="dp-stall" role="note"><i aria-hidden="true">{STALLED_MARK}</i>
       {lane.stages.find(s => s.key === 'read')?.detail}. {lane.job_id ? 'Stop reading, then read it again with Try again.' : 'Nothing else is being read; the reader may not be running.'}</p>}
@@ -629,7 +641,11 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
           : <p className="dp-eyebrow">This drop</p>}
         <dl>
           <div><dt>Files</dt><dd>{t!.files}{t!.files_inside ? ` · ${t!.files_inside} inside` : ''}</dd></div>
-          {ocr && <div><dt>OCR</dt><dd>{ocr.pdf_ocr_enabled ? <Reveal detail={`OCR language: ${language}`}>On</Reveal> : 'Off'}</dd></div>}
+          {/* OCR switched on but missing from this computer (no Tesseract) is said, not shown as On. */}
+          {ocr && <div><dt>OCR</dt><dd>{!ocr.pdf_ocr_enabled ? 'Off' : ocr.ocr_runtime && !ocr.ocr_runtime.available
+            ? <Reveal detail={`Scans and the text in pictures are not read until OCR (Tesseract, ${language}) is installed${ocr.ocr_runtime.detail ? ` · ${ocr.ocr_runtime.detail}` : ''}`}>
+              <span className="dp-ocr-missing"><i aria-hidden="true">⚠</i>Not on this computer</span></Reveal>
+            : <Reveal detail={`OCR language: ${language}`}>On</Reveal>}</dd></div>}
         </dl>
         {/* What leaves this computer stays on screen (the floor); how is on hover. */}
         <Reveal className="dp-local" detail={byOpenAleph ? 'OpenAleph runs here.' : 'Every file is read here.'}><span aria-hidden="true">⌂ </span>Nothing leaves this computer</Reveal>
@@ -662,7 +678,9 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
       {/* The marks' key, and who proposes, are on hover; that a drop uses no AI stays on screen (AI marking). */}
       <footer className="dp-legend">
         <Reveal label="What the marks mean" detail={<>{(['done', 'active', 'waiting', 'needs_you', 'stopped'] as const).map(s => <span key={s} className="rv-row">{MARK[s]} {WORD[s]}</span>)}
-          <span className="rv-row">{STALLED_MARK} {STALLED_WORD}</span></>}><span className="dp-key" aria-hidden="true">✓ ◐ · ! ✕ ⧗</span></Reveal>
+          <span className="rv-row">{STALLED_MARK} {STALLED_WORD}</span></>}><span className="dp-key" aria-hidden="true">
+          {(['done', 'active', 'waiting', 'needs_you', 'stopped'] as const).map(s => <i key={s} className={`dp-stage dp-${s}`}><i>{MARK[s]}</i></i>)}
+          <i className="dp-stage dp-stalled"><i>{STALLED_MARK}</i></i></span></Reveal>
         <Reveal className="dp-by" detail={`Proposed by ${byOpenAleph ? 'OpenAleph' : 'the Workbench’s name-finder (rules)'}. No AI is used in a drop.`}>
           <span className="dp-noai"><b aria-hidden="true">ƒ</b>no <span className="ai-tag">AI</span></span></Reveal>
       </footer>

@@ -143,7 +143,7 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 .dp-total { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; }
 .dp-total i { width: 18px; border-radius: 3px 3px 0 0; background: color-mix(in srgb, var(--status-supported) 60%, var(--surface-3)); }
 .dp-total small { font: 500 10.5px var(--font-mono); color: var(--text-muted); }
-.dp-legend { margin-top: auto; padding-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 11.5px; color: var(--text-muted); }
+.dp-legend { padding-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 11.5px; color: var(--text-muted); }
 .dp-legend > span { display: inline-flex; align-items: center; gap: 6px; }
 .dp-legend .dp-stage { min-height: 16px; width: 20px; padding: 0; }
 .dp-by { margin-left: auto; }
@@ -423,3 +423,12 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 .cp-kv .cp-ask:hover:not(:disabled) { border-color: var(--accent-1); }
 .cp-kv .cp-ask:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
 .cp-kv dd > .cp-ask, .cp-kv dd > .rv:has(> .cp-ask) { display: flex; width: fit-content; }
+
+/* The marks' key under the totals (mockup INTAKE_1): each mark in its own small box; the words on hover. */
+.dp-key { display: inline-flex; gap: 6px; align-items: center; }
+.dp-key .dp-stage { min-height: 18px; width: 22px; padding: 0; }
+.dp-key .dp-stage i { font-size: 11px; animation: none; }
+.dp-why { display: flex; gap: 6px; align-items: baseline; margin: 8px 0 0; font-size: 12px; line-height: 1.4; color: var(--text); }
+.dp-why i { font-style: normal; font-weight: 700; color: var(--status-disputed); }
+.dp-ocr-missing { display: inline-flex; gap: 5px; align-items: baseline; color: var(--accent-1); }
+.dp-ocr-missing i { font-style: normal; }

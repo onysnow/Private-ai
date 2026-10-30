@@ -75,6 +75,34 @@ def test_each_file_is_a_lane_of_seven_stages_with_its_receipt():
     assert body["ready_for_you"] == {"entity": 1}
 
 
+def test_a_picture_has_no_passages_and_a_missing_ocr_is_said_plainly():
+    """A photo's "Split into passages" does not apply (– none), so it is no problem; a scan that needs OCR this computer
+    lacks says so in words, and a clash while saving says try again."""
+    inv = ok(client.post("/api/investigations", json={"name": "Drop pictures"}))["id"]
+    no_ocr = "RuntimeError: No tessdata specified and Tesseract is not installed"
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Files", source_type="document")
+        db.add(src)
+        db.flush()
+        photo = _doc(db, inv, src.id, "harbour.jpg", "complete")
+        photo.extraction_issues = [f"The text in this picture could not be read: {no_ocr}. The picture is kept as it is."]
+        _doc(db, inv, src.id, "scan.pdf", "failed", error=f"PDF contained no extractable text and OCR failed: {no_ocr}")
+        _doc(db, inv, src.id, "clash.pdf", "failed", error="UPDATE statement on table 'extraction_candidates' expected to update 4 row(s); 0 were matched.")
+        _doc(db, inv, src.id, "blank.pdf", "complete")
+        db.commit()
+    lanes = {lane["filename"]: lane for lane in ok(client.get(f"/api/investigations/{inv}/drop"))["lanes"]}
+    photo_stages = {s["key"]: (s["state"], s["detail"]) for s in lanes["harbour.jpg"]["stages"]}
+    assert photo_stages["passages"] == ("skipped", "A picture has no passages")
+    assert photo_stages["read"] == ("done", "picture")
+    assert lanes["harbour.jpg"]["problem"] is False and lanes["harbour.jpg"]["in_progress"] is False
+    assert lanes["harbour.jpg"]["note"] == "Picture kept · its text was not read: OCR is not on this computer"
+    assert {s["key"]: s["detail"] for s in lanes["scan.pdf"]["stages"]}["read"] == drop.NEEDS_OCR
+    assert lanes["scan.pdf"]["problem"] is True and lanes["scan.pdf"]["note"] == drop.NEEDS_OCR
+    assert lanes["clash.pdf"]["note"].endswith("try again")
+    # A document read with no text at all still stops at Split into passages: that is a real problem.
+    assert {s["key"]: s["state"] for s in lanes["blank.pdf"]["stages"]}["passages"] == "stopped"
+
+
 def test_the_receipt_counts_what_each_proposer_s_proposals_came_to():
     """Research §05 "revision rate": per proposer (the rule that proposed it), accepted, rejected and still waiting."""
     inv = ok(client.post("/api/investigations", json={"name": "Drop proposers"}))["id"]

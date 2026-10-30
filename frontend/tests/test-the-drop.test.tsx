@@ -351,6 +351,12 @@ describe('The Drop', () => {
     expect(boxDetail(st('inside', 'skipped', 'None'))).toBe('none');
     expect(boxDetail(st('read', 'active', 'OCR, page 12 of 40'))).toBe('OCR, page 12 of 40');
     expect(boxDetail(st('read', 'stopped', 'The document reader stopped unexpectedly on this file'))).toBe('');  // only its ✕, as the mockup draws it
+    // A picture's passages do not apply: "– none", not a failure; a scan this computer cannot OCR says so.
+    expect(boxDetail(st('passages', 'skipped', 'A picture has no passages'))).toBe('none');
+    expect(boxDetail(st('passages', 'skipped', 'In the files inside'))).toBe('In the files inside');
+    expect(boxDetail(st('read', 'stopped', 'Needs OCR · not on this computer'))).toBe('no OCR');
+    expect(boxDetail(st('ready', 'done', 'Nothing waits'))).toBe('');
+    expect(boxDetail(st('read', 'stopped', 'The transcription model “small” is not on this computer. Fetch it once with: …'))).toBe('no model');
     const warn = {...lane('w', 'w.pdf', ['done', 'done', 'done', 'done', 'skipped', 'done', 'done']), issues: ['Faint text on 2 regions']};
     expect(problemsFirst([warn, drop.lanes[1]] as never).map(l => l.filename)).toEqual(['broken.pdf', 'w.pdf']);
     const stuck = {...lane('s', 's.pdf', ['done', 'done', 'active', 'waiting', 'skipped', 'waiting', 'waiting']), stalled_minutes: 8};
