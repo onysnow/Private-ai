@@ -39,7 +39,7 @@ describe('Does it work today?', () => {
     // Today's state is a shape; the tool and the seconds are on hover (Ony, 29 Oct).
     expect(within(list).getAllByText('video · yt-dlp · 2.1 s').every(el => el.closest('[hidden]'))).toBe(true);
     const detail = screen.getByRole('region', {name: 'Instagram in detail'});
-    expect(detail).toHaveTextContent('broken since 2026-10-26');
+    expect(detail).toHaveTextContent('broken since 26 Oct 2026');
     expect(detail).toHaveTextContent('What still works: paste the link');
     const user = userEvent.setup();
     await user.click(within(screen.getByRole('region', {name: 'What leaves this computer'})).getByRole('checkbox', {name: 'Check once a day'}));

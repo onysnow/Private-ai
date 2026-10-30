@@ -21,7 +21,7 @@ import {attachRelationshipEvidenceEndpoint, createLeadFromRelationshipContext, r
 import type {EvidencePoolRow, GraphOut, RelationshipOut} from '../../lib/generated/types.gen';
 import {isQueryOf} from '../../lib/investigation-queries';
 import {reportPayloadError} from '../../lib/report-error';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {leadQueueKey} from '../leads/leads-panel';
 import {withEnds} from './graph';
@@ -164,7 +164,7 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
       {reviews.length === 0 ? <p className="muted">No relationship-evidence assessments recorded yet.</p> : reviews.map(review => <div className="statement" key={review.id}>
         {/* The stance is its line; the evidence id and the time are revealed on the rationale. */}
         <StanceMark stance={review.stance}/>
-        <Reveal detail={<><span className="rv-row rv-mono">evidence {review.evidence_id}</span><span className="rv-row">{apiTime(review.created_at).toLocaleString()}</span></>}>
+        <Reveal detail={<><span className="rv-row rv-mono">evidence {review.evidence_id}</span><span className="rv-row">{timeWords(review.created_at)}</span></>}>
           <div>{review.rationale}</div></Reveal>
       </div>)}
     </div>}

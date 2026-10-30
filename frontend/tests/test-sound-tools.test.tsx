@@ -73,6 +73,6 @@ describe('sound tools', () => {
     expect(screen.queryByRole('option', {name: 'minutes.pdf'})).toBeNull();
     await user.click(screen.getByRole('button', {name: 'Accept the offset'}));
     await vi.waitFor(() => expect(api.lastBody('POST /api/documents/r1/sync/accept')).toEqual({other_document_id: 'r2'}));
-    expect(await screen.findByText(/Accepted by you, 2026-10-29 07:00/)).toBeInTheDocument();
+    expect(await screen.findByText(/Accepted by you, 29 Oct 2026, \d\d:\d\d/)).toBeInTheDocument();
   });
 });

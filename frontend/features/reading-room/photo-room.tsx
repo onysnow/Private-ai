@@ -17,6 +17,7 @@ import {api} from '../../lib/api-instance';
 import {getPhotoOptions, getPhotoQueryKey, listDerivedOptions, listDerivedQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {findPhotoFaces, makePhotoCopy, reviewExtractionCandidate} from '../../lib/generated/sdk.gen';
 import type {DerivedFileOut, DocumentDetailOut, FaceBoxOut, PhotoOut} from '../../lib/generated/types.gen';
+import {timeWords} from '../../lib/timestamps';
 import {FingerprintMark} from '../the-drop/kind-marks';
 
 type Box = {x: number; y: number; w: number; h: number};
@@ -288,7 +289,7 @@ function TrailTree({doc, rows, picked, onPick, thumb, compact = false}: {doc: Do
         <Reveal detail="Kept as uploaded; the original is never written."><b>{doc.filename} · original</b></Reveal>
         {doc.sha256 && <FingerprintMark hash={doc.sha256}/>}</li>
       {tree.map(({row, depth}) => <li key={row.id} style={{marginLeft: depth * 14}} className={row.id === picked ? 'on' : ''}>
-        <Reveal tabbable={false} detail={`${trailLine(row)} · ${String(row.created_at).slice(0, 16).replace('T', ' ')}`}>
+        <Reveal tabbable={false} detail={`${trailLine(row)} · ${timeWords(String(row.created_at))}`}>
           <button onClick={() => onPick(row.id)}><b>{OPERATION_WORDS[row.operation] ?? row.operation}</b></button></Reveal></li>)}
     </ul>
     {/* With no copy yet, the trail says where the first one comes from instead of an empty box. */}

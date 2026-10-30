@@ -12,7 +12,7 @@ import type {ReactElement, ReactNode} from 'react';
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {api} from '../../lib/api-instance';
-import {apiTime} from '../../lib/timestamps';
+import {apiTime, compactDay, timeWords} from '../../lib/timestamps';
 import {getAuthenticityOptions, getAuthenticityQueryKey, listAuthenticityOptions, listAuthenticityQueryKey, listDocumentsOptions, previewAuthenticityOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {addAboutClaim, compareAuthenticity, decideAuthenticity, examineAgain, outsideAuthenticity, updateAuthenticity} from '../../lib/generated/sdk.gen';
 import type {AuthenticityHistoryOut, AuthenticityOut, AuthenticityPreviewOut} from '../../lib/generated/types.gen';
@@ -51,12 +51,11 @@ const SOURCE_TYPE_WORDS: Record<string, string> = {
 };
 const STATES = [{key: 'trusted', label: 'Valid · signer trusted'}, {key: 'valid', label: 'Valid · signer not trusted'}, {key: 'invalid', label: 'Invalid'}, {key: 'absent', label: 'Absent'}];
 
-const when = (iso: string | null | undefined): string => iso
-  ? apiTime(iso).toLocaleString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).replace(',', '') : '';
+const when = (iso: string | null | undefined): string => iso ? timeWords(iso) : '';
 const clockOf = (iso: string): string => {
   const d = apiTime(iso);
   return d.toDateString() === new Date().toDateString() ? d.toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'})
-    : d.toLocaleDateString('en-GB', {day: 'numeric', month: 'short'});
+    : compactDay(iso);
 };
 const spaced = (sha: string) => `${sha.slice(0, 4)} ${sha.slice(4, 8)} …${sha.slice(-4)}`;
 const size = (n: number | null | undefined) => n == null ? '' : n < 1024 ? `${n} bytes` : n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`;

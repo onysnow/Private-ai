@@ -498,3 +498,24 @@ source already holds, never invented:
 The full title and the place in the record stay on hover. Chips are now one per source (two sources with the same
 title are two chips) and wrap onto a second line, as ACT_2 draws them, instead of being cut on one line. The Cited tab
 and the citation hover keep the full title: they have the room.
+
+## 32. One way to write a date and a time on every screen (30 Oct 2026)
+
+- **Question:** the browser walkthrough found date formats mixed between screens (BACKLOG P1): "30/10/2026, 14:05:22"
+  where a screen called the browser's own `toLocaleString()`, "Thu 30 Oct, 14:05" in Settings, "13 Oct, 22:30" in the
+  Drop, "2026-10-29 07:00" read raw off the API (shown as if local), "06 Feb 2018" in Money, and "Sept" wherever the
+  browser's en-GB month names were used (ICU 72 writes "Sept"; the app's own tables write "Sep").
+- **Call:** a record's date is `dateWords` (lib/dates.ts): "3 Oct 2023", "Oct 2023", "2023", at the precision held. A
+  moment from the API is `timeWords` (lib/timestamps.ts): "3 Oct 2026, 14:05", in the reader's own time, always with
+  the year; its day alone is `timeDayWords` ("3 Oct 2026"). Month names come from one table (`MONTHS`, "Sep"). Kept
+  apart on purpose: relative words ("4 min ago", "yesterday") where the screen is about recency (Red Flags' "ran",
+  Safety's cards, People's "last used", Decide's ages, Following's "14:05 today"); a narrow column with the full time on
+  hover uses `compactDay` ("10 Oct" this year, "Oct 2025" otherwise: Library's Added column, Is it real's history);
+  logs set in monospace keep `shortStamp` ("2026-10-10 15:02": the outbound log, the security request log); provenance
+  lines kept in UTC say so, `utcStamp` ("2026-10-10 14:02 UTC": transcribed, fetched and made-by lines in the
+  listening room, a checked pack's "made on"), and Chain of Custody and Captures keep their UTC forms as the CHECK
+  mockup draws them. Live clocks inside a run (Watch the run's step axis) stay time-of-day.
+- **Why the year always:** a case runs for years and holds moments from several of them; "10 Oct" alone is ambiguous
+  once a case crosses a new year, and a fixed form keeps tests from changing with the calendar. The research writes
+  some stamps without the year ("AI draft · 10 Oct", "last run 10 Oct, 14:02"); they now carry it.
+- **Where:** lib/dates.ts, lib/timestamps.ts and every screen that wrote its own (see the commit).

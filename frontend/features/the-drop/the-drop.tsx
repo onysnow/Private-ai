@@ -32,7 +32,7 @@ import {getCapturesQueryKey, getDropHistoryOptions, getDropHistoryQueryKey, getD
 import {cancelJobEndpoint, createCapture, createIngestionBatch, retryJobEndpoint} from '../../lib/generated/sdk.gen';
 import type {DropHistoryEntryOut, DropLaneOut, DropOut, DropProposerOut, DropStageOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {proposerName} from '../reading-room/proposers';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {PagePicture} from '../case-home/decision-card';
@@ -204,7 +204,7 @@ function DropHistory({investigationId, onShow}: {investigationId: string; onShow
   return <ol className="dp-history" aria-label="Every drop, newest first">{drops.map(d => {
     const found = Object.entries(d.proposals).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${c} ${kindWord(k, c)}`).join(', ');
     return <li key={d.id}>
-      <header><Reveal detail={<time dateTime={String(d.created_at)}>{apiTime(d.created_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}</time>}><b>{d.label}</b></Reveal>
+      <header><Reveal detail={<time dateTime={String(d.created_at)}>{timeWords(d.created_at)}</time>}><b>{d.label}</b></Reveal>
         {d.one_at_a_time && <Reveal label="One at a time" detail="One at a time: the files were brought in singly, each read before the next."><FileIcon size={13} aria-hidden="true"/></Reveal>}</header>
       <ul className="dp-counts" aria-label="What was brought in">
         <li>{n(d.files, 'file saved', 'files saved')}</li>
@@ -637,7 +637,7 @@ export function TheDrop({investigationId, active = true}: {investigationId: stri
         </li>)}</ul>
       </section>}
       <section className="dp-card" aria-label="This drop">
-        {t!.started_at ? <Reveal className="dp-eyebrow" detail={`Since ${apiTime(t!.started_at).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}`}>This drop</Reveal>
+        {t!.started_at ? <Reveal className="dp-eyebrow" detail={`Since ${timeWords(t!.started_at)}`}>This drop</Reveal>
           : <p className="dp-eyebrow">This drop</p>}
         <dl>
           <div><dt>Files</dt><dd>{t!.files}{t!.files_inside ? ` · ${t!.files_inside} inside` : ''}</dd></div>

@@ -14,7 +14,7 @@ import {z} from 'zod';
 import {Reveal} from '../../components/ui/reveal';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormRootError} from '../../components/ui/form';
 import {errorMessage} from '../../lib/api-client';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {
   clearCaseLookupsMutation, getLookupSettingsOptions, getLookupSettingsQueryKey, putCaseLookupsMutation, putLookupDefaultsMutation,
@@ -35,7 +35,7 @@ const KIND_WORDS: Record<string, string> = {
   lookup: 'Lookup', ai: 'AI run', key_check: 'Key check', source_check: 'Source update check', mail: 'Email', push: 'Push notice', download: 'Download',
 };
 const OUTCOME_WORDS: Record<string, string> = {refused: ' · refused: the key was not accepted', failed: ' · did not answer'};
-const when = (iso: string): string => apiTime(iso).toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+const when = timeWords;
 
 /** A web address in what was sent, as its site only; the full address is revealed on it. */
 export function shortSent(sent: string): string {

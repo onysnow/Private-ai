@@ -14,6 +14,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {api} from '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
+import {dateWords} from '../../lib/dates';
 import {investigationVisualCatalogQueryKey, listInvestigationEvidenceQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {createEvidenceEndpoint} from '../../lib/generated/sdk.gen';
 
@@ -56,7 +57,7 @@ export function PictureEvidence({investigationId, documentId, sourceId, filename
     try {
       const evidence = await save.mutateAsync();
       setCaption(''); setTaken('');
-      setStatus(evidence.captured_on ? `Saved as evidence, taken ${evidence.captured_on}. It can be compared as before or after.`
+      setStatus(evidence.captured_on ? `Saved as evidence, taken ${dateWords(evidence.captured_on)}. It can be compared as before or after.`
         : 'Saved as evidence. Add the date it was taken to compare it as before or after.');
       const path = {investigation_id: investigationId};
       await Promise.all([queryClient.invalidateQueries({queryKey: listInvestigationEvidenceQueryKey({path})}),

@@ -234,7 +234,7 @@ describe('MoneyView', () => {
     expect(container.querySelector('.mn-bracket')).not.toBeNull();
     expect(screen.getByText('€10,000 line')).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'j'});
-    expect(container.querySelector('tr.lit')).toHaveTextContent('09 Mar 2018');
+    expect(container.querySelector('tr.lit')).toHaveTextContent('9 Mar 2018');
     const band = [...container.querySelectorAll<SVGPathElement>('.mn-band')].find(b => b.textContent?.startsWith('Kestrel SA to Harbour Council'))!;
     fireEvent.click(band);
     expect(screen.getByText('Traced so far').parentElement).toHaveTextContent('€1,250,0001 payment');
@@ -290,9 +290,9 @@ describe('MoneyView', () => {
     const {container} = wrap(<MoneyView investigationId="inv-1"/>);
     await screen.findByText(/each just under the €10,000 line/);
     const band = screen.getByRole('button', {name: 'Fernhill Ltd to Kestrel SA: 3 × €9,800 (not yet shown)'});
-    const litRows = () => [...container.querySelectorAll('.mn-table tr.lit')].map(r => r.textContent?.slice(0, 11));
+    const litRows = () => [...container.querySelectorAll('.mn-table tr.lit')].map(r => r.querySelector('td')?.textContent);
     fireEvent.mouseEnter(band);
-    expect(litRows()).toEqual(['06 Feb 2018', '09 Mar 2018', '11 Apr 2018']);
+    expect(litRows()).toEqual(['6 Feb 2018', '9 Mar 2018', '11 Apr 2018']);
     expect(container.querySelectorAll('.mn-bar.lit')).toHaveLength(3);
     expect(band).toHaveClass('lit');
     fireEvent.mouseLeave(band);
@@ -374,7 +374,7 @@ describe('MoneyView', () => {
     const {container} = wrap(<MoneyView investigationId="inv-1"/>);
     await screen.findByText(/each just under the €10,000 line/);
     const row = [...container.querySelectorAll('tr')].find(r => r.textContent?.includes('Loop Two BV'));
-    expect(row).toHaveTextContent('01 Mar 2021 to Jun 2021');
+    expect(row).toHaveTextContent('1 Mar 2021 to Jun 2021');
   });
 
   it('shows a payment known only by its end date as "by" that date', async () => {

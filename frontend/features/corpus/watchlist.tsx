@@ -25,7 +25,7 @@ import {
   listLeadsQueryKey, makeLeadFromHitMutation, removeWatchlistEntryMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {HighlightSegmentOut, WatchlistEntryOut, WatchlistHitOut, WatchlistOut} from '../../lib/generated/types.gen';
-import {apiTime} from '../../lib/timestamps';
+import {apiTime, timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 // What the reporter types to watch a name (backend WatchlistEntryCreate: query 1–512, note up to 2000). Other names are
@@ -46,7 +46,7 @@ const SEARCHED_OK = new Set(['ok', 'local']);
 /** The entry's last check in plain words. */
 export function lastCheck(entry: WatchlistEntryOut): string {
   if (!entry.checked_at) return 'Not checked yet: it is searched when a document is next read, or on “Check now”.';
-  const at = apiTime(entry.checked_at).toLocaleString();
+  const at = timeWords(entry.checked_at);
   if (entry.check_state === 'ok') return `Last checked ${at} in OpenAleph.`;
   if (entry.check_state === 'local') return `Last checked ${at} in this investigation's own read documents (OpenAleph could not be asked).`;
   return `Last checked ${at}: ${CHECK_STATE[entry.check_state ?? ''] ?? entry.check_detail ?? 'OpenAleph could not be asked.'}`;
@@ -187,7 +187,7 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
         <Reveal detail="Names searched whenever a document of this investigation is read. Each document a name turns up in shows here once; nothing becomes a lead on its own.">
           <h4 className="wl-title">Watchlist</h4></Reveal>
         {totalNew > 0 && <Reveal detail={`${totalNew} document(s) to decide across every name.`}><span className="wl-total">{totalNew}</span></Reveal>}
-        {entries.length > 0 && <Reveal tabbable={false} className="wl-push" detail={lastChecked ? `Last checked ${apiTime(lastChecked).toLocaleString()}.` : 'Not checked yet.'}>
+        {entries.length > 0 && <Reveal tabbable={false} className="wl-push" detail={lastChecked ? `Last checked ${timeWords(lastChecked)}.` : 'Not checked yet.'}>
           <button type="button" className="wl-icon" aria-label="Check now" onClick={() => void checkNow()} disabled={check.isPending}>
             <RefreshCw size={15} aria-hidden="true" className={check.isPending ? 'wl-spin' : undefined}/></button></Reveal>}
       </header>
@@ -270,7 +270,7 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
       {hit && entry ? <>
         <header className="wl-read-head">
           <DocMark title={hit.title}/>
-          <Reveal className="wl-grow" detail={<><span className="rv-row">{hit.title}</span><span className="rv-row">Found {apiTime(hit.found_at).toLocaleString()}</span></>}>
+          <Reveal className="wl-grow" detail={<><span className="rv-row">{hit.title}</span><span className="rv-row">Found {timeWords(hit.found_at)}</span></>}>
             <h4 className="wl-read-title">{hit.title}</h4></Reveal>
         </header>
         {hit.document_id

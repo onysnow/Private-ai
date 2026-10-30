@@ -1,4 +1,10 @@
 // Dates in words, at the precision a record knows them to.
+//
+// The house style for every date on screen (DECISIONS_LOG "One way to write a date"): "3 Oct 2023", "Oct 2023",
+// "2023"; a moment from the API "3 Oct 2023, 14:05" in the reader's time (lib/timestamps.ts timeWords).
+
+/** Month names as the app writes them. Not the browser's en-GB names: those read "Sept" since ICU 72. */
+export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
 
 /** How much of a date an ISO value holds: "2009" a year, "2009-05" a month, a full date a day. */
 function heldGrain(iso: string): 'year' | 'month' | 'day' {
@@ -15,7 +21,7 @@ export function dateWords(iso: string, precision?: string): string {
   const time = Date.parse(iso);
   if (Number.isNaN(time)) return iso;
   const at = new Date(time);
-  const month = at.toLocaleString('en-GB', {month: 'short', timeZone: 'UTC'});
+  const month = MONTHS[at.getUTCMonth()];
   const held = heldGrain(iso);
   const grain = precision === 'year' || held === 'year' ? 'year' : precision === 'month' || held === 'month' ? 'month' : 'day';
   const words = grain === 'year' ? String(at.getUTCFullYear())

@@ -27,7 +27,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {createClaimEndpoint, createClaimReview, linkClaimEvidenceEndpoint} from '../../lib/generated/sdk.gen';
 import type {ClaimOut, ClaimReviewWorkspaceOut, EvidencePoolRow} from '../../lib/generated/types.gen';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {WatchButton} from '../inbox/watch-button';
 import './claims.css';
@@ -428,7 +428,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                     <span className="rv-row">{event.from_status} → {event.to_status}</span>
                     <span className="rv-row">{pct(event.from_confidence)}% → {pct(event.to_confidence)}%</span>
                     {(event.to_evidence_grade || event.from_evidence_grade) && <span className="rv-row">{gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
-                    {event.created_at && <span className="rv-row">{apiTime(event.created_at).toLocaleString()}</span>}
+                    {event.created_at && <span className="rv-row">{timeWords(event.created_at)}</span>}
                   </>}><div>{event.rationale}</div></Reveal>
                   {event.override_reason && <div className="done-overridden">Marked without: {(event.unmet_rules ?? []).join(', ')}. Reason: {event.override_reason}</div>}
                 </div>

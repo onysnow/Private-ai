@@ -27,7 +27,7 @@ import {errorMessage} from '../../lib/api-client';
 import {getCaptureQuotesOptions, getCaptureQuotesQueryKey, getCapturesOptions, getCapturesQueryKey, getDropQueryKey, platformForUrlOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {captureLatest, captureLookElsewhere, captureSecondWitness, captureTimeProof, collectCaptureMedia, createCapture, followCapture, markCaptureChanged, recheckCapture, refindCaptureQuotes, updateCapture} from '../../lib/generated/sdk.gen';
 import type {CaptureArchiveOut, CaptureFollowOut, CaptureOut, CaptureQuoteOut, CaptureStageOut, CaptureTimeProofOut, GetCapturesError} from '../../lib/generated/types.gen';
-import {apiTime} from '../../lib/timestamps';
+import {apiTime, timeDayWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {FingerprintMark} from './kind-marks';
 
@@ -581,7 +581,7 @@ function PlatformWarning({url}: {url: string}): ReactElement | null {
   const platform = useQuery({...platformForUrlOptions({query: {url: url.trim()}}), enabled: ok, staleTime: 60_000}).data;
   if (!ok || !platform || !platform.state || platform.state === 'works') return null;
   return <p className={`cp-platform ${platform.state}`} role="status"><b aria-hidden="true">{platform.state === 'broken' ? '✕' : '◐'}</b>
-    {platform.name} {platform.state === 'broken' ? 'is broken' : 'works only in part'} at its last check{platform.checked_at ? ` (${platform.checked_at.slice(0, 10)})` : ''}: {platform.detail?.toLowerCase()}.
+    {platform.name} {platform.state === 'broken' ? 'is broken' : 'works only in part'} at its last check{platform.checked_at ? ` (${timeDayWords(platform.checked_at)})` : ''}: {platform.detail?.toLowerCase()}.
     {platform.state === 'broken' ? ' The capture will keep what a logged-out visitor sees; you can also save the post yourself and drop the file.' : ''}</p>;
 }
 

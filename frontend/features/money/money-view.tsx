@@ -23,7 +23,8 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {CurrencyMoneyChecksOut, FinancialTransactionOut, MoneyCheckOut, RedFlagOut, RoundTripOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {apiTime} from '../../lib/timestamps';
+import {dateWords} from '../../lib/dates';
+import {timeWords} from '../../lib/timestamps';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {amountText, layout, pathOf, placeLabels, shortAmount, TOP_FLOWS, type Certainty, type CheckMark, type Payment} from './money-layout';
 
@@ -43,16 +44,8 @@ const KIND: Record<CheckMark, {icon: string; word: string; line: string}> = {
 };
 /** The reporting lines the structuring rule (Red Flags ML-021, catalogue/detection/ml.yaml) draws for each currency. */
 export const REPORTING_LINE: Record<string, number> = {EUR: 10000, USD: 10000};
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const day = (d: string | null) => {
-  if (!d) return '—';
-  const [y, m, dd] = d.split('-');
-  return dd ? `${dd} ${MONTHS[+m - 1]} ${y}` : m ? `${MONTHS[+m - 1]} ${y}` : y;
-};
-const ran = (iso: string) => {
-  const d = apiTime(iso);
-  return `${d.getDate()} ${MONTHS[d.getMonth()]}, ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-};
+const day = (d: string | null) => d ? dateWords(d) : '—';
+const ran = timeWords;
 
 const toPayment = (t: FinancialTransactionOut): Payment => ({
   id: t.id, from: t.from, to: t.to, fromId: t.from_entity_id, toId: t.to_entity_id, amount: t.amount, date: t.dateTime ?? null,

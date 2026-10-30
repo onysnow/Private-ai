@@ -12,12 +12,12 @@ import {
   capabilitiesOptions, listAiRunEventsOptions, listAiRunsOptions, listInvestigationAiAnalysisCandidatesOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {Reveal} from '../../components/ui/reveal';
 import {thoughtTallies} from './run-tally';
 
 const SYSTEMS = ['ras', 'tas', 'qas', 'las', 'das'] as const;
-const hhmm = (iso: string) => apiTime(iso).toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', hour12: false});
+const hhmm = timeWords;
 
 export function AiStrip({investigationId}: {investigationId: string}): ReactElement | null {
   const router = useRouter();

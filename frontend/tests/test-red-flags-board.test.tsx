@@ -333,7 +333,7 @@ describe('what changed since the last visit', () => {
     mockApi({...routes, 'GET /api/investigations/inv-1/red-flags': {...body([flag('f3', BO, 'textbook', 1, {first_seen_at: '2026-10-11T00:00:00'}), flags[0]]), gone: [gone]}});
     renderBoard();
     const strip = await screen.findByRole('group', {name: 'What changed since your last visit'});
-    expect(strip).toHaveTextContent('Since your last visit · 10 Oct: 1 new · 1 no longer fires');
+    expect(strip).toHaveTextContent('Since your last visit · 10 Oct 2026: 1 new · 1 no longer fires');
     await waitFor(() => expect(seen(strip)).toContain('1 of 2 ✚ Circular ownership'));
     // The row is lit by the board after the strip's step renders (an effect), so wait for it too.
     await waitFor(() => expect(document.querySelector('.rb-row.lit')).toHaveAccessibleName(/Circular ownership/));
@@ -350,7 +350,7 @@ describe('what changed since the last visit', () => {
       mockApi({...routes, 'GET /api/investigations/inv-1/red-flags': body([flags[0], {...flags[0], id: 'f1b'}])});
       renderBoard();
       const strip = await screen.findByRole('group', {name: 'What changed since your last visit'});
-      expect(strip).toHaveTextContent('Since your last visit · 8 Oct: 2 new');
+      expect(strip).toHaveTextContent('Since your last visit · 8 Oct 2026: 2 new');
       expect(strip.querySelectorAll('.rb-changed-all li')).toHaveLength(1);
       expect(seen(strip)).toContain('✚ Structuring below reporting thresholds ×2');
     } finally { delete document.documentElement.dataset.motion; }

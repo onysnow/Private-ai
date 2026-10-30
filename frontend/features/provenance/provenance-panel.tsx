@@ -20,6 +20,7 @@ import {
 import type {EvidenceOut, ExtractionLineageOut, ProvenanceTraceOut, SourceOut, StatementHistoryRowOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import type {ProvenanceRequest} from '../../lib/workbench-store';
+import {timeWords} from '../../lib/timestamps';
 
 type Props = {investigationId: string};
 
@@ -189,7 +190,7 @@ function Lineage({lineage}: {lineage: ExtractionLineageOut}): ReactElement {
       <div>{lineage.chunk.text}</div></div>}
     <div><b>Extraction proposal:</b> {lineage.candidate.candidate_type} · {Math.round(lineage.candidate.confidence * 100)}%
       <div>{shown || ''}</div></div>
-    <div><b>Reporter review:</b> {lineage.candidate.reviewed_at ? <Reveal detail={lineage.candidate.reviewed_at}>{lineage.candidate.review_status}</Reveal> : lineage.candidate.review_status}
+    <div><b>Reporter review:</b> {lineage.candidate.reviewed_at ? <Reveal detail={timeWords(lineage.candidate.reviewed_at)}>{lineage.candidate.review_status}</Reveal> : lineage.candidate.review_status}
       {lineage.candidate.reviewer_note && <div><small>{lineage.candidate.reviewer_note}</small></div>}</div>
     {lineage.candidate.accepted_record_type && lineage.candidate.accepted_record_id && <div><b>Accepted record:</b> <Reveal detail={<span className="rv-mono">{lineage.candidate.accepted_record_id}</span>}>{lineage.candidate.accepted_record_type}</Reveal></div>}
   </div>;

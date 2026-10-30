@@ -10,6 +10,7 @@ import type {ReactElement} from 'react';
 import {errorMessage} from '../../lib/api-client';
 import {getRelationshipSourcesOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {WireLinkOut} from '../../lib/generated/types.gen';
+import {timeDayWords} from '../../lib/timestamps';
 import {PagePicture} from '../case-home/decision-card';
 import {SURE, fmtDate, linkSentence} from './wire-engine';
 import type {LinkInfo, OpenLink} from './wire-engine';
@@ -59,7 +60,7 @@ export function LinkPanel({link, info, onClose, openDocument, openFlag, traceEvi
     {evidence.length ? <ul className="tw-lp-sources">
       {evidence.map(e => <li key={e.evidence_id}>
         <b>{e.source_title || e.filename || 'Source'}</b>{e.locator ? ` · ${e.locator}` : e.page ? ` · p.${e.page}` : ''}
-        {e.stance ? <span className="tw-lp-stance"> · {STANCE[e.stance] ?? e.stance}{e.reviewed_at ? `, reviewed ${fmtDate(e.reviewed_at.slice(0, 10))}` : ''}</span> : <span className="tw-lp-stance"> · not reviewed yet</span>}
+        {e.stance ? <span className="tw-lp-stance"> · {STANCE[e.stance] ?? e.stance}{e.reviewed_at ? `, reviewed ${timeDayWords(e.reviewed_at)}` : ''}</span> : <span className="tw-lp-stance"> · not reviewed yet</span>}
         {e.quote ? <q>{e.quote.length > 140 ? `${e.quote.slice(0, 140)}…` : e.quote}</q> : null}
       </li>)}
     </ul> : null}

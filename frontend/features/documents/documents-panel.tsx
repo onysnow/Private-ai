@@ -58,7 +58,7 @@ import {IdentifierOwner} from './identifier-owner';
 import {SchemaQuestion} from './schema-question';
 import {FingerprintMark, ProposalKindMark, proposalKindName} from '../the-drop/kind-marks';
 import {PagePicture} from '../case-home/decision-card';
-import {apiTime} from '../../lib/timestamps';
+import {compactDay} from '../../lib/timestamps';
 import {
   fileKind as libraryKind, fileState, isFiltered, KINDS, lanesById, libraryRows, sharedOpenings, STATE_ORDER, STATES, tally, titleOf, waitingIn,
 } from './library-model';
@@ -74,7 +74,7 @@ const FOLD_OVER = 8;
 const SORTS: {key: SortKey; label: string}[] = [{key: 'pages', label: 'Pages'}, {key: 'passages', label: 'Passages'}, {key: 'waiting', label: 'Waiting'},
   {key: 'added', label: 'Added'}];
 type Tool = 'email' | 'translation' | 'similar' | 'map' | 'picture';
-const shortDay = (iso: string) => apiTime(iso).toLocaleDateString('en-GB', {day: 'numeric', month: 'short'});
+const shortDay = (iso: string) => compactDay(iso);
 
 type Props = {investigationId: string};
 

@@ -12,6 +12,7 @@ import type {PointerEvent as ReactPointerEvent, ReactElement} from 'react';
 
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
+import {MONTHS} from '../../lib/dates';
 import {api} from '../../lib/api-instance';
 import {compareRedactedOptions, getRedactionOptions, listDerivedOptions, listDerivedQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {makeRedactedCopy} from '../../lib/generated/sdk.gen';
@@ -31,7 +32,7 @@ const KIND_WORDS: Record<Kind, string> = {drawn: 'Area', phone: 'Phone number', 
 /** The new file's name as the server makes it: "<name>-redacted-for-<who>-<dd-Mon>.pdf". */
 export function newFileName(filename: string, madeFor: MadeFor, today: Date): string {
   const stem = filename.replace(/\.pdf$/i, '');
-  const day = `${String(today.getDate()).padStart(2, '0')}-${today.toLocaleString('en-GB', {month: 'short'})}`;
+  const day = `${String(today.getDate()).padStart(2, '0')}-${MONTHS[today.getMonth()]}`;
   return `${stem}-redacted-for-${madeFor}-${day}.pdf`.replace(/[^A-Za-z0-9._-]+/g, '_');
 }
 

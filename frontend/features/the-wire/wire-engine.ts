@@ -15,6 +15,7 @@
 // It draws straight into SVG (hundreds of moving parts each frame), so it is plain DOM
 // code mounted by the-wire.tsx; every listener is removed by the returned destroy().
 import type {WireEntityOut, WireLinkOut, WireOut} from '../../lib/generated/types.gen';
+import {dateWords} from '../../lib/dates';
 import {onScreen} from '../../lib/on-screen';
 
 /** How sure a link is (the status grammar): read from the case's review advisory by the-wire.tsx. */
@@ -100,8 +101,7 @@ export const fmtAmt = (a: number | null | undefined, c: string): string => {
 };
 export const fmtDate = (d: string): string => {
   if (!d) return 'no date';
-  const [y, m, dd] = d.split('-');
-  return `${dd ? `${+dd} ` : ''}${m ? `${MONTHS[+m - 1]} ` : ''}${y}`;
+  return dateWords(d);
 };
 export const tval = (d: string): number | null => {
   if (!d) return null;

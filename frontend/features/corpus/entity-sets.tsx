@@ -20,7 +20,7 @@ import {
   listCorpusEntitySetsOptions, listCorpusEntitySetsQueryKey, listEntitiesOptions, sendCorpusEntitySetMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {EntitySetSentOut} from '../../lib/generated/types.gen';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 
 const KIND_NAME: Record<string, string> = {diagram: 'Diagram', timeline: 'Timeline', list: 'List'};
 const KIND_ICON: Record<string, LucideIcon> = {diagram: GitFork, timeline: CalendarRange, list: List};
@@ -84,7 +84,7 @@ export function EntitySets({investigationId}: {investigationId: string}): ReactE
     {(sets.data ?? []).length > 0 && <ul aria-label="Sent to OpenAleph">
       {(sets.data ?? []).map(row => <li key={row.id}>
         {/* Its kind is its icon; the count and when it was sent are on hover. */}
-        {(() => { const Icon = KIND_ICON[row.kind]; return <Reveal label={KIND_NAME[row.kind]} detail={<><b>{KIND_NAME[row.kind]}</b> · {row.items} record(s) · sent {apiTime(row.sent_at).toLocaleString()}</>}>
+        {(() => { const Icon = KIND_ICON[row.kind]; return <Reveal label={KIND_NAME[row.kind]} detail={<><b>{KIND_NAME[row.kind]}</b> · {row.items} record(s) · sent {timeWords(row.sent_at)}</>}>
           {Icon ? <Icon size={14} aria-hidden="true"/> : <span aria-hidden="true">·</span>}</Reveal>; })()}{' '}
         <a href={row.url} target="_blank" rel="noreferrer" aria-label={`${KIND_NAME[row.kind]}: ${row.label}`}>{row.label}</a>
       </li>)}

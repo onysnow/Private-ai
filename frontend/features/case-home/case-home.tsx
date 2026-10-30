@@ -29,6 +29,7 @@ import {
 import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
 import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut, RelationshipOut} from '../../lib/generated/types.gen';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {HIDE_SCREEN_EVENT, OPEN_INBOX_EVENT, OPEN_PALETTE_EVENT, SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
 import {useNeedsYouCount} from '../inbox/inbox';
@@ -391,7 +392,7 @@ function SinceStrip({investigationId, markVisit = true}: {investigationId: strin
     return () => { window.clearTimeout(timer); window.removeEventListener('pagehide', mark); mark(); };
   }, [investigationId, markVisit]);
   const since = useQuery({...getSinceOptions({path: {investigation_id: investigationId}, query: {after: after ?? ''}}), enabled: Boolean(investigationId && after)}).data;
-  const when = after ? new Date(after).toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short'}) : '';
+  const when = after ? timeWords(after) : '';
   const [all, setAll] = useState(false);
   const changes = since?.changes ?? [];
   // With nothing to list, the strip is one slim line, and Next up keeps the room.

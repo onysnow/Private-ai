@@ -13,6 +13,7 @@ import {checkedReply} from '../../lib/api-generated';
 import {api} from '../../lib/api-instance';
 import type {PackCheckOut, PackExhibitOut, PackFileOut} from '../../lib/generated/types.gen';
 import {zPackCheckOut} from '../../lib/generated/zod.gen';
+import {utcStamp} from '../../lib/timestamps';
 
 import {alterForTry} from './try-pack';
 
@@ -190,7 +191,7 @@ export function CheckAPack({investigationId}: {investigationId: string}): ReactE
             <div className={c.missing ? 'bad' : ''}><dt>missing</dt><dd>{c.missing ?? 0}</dd></div><div className={c.extra ? 'add' : ''}><dt>not in the list</dt><dd>{c.extra ?? 0}</dd></div>
           </dl>
           <p className="pk-note">{result.made_here
-            ? `Made by ${by(result.made_by)} for this case on ${result.made_at?.slice(0, 16).replace('T', ' ')} UTC${result.draft ? ', as a draft' : ''}: compared with the list kept here when it was made.`
+            ? `Made by ${by(result.made_by)} for this case on ${result.made_at ? utcStamp(result.made_at) : ''}${result.draft ? ', as a draft' : ''}: compared with the list kept here when it was made.`
             : result.made_in_other_case ? `Made on this computer for another case (${result.made_in_other_case}): compared with its own list only. Open that case to check it against the list kept there.`
             : 'Not made in this case: compared with its own list, which shows it is whole but not that nobody made a new list after changing it.'}
             {result.list_changed ? ' The pack’s own list was changed after it was made.' : ''}</p>

@@ -46,7 +46,7 @@ describe('picture evidence', () => {
     await user.clear(screen.getByLabelText(/Date taken/));
     await user.type(screen.getByLabelText(/Date taken/), '2023-10');
     await user.click(save);
-    expect(await screen.findByText(/Saved as evidence, taken 2023-10/)).toBeInTheDocument();
+    expect(await screen.findByText(/Saved as evidence, taken Oct 2023/)).toBeInTheDocument();
     expect(api.lastBody('POST /api/evidence')).toEqual({source_id: 'src-1', document_id: 'doc-1', quote: 'The market hall, intact',
       locator: 'the whole picture', captured_on: '2023-10'});
   });

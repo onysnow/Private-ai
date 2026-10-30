@@ -73,7 +73,7 @@ describe('WatchTheRun', () => {
   it('draws the header in one line, the key, the systems not in this run and the three ledgers', async () => {
     open();
     const map = await screen.findByRole('group', {name: /The run as a map/});
-    await waitFor(() => expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(/Act · AI runs · Case synthesis · TAS · 10 Oct 1[0-9]:\d\d/));
+    await waitFor(() => expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(/Act · AI runs · Case synthesis · TAS · 10 Oct 2026, 1[0-9]:\d\d/));
     expect(screen.getByRole('button', {name: /Events: summary/})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /^2 problems/})).toBeInTheDocument();
     expect(within(map as unknown as HTMLElement).getAllByText('not in this run').length).toBe(4);
@@ -311,7 +311,7 @@ describe('WatchTheRun, your marks and other runs', () => {
     const user = userEvent.setup();
     const compare = await screen.findByRole('combobox', {name: 'Compare with another run of this question'});
     // Only a run of the same module compares: another system draws another route.
-    expect(within(compare).getAllByRole('option').map(o => o.textContent)).toEqual(['Compare…', expect.stringMatching(/^with 9 Oct \d\d:\d\d · 1 problem$/)]);
+    expect(within(compare).getAllByRole('option').map(o => o.textContent)).toEqual(['Compare…', expect.stringMatching(/^with 9 Oct 2026, \d\d:\d\d · 1 problem$/)]);
     await user.selectOptions(compare, 'run-0');
     expect(await screen.findByText(/Compared with the run of 9 Oct .* 1 part changed/)).toBeInTheDocument();
     expect(screen.getByText(/corroboration: verified → in between/)).toBeInTheDocument();
