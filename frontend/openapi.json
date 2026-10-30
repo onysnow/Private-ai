@@ -18467,6 +18467,83 @@
         "title": "DemoCaseProgressOut",
         "type": "object"
       },
+      "DemoPreDecidedOut": {
+        "description": "The decisions a demo case made for itself (app/services/demo_decided.py), by kind\n(proposal, check, watchlist) and by what each became; ``undone`` after an undo.",
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "decided_by": {
+            "title": "Decided By",
+            "type": "string"
+          },
+          "investigation_id": {
+            "title": "Investigation Id",
+            "type": "string"
+          },
+          "undone": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Undone"
+          }
+        },
+        "required": [
+          "investigation_id",
+          "decided_by",
+          "counts"
+        ],
+        "title": "DemoPreDecidedOut",
+        "type": "object"
+      },
+      "DemoPreDecidedUndo": {
+        "description": "Which of a demo case's own decisions to undo (app/services/demo_decided.py): all of them, one kind, or one item.",
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "proposal",
+                  "check",
+                  "watchlist"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          }
+        },
+        "title": "DemoPreDecidedUndo",
+        "type": "object"
+      },
       "DemoSeedOut": {
         "properties": {
           "created": {
@@ -29789,6 +29866,28 @@
               }
             ],
             "title": "Decided At"
+          },
+          "decided_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Id"
+          },
+          "decided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Name"
           },
           "first_seen_at": {
             "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
@@ -44706,6 +44805,28 @@
             ],
             "title": "Decided At"
           },
+          "decided_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Id"
+          },
+          "decided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Name"
+          },
           "document": {
             "anyOf": [
               {
@@ -46914,6 +47035,28 @@
       "WatchlistHitOut": {
         "description": "A document a watched name was found in (app/services/watchlists.py).",
         "properties": {
+          "decided_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Id"
+          },
+          "decided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Name"
+          },
           "document_id": {
             "anyOf": [
               {
@@ -59692,6 +59835,116 @@
           }
         },
         "summary": "Load Demo Case"
+      }
+    },
+    "/api/demo/pre-decided/{investigation_id}": {
+      "get": {
+        "description": "The decisions the demo case made for itself (\"Demo (pre-decided)\"), by kind and outcome.",
+        "operationId": "get_pre_decided",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoPreDecidedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Pre Decided"
+      }
+    },
+    "/api/demo/pre-decided/{investigation_id}/undo": {
+      "post": {
+        "description": "Undo the demo case's own decisions (all, one kind, or one item): each goes back to waiting in Decide.\nA person's decisions are never touched.",
+        "operationId": "undo_pre_decided",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "investigation_id",
+            "required": true,
+            "schema": {
+              "title": "Investigation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoPreDecidedUndo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoPreDecidedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Undo Pre Decided"
       }
     },
     "/api/demo/seed": {

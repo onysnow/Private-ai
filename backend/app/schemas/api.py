@@ -1136,3 +1136,9 @@ class CleanIn(BaseModel):
 class SyncIn(BaseModel):
     """Another recording of the same event, to line up with this one by matching their sound."""
     other_document_id: str = Field(min_length=1, max_length=64)
+
+
+class DemoPreDecidedUndo(BaseModel):
+    """Which of a demo case's own decisions to undo (app/services/demo_decided.py): all of them, one kind, or one item."""
+    kind: Literal["proposal", "check", "watchlist"] | None = None
+    id: str | None = Field(default=None, min_length=1, max_length=64)

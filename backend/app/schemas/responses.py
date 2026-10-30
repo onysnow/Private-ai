@@ -1634,6 +1634,9 @@ class WatchlistHitOut(ResponseModel):
     status: Literal["new", "lead", "dismissed"]
     lead_id: str | None
     found_at: Timestamp
+    # Who decided it (app/db/decided_by.py): a person, or "Demo (pre-decided)" on a demo case; None while open.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
 
 
 class WatchlistEntryOut(ResponseModel):
@@ -4771,6 +4774,9 @@ class ToCheckItemOut(ResponseModel):
     status: Literal["open", "shows", "does_not", "unclear"]
     note: str | None
     decided_at: Timestamp | None
+    # Who decided it (app/db/decided_by.py): a person, or "Demo (pre-decided)" on a demo case; None while open.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
     parties: list[FlagPartyOut]
     flag_id: str | None  # the flag whose records cannot show this part
     related_flags: list[str]  # other current flags on the same parties
@@ -4798,6 +4804,9 @@ class MissingValueOut(ResponseModel):
     note: str | None
     lead_id: str | None
     decided_at: Timestamp | None
+    # Who decided it (app/db/decided_by.py): a person, or "Demo (pre-decided)" on a demo case; None while open.
+    decided_by_id: str | None = None
+    decided_by_name: str | None = None
     first_seen_at: Timestamp
     gone_at: Timestamp | None
     parties: list[FlagPartyOut]
@@ -5213,6 +5222,15 @@ class DemoCaseProgressOut(ResponseModel):
     leads: int | None = None
     # Web pages the publisher did not serve when the case was loaded: kept as links.
     not_downloaded: list[dict[str, str | None]] = []
+
+
+class DemoPreDecidedOut(ResponseModel):
+    """The decisions a demo case made for itself (app/services/demo_decided.py), by kind
+    (proposal, check, watchlist) and by what each became; ``undone`` after an undo."""
+    investigation_id: str
+    decided_by: str
+    counts: dict[str, dict[str, int]]
+    undone: int | None = None
 
 
 class DemoCaseOut(ResponseModel):

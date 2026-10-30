@@ -255,6 +255,7 @@ def serialize_watchlist(db: Session, investigation_id: str) -> dict[str, Any]:
         "id": entry.id, "query": entry.query, "note": entry.note, "created_by": entry.created_by, "created_at": entry.created_at,
         "checked_at": entry.checked_at, "check_state": entry.check_state, "check_detail": entry.check_detail,
         "hits": [{"id": hit.id, "document_id": hit.document_id, "title": hit.title, "page_number": hit.page_number,
-                  "highlights": hit.highlights or [], "status": hit.status, "lead_id": hit.lead_id, "found_at": hit.found_at}
+                  "highlights": hit.highlights or [], "status": hit.status, "lead_id": hit.lead_id, "found_at": hit.found_at,
+                  "decided_by_id": hit.decided_by_id, "decided_by_name": hit.decided_by_name}
                  for hit in hits.get(entry.id, [])],
     } for entry in entries]}

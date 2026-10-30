@@ -213,12 +213,14 @@ def _with_local_text(read: OpenAlephText, storage_path: str) -> OpenAlephText:
 
 def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str | None:
     """Read a document (_read_document); a stop asked for at any point leaves it
-    marked as stopped, not waiting for a read that will never come."""
+    marked as stopped, not waiting for a read that will never come. A demo case's
+    document then has its proposals pre-decided (app/services/demo_decided.py)."""
     from app.jobs.records import JobStopped
     from app.models.domain import Document
+    from app.services.demo_decided import after_read
 
     try:
-        return _read_document(db, job, report)
+        message = _read_document(db, job, report)
     except JobStopped:
         db.rollback()
         doc = db.get(Document, job.subject_id) if job.subject_id else None
@@ -226,6 +228,9 @@ def extract_document_job(db: Session, job: BackgroundJob, report: Report) -> str
             doc.extraction_status, doc.extraction_error = "failed", STOPPED_READ
             db.commit()
         raise
+    if job.subject_id:
+        after_read(db, job.subject_id)  # nothing on a case that is not a demo; never fails the read
+    return message
 
 
 def _read_document(db: Session, job: BackgroundJob, report: Report) -> str | None:

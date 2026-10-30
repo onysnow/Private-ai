@@ -239,6 +239,10 @@ def build(db: Session, case_id: str, documents: list[tuple[dict[str, Any], bytes
     if problems:
         logger.warning("%s demo: %d record(s) adjusted: %s", case_id, len(problems), "; ".join(problems[:10]))
     db.commit()
+    # A finished case: what waits in Decide is pre-decided from these records (app/services/demo_decided.py).
+    from app.services.demo_decided import after_build
+
+    after_build(db, inv.id)
     return inv, [d.id for d in docs.values()]
 
 

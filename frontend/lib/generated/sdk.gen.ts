@@ -576,6 +576,9 @@ import type {
   GetPlatformChecksData,
   GetPlatformChecksErrors,
   GetPlatformChecksResponses,
+  GetPreDecidedData,
+  GetPreDecidedErrors,
+  GetPreDecidedResponses,
   GetRecordMarksData,
   GetRecordMarksErrors,
   GetRecordMarksResponses,
@@ -1215,6 +1218,9 @@ import type {
   UndoItemData,
   UndoItemErrors,
   UndoItemResponses,
+  UndoPreDecidedData,
+  UndoPreDecidedErrors,
+  UndoPreDecidedResponses,
   UnlockData,
   UnlockErrors,
   UnlockPinData,
@@ -1697,6 +1703,8 @@ import {
   zGetPhotoPath,
   zGetPhotoResponse,
   zGetPlatformChecksResponse,
+  zGetPreDecidedPath,
+  zGetPreDecidedResponse,
   zGetRecordMarksPath,
   zGetRecordMarksQuery,
   zGetRecordMarksResponse,
@@ -2193,6 +2201,9 @@ import {
   zTurnOnResponse,
   zUndoItemPath,
   zUndoItemResponse,
+  zUndoPreDecidedBody,
+  zUndoPreDecidedPath,
+  zUndoPreDecidedResponse,
   zUnlockBody,
   zUnlockPinBody,
   zUnlockPinResponse,
@@ -4584,6 +4595,65 @@ export const loadDemoCase = <ThrowOnError extends boolean = false>(
       await zLoadDemoCaseResponse.parseAsync(data),
     url: '/api/demo/cases/{case_id}',
     ...options,
+  });
+
+/**
+ * Get Pre Decided
+ *
+ * The decisions the demo case made for itself ("Demo (pre-decided)"), by kind and outcome.
+ */
+export const getPreDecided = <ThrowOnError extends boolean = false>(
+  options: Options<GetPreDecidedData, ThrowOnError>,
+): RequestResult<GetPreDecidedResponses, GetPreDecidedErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetPreDecidedResponses,
+    GetPreDecidedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetPreDecidedPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetPreDecidedResponse.parseAsync(data),
+    url: '/api/demo/pre-decided/{investigation_id}',
+    ...options,
+  });
+
+/**
+ * Undo Pre Decided
+ *
+ * Undo the demo case's own decisions (all, one kind, or one item): each goes back to waiting in Decide.
+ * A person's decisions are never touched.
+ */
+export const undoPreDecided = <ThrowOnError extends boolean = false>(
+  options: Options<UndoPreDecidedData, ThrowOnError>,
+): RequestResult<UndoPreDecidedResponses, UndoPreDecidedErrors, ThrowOnError> =>
+  (options.client ?? client).post<
+    UndoPreDecidedResponses,
+    UndoPreDecidedErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zUndoPreDecidedBody,
+          path: zUndoPreDecidedPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zUndoPreDecidedResponse.parseAsync(data),
+    url: '/api/demo/pre-decided/{investigation_id}/undo',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**

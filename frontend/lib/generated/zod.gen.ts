@@ -3363,6 +3363,29 @@ export const zDemoCaseOut = z.object({
 });
 
 /**
+ * DemoPreDecidedOut
+ *
+ * The decisions a demo case made for itself (app/services/demo_decided.py), by kind
+ * (proposal, check, watchlist) and by what each became; ``undone`` after an undo.
+ */
+export const zDemoPreDecidedOut = z.object({
+  counts: z.record(z.string(), z.record(z.string(), z.int())),
+  decided_by: z.string(),
+  investigation_id: z.string(),
+  undone: z.int().nullish(),
+});
+
+/**
+ * DemoPreDecidedUndo
+ *
+ * Which of a demo case's own decisions to undo (app/services/demo_decided.py): all of them, one kind, or one item.
+ */
+export const zDemoPreDecidedUndo = z.object({
+  id: z.string().min(1).max(64).nullish(),
+  kind: z.enum(['proposal', 'check', 'watchlist']).nullish(),
+});
+
+/**
  * DemoSeedOut
  */
 export const zDemoSeedOut = z.object({
@@ -6046,6 +6069,8 @@ export const zMissingValueOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     )
     .nullable(),
+  decided_by_id: z.string().nullish(),
+  decided_by_name: z.string().nullish(),
   first_seen_at: z
     .string()
     .regex(
@@ -10650,6 +10675,8 @@ export const zToCheckItemOut = z.object({
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
     )
     .nullable(),
+  decided_by_id: z.string().nullish(),
+  decided_by_name: z.string().nullish(),
   document: zCheckDocumentOut.nullable(),
   excerpt: z.string().nullable(),
   first_seen_at: z
@@ -11488,6 +11515,8 @@ export const zWatchlistEntryCreate = z.object({
  * A document a watched name was found in (app/services/watchlists.py).
  */
 export const zWatchlistHitOut = z.object({
+  decided_by_id: z.string().nullish(),
+  decided_by_name: z.string().nullish(),
   document_id: z.string().nullable(),
   found_at: z
     .string()
@@ -12801,6 +12830,26 @@ export const zLoadDemoCasePath = z.object({
  * Successful Response
  */
 export const zLoadDemoCaseResponse = zDemoCaseProgressOut;
+
+export const zGetPreDecidedPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetPreDecidedResponse = zDemoPreDecidedOut;
+
+export const zUndoPreDecidedBody = zDemoPreDecidedUndo;
+
+export const zUndoPreDecidedPath = z.object({
+  investigation_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zUndoPreDecidedResponse = zDemoPreDecidedOut;
 
 /**
  * Successful Response

@@ -482,6 +482,11 @@ def build(db: Session, documents: list[tuple[dict[str, Any], bytes | None]], *, 
     from app.services.demo_captures import seed_captures
 
     seed_captures(db, inv.id, storage_dir=storage_dir)
+    # A finished case: what waits in Decide is pre-decided from these records, a few of each kind left to try
+    # (app/services/demo_decided.py; each document's own proposals after it is read).
+    from app.services.demo_decided import after_build
+
+    after_build(db, inv.id)
 
     LAST_PROBLEMS[:] = problems
     if problems:

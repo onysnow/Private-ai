@@ -820,3 +820,41 @@ PLACE_1 draws "Pictures of this place" in the place card and a window under the 
   scroll, never under the pointer, and not at all under reduced motion.
 - **The map's tooltip lookups do not compute pictures** (`pictures=False` in the map chart and the photo tool), so
   their cost is unchanged.
+
+## 45. The demo arrives decided: its review decisions are pre-made, a few of each kind left to try (30 Oct 2026)
+
+BACKLOG "Asked for: demo": the demo is a finished investigation, so the human-review decisions are pre-made from what
+is known, and the user sees the app past the review step. Built in `backend/app/services/demo_decided.py`.
+
+- **Only on a demo case** (`Investigation.is_demo`), never anyone's own. It runs at the end of a demo build (the
+  table's proposals, every missing value and checklist item) and after each of a demo case's documents is read (that
+  document's proposals, passages and watchlist hits): the queue grows as documents are read, so the decisions are made
+  where the proposals are made, not once at load.
+- **Every decision is stamped "Demo (pre-decided)"** (`DEMO_DECIDER_ID` in `app/db/decided_by.py`) with the rule that
+  made it in its note, and can be undone: `POST /api/demo/pre-decided/{investigation_id}/undo` (all, one kind, or one
+  item), counted by `GET /api/demo/pre-decided/{investigation_id}`. Undo never touches a person's decisions. To make
+  this possible To check items and watchlist hits now keep who decided them too (migration b2e5c8a1d730, revising
+  a8d2f6c4e913), stamped the same way a person's proposal decision is; a stamp the code sets itself wins over the
+  request's person, so a demo decision made during a request is still the demo's. The custody chain shows such an
+  acceptance as the app's, not a person's. To check items, missing values and watchlist hits now carry
+  `decided_by_id` / `decided_by_name` in the API, as proposals already did, so a screen can tell the two apart.
+- **Accepted only when the case already holds it; nothing new is made.** A name that is a record's own name or alias
+  word for word (one record only; a table's "X (Y)" by either part) is accepted as that record through the app's own
+  "Same record" answer, so its mentions are kept on it. A passage holding a quote the case keeps from the same source,
+  a sentence that is a claim's text or holds the quote supporting exactly one claim, a table payment the case holds
+  (same ends, amount, currency, date) are accepted as that quote, claim or payment.
+- **Rejected by stated rules:** names made only of court-caption words (Verified Complaint, Forfeiture In Rem, All
+  Right), a court's abbreviation (C.D. Cal), a role standing for an unnamed person (Deutsche Bank Employee, Christie's
+  VP); passages under six words, under half letters, only page furniture (Case 2:16-cv-…, Page 3 of 136) or an email's
+  header lines; the same name, sentence or passage proposed again. Proposals the OCR quality gate held back stay held.
+- **Left waiting, so Decide can still be tried:** the DOJ payments table's rows and names (the money; their "Already in
+  the case" notes show the $330M total), then one name, one sentence and one passage per document while fewer than 36
+  proposals wait; 8 missing values (one of each rule in turn); 8 To check items; 4 watchlist hits. Every other
+  proposal is rejected as "not taken by the finished case"; the rest of To check is set aside as "unclear", missing
+  values as "not needed here", hits dismissed, each with a note saying a person did not answer it. "Shows it" or "Does
+  not" is never pre-made: whether a passage shows an indicator is a person's call.
+- **Measured** (tests/test_demo_decided.py, the case built without downloads, the shipped files read): without the pass
+  about 500 items wait after the reads (323 proposals, 175 missing values, 3 checks); with it 47 (36 proposals, 8
+  missing, 3 to check), 287 proposals and 167 missing values pre-decided. Not measured: a load with the eleven real
+  court PDFs read (OCR, about 15,000 items on Ony's PC); the caps hold there too, but the time the pass takes on that
+  many proposals was not checked.

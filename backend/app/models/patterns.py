@@ -75,3 +75,6 @@ class CheckItem(Base):
     record_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     blocks: Mapped[str | None] = mapped_column(Text, nullable=True)
     lead_id: Mapped[str | None] = mapped_column(ForeignKey("leads.id"), nullable=True)
+    # Who answered it, as signed in when they did (app/db/decided_by.py); None while open, or before this was kept.
+    decided_by_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    decided_by_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
