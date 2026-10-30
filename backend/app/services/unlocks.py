@@ -112,8 +112,14 @@ class Links:
         return self.run_link(str(p.get("schema") or ""), source, target, p.get("properties") or {}, added, f"proposal:{row.id}")
 
     def run_link(self, schema: str, source: str, target: str, properties: dict[str, Any],
-                 added: list[case_graph.Party] | None = None, link_id: str = "new-link") -> list[dict[str, Any]]:
-        """The Red Flags a link not yet in the case would raise or lift, as the rules would read it unreviewed."""
+                 added: list[case_graph.Party] | None = None, link_id: str = "new-link",
+                 payment_kind: str | None = None) -> list[dict[str, Any]]:
+        """The Red Flags a link not yet in the case would raise or lift, as the rules would read it unreviewed. A
+        payment that is an amount owed (app/services/payment_kinds.py) is not read by the rules: it raises none."""
+        from app.services.payment_kinds import is_owed
+
+        if schema == "Payment" and is_owed(payment_kind):
+            return []
         props = {k: [str(v) for v in (vs if isinstance(vs, list) else [vs])] for k, vs in properties.items()}
         graph = case_graph.CaseGraph(parties={**self.graph.parties, **{party.id: party for party in added or []}},
                                      links=[*self.graph.links, case_graph.Link(link_id, schema, source, target, props, "unsupported")])

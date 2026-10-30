@@ -11,13 +11,13 @@ from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
 from app.models.domain import Investigation, RelationshipEdge
 from app.schemas.api import (
-    RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest,
+    PaymentKindSet, RelationshipCreate, RelationshipEvidenceAttachRequest, RelationshipEvidenceReviewRequest,
 )
 from app.schemas.responses import ConnectionsOut, LeadOut, RelationshipEvidenceReviewsOut, RelationshipOut, WireLinkSourcesOut
 from app.services import wire
 from app.services.leads import create_relationship_context_lead, serialize_lead
 from app.services.relationships import (
-    attach_relationship_evidence, create_relationship, relationship_evidence_review_history,
+    attach_relationship_evidence, create_relationship, relationship_evidence_review_history, set_payment_kind,
     review_relationship_evidence, serialize_relationship,
 )
 
@@ -33,7 +33,22 @@ def create_canonical_relationship(body: RelationshipCreate, db: Session = Depend
             db, investigation_id=body.investigation_id, schema=body.schema,
             source_entity_id=body.source_entity_id, target_entity_id=body.target_entity_id,
             properties=body.properties, dataset=body.dataset, origin=body.origin, evidence_id=body.evidence_id,
+            payment_kind=body.payment_kind,
         )
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return serialize_relationship(db, edge)
+
+
+@router.patch("/relationships/{relationship_id}/payment-kind", response_model=RelationshipOut)
+def set_relationship_payment_kind(relationship_id: str, body: PaymentKindSet, db: Session = Depends(get_db)) -> Any:
+    """What kind of payment it is (app/services/payment_kinds.py); null clears it. An amount owed (an agreed price,
+    a fine, an order) leaves the money totals, the flows, the money checks and the Red Flag payment rules."""
+    edge = db.get(RelationshipEdge, relationship_id)
+    if edge is None:
+        raise HTTPException(404, "Relationship not found")
+    try:
+        set_payment_kind(db, edge, body.payment_kind)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
     return serialize_relationship(db, edge)

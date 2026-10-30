@@ -393,6 +393,7 @@ import {
   setInvestigationType,
   setName,
   setPin,
+  setRelationshipPaymentKind,
   setStoryThesis,
   settingsStatus,
   skipItem,
@@ -1571,6 +1572,9 @@ import type {
   SetPinData,
   SetPinError,
   SetPinResponse,
+  SetRelationshipPaymentKindData,
+  SetRelationshipPaymentKindError,
+  SetRelationshipPaymentKindResponse,
   SetStoryThesisData,
   SetStoryThesisError,
   SetStoryThesisResponse,
@@ -12687,6 +12691,36 @@ export const createLeadFromRelationshipContextMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await createLeadFromRelationshipContext({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Set Relationship Payment Kind
+ *
+ * What kind of payment it is (app/services/payment_kinds.py); null clears it. An amount owed (an agreed price,
+ * a fine, an order) leaves the money totals, the flows, the money checks and the Red Flag payment rules.
+ */
+export const setRelationshipPaymentKindMutation = (
+  options?: Partial<Options<SetRelationshipPaymentKindData>>,
+): UseMutationOptions<
+  SetRelationshipPaymentKindResponse,
+  SetRelationshipPaymentKindError,
+  Options<SetRelationshipPaymentKindData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SetRelationshipPaymentKindResponse,
+    SetRelationshipPaymentKindError,
+    Options<SetRelationshipPaymentKindData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await setRelationshipPaymentKind({
         ...options,
         ...fnOptions,
         throwOnError: true,

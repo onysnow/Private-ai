@@ -548,6 +548,8 @@ class RelationshipOut(ResponseModel):
     ftm_id: str | None = None
     schema_: str = Field(alias="schema")
     evidence_status: str | None = None   # DIRECT | INFERRED | ALLEGED (the suite's Relationship record)
+    # A Payment's kind (app/services/payment_kinds.py); None until a person says, read as money that moved.
+    payment_kind: Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"] | None = None
     source_prop: str | None = None
     target_prop: str | None = None
     source: RelationshipEndpointOut | None = None
@@ -2733,6 +2735,8 @@ class FinancialTransactionOut(ResponseModel):
     amount: float
     currency: str
     statedPurpose: str | None = None
+    paymentKind: Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"] | None = Field(
+        default=None, description="What kind of payment a person says it is (app/services/payment_kinds.py); null: not said.")
     transactionNumber: str | None = None
     evidence: str | None = None
     evidence_count: int
@@ -2759,6 +2763,8 @@ class IncompleteTransactionOut(ResponseModel):
     amount: float | None = None
     currency: str | None = None
     statedPurpose: str | None = None
+    paymentKind: Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"] | None = Field(
+        default=None, description="What kind of payment a person says it is (app/services/payment_kinds.py); null: not said.")
     transactionNumber: str | None = None
     evidence: str | None = None
     evidence_count: int
@@ -2773,10 +2779,14 @@ class IncompleteTransactionOut(ResponseModel):
 class FinancialLedgerOut(ResponseModel):
     investigation_id: str
     transactions: list[FinancialTransactionOut]
+    # Amounts owed, not records that money moved (an agreed price, a fine, an order): listed apart, never added to
+    # the transactions' totals or drawn as flows.
+    owed: list[FinancialTransactionOut] = []
     incomplete: list[IncompleteTransactionOut]
     currencies: list[str]
     flow_type_rule: str
     duplicate_rule: str
+    owed_rule: str = ""
 
 
 class MoneyCheckOut(ResponseModel):

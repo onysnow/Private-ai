@@ -4641,6 +4641,9 @@ export const zFinancialTransactionOut = z.object({
   from_entity_id: z.string(),
   id: z.string(),
   locator: z.string().nullish(),
+  paymentKind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
   relationship_id: z.string(),
   statedPurpose: z.string().nullish(),
   status: z.string().nullish(),
@@ -5081,6 +5084,9 @@ export const zIncompleteTransactionOut = z.object({
   from_entity_id: z.string().nullish(),
   id: z.string(),
   locator: z.string().nullish(),
+  paymentKind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
   problems: z.array(z.string()),
   relationship_id: z.string(),
   statedPurpose: z.string().nullish(),
@@ -5100,6 +5106,8 @@ export const zFinancialLedgerOut = z.object({
   flow_type_rule: z.string(),
   incomplete: z.array(zIncompleteTransactionOut),
   investigation_id: z.string(),
+  owed: z.array(zFinancialTransactionOut).optional().default([]),
+  owed_rule: z.string().optional().default(''),
   transactions: z.array(zFinancialTransactionOut),
 });
 
@@ -6187,6 +6195,9 @@ export const zEnd = z.object({
  * LinkIn
  */
 export const zLinkIn = z.object({
+  payment_kind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
   properties: z.record(z.string(), z.array(z.string())).optional().default({}),
   schema: z.string(),
   source: zEnd,
@@ -6887,6 +6898,17 @@ export const zPageVersionOut = z.object({
 export const zPartyYearsOut = z.object({
   entity_id: z.string(),
   years: z.array(z.int()),
+});
+
+/**
+ * PaymentKindSet
+ *
+ * What kind of payment it is; null clears it.
+ */
+export const zPaymentKindSet = z.object({
+  payment_kind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
 });
 
 /**
@@ -7692,6 +7714,9 @@ export const zRelationshipCreate = z.object({
   evidence_id: z.string().nullish(),
   investigation_id: z.string(),
   origin: z.string().nullish(),
+  payment_kind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
   properties: z.record(z.string(), z.array(z.string())).optional(),
   schema: z.string(),
   source_entity_id: z.string(),
@@ -9126,6 +9151,9 @@ export const zEntityRelationshipOut = z.object({
   ftm_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
+  payment_kind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
   properties: z.record(z.string(), z.array(z.string())),
   provenance: zRelationshipProvenanceOut,
   reconciliation: zRelationshipReconciliationOut.nullish(),
@@ -9163,6 +9191,9 @@ export const zRelationshipOut = z.object({
   ftm_id: z.string().nullish(),
   id: z.string(),
   investigation_id: z.string(),
+  payment_kind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
   properties: z.record(z.string(), z.array(z.string())),
   provenance: zRelationshipProvenanceOut,
   reconciliation: zRelationshipReconciliationOut.nullish(),
@@ -15383,6 +15414,17 @@ export const zCreateLeadFromRelationshipContextPath = z.object({
  * Successful Response
  */
 export const zCreateLeadFromRelationshipContextResponse = zLeadOut;
+
+export const zSetRelationshipPaymentKindBody = zPaymentKindSet;
+
+export const zSetRelationshipPaymentKindPath = z.object({
+  relationship_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zSetRelationshipPaymentKindResponse = zRelationshipOut;
 
 export const zGetRelationshipSourcesPath = z.object({
   relationship_id: z.string(),

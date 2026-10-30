@@ -296,6 +296,9 @@ def _ledger(db: Session, investigation_id: str, currency: str | None) -> tuple[l
         {"reason": "incomplete payment", "record_type": "relationship", "record_id": row["id"], "detail": "; ".join(row.get("problems") or [])}
         for row in ledger["incomplete"]
     ]
+    # An agreed price, a fine or an order is an amount owed, not money that moved (app/services/payment_kinds.py).
+    omitted.extend({"reason": "an amount owed, not a payment", "record_type": "relationship", "record_id": row["id"],
+                    "detail": f"{row.get('paymentKind')}: {row.get('amount')} {row.get('currency')}"} for row in ledger.get("owed") or [])
     by_currency: dict[str, list[dict]] = defaultdict(list)
     for tx in ledger["transactions"]:
         by_currency[tx["currency"]].append(tx)

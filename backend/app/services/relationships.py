@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.jobs.corpus import request_corpus_sync
 from app.models.domain import Entity, RelationshipEdge, Statement, Evidence, Source, ClaimEvidenceLink, Claim, RelationshipEvidenceReviewEvent, RelationshipEvidenceAttachment
+from app.services import payment_kinds
 from app.services.ftm import make_ftm_entity
 
 # FollowTheMoney edge semantics. These property names are the entity-reference
@@ -128,8 +129,12 @@ def create_relationship(
     origin: str | None = None,
     evidence_id: str | None = None,
     commit: bool = True,
+    payment_kind: str | None = None,
 ) -> RelationshipEdge:
     info = relationship_schema_info(schema)
+    kind = payment_kinds.check(payment_kind)
+    if kind is not None and schema != "Payment":
+        raise ValueError("Only a payment has a kind of payment")
     source = db.get(Entity, source_entity_id)
     target = db.get(Entity, target_entity_id)
     if source is None or target is None:
@@ -183,6 +188,7 @@ def create_relationship(
         target_entity_id=target.id,
         source_prop=info["source_prop"],
         target_prop=info["target_prop"],
+        payment_kind=kind,
     )
     db.add(edge)
     db.flush()
@@ -197,6 +203,16 @@ def create_relationship(
         request_corpus_sync(db, investigation_id)
     else:
         db.flush()
+    return edge
+
+
+def set_payment_kind(db: Session, edge: RelationshipEdge, kind: str | None) -> RelationshipEdge:
+    """A person says what kind of payment it is (app/services/payment_kinds.py); None clears it."""
+    if edge.schema != "Payment":
+        raise ValueError("Only a payment has a kind of payment")
+    edge.payment_kind = payment_kinds.check(kind)
+    db.commit()
+    db.refresh(edge)
     return edge
 
 
@@ -322,6 +338,7 @@ def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
         "ftm_id": rel.ftm_id if rel else None,
         "schema": edge.schema,
         "evidence_status": edge.evidence_status,
+        "payment_kind": edge.payment_kind,
         "source_prop": edge.source_prop,
         "target_prop": edge.target_prop,
         "source": None if source is None else {

@@ -4,10 +4,14 @@
 // - a party's kind: its Lucide icon in the kind's ring colour (party-icons.ts + PARTY, as the network draws it);
 // - a link's family: a short line in the family's colour, with an arrowhead when the link has a direction (LINK);
 // - evidence's stance on a claim: Chain of Custody's line styles (solid in the supported colour for, red dash-dot
-//   against, dotted grey context only).
+//   against, dotted grey context only);
+// - a payment's kind: its Lucide icon, ringed when it is an amount owed rather than money that moved (PAYMENT_KIND).
 // Each mark is a Reveal, so its name is read with it and shown on hover, focus or click.
+import {BadgeAlert, Gavel, HandCoins, Handshake, MoveRight, Receipt, Tag} from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 import type {ReactElement, ReactNode} from 'react';
 
+import type {RelationshipOut} from '@/lib/generated/types.gen';
 import {LINK, PARTY, isDirected, linkFamily, partyKind} from '@/lib/viz-tokens';
 import type {PartyKind} from '@/lib/viz-tokens';
 
@@ -77,4 +81,41 @@ export function StanceMark({stance, tabbable = true, extra}: {stance: string; ta
   const s = STANCE[stanceOf(stance)];
   return <Reveal tabbable={tabbable} label={s.word} detail={<><b>{s.word}</b><span className="rv-row">{s.meaning}</span>{extra}</>}>
     <StanceGlyph stance={stance}/></Reveal>;
+}
+
+/** What kind of payment a Payment link is (backend app/services/payment_kinds.py; DECISIONS_LOG 33). Not said: no
+ *  mark, read as money that moved. An amount owed (an agreed price, a fine, an order) records what was set or agreed,
+ *  not that money moved: the money views list it apart and add none of it up. */
+export type PaymentKind = NonNullable<RelationshipOut['payment_kind']>;
+
+export const PAYMENT_KIND: Record<PaymentKind, {word: string; meaning: string; owed: boolean; Icon: LucideIcon}> = {
+  transfer: {word: 'A transfer', meaning: 'Money moved from the payer to the payee.', owed: false, Icon: MoveRight},
+  loan: {word: 'A loan', meaning: 'Money lent: it is owed back.', owed: false, Icon: HandCoins},
+  fee: {word: 'A fee', meaning: 'A fee or a payment for services.', owed: false, Icon: Receipt},
+  settlement: {word: 'A settlement', meaning: 'Paid to settle a dispute or a debt.', owed: false, Icon: Handshake},
+  price: {word: 'An agreed price', meaning: 'The price agreed for a purchase or a sale: what is owed, not a record that it was paid.', owed: true, Icon: Tag},
+  fine: {word: 'A fine or penalty', meaning: 'Imposed by a court or a regulator: the amount set, not a record that it was paid.', owed: true, Icon: BadgeAlert},
+  ordered: {word: 'Ordered by a court or authority', meaning: 'A judgment debt, compensation, restitution or disgorgement: the amount ordered, not a record that it was paid.', owed: true, Icon: Gavel},
+};
+export const PAYMENT_KINDS = Object.keys(PAYMENT_KIND) as PaymentKind[];
+export const OWED_LINE = 'Owed, not paid: kept out of the totals, the flows, the money checks and the Red Flag payment rules.';
+
+/** A payment's kind as its icon, drawn alone; an amount owed is ringed, in the not-yet-shown ink. */
+export function PaymentKindGlyph({kind, size = 14}: {kind: PaymentKind; size?: number}): ReactElement {
+  const k = PAYMENT_KIND[kind];
+  return <span aria-hidden="true" className={`nm-pay${k.owed ? ' owed' : ''}`} data-kind={kind}
+    style={{display: 'inline-grid', placeItems: 'center', width: size + 6, height: size + 6, borderRadius: 4, flex: '0 0 auto', verticalAlign: 'middle',
+      color: k.owed ? 'var(--status-unshown)' : 'var(--text-muted)', boxShadow: `inset 0 0 0 1.25px ${k.owed ? 'var(--status-unshown)' : 'transparent'}`}}>
+    <k.Icon size={size} strokeWidth={2}/>
+  </span>;
+}
+
+/** A payment's kind as its icon; the kind, what it means and, for an amount owed, what the views do with it, on reveal.
+ *  No kind said: nothing is drawn. */
+export function PaymentKindMark({kind, tabbable = true, size}: {kind?: string | null; tabbable?: boolean; size?: number}): ReactElement | null {
+  if (!kind || !(kind in PAYMENT_KIND)) return null;
+  const k = PAYMENT_KIND[kind as PaymentKind];
+  return <Reveal tabbable={tabbable} label={k.word} detail={<><b>{k.word}</b><span className="rv-row">{k.meaning}</span>
+    {k.owed && <span className="rv-row">{OWED_LINE}</span>}</>}>
+    <PaymentKindGlyph kind={kind as PaymentKind} size={size}/></Reveal>;
 }

@@ -524,3 +524,48 @@ move to "no longer fire"; the pair's new flag starts open, so a per-payment set-
 **Board.** A flag with several payments shows them as a list under the summary (date, amount, the stated purpose when
 the record gives one; how sure each payment is as the dot's colour, the word on hover), the first six and the rest on a
 click, and links to the money view like the other payment flags.
+
+## 33. A payment has a kind; a fine, an order or an agreed price is owed, not money that moved (30 Oct 2026)
+
+Payments could not be typed as a fine, a judgment debt or an agreed price (BACKLOG, "Still open from before"), so a
+regulator's penalty or a court's fine was read everywhere as money that moved between two parties: on 1MDB the
+RM11.4 billion statutory fine, the S$29.1 million of MAS penalties and the Swiss courts' orders were drawn as flows,
+added into the money totals and checks (a regulator that only receives penalties is a "black hole"), and read by the
+Red Flag payment rules. The demo's own notes say these are "not a transfer that happened".
+
+Calls:
+- **Where it is kept.** FollowTheMoney's Payment has no property that fits (`purpose` is the stated purpose as free
+  text, `programme` a sanctions or funding programme), so the kind is the app's own column, `relationship_edges.
+  payment_kind` (migration `a7d3f9c2e614`), beside `evidence_status`. It is not written into the FtM record, so it does
+  not reach OpenAleph or an FtM export; it does go into backups (they copy every column).
+- **The kinds, a short list** (`app/services/payment_kinds.py`): money that moved — a transfer, a loan, a fee (or payment
+  for services), a settlement; an amount owed — an agreed price, a fine or penalty, an amount ordered by a court or
+  authority (a judgment debt, compensation, restitution, disgorgement). Not said is the default and reads as money
+  that moved, as every payment did before. Nothing guesses a kind.
+- **Where a person sets it.** Add by hand (", as [kind]" after the purpose, "not said" by default) and an opened payment
+  (See › The Wire › All links: a select beside its mark; `PATCH /relationships/{id}/payment-kind`). `POST /relationships`
+  takes it too. A change keeps no history and asks no reason, as `evidence_status` does; the Red Flags see the change
+  on their next run (the graph digest changes).
+- **How it shows.** The kind is its mark (a Lucide icon; an amount owed is ringed), named with what it means on hover,
+  focus or click; no mark when not said. See › Money's ledger rows carry it; the amounts owed are listed under
+  "Owed, not paid: n" below the money picture, every currency, each with its mark and amount, never added up.
+- **What leaves an amount owed out** (each consumer checked): the ledger puts it in `owed`, not `transactions`, so
+  See › Money's picture, flow, strip, currency tabs and "Traced so far", the Case home's money traced, and the money
+  checks (grey / black holes, miracles, round trips) do not count it; the five charts that read the ledger
+  list it under omitted, "an amount owed, not a payment"; the Red Flag rules do not read it (`patterns/graph.py` keeps
+  it in `owed`): structuring (ML-021: the amount was set by an authority, not split by the payer), round trips (ML-023),
+  payments between parties held by the same people (BO-031) and payment with no purpose (BO-033: a fine's reason is
+  that it is a fine). Add by hand's "What it changes" says an amount owed raises no Red Flag. Missing values (MV-PAY-*)
+  still ask for a fine's amount, currency and date: those are gaps either way.
+- **Left as they were, on purpose:** a loan, a fee or a settlement is money that moved and every rule reads it. A loan
+  repaid closes a round trip; the check already names "a loan being repaid" as what could be innocent, and round
+  tripping is often dressed as loans, so it stays. A kind is not a purpose: a typed loan with no stated purpose still
+  rises as BO-033 (faint).
+- **The 1MDB demo** gets kinds only where a payment's own note says "Kind: …" or "Ordered by the court": the court's
+  fine and the nine MAS penalties and composition fine are fines; the tax judgment, FINMA's three disgorgements, the
+  Swiss court's two compensatory claims and its restitution order are ordered; the Tanjong purchase price and the
+  Equanimity's contract balance are agreed prices (19 payments). A purpose that only says "loan" or "settlement", as
+  represented to a bank (Red Granite's "loans", the $700 million "settlement"), is the cover story the case disputes,
+  so those stay not said.
+- **Not done:** a mapped table column and an AI-extracted payment do not carry a kind yet (a person sets it on the
+  opened link).

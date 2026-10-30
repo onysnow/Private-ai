@@ -216,8 +216,13 @@ def test_loading_puts_every_kind_of_record_in_place(loaded):
 def test_the_records_reach_the_screens(loaded):
     db, inv, _ = loaded
     ledger = investigation_financial_ledger(db, inv.id)
-    currencies = {t["currency"] for t in ledger["transactions"]}
+    currencies = {t["currency"] for t in ledger["transactions"] + ledger["owed"]}
     assert {"MYR", "GBP", "EUR", "CHF", "SGD", "USD"} <= currencies
+    # A payment's kind is set only where its own note says it (DECISIONS_LOG 33): the MAS penalties and the court's fine
+    # are fines, FINMA's disgorgements and the courts' orders are ordered, the agreed prices are prices; all are owed.
+    kinds = Counter(t["paymentKind"] for t in ledger["owed"])
+    assert kinds == {"fine": 10, "ordered": 7, "price": 2}, kinds
+    assert not {t["paymentKind"] for t in ledger["transactions"]} - {None}
     places = investigation_places(db, inv.id)
     assert len(places["places"]) == 21
     # The case's properties recorded without coordinates are named under "Can't be placed", never looked up.

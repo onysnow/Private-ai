@@ -10032,6 +10032,18 @@ export type EntityRelationshipOut = {
    */
   investigation_id: string;
   /**
+   * Payment Kind
+   */
+  payment_kind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
+  /**
    * Properties
    */
   properties: {
@@ -11461,6 +11473,14 @@ export type FinancialLedgerOut = {
    */
   investigation_id: string;
   /**
+   * Owed
+   */
+  owed?: Array<FinancialTransactionOut>;
+  /**
+   * Owed Rule
+   */
+  owed_rule?: string;
+  /**
    * Transactions
    */
   transactions: Array<FinancialTransactionOut>;
@@ -11523,6 +11543,20 @@ export type FinancialTransactionOut = {
    * Locator
    */
   locator?: string | null;
+  /**
+   * Paymentkind
+   *
+   * What kind of payment a person says it is (app/services/payment_kinds.py); null: not said.
+   */
+  paymentKind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
   /**
    * Relationship Id
    */
@@ -12493,6 +12527,20 @@ export type IncompleteTransactionOut = {
    * Locator
    */
   locator?: string | null;
+  /**
+   * Paymentkind
+   *
+   * What kind of payment a person says it is (app/services/payment_kinds.py); null: not said.
+   */
+  paymentKind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
   /**
    * Problems
    */
@@ -13672,6 +13720,18 @@ export type LineageSourceOut = {
  * LinkIn
  */
 export type LinkIn = {
+  /**
+   * Payment Kind
+   */
+  payment_kind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
   /**
    * Properties
    */
@@ -16137,6 +16197,26 @@ export type PartyYearsOut = {
 };
 
 /**
+ * PaymentKindSet
+ *
+ * What kind of payment it is; null clears it.
+ */
+export type PaymentKindSet = {
+  /**
+   * Payment Kind
+   */
+  payment_kind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
+};
+
+/**
  * PdfPageOut
  */
 export type PdfPageOut = {
@@ -17884,6 +17964,18 @@ export type RelationshipCreate = {
    */
   origin?: string | null;
   /**
+   * Payment Kind
+   */
+  payment_kind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
+  /**
    * Properties
    */
   properties?: {
@@ -18099,6 +18191,18 @@ export type RelationshipOut = {
    * Investigation Id
    */
   investigation_id: string;
+  /**
+   * Payment Kind
+   */
+  payment_kind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
   /**
    * Properties
    */
@@ -38104,6 +38208,42 @@ export type CreateLeadFromRelationshipContextResponses = {
 
 export type CreateLeadFromRelationshipContextResponse =
   CreateLeadFromRelationshipContextResponses[keyof CreateLeadFromRelationshipContextResponses];
+
+export type SetRelationshipPaymentKindData = {
+  body: PaymentKindSet;
+  path: {
+    /**
+     * Relationship Id
+     */
+    relationship_id: string;
+  };
+  query?: never;
+  url: '/api/relationships/{relationship_id}/payment-kind';
+};
+
+export type SetRelationshipPaymentKindErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type SetRelationshipPaymentKindError =
+  SetRelationshipPaymentKindErrors[keyof SetRelationshipPaymentKindErrors];
+
+export type SetRelationshipPaymentKindResponses = {
+  /**
+   * Successful Response
+   */
+  200: RelationshipOut;
+};
+
+export type SetRelationshipPaymentKindResponse =
+  SetRelationshipPaymentKindResponses[keyof SetRelationshipPaymentKindResponses];
 
 export type GetRelationshipSourcesData = {
   body?: never;

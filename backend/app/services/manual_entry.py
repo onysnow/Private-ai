@@ -58,6 +58,8 @@ class LinkIn(BaseModel):
     source: End
     target: End
     properties: dict[str, list[str]] = {}
+    # A payment's kind (app/services/payment_kinds.py), picked by the person; None: not said.
+    payment_kind: Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"] | None = None
 
     model_config = {"populate_by_name": True}
 
@@ -158,7 +160,8 @@ def preview(db: Session, inv: str, body: EntryIn) -> dict[str, Any]:
                 if {p.get("source_entity_id"), p.get("target_entity_id")} == {a, b} and str(p.get("schema") or "") == body.link.schema_:
                     waiting.append({"kind": "proposal", "id": c.id, "schema": p.get("schema"), "caption": p.get("caption")})
             links = Links(db, inv)
-            changes = [u["text"] for u in links.run_link(body.link.schema_, a, b, body.link.properties)]
+            changes = [u["text"] for u in links.run_link(body.link.schema_, a, b, body.link.properties,
+                                                          payment_kind=body.link.payment_kind)]
         else:
             from app.patterns import graph as case_graph
 
@@ -173,7 +176,8 @@ def preview(db: Session, inv: str, body: EntryIn) -> dict[str, Any]:
                     ids.append(pid)
                     added.append(case_graph.Party(pid, end.new.caption, end.new.schema_, {}))
             if len(ids) == 2:
-                changes = [u["text"] for u in links.run_link(body.link.schema_, ids[0], ids[1], body.link.properties, added)]
+                changes = [u["text"] for u in links.run_link(body.link.schema_, ids[0], ids[1], body.link.properties, added,
+                                                              payment_kind=body.link.payment_kind)]
     elif body.kind == "event" and body.event:
         for ev in db.scalars(select(TimelineEvent).where(TimelineEvent.investigation_id == inv, TimelineEvent.date_start == body.event.date)):
             if _norm(ev.title) == _norm(body.event.title) or (ev.entity_id and ev.entity_id in body.event.entity_ids):
@@ -230,6 +234,8 @@ def _validate(db: Session, inv: str, body: EntryIn, src: SourceIn) -> None:
             raise ValueError("A link joins two different parties")
         if body.link.schema_ == "Payment":
             validate_payment_properties({k: list(v) for k, v in body.link.properties.items()})
+        elif body.link.payment_kind:
+            raise ValueError("Only a payment has a kind of payment")
     if body.kind == "event":
         if body.event is None:
             raise ValueError("Write the event")
@@ -311,7 +317,8 @@ def add(db: Session, inv: str, body: EntryIn, *, actor: str | None) -> dict[str,
                 raise ValueError("Each end of the link is a party of the case or a new one")
         edge = create_relationship(db, investigation_id=inv, schema=body.link.schema_, source_entity_id=ends[0],
                                    target_entity_id=ends[1], properties=body.link.properties, dataset="reporter",
-                                   origin=origin, evidence_id=evidence.id if evidence else None)
+                                   origin=origin, evidence_id=evidence.id if evidence else None,
+                                   payment_kind=body.link.payment_kind if body.link.schema_ == "Payment" else None)
         made["record_id"] = edge.id
         link_target = {"relationship_id": edge.id}
         names = {e.id: e.caption for e in db.scalars(select(Entity).where(Entity.id.in_(ends)))}

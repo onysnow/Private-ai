@@ -4,20 +4,24 @@
 // (each with a required rationale; the assessment history is immutable),
 // and, for a compact edge that stands in for reviewed duplicates, the
 // provenance inventory beneath it. The canonical relationship itself is
-// never changed by an assessment.
+// never changed by an assessment. A payment's kind (a transfer, a loan, a
+// fine, an order...) is its mark, and is set here (DECISIONS_LOG 33).
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {FamilyMark, StanceMark} from '../../components/network/marks';
+import {FamilyMark, PAYMENT_KIND, PAYMENT_KINDS, PaymentKindMark, StanceMark} from '../../components/network/marks';
+import type {PaymentKind} from '../../components/network/marks';
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   getInvestigationGraphQueryKey, listRelationshipEvidenceReviewsOptions, listRelationshipEvidenceReviewsQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import {attachRelationshipEvidenceEndpoint, createLeadFromRelationshipContext, reviewRelationshipEvidenceEndpoint} from '../../lib/generated/sdk.gen';
+import {
+  attachRelationshipEvidenceEndpoint, createLeadFromRelationshipContext, reviewRelationshipEvidenceEndpoint, setRelationshipPaymentKind,
+} from '../../lib/generated/sdk.gen';
 import type {EvidencePoolRow, GraphOut, RelationshipOut} from '../../lib/generated/types.gen';
 import {isQueryOf} from '../../lib/investigation-queries';
 import {reportPayloadError} from '../../lib/report-error';
@@ -88,6 +92,18 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
     }
   };
 
+  // A payment's kind changes what the money views add up and what the Red Flag rules read: every case query is stale.
+  const setPaymentKind = async (kind: PaymentKind | '') => {
+    try {
+      const updated = (await setRelationshipPaymentKind({path: {relationship_id: edge.id}, body: {payment_kind: kind || null}, throwOnError: true})).data;
+      setStatus(kind ? `Kept as ${PAYMENT_KIND[kind].word.toLowerCase()}.` : 'Kind of payment cleared.');
+      await applyUpdate(updated);
+      await queryClient.invalidateQueries();
+    } catch (error) {
+      setStatus(errorMessage(error, 'The kind of payment could not be kept'));
+    }
+  };
+
   // A lead made here lands in the leads panel's queue, which is marked stale.
   const createLead = async () => {
     if (!investigationId) return;
@@ -110,6 +126,9 @@ export function RelationshipDetail({investigationId, edge, evidencePool, onUpdat
         that needs review is an alert and shows. */}
     <b><Reveal detail={<span className="rv-mono">FtM relationship: {edge.ftm_id} · {edge.provenance.statement_count || 0} provenance statements{reconciled?.is_preferred && reconciled.suppressed_duplicate_count > 0 ? ` · preferred presentation; ${reconciled.suppressed_duplicate_count} reviewed duplicate edge(s) collapsed` : reconciled?.suppressed_duplicate ? ` · reviewed duplicate copy; preferred edge ${reconciled.preferred_record_id}` : ''}</span>}>{title}</Reveal></b>
     <div className="relKind"><FamilyMark schema={edge.schema}/>{edge.properties.role?.[0] ? <span>{edge.properties.role[0]}</span> : null}
+      {edge.schema === 'Payment' && <><PaymentKindMark kind={edge.payment_kind}/>
+        <select value={edge.payment_kind ?? ''} onChange={(e: ChangeEvent<HTMLSelectElement>) => void setPaymentKind(e.target.value as PaymentKind | '')} aria-label="Kind of payment">
+          <option value="">kind not said</option>{PAYMENT_KINDS.map(k => <option key={k} value={k}>{PAYMENT_KIND[k].word}</option>)}</select></>}
       {edge.advisory.needs_review && <span className="relAlert">⚠ claim review needed{edge.advisory.has_independent_support ? <Reveal detail="Independent support remains."> · <span>support remains</span></Reveal> : ''}</span>}</div>
     <div>
       <Button onClick={() => void createLead()}>Create reporting lead from relationship</Button>
