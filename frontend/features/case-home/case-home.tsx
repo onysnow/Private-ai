@@ -36,6 +36,7 @@ import {useNeedsYouCount} from '../inbox/inbox';
 import {caseHref} from '../../lib/case-href';
 import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
+import {PreDecidedLine} from '../demo/pre-decided';
 import {NewCaseSetup} from '../new-case/new-case-setup';
 import {DecisionCard, Excerpt, KindMark, pageOf} from './decision-card';
 import {FrostPanel, FrostStill} from '../effects/frost-panel';
@@ -474,7 +475,7 @@ function LinkEvidence({links, parties}: {links: PartyLink[]; parties: DecisionIt
   </div>;
 }
 
-function NextUp({investigationId, active}: {investigationId: string; active: boolean}): ReactElement {
+function NextUp({investigationId, active, isDemo}: {investigationId: string; active: boolean; isDemo?: boolean}): ReactElement {
   const {items, counts, decide, undo, held, query} = useDecisions(investigationId, {enabled: Boolean(investigationId)});
   const [index, setIndex] = useState(0);
   useEffect(() => { if (index > 0 && index >= items.length) setIndex(Math.max(0, items.length - 1)); }, [index, items.length]);
@@ -507,6 +508,7 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
       <span className="ch-dots" aria-hidden="true">{items.slice(0, 9).map((d, i) => <i key={d.id} className={i === index ? 'on' : ''}/>)}</span>
       {/* Only the held answer shows here; what an answer does is on Open Decide, on hover or focus (Ony, 29 Oct). */}
       <span aria-live="polite">{held ? <>Saved in a moment: <b>{held.choice.label}</b>. <button type="button" className="ch-undo" onClick={() => undo()}>Undo <kbd>Z</kbd></button></> : null}</span>
+      <PreDecidedLine investigationId={investigationId} isDemo={isDemo}/>
       <Reveal tabbable={false} detail={<>
         {item?.choices.filter(c => c.happens).map(c => <span key={c.key} className="rv-row"><b>{c.label}:</b> {c.happens}</span>)}
         {item?.consequences.map(c => <span key={c} className="rv-row">{c}</span>)}
@@ -673,7 +675,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
     {!preview && <SafetyNotice investigationId={investigation.id} onOpen={() => router.push(caseHref('/keep#safety-data', investigation.id))}/>}
     <div className="ch-grid">
       <div className="ch-col"><BringIn investigationId={id}/><CheckModule investigationId={id}/></div>
-      <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id} markVisit={!preview}/></div>
+      <div className="ch-col ch-centre"><NextUp investigationId={id} active={active} isDemo={Boolean(investigation.is_demo)}/><SinceStrip investigationId={id} markVisit={!preview}/></div>
       <div className="ch-col"><ActModule investigationId={id}/>
         <Module n="03" name="See · who is linked" href="/see#the-wire" openLabel="Open network"><MiniNetwork investigationId={id}/></Module></div>
     </div>

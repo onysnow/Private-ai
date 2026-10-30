@@ -27,6 +27,7 @@ import {PARTY, partyKind} from '../../lib/viz-tokens';
 import './to-check.css';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
+import {DemoMark, demoRule, isDemoDecided, useUndoPreDecided} from '../demo/pre-decided';
 
 type Status = ToCheckItemOut['status'];
 
@@ -88,14 +89,19 @@ function Parties({parties}: {parties: ToCheckItemOut['parties']}): ReactElement 
     {shown.length < parties.length && <span className="sv-muted">+{parties.length - shown.length} more</span>}</div>;
 }
 
-function CheckCard({item, highlighted, inHand, onHand, onDecide}: {item: ToCheckItemOut; highlighted: boolean; inHand: boolean;
-  onHand: () => void; onDecide: (status: Status, note: string | null) => Promise<void>}): ReactElement {
+function CheckCard({item, highlighted, inHand, onHand, onDecide, onUndoDemo}: {item: ToCheckItemOut; highlighted: boolean; inHand: boolean;
+  onHand: () => void; onDecide: (status: Status, note: string | null) => Promise<void>;
+  /** Undo a decision the demo made ahead (back to not checked, its note gone with it). */
+  onUndoDemo: () => Promise<void>}): ReactElement {
   const openFlag = useWorkbenchStore(state => state.openFlag);
   const openDocument = useWorkbenchStore(state => state.openDocument);
   const [noting, setNoting] = useState(false);
   const [note, setNote] = useState(item.note ?? '');
   const goToFlag = (id: string) => { openFlag(id); document.getElementById('red-flags')?.scrollIntoView({behavior: 'smooth', block: 'start'}); };
   const decide = (status: Status) => void onDecide(status, noting ? note.trim() || null : item.note ?? null).then(() => setNoting(false));
+  // A decision the demo made ahead carries its mark; its rule is on hover, not written on the card.
+  const demo = item.status !== 'open' && isDemoDecided(item);
+  const undo = () => (demo ? void onUndoDemo() : decide('open'));
   // The keys answer the card in hand (the panel decides which); a note being typed keeps its keys.
   useEffect(() => {
     if (!inHand) return undefined;
@@ -137,7 +143,7 @@ function CheckCard({item, highlighted, inHand, onHand, onDecide}: {item: ToCheck
     {item.status !== 'open' && <p className="rf-line tc-decided">
       <Reveal label={DECISION[item.status]} detail={<b>{DECISION[item.status]}</b>}>
         <span className={`tc-mark tc-mark-${item.status}`} aria-hidden="true">{DECISION_MARK[item.status]}</span></Reveal>
-      {item.note && <span>{item.note}</span>}</p>}
+      {demo ? <DemoMark rule={demoRule(item.note)}/> : item.note && <span>{item.note}</span>}</p>}
     {noting && <textarea className="tc-note" aria-label="What you saw" placeholder="What you saw (stays with the item)" value={note}
       onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}/>}
     <div className="tc-decide">
@@ -149,8 +155,8 @@ function CheckCard({item, highlighted, inHand, onHand, onDecide}: {item: ToCheck
       </div>
       {/* Undo and the note are icons; their words on reveal. */}
       <span className="tc-tools">
-        {item.status !== 'open' && <Reveal tabbable={false} describe={false} detail="Undo: back to not checked">
-          <button type="button" className="tc-icon-btn" aria-label="Undo" onClick={() => decide('open')}><Undo2 size={17} aria-hidden="true"/></button></Reveal>}
+        {item.status !== 'open' && <Reveal tabbable={false} describe={false} detail={demo ? 'Undo the demo’s decision: back to not checked' : 'Undo: back to not checked'}>
+          <button type="button" className="tc-icon-btn" aria-label="Undo" onClick={undo}><Undo2 size={17} aria-hidden="true"/></button></Reveal>}
         {noting ? <button type="button" className="sv-btn" onClick={() => decide(item.status)}>Save note</button>
           : <Reveal tabbable={false} describe={false} detail={item.note ? 'Edit the note' : 'Add a note: what you saw'}>
             <button type="button" className="tc-icon-btn" aria-label={item.note ? 'Edit note' : 'Add a note'} onClick={() => setNoting(true)}>
@@ -194,6 +200,11 @@ export function ToCheckPanel({investigationId}: {investigationId: string}): Reac
     } catch (error) { setProblem(errorMessage(error, 'Could not keep the decision')); }
   };
 
+  const undoDemo = useUndoPreDecided(investigationId);
+  const onUndoDemo = (item: ToCheckItemOut) => async () => {
+    try { await undoDemo.run({kind: 'check', id: item.id}); setProblem(''); } catch (error) { setProblem(errorMessage(error, 'Could not undo the demo’s decision')); }
+  };
+
   const items = query.data?.items ?? [];
   const open = items.filter(i => i.status === 'open');
   const decided = items.filter(i => i.status !== 'open');
@@ -202,7 +213,7 @@ export function ToCheckPanel({investigationId}: {investigationId: string}): Reac
   const [hand, setHand] = useState<string | null>(null);
   const inHand = open.some(i => i.id === hand) ? hand : open[0]?.id ?? null;
   const card = (i: ToCheckItemOut) => <CheckCard key={i.id} item={i} highlighted={highlight === i.id} inHand={inHand === i.id}
-    onHand={() => setHand(i.id)} onDecide={onDecide(i)}/>;
+    onHand={() => setHand(i.id)} onDecide={onDecide(i)} onUndoDemo={onUndoDemo(i)}/>;
   const figure = (n: number, mark: string, cls: string, word: string) => <Reveal label={`${n} ${word}`} describe={false} detail={<b>{n} {word}</b>}>
     <span className={`tc-fig ${cls}${n ? '' : ' zero'}`} aria-hidden="true"><i>{mark}</i><b>{n}</b></span></Reveal>;
 

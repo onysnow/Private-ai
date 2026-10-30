@@ -128,6 +128,19 @@ describe('Case home', () => {
     expect(screen.getByText('✕ 2')).toBeInTheDocument();
   });
 
+  it('Next up carries the demo’s line on a demo case only (DECISIONS_LOG 53)', async () => {
+    const api = routes({'GET /api/demo/pre-decided/inv-1': {investigation_id: 'inv-1', decided_by: 'Demo (pre-decided)', counts: {proposal: {rejected: 12}, check: {}, watchlist: {}}}});
+    wrap(<CaseHome investigation={{...INV, is_demo: true}} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    const next = screen.getByRole('region', {name: 'Next up'});
+    expect(await within(next).findByRole('img', {name: '12 decided ahead by the demo'})).toBeInTheDocument();
+    expect(within(next).getByRole('button', {name: 'Undo them'})).toBeInTheDocument();
+    cleanup();
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    await screen.findByTestId('decision-card');
+    expect(screen.queryByText(/decided ahead by the demo/)).toBeNull();
+    expect(api.calls('GET /api/demo/pre-decided/inv-1')).toHaveLength(1);
+  });
+
   it('Bring in lists only what waits, in words, and says so in one quiet line when nothing does', async () => {
     routes();
     wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);

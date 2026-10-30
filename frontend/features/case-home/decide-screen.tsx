@@ -15,6 +15,7 @@ import {apiTime} from '../../lib/timestamps';
 import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
+import {PreDecidedLine} from '../demo/pre-decided';
 import {DecisionCard, Excerpt, KindMark, PartyChips, RowCells, pageOf} from './decision-card';
 import {HOLD_MS, KIND_LABEL, KIND_MEANING, acceptsInBulk, undoBlocked, useDecisions} from './use-decisions';
 import type {DecisionKind, DecisionOrder} from './use-decisions';
@@ -84,8 +85,10 @@ function Unlocks({count}: {count: number}): ReactElement {
   return <span className="dc-unlocks" aria-hidden="true">◆{count > 1 ? <small>{count}</small> : null}</span>;
 }
 
-export function DecideScreen({investigationId, investigationName, active = true, unreachable = null}: {
+export function DecideScreen({investigationId, investigationName, active = true, unreachable = null, isDemo}: {
   investigationId: string; investigationName: string; active?: boolean;
+  /** Whether the case is a demo, when the frame knows: a case known not to be one is not asked for the demo's decisions. */
+  isDemo?: boolean;
   /** The case frame could not reach the server (no case is known yet): shown as this screen's error state. */
   unreachable?: {error: unknown; retry: () => void} | null;
 }): ReactElement {
@@ -181,6 +184,8 @@ export function DecideScreen({investigationId, investigationName, active = true,
             {(Object.keys(ORDER) as DecisionOrder[]).map(o => <option key={o} value={o}>{ORDER[o][0]}</option>)}
           </select></Reveal>
       </label>
+      {/* On a demo case: how many the demo decided ahead (by kind on hover), with Undo them behind a confirmation. */}
+      <PreDecidedLine investigationId={investigationId} isDemo={isDemo}/>
       {(all.query.data?.total ?? 0) > (all.query.data?.items.length ?? 0) && <p className="ch-quiet">
         <Reveal detail="Showing the first ones; each one you decide makes room for the next.">{all.query.data?.items.length} of {all.query.data?.total}</Reveal></p>}
       <div className="dc-list">

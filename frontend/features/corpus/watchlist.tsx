@@ -26,6 +26,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {HighlightSegmentOut, WatchlistEntryOut, WatchlistHitOut, WatchlistOut} from '../../lib/generated/types.gen';
 import {apiTime, timeWords} from '../../lib/timestamps';
+import {DemoMark, isDemoDecided, useUndoPreDecided} from '../demo/pre-decided';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
 // What the reporter types to watch a name (backend WatchlistEntryCreate: query 1–512, note up to 2000). Other names are
@@ -164,6 +165,13 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
     return `Dismissed ${hit.title}.`;
   }, 'Could not dismiss it');
 
+  // A hit the demo dismissed ahead carries its mark, and Undo puts it back to decide.
+  const undoDemo = useUndoPreDecided(investigationId);
+  const undoDemoHit = (hit: WatchlistHitOut) => attempt(async () => {
+    await undoDemo.run({kind: 'watchlist', id: hit.id});
+    return `${hit.title} is back to decide.`;
+  }, 'Could not undo the demo’s decision');
+
   const entries = watchlist.data?.entries ?? [];
   const toDecide = (entry: WatchlistEntryOut) => entry.hits.filter(hit => hit.status === 'new');
   // The picked name: the reporter's, else the first with hits to decide, else the first.
@@ -288,7 +296,8 @@ export function Watchlist({investigationId}: {investigationId: string}): ReactEl
           {hit.status === 'new' ? <>
             <button type="button" className="wl-btn pri" onClick={() => void makeLead(hit)} disabled={busy}>Add to leads</button>
             <button type="button" className="wl-btn" onClick={() => void dismissHit(hit)} disabled={busy}>Dismiss</button>
-          </> : <span className={`wl-decided ${hit.status}`}>{hit.status === 'lead' ? 'In leads' : 'Dismissed'}</span>}
+          </> : <><span className={`wl-decided ${hit.status}`}>{hit.status === 'lead' ? 'In leads' : 'Dismissed'}</span>
+            {isDemoDecided(hit) && <DemoMark rule="The document is already in the case." onUndo={() => void undoDemoHit(hit)} undoing={undoDemo.pending}/>}</>}
         </div>
       </> : <p className="wl-empty">Pick a hit to read it here.</p>}
     </div>}

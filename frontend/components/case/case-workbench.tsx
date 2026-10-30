@@ -240,7 +240,8 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         loading={!rows && !investigationsQuery.isError} active={view === 'home'}/></PanelErrorBoundary>
     </div>}
     {view !== 'all' && mounted('decide') && <div hidden={!shown('decide')} className="cv-home-wrap">
-      <PanelErrorBoundary name="Decide"><DecideScreen investigationId={inv} investigationName={investigationName} active={view === 'decide'} unreachable={decideUnreachable}/></PanelErrorBoundary>
+      <PanelErrorBoundary name="Decide"><DecideScreen investigationId={inv} investigationName={investigationName} active={view === 'decide'} unreachable={decideUnreachable}
+        isDemo={investigation ? Boolean(investigation.is_demo) : undefined}/></PanelErrorBoundary>
     </div>}
 
     {view === 'all' ? <>
