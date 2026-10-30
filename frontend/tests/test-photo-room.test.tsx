@@ -6,7 +6,7 @@ import {cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {PhotoRoom, trailLine, trailTree} from '../features/reading-room/photo-room';
+import {PhotoRoom, photoLine, trailLine, trailTree} from '../features/reading-room/photo-room';
 import type {DerivedFileOut, DocumentDetailOut} from '../lib/generated/types.gen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -37,7 +37,28 @@ describe('photo trail', () => {
   });
 });
 
+describe('photo line', () => {
+  it('says what the photo is and its day by its own clock, or that it gives none', () => {
+    expect(photoLine(PHOTO as never, '2019-08-14T10:42:07')).toBe('A photo · 4032 × 3024 JPEG · 14 Aug 2019 by its own clock');
+    expect(photoLine({...PHOTO, claims: {}} as never, null)).toBe('A photo · 4032 × 3024 JPEG · no date of its own');
+  });
+});
+
 describe('PhotoRoom', () => {
+  it('says once that a file claims nothing about itself, and why no text was read', async () => {
+    mockApi({'GET /api/documents/d1/photo': {...PHOTO, claims: {}, date_tag: null, nearest_place: null, place_proposal: null, text: []},
+      'GET /api/documents/d1/derived': [], 'GET /api/documents/d1/picture': {status: 200, body: 'x'}});
+    const doc = {...DOC, extraction_issues: ['The text in this picture could not be read: Tesseract is not installed.']} as DocumentDetailOut;
+    render(<QueryProvider><PhotoRoom doc={doc} caseName="The harbour land" onClose={() => undefined} onText={() => undefined}/></QueryProvider>);
+    const claims = await screen.findByRole('complementary', {name: 'What the file claims'});
+    expect(within(claims).getByText('Nothing about itself')).toBeInTheDocument();
+    expect(within(claims).queryByText('no GPS in the file')).not.toBeInTheDocument();
+    expect(await within(claims).findByText('4032 × 3024 · JPEG')).toBeInTheDocument();
+    expect(screen.getByText('Text in it: not read')).toBeInTheDocument();
+    expect(screen.getByText('No place: no GPS')).toBeInTheDocument();
+    expect(screen.getByText(/No copies yet/)).toBeInTheDocument();
+  });
+
   it('shows what the file claims, and blurs the faces the detector found when a person says yes', async () => {
     const api = mockApi({'GET /api/documents/d1/photo': PHOTO, 'GET /api/documents/d1/derived': [],
       'GET /api/documents/d1/picture': {status: 200, body: 'x'},

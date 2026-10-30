@@ -51,6 +51,15 @@ export function trailTree(rows: DerivedFileOut[]): Array<{row: DerivedFileOut; d
 }
 
 const dms = (v: number) => v.toFixed(4);
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** The line under a photo's title: what it is, its size, and the day by its own clock or that it gives none. */
+export function photoLine(p: PhotoOut | undefined, captured: string | null): string {
+  const m = captured?.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const when = m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]} ${m[1]} by its own clock` : 'no date of its own';
+  const size = p?.width && p.height ? `${p.width} × ${p.height} ${p.kind}` : p?.kind ?? '';
+  return ['A photo', size, when].filter(Boolean).join(' · ');
+}
 
 export function useBlobUrl(key: string, url: string | null): string | null {
   const blob = useQuery({queryKey: ['photo-blob', key], queryFn: () => api.blob(url as string), enabled: Boolean(url), staleTime: Infinity, retry: false});
@@ -141,6 +150,34 @@ export function PhotoRoom({doc, caseName, onClose, onText}: Props): ReactElement
   const camera = [str(c.make), str(c.model)].filter(Boolean).join(' ');
   const faceBoxes = facesDismissed ? [] : faces ?? [];
   const goodBox = box && box.w > 0.01 && box.h > 0.01;
+  const hasGps = gps?.latitude != null && gps.longitude != null;
+  const timeTag = p?.date_tag || (c.capture_time && !c.capture_time_has_offset)
+    ? `${p?.date_tag ? `from “${p.date_tag}”` : ''}${c.capture_time && !c.capture_time_has_offset ? '; no time zone in the file' : ''}` : null;
+  // What the file says about itself: only the claims it makes get a row; what it leaves out is said once, in a line.
+  const claimRows: Array<[string, ReactElement]> = [];
+  if (str(c.capture_time)) claimRows.push(['Taken', timeTag ? <Reveal detail={timeTag}>{String(c.capture_time)}</Reveal> : <>{String(c.capture_time)}</>]);
+  if (camera) claimRows.push(['Camera', <Reveal key="cam" detail={str(c.serial_number) ? `serial ${String(c.serial_number)}` : 'serial not recorded'}>{camera}</Reveal>]);
+  if (str(c.software)) claimRows.push(['Software', <>{String(c.software)}</>]);
+  if (hasGps) claimRows.push(['Place', <>{`${dms(gps.latitude as number)}, ${dms(gps.longitude as number)}`}
+    <small>{p?.nearest_place ? `${p.nearest_place.metres.toLocaleString('en-GB')} m from ${p.nearest_place.caption}` : 'no place in the case to measure from'}</small></>]);
+  const missing = [!str(c.capture_time) && 'time', !camera && 'camera', !str(c.software) && 'software', !hasGps && 'place'].filter(Boolean) as string[];
+  const claimed = claimRows.length > 0;
+  const claimsPanel = <aside className={`ph-claims${claimed ? '' : ' none'}`} aria-label="What the file claims">
+    <p className="tl2-cap"><Reveal detail="The file’s metadata, as it says it.">What the file claims</Reveal></p>
+    {claimed ? <dl className="ph-dl">{claimRows.map(([k, v]) => <div key={k} className="ph-row"><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+      : <p className="ph-nothing"><b>Nothing about itself</b><Reveal detail="No time, camera, software or GPS in its metadata. Stripped files often look like this: a copy saved from a site or a chat app.">
+        <span className="ph-q" aria-label="Why">?</span></Reveal></p>}
+    {claimed && missing.length > 0 && <p className="ph-missing">Not in the file: {missing.join(', ')}</p>}
+    {/* What is known whatever the file claims: the picture's size and format, and its fingerprint. */}
+    <dl className="ph-known">
+      <div className="ph-row"><dt>Picture</dt><dd>{p?.width && p.height ? `${p.width} × ${p.height}` : '—'}{p?.kind ? ` · ${p.kind}` : ''}</dd></div>
+      {doc.sha256 && <div className="ph-row"><dt>Fingerprint</dt><dd><FingerprintMark hash={doc.sha256} of="the photo as uploaded"/></dd></div>}
+    </dl>
+    {claimed && <Reveal detail="Becomes shown when another record agrees: a source dated the same day, the shadows, the place."><span className="tl2-chip dash">? claimed</span></Reveal>}
+  </aside>;
+  // Why no text was read, when the reading said so (an OCR engine missing on this computer, say).
+  const textIssue = (doc.extraction_issues ?? []).find(i => /text in this picture could not be read|tesseract|ocr/i.test(i)) ?? null;
+  const proposalCount = (p?.text.length ? 1 : 0) + (faces?.length ? 1 : 0) + (p?.place_proposal ? 1 : 0);
 
   return <div className="ph" data-calm-zone="" role="dialog" aria-modal="true" aria-label={`Picture: ${doc.title ?? doc.filename}`}>
     <header className="ph-top">
@@ -153,30 +190,18 @@ export function PhotoRoom({doc, caseName, onClose, onText}: Props): ReactElement
       <p className="tl2-status">Kept as uploaded {p ? <FingerprintMark hash={p.sha256}/> : '…'}</p>
       <button className="tl2-plain" onClick={onClose}>Close</button>
     </header>
-    <div className="tl2-head"><Reveal detail={`${p?.claims && str(c.capture_time) ? `A photo, ${String(c.capture_time).slice(0, 10)} by its own clock. ` : 'A photo. '}What the file says about itself is a claim until something else agrees.`}>
-      <h2>{doc.title ?? doc.filename}</h2></Reveal></div>
+    {/* The title, then one line of what the photo is; that the file's word about itself is only a claim is on hover. */}
+    <div className="tl2-head ph-head"><h2>{doc.title ?? doc.filename}</h2>
+      <p><Reveal detail="What the file says about itself is a claim until something else agrees: a source dated the same day, the shadows, the place.">
+        {photoLine(p, str(c.capture_time))}</Reveal></p></div>
     {message && <p className="tl2-msg" role="status">{message}</p>}
     {photo.isError && <p className="muted">{errorMessage(photo.error, 'Could not read the photo')}</p>}
 
-    <div className="ph-body">
-      <aside className="ph-claims" aria-label="What the file claims">
-        <p className="tl2-cap"><Reveal detail="The file’s metadata, as it says it.">What the file claims</Reveal></p>
-        <dl className="ph-dl">
-          {/* Where the time came from, and the camera's serial, are on hover of the value. */}
-          <dt>Taken</dt><dd>{p?.date_tag || (c.capture_time && !c.capture_time_has_offset)
-            ? <Reveal detail={`${p?.date_tag ? `from “${p.date_tag}”` : ''}${c.capture_time && !c.capture_time_has_offset ? '; no time zone in the file' : ''}`}>{str(c.capture_time) ?? 'no time in the file'}</Reveal>
-            : str(c.capture_time) ?? 'no time in the file'}</dd>
-          <dt>Camera</dt><dd><Reveal detail={str(c.serial_number) ? `serial ${String(c.serial_number)}` : 'serial not recorded'}>{camera || 'not recorded'}</Reveal></dd>
-          <dt>Software</dt><dd>{str(c.software) ?? 'none named'}</dd>
-          <dt>Place</dt><dd>{gps?.latitude != null && gps.longitude != null ? `${dms(gps.latitude)}, ${dms(gps.longitude)}` : 'no GPS in the file'}
-            <small>{p?.nearest_place ? `${p.nearest_place.metres.toLocaleString('en-GB')} m from ${p.nearest_place.caption}` : gps ? 'no place in the case to measure from' : ''}</small></dd>
-          <dt>Size</dt><dd>{p?.width && p.height ? `${p.width} × ${p.height}` : '—'} · {p?.kind}</dd>
-        </dl>
-        <Reveal detail="Becomes shown when another record agrees: a source dated the same day, the shadows, the place."><span className="tl2-chip dash">? claimed</span></Reveal>
-      </aside>
+    <div className={`ph-body${claimed ? '' : ' slim'}`}>
+      {claimed && claimsPanel}
 
       <section className="ph-centre">
-        {tab === 'trail' ? <TrailTree doc={doc} rows={rows} picked={copy?.id ?? null} onPick={id => { setPickedCopy(id); setTab('picture'); }}/> : <>
+        {tab === 'trail' ? <TrailTree doc={doc} rows={rows} picked={copy?.id ?? null} onPick={id => { setPickedCopy(id); setTab('picture'); }} thumb={original}/> : <>
           <div ref={stage} className={`ph-stage${draw ? ' drawing' : ''}`} onPointerDown={onDown}>
             {/* eslint-disable-next-line @next/next/no-img-element -- a blob URL of a case file, served by this app */}
             {original ? <img src={original} alt={`The photo as uploaded: ${doc.filename}`} draggable={false}/> : <p className="tl2-none">Loading the picture…</p>}
@@ -211,10 +236,14 @@ export function PhotoRoom({doc, caseName, onClose, onText}: Props): ReactElement
       </section>
 
       <aside className="ph-side">
+        {!claimed && claimsPanel}
         <section className="ph-props" aria-label="The machine proposes">
-          <p className="tl2-cap"><Reveal detail="The machine proposes; you decide.">The machine proposes</Reveal></p>
-          {p && p.text.length > 0 && <div className="ph-prop"><i aria-hidden="true">T</i><p><Reveal detail="Read on the picture.">Text: “{p.text[0].slice(0, 80)}{p.text[0].length > 80 ? '…' : ''}”</Reveal></p>
-            <button className="tl2-plain" onClick={onText}>Read it</button></div>}
+          <p className="tl2-cap"><Reveal detail="The machine proposes; you decide.">The machine proposes{proposalCount ? ` · ${proposalCount}` : ''}</Reveal></p>
+          {p && p.text.length > 0 ? <div className="ph-prop"><i aria-hidden="true">T</i><p><Reveal detail="Read on the picture by OCR.">Text: “{p.text[0].slice(0, 80)}{p.text[0].length > 80 ? '…' : ''}”</Reveal></p>
+            <button className="tl2-plain" onClick={onText}>Read it</button></div>
+            : p && <div className={`ph-prop${textIssue ? ' alert' : ' quiet'}`}><i aria-hidden="true">T</i>
+              <p>{textIssue ? <Reveal detail={textIssue}>Text in it: not read</Reveal> : <Reveal detail="OCR read the picture and found no words.">No text in it</Reveal>}
+                {textIssue && <small>no OCR on this computer</small>}</p></div>}
           {/* What the face detector fetches the first time stays on screen (what leaves this computer); what it does is on hover. */}
           <div className="ph-prop"><i aria-hidden="true">☺</i>{faces === null ? <><p><Reveal detail="A detector only finds where faces are; nothing names or matches one.">Faces</Reveal>
               {p && !p.face_model_here && <Reveal className="ph-egress" detail="Its model (232 KB) is fetched the first time, then kept on this computer."><small>↙ model 232 KB, once</small></Reveal>}</p>
@@ -224,6 +253,7 @@ export function PhotoRoom({doc, caseName, onClose, onText}: Props): ReactElement
                 <button aria-label="Yes: blur them for export" onClick={() => { setFacesKept(true); make.mutate({operation: 'blur_faces', params: {radius: 24, boxes: faces}, from_id: copy?.id ?? null}); }}>Y</button>
                 <button aria-label="No: not faces" onClick={() => setFacesDismissed(true)}>X</button></span>}</>}
           </div>
+          {p && !p.place_proposal && <div className="ph-prop quiet"><i aria-hidden="true">⌖</i><p><Reveal detail={hasGps ? 'Its GPS gives no place to propose.' : 'A place is proposed from the GPS the file claims; this file has none.'}>No place: {hasGps ? 'none proposed' : 'no GPS'}</Reveal></p></div>}
           {p?.place_proposal && <div className="ph-prop"><i aria-hidden="true">⌖</i><p><Reveal detail={`From the GPS claim · a proposed place for Places · ${p.place_proposal.status}`}>
             Place {p.nearest_place ? `near ${p.nearest_place.caption}` : 'from the GPS'}</Reveal>
             {p.place_proposal.status !== 'proposed' && <span className="ph-kept" aria-hidden="true"> {p.place_proposal.status === 'accepted' ? '✓' : '✕'}</span>}</p>
@@ -231,13 +261,14 @@ export function PhotoRoom({doc, caseName, onClose, onText}: Props): ReactElement
               <button aria-label="Yes: keep the place" onClick={() => decidePlace.mutate('accept')}>Y</button>
               <button aria-label="No: reject the place" onClick={() => decidePlace.mutate('reject')}>X</button></span>}</div>}
         </section>
-        <TrailTree doc={doc} rows={rows} picked={copy?.id ?? null} onPick={setPickedCopy} compact/>
+        <TrailTree doc={doc} rows={rows} picked={copy?.id ?? null} onPick={setPickedCopy} thumb={original} compact/>
       </aside>
     </div>
   </div>;
 }
 
-function TrailTree({doc, rows, picked, onPick, compact = false}: {doc: DocumentDetailOut; rows: DerivedFileOut[]; picked: string | null; onPick: (id: string) => void; compact?: boolean}): ReactElement {
+function TrailTree({doc, rows, picked, onPick, thumb, compact = false}: {doc: DocumentDetailOut; rows: DerivedFileOut[]; picked: string | null; onPick: (id: string) => void;
+  thumb?: string | null; compact?: boolean}): ReactElement {
   const tree = trailTree(rows);
   const manifest = () => {
     const data = {document: {id: doc.id, filename: doc.filename, sha256: doc.sha256}, made_from_it: rows, note: 'The original is never written; each copy names what it was made from.'};
@@ -246,17 +277,22 @@ function TrailTree({doc, rows, picked, onPick, compact = false}: {doc: DocumentD
     a.href = href; a.download = `${doc.filename}-edit-trail.json`; a.click();
     URL.revokeObjectURL(href);
   };
-  return <section className={`ph-trail${compact ? ' compact' : ''}`} aria-label="Edit trail">
-    <p className="tl2-cap">Edit trail · {rows.filter(r => r.operation !== 'preview').length} {rows.filter(r => r.operation !== 'preview').length === 1 ? 'copy' : 'copies'}</p>
+  const made = rows.filter(r => r.operation !== 'preview').length;
+  return <section className={`ph-trail${compact ? ' compact' : ''}${made ? '' : ' empty'}`} aria-label="Edit trail">
+    <p className="tl2-cap"><Reveal detail="Each copy is a new file made from the one above it; the original is never written.">Edit trail · {made} {made === 1 ? 'copy' : 'copies'}</Reveal></p>
     <ul>
       {/* The original is kept as uploaded and never written; its fingerprint, and each copy's settings, tool, maker and
           time, are on hover. */}
-      <li className="orig"><Reveal detail="Kept as uploaded; the original is never written."><b>{doc.filename} · original</b></Reveal>
-        {doc.sha256 && <> <FingerprintMark hash={doc.sha256}/></>}</li>
+      {/* eslint-disable-next-line @next/next/no-img-element -- a blob URL of a case file, served by this app */}
+      <li className="orig">{thumb ? <img src={thumb} alt="" aria-hidden="true"/> : <span className="ph-thumb" aria-hidden="true"/>}
+        <Reveal detail="Kept as uploaded; the original is never written."><b>{doc.filename} · original</b></Reveal>
+        {doc.sha256 && <FingerprintMark hash={doc.sha256}/>}</li>
       {tree.map(({row, depth}) => <li key={row.id} style={{marginLeft: depth * 14}} className={row.id === picked ? 'on' : ''}>
         <Reveal tabbable={false} detail={`${trailLine(row)} · ${String(row.created_at).slice(0, 16).replace('T', ' ')}`}>
           <button onClick={() => onPick(row.id)}><b>{OPERATION_WORDS[row.operation] ?? row.operation}</b></button></Reveal></li>)}
     </ul>
+    {/* With no copy yet, the trail says where the first one comes from instead of an empty box. */}
+    {made === 0 && <p className="ph-first">No copies yet: <b>Make a copy</b> under the picture starts the trail.</p>}
     <button className="tl2-plain" onClick={manifest}>Export the trail (custody manifest)</button>
   </section>;
 }

@@ -4,16 +4,31 @@
 .ph-top { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0 0 40px; }
 .ph-top .tl2-status { margin: 0 0 0 auto; font: 500 10.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); }
 .ph-body { display: grid; grid-template-columns: 290px minmax(0, 1fr) 340px; gap: 14px; align-items: start; }
+/* When the file claims nothing about itself, its one line moves into the side column and the picture takes the room. */
+.ph-body.slim { grid-template-columns: minmax(0, 1fr) 360px; }
+.ph-head p { font-size: 14px; }
 @media (max-width: 1200px) { .ph-body { grid-template-columns: minmax(0, 1fr); } }
 .ph-claims, .ph-centre, .ph-props, .ph-trail { border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); padding: 14px 16px; min-width: 0; }
 .ph-claims { display: flex; flex-direction: column; gap: 10px; }
-.ph-dl { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px 10px; margin: 0; }
+.ph-dl, .ph-known { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.ph-row { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.ph-known { padding-top: 2px; }
+.ph-known dt { font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.ph-known dd { margin: 0; font: 500 14px var(--font-mono); }
+.ph-nothing { margin: 0; display: flex; align-items: center; gap: 8px; font: 400 20px/1.2 var(--font-display, var(--font-ui)); color: var(--text); }
+.ph-nothing b { font-weight: 400; }
+.ph-q { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; border: 1.5px dashed var(--text-muted); color: var(--text-muted); font: 600 11px var(--font-mono); }
+.ph-missing { margin: 0; font-size: 12px; color: var(--text-muted); }
 .ph-dl dt { font: 500 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); padding-top: 3px; }
 .ph-dl dd { margin: 0; font: 500 13.5px var(--font-mono); padding-bottom: 8px; border-bottom: 1px solid var(--line, rgba(127,127,127,.15)); }
 .ph-dl small { display: block; font: 400 12px var(--font-ui); color: var(--text-muted); margin-top: 2px; }
 .ph-centre { display: flex; flex-direction: column; gap: 10px; }
+.ph-centre { align-items: center; }
+.ph-centre > * { align-self: stretch; }
+/* The stage wraps the picture exactly (so faces and drawn boxes sit on it) and grows to the screen's height. */
+.ph-centre > .ph-stage { align-self: center; max-width: 100%; }
 .ph-stage { position: relative; border-radius: 8px; overflow: hidden; background: #111; user-select: none; touch-action: none; }
-.ph-stage img { display: block; width: 100%; height: auto; }
+.ph-stage img { display: block; max-width: 100%; max-height: max(320px, calc(100vh - 250px)); width: auto; height: auto; }
 .ph-stage .ph-copy { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .ph-stage.drawing { cursor: crosshair; }
 .ph-wipe { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; padding: 0; border: 0; background: #fff; cursor: ew-resize; display: grid; place-items: center; color: #222; font-size: 12px; }
@@ -36,7 +51,12 @@
 .ph-props { display: flex; flex-direction: column; gap: 8px; }
 .ph-prop { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 9px 10px; border-radius: 9px; border: 1px solid var(--line, rgba(127,127,127,.25)); }
 .ph-prop i { font-style: normal; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent-1); color: var(--accent-1); display: grid; place-items: center; font-size: 11px; }
-.ph-prop p { margin: 0; font-size: 13px; }
+.ph-prop p { margin: 0; font-size: 14px; }
+.ph-prop.quiet { border-style: dashed; color: var(--text-muted); padding-block: 7px; }
+.ph-prop.quiet i { border-color: var(--text-muted); color: var(--text-muted); }
+.ph-prop.alert i { border-color: var(--status-disputed); color: var(--status-disputed); }
+.ph-prop.alert small { color: var(--status-disputed); }
+.ph-prop > .tl2-plain { font-size: 13px; padding: 5px 12px; border-color: var(--accent-1); color: var(--accent-1); }
 .ph-prop small { display: block; color: var(--text-muted); font-size: 12px; margin-top: 2px; }
 .ph-prop .tl2-plain { font-size: 11.5px; padding: 3px 8px; }
 .ph-yn { display: inline-flex; gap: 4px; }
@@ -44,6 +64,11 @@
 .ph-yn button + button { border-color: var(--status-disputed); color: var(--status-disputed); }
 .ph-trail ul { list-style: none; margin: 8px 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .ph-trail li { border-radius: 9px; border: 1px solid var(--line, rgba(127,127,127,.25)); padding: 8px 10px; }
+.ph-trail li.orig { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.ph-trail li.orig img, .ph-thumb { width: 48px; height: 32px; object-fit: cover; border-radius: 4px; background: #111; display: block; }
+.ph-trail li.orig b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-first { margin: 0 0 8px; font-size: 12.5px; color: var(--text-muted); }
+.ph-trail .ph-first b { color: var(--accent-1); font-weight: 500; display: inline; font-size: inherit; }
 .ph-trail li.orig { border-color: color-mix(in srgb, var(--accent-2) 60%, transparent); }
 .ph-trail li.on { border-color: var(--accent-1); box-shadow: 0 0 0 1px var(--accent-1); }
 .ph-trail li button { all: unset; display: block; width: 100%; cursor: pointer; }
