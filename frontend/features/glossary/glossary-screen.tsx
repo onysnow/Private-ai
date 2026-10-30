@@ -248,7 +248,6 @@ const HIT_KIND: Record<SearchHitOut['kind'], {mark: string; word: string}> = {
   party: {mark: '◉', word: 'A party'}, link: {mark: '⟷', word: 'A link'}, evidence: {mark: '▤', word: 'Evidence'}, claim_event: {mark: '◷', word: 'A claim or event'},
   lead_task: {mark: '⚑', word: 'A lead'}, document: {mark: '▢', word: 'A document'}, outside: {mark: '↗', word: 'From outside the case'},
 };
-const plain = (html: string) => html.replace(/<[^>]*>/g, '');
 
 function TermCard({term, hint, areaName, areaRows, onOpen, known}: {
   term: string; hint: GlossaryHintOut | undefined; areaName: Map<string, string>; areaRows: CatalogueAreaOut[]; onOpen: (term: string) => void; known: GlossaryHintOut[];
@@ -288,7 +287,7 @@ function TermCard({term, hint, areaName, areaRows, onOpen, known}: {
         : found.isError ? <p className="kc-quiet">Could not look in the case.</p>
         : !found.data.results.length ? <p className="kc-quiet">Not in this case&rsquo;s records.</p>
         : <ul className="kg-hits">{found.data.results.map(h => <li key={`${h.kind}:${h.id}`}>
-          <Reveal tabbable={false} detail={<><b>{h.title}</b><span className="rv-row">{HIT_KIND[h.kind]?.word ?? h.kind}{h.date ? ` · ${h.date}` : ''}</span>{h.snippet ? <span className="rv-row">{plain(h.snippet)}</span> : null}</>}>
+          <Reveal tabbable={false} detail={<><b>{h.title}</b><span className="rv-row">{HIT_KIND[h.kind]?.word ?? h.kind}{h.date ? ` · ${h.date}` : ''}</span>{h.snippet ? <span className="rv-row">{h.snippet}</span> : null}</>}>
             <span className="kg-hit"><i aria-hidden="true">{HIT_KIND[h.kind]?.mark ?? '•'}</i><span className="kg-hit-t"><span className="sr-only">{HIT_KIND[h.kind]?.word ?? h.kind}: </span>{h.title}</span></span></Reveal></li>)}</ul>}
     </section>}
     {/* The catalogue's entry: each area that lists the term, opening that area in the Red Flags catalogue. */}
