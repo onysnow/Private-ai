@@ -25,7 +25,7 @@ import {caseHref} from '../../lib/case-href';
 import {errorMessage} from '../../lib/api-client';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {getInvestigationFinancialFlowsOptions, getRedFlagsQueryKey, markRedFlagInnocentMutation} from '../../lib/generated/@tanstack/react-query.gen';
-import type {FinancialTransactionOut, FlagInnocentOut, RedFlagOut} from '../../lib/generated/types.gen';
+import type {FinancialTransactionOut, FlagInnocentOut, IncompleteTransactionOut, RedFlagOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {apiTime} from '../../lib/timestamps';
 import {useWheelStep} from '../case-home/wheel-step';
@@ -393,7 +393,7 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
   const ind = flag.indicator;
   const form = useZodForm<DismissValues>(dismissSchema, {defaultValues: {reason: ''}, mode: 'onSubmit'});
   const first = apiTime(flag.first_seen_at);
-  const payments = flag.links.length > 0 && (flag.facts as {family?: string})?.family === 'count_in_band';
+  const payments = flag.links.length > 0 && ['count_in_band', 'missing_property'].includes((flag.facts as {family?: string})?.family ?? '');
   const moneyFlag = flag.indicator_id.startsWith('ML') || payments;
   return <>
     {preview && <p className="rb-peek-note"><Reveal detail="Click the row to open it; move off the list to go back."><span>Preview</span></Reveal></p>}
@@ -459,7 +459,8 @@ function OpenFlag({flag, kind, step, setStep, investigationId, asking, setAsking
 /** A small picture of what the flag rests on: the payments for a band rule, the loop for a cycle, the chain otherwise. */
 function Picture({flag, investigationId, onParty, filtered = ''}: {flag: RedFlagOut; investigationId: string; onParty?: (id: string) => void; filtered?: string}): ReactElement {
   const family = (flag.facts as {family?: string})?.family;
-  const ledger = useQuery({...getInvestigationFinancialFlowsOptions({path: {investigation_id: investigationId}}), enabled: family === 'count_in_band'});
+  const listed = family === 'missing_property' && flag.links.length > 1;
+  const ledger = useQuery({...getInvestigationFinancialFlowsOptions({path: {investigation_id: investigationId}}), enabled: family === 'count_in_band' || listed});
   if (family === 'count_in_band') {
     const ids = new Set(flag.links);
     const pays = (ledger.data?.transactions ?? []).filter(t => ids.has(t.id) && t.dateTime).sort((a, b) => (a.dateTime! < b.dateTime! ? -1 : 1));
@@ -475,6 +476,13 @@ function Picture({flag, investigationId, onParty, filtered = ''}: {flag: RedFlag
     return <Reveal tabbable={false} detail={on ? 'Show every flag again' : `Show only ${p.name}’s flags`}>
       <button type="button" className="rb-name" aria-pressed={on} onClick={() => onParty(p.id)}>{p.name}</button></Reveal>;
   };
+  if (listed) {
+    // Several payments from one payer to one payee (BO-033 since rule v3): each one, in the flag's order (by date).
+    const byId = new Map([...(ledger.data?.transactions ?? []), ...(ledger.data?.incomplete ?? [])].map(t => [t.id, t] as const));
+    const rows = flag.links.map(id => byId.get(id)).filter((t): t is LedgerRow => t !== undefined);
+    if (!rows.length && ledger.isPending) return <p className="rb-quiet">Reading the payments…</p>;
+    return <PaymentList names={names} rows={rows} count={flag.links.length}/>;
+  }
   if (family === 'shared_property') {
     // Two (or more) parties and the one detail they share, with no link drawn between them: none is in the records.
     const facts = flag.facts as {kind?: string; value?: string; spellings?: string[]};
@@ -533,6 +541,31 @@ export function monthTicks(t0: number, t1: number): {t: number; label: string; y
 
 const CERTAINTY_WORD: Record<FinancialTransactionOut['certainty'], string> = {shown: 'Shown', not_yet_shown: 'Not yet shown', disputed: 'Disputed'};
 const CERTAINTY_STATUS: Record<FinancialTransactionOut['certainty'], ClaimStatus> = {shown: 'supported', not_yet_shown: 'unshown', disputed: 'disputed'};
+
+type LedgerRow = FinancialTransactionOut | IncompleteTransactionOut;
+const LIST_FIRST = 6;
+
+/** The payments one flag carries, one line each: the date and the amount, how sure the payment is as a mark (the word
+ * on hover), and what the record says the purpose was when it says one. The first six show; the rest on a click. */
+export function PaymentList({names, rows, count}: {names: string[]; rows: LedgerRow[]; count: number}): ReactElement {
+  const [all, setAll] = useState(false);
+  const shown = all ? rows : rows.slice(0, LIST_FIRST);
+  const day = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'});
+  return <figure className="rb-picture rb-pay-list" aria-label={`${count} payments from ${names.join(' to ')}`}>
+    <figcaption><span>The payments it rests on</span><small>{count} payments</small></figcaption>
+    <p>{names.map((n, i) => <span key={i}>{i > 0 && <i aria-hidden="true"> → </i>}<b>{n}</b></span>)}</p>
+    <ol>{shown.map(t => <li key={t.id}>
+      <span className={`rb-pay-dot c-${t.certainty}`} role="img" title={CERTAINTY_WORD[t.certainty]} aria-label={CERTAINTY_WORD[t.certainty]}/>
+      {/* The spaces keep the words apart for a screen reader; a grid draws no space-only text. */}
+      {' '}<span className="rb-pay-day">{t.dateTime ? day(t.dateTime) : 'no date'}</span>
+      {' '}<b>{t.amount != null ? `${t.amount.toLocaleString('en-GB')} ${t.currency ?? ''}`.trim() : 'no amount'}</b>
+      {t.statedPurpose && <>{' '}<i>“{t.statedPurpose}”</i></>}
+    </li>)}</ol>
+    {rows.length > LIST_FIRST && <button type="button" className="rb-link-btn" onClick={() => setAll(v => !v)}>
+      {all ? 'Show fewer' : `Show all ${rows.length}`}</button>}
+    {rows.length < count && <small className="rb-quiet">{count - rows.length} not in the payments ledger</small>}
+  </figure>;
+}
 
 /** The payments in the band, by date. Scrolling over the picture steps through them (one notch, one payment; the
  * arrow keys do the same when it has focus); the payment in focus is ringed and named under the picture. */

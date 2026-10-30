@@ -498,3 +498,29 @@ source already holds, never invented:
 The full title and the place in the record stay on hover. Chips are now one per source (two sources with the same
 title are two chips) and wrap onto a second line, as ACT_2 draws them, instead of being cut on one line. The Cited tab
 and the citation hover keep the full title: they have the room.
+
+## 32. BO-033: one flag per payer and payee, not one per payment (30 Oct 2026)
+
+**Call.** The "payment with no stated purpose" rule (BO-033, `missing_property`) raises one flag for all the payments
+from one payer to one payee, instead of one per payment. A pair gets two flags only when some of its payments are
+recorded as having no purpose ("None stated": Textbook) and others simply have no purpose recorded yet (Faint).
+The flag carries every payment (its links, by date), their count, the total per currency (never added across
+currencies), how many have no amount, and the first and last date. The summary reads "Payer paid Payee 3 times,
+3,500.50 EUR and 700 USD in all, from 2014-01-03 to 2015-03-09, and no purpose is found in the records for any of
+them yet." A flag with one payment reads as before. Rule version 3 (family version 4).
+
+**Why.** One flag per payment buried the board: 31 of 37 flags on 1MDB, 144 on Anise, where all 144 deposits go
+from one person to five accounts (now 5 flags). Payer and payee is the unit a reporter checks: one set of documents
+(a contract, invoices, a ledger) says what that dealing was for, and BO-031 and ML-021 already group their payments
+this way. The direction is kept (A paying B is not B paying A) because the summary and the question differ. Stated
+and not-recorded stay apart because their levels differ, and a Faint "nothing entered yet" must not be lifted to
+Textbook by one payment in the same pair.
+
+**Stored flags.** Handled as the engine handles any version change: the rule's version is in the digest, so cases run
+under version 2 read as behind and the next run recomputes. A pair with one payment keeps its flag (same parties and
+link, same fingerprint), with its status. The old per-payment flags of a pair with several payments no longer fire and
+move to "no longer fire"; the pair's new flag starts open, so a per-payment set-aside does not carry over to it.
+
+**Board.** A flag with several payments shows them as a list under the summary (date, amount, the stated purpose when
+the record gives one; how sure each payment is as the dot's colour, the word on hover), the first six and the rest on a
+click, and links to the money view like the other payment flags.

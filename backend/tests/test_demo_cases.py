@@ -194,6 +194,9 @@ def test_anise_raises_the_structuring_flag(tmp_path):
     assert facts["count"] == 75 and facts["first_date"] == "2009-12-08" and facts["last_date"] == "2012-01-26"
     assert ml021[0]["parties"][0]["name"] == "Magdy Fouad Anise"
     assert not {"BO-001", "BO-002", "BO-032", "ML-023"} & set(_counts(flags))
+    # 144 deposits with no purpose recorded, into five accounts: one flag per account, not one per deposit.
+    no_purpose = [f for f in flags["flags"] if f["indicator_id"] == "BO-033"]
+    assert len(no_purpose) == 5 and sum(f["facts"]["payments"] for f in no_purpose) == 144
 
 
 def test_vekselberg_raises_layering_and_shared_address(tmp_path):

@@ -317,6 +317,26 @@ describe('scroll over the picture', () => {
     expect(picture).toHaveTextContent('2 of 3 shown');
     clock.mockRestore();
   });
+
+  it('lists every payment a no-purpose flag carries, the first six and the rest on a click', async () => {
+    const ids = Array.from({length: 8}, (_, i) => `n${i + 1}`);
+    const bo = flag('f4', indicator('BO-033', 'Payments with no stated purpose', {}), 'faint', 1, {
+      parties: [{id: 'hn', name: 'Harbour Nominees', schema: 'Company'}, {id: 'fh', name: 'Fernhill Ltd', schema: 'Company'}],
+      links: ids, facts: {family: 'missing_property', payments: 8, unreviewed_links: []}});
+    const rows = ids.map((id, i) => pay(id, 1000 * (i + 1), `2019-0${i + 1}-01`, i === 0 ? 'shown' : 'not_yet_shown'));
+    mockApi({...routes, 'GET /api/investigations/inv-1/red-flags': body([bo]),
+      'GET /api/investigations/inv-1/financial-flows': {investigation_id: 'inv-1', currencies: [], flow_type_rule: '', duplicate_rule: '',
+        transactions: rows.slice(0, 7), incomplete: [{...pay('n8', 0, '2019-08-01', 'not_yet_shown'), amount: null, statedPurpose: 'None stated', problems: ['amount missing']}]}});
+    renderBoard();
+    const list = await screen.findByRole('figure', {name: '8 payments from Harbour Nominees to Fernhill Ltd'});
+    await waitFor(() => expect(list.querySelectorAll('li')).toHaveLength(6));
+    expect(list.querySelector('li')).toHaveTextContent('1 Jan 2019 1,000 USD');
+    expect(within(list).getAllByRole('img', {name: 'Shown'})).toHaveLength(1);
+    await userEvent.click(within(list).getByRole('button', {name: 'Show all 8'}));
+    expect(list.querySelectorAll('li')).toHaveLength(8);
+    expect(list.querySelectorAll('li')[7]).toHaveTextContent('1 Aug 2019 no amount “None stated”');
+    expect(screen.getByRole('link', {name: 'Show in money flows'})).toBeInTheDocument();
+  });
 });
 
 describe('what changed since the last visit', () => {

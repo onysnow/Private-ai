@@ -119,7 +119,6 @@ Since 29 Oct Ony's open questions are decided on what is best for the app and lo
 ## Still open from the demos
 - Video and audio files are read only through OpenAleph. (Email, .mbox, .zip and .xlsx are now read by the
   Workbench's own reader too: `app/services/container_readers.py`.)
-- BO-033 raises one flag per payment.
 - Documents have no kind or language field.
 - Claim evidence can't be "superseded".
 - Payments can't be typed as a fine, judgment debt or agreed price.

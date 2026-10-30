@@ -287,3 +287,43 @@ def test_running_the_rules_needs_an_unknown_case_to_be_refused_and_a_reader_cann
         assert engine.run(db, inv) is None, "only someone who can edit the case runs the rules"
         read = engine.flags(db, inv)
         assert (read["flags"], read["stale"]) == ([], True), "a reader still reads"
+
+
+def test_payments_with_no_purpose_from_one_payer_to_one_payee_are_one_flag():
+    from datetime import datetime
+
+    from app.models.domain import Investigation, PatternFlag
+    from app.patterns.engine import _fingerprint
+
+    inv = _inv("No purpose, grouped")
+    payer, payee, other = _party(inv, "Payer Ltd"), _party(inv, "Payee Ltd"), _party(inv, "Other Ltd")
+    first = _link(inv, "Payment", payer, payee, amount=["1000"], currency=["EUR"], date=["2014-01-03"])
+    second = _link(inv, "Payment", payer, payee, amount=["2,500.50"], currency=["EUR"], date=["2015-03-09"])
+    third = _link(inv, "Payment", payer, payee, amount=["700"], currency=["USD"], date=["2014-06-01"])
+    stated = _link(inv, "Payment", payer, payee, amount=["50"], currency=["EUR"], purpose=["None stated"])
+    back = _link(inv, "Payment", payee, payer, amount=["10"], currency=["EUR"])
+    _link(inv, "Payment", payer, other, amount=["99"], currency=["EUR"], purpose=["rent"])
+    # A flag the rule's version 2 left for one of the payments: one flag per payment.
+    with SessionLocal() as db:
+        db.add(PatternFlag(investigation_id=inv, indicator_id="BO-033", rule_version=2, fingerprint=_fingerprint("BO-033", [payer, payee], [first]),
+                           level="faint", parties=[payer, payee], links=[first], facts={"summary": "Payer Ltd paid Payee Ltd 1,000 EUR, …"}))
+        db.get(Investigation, inv).red_flag_run = {"at": datetime(2026, 1, 1).isoformat(), "digest": "left by version 2", "cannot_run": []}
+        db.commit()
+    assert _read(inv)["stale"] is True, "the stored flags are behind the new rule version"
+
+    body = _flags(inv)
+    flags = [f for f in body["flags"] if f["indicator_id"] == "BO-033"]
+    assert len(flags) == 3, "one per payer and payee, stated and not recorded apart; the payment with a purpose raises none"
+    grouped = next(f for f in flags if f["links"] == [first, third, second])
+    assert grouped["level"] == "faint" and grouped["rule_version"] == 3
+    assert grouped["facts"]["payments"] == 3
+    assert grouped["facts"]["totals"] == {"EUR": 3500.5, "USD": 700.0}
+    assert (grouped["facts"]["date_from"], grouped["facts"]["date_to"]) == ("2014-01-03", "2015-03-09")
+    assert grouped["summary"] == ("Payer Ltd paid Payee Ltd 3 times, 3,500.50 EUR and 700 USD in all, from 2014-01-03 to 2015-03-09, "
+                                  "and no purpose is found in the records for any of them yet.")
+    said = next(f for f in flags if f["links"] == [stated])
+    assert said["level"] == "textbook" and said["summary"] == "Payer Ltd paid Payee Ltd 50 EUR, and the record says “None stated”."
+    assert next(f for f in flags if f["links"] == [back])["summary"].startswith("Payee Ltd paid Payer Ltd 10 EUR")
+    # The version 2 flag on one payment no longer fires: it is kept under gone, as any flag a run no longer finds.
+    assert any(f["links"] == [first] and f["rule_version"] == 2 for f in body["gone"] if f["indicator_id"] == "BO-033")
+    assert _read(inv)["stale"] is False

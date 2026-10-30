@@ -33,5 +33,10 @@ def amount_words(props: dict[str, list[Any]]) -> str:
     if value is None:
         raw = str(first(props, "amount") or "").strip()
         return f"{raw} {currency}".strip()
+    return money(value, currency)
+
+
+def money(value: float, currency: str = "") -> str:
+    """An amount as a reader writes it: "375,000,000 USD", "1,250.50 EUR"."""
     shown = f"{value:,.2f}".removesuffix(".00")
     return f"{shown} {currency}".strip()
