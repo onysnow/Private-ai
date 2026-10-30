@@ -94,6 +94,13 @@ function problemText(error: unknown): string {
   return error instanceof ApiHttpError ? error.detail : errorMessage(error, 'Could not draw the chart');
 }
 
+/** The chart's alt text without its "Kind: Title." opening, which the frame already shows: the counts and the largest
+ *  value. The full description (every value, the source, what was left out) is under "Description and data table". */
+export function chartSummary(alt: string, title: string): string {
+  const opening = alt.indexOf(`: ${title}.`);
+  return opening >= 0 ? alt.slice(opening + title.length + 3).trim() || alt : alt;
+}
+
 export function ChartBuilderPanel({investigationId}: Props): ReactElement {
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
   const [open, setOpen] = useState(false);
@@ -241,8 +248,8 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
           {preview.isError && <p className="cb-muted" role="alert">{problemText(preview.error)}</p>}
           {(report || drawn) && <div className="cb-result">
             {report && <CheckReportView report={report} kindName={kindName(kind)}/>}
-            {drawn && <ChartFrame kind="built-chart" title={drawnTitle} question={`${kindName(drawn.spec.kind as string)}, drawn from this investigation's records and checked against the design rules.`}
-              rule={{label: 'What it shows:', text: drawn.text.description}}
+            {drawn && <ChartFrame kind="built-chart" title={drawnTitle}
+              rule={{label: 'What it shows:', text: chartSummary(drawn.text.alt_text, drawnTitle)}}
               footer={<><span>{drawn.text.source_line}</span><Reveal label="Tracing a value" detail="Click a bar, slice or point to trace its value to a record; the numbered buttons in the data table trace each one."><span aria-hidden="true">ⓘ</span></Reveal></>}>
               <div style={{padding: '12px 16px'}}>
                 <ChartFigure visual={drawn} onPick={row => {

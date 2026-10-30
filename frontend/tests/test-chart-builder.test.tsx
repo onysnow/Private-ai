@@ -23,7 +23,7 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
-import {ChartBuilderPanel, queriesFor, suggestedKinds, traceRequest} from '../features/charts/chart-builder-panel';
+import {ChartBuilderPanel, chartSummary, queriesFor, suggestedKinds, traceRequest} from '../features/charts/chart-builder-panel';
 import {parseDestination} from '../features/charts/keep-chart';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -157,6 +157,10 @@ describe('ChartBuilderPanel', () => {
     const props = reactEChartsCoreSpy.mock.calls[0][0] as Record<string, unknown>;
     expect(props.option).toEqual(donut.option);
     expect(props.theme).toBeUndefined();
+    // The frame says what the chart shows in one line; the full description waits under its own heading.
+    const rule = screen.getByTestId('chart-rule');
+    expect(rule.textContent).toBe(`What it shows: ${chartSummary(String(donutText.alt_text), 'Meridian received most of the money')}`);
+    expect(rule.textContent!.length).toBeLessThan(String(donutText.description).length);
 
     await user.click(screen.getByText('Description and data table'));
     const firstRow = within(screen.getByRole('table')).getAllByRole('row')[1];
@@ -265,6 +269,12 @@ describe('ChartBuilderPanel', () => {
 });
 
 describe('the builder\'s choices', () => {
+  it('says what a chart shows without repeating its kind and title', () => {
+    expect(chartSummary('Donut: Meridian received most. 3 parts of $9.8 m. Largest: Meridian at 60%.', 'Meridian received most'))
+      .toBe('3 parts of $9.8 m. Largest: Meridian at 60%.');
+    expect(chartSummary('Bar: Who paid. No data.', 'Who paid')).toBe('No data.');
+    expect(chartSummary('Some other words.', 'Who paid')).toBe('Some other words.');
+  });
   it('suggests the question\'s kinds that can draw the data, best first', () => {
     const [ranking, , partOfWhole, distribution] = catalog.questions;
     const [byParty, , , amounts] = catalog.queries;
