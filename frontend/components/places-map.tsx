@@ -11,7 +11,7 @@ import {useEffect, useRef} from 'react';
 import type {ReactElement} from 'react';
 
 import {api} from '../lib/api-instance';
-import {BASEMAP_PROTOCOL, PLACES_SOURCE, basemapLoader, basemapStyle, dotImage, dotRadius, placesBounds, placesGeoJson} from '../lib/basemap-style';
+import {BASEMAP_PROTOCOL, PATH_SOURCE, PLACES_SOURCE, basemapLoader, basemapStyle, dotImage, dotRadius, pathGeoJson, placesBounds, placesGeoJson} from '../lib/basemap-style';
 import type {BasemapStatusOut, PlaceOut} from '../lib/generated/types.gen';
 
 let protocolAdded = false;
@@ -50,14 +50,21 @@ type Props = {
   onPlace?: (entityId: string) => void;
   /** The place picked on the map or the timeline: its dot is drawn larger. */
   picked?: string | null;
-  height?: number;
+  /** A number of px, or a CSS height ('100%' fills the box the map sits in). */
+  height?: number | string;
+  /** A party's path, hop by hop, as [longitude, latitude] points in date order. */
+  path?: [number, number][];
+  /** The dark map under a dark theme; grayscale (the default) for light themes and exports. */
+  flavor?: 'grayscale' | 'dark';
 };
 
-export function PlacesMap({status, places, onPlace, picked = null, height = 420}: Props): ReactElement {
+export function PlacesMap({status, places, onPlace, picked = null, height = 420, path = [], flavor = 'grayscale'}: Props): ReactElement {
   const container = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
   const onPlaceRef = useRef(onPlace);
   onPlaceRef.current = onPlace;
+  const pathRef = useRef(path);
+  pathRef.current = path;
 
   // The map itself, made once per base map.
   useEffect(() => {
@@ -65,7 +72,7 @@ export function PlacesMap({status, places, onPlace, picked = null, height = 420}
     ensureBasemapProtocol();
     const bounds = placesBounds(places);
     const made = new MapLibreMap({
-      container: container.current, style: basemapStyle(status, placesGeoJson(places, picked)),
+      container: container.current, style: basemapStyle(status, placesGeoJson(places, picked), {flavor}),
       ...(bounds ? {bounds, fitBoundsOptions: {padding: 60, maxZoom: Math.min(10, (status.max_zoom ?? 6) + 2)}} : {center: [0, 20], zoom: 1}),
       attributionControl: {compact: false},
     });
@@ -75,19 +82,28 @@ export function PlacesMap({status, places, onPlace, picked = null, height = 420}
       const id = event.features?.[0]?.properties?.entity_id;
       if (typeof id === 'string') onPlaceRef.current?.(id);
     });
+    made.on('load', () => (made.getSource(PATH_SOURCE) as GeoJSONSource | undefined)?.setData(pathGeoJson(pathRef.current)));
     made.on('mouseenter', 'places-dot', () => { made.getCanvas().style.cursor = 'pointer'; });
     made.on('mouseleave', 'places-dot', () => { made.getCanvas().style.cursor = ''; });
     map.current = made;
     return () => { made.remove(); map.current = null; };
     // The places reach a made map through the effect below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [status, flavor]);
 
   // New places, or a new pick, replace the dots without moving the reporter's view.
   useEffect(() => {
     const source = map.current?.getSource(PLACES_SOURCE) as GeoJSONSource | undefined;
     source?.setData(placesGeoJson(places, picked));
   }, [places, picked]);
+
+  // A party's path, drawn when picked and cleared when not.
+  const pathKey = JSON.stringify(path);
+  useEffect(() => {
+    const line = map.current?.getSource(PATH_SOURCE) as GeoJSONSource | undefined;
+    line?.setData(pathGeoJson(path));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathKey]);
 
   return <div ref={container} style={{height}} role="region"
     aria-label={`Map of ${places.length} place${places.length === 1 ? '' : 's'}; the list below names each one`}/>;

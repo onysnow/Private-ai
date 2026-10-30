@@ -80,7 +80,7 @@ export function dotRadius(name: string): number | null {
 export const PLACE_DOT = dotName(PLACE_RADIUS);
 
 /** What each place on a map carries: its name, its dot, and whether it is picked out. */
-export type PlaceMark = {entity_id?: string; caption: string; dot: string; picked: boolean};
+export type PlaceMark = {entity_id?: string; caption: string; dot: string; picked: boolean; sure?: string};
 export type PlaceMarks = GeoJSON.FeatureCollection<GeoJSON.Point, PlaceMark>;
 
 /**
@@ -134,7 +134,7 @@ export function placesGeoJson(places: PlaceOut[], picked: string | null = null):
     type: 'FeatureCollection',
     features: places.map(p => ({type: 'Feature', geometry: {type: 'Point', coordinates: [p.longitude, p.latitude]},
       properties: {entity_id: p.entity_id, caption: p.caption, dot: p.entity_id === picked ? dotName(PICKED_RADIUS) : PLACE_DOT,
-        picked: p.entity_id === picked}})),
+        picked: p.entity_id === picked, sure: p.sure ?? 'not_yet'}})),
   };
 }
 
@@ -150,8 +150,25 @@ export function placesBounds(places: Pick<PlaceOut, 'latitude' | 'longitude'>[])
  * name even where names collide, as in a chart (a picture cannot be zoomed);
  * the app's interactive map lets colliding names wait for a closer zoom.
  */
-export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks, {everyName = false}: {everyName?: boolean} = {}): StyleSpecification {
+export const PATH_SOURCE = 'places-path';
+
+/** A party's path, hop by hop: one line from place to place in date order. */
+export function pathGeoJson(points: [number, number][]): GeoJSON.FeatureCollection<GeoJSON.LineString> {
+  return {type: 'FeatureCollection', features: points.length > 1
+    ? [{type: 'Feature', geometry: {type: 'LineString', coordinates: points}, properties: {}}] : []};
+}
+
+export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks,
+  {everyName = false, flavor = 'grayscale'}: {everyName?: boolean; flavor?: 'grayscale' | 'dark'} = {}): StyleSpecification {
+  const dark = flavor === 'dark';
   const placeLayers: LayerSpecification[] = [
+    // A party's path (Places): under the dots, so every dot stays on top.
+    {id: 'places-path', type: 'line', source: PATH_SOURCE,
+      paint: {'line-color': dark ? '#E8B04B' : PLACE_COLOUR, 'line-width': 2.5, 'line-dasharray': [2, 1.5], 'line-opacity': 0.9}},
+    // A place known only to a town or wider: a soft area around its dot, so the dot does not claim a street.
+    {id: 'places-area', type: 'circle', source: PLACES_SOURCE, filter: ['==', ['get', 'sure'], 'approximate'],
+      paint: {'circle-radius': 26, 'circle-color': dark ? '#E8B04B' : PLACE_COLOUR, 'circle-opacity': 0.16,
+        'circle-stroke-width': 1, 'circle-stroke-color': dark ? '#E8B04B' : PLACE_COLOUR, 'circle-stroke-opacity': 0.5}},
     // Every dot is drawn, and the base map's labels give way to it (see dotImage).
     {id: 'places-dot', type: 'symbol', source: PLACES_SOURCE,
       layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true}},
@@ -160,17 +177,19 @@ export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks, {every
       layout: {'text-field': ['get', 'caption'], 'text-font': PLACE_LABEL_FONT,
         'text-size': ['case', ['boolean', ['get', 'picked'], false], PICKED_LABEL_PX, PLACE_LABEL_PX], 'text-offset': [NAME_OFFSET_EM, 0],
         'text-anchor': 'left', 'text-max-width': NAME_MAX_EM, 'text-allow-overlap': everyName},
-      paint: {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
+      paint: dark ? {'text-color': '#F2EEE6', 'text-halo-color': '#0B1220', 'text-halo-width': 1.5}
+        : {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
   ];
   return {
     version: 8,
     glyphs: `${ROOT}/fonts/{fontstack}/{range}.pbf`,
-    sprite: `${ROOT}/sprites/grayscale`,
+    sprite: `${ROOT}/sprites/${flavor}`,
     sources: {
       protomaps: {type: 'vector', tiles: [`${ROOT}/tiles/{z}/{x}/{y}.mvt`], minzoom: status.min_zoom ?? 0, maxzoom: status.max_zoom ?? 6,
         attribution: status.attribution || '© OpenStreetMap'},
       [PLACES_SOURCE]: {type: 'geojson', data: marks},
+      [PATH_SOURCE]: {type: 'geojson', data: pathGeoJson([])},
     },
-    layers: [...(layers('protomaps', namedFlavor('grayscale'), {lang: 'en'}) as LayerSpecification[]), ...placeLayers],
+    layers: [...(layers('protomaps', namedFlavor(flavor), {lang: 'en'}) as LayerSpecification[]), ...placeLayers],
   };
 }

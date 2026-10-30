@@ -290,8 +290,8 @@ services:
     # when the render service is down (ADR-0005, line 2).
     volumes:
       - ./backend:/app
-      # The base map the `maps` profile installs (empty until it has run).
-      - basemap:/data/basemap:ro
+      # The base map: the backend fetches it here itself on first start (or the `maps` profile does).
+      - basemap:/data/basemap
 
   # Chart images for PowerPoint and Word exports (ADR-0005, line 2): ECharts
   # drawn as SVG on the server, no browser. See render/README.md.
@@ -307,7 +307,7 @@ services:
     profiles: ["maps"]
     command:
       - extract
-      - https://build.protomaps.com/${BASEMAP_BUILD:-20261003}.pmtiles
+      - https://build.protomaps.com/${BASEMAP_BUILD:-20261029}.pmtiles
       - /basemap/world.pmtiles
       - --maxzoom=${BASEMAP_MAXZOOM:-6}
     restart: "no"

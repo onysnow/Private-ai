@@ -9,16 +9,16 @@
 // picked place. The table is the List view (L).
 import {useQuery} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 
 import {errorMessage} from '../../lib/api-client';
 import {getBasemapStatusOptions, getInvestigationPlacesOptions} from '../../lib/generated/@tanstack/react-query.gen';
-import type {PlaceOut} from '../../lib/generated/types.gen';
+import type {BasemapStatusOut, PlaceOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {dayText, eventWindow, placesInWindow} from '../../lib/place-times';
 import type {TimeWindow} from '../../lib/place-times';
-import {edgeMarker, heldHere, km, onAndOff, pathOf, projector, travellers} from './places-model';
+import {pathOf, travellers} from './places-model';
 import {FamilyMark, PartyMark} from '../../components/network/marks';
 import {Reveal} from '../../components/ui/reveal';
 import {Aside, FactMark, KeysMark} from '../timeline/marks';
@@ -43,7 +43,6 @@ export const SURE: Record<PlaceOut['sure'] & string, {word: string; chip: string
   not_yet: {word: 'not yet shown', chip: 'not yet shown'},
 };
 
-const BOX = {w: 900, h: 470, pad: 70};
 
 export function PlacesPanel({investigationId}: Props): ReactElement {
   const openDossier = useWorkbenchStore(state => state.openDossier);
@@ -53,24 +52,14 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
   const [timeWindow, setTimeWindow] = useState<TimeWindow | null>(null);
   const [picked, setPicked] = useState<string | null>(null);
   const [list, setList] = useState(false);
-  const [baseMap, setBaseMap] = useState(false);
   const [path, setPath] = useState<string | null>(null);
+  const [cantOpen, setCantOpen] = useState(false);
   const places = placesInWindow(all, timeWindow);
-  const statusQuery = useQuery({...getBasemapStatusOptions(), enabled: all.length > 0 && baseMap});
+  // The world map: the app fetches it once by itself; until it is here, how far the download has got.
+  const statusQuery = useQuery({...getBasemapStatusOptions(), enabled: all.length > 0,
+    refetchInterval: q => (q.state.data?.available || q.state.data?.download === 'failed' ? false : 2000)});
   const status = statusQuery.data;
-  const wrap = useRef<HTMLDivElement>(null);
-  const [w, setW] = useState(BOX.w);
-  useEffect(() => {
-    const el = wrap.current;
-    if (!el || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(([entry]) => setW(Math.max(420, Math.floor(entry.contentRect.width))));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [placesQuery.data, list, baseMap]);
-
-  const box = {...BOX, w};
-  const {on, off} = useMemo(() => onAndOff(places), [places]);
-  const project = useMemo(() => projector(on, box), [on, box.w]); // eslint-disable-line react-hooks/exhaustive-deps
+  const flavor = useMapFlavor();
   const people = useMemo(() => travellers(all), [all]);
   const hops = path ? pathOf(places, path) : [];
   const countries = new Set(all.map(p => p.country).filter(Boolean));
@@ -104,7 +93,7 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
       <Reveal detail="Drawn from the records’ own coordinates. Nothing is looked up, so no address leaves this computer; it works offline.">
         <span className="tl2-chip dash pl-local">⌂ nothing looked up</span></Reveal>
       <KeysMark><kbd>L</kbd> list · <kbd>←</kbd><kbd>→</kbd> next place · <kbd>Enter</kbd> opens its record</KeysMark>
-      <p className="tl2-status">{all.length} {all.length === 1 ? 'place' : 'places'} · {countries.size} {countries.size === 1 ? 'country' : 'countries'} · {omitted.length} can&apos;t be placed</p>
+      <p className="tl2-status">{all.length} {all.length === 1 ? 'place' : 'places'}{countries.size ? ` · ${countries.size} ${countries.size === 1 ? 'country' : 'countries'}` : ''}{omitted.length ? <> · {omitted.length} can&apos;t be placed</> : null}</p>
     </header>
     {all.length === 0 && omitted.length === 0 && <p className="tl2-empty">No record in this investigation holds both a latitude and a longitude.
       An Address or a RealEstate record with coordinates shows here; nothing is looked up from an address.</p>}
@@ -112,81 +101,26 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
     {(all.length > 0 || omitted.length > 0) && <div className="pl-body">
       <div className="pl-main">
         {list ? <PlacesList places={places} omitted={omitted} onPick={pick} openDossier={openDossier}/> : <>
-          <div className="pl-tools">
-            {all.length > 0 && <div className="tl2-views" role="group" aria-label="Drawing">
-              <button aria-pressed={!baseMap} onClick={() => setBaseMap(false)}>From the records</button>
-              <button aria-pressed={baseMap} onClick={() => setBaseMap(true)}>On the base map</button>
-            </div>}
-            {people.length > 0 && <div className="tl2-views" role="group" aria-label="Path">
+          {people.length > 0 && <div className="pl-tools">
+            <div className="tl2-views" role="group" aria-label="Path">
               <span className="tl2-cap">Path</span>
               {people.slice(0, 4).map(t => <button key={t.id} aria-pressed={path === t.id} onClick={() => setPath(p => (p === t.id ? null : t.id))}>{t.caption}</button>)}
               <button aria-pressed={path === null} onClick={() => setPath(null)}>None</button>
-            </div>}
-          </div>
-          <div ref={wrap} className="pl-map">
-            {baseMap ? <>
-              {status?.available && <PlacesMap status={status} places={places} onPlace={pick} picked={picked}/>}
-              {status && !status.available && <p className="muted p-4" data-testid="no-basemap">
-                No base map is installed here, so the places are drawn from the records only. To show them on a map, install the base map once with the
-                compose profile <code>maps</code> (see DEPLOYMENT.md).</p>}
-              {/* The attribution stays in sight (licence); the build is said with it. */}
-              {status?.available && <p className="tl2-none">Map data © OpenStreetMap contributors (ODbL), Protomaps build {status.version}{status.built ? ` of ${status.built.slice(0, 10)}` : ''}.</p>}
-            </> : <svg width={box.w} height={box.h} role="img" aria-label={`Places drawn from their records: ${on.length} on this map${off.length ? `, ${off.length} off it` : ''}`}>
-              <defs><pattern id="pl-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" className="pl-gridline"/></pattern></defs>
-              <rect width={box.w} height={box.h} fill="url(#pl-grid)" className="pl-ground"/>
-              {hops.length > 1 && <g className="pl-path">
-                {hops.slice(1).map((h, i) => { const a = project(hops[i].place), b = project(h.place);
-                  const offA = off.includes(hops[i].place), offB = off.includes(h.place);
-                  if (offA || offB) return null;
-                  const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2 - 18;
-                  return <g key={i}><path d={`M${a.x},${a.y} Q${mx},${my} ${b.x},${b.y}`} className={h.shown ? '' : 'dashed'}/>
-                    <text x={mx} y={my - 4}>{i + 2} · {dayText(Date.parse(`${h.day}T00:00:00Z`))}{h.shown ? '' : ' ?'}</text></g>; })}
-              </g>}
-              {on.map(p => {
-                const at = project(p);
-                const held = heldHere(p);
-                const isOn = p.entity_id === picked;
-                const firstHop = hops.findIndex(h => h.place.entity_id === p.entity_id);
-                return <g key={p.entity_id} className={`pl-place s-${p.sure}${isOn ? ' on' : ''}`} transform={`translate(${at.x},${at.y})`}
-                  role="button" tabIndex={-1} aria-label={`${p.caption}, ${SURE[p.sure ?? 'not_yet'].word}`} onClick={() => pick(p.entity_id)}>
-                  {/* How sure, the address or the precision: on hover (an SVG title; a Reveal cannot sit in an SVG). */}
-                  <title>{held >= 2 ? `${held} parties at this address` : p.sure === 'approximate' && p.precision ? `${p.precision} only` : p.address ?? (p.precision ? `exact to the ${p.precision}` : SURE[p.sure ?? 'not_yet'].word)}</title>
-                  {p.sure === 'approximate' && <circle r={30} className="pl-area"/>}
-                  {held >= 2 ? <><circle r={12} className="pl-held"/><text y={4} className="pl-heldn">{held}</text></>
-                    : <><circle r={9} className="pl-ring"/><circle r={3.5} className="pl-dot"/></>}
-                  {firstHop === 0 && <text x={-14} y={-14} className="pl-hopn">1 · {dayText(Date.parse(`${hops[0].day}T00:00:00Z`))}</text>}
-                  <text x={16} y={5} className="pl-name">{p.caption}</text>
-                </g>;
-              })}
-              {off.map(p => {
-                const m = edgeMarker({x: box.w / 2, y: box.h / 2}, project(p), box);
-                const nearest = Math.min(...on.map(o => km(o, p)));
-                const right = m.x > box.w / 2;
-                return <g key={p.entity_id} className="pl-edge" transform={`translate(${m.x},${m.y})`} role="button" tabIndex={-1}
-                  aria-label={`${p.caption}, off this map, about ${Math.round(nearest)} km away`} onClick={() => pick(p.entity_id)}>
-                  <rect x={right ? -230 : 0} y={-12} width={230} height={24} rx={12}/>
-                  <text x={right ? -220 : 10} y={4}>{m.arrow} {p.caption} · {Math.round(nearest).toLocaleString('en-GB')} km · {(p.events ?? []).length} {(p.events ?? []).length === 1 ? 'event' : 'events'}</text>
-                </g>;
-              })}
-            </svg>}
+            </div>
+          </div>}
+          <div className="pl-map">
+            {status?.available ? <PlacesMap status={status} places={places} onPlace={pick} picked={picked} height="100%" flavor={flavor}
+              path={hops.map(h => [h.place.longitude, h.place.latitude] as [number, number])}/>
+              : <MapComing status={status} onRetry={() => void statusQuery.refetch()}/>}
             {timeWindow && <p className="pl-window" data-testid="places-window">Showing {places.length} of {all.length} places with events between {years}.
               <button className="tp-link" onClick={() => setTimeWindow(null)}>Reset dates</button></p>}
-            {omitted.length > 0 && <div className="pl-cant">
-              <p className="tl2-cap">Can&apos;t be placed · {omitted.length}</p>
-              {omitted.slice(0, 4).map(o => <div key={o.entity_id}><Reveal detail={o.reason}><b>{o.caption}</b></Reveal>
+            {/* What cannot be placed: one small mark on the map's corner, the list when it is opened, so the map stays clear. */}
+            {omitted.length > 0 && <div className={`pl-cant${cantOpen ? ' open' : ''}`}>
+              <button type="button" className="pl-cant-toggle" aria-expanded={cantOpen} onClick={() => setCantOpen(v => !v)}>
+                <b>{omitted.length}</b> can&apos;t be placed <span aria-hidden="true">{cantOpen ? '▴' : '▾'}</span></button>
+              {cantOpen && <>{omitted.slice(0, 6).map(o => <div key={o.entity_id}><Reveal detail={o.reason}><b>{o.caption}</b></Reveal>
                 <button className="tp-link" onClick={() => openDossier(o.entity_id)}>Open the record</button></div>)}
-              {omitted.length > 4 && <small>and {omitted.length - 4} more in the List view</small>}
-            </div>}
-            {/* The key: each ring, named on hover, focus or click. */}
-            {!baseMap && <div className="pl-key" role="group" aria-label="How sure is the place">
-              <Reveal detail="How sure is the place: a ring for each, named on hover."><p className="tl2-cap">How sure</p></Reveal>
-              <span>
-                <Reveal label="Read from a document" detail="Read from a document"><svg width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" className="pl-ring s-document"/></svg></Reveal>
-                <Reveal label="Approximate (a town)" detail="Approximate (a town)"><svg width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="10" className="pl-area"/><circle cx="11" cy="11" r="3.5" className="pl-dot"/></svg></Reveal>
-                <Reveal label="Not yet shown" detail="Not yet shown"><svg width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" className="pl-ring s-not_yet"/></svg></Reveal>
-                <Reveal label="Worked out: lookups are off" detail="Worked out · lookups are off"><svg width="22" height="22" aria-hidden="true" className="pl-off"><circle cx="11" cy="11" r="7" className="pl-ring" strokeDasharray="1 3"/></svg></Reveal>
-                <Reveal label="One address, several parties" detail="One address, several parties: the number is how many"><svg width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="10" className="pl-held"/></svg></Reveal>
-              </span>
+              {omitted.length > 6 && <button className="tp-link" onClick={() => setList(true)}>{omitted.length - 6} more in the List view</button>}</>}
             </div>}
           </div>
           {hops.length > 1 && <p className="pl-hops">{hops.map(h => `${h.place.caption} ${dayText(Date.parse(`${h.day}T00:00:00Z`))}`).join(' → ')}
@@ -197,6 +131,40 @@ export function PlacesPanel({investigationId}: Props): ReactElement {
       <PlaceDetail place={sel} onStep={step} openDossier={openDossier} timeWindow={timeWindow}/>
     </div>}
   </section>;
+}
+
+/** The dark map under a dark theme, the grayscale one under a light theme: read from the page's ground colour. */
+function useMapFlavor(): 'grayscale' | 'dark' {
+  const [flavor, setFlavor] = useState<'grayscale' | 'dark'>('dark');
+  useEffect(() => {
+    const read = () => {
+      const ground = getComputedStyle(document.body).backgroundColor.match(/\d+(\.\d+)?/g)?.map(Number) ?? [0, 0, 0];
+      setFlavor(0.2126 * ground[0] + 0.7152 * ground[1] + 0.0722 * ground[2] > 128 ? 'grayscale' : 'dark');
+    };
+    read();
+    const watch = new MutationObserver(read);
+    watch.observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+    return () => watch.disconnect();
+  }, []);
+  return flavor;
+}
+
+/** Until the world map is here: the app is fetching it, once, by itself. */
+function MapComing({status, onRetry}: {status: BasemapStatusOut | undefined; onRetry: () => void}): ReactElement {
+  const done = status?.download_done ?? 0, total = status?.download_total ?? 0;
+  const mb = (n: number) => `${Math.round(n / 1e6)} MB`;
+  if (status?.download === 'failed') return <div className="pl-coming" role="status">
+    <b>The world map could not be downloaded</b>
+    <Reveal detail={status.reason ?? 'No connection to Protomaps.'}><span className="pl-coming-sub">Check the connection</span></Reveal>
+    <button className="tp-link" onClick={onRetry}>Try again</button></div>;
+  if (status && !status.download) return <div className="pl-coming" role="status">
+    <b>No world map on this computer</b>
+    <Reveal detail="Downloading the map is turned off here (BASEMAP_AUTO). The compose profile `maps` installs it."><span className="pl-coming-sub">Downloads are off</span></Reveal></div>;
+  return <div className="pl-coming" role="status" aria-live="polite">
+    <b>Getting the world map</b>
+    <Reveal detail="Once, from Protomaps: the same public map for everyone (OpenStreetMap data). Nothing about this case is sent.">
+      <span className="pl-coming-sub">{total ? `${mb(done)} of ${mb(total)}` : 'Starting…'}</span></Reveal>
+    <progress max={total || 1} value={done}/></div>;
 }
 
 function PlaceDetail({place, onStep, openDossier, timeWindow}: {place: PlaceOut | null; onStep: (d: 1 | -1) => void; openDossier: (id: string) => void; timeWindow: TimeWindow | null}): ReactElement {

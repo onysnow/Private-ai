@@ -3423,6 +3423,39 @@
             ],
             "title": "Built"
           },
+          "download": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download"
+          },
+          "download_done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Done"
+          },
+          "download_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Total"
+          },
           "fonts": {
             "items": {
               "type": "string"
@@ -46872,7 +46905,7 @@
     },
     "/api/basemap": {
       "get": {
-        "description": "Whether a base map is installed, the zoom levels and area it covers, and its fonts.",
+        "description": "Whether a base map is installed, the zoom levels and area it covers, and its fonts; while the app is fetching\nit, how far it has got. Asking starts the download when there is no map and none is running.",
         "operationId": "get_basemap_status",
         "responses": {
           "200": {

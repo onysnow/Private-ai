@@ -161,38 +161,41 @@ describe('PlacesPanel', () => {
     expect(useWorkbenchStore.getState().dossier?.entityId).toBe('voss');
   });
 
-  it('draws them on the base map when it is installed, and says how to install it when it is not', async () => {
+  it('draws them on the world map, and says how far the app has got when it is still fetching the map', async () => {
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE, VILLA]), 'GET /api/basemap': STATUS});
     wrap(<PlacesPanel investigationId="inv-1"/>);
-    await userEvent.setup().click(await screen.findByRole('button', {name: 'On the base map'}));
     expect(await screen.findByRole('region', {name: /Map of 2 places/})).toBeInTheDocument();
-    expect(screen.getByText(/Map data © OpenStreetMap contributors \(ODbL\), Protomaps build 4\.15\.2 of 2026-10-03/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'On the base map'})).toBeNull();   // the map is the only drawing
+    expect(maps.at(-1)!.options.style.sources).toHaveProperty('places-path');
     cleanup();
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [VILLA], [{entity_id: 'x', caption: 'Typo address', schema: 'Address',
-      reason: "the latitude 'abc' is not a number"}]), 'GET /api/basemap': basemapStatusBody(false)});
+      reason: "the latitude 'abc' is not a number"}]), 'GET /api/basemap': {...basemapStatusBody(false), download: 'fetching', download_done: 12e6, download_total: 45e6}});
     wrap(<PlacesPanel investigationId="inv-1"/>);
-    await userEvent.setup().click(await screen.findByRole('button', {name: 'On the base map'}));
-    expect(await screen.findByTestId('no-basemap')).toHaveTextContent('compose profile maps');
+    expect(await screen.findByText('Getting the world map')).toBeInTheDocument();
+    expect(screen.getByText('12 MB of 45 MB')).toBeInTheDocument();
     expect(screen.queryByRole('region', {name: /Map of/})).toBeNull();
-    expect(screen.getByText(/the latitude 'abc' is not a number/)).toBeInTheDocument();
+    // What cannot be placed is one small mark on the map until it is opened.
+    expect(screen.queryByText('Typo address')).toBeNull();
+    await userEvent.setup().click(screen.getByRole('button', {name: /1 can.t be placed/}));
+    expect(screen.getByText('Typo address')).toBeInTheDocument();
+    cleanup();
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [VILLA]),
+      'GET /api/basemap': {...basemapStatusBody(false), download: 'failed', reason: 'The world map could not be downloaded.'}});
+    wrap(<PlacesPanel investigationId="inv-1"/>);
+    expect(await screen.findByText('The world map could not be downloaded')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Try again'})).toBeInTheDocument();
   });
 
-  it('draws each place from its record with a ring for how sure it is, a far place on the edge, and an address holding several parties', async () => {
+  it('marks each place on the map with how sure it is: a soft area for a place known only to its town', async () => {
     const near = (id: string, caption: string, lat: number, lon: number, extra: Partial<PlaceOut> = {}) => place(id, caption, lat, lon, {schema: 'Address', ...extra});
-    const fort = near('fort', '4 Fort Street', 50.351, -4.124, {links: [1, 2, 3].map(n => ({relationship_id: `f${n}`, schema: 'UnknownLink', direction: 'incoming', entity_id: `co${n}`, caption: `Company ${n}`, entity_schema: 'Company'}))});
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [
-      near('land', 'The harbour land', 50.35, -4.129, {sure: 'document'}), near('council', 'Council House', 50.353, -4.133),
-      near('fern', 'Fernhill Ltd', 50.357, -4.139, {sure: 'approximate', precision: 'town'}), fort, near('lux', 'Luxembourg office', 49.61, 6.13)])});
+      near('land', 'The harbour land', 50.35, -4.129, {sure: 'document'}),
+      near('fern', 'Fernhill Ltd', 50.357, -4.139, {sure: 'approximate', precision: 'town'})]), 'GET /api/basemap': STATUS});
     wrap(<PlacesPanel investigationId="inv-1"/>);
-    expect(await screen.findByRole('img', {name: 'Places drawn from their records: 4 on this map, 1 off it'})).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'The harbour land, read from a document'})).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Fernhill Ltd, approximate (a town or wider)'})).toBeInTheDocument();
-    expect(screen.getByText('town only')).toBeInTheDocument();
-    expect(screen.getByText('3 parties at this address')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: /^Luxembourg office, off this map, about \d+ km away$/})).toBeInTheDocument();
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Council House, not yet shown'}));
-    expect(screen.getByRole('heading', {name: 'Council House'})).toBeInTheDocument();
-    expect(screen.getByText('its record, with no document behind the coordinates')).toBeInTheDocument();
+    await screen.findByRole('region', {name: /Map of 2 places/});
+    const style = maps.at(-1)!.options.style as unknown as {layers: {id: string; filter?: unknown}[]; sources: Record<string, {data?: {features: {properties: {sure: string}}[]}}>};
+    expect(style.layers.find(l => l.id === 'places-area')?.filter).toEqual(['==', ['get', 'sure'], 'approximate']);
+    expect(style.sources.places.data?.features.map(f => f.properties.sure)).toEqual(['document', 'approximate']);
   });
 
   const dated = (id: string, title: string, first: string, last = first, extra: Record<string, unknown> = {}) => ({
@@ -202,18 +205,19 @@ describe('PlacesPanel', () => {
   const VILLA_DATED = {...VILLA, events: [dated('e2', 'Stake starts', '2021-02-01', '2021-02-28', {exact: false, via: 'link', relationship_id: 'r1'}),
     dated('e3', 'Villa searched', '2023-11-14')]};
 
-  it('draws a party\'s path hop by hop, dashed where its record is not verified', async () => {
+  it('draws a party\'s path hop by hop on the map, and says which hops are not verified', async () => {
     const council = place('council', 'Council House', 50.353, -4.133, {links: [{relationship_id: 'c1', schema: 'UnknownLink', direction: 'incoming', entity_id: 'ross', caption: 'M. Ross', entity_schema: 'Person'}],
       events: [dated('h1', 'Ross at the council', '2019-01-15', '2019-01-15', {via: 'link', relationship_id: 'c1'})]});
     const land = place('land', 'The harbour land', 50.35, -4.129, {links: [{relationship_id: 'l1', schema: 'UnknownLink', direction: 'incoming', entity_id: 'ross', caption: 'M. Ross', entity_schema: 'Person'}],
       events: [dated('h2', 'Ross walks the plot', '2019-08-14', '2019-08-14', {via: 'link', relationship_id: 'l1', verification_status: 'asserted'})]});
-    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [council, land])});
+    mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [council, land]), 'GET /api/basemap': STATUS});
     wrap(<PlacesPanel investigationId="inv-1"/>);
+    await screen.findByRole('region', {name: /Map of 2 places/});
     await userEvent.setup().click(await screen.findByRole('button', {name: 'M. Ross'}));
     expect(screen.getByText(/^Council House 15 Jan 2019 → The harbour land 14 Aug 2019/)).toBeInTheDocument();
-    expect(screen.getByRole('img', {name: 'Dashed hops'})).toBeInTheDocument();
     expect(screen.getByText('Dashed hops rest on records not yet verified.')).toBeInTheDocument();
-    expect(document.querySelector('.pl-path path')).toHaveClass('dashed');
+    const line = maps.at(-1)!.data.at(-1) as {features: {geometry: {coordinates: number[][]}}[]};
+    expect(line.features[0].geometry.coordinates).toEqual([[-4.133, 50.353], [-4.129, 50.35]]);
   });
 
   it('draws a strip of the events at each place, and two dates keep the places with an event between them', async () => {
@@ -235,7 +239,6 @@ describe('PlacesPanel', () => {
     fireEvent.change(screen.getByLabelText('To'), {target: {value: '2022-12-31'}});
     expect(await screen.findByTestId('places-window')).toHaveTextContent('Showing 1 of 2 places with events between 2021 and 2022');
     expect(screen.getByText(/Showing the places with an event between 1 Jan 2021 and 31 Dec 2022/)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', {name: 'On the base map'}));
     await screen.findByRole('region', {name: /Map of 1 place/});
     expect(maps.at(-1)!.options.style.sources).toBeDefined();
     // The strip shades the stretch and greys the events outside it.
@@ -250,7 +253,6 @@ describe('PlacesPanel', () => {
   it('picks a place on the strip: the panel tells it, and its dot stands out on the base map', async () => {
     mockApi({'GET /api/investigations/inv-1/places': placesBody('inv-1', [OFFICE_DATED, VILLA_DATED]), 'GET /api/basemap': STATUS});
     wrap(<PlacesPanel investigationId="inv-1"/>);
-    await userEvent.setup().click(await screen.findByRole('button', {name: 'On the base map'}));
     await screen.findByTestId('places-timeline');
     await screen.findByRole('region', {name: /Map of 2 places/});
     const strip = strips.at(-1)!;

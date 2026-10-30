@@ -316,8 +316,8 @@ services:
       - "${BIND_ADDRESS:-127.0.0.1}:8000:8000"
     volumes:
       - workbench-data:/app/data
-      # The base map the `maps` profile installs (empty until it has run).
-      - basemap:/data/basemap:ro
+      # The base map: the backend fetches it here itself on first start (or the `maps` profile does).
+      - basemap:/data/basemap
     depends_on:
       workbench-db:
         condition: service_healthy
@@ -343,7 +343,7 @@ services:
     profiles: ["maps"]
     command:
       - extract
-      - https://build.protomaps.com/${BASEMAP_BUILD:-20261003}.pmtiles
+      - https://build.protomaps.com/${BASEMAP_BUILD:-20261029}.pmtiles
       - /basemap/world.pmtiles
       - --maxzoom=${BASEMAP_MAXZOOM:-6}
     restart: "no"

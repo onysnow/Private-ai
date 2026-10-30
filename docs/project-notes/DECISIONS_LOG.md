@@ -315,3 +315,20 @@ waiting on me." Each entry: the question, the call, why, and where it is built. 
      `features/timeline/lanes-model.ts`. To align next.
   4. Is it real?'s item kinds have their own marks (▣ picture, ¶ text, ♪ audio, ▶ video): the app has no shared set of
      source-type icons yet.
+
+## 18. Places on a real map, fetched by the app itself (30 Oct 2026)
+
+Ony: "The where and when did it happen has the weirdest map. Can we use a real map?" The grid the app drew from the
+records' coordinates is gone. Places always shows the world map (Protomaps, OpenStreetMap data), in the dark style
+under a dark theme. The backend downloads the map by itself the first time it starts without one
+(`app/services/basemap_install.py`): the newest Protomaps daily build, zoom 0–6, about 45 MB, fetched by byte ranges
+in under a minute, plus the style's fonts and symbols. The same public file goes to everyone, so nothing about a case is
+sent, and each download is a line in the outbound log. Until it arrives, Places says "Getting the world map · 12 MB of
+45 MB". `BASEMAP_AUTO=false` turns the download off for a computer that must never go online. Why not keep a separate
+install step: the backlog already said the base map must come with the app, and the compose file's pinned build
+(20261003) had been removed by Protomaps, so the install step no longer worked. A party's path is a line on the map,
+and a place known only to its town has a soft area round its dot. "Can't be placed" is a small mark on the map's
+corner that opens its list. The country count is left out when the records name no country, rather than saying
+"0 countries".
+
+Demo: Ony said the demo matters less while the rest of the app is unfinished, so it moves to the end of the list.

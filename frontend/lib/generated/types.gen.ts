@@ -1992,6 +1992,18 @@ export type BasemapStatusOut = {
    */
   built?: string | null;
   /**
+   * Download
+   */
+  download?: string | null;
+  /**
+   * Download Done
+   */
+  download_done?: number | null;
+  /**
+   * Download Total
+   */
+  download_total?: number | null;
+  /**
    * Fonts
    */
   fonts: Array<string>;

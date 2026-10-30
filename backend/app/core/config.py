@@ -130,9 +130,13 @@ class Settings(BaseSettings):
     # back to native charts and tables when it cannot be reached.
     render_service_url: str = "http://127.0.0.1:8070"
     # The self-hosted base map (ADR-0005, lines 4 and 18): world.pmtiles and
-    # Protomaps' basemaps-assets (fonts, sprites), put there by the compose
-    # profile `maps`. Maps say "no base map installed" when it is empty.
+    # Protomaps' basemaps-assets (fonts, sprites). The backend fetches them
+    # itself the first time it starts without them (app/services/basemap_install.py);
+    # the compose profile `maps` still works. basemap_auto=false turns the
+    # download off (a computer that must never go online).
     basemap_dir: str = "./data/basemap"
+    basemap_auto: bool = True
+    basemap_maxzoom: int = 6
     render_service_timeout_seconds: float = 15.0
     cors_allowed_origins: str = (
         "http://localhost:3000,http://127.0.0.1:3000,http://127.0.0.1:8000,http://localhost:8000"

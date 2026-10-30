@@ -4077,6 +4077,10 @@ class BasemapStatusOut(ResponseModel):
     built: str | None = Field(default=None, exclude_if=_absent_when_none)            # the OpenStreetMap data's date
     attribution: str | None = Field(default=None, exclude_if=_absent_when_none)
     fonts: list[str]
+    # While the app fetches the map itself: "fetching" with bytes done and to do, or "failed" with why.
+    download: str | None = Field(default=None, exclude_if=_absent_when_none)
+    download_done: int | None = Field(default=None, exclude_if=_absent_when_none)
+    download_total: int | None = Field(default=None, exclude_if=_absent_when_none)
 
 
 class PlaceLinkOut(ResponseModel):

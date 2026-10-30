@@ -36,6 +36,8 @@ import os
 # path has its own tests (test_background_jobs_procrastinate.py). Must be set
 # before app.core.config builds its settings.
 os.environ.setdefault("JOB_RUNNER", "inline")
+# Tests never download the world map (app/services/basemap_install.py).
+os.environ.setdefault("BASEMAP_AUTO", "false")
 # Read documents in the test process so tests can substitute the reader;
 # test_document_reader.py covers the separate reader process.
 os.environ.setdefault("DOCUMENT_READ_IN_SUBPROCESS", "false")

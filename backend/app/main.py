@@ -231,6 +231,9 @@ def create_app(
         # The indicator catalogue takes seconds to read; reading it now, off the
         # loop, keeps the first Red Flags or Case home request from waiting on it.
         threading.Thread(target=_warm_catalogue, name="warm-catalogue", daemon=True).start()
+        # The world map for Places, fetched once if it is not here (public map data, nothing about a case).
+        from app.services.basemap_install import ensure_in_background
+        ensure_in_background()
         try:
             yield
         finally:

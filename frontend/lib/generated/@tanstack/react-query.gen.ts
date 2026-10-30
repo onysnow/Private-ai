@@ -1965,7 +1965,8 @@ export const getBasemapStatusQueryKey = (
 /**
  * Get Basemap Status
  *
- * Whether a base map is installed, the zoom levels and area it covers, and its fonts.
+ * Whether a base map is installed, the zoom levels and area it covers, and its fonts; while the app is fetching
+ * it, how far it has got. Asking starts the download when there is no map and none is running.
  */
 export const getBasemapStatusOptions = (
   options?: Options<GetBasemapStatusData>,
