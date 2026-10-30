@@ -259,6 +259,30 @@ describe('MoneyView', () => {
     expect(await screen.findByText('No payment has an amount yet.')).toBeInTheDocument();
   });
 
+  it('shows a check as its party and one figure; the numbers and what could be innocent on reveal, the actions as quiet icons', async () => {
+    mockApi(routes);
+    wrap(<MoneyView investigationId="inv-1"/>);
+    const grey = await screen.findByRole('article', {name: 'Grey hole: Kestrel SA'});
+    expect(within(grey).getByText('€1.4m unsourced')).toBeInTheDocument();
+    expect(within(grey).getByText(/Could be innocent:/).closest('[hidden]')).not.toBeNull();
+    expect(within(grey).getByText('Kestrel SA').closest('.rv')).toHaveAccessibleDescription(/€1,400,600 has no recorded source\. Could be innocent: a bank loan/);
+    // Icon buttons, named for screen readers and on reveal; none is the loud primary.
+    expect(within(grey).getByRole('button', {name: 'Make a lead'})).toHaveTextContent('');
+    expect(within(grey).getByRole('button', {name: 'Add to To check'})).toHaveTextContent('');
+    // The key is drawn: a swatch per kind of band, each named on reveal.
+    const key = screen.getByRole('group', {name: 'Key'});
+    expect(within(key).getByRole('img', {name: 'Shown'})).toBeInTheDocument();
+    expect(within(key).getByRole('img', {name: 'Not yet shown'})).toHaveAccessibleDescription(/nothing shows it yet/);
+  });
+
+  it('opens the whole Ledger from the rows the compact table leaves out', async () => {
+    const more = Array.from({length: 8}, (_, i) => tx(`m${i}`, FERN, KES, 1000 + i, {dateTime: `2019-0${1 + (i % 9)}-02`}));
+    mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {...LEDGER, transactions: more, incomplete: []}});
+    wrap(<MoneyView investigationId="inv-1"/>);
+    await userEvent.setup().click(await screen.findByRole('button', {name: 'All 8 payments in the Ledger ›'}));
+    expect(screen.getByRole('radio', {name: 'Ledger'})).toHaveAttribute('aria-checked', 'true');
+  });
+
   it('adds a money check to To check once, then says it is already there', async () => {
     const KEPT = {investigation_id: 'inv-1', gone: [], missing: [], items: [{
       id: 'tc-1', indicator_id: 'grey_hole', indicator_name: 'Grey hole', kind: 'money', question: 'Grey hole at Kestrel SA: more out than in',

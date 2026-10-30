@@ -23,6 +23,7 @@ from app.models.domain import (
     BuiltTimeline,
     Claim,
     ClaimEvidenceLink,
+    Document,
     Entity,
     Evidence,
     RelationshipEdge,
@@ -99,11 +100,21 @@ def lanes(db: Session, investigation_id: str) -> dict[str, Any]:
         edge = edges.get(entity_id)
         return [edge.source_entity_id, edge.target_entity_id] if edge else [entity_id]
 
+    doc_source: dict[str, str | None] = {}
+
     def source_of(event: dict[str, Any], statement: Statement | None) -> tuple[str, str]:
         refs = event.get("refs") or {}
         sid = refs.get("source_id") or evidence_source.get(str(refs.get("evidence_id") or ""))
-        if not sid and statement is not None and (statement.origin or "").startswith("source:"):
-            sid = (statement.origin or "")[len("source:"):]
+        # A statement's origin names where it was read: "source:<id>#<locator>" or "document:<id>#<locator>".
+        origin = (statement.origin if statement is not None else None) or str((event.get("provenance") or {}).get("origin") or "")
+        if not sid and origin.startswith("source:"):
+            sid = origin[len("source:"):].split("#")[0]
+        elif not sid and origin.startswith("document:"):
+            did = origin[len("document:"):].split("#")[0]
+            if did not in doc_source:
+                doc = db.get(Document, did)
+                doc_source[did] = doc.source_id if doc is not None else None
+            sid = doc_source[did]
         if sid and sid in sources:
             return f"source:{sid}", sources[sid].title
         dataset = (event.get("provenance") or {}).get("dataset") or (statement.dataset if statement else None)

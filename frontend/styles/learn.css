@@ -279,11 +279,13 @@ html[data-motion='calm'] .kc-flip.flipped .kc-face.front { opacity: 0; }
 .kc-area-card h3 { font-size: 16px; }
 .kc-actions .rv > button:disabled, .kc-top .rv > button:disabled { pointer-events: none; }
 
-/* Glossary rows: the term grows into the room the first sentence left (it opens in the card on point); a term's areas
-   are a dot each, named on hover. */
+/* Glossary rows: compact, the term grows into the room the first sentence left (it opens in the card on point); a
+   term's areas are their short codes, each name on hover; the safety area in its own colour, as on the catalogue map. */
 .kg-row { grid-template-columns: minmax(0, 1fr) auto; }
-.kg-term { font-size: 15px; }
+.kg-term { font-size: 14px; }
 .kg-areas { display: inline-flex; align-items: center; gap: 4px; }
-.kg-areas i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); opacity: .75; }
+.kg-areas i { font: 600 10px/1 var(--font-mono); font-style: normal; letter-spacing: .04em; padding: 3px 5px; border-radius: 5px; color: var(--text-muted);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-muted) 35%, transparent); }
+.kg-areas i.safety { color: var(--accent-2); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-2) 55%, transparent); }
 .kg-areas small { font: 10.5px var(--font-mono); color: var(--text-muted); }
 .rv.kg-tabs-rv { display: block; }

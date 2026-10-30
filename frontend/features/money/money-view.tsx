@@ -11,6 +11,7 @@
 // A payment's kind is its mark beside its parties, named on reveal. An amount owed (an agreed price, a fine, an order;
 // the ledger's `owed`) is not money that moved: it is listed under "Owed, not paid", never drawn, added or checked.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {Check, Lightbulb, ListChecks} from 'lucide-react';
 import dynamic from 'next/dynamic';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
@@ -281,8 +282,12 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
             <span><Reveal detail={<><span className="rv-row">Scroll over the flow to replay it in date order.</span>
               <span className="rv-row">Click a band to add it to “Traced so far”.</span><span className="rv-row">Key: <kbd>L</kbd> list view</span></>}>
               <span>To {drawnTo ? day(drawnTo.slice(0, 7)) : '—'}</span></Reveal>{upTo !== null && <> · <button type="button" className="mn-link" onClick={() => setUpTo(null)}>all</button></>}</span>
-            <Reveal detail={<span className="mn-key"><i className="k-shown"/>shown <i className="k-unshown"/>not yet shown{payments.some(p => p.certainty === 'disputed') && <><i className="k-disputed"/>disputed</>} <i className="k-worked"/>ƒ worked out{picture.folded && <> <i className="k-others"/>others, folded</>}</span>}>
-              <span className="mn-key-mark">Key</span></Reveal>
+            {/* The key is drawn: one swatch per kind of band, its word on reveal (Ony, 29 Oct: colour at rest, the word on reveal). */}
+            <span className="mn-key" role="group" aria-label="Key">{([['k-shown', 'Shown', 'a record shows the payment'], ['k-unshown', 'Not yet shown', 'nothing shows it yet'],
+              ...(payments.some(p => p.certainty === 'disputed') ? [['k-disputed', 'Disputed', 'a record disputes it']] : []),
+              ['k-worked', 'ƒ Worked out', 'a difference the app worked out, never a payment'],
+              ...(picture.folded ? [['k-others', 'Others, folded', 'the smaller flows, drawn as one band']] : [])] as Array<[string, string, string]>).map(([k, word, line]) =>
+              <Reveal key={k} label={word} detail={<><b>{word}</b><span className="rv-row">{line}</span></>}><i className={k} aria-hidden="true"/></Reveal>)}</span>
             {picture.folded && <span className="mn-fold"><Reveal detail={`The ${TOP_FLOWS} largest of ${picture.flows} flows are drawn; others (${picture.folded.flows}) holds the other ${picture.folded.payments} payments, ${amountText(picture.folded.amount, currency)}. Totals count every payment.`}>
               <span>{TOP_FLOWS} of {picture.flows} flows</span></Reveal> <button type="button" className="mn-link" onClick={() => setAllFlows(true)}>Show all {picture.flows} flows</button></span>}
             {allFlows && picture.flows > TOP_FLOWS && <span className="mn-fold">All {picture.flows} flows are drawn. <button type="button" className="mn-link" onClick={() => { setAllFlows(false); setPointed(null); }}>Fold to the {TOP_FLOWS} largest</button></span>}
@@ -300,7 +305,7 @@ export function MoneyView({investigationId, active = true}: {investigationId: st
           {view !== 'ledger' && <div className="mn-table-side">
             {[...structuring, ...flagsOn.filter(f => !structuring.includes(f) && f.links.length === 1 && /round/i.test(f.summary))].slice(0, 2).map(f => <p key={f.id} className="mn-flag"><LevelChip level={f.level as 'faint' | 'strong' | 'textbook'}/> <span>{f.summary}</span></p>)}
             {flagsOn.length > 2 && <p className="mn-muted mn-more-flags">{flagsOn.length} open Red Flags touch these payments · <a href="#red-flags" className="mn-link">see them in Act</a></p>}
-            <LedgerTable txs={txs} lit={litRows} flagged={flaggedIds} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }}/>
+            <LedgerTable txs={txs} lit={litRows} flagged={flaggedIds} traced={tracedSet} onLight={(id, i) => { setLit(id); setRow(i); }} onAll={() => setView('ledger')}/>
           </div>}
         </div>
         {(ledgerQ.data?.incomplete.length ?? 0) > 0 && <details className="mn-incomplete">
@@ -366,8 +371,8 @@ function bandWords(b: ReturnType<typeof layout>['bands'][number], picture: Retur
 
 const COMPACT_ROWS = 6;
 
-function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
-  txs: FinancialTransactionOut[]; lit: Set<string>; flagged: Set<string>; traced: Set<string>; onLight: (id: string, i: number) => void; full?: boolean;
+function LedgerTable({txs, lit, flagged, traced, onLight, onAll, full = false}: {
+  txs: FinancialTransactionOut[]; lit: Set<string>; flagged: Set<string>; traced: Set<string>; onLight: (id: string, i: number) => void; onAll?: () => void; full?: boolean;
 }): ReactElement {
   // The compact table shows six rows and moves only when a lit row is outside them, so the rows a band carries come into view.
   const [start, setStart] = useState(0);
@@ -394,10 +399,11 @@ function LedgerTable({txs, lit, flagged, traced, onLight, full = false}: {
         </tr>;
       })}</tbody>
     </table>
-    {!full && txs.length > shown.length && <p className="mn-muted"><Reveal detail={<>
+    {/* The rest of the rows are the Ledger layout, one click (or L) away. */}
+    {!full && txs.length > shown.length && <p className="mn-muted mn-table-all"><Reveal tabbable={false} detail={<>
       <span className="rv-row">{txs.length - shown.length} more rows{from > 0 ? ` (${from} above)` : ''}{hidden > 0 ? `, ${hidden} of them lit` : ''}</span>
-      <span className="rv-row">Keys: <kbd>J</kbd> / <kbd>K</kbd> move the lit row, and the same band lights above</span></>}>
-      <span>{txs.length - shown.length} more</span></Reveal></p>}
+      <span className="rv-row">Keys: <kbd>L</kbd> the Ledger · <kbd>J</kbd> / <kbd>K</kbd> move the lit row, and the same band lights above</span></>}>
+      <button type="button" className="mn-link" onClick={onAll}>All {txs.length} payments in the Ledger ›</button></Reveal></p>}
   </div>;
 }
 
@@ -501,17 +507,27 @@ function ChecksPanel({investigationId, currency, checks, ranAt, asOf, error}: {
       onSuccess: () => { setKept(m => ({...m, [key]: true})); setKeepProblem(''); },
       onError: e => setKeepProblem(errorMessage(e, 'Could not add it to To check')),
     });
-    // The check's kind is its icon, named with its line on reveal; the lead idea is revealed on Make a lead. Could be
-    // innocent stays (an indicator, never a finding).
+    // At rest a check is its kind's icon, the party and one figure; its numbers and what could be innocent (an
+    // indicator, never a finding) are revealed on the name, the lead idea on Make a lead. The two actions are quiet icon
+    // buttons, named on reveal, so a column of checks is not a column of orange buttons.
+    const short = (n: number) => shortAmount(n, currency, 1e6);
+    const figure = c.kind === 'round_trip' ? `${short(c.gap)} back` : c.kind === 'grey_hole' ? `${short(c.gap)} unsourced`
+      : c.kind === 'miracle' ? `${short(c.amount_out)} out` : `${short(c.amount_in)} in`;
+    const leadWord = made[key] ? 'Lead made ✓' : 'Make a lead';
+    const checkWord = inToCheck ? 'In To check ✓' : 'Add to To check';
     return <article key={key} className={`mn-check mn-check-${c.kind}`} aria-label={title}>
-      <header><CheckIcon kind={c.kind}/><b>{c.party}</b></header>
-      <p>{numbers}</p>
-      <p><b>Could be innocent:</b> {c.innocent}.</p>
-      <div className="mn-check-acts">
-        <Reveal tabbable={false} detail={`Lead idea: ${c.lead_idea}`}><button type="button" disabled={made[key] || lead.isPending} onClick={() => makeLead(key, `${title} (${currency})`, `${numbers} Could be innocent: ${c.innocent}. Lead idea: ${c.lead_idea}.`)}>
-          {made[key] ? 'Lead made ✓' : 'Make a lead'}</button></Reveal>
-        <button type="button" disabled={inToCheck || keep.isPending} onClick={addToCheck}>{inToCheck ? 'In To check ✓' : 'Add to To check'}</button>
-      </div>
+      <header><CheckIcon kind={c.kind}/>
+        <Reveal className="mn-check-what" detail={<><span className="rv-row">{numbers}</span>{' '}<span className="rv-row"><b>Could be innocent:</b> {c.innocent}.</span></>}>
+          <span><b>{c.party}</b><span className="mn-check-fig">{figure}</span></span></Reveal>
+        <span className="mn-check-acts">
+          <Reveal tabbable={false} detail={<><b>{leadWord}</b><span className="rv-row">Lead idea: {c.lead_idea}</span></>}>
+            <button type="button" className={made[key] ? 'done' : undefined} aria-label={leadWord} disabled={made[key] || lead.isPending} onClick={() => makeLead(key, `${title} (${currency})`, `${numbers} Could be innocent: ${c.innocent}. Lead idea: ${c.lead_idea}.`)}>
+              {made[key] ? <Check size={15} aria-hidden="true"/> : <Lightbulb size={15} aria-hidden="true"/>}</button></Reveal>
+          <Reveal tabbable={false} describe={false} detail={<b>{checkWord}</b>}>
+            <button type="button" className={inToCheck ? 'done' : undefined} aria-label={checkWord} disabled={inToCheck || keep.isPending} onClick={addToCheck}>
+              {inToCheck ? <Check size={15} aria-hidden="true"/> : <ListChecks size={15} aria-hidden="true"/>}</button></Reveal>
+        </span>
+      </header>
     </article>;
   };
   return <aside className="mn-checks" aria-label="Does the money add up?">

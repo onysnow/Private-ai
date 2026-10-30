@@ -75,6 +75,7 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   const [adding, setAdding] = useState<null | 'event' | 'period' | 'goto'>(null);
   const [message, setMessage] = useState('');
   const [width, setWidth] = useState(960);
+  const [roomH, setRoomH] = useState(0); // the chart's height on screen: as many lanes as fit are shown
   const wrap = useRef<HTMLDivElement>(null);
   const clipId = `tl2-clip-${useId().replace(/:/g, '')}`;
   const svg = useRef<SVGSVGElement>(null);
@@ -82,7 +83,7 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   useEffect(() => {
     const el = wrap.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(([entry]) => setWidth(Math.max(560, Math.floor(entry.contentRect.width))));
+    const ro = new ResizeObserver(([entry]) => { setWidth(Math.max(560, Math.floor(entry.contentRect.width))); setRoomH(Math.floor(entry.contentRect.height)); });
     ro.observe(el);
     return () => ro.disconnect();
   }, [view]);
@@ -157,16 +158,21 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
     if (by === 'sure') return FACT_ORDER.filter(f => events.some(e => e.fact === f));
     return Array.from(new Set(events.map(e => lanesOf(e, by)[0])));
   }, [view, by, events]);
-  // A case with many parties shows its busiest lanes, in the order they first appear; the rest are one click away.
+  // A case with many parties shows its busiest lanes, in the order they first appear; the rest are one click away. The
+  // page never scrolls: as many lanes are shown as fit the chart's height (at least three), the rest behind "+ N more".
+  const fit = roomH > 0 ? Math.max(3, Math.floor((roomH - TOP - 22 - AXIS - (moneyRow ? MONEY : 0) - 6) / ROW) - (by === 'party' ? 1 : 0)) : LANES_SHOWN;
   const shownKeys = useMemo(() => {
-    if (allLanes || laneKeys.length <= LANES_SHOWN) return laneKeys;
+    if (allLanes || laneKeys.length <= fit) return laneKeys;
     const busy = new Map(laneKeys.map(k => [k, events.filter(e => lanesOf(e, by).includes(k)).length]));
-    const keep = new Set([...laneKeys].sort((a, b) => (busy.get(b) ?? 0) - (busy.get(a) ?? 0)).slice(0, LANES_SHOWN));
-    if (lit) keep.add(lit);
+    // The lit party's lane and the selected event's lanes are always shown, inside the same count.
+    const must = new Set<string>();
+    if (lit && laneKeys.includes(lit)) must.add(lit);
     const sel = events.find(e => e.id === selected);
-    if (sel) for (const k of lanesOf(sel, by)) keep.add(k);
+    if (sel) for (const k of lanesOf(sel, by)) if (laneKeys.includes(k)) must.add(k);
+    const keep = new Set(must);
+    for (const k of [...laneKeys].sort((a, b) => (busy.get(b) ?? 0) - (busy.get(a) ?? 0))) { if (keep.size >= Math.max(fit, must.size)) break; keep.add(k); }
     return laneKeys.filter(k => keep.has(k));
-  }, [allLanes, laneKeys, events, by, lit, selected]);
+  }, [allLanes, laneKeys, events, by, lit, selected, fit]);
   const laneRows: Lane[] = view ? [
     ...(by === 'party' ? [{key: 'mine', name: 'My timeline', sub: 'what you believe', mine: true}] : []),
     ...shownKeys.map(k => laneName(view, by, k)),
@@ -175,7 +181,7 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   const lastLane = laneRows.length - 1;
   const rowY = (i: number) => TOP + i * ROW + ROW / 2;
   const lanesH = laneRows.length * ROW;
-  const moreRow = laneKeys.length > LANES_SHOWN ? 22 : 0;
+  const moreRow = laneKeys.length > fit ? 22 : 0;
   const axisY = TOP + lanesH + moreRow;
   const height = axisY + AXIS + (moneyRow ? MONEY : 0) + 6;
   const inLane = (e: TimelineLaneEventOut, lane: Lane) => lane.mine ? e.kind === 'reporter_event' : lanesOf(e, by).includes(lane.key) && !(by === 'party' && e.kind === 'reporter_event' && !e.parties.length);
@@ -312,8 +318,12 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
       <span className="tl2-cap">Kind</span>
       {[...kindCounts].map(([k, n]) => <span key={k} className="tl2-kind"><KindDot kind={k}/>{n}</span>)}
       <span className="tl2-cap">Date</span>
-      <span className="tl2-kind"><Reveal label="A band" detail="A band: the date is known only to the month or the year, never a day."><i className="tl2-bandkey" aria-hidden="true"/></Reveal></span>
-      {fuzzyCount > 0 && <button className="tl2-keyitem" aria-pressed={hideFuzzy} onClick={() => setHideFuzzy(v => !v)}>{hideFuzzy ? 'show them' : 'hide them'} {fuzzyCount}</button>}
+      {/* One switch for the bands: the band, how many, and a track that is on while they are drawn; what it does on reveal. */}
+      {fuzzyCount > 0 ? <Reveal tabbable={false} detail={<><b>{fuzzyCount} {fuzzyCount === 1 ? 'date' : 'dates'} known only to the month or the year</b>
+        <span className="rv-row">Drawn as a band, never on a day. {hideFuzzy ? 'Hidden now: click to draw them.' : 'Click to hide them and see only the exact dates.'}</span></>}>
+        <button className="tl2-switch" role="switch" aria-checked={!hideFuzzy} aria-label={`Month-or-year dates, ${fuzzyCount}`} onClick={() => setHideFuzzy(v => !v)}>
+          <i className="tl2-bandkey" aria-hidden="true"/><span aria-hidden="true">{fuzzyCount}</span><i className="tl2-track" aria-hidden="true"/></button></Reveal>
+        : <span className="tl2-kind"><Reveal label="A band" detail="A band: the date is known only to the month or the year, never a day."><i className="tl2-bandkey" aria-hidden="true"/></Reveal></span>}
     </div>
 
     <div className="tl2-body">
@@ -420,7 +430,7 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
                   </g>;
                 })}
 
-                {(moreLanes > 0 || allLanes) && laneKeys.length > LANES_SHOWN && <g className="tl2-more click" role="button" onClick={() => setAllLanes(v => !v)}>
+                {(moreLanes > 0 || allLanes) && laneKeys.length > fit && <g className="tl2-more click" role="button" onClick={() => setAllLanes(v => !v)}>
                   <text x={8} y={TOP + lanesH + 15}>{allLanes ? 'Show the busiest lanes' : `+ ${moreLanes} more ${moreLanes === 1 ? 'lane' : 'lanes'}`}</text>
                 </g>}
 

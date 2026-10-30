@@ -112,6 +112,16 @@ describe('Glossary', () => {
     expect(window.location.search).not.toContain('area=');
   });
 
+  it('opens the first term in the card when nothing is pinned, so the card is never empty', async () => {
+    mockApi(routes);
+    render(<GlossaryPage/>);
+    expect(await screen.findByRole('heading', {level: 2, name: hints[0].term})).toBeInTheDocument();
+    expect(screen.getByRole('option', {name: new RegExp(hints[0].term)})).toHaveAttribute('aria-selected', 'true');
+    // A term's areas are their codes, each area named on reveal.
+    expect(screen.getByRole('option', {name: /Nominee/}).querySelector('.kg-areas')).toHaveTextContent('BOMLSF');
+    expect(window.location.search).not.toContain('term=');
+  });
+
   it('shows a row in the card after a short dwell, without pinning it', async () => {
     mockApi(routes);
     window.history.replaceState(null, '', '/glossary?q=Nominee');

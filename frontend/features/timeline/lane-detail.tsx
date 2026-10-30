@@ -74,7 +74,9 @@ export function LaneDetail({view, event: e, lane, finding, opened, investigation
       {e.placeholder && <Reveal detail="I believe it, no evidence yet: drawn dashed until a record is attached."><span className="tl2-chip dash">placeholder</span></Reveal>}
     </div>
     <dl className="tl2-dl">
-      <dt>From</dt><dd>{e.source_label}</dd>
+      <dt>From</dt><dd>{e.source_key.startsWith('dataset:')
+        ? <Reveal detail={<>Imported dataset, no document named<span className="rv-row">{e.source_label}</span></>}><span>An imported dataset</span></Reveal>
+        : e.source_label}</dd>
       {e.amount != null && <><dt>Amount</dt><dd>{e.amount.toLocaleString('en-GB')} {e.currency ?? ''}</dd></>}
     </dl>
     {finding && <div className="tl2-seqbox">

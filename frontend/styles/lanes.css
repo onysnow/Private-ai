@@ -1,5 +1,8 @@
 /* Timeline › Lanes (mockup TIME_1). Status is shape plus word: ✓ ? ! ƒ in the mark, the word in the key and panel. */
-.tl2-panel { display: flex; flex-direction: column; gap: 10px; }
+.tl2-panel { display: flex; flex-direction: column; gap: 10px; height: 100%; min-height: 0; }
+/* The page never scrolls (Ony): the panel fills its section and each view scrolls inside itself; Lanes fits its lanes. */
+.tl2-panel > :not(.tl2-head) { flex: 1 1 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.tl2-panel > .tl2 { overflow: hidden; }
 .tl2-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
 .tl2-head h2 { margin: 0; font: 300 30px/1.15 var(--font-display, var(--font-ui)); letter-spacing: -.01em; }
 .tl2-head p { margin: 0; color: var(--text-muted); font-size: 13px; }
@@ -27,13 +30,26 @@
 .tl2-keyitem.f-notyet i { border-style: dashed; }
 .tl2-kind { display: inline-flex; align-items: center; gap: 5px; }
 .tl2-kind i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.tl2-switch { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--text-muted); font: inherit; cursor: pointer; padding: 2px 4px; border-radius: 5px; }
+.tl2-switch .tl2-bandkey { width: 26px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--text-muted) 45%, transparent); }
+.tl2-track { position: relative; width: 24px; height: 13px; border-radius: 7px; border: 1px solid var(--line, rgba(127,127,127,.45)); background: color-mix(in srgb, var(--accent-1) 30%, transparent); transition: background var(--dur-base, .2s); }
+.tl2-track::after { content: ''; position: absolute; top: 1px; left: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent-1); transition: left var(--dur-base, .2s); }
+.tl2-switch[aria-checked="false"] { opacity: .6; }
+.tl2-switch[aria-checked="false"] .tl2-track { background: transparent; }
+.tl2-switch[aria-checked="false"] .tl2-track::after { left: 1px; background: var(--text-muted); }
+.tl2-switch:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .tl2-track, .tl2-track::after { transition: none; } }
 .tl2-kind .tl2-bandkey { width: 26px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--text-muted) 45%, transparent); }
-.tl2-body { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; align-items: start; }
-@media (max-width: 1100px) { .tl2-body { grid-template-columns: minmax(0, 1fr); } }
-.tl2-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.tl2-body { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: minmax(0, 1fr); gap: 14px; align-items: stretch; }
+.tl2-bar, .tl2-key { flex: none; }
+@media (max-width: 1100px) { .tl2-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; overflow-y: auto; } }
+.tl2-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
+.tl2-main > * { flex: none; }
+.tl2-main > .tl2-chart, .tl2-main > .tl2-list, .tl2-main > .tl2-empty { flex: 1 1 0; min-height: 160px; overflow-y: auto; overscroll-behavior: contain; }
+.tl2-body > .tl2-side { align-self: start; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; }
 .tl2-msg { margin: 0; font-size: 12.5px; color: var(--accent-2); }
 .tl2-empty { padding: 28px; border-radius: 12px; border: 1px dashed var(--line, rgba(127,127,127,.4)); color: var(--text-muted); }
-.tl2-chart { border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); padding: 6px 8px 4px; overflow: hidden; min-width: 0; }
+.tl2-chart { border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); padding: 6px 8px 4px; overflow-x: hidden; min-width: 0; }
 .tl2-chart svg { display: block; font-family: var(--font-ui); user-select: none; }
 .tl2-small { font: 500 9.5px var(--font-mono); letter-spacing: .06em; fill: var(--text-muted); }
 .tl2-shareword { fill: var(--f-shown); }
@@ -117,9 +133,9 @@
   border-top: 2px solid var(--accent-2); cursor: grab; }
 .tl2-card small { font: 500 9.5px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); }
 .tl2-card b { font-weight: 500; font-size: 12.5px; }
-.tl2-card span { font: 500 10.5px var(--font-mono); color: var(--text-muted); }
+.tl2-card > span:not(.rv) { font: 500 10.5px var(--font-mono); color: var(--text-muted); }
 .tl2-card button { margin-top: 4px; align-self: flex-start; border: 0; background: transparent; color: var(--accent-1); font: 600 11.5px var(--font-ui); padding: 0; cursor: pointer; }
-.tl2-undated { padding: 10px 12px; border-radius: 10px; border: 1px dashed var(--line, rgba(127,127,127,.4)); font-size: 12px; }
+.tl2-undated { max-height: 112px; overflow-y: auto; overscroll-behavior: contain; padding: 10px 12px; border-radius: 10px; border: 1px dashed var(--line, rgba(127,127,127,.4)); font-size: 12px; }
 .tl2-undated p { margin: 0 0 5px; }
 .tl2-none { margin: 0; color: var(--text-muted); font-size: 12px; }
 .tl2-keys { margin: 0; font: 500 10.5px var(--font-mono); color: var(--text-muted); line-height: 2; }
