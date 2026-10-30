@@ -469,6 +469,10 @@ def build(db: Session, documents: list[tuple[dict[str, Any], bytes | None]], *, 
     from app.services.demo_following import seed_following
 
     seed_following(db, inv.id)
+    # The story told from the case's own claims, with a short draft citing them (Act › Story).
+    from app.services.demo_story import seed_story
+
+    seed_story(db, inv.id)
 
     LAST_PROBLEMS[:] = problems
     if problems:

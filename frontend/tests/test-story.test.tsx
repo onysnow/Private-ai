@@ -141,6 +141,25 @@ describe('StoryScreen', () => {
     await user.click(screen.getByRole('button', {name: 'Set the thesis'}));
     await waitFor(() => expect(api.lastBody(`PUT ${PATH}`)).toEqual({thesis: 'Kestrel SA ended up with the harbour land'}));
   });
+
+  it('offers the case’s claims beside the thesis, grouped by whom they name, and makes a group a section in one move', async () => {
+    const loose = (id: string, text: string, state: string, about: string | null) => ({id, text, status: 'unverified', state, about});
+    const EMPTY = {...STORY, id: null, thesis: '', sections: [], critical: [], counts: {claims: 0, shown: 0, disputed: 0, unshown: 0}, unplaced: [
+      loose('c1', 'Fernhill Ltd bought the harbour land', 'shown', 'Fernhill'), loose('c2', 'Fernhill paid M. Ross $120,000', 'disputed', 'Fernhill'),
+      loose('c3', 'The sale was not put out to tender', 'unshown', null), loose('c9', 'A ruled-out claim', 'ruled_out', null)]};
+    const MADE = {...EMPTY, sections: [{id: 'sec9', title: 'Fernhill', position: 0, status: 'empty', shown: 0, total: 0, claims: []}]};
+    const api = mockApi({[`GET ${PATH}`]: EMPTY, [`POST ${PATH}/sections`]: MADE, [`POST ${PATH}/sections/sec9/claims`]: MADE});
+    render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    expect(await screen.findByLabelText('Readiness')).toHaveTextContent('No claim in the story yet');
+    const tray = screen.getByRole('region', {name: 'Claims in the case'});
+    expect(within(tray).getByText('From the case · 3 claims')).toBeInTheDocument();
+    const group = within(tray).getByRole('article', {name: 'Fernhill, 2 claims'});
+    expect(within(tray).getByRole('article', {name: 'Other claims, 1 claim'})).not.toHaveTextContent('ruled-out');
+    await user.click(within(group).getByRole('button', {name: 'Make “Fernhill” a section with its 2 claims'}));
+    await waitFor(() => expect(api.calls(`POST ${PATH}/sections/sec9/claims`).map(c => c.body)).toEqual([{claim_id: 'c1'}, {claim_id: 'c2'}]));
+    expect(api.lastBody(`POST ${PATH}/sections`)).toEqual({title: 'Fernhill'});
+  });
 });
 
 const WRITTEN = {...STORY, writeup_id: 'w1', sentences: {total: 4, uncited: 2}, version: {id: 'v2', writeup_id: 'w1', name: 'Before legal read', kind: 'named', word_count: 214, created_at: '2026-10-10T09:00:00'}};

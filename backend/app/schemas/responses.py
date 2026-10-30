@@ -3010,6 +3010,7 @@ class StoryUnplacedOut(ResponseModel):
     text: str
     status: str
     state: Literal["shown", "unshown", "disputed", "ruled_out"]
+    about: str | None = None  # the party the claim is grouped under when offered to the story (stories.claims_about)
 
 
 class StoryReadyOut(ResponseModel):

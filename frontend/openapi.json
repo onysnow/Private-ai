@@ -40405,6 +40405,17 @@
       },
       "StoryUnplacedOut": {
         "properties": {
+          "about": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "About"
+          },
           "id": {
             "title": "Id",
             "type": "string"

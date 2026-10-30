@@ -180,3 +180,23 @@ def test_story_notes_and_versions_travel_with_the_case_backup():
         records = collect_investigation_records(db, inv)
     assert [r["text"] for r in records["notes"]] == ["Ask the council for the tender file"]
     assert [r["name"] for r in records["writeup_versions"]] == ["Before legal read"]
+
+
+def test_claims_not_in_the_story_are_offered_grouped_by_the_party_they_name():
+    """The empty story offers the case's claims grouped by who they are about: an alias or a distinctive word of the
+    party's name counts, a group needs two claims, and a claim naming no party has no group."""
+    from app.db.session import SessionLocal
+    from app.schemas.api import EntityCreate
+    from app.services.entities import create_entity
+
+    inv = ok(client.post("/api/investigations", json={"name": "Grouping"}))["id"]
+    with SessionLocal() as db:
+        create_entity(db, EntityCreate(investigation_id=inv, schema="Person", caption="Low Taek Jho (Jho Low)",
+                                       properties={"alias": ["Jho Low"]}))
+        create_entity(db, EntityCreate(investigation_id=inv, schema="Company", caption="The Goldman Sachs Group, Inc."))
+    texts = ["Jho Low owned Good Star Limited", "Jho Low bought the Equanimity", "Goldman underwrote three bond offerings",
+             "Goldman Sachs paid a $2.3 billion penalty", "The scheme ran from 2009 to 2014"]
+    for text in texts:
+        ok(post_claim(client, {"investigation_id": inv, "text": text}))
+    about = {u["text"]: u["about"] for u in ok(client.get(f"/api/investigations/{inv}/story"))["unplaced"]}
+    assert about == {texts[0]: "Jho Low", texts[1]: "Jho Low", texts[2]: "Goldman", texts[3]: "Goldman", texts[4]: None}

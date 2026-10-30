@@ -95,8 +95,10 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   const [pane, setPane] = useState<Pane>(null);
   const [exporting, setExporting] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [building, setBuilding] = useState(false);
   // The thesis, a new section, a gate and "Ready to run" show a failed save in their own forms.
-  const problem = [placeM, removeM, gateM, writeM].find(m => m.isError)?.error;
+  const problem = [placeM, removeM, gateM, writeM, sectionM].find(m => m.isError)?.error;
   const notes = useQuery({...getNotesOptions({path, query: {record_type: 'story', record_id: story?.id ?? ''}}), enabled: Boolean(story?.id)});
 
   // Claims of the story, numbered in the tree's order: the numbers on the citation chips.
@@ -104,6 +106,16 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
     .map((c, i) => ({id: c.id, n: i + 1, text: c.text, state: c.state, evidence: c.evidence})), [story]);
   const byId = new Map(claims.map(c => [c.id, c]));
   const closeExport = useCallback(() => setExporting(false), []);
+  // A group of the case's claims made a section in one move: the section, then its claims in order.
+  const makeSection = useCallback(async (title: string, claimIds: string[]) => {
+    setBuilding(true);
+    try {
+      const made = await sectionM.mutateAsync({path, body: {title}});
+      const section = [...made.sections].reverse().find(x => x.title === title);
+      for (const id of section ? claimIds : []) await placeM.mutateAsync({path: {...path, section_id: section!.id}, body: {claim_id: id}});
+    } catch { /* the failure shows over the tree */ } finally { setBuilding(false); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- path is rebuilt each render from investigationId
+  }, [investigationId, sectionM, placeM]);
 
   useEffect(() => {
     if (!active) return;
@@ -123,6 +135,7 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   const c = story.counts;
   const gatesOpen = story.gates.length - story.gates_passed;
   const ready = Boolean(story.writeup_id) && story.sentences.total > 0 && story.sentences.uncited === 0;
+  const looseCount = story.unplaced.filter(u => u.state !== 'ruled_out').length;
   const gates = <Gates story={story} onClear={gate => gateM.mutate({path, body: {gate, who: null, on: null}})}
     onGate={async (gate, who, on) => {
       // The failure shows in the gate's form, so not again over the screen.
@@ -134,8 +147,9 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
     <header className="sy-head">
       <h2>{story.thesis || 'The story'}</h2>
       <p className="sy-ready" aria-label="Readiness"><Ring shown={c.shown} total={c.claims}/>
-        <span><b>{c.shown} of {c.claims}</b> claims shown{c.disputed > 0 && <> · <span className="sy-bad">{c.disputed} disputed</span></>}
-          {c.unshown > 0 && <> · {c.unshown} not yet shown</>} · <span className={gatesOpen ? 'sy-warn' : 'sy-ok'}>{gatesOpen ? `${gatesOpen} gates open` : 'every gate passed'}</span></span></p>
+        {c.claims === 0 ? <span><b>No claim</b> in the story yet · <span className={gatesOpen ? 'sy-warn' : 'sy-ok'}>{gatesOpen ? `${gatesOpen} gates open` : 'every gate passed'}</span></span>
+          : <span><b>{c.shown} of {c.claims}</b> claims shown{c.disputed > 0 && <> · <span className="sy-bad">{c.disputed} disputed</span></>}
+          {c.unshown > 0 && <> · {c.unshown} not yet shown</>} · <span className={gatesOpen ? 'sy-warn' : 'sy-ok'}>{gatesOpen ? `${gatesOpen} gates open` : 'every gate passed'}</span></span>}</p>
     </header>
     {problem && <p role="alert" className="sy-quiet">{errorMessage(problem, 'Could not save that')}</p>}
     <div className="sy-body">
@@ -144,19 +158,23 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
           <button type="button" className="sy-btn" aria-pressed={outline} onClick={() => setOutline(v => !v)}><kbd>L</kbd> list view</button></header>
         {story.critical.length > 0 && <p className="sy-critical"><b>Critical path</b> <Reveal detail={`In the section “${story.critical[0].section}”`}>
           <span>Blocked by: {story.critical.map(x => x.text).join(' · ')}</span></Reveal></p>}
-        {!story.thesis ? <Form {...thesisForm}><form className="sy-thesis-form" noValidate onSubmit={submitWith(thesisForm, async ({thesis}) => {
-          await thesisM.mutateAsync({path, body: {thesis}});
-        }, 'Could not set the thesis')}>
-          <label htmlFor="sy-thesis">Write the one sentence this story says</label>
-          <FormField control={thesisForm.control} name="thesis" render={({field}) => <FormItemBare>
-            <FormControl><input {...field} id="sy-thesis" placeholder="e.g. Kestrel SA ended up with the harbour land through companies that hid who owned them"/></FormControl>
-            <FormMessage className="field-msg"/></FormItemBare>}/>
-          <FormRootError className="field-msg"/>
-          <button type="submit">Set the thesis</button>
-        </form></Form> : outline ? <Outline story={story}/> : <Tree story={story} lit={lit} setLit={setLit} byId={byId} canDrag={Boolean(story.writeup_id)} gates={gates}
+        {/* The thesis form sits under the diamond, where the thesis will stand: the tree starts there from the first move. */}
+        {outline && story.thesis ? <Outline story={story}/> : <Tree story={story} lit={lit} setLit={setLit} byId={byId} canDrag={Boolean(story.writeup_id)} gates={gates}
+          thesisForm={story.thesis ? undefined : <Form {...thesisForm}><form className="sy-thesis-form" noValidate onSubmit={submitWith(thesisForm, async ({thesis}) => {
+            await thesisM.mutateAsync({path, body: {thesis}});
+          }, 'Could not set the thesis')}>
+            <label htmlFor="sy-thesis">Write the one sentence this story says</label>
+            <FormField control={thesisForm.control} name="thesis" render={({field}) => <FormItemBare>
+              <FormControl><textarea {...field} id="sy-thesis" rows={4} placeholder="e.g. Kestrel SA ended up with the harbour land through companies that hid who owned them"
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.currentTarget.form?.requestSubmit(); } }}/></FormControl>
+              <FormMessage className="field-msg"/></FormItemBare>}/>
+            <FormRootError className="field-msg"/>
+            <button type="submit">Set the thesis</button>
+          </form></Form>}
+          tray={story.sections.length ? undefined : <CaseClaims story={story} busy={building} onSection={makeSection}/>}
           onRemove={(section, claim) => removeM.mutate({path: {...path, section_id: section, claim_id: claim}})}
           onPlace={(section, claim) => placeM.mutate({path: {...path, section_id: section}, body: {claim_id: claim}})}/>}
-        {story.thesis && <Form {...sectionForm}><form className="sy-add" noValidate onSubmit={submitWith(sectionForm, async ({title}) => {
+        {(story.thesis || story.sections.length > 0) && <Form {...sectionForm}><form className="sy-add" noValidate onSubmit={submitWith(sectionForm, async ({title}) => {
           await sectionM.mutateAsync({path, body: {title}});
           sectionForm.reset();
         }, 'Could not add the section')}>
@@ -165,8 +183,14 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
             <FormMessage className={NEXT_LINE}/></FormItemBare>}/>
           <FormRootError className={NEXT_LINE}/>
           <button type="submit">Add section</button></form></Form>}
-        {/* The gates sit under the thesis in the tree (mockup ACT_2); in the outline, and before there is a thesis, below. */}
-        {(!story.thesis || outline) && gates}
+        {/* More of the case's claims, once the story has sections: the same groups, behind one button. */}
+        {story.sections.length > 0 && !outline && looseCount > 0 && <div className="sy-more">
+          <button type="button" className="sy-link" aria-expanded={moreOpen} onClick={() => setMoreOpen(v => !v)}>
+            {moreOpen ? 'Hide the other claims' : `+ ${looseCount} more claim${looseCount === 1 ? '' : 's'} in the case`}</button>
+          {moreOpen && <CaseClaims story={story} busy={building} onSection={makeSection}/>}
+        </div>}
+        {/* The gates sit under the thesis in the tree (mockup ACT_2); in the outline, below. */}
+        {outline && story.thesis && gates}
         {/* What opens beside the text lies over the tree's edge, next to the write-up, so the text never moves. */}
         {pane && <div className="sy-pane-slot">
           {pane.kind === 'passage' && <PassagePane claim={byId.get(pane.claimId)} onClose={() => setPane(null)}/>}
@@ -218,8 +242,9 @@ export function StoryScreen({investigationId, active = true}: {investigationId: 
   </section>;
 }
 
-function Tree({story, lit, setLit, byId, canDrag, gates, onRemove, onPlace}: {
+function Tree({story, lit, setLit, byId, canDrag, gates, thesisForm, tray, onRemove, onPlace}: {
   story: StoryOut; lit: string | null; setLit: (id: string | null) => void; byId: Map<string, CitableClaim>; canDrag: boolean; gates?: ReactNode;
+  thesisForm?: ReactNode; tray?: ReactNode;
   onRemove: (section: string, claim: string) => void; onPlace: (section: string, claim: string) => void;
 }): ReactElement {
   const box = useRef<HTMLDivElement>(null);
@@ -230,7 +255,8 @@ function Tree({story, lit, setLit, byId, canDrag, gates, onRemove, onPlace}: {
     const measure = () => {
       const r0 = host.getBoundingClientRect();
       const at = (sel: string) => host.querySelector<HTMLElement>(sel)?.getBoundingClientRect();
-      const thesis = at('[data-node="thesis"]');
+      // Branches leave from the diamond's right corner (its box, turned, reaches the corner).
+      const thesis = at('[data-node="thesis"] .sy-diamond');
       const out: typeof lines = [];
       const curve = (a: DOMRect, b: DOMRect) => {
         const x1 = a.right - r0.left; const y1 = a.top + a.height / 2 - r0.top; const x2 = b.left - r0.left; const y2 = b.top + b.height / 2 - r0.top;
@@ -257,17 +283,20 @@ function Tree({story, lit, setLit, byId, canDrag, gates, onRemove, onPlace}: {
   const isLit = (key: string) => Boolean(lit && (key.includes(lit) || (litSection && key === `t>${litSection}`)));
   // The gates sit in the thesis column but are not part of the tree: the tree is the sections' column, which owns the
   // thesis node (aria-owns), so its items are only the thesis, sections and claims.
-  return <div className="sy-tree" ref={box}>
+  return <div className={`sy-tree${story.thesis ? '' : ' sy-tree-new'}`} ref={box}>
     <svg className="sy-lines" aria-hidden="true">{lines.map(l => <path key={l.key} d={l.d} className={`sy-line l-${l.style}${isLit(l.key) ? ' lit' : ''}`}/>)}</svg>
     <div className="sy-col sy-col-thesis">
-      <div className="sy-thesis" id={`sy-thesis-${story.id ?? 'new'}`} data-node="thesis" role="treeitem" aria-level={1} aria-selected={false} aria-label={`Thesis: ${story.thesis}`}>
+      {/* With no section yet there is no tree to own the thesis: it is a plain node, and the case's claims stand beside it. */}
+      <div className="sy-thesis" id={`sy-thesis-${story.id ?? 'new'}`} data-node="thesis" {...(story.sections.length
+        ? {role: 'treeitem', 'aria-level': 1, 'aria-selected': false, 'aria-label': `Thesis: ${story.thesis}`} : {})}>
         <span className="sy-diamond" aria-hidden="true"><b>Thesis</b></span>
-        <p>{story.thesis}</p>
+        {story.thesis && <p>{story.thesis}</p>}
       </div>
+      {thesisForm}
       {gates}
     </div>
-    <div className="sy-col sy-col-rest" role="tree" aria-label="What the story needs" aria-owns={`sy-thesis-${story.id ?? 'new'}`}>
-      {!story.sections.length && <p className="sy-quiet">Add the sections the story will say, then put claims under them.</p>}
+    {!story.sections.length ? <div className="sy-col sy-col-rest">{tray ?? <p className="sy-quiet">Add the sections the story will say, then put claims under them.</p>}</div>
+      : <div className="sy-col sy-col-rest" role="tree" aria-label="What the story needs" aria-owns={`sy-thesis-${story.id ?? 'new'}`}>
       {story.sections.map((s, i) => <div key={s.id} className="sy-branch">
         <div className={`sy-section st-${s.status}`} data-node={`s:${s.id}`} role="treeitem" aria-level={2} aria-selected={lit === s.id}
           aria-label={`Section ${i + 1}: ${s.title}, ${s.shown} of ${s.total} shown`} onMouseEnter={() => setLit(s.id)} onMouseLeave={() => setLit(null)}>
@@ -289,9 +318,7 @@ function Tree({story, lit, setLit, byId, canDrag, gates, onRemove, onPlace}: {
                 <span className="sy-cp" aria-hidden="true">▲</span></Reveal>}
               <button type="button" className="sy-x" aria-label={`Take “${cl.text}” out of this section`} onClick={() => onRemove(s.id, cl.id)}>×</button></span>
             <b>{cl.text}</b>
-            <span className="sy-ev">{cl.evidence.length ? cl.evidence.map(e => e.locator
-              ? <Reveal key={e.id} tabbable={false} describe={false} detail={e.locator}><span className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>{e.label}</span></Reveal>
-              : <span key={e.id} className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>{e.label}</span>) : <span className="sy-ev-chip empty">no evidence linked</span>}
+            <span className="sy-ev">{cl.evidence.length ? <EvidenceChips evidence={cl.evidence}/> : <span className="sy-ev-chip empty">no evidence linked</span>}
               {cl.single_source && <Reveal tabbable={false} describe={false} detail="Rests on one record: mark it as single-source in the text."><span className="sy-single">one source</span></Reveal>}</span>
           </article>)}
           {story.unplaced.length > 0 && <label className="sy-place">
@@ -301,8 +328,57 @@ function Tree({story, lit, setLit, byId, canDrag, gates, onRemove, onPlace}: {
             </select></label>}
         </div>
       </div>)}
-    </div>
+    </div>}
   </div>;
+}
+
+/** A claim's records as one-line chips: each record once (a source quoted twice is one chip), the first two on the
+ * card, the rest counted; a chip's full title and place in the record on hover. */
+function EvidenceChips({evidence}: {evidence: StoryOut['sections'][number]['claims'][number]['evidence']}): ReactElement {
+  const seen = new Map<string, typeof evidence>();
+  for (const e of evidence) seen.set(`${e.label}|${e.stance === 'contradicts'}`, [...(seen.get(`${e.label}|${e.stance === 'contradicts'}`) ?? []), e]);
+  const records = [...seen.values()];
+  const chip = (group: typeof evidence) => {
+    const e = group[0];
+    const where = group.map(x => x.locator).filter(Boolean).join(' · ');
+    return <Reveal key={e.id} tabbable={false} describe={false} detail={<>{e.stance === 'contradicts' && <b>Against · </b>}{e.label}{where ? <> · {where}</> : null}</>}>
+      <span className={`sy-ev-chip ${e.stance === 'contradicts' ? 'against' : ''}`}>{e.label}</span></Reveal>;
+  };
+  const rest = records.slice(2);
+  return <>{records.slice(0, 2).map(chip)}
+    {rest.length > 0 && <Reveal tabbable={false} describe={false} detail={<span className="sy-ev-more">{rest.map(g => <span key={g[0].id} className="rv-row">
+      {g[0].stance === 'contradicts' ? 'Against · ' : ''}{g[0].label}</span>)}</span>}><span className="sy-ev-chip sy-ev-n">+{rest.length}</span></Reveal>}</>;
+}
+
+/** The case's claims not yet in the story, grouped by the party they name (the server's `about`), so a group becomes a
+ * section in one move. Each claim is its status colour and its words; the rest of a big group opens on a click. */
+function CaseClaims({story, busy, onSection}: {story: StoryOut; busy: boolean; onSection: (title: string, claimIds: string[]) => Promise<void>}): ReactElement {
+  const [open, setOpen] = useState<Set<string>>(new Set());
+  const loose = story.unplaced.filter(u => u.state !== 'ruled_out');
+  const groups = new Map<string, typeof loose>();
+  for (const u of loose) groups.set(u.about ?? '', [...(groups.get(u.about ?? '') ?? []), u]);
+  const ordered = [...groups.entries()].sort((a, b) => Number(!a[0]) - Number(!b[0]) || b[1].length - a[1].length);
+  if (!loose.length) return <p className="sy-quiet">The case has no claims yet. Claims made on the other screens come here to be told.</p>;
+  return <section className="sy-tray" aria-label="Claims in the case">
+    <p className="sy-eyebrow"><Reveal detail="Grouped by who or what they name. Make a group a section in one move; take out what does not belong with ×.">
+      <span>From the case · {loose.length} claim{loose.length === 1 ? '' : 's'}</span></Reveal></p>
+    <div className="sy-groups">{ordered.map(([about, items]) => {
+      const all = open.has(about);
+      const shown = all ? items : items.slice(0, 3);
+      const name = about || 'Other claims';
+      return <article key={about || '-'} className="sy-group" aria-label={`${name}, ${items.length} claim${items.length === 1 ? '' : 's'}`}>
+        <header><b>{name}</b>
+          {about && <button type="button" className="sy-make" disabled={busy} onClick={() => onSection(about, items.map(u => u.id))}
+            aria-label={`Make “${about}” a section with its ${items.length} claim${items.length === 1 ? '' : 's'}`}>+ section</button>}</header>
+        {/* The group's claims as their status colours, one mark each: how much of it is shown, at a glance. */}
+        <span className="sy-dots" aria-hidden="true">{items.map(u => <i key={u.id} className={`dot-${u.state}`}/>)}</span>
+        <ul>{shown.map(u => <li key={u.id}><StatusChip status={STATE_CHIP[u.state]}/><span title={u.text}>{u.text}</span></li>)}</ul>
+        {items.length > 3 && <button type="button" className="sy-link" aria-expanded={all}
+          onClick={() => setOpen(prev => { const next = new Set(prev); if (all) next.delete(about); else next.add(about); return next; })}>
+          {all ? 'Fewer' : `${items.length - 3} more`}</button>}
+      </article>;
+    })}</div>
+  </section>;
 }
 
 function Outline({story}: {story: StoryOut}): ReactElement {

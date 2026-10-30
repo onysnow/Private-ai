@@ -9398,6 +9398,7 @@ export const zStoryThesisSet = z.object({
  * StoryUnplacedOut
  */
 export const zStoryUnplacedOut = z.object({
+  about: z.string().nullish(),
   id: z.string(),
   state: z.enum(['shown', 'unshown', 'disputed', 'ruled_out']),
   status: z.string(),

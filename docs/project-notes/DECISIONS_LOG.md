@@ -346,3 +346,21 @@ Calls:
 - **No made-up "Works today" results.** Those rows are app-wide results of really trying each platform's save tool;
   seeding them would claim something works that was never tried. Works today says "not checked yet" and offers the
   first check.
+
+## 20. The Story: a demo story, and an empty state that offers the case's claims (30 Oct 2026)
+
+The Story was an empty form in the demo ("0 of 0 claims"), with 63 claims in the case. The 1MDB demo now has a story
+(`app/services/demo_story.py`): the thesis "Billions raised for 1MDB were diverted through look-alike companies to Jho
+Low, his partners and Malaysia's prime minister", three sections of existing claims (looked up by their text, never
+invented), and a short write-up citing them. Calls:
+- **Unplaced claims are grouped by the party their text names** (`stories.claims_about`): specific parties first; a
+  party named in more than a quarter of the claims (the case's own subject, like 1MDB) only takes what is left;
+  claims naming no party go under "Other claims". Each group offers "+ section", which makes it a section titled with
+  the party's name and places its claims in one move.
+- **The thesis stays the page title**, clamped to one line; the full sentence is in the diamond.
+- **The demo write-up leaves one sentence without a source** on purpose, so the sources gate reads "1 sentence left" as
+  a real draft would.
+- **The thesis column sits at the top of the tree**, not centred, so the thesis and the gates are in the first view of
+  a tall tree.
+Not done: the evidence chips show long source titles cut short, not the mockup's short labels; that needs a short
+label on sources, which the data does not have.

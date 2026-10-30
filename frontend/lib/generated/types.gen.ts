@@ -21084,6 +21084,10 @@ export type StoryThesisSet = {
  */
 export type StoryUnplacedOut = {
   /**
+   * About
+   */
+  about?: string | null;
+  /**
    * Id
    */
   id: string;

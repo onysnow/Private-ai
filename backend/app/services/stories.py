@@ -18,7 +18,18 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.time import utcnow_naive
-from app.models.domain import Claim, ClaimEvidenceLink, Evidence, PatternFlag, Source, Story, StoryClaim, StorySection, Writeup
+from app.models.domain import (
+    Claim,
+    ClaimEvidenceLink,
+    Entity,
+    Evidence,
+    PatternFlag,
+    Source,
+    Story,
+    StoryClaim,
+    StorySection,
+    Writeup,
+)
 
 SHOWN = {"supported", "confirmed"}
 RECORDED_GATES = ("right_of_reply", "legal_read")
@@ -113,6 +124,84 @@ def sentences_without_source(content: dict | None) -> tuple[int, int]:
     return total, uncited
 
 
+# Who or what a claim is about: the case's parties named in its text. Used to offer the claims not yet in the story in
+# groups a reporter can make into sections in one move (the empty story, mockup ACT_2).
+_PARTY_SCHEMAS = {"Person", "Company", "Organization", "PublicBody", "LegalEntity"}
+_PAREN = re.compile(r"\s*\([^)]*\)")
+MAX_GROUPS = 10
+_COMMON = {"limited", "group", "holdings", "holding", "international", "investment", "investments", "company", "capital", "partners",
+           "global", "energy", "finance", "corporation", "development", "authority", "official", "officer", "private", "property",
+           "fund", "trust", "account", "abdul", "bin", "malaysia", "malaysian", "singapore", "swiss", "united", "board", "national",
+           "monetary", "financial", "market", "federal", "reserve", "system", "governors", "government", "court", "criminal",
+           "equity", "emerging", "markets", "growth", "pictures", "services", "consulting", "power", "smart", "world", "view"}
+
+
+def _names(entity: Entity) -> list[str]:
+    props = entity.properties or {}
+    names = {entity.caption, _PAREN.sub("", entity.caption)}
+    for key in ("name", "alias"):
+        names.update(str(v) for v in props.get(key) or [])
+    # A distinctive word of the name too (Goldman, Najib, Qubaisi): claims seldom write a party's full name.
+    names.update(w for w in re.findall(r"[A-Z][a-z]{4,}", _PAREN.sub("", entity.caption)) if w.lower() not in _COMMON)
+    out = []
+    for name in names:
+        name = name.strip().strip('"')
+        if len(name) >= 3 and re.search(r"[A-Za-z]", name) and "(" not in name:
+            out.append(name)
+    return sorted(out, key=len)
+
+
+def _pattern(names: list[str]) -> re.Pattern[str] | None:
+    # Short all-capital names (MAS, SRC) match only in capitals; the rest in any case. Whole words only.
+    parts = [(rf"(?-i:{re.escape(n)})" if len(n) <= 5 and n.isupper() else re.escape(n)) for n in names]
+    return re.compile(r"(?<!\w)(?:" + "|".join(parts) + r")(?!\w)", re.I) if parts else None
+
+
+def claims_about(db: Session, investigation_id: str, claims: list[Claim]) -> dict[str, str]:
+    """{claim id: the party it is grouped under}. Greedy: the party named in the most claims takes them, then the next,
+    while a party gathers at least two; a party named in more than half of many claims (the case's own subject) says
+    little about what sets a claim apart and only takes what the others leave. Claims left over have no group."""
+    if len(claims) < 2:
+        return {}
+    named: dict[str, tuple[str, set[str]]] = {}
+    for entity in db.scalars(select(Entity).where(Entity.investigation_id == investigation_id, Entity.schema.in_(_PARTY_SCHEMAS),
+                                                  Entity.merged_into_entity_id.is_(None))):
+        names = _names(entity)
+        pattern = _pattern(names)
+        if pattern is None:
+            continue
+        hits: set[str] = set()
+        matched: list[str] = []
+        for claim in claims:
+            found = pattern.search(claim.text or "")
+            if found:
+                hits.add(claim.id)
+                matched.append(found.group(0))
+        if len(hits) >= 2:
+            # The group's name: the shortest way the claims name the party (Jho Low, not Low Taek Jho (Jho Low)).
+            label = min(matched, key=lambda m: (len(m), m))
+            label = next((n for n in names if n.lower() == label.lower()), label)
+            if label not in named or len(named[label][1]) < len(hits):
+                named[label] = (label, hits)
+    # Specific parties first; one named in more than a quarter of many claims (the case's own subject) takes only what
+    # is left after them.
+    cap = max(4, len(claims) // 4)
+    left = {c.id for c in claims}
+    out: dict[str, str] = {}
+    for limit in (cap, len(claims)):
+        while len(set(out.values())) < MAX_GROUPS:
+            best = max(((label, hits & left) for label, (_, hits) in named.items() if len(hits) <= limit),
+                       key=lambda x: (len(x[1]), -len(x[0]), x[0]), default=None)
+            if best is None or len(best[1]) < 2:
+                break
+            label, take = best
+            for cid in take:
+                out[cid] = label
+            left -= take
+            named.pop(label)
+    return out
+
+
 def story_tree(db: Session, investigation_id: str) -> dict[str, Any]:
     story = story_of(db, investigation_id)
     sections_out: list[dict[str, Any]] = []
@@ -184,8 +273,9 @@ def story_tree(db: Session, investigation_id: str) -> dict[str, Any]:
         {"key": "legal_read", "label": "Legal read", "state": "passed" if recorded.get("legal_read") else "open",
          "detail": (f"{recorded['legal_read'].get('by')} · {recorded['legal_read'].get('on')}" if recorded.get("legal_read") else "no one assigned")},
     ]
-    unplaced = [{"id": c.id, "text": c.text, "status": c.status, "state": claim_state(c.status)}
-                for c in db.scalars(select(Claim).where(Claim.investigation_id == investigation_id).order_by(Claim.created_at)) if c.id not in placed]
+    loose = [c for c in db.scalars(select(Claim).where(Claim.investigation_id == investigation_id).order_by(Claim.created_at)) if c.id not in placed]
+    about = claims_about(db, investigation_id, [c for c in loose if claim_state(c.status) != "ruled_out"])
+    unplaced = [{"id": c.id, "text": c.text, "status": c.status, "state": claim_state(c.status), "about": about.get(c.id)} for c in loose]
     return {
         "id": story.id if story else None,
         "investigation_id": investigation_id,
