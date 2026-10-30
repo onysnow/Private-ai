@@ -71,9 +71,11 @@ def _coordinate(properties: Any, name: str) -> tuple[float | None, str | None]:
     return value, None
 
 
-def investigation_places(db: Session, investigation_id: str, *, timeline: Callable[[], dict[str, Any]] | None = None) -> dict[str, Any]:
-    """Every record with usable coordinates, and those without. `timeline` gives the investigation's timeline
-    (investigation_timeline with its defaults) when the caller already has it."""
+def investigation_places(db: Session, investigation_id: str, *, timeline: Callable[[], dict[str, Any]] | None = None,
+                         pictures: bool = True) -> dict[str, Any]:
+    """Every place, what is linked to it and when things happened there; with `pictures`, the pictures of each
+    (app/services/place_pictures.py). `timeline` gives the investigation's timeline (investigation_timeline with its
+    defaults) when the caller already has it."""
     entities = db.scalars(select(Entity).where(Entity.investigation_id == investigation_id, Entity.merged_into_entity_id.is_(None))
                           .order_by(Entity.caption, Entity.id)).all()
     places: list[dict[str, Any]] = []
@@ -117,7 +119,11 @@ def investigation_places(db: Session, investigation_id: str, *, timeline: Callab
                     other = others[there]
                     by_id[here]["links"].append({"relationship_id": edge.id, "schema": edge.schema, "direction": direction,
                                                  "entity_id": other.id, "caption": other.caption, "entity_schema": other.schema})
-        _place_events(db, investigation_id, places, edges, timeline or (lambda: investigation_timeline(db, investigation_id)))
+        event_evidence = _place_events(db, investigation_id, places, edges, timeline or (lambda: investigation_timeline(db, investigation_id)))
+        if pictures:
+            from app.services.place_pictures import place_pictures
+
+            place_pictures(db, investigation_id, places, edges, event_evidence)
     return {"investigation_id": investigation_id, "places": places, "omitted": omitted}
 
 
@@ -164,11 +170,13 @@ def _precision(props: dict[str, Any]) -> str | None:
 
 
 def _place_events(db: Session, investigation_id: str, places: list[dict[str, Any]], edges: Sequence[RelationshipEdge],
-                  timeline: Callable[[], dict[str, Any]]) -> None:
+                  timeline: Callable[[], dict[str, Any]]) -> dict[str, dict[str, str]]:
     """Each place's dated events, earliest first: the timeline's events that
     point at the place's record ("place") or at a relationship linking
     something to it ("link", with that relationship), with the days each
-    covers as the timeline chart reads them (data_service.event_span)."""
+    covers as the timeline chart reads them (data_service.event_span).
+    Returns {place id: {evidence id: event title}}, the evidence each event rests on."""
+    evidence_at: dict[str, dict[str, str]] = {}
     by_id = {place["entity_id"]: place for place in places}
     for place in places:
         place["events"] = []
@@ -195,6 +203,8 @@ def _place_events(db: Session, investigation_id: str, places: list[dict[str, Any
         at.extend(links_of.get(refs.get("relationship_entity_id") or "", []))
         at.extend(linked.get(refs.get("entity_id") or "", []))
         for place_id, relationship_id in dict.fromkeys(at):
+            if refs.get("evidence_id"):
+                evidence_at.setdefault(place_id, {}).setdefault(refs["evidence_id"], event["title"])
             by_id[place_id]["events"].append({
                 "id": event["id"], "kind": event["kind"], "title": event["title"],
                 "date_start": event["date_start"], "date_end": event.get("date_end"),
@@ -202,3 +212,4 @@ def _place_events(db: Session, investigation_id: str, places: list[dict[str, Any
                 "verification_status": event["verification_status"],
                 "via": "place" if relationship_id is None else "link", "relationship_id": relationship_id,
             })
+    return evidence_at

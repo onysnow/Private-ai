@@ -16,7 +16,7 @@ import {errorMessage} from '../../lib/api-client';
 import {getBasemapStatusOptions, getInvestigationPlacesOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {BasemapStatusOut, PlaceOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {dayText, eventWindow, placesInWindow} from '../../lib/place-times';
+import {dayText, eventWindow, eventsInWindow, placesInWindow} from '../../lib/place-times';
 import type {TimeWindow} from '../../lib/place-times';
 import {pathOf, placeToOpen, travellers} from './places-model';
 import {FamilyMark, PartyGlyph, PartyMark} from '../../components/network/marks';
@@ -24,6 +24,7 @@ import {Reveal} from '../../components/ui/reveal';
 import {Aside, FactMark, KeysMark} from '../timeline/marks';
 import {partyKind} from '../../lib/viz-tokens';
 
+import {PlacePictures} from './place-pictures';
 import {PlacesTimeline} from './places-timeline';
 const PlacesMap = dynamic(() => import('../../components/places-map').then(m => m.PlacesMap),
   {ssr: false, loading: () => <p className="muted">Loading map…</p>});
@@ -178,6 +179,7 @@ function MapComing({status, onRetry}: {status: BasemapStatusOut | undefined; onR
 }
 
 function PlaceDetail({place, onStep, openDossier, timeWindow}: {place: PlaceOut | null; onStep: (d: 1 | -1) => void; openDossier: (id: string) => void; timeWindow: TimeWindow | null}): ReactElement {
+  const openDocument = useWorkbenchStore(state => state.openDocument);
   if (!place) return <aside className="tl2-side pl-side" aria-label="Place"><p className="tl2-cap">Place</p>
     <p className="tl2-none">Every place on the map is listed under List.</p></aside>;
   const events = [...(place.events ?? [])].sort((a, b) => a.first_day.localeCompare(b.first_day));
@@ -195,12 +197,13 @@ function PlaceDetail({place, onStep, openDossier, timeWindow}: {place: PlaceOut 
       <p className="pl-addr">{place.address}</p></Reveal>}
     <dl className="tl2-dl pl-dl"><dt>Placed from</dt><dd className="pl-from">{place.placed_from ?? 'its record, with no document behind the coordinates'}</dd>
       <dt>Where</dt><dd><Reveal detail={coordinates(place)}><span>{place.country ? place.country.toUpperCase() : coordinates(place)}</span></Reveal></dd></dl>
-    <p className="tl2-cap">What happened here · {events.length}</p>
+    <p className="tl2-cap">What happened here · {timeWindow ? <>{eventsInWindow(place, timeWindow).length} of {events.length} in the dates picked</> : events.length}</p>
     {events.length ? <ul className="pl-events">{events.map(e => {
       const inside = !timeWindow || (eventWindow(e).from < timeWindow.to && eventWindow(e).to > timeWindow.from);
       return <li key={e.id} className={inside ? '' : 'out'}><FactMark fact={e.verification_status === 'verified' ? 'shown' : 'not_yet'} note={e.verification_status}/>
         <time>{e.exact ? dayText(Date.parse(`${e.first_day}T00:00:00Z`)) : e.date_start}</time><span>{e.title}</span></li>; })}</ul>
       : <p className="tl2-none">No dated event here yet.</p>}
+    <PlacePictures key={place.entity_id} pictures={place.pictures ?? []} timeWindow={timeWindow} onOpen={openDocument}/>
     {parties.length > 0 && <><p className="tl2-cap">Parties seen here · {parties.length}</p>
       <div className="pl-parties">{parties.map(l => <button key={l.entity_id} onClick={() => openDossier(l.entity_id)} title={`${l.entity_schema ?? 'Record'}: open its record`}>
         <PartyGlyph kind={partyKind(l.entity_schema)} size={12}/>{l.caption}</button>)}</div></>}

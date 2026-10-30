@@ -16893,6 +16893,10 @@ export type PlaceOut = {
    */
   longitude: number;
   /**
+   * Pictures
+   */
+  pictures?: Array<PlacePictureOut>;
+  /**
    * Placed From
    */
   placed_from?: string | null;
@@ -16908,6 +16912,74 @@ export type PlaceOut = {
    * Sure
    */
   sure?: 'document' | 'approximate' | 'not_yet';
+};
+
+/**
+ * PlacePictureMatchOut
+ *
+ * Why a picture is of a place, by one stated rule (app/services/place_pictures.py): "gps" (the photo's own GPS is
+ * within the place's radius; `metres` is how far), "linked" (a person tied it to the place: evidence for a link or an
+ * event here, or the file the coordinates came from) or "named" (its caption or a captured page names the address).
+ */
+export type PlacePictureMatchOut = {
+  /**
+   * Detail
+   */
+  detail: string;
+  /**
+   * Metres
+   */
+  metres?: number | null;
+  /**
+   * Rule
+   */
+  rule: 'gps' | 'linked' | 'named';
+};
+
+/**
+ * PlacePictureOut
+ *
+ * A picture of a place: a photo file, or a captured web page (`capture_id`, shown by its screenshot). `taken` is
+ * when, to the precision known (a year, a month or a day), from its source, the camera's clock or the capture; the
+ * days it can mean are `first_day` to `last_day`. Opening it opens `document_id`.
+ */
+export type PlacePictureOut = {
+  /**
+   * Capture Id
+   */
+  capture_id?: string | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * First Day
+   */
+  first_day?: string | null;
+  /**
+   * Kind
+   */
+  kind: 'photo' | 'page';
+  /**
+   * Last Day
+   */
+  last_day?: string | null;
+  /**
+   * Matches
+   */
+  matches: Array<PlacePictureMatchOut>;
+  /**
+   * Taken
+   */
+  taken?: string | null;
+  /**
+   * Taken From
+   */
+  taken_from?: 'source' | 'camera' | 'capture' | null;
+  /**
+   * Title
+   */
+  title: string;
 };
 
 /**

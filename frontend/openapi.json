@@ -33423,6 +33423,13 @@
             "title": "Longitude",
             "type": "number"
           },
+          "pictures": {
+            "items": {
+              "$ref": "#/components/schemas/PlacePictureOut"
+            },
+            "title": "Pictures",
+            "type": "array"
+          },
           "placed_from": {
             "anyOf": [
               {
@@ -33469,6 +33476,137 @@
           "links"
         ],
         "title": "PlaceOut",
+        "type": "object"
+      },
+      "PlacePictureMatchOut": {
+        "description": "Why a picture is of a place, by one stated rule (app/services/place_pictures.py): \"gps\" (the photo's own GPS is\nwithin the place's radius; `metres` is how far), \"linked\" (a person tied it to the place: evidence for a link or an\nevent here, or the file the coordinates came from) or \"named\" (its caption or a captured page names the address).",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "metres": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metres"
+          },
+          "rule": {
+            "enum": [
+              "gps",
+              "linked",
+              "named"
+            ],
+            "title": "Rule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule",
+          "detail"
+        ],
+        "title": "PlacePictureMatchOut",
+        "type": "object"
+      },
+      "PlacePictureOut": {
+        "description": "A picture of a place: a photo file, or a captured web page (`capture_id`, shown by its screenshot). `taken` is\nwhen, to the precision known (a year, a month or a day), from its source, the camera's clock or the capture; the\ndays it can mean are `first_day` to `last_day`. Opening it opens `document_id`.",
+        "properties": {
+          "capture_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Id"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "first_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Day"
+          },
+          "kind": {
+            "enum": [
+              "photo",
+              "page"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Day"
+          },
+          "matches": {
+            "items": {
+              "$ref": "#/components/schemas/PlacePictureMatchOut"
+            },
+            "title": "Matches",
+            "type": "array"
+          },
+          "taken": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Taken"
+          },
+          "taken_from": {
+            "anyOf": [
+              {
+                "enum": [
+                  "source",
+                  "camera",
+                  "capture"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Taken From"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "kind",
+          "title",
+          "matches"
+        ],
+        "title": "PlacePictureOut",
         "type": "object"
       },
       "PlaceProposalOut": {

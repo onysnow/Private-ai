@@ -647,7 +647,7 @@ def places_on_map(db: Session, investigation_id: str, params: dict[str, str]) ->
             held["timeline"] = _once(("timeline", investigation_id, None), lambda: investigation_timeline(db, investigation_id))
         return held["timeline"]
 
-    found = investigation_places(db, investigation_id, timeline=whole_timeline)
+    found = investigation_places(db, investigation_id, timeline=whole_timeline, pictures=False)
     timeline = {str(event["id"]): event for event in whole_timeline()["events"]} if found["places"] else {}
     # Two places of one name are told apart by their record id, as each is
     # named on the map and checked by its name.

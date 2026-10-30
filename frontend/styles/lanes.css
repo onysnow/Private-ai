@@ -489,6 +489,33 @@
 .pl-parties button { display: inline-flex; align-items: center; gap: 6px; font: 600 12px var(--font-ui); padding: 3px 10px 3px 4px; border-radius: 99px; border: 1px solid var(--accent-2); color: var(--text); background: transparent; cursor: pointer; text-align: left; }
 .pl-events li { font-size: 13px; }
 .pl-list { display: flex; flex-direction: column; gap: 12px; }
+/* The places' timeline: each row's count of events in the window; the window glides when it moves, unless motion is reduced. */
+.pls-names li { justify-content: space-between; gap: 8px; }
+.pls-count { flex: 0 0 auto; min-width: 20px; text-align: right; font: 600 12px var(--font-mono); color: var(--accent-1); }
+.pls-count.none { color: var(--text-muted); opacity: .6; }
+.pls-window { transition: left .16s ease-out, width .16s ease-out; }
+.pls-window.held { transition: none; }
+.pls-window:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+/* The pictures of a place (place-pictures.tsx): a strip of thumbnails, each one click from its source. */
+.plp { display: flex; flex-direction: column; gap: 8px; }
+.plp > .tl2-cap { display: flex; align-items: center; gap: 8px; }
+.plp-strip { list-style: none; margin: 0; padding: 0 0 4px; display: grid; grid-auto-flow: column; grid-auto-columns: calc(50% - 4px); gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; }
+.plp-strip li { scroll-snap-align: start; }
+.plp-thumb { position: relative; display: block; width: 100%; aspect-ratio: 16 / 10; padding: 0; overflow: hidden; border-radius: 8px; border: 1px solid var(--line, rgba(127,127,127,.3)); background: var(--surface-2); cursor: pointer; color: var(--text); }
+.plp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.plp-thumb:hover, .plp-thumb:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.plp-thumb.out { opacity: .4; }
+.plp-none { display: grid; place-items: center; height: 100%; font: 500 12px var(--font-mono); color: var(--text-muted); }
+.plp-when { position: absolute; left: 0; right: 0; bottom: 0; padding: 5px 8px; text-align: left; font: 600 12.5px var(--font-mono); color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.72)); }
+.plp-rules { position: absolute; top: 5px; left: 5px; display: flex; gap: 3px; }
+.plp-rule { padding: 2px; width: 20px; height: 20px; border-radius: 5px; background: rgba(0,0,0,.6); fill: none; stroke: #fff; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.plp-rule.r-gps { stroke: var(--status-supported); }
+.plp-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.plp-thumb.big { aspect-ratio: 4 / 3; }
+.plp-acts { display: flex; gap: 8px; }
+.plp-acts button { font: 600 13px var(--font-ui); padding: 5px 12px; border-radius: 7px; border: 1px solid var(--line, rgba(127,127,127,.4)); background: transparent; color: var(--text); cursor: pointer; }
+.plp-acts button[aria-pressed='true'] { border-color: var(--accent-1); color: var(--accent-1); }
+@media (prefers-reduced-motion: reduce) { .pls-window { transition: none; } .plp-strip { scroll-behavior: auto; scroll-snap-type: none; } }
 
 /* Show only what matters (Ony, 29 Oct): the marks that stand for a word, and the ? / ⓘ that hold keys and how-to. */
 .tl2-kinddot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: middle; flex: 0 0 auto; }
