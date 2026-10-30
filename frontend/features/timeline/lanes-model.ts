@@ -72,6 +72,63 @@ export function denseStretch(starts: number[], share = 0.8): [number, number] | 
   return [s[lo], s[hi]];
 }
 
+/** A case's events split around its dense stretch (the other views open there, as Lanes does): `early` and `late` are
+ *  the far outliers, by whole year, as Lanes folds them; `core` is the rest. Undated events are left out of all three. */
+export type Folded<T> = {early: T[]; core: T[]; late: T[]; from: number; to: number} | null;
+export function foldOutliers<T extends Pick<TimelineLaneEventOut, 'date_start' | 'date_end'>>(events: T[]): Folded<T> {
+  const dated = events.filter(e => e.date_start);
+  const dense = denseStretch(dated.map(e => span(e)[0]));
+  if (!dense) return null;
+  const y0 = new Date(dense[0]).getUTCFullYear(), y1 = new Date(dense[1]).getUTCFullYear();
+  const year = (e: T) => new Date(span(e)[0]).getUTCFullYear();
+  return {early: dated.filter(e => year(e) < y0), core: dated.filter(e => year(e) >= y0 && year(e) <= y1), late: dated.filter(e => year(e) > y1),
+    from: Date.UTC(y0, 0, 1), to: Date.UTC(y1 + 1, 0, 1) - 1};
+}
+
+/** The years of a run of records, as a title says them: "2009", "2009–11", "1952–2007". */
+export function yearsWords(a: number, b: number): string {
+  if (a === b) return String(a);
+  return Math.floor(a / 100) === Math.floor(b / 100) && b - a < 10 ? `${a}–${String(b).slice(2)}` : `${a}–${b}`;
+}
+
+/** The dense years cut into a handful of runs (at most `most`) holding about as many records each, on whole years:
+ *  each run closes before the year that would take it further past its share than stopping short. Years with no
+ *  record never make a run of their own. */
+export function yearRuns(counts: Map<number, number>, from: number, to: number, most = 4): Array<[number, number]> {
+  const held = [...counts].filter(([y, c]) => y >= from && y <= to && c > 0);
+  const total = held.reduce((n, [, c]) => n + c, 0);
+  const groups = Math.max(1, Math.min(most, held.length));
+  const target = total / groups;
+  const runs: Array<[number, number]> = [];
+  let start = from, acc = 0;
+  for (let y = from; y <= to; y += 1) {
+    const c = counts.get(y) ?? 0;
+    if (acc > 0 && runs.length < groups - 1 && Math.abs(acc - target) < Math.abs(acc + c - target)) { runs.push([start, y - 1]); start = y; acc = 0; }
+    acc += c;
+  }
+  runs.push([start, to]);
+  // Each run is named by the years that hold its records: an empty year at either end is left off.
+  const has = (y: number) => (counts.get(y) ?? 0) > 0;
+  return runs.map(([a, b]) => { while (a < b && !has(a)) a += 1; while (b > a && !has(b)) b -= 1; return [a, b] as [number, number]; });
+}
+
+/** The stretches a case falls into before any period is named: its dense years cut into a handful of runs (yearRuns),
+ *  plus the far outliers before and after (`fold`). Board uses them as its boards; Periods offers them as periods to name. */
+export function stretches(events: TimelineLaneEventOut[]): Array<{from: number; to: number; count: number; fold?: 'early' | 'late'}> {
+  const folded = foldOutliers(events.filter(e => e.date_start && !e.placeholder && e.precision !== 'unknown'));
+  if (!folded) return [];
+  const year = (e: Pick<TimelineLaneEventOut, 'date_start' | 'date_end'>) => new Date(span(e)[0]).getUTCFullYear();
+  const counts = new Map<number, number>();
+  for (const e of folded.core) counts.set(year(e), (counts.get(year(e)) ?? 0) + 1);
+  const y0 = new Date(folded.from).getUTCFullYear(), y1 = new Date(folded.to).getUTCFullYear();
+  const end = (rows: TimelineLaneEventOut[], fold: 'early' | 'late') => ({from: Math.min(...rows.map(year)), to: Math.max(...rows.map(year)), count: rows.length, fold});
+  return [
+    ...(folded.early.length ? [end(folded.early, 'early')] : []),
+    ...yearRuns(counts, y0, y1).map(([a, b]) => ({from: a, to: b, count: folded.core.filter(e => year(e) >= a && year(e) <= b).length})),
+    ...(folded.late.length ? [end(folded.late, 'late')] : []),
+  ];
+}
+
 /** Every how many years the axis names a year, so the names never run into each other. */
 export function yearStep(years: number, width: number, minGap = 52): number {
   for (const step of [1, 2, 5, 10, 20, 25, 50, 100]) if ((width / Math.max(1, years)) * step >= minGap) return step;

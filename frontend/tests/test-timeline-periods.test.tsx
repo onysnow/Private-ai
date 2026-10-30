@@ -46,6 +46,21 @@ describe('periods model', () => {
   });
 });
 
+describe('Periods before any is named', () => {
+  it('offers the stretches the record falls into, and one click fills in its dates', async () => {
+    mockApi({[LANES]: lanesBody('inv-1', events)});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('tab', {name: 'Periods'}));
+    const offers = screen.getByRole('group', {name: 'Stretches in the record'});
+    expect(offers).toHaveTextContent('2018');
+    expect(offers).toHaveTextContent('3 records');
+    await user.click(screen.getByRole('button', {name: /^2019/}));
+    expect(screen.getByLabelText('From')).toHaveValue('2019');
+    expect(screen.getByLabelText('To')).toHaveValue('2019');
+  });
+});
+
 describe('Periods', () => {
   it('shows each period with its summary and evidence, steps between them, and opens one in Lanes', async () => {
     mockApi({[LANES]: lanesBody('inv-1', events, {periods: [money, bid]})});

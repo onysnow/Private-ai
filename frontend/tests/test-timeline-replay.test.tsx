@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TimelinePanel} from '../features/timeline/timeline-panel';
+import {replayFold} from '../features/timeline/replay';
 import type {TimelineLaneEventOut} from '../lib/generated/types.gen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -32,6 +33,30 @@ beforeEach(() => {
   useWorkbenchStore.setState({investigationId: 'inv-1', asOf: null});
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+
+describe('Replay in a case with far-off steps', () => {
+  const wide = [ev('old', 'A bank is incorporated', '1952-11-10'), ...events, ev('x', 'Kestrel SA sells on', '2019-12-01')];
+  it('folds the steps far before the busy stretch and opens on its first step', async () => {
+    mockApi({[LANES]: lanesBody('inv-1', wide)});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('tab', {name: 'Replay'}));
+    expect(screen.getByText('Step 2 of 6 · 1 Mar 2016')).toBeInTheDocument();
+    expect(screen.queryByText('A bank is incorporated')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: /1 step before the busy stretch, 1952: show them/}));
+    await user.click(screen.getByText('A bank is incorporated'));
+    expect(screen.getByText('Step 1 of 6 · 10 Nov 1952')).toBeInTheDocument();
+  });
+
+  it('puts the outliers on a short stub and spreads the busy stretch over the rest of the line', () => {
+    const steps = lanesBody('inv-1', wide).steps as Parameters<typeof replayFold>[0];
+    const fold = replayFold(steps);
+    expect(fold.early).toBe(1);
+    expect(fold.late).toBe(0);
+    expect(fold.pos(steps[0])).toBeLessThan(8);
+    expect(fold.pos(steps[1])).toBeGreaterThanOrEqual(8);
+  });
+});
 
 describe('Replay', () => {
   it('plays the steps and waits at the one nobody has resolved', async () => {

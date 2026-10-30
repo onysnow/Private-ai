@@ -17,14 +17,14 @@ import {useWorkbenchStore} from '../../lib/workbench-store';
 import {exactness} from './lane-detail';
 import {Reveal} from '../../components/ui/reveal';
 import {PartyMark} from '../../components/network/marks';
-import {FACT, bounds, span} from './lanes-model';
+import {FACT, bounds, foldOutliers, span, stretches, yearsWords} from './lanes-model';
 import {Aside, FactMark} from './marks';
 import {inPeriod, periodYears} from './periods';
 
 const MAX_EVENTS = 8;
 const MAX_PEOPLE = 4;
 
-export type BoardDef = {key: string; name: string; years: string; from: number; to: number};
+export type BoardDef = {key: string; name: string; years: string; from: number; to: number; fold?: 'early' | 'late'};
 export type BoardItem =
   | {key: string; kind: 'event'; event: TimelineLaneEventOut}
   | {key: string; kind: 'party'; id: string; caption: string; schema: string}
@@ -32,11 +32,26 @@ export type BoardItem =
   | {key: string; kind: 'note'; id: string; text: string};
 export type BoardString = {a: string; b: string; label: string; shown: boolean};
 
-/** The boards: one per named period, or one per year with events until periods are named. */
+/** The boards: one per named period; until periods are named, the case's dense stretch cut into a handful of runs of
+ *  whole years holding about as many records each, with the far outliers before and after it on one board each at the
+ *  ends (never thirty tabs of one-record years). */
 export function boardsFor(view: TimelineLanesOut): BoardDef[] {
   if (view.periods.length) return view.periods.map(p => ({key: p.id, name: p.name, years: periodYears(p), from: bounds(p.date_start)[0], to: bounds(p.date_end)[1]}));
-  const years = Array.from(new Set(view.events.filter(e => e.date_start && e.precision !== 'unknown').map(e => e.date_start.slice(0, 4)))).sort();
-  return years.map(y => ({key: y, name: y, years: y, from: bounds(y)[0], to: bounds(y)[1]}));
+  return stretches(view.events).map(({from: a, to: b, fold}) => {
+    const years = yearsWords(a, b);
+    return {key: fold ? `fold:${fold}` : years, name: fold === 'early' ? 'Before' : fold === 'late' ? 'After' : years, years, from: Date.UTC(a, 0, 1), to: Date.UTC(b + 1, 0, 1) - 1, ...(fold ? {fold} : {})};
+  });
+}
+
+/** The board a case opens on: the first that is not a fold of outliers, or (with named periods) the first period that
+ *  reaches into the case's dense stretch. */
+export function boardOpensAt(view: TimelineLanesOut, boards: BoardDef[]): number {
+  if (view.periods.length) {
+    const folded = foldOutliers(view.events.filter(e => e.date_start && !e.placeholder && e.precision !== 'unknown'));
+    const i = folded ? boards.findIndex(b => b.to >= folded.from && b.from <= folded.to) : 0;
+    return Math.max(0, i);
+  }
+  return Math.max(0, boards.findIndex(b => !b.fold));
 }
 
 /** A board's items and its string: the events most worth seeing (unresolved first, then those with a document), the
@@ -82,7 +97,7 @@ export function TimelineBoard({view, investigationId, onShowInLanes}: Props): Re
   const openProvenance = useWorkbenchStore(s => s.openProvenance);
   const kept = useQuery({...getTimelineBoardOptions({path}), enabled: Boolean(investigationId)});
   const boards = useMemo(() => boardsFor(view), [view]);
-  const [at, setAt] = useState(0);
+  const [at, setAt] = useState(() => boardOpensAt(view, boards));
   const [layout, setLayout] = useState<TimelineBoardOut>({style: 'rich', positions: {}, notes: []});
   const [picked, setPicked] = useState<string | null>(null);
   const [note, setNote] = useState('');
@@ -152,13 +167,15 @@ export function TimelineBoard({view, investigationId, onShowInLanes}: Props): Re
     <section className="bd-main">
       <div className="bd-top">
         <div className="tl2-views" role="tablist" aria-label="Boards">
-          {boards.map((b, i) => <button key={b.key} role="tab" aria-selected={i === at} onClick={() => { setAt(i); setPicked(null); }}>{b.name}{b.name !== b.years ? ` · ${b.years}` : ''}</button>)}
+          {boards.map((b, i) => <button key={b.key} role="tab" aria-selected={i === at} className={b.fold ? 'bd-foldtab' : undefined} onClick={() => { setAt(i); setPicked(null); }}>
+            {b.fold ? <Reveal tabbable={false} detail={`${b.fold === 'early' ? 'Before' : 'After'} the busy stretch of the case: its few far-off records on one board`}>
+              <span>{b.fold === 'early' ? '⇤ ' : ''}{b.years}{b.fold === 'late' ? ' ⇥' : ''}</span></Reveal> : <>{b.name}{b.name !== b.years ? <small> · {b.years}</small> : null}</>}</button>)}
         </div>
         <div className="tl2-views" role="group" aria-label="Style">
           <button aria-pressed={rich} onClick={() => keep({...layout, style: 'rich'})}>Rich</button>
           <button aria-pressed={!rich} onClick={() => keep({...layout, style: 'clean'})}>Clean</button>
         </div>
-        {!view.periods.length && <Aside label="About the boards">One board a year until periods are named (Periods).</Aside>}
+        {!view.periods.length && <Aside label="About the boards">Until periods are named (Periods), the busy stretch of the case is cut into a few runs of years holding about as many records each; the far-off records before and after it get one board each at the ends.</Aside>}
       </div>
       {message && <p className="tl2-msg" role="status">{message}</p>}
       <div ref={area} className={`bd-board ${rich ? 'rich' : 'clean'}`} aria-label={`Board: ${board.name}`}>
@@ -194,7 +211,7 @@ export function TimelineBoard({view, investigationId, onShowInLanes}: Props): Re
         <button type="submit" disabled={!note.trim()}>Pin the note</button>
       </form>
       <div className="bd-dock" aria-label={`${board.name}: its own timeline`}>
-        <p className="tl2-cap"><Reveal detail="One dot per item on the board"><span>{board.name} · {board.years}</span></Reveal></p>
+        <p className="tl2-cap"><Reveal detail="One dot per item on the board"><span>{board.name !== board.years ? `${board.name} · ` : ''}{board.years}</span></Reveal></p>
         <div className="bd-dockline">
           {dock.map(it => { const t = span(it.event)[0]; const left = ((t - board.from) / Math.max(1, board.to - board.from)) * 100;
             return <button key={it.key} className={`bd-dot f-${FACT[it.event.fact].tone}${picked === it.key ? ' on' : ''}`} style={{left: `${Math.min(100, Math.max(0, left))}%`}}

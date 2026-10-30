@@ -17,7 +17,7 @@ import {eventKind} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {exactness} from './lane-detail';
 import {Reveal} from '../../components/ui/reveal';
-import {parseWhen, span} from './lanes-model';
+import {foldOutliers, parseWhen, span, yearsWords} from './lanes-model';
 import {Aside, FactMark, KindDot} from './marks';
 
 /** For each card in a built order, whether it is told before a card dated earlier: its record date is earlier than
@@ -49,6 +49,7 @@ export function BuildYourOwn({view, investigationId, onShowInLanes}: Props): Rea
   const [message, setMessage] = useState('');
   const [dragging, setDragging] = useState<number | null>(null);
   const [sure, setSure] = useState(false);
+  const [unfold, setUnfold] = useState({early: false, late: false});
 
   const tl = timelines.find(t => t.id === current) ?? timelines[0];
   useEffect(() => { if (tl) { setCurrent(tl.id); setItems(tl.items); } }, [tl?.id, tl?.updated_at]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -104,6 +105,12 @@ export function BuildYourOwn({view, investigationId, onShowInLanes}: Props): Rea
   const palette = view.events.filter(e => e.date_start && !e.placeholder)
     .filter(e => kind === 'all' || kindWord(e) === kind)
     .filter(e => !find.trim() || `${e.title} ${e.description ?? ''} ${e.source_label}`.toLowerCase().includes(find.trim().toLowerCase()));
+  // The palette opens on the busy stretch of the case: far-off records before and after it (a 1952 founding) wait in
+  // one folded row at each end, opened on click. A search shows every match.
+  const folded = useMemo(() => foldOutliers(view.events.filter(e => e.date_start && !e.placeholder)), [view.events]);
+  const yearOf = (e: TimelineLaneEventOut) => new Date(span(e)[0]).getUTCFullYear();
+  const side = (e: TimelineLaneEventOut): 'early' | 'late' | null => (!folded || find.trim() ? null
+    : span(e)[0] < folded.from ? 'early' : span(e)[0] > folded.to ? 'late' : null);
   const kinds = Array.from(new Set(view.events.filter(e => !e.placeholder).map(kindWord)));
   const recordOrder = [...cards].sort((a, b) => a.sort_key.localeCompare(b.sort_key));
   const parsed = parseWhen(when);
@@ -120,11 +127,17 @@ export function BuildYourOwn({view, investigationId, onShowInLanes}: Props): Rea
         {kinds.map(k => <button key={k} aria-pressed={kind === k} onClick={() => setKind(k)}>{k} {view.events.filter(e => !e.placeholder && kindWord(e) === k).length}</button>)}
       </div>
       <ul>
-        {palette.map(e => <li key={e.id} className={items.includes(e.id) ? 'in' : ''} draggable={Boolean(tl) && !items.includes(e.id)}
+        {(['early', null, 'late'] as const).flatMap((part): Array<TimelineLaneEventOut | ReactElement> => {
+          const rows = palette.filter(e => side(e) === part);
+          if (!rows.length) return [];
+          if (part && !unfold[part]) return [<li key={`fold:${part}`} className="by-fold"><button onClick={() => setUnfold(u => ({...u, [part]: true}))}
+            aria-label={`${rows.length} ${rows.length === 1 ? 'record' : 'records'} ${part === 'early' ? 'before' : 'after'} the busy stretch: show them`}>
+            <b>{part === 'early' ? '⇤ ' : ''}{yearsWords(yearOf(rows[0]), yearOf(rows[rows.length - 1]))}{part === 'late' ? ' ⇥' : ''}</b><span>{rows.length}</span></button></li>];
+          return rows;
+        }).map(e => !('fact' in e) ? e : <li key={e.id} className={items.includes(e.id) ? 'in' : ''} draggable={Boolean(tl) && !items.includes(e.id)}
           onDragStart={ev => { ev.dataTransfer.setData('text/x-event', e.id); ev.dataTransfer.effectAllowed = 'copy'; }}>
-          <KindDot kind={e.kind} word={kindWord(e)}/>
           <b>{e.title}</b>
-          <span>{dateWords(e.date_start, e.precision)}</span>
+          <span className="by-when"><KindDot kind={e.kind} word={kindWord(e)}/>{dateWords(e.date_start, e.precision)}</span>
           {items.includes(e.id) ? <em>✓ in it</em> : <button disabled={!tl} onClick={() => add(e.id)} aria-label={`Add ${e.title}`}>Add</button>}
         </li>)}
       </ul>

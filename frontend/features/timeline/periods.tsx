@@ -11,8 +11,9 @@ import {timelineLanesViewQueryKey} from '../../lib/generated/@tanstack/react-que
 import {createTimelinePeriod, deleteTimelinePeriod, updateTimelinePeriod} from '../../lib/generated/sdk.gen';
 import type {TimelineLaneEventOut, TimelineLanesOut, TimelinePeriodOut} from '../../lib/generated/types.gen';
 import {dateWords} from '../../lib/dates';
-import {bounds, parseWhen, span} from './lanes-model';
+import {bounds, parseWhen, span, stretches, yearsWords} from './lanes-model';
 import {FactMark} from './marks';
+import {Reveal} from '../../components/ui/reveal';
 
 /** The period's years as its title says them: "2019", or "2016–2017". */
 export function periodYears(p: Pick<TimelinePeriodOut, 'date_start' | 'date_end'>): string {
@@ -51,6 +52,9 @@ export function TimelinePeriods({view, investigationId, onOpenLanes, onSelect}: 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [naming, setNaming] = useState(periods.length === 0);
+  // The stretches the record falls into, offered as periods to name: one click fills the dates, the name is yours.
+  const [seed, setSeed] = useState<{from: string; to: string; n: number} | null>(null);
+  const offers = periods.length ? [] : stretches(view.events).filter(s => !s.fold);
   const [message, setMessage] = useState('');
   useEffect(() => { if (at >= periods.length) setAt(Math.max(0, periods.length - 1)); }, [periods.length, at]);
   const p = periods[at];
@@ -86,6 +90,15 @@ export function TimelinePeriods({view, investigationId, onOpenLanes, onSelect}: 
     {!p ? <div className="tp-empty">
       <p><b>No periods named yet.</b> Name the stretches of the case (“Set-up 2016”, “The money 2018”) and each becomes its own screen,
         with your summary of it and its evidence. They are drawn as tints on Lanes too.</p>
+      {offers.length > 1 && <div className="tp-offers" role="group" aria-label="Stretches in the record">
+        <p className="tl2-cap"><Reveal detail="The busy part of the case cut into runs of years holding about as many records each. Pick one to fill in its dates; the name and the summary are yours.">
+          <span>Where the record falls</span></Reveal></p>
+        {offers.map(o => { const words = yearsWords(o.from, o.to); const max = Math.max(...offers.map(x => x.count));
+          return <button key={words} className="tp-offer" aria-pressed={seed?.from === String(o.from) && seed?.to === String(o.to)}
+            onClick={() => { setSeed(n => ({from: String(o.from), to: String(o.to), n: (n?.n ?? 0) + 1})); setNaming(true); }}>
+            <b>{words}</b><i aria-hidden style={{width: `${Math.max(8, (o.count / max) * 100)}%`}}/>
+            <small>{o.count} {o.count === 1 ? 'record' : 'records'}</small></button>; })}
+      </div>}
     </div> : <div className="tp-screen">
       <div className="tp-text">
         <p className="tl2-cap">Period {at + 1} of {periods.length}</p>
@@ -130,19 +143,19 @@ export function TimelinePeriods({view, investigationId, onOpenLanes, onSelect}: 
           <span>{q.name}</span><i aria-hidden/></button>)}
       </nav>
     </div>}
-    {naming && <NamePeriod pending={create.isPending} onCancel={() => setNaming(false)} onName={(name, a, b, summary) => create.mutate({name, date_start: a, date_end: b, summary})}/>}
+    {naming && <NamePeriod key={seed ? `${seed.from}-${seed.to}-${seed.n}` : 'blank'} from={seed?.from} to={seed?.to} pending={create.isPending} onCancel={() => setNaming(false)} onName={(name, a, b, summary) => create.mutate({name, date_start: a, date_end: b, summary})}/>}
   </div>;
 }
 
-function NamePeriod({onName, onCancel, pending}: {onName: (name: string, a: string, b: string, summary: string) => void; onCancel: () => void; pending: boolean}): ReactElement {
+function NamePeriod({onName, onCancel, pending, from = '', to = ''}: {onName: (name: string, a: string, b: string, summary: string) => void; onCancel: () => void; pending: boolean; from?: string; to?: string}): ReactElement {
   const [name, setName] = useState('');
-  const [a, setA] = useState('');
-  const [b, setB] = useState('');
+  const [a, setA] = useState(from);
+  const [b, setB] = useState(to);
   const [summary, setSummary] = useState('');
   const pa = parseWhen(a), pb = parseWhen(b);
   return <form className="tl2-form" onSubmit={ev => { ev.preventDefault(); if (pa && pb && name.trim()) onName(name.trim(), pa.date_start, pb.date_end ?? pb.date_start, summary.trim()); }}>
     <b>Name a period</b>
-    <label>Name <input value={name} onChange={e => setName(e.target.value)} placeholder="The bid"/></label>
+    <label>Name <input autoFocus={Boolean(from)} value={name} onChange={e => setName(e.target.value)} placeholder="The bid"/></label>
     <label>From <input value={a} onChange={e => setA(e.target.value)} placeholder="January 2019"/></label>
     <label>To <input value={b} onChange={e => setB(e.target.value)} placeholder="2019"/></label>
     <label>Your summary (optional) <input value={summary} onChange={e => setSummary(e.target.value)} placeholder="What happened in it, in your words"/></label>

@@ -13,7 +13,7 @@ import {Reveal} from '../../components/ui/reveal';
 import {eventKind} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {exactness} from './lane-detail';
-import {bounds} from './lanes-model';
+import {bounds, foldOutliers, span, yearsWords} from './lanes-model';
 import {FactMark, KeysMark, KindDot} from './marks';
 
 export type Step = 'day' | 'week' | 'month' | 'year';
@@ -21,7 +21,7 @@ export const STEPS: Step[] = ['day', 'week', 'month', 'year'];
 const DAY = 86_400_000;
 const PER_LAYER = 5;
 
-export type Layer = {key: string; at: number; label: string; fuzzy: boolean; events: TimelineLaneEventOut[]; gap?: string};
+export type Layer = {key: string; at: number; label: string; fuzzy: boolean; events: TimelineLaneEventOut[]; gap?: string; fold?: 'early' | 'late'};
 
 const grain = (e: TimelineLaneEventOut): Step | 'day' => (e.date_start.length === 4 || e.precision === 'year' ? 'year' : e.date_start.length === 7 || e.precision === 'month' ? 'month' : 'day');
 const rank: Record<Step, number> = {day: 0, week: 1, month: 2, year: 3};
@@ -91,19 +91,45 @@ export function autoStep(events: TimelineLaneEventOut[]): Step {
   return STEPS.find(s => layersFor(events, s).length <= 30) ?? 'year';
 }
 
+const stackable = (e: TimelineLaneEventOut) => Boolean(e.date_start) && !e.placeholder && e.precision !== 'unknown';
+
+/** The stack as it opens: the dense stretch of the case in layers at the step (Auto picks it from that stretch alone),
+ *  with the far outliers before and after it (a 1952 founding in a 2009–2020 case) folded into one layer each at the
+ *  ends, there to step back to but never leading. `start` is the first layer of the dense stretch, where it opens. */
+export function stackLayers(events: TimelineLaneEventOut[], choice: Step | 'auto'): {layers: Layer[]; step: Step; start: number; years: string | null} {
+  const folded = foldOutliers(events.filter(stackable));
+  const core = folded ? folded.core : [];
+  const step = choice === 'auto' ? autoStep(core) : choice;
+  const layers = layersFor(core, step);
+  const fold = (rows: TimelineLaneEventOut[], side: 'early' | 'late'): Layer | null => {
+    if (!rows.length) return null;
+    const sorted = [...rows].sort((a, b) => a.sort_key.localeCompare(b.sort_key));
+    const y = (e: TimelineLaneEventOut) => new Date(span(e)[0]).getUTCFullYear();
+    return {key: `fold:${side}`, at: span(sorted[0])[0], label: yearsWords(y(sorted[0]), y(sorted[sorted.length - 1])), fuzzy: false, events: sorted, fold: side};
+  };
+  const early = folded && fold(folded.early, 'early'), late = folded && fold(folded.late, 'late');
+  const firstCore = layers.find(l => !l.fuzzy);
+  if (early && firstCore && !firstCore.gap) firstCore.gap = `${gapWords(firstCore.at - span(early.events[early.events.length - 1])[0])} later`;
+  if (late && layers.length) late.gap = `${gapWords(late.at - layers[layers.length - 1].at)} later`;
+  const all = [...(early ? [early] : []), ...layers, ...(late ? [late] : [])];
+  const years = folded ? yearsWords(new Date(folded.from).getUTCFullYear(), new Date(folded.to).getUTCFullYear()) : null;
+  return {layers: all, step, start: early && layers.length ? 1 : 0, years};
+}
+
 type Props = {view: TimelineLanesOut; onShowInLanes: (id: string) => void};
 
 export function TimelineStack({view, onShowInLanes}: Props): ReactElement {
   const openProvenance = useWorkbenchStore(s => s.openProvenance);
   const [choice, setChoice] = useState<Step | 'auto'>('auto');
-  const step = choice === 'auto' ? autoStep(view.events) : choice;
-  const layers = useMemo(() => layersFor(view.events, step), [view.events, step]);
-  const [top, setTop] = useState(0);
+  const {layers, step, start, years} = useMemo(() => stackLayers(view.events, choice), [view.events, choice]);
+  const [top, setTop] = useState(start);
   const [picked, setPicked] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const wheelAt = useRef(0);
-  useEffect(() => { setTop(0); setOpen(null); }, [step]);
+  useEffect(() => { setTop(start); setOpen(null); }, [step, start]);
+  const list = useRef<HTMLOListElement>(null);
+  useEffect(() => { list.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView?.({block: 'nearest'}); }, [top]);
   useEffect(() => {
     if (!playing) return;
     const id = window.setInterval(() => setTop(t => { if (t >= layers.length - 1) { setPlaying(false); return t; } return t + 1; }), 1800);
@@ -135,12 +161,14 @@ export function TimelineStack({view, onShowInLanes}: Props): ReactElement {
 
   return <div className="sk" tabIndex={-1} onKeyDown={onKey} aria-label="Stack in depth">
     <aside className="sk-layers" aria-label="Layers">
-      <p className="tl2-cap"><Reveal detail={`Step: ${step}`}><span>Layers {layers.length}</span></Reveal></p>
-      <ol>
+      <p className="tl2-cap sk-cap"><Reveal detail={`${layers.length} layers · step: ${step}${years ? ` · the busy stretch is ${years}; records far before or after it are folded into one layer at each end` : ''}`}>
+        <span>Layers</span></Reveal>{years && <span className="sk-span">{years}</span>}</p>
+      <ol ref={list}>
         {layers.map((l, i) => <li key={l.key}>
           {l.gap && <small className="sk-gap">… {l.gap}</small>}
-          <button aria-current={i === top} className={l.fuzzy ? 'fuzzy' : ''} onClick={() => { setTop(i); setPicked(null); }}>
-            <i aria-hidden/>{l.label}<span>{l.events.length}</span></button>
+          <button aria-current={i === top} className={l.fuzzy ? 'fuzzy' : l.fold ? `fold ${l.fold}` : ''} onClick={() => { setTop(i); setPicked(null); }}>
+            <i aria-hidden/>{l.fold ? <Reveal tabbable={false} detail={`${l.fold === 'early' ? 'Before' : 'After'} the busy stretch: ${l.events.length} ${l.events.length === 1 ? 'record' : 'records'} over ${l.label}, folded into one layer`}>
+              <span className="sk-foldname">{l.fold === 'early' ? '⇤ ' : ''}{l.label}{l.fold === 'late' ? ' ⇥' : ''}</span></Reveal> : l.label}<span>{l.events.length}</span></button>
         </li>)}
       </ol>
       <p className="tl2-cap"><Reveal detail="Auto picks the finest step the dates support. Evidence dated only to a month gets its own dashed layer at the start of that month, never a day."><span>Step</span></Reveal></p>
@@ -156,12 +184,12 @@ export function TimelineStack({view, onShowInLanes}: Props): ReactElement {
       <div className="sk-depth" aria-live="polite">
         {layers.slice(top + 1, top + 5).reverse().map((l, j, arr) => {
           const d = arr.length - j;
-          return <div key={l.key} className={`sk-layer behind${l.fuzzy ? ' fuzzy' : ''}`} style={{transform: `translateY(${-d * 46}px) translateZ(${-d * 90}px) scale(${1 - d * 0.06})`, opacity: 1 - d * 0.2, zIndex: 10 - d}} aria-hidden>
+          return <div key={l.key} className={`sk-layer behind${l.fuzzy ? ' fuzzy' : ''}${l.fold ? ' fold' : ''}`} style={{transform: `translateY(${-d * 46}px) translateZ(${-d * 90}px) scale(${1 - d * 0.06})`, opacity: 1 - d * 0.2, zIndex: 10 - d}} aria-hidden>
             <p className="sk-title">{l.label} <small>{l.events.length}</small></p>
           </div>;
         })}
-        <div key={layer.key} className={`sk-layer sk-front${layer.fuzzy ? ' fuzzy' : ''}`}>
-          <p className="sk-title"><Reveal detail={`${layer.events.length} ${layer.events.length === 1 ? 'item' : 'items'}${layer.fuzzy ? ' · not placed on a day' : ''}`}><span>{layer.label} <small>{layer.events.length}</small></span></Reveal></p>
+        <div key={layer.key} className={`sk-layer sk-front${layer.fuzzy ? ' fuzzy' : ''}${layer.fold ? ' fold' : ''}`}>
+          <p className="sk-title"><Reveal detail={`${layer.events.length} ${layer.events.length === 1 ? 'item' : 'items'}${layer.fuzzy ? ' · not placed on a day' : ''}${layer.fold ? ` · far ${layer.fold === 'early' ? 'before' : 'after'} the busy stretch, folded into one layer` : ''}`}><span>{layer.label} <small>{layer.events.length}</small></span></Reveal></p>
           <div className="sk-cards">
             {shownCards.map(e => <Reveal key={e.id} tabbable={false} detail={<><b>{eventKind(e.kind).name}</b><span className="rv-row">{e.source_label}</span></>}>
               <button className="sk-card" aria-pressed={sel?.id === e.id} style={{borderTopColor: eventKind(e.kind).colour}} onClick={() => setPicked(e.id)}>

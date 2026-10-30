@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TimelinePanel} from '../features/timeline/timeline-panel';
-import {boardItems, boardsFor} from '../features/timeline/board';
+import {boardItems, boardOpensAt, boardsFor} from '../features/timeline/board';
 import type {TimelineLaneEventOut, TimelineLanesOut} from '../lib/generated/types.gen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -35,8 +35,20 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 describe('board model', () => {
   it('has one board a year until periods are named, then one per period', () => {
     const view = lanesBody('inv-1', events, {parties}) as unknown as TimelineLanesOut;
-    expect(boardsFor(view).map(b => b.name)).toEqual(['2016', '2019']);
+    // The 2016 registration lies far before the busy 2019: it gets its own board at the start, and the board opens on 2019.
+    expect(boardsFor(view).map(b => [b.name, b.years, b.fold ?? null])).toEqual([['Before', '2016', 'early'], ['2019', '2019', null]]);
+    expect(boardOpensAt(view, boardsFor(view))).toBe(1);
     expect(boardsFor({...view, periods: [{id: 'p', name: 'The bid', date_start: '2019', date_end: '2019', summary: '', made_by: null}]}).map(b => b.name)).toEqual(['The bid']);
+  });
+
+  it('cuts a long busy stretch into a handful of boards of whole years, not a tab a year', () => {
+    const many: TimelineLaneEventOut[] = [ev('f', 'Founded', '1952-11-10')];
+    const per: Record<number, number> = {2009: 18, 2010: 10, 2011: 13, 2012: 37, 2013: 28, 2014: 28, 2015: 2, 2016: 14};
+    for (const [y, n] of Object.entries(per)) for (let i = 0; i < n; i += 1) many.push(ev(`${y}-${i}`, `Event ${y} ${i}`, `${y}-0${1 + (i % 9)}-1${i % 9}`));
+    const boards = boardsFor(lanesBody('inv-1', many) as unknown as TimelineLanesOut);
+    expect(boards.map(b => b.years)).toEqual(['1952', '2009–11', '2012', '2013', '2014–16']);
+    expect(boards[0].fold).toBe('early');
+    expect(boardOpensAt(lanesBody('inv-1', many) as unknown as TimelineLanesOut, boards)).toBe(1);
   });
 
   it('strings an event to each party it names, dashed until shown, and charts two payments or more', () => {

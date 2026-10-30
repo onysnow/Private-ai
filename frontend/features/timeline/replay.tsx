@@ -11,7 +11,7 @@ import {dateWords} from '../../lib/dates';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {exactness} from './lane-detail';
 import {Reveal} from '../../components/ui/reveal';
-import {span} from './lanes-model';
+import {foldOutliers, span, yearsWords} from './lanes-model';
 import {FactMark, KeysMark} from './marks';
 
 const stepWhen = (s: Pick<TimelineStepOut, 'date_start' | 'date_end' | 'precision'>) =>
@@ -26,12 +26,35 @@ export function onRecordBy(view: TimelineLanesOut, step: TimelineStepOut): {even
   return {events: by.length, shown: by.filter(e => e.fact === 'shown').length, outOfOrder: by.filter(e => late.has(e.id)).length};
 }
 
+/** The steps split around the case's dense stretch: how many lead in from far before it (a 1952 founding), how many
+ *  trail far after it, and where the steps axis puts each step: the outliers squeezed onto a short stub at each end,
+ *  the dense stretch spread over the rest, so its steps are not crushed into the last tenth of the line. */
+export function replayFold(steps: TimelineStepOut[]): {early: number; late: number; from: number; to: number; pos: (s: Pick<TimelineStepOut, 'date_start'>) => number} {
+  const folded = foldOutliers(steps.map((s, i) => ({date_start: s.date_start, date_end: s.date_end, i})));
+  const at = (s: Pick<TimelineStepOut, 'date_start'>) => span({date_start: s.date_start})[0];
+  if (!steps.length || !folded) return {early: 0, late: 0, from: 0, to: 0, pos: () => 50};
+  const early = folded.early.length, late = folded.late.length;
+  const t0 = steps.length ? at(steps[0]) : 0, t1 = steps.length ? at(steps[steps.length - 1]) : 0;
+  const lo = early ? 8 : 0, hi = late ? 92 : 100;
+  const scale = (t: number, a: number, b: number, x0: number, x1: number) => (b > a ? x0 + ((t - a) / (b - a)) * (x1 - x0) : (x0 + x1) / 2);
+  const pos = (s: Pick<TimelineStepOut, 'date_start'>) => {
+    const t = at(s);
+    if (t < folded.from) return scale(t, t0, folded.from, 0, lo - 2);
+    if (t > folded.to) return scale(t, folded.to, t1, hi + 2, 100);
+    return scale(t, folded.from, folded.to, lo, hi);
+  };
+  return {early, late, from: folded.from, to: folded.to, pos};
+}
+
 type Props = {view: TimelineLanesOut; onShowInLanes: (eventId: string, step: TimelineStepOut) => void};
 
 export function TimelineReplay({view, onShowInLanes}: Props): ReactElement {
   const steps = view.steps;
   const openProvenance = useWorkbenchStore(s => s.openProvenance);
-  const [at, setAt] = useState(0);
+  const fold = useMemo(() => replayFold(steps), [steps]);
+  // It opens on the first step of the dense stretch; the far-off steps before it are folded in the list until asked for.
+  const [at, setAt] = useState(() => (fold.early < steps.length ? fold.early : 0));
+  const [unfold, setUnfold] = useState({early: false, late: false});
   const [card, setCard] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<1 | 2>(1);
@@ -79,14 +102,24 @@ export function TimelineReplay({view, onShowInLanes}: Props): ReactElement {
     with no Story yet, it walks the dated events. Add a dated event (Lanes, <kbd>N</kbd>) or place claims in the Story (Act › Story).</div>;
 
   const record = onRecordBy(view, step);
-  const first = span({date_start: steps[0].date_start})[0];
-  const last = span({date_start: steps[steps.length - 1].date_start, date_end: steps[steps.length - 1].date_end})[1];
-  const pos = (s: TimelineStepOut) => (last > first ? ((span({date_start: s.date_start})[0] - first) / (last - first)) * 100 : 50);
+  const pos = fold.pos;
   const years: number[] = [];
-  // At most eight year labels under the scrubber, on round years.
-  const y0 = new Date(first).getUTCFullYear(), y1 = new Date(last).getUTCFullYear();
+  // At most eight year labels under the scrubber, on round years of the dense stretch.
+  const y0 = new Date(fold.from).getUTCFullYear(), y1 = new Date(fold.to).getUTCFullYear();
   const every = [1, 2, 5, 10, 20, 25, 50].find(n => (y1 - y0) / n <= 8) ?? 100;
   for (let y = Math.ceil(y0 / every) * every; y <= y1; y += every) years.push(y);
+  const yearOf = (s: TimelineStepOut) => new Date(span({date_start: s.date_start})[0]).getUTCFullYear();
+  const showEarly = unfold.early || at < fold.early, showLate = unfold.late || at >= steps.length - fold.late;
+  const foldRow = (side: 'early' | 'late') => {
+    const rows = side === 'early' ? steps.slice(0, fold.early) : steps.slice(steps.length - fold.late);
+    const words = yearsWords(yearOf(rows[0]), yearOf(rows[rows.length - 1]));
+    return <li key={`fold:${side}`} className={`rp-fold${side === 'early' && at >= fold.early ? ' done' : ''}`}>
+      <button onClick={() => setUnfold(u => ({...u, [side]: true}))} aria-expanded={false}
+        aria-label={`${rows.length} ${rows.length === 1 ? 'step' : 'steps'} ${side === 'early' ? 'before' : 'after'} the busy stretch, ${words}: show them`}>
+        <b>{side === 'early' ? '⇤ ' : ''}{words}{side === 'late' ? ' ⇥' : ''}</b>
+        <small className="rp-n">{rows.length} {rows.length === 1 ? 'step' : 'steps'}</small>
+      </button></li>;
+  };
   const shownCard = records[Math.min(card, Math.max(0, records.length - 1))];
   const quote = (e?: TimelineLaneEventOut) => (e && typeof e.context?.evidence?.quote === 'string' ? e.context.evidence.quote : null);
   const sourceOf = (e: TimelineLaneEventOut) => ({sourceId: typeof e.refs.source_id === 'string' ? e.refs.source_id : e.source_key.startsWith('source:') ? e.source_key.slice(7) : undefined,
@@ -96,13 +129,15 @@ export function TimelineReplay({view, onShowInLanes}: Props): ReactElement {
     <aside className="rp-steps" aria-label="The steps">
       <p className="tl2-cap">The steps · {steps.length}</p>
       <ol ref={list}>
-        {steps.map((s, i) => <li key={s.key} className={i < at ? 'done' : i === at ? 'now' : ''}>
+        {fold.early > 0 && !showEarly && foldRow('early')}
+        {steps.map((s, i) => ((i < fold.early && !showEarly) || (i >= steps.length - fold.late && !showLate)) ? null : <li key={s.key} className={i < at ? 'done' : i === at ? 'now' : ''}>
           <button aria-current={i === at ? 'step' : undefined} onClick={() => go(i)}>
             <b>{s.title}</b>
             <small>{stepWhen(s)}</small>
             <small className="rp-n">{s.event_ids.length}{s.unresolved ? <i className="rp-open" aria-hidden="true"> ↯</i> : null}
               <span className="sr-only"> {s.event_ids.length === 1 ? 'record' : 'records'}{s.unresolved ? ', unresolved' : ''}</span></small>
           </button></li>)}
+        {fold.late > 0 && !showLate && foldRow('late')}
       </ol>
       {view.steps_undated > 0 && <p className="tl2-none"><Reveal detail={`${view.steps_undated === 1 ? 'A claim' : 'Claims'} in the Story with nothing that dates ${view.steps_undated === 1 ? 'it' : 'them'}: not a step.`}>
         <span>{view.steps_undated} undated</span></Reveal></p>}
@@ -131,7 +166,7 @@ export function TimelineReplay({view, onShowInLanes}: Props): ReactElement {
         <button className="rp-icon" aria-label="On one step" onClick={() => go(at + 1)}>⏭</button>
         <div className="rp-scrub" role="slider" aria-label="Steps by date" aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={at + 1}
           aria-valuetext={`Step ${at + 1}: ${stepWhen(step)}`} tabIndex={0}>
-          {years.map(y => <span key={y} className="rp-year" style={{left: `${last > first ? ((Date.UTC(y, 0, 1) - first) / (last - first)) * 100 : 0}%`}}>{y}</span>)}
+          {years.map(y => <span key={y} className="rp-year" style={{left: `${Math.min(96, Math.max(4, pos({date_start: String(y)})))}%`}}>{y}</span>)}
           <span className="rp-line"/><span className="rp-done" style={{width: `${pos(step)}%`}}/>
           {steps.map((s, i) => <button key={s.key} className={`rp-dot${i === at ? ' now' : ''}${i < at ? ' done' : ''}${s.unresolved ? ' open' : ''}`} style={{left: `${pos(s)}%`}}
             onClick={() => go(i)} aria-label={`Step ${i + 1}: ${s.title}`} tabIndex={-1}/>)}

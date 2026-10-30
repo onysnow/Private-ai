@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {TimelinePanel} from '../features/timeline/timeline-panel';
-import {autoStep, gapWords, layersFor} from '../features/timeline/stack';
+import {autoStep, gapWords, layersFor, stackLayers} from '../features/timeline/stack';
 import type {TimelineLaneEventOut} from '../lib/generated/types.gen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -37,6 +37,32 @@ describe('stack model', () => {
     expect(layersFor(events, 'month').map(l => l.label)).toEqual(['Feb 2018', 'Mar 2018', 'Apr 2018']);
     expect(autoStep(events)).toBe('day');
     expect(gapWords(3 * 365.25 * 86_400_000)).toBe('3 years');
+  });
+});
+
+describe('stack in a case with far-off records', () => {
+  const busy = [...events, ev('g', 'Transfer four', '2018-05-02'), ev('h', 'Transfer five', '2018-06-18'), ev('i', 'Transfer six', '2018-07-02'),
+    ev('j', 'Transfer seven', '2018-07-20'), ev('k', 'Transfer eight', '2018-08-01'), ev('l', 'Transfer nine', '2018-08-21')];
+  const wide = [ev('old', 'Incorporation', '1952-11-10'), ev('old2', 'Birth', '1969-03-25'), ...busy, ev('late', 'Ruling', '2026-06-01')];
+  it('folds the outliers into one layer at each end, picks the step from the busy part, and opens on it', () => {
+    const {layers, step, start, years} = stackLayers(wide, 'auto');
+    expect(step).toBe(autoStep(busy));
+    expect(years).toBe('2018');
+    expect(layers[0]).toMatchObject({label: '1952–1969', fold: 'early'});
+    expect(layers[0].events.map(e => e.id)).toEqual(['old', 'old2']);
+    expect(layers[layers.length - 1]).toMatchObject({label: '2026', fold: 'late', gap: '8 years later'});
+    expect(start).toBe(1);
+    expect(layers[start].fold).toBeUndefined();
+  });
+
+  it('opens the stack on the busy part, with the folded years one step back', async () => {
+    mockApi({'GET /api/investigations/inv-1/timeline/lanes': lanesBody('inv-1', wide)});
+    render(<QueryProvider><TimelinePanel investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('tab', {name: 'Stack'}));
+    expect(screen.queryByRole('heading', {name: 'Incorporation'})).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: /Back/}));
+    expect(screen.getByRole('heading', {name: 'Incorporation'})).toBeInTheDocument();
   });
 });
 
