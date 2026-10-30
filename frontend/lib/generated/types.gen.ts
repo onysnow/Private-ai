@@ -17357,6 +17357,114 @@ export type PropertyTemporalIntervalOut = {
 };
 
 /**
+ * ProposalRoleOut
+ */
+export type ProposalRoleOut = {
+  /**
+   * Label
+   */
+  label: string;
+  /**
+   * Role
+   */
+  role: string;
+};
+
+/**
+ * ProposedColumnIn
+ */
+export type ProposedColumnIn = {
+  /**
+   * Column
+   */
+  column: string;
+  /**
+   * Role
+   *
+   * What the column is; None leaves it out.
+   */
+  role?: string | null;
+};
+
+/**
+ * ProposedColumnOut
+ *
+ * One column of a table and what the proposal says it is, with how sure it is and why (from its header, checked
+ * against its values). ``role`` None: the proposal leaves the column out; its cells stay in each row's evidence.
+ */
+export type ProposedColumnOut = {
+  /**
+   * Column
+   */
+  column: string;
+  /**
+   * Confidence
+   */
+  confidence: number | null;
+  /**
+   * Role
+   */
+  role: string | null;
+  /**
+   * Why
+   */
+  why: string | null;
+};
+
+/**
+ * ProposedRowOut
+ *
+ * One of the first rows as the proposal reads it: what accepting makes from it (a payment's date, amount without
+ * its sign, currency, payer, payee, purpose; a party's name). A value the row does not give is left out.
+ */
+export type ProposedRowOut = {
+  /**
+   * Amount
+   */
+  amount?: string | null;
+  /**
+   * Currency
+   */
+  currency?: string | null;
+  /**
+   * Date
+   */
+  date?: string | null;
+  /**
+   * Kind
+   */
+  kind?: string | null;
+  /**
+   * Name
+   */
+  name?: string | null;
+  /**
+   * Number
+   */
+  number: number;
+  /**
+   * Payee
+   */
+  payee?: string | null;
+  /**
+   * Payer
+   */
+  payer?: string | null;
+  /**
+   * Problems
+   */
+  problems: Array<string>;
+  /**
+   * Purpose
+   */
+  purpose?: string | null;
+  /**
+   * Reference
+   */
+  reference?: string | null;
+};
+
+/**
  * ProvenanceTraceOut
  *
  * Everything connected to one record, followed back to its sources.
@@ -21942,6 +22050,12 @@ export type TableMappingOut = {
    */
   links_proposed: number;
   /**
+   * Prepare
+   */
+  prepare?: {
+    [key: string]: unknown;
+  } | null;
+  /**
    * Query
    */
   query: {
@@ -22041,6 +22155,185 @@ export type TableOut = {
    * Truncated
    */
   truncated: boolean;
+};
+
+/**
+ * TableProposalAcceptIn
+ *
+ * A person accepts the mapping proposed for a table, as it is (an empty body) or changed: which column is which,
+ * whose account a statement is, how its numbers and dates are written (app/services/table_proposals.py).
+ */
+export type TableProposalAcceptIn = {
+  /**
+   * Account Holder
+   */
+  account_holder?: string | null;
+  /**
+   * Columns
+   */
+  columns?: Array<ProposedColumnIn> | null;
+  /**
+   * Currency
+   */
+  currency?: string | null;
+  /**
+   * Date Order
+   */
+  date_order?: 'DMY' | 'MDY' | null;
+  /**
+   * Decimal
+   */
+  decimal?: '.' | ',' | null;
+  /**
+   * Kind
+   */
+  kind?: 'payments' | 'parties' | null;
+  /**
+   * Schema
+   */
+  schema?:
+    'Person' | 'Company' | 'Organization' | 'PublicBody' | 'LegalEntity' | null;
+  /**
+   * Sheet
+   */
+  sheet?: string | null;
+};
+
+/**
+ * TableProposalAcceptedOut
+ *
+ * An accepted proposal: where it stands now, and what its mapping proposed for review.
+ */
+export type TableProposalAcceptedOut = {
+  proposal: TableProposalViewOut;
+  run: TableMappingRunOut;
+};
+
+/**
+ * TableProposalDecisionOut
+ */
+export type TableProposalDecisionOut = {
+  /**
+   * Changed
+   */
+  changed: boolean;
+  /**
+   * Decided At
+   *
+   * ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)
+   */
+  decided_at: string;
+  /**
+   * Decided By
+   */
+  decided_by: string | null;
+  /**
+   * Decision
+   */
+  decision: 'accepted' | 'dismissed';
+  /**
+   * Mapping Id
+   */
+  mapping_id: string | null;
+};
+
+/**
+ * TableProposalDismissIn
+ */
+export type TableProposalDismissIn = {
+  /**
+   * Sheet
+   */
+  sheet?: string | null;
+};
+
+/**
+ * TableProposalOut
+ *
+ * What a table looks like (payments, or a list of people or companies) and which column is which.
+ */
+export type TableProposalOut = {
+  /**
+   * Account Holder
+   *
+   * A statement's account holder: the payer of money out, the payee of money in.
+   */
+  account_holder?: string | null;
+  /**
+   * Columns
+   */
+  columns: Array<ProposedColumnOut>;
+  /**
+   * Confidence
+   */
+  confidence: number | null;
+  /**
+   * Currency
+   *
+   * A currency named in a header, used where a row names none.
+   */
+  currency?: string | null;
+  /**
+   * Date Order
+   */
+  date_order: 'DMY' | 'MDY';
+  /**
+   * Decimal
+   */
+  decimal: '.' | ',';
+  /**
+   * Kind
+   */
+  kind: 'payments' | 'parties';
+  /**
+   * Sample
+   */
+  sample: Array<ProposedRowOut>;
+  /**
+   * Schema
+   *
+   * A party list's kind of record: Person, Company or LegalEntity.
+   */
+  schema?: string | null;
+  /**
+   * Shape
+   *
+   * pair: a payer and a payee per row; statement: one account's rows.
+   */
+  shape?: 'pair' | 'statement' | null;
+  /**
+   * Sheet
+   */
+  sheet: string | null;
+};
+
+/**
+ * TableProposalViewOut
+ *
+ * The proposal shown on a table file and where it stands: proposed; accepted or dismissed (by whom, when, and
+ * whether it was changed first); mapped (a person mapped the table by hand); none (it looks like neither payments
+ * nor a list of parties); unreadable (``problem`` says why).
+ */
+export type TableProposalViewOut = {
+  decision: TableProposalDecisionOut | null;
+  /**
+   * Document Id
+   */
+  document_id: string;
+  /**
+   * Problem
+   */
+  problem?: string | null;
+  proposal: TableProposalOut | null;
+  /**
+   * Roles
+   */
+  roles: Array<ProposalRoleOut>;
+  /**
+   * Status
+   */
+  status:
+    'proposed' | 'accepted' | 'dismissed' | 'mapped' | 'none' | 'unreadable';
 };
 
 /**
@@ -29851,6 +30144,119 @@ export type PreviewTableMappingResponses = {
 
 export type PreviewTableMappingResponse =
   PreviewTableMappingResponses[keyof PreviewTableMappingResponses];
+
+export type GetTableProposalData = {
+  body?: never;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: {
+    /**
+     * Sheet
+     */
+    sheet?: string | null;
+  };
+  url: '/api/documents/{document_id}/table-proposal';
+};
+
+export type GetTableProposalErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type GetTableProposalError =
+  GetTableProposalErrors[keyof GetTableProposalErrors];
+
+export type GetTableProposalResponses = {
+  /**
+   * Successful Response
+   */
+  200: TableProposalViewOut;
+};
+
+export type GetTableProposalResponse =
+  GetTableProposalResponses[keyof GetTableProposalResponses];
+
+export type AcceptTableProposalData = {
+  body: TableProposalAcceptIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/table-proposal/accept';
+};
+
+export type AcceptTableProposalErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type AcceptTableProposalError =
+  AcceptTableProposalErrors[keyof AcceptTableProposalErrors];
+
+export type AcceptTableProposalResponses = {
+  /**
+   * Successful Response
+   */
+  200: TableProposalAcceptedOut;
+};
+
+export type AcceptTableProposalResponse =
+  AcceptTableProposalResponses[keyof AcceptTableProposalResponses];
+
+export type DismissTableProposalData = {
+  body: TableProposalDismissIn;
+  path: {
+    /**
+     * Document Id
+     */
+    document_id: string;
+  };
+  query?: never;
+  url: '/api/documents/{document_id}/table-proposal/dismiss';
+};
+
+export type DismissTableProposalErrors = {
+  /**
+   * The request's input does not match what the route declares
+   */
+  422: ValidationErrorOut;
+  /**
+   * Refused: why, in a sentence
+   */
+  '4XX': ErrorOut;
+};
+
+export type DismissTableProposalError =
+  DismissTableProposalErrors[keyof DismissTableProposalErrors];
+
+export type DismissTableProposalResponses = {
+  /**
+   * Successful Response
+   */
+  200: TableProposalViewOut;
+};
+
+export type DismissTableProposalResponse =
+  DismissTableProposalResponses[keyof DismissTableProposalResponses];
 
 export type GetDocumentTranscriptData = {
   body?: never;

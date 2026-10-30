@@ -655,6 +655,37 @@ class TableMappingIn(BaseModel):
                 for name, entity in self.entities.items()}
 
 
+class ProposedColumnIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    column: str = Field(max_length=255)
+    role: str | None = Field(default=None, max_length=32, description="What the column is; None leaves it out.")
+
+
+class TableProposalAcceptIn(BaseModel):
+    """A person accepts the mapping proposed for a table, as it is (an empty body) or changed: which column is which,
+    whose account a statement is, how its numbers and dates are written (app/services/table_proposals.py)."""
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    sheet: str | None = Field(default=None, max_length=255)
+    kind: Literal["payments", "parties"] | None = None
+    schema_: Literal["Person", "Company", "Organization", "PublicBody", "LegalEntity"] | None = Field(default=None, alias="schema")
+    columns: list[ProposedColumnIn] | None = Field(default=None, max_length=200)
+    account_holder: str | None = Field(default=None, max_length=500)
+    decimal: Literal[".", ","] | None = None
+    date_order: Literal["DMY", "MDY"] | None = None
+    currency: str | None = Field(default=None, pattern=r"^[A-Za-z]{3}$")
+
+    def change(self) -> dict[str, Any]:
+        out = self.model_dump(by_alias=True, exclude_none=True)
+        if self.currency:
+            out["currency"] = self.currency.upper()
+        return out
+
+
+class TableProposalDismissIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    sheet: str | None = Field(default=None, max_length=255)
+
+
 class EntitySetSend(BaseModel):
     """A diagram, timeline or list to make (or update) in OpenAleph from the
     investigation's records in its collection (app/services/openaleph_entitysets.py)."""

@@ -26,6 +26,7 @@ import '../styles/learn.css';
 import '../styles/lock.css';
 import '../styles/pack-check.css';
 import '../styles/by-hand.css';
+import '../styles/table-proposal.css';
 import '../styles/sources.css';
 import '../styles/watchlist.css';
 import '../styles/safety.css';

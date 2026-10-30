@@ -63,6 +63,10 @@ MAX_ROWS = 5000          # rows a mapping reads; every result is reviewed by han
 SAMPLE_ROWS = 20         # rows shown with the columns
 PREVIEW_ROWS = 10        # rows a preview maps
 METHOD = "column_mapping"
+# A cell a proposed mapping reads after reading the row's own cells (an amount without its separators, a date as
+# YYYY-MM-DD, the payer of a statement's row; app/services/table_proposals.py). Such cells are never evidence: a
+# proposal's evidence is the row as the spreadsheet has it.
+DERIVED = "\u21b3 "
 
 logger = logging.getLogger("journalism.table_mappings")
 _engine_log = logging.getLogger("followthemoney.mapping.entity")
@@ -80,6 +84,32 @@ class Table:
     sheets: list[str]
     sheet: str | None
     truncated: bool = False
+    problems: dict[int, list[str]] = field(default_factory=dict)   # row number -> what preparing it could not read
+
+
+def prepared(table: Table, prepare: dict[str, Any] | None) -> Table:
+    """The table with the cells a proposed mapping reads added to each row (app/services/table_proposals.py)."""
+    if not prepare:
+        return table
+    from app.services.table_proposals import prepare_row
+
+    rows: list[tuple[int, dict[str, str]]] = []
+    problems: dict[int, list[str]] = {}
+    added: list[str] = []
+    for number, cells in table.rows:
+        made, found = prepare_row(cells, prepare)
+        for column in made:
+            if column not in added:
+                added.append(column)
+        rows.append((number, {**cells, **made}))
+        if found:
+            problems[number] = found
+    return Table(table.columns + [c for c in added if c not in table.columns], rows, table.sheets, table.sheet, table.truncated, problems)
+
+
+def own_cells(cells: dict[str, str]) -> dict[str, str]:
+    """A row's cells as the spreadsheet has them, without those a proposed mapping added."""
+    return {k: v for k, v in cells.items() if not k.startswith(DERIVED)}
 
 
 def _extension(doc: Document) -> str:
@@ -184,6 +214,28 @@ def _columns_of(spec: dict[str, Any]) -> list[str]:
     return out + list(spec.get("columns") or [])
 
 
+def _read_from(columns: list[str], prepare: dict[str, Any] | None) -> list[str]:
+    """The spreadsheet's own columns a value was read from: a cell a proposed mapping added names the columns it
+    was made from (an amount from Debit and Credit, a statement's payer from the holder and the other party)."""
+    if not prepare:
+        return columns
+    roles: dict[str, list[str]] = prepare.get("roles") or {}
+    made_from = {"amount": ["amount", "debit", "credit"], "payer": ["payer", "counterparty", "payee", "holder"],
+                 "payee": ["payee", "counterparty", "payer", "holder"], "name": ["name", "first_name", "last_name"]}
+    out: list[str] = []
+    for column in columns:
+        if not column.startswith(DERIVED):
+            out.append(column)
+            continue
+        role = column[len(DERIVED):]
+        if prepare.get("shape") == "pair" and role in {"payer", "payee"}:
+            out += roles.get(role) or []
+            continue
+        for source in made_from.get(role, [role]):
+            out += roles.get(source) or []
+    return list(dict.fromkeys(out))
+
+
 def check_query(query: dict[str, Any], table: Table) -> QueryMapping:
     """Refuse a mapping the Workbench would not keep (see the module notes),
     then let FollowTheMoney check the rest as OpenAleph does on save
@@ -279,7 +331,7 @@ def map_rows(engine: QueryMapping, table: Table, *, limit: int | None = None) ->
         for number, cells in table.rows[:limit] if limit else table.rows:
             handler.messages = []
             row = MappedRow(number, cells, dict(engine.map(cells)))
-            row.problems = [text for text in map(_dropped_text, handler.messages) if text]
+            row.problems = list(table.problems.get(number, [])) + [text for text in map(_dropped_text, handler.messages) if text]
             out.append(row)
     finally:
         _engine_log.removeHandler(handler)
@@ -295,7 +347,9 @@ def _caption(proxy: Any) -> str | None:
 
 
 def _plain_properties(proxy: Any) -> dict[str, list[str]]:
-    return {prop.name: list(proxy.get(prop)) for prop in proxy.iterprops() if prop.type != registry.entity}
+    # An empty cell is no value (FollowTheMoney keeps an empty string for a text property such as a currency).
+    found = {prop.name: [v for v in proxy.get(prop) if str(v).strip()] for prop in proxy.iterprops() if prop.type != registry.entity}
+    return {name: values for name, values in found.items() if values}
 
 
 def describe_row(row: MappedRow, query: dict[str, Any]) -> dict[str, Any]:
@@ -312,11 +366,11 @@ def describe_row(row: MappedRow, query: dict[str, Any]) -> dict[str, Any]:
             item["target"] = _caption(target) if target is not None else None
             item["caption"] = f"{item['source'] or '?'} → {item['target'] or '?'}"
         entities.append(item)
-    return {"number": row.number, "cells": row.cells, "entities": entities, "problems": list(row.problems)}
+    return {"number": row.number, "cells": own_cells(row.cells), "entities": entities, "problems": list(row.problems)}
 
 
-def preview(doc: Document, query: dict[str, Any], *, sheet: str | None) -> dict[str, Any]:
-    table = read_table(doc, sheet=sheet, limit=PREVIEW_ROWS)
+def preview(doc: Document, query: dict[str, Any], *, sheet: str | None, prepare: dict[str, Any] | None = None) -> dict[str, Any]:
+    table = prepared(read_table(doc, sheet=sheet, limit=PREVIEW_ROWS), prepare)
     engine = check_query(query, table)
     rows = map_rows(engine, table)
     return {"document_id": doc.id, "sheet": table.sheet, "rows": [describe_row(row, query) for row in rows]}
@@ -326,7 +380,7 @@ def preview(doc: Document, query: dict[str, Any], *, sheet: str | None) -> dict[
 
 
 def _row_text(cells: dict[str, str]) -> str:
-    return "; ".join(f"{column}: {value}" for column, value in cells.items() if value)
+    return "; ".join(f"{column}: {value}" for column, value in own_cells(cells).items() if value)
 
 
 def _where(table: Table, numbers: list[int]) -> str:
@@ -340,23 +394,27 @@ def _add_row(item: dict[str, Any], table: Table, row: MappedRow, properties: dic
     item["rows"].append(row.number)
     item["locator"] = _where(table, item["rows"])
     item["row_text"] = "\n".join(filter(None, [item.get("row_text"), _row_text(row.cells)]))
-    item.setdefault("row_cells", []).append({"number": row.number, "cells": {k: v for k, v in row.cells.items() if v}})
+    item.setdefault("row_cells", []).append({"number": row.number, "cells": {k: v for k, v in own_cells(row.cells).items() if v}})
     for prop, values in properties.items():
         kept = item["properties"].setdefault(prop, [])
         kept += [v for v in values if v not in kept]
 
 
-def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str | None, created_by: str | None) -> dict[str, Any]:
+def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str | None, created_by: str | None,
+                prepare: dict[str, Any] | None = None, commit: bool = True) -> dict[str, Any]:
     """Map every row and propose what it makes. An entity made by several
     rows (the same key values) is one proposal listing those rows; an entity
     or link this document's mappings already proposed is not proposed again.
-    Returns the mapping and what it proposed and skipped."""
+    ``prepare`` is how a proposed mapping reads the cells first
+    (app/services/table_proposals.py). Returns the mapping and what it
+    proposed and skipped."""
     table = read_table(doc, sheet=sheet)
     if table.truncated:
         raise TableError(f"The sheet has more than {MAX_ROWS} rows; split it, or map it in OpenAleph and review the results there")
+    table = prepared(table, prepare)
     check_query(query, table)
     mapping = TableMapping(investigation_id=doc.investigation_id, document_id=doc.id, sheet=table.sheet, query=query,
-                           created_by=created_by, rows_read=len(table.rows))
+                           prepare=prepare, created_by=created_by, rows_read=len(table.rows))
     db.add(mapping)
     db.flush()
     rows = map_rows(_engine(query, key_prefix=doc.id), table)
@@ -393,7 +451,7 @@ def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str
                 "caption": caption, "suggested_schema": schema, "properties": {}, "rows": [],
                 "mapping": {"id": mapping.id, "entity": name, "ftm_id": proxy.id},
                 "rationale": {"rule": METHOD, "entity": name, "schema": schema,
-                              "columns": {prop: _columns_of(spec) for prop, spec in (query[name].get("properties") or {}).items()}},
+                              "columns": {prop: _read_from(_columns_of(spec), prepare) for prop, spec in (query[name].get("properties") or {}).items()}},
             })
             _add_row(item, table, row, _plain_properties(proxy))
         for name, proxy in row.entities.items():
@@ -419,9 +477,12 @@ def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str
                 "rows": [],
                 "mapping": {"id": mapping.id, "entity": name, "ftm_id": proxy.id},
                 "rationale": {"rule": METHOD, "entity": name, "schema": schema, "source": ends["source"], "target": ends["target"],
-                              "columns": {prop: _columns_of(spec) for prop, spec in (query[name].get("properties") or {}).items()}},
+                              "columns": {prop: _read_from(_columns_of(spec), prepare) for prop, spec in (query[name].get("properties") or {}).items()}},
             })
             _add_row(link, table, row, properties)
+            # A payment's kind only when a column says it (app/services/table_proposals.py); otherwise not said.
+            if schema == "Payment" and row.cells.get(DERIVED + "kind") and not link.get("payment_kind"):
+                link["payment_kind"] = row.cells[DERIVED + "kind"]
 
     made_entities = made_links = already = 0
     candidate_for: dict[str, str] = {ftm_id: c.id for ftm_id, c in existing.items()}
@@ -446,8 +507,11 @@ def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str
         made_links += 1
     mapping.entities_proposed = made_entities
     mapping.links_proposed = made_links
-    db.commit()
-    db.refresh(mapping)
+    if commit:
+        db.commit()
+        db.refresh(mapping)
+    else:
+        db.flush()
     return {"mapping": serialize_mapping(mapping), "entities_proposed": made_entities, "links_proposed": made_links,
             "already_proposed": already, "skipped": skipped}
 
@@ -455,7 +519,8 @@ def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str
 def serialize_mapping(mapping: TableMapping) -> dict[str, Any]:
     return {"id": mapping.id, "document_id": mapping.document_id, "sheet": mapping.sheet, "query": mapping.query,
             "created_by": mapping.created_by, "created_at": mapping.created_at, "rows_read": mapping.rows_read,
-            "entities_proposed": mapping.entities_proposed, "links_proposed": mapping.links_proposed}
+            "entities_proposed": mapping.entities_proposed, "links_proposed": mapping.links_proposed,
+            "prepare": mapping.prepare}
 
 
 def list_mappings(db: Session, doc: Document) -> list[dict[str, Any]]:

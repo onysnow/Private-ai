@@ -671,7 +671,7 @@ BACKLOG "Documents have no kind/language field". Built on `documents` (migration
 - Kind and language travel in a backup (they are columns of `documents`); a backup made before keeps none and the
   restored documents read as not known.
 
-## 39. Money's columns say less at rest when the picture is dense (30 Oct 2026)
+## 38. Money's columns say less at rest when the picture is dense (30 Oct 2026)
 
 Ony, 30 Oct, on the 1MDB Money columns: "a LOT of overlapping UI". With five columns and twenty flows, every middle
 party's "in · out" sums sat on the bands, six amount chips were laid over them, and the bands showed through the names.
@@ -681,3 +681,35 @@ drawn above everything else and in its own place when no free place is near; a m
 a source's is its name and total (the count of payments on the label's reveal, as the in/out sums already are); a
 label's plate is opaque, so a band passing behind never reads through a name. A sparse picture keeps every chip and
 sum at rest, as SEE_2 draws it.
+
+## 39. A table proposes its own mapping; a person accepts it (30 Oct 2026)
+BACKLOG "CSV and XLSX make no payments unless mapped". When a CSV, TSV or XLSX arrives, `app/services/table_proposals.py`
+reads its header and first 50 rows and says what it looks like; nothing is made until a person accepts.
+- **Two kinds only:** payments, or a list of people or companies (Person, Company or LegalEntity, from its columns).
+  Anything else gets no proposal and stays with Map columns to entities. Up to five sheets of a workbook are tried; the
+  first that looks like either is proposed.
+- **Roles from the header, checked against the values:** date, value date, amount, money out, money in, which way,
+  currency, payer, payee, other party, account holder, purpose, reference, kind of payment (and name, first/last name,
+  date of birth, nationality, country, address, registration number, incorporated, email, phone for lists). Header
+  words in English, German, French, Spanish, Italian, Dutch and Portuguese. A column's confidence is its header's
+  weight times how many sample values read as the role; a proposal under 50 % is not shown. "Valuta" holding EUR is a
+  currency, holding dates a value date. Booking date is the date; a value date is kept apart, and is the date only when
+  it is the only one.
+- **What a FollowTheMoney mapping cannot say is read first** (`prepare`, kept on the mapping, migration
+  `b1c4e7a9d352`): thousand separators and either decimal mark (decided from the amounts: "1.234,56" vs "1,234.56"),
+  signs, brackets, DR/CR, a currency in the cell or the header; debit/credit pairs or a which-way column; dates day or
+  month first (decided from values above 12, dots mean day first) or in words; and a single account's statement, where
+  the holder (a column, or a name the person types; asked for before Accept is possible) pays money out and receives
+  money in. The amount kept is without its sign. A statement with no other-party column reads its description as the
+  other party, at lower confidence. A counterparty column with unsigned amounts and nothing saying which way is not
+  proposed: guessing the direction would invent who paid whom.
+- **Accepting runs the existing column mapping** (`run_mapping`), so every party and payment is a proposal in the
+  file's queue, reviewed into the ledger as before. Evidence is the row as the file has it, never the derived cells.
+  `payment_kind` is set only when a column says a kind in the kinds' own words (fine, fee, loan, transfer…).
+- **Who decided is kept** (`table_proposal_decisions`): accepted or dismissed, by whom, when, the proposal as shown,
+  the proposal as accepted, whether it was changed, and the mapping it ran. Accepting twice is refused. A dismissed
+  proposal is no longer offered; the hand mapper stays. Both travel in a backup.
+- **On screen** (Drop read receipt, Library side pane): "Looks like payments" (or "one account's payments", "a list of
+  companies"), each column as a chip "Date → date" whose strength is how sure (the percentage and the reason on
+  hover), "+N left out", the first row as it would be read (all three sample rows on hover), Accept, Edit (each column's
+  role, how numbers and dates are written), Dismiss.

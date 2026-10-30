@@ -4280,6 +4280,73 @@ class TableMappingOut(ResponseModel):
     rows_read: int
     entities_proposed: int
     links_proposed: int
+    # How a proposed mapping read the cells first (app/services/table_proposals.py); None for one made by hand.
+    prepare: dict[str, Any] | None = None
+
+
+class ProposedColumnOut(ResponseModel):
+    """One column of a table and what the proposal says it is, with how sure it is and why (from its header, checked
+    against its values). ``role`` None: the proposal leaves the column out; its cells stay in each row's evidence."""
+    column: str
+    role: str | None
+    confidence: float | None
+    why: str | None
+
+
+class ProposedRowOut(ResponseModel):
+    """One of the first rows as the proposal reads it: what accepting makes from it (a payment's date, amount without
+    its sign, currency, payer, payee, purpose; a party's name). A value the row does not give is left out."""
+    number: int
+    problems: list[str]
+    date: str | None = None
+    amount: str | None = None
+    currency: str | None = None
+    payer: str | None = None
+    payee: str | None = None
+    purpose: str | None = None
+    reference: str | None = None
+    kind: str | None = None
+    name: str | None = None
+
+
+class TableProposalOut(ResponseModel):
+    """What a table looks like (payments, or a list of people or companies) and which column is which."""
+    kind: Literal["payments", "parties"]
+    schema_: str | None = Field(default=None, alias="schema", description="A party list's kind of record: Person, Company or LegalEntity.")
+    shape: Literal["pair", "statement"] | None = Field(default=None, description="pair: a payer and a payee per row; statement: one account's rows.")
+    account_holder: str | None = Field(default=None, description="A statement's account holder: the payer of money out, the payee of money in.")
+    sheet: str | None
+    columns: list[ProposedColumnOut]
+    confidence: float | None
+    decimal: Literal[".", ","]
+    date_order: Literal["DMY", "MDY"]
+    currency: str | None = Field(default=None, description="A currency named in a header, used where a row names none.")
+    sample: list[ProposedRowOut]
+
+
+class ProposalRoleOut(ResponseModel):
+    role: str
+    label: str
+
+
+class TableProposalDecisionOut(ResponseModel):
+    decision: Literal["accepted", "dismissed"]
+    decided_by: str | None
+    decided_at: Timestamp
+    mapping_id: str | None
+    changed: bool
+
+
+class TableProposalViewOut(ResponseModel):
+    """The proposal shown on a table file and where it stands: proposed; accepted or dismissed (by whom, when, and
+    whether it was changed first); mapped (a person mapped the table by hand); none (it looks like neither payments
+    nor a list of parties); unreadable (``problem`` says why)."""
+    document_id: str
+    status: Literal["proposed", "accepted", "dismissed", "mapped", "none", "unreadable"]
+    proposal: TableProposalOut | None
+    roles: list[ProposalRoleOut]
+    decision: TableProposalDecisionOut | None
+    problem: str | None = None
 
 
 class SkippedRowOut(ResponseModel):
@@ -4296,6 +4363,12 @@ class TableMappingRunOut(ResponseModel):
     links_proposed: int
     already_proposed: int
     skipped: list[SkippedRowOut]
+
+
+class TableProposalAcceptedOut(ResponseModel):
+    """An accepted proposal: where it stands now, and what its mapping proposed for review."""
+    proposal: TableProposalViewOut
+    run: TableMappingRunOut
 
 
 class EntitySetOut(ResponseModel):

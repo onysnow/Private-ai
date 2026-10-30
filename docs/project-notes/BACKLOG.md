@@ -353,7 +353,7 @@ Scripts and output: `/tmp/claude-0/audit/` (cloud session only).
   - ~~Chart-builder bars do nothing.~~ Fixed 28 Oct: a bar, slice or point traces the first record behind its value (`pickedRow`, `chart-builder-panel.tsx`).
   - ~~Party chips inside a flag's detail do nothing.~~ Fixed 28 Oct: a party named in the open flag's picture filters the list to its flags, and again shows all (`red-flags-board.tsx`).
 - **Material types:**
-  - CSV and XLSX make no payments unless mapped.
+  - ~~CSV and XLSX make no payments unless mapped.~~ 30 Oct: a table proposes its own mapping (payments or a list of parties, each column with how sure) on the Drop receipt and the Library pane; a person accepts, edits or dismisses it, and who did is kept (DECISIONS_LOG 39).
   - MP3, WAV and MP4 give a 415, and the demo's .mp3/.mov show "failed · 0 chunks" with no reason. (28 Oct: recordings are accepted and transcribed on this computer, ADR-0020; a read without the model fetched fails saying what to run.)
   - A web link isn't fetched or archived, and "not a url" is accepted. (28 Oct: a link is captured: page, screenshot with clock, HAR and WARC with SHA-256, read as a document; ADR-0018, The Drop › Links & captures. A source's address is checked as a web address, `app/services/sources.py`.)
   - The watchlist "Check now" needs OpenAleph.

@@ -7486,6 +7486,55 @@ export const zPropertyConflictDecisionOut = z.object({
 });
 
 /**
+ * ProposalRoleOut
+ */
+export const zProposalRoleOut = z.object({
+  label: z.string(),
+  role: z.string(),
+});
+
+/**
+ * ProposedColumnIn
+ */
+export const zProposedColumnIn = z.object({
+  column: z.string().max(255),
+  role: z.string().max(32).nullish(),
+});
+
+/**
+ * ProposedColumnOut
+ *
+ * One column of a table and what the proposal says it is, with how sure it is and why (from its header, checked
+ * against its values). ``role`` None: the proposal leaves the column out; its cells stay in each row's evidence.
+ */
+export const zProposedColumnOut = z.object({
+  column: z.string(),
+  confidence: z.number().nullable(),
+  role: z.string().nullable(),
+  why: z.string().nullable(),
+});
+
+/**
+ * ProposedRowOut
+ *
+ * One of the first rows as the proposal reads it: what accepting makes from it (a payment's date, amount without
+ * its sign, currency, payer, payee, purpose; a party's name). A value the row does not give is left out.
+ */
+export const zProposedRowOut = z.object({
+  amount: z.string().nullish(),
+  currency: z.string().nullish(),
+  date: z.string().nullish(),
+  kind: z.string().nullish(),
+  name: z.string().nullish(),
+  number: z.int(),
+  payee: z.string().nullish(),
+  payer: z.string().nullish(),
+  problems: z.array(z.string()),
+  purpose: z.string().nullish(),
+  reference: z.string().nullish(),
+});
+
+/**
  * ProviderLeadOut
  *
  * What an outside provider said the name resolves to: a lead only, never a choice.
@@ -9814,6 +9863,7 @@ export const zTableMappingOut = z.object({
   entities_proposed: z.int(),
   id: z.string(),
   links_proposed: z.int(),
+  prepare: z.record(z.string(), z.unknown()).nullish(),
   query: z.record(z.string(), z.unknown()),
   rows_read: z.int(),
   sheet: z.string().nullable(),
@@ -9841,6 +9891,102 @@ export const zTableMappingRunOut = z.object({
   links_proposed: z.int(),
   mapping: zTableMappingOut,
   skipped: z.array(zSkippedRowOut),
+});
+
+/**
+ * TableProposalAcceptIn
+ *
+ * A person accepts the mapping proposed for a table, as it is (an empty body) or changed: which column is which,
+ * whose account a statement is, how its numbers and dates are written (app/services/table_proposals.py).
+ */
+export const zTableProposalAcceptIn = z.object({
+  account_holder: z.string().max(500).nullish(),
+  columns: z.array(zProposedColumnIn).max(200).nullish(),
+  currency: z
+    .string()
+    .regex(/^[A-Za-z]{3}$/)
+    .nullish(),
+  date_order: z.enum(['DMY', 'MDY']).nullish(),
+  decimal: z.enum(['.', ',']).nullish(),
+  kind: z.enum(['payments', 'parties']).nullish(),
+  schema: z
+    .enum(['Person', 'Company', 'Organization', 'PublicBody', 'LegalEntity'])
+    .nullish(),
+  sheet: z.string().max(255).nullish(),
+});
+
+/**
+ * TableProposalDecisionOut
+ */
+export const zTableProposalDecisionOut = z.object({
+  changed: z.boolean(),
+  decided_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})?$/,
+    ),
+  decided_by: z.string().nullable(),
+  decision: z.enum(['accepted', 'dismissed']),
+  mapping_id: z.string().nullable(),
+});
+
+/**
+ * TableProposalDismissIn
+ */
+export const zTableProposalDismissIn = z.object({
+  sheet: z.string().max(255).nullish(),
+});
+
+/**
+ * TableProposalOut
+ *
+ * What a table looks like (payments, or a list of people or companies) and which column is which.
+ */
+export const zTableProposalOut = z.object({
+  account_holder: z.string().nullish(),
+  columns: z.array(zProposedColumnOut),
+  confidence: z.number().nullable(),
+  currency: z.string().nullish(),
+  date_order: z.enum(['DMY', 'MDY']),
+  decimal: z.enum(['.', ',']),
+  kind: z.enum(['payments', 'parties']),
+  sample: z.array(zProposedRowOut),
+  schema: z.string().nullish(),
+  shape: z.enum(['pair', 'statement']).nullish(),
+  sheet: z.string().nullable(),
+});
+
+/**
+ * TableProposalViewOut
+ *
+ * The proposal shown on a table file and where it stands: proposed; accepted or dismissed (by whom, when, and
+ * whether it was changed first); mapped (a person mapped the table by hand); none (it looks like neither payments
+ * nor a list of parties); unreadable (``problem`` says why).
+ */
+export const zTableProposalViewOut = z.object({
+  decision: zTableProposalDecisionOut.nullable(),
+  document_id: z.string(),
+  problem: z.string().nullish(),
+  proposal: zTableProposalOut.nullable(),
+  roles: z.array(zProposalRoleOut),
+  status: z.enum([
+    'proposed',
+    'accepted',
+    'dismissed',
+    'mapped',
+    'none',
+    'unreadable',
+  ]),
+});
+
+/**
+ * TableProposalAcceptedOut
+ *
+ * An accepted proposal: where it stands now, and what its mapping proposed for review.
+ */
+export const zTableProposalAcceptedOut = z.object({
+  proposal: zTableProposalViewOut,
+  run: zTableMappingRunOut,
 });
 
 /**
@@ -13113,6 +13259,41 @@ export const zPreviewTableMappingPath = z.object({
  * Successful Response
  */
 export const zPreviewTableMappingResponse = zTableMappingPreviewOut;
+
+export const zGetTableProposalPath = z.object({
+  document_id: z.string(),
+});
+
+export const zGetTableProposalQuery = z.object({
+  sheet: z.string().nullish(),
+});
+
+/**
+ * Successful Response
+ */
+export const zGetTableProposalResponse = zTableProposalViewOut;
+
+export const zAcceptTableProposalBody = zTableProposalAcceptIn;
+
+export const zAcceptTableProposalPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zAcceptTableProposalResponse = zTableProposalAcceptedOut;
+
+export const zDismissTableProposalBody = zTableProposalDismissIn;
+
+export const zDismissTableProposalPath = z.object({
+  document_id: z.string(),
+});
+
+/**
+ * Successful Response
+ */
+export const zDismissTableProposalResponse = zTableProposalViewOut;
 
 export const zGetDocumentTranscriptPath = z.object({
   document_id: z.string(),

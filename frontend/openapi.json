@@ -34276,6 +34276,223 @@
         "title": "PropertyTemporalIntervalOut",
         "type": "object"
       },
+      "ProposalRoleOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "label"
+        ],
+        "title": "ProposalRoleOut",
+        "type": "object"
+      },
+      "ProposedColumnIn": {
+        "additionalProperties": false,
+        "properties": {
+          "column": {
+            "maxLength": 255,
+            "title": "Column",
+            "type": "string"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the column is; None leaves it out.",
+            "title": "Role"
+          }
+        },
+        "required": [
+          "column"
+        ],
+        "title": "ProposedColumnIn",
+        "type": "object"
+      },
+      "ProposedColumnOut": {
+        "description": "One column of a table and what the proposal says it is, with how sure it is and why (from its header, checked\nagainst its values). ``role`` None: the proposal leaves the column out; its cells stay in each row's evidence.",
+        "properties": {
+          "column": {
+            "title": "Column",
+            "type": "string"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "column",
+          "role",
+          "confidence",
+          "why"
+        ],
+        "title": "ProposedColumnOut",
+        "type": "object"
+      },
+      "ProposedRowOut": {
+        "description": "One of the first rows as the proposal reads it: what accepting makes from it (a payment's date, amount without\nits sign, currency, payer, payee, purpose; a party's name). A value the row does not give is left out.",
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "payee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payee"
+          },
+          "payer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payer"
+          },
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          }
+        },
+        "required": [
+          "number",
+          "problems"
+        ],
+        "title": "ProposedRowOut",
+        "type": "object"
+      },
       "ProvenanceTraceOut": {
         "description": "Everything connected to one record, followed back to its sources.\n`root` is the record itself and takes a different shape per record type.",
         "properties": {
@@ -41978,6 +42195,18 @@
             "title": "Links Proposed",
             "type": "integer"
           },
+          "prepare": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prepare"
+          },
           "query": {
             "additionalProperties": true,
             "title": "Query",
@@ -42145,6 +42374,413 @@
           "rows"
         ],
         "title": "TableOut",
+        "type": "object"
+      },
+      "TableProposalAcceptIn": {
+        "additionalProperties": false,
+        "description": "A person accepts the mapping proposed for a table, as it is (an empty body) or changed: which column is which,\nwhose account a statement is, how its numbers and dates are written (app/services/table_proposals.py).",
+        "properties": {
+          "account_holder": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Holder"
+          },
+          "columns": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ProposedColumnIn"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Columns"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z]{3}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "date_order": {
+            "anyOf": [
+              {
+                "enum": [
+                  "DMY",
+                  "MDY"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Order"
+          },
+          "decimal": {
+            "anyOf": [
+              {
+                "enum": [
+                  ".",
+                  ","
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decimal"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "payments",
+                  "parties"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Person",
+                  "Company",
+                  "Organization",
+                  "PublicBody",
+                  "LegalEntity"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          }
+        },
+        "title": "TableProposalAcceptIn",
+        "type": "object"
+      },
+      "TableProposalAcceptedOut": {
+        "description": "An accepted proposal: where it stands now, and what its mapping proposed for review.",
+        "properties": {
+          "proposal": {
+            "$ref": "#/components/schemas/TableProposalViewOut"
+          },
+          "run": {
+            "$ref": "#/components/schemas/TableMappingRunOut"
+          }
+        },
+        "required": [
+          "proposal",
+          "run"
+        ],
+        "title": "TableProposalAcceptedOut",
+        "type": "object"
+      },
+      "TableProposalDecisionOut": {
+        "properties": {
+          "changed": {
+            "title": "Changed",
+            "type": "boolean"
+          },
+          "decided_at": {
+            "description": "ISO 8601 date and time in UTC; the offset may be left out (UTC is meant)",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})?$",
+            "title": "Decided At",
+            "type": "string"
+          },
+          "decided_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By"
+          },
+          "decision": {
+            "enum": [
+              "accepted",
+              "dismissed"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "mapping_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mapping Id"
+          }
+        },
+        "required": [
+          "decision",
+          "decided_by",
+          "decided_at",
+          "mapping_id",
+          "changed"
+        ],
+        "title": "TableProposalDecisionOut",
+        "type": "object"
+      },
+      "TableProposalDismissIn": {
+        "additionalProperties": false,
+        "properties": {
+          "sheet": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          }
+        },
+        "title": "TableProposalDismissIn",
+        "type": "object"
+      },
+      "TableProposalOut": {
+        "description": "What a table looks like (payments, or a list of people or companies) and which column is which.",
+        "properties": {
+          "account_holder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A statement's account holder: the payer of money out, the payee of money in.",
+            "title": "Account Holder"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/ProposedColumnOut"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A currency named in a header, used where a row names none.",
+            "title": "Currency"
+          },
+          "date_order": {
+            "enum": [
+              "DMY",
+              "MDY"
+            ],
+            "title": "Date Order",
+            "type": "string"
+          },
+          "decimal": {
+            "enum": [
+              ".",
+              ","
+            ],
+            "title": "Decimal",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "payments",
+              "parties"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "sample": {
+            "items": {
+              "$ref": "#/components/schemas/ProposedRowOut"
+            },
+            "title": "Sample",
+            "type": "array"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A party list's kind of record: Person, Company or LegalEntity.",
+            "title": "Schema"
+          },
+          "shape": {
+            "anyOf": [
+              {
+                "enum": [
+                  "pair",
+                  "statement"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "pair: a payer and a payee per row; statement: one account's rows.",
+            "title": "Shape"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          }
+        },
+        "required": [
+          "kind",
+          "sheet",
+          "columns",
+          "confidence",
+          "decimal",
+          "date_order",
+          "sample"
+        ],
+        "title": "TableProposalOut",
+        "type": "object"
+      },
+      "TableProposalViewOut": {
+        "description": "The proposal shown on a table file and where it stands: proposed; accepted or dismissed (by whom, when, and\nwhether it was changed first); mapped (a person mapped the table by hand); none (it looks like neither payments\nnor a list of parties); unreadable (``problem`` says why).",
+        "properties": {
+          "decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TableProposalDecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "problem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem"
+          },
+          "proposal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TableProposalOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/ProposalRoleOut"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "proposed",
+              "accepted",
+              "dismissed",
+              "mapped",
+              "none",
+              "unreadable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "status",
+          "proposal",
+          "roles",
+          "decision"
+        ],
+        "title": "TableProposalViewOut",
         "type": "object"
       },
       "TableRowOut": {
@@ -62229,6 +62865,192 @@
           }
         },
         "summary": "Preview Table Mapping"
+      }
+    },
+    "/api/documents/{document_id}/table-proposal": {
+      "get": {
+        "description": "What the table looks like (payments, or a list of people or companies), which column is which with how sure\nthe app is, and where the proposal stands. Nothing is made until a person accepts it.",
+        "operationId": "get_table_proposal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sheet",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sheet"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableProposalViewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Get Table Proposal"
+      }
+    },
+    "/api/documents/{document_id}/table-proposal/accept": {
+      "post": {
+        "description": "Accept the proposal, as it is or changed: the mapping runs, every party and payment it makes is a proposal to\nreview, and the decision records who accepted.",
+        "operationId": "accept_table_proposal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TableProposalAcceptIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableProposalAcceptedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Accept Table Proposal"
+      }
+    },
+    "/api/documents/{document_id}/table-proposal/dismiss": {
+      "post": {
+        "description": "Dismiss the proposal: it is no longer offered on the file, and nothing is made.",
+        "operationId": "dismiss_table_proposal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TableProposalDismissIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableProposalViewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorOut"
+                }
+              }
+            },
+            "description": "The request's input does not match what the route declares"
+          },
+          "4XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Refused: why, in a sentence"
+          }
+        },
+        "summary": "Dismiss Table Proposal"
       }
     },
     "/api/documents/{document_id}/transcript": {
