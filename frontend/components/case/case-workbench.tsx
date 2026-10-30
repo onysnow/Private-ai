@@ -296,11 +296,11 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
       {screen('verify', [
         {anchor: 'claim-verification', label: 'Claims', fill: true, render: () => <PanelErrorBoundary name="Claim verification workspace">
           <ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>},
-        {anchor: 'to-check', label: 'To check', render: () => <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'to-check', label: 'To check', fill: true, render: () => <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'review-queue', label: 'Connector findings', fill: true, render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'is-it-real', label: 'Is it real?', render: () => <PanelErrorBoundary name="Is it real?"><RealnessList investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'chain-of-custody', label: 'Chain of Custody', render: () => <PanelErrorBoundary name="Chain of Custody (full)"><ChainOfCustody investigationId={inv} active={view === 'verify'}/></PanelErrorBoundary>},
-        {anchor: 'check-a-pack', label: 'Check a pack', render: () => <PanelErrorBoundary name="Check a pack"><CheckAPack investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'chain-of-custody', label: 'Chain of Custody', fill: true, render: () => <PanelErrorBoundary name="Chain of Custody (full)"><ChainOfCustody investigationId={inv} active={view === 'verify'}/></PanelErrorBoundary>},
+        {anchor: 'check-a-pack', label: 'Check a pack', fill: true, render: () => <PanelErrorBoundary name="Check a pack"><CheckAPack investigationId={inv}/></PanelErrorBoundary>},
       ])}
       {screen('map', [
         {anchor: 'the-wire', label: 'The Wire', fill: true, render: () => <PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},

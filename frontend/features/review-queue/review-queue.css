@@ -127,3 +127,8 @@ html[data-status='shape'] .rq-state.t-followup, html[data-status='words'] .rq-st
 
 @media (max-width: 1100px) { .rq-body { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); } .rq-val, .rq-led { grid-template-columns: 110px minmax(0, 1fr) auto; } }
 @media (prefers-reduced-motion: reduce) { .rq-assess { transition: none; } }
+/* The empty state is calm: no box, the mark and the line centred in the screen's height, the explanation on reveal. */
+.rq-empty { height: 100%; grid-template-rows: minmax(0, 1fr); }
+.rq-empty-calm { background: none; box-shadow: none; border: 0; gap: 18px; }
+.rq-empty-calm .rq-empty-mark { width: 132px; height: 132px; }
+.rq-empty-calm h2 { font-size: clamp(26px, 2.4vw, 34px); }

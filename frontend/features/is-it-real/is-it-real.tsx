@@ -133,7 +133,9 @@ function Screen({investigationId, documentId, onClose, embedded = false}: {inves
       <ProvenancePanel data={data} findings={findings} onLabel={label => void patch({platform_label: label})}/>
       <section className="ir-panel" aria-label="Outlet and account reputation">
         <p className="ir-cap"><span className="ir-cap-title"><i>2 Source</i> Outlet and account reputation</span><span className="ir-tag">Finding</span></p>
-        <dl className="ir-kv ir-dots">{(findings.source ?? []).map(r => <div key={r.key}><dt>{r.label}</dt><dd data-tone={r.tone}>{r.text}</dd></div>)}</dl>
+        {/* Each row's first sentence shows; what follows it (how to look it up, why) is revealed on it. */}
+        <dl className="ir-kv ir-dots">{(findings.source ?? []).map(r => { const [head, rest] = firstSentence(r.text);
+          return <div key={r.key}><dt>{r.label}</dt><dd data-tone={r.tone}>{rest ? <Reveal detail={rest}><span>{head}</span></Reveal> : head}</dd></div>; })}</dl>
       </section>
       <section className="ir-panel" aria-label="Detectors">
         <p className="ir-cap"><span className="ir-cap-title"><i>3 Hints</i> <Reveal detail={findings.hints?.text ?? 'No hint.'}><span>Detectors</span></Reveal></span><span className="ir-tag">Off by default</span></p>
@@ -254,6 +256,12 @@ function Claims({documentId, data, choice, onChanged}: {documentId: string; data
   </section>;
 }
 
+/** A finding's first sentence, and what follows it ('' when it is one sentence). */
+export function firstSentence(text: string): [string, string] {
+  const at = text.search(/[.;:]\s/);
+  return at < 0 || at >= text.length - 2 ? [text, ''] : [text.slice(0, at + 1), text.slice(at + 2).replace(/^./, c => c.toUpperCase())];
+}
+
 function ProvenancePanel({data, findings, onLabel}: {data: AuthenticityOut; findings: Findings; onLabel: (label: string) => void}): ReactElement {
   const prov = findings.provenance ?? {};
   const text = data.item.kind === 'text';
@@ -302,16 +310,17 @@ function Decide({documentId, data, choice, onChoose, onDone}: {documentId: strin
   };
   return <section className="ir-panel ir-decide" aria-label="Status and your reasons">
     <p className="ir-cap"><span className="ir-cap-title"><i>4 You decide</i> Status and your reasons</span><span className="ir-tag">Only you set this</span></p>
-    <div className="ir-statuses" role="radiogroup" aria-label="Status">{STATUSES.map(s => <button key={s.key} type="button" role="radio"
-      aria-checked={choice === s.key} data-status={s.key} data-current={data.status === s.key || undefined} onClick={() => onChoose(s.key)}>{s.label}</button>)}</div>
-    <p className="ir-small">{STATUSES.find(s => s.key === choice)?.line}</p>
+    {/* What each status means is revealed on it. */}
+    <div className="ir-statuses" role="radiogroup" aria-label="Status">{STATUSES.map(s => <Reveal key={s.key} tabbable={false} detail={s.line}><button type="button" role="radio"
+      aria-checked={choice === s.key} data-status={s.key} data-current={data.status === s.key || undefined} onClick={() => onChoose(s.key)}>{s.label}</button></Reveal>)}</div>
     <div className="ir-checks">{CHECKS.map(c => <label key={c.key}><input type="checkbox" checked={checked.includes(c.key)}
       onChange={e => setChecked(e.target.checked ? [...checked, c.key] : checked.filter(x => x !== c.key))}/> {c.label}</label>)}</div>
     <textarea className="ir-input ir-reason" aria-label="Why? What you checked, and what you did not." placeholder="Why? What you checked, and what you did not."
       value={reason} onChange={e => setReason(e.target.value)} rows={2}/>
     {error && <p role="alert" className="ir-err">{error}</p>}
-    <div className="ir-acts"><button type="button" className="ir-primary" disabled={!ready || busy} onClick={() => void record()}>{busy ? 'Recording…' : 'Record decision'}</button>
-      <small className="ir-dim">{same ? 'Pick a different status to record a decision.' : ready ? 'It goes in the history with your reasons.' : 'Tick what you checked and write at least a short reason.'}</small></div>
+    <div className="ir-acts"><Reveal tabbable={false} detail={same ? 'Pick a different status to record a decision.' : ready ? 'It goes in the history with your reasons.' : 'Tick what you checked and write at least a short reason.'}>
+      <button type="button" className="ir-primary" disabled={!ready || busy} onClick={() => void record()}>{busy ? 'Recording…' : 'Record decision'}</button></Reveal>
+</div>
     {data.decided_at && <p className="ir-small ir-dim"><Reveal detail={`Last decided ${when(data.decided_at)}`}><span>Last decided</span></Reveal>{data.reason ? `: “${data.reason}”` : ''}</p>}
   </section>;
 }
@@ -352,9 +361,13 @@ function Outside({documentId, data, onLogged}: {documentId: string; data: Authen
       <p className="ir-small">This item is marked source-protected. Anything sent to a third party could show what you are looking at, or reveal the source. Nothing is sent from here.</p>
       <p className="ir-small"><b>Still possible, on this computer:</b></p>
     </> : <p className="ir-cap">Before anything is sent <span className="ir-tag">Consent card</span></p>}
-    <div className="ir-options" role="radiogroup" aria-label="Checks">{options.map(o => <button key={o.key} type="button" role="radio" aria-checked={picked === o.key}
-      disabled={!o.available} onClick={() => { setPicked(o.key); setResult(''); }}>
-      <b>{o.label}</b><small>{o.available ? o.to : o.why_not}</small></button>)}</div>
+    {/* Where an option sends shows (what leaves the computer stays in sight); why one is not offered is revealed on it. */}
+    <div className="ir-options" role="radiogroup" aria-label="Checks">{options.map(o => {
+      const button = <button type="button" role="radio" aria-checked={picked === o.key}
+        disabled={!o.available} onClick={() => { setPicked(o.key); setResult(''); }}>
+        <b>{o.label}</b><small>{o.available ? o.to : 'Not offered'}</small></button>;
+      return !o.available && o.why_not ? <Reveal key={o.key} tabbable={false} detail={o.why_not}>{button}</Reveal> : <span key={o.key} className="rv">{button}</span>;
+    })}</div>
     {picked === 'reverse' && <div className="ir-services" role="group" aria-label="Which reverse-image site">{reverse.map(o =>
       <button key={o.key} type="button" aria-pressed={service === o.key} onClick={() => setService(o.key as 'tineye' | 'lens')}>{o.key === 'tineye' ? 'TinEye' : 'Google Lens'}</button>)}</div>}
     {picked !== 'local' && option.sends && <div className="ir-sent"><span>Exactly this is sent:</span><code>{option.sends}</code></div>}

@@ -7,13 +7,20 @@
 // for a passage, the words in place; the decision and an optional note are on
 // the card. Each item names its indicator and links to its Red Flag. A money
 // check a person kept from See › Money carries the check's numbers as they were.
+//
+// The answers are Case home's Next-up answers (features/case-home/decision-card.tsx): three tall buttons, each a shape,
+// a word and a key (S shows it, D does not, U unclear), answering the card in hand: the one pointed at or focused, else
+// the first open one. The counts are figures with their marks, named on reveal; the cards share the screen's height.
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {NotebookPen, Undo2} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement, ReactNode} from 'react';
 
 import {PartyGlyph} from '../../components/network/marks';
 import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
+import {onScreen, typingInto} from '../../lib/on-screen';
+import {singleKeysOn} from '../../lib/shortcuts';
 import {decideCheckMutation, getChecksOptions, getChecksQueryKey, getRedFlagsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import type {ToCheckItemOut} from '../../lib/generated/types.gen';
 import {PARTY, partyKind} from '../../lib/viz-tokens';
@@ -32,6 +39,12 @@ export const DECISION: Record<Status, string> = {
 
 /** A decision as its shape (Red Flags' "records can't show" marks); the word is revealed. */
 const DECISION_MARK: Record<Status, string> = {open: '○', shows: '✓', does_not: '✕', unclear: '?'};
+/** The three answers as Case home's Next-up card draws them: its class, the short word on the button, its key. */
+const ANSWERS = [
+  {status: 'shows', cls: 'ch-yes', word: 'Shows it', key: 's'},
+  {status: 'does_not', cls: 'ch-no', word: 'Does not', key: 'd'},
+  {status: 'unclear', cls: 'ch-unsure', word: 'Unclear', key: 'u'},
+] as const;
 
 /** What kind of item it is, as an icon (quote marks, a coin, a checkbox); the word is revealed. */
 const KIND_WORD: Record<ToCheckItemOut['kind'], string> = {passage: 'Passage', money: 'Money check', checklist: 'Checklist'};
@@ -75,16 +88,29 @@ function Parties({parties}: {parties: ToCheckItemOut['parties']}): ReactElement 
     {shown.length < parties.length && <span className="sv-muted">+{parties.length - shown.length} more</span>}</div>;
 }
 
-function CheckCard({item, highlighted, onDecide}: {item: ToCheckItemOut; highlighted: boolean;
-  onDecide: (status: Status, note: string | null) => Promise<void>}): ReactElement {
+function CheckCard({item, highlighted, inHand, onHand, onDecide}: {item: ToCheckItemOut; highlighted: boolean; inHand: boolean;
+  onHand: () => void; onDecide: (status: Status, note: string | null) => Promise<void>}): ReactElement {
   const openFlag = useWorkbenchStore(state => state.openFlag);
   const openDocument = useWorkbenchStore(state => state.openDocument);
   const [noting, setNoting] = useState(false);
   const [note, setNote] = useState(item.note ?? '');
   const goToFlag = (id: string) => { openFlag(id); document.getElementById('red-flags')?.scrollIntoView({behavior: 'smooth', block: 'start'}); };
   const decide = (status: Status) => void onDecide(status, noting ? note.trim() || null : item.note ?? null).then(() => setNoting(false));
-  return <article id={`check-${item.id}`} className={`tc-card status-${item.status}${highlighted ? ' open' : ''}`}
-    aria-label={`To check: ${sentence(item.question)}`}>
+  // The keys answer the card in hand (the panel decides which); a note being typed keeps its keys.
+  useEffect(() => {
+    if (!inHand) return undefined;
+    const handle = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented || typingInto(e.target) || !singleKeysOn()) return;
+      const answer = ANSWERS.find(a => a.key === e.key.toLowerCase());
+      if (!answer || !onScreen(document.getElementById(`check-${item.id}`))) return;
+      e.preventDefault();
+      decide(answer.status);
+    };
+    window.addEventListener('keydown', handle);
+    return () => window.removeEventListener('keydown', handle);
+  });
+  return <article id={`check-${item.id}`} className={`tc-card status-${item.status}${highlighted ? ' open' : ''}${inHand ? ' in-hand' : ''}`}
+    aria-label={`To check: ${sentence(item.question)}`} onPointerEnter={onHand} onFocus={onHand}>
     {/* The kind is the icon; it and where the item comes from (the indicator, or See › Money) are revealed on it. */}
     <header className="tc-head">
       <Reveal label={KIND_WORD[item.kind]} detail={<><b>{KIND_WORD[item.kind]}</b>
@@ -114,12 +140,22 @@ function CheckCard({item, highlighted, onDecide}: {item: ToCheckItemOut; highlig
       {item.note && <span>{item.note}</span>}</p>}
     {noting && <textarea className="tc-note" aria-label="What you saw" placeholder="What you saw (stays with the item)" value={note}
       onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}/>}
-    <div className="tc-decide" role="group" aria-label="Your decision">
-      {(['shows', 'does_not', 'unclear'] as const).map(s => <button type="button" key={s} aria-pressed={item.status === s}
-        className={`sv-btn tc-${s}${item.status === s ? ' on' : ''}`} onClick={() => decide(s)}>{DECISION[s]}</button>)}
-      {item.status !== 'open' && <button type="button" className="sv-btn" onClick={() => decide('open')}>Undo</button>}
-      {noting ? <button type="button" className="sv-btn" onClick={() => decide(item.status)}>Save note</button>
-        : <button type="button" className="sv-btn" onClick={() => setNoting(true)}>{item.note ? 'Edit note' : 'Add a note'}</button>}
+    <div className="tc-decide">
+      <div className="ch-choices" role="group" aria-label="Your decision">
+        {ANSWERS.map(a => <button type="button" key={a.status} aria-pressed={item.status === a.status} aria-label={DECISION[a.status]}
+          aria-keyshortcuts={inHand ? a.key.toUpperCase() : undefined}
+          className={`ch-choice ${a.cls}${item.status === a.status ? ' on' : ''}`} onClick={() => decide(a.status)}>
+          <span aria-hidden="true">{DECISION_MARK[a.status]}</span>{a.word}{inHand && <kbd aria-hidden="true">{a.key.toUpperCase()}</kbd>}</button>)}
+      </div>
+      {/* Undo and the note are icons; their words on reveal. */}
+      <span className="tc-tools">
+        {item.status !== 'open' && <Reveal tabbable={false} describe={false} detail="Undo: back to not checked">
+          <button type="button" className="tc-icon-btn" aria-label="Undo" onClick={() => decide('open')}><Undo2 size={17} aria-hidden="true"/></button></Reveal>}
+        {noting ? <button type="button" className="sv-btn" onClick={() => decide(item.status)}>Save note</button>
+          : <Reveal tabbable={false} describe={false} detail={item.note ? 'Edit the note' : 'Add a note: what you saw'}>
+            <button type="button" className="tc-icon-btn" aria-label={item.note ? 'Edit note' : 'Add a note'} onClick={() => setNoting(true)}>
+              <NotebookPen size={17} aria-hidden="true"/></button></Reveal>}
+      </span>
     </div>
   </article>;
 }
@@ -162,21 +198,31 @@ export function ToCheckPanel({investigationId}: {investigationId: string}): Reac
   const open = items.filter(i => i.status === 'open');
   const decided = items.filter(i => i.status !== 'open');
   const gone = query.data?.gone ?? [];
-  const card = (i: ToCheckItemOut) => <CheckCard key={i.id} item={i} highlighted={highlight === i.id} onDecide={onDecide(i)}/>;
+  // The card the keys answer: the one last pointed at or focused while it is still open, else the first open one.
+  const [hand, setHand] = useState<string | null>(null);
+  const inHand = open.some(i => i.id === hand) ? hand : open[0]?.id ?? null;
+  const card = (i: ToCheckItemOut) => <CheckCard key={i.id} item={i} highlighted={highlight === i.id} inHand={inHand === i.id}
+    onHand={() => setHand(i.id)} onDecide={onDecide(i)}/>;
+  const figure = (n: number, mark: string, cls: string, word: string) => <Reveal label={`${n} ${word}`} describe={false} detail={<b>{n} {word}</b>}>
+    <span className={`tc-fig ${cls}${n ? '' : ' zero'}`} aria-hidden="true"><i>{mark}</i><b>{n}</b></span></Reveal>;
 
-  return <section className="card tc" id="to-check" aria-labelledby="to-check-title">
-    {/* The explanation is revealed on the title; the counts show. */}
-    <h3 id="to-check-title"><Reveal detail="What the records cannot show. A person decides each one; the app never does.">To check</Reveal></h3>
-    {query.data && <p className="sv-psub"><span className="tc-count">{open.length} open · {decided.length} decided</span></p>}
+  return <section className="tc" id="to-check" aria-labelledby="to-check-title">
+    {/* The explanation is revealed on the title; the counts show, as figures. */}
+    <header className="tc-top">
+      <h3 id="to-check-title"><Reveal detail="What the records cannot show. A person decides each one; the app never does.">To check</Reveal></h3>
+      {query.data && <p className="tc-figs">{figure(open.length, '○', 'f-open', 'open')}{figure(decided.length, '✓', 'f-decided', 'decided')}</p>}
+    </header>
     {query.isError && <p className="sv-error">{errorMessage(query.error, 'Could not load what to check')}</p>}
     {problem && <p className="sv-error" role="alert">{problem}</p>}
-    {query.data && !items.length && <p className="sv-muted">Nothing to check yet. Items appear when a Red Flag&apos;s records cannot show part of its pattern.</p>}
-    {open.map(card)}
-    {decided.length > 0 && <details className="rf-gone"><summary>Decided ({decided.length})</summary>{decided.map(card)}</details>}
-    {/* Why an item is no longer called for, and its indicator, are revealed on its question; the decision kept shows. */}
-    {gone.length > 0 && <details className="rf-gone"><summary>No longer called for ({gone.length})</summary>
-      <ul>{gone.map(i => <li key={i.id}><Reveal detail={<><b>{i.indicator_name}</b><span className="rv-row">The records changed, or its flag was set aside; the decision is kept.</span></>}>
-        <b>{sentence(i.question)}</b></Reveal>{i.status !== 'open' ? `: ${DECISION[i.status]}` : ''}</li>)}</ul>
-    </details>}
+    <div className="tc-list">
+      {query.data && !items.length && <p className="tc-none"><Reveal detail="Items appear when a Red Flag's records cannot show part of its pattern.">Nothing to check yet.</Reveal></p>}
+      {open.map(card)}
+      {decided.length > 0 && <details className="rf-gone"><summary>Decided ({decided.length})</summary>{decided.map(card)}</details>}
+      {/* Why an item is no longer called for, and its indicator, are revealed on its question; the decision kept shows. */}
+      {gone.length > 0 && <details className="rf-gone"><summary>No longer called for ({gone.length})</summary>
+        <ul>{gone.map(i => <li key={i.id}><Reveal detail={<><b>{i.indicator_name}</b><span className="rv-row">The records changed, or its flag was set aside; the decision is kept.</span></>}>
+          <b>{sentence(i.question)}</b></Reveal>{i.status !== 'open' ? `: ${DECISION[i.status]}` : ''}</li>)}</ul>
+      </details>}
+    </div>
   </section>;
 }

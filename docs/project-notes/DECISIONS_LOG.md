@@ -1005,3 +1005,41 @@ tab (the page does not scroll; parts scroll inside) and follows the 29 Oct rule.
 - **Following** (`features/following/following.tsx`): the at-rest paragraph is a lock mark beside "Sources followed",
   the sentence on hover. Only an unencrypted disk (the list readable on this computer; the person must turn encryption
   on) stays on screen, as a short "▲ List not encrypted" alert with the sentence and what to do on hover.
+
+## 51. Check's screens and Decide follow the 29 Oct rules (30 Oct 2026)
+
+A sweep of the running app (1MDB demo, 1440×900) found Check's tabs and Decide still showing sub-text, unnamed
+figures and empty space. What changed, screen by screen:
+
+- **Claims, a claim opened.** The figures (confidence, supporting, contradicting, context, sources) are bare numbers,
+  each named on hover; a zero is quiet (faded), so "0 0 0" no longer shouts. Sections with nothing in them (Linked
+  evidence, Review history, Relationships resting on it) are not drawn: one quiet line says what is empty ("No evidence
+  is linked to this claim yet. No review recorded yet. Nothing rests on it."), with Attach evidence beside it. The
+  status to record is no longer a raw "lead" select: it is a radio group of the six statuses, each in its status
+  colour (lead and unverified dashed like Not yet shown, supported and confirmed green, disputed red, rejected muted);
+  a control keeps its words. The claim's status now is ringed; arrows move. Confidence is a figure with its slider.
+- **The stuck "0% confidence" card** was the shared Reveal opening on focus: a click on a row focuses it, so the card
+  stayed over the list until focus moved. Reveal now ignores the focus a pointer press gives (hover already showed
+  the card); keyboard focus still opens it. A row with no confidence and no grade carries no card at all. This applies
+  to every screen.
+- **The grey status dots are not a bug.** The API lists the 1MDB claims with the 29 lead and unverified ones first, and
+  those are Not yet shown, whose colour is the grey (`--status-unshown`). Further down the list the disputed, supported
+  and rejected claims carry their colours. Checked against `GET /api/investigations/…/claims`.
+- **To check** fills the screen: the title and the counts as figures (○ open, ✓ decided, named on hover, zero quiet),
+  the cards sharing the height. Each card answers with Case home's Next-up buttons (✓ Shows it, ✕ Does not, ? Unclear)
+  and keys S, D, U for the card in hand: the one pointed at or focused, else the first open one. Undo and the note are
+  icons named on hover.
+- **Chain of Custody** fills the screen: the wires take the height the log leaves, the log keeps to its rows and
+  scrolls inside past 42% of the height, the drawer scrolls inside itself. The drawer's "Key" heading now has its key
+  drawn under it (the five line styles and what each means), as the mockup draws it.
+- **Is it real?** A finding's first sentence shows, the rest ("Nothing is sent on its own; ask…") on hover. What each
+  status means ("The default. Nothing either way…") is revealed on its button. An option not offered says "Not
+  offered", the reason on hover. Why Record decision is disabled is revealed on it. Where an offered option sends
+  ("Local · nothing leaves this computer") stays in sight: what leaves the computer is on the floor.
+- **Connector findings, empty:** one calm line centred in the screen with its mark and Run a connector; what findings
+  are is on hover of the line.
+- **Check a pack** fills the screen: the drop zone takes the full height, the three steps spread down their panel at a
+  larger size.
+- **Decide:** the "What happens" box is one quiet line ("What happens", with ◆ when a Yes unlocks something); the box is
+  its reveal, and each answer's own line is revealed on its button. The right column's question is no longer cut at
+  three lines, the passage and the answers are larger, so the column is used.

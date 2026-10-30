@@ -480,11 +480,13 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
     </dl>
     {breaks && row && <div className="cc-breaks" role="status"><b>If this step breaks</b>, everything after it in this row falls, and with it:
       <ul>{rests.map(r => <li key={r.id}>{r.kind === 'claim' ? 'Claim' : r.kind === 'link' ? 'Link' : 'Flag'}: {r.label}</li>)}</ul></div>}
-    {/* The line key is one mark; the five line styles are revealed on it. */}
-    <p className="cc-key-mark"><Reveal detail={<span className="cc-key">
-      <span className="cc-k-confirmed">confirmed by a person</span><span className="cc-k-proposed">proposed, not yet confirmed</span>
-      <span className="cc-k-worked">worked out by the app</span><span className="cc-k-against">against the claim · ✕ check failed</span><span className="cc-k-ai">AI step (plum)</span>
-    </span>}><span className="cc-eyebrow">Key</span></Reveal></p>
+    {/* The line key, drawn (mockup CHECK_2): each line style beside what it means. */}
+    <div className="cc-key-box" aria-label="Key to the lines" role="group">
+      <p className="cc-eyebrow">Key</p>
+      <span className="cc-key">
+        <span className="cc-k-confirmed">confirmed by a person</span><span className="cc-k-proposed">proposed, not yet confirmed</span>
+        <span className="cc-k-worked">worked out by the app</span><span className="cc-k-against">against the claim · ✕ check failed</span><span className="cc-k-ai">AI step</span>
+      </span></div>
     <div className="cc-acts">
       {file?.document_id && <button type="button" className="primary" onClick={() => onOpen(file.document_id!, passage?.page ?? null)}>
         {passage?.page ? `Open page ${passage.page}` : 'Open the file'}</button>}

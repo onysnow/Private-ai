@@ -48,6 +48,9 @@ type Props = {
 export function Reveal({detail, children, tabbable = true, className, label, describe = true}: Props): ReactElement {
   const id = useId();
   const ref = useRef<HTMLSpanElement>(null);
+  // Focus that a press of the pointer gave (clicking a row to open it) does not open the card: the hover already
+  // showed it, and it would stay stuck over what the click opened until focus moved on. Keyboard focus opens it.
+  const pressed = useRef(false);
   const card = useSyncExternalStore(subscribe, () => open, () => null);
   const mine = card?.owner === id;
   const show = useCallback((now: boolean, pinned = false) => {
@@ -63,7 +66,8 @@ export function Reveal({detail, children, tabbable = true, className, label, des
       tabIndex={tabbable ? 0 : undefined} role={tabbable && label ? 'img' : undefined} aria-label={tabbable ? label : undefined}
       aria-describedby={tabbable && describe ? `${id}-detail` : undefined} aria-expanded={tabbable ? mine : undefined}
       onMouseEnter={() => (mine ? keepOpen() : show(false))} onMouseLeave={closeSoon}
-      onFocus={() => { if (!mine) show(true); }}
+      onPointerDown={() => { pressed.current = true; }}
+      onFocus={() => { if (pressed.current) { pressed.current = false; if (!tabbable) closeSoon(); return; } if (!mine) show(true); }}
       onBlur={e => { if (!(e.relatedTarget instanceof Node && document.getElementById('rv-card')?.contains(e.relatedTarget))) { if (!open?.pinned) closeSoon(); } }}
       onClick={tabbable ? () => (mine && card?.pinned ? set(null) : show(true, true)) : undefined}
       onKeyDown={tabbable ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (mine && card?.pinned) set(null); else show(true, true); } } : undefined}>

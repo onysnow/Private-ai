@@ -313,13 +313,12 @@ export function ReviewQueuePanel({investigationId}: Props): ReactElement {
   </div>;
 }
 
-/** No findings: what they are, and where a connector is run. */
+/** No findings: one calm line and where a connector is run; what findings are is revealed on the line. */
 function EmptyQueue({investigationId}: {investigationId: string}): ReactElement {
   return <div className="rq rq-empty">
-    <div className="rq-empty-card">
-      <span className="rq-empty-mark" aria-hidden="true"><Radar size={44} strokeWidth={1.5}/></span>
-      <h2>No connector findings yet</h2>
-      <p>When a connector searches an outside source (OpenAleph, OpenSanctions, the web), what it brings back waits here for you: match each record to the case&apos;s own entity, then accept, dispute or promote what it says.</p>
+    <div className="rq-empty-card rq-empty-calm">
+      <span className="rq-empty-mark" aria-hidden="true"><Radar size={64} strokeWidth={1.25}/></span>
+      <h2><Reveal detail="When a connector searches an outside source (OpenAleph, OpenSanctions, the web), what it brings back waits here for you: match each record to the case's own entity, then accept, dispute or promote what it says.">No connector findings yet</Reveal></h2>
       <Link className="rq-btn pri" href={caseHref('/bring-in#connectors', investigationId)}>Run a connector <ArrowRight size={15} aria-hidden="true"/></Link>
     </div>
   </div>;

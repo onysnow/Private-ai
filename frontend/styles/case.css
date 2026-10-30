@@ -651,3 +651,16 @@ button.ch-link:focus-visible { outline: 2px solid var(--accent-1); }
 .ch-bring > .rv.ch-reading-rv { flex: 1 1 auto; min-height: 0; }
 .ch-bring .ch-reading-rv > .ch-reading { flex: 1 1 auto; }
 .ch-bring .ch-reading .ch-thumb { height: auto; align-self: stretch; min-height: 120px; max-height: 190px; flex-basis: 108px; }
+
+/* "What happens" on one quiet line, its box on reveal (Ony, 29 Oct); an answer's own line on its button. */
+.ch-happens-line { margin: 0; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.ch-happens-unlock { margin-right: 8px; color: var(--accent-2); letter-spacing: 0; }
+.rv-card .ch-happens { display: block; border: 0; background: none; padding: 0; font: 400 13px/1.45 var(--font-ui); letter-spacing: 0; text-transform: none; color: var(--text); }
+.rv-card .ch-happens dl { margin-top: 0; }
+.rv-card .ch-unlocks { display: block; margin-top: 8px; }
+.ch-choices > .ch-choice-rv { display: grid; min-width: 0; }
+/* Decide's right column fills its height: the question unclamped and larger, the passage larger, the answers taller. */
+.dc-card .ch-question { -webkit-line-clamp: 8; font-size: clamp(20px, 1.75vw, 26px); }
+.dc-card .ch-excerpt { font-size: clamp(15px, 1.2vw, 17.5px); line-height: 1.6; }
+.dc-card .ch-card-body { justify-content: flex-start; gap: 16px; }
+.dc-card .ch-choice { min-height: 64px; font-size: 16px; }

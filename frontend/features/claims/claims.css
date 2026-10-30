@@ -159,3 +159,28 @@
 @media (max-width: 1100px) { .cw-body { grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); } .cw-nums { gap: 22px; } }
 html[data-motion='calm'] .cl-row { transition: none; }
 @media (prefers-reduced-motion: reduce) { .cl-row { transition: none; } }
+
+/* A zero figure is quiet (Ony, 29 Oct: numbers show, but nothing there should not shout). */
+.cw-num.zero b, .cw-conf b.zero { color: var(--text-muted); opacity: .5; }
+.cw-num.zero svg { opacity: .45; }
+.cw-num.cl-sources { flex-direction: row; align-items: flex-end; gap: 8px; }
+.cl-src-icon { color: var(--text-muted); margin-bottom: 4px; }
+/* What the open claim has no entries for, in one quiet line. */
+.cw-quiet { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin: 14px 2px 0; color: var(--text-muted); font-size: 13px; }
+.cw-quiet .cw-btn { margin-left: auto; }
+/* The status to record: the app's status control, each choice in its status colour (the grammar's tokens). */
+.cw-statuses { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; flex: 1; min-width: 420px; }
+.cw-statuses button { all: unset; cursor: pointer; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 6px;
+  border-radius: 10px; border: 1px solid var(--line); font-size: 13px; color: var(--text-muted); --st: var(--status-unshown); transition: background var(--dur-fast), color var(--dur-fast); }
+.cw-statuses button.t-supported { --st: var(--status-supported); }
+.cw-statuses button.t-disputed { --st: var(--status-disputed); }
+.cw-statuses button.t-ruled_out { --st: var(--text-muted); }
+.cw-statuses i { width: 9px; height: 9px; border-radius: 50%; background: var(--st); }
+.cw-statuses button.t-unshown i { background: none; border: 1.5px dashed var(--st); width: 8px; height: 8px; }
+.cw-statuses button:hover { color: var(--text); background: var(--surface-2); }
+.cw-statuses button[data-current] { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--st) 55%, transparent); }
+.cw-statuses button[aria-checked='true'] { color: var(--text); border-color: var(--st); background: color-mix(in srgb, var(--st) 16%, transparent); font-weight: 600; }
+.cw-statuses button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.cw-conf { gap: 14px; margin-left: auto; }
+.cw-conf b { font: 300 28px/1 var(--font-display); color: var(--text); font-variant-numeric: tabular-nums; min-width: 64px; text-align: right; }
+.cw-conf b small { font-size: 14px; color: var(--text-muted); margin-left: 1px; }

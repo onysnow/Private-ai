@@ -188,3 +188,5 @@
 .ir-media { display: grid; place-items: center; align-content: center; gap: 6px; aspect-ratio: 3 / 1; border-radius: 10px; background: var(--surface-2); color: var(--text-muted); }
 .ir-media b { font-size: 40px; line-height: 1; font-weight: 400; color: var(--accent-1); }
 .ir-media span { max-width: 90%; font: 11px var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A status or an option wrapped in its reveal stays the grid's cell. */
+.ir-statuses > .rv, .ir-options > .rv { display: grid; }
