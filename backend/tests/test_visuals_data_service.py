@@ -257,3 +257,49 @@ def test_unknown_investigation_is_a_query_error():
         db.commit()
         empty = db.query(Investigation).filter_by(name="empty").one()
         assert all(not q["has_data"] for q in describe_catalog(db, empty.id)["queries"])
+
+
+def test_the_catalogue_reads_its_links_in_a_few_queries_however_many_there_are(demo):
+    """The catalogue loads with Act › Charts: each link is read once for every query, in batches, not one by one."""
+    from sqlalchemy import event
+
+    from app.db.session import engine
+
+    db, inv_id = demo
+    seen = {"n": 0}
+
+    def count(*_args, **_kwargs):
+        seen["n"] += 1
+
+    def statements() -> int:
+        db.expire_all()
+        seen["n"] = 0
+        event.listen(engine, "before_cursor_execute", count)
+        try:
+            before = describe_catalog(db, inv_id)
+        finally:
+            event.remove(engine, "before_cursor_execute", count)
+        assert before["queries"]
+        return seen["n"]
+
+    few = statements()
+    for i in range(30):
+        _add_payment(db, inv_id, "Meridian Holdings Ltd", "Harborline Civic Trust", {"amount": [str(1000 + i)], "currency": ["USD"], "date": [f"2015-0{1 + i % 9}-01"]})
+    db.commit()
+    assert statements() <= few + 2
+
+
+def test_rows_serialized_together_are_each_their_own(demo):
+    from app.models.domain import RelationshipEdge
+    from app.services.relationships import relationship_rows_shared, serialize_relationship, serialize_relationships
+
+    db, inv_id = demo
+    edges = db.query(RelationshipEdge).filter_by(investigation_id=inv_id).order_by(RelationshipEdge.id).all()
+    one_by_one = [serialize_relationship(db, edge) for edge in edges]
+    assert serialize_relationships(db, edges) == one_by_one
+    with relationship_rows_shared():
+        first = serialize_relationships(db, edges + edges[:1])
+        first[0]["properties"]["changed"] = ["yes"]
+        first[0]["statements"].clear()
+        assert serialize_relationships(db, edges) == one_by_one
+        assert first[-1] == one_by_one[0]

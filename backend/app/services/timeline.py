@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from typing import Any
+from typing import Any, Callable
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.models.domain import (
     Claim, ClaimEvidenceLink, Entity, Evidence, Investigation, Lead, PropertyConflictDecision, RelationshipEdge, Source, Statement, TimelineEvent,
 )
-from app.services.relationships import serialize_relationship
+from app.services.relationships import copied, serialize_relationship, serialize_relationships
 from app.schemas.api import TimelineEventCreate
 
 DATE_PROP_HINTS = {
@@ -59,7 +59,27 @@ def _empty_context() -> dict[str, Any]:
     return {"source": None, "evidence": None, "claim": None, "claim_advisory": None, "relationship_advisory": None}
 
 
-def _timeline_context(db: Session, row: TimelineEvent) -> dict:
+AdvisoryOf = Callable[[RelationshipEdge], Any]
+
+
+def _advisories(db: Session, investigation_id: str) -> AdvisoryOf:
+    """A link's relationship advisory, as serialize_relationship gives it. The first ask serializes every link of the
+    investigation in one batch (a few queries, not several per event); each answer is its own copy."""
+    found: dict[str, Any] | None = None
+
+    def advisory_of(edge: RelationshipEdge) -> Any:
+        nonlocal found
+        if found is None:
+            edges = db.scalars(select(RelationshipEdge).where(RelationshipEdge.investigation_id == investigation_id)).all()
+            found = {e.id: row.get("advisory") for e, row in zip(edges, serialize_relationships(db, edges))}
+        if edge.id not in found:
+            return serialize_relationship(db, edge).get("advisory")
+        return copied(found[edge.id])
+
+    return advisory_of
+
+
+def _timeline_context(db: Session, row: TimelineEvent, advisory_of: AdvisoryOf) -> dict:
     """Build a read-only, current provenance context for a reporter-authored event.
 
     The event keeps its own verification status; linked claim/evidence state is disclosed
@@ -81,7 +101,7 @@ def _timeline_context(db: Session, row: TimelineEvent) -> dict:
             RelationshipEdge.relationship_entity_id == row.relationship_entity_id,
         ))
         if edge is not None:
-            context["relationship_advisory"] = serialize_relationship(db, edge).get("advisory")
+            context["relationship_advisory"] = advisory_of(edge)
     if claim:
         claim_context = {"id": claim.id, "text": claim.text, "status": claim.status, "confidence": claim.confidence}
         if evidence:
@@ -120,7 +140,7 @@ def _first(statements: list[Statement], *props: str) -> str | None:
 
 
 def _relationship_event(db: Session, investigation_id: str, edge: RelationshipEdge, statements: list[Statement],
-                        entity_map: dict[str, Entity]) -> dict | None:
+                        entity_map: dict[str, Entity], advisory_of: AdvisoryOf) -> dict | None:
     start_raw = _first(statements, "date", "startDate")
     end_raw = _first(statements, "endDate")
     start = _normalize_date(start_raw) if start_raw else None
@@ -161,12 +181,12 @@ def _relationship_event(db: Session, investigation_id: str, edge: RelationshipEd
                  "relationship_entity_id": edge.relationship_entity_id},
         "provenance": {"dataset": statement.dataset, "origin": statement.origin, "original_value": statement.original_value,
                        "first_seen": statement.first_seen, "last_seen": statement.last_seen},
-        "context": {**_empty_context(), "relationship_advisory": serialize_relationship(db, edge).get("advisory")},
+        "context": {**_empty_context(), "relationship_advisory": advisory_of(edge)},
         "sort_key": _sort_key(date_start, precision),
     }
 
 
-def _manual_event(db: Session, row: TimelineEvent) -> dict:
+def _manual_event(db: Session, row: TimelineEvent, advisory_of: AdvisoryOf) -> dict:
     return {
         "id": row.id,
         "kind": "reporter_event",
@@ -189,7 +209,7 @@ def _manual_event(db: Session, row: TimelineEvent) -> dict:
             "lead_id": row.lead_id,
         },
         "provenance": {"dataset": row.dataset, "origin": row.origin, "created_at": row.created_at},
-        "context": _timeline_context(db, row),
+        "context": _timeline_context(db, row, advisory_of),
         "sort_key": _sort_key(row.date_start, row.precision),
     }
 
@@ -209,13 +229,14 @@ def investigation_timeline(
         raise ValueError("Investigation not found")
 
     events: list[dict] = []
+    advisory_of = _advisories(db, investigation_id)
 
     # Reporter-authored events are the authoritative place to record disputed, approximate,
     # ranged or explicitly verified event dates and can point back to claims/evidence/sources.
     manual = db.scalars(
         select(TimelineEvent).where(TimelineEvent.investigation_id == investigation_id)
     ).all()
-    events.extend(_manual_event(db, row) for row in manual)
+    events.extend(_manual_event(db, row, advisory_of) for row in manual)
 
     # Reporter-adjudicated temporal property intervals become timeline material only when
     # the reporter supplied an explicit boundary. Workbench never derives missing dates.
@@ -317,7 +338,7 @@ def investigation_timeline(
     # amount; not one event per date property.
     for rel_id, rel_statements in by_relationship.items():
         edge = edges[rel_id]
-        event = _relationship_event(db, investigation_id, edge, rel_statements, entity_map)
+        event = _relationship_event(db, investigation_id, edge, rel_statements, entity_map, advisory_of)
         if event is None:
             continue
         if {(ref, event["date_start"]) for ref in (rel_id, edge.source_entity_id, edge.target_entity_id)} & recorded:

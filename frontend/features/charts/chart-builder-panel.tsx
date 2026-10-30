@@ -17,8 +17,8 @@
 // with the icon of the picture that answers it), the data that answers the
 // chosen one are cards with their record counts in large type, then the
 // kinds, the title and the checked preview. Step marks at the top say where
-// the reporter is. The catalogue runs every query once, so it is asked for
-// only when the builder is opened; until then the screen says what it makes. ECharts loads on demand (next/dynamic), as on every
+// the reporter is. The catalogue is asked for when the screen opens (it counts each query's records in well under a
+// second on the 1MDB demo); while it loads the screen says what it makes. ECharts loads on demand (next/dynamic), as on every
 // other panel, so it never counts against the page's first load.
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {ChartBar, ChartColumn, ChartLine, ChartPie, ChartScatter, Grid3x3, MapPinned, Waypoints} from 'lucide-react';
@@ -103,7 +103,6 @@ export function chartSummary(alt: string, title: string): string {
 
 export function ChartBuilderPanel({investigationId}: Props): ReactElement {
   const openProvenance = useWorkbenchStore(state => state.openProvenance);
-  const [open, setOpen] = useState(false);
   const [questionId, setQuestionId] = useState('');
   const [queryName, setQueryName] = useState('');
   const [params, setParams] = useState<Record<string, string>>({});
@@ -111,7 +110,7 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
   const [title, setTitle] = useState('');
 
   const path = {investigation_id: investigationId};
-  const catalog = useQuery({...investigationVisualCatalogOptions({path}), enabled: open && Boolean(investigationId)});
+  const catalog = useQuery({...investigationVisualCatalogOptions({path}), enabled: Boolean(investigationId)});
   const preview = useMutation({...investigationVisualPreviewMutation()});
 
   const questions = catalog.data?.questions ?? [];
@@ -154,7 +153,7 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
   const drawnTitle = typeof drawn?.spec.title === 'string' ? drawn.spec.title : 'Chart';
   const report = preview.data?.report;
 
-  const loaded = Boolean(open && catalog.data);
+  const loaded = Boolean(investigationId && catalog.data);
   const step = !question ? 1 : !query ? 2 : !drawn ? 3 : 4;
 
   return <div className={`cb${loaded ? '' : ' cb-start'}`}>
@@ -170,7 +169,7 @@ export function ChartBuilderPanel({investigationId}: Props): ReactElement {
       <span className="cb-gate-mark" aria-hidden="true"><ChartColumn size={44} strokeWidth={1.5}/></span>
       <h3>A checked chart from the case&apos;s own records</h3>
       <ol className="cb-gate-steps">{STEPS.slice(0, 3).map((word, i) => <li key={word}><i aria-hidden="true">{i + 1}</i>{GATE_STEP[i]}</li>)}</ol>
-      {!open ? <Button onClick={() => setOpen(true)} disabled={!investigationId}>Build a chart</Button>
+      {!investigationId ? <p className="cb-muted">Open a case to chart its records.</p>
         : catalog.isError ? <p className="cb-muted" role="alert">{errorMessage(catalog.error, 'Could not load the chart catalogue')}</p>
           : <p className="cb-loading" role="status"><span className="cb-spin" aria-hidden="true"/>Loading the data you can chart…
             <Reveal detail="Every query runs once over the case’s records to count what each can draw, so this can take a little while on a large case."><span className="cb-why" aria-hidden="true">?</span></Reveal></p>}

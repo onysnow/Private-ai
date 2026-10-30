@@ -38,7 +38,8 @@ from app.models.domain import Claim, ClaimEvidenceLink, Document, Entity, Invest
 from app.visuals.spec import DRAWN_KINDS, QUERY_CATALOG, QUESTIONS, ChartKind, QueryRef, QuerySpec
 
 # While the catalogue runs every query, the money ledger and the timeline are built once and shared: five queries
-# read the ledger and three the timeline, and each build walks every relationship. Outside the catalogue nothing is kept.
+# read the ledger and three the timeline (the map's places too), and each build walks every relationship; each
+# relationship is serialized once for all of them (relationship_rows_shared). Outside the catalogue nothing is kept.
 _shared: ContextVar[dict[Any, Any] | None] = ContextVar("visual_shared", default=None)
 
 
@@ -440,17 +441,29 @@ def payments_over_time(db: Session, investigation_id: str, params: dict[str, str
     )
 
 
-def _event_refs(db: Session, event: dict) -> list[RecordRef]:
+def _edges_of(db: Session, events: list[dict]) -> dict[str, str]:
+    """The relationship id behind each link record the events point at (one per link record), read at once."""
+    wanted = sorted({str((e.get("refs") or {}).get("relationship_entity_id")) for e in events
+                     if e.get("kind") != "reporter_event" and (e.get("refs") or {}).get("relationship_entity_id")})
+    found: dict[str, str] = {}
+    for start in range(0, len(wanted), 500):
+        found.update((rel, edge_id) for rel, edge_id in db.execute(select(RelationshipEdge.relationship_entity_id, RelationshipEdge.id)
+                                                                   .where(RelationshipEdge.relationship_entity_id.in_(wanted[start:start + 500]))))
+    return found
+
+
+def _event_refs(event: dict, edges_of: dict[str, str]) -> list[RecordRef]:
     """The citable records behind one timeline event: the event row itself
-    for a reporter-authored event, otherwise the record whose date it is."""
+    for a reporter-authored event, otherwise the record whose date it is.
+    `edges_of` is _edges_of for the events."""
     refs = event.get("refs") or {}
     if event.get("kind") == "reporter_event":
         return [RecordRef("timeline_event", str(event["id"]))]
     out: list[RecordRef] = []
     if refs.get("relationship_entity_id"):
-        edge = db.scalar(select(RelationshipEdge).where(RelationshipEdge.relationship_entity_id == refs["relationship_entity_id"]))
-        if edge is not None:
-            out.append(RecordRef("relationship", edge.id))
+        edge_id = edges_of.get(str(refs["relationship_entity_id"]))
+        if edge_id is not None:
+            out.append(RecordRef("relationship", edge_id))
     elif refs.get("entity_id"):
         out.append(RecordRef("entity", str(refs["entity_id"])))
     for key, record_type in (("evidence_id", "evidence"), ("source_id", "source"), ("claim_id", "claim"), ("lead_id", "lead")):
@@ -467,6 +480,7 @@ def events_over_time(db: Session, investigation_id: str, params: dict[str, str])
     periods: dict[str, DataRow] = {}
     omitted: list[dict[str, Any]] = []
     used = 0
+    edges_of = _edges_of(db, events)
     for event in sorted(events, key=lambda e: str(e["id"])):
         key = period_key(event.get("date_start"), granularity)
         if key is None:
@@ -476,7 +490,7 @@ def events_over_time(db: Session, investigation_id: str, params: dict[str, str])
         row = periods.get(key) or DataRow(period_label(key), 0.0, [], 0, key)
         row.value += 1
         row.record_count += 1
-        for ref in _event_refs(db, event):
+        for ref in _event_refs(event, edges_of):
             if ref not in row.record_refs:
                 row.record_refs.append(ref)
         periods[key] = row
@@ -542,13 +556,14 @@ def _event_rows(db: Session, kept: list[tuple[date, date, dict]]) -> list[DataRo
         titles[str(event.get("title") or "Untitled event").strip() or "Untitled event"] += 1
     rows: list[DataRow] = []
     used: set[str] = set()
+    edges_of = _edges_of(db, [event for _lo, _hi, event in kept])
     for lo, hi, event in kept:
         title = str(event.get("title") or "Untitled event").strip() or "Untitled event"
         label = title if titles[title] == 1 else f"{title} ({event.get('date_start')})"
         if label in used:
             label = f"{label} [{str(event['id'])[:8]}]"
         used.add(label)
-        refs = sorted(set(_event_refs(db, event)), key=lambda r: (r.record_type, r.record_id))
+        refs = sorted(set(_event_refs(event, edges_of)), key=lambda r: (r.record_type, r.record_id))
         # One event is one record: its value is 1. The key orders the rows by
         # date, then by title, so events on the same day keep one order.
         rows.append(DataRow(label, 1.0, refs, 1, f"{lo.isoformat()}|{hi.isoformat()}|{label.lower()}|{event['id']}",
@@ -624,8 +639,16 @@ def places_on_map(db: Session, investigation_id: str, params: dict[str, str]) ->
     from app.services.places import investigation_places
     from app.services.timeline import investigation_timeline
 
-    found = investigation_places(db, investigation_id)
-    timeline = {str(event["id"]): event for event in _once(("timeline", investigation_id, None), lambda: investigation_timeline(db, investigation_id))["events"]} if found["places"] else {}
+    held: dict[str, dict[str, Any]] = {}
+
+    def whole_timeline() -> dict[str, Any]:
+        # Built once for the places and their events (and once for the whole catalogue while it runs).
+        if "timeline" not in held:
+            held["timeline"] = _once(("timeline", investigation_id, None), lambda: investigation_timeline(db, investigation_id))
+        return held["timeline"]
+
+    found = investigation_places(db, investigation_id, timeline=whole_timeline)
+    timeline = {str(event["id"]): event for event in whole_timeline()["events"]} if found["places"] else {}
     # Two places of one name are told apart by their record id, as each is
     # named on the map and checked by its name.
     names: dict[str, int] = defaultdict(int)
@@ -833,10 +856,13 @@ def describe_catalog(db: Session, investigation_id: str) -> dict[str, Any]:
     kinds that answer each; all chart kinds, and which can be drawn today."""
     if db.get(Investigation, investigation_id) is None:
         raise QueryError("Investigation not found")
+    from app.services.relationships import relationship_rows_shared
+
     queries = []
     token = _shared.set({})
     try:
-        ran = {name: QUERIES[name](db, investigation_id, QueryRef(name=name).resolved_params()) for name in QUERY_CATALOG}
+        with relationship_rows_shared():
+            ran = {name: QUERIES[name](db, investigation_id, QueryRef(name=name).resolved_params()) for name in QUERY_CATALOG}
     finally:
         _shared.reset(token)
     for name, spec in QUERY_CATALOG.items():

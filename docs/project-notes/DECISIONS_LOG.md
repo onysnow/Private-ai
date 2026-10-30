@@ -670,3 +670,31 @@ BACKLOG "Documents have no kind/language field". Built on `documents` (migration
   detected" stays only where nothing is known.
 - Kind and language travel in a backup (they are columns of `documents`); a backup made before keeps none and the
   restored documents read as not known.
+
+## 38. Act › Charts loads its catalogue with the screen (30 Oct 2026)
+Entry 29 left the chart catalogue behind "Build a chart" because building it ran every query (38 s on the demo case).
+Profiled on a fresh 1MDB demo database (172 links, 97 reporter events, 930 evidence records; this container, SQLite):
+`describe_catalog` took 2.0 s cold and 1.7 s warm with **5,025 SQL statements**; `serialize_relationship` alone was
+2.3 of 3.1 s under the profiler. Causes: each link was serialized one by one (entities, statements, evidence, sources,
+reviews, claims: a query each, the review history read again for every attached record), and the same links were
+serialized again by the ledger, the timeline (once per dated link and once per reporter event pointing at a link),
+the places and the link counts; `events_over_time` and `events_in_order` looked up each event's link one query at a
+time; the map's places built the timeline a second time. The 38 s was not reproduced here (this database has no
+documents read); the old cost grows with links and events together, which a case with read documents has more of.
+Calls:
+- **Batched, not cached.** `serialize_relationships` reads what a set of links needs in a few `IN` queries (chunks
+  of 500) and builds the same rows; `serialize_relationship` is that for one link. The relationship list, a party's
+  links, the graph and the timeline's advisories use it. The timeline asks once for every link's advisory.
+- **Shared while the catalogue runs.** Inside `describe_catalog` each link is serialized once for all sixteen queries
+  (`relationship_rows_shared`, read-only work only), and the places reuse the catalogue's one timeline. Every caller
+  still gets its own copy of a row (dicts and lists new; text, numbers and dates shared, as none can change).
+- **No cache across requests.** The app has no data version to key one on, and the catalogue is now fast enough
+  without one; a stale count would be worse than a quarter second.
+- **Result:** 270 statements; 0.47 s cold, 0.19 s warm in the function; the endpoint 0.2–0.4 s after the server's
+  first request (about 1.2 s for that first one, while SQLAlchemy compiles its statements). The output is byte-for-byte
+  what it was: a golden of the catalogue, every query, every link, the relationship lists, the graph, a party's
+  links, the timeline, the places and the ledger, made before and after on the same database, is identical. A test
+  holds the catalogue's statement count flat as links are added (before: 91 → 601 for 30 more payments).
+- **The screen:** Act › Charts asks for the catalogue as it opens; "Build a chart" is gone. While it loads (well under
+  a second) the screen shows what the builder makes and a loading line. Sections of a stage still mount only when
+  first opened, so nothing else asks for it.

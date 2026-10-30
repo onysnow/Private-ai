@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+import copy
 import math
 import re
+from collections.abc import Iterable, Iterator, Sequence
+from contextlib import contextmanager
+from contextvars import ContextVar
+from dataclasses import dataclass, field
+from datetime import date, datetime
 from typing import Any
 
 from sqlalchemy import or_, select
@@ -262,38 +268,146 @@ def relationship_evidence_review_history(db: Session, edge: RelationshipEdge) ->
     rows = db.scalars(select(RelationshipEvidenceReviewEvent).where(RelationshipEvidenceReviewEvent.relationship_edge_id == edge.id).order_by(RelationshipEvidenceReviewEvent.created_at, RelationshipEvidenceReviewEvent.id)).all()
     return [{"id": r.id, "relationship_edge_id": r.relationship_edge_id, "evidence_id": r.evidence_id, "stance": r.stance, "rationale": r.rationale, "reviewer_type": r.reviewer_type, "created_at": r.created_at} for r in rows]
 
+# While relationship_rows_shared() is open, each relationship is serialized once and every caller gets its own copy:
+# the chart catalogue reads the same relationships through the ledger, the timeline, the places and the link counts.
+_shared_rows: ContextVar[dict[str, dict] | None] = ContextVar("relationship_rows_shared", default=None)
+
+_IN_CHUNK = 500
+
+
+@contextmanager
+def relationship_rows_shared() -> Iterator[None]:
+    """Serialize each relationship once while this is open. For read-only work: a row is not
+    serialized again after a change. Nested use keeps the outer store."""
+    if _shared_rows.get() is not None:
+        yield
+        return
+    token = _shared_rows.set({})
+    try:
+        yield
+    finally:
+        _shared_rows.reset(token)
+
+
+def copied(value: Any) -> Any:
+    """A copy of a serialized row: its dicts and lists are new, so a caller may change them; the values in them
+    (text, numbers, dates) are shared, as none of them can be changed. Much faster than copy.deepcopy."""
+    if isinstance(value, dict):
+        return {key: copied(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [copied(item) for item in value]
+    if isinstance(value, (str, int, float, bool, type(None), datetime, date)):
+        return value
+    return copy.deepcopy(value)
+
+
+def _chunks(ids: Iterable[str | None]) -> Iterator[list[str]]:
+    items = list(dict.fromkeys(i for i in ids if i is not None))
+    for start in range(0, len(items), _IN_CHUNK):
+        yield items[start:start + _IN_CHUNK]
+
+
+@dataclass
+class _Loaded:
+    """Everything serialize_relationship reads for a set of edges, read in a few queries."""
+    entities: dict[str, Entity] = field(default_factory=dict)
+    statements: dict[str, list[Statement]] = field(default_factory=dict)
+    attachments: dict[str, list[RelationshipEvidenceAttachment]] = field(default_factory=dict)
+    reviews: dict[str, list[RelationshipEvidenceReviewEvent]] = field(default_factory=dict)
+    evidence: dict[str, Evidence] = field(default_factory=dict)
+    sources: dict[str, Source] = field(default_factory=dict)
+    links: dict[str, list[ClaimEvidenceLink]] = field(default_factory=dict)   # by evidence id, as stored
+    claims: dict[str, Claim] = field(default_factory=dict)
+
+
+def _load(db: Session, edges: Sequence[RelationshipEdge]) -> _Loaded:
+    loaded = _Loaded()
+    edge_ids = [edge.id for edge in edges]
+    ends = [e.source_entity_id for e in edges] + [e.target_entity_id for e in edges] + [e.relationship_entity_id for e in edges]
+    for chunk in _chunks(ends):
+        loaded.entities.update((row.id, row) for row in db.scalars(select(Entity).where(Entity.id.in_(chunk))))
+    for chunk in _chunks(e.relationship_entity_id for e in edges if e.relationship_entity_id in loaded.entities):
+        for stmt in db.scalars(select(Statement).where(Statement.entity_id.in_(chunk)).order_by(Statement.prop, Statement.value)):
+            loaded.statements.setdefault(stmt.entity_id, []).append(stmt)
+    for chunk in _chunks(edge_ids):
+        for attachment in db.scalars(select(RelationshipEvidenceAttachment).where(RelationshipEvidenceAttachment.relationship_edge_id.in_(chunk))
+                                     .order_by(RelationshipEvidenceAttachment.created_at, RelationshipEvidenceAttachment.id)):
+            loaded.attachments.setdefault(attachment.relationship_edge_id, []).append(attachment)
+        for review in db.scalars(select(RelationshipEvidenceReviewEvent).where(RelationshipEvidenceReviewEvent.relationship_edge_id.in_(chunk))
+                                 .order_by(RelationshipEvidenceReviewEvent.created_at, RelationshipEvidenceReviewEvent.id)):
+            loaded.reviews.setdefault(review.relationship_edge_id, []).append(review)
+    evidence_ids = [a.evidence_id for rows in loaded.attachments.values() for a in rows]
+    for chunk in _chunks(evidence_ids):
+        loaded.evidence.update((row.id, row) for row in db.scalars(select(Evidence).where(Evidence.id.in_(chunk))))
+    for chunk in _chunks(ev.source_id for ev in loaded.evidence.values()):
+        loaded.sources.update((row.id, row) for row in db.scalars(select(Source).where(Source.id.in_(chunk))))
+    for chunk in _chunks(evidence_ids):
+        for link in db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id.in_(chunk), ClaimEvidenceLink.superseded_at.is_(None))):
+            loaded.links.setdefault(link.evidence_id, []).append(link)
+    for chunk in _chunks(link.claim_id for rows in loaded.links.values() for link in rows):
+        loaded.claims.update((row.id, row) for row in db.scalars(select(Claim).where(Claim.id.in_(chunk))))
+    return loaded
+
+
+def _review_dict(r: RelationshipEvidenceReviewEvent) -> dict:
+    return {"id": r.id, "relationship_edge_id": r.relationship_edge_id, "evidence_id": r.evidence_id, "stance": r.stance, "rationale": r.rationale, "reviewer_type": r.reviewer_type, "created_at": r.created_at}
+
+
 def serialize_relationship(db: Session, edge: RelationshipEdge) -> dict:
-    source = db.get(Entity, edge.source_entity_id)
-    target = db.get(Entity, edge.target_entity_id)
-    rel = db.get(Entity, edge.relationship_entity_id)
+    return serialize_relationships(db, [edge])[0]
+
+
+def serialize_relationships(db: Session, edges: Sequence[RelationshipEdge]) -> list[dict]:
+    """serialize_relationship for many edges, reading what they need in a few queries instead of
+    several per edge. Every row is its own object, as one call per edge gives."""
+    shared = _shared_rows.get()
+    todo = list({edge.id: edge for edge in edges if shared is None or edge.id not in shared}.values())
+    built: dict[str, dict] = {}
+    if todo:
+        loaded = _load(db, todo)
+        built = {edge.id: _serialize_loaded(edge, loaded) for edge in todo}
+    if shared is not None:
+        shared.update(built)
+        return [copied(shared[edge.id]) for edge in edges]
+    seen: set[str] = set()
+    out = []
+    for edge in edges:
+        out.append(copied(built[edge.id]) if edge.id in seen else built[edge.id])
+        seen.add(edge.id)
+    return out
+
+
+def _serialize_loaded(edge: RelationshipEdge, loaded: _Loaded) -> dict:
+    source = loaded.entities.get(edge.source_entity_id)
+    target = loaded.entities.get(edge.target_entity_id)
+    rel = loaded.entities.get(edge.relationship_entity_id)
     statements = []
     if rel is not None:
-        for stmt in db.scalars(select(Statement).where(Statement.entity_id == rel.id).order_by(Statement.prop, Statement.value)).all():
+        for stmt in loaded.statements.get(rel.id, []):
             statements.append({
                 "id": stmt.id, "prop": stmt.prop, "value": stmt.value,
                 "dataset": stmt.dataset, "origin": stmt.origin,
                 "original_value": stmt.original_value, "first_seen": stmt.first_seen, "last_seen": stmt.last_seen,
             })
-    attachments = relationship_evidence_attachments(db, edge)
+    attachments = loaded.attachments.get(edge.id, [])
+    evidence_review_history = [_review_dict(r) for r in loaded.reviews.get(edge.id, [])]
     attached_evidence: list[dict[str, Any]] = []
     for attachment in attachments:
-        ev = db.get(Evidence, attachment.evidence_id)
-        src = db.get(Source, ev.source_id) if ev else None
-        reviews = [r for r in relationship_evidence_review_history(db, edge) if r["evidence_id"] == attachment.evidence_id]
-        attached_evidence.append({"attachment_id": attachment.id, "attached_by": attachment.attached_by, "note": attachment.note, "created_at": attachment.created_at, "evidence": None if ev is None else {"id": ev.id, "quote": ev.quote, "locator": ev.locator, "notes": ev.notes, "source": None if src is None else {"id": src.id, "title": src.title, "url": src.url, "source_type": src.source_type}}, "latest_review": reviews[-1] if reviews else None})
-    evidence_review_history = relationship_evidence_review_history(db, edge)
-    latest_evidence_review = evidence_review_history[-1] if evidence_review_history else None
+        ev = loaded.evidence.get(attachment.evidence_id)
+        src = loaded.sources.get(ev.source_id) if ev else None
+        reviews = [r for r in evidence_review_history if r["evidence_id"] == attachment.evidence_id]
+        attached_evidence.append({"attachment_id": attachment.id, "attached_by": attachment.attached_by, "note": attachment.note, "created_at": attachment.created_at, "evidence": None if ev is None else {"id": ev.id, "quote": ev.quote, "locator": ev.locator, "notes": ev.notes, "source": None if src is None else {"id": src.id, "title": src.title, "url": src.url, "source_type": src.source_type}}, "latest_review": dict(reviews[-1]) if reviews else None})
+    latest_evidence_review = dict(evidence_review_history[-1]) if evidence_review_history else None
     provenance_sources = sorted({
         f"{stmt['dataset']}|{stmt['origin'] or ''}" for stmt in statements
     })
     claim_dependencies = []
     attached_evidence_ids = {attachment.evidence_id for attachment in attachments}
     if attached_evidence_ids:
-        # A claim's link marked superseded by a newer record: the claim no longer rests on that evidence.
-        links = db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.evidence_id.in_(attached_evidence_ids),
-                                                           ClaimEvidenceLink.superseded_at.is_(None))).all()
-        for link in links:
-            claim = db.get(Claim, link.claim_id)
+        # A claim's link marked superseded by a newer record: the claim no longer rests on that evidence. In the order
+        # one query per edge read them (evidence id, then as stored: SQLite walks the evidence_id index).
+        for link in [link for evidence_id in sorted(attached_evidence_ids) for link in loaded.links.get(evidence_id, [])]:
+            claim = loaded.claims.get(link.claim_id)
             if claim is not None:
                 claim_dependencies.append({"claim_id": claim.id, "evidence_id": link.evidence_id, "text": claim.text, "status": claim.status, "confidence": claim.confidence, "stance": link.stance, "note": link.note, "needs_review": claim.status in {"disputed", "rejected"}})
     disputed_count = sum(1 for row in claim_dependencies if row["status"] == "disputed")
@@ -509,7 +623,7 @@ def investigation_relationships(
         if limit is not None:
             stmt = stmt.limit(limit)
     edges = db.scalars(stmt).all()
-    rows = [serialize_relationship(db, edge) for edge in edges]
+    rows = serialize_relationships(db, edges)
     rows, _ = _apply_reconciliation_view(
         db, investigation_id, rows, include_reconciled_duplicates=include_reconciled_duplicates
     )
@@ -531,8 +645,7 @@ def entity_relationships(
         .order_by(RelationshipEdge.created_at.desc())
     ).all()
     rows = []
-    for edge in edges:
-        row = serialize_relationship(db, edge)
+    for edge, row in zip(edges, serialize_relationships(db, edges)):
         row["direction"] = "outgoing" if edge.source_entity_id == entity_id else "incoming"
         rows.append(row)
     rows, _ = _apply_reconciliation_view(
@@ -554,7 +667,7 @@ def investigation_graph(
     if schemas:
         stmt = stmt.where(RelationshipEdge.schema.in_(schemas))
     edge_models = db.scalars(stmt.order_by(RelationshipEdge.created_at.desc())).all()
-    raw_edges = [serialize_relationship(db, edge) for edge in edge_models]
+    raw_edges = serialize_relationships(db, edge_models)
     edges, reconciliation = _apply_reconciliation_view(
         db, investigation_id, raw_edges,
         include_reconciled_duplicates=include_reconciled_duplicates,

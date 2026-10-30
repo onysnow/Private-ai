@@ -103,14 +103,12 @@ async function openBuilder(routes: Record<string, unknown> = {}) {
 }
 
 describe('ChartBuilderPanel', () => {
-  it('asks for the catalogue only when the builder is opened, and offers the questions', async () => {
-    const {api, user} = await openBuilder();
-    expect(screen.getByRole('button', {name: 'Build a chart'})).toBeInTheDocument();
-    expect(api.calls(CATALOG)).toHaveLength(0);
-    // Until it is opened the screen says what it makes.
+  it('asks for the catalogue with the screen, and offers the questions', async () => {
+    const {api} = await openBuilder();
+    // While it loads the screen says what it makes; nothing has to be pressed first.
     expect(screen.getByRole('heading', {name: /A checked chart from the case/})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Build a chart'})).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     const questions = within(await screen.findByRole('group', {name: 'Question'}));
     expect(questions.getAllByRole('button').map(b => b.textContent)).toEqual(['Ranking', 'Change over time', 'Part of a whole', 'Distribution', 'Correlation', 'Flow']);
     expect(questions.getByRole('button', {name: 'Flow'})).toBeDisabled();   // drawn in the money-flow pass
@@ -120,7 +118,6 @@ describe('ChartBuilderPanel', () => {
 
   it('offers only the data that answers the question and the kinds that can draw it', async () => {
     const {user} = await openBuilder();
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     // The data are cards with their record counts; the first with records is chosen.
     expect(screen.getByRole('radio', {name: 'Payments by party · 5 payments'})).toHaveAttribute('aria-checked', 'true');
@@ -139,7 +136,6 @@ describe('ChartBuilderPanel', () => {
 
   it('previews the chart with its check report, and each value traces to its records', async () => {
     const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
     const preview = screen.getByRole('button', {name: 'Preview chart'});
@@ -176,7 +172,6 @@ describe('ChartBuilderPanel', () => {
       {rule: 13, message: "the title 'Payments' names the data; it must state the finding in a sentence (at least 3 words)"},
     ]});
     const {user} = await openBuilder({[PREVIEW]: failing});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Treemap'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Payments');
@@ -194,7 +189,6 @@ describe('ChartBuilderPanel', () => {
   it('keeps a chart that passes in a deck, sending only the order slip', async () => {
     const DECK_CHARTS = 'POST /api/decks/dk-1/charts';
     const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists, [DECK_CHARTS]: deck({slide_count: 4})});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Meridian received most of the money');
@@ -223,7 +217,6 @@ describe('ChartBuilderPanel', () => {
     const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists,
       [NEW]: writeup({id: 'wu-2', title, content_json: {type: 'doc', content: []}}),
       [CHARTS]: writeup({id: 'wu-2', title, content_json: {type: 'doc', content: []}})});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), title);
@@ -245,7 +238,6 @@ describe('ChartBuilderPanel', () => {
     const DECK_CHARTS = 'POST /api/decks/dk-1/charts';
     const {user} = await openBuilder({[PREVIEW]: previewReply(), ...lists,
       [DECK_CHARTS]: {status: 422, body: {detail: "the chart failed the design checks: rule 4: the parts share records"}}});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Meridian received most of the money');
@@ -260,7 +252,6 @@ describe('ChartBuilderPanel', () => {
 
   it('says in plain words why a kind cannot draw the data', async () => {
     const {user} = await openBuilder({[PREVIEW]: {status: 422, body: {detail: "the question 'distribution' needs one value per record"}}});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Distribution'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Most payments were small');
     await user.click(screen.getByRole('button', {name: 'Preview chart'}));
