@@ -1229,3 +1229,50 @@ A visual sweep of the 1MDB demo at 1440×900 found these, and each is changed so
 - **Claims** with no claim open: under the status bars, "Left to do": near done (not yet shown, 70 % or more), under
   50 %, not graded, leads, each a large count that filters the list (one at a time, with the status and the words;
   Clear clears it). A list of claims was tried first; it repeated the left list's sentences on the same screen.
+
+## 58. Similar documents and deleted documents: the live test cleans up at the end (30 Oct 2026)
+
+- **Question:** `test_the_corpus_is_searched_with_highlights_and_similar_documents_are_found` failed on over a quarter
+  of the OpenAleph live CI runs (8 of the 29 finished runs listed on 30 Oct; a ninth failed installing dependencies):
+  OpenAleph's more_like_this answered `results: []` for the note, also after 120 s, while its steps passed 30 times
+  in a row on a long-running local stack.
+- **Cause (not the Workbench's):** OpenAleph 5.3.1 (images `ghcr.io/openaleph/openaleph:5.3.1`, openaleph-search
+  5.3.1; openaleph-search `main` still has it) builds more_like_this with `boost_terms: 1`. Elasticsearch 9.5.5
+  (Lucene 10.5.1) picks the like document's terms per shard and weighs each by
+  `idf = 1 + ln((numDocs + 1) / (docFreq + 1))`, where `numDocs` counts live documents only but `docFreq` also counts
+  deleted ones still in the segments (soft deletes, kept until a merge, which a small index rarely needs). On a shard
+  where a term's `docFreq` passes about e × (live documents + 1), that weight is negative; with `boost_terms` set, the
+  term query gets boost `weight / best weight`, negative when some terms are positive, and Lucene refuses it: the shard
+  fails with `illegal_argument_exception: boost must be a positive float, got -0.79`. Elasticsearch still answers 200
+  with the other shards' hits, and OpenAleph does not pass `_shards.failed` on, so a document on the failed shard is
+  silently missing. The live tests deleted each test's collection straight after it, so by the search test the
+  documents index held 2 live documents and 36 deleted ones over its 10 shards; whether the memo landed on a shard that
+  fails is down to its id's hash.
+- **Evidence:** a fresh local stack after the four tests before it (per-shard live/deleted 0/8, 0/2, 0/0, 0/1, 0/0, 0/6,
+  2/6, 0/2, 0/8, 0/3) gave the same query, run by hand, a failed shard with that message; a one-shard index with the
+  memo re-written six times fails the same way, and the same index with `boost_terms` 0 does not.
+- **Minimal reproduction** (any Elasticsearch 9.5.5, one shard):
+  ```
+  PUT mlt-repro {"settings":{"number_of_shards":1},"mappings":{"properties":{"content":{"type":"text","term_vector":"with_positions_offsets"}}}}
+  PUT mlt-repro/_doc/like?refresh=true   {"content":"Meridian Holdings records show Angela Merkel"}
+  PUT mlt-repro/_doc/other?refresh=true  {"content":"Angela Merkel discussed Meridian Holdings with the finance desk"}   (7 times)
+  POST mlt-repro/_search {"query":{"more_like_this":{"fields":["content"],"like":[{"_id":"like"}],"min_term_freq":1,"min_doc_freq":1,"boost_terms":1}}}
+  ```
+  The search fails with "boost must be a positive float"; with `"boost_terms":0` it finds `other`.
+- **Where to fix it upstream:** openaleph-search `query/more_like_this.py` (drop `boost_terms`, or make it a parser
+  setting); OpenAleph's search views (say when `_shards.failed` > 0 rather than answering a partial list as complete);
+  Elasticsearch's `XMoreLikeThis` (an idf that cannot go negative when deleted documents are counted).
+- **Why nothing in the app:** the app cannot avoid it or see it. OpenAleph takes only `mlt_min_doc_freq`,
+  `mlt_minimum_should_match`, `mlt_min_term_freq`, `mlt_max_query_terms`, `mlt_min_word_length` and
+  `mlt_max_doc_freq`; none of them keeps the weight positive, since it depends on each shard's live and deleted counts.
+  Its answer carries nothing that says a shard failed. A user can meet it too: a small collection whose documents were
+  re-processed or deleted can show "no similar documents" for one that has some.
+- **Call:** `backend/tests/test_openaleph_live.py` keeps the collections it makes until every test has run (a
+  session fixture), so the tests no longer fill the index with deleted documents before the search test; and the
+  progress test's three files each get their own text (three files with the same text were one OpenAleph entity
+  written six times, enough to fail a shard holding it, the memo and little else). No assertion changed. What is left
+  is each document's own earlier versions (two writes each, three for the memo analysed again), which keeps every
+  shard under the limit. On 10 fresh local stacks after the change (CI's pytest command each time; the last 6 with
+  the progress files apart, where no document was written more than 3 times) the similar documents test passed every
+  time and no shard failed the query. Running the live tests again on the same stack straight after a run can still meet the
+  bug, through the collections the last run deleted; CI starts from a new stack each time.
