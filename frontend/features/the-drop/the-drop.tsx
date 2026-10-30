@@ -37,6 +37,8 @@ import {proposerName} from '../reading-room/proposers';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {PagePicture} from '../case-home/decision-card';
 import {batchLabel, upload} from '../documents/documents-panel';
+import {isTable} from '../documents/table-mapper';
+import {TableProposal} from '../documents/table-proposal';
 import {useDropStream} from './drop-stream';
 import {CaptureLinkField, Captures, isWebAddress, sameLink, useCaptures} from './captures';
 import {FingerprintMark, ProposalKindIcon} from './kind-marks';
@@ -305,6 +307,8 @@ function Receipt({lane, investigationId}: {lane: DropLaneOut; investigationId: s
     {lane.issues.length > 0 && <ul className="dp-issues">{lane.issues.map(i => <li key={i}>{i}</li>)}</ul>}
     {lane.stalled_minutes !== null && lane.stalled_minutes !== undefined && <p className="dp-stall" role="note"><i aria-hidden="true">{STALLED_MARK}</i>
       {lane.stages.find(s => s.key === 'read')?.detail}. {lane.job_id ? 'Stop reading, then read it again with Try again.' : 'Nothing else is being read; the reader may not be running.'}</p>}
+    {/* A table: what it looks like and which column is which, for a person to accept (DECISIONS_LOG 38). */}
+    {isTable(lane.filename) && !lane.problem && !reading && <TableProposal key={lane.document_id} documentId={lane.document_id}/>}
     <div className="dp-actions">
       <button type="button" className="p" onClick={() => openDocument(lane.document_id)}>Open in reading room</button>
       <button type="button" onClick={() => openProvenance({title: lane.filename, kind: 'document', documentId: lane.document_id})}>Trace</button>

@@ -52,6 +52,7 @@ import {CONTAINER_SCHEMATA} from './document-tree';
 import {EmailView} from './email-view';
 import {SimilarDocuments} from './similar-documents';
 import {isTable, TableMapper} from './table-mapper';
+import {TableProposal} from './table-proposal';
 import {isPicture, PictureEvidence} from './picture-evidence';
 import {DocumentTranslation} from './document-translation';
 import {IdentifierOwner} from './identifier-owner';
@@ -710,6 +711,8 @@ export function DocumentsPanel({investigationId}: Props): ReactElement {
       {state === 'reading' && lane && <p className="lib-alert run" role="note"><span className="lib-strip" aria-hidden="true">{lane.stages.map(st =>
         <i key={st.key} className={STAGE_STATE[st.state] ?? ''}/>)}</span>{lane.note || 'Being read'}</p>}
       {(lane?.issues ?? d.extraction_issues).length > 0 && state !== 'problem' && <ul className="lib-issues">{(lane?.issues ?? d.extraction_issues).map(i => <li key={i}>{i}</li>)}</ul>}
+      {/* A table: what it looks like and which column is which, for a person to accept (DECISIONS_LOG 38). */}
+      {isTable(d.filename) && state !== 'problem' && !reading && <TableProposal key={d.id} documentId={d.id} onAccepted={() => void loadCandidates(d.id)}/>}
 
       <dl className="lib-nums">
         <div><dt>Pages</dt><dd>{pages ?? '–'}</dd></div>

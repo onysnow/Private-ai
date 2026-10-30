@@ -74,6 +74,7 @@ from app.models.documents import (
     IngestionBatch,
     IngestionBatchItem,
     TableMapping,
+    TableProposalDecision,
 )
 from app.models.watchlists import (
     WatchlistEntry,
@@ -192,6 +193,7 @@ __all__ = [
     "IngestionBatch",
     "IngestionBatchItem",
     "TableMapping",
+    "TableProposalDecision",
     "WatchlistEntry",
     "WatchlistHit",
     "Tag",

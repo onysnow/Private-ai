@@ -10,6 +10,7 @@ import {
 import { client } from '../client.gen';
 import {
   acceptDocumentSync,
+  acceptTableProposal,
   active,
   addAboutClaim,
   addChartToDeckEndpoint,
@@ -95,6 +96,7 @@ import {
   diskAnswer,
   dismissHit,
   dismissRedFlag,
+  dismissTableProposal,
   editCollection,
   editNote,
   editTag,
@@ -217,6 +219,7 @@ import {
   getStoryVersion,
   getSuiteCatalog,
   getSuiteCoverage,
+  getTableProposal,
   getTaggedRecords,
   getTags,
   getTimelineBoard,
@@ -432,6 +435,9 @@ import type {
   AcceptDocumentSyncData,
   AcceptDocumentSyncError,
   AcceptDocumentSyncResponse,
+  AcceptTableProposalData,
+  AcceptTableProposalError,
+  AcceptTableProposalResponse,
   ActiveData,
   ActiveError,
   ActiveResponse,
@@ -687,6 +693,9 @@ import type {
   DismissRedFlagData,
   DismissRedFlagError,
   DismissRedFlagResponse,
+  DismissTableProposalData,
+  DismissTableProposalError,
+  DismissTableProposalResponse,
   EditCollectionData,
   EditCollectionError,
   EditCollectionResponse,
@@ -1051,6 +1060,9 @@ import type {
   GetSuiteCoverageData,
   GetSuiteCoverageError,
   GetSuiteCoverageResponse,
+  GetTableProposalData,
+  GetTableProposalError,
+  GetTableProposalResponse,
   GetTaggedRecordsData,
   GetTaggedRecordsError,
   GetTaggedRecordsResponse,
@@ -5529,6 +5541,96 @@ export const previewTableMappingMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await previewTableMapping({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getTableProposalQueryKey = (
+  options: Options<GetTableProposalData>,
+) => createQueryKey('getTableProposal', options);
+
+/**
+ * Get Table Proposal
+ *
+ * What the table looks like (payments, or a list of people or companies), which column is which with how sure
+ * the app is, and where the proposal stands. Nothing is made until a person accepts it.
+ */
+export const getTableProposalOptions = (
+  options: Options<GetTableProposalData>,
+) =>
+  queryOptions<
+    GetTableProposalResponse,
+    GetTableProposalError,
+    GetTableProposalResponse,
+    ReturnType<typeof getTableProposalQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getTableProposal({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getTableProposalQueryKey(options),
+  });
+
+/**
+ * Accept Table Proposal
+ *
+ * Accept the proposal, as it is or changed: the mapping runs, every party and payment it makes is a proposal to
+ * review, and the decision records who accepted.
+ */
+export const acceptTableProposalMutation = (
+  options?: Partial<Options<AcceptTableProposalData>>,
+): UseMutationOptions<
+  AcceptTableProposalResponse,
+  AcceptTableProposalError,
+  Options<AcceptTableProposalData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AcceptTableProposalResponse,
+    AcceptTableProposalError,
+    Options<AcceptTableProposalData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await acceptTableProposal({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Dismiss Table Proposal
+ *
+ * Dismiss the proposal: it is no longer offered on the file, and nothing is made.
+ */
+export const dismissTableProposalMutation = (
+  options?: Partial<Options<DismissTableProposalData>>,
+): UseMutationOptions<
+  DismissTableProposalResponse,
+  DismissTableProposalError,
+  Options<DismissTableProposalData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DismissTableProposalResponse,
+    DismissTableProposalError,
+    Options<DismissTableProposalData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await dismissTableProposal({
         ...options,
         ...fnOptions,
         throwOnError: true,

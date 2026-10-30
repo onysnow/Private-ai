@@ -791,6 +791,8 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
             db, investigation_id=doc.investigation_id, schema=str(payload.get('schema') or ''),
             source_entity_id=ends[0], target_entity_id=ends[1], properties=payload.get('properties') or {},
             dataset=f'document:{doc.id}', origin=f'extraction-candidate:{candidate.id}', evidence_id=evidence_record.id, commit=False,
+            # A payment's kind only when a column of the table said it (app/services/table_proposals.py).
+            payment_kind=payload.get('payment_kind') if payload.get('schema') == 'Payment' else None,
         )
         rtype='relationship'; accepted_id=edge_record.id
     elif candidate.candidate_type=='relationship':

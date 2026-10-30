@@ -15,6 +15,9 @@ import type {
   AcceptDocumentSyncData,
   AcceptDocumentSyncErrors,
   AcceptDocumentSyncResponses,
+  AcceptTableProposalData,
+  AcceptTableProposalErrors,
+  AcceptTableProposalResponses,
   ActiveData,
   ActiveErrors,
   ActiveResponses,
@@ -270,6 +273,9 @@ import type {
   DismissRedFlagData,
   DismissRedFlagErrors,
   DismissRedFlagResponses,
+  DismissTableProposalData,
+  DismissTableProposalErrors,
+  DismissTableProposalResponses,
   EditCollectionData,
   EditCollectionErrors,
   EditCollectionResponses,
@@ -636,6 +642,9 @@ import type {
   GetSuiteCoverageData,
   GetSuiteCoverageErrors,
   GetSuiteCoverageResponses,
+  GetTableProposalData,
+  GetTableProposalErrors,
+  GetTableProposalResponses,
   GetTaggedRecordsData,
   GetTaggedRecordsErrors,
   GetTaggedRecordsResponses,
@@ -1268,6 +1277,9 @@ import {
   zAcceptDocumentSyncBody,
   zAcceptDocumentSyncPath,
   zAcceptDocumentSyncResponse,
+  zAcceptTableProposalBody,
+  zAcceptTableProposalPath,
+  zAcceptTableProposalResponse,
   zActiveResponse,
   zAddAboutClaimBody,
   zAddAboutClaimPath,
@@ -1473,6 +1485,9 @@ import {
   zDismissRedFlagBody,
   zDismissRedFlagPath,
   zDismissRedFlagResponse,
+  zDismissTableProposalBody,
+  zDismissTableProposalPath,
+  zDismissTableProposalResponse,
   zEditCollectionBody,
   zEditCollectionPath,
   zEditCollectionResponse,
@@ -1725,6 +1740,9 @@ import {
   zGetStoryVersionResponse,
   zGetSuiteCatalogResponse,
   zGetSuiteCoverageResponse,
+  zGetTableProposalPath,
+  zGetTableProposalQuery,
+  zGetTableProposalResponse,
   zGetTaggedRecordsPath,
   zGetTaggedRecordsResponse,
   zGetTagsPath,
@@ -6046,6 +6064,109 @@ export const previewTableMapping = <ThrowOnError extends boolean = false>(
     responseValidator: async (data) =>
       await zPreviewTableMappingResponse.parseAsync(data),
     url: '/api/documents/{document_id}/table-mappings/preview',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get Table Proposal
+ *
+ * What the table looks like (payments, or a list of people or companies), which column is which with how sure
+ * the app is, and where the proposal stands. Nothing is made until a person accepts it.
+ */
+export const getTableProposal = <ThrowOnError extends boolean = false>(
+  options: Options<GetTableProposalData, ThrowOnError>,
+): RequestResult<
+  GetTableProposalResponses,
+  GetTableProposalErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetTableProposalResponses,
+    GetTableProposalErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          path: zGetTableProposalPath,
+          query: zGetTableProposalQuery.optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetTableProposalResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/table-proposal',
+    ...options,
+  });
+
+/**
+ * Accept Table Proposal
+ *
+ * Accept the proposal, as it is or changed: the mapping runs, every party and payment it makes is a proposal to
+ * review, and the decision records who accepted.
+ */
+export const acceptTableProposal = <ThrowOnError extends boolean = false>(
+  options: Options<AcceptTableProposalData, ThrowOnError>,
+): RequestResult<
+  AcceptTableProposalResponses,
+  AcceptTableProposalErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    AcceptTableProposalResponses,
+    AcceptTableProposalErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zAcceptTableProposalBody,
+          path: zAcceptTableProposalPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zAcceptTableProposalResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/table-proposal/accept',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Dismiss Table Proposal
+ *
+ * Dismiss the proposal: it is no longer offered on the file, and nothing is made.
+ */
+export const dismissTableProposal = <ThrowOnError extends boolean = false>(
+  options: Options<DismissTableProposalData, ThrowOnError>,
+): RequestResult<
+  DismissTableProposalResponses,
+  DismissTableProposalErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    DismissTableProposalResponses,
+    DismissTableProposalErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: zDismissTableProposalBody,
+          path: zDismissTableProposalPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zDismissTableProposalResponse.parseAsync(data),
+    url: '/api/documents/{document_id}/table-proposal/dismiss',
     ...options,
     headers: {
       'Content-Type': 'application/json',
