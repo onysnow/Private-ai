@@ -265,3 +265,62 @@ def test_a_table_not_yet_mapped_is_not_read_as_running_text_either(tmp_path, mon
                                                    ExtractionCandidate.candidate_type == "entity").all()
         assert {c.payload["caption"]: c.review_status for c in old}["Payer Payee Amount"] == "rejected"
         assert all(c.review_status == "proposed" for c in old if c.payload["caption"] != "Payer Payee Amount")
+
+
+KINDED = (
+    "Date;Payer;Payee;Amount;Currency;Type\n"
+    "2020-01-02;Meridian Bank;Monetary Authority;5000000;USD;Penalty\n"
+    "2020-02-03;Meridian Bank;Orrin Shipping SA;900;USD;Bribe?\n"
+    "2020-03-04;Meridian Bank;Bellcastle Trading Group;1000;USD;\n"
+    "2020-04-05;Bellcastle Trading Group;Orrin Shipping SA;77;USD;Loan\n"
+    "2020-04-05;Bellcastle Trading Group;Orrin Shipping SA;77;USD;Fee\n"
+).encode()
+KINDED_MAP = {
+    "payer": {"schema": "Company", "keys": ["Payer"], "properties": {"name": {"column": "Payer"}}},
+    "payee": {"schema": "LegalEntity", "keys": ["Payee"], "properties": {"name": {"column": "Payee"}}},
+    "payment": {"schema": "Payment", "keys": ["Date", "Payer", "Payee", "Amount"], "payment_kind_column": "Type", "properties": {
+        "payer": {"entity": "payer"}, "beneficiary": {"entity": "payee"},
+        "amount": {"column": "Amount"}, "currency": {"column": "Currency"}, "date": {"column": "Date"}}},
+}
+
+
+def test_a_column_mapped_as_the_kind_gives_each_payment_its_kind_and_reports_a_cell_that_names_none():
+    inv = _investigation()
+    doc = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "kinds.csv"},
+                      files={"file": ("kinds.csv", KINDED, "text/csv")}).json()
+    preview = client.post(f"/api/documents/{doc['id']}/table-mappings/preview", json={"entities": KINDED_MAP})
+    assert preview.status_code == 200, preview.text
+    rows = preview.json()["rows"]
+    pay = [next(e for e in r["entities"] if e["name"] == "payment") for r in rows]
+    assert [p["payment_kind"] for p in pay] == ["fine", None, None, "loan", "fee"]
+    assert rows[1]["problems"] == ["“payment”: “Bribe?” in “Type” is not a kind of payment; the kind is left unset"]
+
+    run = client.post(f"/api/documents/{doc['id']}/table-mappings", json={"entities": KINDED_MAP})
+    assert run.status_code == 200, run.text
+    assert run.json()["mapping"]["query"]["payment"]["payment_kind_column"] == "Type"
+    reasons = {(s["row"], s["reason"]) for s in run.json()["skipped"]}
+    assert reasons == {(3, "“payment”: “Bribe?” in “Type” is not a kind of payment; the kind is left unset"),
+                       (5, "“payment”: its rows name different kinds (fee, loan); the kind is left unset")}
+    links = {row["payload"]["caption"]: row for row in _proposals(doc["id"], "relationship")}
+    assert links["Meridian Bank → Monetary Authority"]["payload"]["payment_kind"] == "fine"
+    for unset in ("Meridian Bank → Orrin Shipping SA", "Meridian Bank → Bellcastle Trading Group", "Bellcastle Trading Group → Orrin Shipping SA"):
+        assert "payment_kind" not in links[unset]["payload"], unset
+
+    # Accepted, the payment keeps its kind: an amount owed, not money that moved.
+    entities = {row["payload"]["caption"]: row for row in _proposals(doc["id"], "entity")}
+    for caption in ("Meridian Bank", "Monetary Authority"):
+        assert client.post(f"/api/extraction-candidates/{entities[caption]['id']}/review", json={"decision": "accept"}).status_code == 200
+    edge = client.post(f"/api/extraction-candidates/{links['Meridian Bank → Monetary Authority']['id']}/review", json={"decision": "accept"})
+    assert edge.status_code == 200, edge.text
+    with SessionLocal() as db:
+        assert db.get(RelationshipEdge, edge.json()["record"]["id"]).payment_kind == "fine"
+
+
+def test_only_a_payment_takes_a_kind_column_and_the_column_must_exist():
+    doc = _ledger(_investigation())
+    bad = {**PAYMENTS, "payment": {**PAYMENTS["payment"], "payment_kind_column": "Kind"}}
+    reply = client.post(f"/api/documents/{doc['id']}/table-mappings/preview", json={"entities": bad})
+    assert reply.status_code == 400 and "no column named “Kind”" in reply.json()["detail"]
+    on_entity = {**PAYMENTS, "payer": {**PAYMENTS["payer"], "payment_kind_column": "Currency"}}
+    reply = client.post(f"/api/documents/{doc['id']}/table-mappings/preview", json={"entities": on_entity})
+    assert reply.status_code == 400 and reply.json()["detail"] == "“payer”: only a payment has a kind of payment"

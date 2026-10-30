@@ -110,3 +110,59 @@ def test_add_by_hand_keeps_the_kind_and_its_preview_says_a_fine_raises_no_flag()
                                       "properties": {}, "payment_kind": "loan"}, "source": {"mode": "none"}}
     refused = client.post(f"/api/investigations/{inv}/by-hand", json=wrong)
     assert refused.status_code == 422 and "Only a payment" in refused.text
+
+
+# --- read from what the record says (DECISIONS_LOG 40) ------------------------------------------------------------
+
+
+def test_a_mapped_cell_names_a_kind_by_its_own_words_and_anything_else_names_none():
+    assert [payment_kinds.from_value(v) for v in ("Fine", "A fine or penalty", " penalty ", "Purchase price", "wire transfer",
+                                                  "Judgment debt", "Disgorgement", "loan", "Ordered", "fee")] == [
+        "fine", "fine", "fine", "price", "transfer", "ordered", "ordered", "loan", "ordered", "fee"]
+    assert [payment_kinds.from_value(v) for v in ("", None, "fine art", "invoice 42", "misc")] == [None] * 5
+
+
+def test_a_sentence_gives_a_kind_only_when_it_states_an_amount_owed_in_so_many_words():
+    stated = payment_kinds.stated_in
+    assert stated("The bank was fined S$29.1 million by MAS") == ("fine", "fined")
+    assert stated("MAS imposed a financial penalty of S$1 million") == ("fine", "financial penalty")
+    assert stated("The court ordered Low to pay USD 5 million") == ("ordered", "ordered Low to pay")
+    assert stated("FINMA ordered the disgorgement of CHF 95 million") == ("ordered", "disgorgement")
+    assert stated("The purchase price for Tanjong was $2.7 billion") == ("price", "purchase price")
+    # Vague words, or words that only describe how a payment was represented, give none.
+    for vague in ("He sent a loan of $100 million to Jho Low", "The $700 million settlement was paid", "Everything was fine",
+                  "A fee was paid to the adviser", "The transfer looked fine to the bank", ""):
+        assert stated(vague) is None, vague
+    # Two kinds stated: the sentence does not say which this payment is.
+    assert stated("A penalty of $10 million and the purchase price of $5 million") is None
+
+
+def _proposed_from(sentence: str) -> tuple[dict, str]:
+    """A payment proposed from the claim a document's sentence was extracted as: the proposal and the case."""
+    inv = client.post("/api/investigations", json={"name": "Kinds from a sentence"}).json()["id"]
+    doc = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Notice"},
+                      files={"file": ("notice.txt", sentence.encode(), "text/plain")}).json()
+    candidates = client.get(f"/api/documents/{doc['id']}/candidates?status=proposed").json()
+    claim = next(c for c in candidates if c["candidate_type"] == "claim")
+    accepted = ok(client.post(f"/api/extraction-candidates/{claim['id']}/review", json={"decision": "accept"}))["record"]
+    bank, regulator = _party(inv, "Meridian Bank"), _party(inv, "Monetary Authority")
+    proposal = ok(client.post(f"/api/claims/{accepted['id']}/relationship-proposals", json={
+        "schema": "Payment", "source_entity_id": bank, "target_entity_id": regulator,
+        "properties": {"amount": ["5000000"], "currency": ["USD"]}}))
+    return proposal, inv
+
+
+def test_a_payment_proposed_from_a_sentence_that_states_a_fine_carries_it_and_keeps_it_when_accepted():
+    proposal, _inv = _proposed_from("Meridian Bank was fined USD 5 million by the Monetary Authority in 2020.")
+    assert proposal["payload"]["payment_kind"] == "fine" and proposal["payload"]["payment_kind_stated"] == "fined"
+    edge = ok(client.post(f"/api/extraction-candidates/{proposal['id']}/review", json={"decision": "accept"}))["record"]
+    with SessionLocal() as db:
+        assert db.get(RelationshipEdge, edge["id"]).payment_kind == "fine"
+
+
+def test_a_payment_proposed_from_a_vague_sentence_carries_no_kind():
+    proposal, _inv = _proposed_from("Meridian Bank paid USD 5 million to the Monetary Authority as a loan in 2020.")
+    assert "payment_kind" not in proposal["payload"]
+    edge = ok(client.post(f"/api/extraction-candidates/{proposal['id']}/review", json={"decision": "accept"}))["record"]
+    with SessionLocal() as db:
+        assert db.get(RelationshipEdge, edge["id"]).payment_kind is None

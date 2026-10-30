@@ -700,3 +700,24 @@ Bring in › Sources & evidence was told a link was superseded (entry 36) but sh
 - **Not counted.** A superseded link backs its claim no longer, so the source's claim count, status dots, tally and
   sort leave it out; a source whose every link is superseded says so ("Superseded on every claim it was linked to")
   instead of "Not used in a claim yet", and is in neither "Backing claims" nor "Not used yet".
+
+## 40. A payment's kind read from what the record says, never guessed (30 Oct 2026)
+
+Entry 33 gave a payment a kind set only by a person. Spreadsheets often carry the kind in a column, and a sentence
+sometimes says it outright. Calls:
+- **A mapped column, one optional role.** A Payment link in a table mapping may name `payment_kind_column`. It is the
+  app's own role, not a FollowTheMoney property, so it is kept beside the entity and stripped before the mapping goes
+  to FollowTheMoney; the kind is not one of the keys that make rows one payment. Only a Payment takes it; a column
+  that does not exist is refused like any other.
+- **Read through the vocabulary.** Each cell is read whole through `payment_kinds.from_value`: a kind's name, its word,
+  or a listed name for it ("penalty", "purchase price", "wire transfer", "judgment debt"…). "fine art" names no kind.
+  A cell that names none leaves the kind unset and is reported against its row (preview problems, run skipped list);
+  an empty cell says nothing and is not reported. Rows of one payment that name different kinds leave it unset, reported.
+- **From a sentence, only amounts owed in so many words.** A payment proposed from an extracted claim carries a kind
+  only when the sentence states a fine or penalty ("fined", "a financial penalty of"), an order ("ordered … to pay",
+  disgorgement, restitution, a judgment debt) or an agreed price ("purchase price"), and exactly one of them; the words
+  that stated it travel with the proposal (`payment_kind_stated`). "Loan", "settlement", "fee" and "transfer" are never
+  read from a sentence: how a payment was described is often what the case disputes (entry 33). Accepted, the
+  proposal's kind becomes the link's.
+- **Mapping screen:** under a Payment link, one select, "Kind of payment: not said" or "Kind of payment from “column”";
+  what happens to a cell that names no kind is on hover.

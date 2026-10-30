@@ -4257,6 +4257,8 @@ class MappedEntityOut(ResponseModel):
     properties: dict[str, list[str]]
     source: str | None = None
     target: str | None = None
+    # A payment's kind read from the column mapped as its kind (app/services/payment_kinds.py); null when not said.
+    payment_kind: Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"] | None = None
 
 
 class MappedRowOut(TableRowOut):

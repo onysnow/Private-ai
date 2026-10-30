@@ -29194,6 +29194,19 @@
             "title": "Keys",
             "type": "array"
           },
+          "payment_kind_column": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A Payment link only: the column that says what kind of payment each row is (a fine, a loan, a purchase price…; app/services/payment_kinds.py). A cell that names no kind leaves the kind unset and is reported.",
+            "title": "Payment Kind Column"
+          },
           "properties": {
             "additionalProperties": {
               "$ref": "#/components/schemas/MappedPropertyIn"
@@ -29232,6 +29245,26 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "payment_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Kind"
           },
           "properties": {
             "additionalProperties": {

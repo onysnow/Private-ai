@@ -641,6 +641,9 @@ class MappedEntityIn(BaseModel):
     keys: list[str] = Field(min_length=1, max_length=10, description="The columns whose values identify the entity: rows with the same values make one entity.")
     key_literal: str | None = Field(default=None, max_length=64)
     properties: dict[str, MappedPropertyIn] = Field(default_factory=dict)
+    payment_kind_column: str | None = Field(default=None, max_length=255, description=(
+        "A Payment link only: the column that says what kind of payment each row is (a fine, a loan, a purchase price…; "
+        "app/services/payment_kinds.py). A cell that names no kind leaves the kind unset and is reported."))
 
 
 class TableMappingIn(BaseModel):
