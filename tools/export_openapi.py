@@ -26,6 +26,13 @@ def build_schema() -> str:
     from app.main import create_app  # noqa: E402
 
     schema = create_app(bootstrap_schema=False).openapi()
+    # Python 3.12's http module names 422 "Unprocessable Entity", 3.13's "Unprocessable Content"; FastAPI copies it
+    # into every route's default 422. One wording, so the file is the same whichever Python writes it.
+    for path in schema.get("paths", {}).values():
+        for operation in path.values():
+            answer = operation.get("responses", {}).get("422") if isinstance(operation, dict) else None
+            if answer and answer.get("description") == "Unprocessable Entity":
+                answer["description"] = "Unprocessable Content"
     return json.dumps(schema, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
 
 
