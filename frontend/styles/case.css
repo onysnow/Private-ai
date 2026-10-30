@@ -664,3 +664,28 @@ button.ch-link:focus-visible { outline: 2px solid var(--accent-1); }
 .dc-card .ch-excerpt { font-size: clamp(15px, 1.2vw, 17.5px); line-height: 1.6; }
 .dc-card .ch-card-body { justify-content: flex-start; gap: 16px; }
 .dc-card .ch-choice { min-height: 64px; font-size: 16px; }
+
+/* The demo's pre-made decisions (features/demo/pre-decided.tsx, DECISIONS_LOG 53): a quiet line where the queue is,
+   the demo's stamp on one decision it made. The stamp is the accent-2 dashed ring; its words are on hover. */
+.pd-glyph { flex: 0 0 auto; color: var(--accent-2); }
+.pd-line { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: 12.5px; color: var(--text-muted); }
+.pd-count { display: inline-flex; align-items: center; gap: 6px; }
+.pd-count b { color: var(--text); font: 650 14px var(--font-mono); }
+.pd-undo, .pd-undo-kind, .pd-undo-one { all: unset; cursor: pointer; color: var(--accent-2); font-weight: 650; white-space: nowrap; }
+.pd-undo:hover, .pd-undo-kind:hover, .pd-undo-one:hover, .pd-undo:focus-visible, .pd-undo-kind:focus-visible, .pd-undo-one:focus-visible { text-decoration: underline; }
+.pd-undo-one:disabled { opacity: .6; cursor: default; }
+.pd-kind { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.pd-kind small { display: block; color: var(--text-muted); }
+.pd-quiet { color: var(--text-muted); }
+.pd-confirm { margin: 6px 0; padding: 10px 12px; border-radius: 12px; border: 1.5px dashed var(--accent-2); background: color-mix(in srgb, var(--accent-2) 8%, var(--surface-1)); font-size: 12.5px; animation: ch-rise var(--dur-fast) var(--ease-out); }
+.pd-confirm p { margin: 0 0 6px; line-height: 1.4; }
+.pd-confirm ul { margin: 0 0 6px; padding-left: 18px; line-height: 1.4; }
+.pd-confirm div { display: flex; gap: 10px; }
+.pd-confirm button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); font-weight: 650; }
+.pd-confirm .pd-go { background: var(--accent-2); border-color: var(--accent-2); color: var(--ground); }
+.pd-confirm button:disabled { opacity: .6; cursor: default; }
+.pd-mark-wrap { display: inline-flex; align-items: center; gap: 6px; }
+.pd-mark { display: inline-flex; }
+.ch-next-foot .pd-line, .ch-next-foot .pd-confirm { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .pd-confirm { animation: cv-fade 120ms both; } }
+html[data-motion='calm'] .pd-confirm { animation: cv-fade 120ms both; }

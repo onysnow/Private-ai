@@ -428,7 +428,11 @@ export function pageRoutes(options: PageRoutesOptions = {}): Routes {
     'GET /api/basemap': basemapStatusBody(),
     ...settingsPaneRoutes(),
   };
-  for (const investigation of investigations) Object.assign(routes, investigationRoutes(investigation.id, records));
+  for (const investigation of investigations) {
+    Object.assign(routes, investigationRoutes(investigation.id, records));
+    // Decide and Case home ask only a demo case for the demo's own decisions (features/demo/pre-decided.tsx): none yet.
+    if (investigation.is_demo) routes[`GET /api/demo/pre-decided/${investigation.id}`] = {investigation_id: investigation.id, decided_by: 'Demo (pre-decided)', counts: {proposal: {}, check: {}, watchlist: {}}};
+  }
   return routes;
 }
 

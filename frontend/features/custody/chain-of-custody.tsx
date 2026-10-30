@@ -23,6 +23,7 @@ import {getClaimCustodyChainOptions, listClaimsOptions, recheckHashMutation} fro
 import type {ClaimDoneOut, CustodyAnchorOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {DemoGlyph, DemoMark, isDemoDecided} from '../demo/pre-decided';
 
 const COLUMNS = ['Files', 'Reading', 'Passage', 'Decision', 'The claim'] as const;
 const COL: Record<CustodyCardOut['kind'], number> = {file: 0, source: 0, reading: 1, passage: 2, decision: 3};
@@ -413,7 +414,10 @@ function CardBox({card, row, column, picked, lit, falls, against, gone = false, 
   const whoWhen = card.kind !== 'passage' && (card.when || card.kind !== 'source')
     ? `${card.kind === 'file' && card.who ? `uploaded by ${card.who} · ` : card.who ? `${card.who.charAt(0).toLowerCase()}${card.who.slice(1)} · ` : ''}${short(card.when)}` : '';
   const extra = card.kind === 'file' || card.kind === 'source' ? card.lines.filter(Boolean) : [];
-  const detail = <><b>{KIND_WORD[card.kind]}</b>{extra.map((l, i) => <span key={i} className="rv-row rv-mono">{l}</span>)}{whoWhen && <span className="rv-row">{whoWhen}</span>}</>;
+  // A decision the demo made ahead (DECISIONS_LOG 45) carries the demo's stamp; its name is on hover.
+  const demo = card.kind === 'decision' && isDemoDecided(card);
+  const detail = <><b>{KIND_WORD[card.kind]}</b>{extra.map((l, i) => <span key={i} className="rv-row rv-mono">{l}</span>)}{whoWhen && <span className="rv-row">{whoWhen}</span>}
+    {demo && <span className="rv-row"><b>Decided ahead by the demo</b>, not by a person.</span>}</>;
   return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}${gone ? ' gone' : ''}`}
     style={{gridColumn: column, gridRow: row, '--col': COL[card.kind]} as CSSProperties} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
     aria-label={`${KIND_WORD[card.kind]}: ${card.title}. ${card.checks.map(c => `${c.label} ${c.ok === true ? 'passed' : c.ok === false ? 'failed' : 'not known'}`).join(', ')}`}
@@ -421,13 +425,13 @@ function CardBox({card, row, column, picked, lit, falls, against, gone = false, 
     {(extra.length > 0 || whoWhen) && <span id={`${id}-who`} hidden>{[...extra, whoWhen].filter(Boolean).join(' · ')}</span>}
     <Reveal tabbable={false} describe={false} className="cc-card-rv" detail={detail}>
     {card.kind === 'file' && <span className="cc-thumb" aria-hidden="true"><i/><i/><i/><i/></span>}
-    <span className="cc-card-top">{head ? <span className="cc-kind">{head}</span> : <span/>}{card.checks.map(c => <Check key={c.label} {...c}/>)}</span>
+    <span className="cc-card-top">{head ? <span className="cc-kind">{head}</span> : <span/>}{demo && <DemoGlyph/>}{card.checks.map(c => <Check key={c.label} {...c}/>)}</span>
     {card.kind === 'passage' ? (shown ? <span className="cc-text"><Lit text={shown.text} quote={card.quote} span={shown.span}/></span> : <b>{card.title}</b>)
       : card.kind === 'reading' ? <b>{card.title}{card.lines[0] ? `, ${card.lines[0]}` : ''}</b>
       : card.kind === 'decision' ? <b>{card.title === 'Answered' ? `Answer: ${card.lines[0]}` : card.title === 'Quote saved' ? `Typed in by ${card.who ?? 'a person'}` : card.lines[0]}</b>
       : <b className={card.kind === 'file' ? 'cc-file' : undefined}>{card.title}</b>}
     {card.quote && card.kind === 'source' && <span className="cc-text">“{card.quote}”</span>}
-    {card.kind === 'decision' && card.title === 'Proposed' && card.lines[1] && <small className={card.lines[1].startsWith('accepted') ? 'cc-ok' : ''}>{card.lines[1].startsWith('accepted') ? `✓ ${card.lines[1].replace(/^a/, 'A')}` : card.lines[1]}</small>}
+    {card.kind === 'decision' && card.title === 'Proposed' && card.lines[1] && <small className={card.lines[1].startsWith('accepted') ? 'cc-ok' : ''}>{demo ? '✓ Accepted ahead' : card.lines[1].startsWith('accepted') ? `✓ ${card.lines[1].replace(/^a/, 'A')}` : card.lines[1]}</small>}
     </Reveal>
   </button>;
 }
@@ -473,7 +477,8 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
         ? <span><span role="alert">✕ could not re-check: {recheck.error}</span> <Reveal detail={<span className="rv-mono">{sha}</span>}><span className="cc-mono">hash</span></Reveal></span>
         : <Reveal detail={<span className="rv-mono">{sha}</span>}><span>{recheck?.result !== undefined ? (recheck.result ? '✓ re-checked now' : '✕ does not match the file now')
           : hash?.ok ? '✓ re-checked when opened' : <span className="cc-mono">hash</span>}</span></Reveal>)}
-      {decision && item('Decided', <Reveal detail={short(decision.when)}>{decision.title === 'Proposed' ? decision.lines.join(' · ') : decision.title === 'Answered' ? `Answered by ${decision.who ?? 'a person'}: ${decision.lines[0]}` : `Typed in by ${decision.who ?? 'a person'}`}</Reveal>)}
+      {decision && item('Decided', <span className="cc-checks plain"><Reveal detail={short(decision.when)}>{decision.title === 'Proposed' ? decision.lines.join(' · ') : decision.title === 'Answered' ? `Answered by ${decision.who ?? 'a person'}: ${decision.lines[0]}` : `Typed in by ${decision.who ?? 'a person'}`}</Reveal>
+        {isDemoDecided(decision) && <DemoMark rule="Accepted from what the case already holds."/>}</span>)}
       {row && item('Rests on it', rests.length ? <span className="cc-checks">
         {(['claim', 'link'] as const).map(k => { const c = rests.filter(r => r.kind === k).length; return c ? <span key={k} className="cc-rest">{c} {k}{c === 1 ? '' : 's'}</span> : null; })}
         {rests.filter(r => r.kind === 'flag').map(f => <span key={f.id} className="cc-rest">{f.label} {isLevel(f.level) && <LevelChip level={f.level} focusable/>}</span>)}</span> : 'nothing else yet')}

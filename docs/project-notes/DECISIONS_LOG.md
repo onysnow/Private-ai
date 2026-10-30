@@ -1074,3 +1074,28 @@ A sweep of the 1MDB demo at 1440×900 found these screens saying too much, or cu
 - **Glossary: compact rows, the card never empty.** Rows are 34 px, not 46. With nothing pinned the card holds the
   first term shown (it is not written to the address, so it does not pin). The dot per area, which said nothing, is the
   area's short code (ML, BO, SF), up to three and "+n", each area's name on reveal; the safety area in its own colour.
+
+## 53. The demo's pre-made decisions shown and undoable on screen (30 Oct 2026)
+
+Entry 45 made the demo's review decisions ahead ("Demo (pre-decided)"), with an undo endpoint no screen used. Now a
+person on the demo case can see what the demo decided and take it back. Built in `frontend/features/demo/pre-decided.tsx`.
+
+- **Where the queue is (Decide's queue column, Case home's Next up footer): one quiet line.** At rest: the demo's mark
+  (a dashed stamp ring, accent-2), the number and "decided ahead by the demo", and "Undo them". On hover or focus of the
+  number: what the demo is doing ("a nearly finished case"), the count per kind (proposals; checks and missing values;
+  watchlist hits) with what they became (accepted, rejected, set aside as unclear, not needed here, dismissed), and an
+  Undo per kind. The kind counts are sub-text, so they are not at rest; the total and the undo are what matters.
+- **Undo always asks first, in place:** "Put n of the demo's decisions back in the queue? They wait for you in Decide
+  again:" with the list by kind of what comes back, and "Your own decisions stay as they are." Undo n / Cancel. After an
+  undo every query is refreshed (as Decide's own answers do), so the queue, the counts, To check and the watchlist show
+  what came back; the line says "n back in the queue to decide." and goes when nothing is left.
+- **One decision shown alone carries the mark, "Decided ahead by the demo" on hover:** a To check item (its demo note
+  moves from the card to the hover; the card's Undo sends that item to the demo undo, `{kind: 'check', id}`, so the
+  note goes with it), a watchlist hit the demo dismissed (with its own Undo, `{kind: 'watchlist', id}`), and a custody
+  chain decision card and its "Decided" row (mark and hover only: the chain's card names the quote, not the proposal,
+  so it has no id to undo by; the line in Decide undoes it).
+- **Decide's "Last 10" strip is not marked:** it holds only the answers given in this session, never the demo's.
+- **Nothing on a case that is not a demo.** The frame knows `is_demo` and does not ask a case that is not one; when it
+  does not know (a screen rendered alone), the counts endpoint's 404 says so and nothing shows. A status that waits
+  again (proposed, open, new) is never counted as decided. Page tests answer the counts route for a demo case with no
+  decisions by default (`frontend/test-support/page-routes.ts`); a case that is not a demo is not asked.
