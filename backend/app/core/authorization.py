@@ -158,6 +158,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         AIAnalysisCandidate,
         BackgroundJob,
         Claim,
+        ClaimEvidenceLink,
         ConnectorFinding,
         CrossReferenceProposal,
         Deck,
@@ -239,6 +240,12 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
             return None
         source = db.get(Source, row.source_id)
         return source.investigation_id if source is not None else None
+
+    if key == "link_id":
+        # /claims/{claim_id}/evidence/{link_id}/supersede: a claim's evidence link, traced through its claim.
+        link = db.get(ClaimEvidenceLink, value)
+        claim = db.get(Claim, link.claim_id) if link is not None else None
+        return claim.investigation_id if claim is not None else None
 
     if key == "candidate_id":
         # Two candidate tables share this path-parameter name:

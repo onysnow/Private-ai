@@ -75,7 +75,7 @@ export function TableProposal({documentId, onAccepted}: {documentId: string; onA
   if (data.status === 'accepted' && decided) {
     return <p className="tp-done" aria-label="Mapping proposal">
       <Reveal detail={<>Accepted{decided.decided_by ? ` by ${decided.decided_by}` : ''}, {timeWords(decided.decided_at)}{decided.changed ? ', changed first' : ''}.
-        <span className="rv-row">What it made waits in the file's proposals.</span></>}>
+        <span className="rv-row">What it made waits in the file&rsquo;s proposals.</span></>}>
         <span><i aria-hidden="true">✓</i> {p.kind === 'payments' ? 'Payments mapped' : 'List mapped'}</span></Reveal>
       {status && <span role="status" className="tp-quiet"> {status}</span>}
     </p>;
@@ -133,7 +133,7 @@ export function TableProposal({documentId, onAccepted}: {documentId: string; onA
           {c.why ? <span className="rv-row">{c.why}</span> : null}</>}>
           <span>{c.column} <i aria-hidden="true">→</i> {labelOf(roleOf(c.column, c.role) ?? '')}</span></Reveal>
       </li>)}
-      {leftOut.length > 0 && <li className="tp-chip tp-out"><Reveal detail={<>Left out (kept in each row's evidence): {leftOut.map(c => c.column).join(', ')}</>}>
+      {leftOut.length > 0 && <li className="tp-chip tp-out"><Reveal detail={<>Left out (kept in each row&rsquo;s evidence): {leftOut.map(c => c.column).join(', ')}</>}>
         <span>+{leftOut.length} left out</span></Reveal></li>}
     </ul>}
 
