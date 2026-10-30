@@ -402,3 +402,14 @@ Links & captures and Check a pack were empty in the demo. Calls:
 - **Check a pack offers "Make a pack from this case and check it"**, and a version with one file changed in the
   browser, so the result view can be reached in the demo. Each records a new pack in the case, as an export does.
 - **An added file inside an exhibit folder is only "not in the list"**, no longer also a second "exhibit changed".
+
+## 24. A background job on SQLite gets its own connection (30 Oct 2026)
+
+doj-2018-indictment-low-ng.pdf failed to read with "UPDATE … extraction_candidates expected to update 4 row(s); 0
+were matched". Cause: on SQLite every session shares one connection (StaticPool), so one transaction; the inline job
+runner reads documents in a worker thread while the server answers requests on that same connection, and a request
+session closing rolled back what the job had flushed but not committed. The read then updated rows that were gone.
+(A request committing at the wrong moment would equally have committed a job's half-done writes.) Call: on a SQLite
+file, each inline job and scheduler tick runs on its own connection with a 60 s busy timeout
+(`app/db/session.py own_connection`), so SQLite's file lock keeps it apart, as PostgreSQL already does. Requests still
+share one connection with each other, as before. `tests/test_job_own_connection.py` reproduces the old failure.
