@@ -335,6 +335,8 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     // The Wire (See; in the single-page view since it took over the Relationships panel).
     [`GET ${base}/wire`]: {investigation_id: id, entities: [], links: [], events: []},
     [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
+    // Act › Charts asks for its catalogue as it opens (in the single-page view, with the page).
+    [`GET ${base}/visuals/catalog`]: {investigation_id: id, queries: [], kinds: [], drawn_kinds: [], questions: []},
     [`GET ${base}/timeline`]: timelineBody(id, records.events ?? []),
     [`GET ${base}/timeline/lanes`]: lanesBody(id, records.events ?? []),
     [`GET ${base}/leads/queue`]: leadQueueBody(id, records.leads ?? []),
