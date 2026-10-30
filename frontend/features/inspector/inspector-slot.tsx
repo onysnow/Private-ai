@@ -17,6 +17,7 @@ import type {KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEv
 import {PanelErrorBoundary} from '../../components/panel-error-boundary';
 import {caseHref} from '../../lib/case-href';
 import {getEntityDossierOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {escapeTaken} from '../../lib/on-screen';
 import {markSlotInteraction, useWorkbenchStore} from '../../lib/workbench-store';
 import type {InspectorItem} from '../../lib/workbench-store';
 import {DossierPanel} from '../dossier/dossier-panel';
@@ -72,12 +73,17 @@ export function InspectorSlot({investigationId, onOpenInConnectors}: {
   };
   const stepBack = () => { if (trail.length > 1) back(); else leave(); };
 
-  // Esc steps back (a dialog or a menu that took the key first keeps it).
+  // Esc steps back (a dialog or a menu that took the key first keeps it). The slot is a layer over the screens: it takes
+  // the key (preventDefault), and the screen under it does not act on that Esc (lib/on-screen.ts, DECISIONS_LOG 40).
   const stepBackRef = useRef(stepBack);
   stepBackRef.current = stepBack;
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !e.defaultPrevented && !e.shiftKey) stepBackRef.current(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.shiftKey || escapeTaken(e, slotRef.current)) return;
+      e.preventDefault();
+      stepBackRef.current();
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
@@ -162,7 +168,7 @@ export function InspectorSlot({investigationId, onOpenInConnectors}: {
   // At phone width the sheet closes on a swipe down from its top.
   const swipe = useRef<number | null>(null);
 
-  return <aside ref={slotRef} className="wb-slot" hidden={!item} aria-label="Inspector"
+  return <aside ref={slotRef} className="wb-slot" hidden={!item} aria-label="Inspector" data-layer=""
     onClickCapture={markSlotInteraction} onKeyDownCapture={e => { if (e.key === 'Enter' || e.key === ' ') markSlotInteraction(); }}
     onTouchStart={e => { swipe.current = (slotRef.current?.scrollTop ?? 0) <= 0 ? e.touches[0].clientY : null; }}
     onTouchEnd={e => {

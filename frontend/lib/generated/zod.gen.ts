@@ -4214,6 +4214,7 @@ export const zEvidenceClaimLinkOut = z.object({
   evidence_id: z.string(),
   stance: z.string(),
   superseded: z.boolean().optional().default(false),
+  superseded_mark: zClaimEvidenceSupersededOut.nullish(),
 });
 
 /**
@@ -5789,6 +5790,9 @@ export const zMailboxCreate = z.object({
 export const zMappedEntityOut = z.object({
   caption: z.string().nullable(),
   name: z.string(),
+  payment_kind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
   properties: z.record(z.string(), z.array(z.string())),
   schema: z.string(),
   source: z.string().nullish(),
@@ -5819,6 +5823,7 @@ export const zMappedPropertyIn = z.object({
 export const zMappedEntityIn = z.object({
   key_literal: z.string().max(64).nullish(),
   keys: z.array(z.string()).min(1).max(10),
+  payment_kind_column: z.string().max(255).nullish(),
   properties: z.record(z.string(), zMappedPropertyIn).optional(),
   schema: z.string().max(64),
 });

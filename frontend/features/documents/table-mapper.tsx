@@ -5,7 +5,8 @@
 // the first rows make, and runs it. Every entity and link becomes a proposal
 // to review; a link is accepted only after both its ends. The screen writes a
 // FollowTheMoney mapping (https://followthemoney.tech/docs/mappings/), the
-// format OpenAleph's own mappings use.
+// format OpenAleph's own mappings use. A payment may also name the column that
+// says what kind of payment each row is (a fine, a loan…; DECISIONS_LOG 42).
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
@@ -23,7 +24,9 @@ import type {
 export type PropertyDraft = {prop: string; column: string; format?: string};
 // `keys` null: chosen for the reporter (an entity's name column; every column a link reads).
 export type EntityDraft = {name: string; schema: string; nameColumn: string; keys: string[] | null; properties: PropertyDraft[]};
-export type LinkDraft = {name: string; schema: string; source: string; target: string; keys: string[] | null; properties: PropertyDraft[]};
+export type LinkDraft = {name: string; schema: string; source: string; target: string; keys: string[] | null; properties: PropertyDraft[];
+  /** A payment only: the column that says what kind of payment it is. */
+  kindColumn?: string};
 
 const TABLE_EXTENSIONS = ['.csv', '.tsv', '.xlsx'];
 
@@ -61,7 +64,8 @@ export function buildMapping(entities: EntityDraft[], links: LinkDraft[], linkSc
     const kind = linkSchemas.find(s => s.name === link.schema);
     if (!kind) continue;
     mapped[link.name] = {schema: link.schema, keys: linkKeys(link, entities),
-      properties: {...properties(link.properties), [kind.source_prop]: {entity: link.source}, [kind.target_prop]: {entity: link.target}}};
+      properties: {...properties(link.properties), [kind.source_prop]: {entity: link.source}, [kind.target_prop]: {entity: link.target}},
+      ...(link.schema === 'Payment' && link.kindColumn ? {payment_kind_column: link.kindColumn} : {})};
   }
   return sheet ? {sheet, entities: mapped} : {entities: mapped};
 }
@@ -210,7 +214,7 @@ export function TableMapper({documentId, onProposed}: {documentId: string; onPro
       return <div className="statement" key={link.name} aria-label={`Link ${link.name}`}>
         <b>{link.name}</b>
         <div className="actions">
-          <select aria-label={`${link.name}: kind`} value={link.schema} onChange={(e: ChangeEvent<HTMLSelectElement>) => setLink(index, {schema: e.target.value, properties: []})}>
+          <select aria-label={`${link.name}: kind`} value={link.schema} onChange={(e: ChangeEvent<HTMLSelectElement>) => setLink(index, {schema: e.target.value, properties: [], kindColumn: ''})}>
             {linkKinds.map(k => <option key={k.name} value={k.name}>{k.label}</option>)}
           </select>
           <select aria-label={`${link.name}: ${kind?.source_label ?? 'from'}`} value={link.source} onChange={(e: ChangeEvent<HTMLSelectElement>) => setLink(index, {source: e.target.value})}>
@@ -226,6 +230,13 @@ export function TableMapper({documentId, onProposed}: {documentId: string; onPro
         </div>
         <PropertyRows drafts={link.properties} choices={kind?.properties ?? []} columns={columns} label={link.name}
           onChange={next => setLink(index, {properties: next})}/>
+        {link.schema === 'Payment' && <div className="actions">
+          <select aria-label={`${link.name}: kind of payment column`} title="A cell that names no kind (a fine, a loan, a purchase price…) leaves it unset, and is reported"
+            value={link.kindColumn ?? ''} onChange={(e: ChangeEvent<HTMLSelectElement>) => setLink(index, {kindColumn: e.target.value})}>
+            <option value="">Kind of payment: not said</option>
+            {columns.map(c => <option key={c} value={c}>Kind of payment from “{c}”</option>)}
+          </select>
+        </div>}
         <KeyColumns columns={columns} keys={linkKeys(link, entities)} label={link.name} onChange={keys => setLink(index, {keys})}/>
       </div>;
     })}

@@ -10558,6 +10558,7 @@ export type EvidenceClaimLinkOut = {
    * Superseded
    */
   superseded?: boolean;
+  superseded_mark?: ClaimEvidenceSupersededOut | null;
 };
 
 /**
@@ -14287,6 +14288,12 @@ export type MappedEntityIn = {
    */
   keys: Array<string>;
   /**
+   * Payment Kind Column
+   *
+   * A Payment link only: the column that says what kind of payment each row is (a fine, a loan, a purchase price…; app/services/payment_kinds.py). A cell that names no kind leaves the kind unset and is reported.
+   */
+  payment_kind_column?: string | null;
+  /**
    * Properties
    */
   properties?: {
@@ -14314,6 +14321,18 @@ export type MappedEntityOut = {
    * Name
    */
   name: string;
+  /**
+   * Payment Kind
+   */
+  payment_kind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
   /**
    * Properties
    */

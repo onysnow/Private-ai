@@ -587,6 +587,14 @@ def propose_relationship_from_extracted_claim(db: Session, *, claim_id: str, sch
         'properties': properties or {}, 'claim_id': claim_id, 'evidence_id': evidence_id,
         'note': note, 'span': (lineage.payload or {}).get('span'),
     }
+    if schema == 'Payment':
+        # A kind only when the extracted sentence states an amount owed in so many words (a fine, an order, an agreed
+        # price; payment_kinds.stated_in, DECISIONS_LOG 42); otherwise not said, as a person would leave it.
+        from app.services.payment_kinds import stated_in
+        stated = stated_in(claim.text)
+        if stated is not None:
+            payload['payment_kind'] = stated[0]
+            payload['payment_kind_stated'] = stated[1]
     row = ExtractionCandidate(
         investigation_id=claim.investigation_id, document_id=lineage.document_id, chunk_id=lineage.chunk_id,
         candidate_type='relationship', payload=payload, confidence=0.0,
@@ -791,7 +799,8 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
             db, investigation_id=doc.investigation_id, schema=str(payload.get('schema') or ''),
             source_entity_id=ends[0], target_entity_id=ends[1], properties=payload.get('properties') or {},
             dataset=f'document:{doc.id}', origin=f'extraction-candidate:{candidate.id}', evidence_id=evidence_record.id, commit=False,
-            # A payment's kind only when a column of the table said it (app/services/table_proposals.py).
+            # A payment's kind only when a column of the table said it (table_proposals.py, table_mappings.py) or the
+            # sentence stated it in so many words (payment_kinds.stated_in).
             payment_kind=payload.get('payment_kind') if payload.get('schema') == 'Payment' else None,
         )
         rtype='relationship'; accepted_id=edge_record.id
@@ -809,6 +818,7 @@ def review_candidate(db: Session, candidate: ExtractionCandidate, *, decision: s
             source_entity_id=str(payload.get('source_entity_id') or ''), target_entity_id=str(payload.get('target_entity_id') or ''),
             properties=payload.get('properties') or {}, dataset=f'document:{doc.id}',
             origin=f'extraction-candidate:{candidate.id}', evidence_id=evidence_id, commit=False,
+            payment_kind=payload.get('payment_kind') if payload.get('schema') == 'Payment' else None,
         )
         rtype='relationship'; accepted_id=edge_record.id
     elif candidate.candidate_type=='identifier':

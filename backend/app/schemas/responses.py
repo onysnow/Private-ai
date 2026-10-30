@@ -1861,6 +1861,7 @@ class EvidenceClaimLinkOut(ResponseModel):
     claim_id: str
     stance: str  # supports | contradicts | context
     superseded: bool = False  # marked superseded by a newer record: no longer counts toward the claim
+    superseded_mark: ClaimEvidenceSupersededOut | None = None  # what replaced it, why, who and when; null while it counts
 
 
 class ClaimEvidenceRowOut(ResponseModel):
@@ -4256,6 +4257,8 @@ class MappedEntityOut(ResponseModel):
     properties: dict[str, list[str]]
     source: str | None = None
     target: str | None = None
+    # A payment's kind read from the column mapped as its kind (app/services/payment_kinds.py); null when not said.
+    payment_kind: Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"] | None = None
 
 
 class MappedRowOut(TableRowOut):

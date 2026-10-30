@@ -32,6 +32,10 @@ Choices, each in the mapping's own terms:
 * A value FollowTheMoney cannot read for its property (a date it cannot
   parse, an amount that is not a number) is dropped by the engine; it is
   reported against its row instead of disappearing silently.
+* A Payment link may name a column as its kind (``payment_kind_column``,
+  the app's own role: FollowTheMoney has no property for it; DECISIONS_LOG
+  40). Each cell is read through the kinds' own words (payment_kinds.py
+  ``from_value``); a cell that names no kind leaves it unset and is reported.
 """
 
 from __future__ import annotations
@@ -55,6 +59,7 @@ from sqlalchemy.orm import Session
 
 from app.core.time import utcnow_naive
 from app.models.domain import Document, ExtractionCandidate, TableMapping
+from app.services.payment_kinds import from_value as payment_kind_from_value
 from app.services.relationships import RELATIONSHIP_SCHEMAS, payment_property_problem, validate_payment_properties
 
 TABLE_EXTENSIONS = {"csv": ",", "tsv": "\t", "xlsx": None}
@@ -248,6 +253,10 @@ def check_query(query: dict[str, Any], table: Table) -> QueryMapping:
         if schema not in ENTITY_SCHEMAS and schema not in RELATIONSHIP_SCHEMAS:
             raise TableError(f"“{name}”: {schema or 'no kind'} is not a kind the Workbench keeps")
         missing = [c for c in list(entity.get("keys") or []) if c not in known]
+        if entity.get("payment_kind_column"):
+            if schema != "Payment":
+                raise TableError(f"“{name}”: only a payment has a kind of payment")
+            missing += [c for c in [entity["payment_kind_column"]] if c not in known]
         props = entity.get("properties") or {}
         unknown: list[str] = []
         for prop, spec in props.items():
@@ -282,7 +291,8 @@ def check_query(query: dict[str, Any], table: Table) -> QueryMapping:
 
 
 def _engine(query: dict[str, Any], *, key_prefix: str | None) -> QueryMapping:
-    entities = {name: {**entity, "key_literal": entity.get("key_literal") or name} for name, entity in query.items()}
+    entities = {name: {**{k: v for k, v in entity.items() if k != "payment_kind_column"}, "key_literal": entity.get("key_literal") or name}
+                for name, entity in query.items()}
     return model.make_mapping({"csv_url": "file:///dev/null", "entities": entities}, key_prefix=key_prefix)
 
 
@@ -338,6 +348,18 @@ def map_rows(engine: QueryMapping, table: Table, *, limit: int | None = None) ->
     return out
 
 
+def _payment_kind(spec: dict[str, Any], name: str, cells: dict[str, str]) -> tuple[str | None, str | None]:
+    """A Payment row's kind from the column mapped as its kind, and the problem to report when the cell names none."""
+    column = spec.get("payment_kind_column")
+    value = (cells.get(column) or "").strip() if column else ""
+    if not value:
+        # An accepted table proposal works the kind out of its column first (table_proposals.py): a cell of its own.
+        derived = (cells.get(DERIVED + "kind") or "").strip()
+        return (payment_kind_from_value(derived) if derived else None), None
+    kind = payment_kind_from_value(value)
+    return kind, None if kind else f"“{name}”: “{value}” in “{column}” is not a kind of payment; the kind is left unset"
+
+
 def _caption(proxy: Any) -> str | None:
     for prop in proxy.schema.caption:
         for value in proxy.get(prop, quiet=True):
@@ -355,6 +377,7 @@ def _plain_properties(proxy: Any) -> dict[str, list[str]]:
 def describe_row(row: MappedRow, query: dict[str, Any]) -> dict[str, Any]:
     """One previewed row: each entity and link it makes, in plain terms."""
     entities = []
+    problems = list(row.problems)
     for name, proxy in row.entities.items():
         schema = proxy.schema.name
         item: dict[str, Any] = {"name": name, "schema": schema, "caption": _caption(proxy), "properties": _plain_properties(proxy)}
@@ -365,8 +388,12 @@ def describe_row(row: MappedRow, query: dict[str, Any]) -> dict[str, Any]:
             item["source"] = _caption(source) if source is not None else None
             item["target"] = _caption(target) if target is not None else None
             item["caption"] = f"{item['source'] or '?'} → {item['target'] or '?'}"
+            kind, problem = _payment_kind(query[name], name, row.cells)
+            item["payment_kind"] = kind
+            if problem:
+                problems.append(problem)
         entities.append(item)
-    return {"number": row.number, "cells": own_cells(row.cells), "entities": entities, "problems": list(row.problems)}
+    return {"number": row.number, "cells": own_cells(row.cells), "entities": entities, "problems": problems}
 
 
 def preview(doc: Document, query: dict[str, Any], *, sheet: str | None, prepare: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -436,6 +463,7 @@ def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str
     skipped: list[dict[str, Any]] = []
     entities: dict[str, dict[str, Any]] = {}       # ftm id -> payload being built
     links: dict[str, dict[str, Any]] = {}
+    kinds: dict[str, set[str]] = {}                # link ftm id -> the kinds its rows name
     for row in rows:
         for problem in row.problems:
             skipped.append({"row": row.number, "reason": problem})
@@ -480,10 +508,19 @@ def run_mapping(db: Session, doc: Document, query: dict[str, Any], *, sheet: str
                               "columns": {prop: _read_from(_columns_of(spec), prepare) for prop, spec in (query[name].get("properties") or {}).items()}},
             })
             _add_row(link, table, row, properties)
-            # A payment's kind only when a column says it (app/services/table_proposals.py); otherwise not said.
-            if schema == "Payment" and row.cells.get(DERIVED + "kind") and not link.get("payment_kind"):
-                link["payment_kind"] = row.cells[DERIVED + "kind"]
+            paid_as, kind_problem = _payment_kind(query[name], name, row.cells)
+            if kind_problem:
+                skipped.append({"row": row.number, "reason": kind_problem})
+            if paid_as:
+                kinds.setdefault(proxy.id, set()).add(paid_as)
 
+    for ftm_id, named in kinds.items():
+        if len(named) == 1:
+            links[ftm_id]["payment_kind"] = next(iter(named))
+        else:
+            # Rows of one payment that name different kinds: none is chosen.
+            skipped.append({"row": links[ftm_id]["rows"][0], "reason": f"“{links[ftm_id]['mapping']['entity']}”: its rows name different kinds "
+                            f"({', '.join(sorted(named))}); the kind is left unset"})
     made_entities = made_links = already = 0
     candidate_for: dict[str, str] = {ftm_id: c.id for ftm_id, c in existing.items()}
     for ftm_id, payload in entities.items():

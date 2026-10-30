@@ -6,6 +6,9 @@
 //
 // Shown by default: the title, the kind as a mark, the evidence count, the claims each piece backs as status colours.
 // On hover or focus: the kind's name, publisher and dates, a claim's words and the stance the evidence takes.
+// Evidence a newer record replaces on a claim (DECISIONS_LOG 36, 39) is shown as the Claims screen shows it: its chip
+// for that claim struck and faded, what replaced it, why, who and when on reveal; it backs that claim no longer, so the
+// counts and status dots leave it out. A piece superseded on every claim it was linked to is struck and faded itself.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, BookOpen, ExternalLink, Plus, Route, Search, X} from 'lucide-react';
 import {useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
@@ -17,9 +20,10 @@ import {
   listClaimsOptions, listDocumentsOptions, listInvestigationEvidenceClaimLinksOptions, listInvestigationEvidenceOptions,
   listInvestigationEvidenceQueryKey, listSourcesOptions, listSourcesQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import type {ClaimOut, DocumentOut, EvidenceOut, SourceOut} from '../../lib/generated/types.gen';
+import type {ClaimEvidenceSupersededOut, ClaimOut, DocumentOut, EvidenceOut, SourceOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {pageOf} from '../case-home/decision-card';
+import {supersededDetail} from '../claims/superseded';
 import {SourceCapturePanel} from './source-capture-panel';
 import {ORIGIN, ORIGINS, originOf} from './source-kinds';
 import type {SourceOrigin} from './source-kinds';
@@ -36,10 +40,13 @@ const STANCE: Record<string, {mark: string; word: string}> = {
 const PAGE = 120;
 
 type Use = 'all' | 'used' | 'unused';
-type Link = {claim: ClaimOut; stance: string};
+/** One link to a claim; `gone` is its superseded mark, null while it counts. */
+type Link = {claim: ClaimOut; stance: string; gone: ClaimEvidenceSupersededOut | null};
 type Row = {
   source: SourceOut; origin: SourceOrigin; document?: DocumentOut; evidence: EvidenceOut[];
   claims: ClaimOut[]; disputed: boolean; matches: EvidenceOut[] | null;
+  /** Claims its evidence was linked to only by links since marked superseded. */
+  supersededOnly: number;
 };
 
 const statusOf = (c: ClaimOut): ClaimStatus => CLAIM_STATUS[c.status] ?? 'unshown';
@@ -106,10 +113,11 @@ export function SourcesBrowser({investigationId}: {investigationId: string}): Re
       const claim = claimById.get(l.claim_id);
       if (!claim) continue;
       const list = out.get(l.evidence_id) ?? [];
-      list.push({claim, stance: l.stance});
+      list.push({claim, stance: l.stance, gone: l.superseded ? l.superseded_mark ?? {at: '', reason: '', by_label: null} : null});
       out.set(l.evidence_id, list);
     }
-    for (const list of out.values()) list.sort((a, b) => STATUS_ORDER[statusOf(a.claim)] - STATUS_ORDER[statusOf(b.claim)]);
+    // The links that count first, then by the claim's status.
+    for (const list of out.values()) list.sort((a, b) => Number(Boolean(a.gone)) - Number(Boolean(b.gone)) || STATUS_ORDER[statusOf(a.claim)] - STATUS_ORDER[statusOf(b.claim)]);
     return out;
   }, [linksQuery.data, claimsQuery.data]);
 
@@ -124,11 +132,12 @@ export function SourcesBrowser({investigationId}: {investigationId: string}): Re
     return (sources ?? []).map(source => {
       const ev = bySource.get(source.id) ?? [];
       const claims = new Map<string, ClaimOut>();
-      for (const e of ev) for (const l of linksByEvidence.get(e.id) ?? []) claims.set(l.claim.id, l.claim);
+      const gone = new Set<string>();
+      for (const e of ev) for (const l of linksByEvidence.get(e.id) ?? []) { if (l.gone) gone.add(l.claim.id); else claims.set(l.claim.id, l.claim); }
       const list = [...claims.values()].sort((a, b) => STATUS_ORDER[statusOf(a)] - STATUS_ORDER[statusOf(b)]);
       const document = docBySource.get(source.id);
       return {source, origin: originOf(source, document), document, evidence: ev, claims: list,
-        disputed: list.some(c => statusOf(c) === 'disputed'), matches: null};
+        disputed: list.some(c => statusOf(c) === 'disputed'), matches: null, supersededOnly: [...gone].filter(id => !claims.has(id)).length};
     }).sort((a, b) => b.claims.length - a.claims.length || b.evidence.length - a.evidence.length || a.source.title.localeCompare(b.source.title));
   }, [sources, evidence, documentsQuery.data, linksByEvidence]);
 
@@ -137,7 +146,8 @@ export function SourcesBrowser({investigationId}: {investigationId: string}): Re
   const filtered = useMemo<Row[]>(() => rows.flatMap(r => {
     if (kinds.size && !kinds.has(r.origin)) return [];
     if (use === 'used' && !r.claims.length) return [];
-    if (use === 'unused' && r.claims.length) return [];
+    // A source superseded on every claim it backed was used: it is in neither "Backing claims" nor "Not used yet".
+    if (use === 'unused' && (r.claims.length || r.supersededOnly)) return [];
     if (disputedOnly && !r.disputed) return [];
     if (!q) return [r];
     const matches = r.evidence.filter(e => hits(e, q));
@@ -248,7 +258,8 @@ function SourceRow({row, on, searching, onPick}: {row: Row; on: boolean; searchi
   const count = searching && row.matches ? row.matches.length : row.evidence.length;
   const disputed = row.claims.filter(c => statusOf(c) === 'disputed').length;
   const name = `${row.source.title}. ${label}. ${count} ${searching ? 'matching ' : ''}pieces of evidence. ${row.claims.length
-    ? `Backs ${row.claims.length} claim${row.claims.length === 1 ? '' : 's'}${disputed ? `, ${disputed} disputed` : ''}.` : 'Not used in a claim yet.'}`;
+    ? `Backs ${row.claims.length} claim${row.claims.length === 1 ? '' : 's'}${disputed ? `, ${disputed} disputed` : ''}.`
+    : row.supersededOnly ? 'Superseded on every claim it was linked to.' : 'Not used in a claim yet.'}`;
   return <button type="button" data-source={row.source.id} className={`sb-src${on ? ' on' : ''}${row.claims.length ? '' : ' unused'}`}
     aria-current={on ? 'true' : undefined} aria-label={name} onClick={onPick}>
     <span className={`sb-src-kind k-${row.origin}`}><Icon size={18} aria-hidden="true"/></span>
@@ -269,8 +280,8 @@ function SourceDetail({row, q, shown, onMore, linksByEvidence, linksMissing, onC
   // The pieces that back claims first (a disputed claim's first), then in page order.
   const list = useMemo(() => {
     const rank = (ev: EvidenceOut): number => {
-      const links = linksByEvidence.get(ev.id);
-      return links?.length ? STATUS_ORDER[statusOf(links[0].claim)] : 9;
+      const links = linksByEvidence.get(ev.id)?.filter(l => !l.gone);
+      return links?.length ? STATUS_ORDER[statusOf(links[0].claim)] : linksByEvidence.get(ev.id)?.length ? 8 : 9;
     };
     return [...(q && row.matches?.length ? row.matches : row.evidence)].sort((a, b) => rank(a) - rank(b)
       || (pageOf(a.locator) ?? 1e9) - (pageOf(b.locator) ?? 1e9) || (a.locator ?? '').localeCompare(b.locator ?? ''));
@@ -280,6 +291,8 @@ function SourceDetail({row, q, shown, onMore, linksByEvidence, linksMissing, onC
   const linkOnly = meta(source, 'link_only');
   const counts = {supported: 0, disputed: 0, unshown: 0, ruled_out: 0} as Record<ClaimStatus, number>;
   for (const c of row.claims) counts[statusOf(c)] += 1;
+  // The record a superseded chip names as its replacement, lit while the chip is pointed at.
+  const [replacer, setReplacer] = useState<string | null>(null);
 
   return <>
     <header className="sb-detail-head">
@@ -307,20 +320,22 @@ function SourceDetail({row, q, shown, onMore, linksByEvidence, linksMissing, onC
     {linksMissing && <p className="sb-muted sb-note">The claims each piece backs could not be loaded.</p>}
     <ol className="sb-evs">
       {list.slice(0, shown).map(ev => <EvidenceCard key={ev.id} ev={ev} q={q} links={linksByEvidence.get(ev.id) ?? []} documentId={ev.document_id ?? document?.id ?? null}
-        onClaim={onClaim} onRead={onRead} onTrace={() => onTrace(ev)}/>)}
+        lit={replacer === ev.id} onReplacer={setReplacer} onClaim={onClaim} onRead={onRead} onTrace={() => onTrace(ev)}/>)}
       {!list.length && <li className="sb-muted">This source holds no evidence yet.</li>}
     </ol>
     {list.length > shown && <button type="button" className="sb-btn sb-more-btn" onClick={onMore}>Show {Math.min(PAGE, list.length - shown)} more of {list.length - shown}</button>}
   </>;
 }
 
-function EvidenceCard({ev, q, links, documentId, onClaim, onRead, onTrace}: {ev: EvidenceOut; q: string; links: Link[]; documentId: string | null;
+function EvidenceCard({ev, q, links, documentId, lit, onReplacer, onClaim, onRead, onTrace}: {ev: EvidenceOut; q: string; links: Link[]; documentId: string | null;
+  lit: boolean; onReplacer: (evidenceId: string | null) => void;
   onClaim: (id: string) => void; onRead: (documentId: string, page: number | null) => void; onTrace: () => void}): ReactElement {
+  const allGone = links.length > 0 && links.every(l => l.gone);
   const dates = [['Made', ev.created_on], ['Event', ev.event_on], ['Published', ev.published_on], ['Retrieved', ev.retrieved_on], ['Taken', ev.captured_on]]
     .filter(([, v]) => v) as [string, string][];
   const extra = ev.notes || dates.length || ev.issuer_or_author || ev.limitations?.length;
   const locator = ev.locator ? <span className="sb-loc"><Marked text={ev.locator} q={q}/></span> : <span className="sb-loc none">no locator</span>;
-  return <li className={`sb-ev${links.length ? '' : ' unused'}`}>
+  return <li className={`sb-ev${links.length ? '' : ' unused'}${allGone ? ' gone' : ''}${lit ? ' replacer' : ''}`}>
     <div className="sb-ev-side">
       {extra ? <Reveal detail={<>
         {ev.issuer_or_author && <span className="rv-row"><b>{ev.issuer_or_author}</b></span>}
@@ -329,16 +344,19 @@ function EvidenceCard({ev, q, links, documentId, onClaim, onRead, onTrace}: {ev:
         {ev.limitations?.map(l => <span key={l} className="rv-row">Limit: {l}</span>)}
       </>}>{locator}</Reveal> : locator}
     </div>
-    {ev.quote ? <blockquote className="sb-quote"><Marked text={ev.quote} q={q}/></blockquote>
+    {ev.quote ? <blockquote className="sb-quote">{allGone ? <s><Marked text={ev.quote} q={q}/></s> : <Marked text={ev.quote} q={q}/>}</blockquote>
       : <p className="sb-quote none">{ev.notes ? <Marked text={ev.notes} q={q}/> : 'No quote kept'}</p>}
     <div className="sb-ev-end">
       {links.length > 0 ? <span className="sb-claims" role="list" aria-label="Claims it is linked to">{links.map(l => {
         const st = statusOf(l.claim);
         const stance = STANCE[l.stance] ?? STANCE.context;
-        return <span role="listitem" key={`${l.claim.id}-${l.stance}`}><Reveal tabbable={false} describe={false} detail={<>
-          <b>{STATUS_WORD[st]}</b> · {stance.word}<span className="rv-row">{l.claim.text}</span></>}>
-          <button type="button" className={`sb-claim st-${st} s-${l.stance}`} onClick={() => onClaim(l.claim.id)}
-            aria-label={`${stance.word}: ${l.claim.text} (${STATUS_WORD[st]}). Open the claim`}><span aria-hidden="true">{stance.mark}</span></button></Reveal></span>;
+        const by = l.gone?.by_evidence_id ?? null;
+        return <span role="listitem" key={`${l.claim.id}-${l.stance}`}
+          onPointerEnter={by ? () => onReplacer(by) : undefined} onPointerLeave={by ? () => onReplacer(null) : undefined}><Reveal tabbable={false} describe={false} detail={<>
+          <b>{STATUS_WORD[st]}</b> · {stance.word}<span className="rv-row">{l.claim.text}</span>
+          {l.gone && (l.gone.at ? supersededDetail(l.gone) : <b className="rv-row">Superseded</b>)}</>}>
+          <button type="button" className={`sb-claim st-${st} s-${l.stance}${l.gone ? ' gone' : ''}`} onClick={() => onClaim(l.claim.id)}
+            aria-label={`${stance.word}${l.gone ? ', superseded' : ''}: ${l.claim.text} (${STATUS_WORD[st]}). Open the claim`}><span aria-hidden="true">{l.gone ? <s>{stance.mark}</s> : stance.mark}</span></button></Reveal></span>;
       })}</span> : null}
       <span className="sb-ev-acts">
         {documentId && <Reveal tabbable={false} describe={false} detail="Open it in the reading room">

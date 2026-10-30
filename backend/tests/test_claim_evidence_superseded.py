@@ -136,10 +136,14 @@ def test_the_chain_of_custody_keeps_the_record_logs_the_mark_and_leaves_it_out_o
 
 
 def test_the_sources_and_evidence_browser_is_told_a_link_is_superseded():
-    inv, claim, old, _new, old_link, _new_link = _case()
-    ok(_supersede(claim, old_link, reason="Corrected"))
+    inv, claim, old, new, old_link, _new_link = _case()
+    ok(_supersede(claim, old_link, reason="Corrected", by_evidence_id=new["id"]))
     links = ok(client.get(f"/api/investigations/{inv}/evidence-claim-links"))
-    assert next(x for x in links if x["evidence_id"] == old["id"])["superseded"] is True
+    gone = next(x for x in links if x["evidence_id"] == old["id"])
+    assert gone["superseded"] is True
+    # What replaced it and why travel with the link, for the browser's reveal.
+    assert gone["superseded_mark"]["reason"] == "Corrected" and gone["superseded_mark"]["by_label"] == "Judgment 2020"
+    assert next(x for x in links if x["evidence_id"] != old["id"])["superseded_mark"] is None
 
 
 def test_who_marked_it_is_kept_by_account_and_marking_again_after_an_undo_stamps_again():

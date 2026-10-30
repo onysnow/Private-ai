@@ -713,3 +713,54 @@ reads its header and first 50 rows and says what it looks like; nothing is made 
   companies"), each column as a chip "Date → date" whose strength is how sure (the percentage and the reason on
   hover), "+N left out", the first row as it would be read (all three sample rows on hover), Accept, Edit (each column's
   role, how numbers and dates are written), Dismiss.
+
+## 40. Esc goes to the topmost layer only (30 Oct 2026)
+
+With a party's dossier open in the inspector slot over The Wire, one Esc both stepped the slot back and did The Wire's
+own Esc (closed its drawer, or went up a level): both listen on the window, and the slot did not mark the key as taken.
+Calls:
+- **One mechanism, in `lib/on-screen.ts`** beside `onScreen` and `typingInto`, which every window key handler already
+  uses: a layer is an open dialog or anything marked `data-layer` (the slot is). The layer that acts on Esc calls
+  `preventDefault`; a screen acts on Esc only when `escapeTaken(e, itsRoot)` is false, that is the key was not taken and
+  no layer is open above it. The second half is what makes it hold whatever order the listeners were added in (The
+  Wire's is added before the slot's, so `defaultPrevented` alone would come too late).
+- **Who uses it:** the slot (it steps back only when no dialog is open above it, then takes the key), The Wire, Chain of
+  Custody's "Back to the claim" (which had its own dialog check), and the theme trial bar (which had one too). The
+  screens' other keys are left as they were: only Esc is shared between layers.
+- **Unchanged:** the slot's Back still closes it, its Esc still walks the trail and closes from the first step.
+
+## 41. Sources & evidence shows superseded evidence as Claims does (30 Oct 2026)
+
+Bring in › Sources & evidence was told a link was superseded (entry 36) but showed nothing of it. Calls:
+- **The mark travels with the link.** `GET /investigations/{id}/evidence-claim-links` keeps `superseded` (a boolean) and
+  adds `superseded_mark`, the same object the Claims screen reads (what replaced it, why, who, when; `claims.
+  superseded_of`), null while the link counts.
+- **Per link, not per piece.** A piece can be superseded on one claim and still back another, so the mark is on that
+  claim's chip: struck and faded, its stance mark struck, named "superseded" in its accessible name, and on hover the
+  claim, then what replaced it, why, who and when (the Claims screen's own `supersededDetail`). Pointing at it lights the
+  record that replaced it when that record is in the pane, as on Claims. Only a piece superseded on every claim it was
+  linked to has its quote struck and faded.
+- **Not counted.** A superseded link backs its claim no longer, so the source's claim count, status dots, tally and
+  sort leave it out; a source whose every link is superseded says so ("Superseded on every claim it was linked to")
+  instead of "Not used in a claim yet", and is in neither "Backing claims" nor "Not used yet".
+
+## 42. A payment's kind read from what the record says, never guessed (30 Oct 2026)
+
+Entry 33 gave a payment a kind set only by a person. Spreadsheets often carry the kind in a column, and a sentence
+sometimes says it outright. Calls:
+- **A mapped column, one optional role.** A Payment link in a table mapping may name `payment_kind_column`. It is the
+  app's own role, not a FollowTheMoney property, so it is kept beside the entity and stripped before the mapping goes
+  to FollowTheMoney; the kind is not one of the keys that make rows one payment. Only a Payment takes it; a column
+  that does not exist is refused like any other.
+- **Read through the vocabulary.** Each cell is read whole through `payment_kinds.from_value`: a kind's name, its word,
+  or a listed name for it ("penalty", "purchase price", "wire transfer", "judgment debt"…). "fine art" names no kind.
+  A cell that names none leaves the kind unset and is reported against its row (preview problems, run skipped list);
+  an empty cell says nothing and is not reported. Rows of one payment that name different kinds leave it unset, reported.
+- **From a sentence, only amounts owed in so many words.** A payment proposed from an extracted claim carries a kind
+  only when the sentence states a fine or penalty ("fined", "a financial penalty of"), an order ("ordered … to pay",
+  disgorgement, restitution, a judgment debt) or an agreed price ("purchase price"), and exactly one of them; the words
+  that stated it travel with the proposal (`payment_kind_stated`). "Loan", "settlement", "fee" and "transfer" are never
+  read from a sentence: how a payment was described is often what the case disputes (entry 33). Accepted, the
+  proposal's kind becomes the link's.
+- **Mapping screen:** under a Payment link, one select, "Kind of payment: not said" or "Kind of payment from “column”";
+  what happens to a cell that names no kind is on hover.
