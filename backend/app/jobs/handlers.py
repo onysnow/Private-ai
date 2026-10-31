@@ -689,7 +689,17 @@ def follow_audio_job(db: Session, job: BackgroundJob, report: Report) -> dict:
     if item is None:
         return {"message": "The item was deleted before its audio was fetched", "result": {}}
     report(5, "Fetching the episode's audio file")
-    document_id = fetch_audio(db, item, (job.payload or {}).get("actor"))
+    try:
+        document_id = fetch_audio(db, item, (job.payload or {}).get("actor"))
+    except Exception:
+        # Not fetched: the episode goes back in the queue to be captured again, unless something else decided it.
+        from sqlalchemy import update
+
+        db.rollback()
+        db.execute(update(MonitorItem).where(MonitorItem.id == item.id, MonitorItem.state == "captured",
+                                             MonitorItem.document_id.is_(None)).values(state="waiting"))
+        db.commit()
+        raise
     db.commit()
     bind = db.get_bind()
     factory = build_session_factory(bind if isinstance(bind, Engine) else bind.engine)

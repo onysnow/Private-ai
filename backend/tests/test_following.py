@@ -351,6 +351,20 @@ def test_a_podcast_episode_is_captured_as_its_audio_and_transcribed(site, monkey
     assert doc["extraction_status"] == "complete" and doc["sha256"]
 
 
+def test_a_podcast_episode_whose_audio_cannot_be_fetched_goes_back_in_the_queue(site):
+    inv = _case()
+    _follow(inv, site.base + "/podcast.xml")
+    episode = _screen(inv)["queue"][0]
+    site.status["/ep41.mp3"] = 500
+    after = client.post(f"/api/monitor-items/{episode['id']}/capture")
+    assert after.status_code == 200, after.text
+    back = next(q for q in _screen(inv)["queue"] if q["id"] == episode["id"])
+    assert back["state"] == "waiting" and not back["document_id"]
+    # And it can be captured again once the file answers.
+    del site.status["/ep41.mp3"]
+    assert client.post(f"/api/monitor-items/{episode['id']}/capture").status_code == 200
+
+
 def test_a_closed_platform_has_no_monitor_and_is_never_asked(site):
     inv = _case()
     m = _follow(inv, "https://www.instagram.com/kestrel.sa/")
