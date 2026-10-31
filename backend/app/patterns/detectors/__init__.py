@@ -20,6 +20,9 @@ class Measure:
     links: list[str]
     value: float | None = None  # what the bands read; None for a family that only finds a shape
     facts: dict[str, Any] = field(default_factory=dict)  # stored with the flag and offered to the summary
+    # What the measure is about, for a family that groups links (one payer and payee, one party in a band): the flag
+    # keeps its identity, and so its dismissal and notes, when the group gains or loses a link. None: the links are it.
+    key: tuple[str, ...] | None = None
 
 
 def families() -> dict[str, Any]:

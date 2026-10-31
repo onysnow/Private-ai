@@ -324,6 +324,67 @@ def test_payments_with_no_purpose_from_one_payer_to_one_payee_are_one_flag():
     said = next(f for f in flags if f["links"] == [stated])
     assert said["level"] == "textbook" and said["summary"] == "Payer Ltd paid Payee Ltd 50 EUR, and the record says “None stated”."
     assert next(f for f in flags if f["links"] == [back])["summary"].startswith("Payee Ltd paid Payer Ltd 10 EUR")
-    # The version 2 flag on one payment no longer fires: it is kept under gone, as any flag a run no longer finds.
-    assert any(f["links"] == [first] and f["rule_version"] == 2 for f in body["gone"] if f["indicator_id"] == "BO-033")
+    # The version 2 flag on one payment is taken over by its group: the same flag, now on every payment of the group.
+    assert not any(f["indicator_id"] == "BO-033" for f in body["gone"])
+    with SessionLocal() as db:
+        assert db.query(PatternFlag).filter(PatternFlag.investigation_id == inv, PatternFlag.indicator_id == "BO-033").count() == 3
     assert _read(inv)["stale"] is False
+
+
+def test_a_dismissed_group_of_payments_with_no_purpose_stays_dismissed_with_its_notes():
+    from datetime import datetime
+
+    from app.models.domain import Investigation, PatternFlag
+    from app.patterns.engine import _fingerprint
+
+    inv = _inv("No purpose, set aside")
+    payer, payee = _party(inv, "Payer Ltd"), _party(inv, "Payee Ltd")
+    first = _link(inv, "Payment", payer, payee, amount=["1000"], currency=["EUR"], date=["2014-01-03"])
+    second = _link(inv, "Payment", payer, payee, amount=["2000"], currency=["EUR"], date=["2014-02-03"])
+    flag = next(f for f in _flags(inv)["flags"] if f["indicator_id"] == "BO-033")
+    assert flag["links"] == [first, second]
+    explanation = flag["indicator"]["innocent_explanations"][0]
+    ok(client.post(f"/api/red-flags/{flag['id']}/innocent", json={"text": explanation, "state": "could_apply", "note": "Group invoices"}))
+    ok(client.post(f"/api/red-flags/{flag['id']}/dismiss", json={"reason": "Intercompany fees, invoiced yearly"}))
+
+    def again() -> dict:
+        found = [f for f in _flags(inv)["flags"] if f["indicator_id"] == "BO-033"]
+        assert len(found) == 1, found
+        return found[0]
+
+    # The group gains a payment.
+    third = _link(inv, "Payment", payer, payee, amount=["3000"], currency=["EUR"], date=["2014-03-03"])
+    kept = again()
+    assert (kept["id"], kept["status"], kept["dismissed_reason"]) == (flag["id"], "dismissed", "Intercompany fees, invoiced yearly")
+    assert kept["links"] == [first, second, third]
+    assert next(i for i in kept["innocent"] if i["text"] == explanation)["note"] == "Group invoices"
+    # One payment's purpose is filled in.
+    from app.models.relationships import RelationshipEdge
+
+    with SessionLocal() as db:
+        record = db.get(RelationshipEdge, third).relationship_entity_id
+    ok(client.patch(f"/api/entities/{record}", json={"properties": {"purpose": ["consulting fee"]}}))
+    kept = again()
+    assert (kept["id"], kept["status"], kept["links"]) == (flag["id"], "dismissed", [first, second])
+    # The rule's version changes.
+    with SessionLocal() as db:
+        row = db.get(PatternFlag, flag["id"])
+        row.rule_version = 1
+        db.get(Investigation, inv).red_flag_run = {"at": datetime(2026, 1, 1).isoformat(), "digest": "an older rule", "cannot_run": []}
+        db.commit()
+    kept = again()
+    assert (kept["id"], kept["status"], kept["dismissed_reason"]) == (flag["id"], "dismissed", "Intercompany fees, invoiced yearly")
+
+    # Flags kept one per payment before grouping: the group stays dismissed when each of its payments' flags was.
+    inv2 = _inv("No purpose, set aside one by one")
+    a, b = _party(inv2, "A Ltd"), _party(inv2, "B Ltd")
+    one = _link(inv2, "Payment", a, b, amount=["1"], currency=["EUR"])
+    two = _link(inv2, "Payment", a, b, amount=["2"], currency=["EUR"])
+    with SessionLocal() as db:
+        for link, reason in ((one, "Bank fee"), (two, "Bank fee")):
+            db.add(PatternFlag(investigation_id=inv2, indicator_id="BO-033", rule_version=2, fingerprint=_fingerprint("BO-033", [a, b], [link]),
+                               level="faint", parties=[a, b], links=[link], facts={}, status="dismissed", dismissed_reason=reason))
+        db.commit()
+    body = _flags(inv2)
+    grouped = next(f for f in body["flags"] if f["indicator_id"] == "BO-033")
+    assert (grouped["status"], grouped["dismissed_reason"], set(grouped["links"])) == ("dismissed", "Bank fee", {one, two})

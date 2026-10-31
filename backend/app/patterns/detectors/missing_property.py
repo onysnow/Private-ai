@@ -119,5 +119,6 @@ def measure(graph: CaseGraph, p: Params) -> list[Measure]:
             "amount": (amount_words(one.properties) or None) if one else None, "date": first(one.properties, "date") if one else None,
             "amount_text": _paid_text(links, totals, no_amount, dates), "finding": _finding(len(links), [g for _, g in found]),
         }
-        out.append(Measure([source, target], [l.id for l in links], STATED_ABSENT if stated else NOT_RECORDED, facts))
+        out.append(Measure([source, target], [l.id for l in links], STATED_ABSENT if stated else NOT_RECORDED, facts,
+                           key=(source, target, "stated" if stated else "not recorded")))
     return out

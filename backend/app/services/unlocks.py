@@ -52,7 +52,7 @@ def _flags(graph: case_graph.CaseGraph) -> dict[str, tuple[str, str]]:
         if isinstance(results, str):
             continue
         for res in results:
-            out[engine._fingerprint(spec.indicator, res.parties, res.links)] = (spec.indicator, res.level)
+            out[engine.flag_fingerprint(spec.indicator, res)] = (spec.indicator, res.level)
     return out
 
 
