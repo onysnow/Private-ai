@@ -36,10 +36,55 @@ export function precisionOf(date: string): 'year' | 'month' | 'day' | null {
   return null;
 }
 
-/** The link's properties as FollowTheMoney names them, for its kind. */
+export type AmountReading = {value: string} | {ask: [string, string]} | {bad: string};
+
+const tidy = (int: string, frac = ''): string => {
+  const i = int.replace(/^0+(?=\d)/, '');
+  const f = frac.replace(/0+$/, '');
+  return f ? `${i}.${f}` : i;
+};
+const grouped = (int: string, sep: string): string | null => {
+  const parts = int.split(sep);
+  return /^\d{1,3}$/.test(parts[0]) && parts.slice(1).every(g => /^\d{3}$/.test(g)) ? parts.join('') : null;
+};
+
+/** A typed amount as a plain number ("29400.5"), read the same in every locale. With both a comma and a dot, the last
+ *  is the decimal mark. A mark used more than once separates thousands. A single one before exactly three digits
+ *  ("29.400", "1,500") could be either, so both readings come back to ask; any other single one is the decimal mark.
+ *  Spaces are thousands separators. Null when nothing is typed. */
+export function readAmount(text: string): AmountReading | null {
+  const t = text.trim().replace(/[\s\u00a0\u202f']/g, '');
+  if (!t) return null;
+  const bad = {bad: 'Only digits, with a comma or a dot'};
+  if (!/^\d[\d.,]*\d$|^\d$/.test(t)) return bad;
+  const dots = t.split('.').length - 1, commas = t.split(',').length - 1;
+  if (dots && commas) {
+    const mark = t.lastIndexOf('.') > t.lastIndexOf(',') ? '.' : ',';
+    const other = mark === '.' ? ',' : '.';
+    if ((mark === '.' ? dots : commas) > 1) return bad;
+    const [int, frac] = t.split(mark);
+    const whole = grouped(int, other);
+    return whole === null ? bad : {value: tidy(whole, frac)};
+  }
+  const sep = dots ? '.' : commas ? ',' : '';
+  if (!sep) return {value: tidy(t)};
+  if (dots + commas > 1) { const whole = grouped(t, sep); return whole === null ? bad : {value: tidy(whole)}; }
+  const [int, frac] = t.split(sep);
+  if (frac.length === 3 && int.length <= 3 && int !== '0') return {ask: [tidy(int + frac), tidy(int, frac)]};
+  return {value: tidy(int, frac)};
+}
+
+/** A plain number shown back unambiguously: thousands spaced, a dot before decimals. */
+export function amountWords(value: string): string {
+  const [int, frac] = value.split('.');
+  const spaced = int.replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  return frac ? `${spaced}.${frac}` : spaced;
+}
+
+/** The link's properties as FollowTheMoney names them, for its kind. `amount` is a plain number (readAmount). */
 export function linkProperties(schema: string, amount: string, currency: string, date: string, purpose: string): Record<string, string[]> {
   const p: Record<string, string[]> = {};
-  const n = amount.replace(/[,\s]/g, '');
+  const n = amount.trim();
   if (schema === 'Payment') {
     if (n) p.amount = [n];
     if (currency.trim()) p.currency = [currency.trim().toUpperCase()];
@@ -101,7 +146,8 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
   const [b, setB] = useState<Slot>(EMPTY);
   const [schema, setSchema] = useState('Payment');
   const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState('EUR');
+  const [currency, setCurrency] = useState('');
+  const [amountPick, setAmountPick] = useState<string | null>(null);
   const [date, setDate] = useState('');
   const [purpose, setPurpose] = useState('');
   const [payKind, setPayKind] = useState<PaymentKind | ''>('');
@@ -121,14 +167,21 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
   const docs = (useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: mode === 'passage'}).data ?? [])
     .filter(d => d.extraction_status === 'complete');
   const precision = precisionOf(date);
+  // The amount as a number, never guessed: an ambiguous one waits for the reading picked; a payment needs its currency.
+  const reading = readAmount(amount);
+  const ask = reading && 'ask' in reading ? reading.ask : null;
+  const amountValue = !reading ? '' : 'value' in reading ? reading.value : ask && amountPick && ask.includes(amountPick) ? amountPick : null;
+  const cur = currency.trim().toUpperCase();
+  const curOk = /^[A-Z]{3}$/.test(cur);
+  const amountReady = amountValue !== null && (schema !== 'Payment' || !amountValue || curOk);
 
   const entry: EntryIn | null = useMemo(() => {
     if (kind === 'party') return a.text.trim() && partyKind ? {kind, party: {caption: a.text.trim(), schema: partyKind, country: country.trim() || null}} : null;
-    if (kind === 'link') return ready(a) && ready(b) ? {kind, link: {schema, source: end(a), target: end(b), properties: linkProperties(schema, amount, currency, date, purpose),
+    if (kind === 'link') return ready(a) && ready(b) && amountReady ? {kind, link: {schema, source: end(a), target: end(b), properties: linkProperties(schema, amountValue ?? '', currency, date, purpose),
       ...(schema === 'Payment' && payKind ? {payment_kind: payKind} : {})}} : null;
     return title.trim() && precision ? {kind, event: {title: title.trim(), date: date.trim(), precision: precision === 'year' ? 'year' : precision, where: where.trim() || null,
       entity_ids: [a.id, b.id].filter((x): x is string => Boolean(x))}} : null;
-  }, [kind, a, b, schema, amount, currency, date, purpose, payKind, partyKind, country, title, where, precision]);
+  }, [kind, a, b, schema, amountReady, amountValue, currency, date, purpose, payKind, partyKind, country, title, where, precision]);
   // The preview writes nothing: asked again as the sentence changes.
   const preview = useQuery({queryKey: ['by-hand-preview', investigationId, entry], enabled: Boolean(entry), staleTime: 0,
     queryFn: async () => (await byHandPreview({path: {investigation_id: investigationId}, body: entry as EntryIn, throwOnError: true})).data});
@@ -137,7 +190,7 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
   const sourceReady = mode === 'none' || (mode === 'passage' ? Boolean(docId && quote.trim()) : Boolean(srcTitle.trim()));
   useEffect(() => { setStatus(''); }, [kind]);
 
-  const reset = () => { setA(EMPTY); setB(EMPTY); setAmount(''); setDate(''); setPurpose(''); setPayKind(''); setTitle(''); setWhere(''); setQuote(''); setLocator(''); setPartyKind(null); setCountry(''); };
+  const reset = () => { setA(EMPTY); setB(EMPTY); setAmount(''); setAmountPick(null); setDate(''); setPurpose(''); setPayKind(''); setTitle(''); setWhere(''); setQuote(''); setLocator(''); setPartyKind(null); setCountry(''); };
   const add = async (another: boolean) => {
     if (!entry || !sourceReady) return;
     setBusy(true);
@@ -145,7 +198,7 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
       const made = (await byHandAdd({path: {investigation_id: investigationId}, body: {...entry, source}, throwOnError: true})).data;
       setStatus(`Added: the ${made.record_type}${made.evidence_id ? ', with its evidence' : ''}${made.lead_id ? ', and a lead to find its source' : ''}${made.parties.length ? `, and ${made.parties.length} new part${made.parties.length === 1 ? 'y' : 'ies'}` : ''}.`);
       void queryClient.invalidateQueries();
-      if (another) { setQuote(''); setLocator(''); setTitle(''); setAmount(''); setDate(''); setPurpose(''); setB(EMPTY); } else reset();
+      if (another) { setQuote(''); setLocator(''); setTitle(''); setAmount(''); setAmountPick(null); setDate(''); setPurpose(''); setB(EMPTY); } else reset();
     } catch (error) { setStatus(errorMessage(error, 'It could not be added')); }
     setBusy(false);
   };
@@ -169,9 +222,16 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
               {Object.entries(LINK_WORDS).map(([s, w]) => <option key={s} value={s}>{w}</option>)}</select></label>
             <PartySlot investigationId={investigationId} label="party" value={b} onChange={setB}/>
             {(schema === 'Payment' || schema === 'Ownership') && <label className={`bh-slot${amount ? '' : ' empty'}`}><small>{schema === 'Payment' ? 'amount' : 'per cent'}</small>
-              <input value={amount} onChange={e => setAmount(e.target.value)} aria-label={schema === 'Payment' ? 'Amount' : 'Per cent'} placeholder={schema === 'Payment' ? '29,400' : '60'} inputMode="decimal"
+              <input value={amount} onChange={e => { setAmount(e.target.value); setAmountPick(null); }} aria-label={schema === 'Payment' ? 'Amount' : 'Per cent'} placeholder={schema === 'Payment' ? '29400' : '60'} inputMode="decimal"
                 style={{width: `${Math.max(6, amount.length + 1)}ch`}}/>
-              {schema === 'Payment' && <input className="bh-cur" value={currency} onChange={e => setCurrency(e.target.value)} aria-label="Currency" maxLength={3}/>}</label>}
+              {schema === 'Payment' && <input className={`bh-cur${curOk ? '' : ' empty'}`} value={currency} onChange={e => setCurrency(e.target.value)} aria-label="Currency" placeholder="cur" maxLength={3}/>}</label>}
+            {(schema === 'Payment' || schema === 'Ownership') && reading && <span className="bh-reads" aria-live="polite">
+              {'bad' in reading ? <b className="bh-warn">{reading.bad}</b>
+                : ask && amountValue === null ? <span className="bh-kinds" role="group" aria-label="Which amount?">
+                  {ask.map(v => <button key={v} type="button" aria-pressed={amountPick === v} onClick={() => setAmountPick(v)}>{amountWords(v)}</button>)}</span>
+                : amountValue ? <>reads as {amountWords(amountValue)}{schema === 'Payment' ? (curOk ? ` ${cur}` : <b className="bh-warn"> · which currency?</b>) : '%'}
+                  {ask && <button type="button" className="bh-link" onClick={() => setAmountPick(null)}>change</button>}</> : null}
+            </span>}
             <span>{schema === 'Payment' ? 'on' : 'from'}</span>
             <label className={`bh-slot${date ? '' : ' empty'}`}><small>date</small><input value={date} onChange={e => setDate(e.target.value)} aria-label="Date" placeholder="2019-03-03"/></label>
             <Precision value={precision} date={date}/>
@@ -236,7 +296,7 @@ export function AddByHand({investigationId}: {investigationId: string}): ReactEl
           <p className="bh-cap t"><Reveal detail="Before you add it."><span>Where it lands</span></Reveal></p>
           <svg className="bh-wire" viewBox="0 10 400 84" role="img" aria-label={`${a.text || 'a party'} ${LINK_WORDS[schema]} ${b.text || 'a party'}`}>
             <line x1="170" y1="60" x2="230" y2="60" className="bh-new-line"/>
-            <text x="200" y="30" textAnchor="middle" className="bh-line-label">{LINK_WORDS[schema]}{amount ? ` ${amount}${schema === 'Payment' ? ` ${currency}` : '%'}` : ''} · new</text>
+            <text x="200" y="30" textAnchor="middle" className="bh-line-label">{LINK_WORDS[schema]}{amountValue ? ` ${amountWords(amountValue)}${schema === 'Payment' ? (curOk ? ` ${cur}` : '') : '%'}` : ''} · new</text>
             <rect x="6" y="44" width="164" height="32" rx="8" className={a.id ? 'bh-node known' : a.text ? 'bh-node' : 'bh-node empty'}/><text x="88" y="64" textAnchor="middle">{clip(a.text || 'party')}</text>
             <rect x="230" y="44" width="164" height="32" rx="8" className={b.id ? 'bh-node known' : b.text ? 'bh-node' : 'bh-node empty'}/><text x="312" y="64" textAnchor="middle">{clip(b.text || 'party')}</text>
           </svg>
