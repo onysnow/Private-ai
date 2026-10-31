@@ -47,7 +47,11 @@ def test_a_crashed_reader_fails_the_read_and_is_replaced(in_subprocess, tmp_path
     pool = document_reader._pool
     for pid in [p.pid for p in pool._processes.values()]:  # type: ignore[union-attr]
         os.kill(pid, signal.SIGKILL)  # the reader dies, as on a fatal crash in C code
-    time.sleep(0.5)
+    # Wait until the pool has seen it die (review B7: a state, not a fixed sleep).
+    deadline = time.monotonic() + 10
+    while not getattr(pool, "_broken", False) and time.monotonic() < deadline:
+        time.sleep(0.02)
+    assert pool._broken, "the pool never saw its reader stop"  # type: ignore[union-attr]
     with pytest.raises(RuntimeError, match="stopped unexpectedly"):
         document_reader.read_chunks(path)
     assert document_reader._pool is None
