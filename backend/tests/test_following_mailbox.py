@@ -89,7 +89,7 @@ def test_queues_the_senders_new_messages_read_only_and_keeps_the_password_outsid
     assert ("select", "INBOX", True) in FakeImap.asked
     assert all(a[0] != "FETCH" or a[2] == "(BODY.PEEK[])" for a in FakeImap.asked)  # PEEK: nothing marked read
     with SessionLocal() as db:
-        items = db.query(MonitorItem).filter(MonitorItem.monitor_id == monitor["id"]).order_by(MonitorItem.key).all()
+        items = db.query(MonitorItem).filter(MonitorItem.monitor_id == monitor["id"]).order_by(MonitorItem.title).all()
         assert [i.title for i in items] == ["Issue 1", "Issue 2: the plot sale"]
         assert items[0].summary == "Plain words about the harbour." and str(items[0].published_at) == "2019-10-15 06:00:00"
     secrets = Path(settings.connector_credentials_file).with_name("mailboxes.json")
@@ -183,3 +183,23 @@ def test_a_mailbox_the_server_renumbers_still_queues_its_new_messages_once(monke
         assert sorted(i.title for i in items) == ["Issue 1", "Issue 2: the plot sale", "Issue 3"]
         folder = Path(settings.document_storage_dir) / inv / "following" / monitor["id"]
         assert sorted(p.name for p in folder.glob("*.eml")) == sorted(i.extra["eml"] for i in items)
+
+
+def test_deleting_the_case_leaves_nothing_of_it_on_disk_and_forgets_its_mailbox_password():
+    """Its kept newsletters, its captures' and derived files, the folder itself, and the password kept outside it."""
+    inv, r = _follow()
+    mid = r.json()["id"]
+    other_inv, other = _follow()
+    case = Path(settings.document_storage_dir).resolve() / inv
+    assert list((case / "following" / mid).glob("*.eml")) and mailbox._read().get(mid)
+    for kept in ("captures/cap-1/page.html", "derived/doc-1/copy.pdf"):
+        (case / kept).parent.mkdir(parents=True, exist_ok=True)
+        (case / kept).write_bytes(b"x")
+    preview = client.get(f"/api/investigations/{inv}/deletion-preview").json()
+    assert preview["following_file_count"] == 2
+    deleted = client.delete(f"/api/investigations/{inv}", params={"confirmation": inv})
+    assert deleted.status_code == 200, deleted.text
+    assert not case.exists(), [str(p) for p in case.rglob("*")]
+    assert mailbox._read().get(mid) is None
+    # Another case's mailbox is left as it is.
+    assert mailbox._read().get(other.json()["id"]) and (Path(settings.document_storage_dir).resolve() / other_inv / "following").is_dir()

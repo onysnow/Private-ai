@@ -173,11 +173,34 @@ def preview_investigation_deletion(db: Session, investigation_id: str, storage_r
         # Files made from the case's files (ADR-0021): viewable copies, redacted and cleaned versions; they go too.
         "derived_file_count": sum(1 for p in (root / investigation_id / "derived").rglob("*") if p.is_file())
         if (root / investigation_id / "derived").is_dir() else 0,
+        # Newsletters kept from a followed mailbox and not captured yet (app/services/mailbox.py); they go too.
+        "following_file_count": sum(1 for p in (root / investigation_id / "following").rglob("*") if p.is_file())
+        if (root / investigation_id / "following").is_dir() else 0,
         "can_delete": not unsafe_paths,
         # The reporter types the case's name to delete it (research §10, KEEP_2); the API also takes the ID.
         "requires_confirmation": (inv.name or "").strip() or investigation_id,
         "openaleph_collection": _openaleph_collection(db, investigation_id),
     }
+
+
+# The folders a case keeps of its own under document storage, which go with it.
+CASE_FOLDERS = ("captures", "derived", "following")
+
+
+def _remove_empty(folder: Path) -> None:
+    """The case's folder and the empty folders left in it (a restored document's own folder, once its file is staged).
+    Anything still holding a file stays."""
+    if not folder.is_dir():
+        return
+    for path in sorted((p for p in folder.rglob("*") if p.is_dir()), key=lambda p: len(p.parts), reverse=True):
+        try:
+            path.rmdir()
+        except OSError:
+            pass
+    try:
+        folder.rmdir()
+    except OSError:
+        pass
 
 
 def delete_investigation(db: Session, investigation_id: str, storage_root: str | Path, *, confirmation: str,
@@ -225,19 +248,21 @@ def delete_investigation(db: Session, investigation_id: str, storage_root: str |
             original.replace(staged_path)
             staged.append((original, staged_path))
 
-        # Web captures' files (ADR-0018) and files made from the case's files (ADR-0021) live in the case's folder.
-        for kept in ("captures", "derived"):
+        # Web captures' files (ADR-0018), files made from the case's files (ADR-0021) and newsletters kept from a
+        # followed mailbox (app/services/mailbox.py) live in the case's folder.
+        for kept in CASE_FOLDERS:
             folder = contained_path(root, investigation_id, kept)
             if folder.is_dir():
                 staged_folder = trash_root / investigation_id / kept
                 staged_folder.parent.mkdir(parents=True, exist_ok=True)
                 folder.replace(staged_folder)
                 staged.append((folder, staged_folder))
-        try:
-            contained_path(root, investigation_id).rmdir()
-        except OSError:
-            pass
+        _remove_empty(contained_path(root, investigation_id))
 
+        # The case's mailbox passwords are kept outside the case (app/services/mailbox.py): they go once its rows have.
+        from app.models.following import Monitor
+
+        mailboxes = set(db.scalars(select(Monitor.id).where(Monitor.investigation_id == investigation_id, Monitor.kind == "mailbox")))
         rows = _collect_investigation_rows(db, investigation_id)
         deleted_counts: dict[str, int] = {}
         # SQLAlchemy metadata.sorted_tables is parent-first, so reverse it for safe deletes.
@@ -274,6 +299,10 @@ def delete_investigation(db: Session, investigation_id: str, storage_root: str |
         staging_parent.rmdir()
     except OSError:
         pass
+    if mailboxes:
+        from app.services.mailbox import forget_passwords
+
+        forget_passwords(mailboxes)
 
     collection = preview["openaleph_collection"]
     return {

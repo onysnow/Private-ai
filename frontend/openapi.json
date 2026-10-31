@@ -27095,6 +27095,11 @@
             "title": "Document Files",
             "type": "array"
           },
+          "following_file_count": {
+            "default": 0,
+            "title": "Following File Count",
+            "type": "integer"
+          },
           "investigation_id": {
             "title": "Investigation Id",
             "type": "string"
@@ -76188,11 +76193,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorOut"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorOut"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorOut"
+                    }
+                  ],
+                  "title": "Response 422 Update Monitor"
                 }
               }
             },
-            "description": "The request's input does not match what the route declares"
+            "description": "A mailbox cannot be set to Tor (the message says why)"
           },
           "4XX": {
             "content": {
@@ -76528,7 +76541,7 @@
         "summary": "Get Platform Checks"
       },
       "patch": {
-        "description": "Turn the daily check on or off, the warning before a capture, or change a test item.",
+        "description": "Turn the daily check on or off, the warning before a capture, or change a test item. A setting of the whole\nserver: only its administrator changes it.",
         "operationId": "change_platform_checks",
         "requestBody": {
           "content": {
@@ -76550,6 +76563,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Only the server's administrator changes it"
           },
           "422": {
             "content": {
@@ -76675,6 +76698,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Only the server's administrator runs it"
           },
           "422": {
             "content": {
