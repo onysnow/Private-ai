@@ -28,6 +28,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
 import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../lib/generated/types.gen';
+import {dialogOpen} from '../../lib/on-screen';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -430,7 +431,10 @@ function NextUp({investigationId, active, isDemo}: {investigationId: string; act
   const links = useMemo(() => (item && !item.evidence && item.parties.length > 1 && graph ? partyLinks(graph.edges, item.parties) : []), [item, graph]);
   useEffect(() => {
     if (!active) return undefined;
-    const handle = (event: KeyboardEvent) => { if ((event.key === 'z' || event.key === 'Z') && !event.metaKey && !event.ctrlKey && held) { event.preventDefault(); undo(); } };
+    const handle = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.defaultPrevented || typing(event.target) || !singleKeysOn()) return;
+      if ((event.key === 'z' || event.key === 'Z') && held) { event.preventDefault(); undo(); }
+    };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
   }, [active, held, undo]);
@@ -575,7 +579,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
     if (!active || preview || !investigation) return undefined;
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey || event.defaultPrevented || typing(event.target) || !singleKeysOn()) return;
-      if (document.querySelector('[role="dialog"]')) return;
+      if (dialogOpen()) return;
       const home = document.querySelector<HTMLElement>('[data-testid="case-home"]');
       if (!home || home.closest('[hidden]')) return;
       const key = event.key.toLowerCase();

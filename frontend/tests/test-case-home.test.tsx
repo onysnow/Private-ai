@@ -309,6 +309,23 @@ describe('Case home', () => {
     await waitFor(() => expect(api.lastBody('POST /api/checks/chk-1/decide')).toEqual({status: 'does_not'}));
   });
 
+  it('leaves a held answer alone when Z is typed into a field or pressed with Alt', async () => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    routes({'POST /api/checks/chk-1/decide': {investigation_id: 'inv-1', items: [], gone: [], missing: []}});
+    wrap(<CaseHome investigation={INV} investigations={[INV]} onSwitch={vi.fn()} loading={false}/>);
+    await screen.findByTestId('decision-card');
+    fireEvent.keyDown(window, {key: 's'});
+    expect(await screen.findByText('How much did Fernhill Ltd pay Kestrel SA?')).toBeInTheDocument();
+    const field = document.createElement('textarea');
+    document.body.appendChild(field);
+    fireEvent.keyDown(field, {key: 'z'});
+    fireEvent.keyDown(window, {key: 'z', altKey: true});
+    expect(screen.getByText('How much did Fernhill Ltd pay Kestrel SA?')).toBeInTheDocument();
+    field.remove();
+    fireEvent.keyDown(window, {key: 'z'});
+    expect(await screen.findByText('Does page 4 show that the harbour parcel was bought on behalf of Fernhill Ltd?')).toBeInTheDocument();
+  });
+
   it('offers a first case and the sample case when there is none', async () => {
     const api = routes({'POST /api/investigations': INV, 'GET /api/investigations': [INV]});
     const onSwitch = vi.fn();
