@@ -8,6 +8,9 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiReasoningPanel, WritingReport, describeAiStatus} from '../components/ai-reasoning-panel';
+import {DraftableClaims, draftQuestion} from '../features/ai/draftable-claims';
+import {QueryProvider} from '../lib/query-client';
+import {mockApi} from '../test-support/mock-api';
 import {askBeforeYouRun} from '../features/ai/before-you-run';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -136,11 +139,27 @@ describe('AiReasoningPanel', () => {
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={{...readyStatus, enabled: false, endpoints_callable: false}} />);
 
-    expect(screen.getByTestId('ai-status')).toHaveTextContent(/disabled/);
-    expect(screen.getByRole('button', {name: 'Run module'})).toBeDisabled();
-    expect(screen.getByLabelText('Question')).toBeDisabled();
+    // AI off is a state, said in two words (the deployment's sentence on reveal), not run controls that cannot be used.
+    expect(screen.getByTestId('ai-status')).toHaveTextContent(/AI is off.*nothing runs or leaves this computer/);
+    expect(screen.queryByRole('button', {name: 'Run module'})).toBeNull();
+    expect(screen.queryByLabelText('Question')).toBeNull();
     await screen.findByText('Auto-rejected: invented citation');
     expect(requestUrl(fetchMock.mock.calls[0])).toBe('http://api.test/api/investigations/inv-1/ai-analysis-candidates');
+  });
+
+  it('with no drafts and AI off: the AI mark (its sentence on reveal), what a draft is as its path, and the aside filling the space', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(jsonResponse({candidates: []})));
+    render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={{...readyStatus, enabled: false, endpoints_callable: false}}
+      emptyAside={<p>the claims</p>}/>);
+    await screen.findByText('No drafts yet');
+    const mark = screen.getByRole('img', {name: 'AI is off'});
+    expect(mark).toHaveAccessibleDescription(/AI is off · nothing runs or leaves this computer/);
+    expect(mark).toHaveTextContent('AI');
+    expect(screen.getByRole('link', {name: 'Settings › AI and research'})).toHaveAttribute('href', '/settings#ai');
+    const what = screen.getByRole('region', {name: 'What a draft is'});
+    expect(within(what).getAllByRole('listitem').map(li => li.querySelector('b')?.textContent)).toEqual(['Ask', 'Draft', 'You decide']);
+    expect(within(what).getByRole('link', {name: 'Ask the case'})).toHaveAttribute('href', '#ai-runs');
+    expect(screen.getByText('the claims')).toBeInTheDocument();
   });
 
   it('asks for an investigation before doing anything', () => {
@@ -174,9 +193,10 @@ describe('AiReasoningPanel', () => {
     await user.click(screen.getByRole('button', {name: 'Open'}));
     const detail = await screen.findByTestId('ai-candidate-detail');
     expect(within(detail).getByText('CLM-0001')).toBeInTheDocument();
-    expect(within(detail).getByText(/Supports: evidence:ev-1/)).toBeInTheDocument();
+    // Counts show (✓ 1 · ✕ 0); which records, and the claim's class and confidence, wait in reveals.
+    expect(within(detail).getByText(/Supports: evidence:ev-1/).closest('[hidden]')).not.toBeNull();
     expect(within(detail).getByText('GAP-0001 · Is there an independent corroborating source? — needs the executed copy (bears on CLM-0001)')).toBeInTheDocument();
-    expect(within(detail).getByText('Corroborated fact · Very likely · confidence High')).toBeInTheDocument();
+    expect(within(detail).getByText('Corroborated fact · Very likely · confidence High').closest('[hidden]')).not.toBeNull();
     expect(within(detail).getByText('Most likely way this is wrong:').parentElement).toHaveTextContent('could be a draft that was never executed');
     expect(within(detail).getByTestId('right-of-reply')).toHaveTextContent('Ada North · on CLM-0001: That she signed the agreement.');
     expect(within(detail).getByTestId('right-of-reply')).toHaveTextContent('the AI never does');
@@ -200,7 +220,7 @@ describe('AiReasoningPanel', () => {
   const searchHit = {results: [{type: 'claim', group: 'reporting', id: 'claim-1', investigation_id: 'inv-1', title: 'Claim', snippet: 'Meridian paid Bellcastle $2.4M', score: 1, provenance: {}, metadata: {}, kind: 'claim_event'}],
     query: 'Bellcastle', investigation_id: 'inv-1', total: 1, returned: 1, counts: {claim: 1}, group_counts: {reporting: 1}};
   const runDraft = async (user: ReturnType<typeof userEvent.setup>) => {
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('No drafts yet');
     screen.getByLabelText('Reasoning module').focus();
     await user.keyboard('{ArrowDown}{ArrowDown}');
     await user.click(await screen.findByRole('option', {name: 'Presentation draft'}));
@@ -312,7 +332,7 @@ describe('AiReasoningPanel', () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(jsonResponse({candidates: []}));
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} />);
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('No drafts yet');
 
     const moduleTrigger = screen.getByLabelText('Reasoning module');
     moduleTrigger.focus();
@@ -395,7 +415,7 @@ describe('AiReasoningPanel', () => {
         style: {theme: 'newsprint', fonts: 'theme'}, source_ai_candidate_id: 'cand-9', created_by: null})); // POST promote-to-deck
     vi.stubGlobal('fetch', fetchMock);
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={readyStatus} onTraceRecord={d => traced.push(`${d.trace_record_type}:${d.record_id}`)} />);
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('No drafts yet');
 
     const moduleTrigger = screen.getByLabelText('Reasoning module');
     moduleTrigger.focus();
@@ -474,10 +494,25 @@ describe('AiReasoningPanel', () => {
       }},
     };
     render(<AiReasoningPanel api={new ApiClient('http://api.test')} investigationId="inv-1" status={noTas} />);
-    await screen.findByText('No AI analysis candidates yet for this investigation.');
+    await screen.findByText('No drafts yet');
     expect(screen.getByTestId('ai-status')).toHaveTextContent(/Presentation drafts do not use it and are available/);
     expect(screen.getByLabelText('Goal')).not.toBeDisabled();
     expect(screen.getByLabelText('Search records to add')).not.toBeDisabled();
     expect(screen.queryByLabelText('Question')).not.toBeInTheDocument();
+  });
+});
+
+describe('DraftableClaims', () => {
+  it('lists the claims a draft could test, disputed and not yet shown first, ruled out left out; Ask opens Ask the case with the claim', async () => {
+    connectGeneratedClient(new ApiClient('http://api.test'));
+    const claim = (id: string, text: string, status: string) => ({id, investigation_id: 'inv-1', text, status, confidence: 0, created_at: '2026-10-01T00:00:00'});
+    mockApi({'GET /api/investigations/inv-1/claims': [claim('c1', 'Najib received the money', 'confirmed'), claim('c2', 'Tanore is a shell', 'disputed'),
+      claim('c3', 'The bonds were overpriced', 'unverified'), claim('c4', 'An old idea', 'rejected')]});
+    render(<QueryProvider><DraftableClaims investigationId="inv-1"/></QueryProvider>);
+    const list = await screen.findByRole('region', {name: 'Claims a draft could test'});
+    await waitFor(() => expect(list.querySelectorAll('li')).toHaveLength(3));
+    expect([...list.querySelectorAll('.ai-drafts-claim')].map(e => e.textContent)).toEqual(['Tanore is a shell', 'The bonds were overpriced', 'Najib received the money']);
+    await userEvent.setup().click(within(list).getByRole('button', {name: 'Ask the case about: Tanore is a shell'}));
+    expect(askBeforeYouRun).toHaveBeenCalledWith('inv-1', {module: 'case_synthesis', question: draftQuestion('Tanore is a shell'), theory: ''});
   });
 });

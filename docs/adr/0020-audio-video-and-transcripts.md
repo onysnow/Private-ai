@@ -44,7 +44,8 @@ anything derived from it is marked derived. The suite's EGS rules on capture and
   account, the title, upload date, duration, live status, the tool and the route ("yt-dlp, logged out"). A second
   request on the same page returns what was collected; a new visit is a new capture.
 - **Speakers are not named by the machine here.** Speaker lanes need a diarization model (pyannote) whose weights sit
-  behind a Hugging Face login: left for later, with "Name this voice" in the reporter's hands.
+  behind a Hugging Face login: left for later, with "Name this voice" in the reporter's hands. (29 Oct 2026: done in
+  ADR-0026 with models that need no login.)
 
 ## Consequences
 

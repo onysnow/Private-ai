@@ -4,7 +4,7 @@
 // the read job, retry a failed read, import a batch, review proposals with
 // their reasoning, stage a relationship from a reviewed claim, and the
 // OpenAleph corpus actions.
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {act, cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -14,8 +14,10 @@ import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
+import {fastJobPolls, steppedJobPolls} from '../test-support/job-poll';
 import {mockApi} from '../test-support/mock-api';
 import type {RouteCall} from '../test-support/mock-api';
+import {dropBody, dropLane} from '../test-support/library';
 import {corpusStatusBody, documentFormatsBody, emptyGraph, entityFixture} from '../test-support/page-routes';
 
 // Bulk import navigates to the batch triage screen with useRouter().push().
@@ -30,15 +32,23 @@ const wrap = (node: ReactElement) => render(<QueryProvider>{node}</QueryProvider
 
 beforeEach(() => {
   connectGeneratedClient(new ApiClient('http://api.test'));
-  useWorkbenchStore.setState({investigationId: 'inv-1', provenance: null});
+  useWorkbenchStore.setState({investigationId: 'inv-1', provenance: null, document: null});
 });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); mockPush.mockClear(); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); mockPush.mockClear(); fastJobPolls(); });
 
 const DOCUMENTS = 'GET /api/investigations/inv-1/documents';
 const ENTITIES = 'GET /api/investigations/inv-1/entities';
 const UPLOAD = 'POST /api/documents/upload';
 const CANDIDATES = 'GET /api/documents/doc-1/candidates';
 const CORPUS_STATUS = 'GET /api/investigations/inv-1/corpus/status';
+const DROP = 'GET /api/investigations/inv-1/drop';
+const list = () => screen.getByRole('region', {name: 'Files'});
+const pane = () => screen.getByTestId('library-pane');
+/** Opens the chosen file's OpenAleph menu and presses one of its actions. */
+async function openAleph(user: ReturnType<typeof userEvent.setup>, action: string) {
+  await user.click(within(pane()).getByRole('button', {name: /^OpenAleph/}));
+  await user.click(within(pane()).getByRole('menuitem', {name: action}));
+}
 // The canonical entities a staged relationship can join, read from the shared cache.
 const entities = [entityFixture('ent-1', 'Kestrelwood Holdings', 'Company'), entityFixture('ent-2', 'Jane Doe', 'Person')];
 
@@ -82,25 +92,107 @@ function bulkFileInput(): HTMLInputElement {
 }
 
 async function renderWithDocuments(documents: unknown[] = [docFixture()]) {
-  const api = mockApi({[DOCUMENTS]: documents, [ENTITIES]: entities, 'GET /api/investigations/inv-1/graph': emptyGraph(), [CORPUS_STATUS]: corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody()});
+  const api = mockApi({[DOCUMENTS]: documents, [ENTITIES]: entities, 'GET /api/investigations/inv-1/graph': emptyGraph(), [CORPUS_STATUS]: corpusStatusBody('inv-1'),
+    'GET /api/document-formats': documentFormatsBody(), [DROP]: dropBody('inv-1')});
   wrap(<DocumentsPanel investigationId="inv-1"/>);
-  await screen.findByText(String((documents[0] as {filename: string}).filename));
+  await screen.findByTestId(`document-${String((documents[0] as {id: string}).id)}`);
   return api;
 }
 
 describe('DocumentsPanel upload and review', () => {
-  it('lists the documents with their counts and disables Upload & extract until a file is chosen', async () => {
+  it('lists the documents with their numbers, the chosen one in its pane, and disables Upload & extract until a file is chosen', async () => {
     await renderWithDocuments();
-    expect(screen.getByText('extracted · 12 chunks · entity: 2')).toBeInTheDocument();
+    const row = screen.getByTestId('document-doc-1');
+    expect(within(row).getByText('12')).toBeInTheDocument();   // its passages, a number in its column
+    expect(row).toHaveAttribute('aria-current', 'true');       // the first file is chosen: its pane shows
+    expect(within(pane()).getByRole('heading', {name: 'board-minutes.pdf'})).toBeInTheDocument();
+    // Its kind is a mark, named on hover (Ony, 29 Oct).
+    expect(within(row).getByRole('img', {name: 'PDF'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Upload & extract'})).toBeDisabled();
-    expect(screen.getByRole('link', {name: 'Open review queue for this investigation'})).toHaveAttribute('href', '/review?inv=inv-1');
+    expect(screen.getByRole('link', {name: 'Review queue'})).toHaveAttribute('href', '/review?inv=inv-1');
+  });
+
+  it('shows where each file is in its reading, why one stopped, and filters by kind, state and name', async () => {
+    const api = mockApi({
+      [DOCUMENTS]: [docFixture(), docFixture({id: 'doc-2', filename: 'scan.pdf', extraction_status: 'failed', chunk_count: 0}),
+        docFixture({id: 'doc-3', filename: 'transfer.eml', title: 'Transfer to Meridian', mime_type: 'message/rfc822'})],
+      [ENTITIES]: entities, [CORPUS_STATUS]: corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody(),
+      [DROP]: dropBody('inv-1', [
+        dropLane('doc-1', 'board-minutes.pdf', {waiting: 3}, {pages: 7, passages: 12, proposals: {entity: 5}, waiting: {entity: 3}}),
+        dropLane('doc-2', 'scan.pdf', {problem: true, note: 'Needs OCR · not on this computer'}),
+        dropLane('doc-3', 'transfer.eml', {}, {passages: 2}),
+      ]),
+      // The chosen PDF's first page, drawn by the API, is its picture in the pane.
+      'GET /api/documents/doc-1/page-image': new Blob(['png'], {type: 'image/png'}),
+    });
+    wrap(<DocumentsPanel investigationId="inv-1"/>);
+    const minutes = await screen.findByTestId('document-doc-1');
+    await waitFor(() => expect(within(minutes).getByText('7')).toBeInTheDocument());   // pages
+    expect(within(minutes).getByText('3')).toBeInTheDocument();                         // proposals waiting
+    // A file that could not be read says why on its row; it is an alert, not sub-text.
+    expect(within(screen.getByTestId('document-doc-2')).getByText('Needs OCR · not on this computer')).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: 'Could not be read'}));
+    expect(within(list()).queryByTestId('document-doc-1')).not.toBeInTheDocument();
+    expect(within(pane()).getByRole('button', {name: 'Try reading again'})).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Clear'}));
+    await user.click(screen.getByRole('button', {name: 'Emails'}));
+    expect(screen.getAllByTestId(/^document-/).map(row => row.dataset.testid)).toEqual(['document-doc-3']);
+    await user.click(screen.getByRole('button', {name: 'Emails'}));
+    await user.type(screen.getByRole('searchbox', {name: 'Find a file by name'}), 'meridian');
+    expect(screen.getAllByTestId(/^document-/).map(row => row.dataset.testid)).toEqual(['document-doc-3']);
+    expect(api.unmatched()).toEqual([]);
+  });
+
+  it('marks each document by what it is, filters by it, and lets a person set its kind and language in the pane', async () => {
+    const judgment = docFixture({kind: 'judgment', kind_set_by: 'source', language: 'fr', language_name: 'French', language_set_by: 'detected',
+      language_by: 'py3langid', language_confidence: 0.99});
+    const api = await renderWithDocuments([judgment, docFixture({id: 'doc-2', filename: 'ledger.pdf'})]);
+    // The kind is the row's mark, named on hover; a document whose kind is not known shows its file's kind, faint.
+    expect(within(screen.getByTestId('document-doc-1')).getByRole('img', {name: 'Judgment or order'})).toBeInTheDocument();
+    expect(within(screen.getByTestId('document-doc-2')).getByRole('img', {name: 'PDF'})).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: 'Kind not set'}));
+    expect(screen.getAllByTestId(/^document-/).map(row => row.dataset.testid)).toEqual(['document-doc-2']);
+    await user.click(screen.getByRole('button', {name: 'Kind not set'}));
+    await user.click(screen.getByRole('button', {name: 'Judgments and orders'}));
+    expect(screen.getAllByTestId(/^document-/).map(row => row.dataset.testid)).toEqual(['document-doc-1']);
+    // The pane: its kind and language as chips; how each was set is on hover.
+    expect(within(pane()).getByText('Detected by py3langid · 99% sure').closest('[hidden]')).not.toBeNull();
+    api.add({'PATCH /api/documents/doc-1/about': {...judgment, kind: 'court_filing', kind_set_by: 'person', kind_by: 'Ony'}});
+    await user.click(within(pane()).getByRole('button', {name: 'Kind: Judgment or order. Change it'}));
+    await user.click(within(pane()).getByRole('radio', {name: 'Court filing'}));
+    await waitFor(() => expect(api.calls('PATCH /api/documents/doc-1/about')).toHaveLength(1));
+    expect(api.lastBody('PATCH /api/documents/doc-1/about')).toEqual({kind: 'court_filing'});
+    api.add({'PATCH /api/documents/doc-1/about': {...judgment, language: 'ms', language_name: 'Malay', language_set_by: 'person'}});
+    await user.click(within(pane()).getByRole('button', {name: 'Language: French. Change it'}));
+    const field = within(pane()).getByRole('combobox', {name: 'Language, as a code or a name'});
+    await user.clear(field);
+    await user.type(field, 'Malay');
+    await user.click(within(pane()).getByRole('button', {name: 'Save'}));
+    await waitFor(() => expect(api.calls('PATCH /api/documents/doc-1/about')).toHaveLength(2));
+    expect(api.lastBody('PATCH /api/documents/doc-1/about')).toEqual({language: 'ms'});
+  });
+
+  it('moves along the list with J and K and opens the chosen file in the reading room with Enter', async () => {
+    await renderWithDocuments([docFixture(), docFixture({id: 'doc-2', filename: 'ledger.pdf'})]);
+    const user = userEvent.setup();
+    screen.getByRole('button', {name: 'board-minutes.pdf'}).focus();
+    await user.keyboard('j');
+    expect(screen.getByTestId('document-doc-2')).toHaveAttribute('aria-current', 'true');
+    expect(within(pane()).getByRole('heading', {name: 'ledger.pdf'})).toBeInTheDocument();
+    await user.keyboard('{Enter}');
+    expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'doc-2'});
+    await user.keyboard('k');
+    expect(screen.getByTestId('document-doc-1')).toHaveAttribute('aria-current', 'true');
   });
 
   it('names a document by the title given on upload, with its file name beside it', async () => {
     await renderWithDocuments([docFixture({title: 'Board minutes, March', filename: 'scan_0042.pdf'}), docFixture({id: 'doc-3', filename: 'notes.txt', title: 'notes.txt'})]);
-    expect(screen.getByText('Board minutes, March')).toBeInTheDocument();
-    expect(screen.getByText('scan_0042.pdf')).toBeInTheDocument();
-    expect(screen.getAllByText('notes.txt')).toHaveLength(1);
+    expect(within(list()).getByText('Board minutes, March')).toBeInTheDocument();
+    // The chosen file's pane names its file beside its title; a file named by its file name is not named twice.
+    expect(within(pane()).getByText('scan_0042.pdf', {selector: '.lib-file'})).toBeInTheDocument();
+    expect(within(list()).getAllByText('notes.txt')).toHaveLength(1);
   });
 
   it('uploads a document, reloads the list, and loads its proposals', async () => {
@@ -116,7 +208,7 @@ describe('DocumentsPanel upload and review', () => {
     await user.upload(fileInput(), new File(['pdf-bytes'], 'contract.pdf', {type: 'application/pdf'}));
     await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
 
-    await screen.findByText('contract.pdf');
+    await screen.findByTestId('document-doc-2');
     await screen.findByText('Kestrelwood Holdings Ltd');
     expect(screen.getByText('entity proposal')).toBeInTheDocument();
     expect(screen.getByText('· proposed · 82%')).toBeInTheDocument();
@@ -125,6 +217,7 @@ describe('DocumentsPanel upload and review', () => {
     expect(body.get('title')).toBe('Signed contract');
     expect((body.get('file') as File).name).toBe('contract.pdf');
     expect(api.calls(DOCUMENTS)).toHaveLength(2);
+    expect(screen.getByTestId('document-doc-2')).toHaveAttribute('aria-current', 'true');   // the new file is chosen
     const url = api.lastUrl('GET /api/documents/doc-2/candidates');
     expect(url.searchParams.get('status')).toBe('proposed');
     expect(url.searchParams.get('explain')).toBe('true');
@@ -241,7 +334,7 @@ describe('DocumentsPanel upload and review', () => {
     api.add({[CANDIDATES]: [candidateFixture({explanation}), candidateFixture({id: 'cand-0', review_status: 'rejected', reviewer_note: 'Not a name', payload: {caption: 'Minutes Of'}})]});
     await user.click(screen.getByRole('button', {name: 'Review history'}));
     await screen.findByText('Loaded 2 extraction proposal/review record(s).');
-    expect(screen.getByText('Reporter note: Not a name')).toBeInTheDocument();
+    expect(screen.getByText('Reporter note: Not a name').closest('[hidden]')).not.toBeNull();  // sub-text: on hover, still read with its mark
     const url = api.lastUrl(CANDIDATES);
     expect(url.searchParams.get('status')).toBeNull();
     expect(url.searchParams.get('explain')).toBe('true');
@@ -271,7 +364,8 @@ describe('DocumentsPanel upload and review', () => {
     expect(screen.getByText('Stage relationship from reviewed claim')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Stage proposal'})).toBeDisabled();
 
-    const [sourceSelect, targetSelect] = screen.getAllByRole('combobox');
+    const staging = screen.getByText('Stage relationship from reviewed claim').closest('.candidate') as HTMLElement;
+    const [sourceSelect, targetSelect] = within(staging).getAllByRole('combobox');
     await user.click(sourceSelect);
     await user.click(await screen.findByRole('option', {name: 'Jane Doe · Person'}));
     await user.click(targetSelect);
@@ -291,13 +385,14 @@ describe('DocumentsPanel upload and review', () => {
       [DOCUMENTS]: [docFixture()], [ENTITIES]: entities, 'GET /api/investigations/inv-2/documents': [docFixture({id: 'doc-9', filename: 'harbor.pdf'})],
       'GET /api/investigations/inv-2/entities': [], [CANDIDATES]: [candidateFixture()],
       [CORPUS_STATUS]: corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody(), 'GET /api/investigations/inv-2/corpus/status': corpusStatusBody('inv-2'),
+      [DROP]: dropBody('inv-1'), 'GET /api/investigations/inv-2/drop': dropBody('inv-2'),
     });
     const view = wrap(<DocumentsPanel investigationId="inv-1"/>);
     await userEvent.setup().click(await screen.findByRole('button', {name: 'Review proposals'}));
     await screen.findByText('Kestrelwood Holdings Ltd');
 
     view.rerender(<QueryProvider><DocumentsPanel investigationId="inv-2"/></QueryProvider>);
-    await screen.findByText('harbor.pdf');
+    await screen.findByTestId('document-doc-9');
     expect(screen.queryByText('Kestrelwood Holdings Ltd')).not.toBeInTheDocument();
     expect(api.calls('GET /api/investigations/inv-2/documents')).toHaveLength(1);
   });
@@ -318,15 +413,17 @@ describe('DocumentsPanel reading as a background job (ADR-0004)', () => {
       'GET /api/documents/doc-2': {...read, chunks: []},
       'GET /api/documents/doc-2/candidates': [candidateFixture({id: 'cand-2', document_id: 'doc-2'})],
     });
+    const nextPoll = steppedJobPolls();
     const user = userEvent.setup();
     await user.upload(fileInput(), new File(['pdf-bytes'], 'scan.pdf', {type: 'application/pdf'}));
     await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
 
     await screen.findByText('Saved. Reading the document: Reading the document (5%)');
     expect(screen.getByRole('button', {name: 'Check reading progress'})).toBeInTheDocument();
+    act(() => nextPoll());
     // The "Extracted N chunk(s)" line is replaced at once by loading the
     // proposals, which clears the status on success (as the page always did).
-    await screen.findByText('Kestrelwood Holdings Ltd', {}, {timeout: 4000});
+    await screen.findByText('Kestrelwood Holdings Ltd');
     expect(api.calls('GET /api/jobs/job-1')).toHaveLength(2);
     expect(api.calls('GET /api/documents/doc-2')).toHaveLength(1);
     expect(api.calls(DOCUMENTS)).toHaveLength(3);
@@ -343,9 +440,9 @@ describe('DocumentsPanel reading as a background job (ADR-0004)', () => {
       [retry]: jobFixture({id: 'job-9', subject_id: 'doc-9', status: 'succeeded', finished: true, message: 'Document read', attempts: 2}),
       [DOCUMENTS]: [docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'complete'})],
     });
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Retry reading'}));
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Try reading again'}));
     await screen.findByText('broken.pdf: Document read');
-    expect(screen.queryByRole('button', {name: 'Retry reading'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Try reading again'})).not.toBeInTheDocument();
     expect(api.lastUrl('GET /api/jobs').searchParams.get('subject_id')).toBe('doc-9');
     expect(api.calls(retry)).toHaveLength(1);
     expect(api.calls(DOCUMENTS)).toHaveLength(2);
@@ -355,7 +452,7 @@ describe('DocumentsPanel reading as a background job (ADR-0004)', () => {
   it('says so when a stopped read has no job to retry', async () => {
     const api = await renderWithDocuments([docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'failed'})]);
     api.add({'GET /api/jobs': []});
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Retry reading'}));
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Try reading again'}));
     await screen.findByText('broken.pdf: no reading job found.');
     expect(api.calls(DOCUMENTS)).toHaveLength(1);
   });
@@ -372,7 +469,7 @@ describe('DocumentsPanel reading as a background job (ADR-0004)', () => {
     const user = userEvent.setup();
     await user.upload(fileInput(), new File(['pdf-bytes'], 'scan.pdf', {type: 'application/pdf'}));
     await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
-    await screen.findByText('Saved, but reading it stopped: Failed: scan unreadable. Use “Retry reading” on the document.');
+    await screen.findByText('Saved, but reading it stopped: Failed: scan unreadable. Use “Try reading again” on the document.');
     expect(api.calls('GET /api/documents/doc-2/candidates')).toHaveLength(0);
   });
 });
@@ -452,18 +549,24 @@ describe('DocumentsPanel OpenAleph corpus actions', () => {
     const api = await renderWithDocuments();
     api.add({[STATUS]: reviewStatus()});
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', {name: 'OpenAleph status'}));
+    // OpenAleph's actions are one menu in the chosen file's pane, not a wall of buttons on every row.
+    expect(screen.queryByRole('menuitem', {name: 'OpenAleph status'})).not.toBeInTheDocument();
+    await openAleph(user, 'OpenAleph status');
     await screen.findByText('OpenAleph: not synchronized · 0 awaiting review · 0 accepted · 0 rejected');
-    expect(screen.getByRole('button', {name: 'Refresh OpenAleph review'})).toBeDisabled();
+    await user.click(within(pane()).getByRole('button', {name: /^OpenAleph/}));
+    expect(screen.getByRole('menuitem', {name: 'Refresh OpenAleph review'})).toBeDisabled();
+    await user.click(within(pane()).getByRole('button', {name: /^OpenAleph/}));
 
     api.add({
       'POST /api/documents/doc-1/corpus/openaleph/sync': {sync},
       [STATUS]: reviewStatus({sync, ready_for_import: true, provider_candidate_total: 2, provider_candidate_pending_review: 2}),
     });
-    await user.click(screen.getByRole('button', {name: 'Sync to OpenAleph'}));
+    await openAleph(user, 'Sync to OpenAleph');
     await screen.findByText('OpenAleph synchronization complete. Provider extraction can now be refreshed.');
     expect(screen.getByText('OpenAleph: synced · provider document oa-doc-1 · 2 awaiting review · 0 accepted · 0 rejected')).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Refresh OpenAleph review'})).toBeEnabled();
+    await user.click(within(pane()).getByRole('button', {name: /^OpenAleph/}));
+    expect(screen.getByRole('menuitem', {name: 'Refresh OpenAleph review'})).toBeEnabled();
+    await user.click(within(pane()).getByRole('button', {name: /^OpenAleph/}));
 
     const imported = {document_id: 'doc-1', collection_id: 'oa-1', provider_document_id: 'oa-doc-1', provider: 'openaleph', retrieved: 1, created_candidates: 1, skipped: 0, review_required: true};
     api.add({
@@ -473,7 +576,7 @@ describe('DocumentsPanel OpenAleph corpus actions', () => {
       },
       [CANDIDATES]: [candidateFixture({payload: {quote: 'Provider page text.'}, candidate_type: 'evidence'})],
     });
-    await user.click(screen.getByRole('button', {name: 'Refresh OpenAleph review'}));
+    await openAleph(user, 'Refresh OpenAleph review');
     await screen.findByText('OpenAleph review refreshed: 2 provider candidate(s) awaiting reporter review.');
     expect(screen.getByText('Provider page text.')).toBeInTheDocument();
     expect(api.lastUrl(CANDIDATES).searchParams.get('status')).toBe('proposed');
@@ -483,7 +586,7 @@ describe('DocumentsPanel OpenAleph corpus actions', () => {
   it('shows the server\'s reason when a sync is refused', async () => {
     const api = await renderWithDocuments();
     api.add({'POST /api/documents/doc-1/corpus/openaleph/sync': {status: 503, body: {detail: 'openaleph-client is not installed'}}});
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Sync to OpenAleph'}));
+    await openAleph(userEvent.setup(), 'Sync to OpenAleph');
     await screen.findByText(/openaleph-client is not installed/);
   });
 });

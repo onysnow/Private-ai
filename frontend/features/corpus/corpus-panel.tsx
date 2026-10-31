@@ -14,17 +14,19 @@ import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 
-import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {RefreshCw} from 'lucide-react';
+
 import {Input} from '@/components/ui/input';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   getCorpusSyncOptions, getCorpusSyncQueryKey, listInvestigationCrossReferencesOptions, listInvestigationCrossReferencesQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {decideInvestigationCrossReference, syncCorpusNow} from '../../lib/generated/sdk.gen';
 import type {CorpusSyncOut, CrossReferenceOut} from '../../lib/generated/types.gen';
-import {apiTime} from '../../lib/timestamps';
+import {compactDay, timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {PartyMark} from '../the-drop/kind-marks';
 import {CorpusInsights} from './corpus-insights';
 import {EntitySets} from './entity-sets';
 import {Watchlist} from './watchlist';
@@ -38,7 +40,7 @@ const DECISIONS: {value: Decision; label: string}[] = [
 const DECISION_LABEL: Record<string, string> = {same: 'Same entity', different: 'Different', unsure: 'Not sure'};
 
 function when(value: string | null): string {
-  return value ? apiTime(value).toLocaleString() : 'never';
+  return value ? timeWords(value) : 'never';
 }
 
 /** The "Corpus sync" line in plain words. */
@@ -57,6 +59,26 @@ export function corpusSyncSummary(sync: CorpusSyncOut): string[] {
     lines.push(`Failures: ${sync.consecutive_failures} in a row${sync.failures[0] ? ` — latest ${sync.failures[0].operation}: ${sync.failures[0].error}` : ''}`);
   }
   return lines;
+}
+
+/** The sync's health in the app's status grammar (components/status.tsx): colour by default, Settings › Appearance ›
+ *  Status marks adds the shape or the word; the word is always in the reveal. */
+function syncHealth(sync: CorpusSyncOut): {glyph: string; word: string; tone: string} {
+  if (!sync.enabled) return {glyph: '–', word: 'Not set up', tone: 'st-ruled_out'};
+  if (sync.consecutive_failures > 0 || sync.push.status === 'failed') return {glyph: '✕', word: 'Failing', tone: 'st-disputed'};
+  if (sync.push.status === 'never') return {glyph: '○', word: 'Never sent', tone: 'st-unshown'};
+  if (sync.push.status === 'succeeded') return {glyph: '✓', word: 'Works', tone: 'st-supported'};
+  return {glyph: '○', word: sync.push.status, tone: 'st-unshown'};
+}
+
+const ABOUT = 'Confirmed entities and relationships are copied to the investigation’s OpenAleph collection, which cross-references them with everything OpenAleph holds. A match is only a proposal until a reporter decides.';
+/** When it last went, short: a time today, else the day; the full time is on hover. */
+function sentWhen(sync: CorpusSyncOut): string {
+  const at = sync.push.finished_at ?? sync.push.started_at;
+  if (!at || sync.push.status === 'never') return 'never sent';
+  const day = compactDay(at);
+  const words = timeWords(at);
+  return day === compactDay(new Date().toISOString()) ? words.slice(words.lastIndexOf(',') + 2) : day;
 }
 
 export function CorpusPanel({investigationId}: Props): ReactElement {
@@ -101,42 +123,53 @@ export function CorpusPanel({investigationId}: Props): ReactElement {
     }
   };
 
-  return <Card className="card" id="corpus">
-    <CardHeader className="pb-3">
-      <CardTitle>OpenAleph corpus</CardTitle>
-      <CardDescription>Confirmed entities and relationships are copied to the investigation&apos;s OpenAleph collection, which cross-references them with everything OpenAleph holds. A match is only a proposal until a reporter decides.</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="candidate">
-        <b>Corpus sync</b>
-        {syncQuery.isError && <p className="muted">{errorMessage(syncQuery.error, 'Could not load the corpus sync line')}</p>}
-        {sync && corpusSyncSummary(sync).map(line => <div key={line}><small>{line}</small></div>)}
-        {sync?.push.error && <div><small>Last error: {sync.push.error}</small></div>}
-        {sync?.cross_reference.error && <div><small>Cross-referencing error: {sync.cross_reference.error}</small></div>}
-        {sync && !sync.background && sync.enabled && <p className="muted">No background worker runs here: changes reach OpenAleph on “Sync now”.</p>}
-        <Button onClick={() => void syncNow()} disabled={!sync?.enabled || syncing}>{syncing ? 'Syncing…' : 'Sync now'}</Button>
-      </div>
-      {status && <p className="muted">{status}</p>}
+  const lines = sync ? corpusSyncSummary(sync) : [];
+  const h = sync ? syncHealth(sync) : null;
+  const syncButton = <button type="button" className="co-sync-btn" onClick={() => void syncNow()} disabled={!sync?.enabled || syncing}>
+    <RefreshCw size={14} aria-hidden="true" className={syncing ? 'wl-spin' : undefined}/>{syncing ? 'Syncing…' : 'Sync now'}</button>;
+
+  // No title of its own: the tab says "OpenAleph corpus". One strip says how the sync stands (a colour, when it last
+  // went, what waits); what the corpus is and every line of the sync are on hover. Failures and errors stay (alerts).
+  return <section className="co" id="corpus" aria-label="OpenAleph corpus">
+    <header className="co-strip">
+      {syncQuery.isError && <p className="co-alert">{errorMessage(syncQuery.error, 'Could not load the corpus sync line')}</p>}
+      {sync && h && <Reveal className="co-sync" detail={<><b>{h.word}</b><span className="rv-row">{ABOUT}</span>
+        {lines.filter(l => !l.startsWith('Failures:')).map(line => <span className="rv-row" key={line}>{line}</span>)}</>}>
+        <span className={`st ${h.tone}`}><span className="st-mark" aria-hidden="true">{h.glyph}</span><span className="st-word">{h.word}</span></span>
+        <span className="co-when">{sync.enabled ? sentWhen(sync) : 'not sent'}</span>
+        {sync.enabled && <><span className="co-n"><b>{sync.pending.to_send}</b> to send</span>
+          {sync.cross_reference.open > 0 && <span className="co-n"><b>{sync.cross_reference.open}</b> to review</span>}</>}
+      </Reveal>}
+      {sync && !sync.background && sync.enabled
+        ? <Reveal tabbable={false} detail="No background worker runs here: changes reach OpenAleph on “Sync now”.">{syncButton}</Reveal> : syncButton}
+      {lines.filter(l => l.startsWith('Failures:')).map(line => <p className="co-alert" key={line}>{line}</p>)}
+      {sync?.push.error && <p className="co-alert">Last error: {sync.push.error}</p>}
+      {sync?.cross_reference.error && <p className="co-alert">Cross-referencing error: {sync.cross_reference.error}</p>}
+      {status && <p className="co-status" role="status">{status}</p>}
+    </header>
+    <div className="co-main"><Watchlist investigationId={investigationId}/></div>
+    <aside className="co-rail" aria-label="What OpenAleph holds">
       <CorpusInsights investigationId={investigationId}/>
-      <Watchlist investigationId={investigationId}/>
+      <section className="co-box" aria-label="Cross-references to review">
+        <h4 className="co-cap">Cross-references to review{crossReferences.length > 0 && <span className="co-count">{crossReferences.length}</span>}</h4>
+        {xrefQuery.isError && <p className="co-alert">{errorMessage(xrefQuery.error, 'Could not load the cross-references')}</p>}
+        {crossReferences.length === 0 ? <p className="co-quiet">No cross-reference waits for review.</p> : crossReferences.map(row => <div className="co-xref" key={row.id}>
+          {/* Each side's kind is its party icon; where the match lives, the method and each property's score are on hover. */}
+          <div className="co-pair"><PartyMark schema={row.entity.schema}/> <b>{row.entity.caption}</b> <span aria-hidden="true">↔</span> <PartyMark schema={row.match.schema}/>{' '}
+            <Reveal detail={`(${row.match.schema}) in ${row.match.collection_label ?? 'another collection'}`}><b>{row.match.caption}</b></Reveal></div>
+          <div><Reveal detail={<><span className="rv-row">{`Score ${Math.round(row.score * 100)}%${row.method ? ` · ${row.method}` : ''}`}</span>
+            {row.matched_properties.map(p => <span className="rv-row" key={p.property_type}>{`${p.label} (${Math.round(p.score * 100)}%): ${p.ours.join(', ')} ↔ ${p.theirs.join(', ')}`}</span>)}</>}>
+            <span className="co-score"><i style={{width: `${Math.round(row.score * 100)}%`}}/></span> <b>{Math.round(row.score * 100)}%</b></Reveal></div>
+          <div className="co-links"><a href={row.match.url} target="_blank" rel="noreferrer">Open in OpenAleph</a>
+            <button type="button" className="co-link" onClick={() => openDossier(row.entity.id)}>Open dossier</button></div>
+          <Input aria-label={`Note on ${row.match.caption}`} value={notes[row.id] ?? ''} placeholder="Note (optional)"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setNotes(current => ({...current, [row.id]: e.target.value}))}/>
+          <div className="co-acts">
+            {DECISIONS.map(d => <button type="button" key={d.value} className="wl-btn" onClick={() => void decide(row, d.value)}>{d.label}</button>)}
+          </div>
+        </div>)}
+      </section>
       <EntitySets investigationId={investigationId}/>
-      <h4>Cross-references to review</h4>
-      {xrefQuery.isError && <p className="muted">{errorMessage(xrefQuery.error, 'Could not load the cross-references')}</p>}
-      {crossReferences.length === 0 ? <p className="muted">No cross-reference waits for review.</p> : crossReferences.map(row => <div className="statement" key={row.id}>
-        <div>
-          <b>{row.entity.caption}</b> <small>({row.entity.schema})</small> ↔ <b>{row.match.caption}</b> <small>({row.match.schema}) in {row.match.collection_label ?? 'another collection'}</small>
-          <div><small>Score {Math.round(row.score * 100)}%{row.method ? ` · ${row.method}` : ''}</small></div>
-          {row.matched_properties.length > 0 && <ul>{row.matched_properties.map(p => <li key={p.property_type}>
-            <small>{p.label} ({Math.round(p.score * 100)}%): {p.ours.join(', ')} ↔ {p.theirs.join(', ')}</small>
-          </li>)}</ul>}
-          <div><a href={row.match.url} target="_blank" rel="noreferrer">Open in OpenAleph</a> · <Button variant="link" onClick={() => openDossier(row.entity.id)}>Open dossier</Button></div>
-        </div>
-        <Input aria-label={`Note on ${row.match.caption}`} value={notes[row.id] ?? ''} placeholder="Note (optional)"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setNotes(current => ({...current, [row.id]: e.target.value}))}/>
-        <div className="actions">
-          {DECISIONS.map(d => <Button key={d.value} onClick={() => void decide(row, d.value)}>{d.label}</Button>)}
-        </div>
-      </div>)}
-    </CardContent>
-  </Card>;
+    </aside>
+  </section>;
 }

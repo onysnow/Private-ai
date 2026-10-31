@@ -45,6 +45,12 @@ describe('EntitySets', () => {
     expect(link).toHaveAttribute('href', 'http://openaleph-ui.test/diagrams/set-diagram');
   });
 
+  it('says in one quiet line what it holds while nothing has been sent', async () => {
+    mockApi({[SETS]: []});
+    wrap(<EntitySets investigationId="inv-1"/>);
+    expect(await screen.findByText('Diagrams, timelines and lists sent from this case: none yet.')).toBeInTheDocument();
+  });
+
   it('makes a list of the chosen entities', async () => {
     const api = mockApi({
       [SETS]: [], [ENTITIES]: [entity('e1', 'Meridian Holdings Ltd'), entity('e2', 'Jane Doe', 'Person'), entity('e3', 'Bellcastle')],

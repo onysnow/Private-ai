@@ -81,8 +81,10 @@ describe('BeforeYouRun', () => {
     expect(within(first).getByText('document: Register extract, 2017')).toBeInTheDocument();
     const region = screen.getByRole('region', {name: 'The plan'});
     expect(within(region).getByText('QAS · RAS · DAS')).toBeInTheDocument();
-    expect(within(region).getAllByText(/not expected/)).toHaveLength(1);
-    expect(screen.getByText('under a minute on this machine')).toBeInTheDocument();
+    // The systems not expected are one chip; "not expected" and why each would run are revealed on it.
+    expect(within(region).getByText('QAS · RAS · DAS').closest('.rv')).toHaveAccessibleDescription(/^Not expected · /);
+    // Time is revealed on the model, with size and limits.
+    expect(screen.getByText(/under a minute on this machine/).closest('[hidden]')).not.toBeNull();
     expect(runTime([])).toBe('not measured yet: no run has finished here');
     expect(runTime([1.2, 3.6])).toBe('about 1–4 min on this machine');
     expect(runTime([2.1, 1.9])).toBe('about 2 min on this machine');
@@ -96,10 +98,12 @@ describe('BeforeYouRun', () => {
     await user.type(await screen.findByLabelText('Your question'), 'Who controlled Fernhill Ltd?');
     await user.click(screen.getByRole('button', {name: 'Next: instructions and plan'}));
     const region = await screen.findByRole('region', {name: 'The plan'});
-    expect(await within(region).findByText('3 Tier E records left out by the tier floor · leads only')).toBeInTheDocument();
-    expect(within(region).getByText('1 Tier F record left out by the tier floor · leads only')).toBeInTheDocument();
+    // A count chip per tier; the words are revealed on it.
+    expect(await within(region).findByText('3 Tier E')).toBeInTheDocument();
+    expect(within(region).getByText('3 Tier E').closest('.rv')).toHaveAccessibleDescription(/^3 Tier E records left out by the tier floor · leads only/);
+    expect(within(region).getByText('1 Tier F').closest('.rv')).toHaveAccessibleDescription(/^1 Tier F record left out by the tier floor · leads only/);
     const where = screen.getByRole('region', {name: 'Where it runs, what it costs'});
-    expect(within(where).getByText(/Runs make no outside lookups yet/)).toBeInTheDocument();
+    expect(within(where).getByRole('img', {name: 'About outside lookups'})).toHaveAccessibleDescription(/Runs make no outside lookups yet/);
     expect(within(where).queryByText(/stop and ask/)).not.toBeInTheDocument();
   });
 
@@ -118,6 +122,36 @@ describe('BeforeYouRun', () => {
     await user.type(screen.getByLabelText('Why this case runs with these settings'), 'Named people');
     await user.click(screen.getByRole('button', {name: 'Save'}));
     await waitFor(() => expect(api.lastBody(`PUT ${BASE}/profile`)).toMatchObject({reason: 'Named people', source_tier_floor: 'D', premises: []}));
+  });
+
+  it('says AI is off and what turning it on would send, before the first run, without an error', async () => {
+    mockApi({'GET /api/investigations/inv-1/ai-runs': {runs: []}, [`GET ${BASE}/profile`]: PLAN.profile, 'GET /api/capabilities': {product: 'Journalism Workbench', mode: 'core_preview', ai_features_enabled: false,
+      core: {investigations: true, documents: true, sources: true, evidence: true, claims: true, relationships: true, search: true, dossiers: true,
+        timeline: true, leads_and_tasks: true, provenance: true, connectors: true, backup_restore: true},
+      platforms: {openaleph: {enabled: false, role: 'local_corpus_search_ingestion_platform'}}, note: 'AI is optional.'}});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    expect(await screen.findByText('No runs yet in this case')).toBeInTheDocument();
+    const note = await screen.findByRole('note');
+    expect(note).toHaveTextContent(/AI is off · nothing leaves this computer/);
+    expect(note).toHaveTextContent(/sends your question and up to 30 records from this case to the model you choose/);
+    expect(within(note).getByRole('link', {name: 'Settings › AI and research'})).toHaveAttribute('href', '/settings#ai');
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('lists earlier runs with their problem count, the state as a colour, and watches one again', async () => {
+    mockApi({'GET /api/investigations/inv-1/ai-runs': {runs: [RUN, {...RUN, run_id: 'job-2', question: 'Who paid?', problems: 2}]}, [`GET ${BASE}/profile`]: PLAN.profile,
+      'GET /api/investigations/inv-1/ai-runs/job-2/events': {run: {...RUN, run_id: 'job-2'}, events: []}});
+    render(<QueryProvider><BeforeYouRun investigationId="inv-1"/></QueryProvider>);
+    const list = (await screen.findByText('Who paid?')).closest('ul')!;
+    const rows = within(list as HTMLElement).getAllByRole('listitem');
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveAttribute('data-state', 'clean');
+    expect(rows[1]).toHaveAttribute('data-state', 'problems');
+    expect(within(rows[1]).getByLabelText('2 problems')).toHaveTextContent('2');
+    expect(screen.queryByText('No runs yet in this case')).toBeNull();
+    const user = userEvent.setup();
+    await user.click(within(rows[1]).getByRole('button', {name: 'Watch it again'}));
+    expect(await screen.findByRole('region', {name: 'Watch the run'})).toBeInTheDocument();
   });
 
   it('offers a sample run when the case has none yet', async () => {
@@ -184,7 +218,7 @@ describe('BeforeYouRun', () => {
     expect(within(where).getByText(/outside leads in the packet on → off/)).toBeInTheDocument();
 
     // Fixed steps always run; a step a setting adds can be added and removed here.
-    expect(within(plan).getAllByTitle('This step always runs')).toHaveLength(4);
+    expect(within(plan).getAllByText('always').filter(el => el.closest('.rv')?.getAttribute('aria-describedby'))).toHaveLength(4);
     await user.click(within(plan).getByRole('button', {name: '+ Devil’s advocate'}));
     expect(screen.getByRole('switch', {name: 'Devil’s advocate, on, changed from off'})).toBeInTheDocument();
     await user.click(await within(plan).findByRole('button', {name: 'Remove the step: Devil’s advocate on the lead theory'}));

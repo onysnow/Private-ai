@@ -2,7 +2,15 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.services.document_facts import DocumentKind
 from app.visuals.spec import VisualSpec
+
+class DocumentAboutUpdate(BaseModel):
+    """What a person says a document is and its language. Only the fields sent change; null clears one, and a value a
+    person set is never replaced by the machine."""
+    kind: DocumentKind | None = None
+    language: str | None = Field(default=None, max_length=32, description="ISO 639-1 code (or a BCP-47 tag, an ISO 639-3 code)")
+
 
 class InvestigationCreate(BaseModel):
     name: str
@@ -67,6 +75,12 @@ class ClaimEvidenceLinkCreate(BaseModel):
     evidence_id: str
     stance: str
     note: str | None = None
+
+class ClaimEvidenceSupersede(BaseModel):
+    """Mark a claim's evidence link superseded: why (required), and the newer record that replaces it, when it is in
+    the case."""
+    reason: str
+    by_evidence_id: str | None = None
 
 class TimelineEventGradeUpdate(BaseModel):
     """A reporter's grade for an event they recorded; null clears it."""
@@ -166,6 +180,8 @@ class TimelineEventCreate(BaseModel):
     lead_id: str | None = None
     dataset: str = "reporter"
     origin: str | None = None
+    # A placeholder: believed, with no evidence yet (drawn dashed on My timeline).
+    placeholder: bool = False
 
 class ConnectorSearchRequest(BaseModel):
     investigation_id: str
@@ -248,6 +264,10 @@ class CrossProviderDecisionRequest(BaseModel):
     rationale: str | None = None
 
 
+# A Payment's kind (app/services/payment_kinds.py); None is "not said", read as money that moved.
+PaymentKind = Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"]
+
+
 class RelationshipCreate(BaseModel):
     investigation_id: str
     schema: str  # type: ignore[assignment]  # see EntityCreate.schema above
@@ -257,6 +277,13 @@ class RelationshipCreate(BaseModel):
     dataset: str = "reporter"
     origin: str | None = None
     evidence_id: str | None = None
+    payment_kind: PaymentKind | None = None
+
+
+class PaymentKindSet(BaseModel):
+    """What kind of payment it is; null clears it."""
+    model_config = ConfigDict(extra="forbid")
+    payment_kind: PaymentKind | None = None
 
 
 class RelationshipEvidenceAttachRequest(BaseModel):
@@ -577,6 +604,14 @@ class DeckSlideIn(BaseModel):
     notes: str | None = None
     visual: dict[str, Any] | None = None
     prose: str | None = None   # a slidedoc's prose (app/services/presentation.py deck_kind)
+    made_with: dict[str, str] = Field(default_factory=dict)  # each cited claim's status when the slide was made
+
+
+class DeckCreate(BaseModel):
+    """A new deck (mockup DECK_1): blank, or made from the case's story tree (a slide per section, its claims as bullets
+    with each claim cited)."""
+    title: str = Field(default="", max_length=300)
+    source: Literal["blank", "story"] = "story"
 
 
 class DeckUpdate(BaseModel):
@@ -606,6 +641,9 @@ class MappedEntityIn(BaseModel):
     keys: list[str] = Field(min_length=1, max_length=10, description="The columns whose values identify the entity: rows with the same values make one entity.")
     key_literal: str | None = Field(default=None, max_length=64)
     properties: dict[str, MappedPropertyIn] = Field(default_factory=dict)
+    payment_kind_column: str | None = Field(default=None, max_length=255, description=(
+        "A Payment link only: the column that says what kind of payment each row is (a fine, a loan, a purchase price…; "
+        "app/services/payment_kinds.py). A cell that names no kind leaves the kind unset and is reported."))
 
 
 class TableMappingIn(BaseModel):
@@ -618,6 +656,37 @@ class TableMappingIn(BaseModel):
         return {name: {**entity.model_dump(by_alias=True, exclude_none=True),
                        "properties": {prop: spec.model_dump(exclude_none=True) for prop, spec in entity.properties.items()}}
                 for name, entity in self.entities.items()}
+
+
+class ProposedColumnIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    column: str = Field(max_length=255)
+    role: str | None = Field(default=None, max_length=32, description="What the column is; None leaves it out.")
+
+
+class TableProposalAcceptIn(BaseModel):
+    """A person accepts the mapping proposed for a table, as it is (an empty body) or changed: which column is which,
+    whose account a statement is, how its numbers and dates are written (app/services/table_proposals.py)."""
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    sheet: str | None = Field(default=None, max_length=255)
+    kind: Literal["payments", "parties"] | None = None
+    schema_: Literal["Person", "Company", "Organization", "PublicBody", "LegalEntity"] | None = Field(default=None, alias="schema")
+    columns: list[ProposedColumnIn] | None = Field(default=None, max_length=200)
+    account_holder: str | None = Field(default=None, max_length=500)
+    decimal: Literal[".", ","] | None = None
+    date_order: Literal["DMY", "MDY"] | None = None
+    currency: str | None = Field(default=None, pattern=r"^[A-Za-z]{3}$")
+
+    def change(self) -> dict[str, Any]:
+        out = self.model_dump(by_alias=True, exclude_none=True)
+        if self.currency:
+            out["currency"] = self.currency.upper()
+        return out
+
+
+class TableProposalDismissIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    sheet: str | None = Field(default=None, max_length=255)
 
 
 class EntitySetSend(BaseModel):
@@ -752,8 +821,11 @@ class CaseRecordCreate(BaseModel):
 
 
 class CaptureCreate(BaseModel):
-    """A link to capture (ADR-0018): http or https, a public address."""
+    """A link to capture (ADR-0018): http or https, a public address. The two switches (ADR-0025) ask outside
+    witnesses once the page is kept: a time server signs its fingerprint, a public web archive keeps its own copy."""
     url: str = Field(min_length=1, max_length=4096)
+    time_proof: bool = False
+    second_witness: bool = False
 
 
 class CaseRecordAmend(BaseModel):
@@ -905,3 +977,168 @@ class CaseLockIn(BaseModel):
 
 class LockReasonIn(BaseModel):
     reason: str | None = None   # idle | hide | sleep | button
+
+
+class VoiceName(BaseModel):
+    """A person names a voice of a recording, as a party of the case (`entity_id`) or in words (`name`); both empty
+    clears the name."""
+    name: str | None = Field(default=None, max_length=120)
+    entity_id: str | None = None
+
+
+class PlatformChecksUpdate(BaseModel):
+    """Turn the daily check on or off, the warning before a capture, or change a platform's test item (empty: back to
+    the one the app ships with)."""
+    daily: bool | None = None
+    warn: bool | None = None
+    items: dict[str, str | None] | None = None
+
+
+class ClipCreate(BaseModel):
+    """A part of a recording, in seconds, kept as its own file; cut from the original unless `from_cleaned`."""
+    start: float = Field(ge=0)
+    end: float = Field(gt=0)
+    from_cleaned: bool = False
+
+
+class CaptureFollowIn(BaseModel):
+    """Check a captured page again: never, daily or weekly (the first check is one interval from now)."""
+    every: Literal["never", "daily", "weekly"]
+
+
+class CaptureUpdate(BaseModel):
+    """A link only's reason, when the person knows better than the reply."""
+    reason_kind: Literal["dead_link", "blocked", "timed_out", "tool_error"]
+
+
+class MonitorCreate(BaseModel):
+    """Something to follow (ADR-0022): a web address (a feed, sitemap, podcast or page; a page that names its feed is
+    followed through the feed), a Bluesky handle (@name.bsky.social) or a Mastodon account (@name@server)."""
+    target: str = Field(min_length=1, max_length=4096)
+    every_minutes: int | None = None
+    route: Literal["direct", "tor"] = "direct"
+
+
+class MailboxCreate(BaseModel):
+    """A newsletter mailbox to follow (DECISIONS_LOG 11): a dedicated mailbox read over IMAP with TLS, and the one sender
+    (an address, or @domain for everything from it) whose messages are queued."""
+    host: str = Field(min_length=3, max_length=253)
+    port: int = Field(default=993, ge=1, le=65535)
+    user: str = Field(min_length=1, max_length=320)
+    password: str = Field(min_length=1, max_length=1000)
+    sender: str = Field(min_length=3, max_length=320)
+    every_minutes: int = 60
+
+
+class MonitorUpdate(BaseModel):
+    every_minutes: Literal[15, 30, 60, 1440, 10080] | None = None
+    route: Literal["direct", "tor"] | None = None
+    paused: bool | None = None
+    # Follow the address the source moved to (its old address answered 301 or 308).
+    accept_move: bool | None = None
+
+
+class CaptureAllRequest(BaseModel):
+    """Capturing several at once needs a reason; it goes on each item it captures (the custody log)."""
+    reason: str = Field(min_length=8, max_length=2000)
+
+
+class AuthenticityDecisionIn(BaseModel):
+    """A person's decision on whether a case file is real (ADR-0023): the status, what they checked, and why."""
+    status: Literal["verified_origin", "unverified", "likely_synthetic", "confirmed_synthetic", "disputed"]
+    checked: list[Literal["read_findings", "looked_up_source", "asked_poster", "compared_copies", "checked_place_time"]] = Field(default_factory=list)
+    reason: str = Field(default="", max_length=4000)
+
+
+class AuthenticityUpdate(BaseModel):
+    """What the item is for (evidence of events, or the subject of the story), whether it is source-protected, and the
+    label a platform showed beside it (not part of the file). Only the fields given change."""
+    role: Literal["events", "subject"] | None = None
+    source_protected: bool | None = None
+    platform_label: str | None = Field(default=None, max_length=1000)
+
+
+class AuthenticityOutsideIn(BaseModel):
+    """One outside check, allowed once for this item: which of the consent card's choices."""
+    option: Literal["tineye", "lens", "web"]
+
+
+class AuthenticityAboutClaimIn(BaseModel):
+    """A claim about the item itself (that it circulated, when, posted by whom), which it supports even if synthetic."""
+    text: str = Field(min_length=10, max_length=2000)
+
+
+class TimelinePeriodIn(BaseModel):
+    """A named stretch of the case's time (Timeline › Periods). Dates are a year, a month or a day."""
+    name: str = Field(min_length=1, max_length=120)
+    date_start: str = Field(min_length=4, max_length=32)
+    date_end: str = Field(min_length=4, max_length=32)
+    summary: str = Field(default="", max_length=4000)
+
+
+class BuiltTimelineIn(BaseModel):
+    """A person's own timeline: its name, and the case's event ids in the order they want to tell them."""
+    name: str = Field(min_length=1, max_length=120)
+    items: list[str] = Field(default_factory=list, max_length=500)
+
+
+class BoardNoteIn(BaseModel):
+    id: str = Field(min_length=1, max_length=64)
+    board: str = Field(min_length=1, max_length=128)
+    text: str = Field(min_length=1, max_length=400)
+    x: float = Field(ge=0, le=1)
+    y: float = Field(ge=0, le=1)
+
+
+class TimelineBoardIn(BaseModel):
+    """Where the cards sit on each board (as fractions of the board, so they keep their place at any width), the
+    reporter's sticky notes, and the board's style: Rich (tacks, paper, string) or Clean."""
+    style: Literal["rich", "clean"] = "rich"
+    positions: dict[str, dict[str, tuple[float, float]]] = Field(default_factory=dict)
+    notes: list[BoardNoteIn] = Field(default_factory=list, max_length=200)
+
+
+class PhotoCopyIn(BaseModel):
+    """A copy of a photo (Picture › Make a copy): which tool, its settings, and the copy it is made from (else the photo
+    as shown). blur_faces {radius, boxes?}; strip_metadata {}; crop {box}; redact {box, reason}; turn {degrees}.
+    A box is x, y, w, h as fractions of the picture."""
+    operation: Literal["blur_faces", "strip_metadata", "crop", "redact", "turn"]
+    params: dict[str, Any] = Field(default_factory=dict)
+    from_id: str | None = None
+
+
+class RedactBoxIn(BaseModel):
+    """One box to redact: its page, its place in points from the page's top-left (left, top, right, bottom), its reason
+    (kept in the trail), and whether a person drew it or accepted a proposal (phone, email, person)."""
+    page: int = Field(ge=1)
+    rect: list[float] = Field(min_length=4, max_length=4)
+    reason: str = Field(min_length=1, max_length=300)
+    kind: Literal["drawn", "phone", "email", "person"] = "drawn"
+
+
+class RedactIn(BaseModel):
+    """A redacted copy of a PDF (Redact before sharing): the boxes, the hidden data to take out of the copy, whether to
+    make it PDF/A-2b, and who it is for (it names the file)."""
+    boxes: list[RedactBoxIn] = Field(min_length=1, max_length=500)
+    remove: list[Literal["metadata", "attachments", "comments", "form-fields", "hidden-text", "hidden-layers", "bookmarks",
+                         "links-actions-scripts", "private-data"]] = Field(default_factory=list)
+    pdfa: bool = False
+    made_for: Literal["editor", "lawyer", "publication"] = "editor"
+
+
+class CleanIn(BaseModel):
+    """The steps of a cleaned copy (Listen › Clean and cut): take out mains hum, reduce room noise, even out loudness."""
+    hum: bool = True
+    noise: Literal["off", "light", "medium"] = "medium"
+    loudness_target: float | None = Field(default=-16.0, ge=-30, le=-10)
+
+
+class SyncIn(BaseModel):
+    """Another recording of the same event, to line up with this one by matching their sound."""
+    other_document_id: str = Field(min_length=1, max_length=64)
+
+
+class DemoPreDecidedUndo(BaseModel):
+    """Which of a demo case's own decisions to undo (app/services/demo_decided.py): all of them, one kind, or one item."""
+    kind: Literal["proposal", "check", "watchlist"] | None = None
+    id: str | None = Field(default=None, min_length=1, max_length=64)

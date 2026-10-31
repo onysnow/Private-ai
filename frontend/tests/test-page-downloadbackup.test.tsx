@@ -91,7 +91,7 @@ describe('Home portable backup download', () => {
 
     const Home = await importHome();
     render(<Home />);
-    await screen.findByText('Portable investigation backup & restore');
+    await screen.findByRole('heading', {name: 'Keep a copy off this computer, bring one back'});
 
     expect(screen.getByRole('button', {name: 'Download backup'})).toBeDisabled();
     expect(api.calls(EXPORT)).toHaveLength(0);

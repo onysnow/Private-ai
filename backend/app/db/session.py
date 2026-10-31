@@ -1,8 +1,9 @@
 import sqlite3
 import threading
+from contextlib import contextmanager
 from typing import Any, Iterator
 
-from sqlalchemy import Engine, create_engine
+from sqlalchemy import Connection, Engine, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 from app.core.config import settings
@@ -94,7 +95,7 @@ class _SerializedConnection(sqlite3.Connection):
             return super().close()
 
 
-def build_engine(database_url: str) -> Engine:
+def build_engine(database_url: str, *, busy_timeout: float | None = None) -> Engine:
     """Build an Engine for `database_url` with this app's dialect rules.
 
     Module-level `engine` below is `build_engine(settings.database_url)`; an app
@@ -104,6 +105,8 @@ def build_engine(database_url: str) -> Engine:
     # factory: see _SerializedConnection -- required because of the shared
     # StaticPool connection below.
     connect_args: dict[str, Any] = {"check_same_thread": False, "factory": _SerializedConnection} if database_url.startswith("sqlite") else {}
+    if busy_timeout is not None and database_url.startswith("sqlite"):
+        connect_args["timeout"] = busy_timeout  # how long a write waits on another connection's lock
     engine_kwargs: dict[str, Any] = {"pool_pre_ping": True, "connect_args": connect_args}
     if database_url.startswith("sqlite"):
         # STRUCT-0011: force a single persistent connection for ANY SQLite backend, not
@@ -126,6 +129,50 @@ def build_engine(database_url: str) -> Engine:
 
 def build_session_factory(bound_engine: Engine) -> sessionmaker[Session]:
     return sessionmaker(bind=bound_engine, autoflush=False, autocommit=False)
+
+
+# How long a background job's own SQLite connection waits for the shared one to
+# finish writing before it gives up with "database is locked".
+JOB_CONNECTION_BUSY_SECONDS = 60.0
+
+
+def _sqlite_file(bind: Engine) -> bool:
+    """A SQLite database on disk: one a second connection can open."""
+    if bind.dialect.name != "sqlite":
+        return False
+    database = bind.url.database or ""
+    return bool(database) and ":memory:" not in database and bind.url.query.get("mode") != "memory"
+
+
+@contextmanager
+def own_connection(bind: Engine | Connection) -> Iterator[Engine]:
+    """An engine whose sessions share nothing with the request sessions of ``bind``.
+
+    On a SQLite file every session of ``bind`` shares one connection, and so one
+    transaction (build_engine, StaticPool): a request that closes its session
+    while a background job is half-way through its writes rolls those writes
+    back, and one that commits commits them half-done. A document read that
+    flushed a page's proposals then failed with "UPDATE statement on table
+    'extraction_candidates' expected to update 4 row(s); 0 were matched" when the
+    screen's polling closed a session in between. A job run inside the API
+    process (the inline runner) works through this engine instead: a connection
+    of its own, which SQLite's file locking keeps apart from the shared one, as
+    PostgreSQL keeps every connection apart. The job's own sessions (its progress
+    reports, the jobs it runs for an archive's files) share this connection
+    among themselves, in the job's thread, as before.
+
+    PostgreSQL and an in-memory SQLite database (which a second connection cannot
+    open) get ``bind`` itself.
+    """
+    engine = bind if isinstance(bind, Engine) else bind.engine
+    if not _sqlite_file(engine):
+        yield engine
+        return
+    own = build_engine(engine.url.render_as_string(hide_password=False), busy_timeout=JOB_CONNECTION_BUSY_SECONDS)
+    try:
+        yield own
+    finally:
+        own.dispose()
 
 
 engine = build_engine(settings.database_url)

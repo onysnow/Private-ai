@@ -72,9 +72,15 @@
 .ch-num { display: flex; flex-direction: column; gap: 3px; padding: 10px 14px; color: var(--text); text-decoration: none; height: 100%; box-sizing: border-box;
   transition: background var(--dur-fast); }
 .ch-num:hover { background: var(--surface-2); }
-.ch-num b { font: 600 clamp(18px, 1.8vw, 26px)/1 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-num b { font: 600 clamp(22px, 2.3vw, 34px)/1 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ch-num small { font-size: 11.5px; color: var(--text-muted); line-height: 1.2; }
-.ch-num-mark { font-size: .65em; margin-right: 5px; vertical-align: .18em; }
+/* A long figure (a span of years) is set smaller so it is not cut off. */
+.ch-num.long b { font-size: clamp(17px, 1.7vw, 26px); }
+.ch-num-mark { font-size: .62em; margin-right: 6px; vertical-align: .16em; }
+.ch-num-mark .ch-strip-icon { width: 1em; height: 1em; vertical-align: -.08em; color: var(--text-muted); }
+.ch-num.need .ch-num-mark .ch-strip-icon { color: var(--accent-1); }
+.ch-strip li > .rv.ch-num-rv { display: block; height: 100%; }
+.ch-num { justify-content: center; }
 .ch-num.ok .ch-num-mark { color: var(--status-supported); }
 .ch-num.bad .ch-num-mark { color: var(--status-disputed); }
 .ch-num.need { background: color-mix(in srgb, var(--accent-1) 16%, transparent); box-shadow: inset 0 -3px 0 var(--accent-1); }
@@ -128,13 +134,22 @@
 .ch-progress i { display: block; height: 100%; width: 35%; background: var(--accent-2); border-radius: 3px; }
 .ch-progress i.busy { animation: ch-indeterminate 1.6s var(--ease-out) infinite; }
 @keyframes ch-indeterminate { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
-.ch-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; }
-.ch-rows li { display: grid; grid-template-columns: 26px 1fr auto; align-items: baseline; }
-.ch-rows b { font: 600 15px var(--font-display); font-variant-numeric: tabular-nums; }
-.ch-rows a { color: var(--accent-2); text-decoration: none; font-size: 12.5px; }
-.ch-drop { margin-top: auto; padding: 10px; border: 1.5px dashed var(--line); border-radius: 12px; text-align: center; font-size: 13px; transition: background var(--dur-fast), border-color var(--dur-fast); }
+.ch-bring { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 10px; margin: -4px; padding: 4px; border-radius: 14px;
+  transition: background var(--dur-fast), box-shadow var(--dur-fast); }
+.ch-bring.over { background: color-mix(in srgb, var(--accent-1) 12%, transparent); box-shadow: inset 0 0 0 1.5px var(--accent-1); }
+.ch-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.ch-rows a { display: grid; grid-template-columns: 30px 20px minmax(0, 1fr) auto; align-items: center; gap: 4px; padding: 4px 6px; margin: 0 -6px; border-radius: 8px;
+  color: var(--text); text-decoration: none; font-size: 13.5px; }
+.ch-rows a:hover, .ch-rows a:focus-visible { background: var(--surface-2); }
+.ch-rows a:focus-visible { outline: 2px solid var(--accent-1); }
+.ch-rows .ch-row-words { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-rows .ch-row-verb { color: var(--accent-2); font-size: 12.5px; white-space: nowrap; }
+.ch-all-read { margin: 0; font-size: 13px; color: var(--text-muted); }
+.ch-all-read span { color: var(--status-supported); font-weight: 700; margin-right: 4px; }
+.ch-drop { margin: auto 0 0; padding: 6px 10px; border: 1.5px dashed var(--line); border-radius: 10px; text-align: center; font-size: 12.5px; color: var(--text-muted); }
 .ch-drop a { color: var(--accent-2); text-decoration: none; font-weight: 600; }
-.ch-drop.over { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 14%, transparent); transform: scale(1.01); }
+.ch-drop a:hover { text-decoration: underline; }
+.ch-bring.over .ch-drop { border-color: var(--accent-1); color: var(--text); }
 
 /* Check */
 .ch-bar { display: flex; height: 9px; gap: 2px; border-radius: 5px; overflow: hidden; background: var(--surface-3); }
@@ -267,13 +282,18 @@
 .ch-link.lit line { stroke-width: 3; }
 .ch-node { cursor: pointer; outline: none; }
 .ch-node-hit { fill: transparent; stroke: none; pointer-events: all; }
-.ch-node :is(rect, circle, path):not(.ch-node-hit) { fill: var(--surface-3); stroke: var(--accent-2); stroke-width: 1.5; transition: transform var(--dur-fast) var(--ease-out); }
+.ch-node-mark { transition: transform var(--dur-fast) var(--ease-out); }
+.ch-node-dot { fill: var(--surface-3); stroke-width: 1.6; }
+.ch-node-icon { color: inherit; }
 .ch-link-label { fill: var(--text-muted); font: 500 9.5px var(--font-ui); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; }
 .ch-link-disputed .ch-link-label { fill: var(--status-disputed); }
 .ch-net figcaption > span { display: inline-flex; align-items: center; }
 .ch-key-shape { width: 11px; height: 11px; margin-right: 4px; vertical-align: -1px; fill: var(--surface-3); stroke: var(--accent-2); stroke-width: 2; }
 .ch-node text { fill: var(--text); font: 600 10.5px var(--font-ui); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; }
-.ch-node.on :is(rect, circle, path):not(.ch-node-hit), .ch-node:hover :is(rect, circle, path):not(.ch-node-hit), .ch-node:focus-visible :is(rect, circle, path):not(.ch-node-hit) { fill: var(--accent-1); stroke: var(--accent-1); transform: scale(1.25); }
+.ch-node.on .ch-node-mark, .ch-node:hover .ch-node-mark, .ch-node:focus-visible .ch-node-mark { transform: scale(1.25); }
+.ch-node.on .ch-node-dot, .ch-node:hover .ch-node-dot, .ch-node:focus-visible .ch-node-dot { fill: color-mix(in srgb, currentColor 30%, var(--surface-3)); stroke-width: 2.4; }
+.ch-net-key { display: inline-flex; gap: 3px; align-items: center; padding: 2px 4px; }
+.ch-net-key .ch-key { width: 10px; margin-right: 0; }
 .ch-net figcaption { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11.5px; color: var(--text-muted); }
 .ch-net-count { margin-left: auto; }
 .ch-key { display: inline-block; width: 16px; height: 0; border-top: 2px solid var(--status-supported); margin-right: 5px; vertical-align: middle; }
@@ -287,11 +307,13 @@
 .ch-years.ch-quiet { align-items: center; padding: 0 16px; }
 .ch-years button { all: unset; cursor: pointer; flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 7px 4px 10px; min-width: 64px;
   transition: background var(--dur-fast); }
-.ch-years button + button { border-left: 1px solid color-mix(in srgb, var(--line) 30%, transparent); }
+.ch-years > .rv.ch-year-rv { flex: 1; display: flex; min-width: 64px; }
+.ch-years > .rv.ch-year-rv > button { flex: 1; }
+.ch-years > .rv + .rv > button { border-left: 1px solid color-mix(in srgb, var(--line) 30%, transparent); }
 .ch-years button:hover { background: var(--surface-2); }
 .ch-years button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; }
 .ch-years button.on { background: color-mix(in srgb, var(--accent-1) 20%, transparent); box-shadow: inset 0 3px 0 var(--accent-1); }
-.ch-years b { font: 600 14px var(--font-ui); font-variant-numeric: tabular-nums; }
+.ch-years b { font: 600 19px var(--font-ui); font-variant-numeric: tabular-nums; }
 .ch-years small { font-size: 10.5px; color: var(--text-muted); }
 .ch-years button.flagged { box-shadow: inset 0 -3px 0 var(--status-disputed); }
 .ch-years button.lit { background: color-mix(in srgb, var(--accent-2) 18%, transparent); }
@@ -391,6 +413,12 @@
 .ch-happens dl > div { display: contents; }
 .ch-happens dt { font-weight: 650; white-space: nowrap; }
 .ch-happens dd { margin: 0; }
+.ch-unlocks { margin-top: 8px; padding-top: 8px; border-top: 1px dashed color-mix(in srgb, var(--accent-2) 45%, transparent); }
+.ch-unlocks p { margin: 0; font-size: 13px; font-weight: 650; } .ch-unlocks p small { font-weight: 400; color: var(--text-muted); }
+.ch-unlocks ul { margin: 4px 0 0; }
+/* What a Yes unlocks: the mark and how many on the row; what they are is in the row's reveal and on the card. */
+.dc-row .dc-unlocks { flex: none; color: var(--accent-1); font-size: 15px; line-height: 1; }
+.dc-row .dc-unlocks small { font: 600 11px var(--font-mono); margin-left: 2px; }
 .ch-happens-yes dt { color: var(--status-supported); } .ch-happens-no dt { color: var(--status-disputed); } .ch-happens-unsure dt { color: var(--status-unshown); }
 @media (prefers-reduced-motion: reduce) { .dc-last button, .dc-bulk-confirm { animation: cv-fade 120ms both; } }
 html[data-motion='calm'] .dc-last button, html[data-motion='calm'] .dc-bulk-confirm { animation: cv-fade 120ms both; }
@@ -402,10 +430,11 @@ html[data-motion='calm'] .dc-last button, html[data-motion='calm'] .dc-bulk-conf
 @media (max-width: 980px) {
   .cv-home-wrap { height: auto; overflow: visible; }
   .ch-home, .dc { height: auto; }
-  .ch-top { grid-template-columns: 1fr; grid-template-areas: 'name' 'tools' 'q' 'strip'; }
+  /* minmax(0, 1fr), not 1fr: a 1fr column never shrinks below its widest child, which pushed a phone's page sideways. */
+  .ch-top { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'name' 'tools' 'q' 'strip'; }
   .ch-top > .ch-search { justify-self: start; width: 100%; } .ch-top > .ch-tools { justify-self: end; }
   .ch-strip { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
-  .ch-grid, .dc, .ch-bottom { grid-template-columns: 1fr; }
+  .ch-grid, .dc, .ch-bottom { grid-template-columns: minmax(0, 1fr); }
   .ch-mod { flex: none; min-height: 220px; }
   .dc-empty { grid-column: auto; }
 }
@@ -543,3 +572,143 @@ html[data-motion='calm'] .ch-col > *, html[data-motion='calm'] .ch-card, html[da
 .ch-show-all:focus-visible { outline: 2px solid var(--accent-1); border-radius: 4px; }
 .ch-change .ai-tag { align-self: flex-start; margin-top: 4px; }
 .ch-next-foot > span[aria-live] { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* A Textbook safety sign (Your safety, research §13): one slim line under the case's title band. */
+.ch-home:has(> .ys-notice) { grid-template-rows: auto auto minmax(0, 1fr) auto; }
+
+/* The frame's left handle carries its name in a reveal (components/frame/app-frame.tsx; Ony, 29 Oct). The reveal's
+   span takes the handle's place so its card opens beside the handle. */
+.rv.fr-handle-rv { position: fixed; z-index: 75; left: 3px; top: 50%; width: 5px; height: 240px; margin-top: -120px; }
+.fr.pin-left .rv.fr-handle-rv { display: none; }
+.rv.fr-handle-rv-top { position: fixed; z-index: 75; top: 3px; left: 50%; width: 72px; height: 5px; margin-left: -36px; }
+.fr.pin-top .rv.fr-handle-rv-top { display: none; }
+
+/* Ony's rule of 29 Oct on Case home and Decide: sub-text and type words are in reveals (components/ui/reveal.tsx).
+   A reveal that wraps a whole card or row takes the card's place in the list. */
+.rv.ch-reading-rv, .rv.ch-claim-rv, .rv.ch-flag-rv, .rv.ch-change-rv { display: flex; flex-direction: column; }
+.rv.ch-change-rv > .ch-change { flex: 1; }
+.ch-reading-words b { font-size: 15.5px; line-height: 1.3; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.ch-bring .ch-thumb { flex-basis: 92px; height: 120px; }
+.ch-bring .ch-reading-words b { font-size: 16.5px; }
+.ch-bring .ch-reading { padding: 12px 14px; gap: 18px; }
+.ch-reading .ch-reading-failed { color: var(--status-disputed); font-weight: 600; }
+.ch-rows b { font: 600 18px var(--font-display); font-variant-numeric: tabular-nums; color: var(--accent-1); }
+.ch-rows .dc-kind, .ch-row-mark { font-size: 15px; height: auto; justify-self: start; color: var(--accent-2); }
+.ch-row-mark .ch-strip-icon { width: 15px; height: 15px; vertical-align: -2px; }
+.ch-claim-src { display: inline-flex; gap: 10px; font: 600 12.5px var(--font-mono); }
+.ch-claim-src .ok { color: var(--status-supported); } .ch-claim-src .bad { color: var(--status-disputed); }
+.ch-new { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-1); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-1) 25%, transparent); }
+.ch-change { position: relative; }
+.ch-actor-mark { position: absolute; top: 8px; right: 10px; font: 600 13px var(--font-mono); color: var(--text-muted); }
+.ch-party-ghost { cursor: help; border-style: dashed; color: var(--text-muted); padding: 4px 10px; }
+.ch-pointing .ch-party .nm-party, .ch-party .nm-party { margin-right: 1px; }
+.ch-pointing { font-size: 13.5px; }
+.ch-next .ch-mod-head h2 .dc-kind { font-size: 16px; height: auto; }
+
+/* Decide: a row is one line once its metadata moved into the reveal, so the kind's mark grows. */
+.dc-group ul > li > .rv { display: block; }
+.dc-row { align-items: center; }
+.dc-row .dc-row-text { flex: 1; font-size: 13.5px; }
+.dc-row .lv { flex: none; }
+.dc-row .dc-kind, .dc-chips .dc-kind { cursor: inherit; opacity: 1; }
+.dc-row .dc-kind { flex: 0 0 22px; height: 22px; font-size: 16px; }
+.dc-chips .dc-kind { display: inline; height: auto; margin-right: 5px; font-size: 13px; }
+.dc-card > .ch-eyebrow .dc-kind, .dc-noevidence > .ch-eyebrow .dc-kind { font-size: 18px; height: auto; display: inline-grid; }
+.dc-pages .rv-mark { display: inline-flex; padding: 2px 0; }
+
+/* Start a case: each "what you have" option is its icon and its name; what it covers is in a reveal. */
+.nc-have > .rv.nc-have-rv { display: block; }
+.nc-have .nc-have-rv > label { height: 100%; box-sizing: border-box; flex-direction: row; align-items: center; gap: 10px; }
+.nc-have-icon { flex: none; color: var(--accent-2); }
+.nc-have label b { font-size: 14.5px; }
+.nc-kinds > .rv { display: inline-flex; }
+
+/* Case home, 30 Oct: Bring in's waiting rows (only those above zero), the slim "while you were away" line, and the
+   links between a decision's parties when it has no passage of its own. */
+.ch-rows .dc-kind { cursor: inherit; opacity: 1; font-size: 15px; height: auto; }
+.ch-since-strip.quiet { padding: 9px 16px; }
+.ch-since-strip.quiet header { align-items: center; }
+.ch-since-strip.quiet h2 { margin: 0; font-size: 13px; }
+.ch-since-strip.quiet .ch-quiet { margin-left: auto; font-size: 12.5px; }
+.ch-since-mark { color: var(--status-supported); font-weight: 700; margin-right: 6px; }
+.ch-links-wrap { display: flex; flex-direction: column; gap: 10px; }
+.ch-link-quote { position: relative; max-height: none; font-size: 15.5px; }
+.ch-link-page { all: unset; cursor: pointer; display: block; margin-top: 6px; font: 500 12px var(--font-ui); color: var(--accent-2); }
+.ch-link-page:hover { text-decoration: underline; }
+.ch-link-page:focus-visible { outline: 2px solid var(--accent-1); border-radius: 4px; }
+.ch-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ch-links > li > .rv.ch-link-rv { display: block; }
+.ch-link { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 11px; background: var(--surface-1); font-size: 13.5px; color: var(--text); }
+button.ch-link { cursor: pointer; transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-out); }
+button.ch-link:hover { background: var(--surface-3); transform: translateX(2px); }
+button.ch-link:focus-visible { outline: 2px solid var(--accent-1); }
+.ch-link-end { display: inline-flex; align-items: center; gap: 7px; min-width: 0; }
+.ch-link-end > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-link-end:last-child { justify-content: flex-end; }
+.ch-link-word { font: 600 12px var(--font-mono); color: var(--accent-1); white-space: nowrap; }
+.ch-links-more { font-size: 12px; }
+.ch-skeleton.ch-reading-wait { flex: 0 0 120px; min-height: 120px; }
+/* Fill the space (29 Oct): the document card takes the module's spare height, its thumbnail growing with it,
+   so the drop line sits under it rather than under an empty band. */
+.ch-bring > .rv.ch-reading-rv { flex: 1 1 auto; min-height: 0; }
+.ch-bring .ch-reading-rv > .ch-reading { flex: 1 1 auto; }
+.ch-bring .ch-reading .ch-thumb { height: auto; align-self: stretch; min-height: 120px; max-height: 190px; flex-basis: 108px; }
+
+/* "What happens" on one quiet line, its box on reveal (Ony, 29 Oct); an answer's own line on its button. */
+.ch-happens-line { margin: 0; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.ch-happens-unlock { margin-right: 8px; color: var(--accent-2); letter-spacing: 0; }
+.rv-card .ch-happens { display: block; border: 0; background: none; padding: 0; font: 400 13px/1.45 var(--font-ui); letter-spacing: 0; text-transform: none; color: var(--text); }
+.rv-card .ch-happens dl { margin-top: 0; }
+.rv-card .ch-unlocks { display: block; margin-top: 8px; }
+.ch-choices > .ch-choice-rv { display: grid; min-width: 0; }
+/* Decide's right column fills its height: the question unclamped and larger, the passage larger, the answers taller. */
+.dc-card .ch-question { -webkit-line-clamp: 8; font-size: clamp(20px, 1.75vw, 26px); }
+.dc-card .ch-excerpt { font-size: clamp(15px, 1.2vw, 17.5px); line-height: 1.6; }
+.dc-card .ch-card-body { justify-content: flex-start; gap: 16px; }
+.dc-card .ch-choice { min-height: 64px; font-size: 16px; }
+
+/* The demo's pre-made decisions (features/demo/pre-decided.tsx, DECISIONS_LOG 53): a quiet line where the queue is,
+   the demo's stamp on one decision it made. The stamp is the accent-2 dashed ring; its words are on hover. */
+.pd-glyph { flex: 0 0 auto; color: var(--accent-2); }
+.pd-line { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: 12.5px; color: var(--text-muted); }
+.pd-count { display: inline-flex; align-items: center; gap: 6px; }
+.pd-count b { color: var(--text); font: 650 14px var(--font-mono); }
+.pd-undo, .pd-undo-kind, .pd-undo-one { all: unset; cursor: pointer; color: var(--accent-2); font-weight: 650; white-space: nowrap; }
+.pd-undo:hover, .pd-undo-kind:hover, .pd-undo-one:hover, .pd-undo:focus-visible, .pd-undo-kind:focus-visible, .pd-undo-one:focus-visible { text-decoration: underline; }
+.pd-undo-one:disabled { opacity: .6; cursor: default; }
+.pd-kind { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.pd-kind small { display: block; color: var(--text-muted); }
+.pd-quiet { color: var(--text-muted); }
+.pd-confirm { margin: 6px 0; padding: 10px 12px; border-radius: 12px; border: 1.5px dashed var(--accent-2); background: color-mix(in srgb, var(--accent-2) 8%, var(--surface-1)); font-size: 12.5px; animation: ch-rise var(--dur-fast) var(--ease-out); }
+.pd-confirm p { margin: 0 0 6px; line-height: 1.4; }
+.pd-confirm ul { margin: 0 0 6px; padding-left: 18px; line-height: 1.4; }
+.pd-confirm div { display: flex; gap: 10px; }
+.pd-confirm button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); font-weight: 650; }
+.pd-confirm .pd-go { background: var(--accent-2); border-color: var(--accent-2); color: var(--ground); }
+.pd-confirm button:disabled { opacity: .6; cursor: default; }
+.pd-mark-wrap { display: inline-flex; align-items: center; gap: 6px; }
+.pd-mark { display: inline-flex; }
+.ch-next-foot .pd-line, .ch-next-foot .pd-confirm { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .pd-confirm { animation: cv-fade 120ms both; } }
+html[data-motion='calm'] .pd-confirm { animation: cv-fade 120ms both; }
+
+/* 30 Oct (Decide): the two right-hand panes show different things. With no passage of its own, the evidence pane holds
+   what the records show between the item's parties, as large as the pane allows; the card holds the question, the
+   proposal, the parties and the answers. "What happens" and the keys are marks in the card's top line, their words on
+   reveal; the demo's line keeps to its mark, its count and Undo. */
+.dc-links-head { display: flex; align-items: baseline; gap: 10px; margin: 0 !important; font: 500 11px var(--font-mono) !important; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text-muted); }
+.dc-links-head b { font: 500 15px var(--font-mono); color: var(--text); letter-spacing: 0; }
+.dc-noevidence .ch-links-wrap { flex: 1 1 auto; gap: 14px; }
+.dc-noevidence .ch-link-quote { max-width: 62ch; font: 400 clamp(16px, 1.3vw, 19px)/1.65 var(--font-read); margin: 0; }
+.dc-noevidence .ch-links { gap: 8px; }
+.dc-noevidence .ch-link { padding: 14px 16px; font-size: clamp(14px, 1.1vw, 16px); background: var(--surface-1); }
+.dc-noevidence .ch-link-word { font-size: 13px; }
+.dc-why { color: var(--text-muted); }
+.ch-why .ch-keys, .ch-why > .rv:has(.ch-keys) { margin-left: auto; }
+.ch-keys { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); font: 600 11.5px var(--font-mono); color: var(--text-muted); cursor: help; }
+.ch-happens-mark { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 4px; box-sizing: border-box; border-radius: 11px; border: 1px solid var(--line);
+  font: 600 12px var(--font-mono); color: var(--accent-2); cursor: help; }
+.ch-why > .rv:has(.ch-happens-mark) { margin-left: auto; }
+.ch-why > .rv:has(.ch-happens-mark) + .rv:has(.ch-keys) { margin-left: 0; }
+.pd-count { white-space: nowrap; }

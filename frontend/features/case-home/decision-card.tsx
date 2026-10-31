@@ -5,18 +5,27 @@
 import {useQuery} from '@tanstack/react-query';
 import Link from 'next/link';
 import {useEffect, useRef, useState} from 'react';
-import type {ReactElement} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 
+import {PartyGlyph} from '../../components/network/marks';
 import {AiTag, LevelChip} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
+import {PARTY, partyKind} from '../../lib/viz-tokens';
 import {singleKeysOn} from '../../lib/shortcuts';
 import {api} from '../../lib/api-instance';
 import type {DecisionChoiceOut, DecisionItemOut} from '../../lib/generated/types.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {caseHref} from '../../lib/case-href';
-import {NO_REASONS, markTerms} from './use-decisions';
+import {KIND_ICON, KIND_LABEL, KIND_MEANING, NO_REASONS, markTerms} from './use-decisions';
+import type {DecisionKind} from './use-decisions';
 
 const MARK: Record<DecisionChoiceOut['key'], string> = {yes: '✓', no: '✕', unsure: '○'};
 export const KEYS = {home: {yes: 's', no: 'd', unsure: 'u'}, decide: {yes: '1', no: '2', unsure: '3'}} as const;
+/** The keys a card answers to, behind its `?` (Ony, 29 Oct: key hints never show at rest). */
+export function KeysHint({rows}: {rows: [string, string][]}): ReactElement {
+  return <Reveal label="Keys" detail={<><b>Keys</b>{rows.map(([k, w]) => <span key={k} className="rv-row"><kbd>{k}</kbd> {w}</span>)}</>}>
+    <span className="ch-keys" aria-hidden="true">?</span></Reveal>;
+}
 
 const typing = (target: EventTarget | null): boolean => {
   const el = target as HTMLElement | null;
@@ -39,6 +48,14 @@ export function RowCells({rows, compact = false}: {rows: NonNullable<NonNullable
   </div>;
 }
 
+/** A decision's kind as its mark (Decide's vocabulary), named on hover, focus or click. `bare` draws the mark alone,
+ *  for a control that names the kind itself and wears the reveal. */
+export function KindMark({kind, tabbable = true, bare = false, extra}: {kind: DecisionKind; tabbable?: boolean; bare?: boolean; extra?: ReactNode}): ReactElement {
+  const glyph = <span className={`dc-kind dc-kind-${kind}`} aria-hidden="true">{KIND_ICON[kind]}</span>;
+  if (bare) return glyph;
+  return <Reveal tabbable={tabbable} label={KIND_LABEL[kind]} detail={<><b>{KIND_LABEL[kind]}</b><span className="rv-row">{KIND_MEANING[kind]}</span>{extra}</>}>{glyph}</Reveal>;
+}
+
 export function PartyChips({parties}: {parties: DecisionItemOut['parties']}): ReactElement | null {
   const pointed = useWorkbenchStore(state => state.pointedParty);
   const point = useWorkbenchStore(state => state.setPointedParty);
@@ -58,10 +75,12 @@ export function PartyChips({parties}: {parties: DecisionItemOut['parties']}): Re
   if (!parties.length) return null;
   return <ul className="ch-parties" aria-label="Parties">
     {parties.map(p => <li key={p.id}>
-      <button type="button" className={`ch-party${pointed === p.id ? ' on' : ''}`} onMouseEnter={() => reach(p.id)}
-        onFocus={() => reach(p.id)} onClick={() => press(p.id)} aria-pressed={pointed === p.id}>
-        <span aria-hidden="true" className="ch-party-kind">{(p.schema || 'T')[0]}</span>{p.name}
-      </button>
+      {/* The party's kind is its icon, named on hover or focus (Ony, 29 Oct). */}
+      <Reveal tabbable={false} detail={<><b>{PARTY[partyKind(p.schema)].name}</b>{p.schema ? <span className="rv-row rv-mono">{p.schema}</span> : null}</>}>
+        <button type="button" className={`ch-party${pointed === p.id ? ' on' : ''}`} onMouseEnter={() => reach(p.id)}
+          onFocus={() => reach(p.id)} onClick={() => press(p.id)} aria-pressed={pointed === p.id}>
+          <PartyGlyph kind={partyKind(p.schema)} size={14}/>{p.name}
+        </button></Reveal>
     </li>)}
   </ul>;
 }
@@ -103,21 +122,40 @@ function PageThumb({documentId, page, passage}: {documentId: string; page: numbe
 
 /** "What happens" (CHECK_1): what each answer does, as the server words it from the endpoint the answer posts
  *  to, then what holds whichever way you answer. */
-export function WhatHappens({item}: {item: DecisionItemOut}): ReactElement | null {
+export function WhatHappens({item, mark = false}: {item: DecisionItemOut;
+  /** Drawn as a mark in the card's top line (Decide) rather than a heading of its own over empty room. */
+  mark?: boolean}): ReactElement | null {
   const answers = item.choices.filter(c => c.happens);
-  if (!answers.length && !item.consequences.length) return null;
-  return <div className="ch-happens" aria-label="What happens">
-    <p className="ch-eyebrow">What happens</p>
+  const unlocks = item.unlocks ?? [];
+  if (!answers.length && !item.consequences.length && !unlocks.length) return null;
+  // Ony, 29 Oct: the explanation is revealed, on one quiet line; a Yes that unlocks something keeps its mark and count
+  // in sight. Each answer's own line is also revealed on its button.
+  const box = <WhatHappensBox answers={answers} unlocks={unlocks} consequences={item.consequences}/>;
+  if (mark) return <Reveal label="What each answer does" detail={box}>
+    <span className="ch-happens-mark" aria-hidden="true">{unlocks.length > 0 ? <>◆{unlocks.length > 1 ? unlocks.length : ''}</> : '⇢'}</span></Reveal>;
+  return <div className="ch-happens-line"><Reveal detail={box}>
+    <span>{unlocks.length > 0 && <span className="ch-happens-unlock" aria-hidden="true">◆{unlocks.length > 1 ? unlocks.length : ''}</span>}What happens</span></Reveal></div>;
+}
+
+function WhatHappensBox({answers, unlocks, consequences}: {answers: DecisionChoiceOut[]; unlocks: string[]; consequences: string[]}): ReactElement {
+  return <span className="ch-happens" aria-label="What happens" role="group">
     {answers.length > 0 && <dl>{answers.map(c => <div key={c.key} className={`ch-happens-${c.key}`}>
       <dt><span aria-hidden="true">{MARK[c.key]}</span> {c.label}</dt><dd>{c.happens}</dd>
     </div>)}</dl>}
-    {item.consequences.length > 0 && <ul>{item.consequences.map(c => <li key={c}>{c}</li>)}</ul>}
-  </div>;
+    {unlocks.length > 0 && <span className="ch-unlocks" aria-label="What a Yes unlocks" role="group">
+      <p><span aria-hidden="true">◆</span> A Yes unlocks <small>(a dry run of the rules; nothing is saved until you answer)</small></p>
+      <ul>{unlocks.map(u => <li key={u}>{u}</li>)}</ul>
+    </span>}
+    {consequences.length > 0 && <ul>{consequences.map(c => <li key={c}>{c}</li>)}</ul>}
+  </span>;
 }
 
-export function DecisionCard({item, position, total, keys, active, onDecide, showWhatHappens = true}: {
+export function DecisionCard({item, position, total, keys, active, onDecide, showWhatHappens = true, aside}: {
   item: DecisionItemOut; position: number; total: number; keys: 'home' | 'decide'; active: boolean;
   onDecide: (choice: DecisionChoiceOut, note: string) => void; showWhatHappens?: boolean;
+  /** What the records hold for an item that has no passage of its own (Case home: the links between its parties).
+   *  It names the parties itself, so their chips are left out. */
+  aside?: ReactNode;
 }): ReactElement {
   const [noOpen, setNoOpen] = useState(false);
   const [note, setNote] = useState('');
@@ -143,38 +181,56 @@ export function DecisionCard({item, position, total, keys, active, onDecide, sho
   const inv = useWorkbenchStore(state => state.investigationId);
   // On Case home the page sits beside the question (mockup HOME_1); Decide shows it in its own pane.
   const page = keys === 'home' && ev?.document_id && /\.pdf$/i.test(ev.filename ?? '') && ev.excerpt ? pageOf(ev.locator) : null;
+  // Where the passage sits (file · page · scanned) is sub-text: on the passage, on hover or focus (Ony, 29 Oct).
+  const locator = ev ? [ev.filename, ev.locator, /OCR/i.test(ev.locator ?? '') ? 'scanned, OCR' : null].filter(Boolean).join(' · ') : '';
+  // Why it is asked is sub-text too: on the question. Who proposed it stays as its mark (the AI mark), the level as its bars.
+  const question = <h3 className="ch-question">{item.reason
+    ? <Reveal detail={<>{item.actor_kind !== 'ai' && item.actor ? <b>{item.actor}</b> : null}<span className="rv-row">{item.reason}</span></>}>{item.question}</Reveal>
+    : item.question}</h3>;
+  // On Decide the passage (or the rows) fills the evidence pane beside the card, so the card carries the proposal.
+  const inPane = keys === 'decide';
   const words = <>
-    {ev?.rows?.length ? <RowCells rows={ev.rows} compact/>
-      : ev?.excerpt ? <blockquote className="ch-excerpt"><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></blockquote>
+    {inPane ? <p className="ch-proposal">{item.proposal}</p>
+      : ev?.rows?.length ? <RowCells rows={ev.rows} compact/>
+      : ev?.excerpt ? <blockquote className="ch-excerpt">{locator
+        ? <Reveal detail={<span className="rv-mono">{locator}</span>}><Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/></Reveal>
+        : <Excerpt text={`“${ev.excerpt.trim()}”`} terms={ev.terms}/>}</blockquote>
       : <p className="ch-proposal">{item.proposal}</p>}
     {/* No passage to show here (an AI draft, a missing record): the thing itself is one click away. */}
     {keys === 'home' && !ev && item.choices.length > 0 && <Link className="ch-source-link" href={caseHref(item.open.href, inv)}>{item.open.label} <span aria-hidden="true">↗</span></Link>}
-    {ev && <p className="ch-locator">{[ev.filename, ev.locator, /OCR/i.test(ev.locator ?? '') ? 'scanned, OCR' : null].filter(Boolean).join(' · ')}</p>}
-    <PartyChips parties={item.parties}/>
+    {!inPane && ev && !ev.excerpt && locator && <p className="ch-locator"><Reveal detail={<span className="rv-mono">{locator}</span>}><span>{ev.filename || 'Source'}</span></Reveal></p>}
+    {aside ?? <PartyChips parties={item.parties}/>}
   </>;
   const extras = <>
     {item.known && item.known.length > 0 && <ul className="ch-known" aria-label="Already in the case">{item.known.map(k => <li key={k}>{k}</li>)}</ul>}
-    {showWhatHappens && <WhatHappens item={item}/>}
+    {showWhatHappens && !inPane && <WhatHappens item={item}/>}
   </>;
   return <article className={`ch-card ch-kind-${item.kind}`} aria-label={`${item.question} (${position} of ${total})`} data-testid="decision-card">
-    <p className="ch-why">
-      {item.actor_kind === 'ai' ? <AiTag/> : keys === 'decide' ? <span className="ch-actor">{item.actor}</span> : null}
-      {keys === 'decide' && item.level && <LevelChip level={item.level}/>}
-      <span>{item.reason}</span>
-    </p>
+    <div className="ch-why">
+      {item.actor_kind === 'ai' && <AiTag/>}
+      {keys === 'decide' && item.level && <LevelChip level={item.level} focusable/>}
+      {showWhatHappens && inPane && <WhatHappens item={item} mark/>}
+      {item.choices.length > 0 && <KeysHint rows={[...item.choices.map(c => [keyOf[c.key].toUpperCase(), c.label] as [string, string]),
+        ...(keys === 'decide' ? [['J / K', 'next, previous'], ['Z', 'undo'], ['O', 'open the source']] as [string, string][] : [['Z', 'undo']] as [string, string][])]}/>}
+    </div>
     {page !== null && ev?.document_id ? <div className="ch-card-body ch-split">
       <PageThumb documentId={ev.document_id} page={page} passage={ev.excerpt!.trim()}/>
-      <div className="ch-split-words"><h3 className="ch-question">{item.question}</h3>{words}{extras}</div>
+      <div className="ch-split-words">{question}{words}{extras}</div>
     </div> : <>
-      <h3 className="ch-question">{item.question}</h3>
+      {question}
       <div className="ch-card-body">{words}{extras}</div>
     </>}
     {item.choices.length > 0 ? <>
       <div className="ch-choices" role="group" aria-label="Your answer">
-        {item.choices.map(c => <button key={c.key} type="button" className={`ch-choice ch-${c.key}`} aria-keyshortcuts={keyOf[c.key].toUpperCase()}
-          onClick={() => (c.key === 'no' && !noOpen && NO_REASONS[item.kind].length ? setNoOpen(true) : onDecide(c, note))}>
-          <span aria-hidden="true">{MARK[c.key]}</span>{c.label}<kbd>{keyOf[c.key].toUpperCase()}</kbd>
-        </button>)}
+        {item.choices.map(c => {
+          const button = <button type="button" className={`ch-choice ch-${c.key}`} aria-keyshortcuts={keyOf[c.key].toUpperCase()}
+            onClick={() => (c.key === 'no' && !noOpen && NO_REASONS[item.kind].length ? setNoOpen(true) : onDecide(c, note))}>
+            <span aria-hidden="true">{MARK[c.key]}</span>{c.label}
+          </button>;
+          // What this answer does is revealed on it (Decide; Case home keeps its card bare).
+          return showWhatHappens && c.happens ? <Reveal key={c.key} tabbable={false} describe={false} className="ch-choice-rv" detail={c.happens}>{button}</Reveal>
+            : <span key={c.key} className="rv ch-choice-rv">{button}</span>;
+        })}
       </div>
       {noOpen && <div className="ch-reasons" role="group" aria-label="Why not">
         {NO_REASONS[item.kind].map(r => <button key={r} type="button" className="ch-chip" onClick={() => {

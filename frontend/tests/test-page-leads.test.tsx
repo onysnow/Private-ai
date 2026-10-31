@@ -100,13 +100,12 @@ describe('Home questions & reporting leads', () => {
     const api = await bootstrapWithOneLead({byStatus: true});
 
     expect(screen.getByText('Who approved this contract?')).toBeInTheDocument();
-    expect(screen.getByText('high')).toBeInTheDocument(); // priority badge
-    expect(
-      screen.getByText((_, node) => node?.textContent === 'reporter lead · ⚠ evidence conflict score 2'),
-    ).toBeInTheDocument();
+    // Priority is the card's edge, named on reveal of the title; the conflict score stays (an alert).
+    expect(screen.getByRole('button', {name: 'Who approved this contract?'})).toHaveAccessibleDescription('high priority');
+    expect(screen.getByText('⚠ evidence conflict score 2')).toBeInTheDocument();
     expect(screen.getByText('Needs evidence review:')).toBeInTheDocument();
     expect(screen.getByText('unresolved contradiction', {exact: false})).toBeInTheDocument();
-    expect(screen.getByText('Owner: A. Reporter')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'Owner: A. Reporter'})).toHaveTextContent('AR');
     // the card sits in its "Unreviewed" kanban column
     expect(screen.getByRole('combobox', {name: 'Move "Who approved this contract?"'})).toBeInTheDocument();
     // The queue was asked for with resolved leads included, and nothing the
@@ -127,6 +126,7 @@ describe('Home questions & reporting leads', () => {
     });
 
     const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
     await user.type(
       screen.getByPlaceholderText('Who approved this contract?'),
       'Second question',
@@ -154,7 +154,9 @@ describe('Home questions & reporting leads', () => {
     const api = await bootstrapWithOneLead();
     const callsBefore = api.fetch.mock.calls.length;
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Add lead'}));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
+    await user.click(screen.getByRole('button', {name: 'Add lead'}));
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(api.calls('POST /api/leads')).toHaveLength(0);

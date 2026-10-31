@@ -42,9 +42,11 @@ export type NamedEffect = 'bokeh' | 'rain' | 'grain' | 'iris' | 'shutter' | 'neo
 export const NAMED_EFFECTS: NamedEffect[] = ['bokeh', 'rain', 'grain', 'iris', 'shutter', 'neon', 'bloom'];
 /** Neon starts off (research §04.11: "steady only, off by default"). */
 const OFF_AT_FIRST: NamedEffect[] = ['neon'];
-export type Appearance = {theme: ThemeId; effects: Effects; motion: Motion; format: Format; off: NamedEffect[];
+/** How a status or flag level shows (Ony, 29 Oct): its colour (default), its colour and shape, or the full chip with its word. */
+export type StatusMarks = 'colour' | 'shape' | 'words';
+export type Appearance = {theme: ThemeId; effects: Effects; motion: Motion; format: Format; off: NamedEffect[]; status: StatusMarks;
   /** A theme of your own over `theme` (lib/custom-theme), or null for the built-in theme as it is. */ custom: string | null};
-export const DEFAULT_APPEARANCE: Appearance = {theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], custom: null};
+export const DEFAULT_APPEARANCE: Appearance = {theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], status: 'colour', custom: null};
 
 const KEY = 'pai:appearance';
 const TRY_KEY = 'pai:appearance-trying';
@@ -67,6 +69,7 @@ function valid(a: Partial<Appearance>): Appearance {
     custom: own ? own.id : null,
     effects: a.effects === 'light' || a.effects === 'off' ? a.effects : 'full',
     motion: a.motion === 'calm' ? 'calm' : 'normal',
+    status: a.status === 'shape' || a.status === 'words' ? a.status : 'colour',
     format: FORMATS.some(f => f.id === a.format && f.ready) ? a.format as Format : 'board',
     off: Array.isArray(a.off) ? NAMED_EFFECTS.filter(e => a.off!.includes(e)) : [...OFF_AT_FIRST],
   };
@@ -139,6 +142,7 @@ export function applyAppearance(a: Appearance = currentAppearance()): void {
   html.dataset.effects = a.effects === 'full' && onBattery ? 'light' : a.effects;
   if (a.effects === 'full' && onBattery) html.dataset.effectsAuto = 'battery'; else delete html.dataset.effectsAuto;
   html.dataset.motion = a.motion;
+  html.dataset.status = a.status;
   html.dataset.format = a.format;
   html.dataset.fxOff = a.off.join(' ');
   for (const name of OWN_VARS) html.style.removeProperty(name);
@@ -183,4 +187,4 @@ export function onAppearanceChange(fn: () => void): () => void {
 /** Runs before the first paint (in <head>), so a kept theme never flashes the default. Must stay self-contained. */
 // A theme of your own: its base theme, and the variables stored with it (lib/custom-theme), only values that look like
 // colours. The page's own code checks the theme's contrast again as soon as it runs (applyAppearance).
-export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var a=JSON.parse(localStorage.getItem('${KEY}')||'{}');var t=sessionStorage.getItem('${TRY_KEY}');var h=document.documentElement;var own=t&&t.indexOf('own:')===0?t.slice(4):(t?null:a.custom);h.dataset.theme=(t&&!own?t:a.theme)||'case-night';h.dataset.effects=a.effects||'full';h.dataset.motion=a.motion||'normal';h.dataset.format='board';h.dataset.fxOff=(a.off||['neon']).join(' ');if(own){var l=JSON.parse(localStorage.getItem('${CUSTOM_KEY}')||'[]');for(var i=0;i<l.length;i++){if(l[i]&&l[i].id===own&&l[i].vars){h.dataset.theme=l[i].base;for(var k in l[i].vars){var v=String(l[i].vars[k]);if(/^--[a-z0-9-]+$/.test(k)&&/^[#0-9a-fA-F% .]+$/.test(v))h.style.setProperty(k,v);}}}}}catch(e){}})();`;
+export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var a=JSON.parse(localStorage.getItem('${KEY}')||'{}');var t=sessionStorage.getItem('${TRY_KEY}');var h=document.documentElement;var own=t&&t.indexOf('own:')===0?t.slice(4):(t?null:a.custom);h.dataset.theme=(t&&!own?t:a.theme)||'case-night';h.dataset.effects=a.effects||'full';h.dataset.motion=a.motion||'normal';h.dataset.status=a.status==='shape'||a.status==='words'?a.status:'colour';h.dataset.format='board';h.dataset.fxOff=(a.off||['neon']).join(' ');if(own){var l=JSON.parse(localStorage.getItem('${CUSTOM_KEY}')||'[]');for(var i=0;i<l.length;i++){if(l[i]&&l[i].id===own&&l[i].vars){h.dataset.theme=l[i].base;for(var k in l[i].vars){var v=String(l[i].vars[k]);if(/^--[a-z0-9-]+$/.test(k)&&/^[#0-9a-fA-F% .]+$/.test(v))h.style.setProperty(k,v);}}}}}catch(e){}})();`;

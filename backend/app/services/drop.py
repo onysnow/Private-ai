@@ -45,6 +45,29 @@ def _kind_of(d: Document) -> str:
     return d.mime_type or "file"
 
 
+PICTURES = {"JPG", "JPEG", "PNG", "GIF", "TIF", "TIFF", "WEBP", "HEIC", "HEIF", "BMP"}
+NEEDS_OCR = "Needs OCR · not on this computer"
+
+
+def _is_picture(d: Document) -> bool:
+    """A photo or image: it has no passages to split, so that stage does not apply to it."""
+    return (d.mime_type or "").startswith("image/") or _kind_of(d) in PICTURES
+
+
+def _no_ocr(text: str) -> bool:
+    """The reason is that this computer has no OCR (Tesseract or its language data is missing)."""
+    return "Tesseract is not installed" in text or "No tessdata" in text
+
+
+def plain(text: str, d: Document) -> str:
+    """A reason in the reporter's words: a missing OCR program or a clash while saving, not a stack trace."""
+    if _no_ocr(text):
+        return "Picture kept · its text was not read: OCR is not on this computer" if _is_picture(d) else NEEDS_OCR
+    if "expected to update" in text and "were matched" in text:
+        return "Stopped while saving what it found (the case changed under it) · try again"
+    return text
+
+
 def _how_read(locators: list[str]) -> str:
     ocr = sum("(OCR)" in loc for loc in locators)
     if not locators:
@@ -141,7 +164,7 @@ def drop(db: Session, investigation_id: str, *, now: datetime | None = None) -> 
         stages = [_stage("received", "done", d.created_at.strftime("%d %b %H:%M") if d.created_at else ""),
                   _stage("checked", "done", "= same" if same else _kind_of(d))]
         if status == "failed":
-            stages.append(_stage("read", "stopped", d.extraction_error or "Could not be read"))
+            stages.append(_stage("read", "stopped", plain(d.extraction_error, d) if d.extraction_error else "Could not be read"))
         elif quiet is not None:
             stages.append(_stage("read", "active" if status == "extracting" else "waiting", quiet_words(quiet)))
         elif status == "extracting":
@@ -149,13 +172,16 @@ def drop(db: Session, investigation_id: str, *, now: datetime | None = None) -> 
         elif status in UNREAD:
             stages.append(_stage("read", "waiting", "In the queue"))
         else:
-            stages.append(_stage("read", "done", _how_read([loc for loc, _ in own_chunks]) or "read"))
+            stages.append(_stage("read", "done", _how_read([loc for loc, _ in own_chunks]) or ("picture" if _is_picture(d) else "read")))
         kids = children.get(d.id, [])
         if read_done and own_chunks:
             stages.append(_stage("passages", "done", f"{len(own_chunks)} passage{'s' if len(own_chunks) != 1 else ''}"))
         elif read_done:
             # An archive or mailbox holds its text in the files inside it.
-            stages.append(_stage("passages", "skipped", "In the files inside") if kids else _stage("passages", "stopped", "No text found"))
+            # A picture has no passages: the stage does not apply, it did not fail (mockup INTAKE_1 "– none").
+            stages.append(_stage("passages", "skipped", "In the files inside") if kids
+                          else _stage("passages", "skipped", "A picture has no passages") if _is_picture(d)
+                          else _stage("passages", "stopped", "No text found"))
         else:
             # A file that could not be read stops at Read (mockup INTAKE_1); the stages after it were never reached.
             stages.append(_stage("passages", "waiting"))
@@ -171,13 +197,13 @@ def drop(db: Session, investigation_id: str, *, now: datetime | None = None) -> 
         left = sum(waiting[d.id].values()) + sum(sum(waiting[k.id].values()) for k in kids)
         stages.append(_stage("ready", "needs_you" if left else ("done" if read_done else "waiting"),
                              f"{left} wait for you" if left else ("Nothing waits" if read_done else "")))
-        issues = list(d.extraction_issues or [])
+        issues = [plain(i, d) for i in (d.extraction_issues or [])]
         seconds = _seconds(job) if read_done else None
         # The line under the file's name (mockup INTAKE_1): what happened to it, in a few words.
         if same:
             note = "Already in the case: same fingerprint"
         elif status == "failed":
-            note = d.extraction_error or "Could not be read"
+            note = plain(d.extraction_error, d) if d.extraction_error else "Could not be read"
         elif quiet is not None:
             note = quiet_words(quiet) + (" · it may have stopped" if status == "extracting" else " · nothing is being read")
         elif status == "extracting":

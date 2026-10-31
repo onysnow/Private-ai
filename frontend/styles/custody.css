@@ -30,6 +30,8 @@
 .cc-wire.w-against path { stroke: var(--status-disputed); stroke-dasharray: 8 3 2 3; }
 .cc-wire.w-against text { fill: var(--status-disputed); }
 .cc-wire.w-ai path { stroke: var(--ai-mark); stroke-dasharray: 2 3; }
+.cc-wire.w-gone path { stroke: var(--text-muted); stroke-opacity: .5; stroke-dasharray: 2 6; }
+.cc-wire.w-gone text { text-decoration: line-through; }
 .cc-wire.lit path { stroke-width: 2.6; }
 .cc-card { all: unset; box-sizing: border-box; position: relative; z-index: 1; display: grid; gap: 4px; padding: 9px 11px; border-radius: 10px; background: var(--surface-2);
   box-shadow: inset 0 0 0 1px var(--line); font-size: 12px; cursor: pointer; min-width: 0; }
@@ -39,6 +41,7 @@
 .cc-card.picked { box-shadow: inset 0 0 0 1.5px var(--accent-1); }
 .cc-card.lit { box-shadow: inset 0 0 0 1.5px var(--accent-2); }
 .cc-card.against { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--status-disputed) 70%, transparent); }
+.cc-card.gone { opacity: .5; }
 .cc-card-top { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; justify-content: space-between; }
 .cc-kind { font: 600 9.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
 .cc-check { display: inline-flex; gap: 3px; padding: 0 7px; border-radius: 999px; font: 600 9.5px var(--font-mono); text-transform: uppercase; letter-spacing: .04em; box-shadow: inset 0 0 0 1px currentColor; }
@@ -91,7 +94,6 @@
 .cc-seal-line { padding: 3px 10px; border-radius: 999px; background: var(--surface-1); box-shadow: inset 0 0 0 1px var(--line); font: 500 10.5px var(--font-mono); white-space: nowrap; color: var(--text-muted); user-select: all; }
 .cc-seal-line b { font-weight: 600; } .cc-seal-line b.ok { color: var(--status-supported); } .cc-seal-line b.bad { color: var(--status-disputed); }
 .cc-seal-line .ai { color: var(--ai-mark); }
-.cc-dir { font-size: 12px; color: var(--text-muted); margin-right: 4px; }
 .cc-pick { margin-top: -4px; }
 .cc-thumb { width: auto; height: 40px; align-content: start; padding: 7px 10px; }
 .cc-thumb i:nth-child(3) { width: 85%; } .cc-thumb i:nth-child(4) { width: 55%; }
@@ -106,7 +108,6 @@
 .cc-breaks { padding: 8px 10px; border-radius: 10px; font-size: 12px; background: color-mix(in srgb, var(--status-disputed) 10%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--status-disputed) 60%, transparent); }
 .cc-breaks ul { margin: 4px 0 0; padding-left: 16px; }
 .cc-rest { padding: 0 7px; border-radius: 999px; font-size: 11px; box-shadow: inset 0 0 0 1px var(--line); }
-.cc-level { font: 600 9.5px var(--font-mono); letter-spacing: .04em; padding: 0 5px; border-radius: 4px; color: var(--flag-strong); box-shadow: inset 0 0 0 1px currentColor; }
 .cc-key { display: grid; gap: 3px; padding: 8px 10px; border-radius: 10px; background: var(--surface-2); font-size: 11px; color: var(--text-muted); }
 .cc-key span { display: flex; align-items: center; gap: 8px; }
 .cc-key span::before { content: ''; width: 26px; border-top: 2px solid var(--status-supported); }
@@ -136,7 +137,6 @@
 .cc-seal-line { display: block; overflow: hidden; text-overflow: ellipsis; font-size: 10px; padding: 3px 9px; }
 .cc-tools { gap: 6px; }
 .cc-tools .cc-btn { padding: 4px 9px; font-size: 11.5px; }
-.cc-dir { font-size: 11.5px; }
 .cc-seal .cc-seal-line span.ai { padding: 0; box-shadow: none; background: none; border-radius: 0; }
 
 /* The claim's Done checklist for Supported (server rules, app/services/claim_done.py): ✓ met, ✕ not met with what
@@ -145,10 +145,11 @@
 .cc-done-head { margin: 0; font: 600 9.5px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); }
 .cc-done-head .ok { color: var(--status-supported); } .cc-done-head .bad { color: var(--status-disputed); } .cc-done-head .unknown { color: var(--status-unshown); }
 .cc-done ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 11.5px; color: var(--text-muted); }
-.cc-done li > span { display: inline-block; width: 1.1em; }
-.cc-done li.done-met > span { color: var(--status-supported); }
-.cc-done li.done-not_met { color: var(--text); } .cc-done li.done-not_met > span { color: var(--status-disputed); }
-.cc-done li.done-unknown > span { color: var(--status-unshown); }
+.cc-done li { display: grid; grid-template-columns: 1.2em minmax(0, 1fr); align-items: baseline; }
+.cc-done-mark { color: var(--text-muted); }
+.cc-done li.done-met .cc-done-mark { color: var(--status-supported); }
+.cc-done li.done-not_met { color: var(--text); } .cc-done li.done-not_met .cc-done-mark { color: var(--status-disputed); }
+.cc-done li.done-unknown .cc-done-mark { color: var(--status-unshown); }
 .cc-done li small { display: block; padding-left: 1.1em; font-size: 10.5px; line-height: 1.3; }
 
 /* Scroll-over replay along the log: the row the replay stands on, and its card in the chain. */
@@ -178,3 +179,60 @@
 @keyframes cc-card-in { from { opacity: 0; } to { opacity: 1; } }
 html[data-motion='calm'] .cc-wires.draw .cc-card, html[data-motion='calm'] .cc-lines.draw { animation: none; }
 @media (prefers-reduced-motion: reduce) { .cc-wires.draw .cc-card { animation: none; } }
+
+/* Ony's rule of 29 Oct: titles, data, alerts, numbers and marks show; sub-text is revealed on hover, focus or click.
+   A card's who, when and own lines are revealed on the card, so its content sits in the reveal's span; the kind word
+   has gone (the column says it), so the check chips can be larger. */
+.cc-card-rv { display: grid; gap: 4px; min-width: 0; }
+.cc-kind { font-size: 10.5px; }
+.cc-check { font-size: 11px; padding: 1px 8px; }
+.cc-ai.accepted { border-style: solid; }
+.cc-ai-top { display: flex; gap: 8px; align-items: center; }
+.cc-ai-more .ai-notice { justify-self: start; }
+.cc-src { display: inline-grid; place-items: center; width: 24px; height: 22px; border-radius: 999px; color: var(--status-supported); box-shadow: inset 0 0 0 1px currentColor; }
+.cc-anchor { display: inline-flex; gap: 5px; align-items: baseline; font-weight: 600; }
+.cc-anchor.ok { color: var(--status-supported); } .cc-anchor.warn { color: var(--flag-strong); } .cc-anchor.bad { color: var(--status-disputed); font-weight: 500; }
+.cc-key-mark { margin: 0; }
+.rv-card .cc-key { background: none; padding: 0; }
+
+/* 30 Oct (mockup CHECK_2): the claim card reads as a title and a short checklist with marks, sized for its column;
+   the Done head is a quiet label with one mark (or what is left, an alert), its summary revealed. */
+.cc-claim { gap: 6px; }
+.cc-claim b { font: 600 14px/1.35 var(--font-read); }
+.cc-done { margin-top: 2px; padding-top: 6px; border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+.cc-done-head { font: 500 11px var(--font-ui); letter-spacing: 0; text-transform: none; }
+.cc-done ul { font-size: 12px; gap: 3px; }
+
+/* The screen fills the stage (Ony, 29 Oct): the wires take the height the log leaves them, the log keeps to its rows
+   and scrolls inside past a share of the height; the drawer scrolls inside itself. The key is drawn in the drawer. */
+.cc { height: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
+.cc > * { flex: 0 0 auto; }
+.cc > .cc-body { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+.cc-main { min-height: 0; display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; }
+.cc-main > .cc-wires, .cc-main > .cc-list { flex: 1 0 auto; align-content: center; }
+.cc-main > .cc-log { flex: 0 1 auto; min-height: 96px; max-height: 42%; overflow-y: auto; overscroll-behavior: contain; }
+.cc-detail { align-self: start; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; position: static; }
+.cc-key-box { display: grid; gap: 6px; }
+.cc-key-box .cc-key { background: none; padding: 0 2px; font-size: 11.5px; }
+/* With room to spare, the cards' words grow rather than leave it empty. */
+@media (min-height: 820px) {
+  .cc-card b { font-size: 13.5px; }
+  .cc-text { font-size: 13px; }
+  .cc-log table { font-size: 13px; }
+}
+
+/* 30 Oct: the claim picker is wide enough for most claims (a longer one ends in an ellipsis, whole on hover); the claim
+   card's Done checklist keeps only what is not met in sight, the rest on its name; the line key is a mark in the
+   drawer, drawn on reveal. */
+.cc-pick select { max-width: min(760px, 62vw); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.cc-done-all { display: grid; gap: 2px; margin-top: 6px; }
+.cc-done-all .done-met .cc-done-mark { color: var(--status-supported); }
+.cc-done-all .done-not_met .cc-done-mark { color: var(--status-disputed); }
+.cc-done-all .done-unknown .cc-done-mark { color: var(--status-unshown); }
+.cc-key-mark { margin: 0; }
+.cc-key-glyph { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px 3px 7px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line);
+  font: 500 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.cc-key-glyph i { display: inline-block; width: 8px; border-top: 2px solid var(--status-supported); }
+.cc-key-glyph i:nth-child(2) { border-top-style: dashed; border-color: var(--text-muted); }
+.cc-key-glyph i:nth-child(3) { border-top-style: dotted; border-color: var(--ai-mark); margin-right: 4px; }
+.rv-card .cc-key { display: grid; gap: 4px; font-size: 12px; }

@@ -30,6 +30,8 @@ const SYNC = 'GET /api/investigations/inv-1/corpus/sync';
 const XREFS = 'GET /api/investigations/inv-1/cross-references';
 const WATCHLIST = 'GET /api/investigations/inv-1/watchlist';
 const SETS = 'GET /api/investigations/inv-1/corpus/entity-sets';
+const INSIGHTS = 'GET /api/investigations/inv-1/corpus/insights';
+const quietInsights = {investigation_id: 'inv-1', state: 'disabled', detail: 'OpenAleph is turned off here.', collection_id: null, groups: []};
 
 function syncLine(overrides: Record<string, unknown> = {}) {
   return corpusSyncBody('inv-1', {
@@ -58,7 +60,7 @@ function crossReference(overrides: Record<string, unknown> = {}) {
 }
 
 async function renderPanel(routes: Record<string, unknown> = {}) {
-  const api = mockApi({[SYNC]: syncLine(), [XREFS]: [crossReference()], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], ...routes});
+  const api = mockApi({[SYNC]: syncLine(), [XREFS]: [crossReference()], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], [INSIGHTS]: quietInsights, ...routes});
   wrap(<CorpusPanel investigationId="inv-1"/>);
   await screen.findByText('Meridian Holdings Limited');
   return api;
@@ -68,12 +70,12 @@ describe('CorpusPanel', () => {
   it('shows the corpus sync line and the cross-references waiting for review', async () => {
     const api = await renderPanel();
     expect(screen.getByText(/Last push: succeeded, .* — Sent 3 record\(s\)/)).toBeInTheDocument();
-    expect(screen.getByText('Pending: 1 to send · 0 to remove · 0 judgement(s) · 12 record(s) in Harbour contracts')).toBeInTheDocument();
+    expect(screen.getByText('Pending: 1 to send · 0 to remove · 0 judgement(s) · 12 record(s) in Harbour contracts').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     expect(screen.getByText(/Last cross-reference run: succeeded, .* — 4 match\(es\), 1 new, 1 possible duplicate\(s\) · 1 waiting for review/)).toBeInTheDocument();
     expect(screen.getByText('No background worker runs here: changes reach OpenAleph on “Sync now”.')).toBeInTheDocument();
-    expect(screen.getByText('(Company) in Port authority')).toBeInTheDocument();
+    expect(screen.getByText('(Company) in Port authority').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     expect(screen.getByText('Score 98% · regression-v1')).toBeInTheDocument();
-    expect(screen.getByText('Identifier (100%): 09876543 ↔ 09876543')).toBeInTheDocument();
+    expect(screen.getByText('Identifier (100%): 09876543 ↔ 09876543').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     expect(screen.getByRole('link', {name: 'Open in OpenAleph'})).toHaveAttribute('href', 'http://openaleph.test/entities/theirs.sig');
     expect(api.unmatched()).toEqual([]);
   });
@@ -142,14 +144,14 @@ describe('CorpusPanel', () => {
       cross_reference: {...(syncLine().cross_reference as Record<string, unknown>), status: 'failed', error: 'CrossReferenceTimeout: still busy'},
       failures: [{id: 'f-1', investigation_id: 'inv-1', document_id: null, operation: 'corpus_push', error: 'ConnectError: refused', created_at: '2026-10-02T10:00:05'}],
     });
-    mockApi({[SYNC]: failing, [XREFS]: [], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: []});
+    mockApi({[SYNC]: failing, [XREFS]: [], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], [INSIGHTS]: quietInsights});
     wrap(<CorpusPanel investigationId="inv-1"/>);
     await screen.findByText('Failures: 2 in a row — latest corpus_push: ConnectError: refused');
     expect(screen.getByText('Last error: ConnectError: refused')).toBeInTheDocument();
     expect(screen.getByText('Cross-referencing error: CrossReferenceTimeout: still busy')).toBeInTheDocument();
 
     cleanup();
-    mockApi({[SYNC]: corpusSyncBody('inv-1'), [XREFS]: [], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: []});
+    mockApi({[SYNC]: corpusSyncBody('inv-1'), [XREFS]: [], [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], [INSIGHTS]: quietInsights});
     wrap(<CorpusPanel investigationId="inv-1"/>);
     await screen.findByText('OpenAleph integration is disabled on this deployment.');
     expect(screen.getByRole('button', {name: 'Sync now'})).toBeDisabled();
@@ -167,7 +169,7 @@ describe('CorpusPanel', () => {
   });
 
   it('shows load errors', async () => {
-    mockApi({[SYNC]: {status: 500, body: {detail: 'boom'}}, [XREFS]: {status: 500, body: {detail: 'bang'}}, [WATCHLIST]: watchlistBody('inv-1'), [SETS]: []});
+    mockApi({[SYNC]: {status: 500, body: {detail: 'boom'}}, [XREFS]: {status: 500, body: {detail: 'bang'}}, [WATCHLIST]: watchlistBody('inv-1'), [SETS]: [], [INSIGHTS]: quietInsights});
     wrap(<CorpusPanel investigationId="inv-1"/>);
     await screen.findByText(/boom/);
     await screen.findByText(/bang/);
@@ -190,9 +192,15 @@ describe('CorpusExpand', () => {
     const api = mockApi({[EXPAND]: expanded});
     wrap(<CorpusExpand entityId="ent-1"/>);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Expand in the corpus'}));
-    await screen.findByText(/1 relationship\(s\) and 1 linked entity proposed for review \(2 already in this investigation\)/);
-    expect(screen.getByText('Entity: Bob Smith · Person · Port authority · unreviewed')).toBeInTheDocument();
-    expect(screen.getByText('Relationship: director · Directorship · unreviewed')).toBeInTheDocument();
+    // The count shows; what was already held and where to review them are on its hover (Ony, 29 Oct).
+    await screen.findByText('1 link(s) and 1 party proposed for review');
+    expect(screen.getByText('2 already in this investigation. Review them in the review queue.').closest('[hidden]')).not.toBeNull();
+    // Each finding is its name; its kind and collection on hover, its review state as a shape.
+    expect(screen.getByText('Bob Smith')).toBeInTheDocument();
+    expect(screen.getByText('Party · Person · Port authority').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('director')).toBeInTheDocument();
+    expect(screen.getByText('Link · Directorship').closest('[hidden]')).not.toBeNull();
+    expect(screen.getAllByRole('img', {name: 'unreviewed'})).toHaveLength(2);
     expect(screen.getAllByRole('link', {name: 'Open in OpenAleph'})).toHaveLength(1);
     expect(api.calls(EXPAND)).toHaveLength(1);
   });
@@ -209,7 +217,8 @@ describe('CorpusExpand', () => {
     mockApi({[EXPAND]: {...expanded, relationships: 0, neighbours: 2, skipped_own: 0, findings: []}});
     wrap(<CorpusExpand entityId="ent-1"/>);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Expand in the corpus'}));
-    await screen.findByText(/0 relationship\(s\) and 2 linked entities proposed for review; review them/);
+    await screen.findByText('0 link(s) and 2 parties proposed for review');
+    expect(screen.getByText('Review them in the review queue.').closest('[hidden]')).not.toBeNull();
   });
 });
 
@@ -220,8 +229,10 @@ describe('DuplicateCandidates', () => {
   it('says when OpenAleph cross-referencing found a possible duplicate', () => {
     render(<DuplicateCandidates candidates={[{...candidate, found_by: ['openaleph_xref']}, {...candidate, entity_id: 'ent-3', caption: 'Meridian Holdings', found_by: ['name_overlap', 'openaleph_xref']},
       {...candidate, entity_id: 'ent-4', caption: 'Meridian', found_by: ['name_overlap']}]} previews={{}} onDecide={noop} onPreviewMerge={noop} onExecuteMerge={noop}/>);
-    expect(screen.getByText('· found by OpenAleph cross-referencing')).toBeInTheDocument();
-    expect(screen.getByText('· found by OpenAleph cross-referencing and by name')).toBeInTheDocument();
-    expect(screen.getAllByText(/found by OpenAleph/)).toHaveLength(2);
+    // How a candidate was found is on its score's hover.
+    expect(screen.getByText('Found by OpenAleph cross-referencing').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('Found by OpenAleph cross-referencing and by name')).toBeInTheDocument();
+    expect(screen.getAllByText(/Found by OpenAleph/)).toHaveLength(2);
+    expect(screen.getByText('Found by name')).toBeInTheDocument();
   });
 });

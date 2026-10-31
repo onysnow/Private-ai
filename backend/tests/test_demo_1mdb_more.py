@@ -146,9 +146,12 @@ def test_the_rebuilt_emails_carry_only_the_quoted_words():
 def test_the_word_file_says_it_is_a_conversion():
     import docx
     d = DOCS["docx-doj-2016-introduction"]
-    paragraphs = [p.text for p in docx.Document(str(demo_1mdb.FILES / d["filename"])).paragraphs]
-    assert paragraphs[0].startswith("Converted to Word by the Workbench from ")
-    assert any(p.startswith("6. 1MDB was ostensibly created") for p in paragraphs)
+    word = docx.Document(str(demo_1mdb.FILES / d["filename"]))
+    # It says so in its properties, not in its text: the reader reads the text as the complaint's (audit #12).
+    assert word.core_properties.comments.startswith("Converted to Word by the Workbench from ")
+    assert "Not an original Word file" in word.core_properties.comments
+    paragraphs = [p.text for p in word.paragraphs]
+    assert paragraphs[0].startswith("6. 1MDB was ostensibly created")
 
 
 def test_a_file_that_cannot_be_fetched_stays_a_link():
@@ -213,10 +216,17 @@ def test_loading_puts_every_kind_of_record_in_place(loaded):
 def test_the_records_reach_the_screens(loaded):
     db, inv, _ = loaded
     ledger = investigation_financial_ledger(db, inv.id)
-    currencies = {t["currency"] for t in ledger["transactions"]}
+    currencies = {t["currency"] for t in ledger["transactions"] + ledger["owed"]}
     assert {"MYR", "GBP", "EUR", "CHF", "SGD", "USD"} <= currencies
+    # A payment's kind is set only where its own note says it (DECISIONS_LOG 33): the MAS penalties and the court's fine
+    # are fines, FINMA's disgorgements and the courts' orders are ordered, the agreed prices are prices; all are owed.
+    kinds = Counter(t["paymentKind"] for t in ledger["owed"])
+    assert kinds == {"fine": 10, "ordered": 7, "price": 2}, kinds
+    assert not {t["paymentKind"] for t in ledger["transactions"]} - {None}
     places = investigation_places(db, inv.id)
-    assert len(places["places"]) == 21 and not places["omitted"]
+    assert len(places["places"]) == 21
+    # The case's properties recorded without coordinates are named under "Can't be placed", never looked up.
+    assert places["omitted"] and all(o["reason"] == "no coordinates recorded; nothing is looked up" for o in places["omitted"])
     assert any(p["links"] for p in places["places"])
     statuses = Counter(c.status for c in db.scalars(select(Claim).where(Claim.investigation_id == inv.id)))
     assert statuses["confirmed"] and statuses["rejected"] and statuses["disputed"]

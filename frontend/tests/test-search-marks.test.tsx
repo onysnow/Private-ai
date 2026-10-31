@@ -58,9 +58,13 @@ describe('Search with facets and marks', () => {
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Search this investigation…'), 'Quarry{Enter}');
     const card = await screen.findByRole('option', {name: /^Jane Quarry/});
-    expect(screen.getByText('! Disputed')).toBeInTheDocument();
-    expect(screen.getByText('2 notes')).toBeInTheDocument();
-    expect(within(card).getByText('Matched on name')).toBeInTheDocument();
+    // How sure is the status grammar's mark (its word on hover); the note count is an icon and a number; why it matched
+    // is sub-text, in the page for screen readers but hidden until asked (Ony, 29 Oct).
+    const claimCard = screen.getByRole('option', {name: /Jane Quarry controls/});
+    expect(within(claimCard).getByText('Disputed', {selector: '.st-word'})).toBeInTheDocument();
+    expect(within(claimCard).getByText('✕')).toBeInTheDocument();
+    expect(screen.getByText('2 notes').closest('[hidden]')).not.toBeNull();
+    expect(within(card).getByText('Matched on name').closest('[hidden]')).not.toBeNull();
 
     // A facet narrows the search on the server; pressing it again clears it.
     await user.click(screen.getByRole('button', {name: /Person/, pressed: false}));

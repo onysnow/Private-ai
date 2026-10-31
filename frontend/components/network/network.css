@@ -1,0 +1,4 @@
+/* The network's reveal wrappers (components/network): the party's reveal holds its button without changing its box. */
+.net-party-rv { display: block; }
+.net-contested .rv { display: block; border-radius: 50%; }
+.cg-cell { display: block; width: 100%; height: 100%; }

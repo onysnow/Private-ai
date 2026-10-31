@@ -14,11 +14,13 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {hideScreen} from '../../components/frame/app-frame';
+import {Reveal} from '../../components/ui/reveal';
 import '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
-import {getSafetyDataOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {getSafetyDataOptions, getSigningKeyOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {OutboundRequestOut, SafetyDataOut, SafetyServiceOut, SafetyStoreOut} from '../../lib/generated/types.gen';
 import {apiTime, shortStamp} from '../../lib/timestamps';
+import {YourSafety} from './your-safety';
 
 type Period = SafetyDataOut['period'];
 const PERIODS: [Period, string][] = [['today', 'Today'], ['7d', '7 days'], ['30d', '30 days'], ['all', 'All']];
@@ -29,7 +31,10 @@ const DWELL_MS = 250;
 /** Every 20 s while the page shows, so a request that leaves while you watch appears and its line pulses. */
 const REFRESH_MS = 20_000;
 const PULSE_MS = 1600;
-const STORE_MARK: Record<string, string> = {records: '≡', documents: '▤', backups: '⟲', keys: '⚿', log: '≣', ai: '◇'};
+// The AI store is the plum AI mark (◇ is a proposal elsewhere in the app).
+export const STORE_MARK: Record<string, string> = {records: '≡', documents: '▤', backups: '⟲', keys: '⚿', log: '≣', ai: 'AI'};
+/** A service's mode as a shape, named on hover: ⊘ off, ? ask first, ↻ automatic, ↗ on request, ⌂ local. */
+const STATE_MARK: Record<SafetyServiceOut['state'], string> = {off: '⊘', ask_first: '?', automatic: '↻', on_request: '↗', local: '⌂'};
 
 export const bytesInWords = (n: number): string => (n >= 1e9 ? `${(n / 1e9).toFixed(1)} GB` : n >= 1e6 ? `${(n / 1e6).toFixed(1)} MB` : n >= 1e3 ? `${Math.round(n / 1e3)} KB` : `${n} B`);
 
@@ -58,10 +63,32 @@ function storeFigure(s: SafetyStoreOut): string {
   return '';
 }
 
+/** A store's figure as the card shows it: the number big, its unit, and the rest of the line small. */
+export function storeParts(s: SafetyStoreOut): [string, string, string] {
+  const n = (s.count ?? 0).toLocaleString();
+  if (s.id === 'records') return [n, s.count === 1 ? 'record' : 'records', s.count_note ?? ''];
+  if (s.id === 'documents') return [n, s.count === 1 ? 'file' : 'files', bytesInWords(s.bytes ?? 0)];
+  if (s.id === 'keys') return [n, s.count_note ?? 'set', ''];
+  if (s.id === 'log') return [n, s.count === 1 ? 'event' : 'events', ''];
+  if (s.id === 'backups') return s.count ? [n, 'downloaded from here', ''] : ['None', 'made from here yet', ''];
+  if (s.id === 'ai') return [s.where, '', ''];
+  return ['', '', storeFigure(s)];
+}
+
 /** A service's own requests in the log: an outside AI's rows carry their provider ("ai:…"). */
 const ofService = (id: string) => (r: OutboundRequestOut) => (id === 'ai' ? r.service.startsWith('ai') : r.service === id);
 
 const inBackups = (s: SafetyStoreOut): string => (s.in_backups === true ? 'In every backup ✓' : s.in_backups === false ? 'Not in backups' : '');
+
+/** The key this computer signs evidence packs with: its fingerprint, to read out to whoever receives a pack. */
+function SigningKey(): ReactElement {
+  const key = useQuery(getSigningKeyOptions()).data;
+  return <article className="sd-card" aria-label="Pack signing key">
+    <p className="sd-eyebrow">Pack signing key</p>
+    <h3>{key?.fingerprint ? <code className="sd-fp">{key.fingerprint}</code> : 'Made with the first evidence pack'}</h3>
+    <p><Reveal detail="Each evidence pack’s list of files is signed with this computer’s key. Give this fingerprint to whoever receives a pack, so they can tell it was yours. The key never leaves this computer and is not in a case backup."><span>Read it out to whoever gets a pack</span></Reveal></p>
+  </article>;
+}
 
 export function SafetyScreen({investigationId, caseName, active = true}: {investigationId: string; caseName?: string; active?: boolean}): ReactElement {
   const [period, setPeriod] = useState<Period>('7d');
@@ -115,11 +142,10 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
   return <div className="sd" data-checking={query.isFetching || undefined}>
     <header className="sd-head">
       <div>
-        <h2 className="sd-title">What lives on <em>this computer</em>, and what leaves it</h2>
-        <p className="sd-sub">{caseName ? `${caseName} · ` : ''}{data.exposure}{stale}</p>
+        <h2 className="sd-title"><Reveal detail={`${caseName ? `${caseName} · ` : ''}${data.exposure}${stale}`}><span>What lives on <em>this computer</em>, and what leaves it</span></Reveal></h2>
       </div>
       <span className={`sd-chip${nothingLeft ? '' : ' sd-chip-out'}`}>{nothingLeft ? '◉ no requests logged in this period' : `↗ ${t.requests_left} left in this period`}</span>
-      <button type="button" className="sd-btn sd-hide" onClick={hideScreen} title="Cover the screen at once (⇧Esc)">◐ Hide screen</button>
+      <Reveal tabbable={false} detail="Cover the screen at once (⇧Esc)."><button type="button" className="sd-btn sd-hide" onClick={hideScreen}>◐ Hide screen</button></Reveal>
     </header>
 
     <div className="sd-grid">
@@ -140,32 +166,40 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
           <div className="sd-computer" role="group" aria-label="This computer, local only">
             <p className="sd-eyebrow">This computer · local only</p>
             <ul className="sd-stores">
-              {data.stores.map(s => <li key={s.id} className="sd-store" tabIndex={0} title={s.where}>
-                <span className="sd-mark" aria-hidden="true">{STORE_MARK[s.id]}</span>
-                <strong>{s.name}</strong>
-                <span>{storeFigure(s)}</span>
-                <span className="sd-where">{s.where}</span>
-                {s.warning ? <span className="sd-warn">▲ {s.warning}</span> : <span className="sd-where">{inBackups(s)}</span>}
-              </li>)}
+              {/* The figure shows; where it lives and whether backups hold it are revealed on the store. A warning stays. */}
+              {/* Each store is a titled card with its number big (fill the space); the rest of its line is small. */}
+              {data.stores.map(s => { const [big, unit, rest] = storeParts(s); return <li key={s.id} className={`sd-store sd-store-${s.id}`}>
+                <span className="sd-store-head">
+                  <span className={`sd-mark${s.id === 'ai' ? ' sd-mark-ai' : ''}`} aria-hidden="true">{STORE_MARK[s.id]}</span>
+                  <Reveal detail={<><span className="rv-row rv-mono">{s.where}</span>{inBackups(s) && <span className="rv-row">{inBackups(s)}</span>}</>}><strong>{s.name}</strong></Reveal>
+                  {s.in_backups === true && !s.warning && <span className="sd-inbk" aria-hidden="true">⟲</span>}
+                </span>
+                <span className="sd-fig"><b>{big}</b>{unit ? ` ${unit}` : ''}</span>
+                {rest ? <span className="sd-rest">{rest}</span> : null}
+                {s.warning ? <span className="sd-warn">▲ {s.warning}</span> : null}
+              </li>; })}
             </ul>
           </div>
           <ul className="sd-services" aria-label="Services this case can reach">
             {data.services.map(s => {
               const line = s.sent_count ? `${s.sends.join(', ')} · ${s.sent_count}` : s.where === 'inside' ? '' : s.state === 'off' ? 'nothing sent' : 'never used';
+              // The line is labelled only when something went down it (or it is blocked); an unused line is faint.
               const last = card === s.id ? (data.outbound ?? []).filter(ofService(s.id)).slice(0, 3) : [];
-              return <li key={s.id} className={`sd-service sd-${s.state}${only === s.id ? ' picked' : ''}${pulsing.includes(s.id) ? ' sd-pulse' : ''}`}
+              return <li key={s.id} className={`sd-service sd-${s.state}${s.sent_count ? ' sd-used' : ''}${only === s.id ? ' picked' : ''}${pulsing.includes(s.id) ? ' sd-pulse' : ''}`}
                 onPointerEnter={() => point(s.id)} onPointerLeave={() => point(null)} onFocus={() => point(s.id)}
                 onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) point(null); }}>
-                <span className="sd-line" aria-hidden="true">{s.blocked_note && !s.sent_count ? <i>✕ blocked</i> : <i>{line}</i>}</span>
+                <span className="sd-line" aria-hidden="true">{s.blocked_note && !s.sent_count ? <i>✕ blocked</i> : s.sent_count ? <i>{line}</i> : null}</span>
                 <button type="button" className="sd-box" aria-pressed={only === s.id} aria-describedby={card === s.id ? `sd-card-${s.id}` : undefined}
                   onClick={() => setOnly(only === s.id ? null : s.id)}
                   aria-label={`${s.name}: ${STATE[s.state]}. ${line || s.state_note}. ${s.sent_count ? 'Show its requests in the log.' : ''}`}>
                   <strong>{s.name}</strong>
-                  <span>{s.about}</span>
-                  <span className="sd-state" title={s.blocked_note ?? s.state_note}>{STATE[s.state]}</span>
+                  {/* The mode is its shape; its name, what the service is and its note are in the card on hover or focus. */}
+                  <span className="sd-state" aria-hidden="true">{STATE_MARK[s.state]}</span>
+                  {s.about && s.about !== 'None' ? <span className="sd-about" aria-hidden="true">{s.about}</span> : null}
                 </button>
                 {card === s.id ? <div className="sd-card-hover" role="tooltip" id={`sd-card-${s.id}`}>
                   <p className="sd-eyebrow">{s.name} · {STATE[s.state].toLowerCase()}</p>
+                  {s.about && <p>{s.about}</p>}
                   <p>{s.blocked_note ?? s.state_note}</p>
                   {last.length ? <ol>{last.map(r => <li key={r.id}><span className="sd-time">{shortStamp(r.at)}</span> <q>{r.value}</q> <span>{r.kind}</span></li>)}</ol>
                     : <p className="sd-quiet">Nothing sent to it in this period.</p>}
@@ -174,7 +208,7 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
             })}
           </ul>
         </div>
-        <p className="sd-foot">Point at a line for its requests; press a service to filter the log to it.</p>
+        <p className="sd-foot"><Reveal label="Using the services" detail="A bright line has carried requests; a faint one has carried none in this period; a dotted one is off. Point at a line for its requests; press a service to filter the log to it."><span aria-hidden="true">ⓘ</span></Reveal></p>
         <table className="sd-twin">
           <caption>What lives where, and what can leave</caption>
           <thead><tr><th>Store</th><th>Where</th><th>Size</th><th>In backups</th></tr></thead>
@@ -184,39 +218,47 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
         </table>
       </section>
 
-      <section className="sd-panel sd-log" aria-label="Outbound log">
-        <p className="sd-eyebrow">Outbound log · append-only</p>
+      <div className="sd-right">
+      <YourSafety investigationId={investigationId}/>
+      <section className={`sd-panel sd-log${rows.length ? '' : ' sd-log-empty'}`} aria-label="Outbound log">
+        <p className="sd-eyebrow">Outbound log <Reveal label="Append-only" detail="Append-only: nothing in it can be changed or removed."><span aria-hidden="true">🔒</span></Reveal></p>
         <h3 className="sd-h3">What left, word for word</h3>
         <div className="sd-logbar">
-          <select aria-label="Service" value={only ?? ''} onChange={e => setOnly(e.target.value || null)}>
+          {/* With nothing in the log there is nothing to filter: the bar holds the empty line instead (one row, not three). */}
+          {data.outbound_total > 0 || only ? <select aria-label="Service" value={only ?? ''} onChange={e => setOnly(e.target.value || null)}>
             <option value="">All services</option>
             {data.services.filter(s => s.where === 'outside' || s.sent_count > 0).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-          <span className="sd-count">{rows.length} of {data.outbound_total}</span>
+          </select> : null}
+          {rows.length ? <span className="sd-count">{rows.length} of {data.outbound_total}</span>
+            : <p className="sd-quiet sd-empty">{only ? 'Nothing has been sent to that service in this period.' : 'Nothing has left this computer in this period.'}
+              {' '}<Reveal label="What appears here" detail="Each request that leaves this computer: when, to which service, the exact value sent (a name, an address, a search), why, and whether you or an automatic check started it."><span aria-hidden="true">ⓘ</span></Reveal></p>}
           <button type="button" className="sd-btn" disabled={!rows.length} onClick={() => {
             const blob = new Blob([logCsv(rows)], {type: 'text/csv'});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `outbound-log-${investigationId}.csv`; a.click(); URL.revokeObjectURL(a.href);
           }}>Export log</button>
         </div>
-        {rows.length === 0 ? <p className="sd-quiet">{only ? 'Nothing has been sent to that service in this period.' : 'Nothing has left this computer in this period.'}</p>
+        {rows.length === 0 ? null
           : <ol className="sd-rows" tabIndex={0} aria-label="Requests, newest first">
+            {/* Time, service and value show; the kind, why and who started it are revealed on the value. A failure stays
+                visible, and a request that stayed on this computer is the ⌂ mark. */}
             {rows.map(r => <li key={r.id} className={r.leaves_computer ? '' : 'inside'}>
               <span className="sd-time">{shortStamp(r.at)}</span>
               <span className="sd-svc">{r.service_name}</span>
-              <q className="sd-value">{r.value}</q>
-              <span className="sd-why">{r.kind} · {r.reason || 'no reason recorded'} · {r.actor === 'you' ? 'you started it' : 'automatic'}
-                {r.outcome === 'failed' && ' · ✕ failed on the way'}{!r.leaves_computer && ' · stayed on this computer'}</span>
+              <Reveal detail={`${r.kind} · ${r.reason || 'no reason recorded'} · ${r.actor === 'you' ? 'you started it' : 'automatic'}${!r.leaves_computer ? ' · stayed on this computer' : ''}`}>
+                <q className="sd-value">{r.value}</q></Reveal>
+              {(r.outcome === 'failed' || !r.leaves_computer) && <span className="sd-why">{r.outcome === 'failed' && <b className="sd-failed">✕ failed on the way</b>}
+                {!r.leaves_computer && <Reveal label="Stayed on this computer" detail="Stayed on this computer"><span aria-hidden="true"> ⌂</span></Reveal>}</span>}
             </li>)}
           </ol>}
       </section>
+      </div>
 
       <section className="sd-cards" aria-label="Keep it safe">
         <article className="sd-card">
-          <p className="sd-eyebrow">Backup</p>
+          <p className="sd-eyebrow"><Reveal detail="Records, documents and history in one file. Restore makes a separate case; never merges."><span>Backup</span></Reveal></p>
           <h3>{data.backup.last_backup_at ? `Last backup ${ago(data.backup.last_backup_at)}` : 'No backup made from here yet'}</h3>
-          {data.backup.bytes != null ? <p className="sd-kept" title={data.backup.sha256 ? `SHA-256 ${data.backup.sha256}` : undefined}>
-            {bytesInWords(data.backup.bytes)}{data.backup.sha256 ? ' · ✓ checksum kept' : ''}</p> : null}
-          <p>Records, documents and history in one file. Restore makes a separate case; never merges.</p>
+          {data.backup.bytes != null ? <p className="sd-kept">{bytesInWords(data.backup.bytes)}{data.backup.sha256
+            ? <> · <Reveal detail={<span className="rv-mono">SHA-256 {data.backup.sha256}</span>}><span>✓ checksum kept</span></Reveal></> : ''}</p> : null}
           <p className="sd-warn">{data.backup.encrypted ? '✓ Encrypted' : '▲ Not encrypted: keep it safe'}</p>
           <div className="sd-btns">
             <button type="button" className="sd-btn primary" onClick={() => go('backup-restore')}>Back up now</button>
@@ -226,19 +268,20 @@ export function SafetyScreen({investigationId, caseName, active = true}: {invest
         <article className="sd-card">
           <p className="sd-eyebrow">Who can reach it</p>
           <h3>{data.access.mode === 'local_only' ? 'Only this computer' : 'This computer and devices with a token'}</h3>
-          <p>{data.access.log_readable ? `${data.access.refused_24h} refused · 24 h` : 'The security log could not be read'}</p>
+          <p className={data.access.log_readable ? 'sd-kept' : ''}>{data.access.log_readable ? `${data.access.refused_24h} refused · 24 h` : 'The security log could not be read'}</p>
           <button type="button" className="sd-btn" onClick={() => go('access')}>Access settings</button>
         </article>
         <article className="sd-card">
           <p className="sd-eyebrow">Housekeeping</p>
           <h3>{data.housekeeping.stray_files === null || data.housekeeping.stray_files === undefined ? 'Could not check' : `${data.housekeeping.stray_files} stray ${data.housekeeping.stray_files === 1 ? 'file' : 'files'}`}</h3>
-          <p>{data.housekeeping.stray_bytes ? `${bytesInWords(data.housekeeping.stray_bytes)} no document points to. ` : ''}Kept until you decide.</p>
+          <p className="sd-kept">{data.housekeeping.stray_files == null ? '' : `${bytesInWords(data.housekeeping.stray_bytes ?? 0)} `}<Reveal detail="Files in the case folder that no document points to. Kept until you decide." label="About stray files"><span aria-hidden="true">ⓘ</span></Reveal></p>
           <button type="button" className="sd-btn" onClick={() => go('access')}>Look at them</button>
         </article>
+        <SigningKey/>
         <article className="sd-card sd-danger">
           <p className="sd-eyebrow">Delete this case</p>
           <h3>Remove from this computer</h3>
-          <p>See what goes first. Shared files stay. Cannot be undone.</p>
+          <p><Reveal detail="See what goes first. Shared files stay."><span>Cannot be undone.</span></Reveal></p>
           <button type="button" className="sd-btn danger" onClick={() => go('deletion')}>Preview deletion</button>
         </article>
       </section>

@@ -1,32 +1,40 @@
 'use client';
-// Claim verification workspace: claims stay separate from source material.
-// Open one to see its linked evidence, which canonical relationships rest on
-// that evidence, and its review history; attach evidence from the case's
-// pool as support, contradiction or context; record a review with a
-// rationale. Moved out of app/page.tsx (Foundation Fixes fix 3); the calls
-// and their reply checks are generated from the API schema (fix 2). Any
-// panel can ask for a claim to be opened through the shared store
-// (lib/workbench-store.ts); this panel opens it if it holds the claim.
+// Check › Claims: the claim verification workspace. Claims stay separate from source material. The case's claims are a
+// dense list on the left (status as colour, the claim, its confidence as a number); the open claim fills the right:
+// its evidence balance as large numbers, the evidence linked to it (stance as a line), the review form with the Done
+// rules, the review history, the canonical relationships that rest on it, and the case's evidence pool one click away
+// ("Attach evidence"). The calls and their reply checks are generated from the API schema. Any panel can ask for a
+// claim to be opened through the shared store (lib/workbench-store.ts); this panel opens it if it holds the claim.
+//
+// Shown by default: the counts, each claim's status colour, its words and its confidence when it has one, the open
+// claim's numbers and evidence. On hover or focus: the status words, grades, explanations, locators and notes.
+// Evidence a newer record replaces is marked superseded (./superseded.tsx): struck and faded, not counted; what
+// replaced it, why and who on hover, where the record that replaced it lights up in the list; Undo counts it again.
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {useEffect, useRef, useState} from 'react';
+import {Link2, Plus, Replace, Route, Search, Undo2, X} from 'lucide-react';
+import {useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
 import type {ChangeEvent, KeyboardEvent, ReactElement} from 'react';
 
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Slider} from '@/components/ui/slider';
-import {STATUS_WORDS, StatusChip} from '../../components/status';
+import {FamilyMark, StanceGlyph, StanceMark} from '../../components/network/marks';
+import {StatusChip} from '../../components/status';
 import type {ClaimStatus} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {
   getClaimReviewWorkspaceOptions, getClaimReviewWorkspaceQueryKey, listClaimsOptions, listClaimsQueryKey, listInvestigationEvidenceOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
-import {createClaimEndpoint, createClaimReview, linkClaimEvidenceEndpoint} from '../../lib/generated/sdk.gen';
+import {
+  createClaimEndpoint, createClaimReview, linkClaimEvidenceEndpoint, supersedeClaimEvidenceEndpoint, unsupersedeClaimEvidenceEndpoint,
+} from '../../lib/generated/sdk.gen';
 import type {ClaimOut, ClaimReviewWorkspaceOut, EvidencePoolRow} from '../../lib/generated/types.gen';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {WatchButton} from '../inbox/watch-button';
+import {SupersedeForm, supersededDetail} from './superseded';
 import './claims.css';
 
 /** The canonical relationships the page still holds, as far as this panel
@@ -48,29 +56,48 @@ const CLAIM_STATUSES = ['lead', 'unverified', 'supported', 'confirmed', 'dispute
 const EVIDENCE_GRADES = ['limited', 'medium', 'robust'] as const;
 const AGREEMENT_GRADES = ['low', 'medium', 'high'] as const;
 const UNGRADED = 'none';
+const STANCE_BUTTON: Record<Stance, string> = {supports: 'Supports', contradicts: 'Contradicts', context: 'Context'};
+// Each stance figure's name, revealed on it.
+const STANCE_NAME: Record<Stance, string> = {supports: 'supporting', contradicts: 'contradicting', context: 'context'};
+// The evidence pool can hold hundreds of records: the first ones show, the search finds the rest.
+const POOL_PAGE = 30;
 
 // The status grammar (docs/handoff/02_RULES.md): each claim status takes the shape of the state it stands for, so
-// every status shows a shape and its own word, never colour alone. The same mapping as the case home's Check module.
+// the colour, the shape (Settings › Appearance › Status marks) and the word all agree. The case home uses the same mapping.
 const CLAIM_SHAPE: Record<string, ClaimStatus> = {
   supported: 'supported', confirmed: 'supported', disputed: 'disputed', rejected: 'ruled_out', lead: 'unshown', unverified: 'unshown',
 };
+const SHAPE_WORD: Record<ClaimStatus, string> = {disputed: 'Disputed', unshown: 'Not yet shown', supported: 'Supported or confirmed', ruled_out: 'Ruled out'};
+const SHAPE_ORDER: ClaimStatus[] = ['disputed', 'unshown', 'supported', 'ruled_out'];
 const shapeOf = (status: string): ClaimStatus => CLAIM_SHAPE[status] ?? 'unshown';
 const statusWord = (status: string) => status.charAt(0).toUpperCase() + status.slice(1);
+const pct = (n: number): number => Math.round(n * 100);
 
 /** A status chip for one claim status: the grammar's mark and border, the claim's own word. */
 function ClaimStatusChip({status}: {status: string}): ReactElement {
   return <StatusChip status={shapeOf(status)} label={statusWord(status)}/>;
 }
 
-/** A status in running text: its mark, then its word. */
-function StatusMarked({status}: {status: string}): ReactElement {
-  const shape = shapeOf(status);
-  return <><span aria-hidden="true" className={`cl-mark cl-mark-${shape}`}>{STATUS_WORDS[shape].mark}</span>{status}</>;
-}
+const DONE_WORD = {met: 'Met', not_met: 'Not met', unknown: 'Cannot be checked here'} as const;
 
 /** A grade in words: "medium evidence, high agreement", or null when the claim has none. */
 export function gradeText(claim: {evidence_grade?: string | null; agreement_grade?: string | null}): string | null {
   return claim.evidence_grade && claim.agreement_grade ? `${claim.evidence_grade} evidence, ${claim.agreement_grade} agreement` : null;
+}
+
+// Words that say nothing about which evidence fits a claim.
+const STOP = new Set(['that', 'this', 'with', 'from', 'were', 'was', 'have', 'has', 'which', 'their', 'there', 'they', 'into', 'than', 'then', 'been', 'also', 'when', 'what', 'about']);
+/** A claim's telling words: four letters or more, lower case, without the common ones. */
+export function wordsOf(text: string): Set<string> {
+  return new Set((text.toLowerCase().match(/[\p{L}\p{N}$]{4,}/gu) ?? []).filter(w => !STOP.has(w)));
+}
+/** How many of the claim's telling words a piece of evidence holds. */
+export function overlap(words: Set<string>, text: string): number {
+  if (!words.size) return 0;
+  const there = wordsOf(text);
+  let n = 0;
+  for (const w of words) if (there.has(w)) n += 1;
+  return n;
 }
 
 // One empty list while the claims load, so the effect below sees the same value.
@@ -92,20 +119,33 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const [overrideReason, setOverrideReason] = useState('');
   const [reviewStatus, setReviewStatus] = useState('');
   const [createProblem, setCreateProblem] = useState('');
+  const [shapes, setShapes] = useState<Set<ClaimStatus>>(new Set());
+  const [typed, setTyped] = useState('');
+  // What is left to do (the overview's counts): one at a time, filtering the list with the status and the words.
+  const [need, setNeed] = useState<string | null>(null);
+  const q = useDeferredValue(typed.trim().toLowerCase());
+  const [attaching, setAttaching] = useState(false);
+  const [poolTyped, setPoolTyped] = useState('');
+  // The link whose superseded form is open, the call in flight, and the replacing record pointed at.
+  const [superseding, setSuperseding] = useState<string | null>(null);
+  const [supersedeBusy, setSupersedeBusy] = useState(false);
+  const [replacer, setReplacer] = useState<string | null>(null);
+  const poolQ = useDeferredValue(poolTyped.trim().toLowerCase());
+  const listRef = useRef<HTMLDivElement>(null);
 
   const path = {investigation_id: investigationId};
   const claimsQuery = useQuery({...listClaimsOptions({path}), enabled: Boolean(investigationId)});
   const evidenceQuery = useQuery({...listInvestigationEvidenceOptions({path}), enabled: Boolean(investigationId)});
   const claims: ClaimOut[] = claimsQuery.data ?? NO_CLAIMS;
-  const evidencePool: EvidencePoolRow[] = evidenceQuery.data ?? [];
+  const evidencePool: EvidencePoolRow[] = useMemo(() => evidenceQuery.data ?? [], [evidenceQuery.data]);
   const openChain = useWorkbenchStore(state => state.openChain);
   const selectedClaim = selectedId ? claims.find(c => c.id === selectedId) ?? null : null;
   const workspaceQuery = useQuery({...getClaimReviewWorkspaceOptions({path: {claim_id: selectedId ?? ''}}), enabled: Boolean(selectedClaim)});
   const workspace: ClaimReviewWorkspaceOut | null = selectedClaim ? workspaceQuery.data ?? null : null;
-  const claimEvidence = workspace?.evidence ?? [];
+  const claimEvidence = useMemo(() => workspace?.evidence ?? [], [workspace]);
 
-  // A new case starts with no claim open.
-  useEffect(() => { setSelectedId(null); setReviewStatus(''); }, [investigationId]);
+  // A new case starts with no claim open and nothing filtered.
+  useEffect(() => { setSelectedId(null); setReviewStatus(''); setShapes(new Set()); setTyped(''); setNeed(null); setAttaching(false); setSuperseding(null); }, [investigationId]);
 
   // Opening a claim (from the list here or from a dossier) starts the review
   // form from the claim's current status and confidence. Each request is
@@ -123,7 +163,36 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
     setEvidenceGrade(claim.evidence_grade ?? UNGRADED);
     setAgreementGrade(claim.agreement_grade ?? UNGRADED);
     setReviewStatus('');
+    setRationale('');
+    setOverrideReason('');
   }, [asked, claims]);
+
+  const counts = useMemo(() => {
+    const out = {disputed: 0, unshown: 0, supported: 0, ruled_out: 0} as Record<ClaimStatus, number>;
+    for (const c of claims) out[shapeOf(c.status)] += 1;
+    return out;
+  }, [claims]);
+  const shown = useMemo(() => {
+    const work = WORK.find(w => w.key === need);
+    return claims.filter(c => (!shapes.size || shapes.has(shapeOf(c.status))) && (!q || c.text.toLowerCase().includes(q)) && (!work || work.test(c)));
+  }, [claims, shapes, q, need]);
+  const filtering = Boolean(shapes.size || q || need);
+  const clearFilters = (): void => { setShapes(new Set()); setTyped(''); setNeed(null); };
+  const toggleShape = (s: ClaimStatus): void => setShapes(prev => {
+    const next = new Set(prev);
+    if (next.has(s)) next.delete(s); else next.add(s);
+    return next;
+  });
+
+  const onListKey = (e: KeyboardEvent<HTMLDivElement>): void => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const at = shown.findIndex(c => c.id === selectedId);
+    const next = shown[Math.min(shown.length - 1, Math.max(0, at + (e.key === 'ArrowDown' ? 1 : -1)))];
+    if (!next) return;
+    openClaim(next.id);
+    listRef.current?.querySelector<HTMLButtonElement>(`[data-claim="${next.id}"]`)?.focus();
+  };
 
   const createClaim = async () => {
     if (!investigationId || !newClaimText.trim()) return;
@@ -160,7 +229,7 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
       setRationale('');
       setOverrideReason('');
       const words = gradeText(updated);
-      setReviewStatus(`Recorded immutable review: ${updated.status} at ${Math.round(updated.confidence * 100)}% confidence${words ? `; ${words}` : ''}.`);
+      setReviewStatus(`Recorded immutable review: ${updated.status} at ${pct(updated.confidence)}% confidence${words ? `; ${words}` : ''}.`);
     } catch (error) {
       setReviewStatus(errorMessage(error, 'Could not record the review'));
     }
@@ -178,7 +247,37 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
     }
   };
 
+  // The reply is the claim's workspace as it now stands: its counts and Done rules leave the superseded record out.
+  const markSuperseded = async (linkId: string, reason: string | null, byEvidenceId: string | null) => {
+    if (!selectedClaim) return;
+    setSupersedeBusy(true);
+    try {
+      const reply = reason === null
+        ? await unsupersedeClaimEvidenceEndpoint({path: {claim_id: selectedClaim.id, link_id: linkId}, throwOnError: true})
+        : await supersedeClaimEvidenceEndpoint({path: {claim_id: selectedClaim.id, link_id: linkId}, body: {reason, by_evidence_id: byEvidenceId}, throwOnError: true});
+      queryClient.setQueryData(getClaimReviewWorkspaceQueryKey({path: {claim_id: selectedClaim.id}}), reply.data);
+      setSuperseding(null);
+      setReviewStatus(reason === null ? 'Counted again: the superseded mark is undone.' : 'Marked superseded: shown, no longer counted toward the claim.');
+    } catch (error) {
+      setReviewStatus(errorMessage(error, reason === null ? 'Could not undo the mark' : 'Could not mark it superseded'));
+    } finally {
+      setSupersedeBusy(false);
+    }
+  };
+
   const hasLink = (evidenceId: string, stance: Stance) => claimEvidence.some(row => row.evidence?.id === evidenceId && row.stance === stance);
+
+  // The pool, searched, the records that share the most words with the open claim first; what is already linked to
+  // it sinks to the end.
+  const claimText = selectedClaim?.text ?? '';
+  const pool = useMemo(() => {
+    const linked = new Set(claimEvidence.map(r => r.evidence?.id));
+    const words = wordsOf(claimText);
+    const rows = evidencePool.filter(r => !poolQ || [r.evidence.quote, r.evidence.notes, r.evidence.locator, r.source.title].some(t => (t ?? '').toLowerCase().includes(poolQ)))
+      .map(r => ({row: r, linked: linked.has(r.evidence.id), score: overlap(words, `${r.evidence.quote ?? ''} ${r.evidence.notes ?? ''} ${r.source.title}`)}));
+    rows.sort((a, b) => Number(a.linked) - Number(b.linked) || b.score - a.score);
+    return rows.map(r => r.row);
+  }, [evidencePool, poolQ, claimEvidence, claimText]);
 
   // The Done rules for the status chosen (backend app/services/claim_done.py): Supported and Confirmed need them met, or a written reason.
   const done = workspace && (claimStatus === 'supported' || claimStatus === 'confirmed') ? workspace.done[claimStatus] : null;
@@ -187,37 +286,171 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
   const statusLine = reviewStatus || (selectedClaim && workspaceQuery.isPending ? 'Loading claim review workspace…'
     : selectedClaim && workspaceQuery.isError ? errorMessage(workspaceQuery.error, 'Could not load the claim review workspace') : '');
 
-  return <Card className="card" id="claim-verification">
-    <CardHeader className="pb-3">
-      <CardTitle>Claim verification workspace</CardTitle>
-      <CardDescription>Claims stay separate from source material. Review the exact linked evidence, preserve whether each item supports, contradicts, or only contextualizes the claim, then explicitly set verification status and confidence.</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="searchrow">
-        <Input value={newClaimText} onChange={(e: ChangeEvent<HTMLInputElement>) => setNewClaimText(e.target.value)} onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') void createClaim(); }} placeholder="Write a testable factual claim…"/>
-        <Button onClick={createClaim} disabled={!newClaimText.trim()}>Add unverified claim</Button>
-      </div>
-      {createProblem && <p className="muted">{createProblem}</p>}
-      {claimsQuery.isError && <p className="muted">{errorMessage(claimsQuery.error, 'Could not load the claims')}</p>}
-      <div className="twocol">
-        <div>
-          {claims.length === 0 ? <p className="muted">No claims yet.</p> : claims.map(c => <button type="button" className={`finding cl-row cl-${shapeOf(c.status)}`} key={c.id} onClick={() => openClaim(c.id)}
-            aria-current={c.id === selectedId ? 'true' : undefined}>
-            <ClaimStatusChip status={c.status}/>
-            <strong>{c.text}</strong><small>{Math.round(c.confidence * 100)}% confidence{gradeText(c) ? ` · ${gradeText(c)}` : ''}</small>
-          </button>)}
+  const loading = claimsQuery.isPending && Boolean(investigationId);
+
+  return <div className="cw">
+    <header className="cw-head">
+      {/* Ony, 29 Oct: the screen's explanation is revealed on its count. */}
+      <h2 className="cw-count"><Reveal tabbable={false} describe={false} detail="Claims stay separate from source material. Review the exact linked evidence, preserve whether each item supports, contradicts, or only contextualizes the claim, then explicitly set verification status and confidence.">
+        <span><b>{loading ? '…' : claims.length}</b> <span>claims</span></span></Reveal></h2>
+      {/* The tally is also the filter: each status's colour and count; its word on reveal. */}
+      <div className="cw-tally" role="group" aria-label="Show claims by status">{SHAPE_ORDER.filter(s => counts[s]).map(s =>
+        <Reveal key={s} tabbable={false} describe={false} detail={<><b>{SHAPE_WORD[s]}</b><span className="rv-row">{counts[s]} claim{counts[s] === 1 ? '' : 's'} · click to show only these</span></>}>
+          <button type="button" className={`cw-tally-n t-${s}${shapes.has(s) ? ' on' : ''}`} aria-pressed={shapes.has(s)} aria-label={`${SHAPE_WORD[s]}: ${counts[s]}`}
+            onClick={() => toggleShape(s)}><i aria-hidden="true"/>{counts[s]}</button></Reveal>)}</div>
+      <label className="cw-search">
+        <Search size={16} aria-hidden="true"/>
+        <input type="search" value={typed} onChange={e => setTyped(e.target.value)} placeholder="Find a claim…" aria-label="Find a claim"/>
+        {typed && <button type="button" aria-label="Clear the search" onClick={() => setTyped('')}><X size={14} aria-hidden="true"/></button>}
+      </label>
+    </header>
+
+    <div className="cw-body">
+      <aside className="cw-left" aria-label="Claims">
+        <div className="cw-new">
+          <Plus size={16} aria-hidden="true"/>
+          <input value={newClaimText} onChange={(e: ChangeEvent<HTMLInputElement>) => setNewClaimText(e.target.value)}
+            onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') void createClaim(); }} placeholder="Write a testable factual claim…" aria-label="A new claim"/>
+          <button type="button" className="cw-btn pri" onClick={createClaim} disabled={!newClaimText.trim()}>Add unverified claim</button>
         </div>
-        <div>
-          {!selectedClaim ? <p className="muted">Choose a claim to inspect its evidence and verification state.</p> : <>
+        {createProblem && <p className="cw-muted" role="alert">{createProblem}</p>}
+        {claimsQuery.isError && <p className="cw-muted">{errorMessage(claimsQuery.error, 'Could not load the claims')}</p>}
+        {filtering && <p className="cw-showing"><b>{shown.length}</b> of {claims.length} <button type="button" className="cw-link" onClick={clearFilters}>Clear</button></p>}
+        <div className="cw-list" ref={listRef} onKeyDown={onListKey}>
+          {loading && <p className="cw-muted">Loading the claims…</p>}
+          {!loading && !claimsQuery.isError && claims.length === 0 && <div className="cw-none"><b>No claims yet.</b><span>Write the first one above: one fact, stated so evidence can prove or disprove it.</span></div>}
+          {claims.length > 0 && shown.length === 0 && <p className="cw-muted">Nothing matches. <button type="button" className="cw-link" onClick={clearFilters}>Clear the filters</button></p>}
+          {/* The confidence is a number and shows when there is one; its words and the IPCC grade are revealed on the row. */}
+          {/* A claim with no confidence and no grade has nothing to reveal, so it carries no card. */}
+          {shown.map(c => {
+            const row = <button type="button" data-claim={c.id} className={`cl-row cl-${shapeOf(c.status)}`} onClick={() => openClaim(c.id)}
+              aria-current={c.id === selectedId ? 'true' : undefined}>
+              <ClaimStatusChip status={c.status}/>
+              <strong>{c.text}</strong>
+              <small className={`cl-conf${c.confidence ? '' : ' none'}`}>{c.confidence ? `${pct(c.confidence)}%` : ''}</small>
+            </button>;
+            return c.confidence || gradeText(c) ? <Reveal key={c.id} tabbable={false} className="cl-row-wrap"
+              detail={`${pct(c.confidence)}% confidence${gradeText(c) ? ` · ${gradeText(c)}` : ''}`}>{row}</Reveal>
+              : <span key={c.id} className="cl-row-wrap">{row}</span>;
+          })}
+        </div>
+      </aside>
+
+      <section className="cw-right" aria-label={selectedClaim ? 'The open claim' : 'Claims overview'}>
+        {!selectedClaim ? <ClaimsOverview counts={counts} total={claims.length} onShape={s => setShapes(new Set([s]))} claims={claims} need={need} onNeed={setNeed}/> : <>
+          <header className="cw-detail-head">
             <div className="cl-head"><ClaimStatusChip status={selectedClaim.status}/><h4>{selectedClaim.text}</h4></div>
-            <p><Button variant="outline" size="sm" onClick={() => { openChain(selectedClaim.id); window.location.hash = 'chain-of-custody'; }}>
-              Chain of Custody: how this got here</Button>{' '}
-              <WatchButton investigationId={investigationId} recordType="claim" recordId={selectedClaim.id} className="ap-btn"/></p>
-            <div className="searchrow">
-              <Select value={claimStatus} onValueChange={setClaimStatus}>
-                <SelectTrigger className="w-auto"><SelectValue/></SelectTrigger>
-                <SelectContent>{CLAIM_STATUSES.map(status => <SelectItem value={status} key={status}>{status}</SelectItem>)}</SelectContent>
-              </Select>
+            <div className="cw-acts">
+              <button type="button" className="cw-btn" onClick={() => { openChain(selectedClaim.id); window.location.hash = 'chain-of-custody'; }}>
+                <Route size={15} aria-hidden="true"/> Chain of Custody</button>
+              <WatchButton investigationId={investigationId} recordType="claim" recordId={selectedClaim.id} className="cw-btn"/>
+            </div>
+          </header>
+
+          {/* The figures; each is named on reveal, and a zero is quiet. */}
+          {workspace && <div className="cw-nums">
+            <Reveal tabbable={false} describe={false} detail={<><b>{pct(selectedClaim.confidence)}% confidence</b>
+              <span className="rv-row">{gradeText(selectedClaim) ? `Graded: ${gradeText(selectedClaim)}` : 'Not graded yet'}</span></>}>
+              <span className={`cw-num${selectedClaim.confidence ? '' : ' zero'}`}><b>{pct(selectedClaim.confidence)}<small>%</small></b></span></Reveal>
+            {/* Counts by stance, each drawn in its stance's line and named on reveal. */}
+            <span className="cl-counts" role="img" aria-label={`${workspace.stance_counts.supports} supporting · ${workspace.stance_counts.contradicts} contradicting · ${workspace.stance_counts.context} context`}>
+              {(['supports', 'contradicts', 'context'] as const).map(k => <Reveal key={k} tabbable={false} describe={false}
+                detail={<><b>{workspace.stance_counts[k]} {STANCE_NAME[k]}</b>{k === 'supports' && <span className="rv-row">Grade the claim on the IPCC grid from this balance: evidence is limited, medium or robust by its type, amount, quality and consistency; agreement is low, medium or high by how far the evidence agrees.</span>}</>}>
+                <span className={`cw-num s-${k}${workspace.stance_counts[k] ? '' : ' zero'}`} aria-hidden="true"><b>{workspace.stance_counts[k]}</b><StanceGlyph stance={k} width={34}/></span></Reveal>)}</span>
+            {(workspace.superseded_count ?? 0) > 0 && <Reveal tabbable={false} describe={false}
+              detail={<><b>Superseded</b><span className="rv-row">Replaced by a newer record: shown struck below, not counted for or against the claim.</span></>}>
+              <span className="cw-num cl-gone-n"><b>{workspace.superseded_count}</b><span>superseded</span></span></Reveal>}
+            <Reveal tabbable={false} describe={false} detail={<b>From {workspace.source_count ?? 0} source{workspace.source_count === 1 ? '' : 's'}</b>}>
+              <span className={`cw-num cl-sources${workspace.source_count ? '' : ' zero'}`} role="img" aria-label={`From ${workspace.source_count ?? 0} source${workspace.source_count === 1 ? '' : 's'}`}>
+                <b>{workspace.source_count ?? 0}</b><SourcesIcon/></span></Reveal>
+          </div>}
+          {/* Sections with nothing in them are not drawn: one quiet line says what is empty. */}
+          {workspace && (claimEvidence.length === 0 || workspace.review_history.length === 0 || workspace.dependent_relationships.length === 0) &&
+            <p className="cw-quiet">
+              {claimEvidence.length === 0 && <span>No evidence is linked to this claim yet.</span>}
+              {workspace.review_history.length === 0 && <span>No review recorded yet.</span>}
+              {workspace.dependent_relationships.length === 0 && <Reveal detail="No canonical relationship currently depends on this claim's linked evidence."><span>Nothing rests on it.</span></Reveal>}
+              {claimEvidence.length === 0 && <button type="button" className={`cw-btn${attaching ? ' on' : ''}`} aria-expanded={attaching} onClick={() => setAttaching(v => !v)}>
+                <Link2 size={15} aria-hidden="true"/> Attach evidence</button>}
+            </p>}
+          {statusLine && <p className="cw-status" role="status">{statusLine}</p>}
+
+          {(claimEvidence.length > 0 || attaching) && <section className="cw-sec">
+            {claimEvidence.length > 0 && <h5 className="cw-sec-h">Linked evidence <span className="cw-sec-n">{claimEvidence.length}</span>
+              <button type="button" className={`cw-btn${attaching ? ' on' : ''}`} aria-expanded={attaching} onClick={() => setAttaching(v => !v)}>
+                <Link2 size={15} aria-hidden="true"/> Attach evidence</button></h5>}
+            {/* Each link's stance is its line (Chain of Custody's styles), named on reveal; locator and note on the quote. */}
+            {claimEvidence.length > 0 && <ol className="cw-evs">{claimEvidence.map(row => {
+              const gone = row.superseded ?? null;
+              const words = row.evidence?.quote || row.evidence?.notes || 'Evidence record';
+              const quote = <blockquote className="cw-quote">{gone ? <s>{words}</s> : words}</blockquote>;
+              const lit = Boolean(replacer && row.evidence?.id === replacer && !gone);
+              return <li className={`cl-ev cl-ev-${row.stance}${gone ? ' cl-ev-gone' : ''}${lit ? ' cl-ev-replacer' : ''}`} key={row.id}
+                onPointerEnter={gone?.by_evidence_id ? () => setReplacer(gone.by_evidence_id ?? null) : undefined}
+                onPointerLeave={gone?.by_evidence_id ? () => setReplacer(null) : undefined}>
+                <StanceMark stance={row.stance}/>
+                <div className="cl-ev-body">
+                  {gone || row.evidence?.locator || row.note ? <Reveal detail={<>
+                    {gone && supersededDetail(gone)}
+                    {row.evidence?.locator && <span className="rv-row">Exact locator: {row.evidence.locator}</span>}
+                    {row.note && <span className="rv-row">Reporter note: {row.note}</span>}
+                  </>}>{quote}</Reveal> : quote}
+                  {row.source?.title && <span className="cl-ev-src">{row.source.url ? <a href={row.source.url} target="_blank" rel="noreferrer">{row.source.title}</a> : row.source.title}</span>}
+                  {superseding === row.id && <SupersedeForm row={row} linked={claimEvidence} pool={pool} busy={supersedeBusy}
+                    onSave={(reason, by) => void markSuperseded(row.id, reason, by)} onCancel={() => setSuperseding(null)}/>}
+                </div>
+                <span className="cl-ev-acts">
+                  {gone && <Reveal tabbable={false} describe={false} detail="Undo: count it toward the claim again">
+                    <button type="button" className="cw-icon" aria-label="Undo superseded" disabled={supersedeBusy}
+                      onClick={() => void markSuperseded(row.id, null, null)}><Undo2 size={15} aria-hidden="true"/></button></Reveal>}
+                  <Reveal tabbable={false} describe={false} detail={gone ? 'Change what replaced it, or why' : 'Mark superseded by a newer record'}>
+                    <button type="button" className="cw-icon" aria-label={gone ? 'Change the superseded mark' : 'Mark superseded'} aria-expanded={superseding === row.id}
+                      onClick={() => setSuperseding(v => (v === row.id ? null : row.id))}><Replace size={15} aria-hidden="true"/></button></Reveal>
+                  <Reveal tabbable={false} describe={false} detail="Trace its provenance">
+                    <button type="button" className="cw-icon" aria-label="Trace provenance" onClick={() => openProvenance({
+                      title: selectedClaim.text, kind: `claim evidence: ${row.stance}`, sourceId: row.evidence?.source_id, sourceUrl: row.source?.url ?? undefined,
+                      locator: row.evidence?.locator ?? undefined, detail: row.evidence?.quote || row.evidence?.notes || undefined,
+                      acceptedRecordType: 'evidence', acceptedRecordId: row.evidence?.id,
+                    })}><Route size={15} aria-hidden="true"/></button></Reveal>
+                </span>
+              </li>;
+            })}</ol>}
+
+            {attaching && <div className="cw-pool">
+              <div className="cw-pool-bar">
+                <label className="cw-search sm"><Search size={15} aria-hidden="true"/>
+                  <input type="search" value={poolTyped} onChange={e => setPoolTyped(e.target.value)} placeholder={`Search ${evidencePool.length} evidence records…`} aria-label="Search the evidence pool"/></label>
+                <Input value={evidenceNote} onChange={(e: ChangeEvent<HTMLInputElement>) => setEvidenceNote(e.target.value)} placeholder="Optional reporter note for the next evidence link"/>
+              </div>
+              {evidencePool.length === 0 ? <p className="cw-muted">No evidence records are available in this investigation yet.</p>
+                : pool.length === 0 ? <p className="cw-muted">No evidence matches.</p> : <ul className="cw-pool-list">{pool.slice(0, POOL_PAGE).map(row => <li key={row.evidence.id} className="cw-pool-row">
+                  <div className="cw-pool-text">
+                    {row.evidence.locator ? <Reveal detail={`Exact locator: ${row.evidence.locator}`}><span className="cw-pool-quote">{row.evidence.quote || row.evidence.notes || 'Evidence record'}</span></Reveal>
+                      : <span className="cw-pool-quote">{row.evidence.quote || row.evidence.notes || 'Evidence record'}</span>}
+                    <span className="cl-ev-src">{row.source.title}</span>
+                  </div>
+                  <div className="cw-pool-acts">
+                    {/* Actions keep their words; each also carries its stance's line. */}
+                    {(['supports', 'contradicts', 'context'] as const).map(k => <button type="button" key={k} className="cw-stance" disabled={hasLink(row.evidence.id, k)} onClick={() => attachEvidence(row, k)}>
+                      <StanceGlyph stance={k} width={16}/>{STANCE_BUTTON[k]}{hasLink(row.evidence.id, k) ? ' ✓' : ''}</button>)}
+                    <Reveal tabbable={false} describe={false} detail="Trace its provenance">
+                      <button type="button" className="cw-icon" aria-label="Trace provenance" onClick={() => openProvenance({
+                        title: row.source.title, kind: 'evidence pool', sourceId: row.source.id, sourceUrl: row.source.url ?? undefined,
+                        locator: row.evidence.locator ?? undefined, detail: row.evidence.quote || row.evidence.notes || undefined,
+                        acceptedRecordType: 'evidence', acceptedRecordId: row.evidence.id,
+                      })}><Route size={15} aria-hidden="true"/></button></Reveal>
+                  </div>
+                </li>)}</ul>}
+              {pool.length > POOL_PAGE && <p className="cw-muted">{pool.length - POOL_PAGE} more: search to find them.</p>}
+            </div>}
+          </section>}
+
+          <section className="cw-sec">
+            <h5 className="cw-sec-h">Review</h5>
+            <div className="cw-form">
+              <StatusPicker value={claimStatus} current={selectedClaim.status} onChange={setClaimStatus}/>
+            </div>
+            <div className="cw-form">
               <Select value={evidenceGrade} onValueChange={setEvidenceGrade}>
                 <SelectTrigger className="w-auto" aria-label="Evidence"><SelectValue/></SelectTrigger>
                 <SelectContent>
@@ -232,7 +465,13 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
                   {AGREEMENT_GRADES.map(grade => <SelectItem value={grade} key={grade}>{`Agreement: ${grade}`}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <label>Confidence {Math.round(claimConfidence * 100)}% <Slider className="w-32" value={[claimConfidence]} min={0} max={1} step={0.05} onValueChange={(vals: number[]) => setClaimConfidence(vals[0])}/></label>
+              {/* The confidence is its figure; the slider under it sets it, and its name is revealed. */}
+              <Reveal tabbable={false} describe={false} detail="Confidence: how sure you are, from 0 to 100%">
+                <span className="cw-conf"><b className={claimConfidence ? '' : 'zero'}>{pct(claimConfidence)}<small>%</small></b>
+                  <Slider className="w-40" value={[claimConfidence]} min={0} max={1} step={0.05}
+                    onValueChange={(vals: number[]) => setClaimConfidence(vals[0])}/></span></Reveal>
+            </div>
+            <div className="cw-form">
               <Input value={rationale} onChange={(e: ChangeEvent<HTMLInputElement>) => setRationale(e.target.value)} placeholder="Required rationale for this review"/>
               <Button onClick={saveClaimReview} disabled={!rationale.trim() || blocked}>
                 {done && !done.met ? (overrideReason.trim() ? `Mark ${claimStatus} anyway` : `${claimStatus === 'confirmed' ? 'Confirmed' : 'Supported'} — ${done.left} check${done.left === 1 ? '' : 's'} left`) : 'Record review'}
@@ -241,77 +480,112 @@ export function ClaimsPanel({investigationId, relationships, onInspectRelationsh
             {done && <div className="done-list" data-testid="claim-done">
               <b>{claimStatus === 'confirmed' ? 'Confirmed' : 'Supported'} means</b>
               <ul>{done.rules.map(r => <li key={r.key} className={`done-${r.state}`}>
-                <span aria-hidden="true">{r.state === 'met' ? '✓' : r.state === 'not_met' ? '✕' : '○'}</span>
-                <span><b>{r.label}</b> <small>{r.state === 'unknown' ? 'cannot be checked here: ' : ''}{r.detail}</small></span>
+                {/* A publication gate: the rules stay; each rule's long detail is revealed on its shape. */}
+                <Reveal label={DONE_WORD[r.state]} detail={<><b>{DONE_WORD[r.state]}</b><span className="rv-row">{r.detail}</span></>}>
+                  <span aria-hidden="true">{r.state === 'met' ? '✓' : r.state === 'not_met' ? '✕' : '○'}</span></Reveal>
+                <span><b>{r.label}</b></span>
               </li>)}</ul>
               {!done.met && <label className="done-override">Mark it anyway, because…
                 <Input value={overrideReason} onChange={(e: ChangeEvent<HTMLInputElement>) => setOverrideReason(e.target.value)}
                   placeholder="Some true facts have one source. Say why this one can stand; the reason is kept with the review."/></label>}
             </div>}
-            {statusLine && <p className="muted">{statusLine}</p>}
-            {workspace && <>
-              <div className="candidate">
-                <b>Evidence balance</b>
-                <div>{workspace.stance_counts.supports} supporting · {workspace.stance_counts.contradicts} contradicting · {workspace.stance_counts.context} context</div>
-                <div>From {workspace.source_count ?? 0} source{workspace.source_count === 1 ? '' : 's'}</div>
-                <small>Grade the claim on the IPCC grid from this: evidence is limited, medium or robust by its type, amount, quality and
-                  consistency; agreement is low, medium or high by how far the evidence agrees.</small>
-              </div>
-              <h4>Dependent canonical relationships</h4>
-              {workspace.dependent_relationships.length === 0 ? <p className="muted">No canonical relationship currently depends on this claim&apos;s linked evidence.</p> : workspace.dependent_relationships.map(dep => {
-                const rel = relationships.find(r => r.id === dep.id);
-                const trace = () => openProvenance({title: selectedClaim.text, kind: 'claim-dependent relationship', traceRecordType: 'relationship', acceptedRecordId: dep.id});
-                return <div className="candidate" key={dep.id}>
-                  <b>{rel ? `${rel.source.caption} → ${rel.target.caption}` : `Relationship ${dep.id}`}</b>
-                  <div>{rel?.schema || 'FollowTheMoney relationship'} · {dep.evidence_ids.length} linked evidence record(s)</div>
-                  <Button onClick={() => rel ? onInspectRelationship(rel.id) : trace()}>Inspect relationship</Button>
-                  <Button onClick={trace}>Trace relationship</Button>
-                </div>;
-              })}
-              <h4>Immutable review history</h4>
-              {workspace.review_history.length === 0 ? <p className="muted">No reporter review has been recorded yet.</p> : workspace.review_history.map(event => <div className="statement" key={event.id}>
-                <b><StatusMarked status={event.from_status}/> → <StatusMarked status={event.to_status}/></b> · {Math.round(event.from_confidence * 100)}% → {Math.round(event.to_confidence * 100)}%
-                {(event.to_evidence_grade || event.from_evidence_grade) && <span> · {gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
-                <div>{event.rationale}</div>
-                {event.override_reason && <div className="done-overridden">Marked without: {(event.unmet_rules ?? []).join(', ')}. Reason: {event.override_reason}</div>}
-                {event.created_at && <small>{apiTime(event.created_at).toLocaleString()}</small>}
-              </div>)}
-            </>}
-            <h4>Linked evidence</h4>
-            {claimEvidence.length === 0 ? <p className="muted">No evidence is linked to this claim yet.</p> : claimEvidence.map(row => <div className="candidate" key={row.id}>
-              <b>{row.stance}</b>{row.source?.title && <span> · {row.source.title}</span>}
-              <div>{row.evidence?.quote || row.evidence?.notes || 'Evidence record'}</div>
-              {row.evidence?.locator && <small>Exact locator: {row.evidence.locator}</small>}
-              {row.note && <div><small>Reporter note: {row.note}</small></div>}
-              {row.source?.url && <div><a href={row.source.url} target="_blank" rel="noreferrer">Open source</a></div>}
-              <Button onClick={() => openProvenance({
-                title: selectedClaim.text, kind: `claim evidence: ${row.stance}`, sourceId: row.evidence?.source_id, sourceUrl: row.source?.url ?? undefined,
-                locator: row.evidence?.locator ?? undefined, detail: row.evidence?.quote || row.evidence?.notes || undefined,
-                acceptedRecordType: 'evidence', acceptedRecordId: row.evidence?.id,
-              })}>Trace provenance</Button>
-            </div>)}
-            <h4>Investigation evidence pool</h4>
-            <p className="muted">Attach accepted evidence without changing the claim&apos;s verification status automatically. The backend rejects cross-investigation links and treats an identical claim/evidence/stance link idempotently.</p>
-            <Input value={evidenceNote} onChange={(e: ChangeEvent<HTMLInputElement>) => setEvidenceNote(e.target.value)} placeholder="Optional reporter note for the next evidence link"/>
-            {evidencePool.length === 0 ? <p className="muted">No evidence records are available in this investigation yet.</p> : evidencePool.map(row => <div className="candidate" key={row.evidence.id}>
-              <b>{row.source.title}</b>
-              <div>{row.evidence.quote || row.evidence.notes || 'Evidence record'}</div>
-              {row.evidence.locator && <small>Exact locator: {row.evidence.locator}</small>}
-              {row.source.url && <div><a href={row.source.url} target="_blank" rel="noreferrer">Open source</a></div>}
-              <Button onClick={() => openProvenance({
-                title: row.source.title, kind: 'evidence pool', sourceId: row.source.id, sourceUrl: row.source.url ?? undefined,
-                locator: row.evidence.locator ?? undefined, detail: row.evidence.quote || row.evidence.notes || undefined,
-                acceptedRecordType: 'evidence', acceptedRecordId: row.evidence.id,
-              })}>Trace provenance</Button>
-              <div>
-                <Button disabled={hasLink(row.evidence.id, 'supports')} onClick={() => attachEvidence(row, 'supports')}>Supports{hasLink(row.evidence.id, 'supports') ? ' ✓' : ''}</Button>
-                <Button disabled={hasLink(row.evidence.id, 'contradicts')} onClick={() => attachEvidence(row, 'contradicts')}>Contradicts{hasLink(row.evidence.id, 'contradicts') ? ' ✓' : ''}</Button>
-                <Button disabled={hasLink(row.evidence.id, 'context')} onClick={() => attachEvidence(row, 'context')}>Context{hasLink(row.evidence.id, 'context') ? ' ✓' : ''}</Button>
-              </div>
-            </div>)}
+          </section>
+
+          {workspace && <>
+            {workspace.review_history.length > 0 && <section className="cw-sec">
+              <h5 className="cw-sec-h">Review history <span className="cw-sec-n">{workspace.review_history.length}</span></h5>
+              {/* The status shapes and the rationale show; the words, confidences, grades and time are revealed on the rationale. */}
+              {<ol className="cw-hist">{workspace.review_history.map(event => <li key={event.id}>
+                <span className="cl-move"><ClaimStatusChip status={event.from_status}/><span aria-hidden="true">→</span><ClaimStatusChip status={event.to_status}/></span>
+                <div>
+                  <Reveal detail={<>
+                    <span className="rv-row">{event.from_status} → {event.to_status}</span>
+                    <span className="rv-row">{pct(event.from_confidence)}% → {pct(event.to_confidence)}%</span>
+                    {(event.to_evidence_grade || event.from_evidence_grade) && <span className="rv-row">{gradeText({evidence_grade: event.from_evidence_grade, agreement_grade: event.from_agreement_grade}) ?? 'not graded'} → {gradeText({evidence_grade: event.to_evidence_grade, agreement_grade: event.to_agreement_grade}) ?? 'not graded'}</span>}
+                    {event.created_at && <span className="rv-row">{timeWords(event.created_at)}</span>}
+                  </>}><div>{event.rationale}</div></Reveal>
+                  {event.override_reason && <div className="done-overridden">Marked without: {(event.unmet_rules ?? []).join(', ')}. Reason: {event.override_reason}</div>}
+                </div>
+              </li>)}</ol>}
+            </section>}
+
+            {workspace.dependent_relationships.length > 0 && <section className="cw-sec">
+              <h5 className="cw-sec-h">Relationships resting on it <span className="cw-sec-n">{workspace.dependent_relationships.length}</span></h5>
+              {<ul className="cw-rels">{workspace.dependent_relationships.map(dep => {
+                  const rel = relationships.find(r => r.id === dep.id);
+                  const trace = () => openProvenance({title: selectedClaim.text, kind: 'claim-dependent relationship', traceRecordType: 'relationship', acceptedRecordId: dep.id});
+                  return <li key={dep.id}>
+                    <span className="cl-rel"><FamilyMark schema={rel?.schema}/>
+                      <Reveal detail={`${rel?.schema || 'FollowTheMoney relationship'} · ${dep.evidence_ids.length} linked evidence record(s)`}>
+                        {rel ? `${rel.source.caption} → ${rel.target.caption}` : `Relationship ${dep.id}`}</Reveal></span>
+                    <button type="button" className="cw-btn" onClick={() => rel ? onInspectRelationship(rel.id) : trace()}>Inspect relationship</button>
+                    <button type="button" className="cw-btn" onClick={trace}>Trace relationship</button>
+                  </li>;
+                })}</ul>}
+            </section>}
           </>}
-        </div>
-      </div>
-    </CardContent>
-  </Card>;
+        </>}
+      </section>
+    </div>
+  </div>;
+}
+
+/** What is left to do on the case's claims (beyond the status bars above), each a count that filters the list (Ony, 29 Oct: numbers show, what each
+ *  means on hover). A claim can be in more than one. */
+export const WORK: {key: string; label: string; detail: string; test: (c: ClaimOut) => boolean}[] = [
+  {key: 'ready', label: 'Near done', detail: 'Not yet shown, at 70% confidence or more: the nearest to Supported. Review them against the Done rules.',
+    test: c => shapeOf(c.status) === 'unshown' && c.confidence >= 0.7},
+  {key: 'low', label: 'Under 50%', detail: 'Not yet shown, under 50% confidence: they need evidence.', test: c => shapeOf(c.status) === 'unshown' && c.confidence < 0.5},
+  {key: 'ungraded', label: 'Not graded', detail: 'No IPCC grade (evidence and agreement) yet. Ruled-out claims are left out.',
+    test: c => !gradeText(c) && shapeOf(c.status) !== 'ruled_out'},
+  {key: 'lead', label: 'Leads', detail: 'Questions to follow, not yet claims a reader could check.', test: c => c.status === 'lead'},
+];
+
+/** No claim open: the case's claims at a glance, each status a bar as long as its share (a click shows only those), and
+ *  under it what is left to do, each a count that shows only those claims. */
+function ClaimsOverview({counts, total, onShape, claims, need, onNeed}: {counts: Record<ClaimStatus, number>; total: number; onShape: (s: ClaimStatus) => void;
+  claims: ClaimOut[]; need: string | null; onNeed: (key: string | null) => void}): ReactElement {
+  return <div className="cw-over">
+    <p className="cw-over-ask">Choose a claim to inspect its evidence and verification state.</p>
+    {total > 0 && <ul className="cw-over-bars">{SHAPE_ORDER.filter(s => counts[s]).map(s => <li key={s}>
+      <button type="button" className={`cw-over-bar t-${s}`} onClick={() => onShape(s)} aria-label={`Show the ${counts[s]} ${SHAPE_WORD[s].toLowerCase()} claims`}>
+        <b>{counts[s]}</b><span className="cw-over-word">{SHAPE_WORD[s]}</span>
+        <span className="cw-over-track" aria-hidden="true"><i style={{width: `${(counts[s] / total) * 100}%`}}/></span>
+      </button></li>)}</ul>}
+    {total > 0 && <section className="cw-work" aria-label="Left to do">
+      <h5 className="cw-sec-h">Left to do</h5>
+      <div className="cw-work-tiles">{WORK.map(w => {
+        const n = claims.filter(w.test).length;
+        return <Reveal key={w.key} tabbable={false} describe={false} className="cw-work-rv" detail={<><b>{n} {w.label.toLowerCase()}</b><span className="rv-row">{w.detail}</span>
+          {n > 0 && <span className="rv-row">Click to show only these.</span>}</>}>
+          <button type="button" className={`cw-work-n w-${w.key}${n ? '' : ' zero'}${need === w.key ? ' on' : ''}`} disabled={!n} aria-pressed={need === w.key}
+            aria-label={`${w.label}: ${n}`} onClick={() => onNeed(need === w.key ? null : w.key)}><b>{n}</b><span>{w.label}</span></button></Reveal>;
+      })}</div>
+    </section>}
+  </div>;
+}
+
+const STATUS_WORD: Record<string, string> = {lead: 'Lead', unverified: 'Unverified', supported: 'Supported', confirmed: 'Confirmed', disputed: 'Disputed', rejected: 'Rejected'};
+
+/** The claim's status to record, as the app's status control: one choice per status, each its status colour and its
+ *  word (a control keeps its words); the one picked fills with its colour, the claim's status now is ringed. Arrows move. */
+function StatusPicker({value, current, onChange}: {value: string; current: string; onChange: (status: string) => void}): ReactElement {
+  const move = (e: KeyboardEvent<HTMLDivElement>): void => {
+    const by = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+    if (!by) return;
+    e.preventDefault();
+    const next = CLAIM_STATUSES[(CLAIM_STATUSES.indexOf(value) + by + CLAIM_STATUSES.length) % CLAIM_STATUSES.length];
+    onChange(next);
+    e.currentTarget.querySelector<HTMLButtonElement>(`[data-status="${next}"]`)?.focus();
+  };
+  return <div className="cw-statuses" role="radiogroup" aria-label="Status" onKeyDown={move}>{CLAIM_STATUSES.map(st =>
+    <button key={st} type="button" role="radio" aria-checked={value === st} tabIndex={value === st ? 0 : -1} data-status={st}
+      data-current={current === st || undefined} className={`t-${shapeOf(st)}`} onClick={() => onChange(st)}>
+      <i aria-hidden="true"/>{STATUS_WORD[st]}</button>)}</div>;
+}
+
+/** The number of sources, as a mark: two stacked pages. */
+function SourcesIcon(): ReactElement {
+  return <svg className="cl-src-icon" viewBox="0 0 20 20" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round">
+    <path d="M6 3.5h7l3 3v10H6z"/><path d="M13 3.5v3h3"/><path d="M4 6v12h9"/></svg>;
 }

@@ -8,18 +8,19 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
+import {Reveal} from '../../components/ui/reveal';
 import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormRootError} from '../../components/ui/form';
 import {errorMessage} from '../../lib/api-client';
-import {apiTime} from '../../lib/timestamps';
+import {apiTime, timeWords} from '../../lib/timestamps';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {
   checkConnectorKeyMutation, deleteConnectorCredentialMutation, getLookupSettingsOptions, getLookupSettingsQueryKey, saveConnectorCredentialMutation, settingsStatusQueryKey,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {LookupSourceOut} from '../../lib/generated/types.gen';
 
-const when = (iso: string): string => apiTime(iso).toLocaleString(undefined, {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+const when = timeWords;
 
 export const keySchema = z.object({
   credential: z.string()
@@ -30,18 +31,20 @@ export const keySchema = z.object({
 });
 type KeyIn = z.infer<typeof keySchema>;
 
+const STATE_MARK: Record<string, string> = {ok: '✓', saved: '●', none: '○'};
+
 /** Works, refused, not tried yet, or no key: from the newer of the source's last lookup and its last key check. */
-function state(s: LookupSourceOut): {cls: string; words: string; line: string} {
+export function keyState(s: LookupSourceOut): {cls: string; words: string; line: string} {
   if (!s.key_saved) return {cls: 'none', words: 'no key', line: 'Without one: only what the source gives without a key, if anything.'};
   const check = s.key_check;
   if (check && check.state !== 'not_supported' && check.state !== 'no_key' && (!s.last || apiTime(check.at) >= apiTime(s.last.at))) {
     const credits = check.credits != null ? ` ${check.credits.toLocaleString()} credits left.` : '';
-    if (check.state === 'works') return {cls: 'ok', words: '✓ works', line: `Checked ${when(check.at)}: the source accepts it.${credits}`};
+    if (check.state === 'works') return {cls: 'ok', words: 'works', line: `Checked ${when(check.at)}: the source accepts it.${credits}`};
     if (check.state === 'refused') return {cls: 'bad', words: '! refused', line: `Checked ${when(check.at)}: the source refused this key. Lookups to it fail until the key is replaced.`};
     return {cls: 'saved', words: 'unknown', line: `Checked ${when(check.at)}: ${check.detail}`};
   }
   if (s.last?.status === 'refused') return {cls: 'bad', words: '! refused', line: `The source refused this key on ${when(s.last.at)}. Lookups to it fail until the key is replaced.`};
-  if (s.last?.status === 'completed') return {cls: 'ok', words: '✓ works', line: `Last accepted ${when(s.last.at)}.`};
+  if (s.last?.status === 'completed') return {cls: 'ok', words: 'works', line: `Last accepted ${when(s.last.at)}.`};
   return {cls: 'saved', words: 'saved', line: 'Not used yet: the first lookup shows whether the source accepts it.'};
 }
 
@@ -58,17 +61,21 @@ function KeyCard({s, onChanged}: {s: LookupSourceOut; onChanged: () => void}): R
     setOpen(false);
     onChanged();
   }, 'Could not save the key.', {credential: 'credential'});
-  const st = state(s);
+  const st = keyState(s);
   return <section className="ap-pane st-key" aria-labelledby={`key-${s.key}`}>
-    <div className="st-key-top"><b id={`key-${s.key}`}>{s.label}</b><span className={`st-state st-state-${st.cls}`}>{st.words}</span></div>
-    {s.key_saved && <p className="st-slot">Key saved · never shown again</p>}
+    {/* The key's state is a colour (Ony, 29 Oct), its word and line revealed on it; a refused key is an alert and keeps its word. */}
+    <div className="st-key-top"><b id={`key-${s.key}`}>{s.label}</b>{st.cls === 'bad' ? <span className={`st st-always st-state st-state-${st.cls}`}>{st.words}</span>
+      : <Reveal label={st.words} detail={<><b>{st.words}</b> · {st.line}</>}><span className={`st st-state st-state-${st.cls}`}>
+        <span className="st-mark" aria-hidden="true">{STATE_MARK[st.cls]}</span><span className="st-word">{st.words}</span></span></Reveal>}</div>
+    {s.key_saved && <p className="st-slot"><Reveal label="Key saved" detail="Key saved · never shown again"><span aria-hidden="true">✓ ⚿</span></Reveal></p>}
     <dl className="st-dl">
       <dt>Goes to</dt><dd>{s.host || s.label}, with each lookup</dd>
       <dt>Unlocks</dt><dd>{s.kind}</dd>
       <dt>Last used</dt><dd>{s.last ? `${when(s.last.at)} · ${s.last.case}` : 'never'}</dd>
       <dt>Used by</dt><dd>{s.cases_this_month} case{s.cases_this_month === 1 ? '' : 's'} this month</dd>
     </dl>
-    <p className={`st-hint${st.cls === 'bad' ? ' st-warn' : ''}`}>{st.line}</p>
+    {/* The key's state line stays when something is wrong; otherwise it is revealed on the state. */}
+    {st.cls === 'bad' ? <p className="st-hint st-warn">{st.line}</p> : null}
     {open ? <Form {...form}>
       <form onSubmit={onSubmit} noValidate className="st-form">
         <FormField control={form.control} name="credential" render={({field}) => <FormItem>
@@ -84,8 +91,9 @@ function KeyCard({s, onChanged}: {s: LookupSourceOut; onChanged: () => void}): R
       </form>
     </Form> : <div className="st-acts">
       <button type="button" className={`ap-btn${st.cls === 'bad' ? ' p' : ''}`} onClick={() => setOpen(true)}>Replace</button>
-      <button type="button" className="ap-btn" disabled={check.isPending} title="Asks the source whether it accepts the key. No search is sent, and no name."
-        onClick={() => check.mutate({path: {provider: s.key}})}>{check.isPending ? 'Checking…' : 'Check the key'}</button>
+      <Reveal tabbable={false} detail="Asks the source whether it accepts the key. No search is sent, and no name.">
+        <button type="button" className="ap-btn" disabled={check.isPending}
+        onClick={() => check.mutate({path: {provider: s.key}})}>{check.isPending ? 'Checking…' : 'Check the key'}</button></Reveal>
       {removing ? <>
         <span className="st-hint">Remove the {s.label} key?</span>
         <button type="button" className="ap-btn" disabled={remove.isPending} onClick={() => remove.mutate({path: {provider: s.key}})}>Remove it</button>

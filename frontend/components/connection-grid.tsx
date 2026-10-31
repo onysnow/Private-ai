@@ -27,7 +27,10 @@ import {useState} from 'react';
 import type {CSSProperties, ReactElement} from 'react';
 
 import {connectionGrid} from '@/lib/network-layout';
-import {LINK, LINK_ORDER, PARTY, SWATCH} from '@/lib/viz-tokens';
+import {PartyMark} from './network/marks';
+import './network/network.css';
+import {Reveal} from './ui/reveal';
+import {LINK, LINK_ORDER, SWATCH} from '@/lib/viz-tokens';
 import type {Certainty, LinkFamily, PartyKind} from '@/lib/viz-tokens';
 
 type GridParty = {id: string; label: string; kind?: PartyKind};
@@ -57,18 +60,20 @@ export function ConnectionGrid({nodes, links, onLink}: Props): ReactElement {
     background: r === c ? HATCH : lit && (lit.row === r || lit.column === c) ? LIT : undefined,
   });
   const nameStyle = (on: boolean): CSSProperties => ({fontWeight: on ? 600 : 'normal', color: on ? SWATCH.ink : SWATCH.parchment});
+  // A party's kind is its icon (the network's vocabulary), named on reveal.
   const dot = (id: string) => { const kind = kindOf.get(id); return kind
-    ? <span aria-hidden style={{display: 'inline-block', width: 9, height: 9, borderRadius: '50%', background: PARTY[kind].ring, marginRight: 8, verticalAlign: 1}}/> : null; };
+    ? <span style={{marginRight: 8}}><PartyMark kind={kind} size={12} tabbable={false}/></span> : null; };
   return <div data-testid="connection-grid" style={{overflow: 'auto', maxHeight: 600}} onMouseLeave={() => setLit(null)}>
     <table aria-label="Connection grid" className="text-xs" style={{borderCollapse: 'collapse'}}>
       <thead><tr>
         <th scope="col" style={{verticalAlign: 'bottom', textAlign: 'right', padding: '0 10px 8px 0', fontWeight: 'normal', color: SWATCH.tan, whiteSpace: 'nowrap'}}>
           <span aria-hidden>From ↓ · To →</span><span className="sr-only">Party a link runs from</span>
         </th>
-        {grid.parties.map((p, c) => <th key={p.id} scope="col" title={p.label}
+        {/* A long name is cut short; the whole name is revealed on it. */}
+        {grid.parties.map((p, c) => <th key={p.id} scope="col"
           style={{verticalAlign: 'bottom', padding: '0 0 8px', width: CELL, minWidth: CELL, ...nameStyle(lit?.column === c)}}>
-          <span style={{writingMode: 'vertical-rl', transform: 'rotate(180deg)', whiteSpace: 'nowrap', display: 'inline-block', maxHeight: 190,
-            overflow: 'hidden', textOverflow: 'ellipsis'}}>{p.label}</span>
+          <Reveal tabbable={false} describe={false} detail={p.label}><span style={{writingMode: 'vertical-rl', transform: 'rotate(180deg)', whiteSpace: 'nowrap', display: 'inline-block', maxHeight: 190,
+            overflow: 'hidden', textOverflow: 'ellipsis'}}>{p.label}</span></Reveal>
         </th>)}
       </tr></thead>
       <tbody>{grid.parties.map((row, r) => <tr key={row.id}>
@@ -85,9 +90,10 @@ export function ConnectionGrid({nodes, links, onLink}: Props): ReactElement {
             + (contested ? ', contested' : unsure ? ', not yet supported' : '');
           return <td key={column.id} style={{...cellStyle(r, c), background: cellBackground(cellLinks.map(l => l.family ?? 'other'))}}
             onMouseEnter={() => setLit({row: r, column: c})}>
-            <button type="button" onClick={() => onLink?.(cellLinks[0].id)} onFocus={() => setLit({row: r, column: c})} title={label} aria-label={label}
+            <Reveal tabbable={false} describe={false} className="cg-cell" detail={label}>
+            <button type="button" onClick={() => onLink?.(cellLinks[0].id)} onFocus={() => setLit({row: r, column: c})} aria-label={label}
               style={{width: '100%', height: '100%', color: SWATCH.night, background: 'transparent', border: 0, cursor: 'pointer', fontWeight: 700,
-                outline: unsure ? `1.5px dashed ${SWATCH.night}` : undefined, outlineOffset: unsure ? -6 : undefined}}>{count > 1 ? count : ''}</button>
+                outline: unsure ? `1.5px dashed ${SWATCH.night}` : undefined, outlineOffset: unsure ? -6 : undefined}}>{count > 1 ? count : ''}</button></Reveal>
             {contested && <span aria-hidden style={{position: 'absolute', right: -5, top: -5, width: 14, height: 14, borderRadius: '50%', background: SWATCH.brick,
               color: SWATCH.ink, fontSize: 9, fontWeight: 700, lineHeight: '14px', textAlign: 'center', border: `1px solid ${SWATCH.card}`, zIndex: 1}}>!</span>}
           </td>;

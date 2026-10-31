@@ -22,7 +22,8 @@ describe('Settings sidebar', () => {
     render(<SettingsNav rows={rows} current="appearance" onGo={go}/>);
     const you = screen.getByRole('region', {name: 'You'});
     expect(within(you).getByRole('button', {name: 'Appearance: Case Night'})).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByText('Yours alone.')).toBeInTheDocument();
+    // The setting's note is revealed on the ⓘ under the sidebar.
+    expect(screen.getByRole('img', {name: 'About this setting'})).toHaveAccessibleDescription('Yours alone.');
     expect(screen.getByRole('link', {name: /Operator console/})).toHaveAttribute('href', '/console/');
     await userEvent.setup().click(screen.getByRole('button', {name: 'Keyboard: on'}));
     expect(go).toHaveBeenCalledWith('keyboard');

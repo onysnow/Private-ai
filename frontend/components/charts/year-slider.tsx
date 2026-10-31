@@ -8,6 +8,7 @@ import {useQuery} from '@tanstack/react-query';
 import type {ChangeEvent, ReactElement} from 'react';
 
 import {linkSpan, yearRange} from '../../lib/as-of';
+import {Reveal} from '../ui/reveal';
 import {getInvestigationGraphOptions, getInvestigationTimelineOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
@@ -26,7 +27,8 @@ export function YearSlider({investigationId}: {investigationId: string}): ReactE
   if (!range) return null;
   const year = asOf ?? range.to;
   return <div className="yr-slider" role="group" aria-label="Show the investigation as of a year">
-    <span className="yr-label">As of</span>
+    {/* What "as of" means is revealed on its label (Ony, 29 Oct). */}
+    <Reveal detail="The network, the money and the timeline show what held by the end of that year. Undated records always show."><span className="yr-label">As of</span></Reveal>
     <b className="yr-value" aria-live="polite">{asOf === null ? 'all time' : asOf}</b>
     <span className="yr-end">{range.from}</span>
     <input type="range" min={range.from} max={range.to} step={1} value={year} aria-label="Year"
@@ -34,6 +36,5 @@ export function YearSlider({investigationId}: {investigationId: string}): ReactE
       onChange={(e: ChangeEvent<HTMLInputElement>) => setAsOf(Number(e.target.value))}/>
     <span className="yr-end">{range.to}</span>
     <button type="button" className="cf-tool" onClick={() => setAsOf(null)} disabled={asOf === null}>All time</button>
-    <small>The network, the money and the timeline show what held by the end of that year. Undated records always show.</small>
   </div>;
 }

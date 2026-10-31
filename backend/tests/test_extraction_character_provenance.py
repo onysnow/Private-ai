@@ -29,7 +29,7 @@ def test_reviewed_extraction_preserves_exact_chunk_character_span():
     entity = next(c for c in candidates if c['candidate_type']=='entity' and c['payload']['caption']=='Alice Example')
     assert evidence['payload']['span'] == {'start_char':0,'end_char':len(text)}
     assert entity['payload']['span'] == {'start_char':0,'end_char':len('Alice Example')}
-    accepted = client.post(f"/api/extraction-candidates/{entity['id']}/review", json={'decision':'accept','note':'Verified'}).json()['record']
+    accepted = client.post(f"/api/extraction-candidates/{entity['id']}/review", json={'decision':'accept','note':'Verified','entity_schema':'Person'}).json()['record']
     lineage = client.get(f"/api/extraction-candidates/{entity['id']}/lineage").json()
     assert lineage['chunk']['candidate_span'] == {'start_char':0,'end_char':len('Alice Example')}
     prov = client.get('/api/provenance/extraction-lineage', params={'record_type':'entity','record_id':accepted['id']}).json()['lineage']

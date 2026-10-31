@@ -1,0 +1,9 @@
+/* Relationships (features/relationship-graph), to Ony's rule of 29 Oct: a link's family is its line, its role and
+   any alert show, the rest is revealed. The list's base look is in app/globals.css. */
+button.relEdge { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
+  color: var(--accent-1); font-size: 13px; border-radius: 6px; padding: 2px 4px; }
+button.relEdge:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+button.relEdge::before, button.relEdge::after { content: none; }
+.relAlert { color: var(--status-disputed); font-weight: 600; }
+.relDup { font: 600 11px var(--font-mono); color: var(--text-muted); }
+.relKind { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

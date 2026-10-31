@@ -60,8 +60,13 @@ describe('The lock screen', () => {
     await screen.findByText('Kestrel harbour case');
     expect(screen.queryByRole('dialog', {name: 'The app is locked'})).not.toBeInTheDocument();
     const {LOCKED_EVENT} = await import('../lib/api-client');
+    window.localStorage.setItem('sv-recent:inv-1', '[{"q":"Fernhill"}]');
+    window.localStorage.setItem('workbench.your-safety.inv-1', '{"plan":{"who":"my editor"}}');
     act(() => { window.dispatchEvent(new Event(LOCKED_EVENT)); });
     expect(await screen.findByRole('dialog', {name: 'The app is locked'})).toBeInTheDocument();
+    // Locking forgets the names searched for; the safety plan stays (DECISIONS_LOG 60).
+    expect(window.localStorage.getItem('sv-recent:inv-1')).toBeNull();
+    expect(window.localStorage.getItem('workbench.your-safety.inv-1')).not.toBeNull();
   });
 
   it('works as before when the server has no app lock', async () => {
@@ -123,6 +128,24 @@ describe('Settings › Your safety and People and access', () => {
     await userEvent.click(screen.getByRole('button', {name: 'It is encrypted'}));
     expect(await screen.findByText(/as you said/)).toBeInTheDocument();
     expect(api.lastBody('PUT /api/me/disk')).toEqual({answer: 'encrypted'});
+    // Why the disk matters is revealed on its state; Hide the screen sits with the passphrase's actions.
+    expect(screen.getByText('This computer’s disk is encrypted').closest('.rv')).toHaveAccessibleDescription(/operating system’s job/);
+    expect(screen.getByRole('button', {name: 'Hide the screen now'}).closest('.lk-status')).not.toBeNull();
+  });
+
+  it('shows how your name will read as you type it, and how many decisions stay “a person”', async () => {
+    mockApi({});
+    vi.resetModules();
+    const {useLockStore} = await import('../lib/app-lock');
+    const {NamePane} = await import('../features/lock/name-pane');
+    useLockStore.getState().set({...OPEN, name: '', unsigned_decisions: 214} as never);
+    render(<NamePane/>);
+    expect(screen.getAllByText('your name')).toHaveLength(3);
+    await userEvent.type(screen.getByLabelText('Your name'), 'Jo Okafor');
+    expect(screen.getAllByText('Jo Okafor')).toHaveLength(3);
+    expect(screen.getByText('214')).toBeInTheDocument();
+    // What happens to past decisions is revealed on the heading.
+    expect(screen.getByText('Your name, as it goes on your work').closest('.rv')).toHaveAccessibleDescription(/Past decisions keep the name/);
   });
 
   it('adds a person to this case with a one-time key, and says network access is off', async () => {
@@ -135,8 +158,10 @@ describe('Settings › Your safety and People and access', () => {
     const {QueryProvider} = await import('../lib/query-client');
     useLockStore.getState().set(OPEN as never);
     render(<QueryProvider><PeoplePane investigationId="inv-1" caseName="Kestrel harbour case" networkOn={false} onAccess={() => undefined}/></QueryProvider>);
-    expect(await screen.findByText('a person')).toBeInTheDocument();
-    expect(screen.getByText(/Network access is off/)).toBeInTheDocument();
+    // Why decisions read "a person", and what network access being off means, are revealed on them, not said at rest.
+    expect((await screen.findByText('a person')).closest('.rv')).toHaveAccessibleDescription('Decided before names were kept. They stay that way.');
+    expect(screen.queryByText(/before names were kept/, {selector: 'p'})).not.toBeInTheDocument();
+    expect(screen.getByText('Network access is off').closest('.rv')).toHaveAccessibleDescription(/Keys work only after you turn network access on/);
     await userEvent.type(screen.getByLabelText('Their name'), 'Jo Okafor');
     await userEvent.click(screen.getByRole('radio', {name: /Viewer/}));
     await userEvent.click(screen.getByRole('radio', {name: '90 days'}));

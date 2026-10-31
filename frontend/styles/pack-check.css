@@ -1,0 +1,103 @@
+/* Check a pack (mockup CHECK_4). */
+.pk { display: flex; flex-direction: column; gap: 12px; font-size: 13px; }
+.pk-lede { margin: 0; color: var(--text-muted); max-width: 70ch; }
+.pk-drop { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1.5px dashed color-mix(in srgb, var(--accent-1) 60%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--accent-1) 5%, transparent); cursor: pointer; position: relative; }
+.pk-drop.over { background: color-mix(in srgb, var(--accent-1) 14%, transparent); }
+.pk-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.pk-drop b { display: block; } .pk-drop small { color: var(--text-muted); }
+.pk-ico { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--accent-2); color: var(--accent-2); flex: none; }
+.pk-error { margin: 0; color: var(--status-disputed); }
+.pk-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 430px); gap: 14px; align-items: start; }
+@media (max-width: 980px) { .pk-grid { grid-template-columns: minmax(0, 1fr); } }
+.pk-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.pk-panel { padding: 13px 15px; border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow-panel); min-width: 0; }
+.pk-cap { margin: 0 0 8px; display: flex; gap: 8px; font: 500 10.5px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-1); }
+.pk-cap span { margin-left: auto; letter-spacing: .04em; text-transform: none; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.pk-seg button { border: 1px solid var(--line, rgba(127,127,127,.3)); background: transparent; border-radius: 8px; padding: 3px 10px; font: 600 12px var(--font-ui); color: var(--text-muted); }
+.pk-seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--text); }
+.pk-rows { list-style: none; margin: 0; padding: 0; }
+.pk-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) 110px; gap: 10px; align-items: center; padding: 7px 8px; border-bottom: 1px solid var(--line, rgba(127,127,127,.15)); }
+.pk-row.changed, .pk-row.missing { background: color-mix(in srgb, var(--status-disputed) 12%, transparent); border-radius: 8px; }
+.pk-mark { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font: 600 10px var(--font-mono); border: 1px solid currentColor; }
+.pk-row.as_made .pk-mark { color: var(--status-supported); } .pk-row.changed .pk-mark, .pk-row.missing .pk-mark { color: var(--status-disputed); } .pk-row.extra .pk-mark { color: var(--accent-1); }
+.pk-name { font: 500 11.5px var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-name small { display: block; font: 400 11px var(--font-ui); color: var(--text-muted); white-space: normal; }
+.pk-row code { font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-row.changed .pk-word, .pk-row.missing .pk-word { color: var(--status-disputed); } .pk-row.extra .pk-word { color: var(--accent-1); }
+.pk-seal.bad { border: 1px solid color-mix(in srgb, var(--status-disputed) 55%, transparent); background: color-mix(in srgb, var(--status-disputed) 10%, var(--surface-1)); }
+.pk-seal.ok { border: 1px solid color-mix(in srgb, var(--status-supported) 55%, transparent); }
+.pk-seal h2 { margin: 0 0 6px; font: 400 26px/1.2 var(--font-display); }
+.pk-counts { display: flex; gap: 18px; margin: 0 0 8px; }
+.pk-counts div { display: flex; flex-direction: column-reverse; } .pk-counts dt { font-size: 11.5px; color: var(--text-muted); } .pk-counts dd { margin: 0; font: 300 34px/1 var(--font-display); }
+.pk-note { margin: 6px 0 0; font-size: 12px; color: var(--text-muted); }
+.pk-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pk-cmp figure { margin: 0; } .pk-cmp figcaption { font: 500 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+.pk-pic { position: relative; display: block; } .pk-pic img { display: block; width: 100%; border-radius: 6px; }
+.pk-band { position: absolute; border: 2px solid var(--status-disputed); border-radius: 4px; background: color-mix(in srgb, var(--status-disputed) 18%, transparent); min-width: 6px; min-height: 6px; }
+.pk-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.pk-list li { display: flex; gap: 8px; font-size: 12.5px; } .pk-list b { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; font: 600 10px var(--font-mono); }
+.pk-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.pk-acts button { height: 30px; padding: 0 13px; border-radius: 8px; border: 1px solid var(--line, rgba(127,127,127,.35)); background: transparent; color: var(--text); font: 600 12px var(--font-ui); cursor: pointer; }
+.pk-acts button:hover { border-color: var(--accent-1); }
+.pk-sig { margin: 8px 0 0; display: flex; gap: 8px; font-size: 12.5px; }
+.pk-sig b { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; font: 600 10px var(--font-mono); }
+.pk-sig.valid b { color: var(--status-supported); } .pk-sig.invalid { color: var(--status-disputed); }
+/* Show only what matters (29 Oct): each row is its mark, its name and, when not as made, its word; the fingerprints on reveal. */
+.pk-row > .rv { min-width: 0; overflow: hidden; }
+.pk-row .pk-name { display: block; font-size: 12.5px; }
+/* With no pack yet (30 Oct): a large drop target, what the check does as three marks, the floor, and a way to try it. */
+.pk-start { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 14px; align-items: stretch; }
+@media (max-width: 980px) { .pk-start { grid-template-columns: minmax(0, 1fr); } }
+.pk-start > .pk-error { grid-column: 1 / -1; }
+.pk-drop.big { flex-direction: column; justify-content: center; gap: 12px; min-height: 380px; padding: 32px; border-width: 2px; border-radius: 18px; text-align: center; }
+.pk-drop.big .pk-ico { width: 72px; height: 72px; font-size: 32px; border-width: 1.5px; transition: transform .2s; }
+.pk-drop.big:hover .pk-ico, .pk-drop.big.over .pk-ico { transform: translateY(4px); }
+.pk-drop.big.busy .pk-ico { animation: pk-pulse 1.2s ease-in-out infinite; }
+@keyframes pk-pulse { 50% { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .pk-drop.big .pk-ico { transition: none; animation: none; } }
+.pk-drop-title { font: 400 30px/1.2 var(--font-display); }
+.pk-choose { padding: 5px 14px; border-radius: 99px; border: 1px solid var(--accent-1); color: var(--accent-1); font: 600 13px var(--font-ui); }
+.pk-floor { margin-top: 18px; font-size: 13.5px; color: var(--text); display: inline-flex; gap: 8px; align-items: center; }
+.pk-floor > span { color: var(--accent-2); font-size: 16px; }
+.pk-aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.pk-aside > .pk-panel { flex: 1 1 auto; }
+.pk-try { flex: 0 0 auto !important; }
+.pk-how { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.pk-how li { display: flex; gap: 14px; align-items: center; font-size: 16px; }
+.pk-how-mark { flex: none; min-width: 44px; height: 44px; padding: 0 6px; border-radius: 12px; display: inline-grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent-1) 50%, transparent); color: var(--accent-1); font: 500 20px var(--font-mono); }
+.pk-how-mark.states { display: inline-flex; gap: 3px; }
+.pk-how-mark.states i { font: 600 12px var(--font-mono); font-style: normal; width: 17px; height: 17px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; }
+.pk-how-mark .ok { --tone: var(--status-supported); } .pk-how-mark .bad { --tone: var(--status-disputed); } .pk-how-mark .add { --tone: var(--accent-1); }
+.pk-how-mark.states i { color: var(--tone); }
+.pk-try .pk-acts button { height: auto; min-height: 34px; padding: 6px 13px; text-align: left; }
+.pk-acts button:disabled { opacity: .5; cursor: progress; }
+.pk-acts button.teal { border-color: color-mix(in srgb, var(--accent-2) 60%, transparent); color: var(--accent-2); }
+/* With a pack read: the file, its floor line and Check another; the as-made rows fold; counts carry their colour. */
+.pk-drop-text { flex: 1; min-width: 0; }
+.pk-another { position: relative; z-index: 1; pointer-events: none; height: 30px; padding: 0 13px; display: inline-grid; place-items: center; border-radius: 8px; border: 1px solid var(--line, rgba(127,127,127,.35)); font: 600 12px var(--font-ui); }
+.pk-more { all: unset; cursor: pointer; display: block; padding: 8px 8px 2px 40px; font-size: 12.5px; color: var(--text-muted); }
+.pk-more:hover { color: var(--text); }
+.pk-counts div.bad dd { color: var(--status-disputed); } .pk-counts div.add dd { color: var(--accent-1); }
+.pk-list li > span { min-width: 0; }
+.pk-list li.warn b { color: var(--accent-1); } .pk-list li.ok b { color: var(--status-supported); } .pk-list li.bad b { color: var(--status-disputed); }
+.pk-row { grid-template-columns: 22px minmax(0, 1fr) 120px; padding: 9px 8px; }
+.pk-row .pk-name { font-size: 13px; }
+.pk-how-mark.states { display: inline-grid; grid-template-columns: repeat(2, 15px); gap: 3px; place-content: center; padding: 0; width: 44px; }
+.pk-how-mark.states i { width: 15px; height: 15px; font-size: 9px; }
+.pk-try .pk-acts { flex-direction: column; } .pk-try .pk-acts > *, .pk-try .pk-acts button { width: 100%; }
+
+/* The screen fills the stage (Ony, 29 Oct): before a pack, the drop and the steps take the full height, the steps
+   spread down their panel at a larger size; after one, the result scrolls inside the screen. */
+.pk { height: 100%; box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px; }
+.pk-start { grid-template-rows: minmax(0, 1fr); overflow: hidden; padding-bottom: 12px; }
+.pk-start > .pk-drop.big { min-height: 0; height: 100%; box-sizing: border-box; }
+.pk-start .pk-drop.big .pk-ico { width: 96px; height: 96px; font-size: 42px; }
+.pk-start .pk-drop-title { font-size: clamp(26px, 2.4vw, 34px); }
+.pk-start .pk-aside { min-height: 0; overflow-y: auto; }
+.pk-start .pk-aside > .pk-panel:first-child { display: flex; flex-direction: column; }
+.pk-start .pk-how { flex: 1; justify-content: space-evenly; }
+.pk-start .pk-how li { font-size: clamp(16px, 1.3vw, 19px); }
+.pk-start .pk-how-mark { min-width: 56px; height: 56px; font-size: 24px; }
+.pk-start .pk-how-mark.states { width: 56px; grid-template-columns: repeat(2, 19px); }
+.pk-start .pk-how-mark.states i { width: 19px; height: 19px; font-size: 11px; }

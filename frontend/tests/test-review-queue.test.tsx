@@ -53,17 +53,36 @@ async function renderPanel(routes: Routes = {}, findings: unknown[] = [companyFi
 
 async function inspectCompany(api: ReturnType<typeof mockApi>) {
   api.add({[CANDIDATES]: [candidate], [ASSESSMENTS]: [], [HISTORY]: [historyRow]});
-  await userEvent.setup().click(screen.getAllByRole('button', {name: 'Inspect'})[0]);
+  await userEvent.setup().click(screen.getByRole('button', {name: /^Kestrelwood Holdings/}));
   await screen.findByText('Best entity match:', {exact: false});
 }
 
 describe('ReviewQueuePanel', () => {
   it('lists the findings with their provider and status, and asks for one to be chosen', async () => {
     await renderPanel();
-    expect(screen.getByText('Company · unreviewed')).toBeInTheDocument();
-    expect(screen.getByText('Ownership · unreviewed')).toBeInTheDocument();
+    // Ony's rule of 29 Oct: a finding's kind is its party icon or link line, its review state a shape; each is named on reveal.
+    expect(screen.getByRole('img', {name: 'Company'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'Ownership: Owns'})).toBeInTheDocument();
+    expect(screen.getAllByRole('img', {name: 'unreviewed'})).toHaveLength(2);
     expect(screen.getByText('Choose a finding.')).toBeInTheDocument();
-    expect(screen.getByText('Choose a matched canonical entity to inspect provenance.')).toBeInTheDocument();
+    // The tally counts the review states; a click shows only those findings.
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Not reviewed: 2'}));
+    expect(screen.getByRole('button', {name: 'Not reviewed: 2'})).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('of 2', {exact: false, selector: 'p'})).toBeInTheDocument();
+  });
+
+  it('filters the findings by the words typed', async () => {
+    await renderPanel();
+    await userEvent.setup().type(screen.getByRole('searchbox', {name: 'Find a finding'}), 'owns');
+    expect(screen.queryByText('Kestrelwood Holdings', {selector: 'strong'})).toBeNull();
+    expect(screen.getByText('Jane Doe owns Kestrelwood', {selector: 'strong'})).toBeInTheDocument();
+  });
+
+  it('says what findings are and links to the connectors when there are none', async () => {
+    mockApi({[FINDINGS]: []});
+    wrap(<ReviewQueuePanel investigationId="inv-1"/>);
+    expect(await screen.findByRole('heading', {name: 'No connector findings yet'})).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: /Run a connector/})).toHaveAttribute('href', '/bring-in?inv=inv-1#connectors');
   });
 
   it('inspects an entity finding: its best match, its values, and the matched entity\'s ledger', async () => {
@@ -76,8 +95,8 @@ describe('ReviewQueuePanel', () => {
     expect(screen.getByText('us-in', {selector: 'span'})).toBeInTheDocument();
     expect(screen.getByText('123 Main St', {selector: 'span'})).toBeInTheDocument();
     expect(screen.getAllByRole('button', {name: 'Accept'})).toHaveLength(2);
-    await screen.findByText('External only · 1 support · 0 conflict · latest accepted');
-    expect(screen.getByText('accepted · aleph · registry')).toBeInTheDocument();
+    expect((await screen.findByText('External only · 1 support · 0 conflict · latest accepted')).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('accepted · aleph · registry').closest('[hidden]')).not.toBeNull();
     expect(screen.getByRole('link', {name: 'source'})).toHaveAttribute('href', 'https://aleph.example/aleph-1');
     expect(api.calls(CANDIDATES)).toHaveLength(1);
     expect(api.calls(ASSESSMENTS)).toHaveLength(1);
@@ -95,7 +114,7 @@ describe('ReviewQueuePanel', () => {
     api.add({[FINDINGS]: [findingFixture({review_status: 'accepted'}), ownershipFinding]});
     await userEvent.setup().click(screen.getByRole('button', {name: 'Same entity'}));
 
-    await screen.findByText('Company · accepted');
+    await screen.findAllByRole('img', {name: 'accepted'});
     expect(api.lastBody(resolution)).toEqual({decision: 'positive', entity_id: 'ent-1', confidence: 0.9});
     expect(api.calls(FINDINGS)).toHaveLength(2);
     // The entities and the graph are marked stale too; nothing on screen shows them.
@@ -147,9 +166,9 @@ describe('ReviewQueuePanel', () => {
       'GET /api/investigations/inv-1/graph': emptyGraph(),
     });
     const user = userEvent.setup();
-    await user.click(screen.getAllByRole('button', {name: 'Inspect'})[1]);
+    await user.click(screen.getByRole('button', {name: /^Jane Doe owns Kestrelwood/}));
     await screen.findByText('Ownership relationship');
-    expect(screen.getByText('owner: aleph-3 → asset: aleph-1')).toBeInTheDocument();
+    expect(screen.getByText('owner: aleph-3 → asset: aleph-1').closest('[hidden]')).not.toBeNull();
     expect(screen.getByText('Jane Doe → Kestrelwood Holdings Ltd')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Promote relationship'})).not.toBeInTheDocument();
     // A relationship finding has no entity ledger.
@@ -168,7 +187,7 @@ describe('ReviewQueuePanel', () => {
     const api = await renderPanel({[REL_CANDIDATES]: {
       schema: 'Ownership', source_prop: 'owner', target_prop: 'asset', source_external_id: 'aleph-3', target_external_id: 'aleph-1', source_candidates: [], target_candidates: [candidate],
     }});
-    await userEvent.setup().click(screen.getAllByRole('button', {name: 'Inspect'})[1]);
+    await userEvent.setup().click(screen.getByRole('button', {name: /^Jane Doe owns Kestrelwood/}));
     await screen.findByText('Canonicalize both endpoints before promotion.');
     expect(screen.getByText('No canonical source match → Kestrelwood Holdings Ltd')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Supported'})).not.toBeInTheDocument();
@@ -181,7 +200,7 @@ describe('ReviewQueuePanel', () => {
     cleanup();
     wrap(<ReviewQueuePanel investigationId="inv-2"/>);
     await waitFor(() => expect(api.calls('GET /api/investigations/inv-2/connector-findings')).toHaveLength(1));
-    expect(screen.getByText('Choose a finding.')).toBeInTheDocument();
+    expect(await screen.findByText('No connector findings yet')).toBeInTheDocument();
     expect(screen.queryByText('Best entity match:', {exact: false})).not.toBeInTheDocument();
   });
 });

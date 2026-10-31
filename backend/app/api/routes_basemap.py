@@ -23,8 +23,18 @@ _NOT_INSTALLED: dict[int | str, dict[str, Any]] = {
 
 @router.get("", response_model=BasemapStatusOut)
 def get_basemap_status() -> Any:
-    """Whether a base map is installed, the zoom levels and area it covers, and its fonts."""
-    return basemap.status()
+    """Whether a base map is installed, the zoom levels and area it covers, and its fonts; while the app is fetching
+    it, how far it has got. Asking starts the download when there is no map and none is running."""
+    from app.services import basemap_install
+
+    found = basemap.status()
+    if not found["available"]:
+        basemap_install.ensure_in_background()
+        now = basemap_install.progress()
+        if now["state"] in ("fetching", "failed"):
+            found.update(download=now["state"], download_done=now["done"], download_total=now["total"],
+                         reason=now["error"] or found.get("reason"))
+    return found
 
 
 @router.get("/tiles/{z}/{x}/{y}.mvt", response_class=Response,

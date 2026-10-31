@@ -15,12 +15,15 @@
 // It draws straight into SVG (hundreds of moving parts each frame), so it is plain DOM
 // code mounted by the-wire.tsx; every listener is removed by the returned destroy().
 import type {WireEntityOut, WireLinkOut, WireOut} from '../../lib/generated/types.gen';
-import {onScreen} from '../../lib/on-screen';
+import {dateWords} from '../../lib/dates';
+import {escapeTaken, onScreen} from '../../lib/on-screen';
 
 /** How sure a link is (the status grammar): read from the case's review advisory by the-wire.tsx. */
 export type LinkSure = 'shown' | 'unshown' | 'disputed' | 'worked';
 /** Per link id: how sure it is, and its end date when the record gives one (an ended link is drawn faint). */
 export type LinkInfo = Record<string, {sure: LinkSure; end: string}>;
+/** The reporter's own tags on parties (entity id → its tags), drawn as a ring of coloured arcs outside the dot. */
+export type PartyTags = Record<string, {name: string; colour: string}[]>;
 
 /** The link the "One link" altitude has open, for the link panel: its two parties (an account drawn on its holder
  * counts as the holder's side) and every record between them. */
@@ -42,11 +45,14 @@ type Strand = {fam: string; s: string; t: string; links: WireLinkOut[]; sum: num
 type Bundle = {key: string; a: string; b: string; links: WireLinkOut[]; strands: Record<string, Strand>};
 type Chain = {id: string; mids: string[]; ends: string[]; open: boolean};
 type NodeEl = {
-  id: string; g: SVGGElement; halo: SVGCircleElement; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
+  id: string; g: SVGGElement; halo: SVGCircleElement; tags: SVGGElement | null; dx: number; hw: number; hh: number;
+  pill: {g: SVGGElement; bg: SVGRectElement; t: SVGTextElement; reveal: SVGRectElement; badge: SVGGElement; n: SVGTextElement} | null; dust: SVGCircleElement; dot: SVGGElement; lbl: SVGTextElement; card: SVGGElement;
   beads: SVGGElement; flag: SVGGElement; isChain: boolean; cur: Target; tgt: Target; from: Target | null;
 };
 type EdgeEl = {g: SVGGElement; p: SVGPathElement; u: SVGPathElement | null; h: SVGPathElement; d2: SVGPathElement | null; S: Strand; w: number; bend: number; want: boolean;
-  mid?: {x: number; y: number}; q?: number[]; lab: {g: SVGGElement; w: number; t: SVGTextElement; body: SVGTSpanElement; ended: boolean} | null};
+  mid?: {x: number; y: number}; q?: number[]; lab: {g: SVGGElement; w: number; t: SVGTextElement; body: SVGTSpanElement; ended: boolean} | null;
+  // SEE_1's lettered stubs: a link longer than 40% of the view's diagonal is drawn as its two ends, each with the same letter.
+  stub: {a: SVGGElement; b: SVGGElement; on: boolean} | null};
 type Box = {x0: number; x1: number; y0: number; y1: number};
 type Pt = {x: number; y: number; in: boolean; d?: number};
 
@@ -59,6 +65,11 @@ const KIND: Record<string, {fill: string; ring: string; name: string}> = {
   property: {fill: '#45271f', ring: '#bc9574', name: 'Property'}, account: {fill: '#393941', ring: '#a8a2b8', name: 'Bank account'},
   other: {fill: '#393941', ring: '#a89a7d', name: 'Other'},
 };
+/** The symbol (drawn by the-wire.tsx from components/network/party-icons) that shows each kind. */
+export const KIND_SYMBOL: Record<string, string> = {person: 'tw-k-person', company: 'tw-k-company', org: 'tw-k-org', vehicle: 'tw-k-vehicle',
+  property: 'tw-k-property', account: 'tw-k-account'};
+/** A party's circle (on a card and as a dot), before the card scale. */
+const DOT_R = 11;
 const FAM: Record<string, {c: string; n: string}> = {
   owns: {c: '#d4a152', n: 'Owns'}, runs: {c: '#baac91', n: 'Directs or works for'}, money: {c: '#c98a5e', n: 'Paid'}, other: {c: '#927e5d', n: 'Linked, kind not yet known'},
 };
@@ -71,6 +82,13 @@ const DISPUTED = '#FF8070';
 const TERR = ['#2E4D67', '#2f4f44', '#4d3d2c', '#4f3036', '#3d3858', '#3b4f5e', '#55402b', '#2d4a52', '#4a3f55', '#34503c'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+/** A tag swatch lifted towards white, so a dark swatch still glows on the night background. */
+export const brighten = (hex: string, by = 0.5): string => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  return `#${[16, 8, 0].map(sh => Math.round(((n >> sh) & 255) + (255 - ((n >> sh) & 255)) * by).toString(16).padStart(2, '0')).join('')}`;
+};
 export const esc = (text: unknown): string => String(text ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]!));
 export const fmtAmt = (a: number | null | undefined, c: string): string => {
   if (a == null) return '';
@@ -83,8 +101,7 @@ export const fmtAmt = (a: number | null | undefined, c: string): string => {
 };
 export const fmtDate = (d: string): string => {
   if (!d) return 'no date';
-  const [y, m, dd] = d.split('-');
-  return `${dd ? `${+dd} ` : ''}${m ? `${MONTHS[+m - 1]} ` : ''}${y}`;
+  return dateWords(d);
 };
 export const tval = (d: string): number | null => {
   if (!d) return null;
@@ -96,29 +113,103 @@ const monthYear = (d: string): string => { const [y, m] = d.split('-'); return m
 
 /** A strand's sentence, from the fixed link verbs (research §2.2): "owns 60%", "director since 2017",
  * "paid 29,400 EUR · 3× Feb–Apr 2018", "bid for · 4 Mar 2019". It reads from the strand's first party to its second. */
+/** A jurisdiction code written out ("VG" → "British Virgin Islands"); the code itself when the browser has no name. */
+export const placeName = (code: string): string => {
+  try { return new Intl.DisplayNames(['en'], {type: 'region'}).of(code.toUpperCase()) ?? code; } catch { return code; }
+};
+
+/** Text cut to `n` characters at a word, with an ellipsis when cut (the whole of it is on hover). */
+export const clipWords = (text: string, n: number): string => {
+  if (text.length <= n) return text;
+  const cut = text.slice(0, n - 1), at = cut.lastIndexOf(' ');
+  return `${(at > n * 0.5 ? cut.slice(0, at) : cut).replace(/[\s,;:·–-]+$/, '')}…`;
+};
+
+/** The payments' sums, one per currency in the order they come, never added across currencies: "20,000 EUR + 9,400
+ *  USD"; empty when none has an amount. */
+export function fmtSums(links: Pick<WireLinkOut, 'amount' | 'cur'>[]): string {
+  const by = new Map<string, number>();
+  for (const l of links) if (l.amount) by.set(l.cur || '', (by.get(l.cur || '') ?? 0) + l.amount);
+  return [...by].map(([c, sum]) => fmtAmt(sum, c)).join(' + ');
+}
+
+/** The time strip's quarters: how many payments with an amount each holds, and their sums per currency. */
+export function moneyBins(links: Pick<WireLinkOut, 'fam' | 'date' | 'amount' | 'cur'>[]): Record<string, {n: number; say: string}> {
+  const groups: Record<string, Pick<WireLinkOut, 'amount' | 'cur'>[]> = {};
+  for (const l of links) {
+    if (l.fam !== 'money' || !l.date || !l.amount) continue;
+    const t = tval(l.date);
+    if (t == null) continue;
+    const b = Math.floor(t * 4) / 4;
+    (groups[b] || (groups[b] = [])).push(l);
+  }
+  return Object.fromEntries(Object.entries(groups).map(([b, ls]) => [b, {n: ls.length, say: fmtSums(ls)}]));
+}
+
 export function linkSentence(fam: string, links: WireLinkOut[], ended: string): string {
   const l0 = links[0];
   const n = links.length;
   if (fam === 'money') {
-    const sum = links.reduce((s, l) => s + (l.amount || 0), 0);
+    const sums = fmtSums(links);
     const ds = links.map(l => l.date).filter(Boolean).sort();
     const span = !ds.length ? '' : ds[0].slice(0, 7) === ds[ds.length - 1].slice(0, 7) ? monthYear(ds[0])
       : ds[0].slice(0, 4) === ds[ds.length - 1].slice(0, 4) ? `${MONTHS[+ds[0].slice(5, 7) - 1] ?? ''}–${monthYear(ds[ds.length - 1])}`
         : `${monthYear(ds[0])}–${monthYear(ds[ds.length - 1])}`;
-    const why = n === 1 && l0.role ? ` “${l0.role.slice(0, 24)}”` : '';
-    return `paid ${sum ? fmtAmt(sum, l0.cur) : 'an amount not stated'}${why}${n > 1 ? ` · ${n}×` : ''}${span ? ` · ${span}` : ''}`;
+    const why = n === 1 && l0.role ? ` “${clipWords(l0.role, 24)}”` : '';
+    return `paid ${sums || 'an amount not stated'}${why}${n > 1 ? ` · ${n}×` : ''}${span ? ` · ${span}` : ''}`;
   }
   const many = n > 1 ? ` · ×${n}` : '';
   const when = ended ? ` · ended ${monthYear(ended)}` : l0.date ? ` since ${l0.date.slice(0, 4)}` : '';
-  if (fam === 'owns') return `${l0.pct ? `owns ${l0.pct.replace(/%$/, '')}%` : l0.role ? l0.role.slice(0, 32) : 'owns'}${when}${many}`;
+  if (fam === 'owns') return `${l0.pct ? `owns ${l0.pct.replace(/%$/, '')}%` : l0.role ? clipWords(l0.role, 32) : 'owns'}${when}${many}`;
   if (fam === 'runs') {
-    const verb = l0.role ? l0.role.slice(0, 32) : l0.schema === 'Directorship' ? 'director' : l0.schema === 'Employment' ? 'works for' : 'member of';
+    const verb = l0.role ? clipWords(l0.role, 32) : l0.schema === 'Directorship' ? 'director' : l0.schema === 'Employment' ? 'works for' : 'member of';
     return `${verb}${when}${many}`;
   }
-  return `${l0.role ? l0.role.slice(0, 32) : 'linked'}${l0.date && !ended ? ` · ${fmtDate(l0.date)}` : ended ? ` · ended ${monthYear(ended)}` : ''}${many}`;
+  return `${l0.role ? clipWords(l0.role, 32) : 'linked'}${l0.date && !ended ? ` · ${fmtDate(l0.date)}` : ended ? ` · ended ${monthYear(ended)}` : ''}${many}`;
 }
 
-export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, info: LinkInfo = {}): () => void {
+/* Keeping parties apart (DECISIONS_LOG 30, 52 and 54): each item is a party's footprint, its card with the flag count
+   above it and the accounts under it, or its dot with the name chip on its outward side, as offsets round its place.
+   Overlapping footprints are pushed apart along the axis that needs the shorter move, a fixed item (the party in the
+   middle) never moving, until none overlap or the rounds run out. Returns the new places. */
+export type Footprint = {id: string; x: number; y: number; x0: number; x1: number; y0: number; y1: number; fixed?: boolean};
+export function separate(items: Footprint[], gap = 0, rounds = 80): Record<string, {x: number; y: number}> {
+  const P = items.map(it => ({...it}));
+  for (let r = 0; r < rounds; r++) {
+    let moved = false;
+    for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+      const a = P[i], b = P[j];
+      if (a.fixed && b.fixed) continue;
+      const ox = Math.min(a.x + a.x1, b.x + b.x1) - Math.max(a.x + a.x0, b.x + b.x0) + gap;
+      const oy = Math.min(a.y + a.y1, b.y + b.y1) - Math.max(a.y + a.y0, b.y + b.y0) + gap;
+      if (ox <= 0 || oy <= 0) continue;
+      moved = true;
+      // Who moves: both half way, or all of it the one that is free.
+      const wa = a.fixed ? 0 : b.fixed ? 1 : 0.5, wb = 1 - wa;
+      if (oy <= ox) {
+        const dir = (b.y + (b.y0 + b.y1) / 2) >= (a.y + (a.y0 + a.y1) / 2) ? 1 : -1, d = oy + 0.01;
+        a.y -= dir * d * wa; b.y += dir * d * wb;
+      } else {
+        const dir = (b.x + (b.x0 + b.x1) / 2) >= (a.x + (a.x0 + a.x1) / 2) ? 1 : -1, d = ox + 0.01;
+        a.x -= dir * d * wa; b.x += dir * d * wb;
+      }
+    }
+    if (!moved) break;
+  }
+  const out: Record<string, {x: number; y: number}> = {};
+  for (const p of P) out[p.id] = {x: p.x, y: p.y};
+  return out;
+}
+
+/* How much of a box a set of lines runs through: the lines are sampled as points; a label is better off where none
+   falls inside it. */
+export const pointsIn = (b: {x0: number; x1: number; y0: number; y1: number}, pts: number[]): number => {
+  let n = 0;
+  for (let i = 0; i < pts.length; i += 2) if (pts[i] > b.x0 && pts[i] < b.x1 && pts[i + 1] > b.y0 && pts[i + 1] < b.y1) n++;
+  return n;
+};
+
+export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, info: LinkInfo = {}, partyTags: PartyTags = {}): () => void {
   // Calm (Appearance) and the system's reduced motion both stop the camera and the nodes travelling.
   const RM = () => document.documentElement.dataset.motion === 'calm' || (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
   const q = <T extends Element>(s: string): T => root.querySelector(s) as T;
@@ -127,6 +218,13 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     for (const k in a) e.setAttribute(k, String(a[k]));
     if (p) p.appendChild(e);
     return e;
+  };
+  // A party's kind as its icon (SEE_1: a building, a person, a house in the dot). The Lucide shapes are symbols The
+  // Wire draws once (KIND_SYMBOL); a kind with no icon of its own gets none, so no icon claims more than the record says.
+  const kindIcon = (kind: string, cx: number, cy: number, size: number, colour: string, parent: Element) => {
+    const sym = KIND_SYMBOL[kind];
+    if (!sym) return;
+    el('use', {href: `#${sym}`, x: cx - size / 2, y: cy - size / 2, width: size, height: size, color: colour, class: 'kind-icon'}, parent);
   };
   const cleanups: (() => void)[] = [];
   const on = <E extends Event>(target: EventTarget, type: string, fn: (e: E) => void, opts?: AddEventListenerOptions) => {
@@ -170,7 +268,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       // One curve per kind, direction and certainty: a shown payment and an unshown one between the same two
       // parties are two lines, each with its own style and sentence (SEE_1, Fernhill → Kestrel).
       const sure = sureOf(l);
-      const sk = `${l.fam}|${l.fam === 'other' ? '' : `${a}>${b}`}|${sure ?? ''}`;
+      // Payments in different currencies are different strands: their sums are never added together.
+      const sk = `${l.fam}|${l.fam === 'other' ? '' : `${a}>${b}`}|${sure ?? ''}${l.fam === 'money' ? `|${l.cur ?? ''}` : ''}`;
       const S = B.strands[sk] || (B.strands[sk] = {fam: l.fam, s: a, t: b, links: [], sum: 0, cur: l.cur, sure});
       S.links.push(l);
       if (l.amount) S.sum += l.amount;
@@ -335,25 +434,75 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     const halo = el('circle', {r: 26, fill: 'none', stroke: '#FF8070', 'stroke-width': 2, class: 'halo', style: 'display:none'}, g);
     const dust = el('circle', {r: 2.4, fill: K.ring, opacity: 0.5}, g);
     const dot = el('g', {}, g);
+    let pill: NodeEl['pill'] = null;
     if (isChain) {
       for (let i = 2; i >= 0; i--) el('rect', {x: -58 + i * 5, y: -17 - i * 5, width: 116, height: 34, rx: 7, fill: K.fill, stroke: K.ring, 'stroke-width': 1.2, opacity: 1 - i * 0.22}, dot);
       el('text', {class: 'card-s', x: 0, y: 4, 'text-anchor': 'middle'}, dot);
     } else {
-      el('circle', {r: 4 + Math.sqrt(deg[id] || 0) * 2.6, fill: K.fill, stroke: K.ring, 'stroke-width': 1.6, class: 'ring'}, dot);
+      // Its name is a chip that grows out from behind the circle (placeLabels, revealName).
+      const pg = el('g', {class: 'peek-pill', style: 'display:none'}, dot);
+      // The name is drawn whole and uncovered by a mask that slides with the chip, so it is revealed as the chip opens.
+      const mid = `tw-pm-${++maskSerial}`;
+      const mask = el('mask', {id: mid, maskUnits: 'userSpaceOnUse', x: -1200, y: -40, width: 2400, height: 80}, pg);
+      const bg = el('rect', {class: 'peek-bg', y: -DOT_R, height: DOT_R * 2, rx: DOT_R, stroke: K.ring}, pg);
+      const content = el('g', {mask: `url(#${mid})`}, pg);
+      const t = el('text', {class: 'peek-t', y: 4}, content);
+      // How many parties it is linked to: a link icon and the count.
+      const badge = el('g', {class: 'peek-badge'}, content);
+      el('rect', {class: 'peek-badge-bg', y: -7.5, height: 15, rx: 7.5}, badge);
+      el('use', {href: '#tw-i-link', x: 3, y: -5, width: 10, height: 10, color: K.ring}, badge);
+      const n = el('text', {class: 'peek-n', x: 15, y: 3.5}, badge);
+      pill = {g: pg, bg, t, reveal: el('rect', {class: 'peek-reveal', y: -DOT_R - 2, height: DOT_R * 2 + 4, fill: '#fff'}, mask), badge, n};
+      // A party drawn as a dot is the card's own circle with its kind's icon, the same size on screen as on a card.
+      el('circle', {r: DOT_R, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5, class: 'ring'}, dot);
+      kindIcon(E[id].kind, 0, 0, 13, K.ring, dot);
     }
     const lbl = el('text', {class: 'lbl', 'text-anchor': 'middle'}, g);
     const card = el('g', {}, g);
-    el('rect', {x: -90, y: -27, width: 180, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4}, card);
-    el('circle', {cx: -70, cy: 0, r: 10, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5}, card);
-    el('text', {class: 'card-t', x: -52, y: -4}, card);
-    el('text', {class: 'card-s', x: -52, y: 14}, card);
+    // A tagged party's card is wider on the left, so its tag ring clears the card's edge and its name.
+    const own = isChain ? [] : partyTags[id] ?? [];
+    const pad = own.length ? 14 : 0, dx = -70 - pad / 2, tx = -52 + pad / 3;
+    // A flagged card's outline takes its level's colour over a glow (paintFlag); the glow sits behind the card.
+    // The glow is light from the outline (the grid's lamp colour): a wide soft spread and a tight bright core, added to
+    // what is behind them as light is.
+    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'flag-glow wide', fill: 'none', filter: 'url(#tw-flagglow)', style: 'display:none'}, card);
+    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'flag-glow core', fill: 'none', filter: 'url(#tw-flagglow-core)', style: 'display:none'}, card);
+    el('rect', {x: -90 - pad, y: -27, width: 180 + pad, height: 54, rx: 11, class: 'card-bg', stroke: K.ring, 'stroke-width': 1.4, 'data-ring': K.ring}, card);
+    el('circle', {cx: dx, cy: 0, r: 11, fill: K.fill, stroke: K.ring, 'stroke-width': 1.5, class: 'kind-dot'}, card);
+    if (!isChain) kindIcon(E[id].kind, dx, 0, 13, K.ring, card);
+    el('text', {class: 'card-t', x: tx, y: -4}, card);
+    el('text', {class: 'card-s', x: tx, y: 14}, card);
     const beads = el('g', {}, card);
-    const flag = el('g', {transform: 'translate(90,-27)'}, card);
+    const flag = el('g', {transform: 'translate(91,-28)', class: 'flag-dot'}, card); // the count's circle, on the card's top right corner
+    on<PointerEvent>(flag, 'pointerenter', ev => { if (ev.pointerType === 'touch') return; g.classList.add('flag-hot'); showFlagTip(ev, id); });
+    on(flag, 'pointerleave', () => { g.classList.remove('flag-hot'); hideTip(); });
     g.appendChild(halo); // over the card, so its ring round the kind dot shows
-    const N: NodeEl = {id, g, halo, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
+    // Your tags: one arc per tag, sharing a ring outside the flag ring (shown while the Your tags layer is on). Each arc
+    // is its swatch brightened, over a blurred copy that breathes, so the ring reads as giving off light.
+    let tags: SVGGElement | null = null;
+    if (own.length) {
+      tags = el('g', {class: 'tw-tagring'}, g);
+      const seg = 100 / own.length, gap = own.length > 1 ? 5 : 0;
+      const arc = (layer: SVGGElement, colour: string, i: number, width: number) => el('circle', {fill: 'none', stroke: colour, 'stroke-width': width,
+        'stroke-linecap': own.length > 1 ? 'round' : 'butt', pathLength: 100, 'stroke-dasharray': `${Math.max(seg - gap, 1)} ${100 - seg + gap}`,
+        'stroke-dashoffset': -i * seg, transform: 'rotate(-90)'}, layer);
+      const glow = el('g', {class: 'glow', filter: 'url(#tw-tagglow)'}, tags);
+      const sharp = el('g', {class: 'sharp'}, tags);
+      own.forEach((t, i) => { const c = brighten(t.colour); arc(glow, c, i, 7); arc(sharp, c, i, 2.8); });
+    }
+    const N: NodeEl = {id, g, halo, tags, dx, hw: 90 + pad / 2, hh: 27, pill, dust, dot, lbl, card, beads, flag, isChain, cur: {x: 0, y: 0, o: 0, v: 0}, tgt: {x: 0, y: 0, o: 0, v: 0}, from: null};
     on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); onNodeClick(id); });
-    on<PointerEvent>(g, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showTip(ev, id); });
-    on(g, 'pointerleave', hideTip);
+    on<PointerEvent>(g, 'pointerenter', ev => {
+      if (ev.pointerType === 'touch') return;
+      // An opened name chip comes to the front of the map.
+      if (!g.classList.contains('hovering') && g.nextSibling) g.parentNode?.appendChild(g);
+      g.classList.add('hovering'); showTip(ev, id); revealName(N, true);
+      if ((mode === 'case' && terrEls.length) || (mode === 'party' && rtEls.length)) { hotParty = id; kick(); }
+    });
+    on(g, 'pointerleave', () => {
+      g.classList.remove('hovering'); hideTip(); revealName(N, false);
+      if (hotParty === id) { hotParty = null; kick(); }
+    });
     node[id] = N;
     return N;
   }
@@ -367,38 +516,69 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     if (!e) return;
     const t = N.card.querySelector('.card-t')!;
     t.textContent = '';
-    const all = wrapWords(e.short, 19), L = all.slice(0, 2);
-    if (all.length > 2) L[1] = `${L[1].slice(0, 19)}…`;
-    L.forEach((s, i) => { const ts = el('tspan', {x: -52, dy: i ? 14 : (L.length > 1 ? -7 : 0)}, t); ts.textContent = s; });
+    const all = wrapWords(e.short, 22), L = all.slice(0, 2);
+    if (all.length > 2) L[1] = `${L[1].slice(0, 21)}…`;
+    // The card is as wide as its name (no empty run after it) and one line tall for a one-line name. The kind is the
+    // icon in the dot; the jurisdiction is on hover (showTip), where it is written out in full.
+    const spans = L.map((line, i) => { const ts = el('tspan', {dy: i ? 14 : (L.length > 1 ? -7 : 0)}, t); ts.textContent = line; return ts; });
+    let textW = 0;
+    spans.forEach((ts, i) => { let w = L[i].length * 7.2; try { w = ts.getComputedTextLength() || w; } catch { /* not laid out (tests) */ } textW = Math.max(textW, w); });
+    const pad = N.tags ? 14 : 0, textOff = 38 + pad * 4 / 3;
+    const W = Math.min(250, Math.max(112, textOff + textW + 16)), hw = W / 2, hh = L.length > 1 ? 25 : pad ? 23 : 19;
+    const dx = -hw + 20 + pad / 2, tx = -hw + textOff;
+    N.dx = dx; N.hw = hw; N.hh = hh;
+    t.setAttribute('x', String(tx)); t.setAttribute('y', '4');
+    spans.forEach(ts => ts.setAttribute('x', String(tx)));
+    for (const r of Array.from(N.card.querySelectorAll<SVGRectElement>('.card-bg, .flag-glow'))) {
+      r.setAttribute('x', String(-hw)); r.setAttribute('y', String(-hh)); r.setAttribute('width', String(W)); r.setAttribute('height', String(hh * 2));
+    }
+    N.card.querySelector('.kind-dot')?.setAttribute('cx', String(dx));
+    N.card.querySelector('.kind-icon')?.setAttribute('x', String(dx - 6.5));
+    N.card.querySelector('.card-s')!.textContent = '';
+    N.flag.setAttribute('transform', `translate(${hw + 1},${-hh - 1})`);
     const accts = rollAccounts ? D.entities.filter(a => a.holder === N.id) : [];
-    const s = N.card.querySelector('.card-s')!;
-    s.setAttribute('y', String(L.length > 1 ? 20 : 14));
-    s.textContent = `${(KIND[e.kind] ?? KIND.other).name}${e.jur ? ` · ${e.jur}` : ''}`.toUpperCase();
     N.beads.textContent = '';
-    accts.forEach((_, i) => { el('circle', {cx: -78 + i * 13, cy: 33, r: 4.5, fill: KIND.account.fill, stroke: KIND.account.ring, 'stroke-width': 1.3}, N.beads); });
-    if (accts.length) { const tx = el('text', {class: 'card-s', x: -78 + accts.length * 13, y: 36.5}, N.beads); tx.textContent = `${accts.length} ${accts.length > 1 ? 'ACCOUNTS' : 'ACCOUNT'}`; }
-    paintFlag(N.flag, flagsOf(N.id));
+    accts.forEach((_, i) => { el('circle', {cx: -hw + 12 + i * 13, cy: hh + 6, r: 4.5, fill: KIND.account.fill, stroke: KIND.account.ring, 'stroke-width': 1.3}, N.beads); });
+    if (accts.length) { const ax = el('text', {class: 'card-s', x: -hw + 12 + accts.length * 13, y: hh + 9.5}, N.beads); ax.textContent = `${accts.length} ${accts.length > 1 ? 'ACCOUNTS' : 'ACCOUNT'}`; }
+    paintFlag(N, flagsOf(N.id));
   }
-  function paintFlag(g: SVGGElement, f: Flags): void {
+  const LEVEL_C: Record<string, string> = {textbook: '#FF8070', strong: '#F6966A', faint: '#E9AFA8'};
+  function paintFlag(N: NodeEl, f: Flags): void {
+    const g = N.flag, bg = N.card.querySelector<SVGRectElement>('.card-bg')!, glows = Array.from(N.card.querySelectorAll<SVGRectElement>('.flag-glow'));
     g.textContent = '';
     const n = nOpen(f);
-    if (!n) return;
-    const lvl = f.textbook ? 'textbook' : f.strong ? 'strong' : 'faint';
-    // Level in bars and in its word, then the count (SEE_1 "▮▮▮ TEXTBOOK · 2"); right-aligned on the card's corner.
-    const word = `${lvl.toUpperCase()} · ${n}`;
-    const w = 30 + word.length * 6.4;
-    const r = el('rect', {x: -w, y: -9, width: w, height: 18, rx: 5}, g);
-    if (lvl === 'textbook') { r.setAttribute('fill', '#8E2420'); r.setAttribute('stroke', '#FF8070'); } else {
-      r.setAttribute('fill', '#1E3448'); r.setAttribute('stroke', lvl === 'strong' ? '#F6966A' : '#E9AFA8');
-      if (lvl === 'faint') r.setAttribute('stroke-dasharray', '2.5 2');
+    if (!n) {
+      bg.setAttribute('stroke', bg.dataset.ring ?? ''); bg.setAttribute('stroke-width', '1.4'); bg.removeAttribute('stroke-dasharray');
+      glows.forEach(gl => { gl.style.display = 'none'; }); N.g.classList.remove('flagged', 'faint', 'strong', 'textbook');
+      return;
     }
-    const bars = lvl === 'textbook' ? 3 : lvl === 'strong' ? 2 : 1;
-    for (let i = 0; i < 3; i++) el('rect', {x: -w + 6 + i * 4, y: 3 - (i + 1) * 3.2, width: 2.6, height: (i + 1) * 3.2 + 2,
-      fill: i < bars ? (lvl === 'textbook' ? '#ffe9e4' : lvl === 'strong' ? '#F6966A' : '#E9AFA8') : 'rgb(245 236 218 / .2)'}, g);
-    const t = el('text', {x: -6, y: 4, 'text-anchor': 'end', class: 'flag-n', fill: lvl === 'textbook' ? '#ffe9e4' : '#F5ECDA'}, g);
-    t.textContent = word;
-    const ti = el('title', {}, g);
-    ti.textContent = `${n} open Red Flag${n > 1 ? 's' : ''}, the strongest ${lvl}`;
+    const lvl = f.textbook ? 'textbook' : f.strong ? 'strong' : 'faint', c = LEVEL_C[lvl];
+    // The outline is the level: its colour, dashed when faint so the level never rests on colour alone. The light
+    // round it is the grid's pale blue, stronger by level and brighter on hover.
+    bg.setAttribute('stroke', c); bg.setAttribute('stroke-width', '1.8');
+    if (lvl === 'faint') bg.setAttribute('stroke-dasharray', '5 3'); else bg.removeAttribute('stroke-dasharray');
+    glows.forEach(gl => { gl.style.display = ''; });
+    N.g.classList.remove('faint', 'strong', 'textbook'); N.g.classList.add('flagged', lvl);
+    // The count in a small circle on the top right corner; hover it for the flags themselves.
+    el('circle', {r: 15, class: 'flag-hit', fill: 'transparent'}, g);
+    el('circle', {r: 10.5, class: 'flag-disc', fill: lvl === 'textbook' ? '#8E2420' : '#1b2633', stroke: c, 'stroke-width': 1.6}, g);
+    const t = el('text', {y: 4, 'text-anchor': 'middle', class: 'flag-n', fill: lvl === 'textbook' ? '#ffe9e4' : c}, g);
+    t.textContent = String(n);
+    g.setAttribute('aria-label', `${n} open Red Flag${n > 1 ? 's' : ''}, the strongest ${lvl}`);
+  }
+  function showFlagTip(ev: PointerEvent, id: string): void {
+    const f = flagsOf(id), n = nOpen(f);
+    if (!n) return;
+    const counts = (['textbook', 'strong', 'faint'] as const).filter(k => f[k]).map(k => `${f[k]} ${k}`).join(' · ');
+    let h = `<b>${n} open Red Flag${n > 1 ? 's' : ''}</b><span class="m">${counts}</span>`;
+    const rank: Record<string, number> = {textbook: 0, strong: 1, faint: 2};
+    const items = [...f.items].sort((x, y) => (rank[x.level] ?? 3) - (rank[y.level] ?? 3));
+    for (const it of items.slice(0, 4)) h += `<span class="tip-flag"><i class="${esc(it.level)}">${esc(it.level)}</i>${esc(it.text)}</span>`;
+    if (f.items.length > 4) h += `<span class="m">and ${f.items.length - 4} more</span>`;
+    h += '<span class="m">An indicator, not a finding. Click the card to open them.</span>';
+    tip.innerHTML = h;
+    placeTip(ev);
+    tip.classList.add('on');
   }
 
   /* ---------- layouts ---------- */
@@ -418,7 +598,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
 
   type PartyInfo = {f: string; cx: number; cy: number; R1: number; RX: number; secLabels: {k: string; a: number; n: string; c: number}[]; more: {p: string; n: number; x: number; y: number}[]};
   let partyInfo: PartyInfo | null = null;
-  let moreEls: {x: number; y: number; g: SVGGElement}[] = [];
+  let moreEls: {p: string; w: number; g: SVGGElement; lead: SVGPathElement}[] = [];
   function partyTargets(f: string): Record<string, Target> {
     const T: Record<string, Target> = {};
     const cx = E[f].x, cy = E[f].y;
@@ -510,17 +690,43 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       if (!opts.noTrail) { trail = trail.filter(t => t !== focus); trail.push(focus); if (trail.length > 7) trail.shift(); }
     }
     const T = m === 'case' ? caseTargets() : m === 'path' ? pathTargets(pathIds) : partyTargets(focus);
+    const fitOf = (): {x: number; y: number; k: number} => (m === 'party' ? fitBox(Object.values(T).filter(t => t.v > 0), 40, 1.1)
+      : fitBox(Object.values(T).filter(t => t.v > 0), 60, 1.25));
+    // Around a party and along a path: no card, its name, its flag count or its accounts covers another party, and no
+    // dot's name runs over another dot (DECISIONS_LOG 55). Cards keep their size on screen, so their room on the map
+    // depends on the zoom the view settles at: twice round, the second time at the zoom the first one gave.
+    if (m === 'party' || m === 'path') for (let pass = 0; pass < 2; pass++) keepApart(T, fitOf().k, m === 'party' ? focus : '');
     for (const id in T) { const N = node[id]; if (!N) continue; N.from = {...N.cur}; N.tgt = T[id]; }
     tw = {t0: performance.now(), dur: RM() ? 1 : opts.slow ? 1500 : 950};
     let to: {x: number; y: number; k: number};
     if (m === 'case') to = fitBox(Object.values(T).filter(t => t.o), 120);
-    else if (m === 'party') to = fitBox(Object.values(T).filter(t => t.v > 0), 40, 1.1);
-    else if (m === 'path') to = fitBox(Object.values(T).filter(t => t.v > 0), 60, 1.25);
+    else if (m === 'party' || m === 'path') to = fitOf();
     else { const [a, b] = wireKey.split('|'); to = {x: (T[a].x + T[b].x) / 2, y: (T[a].y + T[b].y) / 2, k: Math.min(3.2, C.k * 2.2)}; }
     Cto = {...to, from: {...C}};
     if (m !== 'wire') { q('.tw-wire').classList.remove('on'); svg.style.opacity = '1'; }
     litLink = null;
     drawStatic(); renderChrome(); kick();
+  }
+  function keepApart(T: Record<string, Target>, k: number, fixed: string): void {
+    const cs = Math.min(2.6, Math.max(1, 0.95 / k)), gap = 10 / k;
+    const fx = fixed && T[fixed] ? T[fixed].x : C.x;
+    const items: Footprint[] = [];
+    for (const id in T) {
+      const t = T[id], N = node[id];
+      if (!N || t.v < 1 || t.o < 0.5) continue;
+      if (t.v === 2 && !N.isChain) {
+        const flagged = nOpen(flagsOf(id)) > 0, accts = rollAccounts && D.entities.some(a => a.holder === id);
+        items.push({id, x: t.x, y: t.y, fixed: id === fixed, x0: -(N.hw + 4) * cs, x1: (N.hw + 14) * cs,
+          y0: -(N.hh + (flagged ? 14 : 5)) * cs, y1: (N.hh + (accts ? 16 : 5)) * cs});
+      } else {
+        // A dot and its name chip at rest, on the side away from the middle (where placeLabels puts it first).
+        const name = E[id]?.short ?? '', reach = (DOT_R + 7 + Math.min(PEEK, name.length) * PILL_FS * 0.55 + 12) * cs, r = (DOT_R + 4) * cs;
+        const out = t.x >= fx;
+        items.push({id, x: t.x, y: t.y, fixed: id === fixed, x0: out ? -r : -reach, x1: out ? reach : r, y0: -14 * cs, y1: 14 * cs});
+      }
+    }
+    const at = separate(items, gap);
+    for (const id in at) { T[id].x = at[id].x; T[id].y = at[id].y; }
   }
   function fitBox(pts: Target[], pad: number, maxK = 1.6): {x: number; y: number; k: number} {
     if (!pts.length) return {x: 1200, y: 800, k: 0.5};
@@ -573,18 +779,41 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
 
   let edgeEls: Record<string, EdgeEl> = {};
   let rtEls: {k: string; g: SVGGElement; o: string}[] = [];
-  let terrEls: {g: SVGGElement; a: SVGTextElement; b: SVGTextElement; x: number; top: number; big: boolean; n: number}[] = [];
+  let terrEls: {g: SVGGElement; a: SVGTextElement; b: SVGTextElement; x: number; top: number; bottom: number | null; big: boolean; n: number; members: string[]}[] = [];
+  // The party under the pointer: its group's name is shown even where names are left out for room.
+  let hotParty: string | null = null;
   let terrBoxes: Box[] = [], cardBoxes: Box[] = [], secBoxes: Box[] = [];
   let secEls: {t: SVGTextElement; a: number; r: number; rx: number; cx: number; cy: number}[] = [];
   let hopEls: {k: string; g: SVGGElement}[] = [];
   const overlap = (b: Box, list: Box[]) => list.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
 
+  // The grid is far behind the map: it follows the camera at a sixth of its travel, and its cells grow with the zoom,
+  // so zoomed in the grid is close, large and soft, zoomed all the way out it is small, sharp and far.
+  const gridEl = root.querySelector<HTMLElement>('.tw-grid');
+  let gridKey = '';
+  function moveGrid(): void {
+    if (!gridEl) return;
+    // 48 px cells all the way out (15%), about 130 px at 63%, 150 px at 100%, 480 px at 400%; past about 50% the grid is
+    // close enough to the lens to fall out of focus, up to a 4.8 px blur.
+    const still = RM(), gs = still ? 48 : 48 * Math.pow(C.k / 0.15, 0.7), blur = still ? 0 : Math.min(4.8, Math.max(0, (C.k - 0.5) * 2.2));
+    const off = (v: number) => (still ? 0 : ((v % gs) + gs) % gs);
+    const key = `${off(-C.x * C.k / 6).toFixed(1)}|${off(-C.y * C.k / 6).toFixed(1)}|${gs.toFixed(2)}|${blur.toFixed(2)}`;
+    if (key === gridKey) return;
+    gridKey = key;
+    const [gx, gy, , bl] = key.split('|');
+    gridEl.style.setProperty('--gx', `${gx}px`); gridEl.style.setProperty('--gy', `${gy}px`); gridEl.style.setProperty('--gs', `${gs.toFixed(2)}px`);
+    gridEl.style.filter = Number(bl) > 0.05 ? `blur(${bl}px)` : '';
+  }
+
+  let curCs = 1;
   function render(): void {
     cam.setAttribute('transform', `translate(${W / 2},${H / 2}) scale(${C.k}) translate(${-C.x},${-C.y})`);
+    moveGrid();
     const P: Record<string, Pt> = {};
     const cands: {id: string; N: NodeEl; d: Pt; pri: number}[] = [];
     // Cards keep a readable size on screen (about 170 px wide) whatever the zoom.
     const cs = Math.min(2.6, Math.max(1, 0.95 / C.k));
+    curCs = cs;
     for (const id in node) {
       const N = node[id], d = disp(N);
       P[id] = d;
@@ -594,6 +823,13 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       N.g.style.display = o < 0.02 ? 'none' : '';
       N.dust.style.display = v === 0 ? '' : 'none';
       N.dot.style.display = v === 1 || (v === 2 && N.isChain) ? '' : 'none';
+      // On a dot, the flag ring and the tag ring sit under the circle and its name chip; on a card, over the card.
+      if (!N.isChain) {
+        const under = v === 1, rings = [N.halo, N.tags].filter((x): x is SVGCircleElement | SVGGElement => Boolean(x));
+        if (under && rings[0].nextSibling !== (rings[1] ?? N.dot)) for (const r of rings) N.g.insertBefore(r, N.dot);
+        else if (!under && N.g.lastChild !== rings[rings.length - 1]) for (const r of rings) N.g.appendChild(r);
+      }
+      if (!N.isChain) N.dot.setAttribute('transform', `scale(${cs})`);
       N.card.style.display = v === 2 && !N.isChain ? '' : 'none';
       if (v === 2) N.card.setAttribute('transform', `scale(${cs})`);
       N.g.style.pointerEvents = v === 0 ? 'none' : '';
@@ -601,7 +837,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const fl = flagsOf(id);
       // The ring: any open Red Flag, its edge by level (textbook pulses, strong solid, faint dashed).
       const lvl = fl.textbook ? 'textbook' : fl.strong ? 'strong' : fl.faint ? 'faint' : '';
-      N.halo.style.display = v > 0 && lvl ? '' : 'none';
+      N.halo.style.display = v === 1 && lvl ? '' : 'none'; // a card shows its level in its outline
       if (lvl && N.halo.dataset.level !== lvl) {
         N.halo.dataset.level = lvl;
         N.halo.setAttribute('class', `halo ${lvl}`);
@@ -609,19 +845,42 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         N.halo.setAttribute('stroke-dasharray', lvl === 'faint' ? '3 3' : 'none');
       }
       // On a card the ring sits round the card's kind dot; on a dot, round the dot.
-      N.halo.setAttribute('r', String(v === 2 && !N.isChain ? 14 * cs : 4 + Math.sqrt(deg[id] || 0) * 2.6 + 5));
-      N.halo.setAttribute('cx', String(v === 2 && !N.isChain ? -70 * cs : 0));
+      N.halo.setAttribute('r', String(v === 2 && !N.isChain ? 14 * cs : (DOT_R + 4) * cs));
+      N.halo.setAttribute('cx', String(v === 2 && !N.isChain ? N.dx * cs : 0));
+      if (N.tags) {
+        N.tags.style.display = v > 0 ? '' : 'none';
+        const r = v === 2 ? 18.5 * cs : (DOT_R + 7.5) * cs;
+        N.tags.setAttribute('transform', v === 2 ? `translate(${N.dx * cs},0)` : '');
+        for (const c of Array.from(N.tags.querySelectorAll('circle'))) c.setAttribute('r', String(r));
+      }
       N.lbl.style.display = 'none';
+      if (N.pill) N.pill.g.style.display = 'none';
       if (v === 1 && !(lens.on && mode === 'case' && d.in)) cands.push({id, N, d, pri: fscore(fl) * 10 + deg[id] + (mode === 'case' ? 0 : 100)});
     }
+    const stubbed: EdgeEl[] = [];
+    const longPx = Math.hypot(W, H) * 0.4;
     for (const k in edgeEls) {
       const R = edgeEls[k], a = P[R.S.s], b = P[R.S.t], na = node[R.S.s], nb = node[R.S.t];
       const vis = Boolean(na && nb && a && b) && na.cur.v > 0 && nb.cur.v > 0 && na.cur.o > 0.02 && nb.cur.o > 0.02 && R.want;
       R.g.style.display = vis ? '' : 'none';
-      if (!vis) continue;
+      if (R.stub) R.stub.on = false;
+      if (!vis) { if (R.stub) { R.stub.a.style.display = 'none'; R.stub.b.style.display = 'none'; } continue; }
       const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1, bend = R.bend * Math.min(80, len * 0.16);
       const mx = (a.x + b.x) / 2 - dy / len * bend, my = (a.y + b.y) / 2 + dx / len * bend;
-      const dd = `M${a.x},${a.y}Q${mx},${my} ${b.x},${b.y}`;
+      let dd = `M${a.x},${a.y}Q${mx},${my} ${b.x},${b.y}`;
+      // A link across most of the view is drawn as its two ends with one letter each (SEE_1), unless it is lit.
+      const sa = toScreen(a.x, a.y), sb = toScreen(b.x, b.y);
+      if (R.stub && longPx > 0 && Math.hypot(sb.x - sa.x, sb.y - sa.y) > longPx && !R.g.classList.contains('lit')) {
+        const t = Math.min(0.2, 46 / Math.hypot(sb.x - sa.x, sb.y - sa.y)), u = 1 - t;
+        const at = (f: number) => [(1 - f) * (1 - f) * a.x + 2 * (1 - f) * f * mx + f * f * b.x, (1 - f) * (1 - f) * a.y + 2 * (1 - f) * f * my + f * f * b.y];
+        const [e1x, e1y] = at(t), [s2x, s2y] = at(u);
+        dd = `M${a.x},${a.y}Q${a.x + (mx - a.x) * t},${a.y + (my - a.y) * t} ${e1x},${e1y}M${s2x},${s2y}Q${mx + (b.x - mx) * u},${my + (b.y - my) * u} ${b.x},${b.y}`;
+        R.stub.on = true;
+        R.stub.a.setAttribute('transform', `translate(${e1x},${e1y}) scale(${1 / C.k})`);
+        R.stub.b.setAttribute('transform', `translate(${s2x},${s2y}) scale(${1 / C.k})`);
+        stubbed.push(R);
+      }
+      if (R.stub) { R.stub.a.style.display = R.stub.on ? '' : 'none'; R.stub.b.style.display = R.stub.on ? '' : 'none'; }
       R.p.setAttribute('d', dd); R.h.setAttribute('d', dd);
       if (R.u) R.u.setAttribute('d', dd);
       if (R.d2) R.d2.setAttribute('d', dd);
@@ -645,13 +904,56 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       R.mid = {x: mx * 0.5 + (a.x + b.x) / 4, y: my * 0.5 + (a.y + b.y) / 4};
       R.q = [a.x, a.y, mx, my, b.x, b.y];
     }
+    // Letters in a steady order, so a link keeps its letter while the view moves.
+    stubbed.sort((p, o) => (p.S.s + p.S.t + p.S.fam).localeCompare(o.S.s + o.S.t + o.S.fam)).forEach((R, i) => {
+      const letter = String.fromCharCode(65 + (i % 26)) + (i >= 26 ? String(Math.floor(i / 26) + 1) : '');
+      const words = R.lab?.body.textContent || linkSentence(R.S.fam, R.S.links, '');
+      for (const g of [R.stub!.a, R.stub!.b]) {
+        g.style.opacity = R.g.style.opacity;
+        g.querySelector('text')!.textContent = letter;
+        g.querySelector('title')!.textContent = `${letter}: ${E[R.S.s]?.short ?? ''} ${words} ${E[R.S.t]?.short ?? ''}. A long link, drawn as its two ends; the other end has the letter ${letter}. Click to open every record on it.`;
+      }
+    });
     terrBoxes = [];
-    for (const t of terrEls.slice().sort((a, b) => Number(b.big) - Number(a.big))) {
-      const fs = t.big ? 17 : 14, s = toScreen(t.x, t.top), sy = s.y - 60 * C.k - 6, w = t.n * fs * 0.5;
-      const bx = {x0: s.x - w / 2, x1: s.x + w / 2, y0: sy - fs, y1: sy + 16};
-      const clash = overlap(bx, terrBoxes);
-      t.g.style.display = clash ? 'none' : '';
-      if (clash) continue;
+    // A group's name goes above the group, else below it, at the first spot clear of the other names, of every party
+    // drawn (it used to sit over the next group's dots) and of the panels over the map. A band's heading (the other
+    // arrangements) sits beside its own parties by design, so it only keeps clear of the names and the panels. With no clear spot it is left
+    // out at rest, and shown while the pointer is on one of the group's parties.
+    const partyBoxes: Box[] = [], panelBoxes: Box[] = [];
+    if (terrEls.length) {
+      const rb = root.getBoundingClientRect();
+      for (const e of Array.from(root.querySelectorAll<HTMLElement>('.tw-glass, .tw-tools'))) {
+        if (!e.offsetParent || getComputedStyle(e).opacity === '0') continue;   // a closed drawer is laid out but unseen
+        const r = e.getBoundingClientRect();
+        panelBoxes.push({x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top});
+      }
+    }
+    if (terrEls.length) for (const id in node) {
+      const N = node[id];
+      if (N.cur.v < 1 || N.cur.o < 0.5 || !P[id]) continue;
+      const s = toScreen(P[id].x, P[id].y);
+      if (N.cur.v === 2) partyBoxes.push({x0: s.x - N.hw * C.k * curCs, x1: s.x + N.hw * C.k * curCs, y0: s.y - N.hh * C.k * curCs, y1: s.y + N.hh * C.k * curCs});
+      else {
+        const r = DOT_R * curCs * C.k, half = r + 12 + Math.min(PEEK, E[id]?.short.length ?? 8) * 6.5;
+        partyBoxes.push({x0: s.x - half, x1: s.x + half, y0: s.y - r - 4, y1: s.y + r + 4});
+      }
+    }
+    const isHot = (t: typeof terrEls[number]) => hotParty !== null && t.members.includes(hotParty);
+    for (const t of terrEls.slice().sort((a, b) => Number(isHot(b)) - Number(isHot(a)) || Number(b.big) - Number(a.big))) {
+      const fs = t.big ? 17 : 14, w = t.n * fs * 0.56, s = toScreen(t.x, t.top), hot = isHot(t);
+      const spots = [s.y - 60 * C.k - 6];
+      if (t.bottom !== null) spots.push(toScreen(t.x, t.bottom).y + 40 * C.k + fs + 6);
+      let sy = NaN, bx: Box | null = null;
+      for (const y of spots) {
+        const b = {x0: s.x - w / 2, x1: s.x + w / 2, y0: y - fs, y1: y + 16};
+        if (!overlap(b, panelBoxes) && (hot || (!overlap(b, terrBoxes) && (t.bottom === null || !overlap(b, partyBoxes))))) { sy = y; bx = b; break; }
+      }
+      t.g.classList.toggle('terr-hot', hot && Boolean(bx));
+      // The named group's title rides above the parties while the pointer is on one of them, so no dot cuts it.
+      const layer = q<SVGGElement>(hot ? '.tw-terr-top' : '.tw-terr-l:not(.tw-terr-top)');
+      if (t.g.parentNode !== layer) layer.appendChild(t.g);
+      t.g.style.display = bx ? '' : 'none';
+      if (!bx) continue;
       terrBoxes.push(bx);
       const wy = (sy - H / 2) / C.k + C.y;
       t.a.setAttribute('x', String(t.x)); t.a.setAttribute('y', String(wy)); t.a.setAttribute('font-size', String(fs / C.k)); t.a.setAttribute('stroke-width', String(5 / C.k));
@@ -662,43 +964,111 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       const N = node[id];
       if (N.cur.v === 2 && !N.isChain && N.cur.o > 0.5) {
         const s = toScreen(P[id].x, P[id].y);
-        cardBoxes.push({x0: s.x - 94 * C.k * cs, x1: s.x + 94 * C.k * cs, y0: s.y - 32 * C.k * cs, y1: s.y + (D.entities.some(a => a.holder === id) ? 42 : 30) * C.k * cs});
+        cardBoxes.push({x0: s.x - (N.hw + 4) * C.k * cs, x1: s.x + (N.hw + 12) * C.k * cs, y0: s.y - (N.hh + (nOpen(flagsOf(id)) ? 13 : 5)) * C.k * cs,
+          y1: s.y + (N.hh + (D.entities.some(a => a.holder === id) ? 16 : 4)) * C.k * cs});
       }
     }
-    const rtBoxes: Box[] = [];
+    // Every dot drawn, with its name beside it on either side (the round-trip chips and the "+N more" chips keep off them).
+    const dotBoxes: Box[] = [];
+    for (const id in node) {
+      const N = node[id];
+      if (N.cur.v !== 1 || N.cur.o < 0.5 || !P[id]) continue;
+      const s = toScreen(P[id].x, P[id].y), r = DOT_R * curCs * C.k, half = r + 12 + Math.min(PEEK, E[id]?.short.length ?? 8) * 6.5;
+      dotBoxes.push({x0: s.x - half, x1: s.x + half, y0: s.y - r - 4, y1: s.y + r + 4});
+    }
+    // Round-trip chips (as the group names, DECISIONS_LOG 30): by the line from the focus, at the first spot clear of every
+    // party (card or dot), the other chips and the panels; above the line first, then below, further out each time. With
+    // no clear spot it is left out at rest and shown while the pointer is on either party of the round trip.
+    const rtBoxes: Box[] = [], rtPanels: Box[] = [];
+    if (rtEls.length) {
+      const rb = root.getBoundingClientRect();
+      for (const e of Array.from(root.querySelectorAll<HTMLElement>('.tw-glass:not(.tw-tip), .tw-tools'))) {
+        if (!e.offsetParent || getComputedStyle(e).opacity === '0') continue;   // the pointer's tip follows the pointer: not a panel
+        const r = e.getBoundingClientRect();
+        rtPanels.push({x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top});
+      }
+    }
     for (const L of rtEls) {
       const R = edgeEls[L.k];
       if (!R || R.g.style.display === 'none') { L.g.style.display = 'none'; continue; }
-      L.g.style.display = '';
       const a = P[focus], b = P[L.o];
+      if (!a || !b) { L.g.style.display = 'none'; continue; }
       // Chips keep their size on screen whatever the zoom (at 65% they were too small to read).
-      // Along the line from the focus, clear of the cards where it can be.
       const w = Number(L.g.querySelector('rect')?.getAttribute('width')) || 150;
-      const at = (f: number) => {
-        const cx = a.x * (1 - f) + b.x * f, cy = a.y * (1 - f) + b.y * f - 30 / C.k, sc = toScreen(cx, cy);
-        return {cx, cy, b: {x0: sc.x - w / 2, x1: sc.x + w / 2, y0: sc.y - 13, y1: sc.y + 13}};
+      const at = (f: number, dy: number) => {
+        const cx = a.x * (1 - f) + b.x * f, cy = a.y * (1 - f) + b.y * f + dy / C.k, sc = toScreen(cx, cy);
+        return {cx, cy, b: {x0: sc.x - w / 2 - 3, x1: sc.x + w / 2 + 3, y0: sc.y - 15, y1: sc.y + 15}};
       };
-      const spot = [0.58, 0.5, 0.42, 0.66, 0.34].map(at).find(o => !overlap(o.b, cardBoxes)) ?? at(0.58);
-      L.g.setAttribute('transform', `translate(${spot.cx},${spot.cy}) scale(${1 / C.k})`);
-      rtBoxes.push(spot.b);
+      const clear = (o: Box) => !overlap(o, cardBoxes) && !overlap(o, dotBoxes) && !overlap(o, rtBoxes) && !overlap(o, rtPanels)
+        && o.x0 > 4 && o.x1 < W - 4 && o.y0 > 4 && o.y1 < H - 4;
+      let spot: ReturnType<typeof at> | undefined;
+      for (const dy of [-30, 30, -58, 58, -86, 86, -114, 114]) {
+        spot = [0.5, 0.58, 0.42, 0.66, 0.34, 0.75, 0.25].map(f => at(f, dy)).find(o => clear(o.b));
+        if (spot) break;
+      }
+      const hot = hotParty !== null && (hotParty === focus || hotParty === L.o);
+      L.g.classList.toggle('rt-hot', !spot && hot);
+      if (!spot && !hot) { L.g.style.display = 'none'; continue; }
+      // Shown on hover with no clear spot: at least off the cards and the other chips where it can be.
+      const put = spot ?? [-30, 30, -58, 58, -86, 86, -114, 114].flatMap(dy => [0.5, 0.58, 0.42, 0.66, 0.34].map(f => at(f, dy))).find(o => !overlap(o.b, cardBoxes) && !overlap(o.b, rtBoxes)) ?? at(0.5, -30);
+      L.g.style.display = '';
+      L.g.setAttribute('transform', `translate(${put.cx},${put.cy}) scale(${1 / C.k})`);
+      rtBoxes.push(put.b);
     }
     // Sector names: the first radius between the focus and its ring that is clear of cards and chips.
     secBoxes = rtBoxes;
+    // Sector names keep off every card, dot and its name, chip and panel (DECISIONS_LOG 55); with no clear spot between
+    // the focus and its ring the name is left out (the sector's parties are still where they are).
+    const secPanels: Box[] = [];
+    if (secEls.length) {
+      const rb = root.getBoundingClientRect();
+      for (const e of Array.from(root.querySelectorAll<HTMLElement>('.tw-glass:not(.tw-tip), .tw-tools'))) {
+        if (!e.offsetParent || getComputedStyle(e).opacity === '0') continue;
+        const r = e.getBoundingClientRect();
+        secPanels.push({x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top});
+      }
+    }
     for (const S of secEls) {
       let ok: {wx: number; wy: number; b: Box} | null = null;
       for (const f of [0.6, 0.5, 0.7, 0.42, 0.8, 0.34]) {
         const wx = S.cx + Math.cos(S.a) * S.r * f * S.rx, wy = S.cy + Math.sin(S.a) * S.r * f, s = toScreen(wx, wy);
-        const w = (S.t.textContent ?? '').length * 7.6, b = {x0: s.x - w / 2, x1: s.x + w / 2, y0: s.y - 9, y1: s.y + 5};
-        if (!overlap(b, cardBoxes) && !overlap(b, secBoxes)) { ok = {wx, wy, b}; break; }
+        const w = (S.t.textContent ?? '').length * 9.4, b = {x0: s.x - w / 2, x1: s.x + w / 2, y0: s.y - 11, y1: s.y + 6};
+        if (!overlap(b, cardBoxes) && !overlap(b, dotBoxes) && !overlap(b, secBoxes) && !overlap(b, secPanels)) { ok = {wx, wy, b}; break; }
       }
       S.t.style.display = ok ? '' : 'none';
-      if (ok) { S.t.setAttribute('x', String(ok.wx)); S.t.setAttribute('y', String(ok.wy)); S.t.setAttribute('font-size', String(10.5 / C.k)); secBoxes.push(ok.b); }
+      if (ok) {
+        S.t.setAttribute('x', String(ok.wx)); S.t.setAttribute('y', String(ok.wy));
+        S.t.setAttribute('font-size', String(12 / C.k)); S.t.setAttribute('stroke-width', String(5 / C.k)); secBoxes.push(ok.b);
+      }
     }
+    // "+N more" chips: beside their party, outward from the focus, at the first spot clear of every card, dot, its name
+    // and link chip (they used to sit at a fixed offset, over the cards' names). A leader line keeps them tied to it.
+    const moreBoxes: Box[] = [];
     for (const M of moreEls) {
-      const s = toScreen(M.x, M.y);
-      M.g.setAttribute('transform', `translate(${M.x},${M.y}) scale(${1 / C.k})`);
-      secBoxes.push({x0: s.x - 40, x1: s.x + 40, y0: s.y - 12, y1: s.y + 12});
+      const at = P[M.p], from = P[focus];
+      if (!at) { M.g.style.display = 'none'; M.lead.style.display = 'none'; continue; }
+      M.g.style.display = ''; M.lead.style.display = '';
+      const s = toScreen(at.x, at.y), f = from ? toScreen(from.x, from.y) : {x: W / 2, y: H / 2};
+      const base = Math.atan2(s.y - f.y, s.x - f.x) || 0;
+      const box = (x: number, y: number) => ({x0: x - M.w / 2 - 4, x1: x + M.w / 2 + 4, y0: y - 17, y1: y + 17});
+      const clear = (b: Box) => !overlap(b, cardBoxes) && !overlap(b, dotBoxes) && !overlap(b, secBoxes) && !overlap(b, moreBoxes)
+        && b.x0 > 8 && b.x1 < W - 8 && b.y0 > 8 && b.y1 < H - 8;
+      let spot: {x: number; y: number} | null = null;
+      for (const d of [120, 150, 185, 225, 270]) {
+        for (const turn of [0, 0.45, -0.45, 0.9, -0.9, 1.4, -1.4, Math.PI]) {
+          const x = s.x + Math.cos(base + turn) * d, y = s.y + Math.sin(base + turn) * d * 0.62;
+          if (clear(box(x, y))) { spot = {x, y}; break; }
+        }
+        if (spot) break;
+      }
+      spot ??= {x: s.x + Math.cos(base) * 150, y: s.y + Math.sin(base) * 93};
+      moreBoxes.push(box(spot.x, spot.y));
+      const wx = (spot.x - W / 2) / C.k + C.x, wy = (spot.y - H / 2) / C.k + C.y;
+      M.g.setAttribute('transform', `translate(${wx},${wy}) scale(${1 / C.k})`);
+      M.lead.setAttribute('d', `M${at.x},${at.y}L${wx},${wy}`);
+      M.lead.setAttribute('stroke-width', String(1.2 / C.k));
     }
+    secBoxes.push(...moreBoxes);
     for (const h of hopEls) {
       const R = edgeEls[h.k];
       if (!R || !R.mid) { h.g.style.display = 'none'; continue; }
@@ -709,32 +1079,89 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     placeLinkLabels(taken);
     const lensOn = lens.on && mode === 'case';
     q<SVGGElement>('.tw-nodes').style.setProperty('--lo', lensOn ? '.28' : '1');
-    q<SVGGElement>('.tw-terr-l').style.opacity = lensOn ? '.3' : '1';
+    root.querySelectorAll<SVGGElement>('.tw-terr-l').forEach(g => { g.style.opacity = lensOn ? '.3' : '1'; });
     renderLens(P);
     q('.tw-zoom').textContent = `${Math.round(C.k * 100)}%`;
   }
 
+  /* A dot's name is a chip that grows out from behind its circle, on whichever side has more open room: at rest it
+     shows the name's first characters fading out; hovering the party slides it open to the whole name and how many
+     parties it is linked to. It lives in the dot's own group, so it keeps the circle's size on screen. */
+  const PEEK = 13, PILL_FS = 11.5;
+  let maskSerial = 0;
+  function revealName(N: NodeEl, full: boolean): void {
+    const P = N.pill;
+    if (!P || P.g.style.display === 'none') return;
+    const name = P.g.dataset.name ?? '', count = P.g.dataset.count ?? '';
+    // Opened, it may take the other side: the side it rests on can have a panel where the whole name would reach.
+    const dir = Number(full ? P.g.dataset.odir : P.g.dataset.dir) || 1;
+    if (P.t.textContent !== name) P.t.textContent = name;
+    if (P.n.textContent !== count) P.n.textContent = count;
+    let nameW = name.length * PILL_FS * 0.55, restW = Math.min(name.length, PEEK) * PILL_FS * 0.55;
+    try {
+      nameW = P.t.getComputedTextLength() || nameW;
+      restW = name.length > PEEK ? P.t.getSubStringLength(0, PEEK) || restW : nameW;
+    } catch { /* not laid out (tests) */ }
+    const inner = DOT_R + 7, badgeW = 19 + count.length * 6.6;
+    // The name always reads from its start: on the right it starts by the circle; on the left it starts at the chip's
+    // far end and slides outward as the chip opens (a transform, so it moves with the chip).
+    const tx = dir > 0 ? inner : -(inner + (full ? nameW : restW));
+    P.t.setAttribute('x', '0'); P.t.setAttribute('text-anchor', 'start'); P.t.style.transform = `translateX(${tx}px)`;
+    P.badge.querySelector('rect')!.setAttribute('width', String(badgeW));
+    P.badge.setAttribute('transform', `translate(${dir > 0 ? inner + nameW + 8 : -(inner + nameW + 8 + badgeW)},0)`);
+    // At rest the chip reaches past the name's first characters, which fade out; opened, past the name and the badge.
+    const reach = full ? inner + nameW + 8 + badgeW + 8 : inner + restW + 12;
+    // From the circle's centre outward: the chip's rounded end is wholly behind the circle, so none of it shows round it.
+    const x = dir > 0 ? 0 : -reach;
+    for (const r of [P.bg, P.reveal]) {
+      r.setAttribute('x', String(x)); r.setAttribute('width', String(reach));
+      r.style.setProperty('x', `${x}px`); r.style.setProperty('width', `${reach}px`);
+    }
+    // At rest the name fades out where it is cut: at the chip's far end on the right, by the circle on the left.
+    P.reveal.setAttribute('fill', full || name.length <= PEEK ? '#fff' : `url(#tw-fade-${dir > 0 ? 'r' : 'l'})`);
+    N.g.classList.toggle('peek-open', full);
+  }
   function placeLabels(cands: {id: string; N: NodeEl; d: Pt; pri: number}[]): Box[] {
     const boxes = terrBoxes.concat(cardBoxes, secBoxes);
     cands.sort((a, b) => b.pri - a.pri);
-    const fsS = mode === 'case' ? 12 : 11.5;
+    const fp = focus && node[focus] ? node[focus].cur : null, centre = fp ? toScreen(fp.x, fp.y) : {x: W / 2, y: H / 2};
+    // The panels over the map: a name chip, opened, must not run under one.
+    const rb = root.getBoundingClientRect();
+    const panels: Box[] = Array.from(root.querySelectorAll<HTMLElement>('.tw-glass, .tw-tools')).filter(e => e.offsetParent).map(e => {
+      const r = e.getBoundingClientRect();
+      return {x0: r.left - rb.left, x1: r.right - rb.left, y0: r.top - rb.top, y1: r.bottom - rb.top};
+    });
+    // Every other dot's circle: a name chip never runs over one (the 1Malaysia name ran under two icons).
+    const circles = cands.map(c => {
+      const s = toScreen(c.d.x, c.d.y), r = (DOT_R + 3) * curCs * C.k;
+      return {id: c.id, x0: s.x - r, x1: s.x + r, y0: s.y - r, y1: s.y + r};
+    });
     for (const c of cands) {
-      const s = toScreen(c.d.x, c.d.y), r = (4 + Math.sqrt(deg[c.id]) * 2.6) * C.k, off = r + fsS + 2;
-      const w = E[c.id].short.length * fsS * 0.56;
-      // Under the dot first, then above it, then to its right or left: a party is not left nameless for a near miss.
-      const spots: {dx: number; dy: number; anchor: string}[] = [{dx: 0, dy: off, anchor: 'middle'}, {dx: 0, dy: -r - 6, anchor: 'middle'},
-        {dx: r + 6, dy: fsS * 0.35, anchor: 'start'}, {dx: -r - 6, dy: fsS * 0.35, anchor: 'end'}];
-      const box = (p: typeof spots[number]) => {
-        const x0 = p.anchor === 'middle' ? s.x - w / 2 : p.anchor === 'start' ? s.x + p.dx : s.x + p.dx - w;
-        return {x0: x0 - 3, x1: x0 + w + 3, y0: s.y + p.dy - fsS, y1: s.y + p.dy + 3};
+      const P = c.N.pill;
+      if (!P) continue;
+      const name = E[c.id].short, shown = name.length > PEEK ? name.slice(0, PEEK) : name;
+      const u = curCs * C.k, s = toScreen(c.d.x, c.d.y), r = DOT_R * u, reach = (DOT_R + 7 + shown.length * PILL_FS * 0.55 + 12) * u;
+      const side = (dir: 1 | -1) => {
+        const x0 = dir > 0 ? s.x + r : s.x - reach, x1 = dir > 0 ? s.x + reach : s.x - r;
+        return {x0: x0 - 2, x1: x1 + 2, y0: s.y - 13 * u, y1: s.y + 13 * u};
       };
-      const at = spots.find(p => { const b = box(p); return b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes); });
-      if (!at) continue;
-      boxes.push(box(at));
-      c.N.lbl.style.display = '';
-      c.N.lbl.setAttribute('font-size', String(fsS / C.k)); c.N.lbl.setAttribute('stroke-width', String(4 / C.k));
-      c.N.lbl.setAttribute('x', String(at.dx / C.k)); c.N.lbl.setAttribute('y', String((at.dy - 2) / C.k)); c.N.lbl.setAttribute('text-anchor', at.anchor);
-      c.N.lbl.textContent = E[c.id].short;
+      const extra = `${deg[c.id]} linked ${deg[c.id] === 1 ? 'party' : 'parties'}`;
+      const open = (DOT_R + 7 + (name.length + extra.length + 1) * PILL_FS * 0.55 + 12) * u;
+      const opened = (dir: 1 | -1): Box => ({x0: dir > 0 ? s.x : s.x - open, x1: dir > 0 ? s.x + open : s.x, y0: s.y - 13 * u, y1: s.y + 13 * u});
+      const room = (dir: 1 | -1) => { const b = side(dir); return b.x0 >= 0 && b.x1 <= W && !overlap(b, boxes) && !overlap(b, circles.filter(o => o.id !== c.id)); };
+      const openRoom = (dir: 1 | -1) => { const b = opened(dir); return b.x0 >= 0 && b.x1 <= W && !overlap(b, panels); };
+      // Outward from the party in the middle has more room, unless something sits there; a side where the opened
+      // chip would run under a panel or off the map comes second.
+      const out: 1 | -1 = s.x >= centre.x ? 1 : -1, other: 1 | -1 = out === 1 ? -1 : 1;
+      const order = ([out, other] as (1 | -1)[]).sort((a, b) => Number(openRoom(b)) - Number(openRoom(a)));
+      const dir = order.find(d => room(d)) ?? 0;
+      if (!dir) continue;
+      boxes.push(side(dir));
+      P.g.style.display = '';
+      const odir = openRoom(dir) ? dir : openRoom(dir === 1 ? -1 : 1) ? (dir === 1 ? -1 : 1) : dir;
+      P.g.dataset.name = name; P.g.dataset.dir = String(dir); P.g.dataset.odir = String(odir);
+      P.g.dataset.count = String(deg[c.id]);
+      revealName(c.N, c.N.g.classList.contains('hovering'));
     }
     return boxes;
   }
@@ -748,11 +1175,25 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     for (const id in node) {
       const N = node[id];
       if (N.cur.v !== 1 || N.cur.o < 0.5) continue;
-      const s = toScreen(N.cur.x, N.cur.y), r = (4 + Math.sqrt(deg[id] || 0) * 2.6) * C.k + 3;
+      const s = toScreen(N.cur.x, N.cur.y), r = DOT_R * curCs * C.k + 3;
       dots.push({x0: s.x - r, x1: s.x + r, y0: s.y - r, y1: s.y + r});
     }
     const placed = boxes.concat(dots);
     const order = Object.values(edgeEls).filter(R => R.lab).sort((a, b) => pri(b) - pri(a));
+    // The lines drawn, sampled on screen per link: a sentence goes, where it can, at a spot no other line runs through
+    // (they sat across other links' lines). Skipped while the view moves, to keep the frames light.
+    const lines: Record<string, number[]> = {};
+    if (!tw) for (const k in edgeEls) {
+      const R = edgeEls[k];
+      if (!R.q || R.g.style.display === 'none') continue;
+      const [ax, ay, mx, my, bx, by] = R.q, pts: number[] = [];
+      for (let i = 1; i < 24; i++) {
+        const t = i / 24, u = 1 - t, s = toScreen(u * u * ax + 2 * u * t * mx + t * t * bx, u * u * ay + 2 * u * t * my + t * t * by);
+        pts.push(s.x, s.y);
+      }
+      lines[k] = pts;
+    }
+    const crossed = (b: Box, own: EdgeEl) => { let n = 0; for (const k in lines) if (edgeEls[k] !== own) n += pointsIn(b, lines[k]); return n; };
     let hidden = 0;
     const top = 120, bottom = H - 112;
     for (const R of order) {
@@ -761,11 +1202,15 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       if (!vis) { L.g.style.display = 'none'; continue; }
       // The middle of the curve first, then further along it either way.
       const [ax, ay, mx, my, bx, by] = R.q!;
-      let spot: {x: number; y: number; b: Box} | null = null;
-      for (const t of [0.5, 0.4, 0.6, 0.3, 0.7, 0.22, 0.78, 0.15, 0.85]) {
+      let spot: {x: number; y: number; b: Box} | null = null, least = Infinity;
+      for (const t of R.stub?.on ? [0.14, 0.86, 0.2, 0.8] : [0.5, 0.4, 0.6, 0.3, 0.7, 0.22, 0.78, 0.15, 0.85]) {
         const u = 1 - t, x = u * u * ax + 2 * u * t * mx + t * t * bx, y = u * u * ay + 2 * u * t * my + t * t * by, s = toScreen(x, y);
         const b = {x0: s.x - L.w / 2 - 2, x1: s.x + L.w / 2 + 2, y0: s.y - 12, y1: s.y + 12};
-        if (b.x0 >= 0 && b.x1 <= W && b.y0 >= top && b.y1 <= bottom && !overlap(b, placed)) { spot = {x, y, b}; break; }
+        if (!(b.x0 >= 0 && b.x1 <= W && b.y0 >= top && b.y1 <= bottom && !overlap(b, placed))) continue;
+        // The clear spot that the fewest other lines run through; the first with none wins.
+        const n = crossed(b, R);
+        if (n < least) { least = n; spot = {x, y, b}; }
+        if (!n) break;
       }
       if (!spot) { L.g.style.display = 'none'; hidden++; continue; }
       placed.push(spot.b);
@@ -836,7 +1281,21 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
           on(lg, 'pointerleave', hideTip);
           lab = {g: lg, w: tw + 14, t, body, ended: false};
         }
-        edgeEls[`${key}#${i}`] = {g, p, u, h, d2, S: {...S, s, t}, w, bend, want, lab};
+        let stub: EdgeEl['stub'] = null;
+        if (mode === 'case' || mode === 'party') {
+          const badge = () => {
+            const sg = el('g', {class: `stub${S.sure ? ` s-${S.sure}` : ''}`, role: 'button', tabindex: -1, style: 'display:none'}, gLab);
+            el('circle', {r: 9, stroke: S.sure === 'disputed' ? DISPUTED : fam.c}, sg);
+            el('text', {y: 3.6, 'text-anchor': 'middle'}, sg);
+            el('title', {}, sg);
+            on<MouseEvent>(sg, 'click', ev => { ev.stopPropagation(); openWire(B.key); });
+            on<PointerEvent>(sg, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showLinkTip(ev, S); });
+            on(sg, 'pointerleave', hideTip);
+            return sg;
+          };
+          stub = {a: badge(), b: badge(), on: false};
+        }
+        edgeEls[`${key}#${i}`] = {g, p, u, h, d2, S: {...S, s, t}, w, bend, want, lab, stub};
         on<MouseEvent>(h, 'click', ev => { ev.stopPropagation(); openWire(B.key); });
         on<PointerEvent>(h, 'pointerenter', ev => { if (ev.pointerType !== 'touch') showLinkTip(ev, S); });
         on(h, 'pointerleave', hideTip);
@@ -870,10 +1329,10 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         const ki = Object.keys(edgeEls).find(k => k.startsWith(`${key}#`));
         if (!ki || !B) continue;
         const pay = B.links.filter(l => l.fam === 'money'), L = pay.length ? pay : B.links, l0 = L[0];
-        const fwd = L.some(l => rep(l.s) === a), sum = pay.reduce((s, l) => s + (l.amount || 0), 0);
+        const fwd = L.some(l => rep(l.s) === a), sums = fmtSums(pay);
         const years = [...new Set(pay.map(l => l.date.slice(0, 4)).filter(Boolean))].sort();
         const span = years.length ? ` · ${years[0]}${years.length > 1 ? `–${years[years.length - 1]}` : ''}` : '';
-        const txt = pay.length ? `${fwd ? 'PAID' : 'WAS PAID BY'} · ${pay.length > 1 ? `${pay.length} PAYMENTS · ` : ''}${fmtAmt(sum, l0.cur).toUpperCase()}${span}`
+        const txt = pay.length ? `${fwd ? 'PAID' : 'WAS PAID BY'} · ${pay.length > 1 ? `${pay.length} PAYMENTS · ` : ''}${(sums || 'amount not stated').toUpperCase()}${span}`
           : `${(FAM[l0.fam] || FAM.other).n.toUpperCase()}${fwd ? '' : ' (OTHER WAY)'}`;
         const g = el('g', {}, gLab);
         const r = el('rect', {y: -11, height: 22, rx: 11, class: 'hop-bg', stroke: '#FF8070'}, g);
@@ -887,8 +1346,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       }
     }
     // Territories.
-    const gT = q<SVGGElement>('.tw-terr'), gL = q<SVGGElement>('.tw-terr-l');
-    gT.textContent = ''; gL.textContent = ''; terrEls = [];
+    const gT = q<SVGGElement>('.tw-terr'), gL = q<SVGGElement>('.tw-terr-l:not(.tw-terr-top)');
+    gT.textContent = ''; gL.textContent = ''; q<SVGGElement>('.tw-terr-top').textContent = ''; terrEls = [];
     if (mode === 'case' && layout) {
       for (const band of layout.bands) {
         const g = el('g', {}, gL);
@@ -896,13 +1355,13 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         a.textContent = band.name;
         const b = el('text', {class: 'terr-s', 'text-anchor': 'middle'}, g);
         b.textContent = band.sub;
-        terrEls.push({g, a, b, x: band.x, top: band.top, big: true, n: band.name.length});
+        terrEls.push({g, a, b, x: band.x, top: band.top, bottom: null, big: true, n: band.name.length, members: []});
       }
     } else if (mode === 'case') {
       for (const t of Object.values(terr)) {
         const ms = t.members;
-        let x = 0, top = 1e9;
-        ms.forEach(m => { x += E[m].x; top = Math.min(top, E[m].y); });
+        let x = 0, top = 1e9, bottom = -1e9;
+        ms.forEach(m => { x += E[m].x; top = Math.min(top, E[m].y); bottom = Math.max(bottom, E[m].y); });
         x /= ms.length;
         ms.forEach(m => el('circle', {cx: E[m].x, cy: E[m].y, r: t.id === 'loose' ? 70 : 88, fill: t.tint, 'fill-opacity': 0.75}, gT));
         const g = el('g', {}, gL);
@@ -911,7 +1370,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         const b = el('text', {class: 'terr-s', 'text-anchor': 'middle'}, g);
         b.textContent = `${ms.length} ${ms.length === 1 ? 'PARTY' : 'PARTIES'}${t.flags ? ` · ${t.flags} OPEN FLAGS` : ''}`;
         if (t.flags) b.setAttribute('fill', '#F6966A');
-        terrEls.push({g, a, b, x, top, big: ms.length > 6, n: t.name.length});
+        terrEls.push({g, a, b, x, top, bottom, big: ms.length > 6, n: t.name.length, members: ms});
       }
     }
     // Sectors and "more" chips.
@@ -928,12 +1387,27 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         secEls.push({t, a: s.a * Math.PI / 180, r: I.R1, rx: I.RX, cx: I.cx, cy: I.cy});
       }
       for (const m of I.more) {
-        const g = el('g', {class: 'more', transform: `translate(${m.x},${m.y})`, role: 'button', 'aria-label': `Show ${m.n} more linked to ${E[m.p].short}`}, gM);
-        el('rect', {x: -40, y: -12, width: 80, height: 24, rx: 12}, g);
-        const t = el('text', {'text-anchor': 'middle', y: 4}, g);
-        t.textContent = `+${m.n} more`;
-        on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); expanded.add(m.p); go('party', {noTrail: true}); });
-        moreEls.push({x: m.x, y: m.y, g});
+        // A folded stack: a leader back to its party, then a tab with three stacked dots and the count.
+        // The leader is drawn with the sector rings, under the links, cards and chips, so it never crosses one.
+        const lead = el('path', {class: 'more-lead'}, gS);
+        const g = el('g', {class: 'more', transform: `translate(${m.x},${m.y})`, role: 'button', tabindex: 0, 'aria-label': `Show ${m.n} more linked to ${E[m.p].short}`}, gM);
+        const w = 80 + String(m.n).length * 8, ws = 40 + String(m.n).length * 8;
+        // At rest a condensed tab (three stacked dots and the count); on hover or keyboard focus it opens to the full chip.
+        // It is placed by its full width, so opening never covers anything.
+        const small = el('g', {class: 'more-s'}, g);
+        el('rect', {x: -ws / 2, y: -11, width: ws, height: 22, rx: 11, class: 'more-bg'}, small);
+        for (const [i, dx] of [0, 4, 8].entries()) el('circle', {cx: -ws / 2 + 10 + dx, cy: 0, r: 3.4, class: `more-stack s${i}`}, small);
+        el('text', {x: -ws / 2 + 25, y: 4.5, class: 'more-n'}, small).textContent = `+${m.n}`;
+        const full = el('g', {class: 'more-f'}, g);
+        el('rect', {x: -w / 2, y: -13, width: w, height: 26, rx: 6, class: 'more-bg'}, full);
+        for (const [i, dx] of [0, 5, 10].entries()) el('circle', {cx: -w / 2 + 11 + dx, cy: 0, r: 4.2, class: `more-stack s${i}`}, full);
+        const t = el('text', {x: -w / 2 + 30, y: 4.5}, full);
+        el('tspan', {class: 'more-n'}, t).textContent = `+${m.n}`;
+        el('tspan', {class: 'more-w', dx: 4}, t).textContent = 'more';
+        const open = () => { expanded.add(m.p); go('party', {noTrail: true}); };
+        on<MouseEvent>(g, 'click', ev => { ev.stopPropagation(); open(); });
+        on<KeyboardEvent>(g, 'keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); open(); } });
+        moreEls.push({p: m.p, w, g, lead});
       }
     }
     chains.forEach(c => { const t = node[c.id]?.dot.querySelector('text'); if (t) t.textContent = c.mids.length > 1 ? `CHAIN OF ${c.mids.length} COMPANIES` : '1 COMPANY BETWEEN'; });
@@ -1195,7 +1669,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       tip.innerHTML = `<b>${c.mids.length > 1 ? `Chain of ${c.mids.length} companies` : 'One company in between'}</b><span class="m">${c.mids.map(m => esc(E[m].short)).join(' → ')}. Each owns the next and nothing else. Click to open it out.</span>`;
     } else {
       const e = E[id], f = flagsOf(id);
-      tip.innerHTML = `<b>${esc(e.short)}</b><span class="m">${esc((KIND[e.kind] ?? KIND.other).name)} · ${deg[id]} linked ${deg[id] === 1 ? 'party' : 'parties'}${nOpen(f) ? ` · ${nOpen(f)} open flags` : ''}</span>`;
+      tip.innerHTML = `<b>${esc(e.short)}</b><span class="m">${esc((KIND[e.kind] ?? KIND.other).name)}${e.jur ? ` · ${esc(placeName(e.jur))}` : ''} · ${deg[id]} linked ${deg[id] === 1 ? 'party' : 'parties'}${nOpen(f) ? ` · ${nOpen(f)} open flags` : ''}</span>`;
     }
     placeTip(ev);
     tip.classList.add('on');
@@ -1213,11 +1687,12 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   const hideTip = () => tip.classList.remove('on');
   let litLink: string | null = null;
   function setLitLink(k: string | null): void {
-    if (litLink && edgeEls[litLink]) { edgeEls[litLink].g.classList.remove('lit'); edgeEls[litLink].lab?.g.classList.remove('lit'); }
+    if (litLink && edgeEls[litLink]) { edgeEls[litLink].g.classList.remove('lit'); edgeEls[litLink].lab?.g.classList.remove('lit'); kick(); }
     litLink = k && edgeEls[k] ? k : null;
     if (!litLink) { hideTip(); return; }
     const R = edgeEls[litLink];
     R.g.classList.add('lit'); R.lab?.g.classList.add('lit');
+    kick();  // a lit link is drawn whole, even when it is long enough to be drawn as two lettered ends
     const words = R.lab?.body.textContent ?? '';
     const sure = R.S.sure ? SURE[R.S.sure] : null;
     tip.innerHTML = `<b>${esc(E[R.S.s]?.short ?? '')} ${esc(words)} ${esc(E[R.S.t]?.short ?? '')}</b><span class="m">${sure ? `${esc(sure.g)} ${esc(sure.n)} · ` : ''}Enter opens every record on this link · J / K next, previous</span>`;
@@ -1230,8 +1705,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   /* key */
   (() => {
     let h = '';
-    for (const kk of ['person', 'company', 'org', 'property', 'vehicle']) h += `<div class="row"><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="${KIND[kk].fill}" stroke="${KIND[kk].ring}" stroke-width="1.6"/></svg>${KIND[kk].name}</div>`;
-    for (const f of ['owns', 'runs', 'money', 'other']) h += `<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="${FAM[f].c}" stroke-width="2.4" ${f === 'other' ? 'stroke-dasharray="5 4"' : ''}/></svg>${FAM[f].n}</div>`;
+    for (const kk of ['person', 'company', 'org', 'property', 'vehicle']) h += `<div class="row"><svg width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="${KIND[kk].fill}" stroke="${KIND[kk].ring}" stroke-width="1.3"/><use href="#${KIND_SYMBOL[kk]}" x="3.5" y="3.5" width="11" height="11" color="${KIND[kk].ring}"/></svg>${KIND[kk].name}</div>`;
+    for (const f of ['owns', 'runs', 'money', 'other']) h += `<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="${FAM[f].c}" stroke-width="2.4" /></svg>${FAM[f].n}</div>`;
     h += '<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="#c98a5e" stroke-width="2"/><path d="M2 5H28" stroke="#ffd9a8" stroke-width="3.4" stroke-dasharray="1 9" stroke-linecap="round"/></svg>Lights run the way money went</div>';
     h += '<div class="row"><svg width="30" height="10" aria-hidden="true"><path d="M2 5H28" stroke="#c98a5e" stroke-width="1.2"/></svg>Thicker line, more money</div>';
     h += '<div class="row"><svg width="30" height="12" aria-hidden="true"><circle cx="5" cy="6" r="4" fill="#393941" stroke="#a8a2b8"/><circle cx="16" cy="6" r="4" fill="#393941" stroke="#a8a2b8"/></svg>Accounts, kept on their holder</div>';
@@ -1244,7 +1719,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     k += `<div class="row"><svg width="34" height="10" aria-hidden="true"><path d="M2 5H32" stroke="${DISPUTED}" stroke-width="5"/><path d="M2 5H32" class="core" stroke-width="2"/></svg><b>${SURE.disputed.g}</b> disputed</div>`;
     k += `<div class="row">${line(`stroke-dasharray="${SURE.worked.dash}" stroke-linecap="round"`)}<b>${SURE.worked.g}</b> worked out by the app</div>`;
     k += `<div class="row">${line('stroke-opacity=".38"')}ended, drawn faint</div>`;
-    k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><circle cx="17" cy="7" r="5.5" fill="#4e4234" stroke="#d4a152" stroke-width="1.4"/><circle cx="17" cy="7" r="6.6" fill="none" stroke="#F6966A" stroke-width="1.4" transform="scale(1)"/></svg>ring: open Red Flags, the badge their level and count</div>';
+    k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><path d="M1 7H8M26 7H33" stroke="#baac91" stroke-width="2"/><circle cx="12" cy="7" r="5" fill="none" stroke="#baac91"/><circle cx="22" cy="7" r="5" fill="none" stroke="#baac91"/></svg>a long link: its two ends, one letter</div>';
+    k += '<div class="row"><svg width="34" height="14" aria-hidden="true"><circle cx="17" cy="7" r="5.5" fill="#4e4234" stroke="#d4a152" stroke-width="1.4"/><circle cx="17" cy="7" r="6.6" fill="none" stroke="#F6966A" stroke-width="1.4" transform="scale(1)"/></svg>a party with open Red Flags: its outline in the level\'s colour, dashed when faint; the corner circle counts them</div>';
     q('.tw-key-sure').innerHTML = k;
   })();
 
@@ -1300,13 +1776,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     tsvg.textContent = '';
     const r = tsvg.getBoundingClientRect(), w = r.width || 600, h = r.height || 74;
     const X = (t: number) => (Math.max(T0, Math.min(T1, t)) - T0) / (T1 - T0) * w;
-    const bins: Record<string, number> = {};
-    for (const l of D.links) {
-      if (l.fam !== 'money' || !l.date || !l.amount) continue;
-      const b = Math.floor(tval(l.date)! * 4) / 4;
-      bins[b] = (bins[b] || 0) + l.amount;
-    }
-    const max = Math.max(1, ...Object.values(bins)), base = h - 18;
+    // A quarter's bar is how many payments it holds: amounts in different currencies are never stacked into one.
+    const bins = moneyBins(D.links);
+    const max = Math.max(1, ...Object.values(bins).map(v => v.n)), base = h - 18;
     el('line', {x1: 0, x2: w, y1: base, y2: base, stroke: '#6F8AA3'}, tsvg);
     const step = Math.max(1, Math.ceil((T1 - T0) / Math.max(1, w / 60)));
     for (let y = Math.ceil(T0); y <= T1; y += step) {
@@ -1316,11 +1788,11 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       t.textContent = String(y);
     }
     for (const b in bins) {
-      const x = X(+b), bh = Math.max(2, Math.log10(bins[b] / 1e6 + 1) / Math.log10(max / 1e6 + 1) * (base - 22));
+      const x = X(+b), bh = Math.max(2, bins[b].n / max * (base - 22));
       const live = +b >= range[0] - 0.25 && +b <= range[1];
       const rc = el('rect', {x: x + 1, y: base - bh, width: Math.max(3, w / (T1 - T0) / 4 - 2), height: bh, rx: 1.5, fill: live ? '#c98a5e' : '#3d5268'}, tsvg);
       const ti = el('title', {}, rc);
-      ti.textContent = `${Math.floor(+b)} Q${(+b % 1) * 4 + 1}: ${fmtAmt(bins[b], '')} paid`;
+      ti.textContent = `${Math.floor(+b)} Q${(+b % 1) * 4 + 1}: ${bins[b].n} ${bins[b].n === 1 ? 'payment' : 'payments'} · ${bins[b].say}`;
     }
     for (const e of D.events) {
       const t = tval(e.date);
@@ -1536,7 +2008,7 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     if (t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName))) return;
     if (e.key === '/') { e.preventDefault(); sIn.focus(); } else if (e.key === 'l' || e.key === 'L') toggleLens();
     else if (e.key === 'f' || e.key === 'F') togglePath(mode !== 'path');
-    else if (e.key === 'Escape') back();
+    else if (e.key === 'Escape') { if (!escapeTaken(e, root)) back(); }
     else if (e.key === 'Backspace' && trail.length > 1) { trail.pop(); go('party', {id: trail[trail.length - 1], noTrail: true}); }
     else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && mode === 'party') {
       const r = ringOrder();
@@ -1584,15 +2056,28 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
   Object.assign(C, fitBox(Object.values(T).filter(t => t.o), 120));
   mode = 'case';
   drawStatic(); render(); renderChrome(); drawTime();
+  // Link chips are sized from their text; measured before the web fonts arrive, the real text overflowed them.
+  let fontsLive = true;
+  document.fonts?.ready.then(() => {
+    if (!fontsLive) return;
+    for (const R of Object.values(edgeEls)) {
+      if (!R.lab) continue;
+      let tw = 0;
+      try { tw = R.lab.t.getComputedTextLength(); } catch { /* not laid out */ }
+      if (tw > 0) { sizePill(R.lab.g, tw + 14); R.lab.w = tw + 14; }
+    }
+    kick();
+  }).catch(() => undefined);
   const boot = window.setTimeout(() => { if (focus && deg[focus]) go('party', {id: focus, slow: true}); }, RM() ? 0 : 900);
 
   return () => {
+    fontsLive = false;
     window.clearTimeout(boot); window.clearTimeout(wireTimer);
     if (raf) cancelAnimationFrame(raf);
     if (playing) cancelAnimationFrame(playing);
     ro?.disconnect();
     cleanups.forEach(f => f());
-    for (const sel of ['.tw-nodes', '.tw-edges', '.tw-terr', '.tw-terr-l', '.tw-sec', '.tw-more', '.tw-lens', '.tw-wsvg', '.tw-tsvg']) { const x = root.querySelector(sel); if (x) x.textContent = ''; }
+    for (const sel of ['.tw-nodes', '.tw-edges', '.tw-terr', '.tw-terr-l', '.tw-terr-top', '.tw-sec', '.tw-more', '.tw-lens', '.tw-wsvg', '.tw-tsvg']) { const x = root.querySelector(sel); if (x) x.textContent = ''; }
     root.querySelectorAll('datalist option, .tw-pfrom option, .tw-pto option, .tw-wire .end, .tw-wire .tag').forEach(x => x.remove());
   };
 }

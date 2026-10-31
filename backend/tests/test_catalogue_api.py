@@ -15,7 +15,10 @@ def ok(reply):
 def test_areas_glossary_search_and_one_indicator():
     areas = ok(client.get("/api/catalogue/areas"))
     found = [a for a in areas if a["key"] != "APP"]
-    assert len(found) == 42 and all(a["indicators"] >= a["verified"] > 0 for a in found)
+    # Every area the catalogue's own data holds, each once: an area added there needs no edit here (review C2).
+    from app.catalogue.loader import load
+    assert sorted(a["key"] for a in found) == sorted(area.key for area in load().areas)
+    assert all(a["indicators"] >= a["verified"] > 0 for a in found)
     assert all(a["summary"] and len(a["summary"]) < 120 for a in areas), "a plain line for people choosing a type"
     own = next(a for a in areas if a["key"] == "APP")
     assert own["indicators"] == 0 and own["terms"] >= 4

@@ -75,21 +75,32 @@ describe('Safety & data', () => {
     expect(tiles.getByText('requests left this computer').nextSibling?.textContent).toBe('2');
     expect(tiles.getByText('documents sent out').nextSibling?.textContent).toBe('0');
     const stores = within(document.querySelector('.sd-stores') as HTMLElement);
-    expect(stores.getByText('4,812 records · 37 claims · 12 pieces of evidence')).toBeTruthy();
-    expect(stores.getByText('86 files · 1.4 GB')).toBeTruthy();
+    // Each store is a titled card: its number big, the unit beside it, the rest of the line small.
+    const card = (name: string) => stores.getByText(name).closest('li') as HTMLElement;
+    expect(card('Case records').querySelector('.sd-fig')).toHaveTextContent(/^4,812 records$/);
+    expect(card('Case records').querySelector('.sd-fig b')).toHaveTextContent('4,812');
+    expect(card('Case records').querySelector('.sd-rest')).toHaveTextContent('37 claims · 12 pieces of evidence');
+    expect(card('Documents & pictures').querySelector('.sd-fig')).toHaveTextContent(/^86 files$/);
+    expect(card('Documents & pictures').querySelector('.sd-rest')).toHaveTextContent('1.4 GB');
+    expect(card('Service keys').querySelector('.sd-fig')).toHaveTextContent(/^2 of 3 set$/);
     expect(stores.getByText('▲ Not encrypted: keep it safe')).toBeTruthy();
     // The screen-reader twin of the diagram says the same in a table.
     expect(within(screen.getByRole('table', {hidden: true})).getAllByRole('row', {hidden: true}).length).toBeGreaterThan(8);
     expect(screen.getByRole('button', {name: /OpenSanctions: ON REQUEST/})).toBeTruthy();
     expect(screen.getByRole('button', {name: /Firecrawl: OFF/})).toBeTruthy();
     expect(screen.getByText('↗ 2 left in this period')).toBeTruthy();
+    // Only a line that carried requests is labelled; an unused or off line carries no words.
+    const lines = [...document.querySelectorAll('.sd-line')].map(l => l.textContent);
+    expect(lines).toEqual(['search text · 2', '', '']);
   });
 
   it('shows the log word for word, with how it was started and a failed request saying so', async () => {
     show();
     const log = await screen.findByRole('list', {name: 'Requests, newest first'});
     expect(within(log).getByText('Harbour Nominees Ltd')).toBeTruthy();
-    expect(within(log).getByText(/automatic · ✕ failed on the way/)).toBeTruthy();
+    // A failure stays on the row; how it was started is revealed on the value.
+    expect(within(log).getByText('✕ failed on the way')).toBeVisible();
+    expect(within(log).getByText('✕ failed on the way').closest('li')!.querySelector('.rv')).toHaveAccessibleDescription(/ · automatic/);
   });
 
   it('asks the server again for another period, and filters the log to a service', async () => {
@@ -110,6 +121,13 @@ describe('Safety & data', () => {
   it('does not say nothing left when the period has no logged requests, only that none are logged', async () => {
     show({totals: {requests_left: 0, services_reached: 0, documents_sent_out: 0, ai_calls_outside: 0}, outbound: [], outbound_total: 0});
     expect(await screen.findByText('◉ no requests logged in this period')).toBeTruthy();
+    // The empty log is one row: no filter for an empty log, the line, and what would appear there on reveal.
+    const log = screen.getByRole('region', {name: 'Outbound log'});
+    expect(log).toHaveClass('sd-log-empty');
+    expect(within(log).queryByRole('combobox')).toBeNull();
+    expect(within(log).getByText(/Nothing has left this computer in this period\./)).toBeTruthy();
+    expect(within(log).getByLabelText('What appears here')).toHaveAccessibleDescription(/the exact value sent/);
+    expect(within(log).queryByRole('list')).toBeNull();
   });
 
   it('points the cards at the tabs that do the work', async () => {
@@ -175,8 +193,10 @@ describe('Safety & data', () => {
 
   it('gives the last backup\'s kept size and checksum, offers Restore when it is on, and hides the screen', async () => {
     show({backup: {last_backup_at: '2026-10-25T10:00:00', encrypted: true, restore_enabled: true, bytes: 1_400_000_000, sha256: 'ab'.repeat(32)}});
-    const kept = await screen.findByText('1.4 GB · ✓ checksum kept');
-    expect(kept).toHaveAttribute('title', `SHA-256 ${'ab'.repeat(32)}`);
+    const kept = await screen.findByText('✓ checksum kept');
+    expect(kept.closest('.sd-kept')).toHaveTextContent(/^1\.4 GB · ✓ checksum kept/);
+    // The hash is revealed on the check, not a browser tooltip.
+    expect(kept.closest('.rv')).toHaveAccessibleDescription(`SHA-256 ${'ab'.repeat(32)}`);
     fireEvent.click(screen.getByRole('button', {name: 'Restore…'}));
     expect(window.location.hash).toBe('#backup-restore');
     const heard = vi.fn();

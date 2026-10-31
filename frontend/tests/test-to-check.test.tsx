@@ -9,7 +9,7 @@ import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {RedFlagsPanel} from '../features/red-flags/red-flags-panel';
-import {marked, ToCheckPanel} from '../features/to-check/to-check-panel';
+import {checkTitle, marked, ToCheckPanel} from '../features/to-check/to-check-panel';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -42,14 +42,20 @@ describe('ToCheckPanel', () => {
     mockApi({'GET /api/investigations/inv-1/checks': body([checklist, passage])});
     wrap(<ToCheckPanel investigationId="inv-1"/>);
     const first = await screen.findByRole('article', {name: 'To check: Whether there is a business reason for the layers'});
-    expect(within(first).getByText('Checklist')).toBeInTheDocument();
-    expect(within(first).getByText(/Layered ownership · BO-002/)).toBeInTheDocument();
-    expect(screen.getByText('2 open · 0 decided')).toBeInTheDocument();
+    // Ony's rule of 29 Oct: the kind is an icon named on reveal; the indicator, the other flags and the file are
+    // revealed too (in the page for screen readers, hidden on screen until asked).
+    expect(within(first).getByRole('img', {name: 'Checklist'})).toBeInTheDocument();
+    expect(within(first).getByText(/Layered ownership · BO-002/).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('img', {name: '2 open'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '0 decided'})).toBeInTheDocument();
+    expect(screen.queryByText('What the records cannot show. A person decides each one; the app never does.')?.closest('[hidden]')).not.toBeNull();
     const second = screen.getByRole('article', {name: 'To check: Does the passage describe layers hiding the owner?'});
     expect(within(second).getByText('Nominee Director').tagName).toBe('MARK');
-    expect(within(second).getByText(/2 other flags on these parties/)).toBeInTheDocument();
+    expect(within(second).getByText('+2 flags')).toBeInTheDocument();
+    expect(within(second).getByText(/2 other flags on these parties/).closest('[hidden]')).not.toBeNull();
+    expect(within(second).getAllByText('filing.txt, p1').every(el => el.closest('[hidden]'))).toBe(true);
     const user = userEvent.setup();
-    await user.click(within(second).getByRole('button', {name: 'filing.txt'}));
+    await user.click(within(second).getByRole('button', {name: 'Open the file'}));
     expect(useWorkbenchStore.getState().document?.documentId).toBe('d-1');
     await user.click(within(first).getByRole('button', {name: 'Its Red Flag'}));
     expect(useWorkbenchStore.getState().flag?.flagId).toBe('f-1');
@@ -70,8 +76,10 @@ describe('ToCheckPanel', () => {
     await user.click(within(card).getByRole('button', {name: 'Shows it'}));
     await waitFor(() => expect(api.lastBody('POST /api/checks/c-1/decide')).toEqual({status: 'shows', note: 'No reason in the annual report'}));
     expect(await screen.findByText('Decided (1)')).toBeInTheDocument();
-    expect(screen.getByText('0 open · 1 decided')).toBeInTheDocument();
-    expect(screen.getByText(/: No reason in the annual report/)).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '1 decided'})).toBeInTheDocument();
+    // The decision is its shape, named on reveal; the person's note shows.
+    expect(screen.getByRole('img', {name: 'Shows it'})).toBeInTheDocument();
+    expect(screen.getByText('No reason in the annual report')).toBeInTheDocument();
   });
 
   it('shows a money check kept from See › Money with its numbers, decided like any item', async () => {
@@ -81,11 +89,30 @@ describe('ToCheckPanel', () => {
     mockApi({'GET /api/investigations/inv-1/checks': body([money])});
     wrap(<ToCheckPanel investigationId="inv-1"/>);
     const card = await screen.findByRole('article', {name: 'To check: Grey hole at Kestrel SA: more out than in'});
-    expect(within(card).getByText('Money check')).toBeInTheDocument();
-    expect(within(card).getByText('Kept from See › Money · EUR ledger')).toBeInTheDocument();
+    expect(within(card).getByRole('img', {name: 'Money check'})).toBeInTheDocument();
+    expect(within(card).getByText('Kept from See › Money · EUR ledger').closest('[hidden]')).not.toBeNull();
     expect(within(card).getByText(/1,358,600 EUR has no recorded source/)).toBeInTheDocument();
     expect(within(card).queryByRole('button', {name: 'Its Red Flag'})).toBeNull();
     expect(within(card).getByRole('button', {name: 'Shows it'})).toBeEnabled();
+  });
+
+  it('answers the card in hand with the keys S, D and U', async () => {
+    const api = mockApi({
+      'GET /api/investigations/inv-1/checks': body([checklist, passage]),
+      'POST /api/checks/c-2/decide': body([checklist, {...passage, status: 'does_not'}]),
+      'GET /api/investigations/inv-1/red-flags': {investigation_id: 'inv-1', rules: [], cannot_run: [], flags: [], gone: [],
+        investigation_type: {set_by: 'app', areas: [], suggested: []}},
+    });
+    wrap(<ToCheckPanel investigationId="inv-1"/>);
+    const first = await screen.findByRole('article', {name: /business reason/});
+    // The first open card is in hand: its answers carry their keys.
+    expect(within(first).getByRole('button', {name: 'Shows it'})).toHaveAttribute('aria-keyshortcuts', 'S');
+    const second = screen.getByRole('article', {name: /layers hiding the owner/});
+    expect(within(second).getByRole('button', {name: 'Shows it'})).not.toHaveAttribute('aria-keyshortcuts');
+    const user = userEvent.setup();
+    await user.hover(second);
+    await user.keyboard('d');
+    await waitFor(() => expect(api.lastBody('POST /api/checks/c-2/decide')).toEqual({status: 'does_not', note: null}));
   });
 
   it('says when there is nothing to check yet', async () => {
@@ -129,5 +156,16 @@ describe('a Red Flag and its items in To check', () => {
     await screen.findByRole('article', {name: 'Red Flag: BO-002'});
     useWorkbenchStore.getState().openFlag('f-1');
     expect(await screen.findByRole('complementary', {name: 'Red Flag details: BO-002'})).toBeInTheDocument();
+  });
+});
+
+describe('checkTitle', () => {
+  it('titles a card by what its flag found and when, with the question and why under it', () => {
+    const t = checkTitle({question: 'whether there was a business reason for the payments'},
+      {summary: '3 payments between Tanore Finance Corporation and Granton Property Holdings Limited; both are held or run by Tan Kim Loong (directorship).', years: [2013, 2012, 2013]});
+    expect(t).toEqual({head: '3 payments between Tanore Finance Corporation and Granton Property Holdings Limited', when: '2012–2013',
+      why: 'Both are held or run by Tan Kim Loong (directorship).', ask: 'Whether there was a business reason for the payments'});
+    expect(checkTitle({question: 'is it so?'}, null)).toEqual({head: 'Is it so?', when: null, why: null, ask: null});
+    expect(checkTitle({question: 'q'}, {summary: 'One clause only.', years: [2015]}).head).toBe('One clause only');
   });
 });

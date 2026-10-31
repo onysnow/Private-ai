@@ -71,11 +71,12 @@ async function renderPanel(leads: unknown[] = [leadFixture()], routes: Record<st
 describe('LeadsPanel', () => {
   it('shows the queue with every lead, resolved ones included, and its triage state', async () => {
     const api = await renderPanel();
-    expect(screen.getByText('high')).toBeInTheDocument();
-    expect(screen.getByText((_, node) => node?.textContent === 'reporter lead · ⚠ evidence conflict score 2')).toBeInTheDocument();
+    // Priority is the card's edge, named on reveal of the title; the conflict score stays (an alert).
+    expect(screen.getByRole('button', {name: 'Who approved this contract?'})).toHaveAccessibleDescription('high priority');
+    expect(screen.getByText('⚠ evidence conflict score 2')).toBeVisible();
     expect(screen.getByText('Needs evidence review:')).toBeInTheDocument();
     expect(screen.getByText('unresolved contradiction', {exact: false})).toBeInTheDocument();
-    expect(screen.getByText('Owner: A. Reporter')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'Owner: A. Reporter'})).toHaveTextContent('AR');
     expect(screen.getByRole('combobox', {name: 'Move "Who approved this contract?"'})).toBeInTheDocument();
     expect(api.lastUrl(QUEUE).searchParams.get('unresolved_only')).toBe('false');
     expect(api.unmatched()).toEqual([]);
@@ -90,6 +91,9 @@ describe('LeadsPanel', () => {
       [QUEUE]: leadQueueBody('inv-1', [leadFixture(), second]),
     });
     const user = userEvent.setup();
+    // The form is one line at rest: "+ New lead" unfolds it in place.
+    expect(screen.queryByPlaceholderText('Who approved this contract?')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
     await user.type(screen.getByPlaceholderText('Who approved this contract?'), 'Second question');
     await user.type(screen.getByPlaceholderText('What is known, what is missing, and why it matters?'), 'The signature is unclear.');
     await user.type(screen.getByPlaceholderText('Owner'), 'B. Reporter');
@@ -101,6 +105,9 @@ describe('LeadsPanel', () => {
     expect(api.lastBody('POST /api/leads')).toEqual({investigation_id: 'inv-1', title: 'Second question', detail: 'The signature is unclear.', status: 'unreviewed'});
     expect(api.lastBody('PATCH /api/leads/lead-2')).toEqual({priority: 'urgent', owner: 'B. Reporter'});
     expect(api.calls(QUEUE)).toHaveLength(2);
+    // Added, it folds away again; opened again, it is empty.
+    await waitFor(() => expect(screen.queryByRole('form', {name: 'New lead'})).not.toBeInTheDocument());
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
     expect(screen.getByPlaceholderText('Who approved this contract?')).toHaveValue('');
     expect(screen.getByPlaceholderText('What is known, what is missing, and why it matters?')).toHaveValue('');
     expect(api.unmatched()).toEqual([]);
@@ -109,10 +116,17 @@ describe('LeadsPanel', () => {
   it('does not create a lead with a blank title', async () => {
     const api = await renderPanel();
     const before = api.fetch.mock.calls.length;
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Add lead'}));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: '+ New lead'}));
+    await user.click(screen.getByRole('button', {name: 'Add lead'}));
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(api.calls('POST /api/leads')).toHaveLength(0);
     expect(api.fetch.mock.calls.length).toBe(before);
+    // Nothing was added, so the form stays open; Esc folds it.
+    expect(screen.getByRole('form', {name: 'New lead'})).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('form', {name: 'New lead'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: '+ New lead'})).toHaveFocus();
   });
 
   it('moves a lead to another column and reloads the queue', async () => {
@@ -151,8 +165,10 @@ describe('LeadsPanel', () => {
       expect(api.calls('GET /api/investigations/inv-1/claims')).toHaveLength(2);
     });
     expect(api.lastBody('POST /api/leads/lead-1/convert')).toEqual({kind: 'claim'});
-    await screen.findByText('0% confidence');
-    expect(screen.getByText('0% confidence').closest('button')).toHaveClass('cl-unshown');
+    // A new claim has no confidence and no grade, so its row has nothing to reveal (features/claims/claims-panel.tsx).
+    await waitFor(() => expect(document.querySelector('button.cl-row')).toBeInTheDocument());
+    expect(document.querySelector('button.cl-row')).not.toHaveAccessibleDescription();
+    expect(document.querySelector('button.cl-row')).toHaveClass('cl-unshown');
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -165,13 +181,14 @@ describe('LeadsPanel', () => {
     });
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: 'Make task'}));
-    await screen.findByText('Call the clerk · todo · 1 event(s)');
+    // The task shows its dot and title; status and events are revealed on it.
+    expect((await screen.findByText(/Call the clerk/)).closest('.rv')).toHaveAccessibleDescription('todo · 1 event(s)');
     expect(api.lastBody('POST /api/leads/lead-1/convert')).toEqual({kind: 'task'});
 
     const done = {...task, status: 'done', history: [{id: 'tw-2', from_status: 'todo', to_status: 'done', note: 'Task marked done in Next.js workbench', created_at: '2026-10-02T00:00:00', lead_provenance: null}, ...task.history]};
     api.add({'PATCH /api/reporting-tasks/task-1': done, [QUEUE]: leadQueueBody('inv-1', [leadFixture({status: 'active', tasks: [done]})])});
     await user.click(screen.getByRole('button', {name: 'Done'}));
-    await screen.findByText('Call the clerk · done · 2 event(s)');
+    await waitFor(() => expect(screen.getByText(/Call the clerk/).closest('.rv')).toHaveAccessibleDescription('done · 2 event(s)'));
     expect(api.lastBody('PATCH /api/reporting-tasks/task-1')).toEqual({status: 'done'});
     expect(screen.queryByRole('button', {name: 'In progress'})).not.toBeInTheDocument();
     expect(api.calls(QUEUE)).toHaveLength(3);

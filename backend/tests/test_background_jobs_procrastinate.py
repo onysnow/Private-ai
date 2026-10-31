@@ -9,6 +9,7 @@ job at GET /api/jobs/{id}.
 from __future__ import annotations
 
 import os
+import threading
 import time
 
 import pytest
@@ -46,26 +47,32 @@ def test_upload_answers_at_once_and_the_worker_reads_the_document(client, monkey
     import app.services.documents as documents
 
     real = documents.extract_chunks
+    release, read_done = threading.Event(), threading.Event()
 
     def slow(path):
-        time.sleep(2)
-        return real(path)
+        # The read is held until the test lets it go: the upload and the health check must both answer
+        # while it is held. The order is the check, not a clock (review B7).
+        release.wait(30)
+        try:
+            return real(path)
+        finally:
+            read_done.set()
 
     monkeypatch.setattr(documents, "extract_chunks", slow)
     inv = client.post("/api/investigations", json={"name": "Queue"}).json()["id"]
-    started = time.monotonic()
-    response = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Memo"},
-                           files={"file": ("memo.txt", b"Acme Holdings Inc. announced a program.\n", "text/plain")})
-    upload_seconds = time.monotonic() - started
-    assert response.status_code == 202, response.text
-    body = response.json()
-    assert upload_seconds < 1.5, f"upload took {upload_seconds:.2f}s; it should not wait for the read"
-    assert body["extraction_status"] == "queued" and body["chunk_count"] == 0
-    assert body["job"]["runner"] == "procrastinate" and body["job"]["finished"] is False
+    try:
+        response = client.post("/api/documents/upload", data={"investigation_id": inv, "title": "Memo"},
+                               files={"file": ("memo.txt", b"Acme Holdings Inc. announced a program.\n", "text/plain")})
+        assert not read_done.is_set(), "the upload waited for the read"
+        assert response.status_code == 202, response.text
+        body = response.json()
+        assert body["extraction_status"] == "queued" and body["chunk_count"] == 0
+        assert body["job"]["runner"] == "procrastinate" and body["job"]["finished"] is False
 
-    health_started = time.monotonic()
-    assert client.get("/api/health").json() == {"status": "ok"}
-    assert time.monotonic() - health_started < 0.75
+        assert client.get("/api/health").json() == {"status": "ok"}
+        assert not read_done.is_set(), "the health check waited for the read"
+    finally:
+        release.set()
 
     job = _wait_for(client, body["job"]["id"])
     assert job["status"] == "succeeded", job
@@ -130,17 +137,22 @@ def test_ai_run_is_queued_and_its_result_is_on_the_job(client, monkeypatch):
     draft = {"title": "t", "goal_restated": "g", "executive_takeaway": "e", "open_questions": [],
              "sections": [{"heading": "h", "body": "b", "key_points": [{"text": "Paid", "evidence": [ref]}], "evidence": [ref]}]}
 
+    release, answered = threading.Event(), threading.Event()
+
     class Slow:
         def generate(self, system_prompt, user_prompt, *, max_tokens=4096):
-            time.sleep(1.5)
+            release.wait(30)  # held until the request has answered (review B7: order, not a clock)
+            answered.set()
             return _json.dumps(draft)
 
     monkeypatch.setattr(reasoning_module, "get_llm_client", lambda *a, **k: Slow())
-    started = time.monotonic()
-    response = client.post(f"/api/investigations/{inv}/assistant/presentation-draft",
-                           json={"goal": "Summarize.", "record_refs": [{"record_type": "claim", "record_id": claim["id"]}]})
+    try:
+        response = client.post(f"/api/investigations/{inv}/assistant/presentation-draft",
+                               json={"goal": "Summarize.", "record_refs": [{"record_type": "claim", "record_id": claim["id"]}]})
+        assert not answered.is_set(), "the request waited for the model"
+    finally:
+        release.set()
     assert response.status_code == 202, response.text
-    assert time.monotonic() - started < 1.0, "the request does not wait for the model"
     assert response.json()["candidate_id"] is None
     job = _wait_for(client, response.json()["job"]["id"])
     assert job["status"] == "succeeded", job

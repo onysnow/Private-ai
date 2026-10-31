@@ -73,14 +73,16 @@ describe('WatchTheRun', () => {
   it('draws the header in one line, the key, the systems not in this run and the three ledgers', async () => {
     open();
     const map = await screen.findByRole('group', {name: /The run as a map/});
-    await waitFor(() => expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(/Act · AI runs · Case synthesis · TAS · 10 Oct 1[0-9]:\d\d/));
+    await waitFor(() => expect(screen.getByRole('heading', {level: 2}).textContent).toMatch(/Act · AI runs · Case synthesis · TAS · 10 Oct 2026, 1[0-9]:\d\d/));
     expect(screen.getByRole('button', {name: /Events: summary/})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /^2 problems/})).toBeInTheDocument();
     expect(within(map as unknown as HTMLElement).getAllByText('not in this run').length).toBe(4);
     expect(within(map as unknown as HTMLElement).getByText('1 of 7 routed')).toBeInTheDocument();
     expect(within(map as unknown as HTMLElement).getByText('+ 12 modules')).toBeInTheDocument();
     expect(within(screen.getByRole('list', {name: 'Key'})).getAllByRole('listitem')).toHaveLength(6);
-    await waitFor(() => expect(screen.getByText('Run record').parentElement?.textContent).toMatch(/\d+/));
+    await waitFor(() => expect(screen.getByText('Run record').closest('div')?.textContent).toMatch(/\d+/));
+    // What each ledger is waits in a reveal on its name.
+    expect(screen.getByText('Run record').closest('.rv')).toHaveAccessibleDescription('Append-only, hashed.');
     expect(screen.getByText('Judgement ledger')).toBeInTheDocument();
     expect(screen.getByText(/tas\/10 runs apart, never inside the run/)).toBeInTheDocument();
   });
@@ -160,10 +162,11 @@ describe('WatchTheRun', () => {
     expect(within(drawer).getByText(/one thought, input to output/i)).toBeInTheDocument();
     expect(within(drawer).getByText('AI · CLM-0001')).toBeInTheDocument();
     for (const chip of ['tier floor D', "devil's advocate on"]) expect(within(drawer).getByText(chip)).toBeInTheDocument();
-    expect(within(drawer).getByText('model says')).toBeInTheDocument();
+    // "The model says" is the plum AI mark, the sentence on reveal.
+    expect(within(drawer).getByRole('img', {name: 'About AI results'})).toHaveAccessibleDescription('The model says this: no check confirms it.');
     expect(within(drawer).getByText(/model: likely/)).toBeInTheDocument();
     expect(within(drawer).queryByText(/capped/)).toBeNull();
-    expect(within(drawer).getByText(/Accept and reject apply to the whole answer; Keep, Correct and Reject above decide this claim; To check marks this thought only/)).toBeInTheDocument();
+    expect(within(drawer).getByRole('button', {name: '✓ Accept'})).toHaveAccessibleDescription(/Accept and reject apply to the whole answer; Keep, Correct and Reject above decide this claim; To check marks this thought only/);
     await user.click(within(drawer).getByRole('button', {name: 'Close the trace'}));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -308,7 +311,7 @@ describe('WatchTheRun, your marks and other runs', () => {
     const user = userEvent.setup();
     const compare = await screen.findByRole('combobox', {name: 'Compare with another run of this question'});
     // Only a run of the same module compares: another system draws another route.
-    expect(within(compare).getAllByRole('option').map(o => o.textContent)).toEqual(['Compare…', expect.stringMatching(/^with 9 Oct \d\d:\d\d · 1 problem$/)]);
+    expect(within(compare).getAllByRole('option').map(o => o.textContent)).toEqual(['Compare…', expect.stringMatching(/^with 9 Oct 2026, \d\d:\d\d · 1 problem$/)]);
     await user.selectOptions(compare, 'run-0');
     expect(await screen.findByText(/Compared with the run of 9 Oct .* 1 part changed/)).toBeInTheDocument();
     expect(screen.getByText(/corroboration: verified → in between/)).toBeInTheDocument();
@@ -336,7 +339,8 @@ describe('WatchTheRun, deciding one claim', () => {
     const drawer = screen.getByRole('dialog');
     const words = await within(drawer).findByText('Kestrel SA controlled Fernhill Ltd.', {selector: '.cr-text'});
     expect(words).toHaveClass('grounded', 'ai');
-    expect(words.getAttribute('title')).toMatch(/Rests on document:doc-41-r, in the packet/);
+    // Where the words rest is revealed on them, and read with them.
+    expect(words.closest('.rv')?.parentElement).toHaveTextContent(/grounded in 1 record \(document:doc-41-r/);
     expect(within(drawer).getByLabelText('Key for the claim underlines')).toBeInTheDocument();
 
     await user.click(within(drawer).getByRole('button', {name: '✓ Keep'}));

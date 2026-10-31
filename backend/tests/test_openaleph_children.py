@@ -229,3 +229,39 @@ def test_a_backup_restores_an_archive_before_its_files():
     rows = [{"id": "c", "parent_document_id": "b"}, {"id": "a", "parent_document_id": None},
             {"id": "b", "parent_document_id": "a"}, {"id": "d", "parent_document_id": "elsewhere"}]
     assert [row["id"] for row in _parents_first(rows)] == ["a", "d", "b", "c"]
+
+
+def _unnamed(fake: FakeOpenAleph, entity_id: str, data: bytes, **properties: object) -> None:
+    """A message ingest-file split out of a mailbox: an Email with no file name of its own."""
+    child = fake.add_child("1.upload", entity_id, "", data, schema="Email", **properties)
+    del child["properties"]["fileName"]
+
+
+def test_a_mailbox_message_is_named_by_its_subject_or_sender_not_its_id():
+    rows = [
+        {"id": "a1b2c3", "schema": "Email", "properties": {"subject": ["Re: the 11th hour / who bought it"]}},
+        {"id": "d4e5f6", "schema": "Email", "properties": {"from": ["Jane Doe <jane@ex.example>"], "date": ["2013-09-26T10:00:00"]}},
+        {"id": "0718aa", "schema": "Email", "properties": {"date": ["2013-09-27"]}},
+        {"id": "99ffee", "schema": "Email", "properties": {}},
+        {"id": "c0ffee", "schema": "PlainText", "properties": {"fileName": ["memo.txt"], "subject": ["ignored"]}},
+    ]
+    names = [child.path for child in openaleph_children.list_children("7", "1.upload", search=lambda *_: rows)]
+    assert names == ["99ffee", "memo.txt", "Message from Jane Doe <jane@ex.example>, 2013-09-26", "Message of 2013-09-27",
+                     "Re: the 11th hour ∕ who bought it"]
+
+
+def test_messages_of_a_mailbox_are_titled_by_subject_and_old_hash_titles_are_renamed(fake):
+    inv = _investigation()
+    fake.entities["1.upload"] = entity("1.upload", "Package", fileName="thread.mbox")
+    _unnamed(fake, "5f2a9c0e", b"Who bought the work?", subject="Who bought it?")
+    _unnamed(fake, "77b1d3aa", b"No headers at all.")
+    _upload(inv, "thread.mbox", b"From x\n", "application/mbox")
+    titles = {row["filename"]: row["title"] for row in _documents(inv) if row["parent_document_id"]}
+    assert titles == {"Who bought it?": "Who bought it?", "77b1d3aa": "77b1d3aa"}
+    # OpenAleph has read the second message's headers since: looking again names it.
+    fake.entities["77b1d3aa"]["properties"]["from"] = ["Audit Desk"]
+    parent = next(row for row in _documents(inv) if not row["parent_document_id"])
+    again = TestClient(app).post(f"/api/documents/{parent['id']}/openaleph/children").json()
+    assert again["message"] == "2 file(s) inside were already added", again
+    titles = {row["filename"]: row["title"] for row in _documents(inv) if row["parent_document_id"]}
+    assert titles == {"Who bought it?": "Who bought it?", "77b1d3aa": "Message from Audit Desk"}

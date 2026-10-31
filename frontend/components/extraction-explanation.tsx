@@ -83,9 +83,12 @@ export function ExtractionExplanationView({explanation}: {explanation: Explanati
   const {method, confidence} = explanation;
   return (
     <details className="explanation" data-testid="extraction-explanation">
+      {/* The whole explanation opens on click (Ony, 29 Oct: sub-text is revealed on hover or click); the summary keeps
+          only the method and, as an alert, how many caveats there are. */}
       <summary>
-        Why this was proposed: {method.label} <small>· {RATIONALE_BASIS_LABEL[explanation.rationale_basis]}{explanation.caveats.length ? ` · ${explanation.caveats.length} caveat(s)` : ''}</small>
+        Why this was proposed: {method.label}{explanation.caveats.length ? <span className="explanation-caveats" aria-label={`${explanation.caveats.length} caveat(s)`}> ⚠ {explanation.caveats.length}</span> : null}
       </summary>
+      <div><small>{RATIONALE_BASIS_LABEL[explanation.rationale_basis]}{explanation.caveats.length ? ` · ${explanation.caveats.length} caveat(s)` : ''}</small></div>
       <div><b>{explanation.summary}</b></div>
       <div><small>{method.automated ? 'Automated' : 'Not automated'}: {method.description}</small></div>
       {explanation.parts.length > 0 && (

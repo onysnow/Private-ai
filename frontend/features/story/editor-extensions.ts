@@ -13,10 +13,14 @@ import {Plugin, PluginKey} from '@tiptap/pm/state';
 import {Decoration, DecorationSet} from '@tiptap/pm/view';
 import type {EditorView} from '@tiptap/pm/view';
 
+import {dateWords} from '../../lib/dates';
+
 /** The drag type a claim of the story tree carries (its id). */
 export const CLAIM_DRAG = 'application/x-story-claim';
 
-export type CitablePassage = {id: string; stance: string; label: string; locator?: string | null; quote?: string | null};
+export type CitablePassage = {id: string; stance: string; label: string; locator?: string | null; quote?: string | null;
+  /** Marked superseded by a newer record: shown struck, never the passage a citation quotes first. */
+  superseded?: {by_label?: string | null; reason: string} | null};
 export type CitableClaim = {id: string; n: number; text: string; state: 'shown' | 'unshown' | 'disputed' | 'ruled_out'; evidence?: CitablePassage[]};
 
 /** The citation chip: an inline atom with the attributes the server reads (app/services/writeups.py). */
@@ -42,12 +46,10 @@ export const Citation = Node.create({
 });
 
 const AI_KEY = new PluginKey<DecorationSet>('ai-drafts');
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-/** "2026-10-10" → "10 Oct". */
+/** "2026-10-10" → "10 Oct 2026". */
 export function draftDay(on: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(on);
-  return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1] ?? ''}`.trim() : on;
+  return m ? dateWords(m[0]) : on;
 }
 
 /** Keep (the person accepts the AI's paragraph) or Undo (the paragraph goes) for the paragraph whose text starts at `at`. */

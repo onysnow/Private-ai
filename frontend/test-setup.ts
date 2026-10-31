@@ -1,5 +1,13 @@
 import '@testing-library/jest-dom/vitest';
-import {vi} from 'vitest';
+import {afterEach, vi} from 'vitest';
+
+import {fastJobPolls} from './test-support/job-poll';
+
+// A screen following a background job polls GET /api/jobs/{id} once a second (lib/jobs.ts). In a
+// test the mock answers at once, so wait 10 ms between polls instead of a real second: a page
+// test that needs two polls no longer races its own wait under load (review B3).
+// test-support/job-poll.ts has a stepped wait for a test that reads the state between polls.
+fastJobPolls();
 
 // app/page.tsx (bulk import) and app/review/page.tsx both use next/navigation
 // hooks, which throw "invariant expected app router to be mounted" outside a
@@ -65,3 +73,14 @@ if (typeof document !== 'undefined') {
   const {configure} = await import('@testing-library/react');
   configure({asyncUtilTimeout: 5000});
 }
+
+// The inspector slot keeps the party it shows in the address (?dossier=, and its own history entry) so a reload opens
+// it again (features/inspector/inspector-slot.tsx). jsdom keeps one address for a whole file: each test starts
+// without the last test's party, as a fresh page would.
+afterEach(() => {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has('dossier') && !(window.history.state as {wbSlot?: boolean} | null)?.wbSlot) return;
+  url.searchParams.delete('dossier');
+  window.history.replaceState(null, '', url.href);
+});

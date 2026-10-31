@@ -53,14 +53,16 @@
 @keyframes kc-shimmer { to { background-position: -200% 0; } }
 
 /* Panel A: the map. */
-.kc-map { display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr) auto auto; overflow: hidden; }
+/* A column, not a grid of counted rows: a fixed row list broke when the "how to use" line moved into the title's reveal
+   (29 Oct) and the map box fell into an auto row of height 0, so the map drew nothing. The box takes the room left. */
+.kc-map { display: flex; flex-direction: column; overflow: hidden; }
 .kc-legend { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 11.5px; color: var(--text-muted); }
 .kc-legend li { display: inline-flex; align-items: center; gap: 6px; }
 .kc-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--line); }
 .kc-legend .kc-key-fires { border: 1.5px dashed var(--flag-strong); }
 .kc-legend .kc-key-line { width: 18px; height: 0; border-radius: 0; border: 0; border-top: 2px solid var(--accent-1); }
 .kc-legend .kc-key-safety { border: 1.5px dashed var(--accent-2); }
-.kc-map-box { position: relative; min-height: 0; margin-top: 4px; overflow: hidden; }
+.kc-map-box { position: relative; flex: 1 1 0; min-height: 240px; margin-top: 4px; overflow: hidden; }
 .kc-map-box:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; border-radius: 10px; }
 .kc-svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 .kc-fam { font: 600 10px var(--font-mono); letter-spacing: .14em; fill: var(--text); opacity: .85; }
@@ -77,6 +79,7 @@
 .kc-n { font: 9px var(--font-mono); fill: var(--text-muted); pointer-events: none; }
 .kc-area.on .kc-key, .kc-area.on .kc-n { fill: var(--ground); }
 .kc-area.safety .kc-key { fill: var(--accent-2); }
+.kc-lines { pointer-events: none; }
 .kc-line { fill: none; stroke: var(--accent-1); opacity: .85; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: kc-draw var(--dur-base, 450ms) var(--ease-out) forwards; }
 .kc-line-n { font: 600 10px var(--font-mono); fill: var(--accent-1); paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; }
 @keyframes kc-draw { to { stroke-dashoffset: 0; } }
@@ -85,7 +88,7 @@
 .kc-hover b { font-size: 12.5px; }
 .kc-hover span { color: var(--text-muted); }
 .kc-hover em { font-style: normal; color: var(--accent-1); }
-.kc-aslist { justify-self: end; margin: 2px 0 6px; }
+.kc-aslist { align-self: flex-end; margin: 2px 0 6px; }
 .kc-area-card { padding: 12px 14px; border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-panel); display: grid; gap: 6px; }
 .kc-area-card header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
 .kc-area-card h3 { margin: 0; font: 700 14.5px var(--font-ui); }
@@ -234,7 +237,9 @@ html[data-motion='calm'] .kc-flip.flipped .kc-face.front { opacity: 0; }
 .kg-body { min-height: 0; display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(320px, 440px); gap: 14px; }
 @media (max-width: 1000px) { .kg-body { grid-template-columns: 34px minmax(0, 1fr); } .kg-card { grid-column: 1 / -1; } }
 .kg-rail { min-height: 0; overflow-y: auto; }
-.kg-rail ol { list-style: none; margin: 0; padding: 0; height: 100%; min-height: 540px; display: grid; grid-auto-rows: minmax(0, 1fr); gap: 1px; }
+/* 27 letters, each at most 25 px tall, from the top: the whole rail fits above the screen's bottom corner (Y was cut and Z
+   gone when the rows stretched to the panel's foot). */
+.kg-rail ol { list-style: none; margin: 0; padding: 0; min-height: 540px; display: grid; grid-auto-rows: minmax(18px, 25px); align-content: start; gap: 1px; }
 .kg-rail button { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; height: 100%; display: grid; place-content: center; justify-items: center; padding: 0; border-radius: 6px; font: 600 11px/1.05 var(--font-mono); }
 .kg-rail button small { font-size: 8px; line-height: 1; color: var(--text-muted); font-weight: 400; }
 .kg-rail button[aria-current='true'] { background: var(--surface-2); color: var(--accent-1); }
@@ -260,3 +265,41 @@ html[data-motion='calm'] .kc-flip.flipped .kc-face.front { opacity: 0; }
 .kc-dashed-box { margin: 0; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; font-size: 13px; color: var(--text-muted); }
 .kg-ul { margin: 0; padding-left: 16px; font-size: 12.5px; color: var(--text-muted); display: grid; gap: 3px; }
 .kg-chips { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Ony's rule of 29 Oct (components/ui/reveal.tsx): an indicator's id, how it is checked and the area's summary are in
+   reveals; how it is checked shows as its shape (◫ records, ⇄ lookups, a person). The list's rows lose the id column,
+   so the name grows into the room. */
+.kc-row { grid-template-columns: minmax(0, 1fr) 20px; font-size: 13.5px; align-items: center; }
+.kc-row-name .lv { margin-left: 4px; }
+.kc-how-glyph { display: inline-grid; place-items: center; min-width: 1em; font: 600 13px var(--font-mono); line-height: 1; vertical-align: -1px; }
+.kc-how .kc-how-glyph { font-size: 14px; }
+.kc-chip .kc-how-glyph { font-size: 13px; }
+.kc-count { font: 500 12px var(--font-mono); color: var(--text-muted); white-space: nowrap; }
+.kc-how-counts { list-style: none; margin: 0; padding: 0; display: flex; gap: 16px; }
+.kc-how-count { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); }
+.kc-how-count b { font: 650 17px var(--font-display); color: var(--text); font-variant-numeric: tabular-nums; }
+.kc-area-card h3 { font-size: 16px; }
+.kc-actions .rv > button:disabled, .kc-top .rv > button:disabled { pointer-events: none; }
+
+/* Glossary rows: compact, the term grows into the room the first sentence left (it opens in the card on point); a
+   term's areas are their short codes, each name on hover; the safety area in its own colour, as on the catalogue map. */
+.kg-row { grid-template-columns: minmax(0, 1fr) auto; }
+.kg-term { font-size: 14px; }
+.kg-areas { display: inline-flex; align-items: center; gap: 4px; }
+.kg-areas i { font: 600 10px/1 var(--font-mono); font-style: normal; letter-spacing: .04em; padding: 3px 5px; border-radius: 5px; color: var(--text-muted);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-muted) 35%, transparent); }
+.kg-areas i.safety { color: var(--accent-2); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-2) 55%, transparent); }
+.kg-areas small { font: 10.5px var(--font-mono); color: var(--text-muted); }
+.rv.kg-tabs-rv { display: block; }
+
+/* The card's case and catalogue rows: a mark, then the title; the kind and the snippet (or the area's counts) on reveal. */
+.kg-hits { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.kg-hits li { min-width: 0; }
+.kg-hits .rv { display: block; }
+.kg-hit { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; align-items: center; padding: 5px 4px; border-bottom: 1px solid var(--line, rgba(127,127,127,.15));
+  font-size: 13.5px; }
+.kg-hit-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kg-hit > i { font: 600 11px/1 var(--font-mono); font-style: normal; color: var(--text-muted); text-align: center; }
+.kg-hit > i.safety { color: var(--accent-2); }
+.kg-hit a { color: var(--text); text-decoration: none; }
+.kg-hit a:hover { color: var(--accent-1); }

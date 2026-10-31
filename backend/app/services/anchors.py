@@ -22,11 +22,12 @@ def chunk_dicts(db: Session, document_id: str) -> list[dict[str, Any]]:
 
 
 def evidence_document_id(db: Session, evidence: Evidence) -> str | None:
-    """The document a quote is from: its own picture document, or its source's file."""
+    """The document a quote is from: its own picture document, or its source's file (an uploaded document, or a web
+    page captured from a link, whose source is "web")."""
     if evidence.document_id:
         return evidence.document_id
     source = db.get(Source, evidence.source_id) if evidence.source_id else None
-    if source is None or source.source_type != "document":
+    if source is None:
         return None
     return db.scalar(select(Document.id).where(Document.source_id == source.id).order_by(Document.created_at).limit(1))
 

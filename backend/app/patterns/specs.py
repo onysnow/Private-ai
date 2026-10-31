@@ -91,6 +91,7 @@ class Result(BaseModel):
     links: list[str]
     facts: dict[str, Any]
     summary: str
+    key: tuple[str, ...] | None = None
 
 
 def run(spec: Spec, graph: CaseGraph) -> list[Result] | str:
@@ -107,7 +108,7 @@ def run(spec: Spec, graph: CaseGraph) -> list[Result] | str:
         level, reason = got
         facts = {**m.facts, "measured": m.value}
         out.append(Result(level=level, band_reason=reason, parties=list(dict.fromkeys(m.parties)), links=list(dict.fromkeys(m.links)),
-                          facts=facts, summary=spec.text(facts)))
+                          facts=facts, summary=spec.text(facts), key=m.key))
     return out
 
 

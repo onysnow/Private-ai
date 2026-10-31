@@ -135,6 +135,19 @@ describe('the mapping it writes', () => {
     expect(body.sheet).toBe('Payments');
     expect(body.entities['company 2'].keys).toEqual(['Payee', 'Date']);
     expect(body.entities['payment 1'].properties).toEqual({amount: {column: 'Amount'}, payer: {entity: 'company 1'}, beneficiary: {entity: 'company 2'}});
+    expect(body.entities['payment 1'].payment_kind_column).toBeUndefined();
+  });
+
+  it('sends the column a payment\'s kind is read from, and only for a payment', () => {
+    const entities = [company('company 1', 'Payer'), company('company 2', 'Payee')];
+    const kinded = buildMapping(entities, [{...payment, kindColumn: 'Type'}], SCHEMA_BODY.links, null);
+    expect(kinded.entities['payment 1'].payment_kind_column).toBe('Type');
+    // The kind is not part of what makes rows one payment.
+    expect(kinded.entities['payment 1'].keys).toEqual(['Payer', 'Payee', 'Amount', 'Date']);
+    const ownership = {...SCHEMA_BODY.links[0], name: 'Ownership', label: 'Ownership', source_prop: 'owner', target_prop: 'asset', properties: []};
+    const owner = buildMapping(entities, [{...payment, schema: 'Ownership', kindColumn: 'Type', properties: []}], [ownership], null);
+    expect(owner.entities['payment 1'].schema).toBe('Ownership');
+    expect(owner.entities['payment 1'].payment_kind_column).toBeUndefined();
   });
 
   it('names entities readably and knows a table by its file name', () => {

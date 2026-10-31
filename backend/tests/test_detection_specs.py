@@ -120,6 +120,22 @@ def test_amount_statistic_needs_enough_amounts():
     assert benford.value > 0.015, "amounts piled on 1s and 2s stray far from Benford"
 
 
+def test_payments_with_no_purpose_are_measured_once_per_payer_and_payee():
+    spec = next(s for s in SPECS if s.indicator == "BO-033")
+    g = graph_of(Example(name="x", expect=None, parties=[{"id": "a", "name": "A", "schema": "Company"}, {"id": "b", "name": "B", "schema": "Company"}],
+                         links=[{"id": "p1", "schema": "Payment", "source": "a", "target": "b", "properties": {"amount": ["100"], "currency": ["EUR"], "purpose": ["no purpose"]}},
+                                {"id": "p2", "schema": "Payment", "source": "a", "target": "b", "properties": {"amount": ["x"], "purpose": ["None stated"], "date": ["2020-05-01"]}},
+                                {"id": "p3", "schema": "Payment", "source": "a", "target": "b", "properties": {}}]))
+    got = run(spec, g)
+    assert not isinstance(got, str)
+    by = {tuple(r.links): r for r in got}
+    assert set(by) == {("p2", "p1"), ("p3",)}, "dated first, undated last; stated and not recorded apart"
+    said = by[("p2", "p1")]
+    assert said.level == "textbook" and said.facts["totals"] == {"EUR": 100.0} and said.facts["no_amount"] == 1
+    assert said.summary == "A paid B 2 times, 100 EUR in all (1 with no amount), on 2020-05-01 (1 undated), and the records say “None stated”, “no purpose”."
+    assert by[("p3",)].summary == "A paid B, and no purpose is found in the records yet."
+
+
 def test_a_name_ending_in_a_full_stop_does_not_end_the_summary_twice():
     spec = Spec(indicator="BO-002", family="chain_depth", level="faint", summary="{name} sits {depth} layers down.")
     assert spec.text({"name": "Lamesa Holding S.A.", "depth": 4}) == "Lamesa Holding S.A. sits 4 layers down."
@@ -183,11 +199,21 @@ def test_the_loop_search_is_bounded_in_a_dense_case_and_says_so():
     """Ten parties paying each other make over a million loops from ninety links. The search stops, keeps the
     shortest, and marks each one so the summary can say the list is not complete."""
     from app.patterns.detectors import cycle
-    import time
 
-    started = time.monotonic()
-    got = cycle.measure(_payment_ring(10), cycle.Params(link="Payment"))
-    assert time.monotonic() - started < 10
+    # Count the loops the search draws, not seconds (review B7): it stops just past MAX_SEARCHED.
+    real, drawn = cycle.nx.simple_cycles, []
+
+    def counted(graph):
+        for loop in real(graph):
+            drawn.append(1)
+            yield loop
+
+    cycle.nx.simple_cycles = counted
+    try:
+        got = cycle.measure(_payment_ring(10), cycle.Params(link="Payment"))
+    finally:
+        cycle.nx.simple_cycles = real
+    assert len(drawn) == cycle.MAX_SEARCHED + 1
     assert 0 < len(got) <= cycle.MAX_KEPT
     assert all(m.facts.get("loops_cut_short") is True for m in got)
     sizes = [len(m.parties) for m in got]

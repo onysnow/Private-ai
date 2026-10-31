@@ -143,7 +143,7 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 .dp-total { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; }
 .dp-total i { width: 18px; border-radius: 3px 3px 0 0; background: color-mix(in srgb, var(--status-supported) 60%, var(--surface-3)); }
 .dp-total small { font: 500 10.5px var(--font-mono); color: var(--text-muted); }
-.dp-legend { margin-top: auto; padding-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 11.5px; color: var(--text-muted); }
+.dp-legend { padding-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 11.5px; color: var(--text-muted); }
 .dp-legend > span { display: inline-flex; align-items: center; gap: 6px; }
 .dp-legend .dp-stage { min-height: 16px; width: 20px; padding: 0; }
 .dp-by { margin-left: auto; }
@@ -208,6 +208,13 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 :is(.cp-chip, .cp-glyph).amber { color: var(--accent-1); } :is(.cp-chip, .cp-glyph).teal { color: var(--accent-2); }
 .cp-safe { padding: 9px 10px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--status-supported) 50%, transparent); line-height: 1.45; }
 .cp-safe b { color: var(--status-supported); }
+.cp-warn { padding: 9px 10px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--accent-1) 55%, transparent); line-height: 1.45; }
+.cp-warn b { color: var(--accent-1); }
+.cp-ask { display: inline-flex; align-items: center; gap: 6px; }
+.cp-confirm { display: grid; gap: 6px; margin-top: 6px; padding: 8px 10px; border-radius: 10px; border: 1px dashed color-mix(in srgb, var(--accent-1) 55%, transparent); font-size: 12px; line-height: 1.45; }
+.cp-confirm code { overflow-wrap: anywhere; }
+.cp-elsewhere { margin-top: 10px; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line, color-mix(in srgb, currentColor 18%, transparent)); line-height: 1.45; }
+.cp-elsewhere p { margin: 0 0 6px; }
 .cp-card .dp-quiet { margin-top: 8px; }
 .cp-switch { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
 .cp-switch small { margin-left: auto; font: 500 10px var(--font-mono); white-space: nowrap; }
@@ -264,3 +271,164 @@ html[data-motion='calm'] .dp-lane:hover { transform: none; }
 @media (max-width: 1200px) { .dp { grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: 'tabs tabs' 'left line' 'right line' 'strip strip'; grid-template-rows: auto auto minmax(0, 1fr) auto; } }
 @media (max-width: 800px) { .dp { display: flex; flex-direction: column; height: auto; } }
 .dp-empty .cp-paste { margin-top: 12px; }
+
+/* Re-check, What changed, Check again later (INTAKE_3, app/services/capture_follow.py) */
+.cp-r { margin-left: auto; text-transform: none; letter-spacing: 0; color: var(--text-muted); }
+.cp-st.warn { border-color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 12%, var(--surface-1)); }
+.cp-st.warn .cp-v { color: var(--accent-1); }
+.cp-versions { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cp-versions li { position: relative; padding-left: 20px; font-size: 12px; }
+.cp-versions li::before { content: ""; position: absolute; left: 2px; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--status-supported); }
+.cp-versions li.amber::before { background: var(--accent-1); }
+.cp-versions li span { display: block; color: var(--text-muted); }
+.cp-diff { border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; background: var(--surface-2); font: 14px/1.55 var(--font-read, Georgia, serif); }
+.cp-diff p { margin: 4px 0; }
+.cp-diff del { color: var(--status-disputed); background: color-mix(in srgb, var(--status-disputed) 14%, transparent); }
+.cp-diff ins { text-decoration: none; color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 14%, transparent); border-bottom: 1px dashed currentColor; }
+.cp-diff .cp-same { font: 500 10px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.cp-both { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cp-both pre { margin: 4px 0 0; white-space: pre-wrap; font: 12.5px/1.5 var(--font-read, Georgia, serif); max-height: 260px; overflow: auto; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; background: var(--surface-2); }
+.cp-seg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 4px; }
+.cp-seg button { all: unset; cursor: pointer; padding: 4px 12px; border-radius: 99px; border: 1px solid var(--line); font-size: 12px; color: var(--text); }
+.cp-seg button[aria-checked="true"] { border-color: var(--accent-1); color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 14%, transparent); }
+.cp-seg button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.cp-seg small { color: var(--text-muted); font-size: 11px; }
+.cp-acts button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 900px) { .cp-both { grid-template-columns: 1fr; } }
+
+/* Pin a quote · finds itself again (INTAKE_3, app/services/capture_quotes.py) */
+.cp-quote { font: 15px/1.5 var(--font-read, Georgia, serif); margin: 6px 0 8px; }
+.cp-quote mark { background: color-mix(in srgb, var(--accent-1) 22%, transparent); color: var(--text); border-bottom: 1px dashed var(--accent-1); }
+.cp-quote .cp-ctx { color: var(--text-muted); }
+.cp-standing { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; margin-top: 8px; }
+.cp-tray { margin-top: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.cp-tray p { margin: 4px 0; font-size: 12px; }
+.cp-linkbtn { all: unset; cursor: pointer; margin-left: 6px; padding: 1px 8px; border: 1px solid var(--line); border-radius: 7px; font-size: 11.5px; color: var(--text); }
+.cp-linkbtn:focus-visible { outline: 2px solid var(--accent-1); }
+.cp-traylist { margin: 6px 0 0; padding-left: 16px; font-size: 12px; }
+.cp-traylist small { display: block; color: var(--text-muted); }
+.cp-platform { margin: 6px 0 0; display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; }
+.cp-platform b { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; font: 600 10px var(--font-mono); }
+.cp-platform.broken b { color: var(--status-disputed); } .cp-platform.partly b { color: var(--accent-1); }
+
+/* Restored after the #116 merge, which dropped them: the converted Bring in screens below still use these. */
+
+/* Marks for a thing's type and for a fingerprint (features/the-drop/kind-marks.tsx), shared by the Bring in screens. */
+.km-party { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid; vertical-align: -4px; }
+.km-party i { font-style: normal; font-weight: 700; }
+.km-kind { display: inline-grid; place-items: center; width: 18px; height: 18px; color: var(--accent-2); vertical-align: -4px; }
+.km-fp { display: inline-flex; align-items: center; gap: 4px; color: var(--accent-2); vertical-align: middle; }
+.km-copy { all: unset; cursor: pointer; padding: 0 5px; border: 1px solid var(--line); border-radius: 6px; font: 500 10px var(--font-mono); color: var(--accent-2); }
+.km-copy:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.km-more { color: var(--text-muted); font: 500 11px var(--font-mono); }
+.km-icons { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.km-icons > .rv { display: inline-flex; align-items: center; gap: 4px; }
+
+/* The Drop, converted to the 29 Oct rule: sub-text on hover, marks bigger where the box has room. */
+.dp-lane > .rv, .dp-totals > .rv { display: flex; min-width: 0; }
+.dp-lane > .rv > [role='gridcell'], .dp-lane > .rv > [role='rowheader'], .dp-totals > .rv > [role='gridcell'] { flex: 1; min-width: 0; }
+.dp-file .dp-file-mark { font-style: normal; margin-right: 5px; }
+.dp-file .dp-file-mark.bad { color: var(--status-disputed); } .dp-file .dp-file-mark.warn { color: var(--accent-1); }
+.dp-stage i { font-size: 14.5px; }
+.dp-history .dp-stage, .dp-produced .dp-stage, .dp-dupes .dp-stage, .dp-problems .dp-stage, .dp-legend .dp-stage { font-size: 11px; }
+.dp-history .dp-stage i, .dp-problems .dp-stage i { font-size: 11px; }
+.dp-pick { all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 34px; height: 30px; border-radius: 8px; border: 1px solid var(--line); color: var(--accent-2); }
+.dp-pick:hover { border-color: var(--accent-1); }
+.dp-pick:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.dp-pickers { display: flex; gap: 8px; margin-top: 4px; }
+.dp-key { all: unset; cursor: help; font: 500 11px var(--font-mono); color: var(--text-muted); }
+.dp-noai { display: inline-flex; align-items: center; gap: 6px; }
+.dp-noai b { font: 600 13px var(--font-mono); color: var(--accent-2); }
+.dp-unsure-chip { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 2px 9px; border-radius: 99px; border: 1px solid var(--accent-1); color: var(--accent-1); font: 600 12px var(--font-mono); }
+.dp-ready a .km-kind { width: 20px; height: 20px; }
+.dp-counts { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; padding: 0; list-style: none; }
+.dp-counts li { display: inline-flex; align-items: center; gap: 4px; }
+.dp-history header .rv-mark b { font-size: 13px; }
+.dp-verdict.mark { padding: 0; width: 22px; height: 22px; display: inline-grid; place-items: center; font-size: 12px; letter-spacing: 0; }
+.dp-ready ul { flex-direction: row; flex-wrap: wrap; gap: 6px 14px; }
+.dp-ready a { gap: 5px; font-size: 15px; }
+.dp-ready a b { font-size: 15px; }
+/* Links & captures, converted to the 29 Oct rule. */
+.cp-marks { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 !important; }
+.cp-egress { font: 500 11.5px var(--font-mono); color: var(--accent-2); }
+.cp-glyph.big { flex: 0 0 30px; width: 30px; height: 30px; font-size: 15px; }
+.cp-cap .cp-glyph { flex: 0 0 20px; width: 20px; height: 20px; font-size: 11px; }
+.cp-st > .rv.cp-v { font-size: 15px; }
+.cp-displayed { border-bottom: 1px dashed var(--text-muted); }
+.cp-safe.rv, .rv > .cp-safe { display: block; }
+.cp-list li > .rv { display: block; }
+.cp-li b { font-size: 13.5px; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.cp-head code { display: inline; }
+.rv.dp-eyebrow, .rv.cp-quote { display: block; width: fit-content; }
+.cp-standing .cp-glyph { font-size: 12px; }
+/* Library (features/documents/documents-panel.tsx), converted as it is: the Drop's stage marks for a file's reading state. */
+.lib-read { display: inline-grid !important; place-items: center; width: 20px; min-height: 20px !important; padding: 0 !important; font-style: normal; font-size: 12px; vertical-align: middle; }
+.lib-proposed { border-left: 2px dashed var(--text-muted); padding-left: 8px; margin-top: 4px; }
+/* Sources & evidence (features/source-capture/source-capture-panel.tsx): the source type as icon buttons. */
+.sc-types { display: inline-flex; gap: 4px; }
+.sc-types button { all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); color: var(--text-muted); }
+.sc-types button.on { border-color: var(--accent-1); color: var(--accent-1); background: color-mix(in srgb, var(--accent-1) 12%, transparent); }
+.sc-types button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.sc-counts span { display: inline-flex; align-items: center; gap: 4px; margin-right: 10px; }
+/* Connectors and the Dossier, converted as they are. */
+.ds-state { display: inline-grid; place-items: center; min-width: 16px; font-weight: 700; color: var(--accent-2); }
+.ds-line { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; }
+.ds-dup { padding: 0 6px; border-radius: 99px; border: 1px solid var(--line); font-family: var(--font-mono); }
+.ds-counts { margin: 4px 0; font: 500 12px var(--font-mono); color: var(--text-muted); }
+.ds-counts b { color: var(--text); font-size: 13.5px; }
+.cn-runs .rv { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; }
+.cn-run i { font-style: normal; }
+.cn-run.ok i { color: var(--status-supported); } .cn-run.bad i { color: var(--status-disputed); } .cn-run.quiet i { color: var(--text-muted); }
+/* OpenAleph corpus (features/corpus/*), converted as it is. */
+.co-sync { margin: 4px 0; font-size: 13px; }
+.co-sync b { font-size: 14px; }
+.co-score { display: inline-block; width: 60px; height: 5px; border-radius: 3px; background: var(--surface-3); overflow: hidden; vertical-align: middle; }
+.co-score i { display: block; height: 100%; background: var(--accent-2); }
+.co-warn { color: var(--accent-1); }
+.co-stages { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-direction: column; gap: 4px; }
+.co-stages .rv { display: inline-flex; align-items: center; gap: 8px; }
+.co-bar { display: inline-flex; width: 120px; height: 6px; border-radius: 3px; overflow: hidden; background: var(--surface-3); }
+.co-bar i { display: block; height: 100%; }
+.co-bar .done { background: var(--status-supported); } .co-bar .run { background: var(--accent-2); } .co-bar .wait { background: var(--surface-2); } .co-bar .fail { background: var(--status-disputed); }
+
+/* Links & captures with nothing captured yet: the link field first and large, what a capture keeps as marks, and the
+   one visit that leaves this computer (mockup INTAKE_3). */
+.cp-none { padding: 48px 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+.cp-none .rv.cp-none-h { display: block; width: fit-content; }
+.cp-none h2 { margin: 0; font: 300 34px var(--font-display); }
+.cp-paste.big { width: min(640px, 100%); box-sizing: border-box; padding: 18px 20px 16px; text-align: left; font-size: 13px; }
+.cp-paste.big .cp-linkfield { margin: 10px 0 2px; gap: 10px; }
+.cp-paste.big .cp-linkfield input { height: 52px; padding: 0 16px; border-radius: 11px; font-size: 15px; }
+.cp-paste.big .cp-linkfield button { padding: 0 24px; display: grid; place-items: center; border-radius: 11px; font-size: 15px; }
+.cp-keeps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; width: min(640px, 100%); }
+.cp-keeps li > .rv { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px 12px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface-1); color: var(--accent-2); }
+.cp-keeps li > .rv:hover, .cp-keeps li > .rv:focus-visible { border-color: var(--accent-2); }
+.cp-keeps span { font: 500 11px var(--font-mono); color: var(--text); }
+.cp-floor { margin: 0; font: 500 12.5px var(--font-mono); color: var(--accent-2); }
+@media (max-width: 900px) { .cp-keeps { grid-template-columns: repeat(3, minmax(0, 1fr)); } .cp-none h2 { font-size: 26px; } }
+/* A stage with no seconds shows only its mark: big enough to fill the box. */
+.cp-st > .cp-v, .cp-st > .rv.cp-v { font-size: 19px; line-height: 1.1; margin-top: 6px; }
+/* No picture kept: a card drawn from what was kept, dashed so it is never taken for the page. */
+.cp-shot.cp-shot-none { box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; padding: 10px 10px 0; background: var(--surface-2); color: var(--text);
+  border: 1px dashed var(--line); box-shadow: none; text-align: left; }
+.cp-pc-host { font: 500 9.5px var(--font-mono); letter-spacing: .06em; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-pc-title { font: 600 12px/1.3 var(--font-read, Georgia, serif); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+.cp-pc-lines { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.cp-pc-lines i { display: block; height: 3px; border-radius: 2px; background: color-mix(in srgb, var(--text-muted) 35%, transparent); }
+.cp-pc-lines i:nth-child(3n) { width: 70%; }
+.cp-pc-band { margin: 0 -10px; padding: 5px 8px; font: 500 8.5px/1.3 var(--font-mono); text-align: center; color: var(--accent-1); border-top: 1px dashed var(--line); }
+/* An outside service asked for from the receipt is a button, on its own line under what the receipt says now. */
+.cp-kv .cp-ask { cursor: pointer; margin: 4px 0 0; padding: 3px 10px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text); font: inherit; font-size: 12px; }
+.cp-kv .cp-ask:hover:not(:disabled) { border-color: var(--accent-1); }
+.cp-kv .cp-ask:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.cp-kv dd > .cp-ask, .cp-kv dd > .rv:has(> .cp-ask) { display: flex; width: fit-content; }
+
+/* The marks' key under the totals (mockup INTAKE_1): each mark in its own small box; the words on hover. */
+.dp-key { display: inline-flex; gap: 6px; align-items: center; }
+.dp-key .dp-stage { min-height: 18px; width: 22px; padding: 0; }
+.dp-key .dp-stage i { font-size: 11px; animation: none; }
+.dp-why { display: flex; gap: 6px; align-items: baseline; margin: 8px 0 0; font-size: 12px; line-height: 1.4; color: var(--text); }
+.dp-why i { font-style: normal; font-weight: 700; color: var(--status-disputed); }
+.dp-ocr-missing { display: inline-flex; gap: 5px; align-items: baseline; color: var(--accent-1); }
+.dp-ocr-missing i { font-style: normal; }

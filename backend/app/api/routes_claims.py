@@ -9,14 +9,14 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
 from app.db.session import get_db
-from app.models.domain import Claim, Evidence, Investigation
+from app.models.domain import Claim, ClaimEvidenceLink, Evidence, Investigation
 from app.schemas.api import (
-    ClaimCreate, ClaimEvidenceLinkCreate, ClaimReviewRequest, ClaimUpdate,
+    ClaimCreate, ClaimEvidenceLinkCreate, ClaimEvidenceSupersede, ClaimReviewRequest, ClaimUpdate,
     ExtractedRelationshipProposalCreate,
 )
 from app.services.claims import (
-    claim_review_workspace, create_claim, link_claim_evidence, list_claim_evidence,
-    review_claim, update_claim, validate_claim_fields,
+    claim_review_workspace, create_claim, link_claim_evidence, link_out, list_claim_evidence,
+    review_claim, supersede_claim_evidence, unsupersede_claim_evidence, update_claim, validate_claim_fields,
 )
 from app.schemas.responses import (
     ClaimEvidenceLinkOut, ClaimEvidenceRowOut, ClaimOut, ClaimReviewResultOut, ClaimReviewWorkspaceOut, ExtractionCandidateOut,
@@ -44,9 +44,39 @@ def link_claim_evidence_endpoint(claim_id: str, body: ClaimEvidenceLinkCreate, d
     if evidence is None:
         raise HTTPException(404, "Evidence not found")
     try:
-        return link_claim_evidence(db, claim, evidence, stance=body.stance, note=body.note)
+        return link_out(db, link_claim_evidence(db, claim, evidence, stance=body.stance, note=body.note))
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+
+
+def _claim_and_link(db: Session, claim_id: str, link_id: str) -> tuple[Claim, ClaimEvidenceLink]:
+    claim = db.get(Claim, claim_id)
+    if claim is None:
+        raise HTTPException(404, "Claim not found")
+    link = db.get(ClaimEvidenceLink, link_id)
+    if link is None or link.claim_id != claim.id:
+        raise HTTPException(404, "Evidence link not found on this claim")
+    return claim, link
+
+
+@router.post("/claims/{claim_id}/evidence/{link_id}/supersede", response_model=ClaimReviewWorkspaceOut)
+def supersede_claim_evidence_endpoint(claim_id: str, link_id: str, body: ClaimEvidenceSupersede, db: Session = Depends(get_db)) -> Any:
+    """Mark the link superseded by a newer record: it stays on the claim, struck, and no longer counts toward it.
+    Marking it again changes the reason or the replacing record. The reply is the claim's workspace as it now stands."""
+    claim, link = _claim_and_link(db, claim_id, link_id)
+    try:
+        supersede_claim_evidence(db, claim, link, reason=body.reason, by_evidence_id=body.by_evidence_id)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    return claim_review_workspace(db, claim)
+
+
+@router.delete("/claims/{claim_id}/evidence/{link_id}/supersede", response_model=ClaimReviewWorkspaceOut)
+def unsupersede_claim_evidence_endpoint(claim_id: str, link_id: str, db: Session = Depends(get_db)) -> Any:
+    """Undo the mark: the link counts toward the claim again."""
+    claim, link = _claim_and_link(db, claim_id, link_id)
+    unsupersede_claim_evidence(db, claim, link)
+    return claim_review_workspace(db, claim)
 
 
 @router.get("/claims/{claim_id}/evidence", response_model=list[ClaimEvidenceRowOut])

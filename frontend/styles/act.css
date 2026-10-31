@@ -63,17 +63,19 @@
 .rb-level-faint { color: var(--flag-faint); border: 1px dashed var(--flag-faint); }
 .rb-quiet { margin: 6px 2px; color: var(--text-muted); font-size: 13px; }
 .rb-carriers { display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 8px; }
-.rb-carriers > div { display: flex; flex-wrap: wrap; gap: 8px; }
-.rb-carrier { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 2px; width: 62px; text-align: center; }
-.rb-carrier small { font-size: 10.5px; line-height: 1.2; color: var(--text-muted); }
+.rb-carriers > ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; max-height: 168px; overflow-y: auto; overscroll-behavior: contain; }
+.rb-carriers > ul > li > .rv { display: block; }
+.rb-carrier { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 4px minmax(0, 1fr) auto; align-items: center; gap: 8px; width: 100%; padding: 4px 6px; border-radius: 6px; font-size: 13px; }
+.rb-carrier:hover, .rb-carrier.on { background: var(--surface-3); }
+.rb-carrier > i { align-self: stretch; border-radius: 2px; background: var(--flag-faint); }
+.rb-carrier.rk-strong > i { background: var(--flag-strong); }
+.rb-carrier.rk-textbook > i { background: var(--flag-textbook-edge); }
+.rb-carrier-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rb-carrier > b { font: 600 13px var(--font-mono); }
 .rb-shared-row { font-size: 14px; }
 .rb-shared-value { font: 400 14px/1.5 var(--font-read); padding: 6px 10px; border-radius: 8px; border: 1px dashed var(--line); }
 .rb-shared-value small { font: 600 10px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-right: 6px; }
 .rb-shared-value i { color: var(--text-muted); font-size: 12.5px; }
-.rb-ring { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 600 13px var(--font-mono); box-shadow: inset 0 0 0 3px var(--flag-faint); }
-.rb-carrier.rk-strong .rb-ring { box-shadow: inset 0 0 0 3px var(--flag-strong); }
-.rb-carrier.rk-textbook .rb-ring { box-shadow: inset 0 0 0 3px var(--flag-textbook-edge); }
-.rb-carrier.on .rb-ring { background: var(--surface-3); }
 .rb-carrier:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 
 .rb-open { overflow-y: auto; overscroll-behavior: contain; padding: 14px 18px 18px; display: grid; gap: 12px; align-content: start; outline: none; }
@@ -127,13 +129,16 @@
 .rb-about { margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .rb-about b { color: var(--text); }
 .rb-acts { display: grid; gap: 6px; }
-.rb-acts > button, .rb-link-btn, .rb-why button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
+/* Watch and Share sit inside a Reveal (their hover words), so the button is one level down: styled the same. */
+.rb-acts > .rv { display: grid; }
+.rb-acts > button, .rb-acts > .rv > button, .rb-link-btn, .rb-why button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
   padding: 8px 12px; border-radius: 10px; font-size: 13px; box-shadow: inset 0 0 0 1px var(--line); text-align: center; }
 .rb-acts > button.primary { background: var(--accent-1); color: var(--ground); box-shadow: none; font-weight: 650; }
-.rb-acts > button:disabled { cursor: default; opacity: .5; }
+.rb-acts > button:disabled, .rb-acts > .rv > button:disabled { cursor: default; opacity: .5; }
+.rb-acts > .rv > button[aria-pressed='true'] { box-shadow: inset 0 0 0 1px var(--accent-2); color: var(--accent-2); }
 .rb-acts kbd { font: 600 10.5px var(--font-mono); padding: 0 5px; border-radius: 4px; box-shadow: inset 0 0 0 1px currentColor; }
 .rb-acts small { font-size: 11px; color: var(--text-muted); text-align: center; }
-.rb-acts > button:focus-visible, .rb-link-btn:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.rb-acts > button:focus-visible, .rb-acts > .rv > button:focus-visible, .rb-link-btn:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .rb-why { display: grid; gap: 6px; font-size: 12px; }
 .rb-why input, .inn-why input { padding: 6px 8px; border-radius: 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); font: inherit; }
 .rb-why span { display: flex; gap: 6px; }
@@ -158,8 +163,9 @@
 .rb-quote { margin: 0; padding: 8px 10px; border-left: 2px solid var(--line); }
 .rb-quote p { margin: 0 0 4px; font: 400 13px/1.45 var(--font-read); font-variant-ligatures: none; }
 .rb-quote footer { font-size: 11px; color: var(--text-muted); }
+.rb-quote > .rv { font-size: 12.5px; color: var(--text); }
 .rb-quote a { color: var(--accent-2); }
-.rb-foot { margin: 0; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--line); padding-top: 8px; }
+.rb-foot { margin: 0; display: flex; gap: 10px; font-size: 14px; color: var(--text-muted); border-top: 1px solid var(--line); padding-top: 8px; }
 
 /* Reading never writes: when the rules last ran, and running them on demand. */
 .rb-runline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
@@ -172,7 +178,7 @@
 
 /* Hover-preview: the row pointed at, and its flag shown in the centre while the chosen one waits. */
 .rb-row.peek:not(.on) { background: var(--surface-2); border-color: var(--line); border-style: dashed; }
-.rb-open.preview { box-shadow: var(--shadow-panel, none), inset 0 0 0 1px var(--line); }
+.rb-open.preview { box-shadow: var(--shadow-panel, none); outline: 1.5px dashed var(--accent-2); outline-offset: -1.5px; }
 .rb-open.preview > :not(.rb-peek-note) { opacity: .88; }
 .rb-peek-note { margin: 0; font: 600 10px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent-2); }
 
@@ -201,9 +207,49 @@
 .rb-pay-focus { margin: 0; font-size: 12.5px; color: var(--text-muted); }
 .rb-pay-focus b { color: var(--text); font-family: var(--font-mono); }
 .rb-pay-word { font: 600 10.5px var(--font-mono); text-transform: uppercase; }
+/* The payments one flag carries (BO-033): one line each; how sure each is shows as the dot's colour, the word on hover. */
+.rb-pay-list ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.rb-pay-list li { display: grid; grid-template-columns: 10px 9.5em auto 1fr; gap: 10px; align-items: baseline; font-size: 14px; line-height: 1.6; }
+.rb-pay-list li b { font: 600 13.5px var(--font-mono); }
+.rb-pay-list li i { color: var(--text-muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rb-pay-day { color: var(--text-muted); font-size: 12.5px; }
+.rb-pay-dot { width: 8px; height: 8px; border-radius: 50%; align-self: center; background: var(--status-unshown); }
+.rb-pay-dot.c-shown { background: var(--status-supported); } .rb-pay-dot.c-disputed { background: var(--status-disputed); }
+.rb-pay-list > button { justify-self: start; }
 .rb-pay-word.c-shown { color: var(--status-supported); } .rb-pay-word.c-not_yet_shown { color: var(--status-unshown); } .rb-pay-word.c-disputed { color: var(--status-disputed); }
 /* Reduced motion and Calm: nothing moves; the open flag only crossfades (120 ms). */
 @media (prefers-reduced-motion: reduce) { .rb-row, .rb-row.lit, .rb-changed-now, .rf-why-list { animation: none; }
   .rb-open[data-dir] > *, .rb-open.preview > * { animation: rb-fade 120ms linear both; } }
 html[data-motion='calm'] .rb-row, html[data-motion='calm'] .rb-row.lit, html[data-motion='calm'] .rb-changed-now, html[data-motion='calm'] .rf-why-list { animation: none; }
 html[data-motion='calm'] .rb-open[data-dir] > *, html[data-motion='calm'] .rb-open.preview > * { animation: rb-fade 120ms linear both; }
+.rb-name { all: unset; cursor: pointer; font-weight: 700; border-bottom: 1px dotted var(--text-muted); }
+.rb-name:hover, .rb-name[aria-pressed=true] { color: var(--accent-1); border-bottom-color: var(--accent-1); }
+.rb-name:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 2px; }
+
+/* 29 Oct rule: sub-text on reveal. The marks that are left carry the meaning, so they are drawn larger. */
+.rb .lv-bars { font-size: 12.5px; }
+.rb-row .rb-row-top { min-height: 16px; }
+.rb-select-icon { font-size: 15px; color: var(--text-muted); }
+.rb-ran { font-size: 14px; color: var(--text-muted); }
+.rb-ran.stale { color: var(--flag-strong); }
+.rb-info { font-size: 14px; color: var(--text-muted); }
+.rb-change-word { font-size: 14px; }
+.rb .rb-state { display: inline-grid; place-items: center; width: 22px; height: 22px; padding: 0; font-size: 12px; }
+.rb .inn-mark { font-size: 15px; }
+.rf-setby { font: 600 14px var(--font-mono); color: var(--text-muted); padding: 0 4px; }
+.cf-segmented > .rv { display: inline-flex; } .cf-segmented > .rv:not(:last-child) > button { border-right: 1px solid var(--line); }
+
+/* 30 Oct (mockup ACT_1): the open flag's ladder and actions fill the pane's height rather than leaving its lower half
+   empty: taller rungs and actions, the summary a step larger. */
+.rb-summary { font-size: 16px; }
+.rb-ladder ol { gap: 8px; }
+.rung { padding: 12px 14px; font-size: 13.5px; }
+.rung-head b { font-size: 11.5px; }
+.rb-acts { gap: 8px; }
+.rb-acts > button, .rb-acts > .rv > button, .rb-link-btn { padding: 11px 14px; font-size: 14px; }
+
+/* Red Flags, 30 Oct sweep: a met rung shows its rule and what met it; the carriers' names one line, cut. */
+.rung-found { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: baseline; font-size: 12px; }
+.rung-found b { font: 700 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--status-supported); }
+.rung-found span { padding: 1px 7px; border-radius: 999px; background: var(--surface-1); box-shadow: inset 0 0 0 1px var(--line); font-family: var(--font-mono); font-size: 11.5px; }
+.inn-title { line-height: 1.4; }

@@ -1,0 +1,324 @@
+'use client';
+
+// Add by hand (mockup ENTRY_1; backend app/services/manual_entry.py): a party, a link or an event a reporter knows,
+// written as a sentence with blanks, and where it comes from. Beside it, before anything is written: where a link
+// lands, what it would change (a dry run of the Red Flag rules), and what the case already holds or has waiting in
+// Decide. Kinds are never guessed: a new party's kind is picked, "not known" included, and so is a payment's kind
+// (a transfer, a loan, a fine, an order...; "not said" by default). An amount owed raises no Red Flag (DECISIONS_LOG 33).
+import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {useEffect, useMemo, useState} from 'react';
+import type {ReactElement} from 'react';
+
+import {PAYMENT_KIND, PAYMENT_KINDS, PaymentKindGlyph, PartyMark} from '../../components/network/marks';
+import type {PaymentKind} from '../../components/network/marks';
+import {Reveal} from '../../components/ui/reveal';
+import {errorMessage} from '../../lib/api-client';
+import {byHandSuggestOptions, listDocumentsOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import {byHandAdd, byHandPreview} from '../../lib/generated/sdk.gen';
+import type {ByHandHitOut, ByHandSuggestionOut, EntryIn, SourceIn} from '../../lib/generated/types.gen';
+
+type Kind = 'party' | 'link' | 'event';
+type PartyKind = 'Company' | 'Person' | 'Organization' | 'PublicBody' | 'LegalEntity';
+type Slot = {id: string | null; text: string; kind: PartyKind | null};
+const EMPTY: Slot = {id: null, text: '', kind: null};
+
+export const LINK_WORDS: Record<string, string> = {
+  Payment: 'paid', Ownership: 'owns', Directorship: 'is a director of', Membership: 'is a member of', Employment: 'works for', UnknownLink: 'is linked to',
+};
+const KIND_WORDS: Record<PartyKind, string> = {Company: 'a company', Person: 'a person', Organization: 'an organisation', PublicBody: 'a public body', LegalEntity: 'kind not known'};
+
+/** How precise a typed date is, from its form: 2019 · 2019-03 · 2019-03-03. */
+export function precisionOf(date: string): 'year' | 'month' | 'day' | null {
+  const d = date.trim();
+  if (/^\d{4}$/.test(d)) return 'year';
+  if (/^\d{4}-(0[1-9]|1[0-2])$/.test(d)) return 'month';
+  if (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(d)) return 'day';
+  return null;
+}
+
+export type AmountReading = {value: string} | {ask: [string, string]} | {bad: string};
+
+const tidy = (int: string, frac = ''): string => {
+  const i = int.replace(/^0+(?=\d)/, '');
+  const f = frac.replace(/0+$/, '');
+  return f ? `${i}.${f}` : i;
+};
+const grouped = (int: string, sep: string): string | null => {
+  const parts = int.split(sep);
+  return /^\d{1,3}$/.test(parts[0]) && parts.slice(1).every(g => /^\d{3}$/.test(g)) ? parts.join('') : null;
+};
+
+/** A typed amount as a plain number ("29400.5"), read the same in every locale. With both a comma and a dot, the last
+ *  is the decimal mark. A mark used more than once separates thousands. A single one before exactly three digits
+ *  ("29.400", "1,500") could be either, so both readings come back to ask; any other single one is the decimal mark.
+ *  Spaces are thousands separators. Null when nothing is typed. */
+export function readAmount(text: string): AmountReading | null {
+  const t = text.trim().replace(/[\s\u00a0\u202f']/g, '');
+  if (!t) return null;
+  const bad = {bad: 'Only digits, with a comma or a dot'};
+  if (!/^\d[\d.,]*\d$|^\d$/.test(t)) return bad;
+  const dots = t.split('.').length - 1, commas = t.split(',').length - 1;
+  if (dots && commas) {
+    const mark = t.lastIndexOf('.') > t.lastIndexOf(',') ? '.' : ',';
+    const other = mark === '.' ? ',' : '.';
+    if ((mark === '.' ? dots : commas) > 1) return bad;
+    const [int, frac] = t.split(mark);
+    const whole = grouped(int, other);
+    return whole === null ? bad : {value: tidy(whole, frac)};
+  }
+  const sep = dots ? '.' : commas ? ',' : '';
+  if (!sep) return {value: tidy(t)};
+  if (dots + commas > 1) { const whole = grouped(t, sep); return whole === null ? bad : {value: tidy(whole)}; }
+  const [int, frac] = t.split(sep);
+  if (frac.length === 3 && int.length <= 3 && int !== '0') return {ask: [tidy(int + frac), tidy(int, frac)]};
+  return {value: tidy(int, frac)};
+}
+
+/** A plain number shown back unambiguously: thousands spaced, a dot before decimals. */
+export function amountWords(value: string): string {
+  const [int, frac] = value.split('.');
+  const spaced = int.replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  return frac ? `${spaced}.${frac}` : spaced;
+}
+
+/** The link's properties as FollowTheMoney names them, for its kind. `amount` is a plain number (readAmount). */
+export function linkProperties(schema: string, amount: string, currency: string, date: string, purpose: string): Record<string, string[]> {
+  const p: Record<string, string[]> = {};
+  const n = amount.trim();
+  if (schema === 'Payment') {
+    if (n) p.amount = [n];
+    if (currency.trim()) p.currency = [currency.trim().toUpperCase()];
+    if (date.trim()) p.date = [date.trim()];
+    if (purpose.trim()) p.purpose = [purpose.trim()];
+  } else {
+    if (schema === 'Ownership' && n) p.percentage = [n];
+    if (date.trim()) p.startDate = [date.trim()];
+  }
+  return p;
+}
+
+function PartySlot({investigationId, label, value, onChange, autoFocus}: {investigationId: string; label: string; value: Slot;
+  onChange: (s: Slot) => void; autoFocus?: boolean}): ReactElement {
+  const [open, setOpen] = useState(false);
+  const typed = value.id ? '' : value.text;
+  const found = useQuery({...byHandSuggestOptions({path: {investigation_id: investigationId}, query: {q: typed}}), enabled: open && typed.trim().length >= 2}).data ?? [];
+  const pick = (s: ByHandSuggestionOut) => { onChange({id: s.id, text: s.caption, kind: null}); setOpen(false); };
+  return <span className="bh-slotwrap">
+    <label className={`bh-slot${value.id ? ' known' : value.text ? '' : ' empty'}`}>
+      <small>{label}</small>
+      <input value={value.text} autoFocus={autoFocus} aria-label={label} placeholder="type a name" style={{width: `${Math.max(10, value.text.length + 1)}ch`}}
+        onChange={e => { onChange({id: null, text: e.target.value, kind: value.kind}); setOpen(true); }} onFocus={() => setOpen(true)}/>
+      {value.id && <Reveal label="in the case" detail="In the case: a record of this case."><span className="bh-known" aria-hidden="true">●</span></Reveal>}
+    </label>
+    {open && !value.id && typed.trim().length >= 2 && <span className="bh-suggest" role="listbox" aria-label={`Parties matching ${typed}`}>
+      {found.map(s => <button key={s.id} type="button" role="option" aria-selected="false" onClick={() => pick(s)}>
+        <span className="bh-chip teal">{s.as === 'its name' ? 'in the case' : 'also known as'}</span>
+        {s.as === 'its name' && <PartyMark schema={s.schema} tabbable={false}/>}
+        <span><b>{s.as === 'its name' ? s.caption : s.matched}</b>{s.as === 'its name' ? (s.country ? <small>{s.country}</small> : null) : <small>another name of {s.caption}</small>}</span>
+      </button>)}
+      <span className="bh-new" role="group" aria-label={`Add “${typed}” as a new party`}>
+        <span className="bh-chip dash">new</span><span><Reveal tabbable={false} detail="Its kind, picked by you, never guessed."><b>Add “{typed}” as a new party</b></Reveal>
+          <span className="bh-kinds">{(Object.keys(KIND_WORDS) as PartyKind[]).map(k => <button key={k} type="button" aria-pressed={value.kind === k}
+            onClick={() => { onChange({id: null, text: typed, kind: k}); setOpen(false); }}>{KIND_WORDS[k]}</button>)}</span></span>
+      </span>
+    </span>}
+    {!value.id && value.kind && <small className="bh-newnote">new · {KIND_WORDS[value.kind]}</small>}
+  </span>;
+}
+
+const clip = (t: string) => (t.length > 22 ? `${t.slice(0, 21)}…` : t);
+const end = (s: Slot) => (s.id ? {entity_id: s.id} : {new: {caption: s.text.trim(), schema: s.kind ?? 'LegalEntity'}});
+const ready = (s: Slot) => Boolean(s.id || (s.text.trim() && s.kind));
+
+function Hits({title, hits}: {title: string; hits: ByHandHitOut[]}): ReactElement | null {
+  if (!hits.length) return null;
+  return <><p className="bh-sub">{title}</p><ul className="bh-list">{hits.map(h => <li key={`${h.kind}-${h.id}`}><b className="bh-ico amber" aria-hidden="true">!</b>
+    <span>{h.kind === 'link' ? `A ${String(h.schema ?? 'link').toLowerCase()} link between these two${h.same ? ', the same way round' : ''} is already in the case.`
+      : h.kind === 'proposal' ? `“${h.caption ?? ''}” waits in Decide${h.schema ? ` as a ${String(h.schema).toLowerCase()}` : ''}: answer that one instead?`
+      : h.kind === 'event' ? `“${h.caption ?? ''}” is already on the timeline on that date.`
+      : `${h.caption ?? ''} (${h.schema ?? ''}) is already in the case, under ${h.as ?? 'that name'}.`}</span></li>)}</ul></>;
+}
+
+export function AddByHand({investigationId}: {investigationId: string}): ReactElement {
+  const queryClient = useQueryClient();
+  const [kind, setKind] = useState<Kind>('link');
+  const [a, setA] = useState<Slot>(EMPTY);
+  const [b, setB] = useState<Slot>(EMPTY);
+  const [schema, setSchema] = useState('Payment');
+  const [amount, setAmount] = useState('');
+  const [currency, setCurrency] = useState('');
+  const [amountPick, setAmountPick] = useState<string | null>(null);
+  const [date, setDate] = useState('');
+  const [purpose, setPurpose] = useState('');
+  const [payKind, setPayKind] = useState<PaymentKind | ''>('');
+  const [partyKind, setPartyKind] = useState<PartyKind | null>(null);
+  const [country, setCountry] = useState('');
+  const [title, setTitle] = useState('');
+  const [where, setWhere] = useState('');
+  const [mode, setMode] = useState<SourceIn['mode']>('passage');
+  const [docId, setDocId] = useState('');
+  const [quote, setQuote] = useState('');
+  const [locator, setLocator] = useState('');
+  const [srcTitle, setSrcTitle] = useState('');
+  const [srcType, setSrcType] = useState<NonNullable<SourceIn['source_type']>>('interview');
+  const [notes, setNotes] = useState('');
+  const [status, setStatus] = useState('');
+  const [busy, setBusy] = useState(false);
+  const docs = (useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: mode === 'passage'}).data ?? [])
+    .filter(d => d.extraction_status === 'complete');
+  const precision = precisionOf(date);
+  // The amount as a number, never guessed: an ambiguous one waits for the reading picked; a payment needs its currency.
+  const reading = readAmount(amount);
+  const ask = reading && 'ask' in reading ? reading.ask : null;
+  const amountValue = !reading ? '' : 'value' in reading ? reading.value : ask && amountPick && ask.includes(amountPick) ? amountPick : null;
+  const cur = currency.trim().toUpperCase();
+  const curOk = /^[A-Z]{3}$/.test(cur);
+  const amountReady = amountValue !== null && (schema !== 'Payment' || !amountValue || curOk);
+
+  const entry: EntryIn | null = useMemo(() => {
+    if (kind === 'party') return a.text.trim() && partyKind ? {kind, party: {caption: a.text.trim(), schema: partyKind, country: country.trim() || null}} : null;
+    if (kind === 'link') return ready(a) && ready(b) && amountReady ? {kind, link: {schema, source: end(a), target: end(b), properties: linkProperties(schema, amountValue ?? '', currency, date, purpose),
+      ...(schema === 'Payment' && payKind ? {payment_kind: payKind} : {})}} : null;
+    return title.trim() && precision ? {kind, event: {title: title.trim(), date: date.trim(), precision: precision === 'year' ? 'year' : precision, where: where.trim() || null,
+      entity_ids: [a.id, b.id].filter((x): x is string => Boolean(x))}} : null;
+  }, [kind, a, b, schema, amountReady, amountValue, currency, date, purpose, payKind, partyKind, country, title, where, precision]);
+  // The preview writes nothing: asked again as the sentence changes.
+  const preview = useQuery({queryKey: ['by-hand-preview', investigationId, entry], enabled: Boolean(entry), staleTime: 0,
+    queryFn: async () => (await byHandPreview({path: {investigation_id: investigationId}, body: entry as EntryIn, throwOnError: true})).data});
+  const source: SourceIn = mode === 'passage' ? {mode, document_id: docId || null, quote: quote.trim() || null, locator: locator.trim() || null}
+    : mode === 'record' ? {mode, title: srcTitle.trim() || null, source_type: srcType, notes: notes.trim() || null} : {mode};
+  const sourceReady = mode === 'none' || (mode === 'passage' ? Boolean(docId && quote.trim()) : Boolean(srcTitle.trim()));
+  useEffect(() => { setStatus(''); }, [kind]);
+
+  const reset = () => { setA(EMPTY); setB(EMPTY); setAmount(''); setAmountPick(null); setDate(''); setPurpose(''); setPayKind(''); setTitle(''); setWhere(''); setQuote(''); setLocator(''); setPartyKind(null); setCountry(''); };
+  const add = async (another: boolean) => {
+    if (!entry || !sourceReady) return;
+    setBusy(true);
+    try {
+      const made = (await byHandAdd({path: {investigation_id: investigationId}, body: {...entry, source}, throwOnError: true})).data;
+      setStatus(`Added: the ${made.record_type}${made.evidence_id ? ', with its evidence' : ''}${made.lead_id ? ', and a lead to find its source' : ''}${made.parties.length ? `, and ${made.parties.length} new part${made.parties.length === 1 ? 'y' : 'ies'}` : ''}.`);
+      void queryClient.invalidateQueries();
+      if (another) { setQuote(''); setLocator(''); setTitle(''); setAmount(''); setAmountPick(null); setDate(''); setPurpose(''); setB(EMPTY); } else reset();
+    } catch (error) { setStatus(errorMessage(error, 'It could not be added')); }
+    setBusy(false);
+  };
+  const changes = preview.data?.changes ?? [];
+
+  return <div className="bh" aria-label="Add by hand">
+    <div className="bh-head">
+      <p className="bh-lede"><Reveal label="What this is for" detail="Something you know that no document the app read has said yet. Write it as a sentence; the app asks where it comes from.">
+        <span className="bh-info" aria-hidden="true">ⓘ</span></Reveal></p>
+      <div className="bh-kinds big" role="group" aria-label="What to add">
+        {(['party', 'link', 'event'] as Kind[]).map(k => <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>{k === 'party' ? 'A party' : k === 'link' ? 'A link' : 'An event'}</button>)}
+      </div>
+    </div>
+    <div className="bh-grid">
+      <div className="bh-col">
+        <section className="bh-panel hot" aria-label="The sentence">
+          <p className="bh-cap"><Reveal detail="Each blank is a record or a value."><span>The {kind}, as a sentence</span></Reveal></p>
+          {kind === 'link' ? <p className="bh-sentence">
+            <PartySlot investigationId={investigationId} label="party" value={a} onChange={setA} autoFocus/>
+            <label className="bh-slot"><small>link</small><select value={schema} onChange={e => setSchema(e.target.value)} aria-label="Link">
+              {Object.entries(LINK_WORDS).map(([s, w]) => <option key={s} value={s}>{w}</option>)}</select></label>
+            <PartySlot investigationId={investigationId} label="party" value={b} onChange={setB}/>
+            {(schema === 'Payment' || schema === 'Ownership') && <label className={`bh-slot${amount ? '' : ' empty'}`}><small>{schema === 'Payment' ? 'amount' : 'per cent'}</small>
+              <input value={amount} onChange={e => { setAmount(e.target.value); setAmountPick(null); }} aria-label={schema === 'Payment' ? 'Amount' : 'Per cent'} placeholder={schema === 'Payment' ? '29400' : '60'} inputMode="decimal"
+                style={{width: `${Math.max(6, amount.length + 1)}ch`}}/>
+              {schema === 'Payment' && <input className={`bh-cur${curOk ? '' : ' empty'}`} value={currency} onChange={e => setCurrency(e.target.value)} aria-label="Currency" placeholder="cur" maxLength={3}/>}</label>}
+            {(schema === 'Payment' || schema === 'Ownership') && reading && <span className="bh-reads" aria-live="polite">
+              {'bad' in reading ? <b className="bh-warn">{reading.bad}</b>
+                : ask && amountValue === null ? <span className="bh-kinds" role="group" aria-label="Which amount?">
+                  {ask.map(v => <button key={v} type="button" aria-pressed={amountPick === v} onClick={() => setAmountPick(v)}>{amountWords(v)}</button>)}</span>
+                : amountValue ? <>reads as {amountWords(amountValue)}{schema === 'Payment' ? (curOk ? ` ${cur}` : <b className="bh-warn"> · which currency?</b>) : '%'}
+                  {ask && <button type="button" className="bh-link" onClick={() => setAmountPick(null)}>change</button>}</> : null}
+            </span>}
+            <span>{schema === 'Payment' ? 'on' : 'from'}</span>
+            <label className={`bh-slot${date ? '' : ' empty'}`}><small>date</small><input value={date} onChange={e => setDate(e.target.value)} aria-label="Date" placeholder="2019-03-03"/></label>
+            <Precision value={precision} date={date}/>
+            {schema === 'Payment' && <><span>, for</span><label className={`bh-slot${purpose ? '' : ' empty'}`}><small>purpose</small>
+              <input value={purpose} onChange={e => setPurpose(e.target.value)} aria-label="Purpose" placeholder="not known"/></label>
+              <span>, as</span><label className={`bh-slot${payKind ? '' : ' empty'}`}><small>kind</small>
+              {payKind && <PaymentKindGlyph kind={payKind}/>}
+              <select value={payKind} onChange={e => setPayKind(e.target.value as PaymentKind | '')} aria-label="Kind of payment">
+                <option value="">not said</option>{PAYMENT_KINDS.map(k => <option key={k} value={k}>{PAYMENT_KIND[k].word.toLowerCase()}</option>)}</select></label></>}
+          </p>
+          : kind === 'party' ? <p className="bh-sentence">
+            <label className={`bh-slot${a.text ? '' : ' empty'}`}><small>name</small><input value={a.text} autoFocus onChange={e => setA({id: null, text: e.target.value, kind: null})} aria-label="Name" placeholder="type a name"/></label>
+            <span>is</span>
+            <span className="bh-kinds" role="group" aria-label="Kind">{(Object.keys(KIND_WORDS) as PartyKind[]).map(k => <button key={k} type="button" aria-pressed={partyKind === k} onClick={() => setPartyKind(k)}>{KIND_WORDS[k]}</button>)}</span>
+            <span>in</span>
+            <label className={`bh-slot${country ? '' : ' empty'}`}><small>country</small><input value={country} onChange={e => setCountry(e.target.value)} aria-label="Country" placeholder="not known"/></label>
+          </p>
+          : <p className="bh-sentence">
+            <label className={`bh-slot${title ? '' : ' empty'}`}><small>what happened</small><input value={title} autoFocus onChange={e => setTitle(e.target.value)} aria-label="What happened" placeholder="the board met on the lease"/></label>
+            <span>on</span>
+            <label className={`bh-slot${date ? '' : ' empty'}`}><small>date</small><input value={date} onChange={e => setDate(e.target.value)} aria-label="Date" placeholder="2019-03-03"/></label>
+            <Precision value={precision} date={date}/>
+            <span>at</span>
+            <label className={`bh-slot${where ? '' : ' empty'}`}><small>place</small><input value={where} onChange={e => setWhere(e.target.value)} aria-label="Place" placeholder="not known"/></label>
+            <span>, with</span>
+            <PartySlot investigationId={investigationId} label="party" value={a} onChange={s => setA(s.id ? s : {...s, kind: null})}/>
+          </p>}
+        </section>
+        <section className="bh-panel" aria-label="Where does it come from?">
+          <p className="bh-cap"><Reveal detail="It decides what it can carry."><span>Where does it come from?</span></Reveal> <span>required</span></p>
+          <div className="bh-src" role="radiogroup" aria-label="Source">
+            {([['passage', 'A passage', 'Words in a document of the case. It starts with them as its evidence.'],
+              ['record', 'A source with no file', 'A call, a meeting, a register seen in person. Kept as a source; the custody chain says no file is behind it.'],
+              ['none', 'I know it, no source yet', 'Kept as Not yet shown, with a lead to find one. Never counts toward Supported.']] as const).map(([m, t, d]) =>
+              <Reveal key={m} tabbable={false} detail={d}><button type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)}><b>{t}</b></button></Reveal>)}
+          </div>
+          {mode === 'passage' ? <div className="bh-fields">
+            <label>Document<select value={docId} onChange={e => setDocId(e.target.value)}><option value="">Choose a document…</option>
+              {docs.map(d => <option key={d.id} value={d.id}>{d.title || d.filename}</option>)}</select></label>
+            <label>The words, as the document has them<textarea value={quote} onChange={e => setQuote(e.target.value)} rows={2} placeholder="LOOP TWO BV · 29,400.00 EUR"/></label>
+            <label>Where in it (optional)<input value={locator} onChange={e => setLocator(e.target.value)} placeholder="page 3 — found by the words when left empty"/></label>
+          </div> : mode === 'record' ? <div className="bh-fields">
+            <label>Who or what said it<input value={srcTitle} onChange={e => setSrcTitle(e.target.value)} placeholder="Call with a former board member"/></label>
+            <label>Kind<select value={srcType} onChange={e => setSrcType(e.target.value as NonNullable<SourceIn['source_type']>)}>
+              <option value="interview">an interview or a call</option><option value="public_record">a public record seen in person</option>
+              <option value="document">a document not in the case</option><option value="web">a web page</option><option value="other">something else</option></select></label>
+            <label>What it said (your note)<textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}/></label>
+          </div> : <p className="bh-note">A lead “Find a source for …” is opened on it.</p>}
+        </section>
+        <section className="bh-panel" aria-label="Who wrote it">
+          <p className="bh-cap"><Reveal detail="Kept on the record and in its custody chain."><span>Who wrote it</span></Reveal></p>
+          <p className="bh-note">Typed in by you, now. A person, not the app.</p>
+          <div className="bh-acts">
+            <button type="button" className="pri" disabled={!entry || !sourceReady || busy} onClick={() => void add(false)}>Add the {kind}</button>
+            <button type="button" disabled={!entry || !sourceReady || busy} onClick={() => void add(true)}>Add and write another</button>
+          </div>
+          {status && <p role="status" className="bh-status">{status}</p>}
+        </section>
+      </div>
+      <div className="bh-col">
+        {kind === 'link' && <section className="bh-panel" aria-label="Where it lands">
+          <p className="bh-cap t"><Reveal detail="Before you add it."><span>Where it lands</span></Reveal></p>
+          <svg className="bh-wire" viewBox="0 10 400 84" role="img" aria-label={`${a.text || 'a party'} ${LINK_WORDS[schema]} ${b.text || 'a party'}`}>
+            <line x1="170" y1="60" x2="230" y2="60" className="bh-new-line"/>
+            <text x="200" y="30" textAnchor="middle" className="bh-line-label">{LINK_WORDS[schema]}{amountValue ? ` ${amountWords(amountValue)}${schema === 'Payment' ? (curOk ? ` ${cur}` : '') : '%'}` : ''} · new</text>
+            <rect x="6" y="44" width="164" height="32" rx="8" className={a.id ? 'bh-node known' : a.text ? 'bh-node' : 'bh-node empty'}/><text x="88" y="64" textAnchor="middle">{clip(a.text || 'party')}</text>
+            <rect x="230" y="44" width="164" height="32" rx="8" className={b.id ? 'bh-node known' : b.text ? 'bh-node' : 'bh-node empty'}/><text x="312" y="64" textAnchor="middle">{clip(b.text || 'party')}</text>
+          </svg>
+        </section>}
+        <section className={`bh-panel${entry ? '' : ' idle'}`} aria-label="What it changes">
+          <p className="bh-cap"><Reveal detail="A dry run: nothing is saved yet."><span>What it changes</span></Reveal>{!entry && <span>once the blanks are filled</span>}</p>
+          {!entry ? null : !preview.data ? <p className="bh-note">{preview.isError ? '' : 'Checking…'}</p>
+            : changes.length ? <ul className="bh-list">{changes.map(c => <li key={c}><b className="bh-ico amber" aria-hidden="true">◆</b><span>{c}</span></li>)}</ul>
+            : <p className="bh-note">{kind === 'link' ? 'No Red Flag rises with it.' : 'It raises no Red Flag on its own.'}{mode === 'none' ? ' With no source it stays Not yet shown.' : ''}</p>}
+        </section>
+        <section className={`bh-panel${entry ? '' : ' idle'}`} aria-label="Already in the case?">
+          <p className="bh-cap"><Reveal detail="Checked as you type."><span>Already in the case?</span></Reveal>{!entry && <span>checked as you type</span>}</p>
+          {!entry ? null : preview.isPending && !preview.isError ? <p className="bh-note">Checking…</p> : preview.isError ? <p role="alert">{errorMessage(preview.error, 'Could not check')}</p>
+            : preview.data && !preview.data.already.length && !preview.data.waiting.length ? <p className="bh-note bh-clear"><b className="bh-ico ok" aria-hidden="true">✓</b> {kind === 'link' ? 'No link between these two yet.' : 'Nothing like it yet.'}</p>
+            : <><Hits title="In the case" hits={preview.data?.already ?? []}/><Hits title="Waiting in Decide" hits={preview.data?.waiting ?? []}/></>}
+        </section>
+      </div>
+    </div>
+  </div>;
+}
+
+function Precision({value, date}: {value: 'year' | 'month' | 'day' | null; date: string}): ReactElement {
+  return <span className="bh-prec" aria-label="Precision">{(['day', 'month', 'year'] as const).map(p => <span key={p} className={value === p ? 'on' : ''}>{p}</span>)}
+    {date && !value && <small className="bh-bad">a year, a month or a day: 2019, 2019-03, 2019-03-03</small>}</span>;
+}

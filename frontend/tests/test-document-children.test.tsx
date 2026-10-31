@@ -15,6 +15,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
+import {dropBody} from '../test-support/library';
 import {corpusStatusBody, documentFormatsBody, emptyGraph} from '../test-support/page-routes';
 
 vi.mock('next/navigation', () => ({
@@ -51,11 +52,23 @@ const documents = [
 function routes(extra: Record<string, unknown> = {}) {
   return {
     [DOCUMENTS]: documents, 'GET /api/investigations/inv-1/entities': [], 'GET /api/investigations/inv-1/graph': emptyGraph(),
-    'GET /api/investigations/inv-1/corpus/status': corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody(), ...extra,
+    'GET /api/investigations/inv-1/corpus/status': corpusStatusBody('inv-1'), 'GET /api/document-formats': documentFormatsBody(),
+    'GET /api/investigations/inv-1/drop': dropBody('inv-1'), ...extra,
   };
 }
 
 const rowOf = (id: string) => screen.getByTestId(`document-${id}`);
+const pane = () => screen.getByTestId('library-pane');
+/** Chooses a file in the list; its pane shows. */
+async function choose(user: ReturnType<typeof userEvent.setup>, id: string) {
+  await user.click(within(rowOf(id)).getAllByRole('button').find(b => b.id === `lib-pick-${id}`)!);
+}
+/** The OpenAleph actions the chosen file's menu offers. */
+async function openAlephMenu(user: ReturnType<typeof userEvent.setup>): Promise<string[]> {
+  await user.click(within(pane()).getByRole('button', {name: /^OpenAleph/}));
+  const items = within(pane()).getAllByRole('menuitem').map(item => item.textContent ?? '');
+  return items;
+}
 
 describe('Files found inside other documents', () => {
   it('nests each file under its container, in the list\'s order', () => {
@@ -66,15 +79,24 @@ describe('Files found inside other documents', () => {
   it('shows each file under the archive or email it was found in', async () => {
     const api = mockApi(routes());
     wrap(<DocumentsPanel investigationId="inv-1"/>);
-    await screen.findByText('letters/first.txt');
+    await screen.findByTestId('document-first');
     const order = screen.getAllByTestId(/^document-/).map(element => element.getAttribute('data-testid'));
     expect(order).toEqual(['document-memo', 'document-mail', 'document-ledger', 'document-zip', 'document-first']);
     expect(within(rowOf('ledger')).getByText('Inside transfer.eml')).toBeInTheDocument();
     expect(within(rowOf('first')).getByText('Inside bundle.zip')).toBeInTheDocument();
-    expect(within(rowOf('zip')).getByRole('button', {name: 'Look for files inside again'})).toBeInTheDocument();
-    expect(within(rowOf('mail')).getByRole('button', {name: 'Look for files inside again'})).toBeInTheDocument();
-    expect(within(rowOf('memo')).queryByRole('button', {name: 'Look for files inside again'})).not.toBeInTheDocument();
-    expect(within(rowOf('memo')).queryByRole('button', {name: 'Headers & thread'})).not.toBeInTheDocument();
+    // A container folds the files inside it.
+    const user = userEvent.setup();
+    await user.click(within(rowOf('zip')).getByRole('button', {name: 'Hide the 1 file inside'}));
+    expect(screen.queryByTestId('document-first')).not.toBeInTheDocument();
+    await user.click(within(rowOf('zip')).getByRole('button', {name: 'Show the 1 file inside'}));
+    expect(rowOf('first')).toBeInTheDocument();
+    // The actions are in the chosen file's pane; OpenAleph's are one menu.
+    expect(within(pane()).queryByRole('button', {name: 'Headers & thread'})).not.toBeInTheDocument();
+    expect(await openAlephMenu(user)).not.toContain('Look for files inside again');
+    for (const id of ['zip', 'mail']) {
+      await choose(user, id);
+      expect(await openAlephMenu(user)).toContain('Look for files inside again');
+    }
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -86,8 +108,11 @@ describe('Files found inside other documents', () => {
       attempts: 1, runner: 'inline', result: null, created_at: '2026-10-02T00:00:00', started_at: null, finished_at: null, updated_at: '2026-10-02T00:00:00',
     }}));
     wrap(<DocumentsPanel investigationId="inv-1"/>);
-    await screen.findByText('letters/first.txt');
-    await userEvent.setup().click(within(rowOf('zip')).getByRole('button', {name: 'Look for files inside again'}));
+    await screen.findByTestId('document-first');
+    const user = userEvent.setup();
+    await choose(user, 'zip');
+    await openAlephMenu(user);
+    await user.click(within(pane()).getByRole('menuitem', {name: 'Look for files inside again'}));
     await screen.findByText(/bundle\.zip: .*1 file\(s\) inside added as documents/);
     expect(api.calls(children)).toHaveLength(1);
     expect(api.calls(DOCUMENTS).length).toBeGreaterThanOrEqual(2);
@@ -107,9 +132,10 @@ describe('Files found inside other documents', () => {
     };
     const api = mockApi(routes({'GET /api/documents/mail/email': email, 'GET /api/documents/reply/candidates': []}));
     wrap(<DocumentsPanel investigationId="inv-1"/>);
-    await screen.findByText('transfer.eml');
+    await screen.findByTestId('document-mail');
     const user = userEvent.setup();
-    await user.click(within(rowOf('mail')).getByRole('button', {name: 'Headers & thread'}));
+    await choose(user, 'mail');
+    await user.click(within(pane()).getByRole('button', {name: 'Headers & thread'}));
     const view = await screen.findByLabelText('Email headers and thread');
     expect(within(view).getByText('Transfer to Meridian', {selector: 'dd'})).toBeInTheDocument();
     expect(within(view).getByText('Jane Doe <jane.doe@meridian.example>')).toBeInTheDocument();

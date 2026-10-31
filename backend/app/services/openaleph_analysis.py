@@ -551,8 +551,22 @@ def import_analysis_proposals(db: Session, document_id: str, analysis: Analysis)
                 chunk_id=first.chunk_id if first else None, candidate_type=kind.candidate_type,
                 payload=payload, confidence=kind.confidence, review_status="proposed",
             ))
+    _keep_what_openaleph_read(doc, analysis)
     db.commit()
     return counts
+
+
+def _keep_what_openaleph_read(doc: Document, analysis: Analysis) -> None:
+    """The document's kind as OpenAleph read it (an Email...), and the language it detected first, unless a firmer
+    value is kept (app/services/document_facts.py)."""
+    from app.services import document_facts
+
+    kind = document_facts.kind_from_file(None, None, openaleph_schema=analysis.schema)
+    if kind:
+        document_facts.set_kind(doc, kind, "reader", who="OpenAleph")
+    for code in analysis.properties.get("detectedLanguage", []):
+        if document_facts.set_language(doc, str(code), "detected", who="OpenAleph"):
+            break
 
 
 def describe_import(counts: dict[str, int]) -> str | None:

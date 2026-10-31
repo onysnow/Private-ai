@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.authorization import AuthorizationScope
 from app.models.domain import (
-    Claim, ConnectorFinding, ConnectorRun, Document, Evidence, Investigation,
+    Claim, ClaimEvidenceLink, ConnectorFinding, ConnectorRun, Document, Evidence, Investigation,
     Lead, ReportingTask, Source,
 )
 from app.schemas.api import InvestigationCreate
@@ -105,6 +105,23 @@ def list_investigation_sources(
     if limit is not None:
         stmt = stmt.limit(limit)
     return list(db.scalars(stmt).all())
+
+
+def list_investigation_evidence_claim_links(db: Session, investigation_id: str) -> list[dict]:
+    """Every evidence-to-claim link in the investigation, one row per link: which
+    evidence record backs, contradicts or gives context to which claim. Lets the
+    Sources & evidence browser show each record's claims without a call per claim."""
+    from app.services.claims import superseded_of
+
+    links = db.scalars(
+        select(ClaimEvidenceLink)
+        .join(Claim, Claim.id == ClaimEvidenceLink.claim_id)
+        .where(Claim.investigation_id == investigation_id)
+        .order_by(ClaimEvidenceLink.evidence_id, ClaimEvidenceLink.claim_id, ClaimEvidenceLink.stance)
+    ).all()
+    # A superseded link carries its mark (what replaced it, why, who, when), as the Claims screen shows it.
+    return [{"evidence_id": link.evidence_id, "claim_id": link.claim_id, "stance": link.stance,
+             "superseded": link.superseded_at is not None, "superseded_mark": superseded_of(db, link)} for link in links]
 
 
 def list_investigation_claims(

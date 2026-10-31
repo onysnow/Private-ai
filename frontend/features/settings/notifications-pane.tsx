@@ -6,6 +6,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
+import {Bell, BellOff, Inbox, Zap} from 'lucide-react';
 
 import {errorMessage} from '../../lib/api-client';
 import {
@@ -14,10 +15,20 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {NotificationPrefsOut} from '../../lib/generated/types.gen';
 
+import {Reveal} from '../../components/ui/reveal';
+import {OPEN_INBOX_EVENT} from '../../components/frame/app-frame';
 import {OutsideChannels} from './outside-channels';
+import {HelpRow} from './settings-index';
 
 type Route = 'interrupt' | 'needs' | 'else' | 'off';
+const ROUTES: Route[] = ['interrupt', 'needs', 'else', 'off'];
 const ROUTE_WORDS: Record<Route, string> = {interrupt: 'Interrupt', needs: 'Needs you', else: 'Everything else', off: 'Off'};
+const ROUTE_DOES: Record<Route, string> = {
+  interrupt: 'One notice in the top band, in the alarm colour, shown once and never repeated. Only a Textbook Red Flag may interrupt.',
+  needs: 'The bell’s first tab: what waits for you.', else: 'The bell’s second tab: the rest, to read when you like.', off: 'Not shown anywhere.',
+};
+const icon = {width: 15, height: 15, strokeWidth: 2, 'aria-hidden': true} as const;
+const ROUTE_ICON: Record<Route, ReactElement> = {interrupt: <Zap {...icon}/>, needs: <Bell {...icon}/>, else: <Inbox {...icon}/>, off: <BellOff {...icon}/>};
 const BACKUP_DAYS: {days: 7 | 14 | 30 | 0; words: string}[] = [
   {days: 7, words: 'A week'}, {days: 14, words: 'Two weeks'}, {days: 30, words: 'A month'}, {days: 0, words: 'Never'},
 ];
@@ -73,44 +84,58 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
 
   return <div className="ap-two">
     <section className="ap-pane" aria-labelledby="nt-routes">
-      <div className="ap-pane-head"><h2 id="nt-routes">Where each kind goes</h2><span>the bell’s two tabs, the top band, or nowhere</span>
+      <div className="ap-pane-head"><h2 id="nt-routes"><Reveal detail="The top band, the bell’s two tabs, or nowhere. Point at a column’s mark for what it does; a ring marks the default."><span>Where each kind goes</span></Reveal></h2>
         <button type="button" className="st-link" onClick={() => put({routes: Object.fromEntries(p.kinds.map(k => [k.key, k.default as Route]))})}>Reset to defaults</button></div>
-      {p.kinds.map(k => {
-        const routes: Route[] = k.can_interrupt ? ['interrupt', 'needs', 'else', 'off'] : ['needs', 'else', 'off'];
-        const current = (p.routes[k.key] ?? k.default) as Route;
-        return <div key={k.key} className="st-route">
-          <span className="st-route-what"><b>{k.label}</b>{week && <small>{week[k.key] ?? 0} last week</small>}</span>
-          <span className="ap-seg" role="radiogroup" aria-label={k.label}>
-            {routes.map(r => <button key={r} type="button" role="radio" aria-checked={current === r} className={current === r ? 'on' : ''}
-              onClick={() => current !== r && put({routes: {[k.key]: r}})}>{ROUTE_WORDS[r]}{r === k.default && <em className="st-default">default</em>}</button>)}
-          </span>
-        </div>;
-      })}
+      {/* Kinds × where they go: one row per kind, one column per place, a dot for the choice. The places are marks named
+          on hover; the default is a ring on its cell, named in the dot's name; last week's count is the number. */}
+      <div className="st-grid" role="presentation">
+        <div className="st-grid-head" aria-hidden="true">
+          <span/>
+          <Reveal detail="How many of each this case raised in the last seven days."><span className="st-grid-n">7d</span></Reveal>
+          {ROUTES.map(r => <Reveal key={r} detail={<><b className="rv-row">{ROUTE_WORDS[r]}</b><span className="rv-row">{ROUTE_DOES[r]}</span></>}>
+            <span className={`st-grid-mark st-to-${r}`}>{ROUTE_ICON[r]}</span></Reveal>)}
+        </div>
+        {p.kinds.map(k => {
+          const current = (p.routes[k.key] ?? k.default) as Route;
+          return <div key={k.key} className={`st-grid-row${current !== k.default ? ' st-changed' : ''}`}>
+            <b className="st-grid-kind">{k.label}</b>
+            {week ? <Reveal detail={`${week[k.key] ?? 0} last week`}><span className={`st-grid-n${week[k.key] ? '' : ' zero'}`}>{week[k.key] ?? 0}</span></Reveal> : <span className="st-grid-n zero" aria-hidden="true">·</span>}
+            <span className="st-grid-cells" role="radiogroup" aria-label={k.label}>
+              {ROUTES.map(r => !k.can_interrupt && r === 'interrupt' ? <span key={r} className="st-grid-none" aria-hidden="true"/>
+                : <button key={r} type="button" role="radio" aria-checked={current === r} aria-label={`${ROUTE_WORDS[r]}${r === k.default ? ' (default)' : ''}`}
+                  className={`st-grid-dot st-to-${r}${current === r ? ' on' : ''}${r === k.default ? ' dflt' : ''}`}
+                  onClick={() => current !== r && put({routes: {[k.key]: r}})}><i aria-hidden="true"/></button>)}
+            </span>
+          </div>;
+        })}
+      </div>
       {problem && <p className="st-problem" role="alert">{problem}</p>}
-      <p className="st-hint">Interrupt is one notice in the top band, in the alarm colour, shown once and never repeated. Only a Textbook Red Flag may interrupt.</p>
     </section>
 
     <div className="st-col">
       <section className="ap-pane" aria-labelledby="nt-week">
-        <div className="ap-pane-head"><h2 id="nt-week">Last week, with these choices</h2><span>{caseName}</span></div>
+        <div className="ap-pane-head"><h2 id="nt-week"><Reveal detail="Counted from what this case raised in the last seven days. Change a route and the numbers move, so you see what you would have been told before you choose.">
+          <span>Last week, with these choices</span></Reveal></h2><span>{caseName}</span>
+          <button type="button" className="st-link" onClick={() => window.dispatchEvent(new Event(OPEN_INBOX_EVENT))}>Open the inbox</button></div>
         {!investigationId ? <p className="st-hint">Open a case to replay its week.</p>
           : !week ? <p className="st-wait">Counting…</p>
           : <div className="st-bins">{BINS.map(b => <div key={b.route} className={`st-bin st-bin-${b.route}`}><b>{bins[b.route]}</b><span>{b.words}</span></div>)}</div>}
-        <p className="st-hint">Counted from what this case raised in the last seven days. Change a route and the numbers move, so you see what you would have been told before you choose.</p>
       </section>
 
       <section className="ap-pane" aria-labelledby="nt-when">
         <div className="ap-pane-head"><h2 id="nt-when">When it tells you</h2></div>
-        <label className="ap-switch"><span><b>Quiet while reading</b><small>In the reader, Chain of Custody and Decide, an interrupt waits until you leave. The bell still counts.</small></span>
-          <input type="checkbox" role="switch" checked={p.quiet_while_reading} onChange={e => put({quiet_while_reading: e.target.checked})}/><i aria-hidden="true"/></label>
-        <label className="ap-switch"><span><b>Desktop notification</b><small>When the Workbench is in the background, an interrupt also tells this computer: the kind only, no names and no text.</small></span>
+        <HelpRow help="In the reader, Chain of Custody and Decide, an interrupt waits until you leave. The bell still counts.">
+        <label className="ap-switch"><span><b>Quiet while reading</b><small className="st-sr">In the reader, Chain of Custody and Decide, an interrupt waits until you leave. The bell still counts.</small></span>
+          <input type="checkbox" role="switch" checked={p.quiet_while_reading} onChange={e => put({quiet_while_reading: e.target.checked})}/><i aria-hidden="true"/></label></HelpRow>
+        <HelpRow help="When the Workbench is in the background, an interrupt also tells this computer: the kind only, no names and no text.">
+        <label className="ap-switch"><span><b>Desktop notification</b><small className="st-sr">When the Workbench is in the background, an interrupt also tells this computer: the kind only, no names and no text.</small></span>
           <input type="checkbox" role="switch" checked={p.desktop} onChange={async e => {
             const on = e.target.checked;
             if (on) { const why = await allowDesktop(); if (why) { setProblem(why); return; } }
             put({desktop: on});
-          }}/><i aria-hidden="true"/></label>
+          }}/><i aria-hidden="true"/></label></HelpRow>
         <div className="st-route">
-          <span className="st-route-what"><b>Remind me to back up</b><small>When a case has new material and no full backup for this long. Only a backup with the files counts.</small></span>
+          <span className="st-route-what"><Reveal detail="When a case has new material and no full backup for this long. Only a backup with the files counts."><b>Remind me to back up</b></Reveal></span>
           <span className="ap-seg" role="radiogroup" aria-label="Remind me to back up">
             {BACKUP_DAYS.map(b => <button key={b.days} type="button" role="radio" aria-checked={p.backup_days === b.days} className={p.backup_days === b.days ? 'on' : ''}
               onClick={() => p.backup_days !== b.days && put({backup_days: b.days})}>{b.words}</button>)}
@@ -121,13 +146,14 @@ export function NotificationsPane({investigationId, caseName}: {investigationId:
       <OutsideChannels prefs={p}/>
 
       <section className="ap-pane" aria-labelledby="nt-watch">
-        <div className="ap-pane-head"><h2 id="nt-watch">Watches on facts</h2><span>told when a fact changes</span></div>
+        <div className="ap-pane-head"><h2 id="nt-watch"><Reveal detail="Told when a fact changes."><span>Watches on facts</span></Reveal></h2></div>
         {!investigationId ? <p className="st-hint">Open a case to see what you watch in it.</p>
           : watches.isPending ? <p className="st-wait">Looking…</p>
           : !watches.data?.length ? <p className="st-hint">Nothing watched in this case. Watch a claim from its card, or a Red Flag from its page.</p>
           : <ul className="st-list">{watches.data.map(w => <li key={w.id} className="st-route">
-            <span className="st-route-what"><b>{w.label}</b>
-              <small>{w.record_type === 'claim' ? 'Claim' : 'Red Flag'} · {w.changed ? `${w.baseline_words} → ${w.value_words}` : `now ${w.value_words}`}</small></span>
+            {/* What kind of fact it is is revealed on its name; the change (or the value now) shows. */}
+            <span className="st-route-what"><Reveal detail={w.record_type === 'claim' ? 'Claim' : 'Red Flag'}><b>{w.label}</b></Reveal>
+              <small>{w.changed ? `${w.baseline_words} → ${w.value_words}` : `now ${w.value_words}`}</small></span>
             <button type="button" className="ap-btn" disabled={stop.isPending} onClick={() => stop.mutate({path: {fact_watch_id: w.id}})}>Stop</button>
           </li>)}</ul>}
       </section>

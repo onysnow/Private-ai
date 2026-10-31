@@ -9,8 +9,8 @@ ingest service runs with OPENALEPH_PROCRASTINATE_DEHYDRATE_ENTITIES=false
 Each test uploads real files through the Workbench's own upload route, so
 OpenAleph reads them, ftm-analyze finds their names, and the Workbench turns
 the result into proposals. Every investigation gets its own OpenAleph
-collection, which the test deletes afterwards; nothing else on the stack is
-touched.
+collection, which is deleted once every test has run (`_collections` says
+why not straight after its test); nothing else on the stack is touched.
 """
 
 from __future__ import annotations
@@ -45,8 +45,32 @@ MEMO = (
 )
 
 
+@pytest.fixture(scope="session")
+def _collections():
+    """The collections the tests made, deleted once every test has run.
+
+    Deleting each test's collection straight after it left the next tests an
+    index of deleted documents: Elasticsearch keeps them (soft deletes) until
+    segments merge, which a few dozen documents never trigger. With
+    openaleph-search's more_like_this (boost_terms 1), a shard where a term's
+    document count, deleted ones included, passes e times its live documents
+    gets a negative term boost and fails ("boost must be a positive float");
+    OpenAleph answers with the other shards' hits only, so the similar
+    documents test saw `results: []` on over a quarter of fresh CI stacks. That is an
+    Elasticsearch/openaleph-search bug (docs/project-notes/DECISIONS_LOG.md, "Similar
+    documents and deleted documents"); cleaning up at the end keeps these tests
+    from making the state that shows it.
+    """
+    created: list[str] = []
+    yield created
+    token = httpx.get(f"{LIVE_URL.rstrip('/')}/api/2/metadata", timeout=10).json().get("token")
+    for collection_id in created:
+        httpx.delete(f"{LIVE_URL.rstrip('/')}/api/2/collections/{collection_id}",
+                     headers={"Authorization": f"Token {token}"}, timeout=30)
+
+
 @pytest.fixture()
-def live(monkeypatch, tmp_path):
+def live(monkeypatch, tmp_path, _collections):
     monkeypatch.setattr(settings, "openaleph_enabled", True)
     monkeypatch.setattr(settings, "openaleph_base_url", LIVE_URL.rstrip("/"))
     monkeypatch.setattr(settings, "openaleph_api_key", "")
@@ -58,12 +82,7 @@ def live(monkeypatch, tmp_path):
     monkeypatch.setattr(settings, "document_storage_dir", str(tmp_path / "docs"))
     monkeypatch.setattr(openaleph_corpus, "_single_user_tokens", {})
     client = TestClient(app)
-    created: list[str] = []
-    yield client, created
-    token = httpx.get(f"{LIVE_URL.rstrip('/')}/api/2/metadata", timeout=10).json().get("token")
-    for collection_id in created:
-        httpx.delete(f"{LIVE_URL.rstrip('/')}/api/2/collections/{collection_id}",
-                     headers={"Authorization": f"Token {token}"}, timeout=30)
+    yield client, _collections
 
 
 def _investigation(live, name: str) -> str:
@@ -170,7 +189,9 @@ def test_reading_progress_follows_openaleph_until_it_is_idle(live, tmp_path):
     aleph = openaleph_corpus._client_factory()
     for number in range(3):
         memo = tmp_path / f"progress-{number}.txt"
-        memo.write_text(MEMO, encoding="utf-8")
+        # Each file its own text: three files with the same text are one OpenAleph entity, written six times, and
+        # those versions count against the similar documents test until merged (`_collections`).
+        memo.write_text(f"{MEMO}\n\nCopy {number + 1} of 3.", encoding="utf-8")
         aleph.ingest_upload(collection_id, memo, {"file_name": memo.name})
 
     seen: list[dict] = []

@@ -11,21 +11,35 @@
 // from the file to the sentence when the chain opens (drawn at once with reduced motion).
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {useRouter} from 'next/navigation';
-import {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useId, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {CSSProperties, ReactElement, ReactNode} from 'react';
 
-import {StatusChip, type ClaimStatus} from '../../components/status';
+import {LevelChip, StatusChip, type ClaimStatus, type FlagLevel} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {useWheelStep} from '../case-home/wheel-step';
 import {errorMessage} from '../../lib/api-client';
-import {onScreen, typingInto} from '../../lib/on-screen';
+import {escapeTaken, onScreen, typingInto} from '../../lib/on-screen';
 import {getClaimCustodyChainOptions, listClaimsOptions, recheckHashMutation} from '../../lib/generated/@tanstack/react-query.gen';
 import type {ClaimDoneOut, CustodyAnchorOut, CustodyCardOut, CustodyChainOut, CustodyLogOut} from '../../lib/generated/types.gen';
 import {apiTime} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
+import {DemoGlyph, DemoMark, isDemoDecided} from '../demo/pre-decided';
 
 const COLUMNS = ['Files', 'Reading', 'Passage', 'Decision', 'The claim'] as const;
 const COL: Record<CustodyCardOut['kind'], number> = {file: 0, source: 0, reading: 1, passage: 2, decision: 3};
 const SOURCE_WORD: Record<string, string> = {public_record: 'Public record', document: 'Document', web: 'Web page', interview: 'Interview', social: 'Social post', other: 'Other'};
+/** A source's type as an icon (globe, page, speech bubble, seal, at-sign, dot), named on reveal (Ony, 29 Oct). */
+function SourceIcon({type}: {type: string}): ReactElement {
+  const paths: Record<string, ReactNode> = {
+    web: <><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2 2 2 10 0 12M8 2c-2 2-2 10 0 12"/></>,
+    document: <><path d="M4 1.5h5.5l3 3v10h-8.5z"/><path d="M6 7.5h4.5M6 10h4.5"/></>,
+    interview: <><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></>,
+    public_record: <><circle cx="8" cy="7" r="4.5"/><path d="M5.5 10.5l-1 4 3.5-1.5 3.5 1.5-1-4"/></>,
+    social: <><circle cx="8" cy="8" r="2.5"/><path d="M10.5 8v1.2a1.8 1.8 0 0 0 3.5 0V8A6 6 0 1 0 11 13.2"/></>,
+  };
+  return <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"
+    style={{verticalAlign: 'middle'}}>{paths[type] ?? <circle cx="8" cy="8" r="2.5" fill="currentColor"/>}</svg>;
+}
 const AI_MODULE: Record<string, string> = {case_synthesis: 'Case synthesis', hypothesis_test: 'Theory test', presentation_draft: 'Presentation',
   research_vetting: 'Research vetting', quant_framing: 'Rival explanations', las_argument_check: 'Logic check', das_framing: 'Decision framing',
   das_options: 'Options and evidence', evidence_plan: 'Evidence plan', ehs_harm_minimisation: 'Harm assessment', ehs_public_interest: 'Public interest'};
@@ -45,6 +59,29 @@ const DONE_STATE: Record<ClaimDoneOut['rules'][number]['state'], {mark: string; 
   met: {mark: '✓', word: 'met'}, not_met: {mark: '✕', word: 'not met'}, unknown: {mark: '○', word: 'cannot be checked here'}};
 /** How long the pointer rests on the log before the wheel replays it (as features/case-home/wheel-step.ts). */
 const LOG_DWELL_MS = 220;
+/** How far a chain grows to fill the room it has (Ony, 29 Oct: fill the space): the zoom `now` scaled so the content
+ * (`used` px tall at that zoom) fills `room` px, never below 1 (Fit scales down), never above 1.5 or what the width
+ * allows (`widthCap`). Small changes are ignored, so measuring after a zoom does not set it swinging. */
+export function growScale(now: number, room: number, used: number, widthCap: number): number {
+  if (!(room > 0) || !(used > 0)) return now;
+  const next = Math.max(1, Math.min(1.5, widthCap, (now * room) / used));
+  const rounded = Math.floor(next * 20) / 20;
+  return Math.abs(rounded - now) < 0.05 ? now : rounded;
+}
+/** The room the chain has: its column's height less the log under it (and the gap), and its width. */
+function roomFor(host: HTMLElement): {height: number; width: number} | null {
+  const main = host.parentElement;
+  if (!main) return null;
+  const others = Array.from(main.children).filter(c => c !== host).reduce((n, c) => n + (c as HTMLElement).offsetHeight + 14, 0);
+  return {height: main.clientHeight - others, width: main.clientWidth};
+}
+/** How tall the chain's content is on screen at zoom `now`: from the highest column head to the lowest card, with the
+ * box's padding. */
+function usedHeight(host: HTMLElement, now: number): number {
+  const rects = Array.from(host.querySelectorAll<HTMLElement>('.cc-card, .cc-col')).map(el => el.getBoundingClientRect());
+  if (!rects.length) return 0;
+  return Math.max(...rects.map(r => r.bottom)) - Math.min(...rects.map(r => r.top)) + 28 * now;
+}
 /** Motion off: the person's calm setting or the system's reduced motion. */
 function calmNow(): boolean {
   if (typeof window === 'undefined') return true;
@@ -183,7 +220,7 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
     const onKey = (e: KeyboardEvent) => {
       if (!onScreen(rootRef.current) || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || typingInto(e.target)) return;
       if (e.key === 'l' || e.key === 'L') { e.preventDefault(); setAsList(v => !v); }
-      else if (e.key === 'Escape' && chosen && !document.querySelector('[role="dialog"]:not([hidden])')) openClaim(chosen);
+      else if (e.key === 'Escape' && chosen && !escapeTaken(e, rootRef.current)) openClaim(chosen);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -209,19 +246,20 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
 
   return <section className="cc" data-calm-zone="" aria-label="Chain of Custody" ref={rootRef}>
     <header className="cc-head">
-      <h2>How this fact got here</h2>
-      {chain && <p className="cc-seal"><button type="button" className="cc-seal-btn" onClick={() => void copySeal()}
-        aria-label={`The custody seal: ${sealLine(chain)}. Copy it for a write-up's methods note`} title="Click to copy for a write-up's methods note"><Seal chain={chain}/></button>
+      {/* Ony, 29 Oct: the direction is revealed on the title (the column heads say it too); the keys on their buttons. */}
+      <h2><Reveal detail="Read from file → to sentence: each row is one piece of evidence, its steps left to right into the claim.">How this fact got here</Reveal></h2>
+      {chain && <p className="cc-seal"><Reveal tabbable={false} detail="Click to copy for a write-up's methods note"><button type="button" className="cc-seal-btn" onClick={() => void copySeal()}
+        aria-label={`The custody seal: ${sealLine(chain)}. Copy it for a write-up's methods note`}><Seal chain={chain}/></button></Reveal>
         {copied && <span className="cc-copied" role="status">{copied}</span>}</p>}
       <div className="cc-tools">
-        <span className="cc-dir">From file → to sentence</span>
         <button type="button" className="cc-btn" aria-pressed={fit} onClick={() => setFit(v => !v)}>Fit</button>
-        <button type="button" className="cc-btn" aria-pressed={asList} onClick={() => setAsList(v => !v)}><kbd>L</kbd> log as list</button>
-        {chosen && <button type="button" className="cc-btn" onClick={() => openClaim(chosen)}><kbd>Esc</kbd> back to the claim</button>}
+        <Reveal tabbable={false} detail={<>Key: <kbd>L</kbd></>}><button type="button" className="cc-btn" aria-pressed={asList} onClick={() => setAsList(v => !v)} aria-keyshortcuts="L">Log as list</button></Reveal>
+        {chosen && <Reveal tabbable={false} detail={<>Key: <kbd>Esc</kbd></>}><button type="button" className="cc-btn" onClick={() => openClaim(chosen)} aria-keyshortcuts="Escape">Back to the claim</button></Reveal>}
       </div>
     </header>
     {(claims.data?.length ?? 0) > 1 && <label className="cc-pick">Claim
-      <select value={chosen} onChange={e => setClaimId(e.target.value)} aria-label="Which claim">
+      {/* Wide enough for most claims; a longer one ends in an ellipsis, its whole sentence on hover. */}
+      <select value={chosen} onChange={e => setClaimId(e.target.value)} aria-label="Which claim" title={claims.data!.find(c => c.id === chosen)?.text}>
         {claims.data!.map(c => <option key={c.id} value={c.id}>{c.text.length > 90 ? `${c.text.slice(0, 90)}…` : c.text}</option>)}
       </select></label>}
     {status && <p className="cc-muted">{status}</p>}
@@ -229,10 +267,11 @@ export function ChainOfCustody({investigationId, active = true}: {investigationI
       <div className="cc-main">
         {asList ? <LogList log={chain.log}/> : <Wires chain={chain} picked={card?.id ?? null} lit={lit} fit={fit} breaking={breaks ? card?.id ?? null : null}
           onPick={id => { setPicked(id); setBreaks(false); }} onLight={setLit} onWatch={watchRun}/>}
-        <section className="cc-log" aria-label="Custody log" title="Scroll over the log to replay it step by step" ref={logRef}
+        <section className="cc-log" aria-label="Custody log" ref={logRef}
           onWheel={wheel.onWheel} onPointerEnter={() => { wheel.onPointerEnter(); enteredLog.current = Date.now(); }}
           onMouseLeave={() => { setStep(null); setLit(null); }}>
-          <header><h3>Custody log <small>who held it · what was done · when</small></h3>
+          <header><h3><Reveal detail={<><span className="rv-row">Who held it · what was done · when</span>
+            <span className="rv-row">Scroll over the log to replay it step by step.</span></>}>Custody log</Reveal></h3>
             <button type="button" onClick={exportLog}>Export for an editor or lawyer ›</button></header>
           <table>
             <tbody>{chain.log.map((e, i) => <tr key={i} className={`${lit === e.card ? 'lit' : ''}${step === i ? ' now' : ''} actor-${e.actor}`}
@@ -260,13 +299,27 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
 }): ReactElement {
   const box = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<{key: string; d: string; style: string; words: string; x: number; y: number}[]>([]);
-  // Fit: the whole chain at once, scaled down to the width it has.
+  // Fit: the whole chain at once, scaled down to the width it has. Otherwise a small chain grows to fill the room the
+  // log leaves it (Ony, 29 Oct: fill the space), never wider than its columns allow.
   const [scale, setScale] = useState(1);
+  const minWidth = useMemo(() => {
+    const used = chain.rows.length ? [0, 1, 2, 3].filter(i => chain.rows.some(r => r.cards.some(c => COL[c.kind] === i))).length : 4;
+    return used * 140 + (used < 4 ? 220 : 200) + used * 52 + 28;
+  }, [chain]);
   useLayoutEffect(() => {
     const host = box.current;
-    if (!host || !fit) { setScale(1); return; }
-    setScale(Math.min(1, host.clientWidth / host.scrollWidth, (window.innerHeight * 0.62) / host.scrollHeight));
-  }, [fit, chain]);
+    if (!host) return undefined;
+    if (fit) { setScale(Math.min(1, host.clientWidth / host.scrollWidth, (window.innerHeight * 0.62) / host.scrollHeight)); return undefined; }
+    const grow = () => setScale(s => {
+      const room = roomFor(host);
+      const used = usedHeight(host, s);
+      return room && used ? growScale(s, room.height, used, room.width / minWidth) : s;
+    });
+    grow();
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(grow);
+    if (host.parentElement) ro?.observe(host.parentElement);
+    return () => ro?.disconnect();
+  }, [fit, chain, minWidth]);
   // More AI steps than fit under the claim fold into one card; it opens them all.
   const [allAi, setAllAi] = useState(false);
   useEffect(() => { setAllAi(false); }, [chain.claim.id]);
@@ -298,9 +351,10 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
           const x2 = b.left - r0.left; const y2 = next ? b.top + b.height / 2 - r0.top : Math.min(Math.max(y1, b.top - r0.top + 24), b.bottom - r0.top - 24);
           const mx = (x1 + x2) / 2;
           // Only the line into the claim says what it does (as the mockup draws it); the others speak by their style.
-          const words = next ? '' : c.wire.style === 'against' ? `✕ against${c.lines.some(l => l && l !== 'typed in by a person') ? ' · answered' : ''}` : c.wire.words;
+          // A row marked superseded by a newer record still runs to the claim, faded, and says so: it counts for nothing.
+          const words = next ? '' : row.superseded ? 'superseded' : c.wire.style === 'against' ? `✕ against${c.lines.some(l => l && l !== 'typed in by a person') ? ' · answered' : ''}` : c.wire.words;
           // A row against the claim is red from its first step (mockup CHECK_2).
-          out.push({key: `${c.id}>${next?.id ?? 'claim'}`, d: `M${x1},${y1}C${mx},${y1} ${mx},${y2} ${x2},${y2}`, style: against ? 'against' : c.wire.style, words,
+          out.push({key: `${c.id}>${next?.id ?? 'claim'}`, d: `M${x1},${y1}C${mx},${y1} ${mx},${y2} ${x2},${y2}`, style: row.superseded ? 'gone' : against ? 'against' : c.wire.style, words,
             x: mx, y: (y1 + y2) / 2 - 5});
         });
       }
@@ -325,31 +379,42 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
   const [draw] = useState(() => !calmNow());
   // A step lights the wires on both its sides.
   const wireLit = (key: string) => Boolean(lit && (key.startsWith(`${lit}>`) || key.endsWith(`>${lit}`)));
-  return <div className={`cc-wires${breaking ? ' breaking' : ''}${draw ? ' draw' : ''}`} ref={box} style={scale < 1 ? {zoom: scale} : undefined}>
+  // Only the columns a card stands in are drawn (a source typed in by hand has no reading or passage step), so the
+  // steps sit side by side into the claim instead of across empty columns; with no evidence yet, all five show.
+  const used = chain.rows.length ? [0, 1, 2, 3].filter(i => chain.rows.some(r => r.cards.some(c => COL[c.kind] === i))) : [0, 1, 2, 3];
+  const at = (col: number) => used.indexOf(col) + 1;
+  const claimAt = used.length + 1;
+  const gridStyle: CSSProperties = {gridTemplateColumns: `repeat(${used.length}, minmax(140px, ${used.length < 4 ? '250px' : '1fr'})) ${used.length < 4 ? 'minmax(220px, 300px)' : 'minmax(200px, 1.2fr)'}`,
+    ...(used.length < 4 ? {justifyContent: 'space-between'} : {}),
+    ...(scale !== 1 ? {zoom: scale} : {})};
+  return <div className={`cc-wires${breaking ? ' breaking' : ''}${draw ? ' draw' : ''}`} ref={box} style={gridStyle} data-columns={used.length + 1}>
     <svg key={chain.claim.id} className={`cc-lines${draw ? ' draw' : ''}`} aria-hidden="true">
       {lines.map(l => <g key={l.key} className={`cc-wire w-${l.style}${wireLit(l.key) ? ' lit' : ''}`}>
         <path d={l.d}/>{l.words && <text x={l.x} y={l.y - (l.words.includes(' · ') ? 6 : 0)} textAnchor="middle">
           {l.words.split(' · ').map((w, i) => <tspan key={i} x={l.x} dy={i ? 11 : 0}>{w}</tspan>)}</text>}</g>)}
     </svg>
-    {COLUMNS.map((c, i) => <p key={c} className="cc-col" style={{gridColumn: i + 1}}>{c.toUpperCase()}</p>)}
-    {chain.rows.map((row, r) => row.cards.map(c => <CardBox key={c.id} card={c} row={r + 2} picked={picked === c.id} lit={lit === c.id} falls={downstream.has(c.id)}
-      against={row.stance === 'contradicts'} anchor={spanOf(row.anchor)} onPick={() => onPick(c.id)} onLight={onLight}/>))}
-    <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}${lit === 'claim' ? ' lit' : ''}`} data-card="claim" style={{gridColumn: 5, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
+    {COLUMNS.map((c, i) => (i === 4 || used.includes(i)) && <p key={c} className="cc-col" style={{gridColumn: i === 4 ? claimAt : at(i)}}>{c.toUpperCase()}</p>)}
+    {chain.rows.map((row, r) => row.cards.map(c => <CardBox key={c.id} card={c} row={r + 2} column={at(COL[c.kind])} picked={picked === c.id} lit={lit === c.id} falls={downstream.has(c.id)}
+      against={row.stance === 'contradicts'} gone={Boolean(row.superseded)} anchor={spanOf(row.anchor)} onPick={() => onPick(c.id)} onLight={onLight}/>))}
+    <article className={`cc-card cc-claim st-${claimStatus}${breaking ? ' falls' : ''}${lit === 'claim' ? ' lit' : ''}`} data-card="claim" style={{gridColumn: claimAt, gridRow: `2 / span ${Math.max(1, chain.rows.length)}`}}
       aria-label={`The claim: ${chain.claim.text}`}>
       <StatusChip status={claimStatus}/>
       <b>{chain.claim.text}</b>
       <DoneList done={chain.done}/>
     </article>
-    {aiShown.map((a, i) => <article key={a.id} className={`cc-card cc-ai${lit === `ai:${a.id}` ? ' lit' : ''}`} data-card={`ai:${a.id}`} style={{gridColumn: 5, gridRow: chain.rows.length + 2 + i}} aria-label="AI step">
-      <span className="cc-kind">AI</span><b>{AI_MODULE[a.module] ?? a.module} draft quoted this claim</b>
-      <small>{short(a.when)} · {a.status === 'accepted' ? 'accepted' : 'not accepted yet'}</small>
+    {/* An AI step: the plum AI mark; "not accepted yet" is the dashed outline (solid once accepted), its words and time
+        revealed on the mark. */}
+    {aiShown.map((a, i) => <article key={a.id} className={`cc-card cc-ai${a.status === 'accepted' ? ' accepted' : ''}${lit === `ai:${a.id}` ? ' lit' : ''}`} data-card={`ai:${a.id}`} style={{gridColumn: claimAt, gridRow: chain.rows.length + 2 + i}} aria-label="AI step">
+      <span className="cc-ai-top"><Reveal label={`AI step, ${a.status === 'accepted' ? 'accepted' : 'not accepted yet'}`} detail={<><b>AI step · {a.status === 'accepted' ? 'accepted' : 'not accepted yet'}</b>
+        <span className="rv-row">{short(a.when)}</span></>}><span className="ai-notice" aria-hidden="true">AI</span></Reveal>
+        <b>{AI_MODULE[a.module] ?? a.module} draft quoted this claim</b></span>
       {a.run_id && <button type="button" className="cc-watch" onClick={() => onWatch(a.run_id!)}>Watch the run →</button>}
     </article>)}
-    {aiShown.length < chain.ai.length && <button type="button" className={`cc-card cc-ai cc-ai-more${aiFolded(lit) ? ' lit' : ''}`} data-card="ai:more" style={{gridColumn: 5, gridRow: chain.rows.length + 2 + aiShown.length}}
+    {aiShown.length < chain.ai.length && <button type="button" className={`cc-card cc-ai cc-ai-more${aiFolded(lit) ? ' lit' : ''}`} data-card="ai:more" style={{gridColumn: claimAt, gridRow: chain.rows.length + 2 + aiShown.length}}
       onClick={() => setAllAi(true)} aria-label={`Show ${chain.ai.length - aiShown.length} more AI steps that quoted this claim`}>
-      <span className="cc-kind">AI</span><b>+{chain.ai.length - aiShown.length} more AI drafts quoted this claim</b><small>Show them all</small>
+      <span className="ai-notice" aria-hidden="true">AI</span><b>+{chain.ai.length - aiShown.length} more AI drafts quoted this claim</b><small>Show them all</small>
     </button>}
-    {!chain.rows.length && <p className="cc-muted" style={{gridColumn: '1 / 5', gridRow: 2}}>
+    {!chain.rows.length && <p className="cc-muted" style={{gridColumn: `1 / ${claimAt}`, gridRow: 2}}>
       This claim has no evidence linked to it yet, so there is no chain to draw. Link a quote to it in Claims to make it traceable.</p>}
   </div>;
 }
@@ -357,37 +422,58 @@ function Wires({chain, picked, lit, fit, breaking, onPick, onLight, onWatch}: {
 /** The Done checklist for Supported (server, app/services/claim_done.py): each rule met, not met, or not checkable
  * here, with what it waits on. Shape and word, never colour alone. */
 function DoneList({done}: {done: ClaimDoneOut}): ReactElement {
+  // The head is the name and one mark (✓ every checkable rule met); what is left stays in sight, an alert. The
+  // summary in words is revealed on the name (Ony, 29 Oct), so the card keeps to the checks themselves.
+  const summary = done.met ? `${done.unknown ? '✓ every checkable rule met' : '✓ every rule met'}${done.unknown ? ` · ○ ${done.unknown} not checkable here` : ''}`
+    : `${done.left} left${done.unknown ? ` · ○ ${done.unknown} not checkable here` : ''}`;
   return <div className="cc-done" aria-label="Done for Supported">
-    <p className="cc-done-head">Done for Supported · <span className={done.met ? 'ok' : 'bad'}>{done.met ? (done.unknown ? '✓ every checkable rule met' : '✓ every rule met') : `${done.left} left`}</span>
-      {done.unknown ? <span className="unknown"> · ○ {done.unknown} not checkable here</span> : null}</p>
-    <ul>{done.rules.map(r => <li key={r.key} className={`done-${r.state}`} title={`${r.label}: ${r.detail}`}
+    <p className="cc-done-head"><Reveal detail={<><b>Done for Supported</b><span className="rv-row">{summary}</span>
+      <span className="rv-row">The rules a review to Supported is held to.</span>
+      <span className="cc-done-all">{done.rules.map(r => <span key={r.key} className={`rv-row done-${r.state}`}>
+        <span className="cc-done-mark" aria-hidden="true">{DONE_STATE[r.state].mark}</span> {DONE_SHORT[r.key] ?? r.label}<span className="sr-only">: {DONE_STATE[r.state].word}</span></span>)}</span></>}>Done for Supported</Reveal>
+      {done.met ? <span className="ok" aria-hidden="true"> ✓</span> : <span className="bad"> · {done.left} left</span>}</p>
+    {/* What is not met is an alert and stays; the whole checklist, each rule's state, wording and what it waits on, is
+        revealed on the name (Ony, 29 Oct: secondary detail on hover). */}
+    {done.rules.some(r => r.state === 'not_met') && <ul>{done.rules.filter(r => r.state === 'not_met').map(r => <li key={r.key} className={`done-${r.state}`}
       aria-label={`${r.label}: ${DONE_STATE[r.state].word}. ${r.detail}`}>
-      <span aria-hidden="true">{DONE_STATE[r.state].mark}</span> {DONE_SHORT[r.key] ?? r.label}
-      {r.state !== 'met' && <small>{r.state === 'not_met' ? 'waits on: ' : ''}{r.detail}</small>}
-    </li>)}</ul>
+      <span className="cc-done-mark" aria-hidden="true">{DONE_STATE[r.state].mark}</span>{' '}<Reveal detail={<><b>{r.label}</b>
+        <span className="rv-row">{r.state === 'not_met' ? 'waits on: ' : ''}{r.detail}</span></>}>{DONE_SHORT[r.key] ?? r.label}</Reveal>
+    </li>)}</ul>}
   </div>;
 }
 
-function CardBox({card, row, picked, lit, falls, against, anchor, onPick, onLight}: {
-  card: CustodyCardOut; row: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; anchor: {start: number; end: number} | null;
+function CardBox({card, row, column, picked, lit, falls, against, gone = false, anchor, onPick, onLight}: {
+  card: CustodyCardOut; row: number; column: number; picked: boolean; lit: boolean; falls: boolean; against: boolean; gone?: boolean; anchor: {start: number; end: number} | null;
   onPick: () => void; onLight: (id: string | null) => void;
 }): ReactElement {
+  const id = useId();
   const shown = card.kind === 'passage' && card.text ? excerpt(card.text, unitSpan(card.text, anchor)) : null;
+  // The column says what kind of step a card is; only a passage's page and lines, and a decision's title, are written.
   const head = card.kind === 'decision' ? (card.title === 'Answered' ? 'Linked against' : card.title)
-    : card.kind === 'passage' ? `Passage${card.page ? ` · p.${card.page}` : ''}${lineSpan(card, 'l.')}` : KIND_WORD[card.kind];
-  return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}`}
-    style={{gridColumn: COL[card.kind] + 1, gridRow: row, '--col': COL[card.kind]} as CSSProperties} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
-    aria-label={`${KIND_WORD[card.kind]}: ${card.title}. ${card.checks.map(c => `${c.label} ${c.ok === true ? 'passed' : c.ok === false ? 'failed' : 'not known'}`).join(', ')}`}>
+    : card.kind === 'passage' ? `Passage${card.page ? ` · p.${card.page}` : ''}${lineSpan(card, 'l.')}` : '';
+  // Who and when, and a file's or source's own lines, are revealed on the card (the log underneath has them all).
+  const whoWhen = card.kind !== 'passage' && (card.when || card.kind !== 'source')
+    ? `${card.kind === 'file' && card.who ? `uploaded by ${card.who} · ` : card.who ? `${card.who.charAt(0).toLowerCase()}${card.who.slice(1)} · ` : ''}${short(card.when)}` : '';
+  const extra = card.kind === 'file' || card.kind === 'source' ? card.lines.filter(Boolean) : [];
+  // A decision the demo made ahead (DECISIONS_LOG 45) carries the demo's stamp; its name is on hover.
+  const demo = card.kind === 'decision' && isDemoDecided(card);
+  const detail = <><b>{KIND_WORD[card.kind]}</b>{extra.map((l, i) => <span key={i} className="rv-row rv-mono">{l}</span>)}{whoWhen && <span className="rv-row">{whoWhen}</span>}
+    {demo && <span className="rv-row"><b>Decided ahead by the demo</b>, not by a person.</span>}</>;
+  return <button type="button" data-card={card.id} className={`cc-card k-${card.kind} a-${card.actor}${picked ? ' picked' : ''}${lit ? ' lit' : ''}${falls ? ' falls' : ''}${against ? ' against' : ''}${gone ? ' gone' : ''}`}
+    style={{gridColumn: column, gridRow: row, '--col': COL[card.kind]} as CSSProperties} onClick={onPick} onMouseEnter={() => onLight(card.id)} onMouseLeave={() => onLight(null)}
+    aria-label={`${KIND_WORD[card.kind]}: ${card.title}. ${card.checks.map(c => `${c.label} ${c.ok === true ? 'passed' : c.ok === false ? 'failed' : 'not known'}`).join(', ')}`}
+    aria-describedby={extra.length || whoWhen ? `${id}-who` : undefined}>
+    {(extra.length > 0 || whoWhen) && <span id={`${id}-who`} hidden>{[...extra, whoWhen].filter(Boolean).join(' · ')}</span>}
+    <Reveal tabbable={false} describe={false} className="cc-card-rv" detail={detail}>
     {card.kind === 'file' && <span className="cc-thumb" aria-hidden="true"><i/><i/><i/><i/></span>}
-    <span className="cc-card-top"><span className="cc-kind">{head}</span>{card.checks.map(c => <Check key={c.label} {...c}/>)}</span>
+    <span className="cc-card-top">{head ? <span className="cc-kind">{head}</span> : <span/>}{demo && <DemoGlyph/>}{card.checks.map(c => <Check key={c.label} {...c}/>)}</span>
     {card.kind === 'passage' ? (shown ? <span className="cc-text"><Lit text={shown.text} quote={card.quote} span={shown.span}/></span> : <b>{card.title}</b>)
       : card.kind === 'reading' ? <b>{card.title}{card.lines[0] ? `, ${card.lines[0]}` : ''}</b>
       : card.kind === 'decision' ? <b>{card.title === 'Answered' ? `Answer: ${card.lines[0]}` : card.title === 'Quote saved' ? `Typed in by ${card.who ?? 'a person'}` : card.lines[0]}</b>
       : <b className={card.kind === 'file' ? 'cc-file' : undefined}>{card.title}</b>}
     {card.quote && card.kind === 'source' && <span className="cc-text">“{card.quote}”</span>}
-    {card.kind === 'decision' && card.title === 'Proposed' && card.lines[1] && <small className={card.lines[1].startsWith('accepted') ? 'cc-ok' : ''}>{card.lines[1].startsWith('accepted') ? `✓ ${card.lines[1].replace(/^a/, 'A')}` : card.lines[1]}</small>}
-    {(card.kind === 'file' || card.kind === 'source') && card.lines.map((l, i) => <small key={i}>{l}</small>)}
-    {card.kind !== 'passage' && (card.when || card.kind !== 'source') && <small className="cc-when">{card.kind === 'file' && card.who ? `uploaded by ${card.who} · ` : card.who ? `${card.who.charAt(0).toLowerCase()}${card.who.slice(1)} · ` : ''}{short(card.when)}</small>}
+    {card.kind === 'decision' && card.title === 'Proposed' && card.lines[1] && <small className={card.lines[1].startsWith('accepted') ? 'cc-ok' : ''}>{demo ? '✓ Accepted ahead' : card.lines[1].startsWith('accepted') ? `✓ ${card.lines[1].replace(/^a/, 'A')}` : card.lines[1]}</small>}
+    </Reveal>
   </button>;
 }
 
@@ -412,34 +498,40 @@ function Detail({card, chain, onOpen, recheck, breaks, onBreaks}: {
   const sha = file?.sha256 ? `${file.sha256.slice(0, 4)} ${file.sha256.slice(4, 8)} … ${file.sha256.slice(-4)}` : null;
   return <aside className="cc-detail" aria-label={`Step ${n} of ${all.length}: ${KIND_WORD[card.kind]}`}>
     <p className="cc-eyebrow">Step {n} of {all.length} · {KIND_WORD[card.kind]}</p>
-    <h3>{title}</h3>
-    {file && <p className="cc-mono cc-muted">{file.title}{passage && lineSpan(passage, 'lines') ? ` ·${lineSpan(passage, 'lines')}` : passage?.page ? ` · page ${passage.page}` : ''}</p>}
+    {/* The file and the lines are revealed on the title. */}
+    <h3>{file ? <Reveal detail={<span className="rv-mono">{file.title}{passage && lineSpan(passage, 'lines') ? ` ·${lineSpan(passage, 'lines')}` : passage?.page ? ` · page ${passage.page}` : ''}</span>}>{title}</Reveal> : title}</h3>
     {(passage?.text || card.quote) && <blockquote><Lit text={passage?.text ?? card.quote ?? ''} quote={card.quote ?? passage?.quote}
       span={passage?.text ? unitSpan(passage.text, spanOf(row?.anchor)) : null}/></blockquote>}
     <dl>
+      {/* The source's type is its icon and its issuer is revealed; the tier letter and "interested party?" show. */}
       {src && item('Source', <span className="cc-checks plain">
-        <Check label={SOURCE_WORD[src.source_type] ?? src.source_type} ok={true}/>
+        <Reveal label={SOURCE_WORD[src.source_type] ?? src.source_type} detail={<b>{SOURCE_WORD[src.source_type] ?? src.source_type}</b>}>
+          <span className="cc-src"><SourceIcon type={src.source_type}/></span></Reveal>
         {src.tier ? <Check label={`Tier ${src.tier}`} ok={true}/> : <Check label="tier not set" ok={null}/>}
-        <Check label={src.issuer ? `by ${src.issuer}` : 'interested party?'} ok={src.issuer ? true : null}/></span>)}
+        {src.issuer ? <Reveal detail={`by ${src.issuer}`}><Check label="issuer" ok={true}/></Reveal> : <Check label="interested party?" ok={null}/>}</span>)}
       {file && item('File', <span className="cc-checks plain">{chip(hash?.ok, hash?.ok ? 'hash matches' : hash?.ok === false ? 'hash differs' : 'hash not checked')}
         {reading && reading.checks[0]?.label === 'OCR' ? <Check label="read by OCR" ok={true}/> : reading ? chip(reading.checks[0]?.ok, 'text layer') : null}</span>)}
       {passage && item('Content', <span className="cc-checks plain">{chip(says?.ok, says?.ok ? 'says it · exact' : says?.ok === false ? 'does not say it' : 'not checked')}</span>)}
-      {row?.anchor && item('Anchor', anchorWords(row.anchor))}
-      {sha && item('SHA-256', <span className="cc-mono">{sha}
-        {recheck?.error ? <> · <span role="alert">✕ could not re-check: {recheck.error}</span></>
-          : recheck?.result !== undefined ? <> · {recheck.result ? '✓ re-checked now' : '✕ does not match the file now'}</> : <> · {hash?.ok ? '✓ re-checked when opened' : ''}</>}</span>)}
-      {decision && item('Decided', `${decision.title === 'Proposed' ? decision.lines.join(' · ') : decision.title === 'Answered' ? `Answered by ${decision.who ?? 'a person'}: ${decision.lines[0]}` : `Typed in by ${decision.who ?? 'a person'}`} · ${short(decision.when)}`)}
+      {row?.anchor && item('Anchor', <AnchorMark a={row.anchor}/>)}
+      {/* The hash is revealed on its result; a failed or impossible re-check is an alert and shows. */}
+      {sha && item('SHA-256', recheck?.error
+        ? <span><span role="alert">✕ could not re-check: {recheck.error}</span> <Reveal detail={<span className="rv-mono">{sha}</span>}><span className="cc-mono">hash</span></Reveal></span>
+        : <Reveal detail={<span className="rv-mono">{sha}</span>}><span>{recheck?.result !== undefined ? (recheck.result ? '✓ re-checked now' : '✕ does not match the file now')
+          : hash?.ok ? '✓ re-checked when opened' : <span className="cc-mono">hash</span>}</span></Reveal>)}
+      {decision && item('Decided', <span className="cc-checks plain"><Reveal detail={short(decision.when)}>{decision.title === 'Proposed' ? decision.lines.join(' · ') : decision.title === 'Answered' ? `Answered by ${decision.who ?? 'a person'}: ${decision.lines[0]}` : `Typed in by ${decision.who ?? 'a person'}`}</Reveal>
+        {isDemoDecided(decision) && <DemoMark rule="Accepted from what the case already holds."/>}</span>)}
       {row && item('Rests on it', rests.length ? <span className="cc-checks">
         {(['claim', 'link'] as const).map(k => { const c = rests.filter(r => r.kind === k).length; return c ? <span key={k} className="cc-rest">{c} {k}{c === 1 ? '' : 's'}</span> : null; })}
-        {rests.filter(r => r.kind === 'flag').map(f => <span key={f.id} className="cc-rest">{f.label} {f.level && <LevelMark level={f.level}/>}</span>)}</span> : 'nothing else yet')}
+        {rests.filter(r => r.kind === 'flag').map(f => <span key={f.id} className="cc-rest">{f.label} {isLevel(f.level) && <LevelChip level={f.level} focusable/>}</span>)}</span> : 'nothing else yet')}
     </dl>
     {breaks && row && <div className="cc-breaks" role="status"><b>If this step breaks</b>, everything after it in this row falls, and with it:
       <ul>{rests.map(r => <li key={r.id}>{r.kind === 'claim' ? 'Claim' : r.kind === 'link' ? 'Link' : 'Flag'}: {r.label}</li>)}</ul></div>}
-    <div className="cc-key" aria-label="Key">
-      <p className="cc-eyebrow">Key</p>
-      <span className="cc-k-confirmed">confirmed by a person</span><span className="cc-k-proposed">proposed, not yet confirmed</span>
-      <span className="cc-k-worked">worked out by the app</span><span className="cc-k-against">against the claim · ✕ check failed</span><span className="cc-k-ai">AI step (plum)</span>
-    </div>
+    {/* The line key, drawn (mockup CHECK_2): each line style beside what it means. */}
+    {/* The line key, drawn (mockup CHECK_2), behind its mark: each line style beside what it means. */}
+    <p className="cc-key-mark"><Reveal label="Key to the lines" detail={<span className="cc-key" role="group" aria-label="Key to the lines">
+        <span className="cc-k-confirmed">confirmed by a person</span><span className="cc-k-proposed">proposed, not yet confirmed</span>
+        <span className="cc-k-worked">worked out by the app</span><span className="cc-k-against">against the claim · ✕ check failed</span><span className="cc-k-ai">AI step</span>
+      </span>}><span className="cc-key-glyph" aria-hidden="true"><i/><i/><i/>Key</span></Reveal></p>
     <div className="cc-acts">
       {file?.document_id && <button type="button" className="primary" onClick={() => onOpen(file.document_id!, passage?.page ?? null)}>
         {passage?.page ? `Open page ${passage.page}` : 'Open the file'}</button>}
@@ -458,6 +550,17 @@ function lineSpan(card: CustodyCardOut, word: string): string {
 
 const MATCH_WORD: Record<string, string> = {exact: 'exact quote', case: 'same words, different case', spacing: 'same words, different spacing'};
 
+/** The anchor as a mark (✓ anchored, ↪ moved, ✕ lost) with its words revealed; a lost quote is an alert and shows. */
+function AnchorMark({a}: {a: CustodyAnchorOut}): ReactElement {
+  const lost = a.start == null || a.end == null;
+  const moved = a.state === 'moved';
+  const mark = lost ? '✕' : moved ? '↪' : '✓';
+  const word = lost ? 'Not found' : moved ? 'Moved' : 'Anchored';
+  if (lost) return <span className="cc-anchor bad" role="status"><span aria-hidden="true">{mark}</span> {anchorWords(a)}</span>;
+  return <Reveal detail={<><b>{word}</b><span className="rv-row">{anchorWords(a)}</span></>}>
+    <span className={`cc-anchor ${moved ? 'warn' : 'ok'}`}><span aria-hidden="true">{mark}</span> {word}</span></Reveal>;
+}
+
 /** The stored anchor as found now (ADR-0015): how the words matched, the text kept either side, the offsets, and
  * what happened to it since it was stored. */
 function anchorWords(a: CustodyAnchorOut): string {
@@ -470,10 +573,7 @@ function anchorWords(a: CustodyAnchorOut): string {
     : a.state === 'not anchored' ? `${where} · found now: saved before anchors were kept` : where;
 }
 
-function LevelMark({level}: {level: string}): ReactElement {
-  const n = level === 'textbook' ? 3 : level === 'strong' ? 2 : 1;
-  return <span className={`cc-level l-${level}`} aria-label={level}>{'▮'.repeat(n)}{'▯'.repeat(3 - n)} {level.toUpperCase()}</span>;
-}
+const isLevel = (l: string | null | undefined): l is FlagLevel => l === 'faint' || l === 'strong' || l === 'textbook';
 
 function LogList({log}: {log: CustodyLogOut[]}): ReactElement {
   return <ol className="cc-list" aria-label="The chain as a list">

@@ -1,0 +1,134 @@
+/* Check › Connector findings (features/review-queue/review-queue-panel.tsx): the findings on the left, the picked one on
+   the right, the same frame as Sources & evidence (styles/sources.css). Kinds are marks, review states colour only
+   (words on hover; the shape with Settings › Appearance › Status marks). */
+.rq { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; padding: 4px 2px 0; color: var(--text); font-size: 13px; }
+.rq-muted { color: var(--text-muted); margin: 8px 2px; list-style: none; }
+.rq-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+.rq-head { display: flex; align-items: center; gap: 22px; }
+.rq-count { margin: 0; font: 400 15px var(--font-ui); color: var(--text-muted); white-space: nowrap; }
+.rq-count b { font: 300 34px/1 var(--font-display); color: var(--text); margin-right: 6px; }
+.rq-tally { display: flex; gap: 6px; }
+.rq-tally-n { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; border-radius: 9px;
+  border: 1px solid var(--line); font: 500 14px var(--font-mono); color: var(--text); }
+.rq-tally-n i { width: 11px; height: 11px; border-radius: 50%; }
+.rq-tally-n.t-supported i { background: var(--status-supported); }
+.rq-tally-n.t-disputed i { background: var(--status-disputed); }
+.rq-tally-n.t-unshown i { border: 1.5px dashed var(--status-unshown); width: 9px; height: 9px; }
+.rq-tally-n.t-followup i { border: 2px solid var(--accent-1); width: 8px; height: 8px; }
+.rq-tally-n:hover { background: var(--surface-1); }
+.rq-tally-n.on { background: var(--surface-2); border-color: var(--accent-1); }
+.rq-seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--surface-1); border: 1px solid var(--line); }
+.rq-seg button { all: unset; cursor: pointer; padding: 5px 12px; border-radius: 7px; color: var(--text-muted); font: 500 12px var(--font-mono); }
+.rq-seg button.on { background: var(--surface-3); color: var(--text); }
+.rq-search { flex: 1; max-width: 420px; margin-left: auto; display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 12px; border-radius: 11px;
+  background: var(--surface-1); border: 1px solid var(--line); color: var(--text-muted); }
+.rq-search:focus-within { border-color: var(--accent-1); }
+.rq-search input { all: unset; flex: 1; min-width: 0; color: var(--text); font-size: 14px; }
+.rq-search button { all: unset; cursor: pointer; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; }
+
+.rq-btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface-1); color: var(--text); font-size: 13px; white-space: nowrap; text-decoration: none; }
+.rq-btn:hover { background: var(--surface-2); }
+.rq-btn.pri { background: var(--accent-1); border-color: var(--accent-1); color: var(--accent-foreground, #1a1208); font-weight: 600; }
+.rq-btn.pri:hover { filter: brightness(1.08); }
+.rq-link { all: unset; cursor: pointer; color: var(--accent-1); text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
+.rq-btn:focus-visible, .rq-link:focus-visible, .rq-pick:focus-visible, .rq-tally-n:focus-visible, .rq-seg button:focus-visible, .rq-assess button:focus-visible {
+  outline: 2px solid var(--accent-1); outline-offset: 1px; }
+
+.rq-body { min-height: 0; display: grid; grid-template-columns: minmax(340px, 440px) minmax(0, 1fr); gap: 16px; }
+.rq-left, .rq-right { min-height: 0; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel);
+  border: 1px solid color-mix(in srgb, var(--accent-1) 16%, transparent); }
+.rq-left { display: flex; flex-direction: column; padding: 10px 8px 8px 10px; }
+.rq-right { overflow-y: auto; overscroll-behavior: contain; padding: 20px 24px 24px; }
+.rq-showing { margin: 0 4px 6px; color: var(--text-muted); }
+.rq-showing b { color: var(--text); font-family: var(--font-mono); font-weight: 500; }
+
+.rq-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; margin: 0; padding: 0 4px 0 0; display: flex; flex-direction: column; gap: 2px; }
+.rq-row { display: grid; grid-template-columns: 30px minmax(0, 1fr) 22px; align-items: center; gap: 10px; min-height: 48px; padding: 4px 10px 4px 6px; border-radius: 10px; }
+.rq-row:hover { background: var(--surface-2); }
+.rq-row.on { background: var(--surface-3); box-shadow: inset 3px 0 0 var(--accent-1); }
+.rq-row > .rv:first-child { justify-self: center; }
+.rq-row.done strong { color: var(--text-muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--text-muted) 50%, transparent); }
+.rq-pick { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 4px 0; }
+.rq-pick strong { font-weight: 500; font-size: 14px; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.rq-prov { font: 500 11px var(--font-mono); color: var(--text-muted); letter-spacing: .04em; }
+
+/* The review state: a colour; the shape inside shows with Settings › Appearance › Status marks. */
+.rq-state { display: inline-grid; place-items: center; width: 12px; height: 12px; border-radius: 50%; }
+.rq-state i { font-style: normal; display: none; font: 700 11px/1 var(--font-ui); }
+.rq-state.t-supported { background: var(--status-supported); }
+.rq-state.t-disputed { background: var(--status-disputed); }
+.rq-state.t-unshown { border: 1.5px dashed var(--status-unshown); }
+.rq-state.t-followup { border: 2.5px solid var(--accent-1); width: 10px; height: 10px; }
+html[data-status='shape'] .rq-state, html[data-status='words'] .rq-state { width: 18px; height: 18px; background: none; border: none; }
+html[data-status='shape'] .rq-state i, html[data-status='words'] .rq-state i { display: inline; }
+html[data-status='shape'] .rq-state.t-supported, html[data-status='words'] .rq-state.t-supported { color: var(--status-supported); }
+html[data-status='shape'] .rq-state.t-disputed, html[data-status='words'] .rq-state.t-disputed { color: var(--status-disputed); }
+html[data-status='shape'] .rq-state.t-unshown, html[data-status='words'] .rq-state.t-unshown { color: var(--status-unshown); }
+html[data-status='shape'] .rq-state.t-followup, html[data-status='words'] .rq-state.t-followup { color: var(--accent-1); }
+
+/* The picked finding. */
+.rq-pickone { padding: 18px 8px; max-width: 560px; }
+.rq-ask { margin: 0 0 6px; font: 400 20px/1.35 var(--font-display); color: var(--text-muted); }
+.rq-detail-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: start; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.rq-detail-kind { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: var(--surface-2); }
+.rq-detail-head h2 { margin: 0; font: 400 24px/1.25 var(--font-display); color: var(--text); }
+.rq-detail-sub { margin: 6px 0 0; display: flex; align-items: center; gap: 10px; }
+.rq-sec { padding: 18px 0 6px; }
+.rq-sec + .rq-sec { border-top: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.rq-sec-h { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.rq-sec-n { font: 500 13px var(--font-mono); color: var(--text); letter-spacing: 0; }
+.rq-acts { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+
+.rq-match { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name score' 'acts acts'; gap: 14px 24px; align-items: center; }
+.rq-match > .rv { grid-area: name; }
+.rq-match-name { font: 400 22px/1.3 var(--font-display); color: var(--text); }
+.rq-score { grid-area: score; display: inline-flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.rq-score b { font: 300 40px/1 var(--font-display); color: var(--text); font-variant-numeric: tabular-nums; }
+.rq-score b small { font-size: 18px; color: var(--text-muted); margin-left: 2px; }
+.rq-bar { display: block; width: 120px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.rq-bar i { display: block; height: 100%; background: var(--accent-1); }
+.rq-match .rq-acts { grid-area: acts; }
+
+.rq-ends { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; font: 400 20px/1.3 var(--font-display); }
+.rq-ends .none { color: var(--text-muted); font-style: italic; font-size: 16px; }
+
+.rq-vals, .rq-ledger { list-style: none; margin: 0; padding: 0; }
+.rq-val { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 9px 4px 9px 10px; border-left: 3px solid transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+.rq-val.a-accepted { border-left-color: var(--status-supported); }
+.rq-val.a-conflicting { border-left: 3px double var(--status-disputed); }
+.rq-val.a-outdated { border-left: 3px dotted var(--text-muted); }
+.rq-val.a-unresolved { border-left: 3px dashed var(--status-unshown); }
+.rq-prop { font: 500 11.5px var(--font-mono); color: var(--text-muted); overflow-wrap: anywhere; }
+.rq-v { font: 400 15.5px/1.45 var(--font-read); color: var(--text); overflow-wrap: anywhere; }
+.rq-assess { display: inline-flex; gap: 2px; padding: 2px; border-radius: 9px; border: 1px solid var(--line); opacity: .55; transition: opacity var(--dur-fast, .12s); }
+.rq-val:hover .rq-assess, .rq-val:focus-within .rq-assess, .rq-val[class*='a-'] .rq-assess { opacity: 1; }
+.rq-assess button { all: unset; cursor: pointer; padding: 4px 9px; border-radius: 7px; font-size: 12px; color: var(--text-muted); }
+.rq-assess button:hover { color: var(--text); background: var(--surface-2); }
+.rq-assess button.on { background: var(--surface-3); color: var(--text); font-weight: 600; }
+.rq-assess .rq-promote { color: var(--accent-1); font-weight: 600; }
+
+.rq-led { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto auto; gap: 16px; align-items: center; padding: 8px 4px; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+.rq-led-n { display: inline-flex; gap: 8px; font: 500 13px var(--font-mono); }
+.rq-led-src { display: inline-flex; gap: 10px; color: var(--text-muted); }
+.rq-led-src a { color: var(--accent-1); }
+
+/* No findings: what they are and where to get them. */
+.rq-empty { display: grid; place-items: center; }
+.rq-empty-card { max-width: 560px; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 48px 36px; text-align: center; border-radius: 18px;
+  background: var(--surface-1); box-shadow: var(--shadow-panel); border: 1px solid color-mix(in srgb, var(--accent-1) 16%, transparent); }
+.rq-empty-mark { display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%; color: var(--accent-2);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 20%, transparent), transparent 70%); }
+.rq-empty-card h2 { margin: 0; font: 400 28px/1.2 var(--font-display); color: var(--text); }
+.rq-empty-card p { margin: 0; color: var(--text-muted); font-size: 14.5px; line-height: 1.55; }
+.rq-empty-card .rq-btn { margin-top: 8px; }
+
+@media (max-width: 1100px) { .rq-body { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); } .rq-val, .rq-led { grid-template-columns: 110px minmax(0, 1fr) auto; } }
+@media (prefers-reduced-motion: reduce) { .rq-assess { transition: none; } }
+/* The empty state is calm: no box, the mark and the line centred in the screen's height, the explanation on reveal. */
+.rq-empty { height: 100%; grid-template-rows: minmax(0, 1fr); }
+.rq-empty-calm { background: none; box-shadow: none; border: 0; gap: 18px; }
+.rq-empty-calm .rq-empty-mark { width: 132px; height: 132px; }
+.rq-empty-calm h2 { font-size: clamp(26px, 2.4vw, 34px); }

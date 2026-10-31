@@ -1,0 +1,117 @@
+/* The watchlist (Bring in › OpenAleph corpus; features/corpus/watchlist.tsx). Side by side, not full-width text:
+   watched names | that name's hits | the picked hit's passage. A match is a low tint of the theme's accent with an
+   underline, never a highlighter (Ony, BACKLOG "Watchlist hits"). */
+.wl { display: grid; grid-template-columns: minmax(260px, 310px) minmax(0, 1fr) minmax(0, 1.1fr); gap: 0;
+  margin: 14px 0; border-radius: 14px; background: var(--surface-1); border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+  height: 540px; overflow: hidden; color: var(--text); font-family: var(--font-ui); }
+.wl > div { min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 14px 16px; }
+.wl > div + div { border-left: 1px solid color-mix(in srgb, var(--line) 35%, transparent); }
+.wl-head { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; min-height: 30px; }
+.wl-title { margin: 0; font: 600 17px/1.2 var(--font-ui); }
+.wl-sub { margin: 0; font: 600 15px/1.25 var(--font-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.wl-total { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px;
+  background: color-mix(in srgb, var(--accent-1) 22%, transparent); color: var(--accent-1); font: 700 12px var(--font-ui); }
+.wl-push, .wl-head > .wl-scope { margin-left: auto; }
+.wl-grow { flex: 1 1 auto; min-width: 0; }
+.wl-icon { all: unset; box-sizing: border-box; cursor: pointer; display: inline-grid; place-items: center; width: 32px; height: 32px;
+  border-radius: 9px; color: var(--text-muted); border: 1px solid transparent; }
+.wl-icon:hover { color: var(--text); background: var(--surface-2); }
+.wl-icon:focus-visible, .wl button:focus-visible { outline: 2px solid var(--accent-1); outline-offset: 1px; }
+.wl-icon.pri { background: var(--accent-1); color: var(--ground); }
+.wl-icon.pri:hover { filter: brightness(1.08); }
+.wl-icon:disabled { opacity: .55; cursor: default; }
+.wl-spin { animation: wl-spin 1s linear infinite; }
+@keyframes wl-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .wl-spin { animation: none; } }
+.wl-alert { margin: 0 0 8px; font-size: 12.5px; line-height: 1.4; color: var(--accent-1); }
+.wl-empty { margin: 4px 0; font-size: 13px; line-height: 1.5; color: var(--text-muted); }
+.wl-status { margin: 8px 0 0; font-size: 12.5px; color: var(--text-muted); }
+
+/* Names */
+.wl-list { list-style: none; margin: 0 -6px; padding: 0; overflow-y: auto; flex: 1 1 auto; min-height: 0; }
+.wl-list li { position: relative; display: flex; align-items: center; border-radius: 9px; }
+.wl-list li.on { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent-1); }
+.wl-name { all: unset; box-sizing: border-box; cursor: pointer; flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px;
+  padding: 9px 30px 9px 12px; border-radius: 9px; }
+.wl-list li:not(.on) .wl-name:hover { background: color-mix(in srgb, var(--surface-2) 60%, transparent); }
+.wl-name-text { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; }
+.wl-aka { flex: none; padding: 0 4px; border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); border-radius: 4px; font: 500 9.5px/14px var(--font-mono); font-style: normal; letter-spacing: .04em; color: var(--text-muted); }
+.wl-count { flex: none; font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+.wl-count b { font: 600 17px/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--text); }
+.wl-unchecked { flex: none; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--status-unshown); }
+.wl.solo { grid-template-columns: minmax(260px, 310px) minmax(0, 1fr); }
+.wl-none { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 18px; padding: 0 8% 8%; }
+.wl-none p { margin: 0; }
+.wl-none-name { font: 400 clamp(34px, 4vw, 64px)/1.1 var(--font-display); color: var(--text); overflow-wrap: anywhere; }
+.wl-none-name.muted { color: var(--text-muted); }
+.wl-none-aka { display: flex; flex-wrap: wrap; gap: 6px; }
+.wl-none-aka span { padding: 5px 13px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); font-size: 16px; color: var(--text-muted); }
+.wl-none-note { font: 400 clamp(17px, 1.4vw, 21px)/1.5 var(--font-read); color: var(--text-muted); max-width: 52ch; }
+.wl-none-state { font: 500 14px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--status-unshown); }
+.wl-none .wl-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; font-size: 16px; }
+.wl-new { flex: none; display: inline-flex; align-items: center; gap: 4px; color: var(--accent-2); font: 700 12px var(--font-ui); font-variant-numeric: tabular-nums; }
+.wl-new i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.wl-stop { all: unset; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); cursor: pointer; display: grid; place-items: center;
+  width: 20px; height: 20px; border-radius: 6px; color: var(--text-muted); opacity: 0; }
+.wl-list li:hover .wl-stop, .wl-stop:focus-visible { opacity: 1; }
+.wl-stop:hover { color: var(--status-disputed); background: var(--surface-3); }
+.wl-list li:hover .wl-name { padding-right: 34px; }
+
+.wl-add { margin-top: 10px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--line) 30%, transparent); display: grid; gap: 6px; }
+.wl-add-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.wl-add-row .field-msg { grid-column: 1 / -1; order: 3; }
+.wl-add input { height: 34px; font-size: 13px; }
+
+/* Hits */
+.wl-scope { display: inline-flex; gap: 2px; padding: 2px; border-radius: 9px; background: var(--surface-2); flex: none; }
+.wl-scope button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 7px; font-size: 12.5px; color: var(--text-muted); white-space: nowrap; }
+.wl-scope button b { margin-left: 4px; color: var(--text); font-variant-numeric: tabular-nums; }
+.wl-scope button[aria-pressed='true'] { background: var(--surface-1); color: var(--text); }
+.wl-hitlist { list-style: none; margin: 0 -6px; padding: 0; overflow-y: auto; flex: 1 1 auto; min-height: 0; display: grid; gap: 2px; align-content: start; }
+.wl-hit { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 9px 10px; border-radius: 9px; }
+.wl-hit:hover { background: color-mix(in srgb, var(--surface-2) 60%, transparent); }
+.wl-hit.on { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent-1); }
+.wl-hit-top { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.wl-kind { display: inline-grid; place-items: center; color: var(--accent-2); flex: none; }
+.wl-doc { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
+.wl-page { flex: none; font: 500 11.5px var(--font-mono); color: var(--text-muted); }
+.wl-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.wl-hit-top > .wl-push { display: inline-flex; }
+.wl-dot.fresh { background: var(--accent-2); }
+.wl-dot.lead { background: var(--status-supported); }
+.wl-dot.dismissed { background: transparent; border: 1.5px solid var(--status-unshown); }
+.wl-snip { margin: 5px 0 0 22px; font-size: 12.5px; line-height: 1.45; color: var(--text-muted);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* The match: a low tint of the accent and an underline, the text keeps its own colour. */
+.wl mark.wl-mark { background: color-mix(in srgb, var(--accent-1) 16%, transparent); color: var(--text); border-radius: 2px;
+  box-shadow: inset 0 -1.5px 0 color-mix(in srgb, var(--accent-1) 70%, transparent); padding: 0 1px; }
+
+/* The passage */
+.wl-read { overflow: hidden; }
+.wl-read-head { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; min-width: 0; }
+.wl-read-title { margin: 0; font: 600 16px/1.3 var(--font-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wl-open { all: unset; cursor: pointer; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 9px;
+  font-size: 13.5px; font-weight: 600; color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 12%, transparent); }
+.wl-open:hover { background: color-mix(in srgb, var(--accent-2) 20%, transparent); }
+.wl-only { font-size: 12.5px; color: var(--text-muted); }
+.wl-passages { margin: 16px -8px 0 0; padding-right: 8px; display: grid; gap: 14px; align-content: start; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.wl-passage { margin: 0; font: 400 17px/1.65 var(--font-read); color: var(--text); max-width: 62ch; }
+.wl-actions { flex: none; padding-top: 14px; display: flex; gap: 8px; align-items: center; }
+.wl-btn { all: unset; box-sizing: border-box; cursor: pointer; padding: 7px 14px; border-radius: 9px; border: 1px solid var(--line); font-size: 13px; color: var(--text); }
+.wl-btn:hover { background: var(--surface-2); }
+.wl-btn.pri { background: var(--accent-1); border-color: var(--accent-1); color: var(--ground); font-weight: 600; }
+.wl-btn.pri:hover { filter: brightness(1.08); }
+.wl-btn:disabled { opacity: .55; cursor: default; }
+.wl-decided { font-size: 13px; color: var(--text-muted); }
+.wl-decided.lead { color: var(--status-supported); }
+
+@media (max-width: 1100px) {
+  .wl { grid-template-columns: minmax(220px, 260px) minmax(0, 1fr); height: auto; }
+  .wl-read { grid-column: 1 / -1; border-left: 0 !important; border-top: 1px solid color-mix(in srgb, var(--line) 35%, transparent); }
+  .wl-list, .wl-hitlist { max-height: 420px; }
+}
+@media (max-width: 700px) {
+  .wl { grid-template-columns: minmax(0, 1fr); }
+  .wl > div + div { border-left: 0; border-top: 1px solid color-mix(in srgb, var(--line) 35%, transparent); }
+}

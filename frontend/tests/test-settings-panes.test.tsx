@@ -5,10 +5,13 @@ import {act, cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {InterruptNotice} from '../features/inbox/interrupt-notice';
+import {FOLD_MS, InterruptNotice} from '../features/inbox/interrupt-notice';
+
+// How often the notice looks for a calm zone (features/inbox/interrupt-notice.tsx, its setInterval).
+const CALM_POLL = 2000;
 import {SavedQuestions} from '../features/ai/saved-questions';
 import {KeysPane} from '../features/settings/keys-pane';
-import {LookupsPane, whatLeaves} from '../features/settings/lookups-pane';
+import {leavesShort, LookupsPane, shortSent, whatLeaves} from '../features/settings/lookups-pane';
 import {NotificationsPane} from '../features/settings/notifications-pane';
 import {ResearchPane} from '../features/settings/research-pane';
 import {ApiClient} from '../lib/api-client';
@@ -55,6 +58,10 @@ describe('Settings › Notifications', () => {
     expect(screen.getByText('in Everything else').previousSibling).toHaveTextContent('9');
     // Only what can mean danger is offered Interrupt.
     expect(within(screen.getByRole('radiogroup', {name: 'Faint Red Flag'})).queryByRole('radio', {name: /Interrupt/})).toBeNull();
+    // A grid of dots, kinds × places: the place is named on the dot, the default too; no wall of words.
+    expect(within(screen.getByRole('radiogroup', {name: 'Textbook Red Flag'})).getByRole('radio', {name: 'Interrupt (default)'})).toHaveAttribute('aria-checked', 'true');
+    expect(within(screen.getByRole('radiogroup', {name: 'Strong Red Flag'})).getByRole('radio', {name: 'Needs you (default)'})).toHaveAttribute('aria-checked', 'true');
+    expect(screen.queryByText('default')).toBeNull();
 
     await userEvent.setup().click(within(screen.getByRole('radiogroup', {name: 'Faint Red Flag'})).getByRole('radio', {name: 'Off'}));
     expect(api.lastBody('PUT /api/settings/notifications')).toMatchObject({routes: {flag_faint: 'off'}});
@@ -75,7 +82,12 @@ describe('Settings › Notifications › Outside the app', () => {
       'GET /api/investigations/inv-1/watches': [],
     });
     render(<QueryProvider><NotificationsPane investigationId="inv-1" caseName="Kestrel SA"/></QueryProvider>);
-    expect(await screen.findByText(/This server has no mail account/)).toBeInTheDocument();
+    // Plain words at rest; the server's setting name only on the reveal, for whoever sets up the server.
+    const notSet = await screen.findAllByText('Not set up on this server');
+    expect(notSet).toHaveLength(2);
+    expect(notSet[0].closest('.rv')).toHaveAccessibleDescription(/NOTIFY_MAIL_URL/);
+    expect(notSet[1].closest('.rv')).toHaveAccessibleDescription(/NOTIFY_PUSH_SUBJECT/);
+    for (const el of screen.queryAllByText(/NOTIFY_/)) expect(el.closest('[hidden]')).not.toBeNull();
     expect(screen.queryByLabelText('Your email address')).toBeNull();
     const user = userEvent.setup();
     await user.type(screen.getByLabelText('Your ntfy address'), 'ntfys://ntfy.example.org/desk');
@@ -97,6 +109,20 @@ describe('Settings › Outside lookups', () => {
     expect(whatLeaves([source(), source({key: 'firecrawl', label: 'Firecrawl', host: 'api.firecrawl.dev', mode: 'off'})]))
       .toBe('Nothing leaves this computer for an outside lookup except: the name of a party you choose to OpenSanctions (api.opensanctions.org), when you say so.');
     expect(whatLeaves([source({mode: 'off'})])).toBe('Nothing leaves this computer for an outside lookup.');
+    // At rest, a few words; the sentence above is revealed on them.
+    expect(leavesShort([source(), source({key: 'aleph', label: 'OpenAleph', mode: 'ask'}), source({key: 'firecrawl', label: 'Firecrawl', mode: 'automatic'})]))
+      .toBe('A party’s name, to OpenSanctions and OpenAleph, when you say so; to Firecrawl, as each new party joins.');
+    expect(leavesShort([source({mode: 'off'})])).toBe('Nothing leaves for an outside lookup.');
+  });
+
+  it('names the site of an address it sent, the full address revealed', async () => {
+    expect(shortSent('a request for https://www.malaymail.com/news/malaysia/2025/12/26/x')).toBe('a request for malaymail.com');
+    expect(shortSent('Fernhill Ltd')).toBe('Fernhill Ltd');
+    mockApi({'GET /api/settings/lookups': {sources: [source()], cases: [], can_change_defaults: true,
+      week: [{id: 'w1', kind: 'download', service: 'web', destination: 'www.malaymail.com', sent: 'a request for https://www.malaymail.com/news/a-long-path', outcome: 'ok', case: 'Kestrel SA', at: '2026-10-19T10:00:00'}]},
+    'GET /api/connectors': {providers: [], status: {}}});
+    render(<QueryProvider><LookupsPane investigationId="" caseName="" providers={[]}/></QueryProvider>);
+    expect((await screen.findByText('a request for malaymail.com')).closest('.rv')).toHaveAccessibleDescription(/https:\/\/www\.malaymail\.com\/news\/a-long-path/);
   });
 
   it('asks why before a case looks up differently', async () => {
@@ -118,7 +144,8 @@ describe('Settings › Outside lookups', () => {
     await user.type(screen.getByLabelText('Why this case is different'), 'source protection');
     await user.click(screen.getByRole('button', {name: 'Save for this case'}));
     expect(api.lastBody('PUT /api/investigations/inv-1/lookups')).toEqual({modes: {opensanctions: 'off'}, reason: 'source protection'});
-    expect(await screen.findByText('“source protection” · ', {exact: false})).toBeInTheDocument();
+    // The reason shows; when it was set is revealed on it.
+    expect((await screen.findByText('“source protection”')).closest('.rv')).toHaveAccessibleDescription(/^Set /);
   });
 });
 
@@ -157,7 +184,8 @@ describe('Settings › Connector keys › Check the key', () => {
       'POST /api/settings/connectors/opensanctions/check': () => { checked = true; return after.sources[0].key_check; },
     });
     render(<QueryProvider><KeysPane/></QueryProvider>);
-    expect(await screen.findByText('saved')).toBeInTheDocument();
+    // A key's state is a colour; its word and what it means are revealed on it.
+    expect(await screen.findByRole('img', {name: 'saved'})).toHaveAccessibleDescription(/^saved · Not used yet/);
     await userEvent.setup().click(screen.getByRole('button', {name: 'Check the key'}));
     expect(api.calls('POST /api/settings/connectors/opensanctions/check')).toHaveLength(1);
     expect(await screen.findByText('! refused')).toBeInTheDocument();
@@ -231,16 +259,56 @@ describe('The top-band notice', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
-  it('waits while a calm zone is on screen', async () => {
+  it('docks in a corner, folds to its mark by hand or after a while, and opens again from the mark', async () => {
     mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+    render(<QueryProvider><InterruptNotice/></QueryProvider>);
+    const user = userEvent.setup();
+    const alarm = await screen.findByRole('alert');
+    await user.click(within(alarm).getByRole('button', {name: 'Fold to its mark'}));
+    expect(screen.queryByRole('alert')).toBeNull();
+    const mark = screen.getByRole('button', {name: 'Textbook Red Flag: round trip. Show the notice'});
+    expect(mark).toHaveFocus();
+    await user.click(mark);
+    // Opened again by hand it is a plain region (it was announced once), with Open in focus and Dismiss beside it.
+    const region = screen.getByRole('region', {name: 'Textbook Red Flag notice'});
+    expect(within(region).getByRole('link', {name: 'Open'})).toHaveFocus();
+    await user.click(within(region).getByRole('button', {name: 'Dismiss'}));
+    expect(screen.queryByRole('region', {name: 'Textbook Red Flag notice'})).toBeNull();
+    expect(screen.queryByRole('button', {name: /Show the notice/})).toBeNull();
+  });
+
+  it('folds by itself after a few seconds when nothing holds it open', async () => {
+    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    render(<QueryProvider><InterruptNotice/></QueryProvider>);
+    await screen.findByRole('alert');
+    // The alert is found as soon as React puts it on the page; the effect that starts the fold
+    // timer runs after that, on a task of its own. Let it run before moving the clock, or the
+    // clock moves first and the timer starts after it (whether it had run was a matter of luck).
+    await act(async () => {});
+    try {
+      act(() => { vi.advanceTimersByTime(FOLD_MS + 10); });
+      expect(screen.queryByRole('alert')).toBeNull();
+      expect(screen.getByRole('button', {name: /Show the notice/})).toBeInTheDocument();
+    } finally { vi.useRealTimers(); }
+  });
+
+  it('waits while a calm zone is on screen', async () => {
     const zone = document.createElement('div');
     zone.setAttribute('data-calm-zone', '');
     document.body.appendChild(zone);
-    render(<QueryProvider><InterruptNotice/></QueryProvider>);
-    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
-    expect(screen.queryByRole('alert')).toBeNull();
-    zone.remove();
-    expect(await screen.findByRole('alert', {}, {timeout: 3000})).toHaveTextContent('round trip');
+    // The calm check runs every CALM_POLL (2 s): step the clock past it rather than wait on it (review B4).
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    try {
+      const api = mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+      render(<QueryProvider><InterruptNotice/></QueryProvider>);
+      await vi.waitFor(() => expect(api.calls('GET /api/investigations/inv-1/inbox')).toHaveLength(1));
+      await act(async () => {});
+      expect(screen.queryByRole('alert')).toBeNull();
+      zone.remove();
+      act(() => { vi.advanceTimersByTime(CALM_POLL + 10); });
+      expect(screen.getByRole('alert')).toHaveTextContent('round trip');
+    } finally { vi.useRealTimers(); }
   });
 
   it('is not held by a calm zone kept mounted behind a hidden wrapper', async () => {
@@ -269,27 +337,37 @@ describe('The top-band notice', () => {
     const {useSnoozed} = await import('../features/inbox/inbox');
     let snooze: (id: string, ms: number) => void = () => undefined;
     function Snoozer(): null { snooze = useSnoozed()[1]; return null; }
-    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
     const zone = document.createElement('div');
     zone.setAttribute('data-calm-zone', '');
     document.body.appendChild(zone);
-    render(<QueryProvider><Snoozer/><InterruptNotice/></QueryProvider>);
-    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
-    act(() => { snooze('f:f1', 60_000); });
-    zone.remove();
-    await act(async () => { await new Promise(r => setTimeout(r, 2500)); });
-    expect(screen.queryByRole('alert')).toBeNull();
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    try {
+      const api = mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+      render(<QueryProvider><Snoozer/><InterruptNotice/></QueryProvider>);
+      await vi.waitFor(() => expect(api.calls('GET /api/investigations/inv-1/inbox')).toHaveLength(1));
+      await act(async () => {});
+      act(() => { snooze('f:f1', 60_000); });
+      zone.remove();
+      // The clock moves past the calm check for certain (the control below shows the notice with the same
+      // steps), so no notice here is the snooze's doing, not a check that never came.
+      act(() => { vi.advanceTimersByTime(CALM_POLL + 10); });
+      expect(screen.queryByRole('alert')).toBeNull();
+    } finally { vi.useRealTimers(); }
   });
 
   it('(control) without the snooze the same notice does show', async () => {
-    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
     const zone = document.createElement('div');
     zone.setAttribute('data-calm-zone', '');
     document.body.appendChild(zone);
-    render(<QueryProvider><InterruptNotice/></QueryProvider>);
-    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
-    zone.remove();
-    await act(async () => { await new Promise(r => setTimeout(r, 2500)); });
-    expect(screen.queryByRole('alert')).not.toBeNull();
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    try {
+      const api = mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+      render(<QueryProvider><InterruptNotice/></QueryProvider>);
+      await vi.waitFor(() => expect(api.calls('GET /api/investigations/inv-1/inbox')).toHaveLength(1));
+      await act(async () => {});
+      zone.remove();
+      act(() => { vi.advanceTimersByTime(CALM_POLL + 10); });
+      expect(screen.queryByRole('alert')).not.toBeNull();
+    } finally { vi.useRealTimers(); }
   });
 });

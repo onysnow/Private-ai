@@ -1,83 +1,32 @@
 'use client';
-// The places' timeline: a strip under the map with one row per place and
-// each dated event at that place on a shared time axis (a dot for a day, a
-// bar from start to end, drawn hollow when a date is known only to the
-// month or year). Two dates, "From" and "To", pick a stretch of time: the
-// map and the list keep only the places with an event in it, and the strip
-// shades it and greys the events outside it. Picking a place on the map, in
-// the list or on the strip picks out its row here and its dot on the map.
-// One filter drives both views, after Bellingcat's map of civilian harm in
-// Ukraine and Forensic Architecture's TimeMap (design doc, "Timelines and
-// maps"). The dates are native date fields, so the stretch of time can be
-// set from the keyboard (WCAG 2.1.1). The events come from the
-// investigation's timeline (backend app/services/places.py).
-import type {EChartsOption} from 'echarts';
-import {useMemo} from 'react';
-import type {ChangeEvent, ReactElement} from 'react';
+// The places' timeline (mockup PLACE_1): a strip under the map with one row per place that has a dated event, each
+// event a mark on a shared time axis with year ticks (a dot for a day, a band for a longer stretch, hollow when a date
+// is known only to the month or year). A window lies across the rows: drag its edges, drag it to move it, or drag
+// anywhere on the strip to draw a new one. The map and the list keep only the places with an event in the window;
+// events outside it grey. The edges are sliders (arrows move a month, Page Up/Down a year), and the dates can be typed
+// in the window's own control (WCAG 2.1.1). Scrolling over the strip moves a picked window a month a notch (PLACE_1,
+// "scroll to move it"), and the window itself takes the arrow keys to move whole. Each row ends with how many of the
+// place's events fall in the window. Nothing animates when the system asks for reduced motion (lanes.css).
+// Places with no dated event are counted in one line, named on reveal.
+// One filter drives both views, after Bellingcat's map of civilian harm in Ukraine and Forensic Architecture's
+// TimeMap (design doc, "Timelines and maps"). The events come from the investigation's timeline (backend
+// app/services/places.py).
+import {useEffect, useRef, useState} from 'react';
+import type {ChangeEvent, KeyboardEvent, PointerEvent, ReactElement} from 'react';
 
-import {Chart} from '../../components/charts/chart';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
+import {Reveal} from '../../components/ui/reveal';
 import type {PlaceEventOut, PlaceOut} from '../../lib/generated/types.gen';
-import {DAY_MS, dayText, eventWindow, eventsExtent, isoDay} from '../../lib/place-times';
+import {dateWords} from '../../lib/dates';
+import {DAY_MS, dayText, eventWindow, eventsExtent, eventsInWindow, isoDay} from '../../lib/place-times';
 import type {TimeWindow} from '../../lib/place-times';
 
-const ROW_PX = 28;
-const AXIS_PX = 44;   // the time axis under the rows
-const PICKED_COLOUR = '#8A2F1E';
-const DIM_COLOUR = '#9C8E78';
-const WINDOW_SHADE = 'rgba(138, 47, 30, 0.22)';
 const STATUS_WORDS: Record<string, string> = {verified: 'verified', asserted: 'asserted', disputed: 'disputed', system_recorded: 'recorded'};
+const MONTH_MS = 30 * DAY_MS;
+const YEAR_MS = 365 * DAY_MS;
 
-type Mark = {value: [number, number, number, number]; name: string; event: PlaceEventOut; placeId: string};
-
-/** The strip's ECharts option: a row per place with events and its events
- * as marks; the stretch of time picked shaded, the events outside it grey,
- * and, when a place is picked, the other places' events grey. */
-export function stripOption(places: PlaceOut[], picked: string | null, span: TimeWindow | null = null): EChartsOption {
-  const extent = eventsExtent(places);
-  const rows = places.filter(place => (place.events ?? []).length);
-  // A category axis runs upward: the first place goes last so it reads at the top.
-  const names = rows.map(place => place.caption).reverse();
-  const marks: Mark[] = rows.flatMap((place, index) => (place.events ?? []).map(event => {
-    const {from, to} = eventWindow(event);
-    return {value: [rows.length - 1 - index, from, to, event.exact ? 1 : 0], name: event.title, event, placeId: place.entity_id};
-  }));
-  const inSpan = (mark: Mark): boolean => !span || (mark.value[1] < span.to && mark.value[2] > span.from);
-  const colour = (mark: Mark): string => ((!picked || picked === mark.placeId) && inSpan(mark) ? PICKED_COLOUR : DIM_COLOUR);
-  return {
-    animation: false,
-    useUTC: true,
-    grid: {left: 8, right: 16, top: 8, bottom: 8, containLabel: true},
-    // Rich text, not HTML: the titles come from the records, so they are never read as markup.
-    tooltip: {trigger: 'item', renderMode: 'richText', formatter: (params: unknown) => {
-      const mark = (params as {data: Mark}).data;
-      const {from, to} = eventWindow(mark.event);
-      const when = to - from > DAY_MS ? `${dayText(from)} – ${dayText(to - DAY_MS)}` : dayText(from);
-      return `${mark.event.title}\n${when}${mark.event.exact ? '' : ' (not known to the day)'} · ${STATUS_WORDS[mark.event.verification_status] ?? mark.event.verification_status}`;
-    }},
-    // The axis ends with the last day an event covers.
-    xAxis: {type: 'time', axisLabel: {hideOverlap: true}, ...(extent ? {min: extent.from, max: extent.to - 1} : {})},
-    yAxis: {type: 'category', data: names, axisTick: {show: false},
-      axisLabel: {formatter: (name: string) => (name.length > 28 ? `${name.slice(0, 27)}…` : name)}},
-    series: [{
-      type: 'custom',
-      encode: {x: [1, 2], y: 0},
-      data: marks,
-      ...(span ? {markArea: {silent: true, itemStyle: {color: WINDOW_SHADE}, data: [[{xAxis: span.from}, {xAxis: span.to - 1}]]}} : {}),
-      renderItem: (params, api) => {
-        const row = api.value(0) as number;
-        const start = api.coord([api.value(1), row]);
-        const end = api.coord([api.value(2), row]);
-        const exact = api.value(3) === 1;
-        const fill = colour(marks[params.dataIndex]);
-        const style = {fill: exact ? fill : '#FFFFFF', stroke: fill, lineWidth: 2};
-        // A day is a dot; a longer stretch a bar; hollow when a date is known only to the month or year.
-        if (end[0] - start[0] < 10) return {type: 'circle', shape: {cx: (start[0] + end[0]) / 2, cy: start[1], r: 5}, style};
-        return {type: 'rect', shape: {x: start[0], y: start[1] - 5, width: end[0] - start[0], height: 10, r: 3}, style};
-      },
-    }],
-  };
+/** When an event happened, in words at the precision it was recorded: "2009 – 2013", never "1 Jan 2009 – 31 Dec 2013". */
+export function placeEventWhen(event: Pick<PlaceEventOut, 'date_start' | 'date_end'>): string {
+  return event.date_end && event.date_end !== event.date_start ? `${dateWords(event.date_start)} – ${dateWords(event.date_end)}` : dateWords(event.date_start);
 }
 
 /** The stretch of time two date fields give, or null when they cover every event. */
@@ -88,6 +37,37 @@ export function fieldWindow(from: string, to: string, extent: TimeWindow): TimeW
   return start <= extent.from && end >= extent.to ? null : {from: start, to: end};
 }
 
+/** The strip's axis: the events' extent with a little room each side, so no mark sits on the edge. */
+export function stripAxis(extent: TimeWindow): TimeWindow {
+  const pad = Math.max((extent.to - extent.from) * 0.03, 15 * DAY_MS);
+  return {from: extent.from - pad, to: extent.to + pad};
+}
+
+/** The years to tick on an axis: each 1 Jan inside it, thinned to at most `most` ticks. */
+export function yearTicks(axis: TimeWindow, most = 10): number[] {
+  const first = new Date(axis.from).getUTCFullYear() + 1, last = new Date(axis.to).getUTCFullYear();
+  const span = Math.max(1, last - first + 1);
+  const step = [1, 2, 5, 10, 20, 50].find(s => span / s <= most) ?? 100;
+  const ticks: number[] = [];
+  for (let y = Math.ceil(first / step) * step; y <= last; y += step) ticks.push(Date.UTC(y, 0, 1));
+  return ticks;
+}
+
+/** A window of the same length moved by `by` ms, kept inside the events' extent. */
+export function shiftWindow(w: TimeWindow, by: number, extent: TimeWindow): TimeWindow {
+  const len = w.to - w.from;
+  const from = Math.min(Math.max(w.from + by, extent.from), extent.to - len);
+  return {from, to: from + len};
+}
+
+/** A window kept inside the events' extent, at least a day long, snapped to whole days; null when it is all of it. */
+export function clampWindow(w: TimeWindow, extent: TimeWindow): TimeWindow | null {
+  const snap = (t: number) => Math.round(t / DAY_MS) * DAY_MS;
+  let from = Math.max(extent.from, snap(Math.min(w.from, w.to))), to = Math.min(extent.to, snap(Math.max(w.from, w.to)));
+  if (to - from < DAY_MS) { if (to >= extent.to) from = to - DAY_MS; else to = from + DAY_MS; }
+  return from <= extent.from && to >= extent.to ? null : {from, to};
+}
+
 type Props = {
   places: PlaceOut[];
   picked: string | null;
@@ -96,18 +76,90 @@ type Props = {
   onPick: (placeId: string) => void;
 };
 
+type Drag = {kind: 'from' | 'to' | 'move' | 'new'; x0: number; start: TimeWindow; anchor: number};
+
 export function PlacesTimeline({places, picked, timeWindow, onWindow, onPick}: Props): ReactElement {
-  const extent = useMemo(() => eventsExtent(places), [places]);
-  const option = useMemo(() => stripOption(places, picked, timeWindow), [places, picked, timeWindow]);
-  const onEvents = useMemo(() => ({
-    click: (params: unknown) => { const mark = (params as {data?: Mark}).data; if (mark) onPick(mark.placeId); },
-  }), [onPick]);
-  const dated = places.filter(place => (place.events ?? []).length).length;
+  const track = useRef<HTMLDivElement | null>(null);
+  const drag = useRef<Drag | null>(null);
+  const [typing, setTyping] = useState(false);
+  const [dragging, setDragging] = useState(false);   // the window glides on keys and scroll, never under the pointer
+  const extent = eventsExtent(places);
+  // Scroll over the strip moves a picked window (a month a notch). A native listener, since React's wheel listener
+  // is passive and could not keep the page from scrolling too; with no window picked the page scrolls as usual.
+  const wheel = useRef<(event: WheelEvent) => void>(() => undefined);
+  wheel.current = (event: WheelEvent) => {
+    if (!timeWindow || !extent) return;
+    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    if (!delta) return;
+    event.preventDefault();
+    onWindow(clampWindow(shiftWindow(timeWindow, Math.sign(delta) * MONTH_MS, extent), extent));
+  };
+  const hasExtent = Boolean(extent);
+  useEffect(() => {
+    const box = track.current;
+    if (!box) return undefined;
+    const listen = (event: WheelEvent) => wheel.current(event);
+    box.addEventListener('wheel', listen, {passive: false});
+    return () => box.removeEventListener('wheel', listen);
+  }, [hasExtent]);
+  const rows = places.filter(place => (place.events ?? []).length);
+  const undated = places.filter(place => !(place.events ?? []).length);
 
   if (!extent) {
-    return <p className="muted text-sm" data-testid="places-timeline-empty">No event on the timeline is dated at these places, so there is no
-      stretch of time to pick. An event about a place, or about a link to it (an ownership that started on a date), shows here.</p>;
+    return <p className="pls-empty" data-testid="places-timeline-empty">
+      <Reveal detail="An event about a place, or about a link to it (an ownership that started on a date), shows here as a strip to pick a stretch of time from.">
+        <span>No event on the timeline is dated at these places</span></Reveal></p>;
   }
+  const axis = stripAxis(extent);
+  const pct = (t: number) => `${((t - axis.from) / (axis.to - axis.from)) * 100}%`;
+  const shown = timeWindow ?? extent;
+  const at = (clientX: number): number => {
+    const box = track.current?.getBoundingClientRect();
+    if (!box || !box.width) return axis.from;
+    return axis.from + ((clientX - box.left) / box.width) * (axis.to - axis.from);
+  };
+  const begin = (kind: Drag['kind']) => (event: PointerEvent<HTMLElement>) => {
+    if (event.button !== 0) return;
+    event.stopPropagation();
+    event.preventDefault();
+    drag.current = {kind, x0: event.clientX, start: shown, anchor: at(event.clientX)};
+    setDragging(true);
+    track.current?.setPointerCapture?.(event.pointerId);
+  };
+  const move = (event: PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d) return;
+    const t = at(event.clientX);
+    const shift = t - d.anchor;
+    const next: TimeWindow = d.kind === 'from' ? {from: d.start.from + shift, to: d.start.to}
+      : d.kind === 'to' ? {from: d.start.from, to: d.start.to + shift}
+      : d.kind === 'new' ? {from: d.anchor, to: t}
+      : shiftWindow(d.start, shift, extent);
+    if (d.kind === 'new' && Math.abs(event.clientX - d.x0) < 4) return;   // a click, not a drag
+    onWindow(clampWindow(next, extent));
+  };
+  const end = () => { drag.current = null; setDragging(false); };
+  const key = (edge: 'from' | 'to') => (event: KeyboardEvent<HTMLDivElement>) => {
+    const by: Record<string, number> = {ArrowLeft: -MONTH_MS, ArrowDown: -MONTH_MS, ArrowRight: MONTH_MS, ArrowUp: MONTH_MS, PageDown: -YEAR_MS, PageUp: YEAR_MS};
+    let value = shown[edge];
+    if (event.key in by) value += by[event.key];
+    else if (event.key === 'Home') value = extent.from;
+    else if (event.key === 'End') value = extent.to;
+    else return;
+    event.preventDefault();
+    event.stopPropagation();   // the arrows here move the edge, not to the next place
+    onWindow(clampWindow({...shown, [edge]: value}, extent));
+  };
+  // The window itself: the arrows move it whole (a month), Page Up/Down a year, Escape lets it go.
+  const moveKey = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    const by: Record<string, number> = {ArrowLeft: -MONTH_MS, ArrowDown: -MONTH_MS, ArrowRight: MONTH_MS, ArrowUp: MONTH_MS, PageDown: -YEAR_MS, PageUp: YEAR_MS};
+    if (event.key === 'Escape' && timeWindow) { event.preventDefault(); event.stopPropagation(); onWindow(null); return; }
+    if (!(event.key in by) || !timeWindow) return;
+    event.preventDefault();
+    event.stopPropagation();
+    onWindow(clampWindow(shiftWindow(timeWindow, by[event.key], extent), extent));
+  };
   const first = isoDay(extent.from), last = isoDay(extent.to - DAY_MS);
   const shownFrom = timeWindow ? isoDay(timeWindow.from) : '';
   const shownTo = timeWindow ? isoDay(timeWindow.to - DAY_MS) : '';
@@ -116,17 +168,67 @@ export function PlacesTimeline({places, picked, timeWindow, onWindow, onPick}: P
     const to = which === 'to' ? event.target.value : shownTo;
     onWindow(fieldWindow(from, to, extent));
   };
-  return <div data-testid="places-timeline">
-    <Chart option={option} height={AXIS_PX + dated * ROW_PX} onEvents={onEvents}
-      ariaLabel={`Timeline of ${dated} place${dated === 1 ? '' : 's'} with dated events, from ${dayText(extent.from)} to ${dayText(extent.to - DAY_MS)}`}/>
-    <div className="searchrow" role="group" aria-label="Show the places with an event between two dates">
-      <label className="text-sm">From <Input type="date" className="w-auto" value={shownFrom} min={first} max={last} onChange={change('from')}/></label>
-      <label className="text-sm">To <Input type="date" className="w-auto" value={shownTo} min={first} max={last} onChange={change('to')}/></label>
-      {timeWindow && <Button variant="link" size="sm" onClick={() => onWindow(null)}>All dates</Button>}
+  const inWindow = (e: PlaceEventOut) => { const w = eventWindow(e); return w.from < shown.to && w.to > shown.from; };
+  const range = `${dayText(shown.from)} – ${dayText(shown.to - DAY_MS)}`;
+
+  return <div className="pls" data-testid="places-timeline"
+    role="group" aria-label={`Timeline of ${rows.length} place${rows.length === 1 ? '' : 's'} with dated events, from ${dayText(extent.from)} to ${dayText(extent.to - DAY_MS)}`}>
+    <div className="pls-head">
+      <span className="tl2-cap">When</span>
+      {/* The window's own control: its dates, typed when that is easier than dragging. */}
+      <button type="button" className={`pls-when${timeWindow ? ' on' : ''}`} aria-expanded={typing} onClick={() => setTyping(v => !v)}
+        aria-label={timeWindow ? `Window ${range}; type the dates` : 'All dates; type a From and a To date'}>
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="1.5" y="2.5" width="11" height="10" rx="2" fill="none" stroke="currentColor"/><path d="M1.5 5.5h11M4.5 1v3M9.5 1v3" stroke="currentColor"/></svg>
+        {timeWindow ? range : 'All dates'}</button>
+      {typing && <div className="pls-type" role="group" aria-label="Show the places with an event between two dates">
+        <label>From <input type="date" value={shownFrom} min={first} max={last} onChange={change('from')}/></label>
+        <label>To <input type="date" value={shownTo} min={first} max={last} onChange={change('to')}/></label>
+      </div>}
+      <Reveal className="pls-hint" detail="Drag the window's edges, drag the window to move it, or drag across the strip to draw a new one. Scroll over the strip to move it. The edges take the arrow keys (a month) and Page Up/Down (a year); so does the window itself, which moves whole, and Escape lets it go.">
+        <span className="tl2-q" aria-hidden="true">?</span></Reveal>
+      <p className="sr-only" aria-live="polite">{timeWindow ? `Showing the places with an event between ${dayText(timeWindow.from)} and ${dayText(timeWindow.to - DAY_MS)}.` : 'All places.'}</p>
     </div>
-    <p className="muted text-sm" aria-live="polite">
-      {timeWindow ? `Showing the places with an event between ${dayText(timeWindow.from)} and ${dayText(timeWindow.to - DAY_MS)}.`
-        : 'All places. Set a From or a To date to show only the places with an event in that stretch of time.'}
-    </p>
+    <div className="pls-grid" style={{['--pls-rows' as string]: rows.length}}>
+      <ul className="pls-names">
+        {rows.map(place => {
+          const n = eventsInWindow(place, timeWindow).length;
+          return <li key={place.entity_id}>
+            <button type="button" className={place.entity_id === picked ? 'on' : ''} aria-pressed={place.entity_id === picked}
+              onClick={() => onPick(place.entity_id)} title={place.caption}>{place.caption}</button>
+            <span className={`pls-count${n ? '' : ' none'}`} data-testid="places-row-count"
+              aria-label={`${n} of ${(place.events ?? []).length} events ${timeWindow ? 'in the window' : ''}`.trim()}>{n}</span></li>;
+        })}
+      </ul>
+      <div className="pls-track" ref={track} onPointerDown={begin('new')} onPointerMove={move} onPointerUp={end} onPointerCancel={end}>
+        {yearTicks(axis).map(t => <span key={t} className="pls-tick" style={{left: pct(t)}}><i>{new Date(t).getUTCFullYear()}</i></span>)}
+        {rows.map(place => <div key={place.entity_id} className={`pls-row${place.entity_id === picked ? ' on' : ''}`}>
+          {(place.events ?? []).map(e => {
+            const w = eventWindow(e);
+            const band = (w.to - w.from) / (axis.to - axis.from) > 0.012;
+            const when = placeEventWhen(e);
+            return <button key={e.id} type="button" tabIndex={-1}
+              className={`pls-mark ${band ? 'band' : 'dot'} v-${e.verification_status}${e.exact ? '' : ' hollow'}${inWindow(e) ? '' : ' out'}`}
+              style={band ? {left: pct(w.from), width: `calc(${pct(w.to)} - ${pct(w.from)})`} : {left: pct((w.from + w.to) / 2)}}
+              aria-label={`${e.title}, ${when}, ${STATUS_WORDS[e.verification_status] ?? e.verification_status}`}
+              data-tip={`${when} · ${e.title}`}
+              onPointerDown={ev => ev.stopPropagation()} onClick={() => onPick(place.entity_id)}/>;
+          })}
+        </div>)}
+        <div className={`pls-window${timeWindow ? ' set' : ''}${dragging ? ' held' : ''}`} style={{left: pct(shown.from), width: `calc(${pct(shown.to)} - ${pct(shown.from)})`}}
+          onPointerDown={begin('move')} onKeyDown={moveKey} tabIndex={timeWindow ? 0 : -1} data-testid="places-window-band"
+          role={timeWindow ? 'group' : undefined} aria-label={timeWindow ? `Window ${range}: the arrows move it, Escape lets it go` : undefined}>
+          <div className="pls-edge from" role="slider" tabIndex={0} aria-label="Window starts"
+            aria-valuemin={extent.from} aria-valuemax={extent.to} aria-valuenow={shown.from} aria-valuetext={dayText(shown.from)}
+            onPointerDown={begin('from')} onKeyDown={key('from')}/>
+          <div className="pls-edge to" role="slider" tabIndex={0} aria-label="Window ends"
+            aria-valuemin={extent.from} aria-valuemax={extent.to} aria-valuenow={shown.to} aria-valuetext={dayText(shown.to - DAY_MS)}
+            onPointerDown={begin('to')} onKeyDown={key('to')}/>
+        </div>
+      </div>
+    </div>
+    {undated.length > 0 && <p className="pls-undated">
+      <Reveal detail={<>{undated.slice(0, 14).map(p => <span key={p.entity_id} className="rv-row">{p.caption}</span>)}
+        {undated.length > 14 ? <span className="rv-row">and {undated.length - 14} more</span> : null}</>}>
+        <span>+{undated.length} {undated.length === 1 ? 'place' : 'places'} with no dated event</span></Reveal></p>}
   </div>;
 }

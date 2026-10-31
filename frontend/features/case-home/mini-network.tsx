@@ -8,7 +8,10 @@ import {useQuery} from '@tanstack/react-query';
 import {useRef} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 
+import {KIND_ICON} from '../../components/network/party-icons';
+import {Reveal} from '../../components/ui/reveal';
 import {linkSpan, shownAsOf} from '../../lib/as-of';
+import {PARTY, partyKind} from '../../lib/viz-tokens';
 
 import {getInvestigationGraphOptions, getStandingOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {RelationshipOut} from '../../lib/generated/types.gen';
@@ -73,11 +76,15 @@ export function shapeOf(schema: string): Shape {
   return 'company';
 }
 
-function Mark({shape}: {shape: Shape}): ReactElement {
-  if (shape === 'person') return <circle r={8}/>;
-  if (shape === 'property') return <path d="M-8,8 V-1 L0,-9 L8,-1 V8 Z"/>;
-  if (shape === 'account') return <path d="M0,-9 L9,0 L0,9 L-9,0 Z"/>;
-  return <rect x={-8} y={-8} width={16} height={16} rx={3}/>;
+/** A party as the Relationships network draws it: its kind's icon in the kind's ring colour (party-icons.ts, PARTY). */
+function Mark({schema}: {schema: string}): ReactElement {
+  const kind = partyKind(schema);
+  const Icon = KIND_ICON[kind];
+  const ring = PARTY[kind].ring;
+  return <g className="ch-node-mark" style={{color: ring}}>
+    <circle className="ch-node-dot" r={10} style={{stroke: ring}}/>
+    {Icon ? <Icon className="ch-node-icon" x={-6.5} y={-6.5} size={13} strokeWidth={2.2}/> : <circle className="ch-node-other" r={2.5} style={{fill: ring}}/>}
+  </g>;
 }
 
 export function MiniNetwork({investigationId}: {investigationId: string}): ReactElement {
@@ -134,7 +141,7 @@ export function MiniNetwork({investigationId}: {investigationId: string}): React
         const sure: Sure = sures.includes('disputed') ? 'disputed' : sures.every(x => x === 'supported') ? 'supported' : 'unshown';
         const lit = pointed && (pointed === e.source!.id || pointed === e.target!.id);
         const years = group.filter(x => x.schema !== 'Payment').map(linkYear).filter(Boolean);
-        const mark = sure === 'supported' ? '✓' : sure === 'disputed' ? '×' : '○';
+        const mark = sure === 'supported' ? '✓' : sure === 'disputed' ? '✕' : '○';
         const label = [linkWord(group), years[0], mark].filter(Boolean).join(' ');
         // The label sits beside the line's middle, on its upper side.
         const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
@@ -165,21 +172,27 @@ export function MiniNetwork({investigationId}: {investigationId: string}): React
         const below = p.y > H / 2;
         const half = Math.max(12, name.length * 3.2);
         return <g key={n.id} className={`ch-node${on ? ' on' : ''}`} transform={`translate(${p.x},${p.y})`} tabIndex={0} role="button"
-          aria-label={`${n.caption}, ${degree.get(n.id) ?? 0} links`} aria-pressed={on}
+          aria-label={`${n.caption}, ${PARTY[partyKind(n.schema)].name}, ${degree.get(n.id) ?? 0} links`} aria-pressed={on}
           onMouseEnter={() => reach(n.id)} onFocus={() => reach(n.id)} onClick={() => press(n.id)}
           onKeyDown={(event: KeyboardEvent) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); press(n.id); } }}>
           {/* The whole party, mark and name, takes the pointer: the gap between them is not the drawing's. */}
           <rect className="ch-node-hit" x={-half} y={below ? -11 : -25} width={half * 2} height={37}/>
-          <Mark shape={shapeOf(n.schema)}/>
+          <title>{`${n.caption} · ${PARTY[partyKind(n.schema)].name}`}</title>
+          <Mark schema={n.schema}/>
           <text y={below ? 22 : -13} textAnchor="middle">{name}</text>
         </g>;
       })}
     </svg>
     <figcaption>
-      <span><i className="ch-key ch-key-supported"/>shown</span>
-      <span><i className="ch-key ch-key-unshown"/>not yet shown</span>
-      <span><i className="ch-key ch-key-disputed"/>disputed</span>
-      <span className="ch-net-count" title={`${linked.size} ${linked.size === 1 ? 'party has' : 'parties have'} a link${asOf !== null ? ` as of ${asOf}` : ''}. ${inCase !== undefined ? `The case holds ${inCase} in all. ` : ''}The six most linked are drawn.`}>{linked.size} linked{inCase !== undefined ? ` · ${inCase} in the case` : ''}{asOf !== null ? ` · as of ${asOf}` : ''}</span>
+      {/* The line styles are the marks; their key is on hover or focus of a small key mark (Ony, 29 Oct). */}
+      <Reveal label="Key to the lines" detail={<>
+        <span className="rv-row"><i className="ch-key ch-key-supported"/>shown</span>
+        <span className="rv-row"><i className="ch-key ch-key-unshown"/>not yet shown</span>
+        <span className="rv-row"><i className="ch-key ch-key-disputed"/>disputed</span>
+        <span className="rv-row">Point at a party to light it everywhere.</span></>}>
+        <span className="ch-net-key" aria-hidden="true"><i className="ch-key ch-key-supported"/><i className="ch-key ch-key-unshown"/><i className="ch-key ch-key-disputed"/></span></Reveal>
+      <Reveal className="ch-net-count" detail={`${linked.size} ${linked.size === 1 ? 'party has' : 'parties have'} a link${asOf !== null ? ` as of ${asOf}` : ''}. ${inCase !== undefined ? `The case holds ${inCase} in all. ` : ''}The six most linked are drawn.`}>
+        <span>{linked.size} linked{inCase !== undefined ? ` · ${inCase} in the case` : ''}{asOf !== null ? ` · as of ${asOf}` : ''}</span></Reveal>
     </figcaption>
   </figure>;
 }

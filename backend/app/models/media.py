@@ -28,6 +28,12 @@ class DocumentMedia(Base):
     outline: Mapped[list] = mapped_column(JSON, default=list)
     outline_step: Mapped[float] = mapped_column(Float)
     transcript: Mapped[dict] = mapped_column(JSON, default=dict)
+    # Who spoke when (ADR-0026, app/services/voices.py): the voices the machine told apart, each with the name a
+    # person gave it, the turns, how they were found, and every earlier name.
+    voices: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # Another recording of the same event lined up with this one by matching their sound, once a person accepted the
+    # offset (app/services/media_sound.py): {other_document_id, offset_seconds, confidence, accepted_by, accepted_at}.
+    sync: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

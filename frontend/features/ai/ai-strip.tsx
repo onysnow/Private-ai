@@ -12,11 +12,12 @@ import {
   capabilitiesOptions, listAiRunEventsOptions, listAiRunsOptions, listInvestigationAiAnalysisCandidatesOptions,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
+import {Reveal} from '../../components/ui/reveal';
 import {thoughtTallies} from './run-tally';
 
 const SYSTEMS = ['ras', 'tas', 'qas', 'las', 'das'] as const;
-const hhmm = (iso: string) => apiTime(iso).toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit', hour12: false});
+const hhmm = timeWords;
 
 export function AiStrip({investigationId}: {investigationId: string}): ReactElement | null {
   const router = useRouter();
@@ -32,7 +33,7 @@ export function AiStrip({investigationId}: {investigationId: string}): ReactElem
   const events = useQuery({...listAiRunEventsOptions({path: {investigation_id: investigationId, run_id: latest?.run_id ?? ''}, query: {after: 0}}),
     enabled: Boolean(latest), refetchInterval: latest && !latest.finished ? 1500 : false});
   if (!caps.data) return null;
-  if (!on) return <span className="ai-strip off" title="AI is turned off on this computer">AI off</span>;
+  if (!on) return <Reveal detail="AI is turned off on this computer."><span className="ai-strip off">AI off</span></Reveal>;
   const waiting = drafts.data?.candidates.length ?? 0;
   const actHref = `/act?inv=${encodeURIComponent(investigationId)}#ai-runs`;
   const open = () => { if (latest) { openAiRun(latest.run_id); router.push(actHref); } };
@@ -48,8 +49,10 @@ export function AiStrip({investigationId}: {investigationId: string}): ReactElem
   const routed = new Set(list.filter(e => e.kind === 'ROUTE').map(e => e.system));
   const writing = list.some(e => e.node === 'model' && e.verdict === 'STARTED') && !list.some(e => e.node === 'model' && e.verdict !== 'STARTED');
   const t = thoughtTallies(list);
-  const words = `AI: ${waiting} draft${waiting === 1 ? '' : 's'} waiting for review${latest ? ` · last run ${hhmm(latest.created_at)}` : ''}`;
-  if (!latest) return <><span className="ai-strip" title={words}><span>{words}</span></span>{askField}</>;
+  // "AI · 1 waiting" shows; what waits and when the last run was are revealed on it.
+  const short = `AI · ${waiting} waiting`;
+  const words = `${waiting} AI draft${waiting === 1 ? '' : 's'} waiting for review${latest ? ` · last run ${hhmm(latest.created_at)}` : ''}`;
+  if (!latest) return <><Reveal detail={words}><span className="ai-strip"><span>{short}</span></span></Reveal>{askField}</>;
   if (!latest.finished) return <button type="button" className="ai-strip live" onClick={open}
     aria-label={`AI run live: ${[...routed].map(s => s.toUpperCase()).join(', ') || 'nothing'} routed, ${writing ? 'the model is writing, ' : ''}${latest.problems} problem${latest.problems === 1 ? '' : 's'}. Open it`}>
     <span className="ai-live">● live</span>
@@ -58,8 +61,8 @@ export function AiStrip({investigationId}: {investigationId: string}): ReactElem
       <circle cx={86} cy={8} r={5.5} className={`ring${writing ? ' writing' : ''}`}/>
     </svg>
     <b className={latest.problems ? 'bad' : ''}>{latest.problems} problem{latest.problems === 1 ? '' : 's'}</b></button>;
-  return <><button type="button" className="ai-strip" onClick={open} title={`${words}. Open the last run in Act › AI runs`}>
-    <span>{words}</span>
+  return <><Reveal tabbable={false} detail={`${words}. Open the last run in Act › AI runs.`}><button type="button" className="ai-strip" onClick={open}>
+    <span>{short}</span>
     <span className="ai-tallies" aria-label={`last run: ${t.good} verified, ${t.partial} in between, ${t.bad} stopped, ${t.neutral} findings`}>
-      <i className="good">✓{t.good}</i><i className="partial">◆{t.partial}</i><i className="bad">✕{t.bad}</i><i className="neutral">○{t.neutral}</i></span></button>{askField}</>;
+      <i className="good">✓{t.good}</i><i className="partial">◆{t.partial}</i><i className="bad">✕{t.bad}</i><i className="neutral">○{t.neutral}</i></span></button></Reveal>{askField}</>;
 }

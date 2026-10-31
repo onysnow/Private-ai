@@ -214,7 +214,8 @@ describe('Document review queue: issues and clarifying questions', () => {
     const ReviewPage = await importReviewPage();
     render(<ReviewPage />);
     const first = await screen.findByTestId('candidate-cand-evidence');
-    expect(screen.getByTestId('review-keys')).toHaveTextContent('A accepts · R rejects');
+    // The keys sit behind a mark, read with it.
+    expect(screen.getByRole('img', {name: 'Keys'})).toHaveAccessibleDescription(/A accepts · R rejects/);
 
     const user = userEvent.setup();
     first.focus();

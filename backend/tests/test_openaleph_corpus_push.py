@@ -130,16 +130,18 @@ def test_a_merged_away_record_is_removed_once_indexing_is_idle_and_its_relations
         namespace = Namespace("fake-ns-1")
 
         _merge(db, db.get(Entity, duplicate.id), db.get(Entity, meridian.id))
-        assert pending_changes(db, inv.id) == {"to_send": 1, "to_remove": 1, "pushed": 6, "cannot_send": []}
+        # The record that stays changed too: it now holds the merged-away name as an alias.
+        assert pending_changes(db, inv.id) == {"to_send": 2, "to_remove": 1, "pushed": 6, "cannot_send": []}
 
         # OpenAleph is still indexing: the relationship is re-sent pointing at
-        # the record that stays, and the removal waits.
+        # the record that stays, that record is re-sent with its new alias, and the removal waits.
         result = push_confirmed_records(db, inv.id, gateway=gateway)
-        assert (result.sent, result.removed, result.removals_waiting) == (1, 0, 1)
-        assert openaleph.bulk_batches[-1][0]["id"] == owner.relationship_entity_id
-        assert openaleph.bulk_batches[-1][0]["properties"]["asset"] == [meridian.id]
+        assert (result.sent, result.removed, result.removals_waiting) == (2, 0, 1)
+        sent = {e["id"]: e for e in openaleph.bulk_batches[-1]}
+        assert sent[owner.relationship_entity_id]["properties"]["asset"] == [meridian.id]
+        assert "Meridian Holdings Limited" in sent[meridian.id]["properties"]["alias"]
         assert duplicate.id in _links(db, inv)
-        assert result.message() == "Sent 1 record(s); 1 removal(s) wait for OpenAleph to finish indexing"
+        assert result.message() == "Sent 2 record(s); 1 removal(s) wait for OpenAleph to finish indexing"
 
         # Indexing is done, but the search index has not refreshed: it still
         # shows the ownership pointing at the duplicate, so removing the
@@ -165,6 +167,9 @@ def test_a_merged_away_record_is_removed_once_indexing_is_idle_and_its_relations
         openaleph.index[collection].pop(namespace.sign(stray.id))
         openaleph.entities[collection].pop(namespace.sign(stray.id))
         _merge(db, db.get(Entity, stray.id), db.get(Entity, jane.id))
+        # Jane is sent again first, with the merged-away name as her alias; the removal follows once that is indexed.
+        assert push_confirmed_records(db, inv.id, gateway=gateway).sent == 1
+        openaleph.finish_indexing()
         assert push_confirmed_records(db, inv.id, gateway=gateway).removed == 1
 
 

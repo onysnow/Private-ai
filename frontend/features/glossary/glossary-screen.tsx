@@ -11,14 +11,16 @@ import Link from 'next/link';
 import {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent, ReactElement, ReactNode} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
-import {getGlossaryEntryOptions, listAreasOptions, listTermHintsOptions} from '../../lib/generated/@tanstack/react-query.gen';
-import type {CatalogueAreaOut, GlossaryHintOut} from '../../lib/generated/types.gen';
+import {getGlossaryEntryOptions, listAreasOptions, listTermHintsOptions, searchWorkbenchOptions} from '../../lib/generated/@tanstack/react-query.gen';
+import type {CatalogueAreaOut, GlossaryHintOut, SearchHitOut} from '../../lib/generated/types.gen';
 import {setTrailTail} from '../../lib/trail';
-import {FAMILIES} from '../knowledge/families';
+import {useWorkbenchStore} from '../../lib/workbench-store';
+import {FAMILIES, familyOf} from '../knowledge/families';
 import {GlossaryText} from './glossary-text';
 
-export const ROW_H = 46;
+export const ROW_H = 34;
 const OVERSCAN = 8;
 const DWELL_MS = 120;
 const LETTERS = ['#', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
@@ -102,7 +104,9 @@ export function GlossaryScreen({tabs}: {tabs?: ReactNode}): ReactElement {
   const shown = useMemo(() => filterTerms(hints, q, chosen), [hints, q, chosen]);
   useEffect(() => setActive(0), [q, chosen]);
   const pinnedHint = hints.find(h => h.term.toLowerCase() === pinned.toLowerCase());
-  const open = hover || pinnedHint?.term || '';
+  // The card is never empty: with nothing pinned it holds the first term shown (Ony, 29 Oct: fill the space).
+  const kept = pinnedHint?.term ?? shown[0]?.term ?? '';
+  const open = hover || kept;
   const firstIndex = useMemo(() => {
     const m = new Map<string, number>();
     shown.forEach((h, i) => { const l = letterOf(h.term); if (!m.has(l)) m.set(l, i); });
@@ -181,19 +185,23 @@ export function GlossaryScreen({tabs}: {tabs?: ReactNode}): ReactElement {
           <div style={{height: shown.length * ROW_H, position: 'relative'}}>
             {shown.slice(from, to).map((h, k) => {
               const i = from + k;
-              return <div key={h.term} id={`kg-row-${i}`} role="option" aria-selected={h.term === pinnedHint?.term}
-                className={`kg-row${i === active ? ' active' : ''}${h.term === pinnedHint?.term ? ' on' : ''}`} style={{top: i * ROW_H, height: ROW_H}}
+              return <div key={h.term} id={`kg-row-${i}`} role="option" aria-selected={h.term === kept}
+                className={`kg-row${i === active ? ' active' : ''}${h.term === kept ? ' on' : ''}`} style={{top: i * ROW_H, height: ROW_H}}
                 onClick={() => { setActive(i); pin(h.term); }}
                 onPointerEnter={() => { clearTimer(); timer.current = window.setTimeout(() => setHover(h.term), DWELL_MS); }}>
+                {/* A row is its term; the first sentence opens in the card on point (and is read with the row), and its areas
+                    are their short codes (ML, BO), each area's name on hover (Ony, 29 Oct). */}
                 <span className="kg-term">{h.term}</span>
-                <span className="kg-first">{firstSentence(h.definition)}</span>
-                <span className="kg-areas" aria-label={`Areas: ${h.areas.map(a => areaName.get(a) ?? a).join(', ')}`}>{h.areas.slice(0, 3).join(' · ')}{h.areas.length > 3 ? ' …' : ''}</span>
+                <span className="kg-first sr-only">{firstSentence(h.definition)}</span>
+                <Reveal tabbable={false} describe={false} detail={h.areas.map(a => <span key={a} className="rv-row">{areaName.get(a) ?? a}</span>)}>
+                  <span className="kg-areas" aria-label={`Areas: ${h.areas.map(a => areaName.get(a) ?? a).join(', ')}`}>
+                    {h.areas.slice(0, 3).map(a => <i key={a} aria-hidden="true" className={familyOf(a).safety ? 'safety' : undefined}>{a}</i>)}{h.areas.length > 3 && <small aria-hidden="true">+{h.areas.length - 3}</small>}</span></Reveal>
               </div>;
             })}
           </div>
         </div>
       </div>
-      <TermCard term={open} hint={hints.find(h => h.term === open)} areaName={areaName} onOpen={pin} known={hints}/>
+      <TermCard term={open} hint={hints.find(h => h.term === open)} areaName={areaName} areaRows={areasQuery.data ?? []} onOpen={pin} known={hints}/>
     </div>
   </div>;
 }
@@ -220,10 +228,35 @@ function AreaPicker({families, chosen, onChange}: {families: AreaGroup[]; chosen
   </div>;
 }
 
-function TermCard({term, hint, areaName, onOpen, known}: {
-  term: string; hint: GlossaryHintOut | undefined; areaName: Map<string, string>; onOpen: (term: string) => void; known: GlossaryHintOut[];
+/** The terms around one in the catalogue: those whose definition names it, and its neighbours in its first area (the
+ *  terms on either side of it in the catalogue's order), each up to `n`. */
+export function termsAround(term: string, areas: string[], known: GlossaryHintOut[], n = 8): {mentionedIn: GlossaryHintOut[]; sameArea: GlossaryHintOut[]} {
+  if (!term) return {mentionedIn: [], sameArea: []};
+  const esc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const named = new RegExp(`(^|[^\\p{L}\\p{N}])${esc}($|[^\\p{L}\\p{N}])`, 'iu');
+  const mentionedIn = known.filter(h => h.term !== term && named.test(h.definition)).slice(0, n);
+  const area = areas[0];
+  const inArea = area ? known.filter(h => h.areas.includes(area)) : [];
+  const at = inArea.findIndex(h => h.term === term);
+  const from = Math.max(0, Math.min(at - Math.floor(n / 2), inArea.length - n - 1));
+  const sameArea = inArea.slice(from, from + n + 1).filter(h => h.term !== term && !mentionedIn.includes(h)).slice(0, n);
+  return {mentionedIn, sameArea};
+}
+
+// A hit's kind as a mark, its word on reveal (Ony, 29 Oct: types are marks named on hover).
+const HIT_KIND: Record<SearchHitOut['kind'], {mark: string; word: string}> = {
+  party: {mark: '◉', word: 'A party'}, link: {mark: '⟷', word: 'A link'}, evidence: {mark: '▤', word: 'Evidence'}, claim_event: {mark: '◷', word: 'A claim or event'},
+  lead_task: {mark: '⚑', word: 'A lead'}, document: {mark: '▢', word: 'A document'}, outside: {mark: '↗', word: 'From outside the case'},
+};
+
+function TermCard({term, hint, areaName, areaRows, onOpen, known}: {
+  term: string; hint: GlossaryHintOut | undefined; areaName: Map<string, string>; areaRows: CatalogueAreaOut[]; onOpen: (term: string) => void; known: GlossaryHintOut[];
 }): ReactElement {
   const entry = useQuery({...getGlossaryEntryOptions({query: {term}}), enabled: Boolean(term), staleTime: Infinity});
+  // Where the term is in the case open in the workbench (the card was empty below the definition: Ony, fill the space).
+  const inv = useWorkbenchStore(st => st.investigationId);
+  const found = useQuery({...searchWorkbenchOptions({query: {q: term, investigation_id: inv, limit: 5}}), enabled: Boolean(term && inv), staleTime: 60_000});
+  const around = useMemo(() => termsAround(hint?.term ?? '', hint?.areas ?? [], known), [hint, known]);
   const [tab, setTab] = useState('');
   useEffect(() => setTab(''), [term]);
   if (!term || !hint) return <article className="kc-panel kg-card"><p className="kc-quiet">Point at a term to read it here; click to keep it open.</p></article>;
@@ -235,13 +268,12 @@ function TermCard({term, hint, areaName, onOpen, known}: {
   return <article className="kc-panel kg-card" aria-labelledby="kg-card-title" key={term}>
     <p className="kc-eyebrow">{areas.map(a => areaName.get(a) ?? a).join(' · ')}</p>
     <h2 id="kg-card-title" className="kc-ind-name">{hint.term}</h2>
-    {areas.length > 1 && <>
-      <p className="kc-small">Defined in {defs.size || hint.definitions} {(defs.size || hint.definitions) === 1 ? 'area' : 'areas'}{areas.length > (defs.size || hint.definitions) ? `, listed in ${areas.length}` : ''}</p>
+    {/* How many areas define it is sub-text: on the area tabs, on hover, and read with them (Ony, 29 Oct). */}
+    {areas.length > 1 && <Reveal tabbable={false} className="kg-tabs-rv" detail={<>Defined in {defs.size || hint.definitions} {(defs.size || hint.definitions) === 1 ? 'area' : 'areas'}{areas.length > (defs.size || hint.definitions) ? `, listed in ${areas.length}` : ''}</>}>
       <div className="kg-tabs" role="tablist" aria-label="Each area's definition">
         {areas.map(a => <button type="button" key={a} role="tab" aria-selected={a === current} className={a === current ? 'on' : ''} onClick={() => setTab(a)}>
           {areaName.get(a) ?? a}{defs.has(a) || !e ? '' : ' ○'}</button>)}
-      </div>
-    </>}
+      </div></Reveal>}
     <div role={areas.length > 1 ? 'tabpanel' : undefined} className="kg-def">
       {e && !defs.has(current) ? <p className="kc-dashed-box">No definition yet in {areaName.get(current) ?? current}.</p>
         : <p className="kc-def"><GlossaryText text={defs.get(current)?.definition ?? hint.definition} skip={hint.term}/></p>}
@@ -250,11 +282,28 @@ function TermCard({term, hint, areaName, onOpen, known}: {
     </div>
     {entry.isError && <p className="kc-error">{errorMessage(entry.error, 'Could not load the full entry')}</p>}
     {e && e.examples.length > 0 && <section><h3 className="kc-eyebrow">Examples</h3><ul className="kg-ul">{e.examples.map((x, i) => <li key={i}>{x}</li>)}</ul></section>}
+    {inv && <section className="kg-incase"><h3 className="kc-eyebrow">In this case{found.data ? ` · ${found.data.total}` : ''}</h3>
+      {found.isPending ? <p className="kc-quiet">Looking in the case…</p>
+        : found.isError ? <p className="kc-quiet">Could not look in the case.</p>
+        : !found.data.results.length ? <p className="kc-quiet">Not in this case&rsquo;s records.</p>
+        : <ul className="kg-hits">{found.data.results.map(h => <li key={`${h.kind}:${h.id}`}>
+          <Reveal tabbable={false} detail={<><b>{h.title}</b><span className="rv-row">{HIT_KIND[h.kind]?.word ?? h.kind}{h.date ? ` · ${h.date}` : ''}</span>{h.snippet ? <span className="rv-row">{h.snippet}</span> : null}</>}>
+            <span className="kg-hit"><i aria-hidden="true">{HIT_KIND[h.kind]?.mark ?? '•'}</i><span className="kg-hit-t"><span className="sr-only">{HIT_KIND[h.kind]?.word ?? h.kind}: </span>{h.title}</span></span></Reveal></li>)}</ul>}
+    </section>}
+    {/* The catalogue's entry: each area that lists the term, opening that area in the Red Flags catalogue. */}
+    <section><h3 className="kc-eyebrow">In the catalogue</h3><ul className="kg-hits">{areas.map(a => { const row = areaRows.find(r => r.key === a);
+      return <li key={a}><Reveal tabbable={false} detail={row ? <><b>{row.name}</b><span className="rv-row">{row.indicators} indicators · {row.terms} terms</span></> : a}>
+        <span className="kg-hit"><i className={familyOf(a).safety ? 'safety' : undefined}>{a}</i>
+          <span className="kg-hit-t">{row && row.indicators > 0 ? <Link href={`/learn?area=${encodeURIComponent(a)}${inv ? `&inv=${encodeURIComponent(inv)}` : ''}`}>{row.name}</Link> : (areaName.get(a) ?? a)}</span></span></Reveal></li>; })}</ul></section>
     {e && e.related.length > 0 && <section><h3 className="kc-eyebrow">Related</h3><p className="kg-chips">{e.related.map(r => knownTerm(r)
       ? <button type="button" key={r} className="kc-chip" onClick={() => onOpen(knownTerm(r)!.term)}>{r}</button>
       : <span key={r} className="kc-chip static">{r}</span>)}</p></section>}
     {e && e.cases.length > 0 && <section><h3 className="kc-eyebrow">Cases to look up</h3><ul className="kg-ul">{e.cases.map((c, i) => <li key={i}>{c}</li>)}</ul></section>}
     {e && e.indicators.length > 0 && <section><h3 className="kc-eyebrow">Used by</h3><p className="kg-chips">{e.indicators.map(id =>
       <Link key={id} className="kc-chip" href={`/learn?indicator=${encodeURIComponent(id)}`}>{id}</Link>)}</p></section>}
+    {around.mentionedIn.length > 0 && <section><h3 className="kc-eyebrow">Named in</h3><p className="kg-chips">{around.mentionedIn.map(h =>
+      <button type="button" key={h.term} className="kc-chip" onClick={() => onOpen(h.term)}>{h.term}</button>)}</p></section>}
+    {around.sameArea.length > 0 && <section><h3 className="kc-eyebrow">Also in {areaName.get(areas[0]) ?? areas[0]}</h3><p className="kg-chips">{around.sameArea.map(h =>
+      <button type="button" key={h.term} className="kc-chip" onClick={() => onOpen(h.term)}>{h.term}</button>)}</p></section>}
   </article>;
 }

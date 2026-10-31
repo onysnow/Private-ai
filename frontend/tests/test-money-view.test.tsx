@@ -7,8 +7,8 @@ import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {MoneyView} from '../features/money/money-view';
-import {cycleClosers, layout, pathOf, type Payment} from '../features/money/money-layout';
+import {MoneyView, stripValues} from '../features/money/money-view';
+import {cycleClosers, layout, middleMarks, pathOf, placeLabels, shortAmount, wrapName, type Payment} from '../features/money/money-layout';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -131,6 +131,70 @@ describe('the money picture', () => {
     expect(pic.bands.reduce((s, b) => s + b.amount, 0)).toBe(ps.reduce((s, x) => s + x.amount, 0));
   });
 
+  it('places every party\'s label so none overlaps another, none crosses into the next column and none runs off the picture', () => {
+    // A ledger like the demo case's: long names, nine-digit sums, crowded columns, two steps through the middle.
+    const long = (i: number) => `Party ${i} International Investment Holdings Corporation (BVI) Limited`;
+    const ps: Payment[] = [];
+    for (let i = 0; i < 9; i++) {
+      ps.push({...p(`a${i}`, `S${i}`, `M${i % 4}`, 300_000_000 + i * 7_000_000, '2012'), from: long(i), to: long(10 + (i % 4))});
+      ps.push({...p(`b${i}`, `M${i % 4}`, `N${i % 3}`, 200_000_000 + i, '2013'), from: long(10 + (i % 4)), to: long(20 + (i % 3))});
+      ps.push({...p(`c${i}`, `N${i % 3}`, `E${i}`, 150_000_000 + i, '2014'), from: long(20 + (i % 3)), to: long(30 + i)});
+    }
+    const pic = layout(ps, 'USD', {top: 20});
+    const {labels, height} = placeLabels(pic, ps, 'USD');
+    expect(labels).toHaveLength(pic.nodes.filter(n => !(n.others && n.col === pic.columns.length - 1)).length);
+    expect(height).toBeGreaterThanOrEqual(pic.height);
+    const col = (id: string) => pic.nodes.find(n => n.id === id)!.col;
+    labels.forEach((a, i) => {
+      expect(a.top).toBeGreaterThanOrEqual(20);
+      expect(a.top + a.h).toBeLessThanOrEqual(height);
+      expect(a.x + a.w).toBeLessThanOrEqual(col(a.nodeId) < pic.columns.length - 1 ? pic.columns[col(a.nodeId) + 1].x : pic.width);
+      labels.slice(i + 1).forEach(b => expect(a.x < b.x + b.w && a.x + a.w > b.x && a.top < b.top + b.h && a.top + a.h > b.top).toBe(false));
+    });
+    // Long names are shortened (the full name is revealed on the label), and nine-digit sums are written short.
+    expect(labels.some(l => l.cut)).toBe(true);
+    expect(labels.flatMap(l => l.lines.map(x => `${x.text}${x.tail ?? ''}`)).join(' ')).toMatch(/\$3\d\dm/);
+    expect(labels.filter(l => l.leader).every(l => l.leader!.startsWith('M'))).toBe(true);
+  });
+
+  it('wraps a long name over two lines and cuts the rest with an ellipsis; writes big sums short', () => {
+    expect(wrapName('Kestrel SA', 200)).toEqual({lines: ['Kestrel SA'], cut: false});
+    const w = wrapName('1MDB Global Investments Limited of the Cayman Islands', 140);
+    expect(w.cut).toBe(true);
+    expect(w.lines).toHaveLength(2);
+    expect(w.lines[1].endsWith('…')).toBe(true);
+    expect(wrapName('Enterprise Emerging Markets Fund', 150, 1).lines[0]).toMatch(/^Enterprise Emerging M.*…$/);
+    expect(shortAmount(1_250_000, 'EUR')).toBe('€1,250,000');
+    expect(shortAmount(646_464_649, 'USD')).toBe('$646m');
+    expect(shortAmount(1_592_311_599, 'USD')).toBe('$1.59bn');
+    expect(shortAmount(5_200_000, 'SGD', 1e6)).toBe('5.2m SGD');
+  });
+
+  it('writes the strip\'s values only where they overlap nothing', () => {
+    const bars = Array.from({length: 12}, (_, i) => ({id: `v${i}`, x: 100 + i * 4, top: 20 + (i % 3), amount: 500_000_000 + i}));
+    const vals = stripValues(bars, 'USD', 420, 130, {x: 200, y: 80, w: 68, h: 12}, 10000);
+    expect(vals.length).toBeGreaterThan(0);
+    expect(vals.length).toBeLessThan(bars.length);
+    const box = (v: typeof vals[number]) => { const w = v.text.length * 5.8; return {x: v.anchor === 'start' ? v.x : v.x - w, y: v.y - 9, w, h: 11}; };
+    vals.map(box).forEach((a, i, all) => {
+      expect(a.x).toBeGreaterThanOrEqual(0); expect(a.x + a.w).toBeLessThanOrEqual(420);
+      all.slice(i + 1).forEach(b => expect(a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y).toBe(false));
+    });
+  });
+
+  it('keeps a middle bar\'s check mark off the names and bars around it', () => {
+    const n = {x: 440, y: 410, h: 20, marks: ['round_trip' as const]};
+    // A name right above the bar, where the mark used to go.
+    const name = {x: 446, top: 382, w: 120, h: 28};
+    const [at] = middleMarks(n, [name], [n], []);
+    const box = {x: at.x - 9, y: at.y - 9, w: 18, h: 18};
+    const off = (o: {x: number; y: number; w: number; h: number}) => !(box.x < o.x + o.w && box.x + box.w > o.x && box.y < o.y + o.h && box.y + box.h > o.y);
+    expect(off({x: name.x - 3, y: name.top - 1, w: name.w + 6, h: name.h + 2})).toBe(true);
+    expect(off({x: n.x, y: n.y, w: 12, h: n.h})).toBe(true);
+    // With room above, it stays above the bar.
+    expect(middleMarks(n, [], [n], [])).toEqual([{x: 446, y: 396}]);
+  });
+
   it('never refuses a cycle: the latest payment of a round trip is drawn as a return arc', () => {
     const ps = [p('1', 'A', 'B', 100, '2018-01-01'), p('2', 'B', 'C', 90, '2018-06-01'), p('3', 'C', 'A', 85, '2019-01-01')];
     expect([...cycleClosers(ps)]).toEqual(['3']);
@@ -145,12 +209,16 @@ describe('MoneyView', () => {
   it('loads with the view, keeps each currency apart, and labels each band and party', async () => {
     mockApi(routes);
     wrap(<MoneyView investigationId="inv-1"/>);
-    expect(await screen.findByText('Euro payments only. The 1 sterling payment is kept apart and never added to these.')).toBeInTheDocument();
+    // "EUR only" shows; the sentence is revealed on it (Ony, 29 Oct), in the page for screen readers.
+    expect((await screen.findByText('Euro payments only. The 1 sterling payment is kept apart and never added to these.')).closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('EUR only').closest('.rv')).toHaveAccessibleDescription('Euro payments only. The 1 sterling payment is kept apart and never added to these.');
     expect(screen.getByRole('tab', {name: 'EUR · 5'})).toHaveAttribute('aria-selected', 'true');
     const list = screen.getByRole('list', {name: 'The payments, in order'});
     expect(within(list).getByText('Fernhill Ltd to Kestrel SA: 3 × €9,800 (not yet shown)')).toBeInTheDocument();
     expect(within(list).getByText('Kestrel SA to Harbour Council: €1,250,000 · land price (shown)')).toBeInTheDocument();
-    expect(screen.getByText('= what left Kestrel SA minus what came in')).toBeInTheDocument();
+    // The worked-out sum's explanation is revealed on its line, and each check mark is named on reveal.
+    expect(screen.getByText('= what left Kestrel SA minus what came in', {exact: false}).closest('[hidden]')).not.toBeNull();
+    expect(screen.getAllByRole('img', {name: 'Grey hole'}).length).toBeGreaterThan(0);
     expect(screen.getByText(/Not charted: 1 payment missing something/)).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('tab', {name: 'GBP · 1'}));
     expect(screen.getByText('Sterling payments only. The 5 euro payments are kept apart and never added to these.')).toBeInTheDocument();
@@ -162,8 +230,10 @@ describe('MoneyView', () => {
     const grey = await screen.findByRole('article', {name: 'Grey hole: Kestrel SA'});
     expect(grey).toHaveTextContent('€29,400 recorded in, €1,430,000 out: €1,400,600 has no recorded source.');
     expect(grey).toHaveTextContent('Could be innocent: a bank loan, or money from the owners, that the case does not hold yet.');
-    expect(screen.getByRole('article', {name: 'Miracle: none found'})).toBeInTheDocument();
-    expect(screen.getByRole('article', {name: 'Round trip: none found'})).toHaveTextContent('No euro chain returns to its payer.');
+    // The four checks in a row: hollow when none was found, each named on reveal.
+    expect(screen.getByRole('img', {name: 'Miracle: none found'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'Round trip: none found'})).toHaveAccessibleDescription(/No euro chain returns to its payer\./);
+    expect(within(grey).getByText('Lead idea:', {exact: false}).closest('[hidden]')).not.toBeNull();
     await userEvent.setup().click(within(grey).getByRole('button', {name: 'Make a lead'}));
     await waitFor(() => expect(api.calls('POST /api/leads')).toHaveLength(1));
     expect(api.lastBody('POST /api/leads')).toMatchObject({investigation_id: 'inv-1', title: 'Grey hole: Kestrel SA (EUR)'});
@@ -177,7 +247,7 @@ describe('MoneyView', () => {
     expect(container.querySelector('.mn-bracket')).not.toBeNull();
     expect(screen.getByText('€10,000 line')).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'j'});
-    expect(container.querySelector('tr.lit')).toHaveTextContent('09 Mar 2018');
+    expect(container.querySelector('tr.lit')).toHaveTextContent('9 Mar 2018');
     const band = [...container.querySelectorAll<SVGPathElement>('.mn-band')].find(b => b.textContent?.startsWith('Kestrel SA to Harbour Council'))!;
     fireEvent.click(band);
     expect(screen.getByText('Traced so far').parentElement).toHaveTextContent('€1,250,0001 payment');
@@ -200,6 +270,30 @@ describe('MoneyView', () => {
     mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {...LEDGER, transactions: [], incomplete: []}});
     wrap(<MoneyView investigationId="inv-1"/>);
     expect(await screen.findByText('No payment has an amount yet.')).toBeInTheDocument();
+  });
+
+  it('shows a check as its party and one figure; the numbers and what could be innocent on reveal, the actions as quiet icons', async () => {
+    mockApi(routes);
+    wrap(<MoneyView investigationId="inv-1"/>);
+    const grey = await screen.findByRole('article', {name: 'Grey hole: Kestrel SA'});
+    expect(within(grey).getByText('€1.4m unsourced')).toBeInTheDocument();
+    expect(within(grey).getByText(/Could be innocent:/).closest('[hidden]')).not.toBeNull();
+    expect(within(grey).getByText('Kestrel SA').closest('.rv')).toHaveAccessibleDescription(/€1,400,600 has no recorded source\. Could be innocent: a bank loan/);
+    // Icon buttons, named for screen readers and on reveal; none is the loud primary.
+    expect(within(grey).getByRole('button', {name: 'Make a lead'})).toHaveTextContent('');
+    expect(within(grey).getByRole('button', {name: 'Add to To check'})).toHaveTextContent('');
+    // The key is drawn: a swatch per kind of band, each named on reveal.
+    const key = screen.getByRole('group', {name: 'Key'});
+    expect(within(key).getByRole('img', {name: 'Shown'})).toBeInTheDocument();
+    expect(within(key).getByRole('img', {name: 'Not yet shown'})).toHaveAccessibleDescription(/nothing shows it yet/);
+  });
+
+  it('opens the whole Ledger from the rows the compact table leaves out', async () => {
+    const more = Array.from({length: 8}, (_, i) => tx(`m${i}`, FERN, KES, 1000 + i, {dateTime: `2019-0${1 + (i % 9)}-02`}));
+    mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {...LEDGER, transactions: more, incomplete: []}});
+    wrap(<MoneyView investigationId="inv-1"/>);
+    await userEvent.setup().click(await screen.findByRole('button', {name: 'All 8 payments in the Ledger ›'}));
+    expect(screen.getByRole('radio', {name: 'Ledger'})).toHaveAttribute('aria-checked', 'true');
   });
 
   it('adds a money check to To check once, then says it is already there', async () => {
@@ -233,9 +327,9 @@ describe('MoneyView', () => {
     const {container} = wrap(<MoneyView investigationId="inv-1"/>);
     await screen.findByText(/each just under the €10,000 line/);
     const band = screen.getByRole('button', {name: 'Fernhill Ltd to Kestrel SA: 3 × €9,800 (not yet shown)'});
-    const litRows = () => [...container.querySelectorAll('.mn-table tr.lit')].map(r => r.textContent?.slice(0, 11));
+    const litRows = () => [...container.querySelectorAll('.mn-table tr.lit')].map(r => r.querySelector('td')?.textContent);
     fireEvent.mouseEnter(band);
-    expect(litRows()).toEqual(['06 Feb 2018', '09 Mar 2018', '11 Apr 2018']);
+    expect(litRows()).toEqual(['6 Feb 2018', '9 Mar 2018', '11 Apr 2018']);
     expect(container.querySelectorAll('.mn-bar.lit')).toHaveLength(3);
     expect(band).toHaveClass('lit');
     fireEvent.mouseLeave(band);
@@ -280,8 +374,9 @@ describe('MoneyView', () => {
     for (const b of container.querySelectorAll('.mn-band')) if (b !== others) fireEvent.click(b);
     expect(screen.getByText('Traced so far').parentElement).toHaveTextContent(`€${top20.toLocaleString('en-GB')}`);
     // A party's label keeps its exact total even when some of its flows are folded away: Payer 20 pays
-    // Payee 50 €12,000 (drawn) and Payee 20 €9,000 (folded).
-    expect([...container.querySelectorAll('.mn-node-name')].map(t => t.textContent)).toContain('Payer 20€21,000 · 5 payments');
+    // Payee 50 €12,000 (drawn) and Payee 20 €9,000 (folded). The picture is dense, so the count waits on the label.
+    const label = [...container.querySelectorAll('.mn-node-name')].find(t => t.textContent === 'Payer 20')!;
+    expect(label.parentElement!.textContent).toContain('Payer 20€21,000');
     fireEvent.click(others);
     expect(container.querySelectorAll('.mn-band')).toHaveLength(61);
     expect(screen.getByText(/All 61 flows are drawn/)).toBeInTheDocument();
@@ -317,12 +412,36 @@ describe('MoneyView', () => {
     const {container} = wrap(<MoneyView investigationId="inv-1"/>);
     await screen.findByText(/each just under the €10,000 line/);
     const row = [...container.querySelectorAll('tr')].find(r => r.textContent?.includes('Loop Two BV'));
-    expect(row).toHaveTextContent('01 Mar 2021 to Jun 2021');
+    expect(row).toHaveTextContent('1 Mar 2021 to Jun 2021');
+  });
+
+  it('shows a payment known only by its end date as "by" that date', async () => {
+    const ended = {...LEDGER, transactions: LEDGER.transactions.map(t => t.id === 'p5' ? {...t, dateTime: null, dateEnd: '2021-06'} : t)};
+    mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': ended});
+    const {container} = wrap(<MoneyView investigationId="inv-1"/>);
+    await screen.findByText(/each just under the €10,000 line/);
+    await waitFor(() => expect([...container.querySelectorAll('tr')].find(r => r.textContent?.includes('Loop Two BV'))).toHaveTextContent('by Jun 2021'));
   });
 
   it('shows the reason when the ledger cannot be read', async () => {
     mockApi({...routes, 'GET /api/investigations/inv-1/financial-flows': {status: 500, body: {detail: 'ledger unavailable'}}});
     wrap(<MoneyView investigationId="inv-1"/>);
     expect(await screen.findByText(/ledger unavailable/)).toBeInTheDocument();
+  });
+});
+
+describe('a dense picture says less at rest', () => {
+  const pay = (i: number, from: string, to: string, amount: number): Payment => ({id: `p${i}`, from, to, fromId: from, toId: to, amount,
+    date: `2012-0${1 + (i % 9)}-01`, certainty: 'shown', purpose: null, locator: `page ${i}`});
+  it('names a middle party alone and a source with its total; a sparse one keeps every sum', () => {
+    const chain = [pay(1, 'A', 'B', 9e6), pay(2, 'B', 'C', 8e6), pay(3, 'C', 'D', 7e6)];
+    const sparse = layout(chain, 'USD');
+    const middle = (pic: ReturnType<typeof layout>, quiet?: boolean) => placeLabels(pic, chain, 'USD', quiet).labels.find(l => l.nodeId === 'B')!;
+    expect(middle(sparse).lines.some(l => l.kind === 'sum')).toBe(true);
+    expect(middle(sparse, true).lines.map(l => l.kind)).toEqual(['name']);
+    const many = Array.from({length: 9}, (_, i) => pay(10 + i, `S${i}`, `T${i}`, (i + 1) * 1e6));
+    const dense = layout(many, 'USD');
+    const source = placeLabels(dense, many, 'USD').labels.find(l => l.nodeId === 'S3')!;
+    expect(source.lines).toEqual([{text: 'S3', kind: 'name'}, {text: '$4,000,000', kind: 'sum'}]);
   });
 });

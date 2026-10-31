@@ -9,6 +9,7 @@ import {useQuery} from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import type {ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {getOwnershipChainOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {OwnershipChainOut} from '../../lib/generated/types.gen';
@@ -59,7 +60,7 @@ export function OwnershipChain({entityId, onParty}: Props): ReactElement {
     <OwnershipDiagram chain={chain} onParty={onParty}/>
     {chain.owners.length > 0 && <div style={{padding: '4px 16px 14px'}}>
       <table className="oc-table" aria-label="Owners and their shares">
-        <thead><tr><th scope="col">Owner</th><th scope="col">Holds</th><th scope="col">Paths</th></tr></thead>
+        <thead><tr><th scope="col">Owner</th><th scope="col"><Reveal detail="A share through several companies is the percentages multiplied along each path and added over the paths (HMRC MTT17040). It is worked out only when every link on the way states a percentage, none has ended and none runs in a circle.">Holds</Reveal></th><th scope="col">Paths</th></tr></thead>
         <tbody>
           {chain.owners.map(o => <tr key={o.entity_id}>
             <th scope="row">{chain.nodes.find(n => n.id === o.entity_id)?.caption ?? o.entity_id}</th>
@@ -68,9 +69,8 @@ export function OwnershipChain({entityId, onParty}: Props): ReactElement {
           </tr>)}
         </tbody>
       </table>
-      <p className="text-xs" style={{color: SWATCH.tan, marginTop: 8}}>A share through several companies is the percentages multiplied along each path and added over the paths
-        (HMRC MTT17040). It is worked out only when every link on the way states a percentage, none has ended and none runs in a circle.
-        It is equity arithmetic, not a finding of control or beneficial ownership.</p>
+      {/* How a share is worked out is on hover of "Holds"; that it is arithmetic, not a finding, stays on screen. */}
+      <p className="text-xs" style={{color: SWATCH.tan, marginTop: 8}}><b aria-hidden="true">ƒ </b>Equity arithmetic, not a finding of control or beneficial ownership.</p>
     </div>}
   </ChartFrame>;
 }

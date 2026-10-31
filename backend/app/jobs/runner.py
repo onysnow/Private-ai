@@ -21,11 +21,11 @@ import logging
 from datetime import timedelta
 from typing import Any
 
-from sqlalchemy import Engine
+from sqlalchemy import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.concurrency import run_in_threadpool
 
-from app.db.session import build_session_factory
+from app.db.session import build_session_factory, own_connection
 from app.jobs import corpus as corpus_jobs
 from app.jobs.handlers import HANDLERS
 from app.jobs import recovery
@@ -209,9 +209,14 @@ class JobRunner:
         while True:
             await asyncio.sleep(TICK_SECONDS)
             try:
-                await run_in_threadpool(scheduler_tick, self.session_factory)
+                await run_in_threadpool(self._tick_inline)
             except Exception:
                 logger.warning("the scheduler tick failed", exc_info=True)
+
+    def _tick_inline(self) -> None:
+        """The timed work, on a connection of its own for the same reason as _run_inline."""
+        with own_connection(self.engine) as engine:
+            scheduler_tick(build_session_factory(engine))
 
     async def _watch_stalled(self) -> None:
         while True:
@@ -224,8 +229,7 @@ class JobRunner:
         returns when it has finished, on the same database as ``db`` (the
         request's session) when given. Procrastinate: queues it and returns."""
         if self.mode == "inline":
-            factory = build_session_factory(db.get_bind()) if db is not None else self.session_factory  # type: ignore[arg-type]
-            await run_in_threadpool(execute_job, factory, job.id, self.handlers)
+            await run_in_threadpool(self._run_inline, job.id, db.get_bind() if db is not None else self.engine)
             return
         queue_job_id = await self._task.defer_async(job_id=job.id)
         with self.session_factory() as db:
@@ -233,6 +237,13 @@ class JobRunner:
             if row is not None:
                 row.queue_job_id = queue_job_id
                 db.commit()
+
+    def _run_inline(self, job_id: str, bind: Engine | Connection) -> None:
+        """Run a job in this thread on a connection of its own (own_connection): on SQLite the
+        requests the server answers meanwhile share one connection, and a request ending
+        would otherwise roll back the job's half-done writes."""
+        with own_connection(bind) as engine:
+            execute_job(build_session_factory(engine), job_id, self.handlers)
 
     async def cancel(self, job: BackgroundJob) -> None:
         """Withdraw a queued job from Procrastinate (the row is marked

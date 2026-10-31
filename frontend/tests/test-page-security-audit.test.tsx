@@ -133,7 +133,7 @@ describe('Home security audit metadata', () => {
     await screen.findByText('Loaded 1 of 150 security event(s).');
 
     expect(
-      screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · this computer · opened a page of the app · ✓ allowed$/.test(node?.textContent ?? ''), {
+      screen.getByText((_, node) => /^✓ opened a page of the app2026-09-2\d \d\d:\d\d · this computer · allowed$/.test(node?.textContent ?? ''), {
         selector: 'small',
       }),
     ).toBeInTheDocument();
@@ -172,12 +172,12 @@ describe('Home security audit metadata', () => {
 
     await screen.findByText('Showing 2 of 150 matching event(s).');
     expect(
-      screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · this computer · opened a page of the app · ✓ allowed$/.test(node?.textContent ?? ''), {
+      screen.getByText((_, node) => /^✓ opened a page of the app2026-09-2\d \d\d:\d\d · this computer · allowed$/.test(node?.textContent ?? ''), {
         selector: 'small',
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText((_, node) => /^2026-09-2\d \d\d:\d\d · another device.* · opened a page of the app · ✕ refused$/.test(node?.textContent ?? ''), {
+      screen.getByText((_, node) => /^✕ opened a page of the app2026-09-2\d \d\d:\d\d · another device.* · refused$/.test(node?.textContent ?? ''), {
         selector: 'small',
       }),
     ).toBeInTheDocument();
@@ -244,7 +244,7 @@ describe('Home security audit metadata', () => {
     // audit list + summary.
     expect(screen.getByPlaceholderText('Type PRUNE SECURITY AUDIT')).toHaveValue('');
     expect(
-      screen.getByText((_, node) => node?.textContent === '100 valid event(s) · 90 local · 10 remote · 0 malformed retained'),
+      screen.getByText((_, node) => node?.textContent === '100 valid event(s) · 90 local · 10 remote · 0 malformed retained', {selector: 'small'}),
     ).toBeInTheDocument();
     expect(api.calls(AUDIT)).toHaveLength(1);
     expect(api.calls(SUMMARY)).toHaveLength(1);

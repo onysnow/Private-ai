@@ -59,6 +59,6 @@ describe('API times on screen', () => {
     await userEvent.setup().click(screen.getByRole('button', {name: 'History'}));
     const history = await screen.findByRole('list', {name: 'Every drop, newest first'});
     // 02:30 UTC on the 14th is 22:30 on the 13th in New York.
-    expect(within(history).getByText('13 Oct, 22:30')).toBeInTheDocument();
+    expect(within(history).getByText('13 Oct 2026, 22:30')).toBeInTheDocument();
   });
 });

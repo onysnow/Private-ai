@@ -9,20 +9,21 @@
 // (4) records the human accept/reject decision. Kept out of app/page.tsx so
 // the flow can be rendered and tested on its own (STRUCT-0015 remainder).
 import {useCallback,useEffect,useRef,useState} from 'react';
-import type {ChangeEvent,ReactElement} from 'react';
+import type {ChangeEvent,ReactElement,ReactNode} from 'react';
 
 import type {AiAnalysisCandidate,AiAnalysisCandidateSummary,AiModuleName,AiReasoningStatus,BackgroundJob,DeckStyle,JsonObject,JsonValue,PresentationStyleCatalog,VisualStyle} from '../lib/api-types';
 import {ApiPayloadError,isAiAnalysisCandidate,isAiAnalysisCandidateReview,isAiReasoningRunResult,isBackgroundJob,isDeck,isPresentationStyleCatalog,isWriteup,parseAiAnalysisCandidateList} from '../lib/api-validate';
 import {ApiClient,ApiHttpError,errorMessage} from '../lib/api-client';
 import type {ChartRestyleOut} from '../lib/generated/types.gen';
-import {shortStamp} from '../lib/timestamps';
+import {timeWords} from '../lib/timestamps';
 import {getAiAnalysisCandidateEndpoint,investigationVisualRestyle,listInvestigationAiAnalysisCandidates,presentationStyles,
   promoteAiAnalysisCandidateToDeckEndpoint,promoteAiAnalysisCandidateToWriteupEndpoint,reviewAiAnalysisCandidateEndpoint} from '../lib/generated/sdk.gen';
 import type {ChartRestyleRequest} from '../lib/generated/types.gen';
 import {narrowed} from '../lib/narrow';
 import {describeJob,waitForJob} from '../lib/jobs';
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Reveal} from '@/components/ui/reveal';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -36,7 +37,9 @@ import type {TraceHandler} from './presentation/draft-preview';
 
 // onTraceRecord: opens the page's provenance drawer for a cited record (an
 // evidence chip in a presentation draft's preview).
-type Props={api:ApiClient,investigationId:string,status:AiReasoningStatus|null|undefined,onTraceRecord?:TraceHandler};
+type Props={api:ApiClient,investigationId:string,status:AiReasoningStatus|null|undefined,onTraceRecord?:TraceHandler,
+  /** Drawn beside the empty state, to fill it (the workbench passes the case's claims a draft could test). */
+  emptyAside?:ReactNode};
 
 const MODULE_LABEL:Record<AiModuleName,string>={case_synthesis:'Case synthesis (TAS module 08)',hypothesis_test:'Hypothesis & contradiction test (TAS module 06)',presentation_draft:'Presentation draft (brief/deck from picked evidence)',
   research_vetting:'Research vetting (RAS modules 03 and 04)',quant_framing:'Rival explanations (QAS modules 01 and 03)',las_argument_check:'Logic check (LAS modules 01 and 02)',
@@ -95,6 +98,12 @@ const sideText=(v:JsonValue|undefined):string=>{const o=asObj(v);return o?`${asS
 export const whereModelRuns=(status:AiReasoningStatus):string=>status.runs_on_this_computer===true?' (runs on this computer)':status.runs_on_this_computer===false?' (runs on the provider\'s servers)':'';
 const whereItRuns=whereModelRuns;
 
+/** Supporting and contradicting evidence as counts (✓ 2 · ✕ 0); the record labels are revealed on them. */
+function StanceCounts({supports,contradicts,more=''}:{supports:string[];contradicts:string[];more?:string}):ReactElement{
+  return <Reveal detail={`Supports: ${supports.join(', ')||'none'} · Contradicts: ${contradicts.join(', ')||'none'}${more}`}>
+    <small>✓ {supports.length} · ✕ {contradicts.length}</small></Reveal>;
+}
+
 export function describeAiStatus(status:AiReasoningStatus|null|undefined):string{
   if(!status)return 'AI reasoning status unavailable from this backend.';
   if(!status.enabled)return 'AI reasoning is disabled on this deployment (ENABLE_AI_FEATURES is off). The core workbench does not need it.';
@@ -108,7 +117,16 @@ export function describeAiStatus(status:AiReasoningStatus|null|undefined):string
   return `Ready: provider ${status.provider}${status.model?`, model ${status.model}`:''}${whereItRuns(status)}, Authority System Suite (TAS v${suite.tas_version||'?'}).`;
 }
 
-export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Props):ReactElement{
+/** The AI's state in two words, for the panel's status mark; the full sentence (describeAiStatus) is revealed on it.
+ *  Null when the state needs its sentence on screen (a suite file missing: something to fix in the suite). */
+export function aiStateWord(status:AiReasoningStatus|null|undefined):string|null{
+  if(!status)return 'AI state unknown';
+  if(!status.enabled)return 'AI is off';
+  if(!status.provider||!status.provider_key_configured)return 'No model chosen';
+  return null;
+}
+
+export function AiReasoningPanel({api,investigationId,status,onTraceRecord,emptyAside}:Props):ReactElement{
   const [module,setModule]=useState<AiModuleName>('case_synthesis');
   const [question,setQuestion]=useState('');
   const [theory,setTheory]=useState('');
@@ -292,11 +310,22 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
   const replies=asArr(payload?.right_of_reply_needed);
   const isPresentationDraft=selected?.module==='presentation_draft';
 
-  return <Card className="card" data-testid="ai-reasoning-panel"><CardHeader className="pb-3"><CardTitle>AI reasoning &amp; presentations</CardTitle>
-    <CardDescription>Bounded reasoning over this investigation&apos;s own evidence, and briefs or decks drafted from evidence you pick. Every run is checked for invented citations and a malformed shape, then parked in a review queue. Accepting marks it as trusted analysis for reporters; it never creates or edits a canonical record.</CardDescription>
-    <p className="muted text-sm" data-testid="ai-status">{describeAiStatus(status)}</p></CardHeader><CardContent>
+  // The panel's explanation is revealed on its title. The AI's state is the AI mark with its sentence on reveal: lit when
+  // ready, hollow and grey when off or with no model chosen (a calm state, DECISIONS_LOG 27, as on AI runs), with
+  // Settings beside it. Any other state (a missing suite file) blocks a run and stays written out.
+  const aiStatus=describeAiStatus(status);
+  const offWord=aiStateWord(status);
+  const empty=Boolean(investigationId)&&!queue.length&&!queueStatus&&filter==='all'&&!selected;
+  return <Card className="card" data-testid="ai-reasoning-panel"><CardHeader className="pb-3"><CardTitle>
+    <Reveal detail="Bounded reasoning over this investigation’s own evidence, and briefs or decks drafted from evidence you pick. Every run is checked for invented citations and a malformed shape, then parked in a review queue. Accepting marks it as trusted analysis for reporters; it never creates or edits a canonical record.">
+      <span>AI reasoning &amp; presentations</span></Reveal></CardTitle>
+    <p className="muted text-sm" data-testid="ai-status">{aiStatus.startsWith('Ready:')?<Reveal label="AI ready" detail={aiStatus}><span className="ai-notice" aria-hidden="true">AI ✓</span></Reveal>
+      :offWord?<span className="ai-drafts-off"><Reveal label={offWord} detail={<><b>{offWord}</b> · nothing runs or leaves this computer; drafts already made stay here to review.<span className="rv-row">{aiStatus}</span></>}>
+          <span className="ai-notice ai-notice-off" aria-hidden="true">AI</span></Reveal>
+        <Reveal tabbable={false} detail="Turn AI on in Settings › AI and research"><a href="/settings#ai" className="ai-drafts-settings" aria-label="Settings › AI and research">Settings ›</a></Reveal></span>
+      :aiStatus}</p></CardHeader><CardContent>
     {!investigationId?<p className="muted">Select an investigation to run or review AI analysis.</p>:<>
-      <div className="searchrow">
+      {anyCallable&&<><div className="searchrow">
         <Select value={module} onValueChange={(v:string)=>setModule(v as AiModuleName)} disabled={!anyCallable||running}><SelectTrigger aria-label="Reasoning module" className="w-auto"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="case_synthesis">Case synthesis</SelectItem><SelectItem value="hypothesis_test">Hypothesis test</SelectItem><SelectItem value="presentation_draft">Presentation draft</SelectItem></SelectContent></Select>
         {module!=='presentation_draft'&&<>
           <Input aria-label="Question" value={question} onChange={(e:ChangeEvent<HTMLInputElement>)=>setQuestion(e.target.value)} placeholder="What does the evidence establish about …?" disabled={!callable||running} className="min-w-[12rem] flex-1"/>
@@ -309,21 +338,33 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
       {module==='presentation_draft'&&<div className="mt-3 space-y-3">
         <Textarea aria-label="Goal" value={goal} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setGoal(e.target.value)} rows={2} placeholder="What should this brief or deck accomplish? e.g. “Brief my editor on what we can and can’t say about the Bellcastle payment.”" disabled={!callable||running}/>
         <RecordPicker investigationId={investigationId} selected={selectedRefs} onChange={setSelectedRefs} disabled={!callable||running}/>
-      </div>}
+      </div>}</>}
       {runStatus&&<p className="muted" data-testid="ai-run-status">{runStatus}</p>}
-      <div className="twocol" style={isPresentationDraft?{gridTemplateColumns:'minmax(220px,0.55fr) minmax(0,2fr)'}:undefined}>
+      {empty?<div className="ai-drafts-empty">
+        <section className="ai-drafts-what" aria-label="What a draft is">
+          <p className="ai-drafts-empty-head">No drafts yet</p>
+          {/* What a draft is, as its path: each step a mark with one word, what happens there on reveal. */}
+          <ol className="ai-drafts-flow">
+            <li><Reveal detail="You ask a question in Ask the case, and see what the run will read and send before it starts."><span><i aria-hidden="true">?</i><b>Ask</b></span></Reveal></li>
+            <li><Reveal detail="The answer lands here as a draft. Every citation is checked against the case’s records, and an answer that invents one is turned away."><span><i className="ai-notice" aria-hidden="true">AI</i><b>Draft</b></span></Reveal></li>
+            <li><Reveal detail="You read it with its citations and accept or reject it. Nothing joins the case until you accept it, and accepting never edits a record."><span><i aria-hidden="true">✓</i><b>You decide</b></span></Reveal></li>
+          </ol>
+          <a href="#ai-runs" className="ai-drafts-ask">Ask the case</a>
+        </section>
+        {emptyAside}
+      </div>:<div className="twocol" style={isPresentationDraft?{gridTemplateColumns:'minmax(220px,0.55fr) minmax(0,2fr)'}:undefined}>
         <div>
-          <div className="searchrow"><b>Review queue</b><select aria-label="Queue filter" className="h-8 rounded-md border border-input bg-transparent px-2 text-sm text-foreground" value={filter} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setFilter(e.target.value as typeof filter)}><option value="all">all</option><option value="proposed">proposed</option><option value="accepted">accepted</option><option value="rejected">rejected</option></select><Button size="sm" variant="outline" onClick={()=>void loadQueue()}>Refresh</Button></div>
+          {(queue.length>0||filter!=='all'||queueStatus)&&<div className="searchrow"><b>Review queue</b><select aria-label="Queue filter" className="h-8 rounded-md border border-input bg-transparent px-2 text-sm text-foreground" value={filter} onChange={(e:ChangeEvent<HTMLSelectElement>)=>setFilter(e.target.value as typeof filter)}><option value="all">all</option><option value="proposed">proposed</option><option value="accepted">accepted</option><option value="rejected">rejected</option></select><Button size="sm" variant="outline" onClick={()=>void loadQueue()}>Refresh</Button></div>}
           {queueStatus&&<p className="muted">{queueStatus}</p>}
-          {!queue.length&&!queueStatus&&<p className="muted">No AI analysis candidates yet for this investigation.</p>}
-          {queue.map(c=><div className="candidate" key={c.id} style={selected?.id===c.id?{outline:'2px solid hsl(var(--primary))',outlineOffset:2}:undefined} aria-current={selected?.id===c.id?'true':undefined}><b>{moduleLabel(c.module)}</b> <small>{c.review_status} · {c.checked_citation_count} citation(s) checked · {shortStamp(c.created_at)}</small>
+          {!queue.length&&!queueStatus&&filter!=='all'&&<p className="muted">No {filter} drafts.</p>}
+          {queue.map(c=><div className="candidate" key={c.id} style={selected?.id===c.id?{outline:'2px solid hsl(var(--primary))',outlineOffset:2}:undefined} aria-current={selected?.id===c.id?'true':undefined}><Reveal detail={`${c.checked_citation_count} citation(s) checked · ${timeWords(c.created_at)}`}><b>{moduleLabel(c.module)}</b></Reveal> <small>{c.review_status}</small>
             <div>{asStr(c.request.question??'')||<i>no question recorded</i>}</div>
             {c.reviewer_note&&<small>{c.reviewer_note}</small>}
             <div className="actions"><Button size="sm" variant="outline" onClick={()=>{setReviewStatus('');setNote('');void open(c.id)}}>Open</Button></div>
           </div>)}
         </div>
         <div>
-          {!selected?<p className="muted">Open a candidate to read its claims and citations.</p>:<div data-testid="ai-candidate-detail">
+          {!selected?(queue.length?<p className="muted">Open a draft to read its claims and citations.</p>:null):<div data-testid="ai-candidate-detail">
             <h2 style={{fontSize:20}}>{moduleLabel(selected.module)} · {selected.review_status}</h2>
             <div className="muted"><b>{isPresentationDraft?'Goal:':'Question:'}</b> {asStr(selected.request.question??'')}{selected.request.working_theory?<><br/><b>Working theory:</b> {asStr(selected.request.working_theory)}</>:null}</div>
             {payload&&'executive_summary' in payload&&<p><b>Summary:</b> {asStr(payload.executive_summary)}</p>}
@@ -336,32 +377,34 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
                 chartLooks={chartLooks} chartProblems={chartProblems}/>
             </div>}
             {claims.map((raw,i)=>{const cl=asObj(raw);if(!cl)return null;return <div className="candidate" key={asStr(cl.claim_id)||String(i)}>
-              <b>{asStr(cl.claim_id)||`Claim ${i+1}`}</b> <small>{words(cl.classification)} · {cl.confidence_term?`${words(cl.confidence_term)} · `:''}confidence {words(cl.confidence)}</small>
+              <Reveal detail={`${words(cl.classification)} · ${cl.confidence_term?`${words(cl.confidence_term)} · `:''}confidence ${words(cl.confidence)}`}><b>{asStr(cl.claim_id)||`Claim ${i+1}`}</b></Reveal>
               <div>{asStr(cl.claim)}</div>
               {asStr(cl.warrant)&&<div><b>Warrant:</b> {asStr(cl.warrant)}</div>}
               {asStr(cl.confidence_basis)&&<div><b>Why this confidence:</b> {asStr(cl.confidence_basis)}</div>}
-              <small>Supports: {asArr(cl.supporting_evidence).map(refLabel).join(', ')||'none'} · Contradicts: {asArr(cl.contradicting_evidence).map(refLabel).join(', ')||'none'}</small>
+              <StanceCounts supports={asArr(cl.supporting_evidence).map(refLabel)} contradicts={asArr(cl.contradicting_evidence).map(refLabel)}/>
             </div>})}
             {hypotheses.map((raw,i)=>{const h=asObj(raw);if(!h)return null;return <div className="candidate" key={asStr(h.hypothesis_id)||String(i)}>
-              <b>{asStr(h.hypothesis_id)||`Hypothesis ${i+1}`}</b> <small>{[h.kind?words(h.kind):'',typeof h.viable==='boolean'?(h.viable?'still viable':'no longer viable'):'',asStr(h.diagnostic_value)].filter(Boolean).join(' · ')}</small>
+              <Reveal detail={[h.kind?words(h.kind):'',typeof h.viable==='boolean'?(h.viable?'still viable':'no longer viable'):'',asStr(h.diagnostic_value)].filter(Boolean).join(' · ')}><b>{asStr(h.hypothesis_id)||`Hypothesis ${i+1}`}</b></Reveal>
+              {typeof h.viable==='boolean'&&<span aria-hidden="true" className={h.viable?'text-[var(--status-supported)]':'text-muted-foreground'}> {h.viable?'●':'○'}</span>}
               <div>{asStr(h.hypothesis)}</div>
               {asStr(h.assessment)&&<div><b>Assessment:</b> {asStr(h.assessment)}</div>}
               {asArr(h.falsifiers).length>0&&<div><b>Falsifiers:</b> {asArr(h.falsifiers).map(asStr).join(' · ')}</div>}
               {asArr(h.missing_records).length>0&&<div><b>Missing records:</b> {asArr(h.missing_records).map(asStr).join(' · ')}</div>}
-              <small>Supports: {refs(h.supporting_evidence)} · Contradicts: {refs(h.contradicting_evidence)}{asArr(h.ambiguous_evidence).length?` · Ambiguous: ${refs(h.ambiguous_evidence)}`:''}{asArr(h.non_diagnostic_evidence).length?` · Fits every hypothesis (not counted): ${refs(h.non_diagnostic_evidence)}`:''}</small>
+              <StanceCounts supports={asArr(h.supporting_evidence).map(refLabel)} contradicts={asArr(h.contradicting_evidence).map(refLabel)}
+                more={`${asArr(h.ambiguous_evidence).length?` · Ambiguous: ${refs(h.ambiguous_evidence)}`:''}${asArr(h.non_diagnostic_evidence).length?` · Fits every hypothesis (not counted): ${refs(h.non_diagnostic_evidence)}`:''}`}/>
             </div>})}
             {conflicts.map((raw,i)=>{const c=asObj(raw);if(!c)return null;return <div className="candidate" key={asStr(c.conflict_id)||String(i)}>
-              <b>{asStr(c.conflict_id)||`Conflict ${i+1}`}</b> <small>{words(c.conflict_type)} · {'resolution' in c?(c.resolution===null?'open':asStr(c.resolution)):asStr(c.resolution_status)}</small>
+              <Reveal detail={`${words(c.conflict_type)} · ${'resolution' in c?(c.resolution===null?'open':asStr(c.resolution)):asStr(c.resolution_status)}`}><b>{asStr(c.conflict_id)||`Conflict ${i+1}`}</b></Reveal>
               <div>A: {sideText(c.statement_a)}</div><div>B: {sideText(c.statement_b)}</div>
               {asStr(c.same_proposition_basis)&&<small>Same proposition? {asStr(c.same_proposition_basis)}</small>}
               {asArr(c.evidence).length>0&&<small>Evidence: {refs(c.evidence)}</small>}
             </div>})}
             {payload&&'conclusion' in payload&&<p><b>Conclusion:</b> {asStr(payload.conclusion)}</p>}
             {payload&&asStr(payload.most_likely_failure)&&<p><b>Most likely way this is wrong:</b> {asStr(payload.most_likely_failure)}</p>}
-            {replies.length>0&&<div data-testid="right-of-reply"><b>Right of reply needed before publishing:</b><ul>{replies.map((raw,i)=>{const r=asObj(raw);if(!r)return null;
+            {replies.length>0&&<div data-testid="right-of-reply"><Reveal detail="A person makes the approach and records the answer; the AI never does."><b>Right of reply needed before publishing:</b></Reveal><ul>{replies.map((raw,i)=>{const r=asObj(raw);if(!r)return null;
               return <li key={i}>{asStr(r.subject)} · on {asArr(r.claim_ids).map(asStr).join(', ')||'—'}{asStr(r.what_will_be_said)?`: ${asStr(r.what_will_be_said)}`:''}
                 {asArr(r.draft_questions).length>0&&<div><small>Questions a person could ask: {asArr(r.draft_questions).map(asStr).join(' · ')}</small></div>}</li>})}</ul>
-              <small className="muted">A person makes the approach and records the answer; the AI never does.</small></div>}
+              </div>}
             {gaps.length>0&&<div><b>Investigative gaps:</b><ul>{gaps.map((g,i)=><li key={i}>{gapText(g)}</li>)}</ul></div>}
             <details><summary className="muted">Checked against {selected.checked_citation_ids.length} citation id(s) · raw payload</summary><pre style={{whiteSpace:'pre-wrap',fontSize:12}}>{JSON.stringify(payload,null,2)}</pre></details>
             {selected.trace&&<details data-testid="ai-trace"><summary className="muted">What the model was sent · {asStr(selected.trace.response&&asObj(selected.trace.response)?.model)}{selected.trace.response&&asObj(selected.trace.response)?.truncated?' · truncated':''}</summary>
@@ -371,11 +414,10 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
             {selected.review_status==='proposed'?<>
               <Textarea className="mt-3" aria-label="Reviewer note" value={note} onChange={(e:ChangeEvent<HTMLTextAreaElement>)=>setNote(e.target.value)} placeholder="Reviewer note (why this is or is not trustworthy)."/>
               <div className="actions"><Button onClick={()=>void review('accept')}>Accept as trusted analysis</Button><Button variant="outline" onClick={()=>void review('reject')}>Reject</Button></div>
-            </>:<p className="muted">Reviewed {selected.reviewed_at?shortStamp(selected.reviewed_at):''}{selected.reviewer_note?` · ${selected.reviewer_note}`:''}</p>}
+            </>:<p className="muted">Reviewed {selected.reviewed_at?timeWords(selected.reviewed_at):''}{selected.reviewer_note?` · ${selected.reviewer_note}`:''}</p>}
             {reviewStatus&&<p className="muted" data-testid="ai-review-status">{reviewStatus}</p>}
             {isPresentationDraft&&selected.review_status==='accepted'&&<div className="mt-4 rounded-lg border border-border bg-card p-4" data-testid="promote-panel">
-              <div className="text-sm font-semibold text-foreground">Make it a document or a deck</div>
-              <p className="mt-0.5 text-xs text-muted-foreground">Creates an editable write-up or deck from this reviewed draft. You can do both, more than once.</p>
+              <div className="text-sm font-semibold text-foreground"><Reveal detail="Creates an editable write-up or deck from this reviewed draft. You can do both, more than once."><span>Make it a document or a deck</span></Reveal></div>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Input aria-label="Promoted title" value={promoteTitle} onChange={(e:ChangeEvent<HTMLInputElement>)=>setPromoteTitle(e.target.value)} placeholder={asStr(payload?.title)||'Title (optional — defaults to the draft title)'} className="min-w-[14rem] flex-1"/>
                 <Button type="button" size="sm" onClick={()=>void promote('writeup')}><FileText className="mr-1.5 h-4 w-4"/>Promote to write-up</Button>
@@ -390,7 +432,7 @@ export function AiReasoningPanel({api,investigationId,status,onTraceRecord}:Prop
             </div>}
           </div>}
         </div>
-      </div>
+      </div>}
     </>}
   </CardContent></Card>;
 }

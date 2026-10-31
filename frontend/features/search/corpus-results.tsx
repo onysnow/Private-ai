@@ -8,7 +8,10 @@
 import {useQuery} from '@tanstack/react-query';
 import type {ReactElement} from 'react';
 
+import {FileText} from 'lucide-react';
+
 import {Button} from '@/components/ui/button';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {searchInvestigationCorpusOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {HighlightSegmentOut} from '../../lib/generated/types.gen';
@@ -39,11 +42,12 @@ export function CorpusResults({investigationId, q}: Props): ReactElement | null 
     {found?.results.map(hit => {
       const documentId = hit.document_id;
       return <div className="candidate" key={hit.openaleph_entity_id}>
-        <b>{hit.filename || hit.title}</b> <small>{hit.page_number ? `page ${hit.page_number} · ` : ''}{hit.schema}</small>
+        {/* The document's kind is its icon, the page and the kind on hover (Ony, 29 Oct). */}
+        <Reveal label={hit.schema} detail={`${hit.page_number ? `page ${hit.page_number} · ` : ''}${hit.schema}`}><FileText size={14} aria-hidden="true"/></Reveal> <b>{hit.filename || hit.title}</b>
         {hit.highlights.map((pieces, index) => <Snippet key={index} pieces={pieces}/>)}
         {documentId
           ? <Button onClick={() => openDocument(documentId, hit.page_number)}>Open document</Button>
-          : <small>In OpenAleph, not uploaded to this investigation.</small>}
+          : <Reveal label="Only in OpenAleph" detail="In OpenAleph, not uploaded to this investigation."><span className="km-more" aria-hidden="true">↗ OpenAleph</span></Reveal>}
       </div>;
     })}
   </div>;

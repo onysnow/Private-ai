@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import GlossaryPage from '../app/glossary/page';
-import {ROW_H, filterTerms, letterOf} from '../features/glossary/glossary-screen';
+import {ROW_H, filterTerms, letterOf, termsAround} from '../features/glossary/glossary-screen';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {useWorkbenchStore} from '../lib/workbench-store';
@@ -63,7 +63,36 @@ describe('filterTerms and letters', () => {
   });
 });
 
+describe('the terms around a term', () => {
+  it('finds the terms whose definition names it, and its neighbours in its first area', () => {
+    const ts = [hint('Shell company', 'No operations.', ['BO']), hint('Front', 'Often a shell company, run for another.', ['BO']),
+      hint('Shelling', 'Not the same word as shell company-ish.', ['ML']), hint('Nominee', 'Someone named for another.', ['BO']), hint('Trust', 'An arrangement.', ['TR'])];
+    const r = termsAround('Shell company', ['BO'], ts);
+    expect(r.mentionedIn.map(h => h.term)).toEqual(['Front', 'Shelling']);
+    expect(r.sameArea.map(h => h.term)).toEqual(['Nominee']);
+    expect(termsAround('', [], ts)).toEqual({mentionedIn: [], sameArea: []});
+    // A name that starts with a sign is still found as a whole word.
+    expect(termsAround('#TAPEX', ['KX'], [hint('#TAPEX', 'x', ['KX']), hint('Tag', 'Reports tagged #TAPEX.', ['KX'])]).mentionedIn.map(h => h.term)).toEqual(['Tag']);
+  });
+});
+
 describe('Glossary', () => {
+  it('fills the card with where the term is in the open case and its catalogue entry', async () => {
+    useWorkbenchStore.setState({investigationId: 'inv-1'});
+    const api = mockApi({...routes, 'GET /api/search': {query: 'Nominee', investigation_id: 'inv-1', counts: {party: 1}, returned: 1, total: 1,
+      results: [{id: 'e1', investigation_id: 'inv-1', kind: 'party', group: 'parties', title: 'Harbour Nominees Ltd', snippet: 'a <mark>nominee</mark> director', score: 1, type: 'Company', metadata: {}, provenance: {}}]}});
+    window.history.replaceState(null, '', '/glossary?term=Nominee');
+    render(<GlossaryPage/>);
+    expect(await screen.findByRole('heading', {name: 'In this case · 1'})).toBeInTheDocument();
+    const card = screen.getByRole('article');
+    expect(within(card).getAllByText('Harbour Nominees Ltd').length).toBeGreaterThan(0);
+    expect(api.lastUrl('GET /api/search').searchParams.get('investigation_id')).toBe('inv-1');
+    expect(api.lastUrl('GET /api/search').searchParams.get('q')).toBe('Nominee');
+    // The catalogue's entry: each area, opening it in the Red Flags catalogue.
+    expect(within(card).getByRole('heading', {name: 'In the catalogue'})).toBeInTheDocument();
+    expect(within(card).getByRole('link', {name: 'Hidden ownership and shell companies'})).toHaveAttribute('href', '/learn?area=BO&inv=inv-1');
+  });
+
   it('lists every term (not the first 200) in a windowed list, and the rail jumps to a letter', async () => {
     mockApi(routes);
     render(<GlossaryPage/>);
@@ -96,7 +125,9 @@ describe('Glossary', () => {
     await user.click(within(screen.getByRole('listbox', {name: 'Terms'})).getByRole('option', {name: /Nominee/}));
     const card = await screen.findByRole('article');
     expect(within(card).getByRole('heading', {level: 2, name: 'Nominee'})).toBeInTheDocument();
-    expect(within(card).getByText(/Defined in 2 areas, listed in 3/)).toBeInTheDocument();
+    // How many areas define it is on the area tabs, on hover or focus, not on screen.
+    expect(within(card).getByText(/Defined in 2 areas, listed in 3/).closest('[hidden]')).not.toBeNull();
+    expect(within(card).getByRole('tablist')).toHaveAccessibleDescription('Defined in 2 areas, listed in 3');
     const tabs = await within(card).findAllByRole('tab');
     expect(tabs.map(t => t.textContent)).toEqual(['Hidden ownership and shell companies', 'Money laundering', 'Terrorist financing ○']);
     await user.click(tabs[1]);
@@ -108,6 +139,16 @@ describe('Glossary', () => {
     expect(within(card).getByText('Not a term here').tagName).toBe('SPAN');
     await user.click(screen.getByRole('button', {name: 'Remove Terrorist financing'}));
     expect(window.location.search).not.toContain('area=');
+  });
+
+  it('opens the first term in the card when nothing is pinned, so the card is never empty', async () => {
+    mockApi(routes);
+    render(<GlossaryPage/>);
+    expect(await screen.findByRole('heading', {level: 2, name: hints[0].term})).toBeInTheDocument();
+    expect(screen.getByRole('option', {name: new RegExp(hints[0].term)})).toHaveAttribute('aria-selected', 'true');
+    // A term's areas are their codes, each area named on reveal.
+    expect(screen.getByRole('option', {name: /Nominee/}).querySelector('.kg-areas')).toHaveTextContent('BOMLSF');
+    expect(window.location.search).not.toContain('term=');
   });
 
   it('shows a row in the card after a short dwell, without pinning it', async () => {

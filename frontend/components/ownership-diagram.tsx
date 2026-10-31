@@ -22,6 +22,7 @@ import type {OwnershipChainOut} from '../lib/generated/types.gen';
 import {NODE_HEIGHT, NODE_WIDTH, layoutChain} from '../lib/ownership-layout';
 import {LINK, PARTY, SWATCH, partyKind} from '../lib/viz-tokens';
 import {KIND_ICON} from './network/party-icons';
+import {Reveal} from './ui/reveal';
 
 type PartyData = {caption: string; schema: string; subject: boolean};
 
@@ -37,10 +38,13 @@ function Party({data}: NodeProps<Node<PartyData>>): ReactElement {
   const Icon = KIND_ICON[kind];
   return <>
     <Handle type="target" position={Position.Top} id="in" style={HIDDEN} isConnectable={false}/>
+    {/* The kind is the icon and ring (the network's vocabulary), named on reveal (Ony, 29 Oct); the node's own label
+        reads it to screen readers. Which party the dossier is about stays: it is position, not type. */}
+    <Reveal tabbable={false} describe={false} className="block" detail={<><b>{look.name}</b>{data.schema !== look.name ? <span className="rv-row rv-mono">{data.schema}</span> : null}</>}>
     <div className="oc-party" style={{borderColor: data.subject ? SWATCH.parchment : look.ring, boxShadow: data.subject ? `0 0 0 2px ${SWATCH.card}, 0 0 0 4px ${look.ring}` : undefined}}>
-      <span className="oc-dot" style={{background: look.fill, borderColor: look.ring}}>{Icon && <Icon size={14} color={look.ring} strokeWidth={2.2}/>}</span>
-      <span className="oc-text"><b>{data.caption}</b><small>{data.subject ? `${look.name} · this dossier` : look.name}</small></span>
-    </div>
+      <span className="oc-dot" style={{background: look.fill, borderColor: look.ring}}>{Icon && <Icon size={16} color={look.ring} strokeWidth={2.2}/>}</span>
+      <span className="oc-text"><b>{data.caption}</b>{data.subject && <small>this dossier</small>}</span>
+    </div></Reveal>
     <Handle type="source" position={Position.Bottom} id="out" style={HIDDEN} isConnectable={false}/>
     <Handle type="source" position={Position.Right} id="side-out" style={{...HIDDEN, top: '35%'}} isConnectable={false}/>
     <Handle type="target" position={Position.Right} id="side-in" style={{...HIDDEN, top: '65%'}} isConnectable={false}/>

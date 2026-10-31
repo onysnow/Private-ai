@@ -28,7 +28,9 @@ emails rebuilt word for word from the US filings' quotes (with a .zip and an
 .mbox thread), a Word conversion, the DOJ payments table (mapped to proposals),
 and the records drawn from them: registry values on the parties, places with
 coordinates, payments in five currencies, ranged and disputed dates, graded
-claims, disputed and superseded links, and leads with next actions.
+claims, disputed and superseded links, and leads with next actions. The case
+also follows a few public sources (app/services/demo_following.py), with what
+they turned up already waiting in the Following queue.
 
 Copyrighted material is fetched from its own address at load and never stored
 with the app; files/ holds only public-domain text and pictures and the
@@ -351,11 +353,16 @@ def build(db: Session, documents: list[tuple[dict[str, Any], bytes | None]], *, 
         mime = "text/html" if meta["filename"].endswith(".html") else "application/pdf"
         doc = store_document(db, investigation_id=inv.id, title=meta["title"], filename=meta["filename"], mime_type=mime, data=data,
                              storage_dir=storage_dir, source_metadata={"url": meta["url"], "publisher": meta["publisher"], "date": meta["date"],
-                                                                       "licence": meta["licence_note"], "demo": "1mdb"})
+                                                                       "licence": meta["licence_note"], "demo": "1mdb",
+                                                                       **{k: meta[k] for k in ("kind", "language") if meta.get(k)}})
         source = db.get(Source, doc.source_id)
         if source is not None:
             source.url = meta["url"]
             source.source_type = meta.get("source_type", "public_record")
+            # The suite's tier (TAS): the record of an authority's own action, or an admission, is a primary official
+            # record (A); a complaint, indictment or affidavit is a party's sworn assertion, testimony to corroborate
+            # (B). So an allegation alone can make a claim Supported but never Confirmed (DECISIONS_LOG, 29 Oct).
+            source.source_tier = "A" if meta.get("admitted") else "B"
         docs[meta["id"]] = doc
         source_ids[meta["id"]] = doc.source_id
     db.commit()
@@ -459,6 +466,27 @@ def build(db: Session, documents: list[tuple[dict[str, Any], bytes | None]], *, 
 
     _build_more(db, inv, docs=docs, source_ids=source_ids, entities=entities, edges=edges, claim_rows=claim_rows, lead_rows=lead_rows,
                 pictures=pictures, evidence=evidence, origin=origin, problems=problems)
+    # The sources the case follows, with what they turned up waiting in the queue (nothing is fetched).
+    from app.services.demo_following import seed_following
+
+    seed_following(db, inv.id)
+    # The story told from the case's own claims, with a short draft citing them (Act › Story).
+    from app.services.demo_story import seed_story
+
+    seed_story(db, inv.id)
+    # One deck made from that story by the app's own "New deck from the story" (Act › Decks).
+    from app.services.demo_deck import seed_deck
+
+    seed_deck(db, inv.id)
+    # Pages the loader brought in, kept again as web captures (Bring in › The Drop › Links & captures; nothing fetched).
+    from app.services.demo_captures import seed_captures
+
+    seed_captures(db, inv.id, storage_dir=storage_dir)
+    # A finished case: what waits in Decide is pre-decided from these records, a few of each kind left to try
+    # (app/services/demo_decided.py; each document's own proposals after it is read).
+    from app.services.demo_decided import after_build
+
+    after_build(db, inv.id)
 
     LAST_PROBLEMS[:] = problems
     if problems:
@@ -630,11 +658,12 @@ def _build_more(db: Session, inv: Investigation, *, docs: dict[str, Document], s
             ev_row.notes = f"{ev_row.notes or ''} {v['note']}".strip()
     db.commit()
 
-    def link(schema: str, source_key: str, target_key: str, props: dict[str, list[str]], quotes: list[dict[str, Any]], note: str | None) -> Any:
+    def link(schema: str, source_key: str, target_key: str, props: dict[str, list[str]], quotes: list[dict[str, Any]], note: str | None,
+             payment_kind: str | None = None) -> Any:
         try:
             edge = create_relationship(db, investigation_id=inv.id, schema=schema, source_entity_id=entities[source_key].id,
                                        target_entity_id=entities[target_key].id, properties=props, dataset="1mdb-demo",
-                                       origin=origin(next((q for q in quotes if "doc" in q), None)))
+                                       origin=origin(next((q for q in quotes if "doc" in q), None)), payment_kind=payment_kind)
         except Exception as exc:
             db.rollback()
             problems.append(f"{schema} {source_key} → {target_key}: {exc}")
@@ -668,7 +697,9 @@ def _build_more(db: Session, inv: Investigation, *, docs: dict[str, Document], s
     # Payments and other links, then the case's own links' further evidence (disputed, superseded).
     by_id: dict[str, Any] = {}
     for r in data["relationships"]:
-        edge = link(r["schema"], r["source"], r["target"], r["properties"], r["evidence"], r.get("note"))
+        # A payment's kind only where the record's own note says it (a fine, a regulator's penalty, a court order, an
+        # agreed price); never guessed from its purpose (DECISIONS_LOG 33).
+        edge = link(r["schema"], r["source"], r["target"], r["properties"], r["evidence"], r.get("note"), r.get("payment_kind"))
         if r.get("id") and edge is not None:
             by_id[r["id"]] = edge
     for item in data["link_evidence"]:

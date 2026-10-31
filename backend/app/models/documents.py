@@ -32,6 +32,16 @@ class Document(Base):
     # The archive or email this file was found in (ADR-0006, Wave A):
     # OpenAleph read the container and the file is one of its children.
     parent_document_id: Mapped[str | None] = mapped_column(ForeignKey("documents.id"), nullable=True, index=True)
+    # What the document is (a court filing, a judgment, an article...) and its language (ISO 639-1), each with how it
+    # was set: reader / source / detected / person, and who or what set it (the tool, or the person's name); a
+    # detection keeps how sure it was, 0-1 (app/services/document_facts.py). None until known.
+    kind: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    kind_set_by: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    kind_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    language: Mapped[str | None] = mapped_column(String(16), nullable=True, index=True)
+    language_set_by: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    language_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    language_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
 
 
 class InvestigationCorpusBinding(Base):
@@ -171,3 +181,25 @@ class TableMapping(Base):
     rows_read: Mapped[int] = mapped_column(default=0)
     entities_proposed: Mapped[int] = mapped_column(default=0)
     links_proposed: Mapped[int] = mapped_column(default=0)
+    # How a proposed mapping reads the cells before the mapping runs (app/services/table_proposals.py); None for a
+    # mapping made by hand, which reads the cells as they are.
+    prepare: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+
+class TableProposalDecision(Base):
+    """What a person decided about the mapping the app proposed for a table (app/services/table_proposals.py):
+    accepted (with the roles as accepted, whether they changed the proposal first, and the mapping it ran) or
+    dismissed. Who decided and when are kept; the proposal itself is worked out from the file whenever it is shown."""
+    __tablename__ = "table_proposal_decisions"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=uid)
+    investigation_id: Mapped[str] = mapped_column(ForeignKey("investigations.id"), index=True)
+    document_id: Mapped[str] = mapped_column(ForeignKey("documents.id"), index=True)
+    sheet: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    decision: Mapped[str] = mapped_column(String(16))          # accepted | dismissed
+    kind: Mapped[str] = mapped_column(String(16))              # payments | parties
+    proposed: Mapped[dict] = mapped_column(JSON, default=dict)  # the proposal as it was shown
+    accepted: Mapped[dict | None] = mapped_column(JSON, nullable=True)   # the proposal as accepted, after any change
+    changed: Mapped[bool] = mapped_column(default=False)
+    mapping_id: Mapped[str | None] = mapped_column(ForeignKey("table_mappings.id"), nullable=True)
+    decided_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    decided_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)

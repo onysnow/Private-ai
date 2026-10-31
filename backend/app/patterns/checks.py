@@ -190,6 +190,20 @@ def _wanted(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...]) ->
     return out
 
 
+def carry_flag_items(db: Session, investigation_id: str, old: str, new: str) -> None:
+    """A flag kept under a new fingerprint (patterns/engine.py, a grouped flag taking over earlier ones) keeps its To
+    check items and the decisions on them."""
+    flag_items = db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id, CheckItem.kind == "checklist",
+                                                    CheckItem.flag_id.is_not(None)))
+    held = {c.fingerprint for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id))}
+    for item in flag_items:
+        if item.fingerprint == _fp("flag", old, item.question or ""):
+            moved = _fp("flag", new, item.question or "")
+            if moved not in held:
+                item.fingerprint = moved
+                held.add(moved)
+
+
 def recompute(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] | None = None) -> None:
     """Brings the case's items up to date: new ones open, ones no longer called
     for are marked gone (decisions kept), ones that come back lose the mark."""
@@ -314,6 +328,7 @@ def serialize_missing(row: CheckItem, names: dict[str, tuple[str, str]]) -> dict
         "id": row.id, "rule": row.indicator_id, "rule_name": rule_name(row.indicator_id), "question": row.question, "record_label": row.excerpt or "",
         "record_type": row.record_type or "", "record_id": row.record_id or "", "blocks": row.blocks or "", "status": row.status, "note": row.note,
         "lead_id": row.lead_id, "decided_at": row.decided_at, "first_seen_at": row.first_seen_at, "gone_at": row.gone_at,
+        "decided_by_id": row.decided_by_id, "decided_by_name": row.decided_by_name,
         "parties": [{"id": p, "name": names.get(p, (p, ""))[0], "schema": names.get(p, ("", "Thing"))[1]} for p in row.parties],
     }
 
@@ -323,6 +338,7 @@ def serialize(row: CheckItem, names: dict[str, tuple[str, str]], indicator_names
     return {
         "id": row.id, "indicator_id": row.indicator_id, "indicator_name": indicator_names.get(row.indicator_id, row.indicator_id),
         "kind": row.kind, "question": row.question, "status": row.status, "note": row.note, "decided_at": row.decided_at,
+        "decided_by_id": row.decided_by_id, "decided_by_name": row.decided_by_name,
         "parties": [{"id": p, "name": names.get(p, (p, ""))[0], "schema": names.get(p, ("", "Thing"))[1]} for p in row.parties],
         "flag_id": row.flag_id,
         "related_flags": sorted({f for p in row.parties for f in flags_on_parties.get(p, [])} - ({row.flag_id} if row.flag_id else set())),

@@ -8,6 +8,8 @@ import {useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 import {z} from 'zod';
 
+import {AiNotice} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormRootError} from '../../components/ui/form';
 import {errorMessage} from '../../lib/api-client';
 import {caseHref} from '../../lib/case-href';
@@ -50,8 +52,10 @@ export function ResearchPane({model, rules}: {model: ReactNode; rules: ReactNode
   }, 'Could not save the defaults.');
 
   return <div className="st-stack">
+    {/* The model and what the AI may start on its own, side by side, so the pane fits the window. */}
+    <div className="ap-two st-ai-top">
     <section className="ap-pane" aria-labelledby="ai-model">
-      <div className="ap-pane-head"><h2 id="ai-model">The model</h2><span>set on the server</span></div>
+      <div className="ap-pane-head"><h2 id="ai-model"><Reveal detail="Set on the server."><span>The model</span></Reveal></h2></div>
       {model}
       <details className="st-details"><summary>Change it</summary>
         <p className="st-hint">The model is set in the server’s environment file, not here: <code>AI_PROVIDER</code>, then <code>OLLAMA_MODEL</code> and <code>OLLAMA_BASE_URL</code> for a model on this computer. A remote model also needs <code>AI_ALLOW_REMOTE_ENDPOINT</code>.</p>
@@ -59,25 +63,28 @@ export function ResearchPane({model, rules}: {model: ReactNode; rules: ReactNode
     </section>
 
     <section className="ap-pane" aria-labelledby="ai-auto">
-      <div className="ap-pane-head"><h2 id="ai-auto">Research without asking</h2><span>what the AI may start on its own</span></div>
+      <div className="ap-pane-head"><h2 id="ai-auto"><Reveal detail="What the AI may start on its own. A question is saved from Before you run, and a case can choose differently there.">
+        <span>Research without asking</span></Reveal></h2>
+        <AiNotice>Whatever is chosen, every result is a proposal: nothing joins the case until you accept it in Decide.</AiNotice></div>
       <div className="st-big" role="radiogroup" aria-label="Research without asking">
-        {MODES.map(m => <button key={m.id} type="button" role="radio" aria-checked={d.mode === m.id} className={d.mode === m.id ? 'on' : ''}
+        {/* What each mode does is revealed on it. */}
+        {MODES.map(m => <Reveal key={m.id} tabbable={false} detail={m.text}><button type="button" role="radio" aria-checked={d.mode === m.id} className={d.mode === m.id ? 'on' : ''}
           disabled={!d.can_change_defaults || save.isPending} onClick={() => d.mode !== m.id && save.mutate({body: {mode: m.id}})}>
-          <b>{m.label}</b><small>{m.text}</small></button>)}
+          <b>{m.label}</b></button></Reveal>)}
       </div>
       {!d.ai_enabled && <p className="st-hint">No model is set up, so nothing is asked or run either way.</p>}
-      <p className="st-hint">Whatever is chosen, every result is a proposal: nothing joins the case until you accept it in Decide. A question is saved from Before you run, and a case can choose differently there.</p>
     </section>
+    </div>
 
     <div className="ap-two">
       <section className="ap-pane" aria-labelledby="ai-def">
-        <div className="ap-pane-head"><h2 id="ai-def">How a run works, for new cases</h2>
+        <div className="ap-pane-head"><h2 id="ai-def"><Reveal detail="A case that has saved its own settings in Before you run keeps them."><span>How a run works, for new cases</span></Reveal></h2>
           <span>{d.defaults_reason ? `“${d.defaults_reason}”` : 'as the suite ships'}</span>
           {changed.length > 0 && <em>{changed.length} changed · save asks why</em>}</div>
         {groups.map(g => <div key={g} className="st-group">
           <p className="st-lab">{g}</p>
           {d.settings.filter(s => s.group === g).map(s => <div key={s.key} className={`st-route${value(s) !== s.case_default ? ' st-changed' : ''}`}>
-            <span className="st-route-what"><b>{s.label}</b><small>{s.help}</small></span>
+            <span className="st-route-what"><Reveal detail={s.help}><b>{s.label}</b></Reveal></span>
             <span className="ap-seg" role="radiogroup" aria-label={s.label}>
               {s.allowed.map(a => <button key={a.value} type="button" role="radio" aria-checked={value(s) === a.value} className={value(s) === a.value ? 'on' : ''}
                 disabled={!d.can_change_defaults} onClick={() => setDraft(x => ({...x, [s.key]: a.value}))}>
@@ -101,16 +108,15 @@ export function ResearchPane({model, rules}: {model: ReactNode; rules: ReactNode
         </Form>}
         {!d.can_change_defaults && <p className="st-hint">Only the owner of this computer or an admin changes these.</p>}
         {save.isError && !changed.length && <p className="st-problem" role="alert">{errorMessage(save.error, 'Could not save that.')}</p>}
-        <p className="st-hint">A case that has saved its own settings in Before you run keeps them.</p>
       </section>
 
       <div className="st-col">
         <section className="ap-pane" aria-labelledby="ai-lock">
           <div className="ap-pane-head"><h2 id="ai-lock">Cannot be turned off</h2></div>
-          <ul className="st-list">{d.locked.map(l => <li key={l.text} className="st-lock"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>{l.text}<small>{l.by}</small></span></li>)}</ul>
+          <ul className="st-list">{d.locked.map(l => <li key={l.text} className="st-lock"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><Reveal detail={l.by}><span>{l.text}</span></Reveal></li>)}</ul>
         </section>
         <section className="ap-pane" aria-labelledby="ai-diff">
-          <div className="ap-pane-head"><h2 id="ai-diff">Cases that run differently</h2><span>only what is different</span></div>
+          <div className="ap-pane-head"><h2 id="ai-diff"><Reveal detail="Only what is different."><span>Cases that run differently</span></Reveal></h2></div>
           {!d.cases.length ? <p className="st-hint">None: every case runs with the defaults.</p>
             : <ul className="st-list">{d.cases.map(c => <li key={c.investigation_id} className="st-route">
               <span className="st-route-what"><b>{c.name}</b><small>{c.differs.join(' · ')}{c.reason ? ` · “${c.reason}”` : ''}</small></span>

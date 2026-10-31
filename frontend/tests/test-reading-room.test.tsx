@@ -25,6 +25,13 @@ const start = TEXT.indexOf('Fernhill Ltd');
 const name = {id: 'x1', investigation_id: 'inv-1', document_id: 'd1', chunk_id: 'c1', candidate_type: 'entity', confidence: 0.9, review_status: 'proposed',
   payload: {caption: 'Fernhill Ltd', suggested_schema: 'Company', span: {start_char: start, end_char: start + 12}, rationale: {rule: 'capitalized_name_sequence'}}, created_at: '2026-10-12T00:00:00'};
 
+/** The passage whose place in the file (its locator, on hover of its ¶ mark) is `locator`. */
+function passageAt(locator: string): HTMLElement {
+  const passage = screen.getAllByText(locator).map(el => el.closest('.rr-para')?.querySelector<HTMLElement>('.rr-passage')).find(Boolean);
+  if (!passage) throw new Error(`No passage at ${locator}`);
+  return passage;
+}
+
 function routes(extra = {}) {
   return mockApi({
     'GET /api/documents/d1': doc,
@@ -86,15 +93,46 @@ describe('ReadingRoom', () => {
     routes({'GET /api/documents/d1': scanned});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
     const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
-    expect(await within(room).findByText('Read by OCR · 91% legible')).toBeInTheDocument();
-    expect(within(room).getByText('English · French')).toHaveAttribute('title', 'Detected by OpenAleph when it read the document');
+    // The page shows a mark with its number and the language codes; the words are on hover (Ony, 29 Oct).
+    expect(await within(room).findByText('91%')).toBeVisible();
+    expect(within(room).getByText('EN · FR')).toBeVisible();
+    expect(within(room).getByText('Read by OCR · 91% legible').closest('[hidden]')).not.toBeNull();
+    expect(within(room).getByText('English · French').closest('[hidden]')).not.toBeNull();
+    expect(within(room).getByText('Detected by OpenAleph when it read the document').closest('[hidden]')).not.toBeNull();
     cleanup();
 
     routes({'GET /api/documents/d1': {...doc, chunks: [{...doc.chunks[0], locator: 'page 4 (OCR)'}]}});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
     const again = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
-    expect(await within(again).findByText('Read by OCR · legibility not measured')).toBeInTheDocument();
-    expect(within(again).getByText('Language not detected')).toBeInTheDocument();
+    expect((await within(again).findByText('Read by OCR · legibility not measured')).closest('[hidden]')).not.toBeNull();
+    expect(within(again).getByText('Language not detected').closest('[hidden]')).not.toBeNull();
+  });
+
+  it('names the document’s own language first, with how it was set, and the others OpenAleph found', async () => {
+    routes({'GET /api/documents/d1': {...doc, language: 'fr', language_name: 'French', language_set_by: 'detected', language_by: 'py3langid',
+      language_confidence: 0.97, languages: [{code: 'fra', name: 'French'}, {code: 'eng', name: 'English'}]}});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    expect(await within(room).findByText('FR · EN')).toBeVisible();
+    expect(within(room).getByText('Detected by py3langid · 97% sure').closest('[hidden]')).not.toBeNull();
+    expect(within(room).getByText('OpenAleph also found English').closest('[hidden]')).not.toBeNull();
+    expect(within(room).queryByText('Language not detected')).not.toBeInTheDocument();
+    // Details: the kind and language as chips a person presses to change.
+    await userEvent.setup().click(within(room).getByRole('tab', {name: 'Details'}));
+    expect(within(room).getByRole('button', {name: 'Language: French. Change it'})).toBeInTheDocument();
+    expect(within(room).getByRole('button', {name: 'Kind: not set. Change it'})).toBeInTheDocument();
+  });
+
+  it('shows a proposal held back by the OCR quality gate, with why, and still lets a person decide it', async () => {
+    const note = 'Held back: read by OCR from a page only 38% legible (under 60%). Check it against the page before using it.';
+    routes({'GET /api/documents/d1': {...doc, chunks: [{...doc.chunks[0], locator: 'page 4 (OCR)', ocr_legibility: 38.2}]},
+      'GET /api/documents/d1/candidates': [{...name, review_status: 'held', reviewer_note: note}]});
+    render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
+    const room = await screen.findByRole('dialog', {name: 'Reading room: minutes.pdf'});
+    const card = await within(room).findByRole('article', {name: /Fernhill Ltd/});
+    expect(within(card).getByText('Held back · hard to read')).toBeInTheDocument();
+    expect(within(card).getByText(note)).toBeInTheDocument();
+    expect(within(card).getByRole('button', {name: /Accept/})).toBeInTheDocument();
   });
 
   it('marks what was found, accepts a proposal with A after a moment to undo it, and sends it on closing', async () => {
@@ -104,7 +142,7 @@ describe('ReadingRoom', () => {
     expect(await within(room).findByText('Fernhill Ltd', {selector: '.rr-span'})).toBeInTheDocument();
     expect(within(room).getByRole('button', {name: /^Page 4/})).toHaveAttribute('aria-current', 'true');
     const card = within(room).getByRole('article', {name: 'Name: Fernhill Ltd'});
-    expect(within(card).getByText('Name-finder (rules) · p.4 ¶1')).toBeInTheDocument();
+    expect(within(card).getByText('Name-finder (rules) · p.4 ¶1').closest('[hidden]')).not.toBeNull();  // on hover of the dots
     expect(within(card).getByText('High')).toBeInTheDocument();
     await waitFor(() => expect(within(card).getByRole('button', {name: /Accept/})).toBeEnabled());
     await userEvent.setup().click(card);
@@ -158,7 +196,7 @@ describe('ReadingRoom', () => {
   it('keeps selected words as evidence and shows the clip', async () => {
     const api = routes({'POST /api/evidence': {id: 'ev-1', source_id: 'src-1', quote: 'bought on behalf', locator: 'page 4', document_id: 'd1'}});
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
-    const passage = (await screen.findByTitle('page 4')) as HTMLElement;
+    const passage = (await waitFor(() => passageAt('page 4')));
     const first = passage.querySelector('span')!.firstChild!;  // the first run of text
     const node = (first.nodeType === Node.TEXT_NODE ? first : first.firstChild)!;
     const range = document.createRange();
@@ -271,7 +309,7 @@ describe('ReadingRoom', () => {
   it('finds words in the document and closes with Escape', async () => {
     routes();
     render(<QueryProvider><ReadingRoom investigationId="inv-1"/></QueryProvider>);
-    await screen.findByTitle('page 4');
+    await waitFor(() => passageAt('page 4'));
     await userEvent.setup().type(screen.getByRole('searchbox', {name: 'Find in this document'}), 'board');
     expect(screen.getByText('1 found')).toBeInTheDocument();
     expect(screen.getByText('board', {selector: 'mark'})).toBeInTheDocument();

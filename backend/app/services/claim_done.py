@@ -14,7 +14,10 @@ Authority System Suite's Tier A, the only tier that can carry a fact alone).
 When a person has set a source's suite tier it decides: E and F are leads only, A
 carries a fact alone, and only A, B and D count as independent origins (C never
 does). Evidence that restates another item counts as its original's origin, so a
-repeat is not a second source. A source with no tier falls back to its type."""
+repeat is not a second source. A source with no tier falls back to its type.
+
+Evidence of events from a file a person marked likely or confirmed synthetic supports nothing: the claim needs other
+support, or says it is supported only by a synthetic source. Evidence about the file itself still counts (ADR-0023)."""
 
 from __future__ import annotations
 
@@ -28,6 +31,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.domain import Claim, ClaimEvidenceLink, Document, DocumentChunk, Evidence, Source
+from app.services.authenticity import evidence_blocked
 from app.services.suite_fields import original_of
 
 DONE_STATUSES = {"supported", "confirmed"}
@@ -92,22 +96,41 @@ def _origin(source: Source) -> str:
 
 def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict[str, Any]:
     links = list(db.scalars(select(ClaimEvidenceLink).where(ClaimEvidenceLink.claim_id == claim.id)))
+    # A link marked superseded by a newer record counts neither for nor against the claim (claims.supersede_claim_evidence;
+    # the suite's RAS Module 07 rule 5: a superseded contradicting source stops being live dissent, as a supporting one
+    # stops being cited as support).
+    superseded = sum(1 for link in links if not link.counts_toward_claim and link.stance == "supports")
+    return judge(db, claim.id, [(link.stance, db.get(Evidence, link.evidence_id), link.note) for link in links if link.counts_toward_claim],
+                 target=target, superseded=superseded)
+
+
+def judge(db: Session, claim_id: str | None, links: list[tuple[str, Evidence | None, str | None]], *,
+          target: str = "supported", superseded: int = 0) -> dict[str, Any]:
+    """The rules over a claim's evidence links, each (stance, evidence, note). The evidence need not be saved:
+    Decide's "what it unlocks" asks what a claim not yet kept would meet (app/services/unlocks.py)."""
     supporting: list[tuple[Evidence, Source | None]] = []
-    for link in links:
-        if link.stance != "supports":
+    synthetic = 0
+    for stance, ev, _note in links:
+        if stance != "supports":
             continue
-        ev = db.get(Evidence, link.evidence_id)
-        if ev is not None:
+        if ev is not None and evidence_blocked(db, ev):
+            synthetic += 1  # evidence of events from a file a person marked AI-made: it supports nothing (ADR-0023)
+        elif ev is not None:
             supporting.append((ev, db.get(Source, ev.source_id)))
-    contradicting = [link for link in links if link.stance == "contradicts"]
+    contradicting = [note for stance, _ev, note in links if stance == "contradicts"]
     rules: list[dict[str, Any]] = []
 
     def rule(key: str, label: str, state: str, detail: str) -> None:
         rules.append({"key": key, "label": label, "state": state, "detail": detail})
 
     n = len(supporting)
+    not_counted = "".join([f"; {synthetic} marked AI-made does not count" if synthetic else "",
+                           f"; {superseded} superseded {'does' if superseded == 1 else 'do'} not count" if superseded else ""])
     rule("supporting", "At least one supporting item is linked", "met" if n else "not_met",
-         f"{n} supporting item{'s' if n != 1 else ''}" if n else "Link the evidence that shows it, with the stance Supports.")
+         (f"{n} supporting item{'s' if n != 1 else ''}" + not_counted) if n
+         else "Supported only by a synthetic source: it needs other support." if synthetic
+         else "Its supporting evidence is superseded: link the record that replaces it." if superseded
+         else "Link the evidence that shows it, with the stance Supports.")
 
     says, unknown_says, failed_says = 0, 0, []
     hashes_ok, hash_failed, hash_unknown = 0, [], 0
@@ -119,7 +142,7 @@ def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict
         elif found:
             says += 1
         else:
-            failed_says.append(ev.locator or ev.id)
+            failed_says.append(ev.locator or ev.id or "the passage")
         if doc is None:
             hash_unknown += 1
         elif _file_matches(doc):
@@ -151,7 +174,7 @@ def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict
         rule("file", "The file behind each item still matches its fingerprint", "met" if n else "not_met",
              f"{hashes_ok} file{'s' if hashes_ok != 1 else ''} checked" if n else "Nothing to check yet.")
 
-    unanswered = [link for link in contradicting if not (link.note or "").strip()]
+    unanswered = [note for note in contradicting if not (note or "").strip()]
     rule("contradictions", "Every contradicting item has a written answer", "not_met" if unanswered else "met",
          f"{len(unanswered)} contradicting item{'s' if len(unanswered) != 1 else ''} without an answer; answer it, or the claim is Disputed."
          if unanswered else (f"{len(contradicting)} answered" if contradicting else "None linked."))
@@ -172,7 +195,7 @@ def done_checks(db: Session, claim: Claim, *, target: str = "supported") -> dict
              "A public record supports it." if official else (f"{len(origins)} separate origin{'s' if len(origins) != 1 else ''}."))
 
     missing = [r for r in rules if r["state"] == "not_met"]
-    return {"claim_id": claim.id, "target": target, "rules": rules, "met": not missing,
+    return {"claim_id": claim_id, "target": target, "rules": rules, "met": not missing,
             "left": len(missing), "unknown": sum(r["state"] == "unknown" for r in rules)}
 
 

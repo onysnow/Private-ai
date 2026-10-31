@@ -14,7 +14,10 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {DragEvent, ReactElement, ReactNode} from 'react';
 import {z} from 'zod';
 
+import {PartyGlyph} from '../../components/network/marks';
 import {LevelChip, StatusChip} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
+import {PARTY, partyKind} from '../../lib/viz-tokens';
 import type {ClaimStatus} from '../../components/status';
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {errorMessage} from '../../lib/api-client';
@@ -25,23 +28,30 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {patchInvestigation, seedDemo} from '../../lib/generated/sdk.gen';
 import type {DecisionChoiceOut, DecisionItemOut, InvestigationOut} from '../../lib/generated/types.gen';
+import {dialogOpen} from '../../lib/on-screen';
 import {singleKeysOn} from '../../lib/shortcuts';
+import {timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {HIDE_SCREEN_EVENT, OPEN_INBOX_EVENT, OPEN_PALETTE_EVENT, SWITCH_CASE_EVENT} from '../../components/frame/app-frame';
 import {useNeedsYouCount} from '../inbox/inbox';
 import {caseHref} from '../../lib/case-href';
 import {upload} from '../documents/documents-panel';
 import {OneMdbLoader} from '../demo/one-mdb-loader';
+import {PreDecidedLine} from '../demo/pre-decided';
 import {NewCaseSetup} from '../new-case/new-case-setup';
-import {DecisionCard} from './decision-card';
+import {DecisionCard, KindMark} from './decision-card';
 import {FrostPanel, FrostStill} from '../effects/frost-panel';
 import {RainPane} from '../effects/rain-pane';
 import {MiniNetwork} from './mini-network';
+import {LinkEvidence, partyLinks} from './party-links';
+export {partyLinks} from './party-links';
+export type {PartyLink} from './party-links';
 import {PagePicture} from './decision-card';
 import {HOLD_MS, useDecisions} from './use-decisions';
 import {useWheelStep} from './wheel-step';
 import {useRedFlagsQuery} from '../red-flags/use-red-flags-query';
 import {AiStrip} from '../ai/ai-strip';
+import {SafetyNotice} from '../safety/your-safety';
 
 const CLAIM_STATUS: Record<string, ClaimStatus> = {
   supported: 'supported', confirmed: 'supported', disputed: 'disputed', rejected: 'ruled_out', lead: 'unshown', unverified: 'unshown',
@@ -121,9 +131,8 @@ function Stepper({index, count, total, onStep, label}: {index: number; count: nu
   if (count < 2) return count === 1 ? <span className="ch-step">1 of {all.toLocaleString('en-GB')}</span> : null;
   return <span className="ch-step" aria-label={`${label}: ${index + 1} of ${all}`}>
     <button type="button" aria-label="Previous" onClick={() => onStep(Math.max(0, index - 1))} disabled={index === 0}>‹</button>
-    {index + 1} of {all.toLocaleString('en-GB')}
+    <Reveal detail="Scroll over the list to step through it.">{index + 1} of {all.toLocaleString('en-GB')}</Reveal>
     <button type="button" aria-label="Next" onClick={() => onStep(Math.min(count - 1, index + 1))} disabled={index >= count - 1}>›</button>
-    <small className="ch-step-hint" aria-hidden="true">· scroll</small>
   </span>;
 }
 
@@ -152,30 +161,51 @@ function CaseQuestion({investigation}: {investigation: InvestigationOut}): React
     <button type="submit">Save</button>
   </form></Form>;
   return <div className="ch-q">
-    <p className="ch-eyebrow">The question</p>
+    {/* The question needs no label: its place and size say it (Ony, 29 Oct). */}
     {investigation.question
-      ? <button type="button" className={`ch-q-text${investigation.question.length > 110 ? ' long' : ''}`} onClick={() => setEditing(true)} title={`${investigation.question} (click to change)`}>{investigation.question}</button>
+      ? <Reveal tabbable={false} detail={<><b>The question</b><span className="rv-row">Click to change it.</span></>}>
+        <button type="button" className={`ch-q-text${investigation.question.length > 110 ? ' long' : ''}`} onClick={() => setEditing(true)}>{investigation.question}</button></Reveal>
       : <button type="button" className="ch-q-empty" onClick={() => setEditing(true)}>Write the question this case answers</button>}
   </div>;
+}
+
+/** What the money figure counts: where it starts, how many payments, and every other currency with its own sum
+ *  (one figure never adds currencies together, and none is hidden). */
+export function moneyCaption(m: {starting_payers?: number; payments: number; others: {currency: string; amount: number}[]}): string {
+  const n = m.starting_payers ?? 0;
+  const base = `money traced from ${n} starting payer${n === 1 ? '' : 's'} · ${m.payments} payment${m.payments === 1 ? '' : 's'}`;
+  return m.others.length ? `${base} · also ${m.others.map(o => money(o.amount, o.currency)).join(', ')}` : base;
+}
+
+/** The strip's marks for what a number counts: a person to decide, a coin, a calendar, a page. */
+function StripIcon({name}: {name: 'person' | 'coin' | 'calendar' | 'page'}): ReactElement {
+  const d: Record<typeof name, ReactNode> = {
+    person: <><circle cx="8" cy="5" r="2.6"/><path d="M3 14c.6-3 2.6-4.6 5-4.6s4.4 1.6 5 4.6"/></>,
+    coin: <><circle cx="8" cy="8" r="5.6"/><path d="M8 4.8v6.4M9.8 6.2C9.4 5.6 8.8 5.4 8 5.4c-1 0-1.8.5-1.8 1.3 0 1.8 3.7 1 3.7 2.8 0 .8-.8 1.3-1.9 1.3-.8 0-1.5-.3-1.9-.9"/></>,
+    calendar: <><rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></>,
+    page: <><path d="M4 1.8h5.2L12 4.6v9.6H4z"/><path d="M6 7.5h4M6 10h4"/></>,
+  };
+  return <svg className="ch-strip-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">{d[name]}</svg>;
 }
 
 function StandingStrip({investigationId}: {investigationId: string}): ReactElement {
   const standing = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
   const s = standing.data;
-  const cell = (key: string, big: ReactNode, small: string, href: string, mark?: string, tone = '') =>
-    <li key={key}><Link className={`ch-num ${tone}`} href={caseHref(href, investigationId)}>
-      <b>{mark && <span aria-hidden="true" className="ch-num-mark">{mark}</span>}{big}</b><small>{small}</small>
-    </Link></li>;
+  // Each cell is its mark and its number; what the number counts is on hover or focus, and in the link's name.
+  const cell = (key: string, big: ReactNode, small: string, href: string, mark?: ReactNode, tone = '') =>
+    <li key={key}><Reveal tabbable={false} describe={false} className="ch-num-rv" detail={small}><Link className={`ch-num ${tone}${typeof big === 'string' && big.length > 6 ? ' long' : ''}`} href={caseHref(href, investigationId)}>
+      <b>{mark && <span aria-hidden="true" className="ch-num-mark">{mark}</span>}{big}</b><small className="sr-only">{small}</small>
+    </Link></Reveal></li>;
   if (standing.isError) return <p className="ch-strip-error" role="alert">{errorMessage(standing.error, 'Could not count the case')} <button type="button" onClick={() => void standing.refetch()}>Retry</button></p>;
   return <ul className="ch-strip" aria-label="Where the case stands" aria-busy={!s}>
     {cell('sup', s?.claims.supported ?? '·', 'claims supported', '/check#claim-verification', '✓', 'ok')}
     {cell('dis', s?.claims.disputed ?? '·', 'claims disputed', '/check#claim-verification', '✕', 'bad')}
     {cell('uns', s?.claims.unshown ?? '·', 'not yet shown', '/check#claim-verification', '○')}
-    {cell('dec', s?.to_decide ?? '·', 'to decide · need a person', '/decide', undefined, 'need')}
-    {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? `money traced from ${s.money.from_sources ?? 0} source${s.money.from_sources === 1 ? '' : 's'} · ${s.money.payments} payment${s.money.payments === 1 ? '' : 's'}` : 'money traced', '/see#money-flows')}
+    {cell('dec', s?.to_decide ?? '·', 'to decide · need a person', '/decide', <StripIcon name="person"/>, 'need')}
+    {cell('mon', s ? money(s.money.amount, s.money.currency) : '·', s ? moneyCaption(s.money) : 'money traced', '/see#money-flows', <StripIcon name="coin"/>)}
     {cell('yrs', s?.timeline.from ? (s.timeline.from === s.timeline.to ? s.timeline.from : `${s.timeline.from}–${s.timeline.to?.slice(2)}`) : '—',
-      s ? `${s.timeline.events} events · ${continuousYears(s.timeline.years).length} years` : 'events', '/see#timeline')}
-    {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread` : 'documents', '/bring-in#document-ingestion')}
+      s ? `${s.timeline.events} events · ${continuousYears(s.timeline.years).length} years` : 'events', '/see#timeline', <StripIcon name="calendar"/>)}
+    {cell('doc', s?.documents.total ?? '·', s ? `documents · ${s.documents.unread} unread${s.documents.failed ? ` · ${s.documents.failed} could not be read` : ''}` : 'documents', '/bring-in#document-ingestion', <StripIcon name="page"/>)}
   </ul>;
 }
 
@@ -191,7 +221,8 @@ export function proposedLine(doc: {candidate_counts?: Record<string, number> | n
 
 function BringIn({investigationId}: {investigationId: string}): ReactElement {
   const queryClient = useQueryClient();
-  const docs = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data ?? [];
+  const docsQuery = useQuery({...listDocumentsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
+  const docs = useMemo(() => docsQuery.data ?? [], [docsQuery.data]);
   const standing = useQuery({...getStandingOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)}).data;
   const [over, setOver] = useState(false);
   const [dropped, setDropped] = useState('');
@@ -218,28 +249,42 @@ function BringIn({investigationId}: {investigationId: string}): ReactElement {
     setDropped(`${done} document${done === 1 ? '' : 's'} saved. Reading starts now.`);
     await queryClient.invalidateQueries();
   };
-  const row = (count: number, label: string, href: string, verb: string) =>
-    <li><b>{count}</b><span>{label}</span><Link href={caseHref(href, investigationId)}>{verb} →</Link></li>;
+  // What waits, each as its count, its mark and a few words; a row at zero is left out, and when every one is
+  // at zero a single quiet line says so (mockup HOME_1: a row of zeros reads as broken).
+  const waiting = [
+    {key: 'unread', count: unread, mark: <span className="ch-row-mark" aria-hidden="true"><StripIcon name="page"/></span>,
+      words: `document${unread === 1 ? '' : 's'} not read yet`, href: '/bring-in#document-ingestion', verb: 'Read'},
+    {key: 'outside', count: kinds.outside ?? 0, mark: <KindMark kind="outside" bare/>,
+      words: `outside finding${kinds.outside === 1 ? '' : 's'} to review`, href: '/decide?kind=outside', verb: 'Review'},
+    {key: 'watchlist', count: kinds.watchlist ?? 0, mark: <KindMark kind="watchlist" bare/>,
+      words: `watchlist hit${kinds.watchlist === 1 ? '' : 's'}`, href: '/decide?kind=watchlist', verb: 'See'},
+  ].filter(r => r.count > 0);
+  const state = shown ? (shown === reading ? (busy ? (job?.status === 'running' && job.message ? job.message : 'Reading now') : 'Waiting to be read')
+    : shown.extraction_status === 'failed' ? 'Could not be read' : `Read · ${shown.chunk_count} passage${shown.chunk_count === 1 ? '' : 's'}`) : '';
   return <Module n="01" name="Bring in" href="/bring-in">
-    {shown ? <button type="button" className="ch-reading" onClick={() => openDocument(shown.id)} aria-label={`Open ${shown.filename} in the reading room`}>
+    {/* Files dropped anywhere on the module's body are brought in; the line at its foot says so and opens The Drop. */}
+    <div className={`ch-bring${over ? ' over' : ''}`} data-testid="bring-in-drop" onDragOver={e => { e.preventDefault(); setOver(true); }}
+      onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOver(false); }} onDrop={e => void onDrop(e)}>
+    {/* The file's state and what was proposed from it are on hover or focus; a file that could not be read says so. */}
+    {shown ? <Reveal tabbable={false} className="ch-reading-rv" detail={<><b>{state}</b>{proposedLine(shown) && <span className="rv-row">{proposedLine(shown)}</span>}</>}>
+    <button type="button" className="ch-reading" onClick={() => openDocument(shown.id)} aria-label={`Open ${shown.filename} in the reading room`}>
       <span className="ch-thumb">{/\.pdf$/i.test(shown.filename) && shown.chunk_count > 0
         ? <PagePicture documentId={shown.id} page={1} width={120} alt=""/> : <span className="ch-thumb-lines" aria-hidden="true"><i/><i/><i/><i/></span>}</span>
       <span className="ch-reading-words"><b>{shown.filename}</b>
-        <span>{shown === reading ? (busy ? (job?.status === 'running' && job.message ? job.message : 'Reading now') : 'Waiting to be read')
-          : shown.extraction_status === 'failed' ? 'Could not be read' : `Read · ${shown.chunk_count} passage${shown.chunk_count === 1 ? '' : 's'}`}</span>
+        {shown !== reading && shown.extraction_status === 'failed' && <span className="ch-reading-failed">{state}</span>}
         {shown === reading && <span className="ch-progress" role={progress === null ? undefined : 'progressbar'} aria-label={progress === null ? undefined : 'Reading'}
           aria-valuenow={progress ?? undefined} aria-valuemin={progress === null ? undefined : 0} aria-valuemax={progress === null ? undefined : 100} aria-hidden={progress === null}>
           <i className={busy && progress === null ? 'busy' : ''} style={progress === null ? undefined : {width: `${progress}%`}}/></span>}
-        {proposedLine(shown) && <small className="ch-proposed">{proposedLine(shown)}</small>}
       </span>
-    </button> : <p className="ch-quiet">Nothing brought in yet.</p>}
-    <ul className="ch-rows">
-      {row(unread, `document${unread === 1 ? '' : 's'} not read yet`, '/bring-in#document-ingestion', 'Read')}
-      {row(kinds.outside ?? 0, 'outside findings to review', '/decide?kind=outside', 'Review')}
-      {row(kinds.watchlist ?? 0, `watchlist hit${(kinds.watchlist ?? 0) === 1 ? '' : 's'}`, '/decide?kind=watchlist', 'See')}
-    </ul>
-    <div className={`ch-drop${over ? ' over' : ''}`} onDragOver={e => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={e => void onDrop(e)}>
-      {dropped ? <span role="status">{dropped}</span> : <Link href={caseHref('/bring-in#the-drop', investigationId)}>+ Drop documents anywhere</Link>}
+    </button></Reveal> : docsQuery.isPending ? <div className="ch-skeleton ch-reading-wait" aria-busy="true" aria-label="Looking for documents"/>
+      : <p className="ch-quiet">Nothing brought in yet.</p>}
+    {waiting.length ? <ul className="ch-rows">
+      {waiting.map(r => <li key={r.key}><Link href={caseHref(r.href, investigationId)}>
+        <b>{r.count.toLocaleString('en-GB')}</b>{r.mark}<span className="ch-row-words">{r.words}</span><span className="ch-row-verb" aria-hidden="true">{r.verb} →</span>
+      </Link></li>)}
+    </ul> : standing ? <p className="ch-all-read"><span aria-hidden="true">✓</span> All read · nothing to review</p> : null}
+    <p className="ch-drop" role={dropped ? 'status' : undefined}>{dropped
+      || <Link href={caseHref('/bring-in#the-drop', investigationId)}><span aria-hidden="true">+</span> Drop documents anywhere</Link>}</p>
     </div>
   </Module>;
 }
@@ -257,8 +302,10 @@ export function sourceLine(line?: {sources_for?: number; sources_against?: numbe
   return parts.join(' · ');
 }
 
-function SourceLine({line}: {line?: Parameters<typeof sourceLine>[0]}): ReactElement {
-  return <span className="ch-claim-src">{sourceLine(line)}</span>;
+/** A claim's sources as two numbers with their marks; the names and open leads are in the claim's reveal. */
+function SourceCounts({line}: {line?: Parameters<typeof sourceLine>[0]}): ReactElement | null {
+  if (!line?.count) return null;
+  return <span className="ch-claim-src" aria-hidden="true"><span className="ok">✓ {line.sources_for ?? 0}</span>{line.sources_against ? <span className="bad">✕ {line.sources_against}</span> : null}</span>;
 }
 
 function CheckModule({investigationId}: {investigationId: string}): ReactElement {
@@ -279,12 +326,12 @@ function CheckModule({investigationId}: {investigationId: string}): ReactElement
       {(['supported', 'disputed', 'unshown'] as ClaimStatus[]).map(k => counts[k] ? <i key={k} className={`ch-bar-${k}`} style={{flexGrow: counts[k]}}/> : null)}
     </div>
     <div className="ch-list" {...wheel}>
-      {shown.length ? shown.map(c => <button key={c.id} type="button" className={`ch-claim ch-claim-${CLAIM_STATUS[c.status] ?? 'unshown'}`}
-        onClick={() => openClaim(c.id)}>
-        <StatusChip status={CLAIM_STATUS[c.status] ?? 'unshown'}/>
-        <span className="ch-claim-text">{c.text}</span>
-        <SourceLine line={sources.get(c.id)}/>
-      </button>) : <p className="ch-quiet">No claims yet. A claim is a sentence you may publish; add one in Check.</p>}
+      {shown.length ? shown.map(c => <Reveal key={c.id} tabbable={false} className="ch-claim-rv" detail={sourceLine(sources.get(c.id))}>
+        <button type="button" className={`ch-claim ch-claim-${CLAIM_STATUS[c.status] ?? 'unshown'}`} onClick={() => openClaim(c.id)}>
+          <StatusChip status={CLAIM_STATUS[c.status] ?? 'unshown'}/>
+          <span className="ch-claim-text">{c.text}</span>
+          <SourceCounts line={sources.get(c.id)}/>
+        </button></Reveal>) : <p className="ch-quiet"><Reveal detail="A claim is a sentence you may publish; add one in Check.">No claims yet</Reveal></p>}
     </div>
   </Module>;
 }
@@ -315,13 +362,16 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
           const innocent = f.indicator?.innocent_explanations ?? [];
           const fresh = Boolean(visit && f.first_seen_at > visit.slice(0, 19));
           const when = f.years?.length ? `lights ${yearSpan(f.years)}` : '';
-          return <button key={f.id} type="button" className={`ch-flag ch-flag-${f.level}`} onClick={() => openFlag(f.id)}>
-            <span className="ch-flag-top"><LevelChip level={f.level}/><span className="ch-since">{[fresh ? 'new' : '', when].filter(Boolean).join(' · ')}</span></span>
+          // "New" is a dot; the years it lights are on hover or focus (Ony, 29 Oct).
+          return <Reveal key={f.id} tabbable={false} className="ch-flag-rv" describe={Boolean(fresh || when)}
+            detail={<>{fresh && <b>New since your last visit</b>}{when && <span className="rv-row">{when[0].toUpperCase()}{when.slice(1)}</span>}</>}>
+          <button type="button" className={`ch-flag ch-flag-${f.level}`} onClick={() => openFlag(f.id)}>
+            <span className="ch-flag-top"><LevelChip level={f.level}/>{fresh && <span className="ch-new" aria-hidden="true"/>}</span>
             <b>{f.indicator?.name ?? f.indicator_id}</b>
-            <span className="ch-flag-parties">{f.summary && f.level !== 'textbook' ? f.summary : flagChain(f.parties, /circular|loop/i.test(f.indicator?.name ?? ''))}</span>
+            <span className="ch-flag-parties">{f.summary || flagChain(f.parties, /circular|loop/i.test(f.indicator?.name ?? ''))}</span>
             {innocent.length > 0 && f.level === 'textbook' && <span className="ch-innocent"><em>Could be innocent</em>{innocent[0]}
               {innocent.length > 1 && <span className="ch-more"> {innocent.length - 1} more ›</span>}</span>}
-          </button>;
+          </button></Reveal>;
         })}
         {faint.slice(0, 2).map(f => <button key={f.id} type="button" className="ch-faint-row" onClick={() => openFlag(f.id)}>
           <LevelChip level="faint"/><span>{f.indicator?.name ?? f.indicator_id}{leadsOf(f) ? ` · ${leadsOf(f)} to check` : ''}</span></button>)}
@@ -331,7 +381,9 @@ function ActModule({investigationId}: {investigationId: string}): ReactElement {
   </Module>;
 }
 
-const ACTOR: Record<string, string> = {person: 'by a person', app: 'found by the app', ai: 'drafted, to review', connector: 'from outside records'};
+const ACTOR: Record<string, string> = {person: 'By a person', app: 'Found by the app', ai: 'Drafted by AI, to review', connector: 'From outside records'};
+/** Who made a change, as a mark (the AI mark is the plum AI tag): the app ƒ, outside records ↗. */
+const ACTOR_MARK: Record<string, string> = {app: 'ƒ', connector: '↗'};
 
 function SinceStrip({investigationId, markVisit = true}: {investigationId: string; markVisit?: boolean}): ReactElement {
   const [after, setAfter] = useState<string | null>(null);
@@ -345,23 +397,27 @@ function SinceStrip({investigationId, markVisit = true}: {investigationId: strin
     return () => { window.clearTimeout(timer); window.removeEventListener('pagehide', mark); mark(); };
   }, [investigationId, markVisit]);
   const since = useQuery({...getSinceOptions({path: {investigation_id: investigationId}, query: {after: after ?? ''}}), enabled: Boolean(investigationId && after)}).data;
-  const when = after ? new Date(after).toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short'}) : '';
+  const when = after ? timeWords(after) : '';
   const [all, setAll] = useState(false);
   const changes = since?.changes ?? [];
-  return <section className="ch-since-strip" aria-label="What changed while you were away">
-    <header><p className="ch-eyebrow">{after ? `Since ${when}` : 'First visit on this computer'}</p><h2>What changed while you were away</h2>
-      {changes.length > 4 && <button type="button" className="ch-show-all" aria-expanded={all} onClick={() => setAll(!all)}>{all ? 'Show fewer' : 'Show all'}</button>}</header>
-    {!after ? <p className="ch-quiet">Next time you open this case, what moved in between shows here: who did it, and where.</p>
-      : !changes.length ? <p className="ch-quiet">Nothing has changed since then.</p>
-      : <ul>{(all ? changes : changes.slice(0, 4)).map(c => <li key={c.key}><Link href={caseHref(c.href, investigationId)} className={`ch-change ch-actor-${c.actor_kind}`}
-        title={ACTOR[c.actor_kind]}>
+  // With nothing to list, the strip is one slim line, and Next up keeps the room.
+  const quiet = !after || !changes.length;
+  return <section className={`ch-since-strip${quiet ? ' quiet' : ''}`} aria-label="What changed while you were away">
+    <header><h2><Reveal detail={after ? <b>Since {when}</b> : <><b>First visit on this computer</b>
+      <span className="rv-row">Next time you open this case, what moved in between shows here: who did it, and where.</span></>}>What changed while you were away</Reveal></h2>
+      {changes.length > 4 && <button type="button" className="ch-show-all" aria-expanded={all} onClick={() => setAll(!all)}>{all ? 'Show fewer' : 'Show all'}</button>}
+      {/* While the changes are still being counted it says nothing, rather than "nothing has changed". */}
+      {quiet && (!after || since) && <p className="ch-quiet"><span aria-hidden="true" className="ch-since-mark">✓</span>{!after ? 'First visit on this computer' : `Nothing has changed since ${when}`}</p>}</header>
+    {quiet ? null
+      : <ul>{(all ? changes : changes.slice(0, 4)).map(c => <li key={c.key}><Reveal tabbable={false} className="ch-change-rv" detail={ACTOR[c.actor_kind] ?? c.actor_kind}>
+        <Link href={caseHref(c.href, investigationId)} className={`ch-change ch-actor-${c.actor_kind}`}>
         <b>{c.count}</b><span>{c.label}</span>
-        {c.actor_kind === 'ai' && <span className="ai-tag">AI</span>}
-      </Link></li>)}</ul>}
+        {c.actor_kind === 'ai' ? <span className="ai-tag">AI</span> : ACTOR_MARK[c.actor_kind] ? <span className="ch-actor-mark" aria-hidden="true">{ACTOR_MARK[c.actor_kind]}</span> : null}
+      </Link></Reveal></li>)}</ul>}
   </section>;
 }
 
-function NextUp({investigationId, active}: {investigationId: string; active: boolean}): ReactElement {
+function NextUp({investigationId, active, isDemo}: {investigationId: string; active: boolean; isDemo?: boolean}): ReactElement {
   const {items, counts, decide, undo, held, query} = useDecisions(investigationId, {enabled: Boolean(investigationId)});
   const [index, setIndex] = useState(0);
   useEffect(() => { if (index > 0 && index >= items.length) setIndex(Math.max(0, items.length - 1)); }, [index, items.length]);
@@ -370,28 +426,39 @@ function NextUp({investigationId, active}: {investigationId: string; active: boo
   const total = Object.values(counts).reduce((n, v) => n + v, 0);
   const onDecide = useCallback((choice: DecisionChoiceOut, note: string) => { if (item) decide(item, choice, note); }, [decide, item]);
   const inv = investigationId;
+  // An item with no passage of its own (most "To check" items) rests on the links between its parties instead.
+  const graph = useQuery({...getInvestigationGraphOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId && item && !item.evidence)}).data;
+  const links = useMemo(() => (item && !item.evidence && item.parties.length > 1 && graph ? partyLinks(graph.edges, item.parties) : []), [item, graph]);
   useEffect(() => {
     if (!active) return undefined;
-    const handle = (event: KeyboardEvent) => { if ((event.key === 'z' || event.key === 'Z') && !event.metaKey && !event.ctrlKey && held) { event.preventDefault(); undo(); } };
+    const handle = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.defaultPrevented || typing(event.target) || !singleKeysOn()) return;
+      if ((event.key === 'z' || event.key === 'Z') && held) { event.preventDefault(); undo(); }
+    };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
   }, [active, held, undo]);
   return <section className="ch-mod ch-next" aria-label="Next up" data-module="next" tabIndex={-1} {...wheel}>
     <header className="ch-mod-head">
-      <h2><span className="ch-eyebrow">Next up</span>{item?.kind === 'to_check' ? 'One thing only you can check' : 'One thing only you can decide'}</h2>
+      <h2><span className="ch-eyebrow">Next up</span>{item && <KindMark kind={item.kind}
+        extra={<span className="rv-row">{item.kind === 'to_check' ? 'One thing only you can check.' : 'One thing only you can decide.'}</span>}/>}</h2>
       <Stepper index={index} count={items.length} total={query.data?.total} onStep={setIndex} label="Decisions"/>
     </header>
     {query.isError ? <p role="alert">{errorMessage(query.error, 'Could not load what waits for you')} <button type="button" onClick={() => void query.refetch()}>Retry</button></p>
       : query.isPending && investigationId ? <div className="ch-skeleton" aria-busy="true"/>
-      : item ? <DecisionCard key={item.id} item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}/>
+      : item ? <DecisionCard key={item.id} item={item} position={index + 1} total={items.length} keys="home" active={active} onDecide={onDecide} showWhatHappens={false}
+        aside={links.length ? <LinkEvidence links={links} parties={item.parties}/> : undefined}/>
       : <div className="ch-clear"><p>Nothing waits for you.</p><Link href={caseHref('/bring-in#document-ingestion', inv)}>Drop documents</Link></div>}
     <footer className="ch-next-foot">
       <span className="ch-dots" aria-hidden="true">{items.slice(0, 9).map((d, i) => <i key={d.id} className={i === index ? 'on' : ''}/>)}</span>
-      <span aria-live="polite" title={item ? [...item.choices.map(c => (c.happens ? `${c.label}: ${c.happens}` : '')), ...item.consequences].filter(Boolean).join(' ') : undefined}>{held ? <>Saved in a moment: <b>{held.choice.label}</b>. <button type="button" className="ch-undo" onClick={() => undo()}>Undo <kbd>Z</kbd></button></>
-        : item?.consequences.length ? `${item.consequences.join(' ').replace(/\.$/, '')}; Undo for ${HOLD_MS / 1000} s.`
-        : item?.choices[0]?.happens ? `${item.choices[0].label}: ${item.choices[0].happens.replace(/\.$/, '')}; Undo for ${HOLD_MS / 1000} s.`
-        : `${total} to decide in this case. Your answer waits ${HOLD_MS / 1000} s before it is sent, so you can undo it.`}</span>
-      <Link href={caseHref('/decide', inv)}>Open Decide <span aria-hidden="true">↗</span></Link>
+      {/* Only the held answer shows here; what an answer does is on Open Decide, on hover or focus (Ony, 29 Oct). */}
+      <span aria-live="polite">{held ? <>Saved in a moment: <b>{held.choice.label}</b>. <button type="button" className="ch-undo" onClick={() => undo()}>Undo <kbd>Z</kbd></button></> : null}</span>
+      <PreDecidedLine investigationId={investigationId} isDemo={isDemo}/>
+      <Reveal tabbable={false} detail={<>
+        {item?.choices.filter(c => c.happens).map(c => <span key={c.key} className="rv-row"><b>{c.label}:</b> {c.happens}</span>)}
+        {item?.consequences.map(c => <span key={c} className="rv-row">{c}</span>)}
+        <span className="rv-row">{total} to decide in this case. Your answer waits {HOLD_MS / 1000} s before it is sent, so you can undo it.</span>
+      </>}><Link href={caseHref('/decide', inv)}>Open Decide <span aria-hidden="true">↗</span></Link></Reveal>
     </footer>
   </section>;
 }
@@ -428,12 +495,14 @@ function YearRail({investigationId}: {investigationId: string}): ReactElement {
       const flags = y.flags ?? 0;
       const empty = !y.events && !flags;
       const cls = [on && 'on', flags && 'flagged', lit.has(Number(y.year)) && 'lit', empty && 'empty'].filter(Boolean).join(' ');
-      return <button key={y.year} type="button" className={cls} aria-pressed={on} onClick={() => setAsOf(on ? null : Number(y.year))}
-        title={on ? 'Show all years again' : `Show the case as of ${y.year}`}>
-        <b>{y.year}</b><small aria-label={`${y.events} event${y.events === 1 ? '' : 's'}${flags ? `, ${flags} Red Flag${flags === 1 ? '' : 's'}` : ''}`}>
-          {y.events}{flags ? <> · <span className="ch-year-flags">flag</span></> : null}</small>
-        <i style={{width: `${(100 * y.events) / most}%`}}/>
-      </button>;
+      const counted = `${y.events} event${y.events === 1 ? '' : 's'}${flags ? `, ${flags} Red Flag${flags === 1 ? '' : 's'}` : ''}`;
+      // The year shows; its count is the bar under it and a Red Flag the red underline. Both are named on hover or focus.
+      return <Reveal key={y.year} tabbable={false} describe={false} className="ch-year-rv" detail={<><b>{counted}</b>
+        <span className="rv-row">{on ? 'Click to show all years again.' : `Click to show the case as of ${y.year}.`}</span></>}>
+        <button type="button" className={cls} aria-pressed={on} onClick={() => setAsOf(on ? null : Number(y.year))}>
+          <b>{y.year}</b><span className="sr-only">{counted}</span>
+          <i style={{width: `${(100 * y.events) / most}%`}}/>
+        </button></Reveal>;
     })}
   </nav>;
 }
@@ -448,10 +517,11 @@ function PointingAt({investigationId}: {investigationId: string}): ReactElement 
   const {years} = usePointedYears();
   return <div className="ch-pointing" aria-live="polite">
     <p className="ch-eyebrow">Pointing at</p>
-    {pointed ? <><span className="ch-party on"><span aria-hidden="true" className="ch-party-kind">{(node?.schema || 'T')[0]}</span>{name ?? 'a party'}</span>
-      <span>{years.length ? `lights ${yearSpan(years)} everywhere` : 'lit in every part'}{asOf ? ` · as of ${asOf}` : ''}</span>
+    {pointed ? <><Reveal detail={<><b>{PARTY[partyKind(node?.schema)].name}</b>
+        <span className="rv-row">{years.length ? `lights ${yearSpan(years)} everywhere` : 'lit in every part'}{asOf ? ` · as of ${asOf}` : ''}</span></>}>
+        <span className="ch-party on"><PartyGlyph kind={partyKind(node?.schema)} size={14}/>{name ?? 'a party'}</span></Reveal>
       <button type="button" onClick={() => point(null)}>Clear ×</button></>
-      : <span className="ch-quiet">Nothing. Point at a party to light it everywhere{asOf ? ` · showing ${asOf}` : ''}.</span>}
+      : <Reveal detail={`Point at a party to light it everywhere${asOf ? ` · showing ${asOf}` : ''}.`}><span className="ch-party ch-party-ghost">Nothing</span></Reveal>}
   </div>;
 }
 
@@ -466,9 +536,11 @@ function HomeTools(): ReactElement {
       <button type="button" className="ch-tool ch-bell" onClick={fire(OPEN_INBOX_EVENT)} aria-label={`Inbox: ${waiting} need${waiting === 1 ? 's' : ''} you`}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17h12l-1.6-2.2V10a4.4 4.4 0 0 0-8.8 0v4.8z M10 19.5a2 2 0 0 0 4 0"/></svg>
         {waiting > 0 && <b className="ch-count">{waiting > 99 ? '99+' : waiting}</b>}</button>
-      <Link href="/settings" className="ch-tool" aria-label="Settings" title="Settings">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></Link>
-      <button type="button" className="ch-tool ch-hide" onClick={fire(HIDE_SCREEN_EVENT)} title="Cover the screen at once">Hide screen <kbd>⌘⇧H</kbd></button>
+      <Reveal tabbable={false} describe={false} detail="Settings"><Link href="/settings" className="ch-tool" aria-label="Settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></Link></Reveal>
+      {/* Hide screen stays a visible button: it must be found in a hurry. Its keys are on hover or focus. */}
+      <Reveal tabbable={false} detail={<>Cover the screen at once <kbd>⌘⇧H</kbd></>}>
+        <button type="button" className="ch-tool ch-hide" onClick={fire(HIDE_SCREEN_EVENT)}>Hide screen</button></Reveal>
     </div>
   </>;
 }
@@ -507,7 +579,7 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
     if (!active || preview || !investigation) return undefined;
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey || event.defaultPrevented || typing(event.target) || !singleKeysOn()) return;
-      if (document.querySelector('[role="dialog"]')) return;
+      if (dialogOpen()) return;
       const home = document.querySelector<HTMLElement>('[data-testid="case-home"]');
       if (!home || home.closest('[hidden]')) return;
       const key = event.key.toLowerCase();
@@ -535,8 +607,8 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
       <div className="ch-name">
         <div className="ch-name-line">
           <h1 title={investigation.name}>{investigation.name}</h1>
-          <button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
-            Switch case <kbd>⌘O</kbd></button>
+          <Reveal tabbable={false} detail={<kbd>⌘O</kbd>}><button type="button" className="ch-switch" onClick={() => window.dispatchEvent(new Event(SWITCH_CASE_EVENT))}>
+            Switch case</button></Reveal>
         </div>
         {/* The AI line and its question field share one line, so the band stays as low as HOME_1's. */}
         {!preview && <div className="ch-ai-line"><AiStrip investigationId={id}/></div>}
@@ -545,9 +617,10 @@ export function CaseHome({investigation, investigations: _cases, onSwitch, loadi
       <CaseQuestion investigation={investigation}/>
       <StandingStrip investigationId={id}/>
     </RainPane>
+    {!preview && <SafetyNotice investigationId={investigation.id} onOpen={() => router.push(caseHref('/keep#safety-data', investigation.id))}/>}
     <div className="ch-grid">
       <div className="ch-col"><BringIn investigationId={id}/><CheckModule investigationId={id}/></div>
-      <div className="ch-col ch-centre"><NextUp investigationId={id} active={active}/><SinceStrip investigationId={id} markVisit={!preview}/></div>
+      <div className="ch-col ch-centre"><NextUp investigationId={id} active={active} isDemo={Boolean(investigation.is_demo)}/><SinceStrip investigationId={id} markVisit={!preview}/></div>
       <div className="ch-col"><ActModule investigationId={id}/>
         <Module n="03" name="See · who is linked" href="/see#the-wire" openLabel="Open network"><MiniNetwork investigationId={id}/></Module></div>
     </div>

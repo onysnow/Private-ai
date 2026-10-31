@@ -31,7 +31,9 @@ def test_timeline_normalizes_ftm_source_and_reporter_events():
     })
     assert manual.status_code == 200
 
-    r = client.get(f"/api/investigations/{inv['id']}/timeline")
+    # A source's own date says when a document was made, not what happened: only when asked for.
+    assert "source_date" not in client.get(f"/api/investigations/{inv['id']}/timeline").json()["counts"]
+    r = client.get(f"/api/investigations/{inv['id']}/timeline", params={"include_source_dates": True})
     assert r.status_code == 200
     body = r.json()
     assert body["total"] >= 3
@@ -63,6 +65,34 @@ def test_relationship_date_keeps_relationship_provenance():
     assert event["refs"]["relationship_entity_id"] == rel["relationship_entity_id"]
     assert event["provenance"]["dataset"] == "corporate filing"
     assert event["provenance"]["origin"] == "https://example.test/corp"
+
+
+def test_a_payment_is_one_event_in_words_with_its_amount_and_both_dates():
+    inv = make_inv("Payment timeline")
+    a = client.post("/api/entities", json={"investigation_id": inv["id"], "schema": "Company", "caption": "Fernhill Ltd"}).json()
+    b = client.post("/api/entities", json={"investigation_id": inv["id"], "schema": "Company", "caption": "Kestrel SA"}).json()
+    client.post("/api/relationships", json={
+        "investigation_id": inv["id"], "schema": "Payment", "source_entity_id": a["id"], "target_entity_id": b["id"],
+        "properties": {"amount": ["29400"], "currency": ["EUR"], "startDate": ["2017-02"], "endDate": ["2017-04"], "purpose": ["consulting"]},
+    })
+    events = [e for e in client.get(f"/api/investigations/{inv['id']}/timeline").json()["events"] if e["kind"] == "relationship_date"]
+    assert len(events) == 1  # not one per date property
+    event = events[0]
+    assert event["title"] == "Fernhill Ltd paid Kestrel SA 29400 EUR"
+    assert (event["date_start"], event["date_end"], event["precision"]) == ("2017-02", "2017-04", "month")
+    assert event["description"] == "consulting" and "startDate" not in event["title"]
+
+
+def test_a_record_date_already_on_the_timeline_is_not_drawn_twice():
+    inv = make_inv("No twice")
+    co = client.post("/api/entities", json={"investigation_id": inv["id"], "schema": "Company", "caption": "Good Harbour Ltd",
+                                            "properties": {"name": ["Good Harbour Ltd"], "incorporationDate": ["2009-05-18"]}}).json()
+    first = client.get(f"/api/investigations/{inv['id']}/timeline").json()["events"]
+    assert [e["title"] for e in first if e["kind"] == "entity_date"] == ["Good Harbour Ltd: incorporation date"]
+    client.post("/api/timeline-events", json={"investigation_id": inv["id"], "title": "Good Harbour formed in the Seychelles",
+                                               "date_start": "2009-05-18", "precision": "day", "entity_id": co["id"]})
+    kinds = [e["kind"] for e in client.get(f"/api/investigations/{inv['id']}/timeline").json()["events"]]
+    assert kinds == ["reporter_event"]
 
 
 def test_timeline_filters_and_rejects_cross_investigation_refs():
@@ -141,7 +171,7 @@ def test_timeline_relationship_context_preserves_mixed_evidence_assessments():
     for ev, stance in zip(evidence, ["supports", "contradicts", "unresolved"]):
         response = client.post(f"/api/relationships/{rel['id']}/evidence/{ev['id']}/reviews", json={"stance": stance, "rationale": f"Reporter assessment: {stance}."})
         assert response.status_code == 200, response.text
-    manual = client.post("/api/timeline-events", json={"investigation_id": inv["id"], "title": "Mixed relationship event", "date_start": "2024-01-15", "relationship_entity_id": rel["relationship_entity_id"], "verification_status": "asserted"})
+    manual = client.post("/api/timeline-events", json={"investigation_id": inv["id"], "title": "Mixed relationship event", "date_start": "2024-02-01", "relationship_entity_id": rel["relationship_entity_id"], "verification_status": "asserted"})
     assert manual.status_code == 200, manual.text
     timeline = client.get(f"/api/investigations/{inv['id']}/timeline").json()
     relationship_date = next(x for x in timeline["events"] if x["kind"] == "relationship_date")

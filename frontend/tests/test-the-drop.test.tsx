@@ -45,7 +45,8 @@ describe('The Drop', () => {
     expect(within(lanes[0]).getByRole('gridcell', {name: 'broken.pdf, Read: stopped, The file is damaged'})).toBeInTheDocument();
     expect(within(lanes[1]).getByRole('gridcell', {name: 'minutes.pdf, Ready for you: needs you'})).toBeInTheDocument();
     const receipt = screen.getByRole('region', {name: 'Read receipt: broken.pdf'});
-    expect(within(receipt).getByText('✕ Not read')).toBeInTheDocument();
+    // The verdict is its mark; the words are its name and on hover (Ony, 29 Oct).
+    expect(within(receipt).getByRole('img', {name: 'Not read'})).toHaveTextContent('✕');
     expect(within(screen.getByRole('region', {name: 'Problems first'})).getByRole('button', {name: /broken\.pdf/})).toBeInTheDocument();
     const user = userEvent.setup();
     await user.click(lanes[1]);
@@ -55,8 +56,9 @@ describe('The Drop', () => {
     expect(useWorkbenchStore.getState().document).toMatchObject({documentId: 'd1'});
     const ready = screen.getByRole('region', {name: 'Ready for you'});
     expect(within(ready).getByRole('link', {name: '2 names proposed'})).toBeInTheDocument();
-    expect(within(ready).getByText('proposals waiting, from 1 document')).toBeInTheDocument();
-    expect(within(ready).getByText('1 is medium or low and asks a question')).toBeInTheDocument();
+    // Sub-text is in the page for screen readers but not on screen until asked.
+    expect(within(ready).getByText('proposals waiting, from 1 document').closest('[hidden]')).not.toBeNull();
+    expect(within(ready).getByText('1 is medium or low and asks a question').closest('[hidden]')).not.toBeNull();
     expect(within(line).getByLabelText('All files, stage by stage')).toHaveTextContent('All 2 files');
   });
 
@@ -70,7 +72,10 @@ describe('The Drop', () => {
     mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': {...drop, lanes: [counted]}});
     render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
     const receipt = await screen.findByRole('region', {name: 'Read receipt: minutes.pdf'});
-    const rows = within(within(receipt).getByRole('list', {name: 'What each proposer\'s proposals came to'})).getAllByRole('listitem');
+    // On hover of the proposals (sub-text), so in the page but hidden until asked.
+    const list = within(receipt).getByRole('list', {name: 'What each proposer\'s proposals came to', hidden: true});
+    expect(list.closest('[hidden]')).not.toBeNull();
+    const rows = within(list).getAllByRole('listitem', {hidden: true});
     expect(rows.map(r => r.textContent)).toEqual(['Name-finder (rules): 31 of 40 accepted · 1 waits', 'OpenAleph: 3 of 4 accepted']);
   });
 
@@ -109,7 +114,7 @@ describe('The Drop', () => {
     mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': {...drop, lanes: [], totals: {...drop.totals, files: 0}, ready_for_you: {}}});
     render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
     expect(await screen.findByText(/nothing leaves it/)).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'a folder'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Choose a folder'})).toBeInTheDocument();
   });
 
   it('offers the sample case on an empty Drop only when the sample has documents to bring in', async () => {
@@ -132,7 +137,10 @@ describe('The Drop', () => {
     mockApi({...SETTINGS, 'GET /api/investigations/inv-1/drop': {...drop, ready_for_you: {identifier: 3}}});
     render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
     const ready = await screen.findByRole('region', {name: 'Ready for you'});
-    expect(within(ready).getByRole('link', {name: '3 emails & phones proposed'})).toHaveTextContent('Emails & phones');
+    const link = within(ready).getByRole('link', {name: '3 emails & phones proposed'});
+    expect(link).toHaveTextContent(/^3$/);  // the kind is its icon; named on hover or focus
+    fireEvent.focus(link);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Emails & phones');
   });
 
   it('reads a failed file again, and sends a second copy to the first', async () => {
@@ -251,7 +259,8 @@ describe('The Drop', () => {
     await user.click(screen.getByRole('button', {name: 'History'}));
     const history = await screen.findByRole('list', {name: 'Every drop, newest first'});
     const [first, second] = within(history).getAllByRole('listitem').filter(li => li.parentElement === history);
-    expect(first).toHaveTextContent('1 file saved · 1 already in the case');
+    expect(first).toHaveTextContent('1 file saved');
+    expect(within(first).getByText('1 already in the case').closest('[hidden]')).not.toBeNull();
     expect(first).toHaveTextContent('1 could not be read');
     expect(second).toHaveTextContent('One at a time');
     expect(within(second).getByRole('list', {name: 'What it produced'})).toHaveTextContent('✓1 read214 passages24 names, 8 claims found3 accepted!29 wait for you');
@@ -342,6 +351,12 @@ describe('The Drop', () => {
     expect(boxDetail(st('inside', 'skipped', 'None'))).toBe('none');
     expect(boxDetail(st('read', 'active', 'OCR, page 12 of 40'))).toBe('OCR, page 12 of 40');
     expect(boxDetail(st('read', 'stopped', 'The document reader stopped unexpectedly on this file'))).toBe('');  // only its ✕, as the mockup draws it
+    // A picture's passages do not apply: "– none", not a failure; a scan this computer cannot OCR says so.
+    expect(boxDetail(st('passages', 'skipped', 'A picture has no passages'))).toBe('none');
+    expect(boxDetail(st('passages', 'skipped', 'In the files inside'))).toBe('In the files inside');
+    expect(boxDetail(st('read', 'stopped', 'Needs OCR · not on this computer'))).toBe('no OCR');
+    expect(boxDetail(st('ready', 'done', 'Nothing waits'))).toBe('');
+    expect(boxDetail(st('read', 'stopped', 'The transcription model “small” is not on this computer. Fetch it once with: …'))).toBe('no model');
     const warn = {...lane('w', 'w.pdf', ['done', 'done', 'done', 'done', 'skipped', 'done', 'done']), issues: ['Faint text on 2 regions']};
     expect(problemsFirst([warn, drop.lanes[1]] as never).map(l => l.filename)).toEqual(['broken.pdf', 'w.pdf']);
     const stuck = {...lane('s', 's.pdf', ['done', 'done', 'active', 'waiting', 'skipped', 'waiting', 'waiting']), stalled_minutes: 8};

@@ -3,17 +3,21 @@
 // server, the account kept on its holder's card, a party's drawer with its flags and
 // the dossier link, names shown as text (never as markup), the empty case, and touch
 // (a finger's pan is not a tap, no hover tips for a finger, the phone bar's Back and Next).
-import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {InspectorSlot} from '../features/inspector/inspector-slot';
 import {TheWire, linkInfo} from '../features/the-wire/the-wire';
-import {fmtAmt, fmtDate, linkSentence} from '../features/the-wire/wire-engine';
+import {brighten, clipWords, fmtAmt, fmtDate, fmtSums, linkSentence, moneyBins, pointsIn, separate} from '../features/the-wire/wire-engine';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
-import {emptyGraph, plainAdvisory, relationshipFixture} from '../test-support/page-routes';
+import {dossierFixture, dossierRoutes, emptyGraph, entityFixture, plainAdvisory, relationshipFixture} from '../test-support/page-routes';
+
+// The store's own openDossier, before a test swaps in a spy.
+const storeOpenDossier = useWorkbenchStore.getState().openDossier;
 
 const ent = (id: string, name: string, extra: Record<string, unknown> = {}) => ({
   id, name, short: name, kind: 'company', schema: 'Company', note: '', deg: 1, holder: null, c: 0, x: 400, y: 400, jur: '', flags: null, ...extra,
@@ -37,7 +41,14 @@ beforeEach(() => {
   connectGeneratedClient(new ApiClient('http://api.test'));
   useWorkbenchStore.setState({investigationId: 'inv-1'});
 });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); document.documentElement.removeAttribute('data-motion'); });
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); document.documentElement.removeAttribute('data-motion'); });
+
+// The engine places its labels in animation frames and boots on a timer (wire-engine.ts). A test that
+// reads a label fakes the clock and frames, then runs them out once the data is in, so the map has
+// settled before it is read (review B1). shouldAdvanceTime keeps Testing Library's waits moving.
+const fakeFrames = () => vi.useFakeTimers({shouldAdvanceTime: true,
+  toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance']});
+const settle = () => act(async () => { await vi.advanceTimersByTimeAsync(5000); });
 
 const reviewed = (stance: 'supports' | 'contradicts') => plainAdvisory({relationship_evidence_attachment_count: 1,
   relationship_evidence_review_counts: {supports: stance === 'supports' ? 1 : 0, contradicts: stance === 'contradicts' ? 1 : 0, context: 0, superseded: 0, unresolved: 0, unreviewed: 0}});
@@ -103,12 +114,46 @@ describe('The Wire', () => {
     expect(fmtDate('')).toBe('no date');
   });
 
+  it('keeps party footprints apart: a card with its flag count and accounts never covers another, the middle never moves', () => {
+    const card = (id: string, x: number, y: number, fixed = false) => ({id, x, y, x0: -90, x1: 100, y0: -40, y1: 45, fixed});
+    const items = [card('f', 0, 0, true), card('a', 60, 20), card('b', 80, 30), card('c', -20, 70)];
+    const at = separate(items, 8);
+    expect(at.f).toEqual({x: 0, y: 0});
+    const box = (i: typeof items[number]) => ({x0: at[i.id].x + i.x0, x1: at[i.id].x + i.x1, y0: at[i.id].y + i.y0, y1: at[i.id].y + i.y1});
+    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
+      const a = box(items[i]), b = box(items[j]);
+      expect(a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0).toBe(false);
+    }
+    // Apart already: nothing moves.
+    expect(separate([card('p', 0, 0), card('q', 0, 400)])).toEqual({p: {x: 0, y: 0}, q: {x: 0, y: 400}});
+  });
+
+  it('counts the line points inside a sentence box, so a sentence can sit where no other line runs', () => {
+    expect(pointsIn({x0: 0, x1: 10, y0: 0, y1: 10}, [5, 5, 20, 5, 1, 9])).toBe(2);
+  });
+
   it('reads how sure each link is from the review advisory, with its end date', () => {
     const info = linkInfo(SEE1_GRAPH.edges as never);
     expect(info.o1).toEqual({sure: 'shown', end: ''});
     expect(info.u1).toEqual({sure: 'unshown', end: ''});
     expect(info.d1).toEqual({sure: 'shown', end: '2017-07-03'});
     expect(info.x1).toEqual({sure: 'disputed', end: ''});
+  });
+
+  it('cuts a long role at a word with an ellipsis, never mid-word', () => {
+    expect(clipWords('Owning entity in the Cook Islands trust structure', 32)).toBe('Owning entity in the Cook…');
+    expect(clipWords('Founder and chairman of the board', 32)).toBe('Founder and chairman of the…');
+    expect(clipWords('Director', 32)).toBe('Director');
+  });
+
+  it('never adds payments in different currencies: each currency has its own sum', () => {
+    const l = (amount: number, cur: string, date: string) => ({id: 'x', s: 'a', t: 'b', schema: 'Payment', fam: 'money' as const, amount, cur, date, role: '', pct: '', ev: []});
+    expect(linkSentence('money', [l(20000, 'EUR', '2018-02-01'), l(9400, 'USD', '2018-03-01')], '')).toBe('paid 20,000 EUR + 9,400 USD · 2× · Feb–Mar 2018');
+    expect(fmtSums([l(1000, 'EUR', ''), l(500, 'USD', ''), l(2000, 'EUR', '')])).toBe('3,000 EUR + 500 USD');
+    expect(fmtSums([])).toBe('');
+    // The time strip counts payments a quarter and names each currency's sum; it never stacks amounts across them.
+    const bins = moneyBins([l(20000, 'EUR', '2018-02-01'), l(9400, 'USD', '2018-03-01')]);
+    expect(Object.values(bins)).toEqual([{n: 2, say: '20,000 EUR + 9,400 USD'}]);
   });
 
   it('writes each link as a sentence from the fixed verbs', () => {
@@ -135,8 +180,23 @@ describe('The Wire', () => {
     expect(labels).toEqual(expect.arrayContaining(['✓ owns 100% since 2016', '? signs for', '✕ emailed about filing · 2 Nov 2018']));
     // The ended directorship says so, once the window passes its end.
     await waitFor(() => expect(labels.concat([...map.querySelectorAll('.elab text')].map(t => t.textContent))).toContain('✓ director · ended Jul 2017'));
-    // The flag badge gives the level in words with the count.
-    expect(map.textContent).toContain('TEXTBOOK · 2');
+    // A flagged card's outline takes its level; the count sits in a circle on its corner, named in words.
+    const kestrel = [...map.querySelectorAll('g.node')].find(g => g.classList.contains('textbook'))!;
+    expect(kestrel.querySelector('.card-bg')?.getAttribute('stroke')).toBe('#FF8070');
+    expect(kestrel.querySelector('.flag-dot')?.getAttribute('aria-label')).toBe('2 open Red Flags, the strongest textbook');
+    expect(kestrel.querySelector('.flag-dot .flag-n')?.textContent).toBe('2');
+    // The kind is the icon in the card's dot (SEE_1), not a word on the card.
+    expect(kestrel.querySelector('use.kind-icon')?.getAttribute('href')).toBe('#tw-k-company');
+    expect(document.getElementById('tw-k-company')?.tagName).toBe('symbol');
+    expect(kestrel.querySelector('.card-s')?.textContent).not.toMatch(/COMPANY/);
+    // Hovering the circle brightens the glow and shows the flags themselves.
+    fireEvent.pointerEnter(kestrel.querySelector('.flag-dot')!, {pointerType: 'mouse'});
+    expect(kestrel.classList.contains('flag-hot')).toBe(true);
+    const tip = document.querySelector('.tw-tip')!;
+    expect(tip.textContent).toContain('2 open Red Flags');
+    expect(tip.textContent).toContain('Circular ownership');
+    fireEvent.pointerLeave(kestrel.querySelector('.flag-dot')!);
+    expect(kestrel.classList.contains('flag-hot')).toBe(false);
     expect(screen.getByLabelText('Key').textContent).toMatch(/How sure.*always on.*shown.*not yet shown.*disputed.*worked out by the app.*ended, drawn faint/);
     expect(document.querySelector('.tw-counts')?.textContent).toBe('Showing all 4 links · 1 ended, drawn faint · 1 undated, always shown');
   });
@@ -160,14 +220,14 @@ describe('The Wire', () => {
   it('steps through the labelled links with J / K and opens one with Enter', async () => {
     mockApi({'GET /api/investigations/inv-1/wire': SEE1, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH});
     document.documentElement.dataset.motion = 'calm';
+    fakeFrames();
     render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
     await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
-    await waitFor(() => expect([...document.querySelectorAll<SVGGElement>('.elab')].some(g => g.style.display !== 'none')).toBe(true));
-    // The calm descent to the party can still be redrawing the links: press J until one stays lit.
-    await waitFor(() => {
-      if (!document.querySelector('.elab.lit')) fireEvent.keyDown(window, {key: 'j'});
-      expect(document.querySelector('.elab.lit')).not.toBeNull();
-    });
+    await settle();
+    expect([...document.querySelectorAll<SVGGElement>('.elab')].some(g => g.style.display !== 'none')).toBe(true);
+    fireEvent.keyDown(window, {key: 'j'});
+    await settle();
+    expect(document.querySelector('.elab.lit')).not.toBeNull();
     expect(document.querySelector('.tw-tip')?.textContent).toMatch(/Enter opens every record on this link/);
     fireEvent.keyDown(window, {key: 'Enter'});
     await waitFor(() => expect(document.querySelector('.tw-alttitle')?.textContent).toBe('one link, opened'));
@@ -234,14 +294,13 @@ describe('The Wire', () => {
       'GET /api/documents/d1/page-image': () => new Response(new Uint8Array([137, 80, 78, 71]), {headers: {'content-type': 'image/png'}}),
     });
     document.documentElement.dataset.motion = 'calm';
+    fakeFrames();
     render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
     await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
-    const pill = await waitFor(() => {
-      const g = [...document.querySelectorAll<SVGGElement>('.elab')].find(x => x.style.display !== 'none' && x.textContent?.includes('owns 100%'));
-      expect(g).toBeTruthy();
-      return g!;
-    });
-    fireEvent.click(pill);
+    await settle();
+    const pill = [...document.querySelectorAll<SVGGElement>('.elab')].find(x => x.style.display !== 'none' && x.textContent?.includes('owns 100%'));
+    expect(pill).toBeTruthy();
+    fireEvent.click(pill!);
     const panel = await screen.findByRole('complementary', {name: 'The link'});
     expect(panel.querySelector('h2')?.textContent).toBe('Loop Two BV owns 100% since 2016 Kestrel SA');
     expect(panel.textContent).toContain('✓ Shown');
@@ -276,5 +335,56 @@ describe('The Wire', () => {
     expect(bands()).toEqual(['Company', 'Person']);
     fireEvent.click(screen.getByRole('button', {name: 'Linked groups'}));
     expect(screen.getByText(/Each patch is a group/)).toBeInTheDocument();
+  });
+  it('draws your tags as a ring of arcs outside a tagged party, with a key, and hides them with Your tags', async () => {
+    const row = (record_id: string, name: string, colour: string, record_type = 'entity') => ({record_type, record_id, name, colour, tag_id: name});
+    mockApi({'GET /api/investigations/inv-1/wire': WIRE, 'GET /api/investigations/inv-1/record-tags': {investigation_id: 'inv-1',
+      rows: [row('a', 'Owner', '#7FB7E0'), row('a', 'Check again', '#E9AFA8'), row('b', 'Owner', '#7FB7E0'), row('l1', 'Owner', '#7FB7E0', 'relationship')]}});
+    render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    await waitFor(() => expect(map.querySelectorAll('.tw-tagring').length).toBe(2));
+    // Meridian carries two tags, each its own arc of the one ring.
+    // Each arc is its swatch brightened, over a glowing copy.
+    const ring = map.querySelectorAll('.tw-tagring')[0];
+    expect(Array.from(ring.querySelectorAll('.sharp circle')).map(c => c.getAttribute('stroke'))).toEqual([brighten('#7FB7E0'), brighten('#E9AFA8')]);
+    expect(ring.querySelectorAll('.glow circle')).toHaveLength(2);
+    expect(brighten('#3e6181')).toBe('#9fb0c0');
+    const key = screen.getByLabelText('Key');
+    expect(key.textContent).toContain('Owner · 2');
+    expect(key.textContent).toContain('Check again · 1');
+    const toggle = screen.getByRole('button', {name: 'Your tags'});
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByLabelText('The Wire').classList.contains('tw-tags-off')).toBe(true);
+    expect(key.textContent).not.toContain('Owner');
+  });
+
+  it('leaves Esc to the inspector slot while a dossier is open over it, then steps back itself', async () => {
+    // DECISIONS_LOG 40: the slot is the layer on top. The Wire's key handler was added first, so without the layer check
+    // it would act on the same Esc (closing its drawer) before the slot took the key.
+    mockApi({'GET /api/investigations/inv-1/wire': WIRE, ...dossierRoutes('a', dossierFixture(entityFixture('a', 'Meridian Holdings Ltd', 'Company')))});
+    useWorkbenchStore.setState({openDossier: storeOpenDossier, inspector: []});
+    if (!window.matchMedia) {
+      window.matchMedia = ((query: string) => ({matches: false, media: query, onchange: null, addListener: () => {}, removeListener: () => {},
+        addEventListener: () => {}, removeEventListener: () => {}, dispatchEvent: () => false})) as unknown as typeof window.matchMedia;
+    }
+    render(<QueryProvider><TheWire investigationId="inv-1"/><InspectorSlot investigationId="inv-1"/></QueryProvider>);
+    const map = await screen.findByRole('img', {name: /Map of the parties/});
+    await waitFor(() => expect(map.querySelectorAll('g.node').length).toBe(4));
+    fireEvent.click(map.querySelectorAll('g.node')[0]);
+    const drawer = document.querySelector('.tw-drawer')!;
+    await waitFor(() => expect(drawer.classList.contains('open')).toBe(true));
+    fireEvent.click(screen.getByRole('button', {name: 'Open the dossier'}));
+    const slot = document.querySelector<HTMLElement>('aside[aria-label="Inspector"]')!;
+    expect(slot).toBeVisible();
+
+    // One Esc: the slot closes, The Wire's drawer stays open.
+    fireEvent.keyDown(window, {key: 'Escape'});
+    expect(slot).not.toBeVisible();
+    expect(drawer.classList.contains('open')).toBe(true);
+    // The next Esc is The Wire's: its drawer closes.
+    fireEvent.keyDown(window, {key: 'Escape'});
+    expect(drawer.classList.contains('open')).toBe(false);
   });
 });

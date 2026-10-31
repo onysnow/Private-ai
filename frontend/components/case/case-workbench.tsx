@@ -22,6 +22,7 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Toaster} from '@/components/ui/sonner';
 import {AiReasoningPanel} from '../ai-reasoning-panel';
+import {DraftableClaims} from '../../features/ai/draftable-claims';
 import {BeforeYouRun} from '../../features/ai/before-you-run';
 import {PanelErrorBoundary} from '../panel-error-boundary';
 import {ApiAccessPanel} from '../../features/api-access/api-access-panel';
@@ -35,8 +36,13 @@ import {MoneyView} from '../../features/money/money-view';
 import {ChainOfCustody} from '../../features/custody/chain-of-custody';
 import {StoryScreen} from '../../features/story/story-screen';
 import {TheDrop} from '../../features/the-drop/the-drop';
+import {Following} from '../../features/following/following';
 import {ReadingRoom} from '../../features/reading-room/reading-room';
+import {IsItReal, RealnessList} from '../../features/is-it-real/is-it-real';
+import {CheckAPack} from '../../features/pack-check/check-a-pack';
+import {AddByHand} from '../../features/by-hand/add-by-hand';
 import {ChartBuilderPanel} from '../../features/charts/chart-builder-panel';
+import {DecksScreen} from '../../features/decks/deck-editor';
 import {ClaimsPanel} from '../../features/claims/claims-panel';
 import {ConnectorsPanel} from '../../features/connectors/connectors-panel';
 import {CorpusPanel} from '../../features/corpus/corpus-panel';
@@ -44,7 +50,7 @@ import {DeletionPanel} from '../../features/deletion/deletion-panel';
 import {DocumentsPanel} from '../../features/documents/documents-panel';
 import {LeadsPanel} from '../../features/leads/leads-panel';
 import {PlacesPanel} from '../../features/places/places-panel';
-import {ProvenancePanel} from '../../features/provenance/provenance-panel';
+import {InspectorSlot} from '../../features/inspector/inspector-slot';
 import {withEnds} from '../../features/relationship-graph/graph';
 import {StageRail, StageSection, StandingTiles, useStanding} from '../layout/workbench-page';
 import {RedFlagsBoard} from '../../features/act/red-flags-board';
@@ -53,11 +59,12 @@ import type {Section} from './section-screen';
 import {YearSlider} from '../charts/year-slider';
 import {RedFlagsPanel} from '../../features/red-flags/red-flags-panel';
 import {ToCheckPanel} from '../../features/to-check/to-check-panel';
-import {RelationshipGraphPanel} from '../../features/relationship-graph/relationship-graph-panel';
 import {ReviewQueuePanel} from '../../features/review-queue/review-queue-panel';
 import {SearchPanel} from '../../features/search/search-panel';
 import {SecurityPanel} from '../../features/security/security-panel';
+import {AccessScreen} from '../../features/security/access-screen';
 import {SourceCapturePanel} from '../../features/source-capture/source-capture-panel';
+import {SourcesBrowser} from '../../features/source-capture/sources-browser';
 import {TimelinePanel} from '../../features/timeline/timeline-panel';
 import {api} from '../../lib/api-instance';
 import type {CitationDetail} from '../../lib/api-types';
@@ -107,8 +114,9 @@ function investigationToOpen(rows: InvestigationOut[]): string {
 export {caseHref};
 
 /** Which stage holds what a request asks for. */
-const STAGE_OF_REQUEST: Record<'claim' | 'dossier' | 'relationship' | 'document' | 'flag' | 'check', StageKey> = {
-  claim: 'verify', check: 'verify', dossier: 'collect', document: 'collect', relationship: 'map', flag: 'report',
+// A party's dossier and a record's Chain of Custody open in the inspector slot, where you are (DECISIONS_LOG 16).
+const STAGE_OF_REQUEST: Record<'claim' | 'relationship' | 'document' | 'flag' | 'check', StageKey> = {
+  claim: 'verify', check: 'verify', document: 'collect', relationship: 'map', flag: 'report',
 };
 
 export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElement {
@@ -155,7 +163,11 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         if (!req || seen.current[key] === req.serial) continue;
         seen.current[key] = req.serial;
         const stage = STAGES.find(s => s.key === STAGE_OF_REQUEST[key]);
-        if (stage && viewOfPath(window.location.pathname) !== stage.key) router.push(caseHref(stage.route, state.investigationId));
+        if (!stage) continue;
+        // A relationship opens in The Wire's All links (the old Relationships panel's work moved there).
+        const anchor = key === 'relationship' ? 'the-wire' : '';
+        if (viewOfPath(window.location.pathname) !== stage.key) router.push(caseHref(`${stage.route}${anchor ? `#${anchor}` : ''}`, state.investigationId));
+        else if (anchor && window.location.hash !== `#${anchor}`) window.location.hash = anchor;
       }
     });
   }, [fixedView, router]);
@@ -201,8 +213,6 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
   const investigation = investigations.find(i => i.id === inv);
   const investigationName = investigation?.name ?? '';
   useEffect(() => { useWorkbenchStore.getState().setInvestigationName(investigationName); }, [investigationName]);
-  const provenance = useWorkbenchStore(state => state.provenance);
-  const clearProvenance = useWorkbenchStore(state => state.clearProvenance);
   const accessLabel = access.state === 'authenticated' ? 'API: session active' : access.state === 'local' ? 'API: local access' : access.state === 'needs_token' ? 'API: token needed'
     : access.state === 'remote_disabled' ? 'API: remote disabled' : access.state === 'error' ? 'API: connection error' : 'API: checking…';
   // Decide shows a server that does not answer as its own error state, alone, with a retry (BACKLOG P1:
@@ -230,7 +240,8 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         loading={!rows && !investigationsQuery.isError} active={view === 'home'}/></PanelErrorBoundary>
     </div>}
     {view !== 'all' && mounted('decide') && <div hidden={!shown('decide')} className="cv-home-wrap">
-      <PanelErrorBoundary name="Decide"><DecideScreen investigationId={inv} investigationName={investigationName} active={view === 'decide'} unreachable={decideUnreachable}/></PanelErrorBoundary>
+      <PanelErrorBoundary name="Decide"><DecideScreen investigationId={inv} investigationName={investigationName} active={view === 'decide'} unreachable={decideUnreachable}
+        isDemo={investigation ? Boolean(investigation.is_demo) : undefined}/></PanelErrorBoundary>
     </div>}
 
     {view === 'all' ? <>
@@ -252,7 +263,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
 
       {stage('map', <>
         <YearSlider investigationId={inv}/>
-        <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary>
+        <div id="the-wire" style={{height: 720, position: 'relative'}}><PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={false}/></PanelErrorBoundary></div>
         <div id="money-flows"><PanelErrorBoundary name="Money"><MoneyView investigationId={inv} active={false}/></PanelErrorBoundary></div>
         <div id="timeline"><PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary></div>
         <div id="places"><PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary></div>
@@ -262,63 +273,69 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
         <PanelErrorBoundary name="Red Flags"><RedFlagsPanel investigationId={inv}/></PanelErrorBoundary>
         <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>
         <div id="chart-builder"><PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary></div>
-        <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>
+        <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation} emptyAside={<DraftableClaims investigationId={inv}/>}/>
       </>)}
 
       {stage('keep', <>
         <div className="wb-row">
           <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>
-          <div id="deletion"><PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary></div>
+          <div id="deletion"><PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted} countOnOpen={false}/></PanelErrorBoundary></div>
         </div>
         {access.settingsStatus && <div id="access"><PanelErrorBoundary name="Local security/settings status"><SecurityPanel settingsStatus={access.settingsStatus} providers={providers}/></PanelErrorBoundary></div>}
       </>)}
     </> : <>
       {screen('collect', [
         {anchor: 'the-drop', label: 'The Drop', fill: true, render: () => <PanelErrorBoundary name="The Drop"><TheDrop investigationId={inv} active={view === 'collect'}/></PanelErrorBoundary>},
-        {anchor: 'investigation-search', label: 'Search', render: () => <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'document-ingestion', label: 'Library', render: () => <PanelErrorBoundary name="Library"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'source-capture', label: 'Sources & evidence', render: () => <PanelErrorBoundary name="Source & exact evidence capture">
-          <SourceCapturePanel investigationId={inv} sourceCount={sourcesQuery.data?.length ?? 0} evidenceCount={evidenceQuery.data?.length ?? 0}/></PanelErrorBoundary>},
-        {anchor: 'connectors', label: 'Connectors', render: () => <PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers} picker={picker}/></PanelErrorBoundary>},
-        {anchor: 'corpus', label: 'OpenAleph corpus', render: () => <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'following', label: 'Following', fill: true, render: () => <PanelErrorBoundary name="Following"><Following investigationId={inv} active={view === 'collect'}/></PanelErrorBoundary>},
+        {anchor: 'investigation-search', label: 'Search', fill: true, render: () => <PanelErrorBoundary name="Investigation search"><SearchPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'document-ingestion', label: 'Library', fill: true, render: () => <PanelErrorBoundary name="Library"><DocumentsPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'source-capture', label: 'Sources & evidence', fill: true, render: () => <PanelErrorBoundary name="Sources & evidence">
+          <SourcesBrowser investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'connectors', label: 'Connectors', fill: true, render: () => <PanelErrorBoundary name="External connectors"><ConnectorsPanel investigationId={inv} providers={providers}/></PanelErrorBoundary>},
+        {anchor: 'corpus', label: 'OpenAleph corpus', fill: true, render: () => <PanelErrorBoundary name="OpenAleph corpus"><CorpusPanel investigationId={inv}/></PanelErrorBoundary>},
       ])}
       {screen('verify', [
-        {anchor: 'claim-verification', label: 'Claims', render: () => <PanelErrorBoundary name="Claim verification workspace">
+        {anchor: 'claim-verification', label: 'Claims', fill: true, render: () => <PanelErrorBoundary name="Claim verification workspace">
           <ClaimsPanel investigationId={inv} relationships={relationships} onInspectRelationship={id => openRelationship({relationshipId: id})}/></PanelErrorBoundary>},
-        {anchor: 'to-check', label: 'To check', render: () => <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'review-queue', label: 'Connector findings', render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'chain-of-custody', label: 'Chain of Custody', render: () => <PanelErrorBoundary name="Chain of Custody (full)"><ChainOfCustody investigationId={inv} active={view === 'verify'}/></PanelErrorBoundary>},
+        {anchor: 'to-check', label: 'To check', fill: true, render: () => <PanelErrorBoundary name="To check"><ToCheckPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'review-queue', label: 'Connector findings', fill: true, render: () => <PanelErrorBoundary name="Review queue"><ReviewQueuePanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'is-it-real', label: 'Is it real?', render: () => <PanelErrorBoundary name="Is it real?"><RealnessList investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'chain-of-custody', label: 'Chain of Custody', fill: true, render: () => <PanelErrorBoundary name="Chain of Custody (full)"><ChainOfCustody investigationId={inv} active={view === 'verify'}/></PanelErrorBoundary>},
+        {anchor: 'check-a-pack', label: 'Check a pack', fill: true, render: () => <PanelErrorBoundary name="Check a pack"><CheckAPack investigationId={inv}/></PanelErrorBoundary>},
       ])}
       {screen('map', [
         {anchor: 'the-wire', label: 'The Wire', fill: true, render: () => <PanelErrorBoundary name="The Wire"><TheWire investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
         {anchor: 'money-flows', label: 'Money', render: () => <PanelErrorBoundary name="Money"><MoneyView investigationId={inv} active={view === 'map'}/></PanelErrorBoundary>},
-        {anchor: 'relationship-graph', label: 'Relationships', render: () => <><YearSlider investigationId={inv}/>
-          <PanelErrorBoundary name="FollowTheMoney relationship graph"><RelationshipGraphPanel investigationId={inv}/></PanelErrorBoundary></>},
-        {anchor: 'timeline', label: 'Timeline', render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'timeline', label: 'Timeline', fill: true, render: () => <PanelErrorBoundary name="Investigation timeline"><TimelinePanel investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'places', label: 'Places', render: () => <PanelErrorBoundary name="Places"><PlacesPanel investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'add-by-hand', label: 'Add by hand', render: () => <PanelErrorBoundary name="Add by hand"><AddByHand investigationId={inv}/></PanelErrorBoundary>},
       ])}
       {screen('report', [
         {anchor: 'red-flags', label: 'Red Flags', fill: true, render: () => <PanelErrorBoundary name="Red Flags"><RedFlagsBoard investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'story', label: 'Story', render: () => <PanelErrorBoundary name="Story"><StoryScreen investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
         {anchor: 'leads', label: 'Leads', render: () => <PanelErrorBoundary name="Questions & reporting leads"><LeadsPanel investigationId={inv}/></PanelErrorBoundary>},
-        {anchor: 'chart-builder', label: 'Charts', render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'chart-builder', label: 'Charts', fill: true, render: () => <PanelErrorBoundary name="Chart builder"><ChartBuilderPanel key={inv} investigationId={inv}/></PanelErrorBoundary>},
+        {anchor: 'decks', label: 'Decks', fill: true, render: () => <PanelErrorBoundary name="Decks"><DecksScreen investigationId={inv}/></PanelErrorBoundary>},
         {anchor: 'ai-runs', label: 'AI runs', render: () => <PanelErrorBoundary name="AI runs"><BeforeYouRun investigationId={inv} active={view === 'report'}/></PanelErrorBoundary>},
-        {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation}/>},
+        {anchor: 'ai-reasoning-panel', label: 'AI drafts', render: () => <AiReasoningPanel api={api} investigationId={inv} status={access.settingsStatus?.ai} onTraceRecord={traceCitation} emptyAside={<DraftableClaims investigationId={inv}/>}/>},
       ])}
       {screen('keep', [
         {anchor: 'safety-data', label: 'Safety & data', fill: true, render: () => <PanelErrorBoundary name="Safety & data"><SafetyScreen investigationId={inv} caseName={investigationName} active={view === 'keep'}/></PanelErrorBoundary>},
-        {anchor: 'backup-restore', label: 'Backup & restore', render: () => <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>},
-        {anchor: 'deletion', label: 'Delete', render: () => <PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary>},
-        ...(access.settingsStatus ? [{anchor: 'access', label: 'Access', render: () => <PanelErrorBoundary name="Local security/settings status">
-          <SecurityPanel settingsStatus={access.settingsStatus!} providers={providers}/></PanelErrorBoundary>}] : []),
+        {anchor: 'backup-restore', label: 'Backup & restore', fill: true, render: () => <PanelErrorBoundary name="Portable backup & restore"><BackupPanel investigationId={inv} onRestored={afterInvestigationRestored}/></PanelErrorBoundary>},
+        {anchor: 'deletion', label: 'Delete', fill: true, render: () => <PanelErrorBoundary name="Local investigation deletion"><DeletionPanel investigationId={inv} caseName={investigationName} onDeleted={afterInvestigationDeleted}/></PanelErrorBoundary>},
+        ...(access.settingsStatus ? [{anchor: 'access', label: 'Access', fill: true, render: () => <PanelErrorBoundary name="Access">
+          <AccessScreen investigationId={inv} caseName={investigationName} settingsStatus={access.settingsStatus!}/></PanelErrorBoundary>}] : []),
       ])}
     </>}
   </>;
 
-  const drawer = <aside className="wb-drawer" hidden={!provenance} aria-label="Chain of Custody">
-    <button type="button" className="wb-drawer-close" onClick={clearProvenance} aria-label="Close Chain of Custody">×</button>
-    <PanelErrorBoundary name="Chain of Custody"><ProvenancePanel investigationId={inv}/></PanelErrorBoundary>
-  </aside>;
+  // A dossier's "Open in Bring in › Connectors": the party stays selected there (opening its dossier selected it), and
+  // the slot stays open beside it.
+  const openInConnectors = fixedView ? undefined : () => {
+    if (viewOfPath(window.location.pathname) !== 'collect') router.push(caseHref('/bring-in#connectors', inv));
+    else if (window.location.hash !== '#connectors') window.location.hash = 'connectors';
+  };
+  const drawer = <InspectorSlot investigationId={inv} onOpenInConnectors={openInConnectors}/>;
 
   if (view === 'all') return <AllStages investigationName={investigationName} picker={investigations.length > 0 ? picker : null}
     accessLabel={accessLabel} accessMessage={access.message} onClear={access.state === 'authenticated' ? clearApiSession : null} drawer={drawer}>{body}</AllStages>;
@@ -327,6 +344,7 @@ export function CaseWorkbench({view: fixedView}: {view?: CaseView}): ReactElemen
     {body}
     {drawer}
     <PanelErrorBoundary name="Reading room"><ReadingRoom investigationId={inv}/></PanelErrorBoundary>
+    <PanelErrorBoundary name="Is it real?"><IsItReal investigationId={inv}/></PanelErrorBoundary>
     <Toaster/>
   </div>;
 }

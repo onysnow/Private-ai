@@ -11,11 +11,12 @@
 // OpenAleph sync/refresh and staging a relationship from an accepted claim
 // candidate -- both layer on top of what's covered here rather than being
 // core to the upload/review loop.
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {act, cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {fastJobPolls, steppedJobPolls} from '../test-support/job-poll';
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi, RouteCall} from '../test-support/mock-api';
 import {pageRoutes} from '../test-support/page-routes';
@@ -51,6 +52,7 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
   mockPush.mockClear();
+  fastJobPolls();
 });
 
 async function importHome(): Promise<() => ReactElement> {
@@ -113,7 +115,7 @@ async function bootstrapWithOneDocument(document: Record<string, unknown> = docF
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText(String(document.filename));
+  await screen.findByTestId(`document-${String(document.id)}`);
   return api;
 }
 
@@ -156,8 +158,8 @@ describe('Home document ingestion & extraction', () => {
     // uploadDocument() sets "Extracted N chunk(s)..." and keeps it once the
     // proposals are in (loading them used to clear it). What persists: that
     // line, the reloaded documents list and the newly loaded proposals.
-    await screen.findByText('contract.pdf');
-    expect(screen.getByText('Kestrelwood Holdings Ltd')).toBeInTheDocument();
+    await screen.findByTestId('document-doc-2');
+    await screen.findByText('Kestrelwood Holdings Ltd');
     expect(screen.getByText('Extracted 4 chunk(s). Review proposals before canonicalizing.')).toBeInTheDocument();
 
     expect(api.calls(UPLOAD)).toHaveLength(1);
@@ -254,12 +256,14 @@ describe('Home document reading runs as a background job (ADR-0004)', () => {
       'GET /api/documents/doc-2/candidates': [candidateFixture({id: 'cand-2'})],
     });
 
+    const nextPoll = steppedJobPolls();
     const user = userEvent.setup();
     await user.upload(fileInput(), new File(['pdf-bytes'], 'scan.pdf', {type: 'application/pdf'}));
     await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
 
     await screen.findByText('Saved. Reading the document: Reading the document (5%)');
-    await screen.findByText('Kestrelwood Holdings Ltd', {}, {timeout: 4000});
+    act(() => nextPoll());
+    await screen.findByText('Kestrelwood Holdings Ltd');
     // Two polls until the job finished, then the read document and its
     // proposals; the list was reloaded on save and again when the read ended.
     expect(api.calls('GET /api/jobs/job-1')).toHaveLength(2);
@@ -281,9 +285,9 @@ describe('Home document reading runs as a background job (ADR-0004)', () => {
       [DOCUMENTS]: [docFixture({id: 'doc-9', filename: 'broken.pdf', extraction_status: 'complete'})], // the list the reload finds
     });
 
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Retry reading'}));
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Try reading again'}));
     await screen.findByText('broken.pdf: Document read');
-    expect(screen.queryByRole('button', {name: 'Retry reading'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Try reading again'})).not.toBeInTheDocument();
     expect(api.calls('GET /api/jobs')).toHaveLength(1);
     expect(api.lastUrl('GET /api/jobs').searchParams.get('subject_id')).toBe('doc-9');
     expect(api.calls(retry)).toHaveLength(1);
@@ -300,7 +304,7 @@ describe('Home remembers the open investigation in the address bar (?inv=)', () 
     const api = mockApi(pageRoutes({investigations: [investigation, second], documents: [docFixture({id: 'doc-9', filename: 'harbor.pdf'})]}));
     const Home = await importHome();
     render(<Home />);
-    await screen.findByText('harbor.pdf');
+    await screen.findByTestId('document-doc-9');
     expect(api.calls('GET /api/investigations/inv-2/documents')).toHaveLength(1);
     expect(api.calls(DOCUMENTS)).toHaveLength(0);
     expect(window.location.search).toBe('?inv=inv-2');

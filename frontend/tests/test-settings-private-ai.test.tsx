@@ -37,7 +37,9 @@ describe('Settings: AI and research', () => {
     expect(screen.getByRole('button', {name: 'AI and research: ask first'})).toBeInTheDocument();
     expect(screen.getAllByText(/runs on this computer/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/remote endpoints allowed/)).not.toBeInTheDocument();
-    expect(screen.getByTestId('authority-suite')).toHaveTextContent('Rules the AI works under: the Authority System Suite (b1c71e8), TAS v1.12. Default source floor: tier D; tier C never counts toward corroboration.');
+    // The rules' name shows; source, version and tier floor are revealed on it.
+    expect(within(screen.getByTestId('authority-suite')).getByText('the Authority System Suite').closest('.rv'))
+      .toHaveAccessibleDescription('Source b1c71e8 · TAS v1.12. Default source floor: tier D; tier C never counts toward corroboration.');
   });
 
   it('says when a cloud provider answers, and when remote endpoints are allowed', async () => {
@@ -50,7 +52,10 @@ describe('Settings: AI and research', () => {
 
   it('explains when AI is off', async () => {
     await renderSettings({enabled: false, model: null});
-    expect(screen.getByText(/AI reasoning is disabled on this deployment/)).toBeInTheDocument();
+    // A calm state in plain words; the deployment flag only on the reveal.
+    const state = screen.getByTestId('ai-state');
+    expect(within(state).getByText('AI is off').closest('.rv')).toHaveAccessibleDescription(/ENABLE_AI_FEATURES is off/);
+    for (const el of screen.queryAllByText(/ENABLE_AI_FEATURES/)) expect(el.closest('[hidden]')).not.toBeNull();
     expect(screen.queryByText(/Model:/)).not.toBeInTheDocument();
   });
 });

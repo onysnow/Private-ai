@@ -39,6 +39,7 @@ from app.models.sources import Evidence, Source
 from app.services.anchor_text import refind_anchor
 from app.services.anchors import chunk_dicts
 from app.services.claim_done import _document_of, _file_matches, _norm, done_checks
+from app.services.claims import superseded_of
 from app.services.provenance import _record_extraction_lineage
 
 READ_METHOD = {"ocr": "OCR", "native_pdf": "text layer", "native_text": "text"}
@@ -90,7 +91,9 @@ def _rests_on(db: Session, investigation_id: str, evidence_id: str, claim_id: st
     """What falls if this evidence breaks: the claims it is linked to, the links (relationships) it is attached to,
     and the open Red Flags that name it or one of those claims (research §3.11 "What if this breaks?")."""
     out: list[dict[str, Any]] = []
-    claim_ids = list(db.scalars(select(ClaimEvidenceLink.claim_id).where(ClaimEvidenceLink.evidence_id == evidence_id)))
+    # A claim whose link to it is superseded no longer rests on it.
+    claim_ids = list(db.scalars(select(ClaimEvidenceLink.claim_id).where(ClaimEvidenceLink.evidence_id == evidence_id,
+                                                                         ClaimEvidenceLink.superseded_at.is_(None))))
     for c in list(db.scalars(select(Claim).where(Claim.id.in_(claim_ids)))) if claim_ids else []:
         out.append({"kind": "claim", "id": c.id, "label": c.text})
     edge_ids = list(db.scalars(select(RelationshipEvidenceAttachment.relationship_edge_id).where(RelationshipEvidenceAttachment.evidence_id == evidence_id)))
@@ -106,6 +109,13 @@ def _rests_on(db: Session, investigation_id: str, evidence_id: str, claim_id: st
 def _person(name: str | None) -> str:
     """A decider by name when one was kept; "a person" otherwise (decided before names were kept, or with no account)."""
     return name or "a person"
+
+
+def _decider_actor(candidate: dict[str, Any]) -> str:
+    """Who accepted a proposal: a person, or the demo case's own pre-made decision (app/services/demo_decided.py)."""
+    from app.db.decided_by import DEMO_DECIDER_ID
+
+    return "app" if candidate.get("decided_by_id") == DEMO_DECIDER_ID else "person"
 
 
 def _anchor(db: Session, ev: Evidence, doc: Document | None) -> tuple[dict[str, Any] | None, str | None]:
@@ -206,7 +216,7 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
                           "lines": [f"{proposer} · {candidate.get('candidate_type')}{f' · {conf:.2f}' if isinstance(conf, (int, float)) else ''}",
                                     f"accepted by {_person(candidate.get('decided_by_name'))}" if accepted else "not yet decided"],
                           "who": _person(candidate.get("decided_by_name")) if accepted else proposer,
-                          "actor": "person" if accepted else _proposer_actor(candidate.get("payload")),
+                          "actor": _decider_actor(candidate) if accepted else _proposer_actor(candidate.get("payload")),
                           "when": candidate.get("reviewed_at") or candidate.get("created_at"),
                           "checks": [{"label": "accepted", "ok": accepted}],
                           "wire": {"style": "against" if against else ("confirmed" if accepted else "proposed"),
@@ -214,7 +224,7 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             log.append({"when": candidate.get("created_at"), "who": proposer, "actor": _proposer_actor(candidate.get("payload")),
                         "what": f"Proposed this {candidate.get('candidate_type')}{f' ({conf:.2f})' if isinstance(conf, (int, float)) else ''}", "card": f"decision:{ev.id}"})
             if accepted and candidate.get("reviewed_at"):
-                log.append({"when": candidate["reviewed_at"], "who": _person(candidate.get("decided_by_name")), "actor": "person",
+                log.append({"when": candidate["reviewed_at"], "who": _person(candidate.get("decided_by_name")), "actor": _decider_actor(candidate),
                             "what": "Accepted the proposal", "card": f"decision:{ev.id}"})
         else:
             cards.append({"id": f"decision:{ev.id}", "kind": "decision", "title": "Answered" if against and link.note else "Quote saved",
@@ -223,7 +233,12 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
                           "wire": {"style": "against" if against else "confirmed", "words": "against" if against else "supports"}})
         log.append({"when": link.created_at, "who": _person(link.decided_by_name), "actor": "person",
                     "what": f"Linked as {'against' if against else 'supporting'} the claim{f': {link.note}' if link.note else ''}", "card": f"decision:{ev.id}"})
-        rows.append({"evidence_id": ev.id, "stance": link.stance, "cards": cards,
+        superseded = superseded_of(db, link)
+        if superseded is not None:
+            by = superseded["by_label"]
+            log.append({"when": superseded["at"], "who": _person(superseded["decided_by_name"]), "actor": "person",
+                        "what": f"Marked superseded{f' by {by}' if by else ''}: {superseded['reason']}", "card": f"decision:{ev.id}"})
+        rows.append({"evidence_id": ev.id, "stance": link.stance, "cards": cards, "superseded": superseded,
                      "source": {"title": source.title, "source_type": source.source_type, "tier": source.source_tier, "issuer": source.issuer_or_author} if source else None,
                      "anchor": anchor,
                      "rests_on": _rests_on(db, claim.investigation_id, ev.id, claim.id)})
@@ -251,7 +266,9 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
     people = len(named) or (1 if "person" in actors else 0)
     # The app's services that acted: in the log, or on a step (a reading with no recorded job still had a reader).
     app_services = len({e["who"] for e in log if e["actor"] == "app"} | {c["who"] for c in cards_all if c["actor"] == "app" and c.get("who")})
-    supports = [r for r in rows if r["stance"] == "supports"]
+    # A superseded record stays in the chain, and counts neither for nor against the claim.
+    supports = [r for r in rows if r["stance"] == "supports" and r["superseded"] is None]
+    against_rows = [r for r in rows if r["stance"] == "contradicts" and r["superseded"] is None]
     return {
         "claim": {"id": claim.id, "text": claim.text, "status": claim.status, "confidence": claim.confidence},
         "rows": rows,
@@ -267,7 +284,7 @@ def claim_custody_chain(db: Session, claim_id: str) -> dict[str, Any] | None:
             "hashes_checked": len(hashes),
             "ai_uses": len(ai),
             "sources_for": len(supports),
-            "against": len(rows) - len(supports),
+            "against": len(against_rows),
         },
         # The Done checklist for Supported, from the same rules a review to Supported is held to (claim_done.py):
         # each rule met, not met, or not checkable here, with what it waits on.

@@ -21,7 +21,7 @@ Ony: "how the hell are we supposed to test everything if we don't HAVE everythin
   - 97 events, including ranges, month and year dates, and disputed dates.
   - Party data: 17 LEIs, 24 registration numbers, 7 PEPs, red notices, birth dates for public figures, the yacht's IMO and MMSI numbers.
   - Merge candidates: Najib vs "Malaysian Official 1", TIA vs 1MDB, account 9694 vs AMPRIVATE-MR.
-- **Red flags:** 37 (BO-033 ×31, BO-031 ×4, ML-023 ×2).
+- **Red flags:** 36 measured 30 Oct (BO-033 ×31, each a different payer and payee with one payment; BO-031 ×3, ML-023 ×2).
 - **Research behind it:** docs/research/demo-data/ (parties.json, records.json and the manifests).
 
 ## Small real cases (backend/app/demo/<id>, services/demo_cases.py, Settings → demo cases)
@@ -51,9 +51,9 @@ Ony: "how the hell are we supposed to test everything if we don't HAVE everythin
   - a scanned page with a filing stamp is OCR'd;
   - a flag summary no longer doubles the full stop after "S.A.";
   - BO-032 matches an address written two ways;
-  - one demo loads at a time, and a failed load is cleaned up.
+  - one demo loads at a time, and a failed load is cleaned up;
+  - BO-033 raises one flag per payer and payee, not one per payment (Anise: 5, was 144; DECISIONS_LOG).
 - **Open:**
-  - BO-033 raises one flag per payment (144 on Anise);
   - documents have no kind or language field;
   - claim evidence can't be "superseded";
   - payments can't be typed as a fine, judgment debt or agreed price.

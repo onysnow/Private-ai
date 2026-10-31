@@ -15,7 +15,7 @@ from app.db.session import Base
 
 def test_every_model_module_is_reexported_and_registers_on_the_shared_base():
     module_names = sorted(m.name for m in pkgutil.iter_modules(app.models.__path__) if m.name not in {"domain", "base"})
-    assert module_names == ["ai", "annotations", "captures", "case_records", "claims", "connectors", "corpus", "decks", "documents", "entities", "identity", "investigations", "jobs", "leads", "media", "outbound", "patterns", "platform", "preferences", "relationships", "safety", "sources", "stories", "watchlists", "writeups"]
+    assert module_names == ["ai", "annotations", "authenticity", "captures", "case_records", "claims", "connectors", "corpus", "decks", "derived", "documents", "entities", "evidence_pack", "following", "identity", "investigations", "jobs", "leads", "media", "outbound", "patterns", "platform", "platform_check", "preferences", "relationships", "safety", "sources", "stories", "timeline_period", "watchlists", "writeups"]
     mapped = {mapper.class_.__name__: mapper.class_ for mapper in Base.registry.mappers}
     for name in module_names:
         module = importlib.import_module(f"app.models.{name}")
@@ -24,11 +24,25 @@ def test_every_model_module_is_reexported_and_registers_on_the_shared_base():
                 assert getattr(domain, attr) is value, f"{attr} from app.models.{name} is not re-exported by app.models.domain"
                 assert attr in domain.__all__
                 assert mapped[attr] is value
-    assert len(domain.__all__) == len(set(domain.__all__)) == 80  # 79 models + uid
+    # Every mapped model and uid, each once: no count to edit when a model is added (review C1).
+    assert len(domain.__all__) == len(set(domain.__all__))
+    assert set(domain.__all__) == {mapper.class_.__name__ for mapper in Base.registry.mappers} | {"uid"}
 
 
-def test_table_set_matches_the_alembic_schema_and_no_model_was_lost():
+def test_table_set_matches_the_alembic_schema_and_no_model_was_lost(tmp_path):
+    from alembic import command
+    from sqlalchemy import create_engine, inspect
+    from app.db.migrations import _alembic_config
+
     tables = set(Base.metadata.tables)
-    assert len(tables) == 79, sorted(tables)
+    # The migrated schema has exactly the models' tables: a model with no migration, or a
+    # migration whose model was dropped, fails here (review C1, A3).
+    url = f"sqlite:///{(tmp_path / 'migrated.db').as_posix()}"
+    command.upgrade(_alembic_config(url), "head")
+    engine = create_engine(url)
+    try:
+        assert set(inspect(engine).get_table_names()) - {"alembic_version"} == tables
+    finally:
+        engine.dispose()
     for expected in ("investigations", "entities", "claims", "leads", "documents", "connector_findings", "relationship_edges", "ai_analysis_candidates", "app_users", "sources", "evidence"):
         assert expected in tables

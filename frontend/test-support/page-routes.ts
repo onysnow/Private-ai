@@ -16,6 +16,7 @@
 //   api.add({...investigationRoutes('inv-restored')});       // a case opened later
 import type {BasemapStatusOut, ClaimDoneByStatusOut, CorpusSearchOut, CorpusStatusOut, DocumentFormatsOut, DossierExternalOut, DossierSummaryOut, InvestigationOut, OwnershipChainOut, PostMergeReconciliationOut} from '../lib/generated/types.gen';
 import type {Routes} from './mock-api';
+import {dropBody} from './library';
 
 /** A reply as a test writes it: the generated shape, with whatever a test overrides. */
 export type Fixture = Record<string, unknown>;
@@ -167,6 +168,15 @@ export function dossierRoutes(entityId: string, dossier: unknown, duplicates: un
   };
 }
 
+/** The case-wide reads a dossier works its own share out of (its party's Red Flags and payments): none by default. */
+export function dossierCaseRoutes(investigationId: string, flags: unknown[] = [], transactions: unknown[] = []): Routes {
+  const base = `/api/investigations/${investigationId}`;
+  return {
+    [`GET ${base}/red-flags`]: {investigation_id: investigationId, rules: [], flags, gone: [], cannot_run: [], investigation_type: {set_by: 'app', areas: [], suggested: []}},
+    [`GET ${base}/financial-flows`]: {investigation_id: investigationId, transactions, incomplete: [], currencies: [], flow_type_rule: '', duplicate_rule: ''},
+  };
+}
+
 export type GraphBody = {
   nodes: unknown[];
   edges: unknown[];
@@ -214,6 +224,29 @@ export function timelineBody(investigationId: string, events: unknown[] = []): T
     total: events.length,
     returned: events.length,
     offset: 0,
+  };
+}
+
+/** A Lanes reply (the generated TimelineLanesOut shape). Events given in the plain timeline shape are filled in as
+ * Lanes draws them: no parties, typed in the app, and one mark derived as the backend does for a verified date
+ * (shown), a disputed one, or else not yet shown. */
+export function lanesBody(investigationId: string, events: unknown[] = [], extra: Record<string, unknown> = {}): Record<string, unknown> {
+  const filled: Array<Record<string, unknown>> = events.map(raw => {
+    const e = raw as Record<string, unknown>;
+    const fact = e.fact ?? (e.verification_status === 'verified' ? 'shown' : e.verification_status === 'disputed' ? 'disputed' : 'not_yet');
+    return {parties: [], source_key: 'you', source_label: 'Typed by you', fact, fact_note: null, placeholder: false, grade: null, ...e};
+  });
+  const facts: Record<string, number> = {};
+  for (const e of filled) facts[e.fact as string] = (facts[e.fact as string] ?? 0) + 1;
+  const years = filled.map(e => String(e.date_start).slice(0, 4)).sort();
+  return {
+    investigation_id: investigationId, events: filled, parties: [], periods: [], sequence: [],
+    steps: filled.map(e => ({key: e.id, title: e.title, claim_id: null, claim_status: null, event_ids: [e.id], date_start: e.date_start,
+      date_end: e.date_end ?? null, precision: e.precision, unresolved: e.fact !== 'shown'})), steps_from: 'events', steps_undated: 0,
+    not_placed: [], not_placed_total: 0, undated: [], undated_total: 0, facts,
+    span: {first: years[0] ?? null, last: years[years.length - 1] ?? null, busiest: years[0] ?? null},
+    opens_on: (filled.find(e => e.fact !== 'shown')?.id as string | undefined) ?? null,
+    ...extra,
   };
 }
 
@@ -308,13 +341,26 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/connector-findings`]: records.findings ?? [],
     [`GET ${base}/entities`]: records.entities ?? [],
     [`GET ${base}/graph`]: records.graph ?? emptyGraph(),
+    // The Wire (See; in the single-page view since it took over the Relationships panel).
+    [`GET ${base}/wire`]: {investigation_id: id, entities: [], links: [], events: []},
+    [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
+    // Asked as their screens open (the 30 Oct sweep): Search's counts, What stands out, and what a backup holds.
+    // Safety & data answers 404 here, as a case with no stores to count does; Backup & restore shows its own words.
+    [`GET ${base}/standing`]: emptyCaseHomeRoutes(id)[`GET ${base}/standing`],
+    [`GET ${base}/corpus/insights`]: {investigation_id: id, state: 'disabled', detail: 'OpenAleph is turned off here.', collection_id: null, groups: []},
+    [`GET ${base}/safety-data`]: {status: 404, body: {detail: 'Not counted in this test'}},
+    // Act › Charts asks for its catalogue as it opens (in the single-page view, with the page).
+    [`GET ${base}/visuals/catalog`]: {investigation_id: id, queries: [], kinds: [], drawn_kinds: [], questions: []},
     [`GET ${base}/timeline`]: timelineBody(id, records.events ?? []),
+    [`GET ${base}/timeline/lanes`]: lanesBody(id, records.events ?? []),
     [`GET ${base}/leads/queue`]: leadQueueBody(id, records.leads ?? []),
     [`GET ${base}/claims`]: records.claims ?? [],
     [`GET ${base}/evidence`]: records.evidence ?? [],
     [`GET ${base}/sources`]: records.sources ?? [],
     [`GET ${base}/documents`]: records.documents ?? [],
     [`GET ${base}/corpus/status`]: corpusStatusBody(id),
+    // The Drop's line, which the Library reads for where each file is in its reading.
+    [`GET ${base}/drop`]: dropBody(id),
     [`GET ${base}/ai-analysis-candidates`]: {candidates: records.aiCandidates ?? []},
     [`GET ${base}/corpus/sync`]: corpusSyncBody(id),
     [`GET ${base}/cross-references`]: [],
@@ -323,8 +369,7 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/places`]: placesBody(id),
     [`GET ${base}/tags`]: tagsBody(id),
     [`GET ${base}/collections`]: {investigation_id: id, collections: []},
-    [`GET ${base}/record-tags`]: {investigation_id: id, rows: []},
-    [`GET ${base}/red-flags`]: {investigation_id: id, rules: [], flags: [], gone: []},
+    [`GET ${base}/red-flags`]: {investigation_id: id, rules: [], flags: [], gone: [], cannot_run: [], investigation_type: {set_by: 'app', areas: [], suggested: []}},
     [`GET ${base}/checks`]: {investigation_id: id, items: [], gone: []},
     // See › Money loads with the view (features/money): no payments yet.
     [`GET ${base}/financial-flows`]: {investigation_id: id, transactions: [], incomplete: [], currencies: [], flow_type_rule: '', duplicate_rule: ''},
@@ -383,7 +428,11 @@ export function pageRoutes(options: PageRoutesOptions = {}): Routes {
     'GET /api/basemap': basemapStatusBody(),
     ...settingsPaneRoutes(),
   };
-  for (const investigation of investigations) Object.assign(routes, investigationRoutes(investigation.id, records));
+  for (const investigation of investigations) {
+    Object.assign(routes, investigationRoutes(investigation.id, records));
+    // Decide and Case home ask only a demo case for the demo's own decisions (features/demo/pre-decided.tsx): none yet.
+    if (investigation.is_demo) routes[`GET /api/demo/pre-decided/${investigation.id}`] = {investigation_id: investigation.id, decided_by: 'Demo (pre-decided)', counts: {proposal: {}, check: {}, watchlist: {}}};
+  }
   return routes;
 }
 
@@ -404,7 +453,7 @@ export function emptyCaseHomeRoutes(investigationId: string): Record<string, unk
   return {
     [`GET ${base}/standing`]: {
       investigation_id: investigationId, claims: {total: 0, supported: 0, disputed: 0, unshown: 0, ruled_out: 0}, to_check: 0, missing: 0, to_decide: 0,
-      to_decide_by_kind: {}, money: {currency: null, amount: 0, payments: 0, from_sources: 0, other_currencies: []},
+      to_decide_by_kind: {}, money: {currency: null, amount: 0, payments: 0, starting_payers: 0, others: []},
       timeline: {events: 0, from: null, to: null, years: []}, documents: {total: 0, unread: 0, failed: 0}, sources: 0, evidence: 0,
       network: {parties: 0, links: 0}, flags: {open: 0, textbook: 0, strong: 0, faint: 0}, leads: {open: 0}, watchlist: {names: 0, new_hits: 0},
     },

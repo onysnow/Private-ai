@@ -171,9 +171,46 @@ def _name(indicator_id: str) -> str:
     return found[0].name if found else indicator_id
 
 
-def _fingerprint(indicator_id: str, parties: list[str], links: list[str]) -> str:
-    raw = "|".join([indicator_id, ",".join(sorted(parties)), ",".join(sorted(links))])
+def _fingerprint(indicator_id: str, parties: list[str], links: list[str], key: tuple[str, ...] | None = None) -> str:
+    """A flag's identity. A family that groups links gives what the group is about (BO-033: payer, payee, and whether
+    the records say "none"; ML-021: the party and currency; BO-031: the two parties), so the flag stays the same flag,
+    with its dismissal and notes, when the group gains or loses a link or the rule's version changes."""
+    raw = "|".join([indicator_id, "key", *key]) if key is not None else "|".join([indicator_id, ",".join(sorted(parties)), ",".join(sorted(links))])
     return hashlib.sha256(raw.encode()).hexdigest()[:32]
+
+
+def flag_fingerprint(indicator_id: str, res: Any) -> str:
+    return _fingerprint(indicator_id, res.parties, res.links, getattr(res, "key", None))
+
+
+def _adopt(db: Session, existing: dict[str, PatternFlag], taken: set[str], indicator_id: str, res: Any, fp: str) -> PatternFlag | None:
+    """A grouped flag seen for the first time under its key takes over the case's earlier flags of the same rule on
+    any of its links (flags kept one per link, or under the group's links before it had a key): it keeps the first
+    one's id, lead and notes, and stays dismissed when every one it takes over was dismissed. The others go."""
+    links = set(res.links)
+    found = sorted((r for f, r in existing.items() if f not in taken and r.indicator_id == indicator_id and r.gone_at is None
+                    and links & set(r.links or [])), key=lambda r: (r.first_seen_at or utcnow_naive(), r.id or ""))
+    if not found:
+        return None
+    row = found[0]
+    taken.update(r.fingerprint for r in found)
+    dismissed = [r for r in found if r.status == "dismissed"]
+    if len(dismissed) == len(found):
+        row.status = "dismissed"
+        row.dismissed_reason = "; ".join(dict.fromkeys(r.dismissed_reason for r in dismissed if r.dismissed_reason)) or row.dismissed_reason
+    else:
+        row.status, row.dismissed_reason = "open", None
+    notes: dict[str, Any] = {}
+    for r in reversed(found):
+        notes.update(r.innocent or {})
+    row.innocent = notes or row.innocent
+    row.lead_id = next((r.lead_id for r in found if r.lead_id), None)
+    old = row.fingerprint
+    del existing[old]
+    row.fingerprint = fp
+    existing[fp] = row
+    check_items.carry_flag_items(db, row.investigation_id, old, fp)
+    return row
 
 
 class _Crashed(str):
@@ -221,13 +258,17 @@ def recompute(db: Session, investigation_id: str) -> list[dict[str, str]]:
             cannot.append({"indicator_id": spec.indicator, "name": _name(spec.indicator), "reason": results})
             continue
         family = spec.family_module()
+        # This run's own fingerprints for the rule are never taken over by another of its groups.
+        taken = {flag_fingerprint(spec.indicator, res) for res in results}
         for res in results:
-            fp = _fingerprint(spec.indicator, res.parties, res.links)
+            fp = flag_fingerprint(spec.indicator, res)
             seen.add(fp)
             facts = {**res.facts, "summary": res.summary, "weak": spec.weak, "not_shown": spec.not_shown, "band_reason": res.band_reason,
                      "family": spec.family, "family_version": family.VERSION,
                      "unreviewed_links": [l for l in res.links if certainty.get(l) != "supported"]}
             row = existing.get(fp)
+            if row is None and res.key is not None:
+                row = _adopt(db, existing, taken, spec.indicator, res, fp)
             if row is None:
                 row = PatternFlag(investigation_id=investigation_id, indicator_id=spec.indicator, fingerprint=fp, first_seen_at=now, status="open")
                 db.add(row)

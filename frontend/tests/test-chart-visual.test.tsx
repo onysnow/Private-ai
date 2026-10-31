@@ -23,7 +23,7 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
-import {ChartFigure, fitScale, tableCells} from '../components/presentation/chart-visual';
+import {ChartFigure, fitScale, pickedRow, tableCells} from '../components/presentation/chart-visual';
 import {DraftPreview, asDraft} from '../components/presentation/draft-preview';
 import {SlideCanvas, SlideStyleProvider, DEFAULT_THEME, buildCitationLookup, visualRefs} from '../components/presentation/slide-canvas';
 import type {ChartVisual, DeckSlide, JsonObject} from '../lib/api-types';
@@ -229,5 +229,16 @@ describe('the preview with a chart section', () => {
     render(<DraftPreview payload={payload} slides={slides} citationDetails={[]}/>);
     await userEvent.setup().click(screen.getByRole('tab', {name: 'Brief'}));
     expect(await screen.findByTestId('chart-visual')).toBeInTheDocument();
+  });
+});
+
+describe('a click on the chart', () => {
+  it('lands on the row by its name, else by its place', () => {
+    const rows = [{label: 'Kestrel SA', value: 3, record_refs: [{record_type: 'claim', record_id: 'c1'}], record_count: 1, formatted: '3'},
+      {label: 'Fernhill Ltd', value: 1, record_refs: [], record_count: 0, formatted: '1'}];
+    const visual = {data: {rows}} as unknown as ChartVisual;
+    expect(pickedRow(visual, {name: 'Fernhill Ltd', dataIndex: 0})?.label).toBe('Fernhill Ltd');
+    expect(pickedRow(visual, {dataIndex: 0})?.label).toBe('Kestrel SA');
+    expect(pickedRow(visual, {name: 'Nobody'})).toBeUndefined();
   });
 });

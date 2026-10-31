@@ -11,6 +11,7 @@ import {useIdleTimer} from 'react-idle-timer';
 
 import {HIDE_SCREEN_EVENT} from '../../components/frame/app-frame';
 import {LOCKED_EVENT} from '../../lib/api-client';
+import {forgetOnLock} from '../../lib/case-browser-data';
 import {ensureSession, lockNow, useLockStore} from '../../lib/app-lock';
 import {active} from '../../lib/generated/sdk.gen';
 import {FirstOpen} from './first-open';
@@ -35,6 +36,8 @@ export function LockGate({children}: {children: ReactNode}): ReactElement {
     window.addEventListener(LOCKED_EVENT, onLocked);
     return () => window.removeEventListener(LOCKED_EVENT, onLocked);
   }, [markLocked]);
+  // Locked: the names searched for leave this browser (lib/case-browser-data.ts).
+  useEffect(() => { if (locked) forgetOnLock(); }, [locked]);
   // Back from the lock: everything that failed while locked is asked again.
   useEffect(() => {
     if (wasLocked.current && !locked) void queryClient.invalidateQueries();

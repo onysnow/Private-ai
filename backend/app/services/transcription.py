@@ -92,6 +92,9 @@ def probe(path: Path) -> tuple[str, float, list[dict[str, Any]]]:
                 entry.update(channels=context.channels, sample_rate=context.sample_rate)
             elif stream.type == "video":
                 entry.update(width=context.width, height=context.height)
+                # Cover art in a sound file (an MP3's picture) is a one-picture stream, not moving pictures.
+                if "attached_pic" in str(getattr(stream, "disposition", "")):
+                    entry["type"] = "cover"
             streams.append(entry)
         duration = float(container.duration) / 1_000_000 if container.duration else 0.0
     if not any(s["type"] == "audio" for s in streams):
@@ -205,8 +208,13 @@ def read_media_document(db: Session, document_id: str, report: Callable[[int | N
     if unsure:
         issues.append(f"{unsure} word{'s' if unsure != 1 else ''} the machine was unsure of: listen before quoting them.")
     report(92, "Reading the transcript")
+    # The language the model heard (or was told to hear, in Settings) is the recording's, unless a firmer one is kept.
+    heard = transcript.about.get("language")
+    told = bool(settings.transcription_language)
+    language = (str(heard), None if told else transcript.about.get("language_probability"), _tool(),
+                "reader" if told else "detected") if heard else None
     doc = extract_document(db, document_id, text=([{"locator": locator(s.start, s.end), "page_number": None, "text": s.text}
-                                                   for s in spoken], issues))
+                                                   for s in spoken], issues), language=language)
     if doc is None:
         return "The document was deleted before it was read"
     if doc.extraction_status != "complete":
@@ -226,8 +234,24 @@ def read_media_document(db: Session, document_id: str, report: Callable[[int | N
                            outline_step=transcript.outline_step, transcript=transcript.about))
     db.commit()
     minutes = transcript.duration / 60
-    return (f"Transcribed on this computer: {len(spoken)} spoken part{'s' if len(spoken) != 1 else ''} in "
-            f"{minutes:.1f} min, {transcript.about['language']}")
+    message = (f"Transcribed on this computer: {len(spoken)} spoken part{'s' if len(spoken) != 1 else ''} in "
+               f"{minutes:.1f} min, {transcript.about['language']}")
+    # Who spoke when (ADR-0026), when the voice models are on this computer. Not finding voices never undoes the read.
+    from app.services import voices
+
+    if spoken and voices.available() is None:
+        report(95, "Listening for voices")
+        try:
+            message = f"{message}; {voices.find_in_document(db, doc.id, report)}"
+        except Exception as exc:
+            from app.jobs.records import JobStopped
+
+            if isinstance(exc, JobStopped):
+                raise
+            db.rollback()
+            logger.exception("finding voices failed for %s", document_id)
+            message = f"{message}; voices could not be told apart ({type(exc).__name__})"
+    return message
 
 
 def _fail(db: Session, document_id: str, message: str) -> None:

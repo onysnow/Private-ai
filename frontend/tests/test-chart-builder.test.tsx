@@ -23,7 +23,7 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
-import {ChartBuilderPanel, queriesFor, suggestedKinds, traceRequest} from '../features/charts/chart-builder-panel';
+import {ChartBuilderPanel, chartSummary, queriesFor, suggestedKinds, traceRequest} from '../features/charts/chart-builder-panel';
 import {parseDestination} from '../features/charts/keep-chart';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
@@ -103,12 +103,12 @@ async function openBuilder(routes: Record<string, unknown> = {}) {
 }
 
 describe('ChartBuilderPanel', () => {
-  it('asks for the catalogue only when the builder is opened, and offers the questions', async () => {
-    const {api, user} = await openBuilder();
-    expect(screen.getByRole('button', {name: 'Build a chart'})).toBeInTheDocument();
-    expect(api.calls(CATALOG)).toHaveLength(0);
+  it('asks for the catalogue with the screen, and offers the questions', async () => {
+    const {api} = await openBuilder();
+    // While it loads the screen says what it makes; nothing has to be pressed first.
+    expect(screen.getByRole('heading', {name: /A checked chart from the case/})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Build a chart'})).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     const questions = within(await screen.findByRole('group', {name: 'Question'}));
     expect(questions.getAllByRole('button').map(b => b.textContent)).toEqual(['Ranking', 'Change over time', 'Part of a whole', 'Distribution', 'Correlation', 'Flow']);
     expect(questions.getByRole('button', {name: 'Flow'})).toBeDisabled();   // drawn in the money-flow pass
@@ -116,28 +116,44 @@ describe('ChartBuilderPanel', () => {
     expect(api.unmatched()).toEqual([]);
   });
 
+  it('fills the screen with every chart it can make, as cards by question with their record counts; a card chooses both', async () => {
+    const {user} = await openBuilder();
+    // (Another branch opens the catalogue with the screen; either way the gallery is what shows first.)
+    const build = screen.queryByRole('button', {name: 'Build a chart'});
+    if (build) await user.click(build);
+    const gallery = await screen.findByRole('region', {name: 'Charts you can make'});
+    const groups = within(gallery).getAllByRole('group').map(g => g.getAttribute('aria-label'));
+    expect(groups).toEqual(['Ranking', 'Change over time', 'Part of a whole', 'Distribution', 'Correlation']);   // Flow is not drawn yet
+    const ranking = within(within(gallery).getByRole('group', {name: 'Ranking'}));
+    expect(ranking.getByRole('button', {name: 'Ranking: Payments by party · 5 payments'})).toHaveTextContent('5payments');
+    expect(ranking.getByRole('button', {name: 'Ranking: Documents by status · no records yet'})).toBeDisabled();
+    await user.click(within(within(gallery).getByRole('group', {name: 'Part of a whole'})).getByRole('button', {name: /^Part of a whole: Payments by party/}));
+    expect(screen.queryByRole('region', {name: 'Charts you can make'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Part of a whole'})).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('radio', {name: 'Payments by party · 5 payments'})).toHaveAttribute('aria-checked', 'true');
+    expect(within(screen.getByRole('group', {name: 'Chart kind'})).getAllByRole('button')[0]).toHaveTextContent('100% bar');
+  });
+
   it('offers only the data that answers the question and the kinds that can draw it', async () => {
     const {user} = await openBuilder();
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
-    expect(screen.getByRole('combobox', {name: 'Data'})).toHaveTextContent('Payments by party · 5 payments');
+    // The data are cards with their record counts; the first with records is chosen.
+    expect(screen.getByRole('radio', {name: 'Payments by party · 5 payments'})).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('radio', {name: 'Payments by party · 5 payments'})).toHaveTextContent('5payments');
     const chartKinds = within(screen.getByRole('group', {name: 'Chart kind'}));
-    expect(chartKinds.getAllByRole('button').map(b => b.textContent)).toEqual(['100% bar (suggested)', 'Donut', 'Treemap']);
-    expect(chartKinds.getByRole('button', {name: '100% bar (suggested)'})).toHaveAttribute('aria-pressed', 'true');
+    expect(chartKinds.getAllByRole('button').map(b => b.textContent)).toEqual(['100% bar (suggested) ★', 'Donut', 'Treemap']);
+    expect(chartKinds.getByRole('button', {name: /^100% bar\s*\(suggested\)/})).toHaveAttribute('aria-pressed', 'true');
 
     // Data with no records yet is listed but cannot be chosen.
-    await user.click(screen.getByRole('combobox', {name: 'Data'}));
-    expect(await screen.findByRole('option', {name: 'Documents by status · no records yet'})).toHaveAttribute('aria-disabled', 'true');
-    await user.keyboard('{Escape}');
+    expect(screen.getByRole('radio', {name: 'Documents by status · no records yet'})).toBeDisabled();
 
     await user.click(screen.getByRole('button', {name: 'Distribution'}));
-    expect(screen.getByRole('combobox', {name: 'Data'})).toHaveTextContent('Payment amounts');
-    expect(within(screen.getByRole('group', {name: 'Chart kind'})).getAllByRole('button').map(b => b.textContent)).toEqual(['Histogram (suggested)']);
+    expect(screen.getByRole('radio', {name: /^Payment amounts/})).toHaveAttribute('aria-checked', 'true');
+    expect(within(screen.getByRole('group', {name: 'Chart kind'})).getAllByRole('button').map(b => b.textContent)).toEqual(['Histogram (suggested) ★']);
   });
 
   it('previews the chart with its check report, and each value traces to its records', async () => {
     const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
     const preview = screen.getByRole('button', {name: 'Preview chart'});
@@ -155,6 +171,10 @@ describe('ChartBuilderPanel', () => {
     const props = reactEChartsCoreSpy.mock.calls[0][0] as Record<string, unknown>;
     expect(props.option).toEqual(donut.option);
     expect(props.theme).toBeUndefined();
+    // The frame says what the chart shows in one line; the full description waits under its own heading.
+    const rule = screen.getByTestId('chart-rule');
+    expect(rule.textContent).toBe(`What it shows: ${chartSummary(String(donutText.alt_text), 'Meridian received most of the money')}`);
+    expect(rule.textContent!.length).toBeLessThan(String(donutText.description).length);
 
     await user.click(screen.getByText('Description and data table'));
     const firstRow = within(screen.getByRole('table')).getAllByRole('row')[1];
@@ -170,7 +190,6 @@ describe('ChartBuilderPanel', () => {
       {rule: 13, message: "the title 'Payments' names the data; it must state the finding in a sentence (at least 3 words)"},
     ]});
     const {user} = await openBuilder({[PREVIEW]: failing});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Treemap'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Payments');
@@ -188,7 +207,6 @@ describe('ChartBuilderPanel', () => {
   it('keeps a chart that passes in a deck, sending only the order slip', async () => {
     const DECK_CHARTS = 'POST /api/decks/dk-1/charts';
     const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists, [DECK_CHARTS]: deck({slide_count: 4})});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Meridian received most of the money');
@@ -217,7 +235,6 @@ describe('ChartBuilderPanel', () => {
     const {api, user} = await openBuilder({[PREVIEW]: previewReply(), ...lists,
       [NEW]: writeup({id: 'wu-2', title, content_json: {type: 'doc', content: []}}),
       [CHARTS]: writeup({id: 'wu-2', title, content_json: {type: 'doc', content: []}})});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), title);
@@ -239,7 +256,6 @@ describe('ChartBuilderPanel', () => {
     const DECK_CHARTS = 'POST /api/decks/dk-1/charts';
     const {user} = await openBuilder({[PREVIEW]: previewReply(), ...lists,
       [DECK_CHARTS]: {status: 422, body: {detail: "the chart failed the design checks: rule 4: the parts share records"}}});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Part of a whole'}));
     await user.click(screen.getByRole('button', {name: 'Donut'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Meridian received most of the money');
@@ -254,7 +270,6 @@ describe('ChartBuilderPanel', () => {
 
   it('says in plain words why a kind cannot draw the data', async () => {
     const {user} = await openBuilder({[PREVIEW]: {status: 422, body: {detail: "the question 'distribution' needs one value per record"}}});
-    await user.click(screen.getByRole('button', {name: 'Build a chart'}));
     await user.click(await screen.findByRole('button', {name: 'Distribution'}));
     await user.type(screen.getByRole('textbox', {name: 'Title'}), 'Most payments were small');
     await user.click(screen.getByRole('button', {name: 'Preview chart'}));
@@ -263,6 +278,12 @@ describe('ChartBuilderPanel', () => {
 });
 
 describe('the builder\'s choices', () => {
+  it('says what a chart shows without repeating its kind and title', () => {
+    expect(chartSummary('Donut: Meridian received most. 3 parts of $9.8 m. Largest: Meridian at 60%.', 'Meridian received most'))
+      .toBe('3 parts of $9.8 m. Largest: Meridian at 60%.');
+    expect(chartSummary('Bar: Who paid. No data.', 'Who paid')).toBe('No data.');
+    expect(chartSummary('Some other words.', 'Who paid')).toBe('Some other words.');
+  });
   it('suggests the question\'s kinds that can draw the data, best first', () => {
     const [ranking, , partOfWhole, distribution] = catalog.questions;
     const [byParty, , , amounts] = catalog.queries;

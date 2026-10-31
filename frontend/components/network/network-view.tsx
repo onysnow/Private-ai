@@ -23,14 +23,16 @@
 // at a link writes its kind. Clicking a party or a link opens it.
 import {BaseEdge, EdgeLabelRenderer, Handle, MarkerType, Position, ReactFlow, ReactFlowProvider, ViewportPortal, useReactFlow} from '@xyflow/react';
 import {Maximize2, Minus, Plus} from 'lucide-react';
-import type {Edge, EdgeProps, Node, NodeProps} from '@xyflow/react';
+import type {Edge, EdgeProps, Node, NodeProps, ReactFlowInstance} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import {createContext, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {useArrangement} from '@/lib/use-arrangement';
 import {MAX_RADIUS, dotRadius, partyBox} from '@/lib/network-rules';
+import {Reveal} from '../ui/reveal';
 import {KIND_ICON} from './party-icons';
+import './network.css';
 import type {Arrangement, Guide, Placed} from '@/lib/network-rules';
 import {CERTAINTY, LINK, PARTY, SWATCH, TEXT} from '@/lib/viz-tokens';
 import type {Certainty, LinkFamily, PartyKind} from '@/lib/viz-tokens';
@@ -85,8 +87,13 @@ function PartyNode({data}: NodeProps<Node<PartyData>>): ReactElement {
   const Icon = KIND_ICON[party.kind];
   const dim = lit !== null && !lit.has(party.id);
   const on = hover.party === party.id || (hover.party === null && focusParty === party.id);
-  return <button type="button" className="net-party" style={{width, opacity: dim ? 0.22 : 1}}
-    aria-label={`${party.label}, ${look.name}, ${links} link${links === 1 ? '' : 's'}${tagRings.length ? `, tagged ${tagRings.map(t => t.name).join(', ')}` : ''}${flagCount ? `, ${flagCount} open Red Flag${flagCount === 1 ? '' : 's'}` : ''}`} title={`${party.label} · ${party.schema}`}
+  // The party's name, kind, record schema, tags and flags are revealed on it (Ony, 29 Oct; was a title tooltip).
+  return <Reveal tabbable={false} describe={false} className="net-party-rv" detail={<><b>{party.label}</b>
+    <span className="rv-row">{look.name}{party.schema && party.schema !== look.name ? ` · ${party.schema}` : ''} · {links} link{links === 1 ? '' : 's'}</span>
+    {tagRings.length > 0 && <span className="rv-row">Tagged {tagRings.map(t => t.name).join(', ')}</span>}
+    {flagCount > 0 && <span className="rv-row">{flagCount} open Red Flag{flagCount === 1 ? '' : 's'}</span>}</>}>
+  <button type="button" className="net-party" style={{width, opacity: dim ? 0.22 : 1}}
+    aria-label={`${party.label}, ${look.name}, ${links} link${links === 1 ? '' : 's'}${tagRings.length ? `, tagged ${tagRings.map(t => t.name).join(', ')}` : ''}${flagCount ? `, ${flagCount} open Red Flag${flagCount === 1 ? '' : 's'}` : ''}`}
     onMouseEnter={() => setHover({party: party.id, link: null})} onMouseLeave={() => setHover({party: null, link: null})}
     onFocus={() => setHover({party: party.id, link: null})} onBlur={() => setHover({party: null, link: null})}
     onClick={() => onParty?.(party.id)}>
@@ -95,15 +102,14 @@ function PartyNode({data}: NodeProps<Node<PartyData>>): ReactElement {
     <Handle type="source" position={Position.Bottom} isConnectable={false} style={HIDDEN_HANDLE}/>
     <svg width={width} height={2 * MAX_RADIUS + 4} style={{display: 'block'}} aria-hidden>
       {on && <circle cx={width / 2} cy={MAX_RADIUS + 2} r={r + 4} fill="none" stroke={SWATCH.parchment} strokeWidth={1.5}/>}
-      {tagRings.map((t, i) => <circle key={t.name} cx={width / 2} cy={MAX_RADIUS + 2} r={r + 3.5 + i * 3.5} fill="none" stroke={t.colour} strokeWidth={3}><title>{t.name}</title></circle>)}
+      {tagRings.map((t, i) => <circle key={t.name} cx={width / 2} cy={MAX_RADIUS + 2} r={r + 3.5 + i * 3.5} fill="none" stroke={t.colour} strokeWidth={3}/>)}
       <circle cx={width / 2} cy={MAX_RADIUS + 2} r={r} fill={look.fill} stroke={look.ring} strokeWidth={2.5}/>
       {flagCount > 0 && <g><circle cx={width / 2 + r * 0.8} cy={MAX_RADIUS + 2 - r * 0.8} r={8} fill="#312237" stroke="#9a83a8" strokeWidth={1.5}/>
-        <text x={width / 2 + r * 0.8} y={MAX_RADIUS + 2 - r * 0.8 + 3.5} textAnchor="middle" fontSize={10} fontWeight={700} fill={SWATCH.ink}>{flagCount}</text>
-        <title>{flagCount} open Red Flag{flagCount === 1 ? '' : 's'}</title></g>}
+        <text x={width / 2 + r * 0.8} y={MAX_RADIUS + 2 - r * 0.8 + 3.5} textAnchor="middle" fontSize={10} fontWeight={700} fill={SWATCH.ink}>{flagCount}</text></g>}
       {Icon && <Icon x={width / 2 - r * 0.55} y={MAX_RADIUS + 2 - r * 0.55} width={r * 1.1} height={r * 1.1} color={look.ring} strokeWidth={2.2}/>}
     </svg>
     <span className="net-name">{lines.map((line, i) => <span key={i}>{line}</span>)}</span>
-  </button>;
+  </button></Reveal>;
 }
 
 type LinkData = {
@@ -152,8 +158,9 @@ function LinkEdge({id, data, markerEnd}: EdgeProps<Edge<LinkData>>): ReactElemen
     <BaseEdge id={id} path={path} markerEnd={link.directed ? markerEnd : undefined} interactionWidth={14}
       style={{stroke: colour, strokeWidth: lineWidth(link), strokeDasharray: CERTAINTY[link.certainty].dash, opacity: dim ? 0.12 : 0.95}}/>
     <EdgeLabelRenderer>
-      {link.certainty === 'contested' && <div className="net-contested nodrag nopan" style={{transform: `translate(-50%,-50%) translate(${mid.x}px,${mid.y}px)`, opacity: dim ? 0.2 : 1}}
-        title="A supporting claim is disputed or rejected, or evidence contradicts this link">!</div>}
+      {link.certainty === 'contested' && <div className="net-contested nodrag nopan" style={{transform: `translate(-50%,-50%) translate(${mid.x}px,${mid.y}px)`, opacity: dim ? 0.2 : 1}}>
+        <Reveal label="Contested" detail={<><b>Contested</b><span className="rv-row">A supporting claim is disputed or rejected, or evidence contradicts this link.</span></>}>
+          <span aria-hidden="true">!</span></Reveal></div>}
       {date && !showLabel && <div className="net-link-date nodrag nopan" style={{transform: `translate(-50%,-50%) translate(${mid.x}px,${mid.y + (link.certainty === 'contested' ? 16 : 0)}px)`, opacity: dim ? 0.2 : 1}}>{date}</div>}
       {showLabel && <div className="net-link-label nodrag nopan" style={{transform: `translate(-50%,${link.certainty === 'contested' ? '-160%' : '-50%'}) translate(${mid.x}px,${mid.y}px)`, borderColor: colour}}>
         {link.label}{link.certainty !== 'supported' ? ` · ${link.certainty === 'contested' ? 'contested' : 'not yet supported'}` : ''}
@@ -310,7 +317,7 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
       {/* Drawn once the box's width is known, so the first fit is to the box's final height. */}
       {laying && <p className="muted p-4" role="status" aria-busy="true">Laying out the linked groups…</p>}
       {boxWidth > 0 && arranged && <ReactFlow key={`${arrangement}|${focus ?? ''}|${parties.length}|${links.length}`} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} colorMode="dark"
-        fitView fitViewOptions={{padding: 0.06, maxZoom: 1.2}} minZoom={0.15} maxZoom={2}
+        fitView fitViewOptions={OPENING_FIT} onInit={flow => void openAtTop(flow)} minZoom={0.15} maxZoom={2}
         nodesDraggable={false} nodesConnectable={false} nodesFocusable={false} edgesFocusable={false} elementsSelectable={false}
         onEdgeMouseEnter={(_event, edge) => setHover({party: null, link: edge.id})} onEdgeMouseLeave={() => setHover({party: null, link: null})}
         onEdgeClick={(_event, edge) => onLink?.(edge.id)}>
@@ -320,13 +327,27 @@ export function NetworkView({parties, links, arrangement, focus, onPlaced, onPar
   </ReactFlowProvider></HoverContext.Provider>;
 }
 
+/** How the drawing opens: fitted to its box, but never smaller than names can be read at (13 px names at 85% read
+ * at about 11 px). A drawing too tall for that opens at its top-left, to be scrolled; Fit shows all of it, smaller. */
+const OPENING_FIT = {padding: 0.06, maxZoom: 1.2, minZoom: 0.85};
+
+/** Fits the drawing for opening; when it is held at the reading size, shows its top (the top of the chain) first. */
+async function openAtTop(flow: Pick<ReactFlowInstance, 'fitView' | 'getViewport' | 'setViewport' | 'getNodes' | 'getNodesBounds'>): Promise<void> {
+  await flow.fitView(OPENING_FIT);
+  const view = flow.getViewport();
+  const nodes = flow.getNodes();
+  if (!nodes.length || view.zoom > OPENING_FIT.minZoom + 0.001) return;
+  const top = flow.getNodesBounds(nodes).y;
+  await flow.setViewport({x: view.x, y: 24 - top * view.zoom, zoom: view.zoom});
+}
+
 /** Fits the drawing again when its box changes height (React Flow fits it
  * once, when it first draws). */
 function FitWhenResized({height}: {height: number}): null {
   const flow = useReactFlow();
   useEffect(() => {
     // After React Flow has seen the new size (it measures with its own observer).
-    const timer = setTimeout(() => { void flow.fitView({padding: 0.06, maxZoom: 1.2}); }, 80);
+    const timer = setTimeout(() => { void openAtTop(flow); }, 80);
     return () => clearTimeout(timer);
   }, [height, flow]);
   return null;
@@ -340,6 +361,6 @@ function ZoomBar(): ReactElement {
   return <div className="net-zoom" role="group" aria-label="Zoom">
     <button type="button" className="cf-tool" onClick={() => void flow.zoomIn({duration: 150})} aria-label="Zoom in"><Plus size={14}/></button>
     <button type="button" className="cf-tool" onClick={() => void flow.zoomOut({duration: 150})} aria-label="Zoom out"><Minus size={14}/></button>
-    <button type="button" className="cf-tool" onClick={() => void flow.fitView({padding: 0.06, maxZoom: 1.2, duration: 200})}><Maximize2 size={13}/> Fit</button>
+    <button type="button" className="cf-tool" onClick={() => void flow.fitView({padding: 0.06, maxZoom: 1.2, duration: 200})} title="The whole drawing in the box, however small its names get"><Maximize2 size={13}/> Fit</button>
   </div>;
 }

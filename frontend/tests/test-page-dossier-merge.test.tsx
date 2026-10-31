@@ -92,7 +92,7 @@ async function bootstrapAndOpenDossier(
   await screen.findByRole('heading', {level: 1, name: 'Kestrelwood filings'});
 
   // loadEntities() auto-fills entityId to entities[0].
-  await userEvent.setup().click(screen.getByRole('button', {name: 'Open dossier'}));
+  await userEvent.setup().click(await screen.findByRole('button', {name: 'Open dossier'}));
   await screen.findByText('Kestrelwood Holdings Ltd dossier');
 
   return api;
@@ -103,7 +103,7 @@ describe('Home entity dossier: canonical duplicates & merge', () => {
     const api = await bootstrapAndOpenDossier(dossierFixture(entityA), [duplicateCandidate()], emptyReconciliation());
     const decision = 'POST /api/entities/ent-1/canonical-resolution';
 
-    await screen.findByText('Possible canonical duplicates');
+    await screen.findByText('Same party?');
     expect(screen.getByRole('button', {name: 'Preview merge into this record'})).toBeDisabled();
 
     api.add({
@@ -114,10 +114,8 @@ describe('Home entity dossier: canonical duplicates & merge', () => {
 
     await userEvent.setup().click(screen.getByRole('button', {name: 'Same entity'}));
 
-    // The wrapping <div> around this <small> has no other text, so a plain
-    // getByText would match both -- disambiguate the same way earlier
-    // cycles did for a div-wraps-only-a-small pattern.
-    await screen.findByText('Latest review: same · 90%', {selector: 'small'});
+    // The latest review is a mark; its words are on hover.
+    await screen.findByText('Latest review: same · 90%');
     expect(screen.getByRole('button', {name: 'Preview merge into this record'})).not.toBeDisabled();
 
     expect(api.calls(decision)).toHaveLength(1);
@@ -210,7 +208,7 @@ describe('Home entity dossier: canonical duplicates & merge', () => {
     const api = await bootstrapAndOpenDossier(dossierFixture(entityA), [], reconciliationWithPair);
     const decision = 'POST /api/entities/ent-1/post-merge-reconciliation';
 
-    await screen.findByText('Post-merge duplicate review');
+    await screen.findByText('Repeated after the merge', {exact: false});
     expect(screen.getByText('1 statement pair(s) · 0 relationship pair(s) · 1 unresolved')).toBeInTheDocument();
 
     const recorded = {id: 'rd-1', investigation_id: 'inv-1', entity_id: 'ent-1', record_type: 'statement', record_a_id: 'st-1', record_b_id: 'st-2', decision: 'duplicate', rationale: null, preferred_record_id: 'st-1', created_at: '2026-09-23T00:00:00'};

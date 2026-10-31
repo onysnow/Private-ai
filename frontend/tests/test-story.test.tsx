@@ -72,7 +72,7 @@ const STORY = {
       claim('c1', 'Fernhill Ltd bought the harbour land in November 2017', 'shown', [{id: 'e1', stance: 'supports', label: 'Land registry', locator: 'title ML-2017', quote: 'transferred to Fernhill Ltd'}]),
       claim('c2', 'The sale was not put out to tender', 'unshown')]},
     {id: 'sec2', title: 'Where the money went', position: 1, status: 'disputed', shown: 0, total: 1, claims: [
-      claim('c3', 'M. Ross was a director of both companies', 'disputed', [{id: 'e2', stance: 'contradicts', label: 'Kestrel annual report', locator: 'p.11'}])]},
+      claim('c3', 'M. Ross was a director of both companies', 'disputed', [{id: 'e2', stance: 'contradicts', label: 'Kestrel SA annual report and accounts for the year ended 31 December 2018', short: 'Kestrel annual report · 2018', source_id: 's2', locator: 'p.11'}])]},
   ],
   counts: {claims: 3, shown: 1, disputed: 1, unshown: 1},
   critical: [{claim_id: 'c2', text: 'The sale was not put out to tender', section: 'Who bought the land'}],
@@ -95,9 +95,17 @@ describe('StoryScreen', () => {
     expect(screen.getByLabelText('Readiness')).toHaveTextContent('1 of 3 claims shown · 1 disputed · 1 not yet shown · 5 gates open');
     const tree = screen.getByRole('tree', {name: 'What the story needs'});
     expect(within(tree).getByRole('treeitem', {name: 'Section 1: Who bought the land, 1 of 2 shown'})).toBeInTheDocument();
-    expect(within(tree).getByRole('treeitem', {name: 'Claim, not yet shown, The sale was not put out to tender'})).toHaveTextContent('Critical path');
+    // The critical path is the claim's outline and a ▲ mark, named on reveal (and in the claim's name).
+    const critical = within(tree).getByRole('treeitem', {name: 'Claim, not yet shown, The sale was not put out to tender, on the critical path'});
+    expect(critical).toHaveClass('critical');
+    expect(critical.querySelector('.sy-cp')).toHaveTextContent('▲');
     expect(screen.getByText(/Blocked by: The sale was not put out to tender/)).toBeInTheDocument();
-    expect(within(tree).getByText('Land registry · title ML-2017')).toBeInTheDocument();
+    // The evidence chip shows its label; the locator waits in a reveal.
+    expect(within(tree).getByText('Land registry')).toBeVisible();
+    expect(within(tree).queryByText(/title ML-2017/)).toBeNull();
+    // A source with a short label shows it; its full title waits in the reveal.
+    expect(within(tree).getByText('Kestrel annual report · 2018')).toHaveClass('sy-ev-chip');
+    expect(within(tree).queryByText('Kestrel SA annual report and accounts for the year ended 31 December 2018', {selector: '.sy-ev-chip'})).toBeNull();
     const gates = screen.getByRole('region', {name: 'Gates'});
     expect(within(gates).getByText('Gates · 0 of 5 passed')).toBeInTheDocument();
     expect(within(gates).getByRole('button', {name: 'Ready to run'})).toBeDisabled();
@@ -106,6 +114,24 @@ describe('StoryScreen', () => {
     expect(tree.contains(gates)).toBe(false);
     expect(screen.getByRole('button', {name: 'Export for publication'})).toBeDisabled();
     expect(screen.getByText('Start the write-up first')).toBeInTheDocument();
+  });
+
+  it('shows a superseded record as a struck chip after the ones that count, with what replaced it on hover', async () => {
+    const gone = {id: 'e0', stance: 'supports', label: 'Indictment 2016', short: 'Indictment 2016', source_id: 's0', locator: 'para 12',
+      superseded: {at: '2026-10-04T00:00:00', by_evidence_id: 'e1', by_label: 'Land registry', by_locator: 'title ML-2017', reason: 'The registry corrected it'}};
+    const live = {id: 'e1', stance: 'supports', label: 'Land registry', source_id: 's1', locator: 'title ML-2017', quote: 'transferred to Fernhill Ltd'};
+    const story = {...STORY, sections: [{...STORY.sections[0], claims: [
+      {...claim('c1', 'Fernhill Ltd bought the harbour land in November 2017', 'shown', [gone, live]), single_source: true}, STORY.sections[0].claims[1]]}, STORY.sections[1]]};
+    mockApi({[`GET ${PATH}`]: story});
+    render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
+    const tree = await screen.findByRole('tree', {name: 'What the story needs'});
+    const chips = [...tree.querySelectorAll('.sy-ev-chip')].map(c => c.textContent);
+    expect(chips.indexOf('Land registry')).toBeLessThan(chips.indexOf('Indictment 2016'));
+    const struck = within(tree).getByText('Indictment 2016');
+    expect(struck.tagName).toBe('S');
+    expect(struck.closest('.sy-ev-chip')).toHaveClass('gone');
+    await userEvent.setup().hover(struck);
+    expect(await screen.findByText('Superseded by Land registry: The registry corrected it · not counted')).toBeInTheDocument();
   });
 
   it('puts a claim under a section, records a gate, and starts the write-up with the claims numbered for citing', async () => {
@@ -136,6 +162,25 @@ describe('StoryScreen', () => {
     await user.click(screen.getByRole('button', {name: 'Set the thesis'}));
     await waitFor(() => expect(api.lastBody(`PUT ${PATH}`)).toEqual({thesis: 'Kestrel SA ended up with the harbour land'}));
   });
+
+  it('offers the case’s claims beside the thesis, grouped by whom they name, and makes a group a section in one move', async () => {
+    const loose = (id: string, text: string, state: string, about: string | null) => ({id, text, status: 'unverified', state, about});
+    const EMPTY = {...STORY, id: null, thesis: '', sections: [], critical: [], counts: {claims: 0, shown: 0, disputed: 0, unshown: 0}, unplaced: [
+      loose('c1', 'Fernhill Ltd bought the harbour land', 'shown', 'Fernhill'), loose('c2', 'Fernhill paid M. Ross $120,000', 'disputed', 'Fernhill'),
+      loose('c3', 'The sale was not put out to tender', 'unshown', null), loose('c9', 'A ruled-out claim', 'ruled_out', null)]};
+    const MADE = {...EMPTY, sections: [{id: 'sec9', title: 'Fernhill', position: 0, status: 'empty', shown: 0, total: 0, claims: []}]};
+    const api = mockApi({[`GET ${PATH}`]: EMPTY, [`POST ${PATH}/sections`]: MADE, [`POST ${PATH}/sections/sec9/claims`]: MADE});
+    render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    expect(await screen.findByLabelText('Readiness')).toHaveTextContent('No claim in the story yet');
+    const tray = screen.getByRole('region', {name: 'Claims in the case'});
+    expect(within(tray).getByText('From the case · 3 claims')).toBeInTheDocument();
+    const group = within(tray).getByRole('article', {name: 'Fernhill, 2 claims'});
+    expect(within(tray).getByRole('article', {name: 'Other claims, 1 claim'})).not.toHaveTextContent('ruled-out');
+    await user.click(within(group).getByRole('button', {name: 'Make “Fernhill” a section with its 2 claims'}));
+    await waitFor(() => expect(api.calls(`POST ${PATH}/sections/sec9/claims`).map(c => c.body)).toEqual([{claim_id: 'c1'}, {claim_id: 'c2'}]));
+    expect(api.lastBody(`POST ${PATH}/sections`)).toEqual({title: 'Fernhill'});
+  });
 });
 
 const WRITTEN = {...STORY, writeup_id: 'w1', sentences: {total: 4, uncited: 2}, version: {id: 'v2', writeup_id: 'w1', name: 'Before legal read', kind: 'named', word_count: 214, created_at: '2026-10-10T09:00:00'}};
@@ -159,7 +204,9 @@ describe('StoryScreen beside the write-up', () => {
     const pane = screen.getByRole('complementary', {name: 'The passage'});
     expect(pane).toHaveTextContent('Citation 1');
     expect(pane).toHaveTextContent('Fernhill Ltd bought the harbour land in November 2017');
-    expect(within(pane).getByText('✓ supports · Land registry · title ML-2017')).toBeInTheDocument();
+    // The stance is the ✓ mark, named on reveal; the label shows and the locator is on its reveal.
+    expect(within(pane).getByRole('img', {name: 'Supports'})).toHaveTextContent('✓');
+    expect(within(pane).getByText('Land registry').closest('.rv')).toHaveAccessibleDescription('title ML-2017');
     expect(within(pane).getByText('transferred to Fernhill Ltd')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('complementary', {name: 'The passage'})).not.toBeInTheDocument();
@@ -168,7 +215,7 @@ describe('StoryScreen beside the write-up', () => {
   it('lets a claim of the tree be dragged into the write-up once it is started', async () => {
     mockApi({[`GET ${PATH}`]: WRITTEN, [NOTES]: {investigation_id: 'inv-1', notes: []}});
     render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
-    const item = await screen.findByRole('treeitem', {name: 'Claim, not yet shown, The sale was not put out to tender'});
+    const item = await screen.findByRole('treeitem', {name: 'Claim, not yet shown, The sale was not put out to tender, on the critical path'});
     expect(item).toHaveAttribute('draggable', 'true');
     const setData = vi.fn();
     fireEvent.dragStart(item, {dataTransfer: {setData, effectAllowed: 'all'}});
@@ -202,12 +249,15 @@ describe('StoryScreen beside the write-up', () => {
       [`POST ${PATH}/versions/v1/restore`]: WRITEUP});
     render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
     const user = userEvent.setup();
-    expect(await screen.findByText(/version “Before legal read”/)).toBeInTheDocument();
+    // Which version the draft is waits in the reveal on Version history.
+    expect(await screen.findByRole('button', {name: 'Version history'})).toHaveAccessibleDescription(/version “Before legal read”/);
     await user.click(screen.getByRole('button', {name: 'Version history'}));
     const pane = screen.getByRole('complementary', {name: 'Version history'});
     const list = await within(pane).findByRole('list', {name: 'Versions, newest first'});
     expect(within(list).getAllByRole('button').map(b => b.textContent)).toEqual([
-      expect.stringContaining('Before legal read'), expect.stringMatching(/^◇Automatic · .*automatic · .* · 180 words$/)]);
+      expect.stringContaining('Before legal read'), expect.stringMatching(/^◇Automatic · /)]);
+    // Kind, time and words are revealed on the version.
+    expect(within(list).getAllByRole('button')[1]).toHaveAccessibleDescription(/^automatic · .* · 180 words$/);
     await user.type(within(pane).getByLabelText('Name the text as it stands'), 'After the lawyer');
     await user.click(within(pane).getByRole('button', {name: 'Keep'}));
     await waitFor(() => expect(api.lastBody(`POST ${PATH}/versions`)).toEqual({name: 'After the lawyer'}));
@@ -224,8 +274,11 @@ describe('StoryScreen beside the write-up', () => {
     expect(await within(pane).findByRole('list', {name: 'Versions, newest first'})).toBeInTheDocument();
   });
 
-  it('opens the Export sheet: publication stays disabled with its reason, and the checks list what is left', async () => {
-    mockApi({[`GET ${PATH}`]: WRITTEN, [NOTES]: {investigation_id: 'inv-1', notes: []}});
+  it('opens the Export sheet: publication stays disabled with its reason, the pack goes as a draft, and the checks list what is left', async () => {
+    const api = mockApi({[`GET ${PATH}`]: WRITTEN, [NOTES]: {investigation_id: 'inv-1', notes: []},
+      'GET /api/investigations/inv-1/evidence-pack.zip': {status: 200, body: 'zip'}});
+    (URL as unknown as {createObjectURL: () => string}).createObjectURL = () => 'blob:pack';
+    (URL as unknown as {revokeObjectURL: () => void}).revokeObjectURL = () => undefined;
     render(<QueryProvider><StoryScreen investigationId="inv-1"/></QueryProvider>);
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', {name: 'stub: text read'}));
@@ -235,7 +288,13 @@ describe('StoryScreen beside the write-up', () => {
     const sheet = screen.getByRole('dialog', {name: 'Export'});
     expect(within(sheet).getByRole('button', {name: 'Export the .docx'})).toBeDisabled();
     expect(within(sheet).getByText('○ 2 sentences need a source')).toBeInTheDocument();
-    expect(within(sheet).getByRole('button', {name: 'Export the pack'})).toBeDisabled();
+    // Open checks never stop the evidence pack: it is made as a draft, stamped on every page.
+    const pack = within(sheet).getByRole('button', {name: 'Export as draft'});
+    expect(pack).toBeEnabled();
+    expect(within(sheet).getByText(/every page is stamped “Export as draft”/)).toBeInTheDocument();
+    await user.click(pack);
+    await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/evidence-pack.zip')).toHaveLength(1));
+    expect(await within(sheet).findByText('Evidence pack downloaded, stamped as a draft.')).toBeInTheDocument();
     expect(within(sheet).getByRole('button', {name: 'Download the backup'})).toBeEnabled();
     const checks = within(sheet).getByRole('region', {name: 'Before it leaves this computer'});
     expect(checks).toHaveTextContent('2 sentences without a source');

@@ -8,7 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const push = vi.fn();
 vi.mock('next/navigation', () => ({useRouter: () => ({push})}));
 
-import {ChainOfCustody, logTable, sealLine, unitSpan, whoWord} from '../features/custody/chain-of-custody';
+import {ChainOfCustody, growScale, logTable, sealLine, unitSpan, whoWord} from '../features/custody/chain-of-custody';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -82,11 +82,18 @@ describe('Chain of Custody', () => {
     // The claim card carries the server's Done checklist for Supported: each rule met or not, and what it waits on.
     const claim = screen.getByRole('article', {name: `The claim: ${CHAIN.claim.text}`});
     const done = within(claim).getByLabelText('Done for Supported');
-    expect(done).toHaveTextContent('Done for Supported · 1 left');
-    expect(within(done).getByLabelText('Every contradicting item has a written answer: met. 1 answered')).toHaveTextContent('✓ against answered');
-    expect(within(done).getByLabelText('Every supporting item has an exact locator: not met. 1 without a page, paragraph or timestamp.'))
-      .toHaveTextContent('✕ each says wherewaits on: 1 without a page, paragraph or timestamp.');
-    expect(within(done).getAllByRole('listitem')).toHaveLength(6);
+    // The head is the name and what is left (an alert, in sight); its summary in words is revealed on the name.
+    const head = done.querySelector('.cc-done-head')!;
+    expect(head.querySelector('.bad')).toHaveTextContent('· 1 left');
+    expect(within(done).getByText('Done for Supported', {selector: '.rv'})).toHaveAccessibleDescription(/^Done for Supported1 left/);
+    // A rule met is not in sight: the whole checklist is revealed on the name (Ony, 29 Oct).
+    expect(within(done).getByText('against answered').closest('[hidden]')).not.toBeNull();
+    // The rule's short name shows; its full wording and what it waits on are revealed on it (Ony, 29 Oct).
+    const unmet = within(done).getByLabelText('Every supporting item has an exact locator: not met. 1 without a page, paragraph or timestamp.');
+    expect(unmet).toHaveTextContent('✕ each says where');
+    expect(within(unmet).getByText('each says where')).toHaveAccessibleDescription('Every supporting item has an exact locatorwaits on: 1 without a page, paragraph or timestamp.');
+    expect(within(unmet).getByText(/waits on: 1 without a page/).closest('[hidden]')).not.toBeNull();
+    expect(within(done).getAllByRole('listitem')).toHaveLength(1);
     expect(screen.getByRole('article', {name: 'AI step'})).toHaveTextContent('Case synthesis draft quoted this claim');
     // The passage opens first in the detail panel, with its words lit.
     const detail = screen.getByRole('complementary', {name: 'Step 3 of 4: Passage'});
@@ -97,6 +104,14 @@ describe('Chain of Custody', () => {
     expect(detail).toHaveTextContent('Fernhill_share_transfer_2018.pdf · lines 14\u2060–\u206022');
     expect(detail).toHaveTextContent('exact quote + 27 characters before, 32 after, offsets 27–79');
     expect(detail).toHaveTextContent('Name-finder · entity · 0.78 · accepted by Ony');
+    // The file and lines, the anchor's words and the hash are revealed, not on screen until asked.
+    expect(within(detail).getByText(/a3f9 07c2 … 5d1e/).closest('[hidden]')).not.toBeNull();
+    expect(within(detail).getByText(/offsets 27–79/).closest('[hidden]')).not.toBeNull();
+    expect(within(detail).getByText('✓ re-checked when opened')).toBeVisible();
+    // A card's who and when are revealed on it; the column says its kind.
+    const file = screen.getByRole('button', {name: /^File: Fernhill/});
+    expect(file).toHaveAccessibleDescription('uploaded by Ony · 02 Oct 09:14 · uploaded by Ony · 2 Oct 09:14');
+    expect(within(file).queryByText('File')).toBeNull();
     expect(screen.getByRole('button', {name: /^Passage: Passage · page 3/})).toHaveTextContent('Passage · p.3 l.14\u2060–\u206022');
     // The card shows the words around the stored anchor, lit (offsets 27–79 of the passage).
     expect(screen.getByRole('button', {name: /^Passage: Passage · page 3/}).querySelector('mark')).toHaveTextContent('Harbour Nominees Limited, being forty per cent (40%)');
@@ -214,7 +229,23 @@ describe('Chain of Custody', () => {
     mockApi({...routes, 'GET /api/claims/c1/custody-chain': {...CHAIN, done}});
     render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
     const list = await screen.findByLabelText('Done for Supported');
-    expect(list).toHaveTextContent('Done for Supported · ✓ every checkable rule met · ○ 1 not checkable here');
+    // One mark in sight; the words on reveal.
+    expect(list.querySelector('.cc-done-head .ok')).toHaveTextContent('✓');
+    expect(within(list).getByText('Done for Supported', {selector: '.rv'}))
+      .toHaveAccessibleDescription(/✓ every checkable rule met · ○ 1 not checkable here/);
+  });
+
+  it('draws only the columns a card stands in, so a typed-in source runs straight to its decision and the claim', async () => {
+    const source = {...CHAIN, rows: [{...CHAIN.rows[0], cards: [
+      {...CHAIN.rows[0].cards[0], id: 'source:s1', kind: 'source', title: 'MAS release', checks: [], document_id: null, sha256: null},
+      {...CHAIN.rows[0].cards[CHAIN.rows[0].cards.length - 1], id: 'decision:s1'}]}]};
+    mockApi({...routes, 'GET /api/claims/c1/custody-chain': source});
+    const {container} = render(<QueryProvider><ChainOfCustody investigationId="inv-1"/></QueryProvider>);
+    await screen.findByText(/7 steps · 1 person/);
+    expect([...container.querySelectorAll('.cc-col')].map(c => c.textContent)).toEqual(['FILES', 'DECISION', 'THE CLAIM']);
+    expect(container.querySelector('.cc-wires')).toHaveAttribute('data-columns', '3');
+    expect((container.querySelector('[data-card="decision:s1"]') as HTMLElement).style.gridColumn).toBe('2');
+    expect((container.querySelector('[data-card="claim"]') as HTMLElement).style.gridColumn).toBe('3');
   });
 
   it('opens the claim another panel asked for, and says when there is nothing to trace', async () => {
@@ -233,5 +264,17 @@ describe('unitSpan', () => {
     const b = unitSpan(text, {start: 19, end: 26})!;
     expect(text.slice(b.start, b.end)).toBe('𝐋imited');
     expect(unitSpan('plain', null)).toBeNull();
+  });
+});
+
+describe('growScale', () => {
+  it('grows a small chain to fill its room, within the width and 1.5, never below 1, and ignores small changes', () => {
+    expect(growScale(1, 520, 300, 1.56)).toBe(1.5);
+    expect(growScale(1, 520, 400, 2)).toBe(1.3);
+    expect(growScale(1, 520, 300, 1.2)).toBe(1.2);
+    expect(growScale(1.3, 520, 600, 2)).toBe(1.1);
+    expect(growScale(1, 300, 600, 2)).toBe(1);
+    expect(growScale(1.3, 520, 515, 2)).toBe(1.3);
+    expect(growScale(1, 0, 300, 2)).toBe(1);
   });
 });

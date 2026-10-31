@@ -25,6 +25,9 @@ class RelationshipEdge(Base):
     # Whether the link is documented, inferred or alleged (the suite's Relationship
     # record, Standard §9); None until a person says.
     evidence_status: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    # A Payment's kind (app/services/payment_kinds.py): transfer, loan, fee, settlement, price, fine or
+    # ordered; None until a person says, and read as money that moved.
+    payment_kind: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow_naive)
 
 

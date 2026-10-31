@@ -735,6 +735,11 @@ def run_capture(db: Session, capture_id: str, report: Callable[[int | None, str 
         read_ok = doc_row is not None and doc_row.extraction_status == "complete"
         row.stages = _stages(times, stopped=None if read_ok else "text")
         db.commit()
+    if outcome == "saved" and (row.witnesses or {}).get("asked"):
+        from app.services.capture_witness import after_capture
+
+        report(95, "Asking the outside witnesses you chose")
+        after_capture(db, row)
     words = {"saved": "Page kept", "not_seen": "Not seen", "link_only": "Link only"}[outcome]
     return {"message": f"{words}: {reason}" if reason else words,
             "result": {"capture_id": row.id, "outcome": outcome, "document_id": row.document_id}}
@@ -772,7 +777,7 @@ def serialize_capture(row: Capture) -> dict[str, Any]:
         "stages": row.stages or [], "exchange": row.exchange or {},
         "source_id": row.source_id, "document_id": row.document_id, "case_record_id": row.case_record_id,
         "job_id": row.job_id, "content_verified": "not done by this system",
-        "media": row.media or {}, "media_document_id": row.media_document_id,
+        "media": row.media or {}, "media_document_id": row.media_document_id, "witnesses": {},
     }
 
 

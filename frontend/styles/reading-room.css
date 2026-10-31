@@ -89,6 +89,8 @@
 .rr-card header small { margin-left: auto; font-size: 11px; color: var(--text-muted); }
 .rr-chip { padding: 1px 7px; border-radius: 99px; border: 1px dashed var(--text-muted); font: 600 9.5px var(--font-ui); color: var(--text-muted); }
 .rr-chip.accepted { border-style: solid; color: var(--status-supported); } .rr-chip.rejected { border-style: solid; color: var(--status-disputed); }
+.rr-chip.held { color: var(--accent-1); border-color: var(--accent-1); }
+.rr-gate { margin: 4px 0 6px; font-size: 12px; color: var(--accent-1); }
 .rr-dots { display: inline-flex; gap: 4px; align-items: center; font-size: 11px; color: var(--text-muted); }
 .rr-dots i { font-style: normal; color: var(--accent-2); letter-spacing: 1px; font-size: 9px; }
 .rr-card-text { margin: 6px 0 8px; font: 600 15px/1.35 var(--font-read); overflow-wrap: anywhere; }
@@ -151,7 +153,6 @@
 .rr-next { margin-left: auto; background: var(--accent-1); border-color: var(--accent-1); color: var(--ground); font-weight: 600; }
 .rr-anchor { display: inline-block; width: 0; height: 1em; vertical-align: baseline; }
 @media (max-width: 1000px) { .rr { grid-template-columns: 1fr; grid-template-areas: 'top' 'main' 'side' 'foot'; grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr) auto; overflow: auto; } .rr-pages { display: none; } .rr-leader { display: none; } }
-.fr-hint { z-index: 65; }
 
 /* Pointing (research §6): a card and its words light together; every control answers the pointer. */
 .rr-span.lit { text-decoration-style: solid; text-decoration-color: var(--accent-1); }
@@ -186,7 +187,7 @@
 .lr-panel { padding: 12px 14px; border-radius: 14px; background: var(--surface-1); box-shadow: var(--shadow-panel); font-size: 12.5px; }
 .lr-panel.hot { box-shadow: 0 0 0 1px var(--accent-1), var(--shadow-panel); }
 .lr-cap { margin: 0 0 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 500 10.5px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent-1); }
-.lr-cap span:not(.lr-chip) { color: var(--text-muted); text-transform: none; letter-spacing: 0; }
+.lr-cap > span:not(.lr-chip):not(.rv), .lr-cap .rv span { color: var(--text-muted); text-transform: none; letter-spacing: 0; }
 .lr-note { margin: 8px 0 0; color: var(--text-muted); font-size: 12px; line-height: 1.45; }
 .lr-note a { color: var(--accent-2); }
 .lr-facts { margin: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -199,7 +200,7 @@
 .lr-seg span { display: inline-block; padding: 5px 11px; border-radius: 8px; background: var(--surface-3); font-size: 12.5px; font-weight: 600; }
 .lr-meta { flex: 1; min-width: 0; margin: 0; font: 400 10.5px/1.35 var(--font-mono); color: var(--text-muted); }
 .lr-lines { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 18px 14px; }
-.lr-sg { display: grid; grid-template-columns: 62px 70px minmax(0, 1fr) auto; gap: 0 12px; padding: 8px; border-radius: 9px; align-items: baseline; }
+.lr-sg { display: grid; grid-template-columns: 62px 96px minmax(0, 1fr) auto; gap: 0 12px; padding: 8px; border-radius: 9px; align-items: baseline; }
 .lr-sg:focus-visible { outline: 2px solid var(--accent-1); }
 .lr-tc { all: unset; cursor: pointer; font: 500 11px var(--font-mono); color: var(--text-muted); }
 .lr-tc:hover, .lr-tc:focus-visible { color: var(--accent-1); }
@@ -240,7 +241,7 @@
 .lr-file { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 8px 10px; border-radius: 9px; border: 1px solid color-mix(in srgb, var(--accent-2) 50%, transparent); }
 .lr-file b { font: 500 11.5px var(--font-mono); overflow-wrap: anywhere; } .lr-file small { flex-basis: 100%; font: 400 10px var(--font-mono); color: var(--text-muted); }
 
-.lr-player { grid-area: player; display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 16px; padding: 12px 16px; border-radius: 16px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
+.lr-player { grid-area: player; display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 16px; padding: 10px 16px 18px; border-radius: 16px; background: var(--surface-1); box-shadow: var(--shadow-panel); }
 .lr-tport { display: flex; flex-direction: column; gap: 6px; }
 .lr-btns { display: flex; gap: 8px; }
 .lr-pbtn { all: unset; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-1); color: var(--ground); font-size: 13px; }
@@ -250,19 +251,97 @@
 .lr-time small { font: 400 12px var(--font-mono); color: var(--text-muted); margin-left: 2px; }
 .lr-keys { margin: 0; font-size: 11px; color: var(--text-muted); line-height: 1.8; }
 .lr-wf { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.lr-ovw { width: 100%; height: 10px; cursor: pointer; }
-.lr-ovw-bg { fill: var(--line); } .lr-ovw-win { fill: color-mix(in srgb, var(--accent-1) 18%, transparent); stroke: var(--accent-1); stroke-width: 1.5; }
-.lr-ovw-ph { fill: var(--text); }
-.lr-wf-cap { margin: 0; display: flex; justify-content: space-between; gap: 10px; font: 500 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+.lr-ovw { flex: 1; min-width: 0; height: 10px; cursor: pointer; }
+.lr-ovw-bg { fill: var(--line); } .lr-ovw-win { fill: color-mix(in srgb, var(--accent-1) 18%, transparent); stroke: var(--accent-1); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.lr-ovw-ph { fill: var(--text); } .lr-ovw-pin { fill: var(--accent-1); }
+.lr-ticks { position: relative; height: 13px; font: 500 9.5px var(--font-mono); color: var(--text-muted); }
+.lr-ticks span { position: absolute; top: 0; padding-left: 3px; white-space: nowrap; }
+.lr-wave-box { position: relative; }
+.lr-tick { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.lr-ph-dot { position: absolute; top: -4px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: var(--accent-1); pointer-events: none; }
+.lr-pin-at { position: absolute; bottom: -15px; font: 500 9.5px var(--font-mono); color: var(--accent-1); white-space: nowrap; pointer-events: none; }
+.lr-lane { fill: var(--lr-voice, var(--text-muted)); }
+.lr-hatch { fill: color-mix(in srgb, var(--status-disputed) 45%, transparent); }
+.lr-wf-cap { margin: 0; display: flex; align-items: center; gap: 12px; font: 500 10px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
 .lr-wf-cap span { display: inline-flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; }
 .lr-key { display: inline-block; width: 12px; height: 6px; border-radius: 3px; }
 .lr-key.pin { background: var(--accent-1); } .lr-key.unsure { width: 6px; border-radius: 50%; border: 1px solid var(--accent-1); } .lr-key.ns { background: color-mix(in srgb, var(--status-disputed) 40%, transparent); }
-.lr-wave { width: 100%; height: 110px; cursor: pointer; }
-.lr-bar { fill: color-mix(in srgb, var(--text) 30%, transparent); } .lr-bar.on { fill: color-mix(in srgb, var(--text) 75%, transparent); }
-.lr-wave .lr-sp { fill: var(--accent-2); }
-.lr-unsure { fill: none; stroke: var(--accent-1); stroke-width: 1.2; }
-.lr-ns { fill: color-mix(in srgb, var(--status-disputed) 14%, transparent); stroke: color-mix(in srgb, var(--status-disputed) 50%, transparent); stroke-dasharray: 4 3; }
-.lr-pin { fill: color-mix(in srgb, var(--accent-1) 22%, transparent); stroke: var(--accent-1); stroke-dasharray: 3 2; }
-.lr-ph { stroke: var(--accent-1); stroke-width: 2; }
+.lr-wave { display: block; width: 100%; height: 118px; cursor: pointer; }
+/* The outline: spoken parts bright, gaps between them faint, the part already played brightest. */
+.lr-bar { fill: color-mix(in srgb, var(--text) 16%, transparent); } .lr-bar.sp { fill: color-mix(in srgb, var(--text) 42%, transparent); }
+.lr-bar.sp.on { fill: color-mix(in srgb, var(--text) 85%, transparent); } .lr-bar.on { fill: color-mix(in srgb, var(--text) 30%, transparent); }
+.lr-unsure { fill: none; stroke: var(--accent-1); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.lr-ns { fill: url(#lr-hatch); stroke: color-mix(in srgb, var(--status-disputed) 50%, transparent); stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.lr-pin { fill: color-mix(in srgb, var(--accent-1) 22%, transparent); stroke: var(--accent-1); stroke-dasharray: 3 2; vector-effect: non-scaling-stroke; }
+.lr-ph { stroke: var(--accent-1); stroke-width: 2; vector-effect: non-scaling-stroke; }
 @media (max-width: 1100px) { .lr { grid-template-columns: minmax(0, 1fr) minmax(280px, 330px); grid-template-areas: 'top top' 'read right' 'player player'; } .lr-left { display: none; } }
 @media (max-width: 760px) { .lr { display: flex; flex-direction: column; overflow-y: auto; } .lr-read { min-height: 60vh; } .lr-player { grid-template-columns: 1fr; } }
+
+/* Parts from the feed, the publisher's transcript, Compare, derived files (INTAKE_4) */
+.lr-parts { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.lr-parts button { all: unset; cursor: pointer; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 6px; width: 100%; box-sizing: border-box; padding: 3px 8px; border-radius: 7px; font-size: 12.5px; line-height: 1.5;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lr-parts button > b { font-weight: 400; overflow: hidden; text-overflow: ellipsis; }
+.lr-parts button span { font: 500 10.5px var(--font-mono); color: var(--text-muted); padding-top: 2px; }
+.lr-parts button.on { background: var(--surface-2); } .lr-parts button.on span { color: var(--accent-1); }
+.lr-parts button[class*="lr-v"] { box-shadow: inset 2px 0 0 var(--lr-voice); }
+.lr-parts button.ns { color: var(--status-disputed); font-style: italic; }
+.lr-parts button:hover { background: var(--surface-2); }
+.lr-facts-panel .lr-cap { margin: 0; }
+.rv-card .lr-facts, #rv-card .lr-facts { min-width: 200px; }
+/* Nothing pinned: one line; how to pin is on hover. */
+.lr-pinned.empty { padding: 10px 14px; }
+.lr-pinned.empty .lr-cap { margin: 0; }
+.lr-pinned.empty .lr-empty { font: 400 12px var(--font-ui); color: var(--text-muted); letter-spacing: 0; text-transform: none; }
+.lr-parts button:focus-visible { outline: 2px solid var(--accent-1); }
+.lr-seg button { all: unset; cursor: pointer; padding: 4px 11px; border-radius: 7px; font-size: 12px; color: var(--text-muted); }
+.lr-seg button[aria-selected="true"] { background: var(--surface-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.lr-seg button:disabled { opacity: .45; cursor: not-allowed; }
+.lr-seg button:focus-visible { outline: 2px solid var(--accent-1); }
+.lr-cmprow { grid-template-columns: 64px 70px minmax(0, 1fr) minmax(0, 1fr) !important; }
+.lr-cmprow .theirs { color: var(--text-muted); }
+.lr-cmprow.differs { background: color-mix(in srgb, var(--accent-1) 6%, transparent); }
+mark.lr-diff { background: transparent; color: inherit; outline: 1px solid var(--accent-1); outline-offset: 1px; border-radius: 3px; }
+.lr-chip.plum { color: var(--accent-plum, #B994DC); }
+.lr-file.der { border-style: dashed; border-color: var(--line); margin-top: 6px; margin-left: 12px; }
+.lr-file em { margin-left: auto; font: 500 10.5px var(--font-mono); font-style: normal; color: var(--text-muted); }
+.lr-tree { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.lr-tree audio, .lr-orig audio { width: 100%; margin-top: 6px; }
+.lr-derived, .lr-orig { padding: 4px 4px 20px; }
+.rr-real { all: unset; cursor: pointer; padding: 5px 11px; border-radius: 9px; border: 1px solid var(--line); font-size: 12.5px; color: var(--text-muted); }
+.rr-real:hover { color: var(--text); border-color: var(--accent-1); }
+
+/* Voices (ADR-0026): each voice keeps one colour on its tag and its bars; the tag always says the voice in words,
+   with "?" while it is the machine's guess. */
+.lr-sp.lr-v1, .lr-sp.lr-v2, .lr-sp.lr-v3, .lr-sp.lr-v4, .lr-sp.lr-v5, .lr-sp.lr-v6 { display: inline-flex; align-items: center; gap: 5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.lr-sp i { width: 7px; height: 7px; border-radius: 50%; background: var(--lr-voice, var(--text-muted)); flex: none; }
+.lr-v1 { --lr-voice: var(--accent-2); } .lr-v2 { --lr-voice: var(--accent-1); } .lr-v3 { --lr-voice: var(--status-supported); }
+.lr-v4 { --lr-voice: var(--status-disputed); } .lr-v5 { --lr-voice: #b994dc; } .lr-v6 { --lr-voice: var(--text-muted); }
+.lr-wave rect.lr-sp[class*="lr-v"] { fill: var(--lr-voice); }
+/* One row a voice: its colour, its name or "Voice 2 · a guess"; a click on the row names it in place. */
+.lr-voices { list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.lr-voices .rv { display: block; }
+.lr-vrow { all: unset; cursor: pointer; box-sizing: border-box; width: 100%; display: flex; align-items: baseline; gap: 7px; padding: 2px 6px; border-radius: 7px; font-size: 13px; line-height: 1.6; }
+.lr-vrow i, .lr-name i { flex: none; align-self: center; width: 8px; height: 8px; border-radius: 50%; background: var(--lr-voice, var(--text-muted)); }
+.lr-vrow b { font-weight: 600; white-space: nowrap; }
+.lr-vrow small { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 11.5px; }
+.lr-vrow em { margin-left: auto; font-style: normal; color: var(--text-muted); opacity: 0; }
+.lr-vrow:hover, .lr-vrow:focus-visible { background: var(--surface-2); }
+.lr-vrow:hover em, .lr-vrow:focus-visible em { opacity: 1; }
+.lr-vrow:focus-visible { outline: 2px solid var(--accent-1); }
+.lr-vrow.more b { font: 500 11px var(--font-mono); color: var(--text-muted); }
+.lr-vrow.more { color: var(--text-muted); font-size: 11.5px; }
+.lr-name { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 8px; background: var(--surface-2); }
+.lr-name input { flex: 1 1 100px; min-width: 0; font-size: 12.5px; }
+.lr-name .lr-acts { margin: 0; flex-basis: 100%; }
+.lr-name .lr-acts button { padding: 3px 9px; font-size: 11.5px; }
+
+/* Converted to the 29 Oct rule: the card's kind is its icon, a waiting card's edge is dashed, sub-text on hover. */
+.rr-card header .km-kind { width: 22px; height: 22px; }
+.rr-card:not(.done) .rr-card-text { border-left: 2px dashed var(--text-muted); padding-left: 8px; }
+.rr-card-text .km-party { width: 20px; height: 20px; }
+.rr-chips .rv > span { padding: 3px 9px; border-radius: 99px; border: 1px solid var(--line); font-size: 12px; color: var(--text-muted); }
+.rr-chips .rv > span b { color: var(--text); }
+.rr-note-mark { color: var(--accent-1); margin-right: 4px; }
+.rr-clip-meta .rr-ok { font-size: 13px; }
+.rr-clip-meta { display: flex; align-items: center; gap: 8px; }

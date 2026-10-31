@@ -9,6 +9,7 @@ import Link from 'next/link';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent, ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 // Connects the generated client to the shared ApiClient, as every page that calls the API does.
 import '../../lib/api-instance';
 import {errorMessage} from '../../lib/api-client';
@@ -70,7 +71,8 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
   const [area, setArea] = useState('');
   const [indicator, setIndicator] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
-  const [filter, setFilter] = useState<ListFilter>('all');
+  // Learn opens on what the app computes (DECISIONS_LOG 12, call 10); an area with no rule opens on everything.
+  const [chosenFilter, setFilter] = useState<ListFilter | null>(null);
   const asked = useRef<{area: string; indicator: string} | null>(null);
 
   useEffect(() => {
@@ -92,6 +94,9 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
 
   const rowsQuery = useQuery({...listIndicatorsOptions({query: {area, limit: 3000}}), enabled: Boolean(area), staleTime: Infinity});
   const rows = useMemo(() => rowsQuery.data?.indicators ?? [], [rowsQuery.data]);
+  // An indicator opened by its address is never hidden by the default.
+  const chosenRow = rows.find(r => r.id === indicator);
+  const filter: ListFilter = chosenFilter ?? (rows.some(r => r.rule) && (!chosenRow || chosenRow.rule) ? 'computed' : 'all');
 
   // The indicator to open in a newly chosen area: the one asked for, else the strongest flag here, else the first.
   useEffect(() => {
@@ -114,7 +119,7 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
     return () => setTrailTail([]);
   }, [areaRow, indicator]);
 
-  const chooseArea = (key: string) => { if (key !== area) { setArea(key); setFilter('all'); setPreview(null); } };
+  const chooseArea = (key: string) => { if (key !== area) { setArea(key); setFilter(null); setPreview(null); } };
   const openIndicator = (id: string) => { const key = id.split('-')[0]; if (key !== area) { chooseArea(key); asked.current = {area: key, indicator: id}; } setIndicator(id); setPreview(null); };
   const totalIndicators = areas.reduce((n, a) => n + a.indicators, 0);
   const problem = areasQuery.isError ? errorMessage(areasQuery.error, 'Could not load the catalogue') : '';
@@ -128,13 +133,15 @@ function Catalogue({layer}: {layer: ReturnType<typeof useCaseLayer>}): ReactElem
         {(['map', 'table', 'cards'] as const).map(v => <button type="button" key={v} aria-pressed={view === v} className={view === v ? 'on' : ''}
           onClick={() => setView(v)}>{v[0].toUpperCase() + v.slice(1)}</button>)}
       </div>
-      <button type="button" className="kc-practise" disabled aria-describedby="kc-practise-why">⟲ Practise</button>
+      {/* Why Practise is off is on the button, on hover, as well as for screen readers (Ony, 29 Oct). */}
+      <Reveal tabbable={false} describe={false} detail="Practise (spaced review of flip cards) is not built yet.">
+        <button type="button" className="kc-practise" disabled aria-describedby="kc-practise-why">⟲ Practise</button></Reveal>
       <span id="kc-practise-why" className="sr-only">Practise (spaced review of flip cards) is not built yet.</span>
     </header>
     {problem && <p className="kc-error" role="alert">{problem}</p>}
     <div className={`kc-board view-${view}`}>
       {view === 'map' && <>
-        <CatalogueMap areas={areas} map={mapQuery.data} layer={layer} selected={area} onSelect={chooseArea} onOpenIndicator={openIndicator} onShowTable={() => setView('table')}/>
+        <CatalogueMap loading={areasQuery.isPending} areas={areas} map={mapQuery.data} layer={layer} selected={area} onSelect={chooseArea} onOpenIndicator={openIndicator} onShowTable={() => setView('table')}/>
         <IndicatorList area={areaRow} rows={rows} loading={rowsQuery.isPending && Boolean(area)} error={rowsQuery.isError ? errorMessage(rowsQuery.error, 'Could not load the indicators') : ''}
           layer={layer} filter={filter} onFilter={setFilter} selected={indicator} onSelect={id => { setIndicator(id); setPreview(null); }} onPreview={setPreview}/>
       </>}

@@ -14,6 +14,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
+import {dropBody} from '../test-support/library';
 import {corpusStatusBody, documentFormatsBody, emptyGraph} from '../test-support/page-routes';
 
 vi.mock('next/navigation', () => ({
@@ -52,7 +53,7 @@ describe('Reading progress for the corpus', () => {
     const onIdle = vi.fn();
     wrap(<CorpusStatus investigationId="inv-1" watch={false} onIdle={onIdle} pollMs={20}/>);
     const box = await screen.findByRole('status', {name: 'OpenAleph progress'});
-    expect(within(box).getByText('Reading files: 1 waiting · 1 in progress · 6 done · 1 failed')).toBeInTheDocument();
+    expect(within(box).getByText('Reading files: 1 waiting · 1 in progress · 6 done · 1 failed').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     expect(within(box).getByText('Finding names: 2 waiting · 0 in progress · 0 done')).toBeInTheDocument();
 
     api.add({[STATUS]: corpusStatusBody('inv-1', {collection_id: '7'})});
@@ -89,7 +90,7 @@ describe('Reading progress for the corpus', () => {
     const api = mockApi({
       'GET /api/investigations/inv-1/documents': [queued], 'GET /api/investigations/inv-1/entities': [],
       'GET /api/investigations/inv-1/graph': emptyGraph(), [STATUS]: working,
-      'GET /api/document-formats': documentFormatsBody(),
+      'GET /api/document-formats': documentFormatsBody(), 'GET /api/investigations/inv-1/drop': dropBody('inv-1'),
     });
     wrap(<DocumentsPanel investigationId="inv-1"/>);
     const box = await screen.findByRole('status', {name: 'OpenAleph progress'});

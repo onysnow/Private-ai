@@ -24,14 +24,16 @@ from app.jobs.handlers import ANALYZE_DOCUMENT, EXTRACT_DOCUMENT, FIND_CHILDREN
 from app.jobs.records import create_job, serialize_job
 from app.jobs.runner import job_runner
 from app.models.domain import BackgroundJob, Document, IngestionBatch, Investigation
-from app.schemas.api import IngestionBatchCreate
+from app.schemas.api import DocumentAboutUpdate, IngestionBatchCreate
 from app.schemas.responses import file_response
 from app.schemas.responses import (
-    BackgroundJobOut, DocumentDetailOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut,
+    BackgroundJobOut, DocumentDetailOut, DocumentOut, DocumentEmailOut, DocumentFormatsOut, DocumentReadFailedOut, DocumentUploadOut,
     DocumentTranslationOut, DuplicateDocumentOut, ErrorOut, IngestionBatchesOut, IngestionBatchOut,
     ExtractionCandidateOut, OpenAlephDocumentSyncOut, OpenAlephEntityImportOut, OpenAlephEvidenceImportOut,
     OpenAlephReviewRefreshOut, OpenAlephReviewStatusOut, SimilarDocumentsOut, ValidationErrorOut, upstream,
 )
+from app.db.decided_by import person_name
+from app.services import document_facts
 from app.services.document_formats import UnsupportedFormat, accepted_formats, check_upload
 from app.services.email_documents import document_email
 from app.services.openaleph_children import is_container
@@ -48,8 +50,9 @@ from app.services.openaleph_corpus import (
     import_openaleph_evidence_candidates, record_openaleph_operation_failure,
     refresh_openaleph_review_candidates, serialize_sync, sync_document_to_openaleph,
 )
-from app.services.image_reader import NotAPicture, stored_picture
+from app.services.image_reader import NotAPicture, shown_path, stored_picture
 from app.services.security import resolve_storage_root
+from app.services.photos import is_photo
 from app.services.transcription import is_media
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
@@ -326,8 +329,9 @@ async def upload_document(
     except UnsupportedFormat as exc:
         raise refused(415, str(exc))
     try:
-        # A recording may be larger than a document (ADR-0020).
-        data = await read_upload_limited(file, settings.max_media_bytes if is_media(file.filename) else settings.max_document_bytes)
+        # A recording or a camera's RAW photo may be larger than a document (ADR-0020, ADR-0021).
+        large = is_media(file.filename) or is_photo(file.filename)
+        data = await read_upload_limited(file, settings.max_media_bytes if large else settings.max_document_bytes)
     except HTTPException as exc:
         raise refused(exc.status_code, str(exc.detail))
     if not data:
@@ -389,8 +393,28 @@ def get_document(document_id: str, db: Session = Depends(get_db)) -> Any:
     return get_document_detail(db, row)
 
 
+@router.patch("/documents/{document_id}/about", response_model=DocumentOut,
+              responses={404: {"model": ErrorOut}, 422: {"model": ValidationErrorOut | ErrorOut, "description": "Not a kind this app knows, or not a language"}})
+def update_document_about(document_id: str, body: DocumentAboutUpdate, db: Session = Depends(get_db)) -> Any:
+    """A person sets what the document is and its language (the Library pane, the reading room). Only the fields sent
+    change; null clears one. Who set it is kept with it, and the machine never replaces it."""
+    row = db.get(Document, document_id)
+    if row is None:
+        raise HTTPException(404, "Document not found")
+    who = person_name(db)
+    if "kind" in body.model_fields_set:
+        document_facts.set_kind(row, body.kind, "person", who)
+    if "language" in body.model_fields_set:
+        if body.language is not None and document_facts.language_code(body.language) is None:
+            raise HTTPException(422, f"Not a language code: {body.language}")
+        document_facts.set_language(row, body.language, "person", who=who)
+    db.commit()
+    db.refresh(row)
+    return serialize_document(db, row)
+
+
 @router.get("/documents/{document_id}/picture", response_class=Response,
-            responses=file_response("image/png", "The picture this document is, as uploaded (PNG or JPEG)"))
+            responses=file_response("image/png", "The picture this document is, as uploaded (PNG or JPEG), or the viewable copy of a HEIC or RAW photo"))
 def get_document_picture(document_id: str, db: Session = Depends(get_db)) -> Response:
     """The picture a document is (app/services/image_reader.py), for the app to
     show beside its evidence. Its type is read from its bytes; it is sent so
@@ -399,7 +423,7 @@ def get_document_picture(document_id: str, db: Session = Depends(get_db)) -> Res
     if row is None:
         raise HTTPException(404, "Document not found")
     try:
-        data, picture = stored_picture(row.storage_path, resolve_storage_root(settings.document_storage_dir))
+        data, picture = stored_picture(shown_path(db, row), resolve_storage_root(settings.document_storage_dir))
     except NotAPicture as exc:
         raise HTTPException(415, f"This document is not a picture: {exc}") from exc
     except OSError as exc:

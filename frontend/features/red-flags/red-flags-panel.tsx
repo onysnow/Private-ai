@@ -12,6 +12,9 @@ import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement} from 'react';
 import {z} from 'zod';
 
+import {LevelChip} from '@/components/status';
+import type {FlagLevel} from '@/components/status';
+import {Reveal} from '@/components/ui/reveal';
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {errorMessage} from '../../lib/api-client';
 import {submitWith, useZodForm} from '../../lib/forms';
@@ -71,10 +74,11 @@ export function PartyButtons({parties, limit}: {parties: RedFlagOut['parties']; 
   const setPointed = useWorkbenchStore(state => state.setPointedParty);
   const openDossier = useWorkbenchStore(state => state.openDossier);
   const shown = limit ? parties.slice(0, limit) : parties;
-  return <div className="rf-who">{shown.map(p => <button type="button" key={p.id} className="sv-pd rf-party" title={`Open ${p.name}'s dossier`}
+  return <div className="rf-who">{shown.map(p => <Reveal key={p.id} tabbable={false} detail={`Open ${p.name}'s dossier`}>
+    <button type="button" className="sv-pd rf-party"
     onMouseEnter={() => setPointed(p.id)} onMouseLeave={() => setPointed(null)} onFocus={() => setPointed(p.id)} onBlur={() => setPointed(null)}
     onClick={() => openDossier(p.id)}>
-    <i style={{borderColor: PARTY[partyKind(p.schema)].ring}}/>{p.name}</button>)}
+    <i style={{borderColor: PARTY[partyKind(p.schema)].ring}}/>{p.name}</button></Reveal>)}
     {shown.length < parties.length && <span className="sv-muted">+{parties.length - shown.length} more</span>}</div>;
 }
 
@@ -85,7 +89,8 @@ export function NotShown({flag}: {flag: RedFlagOut}): ReactElement {
   return <>{flag.not_shown.map((part, i) => {
     const item = (flag.checks ?? []).find(c => c.question === part);
     return <span key={part}>{i > 0 && '; '}{item
-      ? <button type="button" className="tc-link" onClick={() => go(item.id)} title="Open it in To check">{part}</button> : part}
+      ? <Reveal tabbable={false} detail="Open it in To check">
+        <button type="button" className="tc-link" onClick={() => go(item.id)}>{part}</button></Reveal> : part}
       {item && item.status !== 'open' && <small> ({DECISION[item.status]})</small>}</span>;
   })}</>;
 }
@@ -99,12 +104,13 @@ function FlagCard({flag, rank, open, onOpen, ...actions}: {flag: RedFlagOut; ran
   const innocent = ind?.innocent_explanations ?? [];
   const name = ind?.name ?? flag.indicator_id;
   return <article className={`rf-card level-${flag.level}${flag.status !== 'open' ? ' decided' : ''}${open ? ' open' : ''}`} aria-label={`Red Flag: ${name}`}>
-    {flag.level !== 'faint' && <div className="rf-band"><GlossaryText text={`${LEVEL[flag.level].name} · ${LEVEL[flag.level].meaning}`}/></div>}
+    {flag.level !== 'faint' && <div className="rf-band"><LevelChip level={flag.level as FlagLevel} focusable/></div>}
     <header className="rf-head">
       <span className="rf-rank">{rank}</span>
       <div>
         <h4><button type="button" className="rf-open" onClick={onOpen} aria-expanded={open} aria-controls="rf-drawer">{name}</button></h4>
-        <small>{flag.level === 'faint' ? `Faint · ${LEVEL.faint.meaning} · ` : ''}{flag.indicator_id}</small>
+        <small>{flag.level === 'faint' && <LevelChip level="faint" focusable/>} <Reveal label="Indicator code" detail={<span className="rv-mono">{flag.indicator_id}</span>}>
+          <span aria-hidden="true">ⓘ</span></Reveal></small>
       </div>
     </header>
     <PartyButtons parties={flag.parties} limit={PARTIES_SHOWN}/>
@@ -132,9 +138,10 @@ export function FlagDetail({flag, ...actions}: {flag: RedFlagOut} & FlagActions)
   const max = Math.max(1.5, flag.weight);
   const name = ind?.name ?? flag.indicator_id;
   return <>
-    <p className="rf-drawer-level">{LEVEL[flag.level].name} · {LEVEL[flag.level].meaning}</p>
+    <p className="rf-drawer-level"><LevelChip level={flag.level as FlagLevel} focusable/></p>
     <h3>{flag.level === 'textbook' ? <NeonTitle text={name}/> : name}</h3>
-    <p className="sv-muted">{flag.indicator_id}{ind ? ` · ${ind.area_name}` : ''}{ind && <> · <a href={`/learn?indicator=${encodeURIComponent(ind.id)}`}>Full entry in the catalogue</a></>}</p>
+    <p className="sv-muted"><Reveal label="About this flag" detail={<><span className="rv-mono">{flag.indicator_id}</span>{ind ? ` · ${ind.area_name}` : ''}</>}>
+      <span aria-hidden="true">ⓘ</span></Reveal>{ind && <> <a href={`/learn?indicator=${encodeURIComponent(ind.id)}`}>Full entry in the catalogue</a></>}</p>
     <p className="rf-summary"><GlossaryText text={flag.summary}/></p>
     <PartyButtons parties={flag.parties}/>
     <section className="rf-sec" aria-labelledby="rf-sec-innocent">
@@ -178,6 +185,12 @@ function FlagDrawer({flag, onClose, ...actions}: {flag: RedFlagOut; onClose: () 
   </aside>;
 }
 
+const SET_BY: Record<string, {mark: string; word: string}> = {app: {mark: 'ƒ', word: 'Chosen by the app'}, reporter: {mark: '✎', word: 'Chosen by you'}};
+function SetBy({by}: {by: string}): ReactElement {
+  const s = SET_BY[by] ?? SET_BY.reporter;
+  return <Reveal label={s.word} detail={s.word}><span className="rf-setby" aria-hidden="true">{s.mark}</span></Reveal>;
+}
+
 /** The investigation's type: catalogue areas, chosen by the app with its reasons, or by the reporter (indicators.md).
  * Closed, it is one line of area names. Open, the app's suggestions come first with why, then every other area
  * as a card with a one-line summary, searchable. The safety area (SA) is the reporter's safety, not a type. */
@@ -202,7 +215,8 @@ export function InvestigationType({kind, flagsByArea, onSet}: {kind: Investigati
     return <div className="rf-type" role="group" aria-label="Type of investigation">
       <span className="rf-type-label">Type</span>
       <span className="rf-type-names">{kind.areas.length ? kind.areas.map(a => a.name).join(' · ') : 'Not known yet'}</span>
-      <span className="sv-muted">{kind.set_by === 'app' ? '— chosen by the app' : '— chosen by you'}</span>
+      {/* Who chose the type is a mark: ƒ the app, ✎ you; named on reveal. */}
+      <SetBy by={kind.set_by}/>
       {/* "why?": the app's reasons for the areas it chose (research Act §4: the reasons, without opening the picker). */}
       {kind.set_by === 'app' && kind.areas.length > 0 && <span className="rf-why" onKeyDown={e => { if (e.key === 'Escape' && why) { e.stopPropagation(); setWhy(false); } }}>
         <button type="button" className="rf-why-btn" aria-expanded={why} aria-controls="rf-why-list" onClick={() => setWhy(w => !w)}>why?</button>
@@ -214,7 +228,7 @@ export function InvestigationType({kind, flagsByArea, onSet}: {kind: Investigati
   }
   return <div className="rf-type editing" role="group" aria-label="Type of investigation">
     <div className="tp-head"><span className="rf-type-label">Type of investigation</span>
-      <span className="sv-muted">{kind.set_by === 'app' ? 'Chosen by the app' : 'Chosen by you'}</span></div>
+      <SetBy by={kind.set_by}/></div>
     {kind.suggested.length > 0 && <section aria-label="Suggested">
       <h5 className="tp-sub">Suggested</h5>
       <div className="tp-grid wide">{kind.suggested.map(s => <button type="button" key={s.key} className="tp-card" aria-pressed={picked.includes(s.key)}
@@ -228,12 +242,11 @@ export function InvestigationType({kind, flagsByArea, onSet}: {kind: Investigati
       <div className="tp-subrow"><h5 className="tp-sub">{kind.suggested.length ? 'Add another area' : 'Areas'}</h5>
         <label className="sv-sbox tp-find"><input value={find} placeholder="Search areas…" aria-label="Search areas"
           onChange={(e: ChangeEvent<HTMLInputElement>) => setFind(e.target.value)}/></label></div>
-      <div className="tp-grid">{others.map(a => <button type="button" key={a.key} className="tp-card" aria-pressed={picked.includes(a.key)} title={a.summary}
-        onClick={() => toggle(a.key)}>
+      <div className="tp-grid">{others.map(a => <Reveal key={a.key} tabbable={false} detail={a.summary}>
+        <button type="button" className="tp-card" aria-pressed={picked.includes(a.key)} onClick={() => toggle(a.key)}>
         <span className="tp-name">{a.name}</span>
-        <span className="tp-sum">{a.summary}</span>
         <span className="tp-meta">{a.indicators} indicators{flagLine(a.key) ? ` · ${flagLine(a.key)}` : ''}</span>
-      </button>)}
+      </button></Reveal>)}
       {all.length > 0 && !others.length && <p className="sv-muted">No area matches.</p>}</div>
     </section>
     <div className="tp-actions">
@@ -316,8 +329,9 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
 
   return <section className="card rf" id="red-flags" aria-labelledby="red-flags-title">
     <h3 id="red-flags-title">Red Flags</h3>
-    <p className="sv-psub">Patterns from published cases found in this investigation&apos;s records. Each is a lead, not a finding.{' '}
-      <span className="rf-rules" title={rules.map(r => r.name).join('\n')}>{rules.length - cannot.length} of {rules.length} checks ran</span>.</p>
+    <p className="sv-psub"><Reveal detail="Patterns from published cases found in this investigation’s records."><span>Each is a lead, not a finding.</span></Reveal>{' '}
+      <Reveal detail={<>{rules.map(r => <span key={r.indicator_id} className="rv-row">{r.name}</span>)}</>}>
+        <span className="rf-rules">{rules.length - cannot.length} of {rules.length} checks ran</span></Reveal></p>
     {cannot.length > 0 && <details className="rf-cannot"><summary>{cannot.length} could not run on these records</summary>
       <ul>{cannot.map(c => <li key={c.indicator_id}><b>{c.name}</b>: {c.reason}</li>)}</ul></details>}
     {kind && <InvestigationType kind={kind} flagsByArea={flagsByArea(flags)} onSet={setAreas}/>}
@@ -332,7 +346,7 @@ export function RedFlagsPanel({investigationId}: {investigationId: string}): Rea
     </div>)}
     {opened && <FlagDrawer key={opened.id} flag={opened} onClose={() => setOpenId(null)} {...actionsFor(opened)}/>}
     {gone.length > 0 && <details className="rf-gone"><summary>No longer fire ({gone.length})</summary>
-      <ul>{gone.map(f => <li key={f.id}><b>{f.indicator?.name ?? f.indicator_id}</b>: {f.summary} <small>The records changed so the pattern no longer holds.</small></li>)}</ul>
+      <ul>{gone.map(f => <li key={f.id}><Reveal detail="The records changed so the pattern no longer holds."><b>{f.indicator?.name ?? f.indicator_id}</b></Reveal>: {f.summary}</li>)}</ul>
     </details>}
   </section>;
 }

@@ -42,7 +42,7 @@ describe('theme storage', () => {
 
   it('ignores unknown or unready values', () => {
     window.localStorage.setItem('pai:appearance', JSON.stringify({theme: 'neon-pink', format: 'desk', effects: 'loud'}));
-    expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], custom: null});
+    expect(keptAppearance()).toEqual({theme: 'case-night', effects: 'full', motion: 'normal', format: 'board', off: ['neon'], status: 'colour', custom: null});
   });
 });
 
@@ -108,6 +108,10 @@ describe('Settings › Appearance', () => {
     render(<QueryProvider><AppearancePanel/></QueryProvider>);
     expect(screen.getByRole('radio', {name: 'Rain Noir theme, lowest contrast 5.90:1, has effects'})).toBeInTheDocument();
     expect(screen.getByRole('radio', {name: 'Forest Ledger theme, lowest contrast 4.84:1'})).toBeInTheDocument();
+    // At rest a card is its name and its preview; its mood and contrast line are revealed on it.
+    const archive = screen.getByRole('radio', {name: /^Archive theme/});
+    expect(archive).toHaveAccessibleDescription(/Lowest pair 4\.72:1 · AA/);
+    expect(archive.textContent).not.toMatch(/Lowest pair/);
   });
 
   it('crossfades a theme change where the browser can, 700 ms into Rain Noir', async () => {
@@ -135,7 +139,7 @@ describe('Settings › Appearance', () => {
     await userEvent.setup().hover(screen.getByRole('radio', {name: /^Indigo Clarity theme/}));
     const facts = screen.getByText('Lowest text pair 6.39:1 · AA').closest('dl')!;
     expect(facts).toHaveAttribute('aria-label', 'Indigo Clarity in four facts');
-    expect(within(facts).getByText('Inclusive Sans · Lexend · Plex Mono')).toBeInTheDocument();
+    expect(within(facts).getByText('Fonts on this computer').closest('.rv')).toHaveAccessibleDescription('Inclusive Sans · Lexend · Plex Mono');
     expect(await screen.findByText('Open or start a case to see its Case home here in each theme.')).toBeInTheDocument();
   });
 });
@@ -219,10 +223,10 @@ describe('AppFrame', () => {
   it('opens edges with Alt and an arrow, pins one on this computer, and lists where you have been', async () => {
     render(<QueryProvider><AppFrame><p>content</p></AppFrame></QueryProvider>);
     const left = document.getElementById('fr-left')!;
-    expect(screen.getByText('Steps and pages', {selector: '.fr-hint'})).toBeInTheDocument();
+    // No hint chip floats over the work: the keys live behind ?.
+    expect(document.querySelector('.fr-hint')).toBeNull();
     fireEvent.keyDown(window, {key: 'ArrowRight', altKey: true});
     expect(left).toHaveClass('open');
-    expect(screen.queryByText('Steps and pages', {selector: '.fr-hint'})).not.toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'ArrowLeft', altKey: true});
     expect(left).not.toHaveClass('open');
     fireEvent.keyDown(window, {key: '['});
@@ -282,10 +286,19 @@ describe('AppFrame', () => {
 });
 
 describe('status grammar', () => {
-  it('always shows a word and a shape, not only a colour', () => {
+  it('keeps the shape and the word in every chip, for the Status marks setting and screen readers', () => {
     render(<><StatusChip status="disputed"/><StatusChip status="unshown"/><LevelChip level="strong" showMeaning/></>);
     expect(screen.getByText('Disputed').closest('.st')).toHaveTextContent('✕Disputed');
     expect(screen.getByText('Not yet shown').closest('.st')).toHaveClass('st-unshown');
     expect(screen.getByText('Strong').closest('.lv')).toHaveTextContent('▮▮▯Strong · it looks serious');
+  });
+
+  it('shows colour alone by default, and the shape or the word when Status marks asks for them', () => {
+    keepAppearance({status: 'shape'});
+    expect(document.documentElement.dataset.status).toBe('shape');
+    keepAppearance({status: 'words'});
+    expect(keptAppearance().status).toBe('words');
+    keepAppearance({status: 'colour'});
+    expect(document.documentElement.dataset.status).toBe('colour');
   });
 });

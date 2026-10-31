@@ -7,8 +7,9 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import type {ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {
   deleteSavedQuestionMutation, getCaseResearchOptions, getCaseResearchQueryKey, listAiRunsQueryKey, putCaseResearchMutation, runSavedQuestionMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
@@ -46,8 +47,9 @@ export function SavedQuestions({investigationId, onAsk}: {investigationId: strin
     <p className="br-eyebrow" id="br-saved-head">Saved questions</p>
     {!d.questions.length ? <p className="br-quietline">None yet. Save a question from its plan to ask it again{mode === 'automatic' ? ', or by itself after each import' : ''}.</p>
       : <ul>{d.questions.map(q => <li key={q.id}>
-        <span>{q.question}{q.module === 'hypothesis_test' && q.working_theory ? <em> · testing “{q.working_theory}”</em> : null}</span>
-        <small>{q.last_run_at ? `last run ${apiTime(q.last_run_at).toLocaleString(undefined, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}` : 'not run yet'}</small>
+        {/* When it last ran is revealed on the question. */}
+        <Reveal detail={q.last_run_at ? `Last run ${timeWords(q.last_run_at)}` : 'Not run yet'}>
+          <span>{q.question}{q.module === 'hypothesis_test' && q.working_theory ? <em> · testing “{q.working_theory}”</em> : null}</span></Reveal>
         <button type="button" className="br-quiet" onClick={() => onAsk(q)}>Ask it</button>
         <button type="button" className="br-quiet" disabled={!d.ai_enabled || runNow.isPending} onClick={() => runNow.mutate({path: {saved_question_id: q.id}})}>Run now</button>
         <button type="button" className="br-quiet" disabled={stop.isPending} onClick={() => stop.mutate({path: {saved_question_id: q.id}})}>Stop asking it</button>
@@ -55,10 +57,11 @@ export function SavedQuestions({investigationId, onAsk}: {investigationId: strin
 
     <div className="br-saved-mode">
       <span className="br-seg" role="radiogroup" aria-label="This case: research without asking">
-        {(['off', 'ask', 'automatic'] as const).map(m => <button key={m} type="button" role="radio" aria-checked={mode === m}
-          className={(choosing ?? mode) === m ? 'on' : ''} onClick={() => { if (m !== mode) { setChoosing(m); setReason(''); } else setChoosing(null); }}>{MODE_WORDS[m]}</button>)}
+        {/* What each mode does is revealed on it. */}
+        {(['off', 'ask', 'automatic'] as const).map(m => <Reveal key={m} tabbable={false} detail={MODE_LINES[m]}><button type="button" role="radio" aria-checked={mode === m}
+          className={(choosing ?? mode) === m ? 'on' : ''} onClick={() => { if (m !== mode) { setChoosing(m); setReason(''); } else setChoosing(null); }}>{MODE_WORDS[m]}</button></Reveal>)}
       </span>
-      <small>{MODE_LINES[choosing ?? mode]} {d.own ? <>This case’s own choice{d.reason ? `: “${d.reason}”` : ''}. <button type="button" className="br-quiet"
+      <small>{d.own ? <>This case’s own choice{d.reason ? `: “${d.reason}”` : ''}. <button type="button" className="br-quiet"
         disabled={setMode.isPending} onClick={() => setMode.mutate({path: {investigation_id: investigationId}, body: {mode: null}})}>Follow Settings again ({MODE_WORDS[d.default as Mode] ?? d.default})</button></>
         : 'As in Settings › AI and research.'}</small>
     </div>

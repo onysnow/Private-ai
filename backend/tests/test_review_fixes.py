@@ -427,8 +427,6 @@ def test_a_chart_in_a_writeup_keeps_its_drawing_text_and_real_report_through_a_s
 # --- CodeQL findings on the combined branch ---------------------------------
 
 def test_the_query_workbench_strips_comments_in_one_pass():
-    import time as _t
-
     import pytest as _p
 
     from opsconsole.core.sqlscreen import screen_read
@@ -438,10 +436,30 @@ def test_the_query_workbench_strips_comments_in_one_pass():
         screen_read("/* hidden */ DROP TABLE x")
     with _p.raises(ValueError):
         screen_read("select 1 /* a */ ; delete from t")
-    started = _t.perf_counter()
-    with _p.raises(ValueError):          # nothing but unclosed '/*': used to take quadratic time
-        screen_read("/*a" * 200_000)
-    assert _t.perf_counter() - started < 2
+    # Nothing but unclosed '/*' used to take quadratic time. Count the reads of the text, not seconds
+    # (review B7): one pass reads each character a few times, however long the text is.
+    class _Counted(str):
+        reads = 0
+
+        def startswith(self, *args, **kwargs):  # type: ignore[override]
+            _Counted.reads += 1
+            return str.startswith(self, *args, **kwargs)
+
+        def __getitem__(self, key):  # type: ignore[override]
+            _Counted.reads += 1
+            return str.__getitem__(self, key)
+
+        def find(self, sub, start=0, end=None):  # type: ignore[override]
+            # A search reads what lies between where it starts and what it finds.
+            found = str.find(self, sub, start, len(self) if end is None else end)
+            _Counted.reads += ((len(self) if found == -1 else found) - start) or 1
+            return found
+
+    for n in (2_000, 20_000):
+        _Counted.reads = 0
+        with _p.raises(ValueError):
+            screen_read(_Counted("/*a" * n))
+        assert _Counted.reads <= 10 * 3 * n, f"{_Counted.reads} reads of a {3 * n}-character text"
 
 
 def test_a_connector_credential_failure_does_not_answer_with_the_internal_reason(monkeypatch):

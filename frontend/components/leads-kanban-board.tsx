@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import type {ChangeEvent, ReactElement, ReactNode} from 'react';
 import {
   DndContext,
@@ -12,11 +12,17 @@ import {
   useDroppable,
 } from '@dnd-kit/core';
 import type {DragEndEvent, DragStartEvent} from '@dnd-kit/core';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from './ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from './ui/card';
 import {Button} from './ui/button';
 import {Input} from './ui/input';
 import {Textarea} from './ui/textarea';
-import {Badge} from './ui/badge';
+import {Reveal} from './ui/reveal';
+
+// Priority is the card's left edge (thick for urgent, medium for high, dashed for low), as on the horizons; a task's
+// status is a dot. Both are named on reveal.
+const EDGE: Record<string, string> = {urgent: 'border-l-[5px]', high: 'border-l-[3px]', low: 'border-l border-l-foreground/40 border-dashed'};
+const TASK_DOT: Record<string, string> = {todo: '○', in_progress: '◐', blocked: '✕', done: '✓', cancelled: '–'};
+const initials = (name: string) => name.split(/\s+/).filter(Boolean).map(w => w[0]?.toUpperCase()).join('').slice(0, 3);
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from './ui/select';
 
 // The board asks only for what it draws, so a lead from the generated API
@@ -61,7 +67,8 @@ interface LeadsKanbanBoardProps {
   setLeadPriority: (v: string) => void;
   leadOwner: string;
   setLeadOwner: (v: string) => void;
-  onCreateLead: () => void;
+  /** Adds the lead from the fields; true when it was added (the form folds away again). */
+  onCreateLead: () => void | boolean | Promise<void | boolean>;
   onStatusChange: (id: string, status: string) => void;
   onTraceLink: (lead: LeadCard, link: LeadLinkCard) => void;
   onTraceTask: (task: TaskCard, leadTitle: string) => void;
@@ -71,6 +78,37 @@ interface LeadsKanbanBoardProps {
   viewSwitch?: ReactNode;
   /** Another view of the same leads (Now / Next / Later), drawn in place of the status columns. */
   board?: ReactNode;
+}
+
+type NewLeadProps = Pick<LeadsKanbanBoardProps, 'leadTitle' | 'setLeadTitle' | 'leadDetail' | 'setLeadDetail' | 'leadPriority' | 'setLeadPriority'
+  | 'leadOwner' | 'setLeadOwner' | 'onCreateLead'>;
+
+/** "+ New lead": one line at rest; a click unfolds the form in place (the question, priority, owner, what is known),
+ *  Esc or Cancel folds it, and it folds by itself once the lead is added. */
+export function NewLead(props: NewLeadProps): ReactElement {
+  const [open, setOpen] = useState(false);
+  const opener = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+  useEffect(() => { if (wasOpen.current && !open) opener.current?.focus(); wasOpen.current = open; }, [open]);
+  if (!open) return <Button ref={opener} type="button" size="sm" variant="outline" aria-expanded={false} onClick={() => setOpen(true)}>+ New lead</Button>;
+  const add = async () => { if ((await props.onCreateLead()) === true) setOpen(false); };
+  return <form className="grid basis-full gap-2 rounded-lg border bg-card p-2.5" aria-label="New lead" noValidate
+    onSubmit={e => { e.preventDefault(); void add(); }} onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); setOpen(false); } }}>
+    <div className="flex flex-wrap items-center gap-2">
+      <Input autoFocus className="min-w-[240px] flex-[3]" aria-label="The question" value={props.leadTitle}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => props.setLeadTitle(e.target.value)} placeholder="Who approved this contract?" />
+      <Select value={props.leadPriority} onValueChange={props.setLeadPriority}>
+        <SelectTrigger className="w-auto" aria-label="Priority"><SelectValue /></SelectTrigger>
+        <SelectContent>{['normal', 'high', 'urgent', 'low'].map(x => <SelectItem value={x} key={x}>{x}</SelectItem>)}</SelectContent>
+      </Select>
+      <Input className="min-w-[140px] flex-1" aria-label="Owner" value={props.leadOwner}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => props.setLeadOwner(e.target.value)} placeholder="Owner" />
+      <Button type="submit">Add lead</Button>
+      <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+    </div>
+    <Textarea rows={2} aria-label="What is known" value={props.leadDetail} onChange={(e: ChangeEvent<HTMLTextAreaElement>) => props.setLeadDetail(e.target.value)}
+      placeholder="What is known, what is missing, and why it matters?" />
+  </form>;
 }
 
 function LeadCardView({lead, onStatusChange, onTraceLink, onTraceTask, onTaskStatus, onConvert, dragHandleProps}: {
@@ -85,17 +123,18 @@ function LeadCardView({lead, onStatusChange, onTraceLink, onTraceTask, onTaskSta
   const links = lead.links || [];
   const tasks = lead.tasks || [];
   return (
-    <div className="rounded-lg border bg-card p-3 text-card-foreground shadow-xs space-y-2">
+    <div className={`rounded-lg border ${EDGE[lead.priority] ?? ''} border-l-foreground/70 bg-card p-3 text-card-foreground shadow-xs space-y-2`}>
       <div className="flex items-start justify-between gap-2">
-        <button type="button" className="text-left font-medium leading-snug cursor-grab active:cursor-grabbing" {...dragHandleProps}>
-          {lead.title}
-        </button>
-        <Badge variant={lead.priority === 'urgent' ? 'destructive' : 'secondary'}>{lead.priority}</Badge>
+        <Reveal tabbable={false} detail={`${lead.priority} priority`}>
+          <button type="button" className="text-left font-medium leading-snug cursor-grab active:cursor-grabbing" {...dragHandleProps}>
+            {lead.title}
+          </button></Reveal>
+        <span className="flex items-center gap-1.5 text-muted-foreground">
+          {lead.provider && <Reveal label={`${lead.provider} lead`} detail={`From ${lead.provider}: an outside lead`}><span aria-hidden="true">↗</span></Reveal>}
+          {lead.owner && <Reveal label={`Owner: ${lead.owner}`} detail={`Owner: ${lead.owner}`}><span aria-hidden="true" className="rounded-full border px-1.5 text-xs">{initials(lead.owner)}</span></Reveal>}
+        </span>
       </div>
-      <div className="text-xs text-muted-foreground">
-        {lead.provider ? `${lead.provider} lead` : 'reporter lead'}
-        {lead.triage.needs_attention ? ` · ⚠ evidence conflict score ${lead.triage.attention_score}` : ''}
-      </div>
+      {lead.triage.needs_attention && <div className="text-xs text-destructive">⚠ evidence conflict score {lead.triage.attention_score}</div>}
       <Select value={lead.status} onValueChange={(status) => onStatusChange(lead.id, status)}>
         <SelectTrigger className="h-7 w-auto text-xs" aria-label={`Move "${lead.title}"`}><SelectValue /></SelectTrigger>
         <SelectContent>{COLUMNS.map(c => <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>)}</SelectContent>
@@ -103,11 +142,11 @@ function LeadCardView({lead, onStatusChange, onTraceLink, onTraceTask, onTaskSta
       {lead.triage.needs_attention && (
         <div className="text-xs text-destructive"><b>Needs evidence review:</b> {lead.triage.reasons.join(' · ')}</div>
       )}
-      {lead.owner && <div className="text-xs">Owner: {lead.owner}</div>}
       {lead.next_action && <div className="text-xs"><b>Next:</b> {lead.next_action}</div>}
       {lead.detail && <div className="text-sm">{lead.detail}</div>}
-      <div className="text-xs text-muted-foreground">
-        {links.length} linked record(s) · {tasks.length} task(s) · {lead.triage.stance_counts.supports} support / {lead.triage.stance_counts.contradicts} contradiction / {lead.triage.stance_counts.context} context
+      <div className="text-sm text-muted-foreground">
+        <Reveal detail={`${links.length} linked record(s) · ${tasks.length} task(s) · ${lead.triage.stance_counts.supports} support / ${lead.triage.stance_counts.contradicts} contradiction / ${lead.triage.stance_counts.context} context`}>
+          <span>✓ {lead.triage.stance_counts.supports} · ✕ {lead.triage.stance_counts.contradicts} · ☐ {tasks.length}</span></Reveal>
       </div>
       {links.length > 0 && (
         <div className="flex flex-wrap gap-1">
@@ -123,7 +162,8 @@ function LeadCardView({lead, onStatusChange, onTraceLink, onTraceTask, onTaskSta
           <div className="text-xs font-semibold">Reporting tasks</div>
           {tasks.map(task => (
             <div key={task.id} className="flex flex-wrap items-center gap-1 text-xs">
-              <span>{task.title || 'Task'} · {task.status || 'todo'} · {(task.history || []).length} event(s)</span>
+              <Reveal detail={`${task.status || 'todo'} · ${(task.history || []).length} event(s)`}>
+                <span><span aria-hidden="true">{TASK_DOT[task.status || 'todo'] ?? '○'}</span> {task.title || 'Task'}</span></Reveal>
               <Button size="sm" variant="ghost" onClick={() => onTraceTask(task, lead.title)}>Trace</Button>
               {task.status !== 'done' && (
                 <>
@@ -163,9 +203,9 @@ function KanbanColumn({column, leads, children}: {column: {id: string; label: st
       ref={setNodeRef}
       className={`flex min-w-[260px] flex-1 flex-col gap-2 rounded-lg border bg-muted/30 p-2 transition-colors ${isOver ? 'bg-muted/70 ring-2 ring-primary/40' : ''}`}
     >
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-baseline gap-1.5 px-1">
         <span className="text-sm font-semibold">{column.label}</span>
-        <Badge variant="outline">{leads.length}</Badge>
+        <span className="text-sm tabular-nums text-muted-foreground">{leads.length}</span>
       </div>
       <div className="flex flex-col gap-2 min-h-[80px]">{children}</div>
     </div>
@@ -204,22 +244,13 @@ export function LeadsKanbanBoard(props: LeadsKanbanBoardProps): ReactElement {
   return (
     <Card className="card" id="leads">
       <CardHeader className="pb-3">
-        <CardTitle>Questions & reporting leads</CardTitle>
-        <CardDescription>Questions stay separate from claims until evidence supports a conversion. Connector hits remain leads until reviewed.{props.board ? '' : ' Drag a card to change its status.'}</CardDescription>
+        <CardTitle><Reveal detail={`Questions stay separate from claims until evidence supports a conversion. Connector hits remain leads until reviewed.${props.board ? '' : ' Drag a card to change its status.'}`}>
+          <span>Questions & reporting leads</span></Reveal></CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="searchrow">
-          <Input value={props.leadTitle} onChange={(e: ChangeEvent<HTMLInputElement>) => props.setLeadTitle(e.target.value)} placeholder="Who approved this contract?" />
-          <Select value={props.leadPriority} onValueChange={props.setLeadPriority}>
-            <SelectTrigger className="w-auto"><SelectValue /></SelectTrigger>
-            <SelectContent>{['normal', 'high', 'urgent', 'low'].map(x => <SelectItem value={x} key={x}>{x}</SelectItem>)}</SelectContent>
-          </Select>
-          <Input value={props.leadOwner} onChange={(e: ChangeEvent<HTMLInputElement>) => props.setLeadOwner(e.target.value)} placeholder="Owner" />
-          <Button onClick={props.onCreateLead}>Add lead</Button>
-        </div>
-        <Textarea value={props.leadDetail} onChange={(e: ChangeEvent<HTMLTextAreaElement>) => props.setLeadDetail(e.target.value)} placeholder="What is known, what is missing, and why it matters?" />
-        {props.problem && <p className="muted">{props.problem}</p>}
-        {props.viewSwitch}
+        {props.problem && <p className="muted" role="alert">{props.problem}</p>}
+        {/* The other view (Now / Next / Later) draws its own toolbar, with the view switch and "+ New lead" in it. */}
+        {!props.board && <div className="flex flex-wrap items-center gap-2">{props.viewSwitch}<NewLead {...props}/></div>}
 
         {props.board ?? <>
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>

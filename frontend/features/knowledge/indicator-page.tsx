@@ -13,10 +13,11 @@ import {caseHref} from '../../lib/case-href';
 import {errorMessage} from '../../lib/api-client';
 import {getIndicatorOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import type {CatalogueIndicatorOut, CatalogueIndicatorRowOut} from '../../lib/generated/types.gen';
-import {LevelMark} from '../act/red-flags-board';
+import {Reveal} from '../../components/ui/reveal';
 import {GlossaryText} from '../glossary/glossary-text';
 import type {CaseLayer} from './case-layer';
-import {HOW_CHECKED, UNSET_LEVEL, shortAreaName} from './families';
+import {HOW_CHECKED, UNSET_LEVEL} from './families';
+import {FlagLevelChip, HowGlyph} from './indicator-list';
 
 const OUTCOME: Record<string, string> = {
   convicted: 'Convicted', acquitted: 'Acquitted', settled: 'Settled', fined_by_regulator: 'Fined by a regulator',
@@ -60,8 +61,11 @@ function Body({ind, row, layer, preview}: {ind: CatalogueIndicatorOut; row: Cata
     ? `No rule checks this on records yet: it is checked ${how.long}.` : '';
 
   return <article className="kc-ind">
-    <p className="kc-eyebrow">{preview && <span className="kc-preview-tag">Preview · </span>}{ind.id} · {shortAreaName(ind.area_name)}
-      {' · '}{verified ? <span className="kc-verified">✓ Verified</span> : <span className="kc-pending-tag">○ Pending checks</span>} · v{ind.version}</p>
+    {/* The id names the indicator across Learn; its area and version are on the ✓ / ○ mark, on hover or focus (Ony, 29 Oct). */}
+    <p className="kc-eyebrow">{preview && <span className="kc-preview-tag">Preview · </span>}{ind.id}{' '}
+      <Reveal describe={false} detail={<><b>{verified ? 'Verified' : 'Pending checks'}</b><span className="rv-row">{ind.area_name}</span><span className="rv-row">Version {ind.version}</span></>}>
+        {verified ? <span className="kc-verified">✓<span className="sr-only"> Verified · {ind.area_name} · version {ind.version}</span></span>
+          : <span className="kc-pending-tag">○<span className="sr-only"> Pending checks · {ind.area_name} · version {ind.version}</span></span>}</Reveal></p>
     <h2 className="kc-ind-name">{ind.name}</h2>
     {!verified && <p className="kc-banner-pending">Pending checks: not used for Red Flags yet.</p>}
     <p className="kc-def"><GlossaryText text={ind.definition}/></p>
@@ -75,14 +79,18 @@ function Body({ind, row, layer, preview}: {ind: CatalogueIndicatorOut; row: Cata
         const here = meets === step;
         return <li key={step} className={`kc-step ${step}${unset ? ' unset' : ''}${here ? ' here' : ''}`}
           aria-label={`${STEP_NAME[step]}, ${STEPS.indexOf(step) + 1} of 3, ${unset ? 'not set' : text}${here ? ', this case meets it' : ''}`}>
-          <span className="kc-step-top"><LevelMark level={step}/>{here && <span className="kc-this-case">This case</span>}</span>
+          {/* Learn teaches the levels, so here each step names its level in words. */}
+          <span className="kc-step-top"><FlagLevelChip level={step} showWord/>{here && <span className="kc-this-case">This case</span>}</span>
           <span className="kc-step-text">{unset ? 'No published number yet. Shown as “not set”, never guessed.' : <GlossaryText text={text}/>}</span>
         </li>;
       })}
     </ol>
+    {/* Where the numbers come from stays one click away; whether it is confirmed and the note are on its mark. */}
     {(levels.threshold_source && levels.threshold_source !== 'none' || levels.threshold_note) && <p className="kc-small">
-      {levels.threshold_source && levels.threshold_source !== 'none' && <>Numbers from <a href={levels.threshold_source} target="_blank" rel="noreferrer">this source</a>{ind.threshold_verified ? ' · ✓ confirmed' : ' · ○ not yet confirmed'}. </>}
-      {levels.threshold_note}</p>}
+      {levels.threshold_source && levels.threshold_source !== 'none' && <a href={levels.threshold_source} target="_blank" rel="noreferrer">Source of the numbers</a>}{' '}
+      <Reveal label={ind.threshold_verified ? 'Numbers confirmed' : 'Numbers not yet confirmed'} detail={<>
+        <b>{ind.threshold_verified ? '✓ Confirmed' : '○ Not yet confirmed'}</b>{levels.threshold_note && <span className="rv-row">{levels.threshold_note}</span>}</>}>
+        <span aria-hidden="true">{ind.threshold_verified ? '✓' : '○'}</span></Reveal></p>}
 
     <div className="kc-pair">
       <section aria-label="Could be innocent" className="kc-innocent">
@@ -98,13 +106,19 @@ function Body({ind, row, layer, preview}: {ind: CatalogueIndicatorOut; row: Cata
 
     <dl className="kc-facts">
       <dt>Checked by</dt>
-      <dd><span aria-hidden="true">{how.glyph} </span>{CHECKED_BY[ind.checkable]}{ind.lookup_sources.length ? `: ${ind.lookup_sources.join(', ')}` : ''}.
-        {ind.checkable === 'lookups' && <span className="kc-outbound">↗ Checking this means asking an outside source</span>}
-        {ind.data_needed.length > 0 && <span className="kc-small kc-block">Data needed: {ind.data_needed.join('; ')}</span>}</dd>
+      <dd>{ind.data_needed.length > 0
+          ? <Reveal label={`Checked ${how.long}`} detail={<><b>Data needed</b><span className="rv-row">{ind.data_needed.join('; ')}</span></>}><HowGlyph how={ind.checkable}/></Reveal>
+          : <HowGlyph how={ind.checkable}/>}{' '}{CHECKED_BY[ind.checkable]}{ind.lookup_sources.length ? `: ${ind.lookup_sources.join(', ')}` : ''}.
+        {/* What leaves this computer stays on screen. */}
+        {ind.checkable === 'lookups' && <span className="kc-outbound">↗ Checking this means asking an outside source</span>}</dd>
       <dt>Sources · {ind.sources.length}</dt>
       <dd>{(allSources ? ind.sources : source ? [source] : []).map((s, i) => <div key={i} className="kc-source">
         <q className="kc-quote">{s.quote}</q>
-        <span className="kc-mono kc-small">{s.publisher} {s.year ?? ''}{s.locator ? ` · ${s.locator}` : ''} · {s.quote_verified ? <span>✓ quote confirmed</span> : <span className="kc-dashed">○ not yet confirmed</span>}
+        {/* The publisher shows; the year, the place in the source and whether the quote is confirmed are on its mark. */}
+        <span className="kc-mono kc-small">{s.publisher}{' '}
+          <Reveal describe={false} detail={<>{[s.year, s.locator].filter(Boolean).join(' · ')}<span className="rv-row">{s.quote_verified ? 'Quote confirmed' : 'Quote not yet confirmed'}</span></>}>
+            {s.quote_verified ? <span>✓<span className="sr-only"> quote confirmed</span></span> : <span className="kc-dashed">○<span className="sr-only"> not yet confirmed</span></span>}</Reveal>
+          <span className="sr-only">{[s.year, s.locator].filter(Boolean).join(' · ')}</span>
           {' · '}<a href={s.url} target="_blank" rel="noreferrer">open</a></span>
       </div>)}</dd>
       {ind.cases.length > 0 && <><dt>Case{ind.cases.length > 1 ? `s · ${ind.cases.length}` : ''}</dt>
@@ -122,15 +136,19 @@ function Body({ind, row, layer, preview}: {ind: CatalogueIndicatorOut; row: Cata
     {!preview && <footer className="kc-actions">
       <button type="button" className="kc-btn primary" disabled={Boolean(reason) || layer.refetching} onClick={check}
         aria-describedby={reason ? `kc-why-${ind.id}` : undefined}>{layer.refetching ? 'Checking…' : 'Check this in my case'}</button>
-      <button type="button" className="kc-btn" disabled aria-describedby={`kc-why-flip-${ind.id}`}>＋ Flip card</button>
+      <Reveal tabbable={false} describe={false} detail="Flip cards come with Practise, not built yet.">
+        <button type="button" className="kc-btn" disabled aria-describedby={`kc-why-flip-${ind.id}`}>＋ Flip card</button></Reveal>
       <button type="button" className="kc-btn ghost" aria-expanded={allSources} onClick={() => setAllSources(v => !v)}>
         {allSources ? 'Fewer details' : `${ind.sources.length} ${ind.sources.length === 1 ? 'source' : 'sources'}`}</button>
-      <button type="button" className="kc-btn ghost" disabled aria-describedby={`kc-why-suggest-${ind.id}`}>Suggest change</button>
+      <Reveal tabbable={false} describe={false} detail="Suggestions need a place to send them, not built yet.">
+        <button type="button" className="kc-btn ghost" disabled aria-describedby={`kc-why-suggest-${ind.id}`}>Suggest change</button></Reveal>
       <p className="kc-why">
         {reason && <span id={`kc-why-${ind.id}`}>{reason} </span>}
         {checked && <span role="status">{checked} </span>}
-        <span id={`kc-why-flip-${ind.id}`}>Flip cards come with Practise, not built yet. </span>
-        <span id={`kc-why-suggest-${ind.id}`}>Suggestions need a place to send them, not built yet.</span>
+        {/* Why a control is not built yet is sub-text: on the control, on hover, and here for screen readers. The reason
+            the main action is blocked stays on screen. */}
+        <span id={`kc-why-flip-${ind.id}`} className="sr-only">Flip cards come with Practise, not built yet. </span>
+        <span id={`kc-why-suggest-${ind.id}`} className="sr-only">Suggestions need a place to send them, not built yet.</span>
       </p>
     </footer>}
   </article>;
@@ -144,7 +162,7 @@ function InThisCase({ind, layer, hasRule}: {ind: CatalogueIndicatorOut; layer: C
   if (flags.length) {
     const f = flags[0];
     return <div className="kc-incase-box">
-      <b>In this case:</b> {f.summary} <LevelMark level={f.level}/>
+      <b>In this case:</b> {f.summary} <FlagLevelChip level={f.level}/>
       {flags.length > 1 && <> and {flags.length - 1} more</>}. {f.not_shown.length > 0 && <span className="kc-small">Records can’t show: {f.not_shown[0]}</span>}
       {' '}<Link href={href}>Open in Red Flags</Link>
     </div>;

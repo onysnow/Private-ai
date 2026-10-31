@@ -1,5 +1,7 @@
 from pathlib import Path
+
 from PIL import Image, ImageDraw
+
 from app.services.pdf_ocr import extract_pdf_chunks
 
 
@@ -81,3 +83,77 @@ def test_each_page_is_told_as_it_is_read(tmp_path):
     finally:
         PAGE_PROGRESS.reset(token)
     assert told == [(1, 2, False), (2, 2, False)]
+
+
+def _pleading_pdf(path: Path, pages: int = 2, skip: tuple[int, ...] = ()) -> None:
+    """US pleading paper: 1 to 28 down the left margin of every page, the text in a column right of it."""
+    import fitz
+    doc = fitz.open()
+    for n in range(1, pages + 1):
+        page = doc.new_page(width=612, height=792)
+        for k in range(1, 29):
+            if k not in skip:
+                page.insert_text((44, 72 + 24 * (k - 1)), str(k), fontsize=11)
+        page.insert_text((72, 72), f'The United States brings this complaint, page {n}.', fontsize=11)
+        page.insert_text((72, 96), '1. The defendant asset is real property in New York.', fontsize=11)
+        page.insert_text((72, 120), '2. It was bought with diverted funds.', fontsize=11)
+        page.insert_text((300, 760), str(n), fontsize=11)
+    doc.save(path)
+    doc.close()
+
+
+def test_pleading_paper_margin_numbers_are_not_read_as_text(tmp_path):
+    p = tmp_path / 'pleading.pdf'
+    _pleading_pdf(p)
+    result = extract_pdf_chunks(p, enable_ocr=False)
+    for n, chunk in enumerate(result.chunks, 1):
+        text = chunk['text']
+        assert text.startswith(f'The United States brings this complaint, page {n}.'), text[:80]
+        assert '1. The defendant asset' in text and '2. It was bought' in text
+        assert '\n3\n' not in text and '\n27\n' not in text and '\n28' not in text
+
+
+def test_page_one_keeps_no_margin_numbers():
+    # Page 1's own number is "1": it once took the margin's "1", and the rest (2 to 28) stayed as text.
+    from app.services.pdf_ocr import strip_page_furniture
+    margin = "\n".join(str(n) for n in range(1, 29))
+    assert strip_page_furniture(f" \n \n{margin}\nM. KENDALL DAY, Chief", 1).strip() == "M. KENDALL DAY, Chief"
+    assert strip_page_furniture(f"1\n{margin}\nM. KENDALL DAY, Chief", 1).strip() == "M. KENDALL DAY, Chief"
+
+
+def test_margin_numbers_found_by_position_allow_gaps(tmp_path):
+    import fitz
+
+    from app.services.pdf_ocr import margin_line_numbers
+    p = tmp_path / 'gaps.pdf'
+    _pleading_pdf(p, pages=1, skip=(5, 6, 19))
+    with fitz.open(p) as doc:
+        found = margin_line_numbers(doc[0])
+    assert found == [str(k) for k in range(1, 29) if k not in (5, 6, 19)]
+    result = extract_pdf_chunks(p, enable_ocr=False)
+    text = result.chunks[0]['text']
+    assert text.startswith('The United States brings this complaint, page 1.')
+    assert '\n4\n' not in text and '\n20\n' not in text
+
+
+def test_a_normal_pdf_keeps_its_numbers(tmp_path):
+    import fitz
+
+    from app.services.pdf_ocr import _clean, margin_line_numbers
+    p = tmp_path / 'normal.pdf'
+    doc = fitz.open()
+    for n in (1, 2):
+        page = doc.new_page(width=612, height=792)
+        page.insert_text((72, 72), f'Board minutes, page {n}, with enough native text to be read.', fontsize=11)
+        for k in range(1, 8):  # a numbered list, each number on its own line in the text column
+            page.insert_text((72, 96 + 20 * k), str(k), fontsize=11)
+            page.insert_text((72, 106 + 20 * k), f'Item {k} of the agenda was discussed.', fontsize=11)
+        page.insert_text((300, 760), str(n), fontsize=11)  # the page number, at the foot
+    doc.save(p)
+    doc.close()
+    result = extract_pdf_chunks(p, enable_ocr=False)
+    with fitz.open(p) as doc:
+        assert [margin_line_numbers(page) for page in doc] == [[], []]
+        expected = [_clean(page.get_text('text')) for page in doc]
+    assert [c['text'] for c in result.chunks] == expected
+    assert '\n7\nItem 7' in result.chunks[0]['text'] and result.chunks[1]['text'].endswith('\n2')

@@ -3,26 +3,49 @@
 // each with its id, name and how it can be checked (◫ records, ⇄ lookups, ◉ a person: a shape, and the word in the
 // key and to screen readers); a fired indicator shows its level inline. Filter chips carry their counts. Pointing
 // at a row for a moment previews it in panel C without changing the choice; J / K move the choice. The list scrolls.
+import {UserRound} from 'lucide-react';
 import {useEffect, useRef} from 'react';
 import type {KeyboardEvent, ReactElement} from 'react';
 
+import {LevelChip} from '../../components/status';
+import type {FlagLevel} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import type {CatalogueAreaOut, CatalogueIndicatorRowOut} from '../../lib/generated/types.gen';
-import {LevelMark} from '../act/red-flags-board';
 import type {CaseLayer} from './case-layer';
 import {strongest} from './case-layer';
 import {HOW_CHECKED, shortAreaName} from './families';
 
-export type ListFilter = 'all' | 'fires' | 'records' | 'lookups' | 'person';
+type How = keyof typeof HOW_CHECKED;
+
+/** How an indicator is checked, as its shape alone (◫ records, ⇄ lookups, a person); the word is named beside it by the
+ *  caller, in a reveal and for screen readers (Ony, 29 Oct). */
+export function HowGlyph({how}: {how: How}): ReactElement {
+  return <span className={`kc-how-glyph kc-how-${how}`} aria-hidden="true">{how === 'person' ? <UserRound size={12} strokeWidth={2.2}/> : HOW_CHECKED[how].glyph}</span>;
+}
+
+/** The shape with its word in a reveal (and spoken with it). */
+export function HowMark({how, tabbable = true}: {how: How; tabbable?: boolean}): ReactElement {
+  const long = HOW_CHECKED[how].long;
+  return <Reveal tabbable={tabbable} label={`Checked ${long}`} detail={<>Checked <b>{long}</b></>}><HowGlyph how={how}/></Reveal>;
+}
+
+/** A Red Flag's level as the shared status grammar draws it (components/status.tsx). */
+export function FlagLevelChip({level, showWord = false}: {level: string; showWord?: boolean}): ReactElement {
+  return level === 'faint' || level === 'strong' || level === 'textbook' ? <LevelChip level={level as FlagLevel} showWord={showWord}/> : <span>{level}</span>;
+}
+
+export type ListFilter = 'all' | 'computed' | 'fires' | 'records' | 'lookups' | 'person';
 const PREVIEW_MS = 300;
 
 export function filterRows(rows: CatalogueIndicatorRowOut[], filter: ListFilter, layer: Pick<CaseLayer, 'flags'>): CatalogueIndicatorRowOut[] {
   if (filter === 'all') return rows;
   if (filter === 'fires') return rows.filter(r => layer.flags.has(r.id));
+  if (filter === 'computed') return rows.filter(r => r.rule);
   return rows.filter(r => r.checkable === filter);
 }
 
 const EMPTY: Record<ListFilter, string> = {
-  all: 'holds no indicator yet', fires: 'fires in this case', records: 'is checked from your records',
+  all: 'holds no indicator yet', computed: 'is computed by the app yet', fires: 'fires in this case', records: 'is checked from your records',
   lookups: 'is checked after outside lookups', person: 'is checked only by a person',
 };
 
@@ -37,7 +60,6 @@ export function IndicatorList({area, rows, loading, error, layer, filter, onFilt
   const chips: {key: ListFilter; label: string}[] = [
     {key: 'all', label: `All ${rows.length}`},
     ...(layer.investigationId ? [{key: 'fires' as const, label: `Fire here ${count('fires')}`}] : []),
-    ...(['records', 'lookups', 'person'] as const).map(k => ({key: k, label: `${HOW_CHECKED[k].glyph} ${HOW_CHECKED[k].word} ${count(k)}`})),
   ];
 
   const clearTimer = () => { if (timer.current !== null) { window.clearTimeout(timer.current); timer.current = null; } };
@@ -61,11 +83,20 @@ export function IndicatorList({area, rows, loading, error, layer, filter, onFilt
   };
 
   return <section className="kc-panel kc-list-panel" aria-label="Indicators of the area">
-    <p className="kc-eyebrow kc-clip" title={area?.name}>{area ? `${area.key} · ${shortAreaName(area.name)}` : 'Choose an area'}</p>
-    <h2 className="kc-title kc-title-s">{rows.length} indicators</h2>
+    {/* The area's name is the list's title; its code and full name are on hover or focus (Ony, 29 Oct). */}
+    <h2 className="kc-title kc-title-s kc-clip">{area ? <Reveal detail={<><b>{area.name}</b><span className="rv-row rv-mono">{area.key}</span></>}>{shortAreaName(area.name)}</Reveal> : 'Choose an area'}
+      {' '}<span className="kc-count">{rows.length} indicators</span></h2>
     <div className="kc-chips" role="group" aria-label="Show">
+      {/* The indicators the app computes itself: the mark and the count; the words on hover or focus, and in the name. */}
+      {count('computed') > 0 && <Reveal tabbable={false} describe={false} detail={<>The app <b>computes</b> these</>}>
+        <button type="button" className={`kc-chip${filter === 'computed' ? ' on' : ''}`} aria-pressed={filter === 'computed'} onClick={() => onFilter('computed')}>
+          <span aria-hidden="true">◆</span><span className="sr-only">The app computes</span>{' '}{count('computed')}</button></Reveal>}
       {chips.map(c => <button type="button" key={c.key} className={`kc-chip${filter === c.key ? ' on' : ''}`} aria-pressed={filter === c.key}
         onClick={() => onFilter(c.key)}>{c.label}</button>)}
+      {/* How it is checked: the shape and the count; the word on hover or focus, and in the button's name. */}
+      {(['records', 'lookups', 'person'] as const).map(k => <Reveal key={k} tabbable={false} describe={false} detail={<>Checked <b>{HOW_CHECKED[k].long}</b></>}>
+        <button type="button" className={`kc-chip${filter === k ? ' on' : ''}`} aria-pressed={filter === k} onClick={() => onFilter(k)}>
+          <HowGlyph how={k}/><span className="sr-only">{HOW_CHECKED[k].word}</span>{' '}{count(k)}</button></Reveal>)}
     </div>
     {error && <p className="kc-error" role="alert">{error}</p>}
     <ul className="kc-list" ref={listRef} role="listbox" aria-label={area ? `Indicators in ${area.name}` : 'Indicators'} onKeyDown={onKey}
@@ -80,13 +111,16 @@ export function IndicatorList({area, rows, loading, error, layer, filter, onFilt
           className={`kc-row${r.id === selected ? ' on' : ''}`} style={{['--i' as string]: Math.min(i, 8)}}
           onClick={() => { clearTimer(); onSelect(r.id); }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(r.id); } }}
           onPointerEnter={() => { clearTimer(); timer.current = window.setTimeout(() => onPreview(r.id), PREVIEW_MS); }}>
-          <span className="kc-mono kc-row-id">{r.id}</span>
-          <span className="kc-row-name">{r.name}{fired && <> <LevelMark level={fired.level}/></>}
-            {r.status === 'pending' && <span className="kc-pending"> ○ pending</span>}</span>
-          <span className="kc-how" title={`Checked ${how.long}`}><span aria-hidden="true">{how.glyph}</span><span className="sr-only">checked {how.long}</span></span>
+          {/* The id, "pending" and how it is checked are on hover, and in the option for screen readers (Ony, 29 Oct). */}
+          <span className="sr-only">{r.id} </span>
+          <span className="kc-row-name"><Reveal tabbable={false} describe={false} detail={<span className="rv-mono">{r.id}</span>}><span>{r.name}</span></Reveal>
+            {fired && <> <FlagLevelChip level={fired.level}/></>}
+            {r.status === 'pending' && <Reveal tabbable={false} describe={false} detail="Pending checks: not used for Red Flags yet.">
+              <span className="kc-pending"> <span aria-hidden="true">○</span><span className="sr-only"> pending</span></span></Reveal>}</span>
+          <Reveal tabbable={false} describe={false} detail={<>Checked <b>{how.long}</b></>}>
+            <span className="kc-how"><HowGlyph how={r.checkable}/><span className="sr-only">checked {how.long}</span></span></Reveal>
         </li>;
       })}
     </ul>
-    <p className="kc-foot">◫ from your records · ⇄ after outside lookups · ◉ only a person · J / K to move</p>
   </section>;
 }

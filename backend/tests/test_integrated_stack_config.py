@@ -197,7 +197,7 @@ def _assert_basemap_profile(compose: dict) -> None:
     assert extract["profiles"] == assets["profiles"] == ["maps"]
     assert extract["restart"] == assets["restart"] == "no"
     assert extract["image"] == "protomaps/go-pmtiles:${PMTILES_TAG:-v1.31.2}"
-    assert extract["command"] == ["extract", "https://build.protomaps.com/${BASEMAP_BUILD:-20261003}.pmtiles", "/basemap/world.pmtiles",
+    assert extract["command"] == ["extract", "https://build.protomaps.com/${BASEMAP_BUILD:-20261029}.pmtiles", "/basemap/world.pmtiles",
                                   "--maxzoom=${BASEMAP_MAXZOOM:-6}"]
     assert assets["image"] == "alpine:3.22" and "protomaps.github.io/basemaps-assets" in assets["command"][2]
     for font in ("Noto Sans Regular", "Noto Sans Medium", "Noto Sans Italic"):
@@ -205,7 +205,8 @@ def _assert_basemap_profile(compose: dict) -> None:
     assert extract["volumes"] == assets["volumes"] == ["basemap:/basemap"]
     backend = services["backend"]
     assert backend["environment"]["BASEMAP_DIR"] == "/data/basemap"
-    assert "basemap:/data/basemap:ro" in backend["volumes"]
+    # Writable: the backend fetches the map into it itself on first start (app/services/basemap_install.py).
+    assert "basemap:/data/basemap" in backend["volumes"]
     assert "basemap" in compose["volumes"]
 
 

@@ -7,7 +7,7 @@
 // line 15). The claims and evidence routes are seeded with one row each so
 // createClaim/openClaim, saveClaimReview, and attachEvidenceToClaim are all
 // reachable without a second bootstrap.
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -83,7 +83,8 @@ async function bootstrapWithClaimAndEvidence(): Promise<MockApi> {
 
   const Home = await importHome();
   render(<Home />);
-  await screen.findByText('The contract was approved on March 3.');
+  // Scoped to the Claims list: AI drafts' empty state lists the same claim as one a draft could test.
+  await within(await screen.findByRole('complementary', {name: 'Claims'})).findByText('The contract was approved on March 3.');
   return api;
 }
 
@@ -128,7 +129,7 @@ describe('Home claim verification workspace', () => {
     const api = await bootstrapWithClaimAndEvidence();
 
     api.add({[WORKSPACE]: emptyWorkspace(claimFixture())});
-    await userEvent.setup().click(screen.getByRole('button', {name: /The contract was approved/}));
+    await userEvent.setup().click(within(screen.getByRole('complementary', {name: 'Claims'})).getByRole('button', {name: /The contract was approved/}));
     await screen.findByText("No canonical relationship currently depends on this claim's linked evidence.");
     expect(screen.getByRole('button', {name: 'Record review'})).toBeDisabled();
 
@@ -137,8 +138,7 @@ describe('Home claim verification workspace', () => {
     api.add({'POST /api/claims/claim-1/reviews': {claim: updated, review, workspace: {...emptyWorkspace(updated), review_history: [review]}}});
 
     const user = userEvent.setup();
-    await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
-    await user.click(await screen.findByRole('option', {name: 'confirmed'}));
+    await user.click(screen.getByRole('radio', {name: 'Confirmed'}));
     await user.type(
       screen.getByPlaceholderText('Required rationale for this review'),
       'Board minutes confirm the date directly.',
@@ -159,7 +159,7 @@ describe('Home claim verification workspace', () => {
     const api = await bootstrapWithClaimAndEvidence();
 
     api.add({[WORKSPACE]: emptyWorkspace(claimFixture())});
-    await userEvent.setup().click(screen.getByRole('button', {name: /The contract was approved/}));
+    await userEvent.setup().click(within(screen.getByRole('complementary', {name: 'Claims'})).getByRole('button', {name: /The contract was approved/}));
     await screen.findByText('No evidence is linked to this claim yet.');
 
     api.add({
@@ -174,6 +174,8 @@ describe('Home claim verification workspace', () => {
       },
     });
 
+    // The evidence pool opens on Attach evidence.
+    await userEvent.setup().click(screen.getByRole('button', {name: 'Attach evidence'}));
     await userEvent.setup().click(screen.getByRole('button', {name: 'Supports'}));
 
     await waitFor(() => expect(screen.getByText('Linked evidence as supports.')).toBeInTheDocument());

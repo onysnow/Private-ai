@@ -78,13 +78,13 @@ def test_events_over_time_fills_quiet_years_with_zero_and_cites_the_events(demo)
     db, inv_id = demo
     data = run_query(db, inv_id, QueryRef(name="events_over_time", params={"granularity": "year"}))
     assert data.unit_kind == "count" and data.record_noun == "events"
-    assert [(r.key, r.value) for r in data.rows] == [("2019", 1.0), ("2020", 0.0), ("2021", 1.0), ("2022", 0.0), ("2023", 2.0), ("2024", 2.0)]
+    assert [(r.key, r.value) for r in data.rows] == [("2019", 1.0), ("2020", 0.0), ("2021", 1.0), ("2022", 0.0), ("2023", 1.0), ("2024", 2.0)]
     quiet = data.rows[1]
     assert quiet.record_refs == [] and quiet.record_count == 0
     late_2023 = data.rows[4]
-    # The reporter's event and the Payment relationship's own date both fall in 2023.
-    assert {ref.record_type for ref in late_2023.record_refs} == {"timeline_event", "relationship"}
-    assert data.record_count == 6
+    # The reporter's event about the payment, once: the Payment's own date is the same day and not drawn again.
+    assert {ref.record_type for ref in late_2023.record_refs} == {"timeline_event"}
+    assert data.record_count == 5
 
 
 def test_events_dated_only_to_a_year_are_left_out_of_a_monthly_series_with_the_reason(demo):
@@ -257,3 +257,49 @@ def test_unknown_investigation_is_a_query_error():
         db.commit()
         empty = db.query(Investigation).filter_by(name="empty").one()
         assert all(not q["has_data"] for q in describe_catalog(db, empty.id)["queries"])
+
+
+def test_the_catalogue_reads_its_links_in_a_few_queries_however_many_there_are(demo):
+    """The catalogue loads with Act › Charts: each link is read once for every query, in batches, not one by one."""
+    from sqlalchemy import event
+
+    from app.db.session import engine
+
+    db, inv_id = demo
+    seen = {"n": 0}
+
+    def count(*_args, **_kwargs):
+        seen["n"] += 1
+
+    def statements() -> int:
+        db.expire_all()
+        seen["n"] = 0
+        event.listen(engine, "before_cursor_execute", count)
+        try:
+            before = describe_catalog(db, inv_id)
+        finally:
+            event.remove(engine, "before_cursor_execute", count)
+        assert before["queries"]
+        return seen["n"]
+
+    few = statements()
+    for i in range(30):
+        _add_payment(db, inv_id, "Meridian Holdings Ltd", "Harborline Civic Trust", {"amount": [str(1000 + i)], "currency": ["USD"], "date": [f"2015-0{1 + i % 9}-01"]})
+    db.commit()
+    assert statements() <= few + 2
+
+
+def test_rows_serialized_together_are_each_their_own(demo):
+    from app.models.domain import RelationshipEdge
+    from app.services.relationships import relationship_rows_shared, serialize_relationship, serialize_relationships
+
+    db, inv_id = demo
+    edges = db.query(RelationshipEdge).filter_by(investigation_id=inv_id).order_by(RelationshipEdge.id).all()
+    one_by_one = [serialize_relationship(db, edge) for edge in edges]
+    assert serialize_relationships(db, edges) == one_by_one
+    with relationship_rows_shared():
+        first = serialize_relationships(db, edges + edges[:1])
+        first[0]["properties"]["changed"] = ["yes"]
+        first[0]["statements"].clear()
+        assert serialize_relationships(db, edges) == one_by_one
+        assert first[-1] == one_by_one[0]

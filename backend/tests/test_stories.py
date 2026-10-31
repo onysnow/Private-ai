@@ -60,8 +60,9 @@ def test_the_tree_is_as_strong_as_its_weakest_claim_and_ready_waits_for_every_ga
         story = ok(client.post(f"/api/investigations/{inv}/story/sections/{section['id']}/claims", json={"claim_id": claim["id"]}))
     section = story["sections"][0]
     assert section["status"] == "unshown" and (section["shown"], section["total"]) == (1, 2)
-    assert section["claims"][0]["evidence"] == [{"id": ev["id"], "stance": "supports", "label": "Land registry", "locator": "title ML-2017",
-                                                  "quote": "transferred to Fernhill Ltd"}]
+    assert section["claims"][0]["evidence"] == [{"id": ev["id"], "stance": "supports", "label": "Land registry", "short": "Land registry",
+                                                  "source_id": src["id"], "locator": "title ML-2017",
+                                                  "quote": "transferred to Fernhill Ltd", "superseded": None}]
     assert section["claims"][0]["single_source"] is True
     assert story["critical"] == [{"claim_id": unshown["id"], "text": "The sale was not put out to tender", "section": "Who bought the land"}]
     assert story["counts"] == {"claims": 2, "shown": 1, "disputed": 0, "unshown": 1}
@@ -180,3 +181,23 @@ def test_story_notes_and_versions_travel_with_the_case_backup():
         records = collect_investigation_records(db, inv)
     assert [r["text"] for r in records["notes"]] == ["Ask the council for the tender file"]
     assert [r["name"] for r in records["writeup_versions"]] == ["Before legal read"]
+
+
+def test_claims_not_in_the_story_are_offered_grouped_by_the_party_they_name():
+    """The empty story offers the case's claims grouped by who they are about: an alias or a distinctive word of the
+    party's name counts, a group needs two claims, and a claim naming no party has no group."""
+    from app.db.session import SessionLocal
+    from app.schemas.api import EntityCreate
+    from app.services.entities import create_entity
+
+    inv = ok(client.post("/api/investigations", json={"name": "Grouping"}))["id"]
+    with SessionLocal() as db:
+        create_entity(db, EntityCreate(investigation_id=inv, schema="Person", caption="Low Taek Jho (Jho Low)",
+                                       properties={"alias": ["Jho Low"]}))
+        create_entity(db, EntityCreate(investigation_id=inv, schema="Company", caption="The Goldman Sachs Group, Inc."))
+    texts = ["Jho Low owned Good Star Limited", "Jho Low bought the Equanimity", "Goldman underwrote three bond offerings",
+             "Goldman Sachs paid a $2.3 billion penalty", "The scheme ran from 2009 to 2014"]
+    for text in texts:
+        ok(post_claim(client, {"investigation_id": inv, "text": text}))
+    about = {u["text"]: u["about"] for u in ok(client.get(f"/api/investigations/{inv}/story"))["unplaced"]}
+    assert about == {texts[0]: "Jho Low", texts[1]: "Jho Low", texts[2]: "Goldman", texts[3]: "Goldman", texts[4]: None}

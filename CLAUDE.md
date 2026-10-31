@@ -7,14 +7,27 @@ Read docs/project-notes/START_HERE.md first: it says where the work stands. The 
   folder, joined with `&&`. He uses Windows Command Prompt, where `;` does not separate commands.
   His repo is `C:\Users\Wigi\Documents\Private-ai`.
   Example: `cd /d C:\Users\Wigi\Documents\Private-ai && git push origin timeline-wip-cloud:timeline-wip`
-- **Mockups first:** he approves before the app changes. When he gives feedback, discuss the change
-  with him and edit only after he agrees.
+- **Don't wait on him (29 Oct 2026):** make each open decision on what is best for the app, build
+  it, and write the call and its reason in docs/project-notes/DECISIONS_LOG.md so he can read them
+  later. Mockups and screens follow the research and UX/UI docs (REDESIGN_RESEARCH.md, the
+  ui-simplification and source-intake research, the mockup folders); no approval round is needed
+  before building. When he gives feedback on something built, change it as he says.
 - **Execute instructions** rather than acknowledging them. No unrequested recommendations. Never
   re-raise something he ruled out.
 - **No assumptions:** say what was checked and what wasn't.
 - **Lead with the answer.** Don't announce your own honesty, rate your own point, announce a
   shortcut you declined, or perform contrition.
 - **UI:** innovative, using the fact it's digital, not copies of other tools.
+- **Show only what matters; the rest on hover or click (29 Oct).** By default a screen shows titles, important data,
+  alerts, numbers and icons. Sub-text (how many times something was read, timings in ms, explanations, secondary
+  details) is revealed on hover or click, unless the context gives a reason to show it. Categorical facts (what type
+  of thing something is) are inferred through the UI (a mark, shape, colour or position) and named on hover or
+  click. Applies to the whole app; build every new screen this way.
+  Ony's answers (29 Oct, `docs/research/ui-density/SUBTEXT_AND_TYPES.md`): statuses and flag levels are colour only
+  by default, the word on reveal, with an accessibility setting to add the shape or the word; key hints live behind
+  `?`; AI notices are the AI mark with the sentence on hover; the old panels are converted now, as they are.
+- **Fill the space (29 Oct).** When a row, card or box has a lot of empty space above and below its content, make the
+  text or icon bigger instead of leaving the space empty.
 - **Approval mode is auto:** proceed without stopping on routine steps.
 - **Don't create new problems while fixing things.**
 - **The Authority System Suite is in beta** (bundled in `authority-suite-sdk`, which `backend/app/ai/authority_sdk.py` imports; this repo keeps no copy). When a problem's cause is in the suite

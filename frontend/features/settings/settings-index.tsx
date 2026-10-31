@@ -3,7 +3,9 @@
 // This computer, each with its current value, the chosen one opening on the right; the
 // address keeps the choice (#keyboard). Search narrows the sidebar; Enter opens the first.
 import {useCallback, useEffect, useState} from 'react';
-import type {ReactElement} from 'react';
+import type {ReactElement, ReactNode} from 'react';
+
+import {Reveal} from '../../components/ui/reveal';
 
 export type SettingRow = {
   group: 'You' | 'Cases' | 'This computer'; id: string; label: string; value: string; words?: string;
@@ -20,6 +22,12 @@ export type SettingRow = {
 export function KeptLine({row}: {row: SettingRow}): ReactElement | null {
   if (!row.stored && !row.leaves) return null;
   return <p className="st-kept">{row.stored && <span>Kept: {row.stored}</span>}{row.leaves && <span>Leaves this computer: {row.leaves}</span>}</p>;
+}
+
+/** A switch row whose help line is revealed (29 Oct rule): pointing at the row, or focusing its switch, shows the help;
+ *  the row keeps the help as visually hidden text (class st-sr) so it stays part of the switch's name for screen readers. */
+export function HelpRow({help, children}: {help: ReactNode; children: ReactNode}): ReactElement {
+  return <Reveal tabbable={false} describe={false} className="ap-help-rv" detail={help}>{children}</Reveal>;
 }
 
 const GROUPS: SettingRow['group'][] = ['You', 'Cases', 'This computer'];
@@ -81,6 +89,6 @@ export function SettingsNav({rows, current, onGo}: {rows: SettingRow[]; current:
             <span>{r.label}</span>{r.value && <b>{r.value}</b>}</button>}
       </li>)}</ul>
     </section>)}
-    {note && <p className="st-note">{note}</p>}
+    {note && <p className="st-note"><Reveal label="About this setting" detail={note}><span aria-hidden="true">ⓘ</span></Reveal></p>}
   </nav>;
 }

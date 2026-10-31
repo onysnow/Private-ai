@@ -144,7 +144,10 @@ describe("DropSim (water-drops 7.5 step 1)", () => {
   );
 
   it("evaporation removes drops at V_MIN and nothing goes NaN", () => {
-    const sim = quiet();
+    // A small pane: each step dries every film, lane and mist cell, so forty simulated minutes
+    // on the full 200 x 400 pane cost seconds of CPU and ran past the time limit when the whole
+    // suite shared the machine. The drops and the law are the same; only the empty glass is less.
+    const sim = quiet({ width: 120, height: 120 });
     sim.add(100, 100, V_MIN * 1.5);
     sim.add(50, 50, 0.5);
     // Forty minutes: in rain the air is near saturated, so a 0.5 uL drop lasts most of half an hour.

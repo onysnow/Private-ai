@@ -52,6 +52,22 @@ async function renderPanel(routes: Record<string, unknown> = {}) {
   return api;
 }
 
+describe('Leads at rest (30 Oct sweep)', () => {
+  it('keeps the add form folded to "+ New lead", counts in the column titles, the move mark named on hover, and no empty lines on a card', async () => {
+    await renderPanel();
+    expect(screen.queryByRole('form', {name: 'New lead'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: '+ New lead'})).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('img', {name: 'Moving a lead'})).toHaveAccessibleDescription(/drag a card between horizons/);
+    const next = screen.getByRole('region', {name: 'Next, 1'});
+    expect(next.querySelector('header')).toHaveTextContent(/^Next1$/);
+    expect(screen.getByRole('button', {name: 'Done, 1'})).toHaveTextContent(/^Done1$/);
+    // A lead with nothing but a title: its status mark sits beside the title, and no other line is drawn.
+    const card = within(next).getByRole('button', {name: /^Who owns Harbour Nominees\?/});
+    expect(card.children).toHaveLength(1);
+    expect(within(card.children[0] as HTMLElement).getByLabelText('Status: active')).toBeInTheDocument();
+  });
+});
+
 describe('Leads as Now / Next / Later', () => {
   it('places open leads by horizon, with the inbox above, Now’s cap, and status as a mark on the card', async () => {
     await renderPanel();
@@ -59,15 +75,18 @@ describe('Leads as Now / Next / Later', () => {
     const now = screen.getByRole('region', {name: 'Now, 1 of 5'});
     expect(within(now).getByText('1 / 5')).toBeInTheDocument();
     const card = within(now).getByRole('button', {name: /^Were the four payments cash\?, blocked, urgent priority/});
-    expect(within(card).getByLabelText('Status: blocked')).toHaveTextContent('✕ blocked');
+    // The status is its glyph; the word and the priority are revealed on it (the card's name carries both).
+    expect(within(card).getByLabelText('Status: blocked')).toHaveTextContent(/^✕$/);
     expect(within(card).getByLabelText('Owner: A. Reporter')).toHaveTextContent('AR');
-    expect(within(card).getByText('Harbour Nominees paid Fernhill Ltd four times')).toBeInTheDocument();
+    // What it is for is the ↳ mark; its words are on hover (30 Oct).
+    expect(within(card).getByLabelText('For: Harbour Nominees paid Fernhill Ltd four times')).toHaveTextContent(/^↳$/);
     expect(within(card).getByLabelText('Tasks: Task t1 todo, Task t2 in progress, Task t3 done')).toHaveTextContent('○◐✓');
     expect(within(card).getByLabelText('2 supporting, 1 contradicting')).toHaveTextContent('✓ 2 · ✕ 1');
     expect(within(screen.getByRole('region', {name: 'Next, 1'})).getByText('Who owns Harbour Nominees?')).toBeInTheDocument();
     const inbox = screen.getByRole('region', {name: 'Inbox · not yet placed, 1'});
     expect(within(inbox).getByText('Watchlist hit: Kestrel SA')).toBeInTheDocument();
-    expect(within(inbox).getByText('from watchlist')).toBeInTheDocument();
+    // An outside source is the ↗ mark, named on reveal.
+    expect(within(inbox).getByLabelText('From watchlist')).toHaveTextContent('↗');
     // A finished lead is not on the board.
     expect(screen.queryByText('Ask the registry for the 2018 filing')).not.toBeInTheDocument();
   });
@@ -100,11 +119,12 @@ describe('Leads as Now / Next / Later', () => {
   it('lists finished leads with their outcome and reason in the Done view, and reopens one', async () => {
     const api = await renderPanel({'PATCH /api/leads/l4': lead('l4', 'Ask the registry for the 2018 filing')});
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', {name: 'Done (1)'}));
+    await user.click(screen.getByRole('button', {name: 'Done, 1'}));
     const done = screen.getByRole('list', {name: 'Done leads'});
     const row = within(done).getByText('Ask the registry for the 2018 filing').closest('li')!;
-    expect(row).toHaveTextContent('✓ resolved');
-    expect(row).toHaveTextContent('The registry sent it on 3 Oct');
+    expect(within(row).getByRole('img', {name: 'resolved'})).toHaveTextContent('✓');
+    // The reason given is revealed on the title.
+    expect(within(row).getByText('Ask the registry for the 2018 filing').closest('.rv')).toHaveAccessibleDescription('The registry sent it on 3 Oct');
     await user.click(within(row).getByRole('button', {name: 'Reopen'}));
     await waitFor(() => expect((api.lastBody('PATCH /api/leads/l4') as {status: string}).status).toBe('active'));
   });

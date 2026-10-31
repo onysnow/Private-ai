@@ -9,6 +9,7 @@ import {useCallback, useEffect, useState} from 'react';
 import type {ReactElement, ReactNode} from 'react';
 
 import {STAGES} from '../../lib/stages';
+import {Reveal} from '../ui/reveal';
 import type {StageKey} from '../../lib/stages';
 
 export type Section = {
@@ -57,7 +58,8 @@ export function SectionScreen({stage, investigationName, sections, active = true
     <header className="ss-head">
       <div className="ss-title">
         <p className="cv-eyebrow">{investigationName ? '' : 'No case open · '}step {s.n} of 5</p>
-        <h1>{s.name}</h1>
+        {/* The stage's one-line purpose is on hover, focus or click of its name (Ony, 29 Oct). */}
+        <h1><Reveal detail={s.line}><span>{s.name}</span></Reveal></h1>
       </div>
       <nav className="ss-tabs" aria-label={`Sections of ${s.name}`}
         onKeyDown={e => { if (e.key === 'ArrowRight') { e.preventDefault(); step(1); } if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); } }}>
@@ -66,7 +68,6 @@ export function SectionScreen({stage, investigationName, sections, active = true
           {x.label}{x.badge !== undefined && x.badge !== null && <span className="ss-badge">{x.badge}</span>}
         </a>)}
       </nav>
-      <p className="ss-line">{s.line}</p>
     </header>
     <div className="ss-body">
       {sections.map(x => opened.has(x.anchor) && <section key={x.anchor} id={`${x.anchor}-section`} aria-label={x.label}

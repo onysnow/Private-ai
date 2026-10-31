@@ -20,10 +20,15 @@ venv/
 .coverage
 backend/.coverage
 
+# The native module's Rust build output (backend/native, ADR-0021)
+backend/native/target/
+
 # Frontend dependencies/build output
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+# The screen check's report and screenshots (frontend/scripts/check-screens.mjs).
+frontend/screen-check/
 # The MapLibre worker, copied from node_modules before each build (frontend/scripts/copy-maplibre-worker.mjs).
 frontend/public/maplibre/
 node_modules/
@@ -41,3 +46,4 @@ Thumbs.db
 # Per-process coverage files (pytest-cov in reader subprocesses)
 .coverage.*
 backend/.coverage.*
+

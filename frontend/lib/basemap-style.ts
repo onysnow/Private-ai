@@ -35,6 +35,13 @@ export const VIEW_PADDING = 60;    // px kept clear around a chart's places
 export const MAX_OVERZOOM = 2;     // zoom levels past the base map's own
 export const ONE_PLACE_ZOOM = 8;   // a single place's view
 
+/** The px kept clear on the right of an interactive map's places: the room the widest name takes beside its dot
+ *  (they ran off the map's right edge), at most `share` of the map's width. */
+export function nameRoomRight(places: {caption: string}[], width: number, share = 0.35): number {
+  const most = Math.max(0, ...places.map(p => nameRoom(p.caption, false)));
+  return Math.round(Math.max(VIEW_PADDING, Math.min(most + 16, width * share)));
+}
+
 /** The px a place's name takes to the right of its dot. */
 export function nameRoom(name: string, picked: boolean): number {
   const size = picked ? PICKED_LABEL_PX : PLACE_LABEL_PX;
@@ -80,7 +87,7 @@ export function dotRadius(name: string): number | null {
 export const PLACE_DOT = dotName(PLACE_RADIUS);
 
 /** What each place on a map carries: its name, its dot, and whether it is picked out. */
-export type PlaceMark = {entity_id?: string; caption: string; dot: string; picked: boolean};
+export type PlaceMark = {entity_id?: string; caption: string; dot: string; picked: boolean; sure?: string; marked?: boolean};
 export type PlaceMarks = GeoJSON.FeatureCollection<GeoJSON.Point, PlaceMark>;
 
 /**
@@ -128,13 +135,14 @@ export function basemapLoader(client: Pick<ApiClient, 'blob'>) {
 export const PICKED_RADIUS = 10;   // px: a picked place's dot
 
 /** The places as GeoJSON points, each carrying its record's id and name;
- * the picked place's dot is larger and its name larger, as on a chart. */
-export function placesGeoJson(places: PlaceOut[], picked: string | null = null): PlaceMarks {
+ * the picked place's dot is larger and its name larger, as on a chart.
+ * `marked`: the places a picked party was seen at (Places' Path), ringed. */
+export function placesGeoJson(places: PlaceOut[], picked: string | null = null, marked: readonly string[] = []): PlaceMarks {
   return {
     type: 'FeatureCollection',
     features: places.map(p => ({type: 'Feature', geometry: {type: 'Point', coordinates: [p.longitude, p.latitude]},
       properties: {entity_id: p.entity_id, caption: p.caption, dot: p.entity_id === picked ? dotName(PICKED_RADIUS) : PLACE_DOT,
-        picked: p.entity_id === picked}})),
+        picked: p.entity_id === picked, sure: p.sure ?? 'not_yet', marked: marked.includes(p.entity_id)}})),
   };
 }
 
@@ -150,8 +158,28 @@ export function placesBounds(places: Pick<PlaceOut, 'latitude' | 'longitude'>[])
  * name even where names collide, as in a chart (a picture cannot be zoomed);
  * the app's interactive map lets colliding names wait for a closer zoom.
  */
-export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks, {everyName = false}: {everyName?: boolean} = {}): StyleSpecification {
+export const PATH_SOURCE = 'places-path';
+
+/** A party's path, hop by hop: one line from place to place in date order. */
+export function pathGeoJson(points: [number, number][]): GeoJSON.FeatureCollection<GeoJSON.LineString> {
+  return {type: 'FeatureCollection', features: points.length > 1
+    ? [{type: 'Feature', geometry: {type: 'LineString', coordinates: points}, properties: {}}] : []};
+}
+
+export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks,
+  {everyName = false, flavor = 'grayscale'}: {everyName?: boolean; flavor?: 'grayscale' | 'dark'} = {}): StyleSpecification {
+  const dark = flavor === 'dark';
   const placeLayers: LayerSpecification[] = [
+    // A party's path (Places): under the dots, so every dot stays on top.
+    {id: 'places-path', type: 'line', source: PATH_SOURCE,
+      paint: {'line-color': dark ? '#E8B04B' : PLACE_COLOUR, 'line-width': 2.5, 'line-dasharray': [2, 1.5], 'line-opacity': 0.9}},
+    // A place known only to a town or wider: a soft area around its dot, so the dot does not claim a street.
+    {id: 'places-area', type: 'circle', source: PLACES_SOURCE, filter: ['==', ['get', 'sure'], 'approximate'],
+      paint: {'circle-radius': 26, 'circle-color': dark ? '#E8B04B' : PLACE_COLOUR, 'circle-opacity': 0.16,
+        'circle-stroke-width': 1, 'circle-stroke-color': dark ? '#E8B04B' : PLACE_COLOUR, 'circle-stroke-opacity': 0.5}},
+    // The places a picked party was seen at (Places' Path): a ring around each dot.
+    {id: 'places-mark', type: 'circle', source: PLACES_SOURCE, filter: ['==', ['get', 'marked'], true],
+      paint: {'circle-radius': 15, 'circle-opacity': 0, 'circle-stroke-width': 2.5, 'circle-stroke-color': dark ? '#E8B04B' : PLACE_COLOUR}},
     // Every dot is drawn, and the base map's labels give way to it (see dotImage).
     {id: 'places-dot', type: 'symbol', source: PLACES_SOURCE,
       layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true}},
@@ -159,18 +187,29 @@ export function basemapStyle(status: BasemapStatusOut, marks: PlaceMarks, {every
     {id: 'places-name', type: 'symbol', source: PLACES_SOURCE,
       layout: {'text-field': ['get', 'caption'], 'text-font': PLACE_LABEL_FONT,
         'text-size': ['case', ['boolean', ['get', 'picked'], false], PICKED_LABEL_PX, PLACE_LABEL_PX], 'text-offset': [NAME_OFFSET_EM, 0],
-        'text-anchor': 'left', 'text-max-width': NAME_MAX_EM, 'text-allow-overlap': everyName},
-      paint: {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
+        'text-anchor': 'left', 'text-max-width': NAME_MAX_EM, 'text-allow-overlap': everyName,
+        // Where names collide, the picked place's and a marked place's name win; the others wait for a closer zoom
+        // (and every dot is named on hover, places-map.tsx).
+        'symbol-sort-key': ['case', ['boolean', ['get', 'picked'], false], 0, ['boolean', ['get', 'marked'], false], 1, 2]},
+      paint: dark ? {'text-color': '#F2EEE6', 'text-halo-color': '#0B1220', 'text-halo-width': 1.5}
+        : {'text-color': '#1F1B16', 'text-halo-color': '#FFFFFF', 'text-halo-width': 1.5}},
+    // The interactive map: every dot, unseen, placed before the names (MapLibre places the upper layer first), so a
+    // name never covers another place's dot; such a name waits for a closer zoom and is shown on hover. A little
+    // smaller than the dot, so its own name, NAME_OFFSET_EM off, still fits beside it. A chart keeps every name.
+    ...(everyName ? [] : [{id: 'places-keepout', type: 'symbol', source: PLACES_SOURCE,
+      layout: {'icon-image': ['get', 'dot'], 'icon-allow-overlap': true, 'icon-size': 0.85, 'icon-padding': 0},
+      paint: {'icon-opacity': 0}} as LayerSpecification]),
   ];
   return {
     version: 8,
     glyphs: `${ROOT}/fonts/{fontstack}/{range}.pbf`,
-    sprite: `${ROOT}/sprites/grayscale`,
+    sprite: `${ROOT}/sprites/${flavor}`,
     sources: {
       protomaps: {type: 'vector', tiles: [`${ROOT}/tiles/{z}/{x}/{y}.mvt`], minzoom: status.min_zoom ?? 0, maxzoom: status.max_zoom ?? 6,
         attribution: status.attribution || '© OpenStreetMap'},
       [PLACES_SOURCE]: {type: 'geojson', data: marks},
+      [PATH_SOURCE]: {type: 'geojson', data: pathGeoJson([])},
     },
-    layers: [...(layers('protomaps', namedFlavor('grayscale'), {lang: 'en'}) as LayerSpecification[]), ...placeLayers],
+    layers: [...(layers('protomaps', namedFlavor(flavor), {lang: 'en'}) as LayerSpecification[]), ...placeLayers],
   };
 }

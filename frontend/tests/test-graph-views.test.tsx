@@ -95,7 +95,8 @@ describe('the network frame', () => {
     render(<Graph relationships={[rel('r1', 'Ownership', bellcastle, meridian), rel('r2', 'Family', jane, meridian)]}
       entities={entities} onNode={vi.fn()} onEdge={vi.fn()}/>);
     expect(await screen.findByTestId('network-stub')).toHaveTextContent('3 parties');
-    const chip = screen.getByRole('button', {name: 'Family or associate · 1'});
+    // The chip is the family's line and its count; the name is read with it and revealed on hover (Ony, 29 Oct).
+    const chip = screen.getByRole('button', {name: 'Family or associate 1'});
     await user.click(chip);
     expect(chip).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByTestId('network-stub')).toHaveTextContent('2 parties');

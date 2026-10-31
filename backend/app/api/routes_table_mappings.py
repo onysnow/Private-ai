@@ -13,9 +13,29 @@ from app.api.dependencies import authorize_request_resource
 from app.core.authorization import scope_for_request
 from app.db.session import get_db
 from app.models.domain import Document
-from app.schemas.api import TableMappingIn
-from app.schemas.responses import MappingSchemasOut, TableMappingOut, TableMappingPreviewOut, TableMappingRunOut, TableOut
-from app.services.table_mappings import TableError, list_mappings, mapping_schemas, preview, run_mapping, table_view
+from app.schemas.api import (
+    TableMappingIn,
+    TableProposalAcceptIn,
+    TableProposalDismissIn,
+)
+from app.schemas.responses import (
+    MappingSchemasOut,
+    TableMappingOut,
+    TableMappingPreviewOut,
+    TableMappingRunOut,
+    TableOut,
+    TableProposalAcceptedOut,
+    TableProposalViewOut,
+)
+from app.services import table_proposals
+from app.services.table_mappings import (
+    TableError,
+    list_mappings,
+    mapping_schemas,
+    preview,
+    run_mapping,
+    table_view,
+)
 
 router = APIRouter(prefix="/api", dependencies=[Depends(authorize_request_resource)])
 
@@ -56,6 +76,36 @@ async def preview_table_mapping(document_id: str, body: TableMappingIn, db: Sess
     try:
         return await run_in_threadpool(preview, doc, body.query(), sheet=body.sheet)
     except TableError as exc:
+        raise HTTPException(400, str(exc))
+
+
+@router.get("/documents/{document_id}/table-proposal", response_model=TableProposalViewOut)
+def get_table_proposal(document_id: str, sheet: str | None = None, db: Session = Depends(get_db)) -> Any:
+    """What the table looks like (payments, or a list of people or companies), which column is which with how sure
+    the app is, and where the proposal stands. Nothing is made until a person accepts it."""
+    return table_proposals.proposal_view(db, _document(db, document_id), sheet=sheet)
+
+
+@router.post("/documents/{document_id}/table-proposal/accept", response_model=TableProposalAcceptedOut)
+def accept_table_proposal(document_id: str, body: TableProposalAcceptIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Accept the proposal, as it is or changed: the mapping runs, every party and payment it makes is a proposal to
+    review, and the decision records who accepted."""
+    doc = _document(db, document_id)
+    try:
+        return table_proposals.accept(db, doc, body.change(), decided_by=scope_for_request(request).actor_id)
+    except TableError as exc:
+        db.rollback()
+        raise HTTPException(400, str(exc))
+
+
+@router.post("/documents/{document_id}/table-proposal/dismiss", response_model=TableProposalViewOut)
+def dismiss_table_proposal(document_id: str, body: TableProposalDismissIn, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Dismiss the proposal: it is no longer offered on the file, and nothing is made."""
+    doc = _document(db, document_id)
+    try:
+        return table_proposals.dismiss(db, doc, sheet=body.sheet, decided_by=scope_for_request(request).actor_id)
+    except TableError as exc:
+        db.rollback()
         raise HTTPException(400, str(exc))
 
 

@@ -158,6 +158,7 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         AIAnalysisCandidate,
         BackgroundJob,
         Claim,
+        ClaimEvidenceLink,
         ConnectorFinding,
         CrossReferenceProposal,
         Deck,
@@ -186,6 +187,11 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         FactWatch,
         SavedQuestion,
         Capture,
+        DerivedFile,
+        Monitor,
+        MonitorItem,
+        TimelinePeriod,
+        BuiltTimeline,
     )
 
     direct = {
@@ -217,6 +223,11 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
         "fact_watch_id": (FactWatch, "investigation_id"),
         "saved_question_id": (SavedQuestion, "investigation_id"),
         "capture_id": (Capture, "investigation_id"),
+        "derived_file_id": (DerivedFile, "investigation_id"),
+        "monitor_id": (Monitor, "investigation_id"),
+        "monitor_item_id": (MonitorItem, "investigation_id"),
+        "period_id": (TimelinePeriod, "investigation_id"),
+        "built_id": (BuiltTimeline, "investigation_id"),
     }
     if key in direct:
         model, attr = direct[key]
@@ -229,6 +240,12 @@ def _resource_investigation_id(db: Session, key: str, value: str) -> str | None:
             return None
         source = db.get(Source, row.source_id)
         return source.investigation_id if source is not None else None
+
+    if key == "link_id":
+        # /claims/{claim_id}/evidence/{link_id}/supersede: a claim's evidence link, traced through its claim.
+        link = db.get(ClaimEvidenceLink, value)
+        claim = db.get(Claim, link.claim_id) if link is not None else None
+        return claim.investigation_id if claim is not None else None
 
     if key == "candidate_id":
         # Two candidate tables share this path-parameter name:

@@ -9,6 +9,11 @@ import {useState} from 'react';
 import type {ReactElement} from 'react';
 import {z} from 'zod';
 
+
+import {FileText, MessageCircleQuestion, Search, Table} from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
+
+import {Reveal} from '../../components/ui/reveal';
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
 import {caseHref} from '../../lib/case-href';
 import {submitWith, useZodForm} from '../../lib/forms';
@@ -16,11 +21,11 @@ import {listAreasOptions, listInvestigationsQueryKey} from '../../lib/generated/
 import {createInvestigation, setInvestigationType} from '../../lib/generated/sdk.gen';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 
-export const HAVE: {key: string; label: string; line: string; href: string}[] = [
-  {key: 'documents', label: 'Documents', line: 'PDFs, scans, e-mails, pictures', href: '/bring-in#document-ingestion'},
-  {key: 'table', label: 'A spreadsheet', line: 'Payments, registers, lists of records', href: '/bring-in#document-ingestion'},
-  {key: 'names', label: 'Names to look up', line: 'People or companies to find in the records', href: '/bring-in#investigation-search'},
-  {key: 'nothing', label: 'Nothing yet', line: 'A tip or a question to start from', href: '/'},
+export const HAVE: {key: string; label: string; line: string; href: string; icon: LucideIcon}[] = [
+  {key: 'documents', label: 'Documents', line: 'PDFs, scans, e-mails, pictures', href: '/bring-in#document-ingestion', icon: FileText},
+  {key: 'table', label: 'A spreadsheet', line: 'Payments, registers, lists of records', href: '/bring-in#document-ingestion', icon: Table},
+  {key: 'names', label: 'Names to look up', line: 'People or companies to find in the records', href: '/bring-in#investigation-search', icon: Search},
+  {key: 'nothing', label: 'Nothing yet', line: 'A tip or a question to start from', href: '/', icon: MessageCircleQuestion},
 ];
 
 // The case's name and question, as the backend takes them (InvestigationCreate; the name as InvestigationUpdate allows it, 1–255).
@@ -60,24 +65,26 @@ export function NewCaseSetup({onCreated}: {onCreated?: (id: string) => void}): R
         <label>Name<FormControl><input {...field} placeholder="Kestrel harbour land" required maxLength={255}/></FormControl></label>
         <FormMessage className="field-msg"/></FormItemBare>}/>
       <FormField control={form.control} name="question" render={({field}) => <FormItemBare>
-        <label>The question it answers <small>(you can write it later)</small>
+        <label><Reveal detail="You can write it later.">The question it answers</Reveal>
           <FormControl><input {...field} placeholder="Who really owns the harbour land?" maxLength={500}/></FormControl></label>
         <FormMessage className="field-msg"/></FormItemBare>}/>
     </fieldset>
     <fieldset>
-      <legend><span>2</span>What kind of case <small>(optional: skip it and the app suggests kinds from what you bring in)</small></legend>
+      <legend><span>2</span><Reveal detail="Optional: skip it and the app suggests kinds from what you bring in.">What kind of case</Reveal></legend>
       <input type="search" aria-label="Find a kind of case" placeholder="Find a kind: money laundering, trafficking…" value={filter} onChange={e => setFilter(e.target.value)}/>
       <div className="nc-kinds" role="group" aria-label="Kinds of case">
-        {shown.map(a => <button key={a.key} type="button" aria-pressed={kinds.includes(a.key)} className={kinds.includes(a.key) ? 'on' : ''}
-          title={a.summary} onClick={() => toggle(a.key)}>{a.name}</button>)}
+        {shown.map(a => <Reveal key={a.key} tabbable={false} detail={a.summary}><button type="button" aria-pressed={kinds.includes(a.key)} className={kinds.includes(a.key) ? 'on' : ''}
+          onClick={() => toggle(a.key)}>{a.name}</button></Reveal>)}
         {!shown.length && <p className="nc-quiet">{areas.length ? 'No kind matches.' : 'Reading the catalogue…'}</p>}
       </div>
     </fieldset>
     <fieldset>
       <legend><span>3</span>What do you have so far</legend>
       <div className="nc-have" role="radiogroup" aria-label="What you have so far">
-        {HAVE.map(h => <label key={h.key} className={have === h.key ? 'on' : ''}>
-          <input type="radio" name="nc-have" checked={have === h.key} onChange={() => setHave(h.key)}/><b>{h.label}</b><small>{h.line}</small></label>)}
+        {/* Each option is its icon and its name; what it covers is on hover or focus (Ony, 29 Oct). */}
+        {HAVE.map(h => <Reveal key={h.key} tabbable={false} describe={false} className="nc-have-rv" detail={h.line}><label className={have === h.key ? 'on' : ''}>
+          <input type="radio" name="nc-have" checked={have === h.key} onChange={() => setHave(h.key)}/><h.icon className="nc-have-icon" size={20} strokeWidth={1.8} aria-hidden="true"/>
+          <b>{h.label}</b><small className="sr-only">{h.line}</small></label></Reveal>)}
       </div>
     </fieldset>
     <FormRootError className="field-msg"/>

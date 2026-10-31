@@ -55,7 +55,7 @@ describe('ClaimsPanel', () => {
     const api = await renderPanel({[WORKSPACE]: workspace(claimFixture(), {source_count: 2})});
     const user = userEvent.setup();
     await user.click(screen.getByText('The contract was approved on March 3.'));
-    expect(await screen.findByText('From 2 sources')).toBeInTheDocument();
+    expect(await screen.findByRole('img', {name: 'From 2 sources'})).toBeInTheDocument();
     await user.type(screen.getByPlaceholderText('Required rationale for this review'), 'Two independent filings agree.');
     // One half alone is refused before anything is sent.
     screen.getByRole('combobox', {name: 'Evidence'}).focus();
@@ -79,11 +79,12 @@ describe('ClaimsPanel', () => {
     expect(await screen.findByText(/robust evidence, high agreement\.$/)).toBeInTheDocument();
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toEqual({status: 'unverified', confidence: 0.4, rationale: 'Two independent filings agree.',
       evidence_grade: 'robust', agreement_grade: 'high'});
-    expect(screen.getByText('40% confidence · robust evidence, high agreement')).toBeInTheDocument();
+    // The row shows the confidence as a number; its words and the grade are revealed (in the page for screen readers).
+    expect(screen.getByText('40% confidence · robust evidence, high agreement').closest('[hidden]')).not.toBeNull();
     expect(screen.getByText(/not graded → robust evidence, high agreement/)).toBeInTheDocument();
   });
 
-  it('shows every status in the list as a shape and a word, never colour alone', async () => {
+  it('shows every status in the list by its colour, with its shape and word in the chip for the other settings and screen readers', async () => {
     await renderPanel({[CLAIMS]: [
       claimFixture(),
       claimFixture({id: 'claim-2', text: 'The vendor was paid twice.', status: 'disputed'}),
@@ -100,9 +101,10 @@ describe('ClaimsPanel', () => {
     ];
     for (const [text, word, shape, mark] of expected) {
       const row = screen.getByText(text).closest('button')!;
-      // The row's left edge takes the shape (solid, dashed, double, dotted); its chip carries the mark and the word.
+      // The row's left edge takes the shape (solid, dashed, double, dotted); its chip carries the mark and the word
+      // (shown by Settings › Appearance › Status marks, read by screen readers, named on hover).
       expect(row).toHaveClass(`cl-${shape}`);
-      const chip = within(row).getByText(word);
+      const chip = within(row).getByText(word).closest('.st')!;
       expect(chip).toHaveClass('st', `st-${shape}`);
       expect(chip.querySelector('[aria-hidden="true"]')?.textContent).toBe(mark);
     }
@@ -117,9 +119,29 @@ describe('ClaimsPanel', () => {
 
   it('lists the claims and disables Add unverified claim until text is entered', async () => {
     await renderPanel();
-    expect(screen.getByText('40% confidence')).toBeInTheDocument();
+    expect(screen.getByText('40%')).toBeVisible();
+    expect(screen.getByText('40% confidence').closest('[hidden]')).not.toBeNull();
     expect(screen.getByText('Choose a claim to inspect its evidence and verification state.')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Add unverified claim'})).toBeDisabled();
+  });
+
+  it('draws no empty section: one quiet line says what is empty; the status is a radio group in its colours', async () => {
+    await renderPanel({[WORKSPACE]: workspace(claimFixture())});
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: /The contract was approved/}));
+    await screen.findByText('No evidence is linked to this claim yet.');
+    expect(screen.getByText('No review recorded yet.')).toBeInTheDocument();
+    expect(screen.getByText('Nothing rests on it.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', {name: /Linked evidence|Review history|Relationships resting on it/})).toBeNull();
+    // A zero figure is quiet; each figure is named on reveal.
+    expect(screen.getByRole('img', {name: '0 supporting · 0 contradicting · 0 context'}).querySelectorAll('.cw-num.zero')).toHaveLength(3);
+    const status = screen.getByRole('radiogroup', {name: 'Status'});
+    expect(within(status).getAllByRole('radio')).toHaveLength(6);
+    expect(within(status).getByRole('radio', {name: 'Unverified'})).toHaveAttribute('aria-checked', 'true');
+    within(status).getByRole('radio', {name: 'Unverified'}).focus();
+    await user.keyboard('{ArrowRight}');
+    expect(within(status).getByRole('radio', {name: 'Supported'})).toHaveAttribute('aria-checked', 'true');
+    expect(within(status).getByRole('radio', {name: 'Supported'})).toHaveClass('t-supported');
   });
 
   it('creates a claim, reloads the list, and opens its review workspace', async () => {
@@ -135,8 +157,8 @@ describe('ClaimsPanel', () => {
 
     await screen.findByRole('heading', {name: 'The vendor was paid twice.', level: 4});
     expect(screen.getByText('No evidence is linked to this claim yet.')).toBeInTheDocument();
-    expect(screen.getByText('No reporter review has been recorded yet.')).toBeInTheDocument();
-    expect(screen.getByText('0 supporting · 0 contradicting · 0 context')).toBeInTheDocument();
+    expect(screen.getByText('No review recorded yet.')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '0 supporting · 0 contradicting · 0 context'})).toBeInTheDocument();
     expect(api.lastBody('POST /api/claims')).toEqual({investigation_id: 'inv-1', text: 'The vendor was paid twice.', status: 'unverified', confidence: 0});
     expect(api.calls(CLAIMS)).toHaveLength(2);
     expect(api.calls('GET /api/claims/claim-2/review-workspace')).toHaveLength(1);
@@ -148,8 +170,8 @@ describe('ClaimsPanel', () => {
     const api = await renderPanel({[WORKSPACE]: workspace(claimFixture())});
     useWorkbenchStore.getState().openClaim('claim-1');
     await screen.findByRole('heading', {name: 'The contract was approved on March 3.', level: 4});
-    expect(screen.getByText('Confidence 40%')).toBeInTheDocument();
-    expect(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')).toBeTruthy();
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '0.4');
+    expect(screen.getByRole('radio', {name: 'Unverified'})).toHaveAttribute('aria-checked', 'true');
     expect(api.calls(WORKSPACE)).toHaveLength(1);
 
     // A claim the panel does not hold is not opened.
@@ -169,16 +191,15 @@ describe('ClaimsPanel', () => {
     const updated = claimFixture({status: 'confirmed', confidence: 0.9});
     const review = {id: 'rev-1', claim_id: 'claim-1', from_status: 'unverified', to_status: 'confirmed', from_confidence: 0.4, to_confidence: 0.9, rationale: 'Board minutes confirm the date directly.', created_at: '2026-10-02T00:00:00'};
     api.add({'POST /api/claims/claim-1/reviews': {claim: updated, review, workspace: workspace(updated, {review_history: [review]})}});
-    await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
-    await user.click(await screen.findByRole('option', {name: 'confirmed'}));
+    await user.click(screen.getByRole('radio', {name: 'Confirmed'}));
     await user.type(screen.getByPlaceholderText('Required rationale for this review'), 'Board minutes confirm the date directly.');
     await user.click(screen.getByRole('button', {name: 'Record review'}));
 
     await screen.findByText('Recorded immutable review: confirmed at 90% confidence.');
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toEqual({status: 'confirmed', confidence: 0.4, rationale: 'Board minutes confirm the date directly.'});
     // The reply is what the screen shows now: the list, the history, and no further request.
-    expect(screen.getByText('90% confidence')).toBeInTheDocument();
-    expect(screen.getAllByText('Confirmed')[0]).toHaveClass('st-supported');
+    expect(screen.getByText('90%')).toBeInTheDocument();
+    expect(screen.getAllByText('Confirmed')[0].closest('.st')).toHaveClass('st-supported');
     expect(screen.getByText('unverified → confirmed')).toBeInTheDocument();
     expect(screen.getByText('Board minutes confirm the date directly.')).toBeInTheDocument();
     expect(api.calls(CLAIMS)).toHaveLength(1);
@@ -192,6 +213,9 @@ describe('ClaimsPanel', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText('No evidence is linked to this claim yet.');
+    // The case's evidence pool is one click away, not a wall of text under the claim.
+    expect(screen.queryByText('Approved 3/3, signed by CFO.')).toBeNull();
+    await user.click(screen.getByRole('button', {name: 'Attach evidence'}));
     expect(screen.getByText('Approved 3/3, signed by CFO.')).toBeInTheDocument();
 
     api.add({
@@ -207,11 +231,55 @@ describe('ClaimsPanel', () => {
     await screen.findByText('Linked evidence as supports.');
     expect(api.lastBody('POST /api/claims/claim-1/evidence')).toEqual({evidence_id: 'ev-1', stance: 'supports', note: 'Signed copy'});
     expect(api.calls(WORKSPACE)).toHaveLength(2);
-    expect(screen.getByText('1 supporting · 0 contradicting · 0 context')).toBeInTheDocument();
-    expect(screen.getByText('Reporter note: Signed copy')).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '1 supporting · 0 contradicting · 0 context'})).toBeInTheDocument();
+    expect(screen.getByText('Reporter note: Signed copy').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('img', {name: 'Supports'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Supports ✓'})).toBeDisabled();
     expect(screen.getByRole('button', {name: 'Contradicts'})).toBeEnabled();
     expect(screen.getByPlaceholderText('Optional reporter note for the next evidence link')).toHaveValue('');
+    expect(api.unmatched()).toEqual([]);
+  });
+
+  it('marks evidence superseded by a newer record: struck, its reason and replacement on hover, not counted, and undone', async () => {
+    const later = {id: 'ev-2', source_id: 'src-2', quote: 'Approved 4/3 after correction.', locator: 'p.2', notes: null};
+    const judgment = {...source, id: 'src-2', title: 'Corrected minutes', url: null};
+    const rows = [
+      {id: 'link-1', stance: 'supports', evidence, source, note: null, created_at: '2026-10-02T00:00:00'},
+      {id: 'link-2', stance: 'supports', evidence: later, source: judgment, note: null, created_at: '2026-10-03T00:00:00'},
+    ];
+    const mark = {at: '2026-10-04T00:00:00', by_evidence_id: 'ev-2', by_label: 'Corrected minutes', by_locator: 'p.2', reason: 'The minutes were corrected',
+      decided_by_id: 'local-owner', decided_by_name: 'Ony'};
+    const api = await renderPanel({[WORKSPACE]: workspace(claimFixture(), {evidence: rows, stance_counts: {supports: 2, contradicts: 0, context: 0}})});
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', {name: /The contract was approved/}));
+    await screen.findByText('Approved 3/3, signed by CFO.');
+    await user.click(screen.getAllByRole('button', {name: 'Mark superseded'})[0]);
+    const form = screen.getByRole('form', {name: 'Mark superseded'});
+    // The claim's own other evidence is offered first as what replaces it; nothing is sent without a reason.
+    expect(within(form).getByRole('option', {name: /Corrected minutes · Approved 4\/3/})).toBeInTheDocument();
+    expect(within(form).getByRole('button', {name: 'Mark superseded'})).toBeDisabled();
+    await user.selectOptions(within(form).getByRole('combobox'), 'ev-2');
+    await user.type(within(form).getByRole('textbox'), 'The minutes were corrected');
+    api.add({'POST /api/claims/claim-1/evidence/link-1/supersede': workspace(claimFixture(), {
+      evidence: [{...rows[0], superseded: mark}, rows[1]], stance_counts: {supports: 1, contradicts: 0, context: 0}, superseded_count: 1})});
+    await user.click(within(form).getByRole('button', {name: 'Mark superseded'}));
+    await screen.findByText('Marked superseded: shown, no longer counted toward the claim.');
+    expect(api.lastBody('POST /api/claims/claim-1/evidence/link-1/supersede')).toEqual({reason: 'The minutes were corrected', by_evidence_id: 'ev-2'});
+    // Still listed, struck; what replaced it, why and who are revealed (in the page for screen readers).
+    const struck = screen.getByText('Approved 3/3, signed by CFO.');
+    expect(struck.tagName).toBe('S');
+    expect(struck.closest('li')).toHaveClass('cl-ev-gone');
+    expect(screen.getByText('Superseded by Corrected minutes, p.2').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByText('Marked by Ony · ' + new Date('2026-10-04T00:00:00Z').toLocaleDateString())).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: '1 supporting · 0 contradicting · 0 context'})).toBeInTheDocument();
+    // Pointing at it lights the record that replaced it.
+    await user.hover(struck.closest('li')!);
+    expect(screen.getByText('Approved 4/3 after correction.').closest('li')).toHaveClass('cl-ev-replacer');
+
+    api.add({'DELETE /api/claims/claim-1/evidence/link-1/supersede': workspace(claimFixture(), {evidence: rows, stance_counts: {supports: 2, contradicts: 0, context: 0}})});
+    await user.click(screen.getByRole('button', {name: 'Undo superseded'}));
+    await screen.findByText('Counted again: the superseded mark is undone.');
+    expect(screen.getByText('Approved 3/3, signed by CFO.').tagName).not.toBe('S');
     expect(api.unmatched()).toEqual([]);
   });
 
@@ -228,7 +296,8 @@ describe('ClaimsPanel', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText('Jane Doe → Kestrelwood Holdings');
-    expect(screen.getByText('Directorship · 1 linked evidence record(s)')).toBeInTheDocument();
+    expect(screen.getByText('Directorship · 1 linked evidence record(s)').closest('[hidden]')).not.toBeNull();
+    expect(screen.getByRole('img', {name: 'Directorship: Directs, works for or belongs to'})).toBeInTheDocument();
     expect(screen.getByText('Relationship rel-9')).toBeInTheDocument();
     expect(screen.getByText('FollowTheMoney relationship · 2 linked evidence record(s)')).toBeInTheDocument();
 
@@ -243,6 +312,7 @@ describe('ClaimsPanel', () => {
       title: 'The contract was approved on March 3.', kind: 'claim evidence: supports', sourceId: 'src-1', sourceUrl: 'https://example.test/minutes',
       locator: 'p.4', detail: 'Approved 3/3, signed by CFO.', acceptedRecordType: 'evidence', acceptedRecordId: 'ev-1',
     });
+    await user.click(screen.getByRole('button', {name: 'Attach evidence'}));
     await user.click(screen.getAllByRole('button', {name: 'Trace provenance'})[1]);
     expect(useWorkbenchStore.getState().provenance?.request).toMatchObject({title: 'Board minutes', kind: 'evidence pool', sourceId: 'src-1', acceptedRecordId: 'ev-1'});
     expect(api.unmatched()).toEqual([]);
@@ -256,6 +326,7 @@ describe('ClaimsPanel', () => {
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText('No evidence is linked to this claim yet.');
     api.add({'POST /api/claims/claim-1/evidence': {status: 400, body: {detail: 'Claim and evidence must belong to the same investigation'}}});
+    await user.click(screen.getByRole('button', {name: 'Attach evidence'}));
     await user.click(screen.getByRole('button', {name: 'Context'}));
     await screen.findByText(/Claim and evidence must belong to the same investigation/);
 
@@ -266,17 +337,38 @@ describe('ClaimsPanel', () => {
     expect(screen.getByText('No claims yet.')).toBeInTheDocument();
   });
 
+  it('filters the list by status from the tally and by the words typed, and ranks the pool by the open claim\'s words', async () => {
+    const other = {evidence: {id: 'ev-2', source_id: 'src-1', quote: 'The weather was mild in spring.', locator: null, notes: null}, source};
+    const fitting = {evidence: {id: 'ev-3', source_id: 'src-1', quote: 'The contract was approved by the board.', locator: null, notes: null}, source};
+    await renderPanel({[CLAIMS]: [claimFixture(), claimFixture({id: 'claim-2', text: 'The vendor was paid twice.', status: 'disputed'})],
+      [EVIDENCE]: [other, fitting], [WORKSPACE]: workspace(claimFixture())});
+    const user = userEvent.setup();
+    // The tally shows each status's count; a click shows only those claims.
+    await user.click(screen.getByRole('button', {name: 'Disputed: 1'}));
+    expect(screen.queryByText('The contract was approved on March 3.')).toBeNull();
+    expect(screen.getByText('The vendor was paid twice.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Clear'}));
+    await user.type(screen.getByRole('searchbox', {name: 'Find a claim'}), 'contract');
+    expect(screen.queryByText('The vendor was paid twice.')).toBeNull();
+    await user.click(screen.getByRole('button', {name: /The contract was approved/}));
+    await user.click(await screen.findByRole('button', {name: 'Attach evidence'}));
+    const quotes = [...document.querySelectorAll('.cw-pool-quote')].map(el => el.textContent);
+    expect(quotes).toEqual(['The contract was approved by the board.', 'The weather was mild in spring.']);
+  });
+
   it('holds Supported to the Done rules: names what is left, and records it anyway only with a reason', async () => {
     const api = await renderPanel({[WORKSPACE]: workspace(claimFixture(), {done: claimDoneFixture('claim-1', false)})});
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', {name: /The contract was approved/}));
     await screen.findByText("No canonical relationship currently depends on this claim's linked evidence.");
-    await user.click(screen.getAllByRole('combobox').find(el => el.textContent === 'unverified')!);
-    await user.click(await screen.findByRole('option', {name: 'supported'}));
+    await user.click(screen.getByRole('radio', {name: 'Supported'}));
     const done = await screen.findByTestId('claim-done');
     expect(done).toHaveTextContent('Supported means');
-    expect(done).toHaveTextContent('✕At least one supporting item is linked');
-    expect(done).toHaveTextContent('cannot be checked here');
+    // A publication gate: the rules stay on screen; each rule's state is its shape, named (with its detail) on reveal.
+    expect(within(done).getByText('At least one supporting item is linked')).toBeVisible();
+    expect(within(done).getByRole('img', {name: 'Not met'})).toHaveTextContent('✕');
+    expect(within(done).getByRole('img', {name: 'Cannot be checked here'})).toHaveAccessibleDescription(/No supporting item has a stored file\./);
+    expect(within(done).getByText('No supporting item has a stored file.').closest('[hidden]')).not.toBeNull();
     await user.type(screen.getByPlaceholderText('Required rationale for this review'), 'Two editors read it.');
     expect(screen.getByRole('button', {name: 'Supported — 1 check left'})).toBeDisabled();
     await user.type(screen.getByPlaceholderText(/Some true facts have one source/), 'The registry is the only record.');
@@ -287,5 +379,20 @@ describe('ClaimsPanel', () => {
     await user.click(screen.getByRole('button', {name: 'Mark supported anyway'}));
     await screen.findByText('Marked without: supporting. Reason: The registry is the only record.');
     expect(api.lastBody('POST /api/claims/claim-1/reviews')).toMatchObject({status: 'supported', override_reason: 'The registry is the only record.'});
+  });
+});
+
+describe('Claims overview: left to do', () => {
+  afterEach(cleanup);
+  it('counts what is left to do, and a count shows only those claims', async () => {
+    await renderPanel({[CLAIMS]: [claimFixture(), claimFixture({id: 'claim-2', text: 'The vendor was paid twice.', status: 'disputed'}),
+      claimFixture({id: 'claim-3', text: 'The board met in May.', confidence: 0.8})]});
+    const left = screen.getByRole('region', {name: 'Left to do'});
+    expect(within(left).getByRole('button', {name: 'Near done: 1'})).toBeInTheDocument();
+    expect(within(left).getByRole('button', {name: 'Leads: 0'})).toBeDisabled();
+    await userEvent.setup().click(within(left).getByRole('button', {name: 'Under 50%: 1'}));
+    expect(screen.queryByText('The vendor was paid twice.')).toBeNull();
+    expect(screen.queryByText('The board met in May.')).toBeNull();
+    expect(screen.getByText('The contract was approved on March 3.')).toBeInTheDocument();
   });
 });

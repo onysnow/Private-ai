@@ -12,6 +12,8 @@ import type {KeyboardEvent as ReactKeyboardEvent, ReactElement, ReactNode} from 
 import {z} from 'zod';
 
 import {Form, FormControl, FormField, FormItemBare, FormMessage, FormRootError} from '@/components/ui/form';
+import {AiNotice} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {submitWith, useZodForm} from '../../lib/forms';
 import {onScreen, typingInto} from '../../lib/on-screen';
@@ -21,7 +23,7 @@ import {
 } from '../../lib/generated/@tanstack/react-query.gen';
 import type {AiRunEventOut} from '../../lib/generated/types.gen';
 import {currentAppearance, onAppearanceChange} from '../../lib/theme';
-import {apiTime} from '../../lib/timestamps';
+import {apiTime, timeWords} from '../../lib/timestamps';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {RunBloom} from '../effects/run-bloom';
 import type {Flight} from '../effects/run-bloom';
@@ -116,7 +118,7 @@ const nodeFor = (routeNode: string | null | undefined) => (e: Ev): string => {
 };
 const words = (v: string | null | undefined) => (v ? (v.charAt(0) + v.slice(1).toLowerCase()).replace(/_/g, ' ') : '');
 const utc = (iso: string) => apiTime(iso).getTime();
-const stamp = (iso: string) => new Date(utc(iso)).toLocaleString('en-GB', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false}).replace(',', '');
+const stamp = timeWords;
 const clock = (ms: number) => new Date(ms).toLocaleTimeString('en-GB', {hour12: false});
 const who = (e: Ev) => (e.node === 'review' ? 'you' : e.self_reported ? 'model says' : e.system === 'app' ? 'app · enforced' : e.system);
 const lines = (text: string, width: number, max: number): string[] => {
@@ -702,8 +704,9 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
       {planDrawer && <aside className="wr-plan" aria-label="Instructions and plan" role="region">{planDrawer}</aside>}
       {log ? <ol className="wr-log" aria-label="The run, step by step" aria-live="polite">
         {visible.filter(e => full || e.kind !== 'SETTING').map(e => <li key={e.n} className={`${e.status}${lit.has(e.n) ? ' lit' : ''}`}>
-          <button type="button" onClick={() => setFocus(e.n)}><span className="wr-ln">#{e.n}</span><svg width="16" height="16" aria-hidden="true"><Mark status={e.status} self={e.self_reported} x={8} y={8} r={5}/></svg>
-            <span>{e.text}</span><small>{who(e)}{e.rule ? ` · ${e.rule}` : ''}</small><b>{words(e.verdict)}</b></button></li>)}
+          <Reveal tabbable={false} detail={`${who(e)}${e.rule ? ` · ${e.rule}` : ''}`}>
+            <button type="button" onClick={() => setFocus(e.n)}><span className="wr-ln">#{e.n}</span><svg width="16" height="16" aria-hidden="true"><Mark status={e.status} self={e.self_reported} x={8} y={8} r={5}/></svg>
+            <span>{e.text}</span><b>{words(e.verdict)}</b></button></Reveal></li>)}
       </ol> : <div className="wr-map" ref={mapRef}>
         {zoom.k > 1 && <button type="button" className="wr-pill wr-fit" onClick={() => setZoom({k: 1, cx: 500, cy: 210})}>Fit · {Math.round(zoom.k * 100)}%</button>}
         {run?.finished && events.length === 0 && <p className="wr-old" role="status">This run was made before steps were recorded. Showing what was stored: question, packet, reply.</p>}
@@ -721,12 +724,11 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
           {SYSTEMS.map(s => {
             const on = s.key === 'tas' ? tasOn : routeSys === s.key || events.some(e => e.system === s.key && e.kind !== 'SETTING');
             const runsHere = routeSys === s.key;
-            return <g key={s.key} className={`wr-sys${on ? '' : ' dim'}`}><title>{on ? `${s.name}: ${s.trigger}` : `${s.name} not in this run: it runs ${s.trigger}, as its own run`}</title>
+            return <g key={s.key} className={`wr-sys${on ? '' : ' dim'}`}><title>{on ? `${s.name}: ${s.trigger}${runsHere && notRunHere > 0 ? ` · ${notRunHere} modules not run here` : ''}` : `${s.name} not in this run: it runs ${s.trigger}, as its own run`}</title>
               <rect x={s.x - s.w / 2} y={82} width={s.w} height={262} rx={10}/>
               <text x={s.x} y={100} className="wr-label">{s.name}</text>
               {!on && <text x={s.x} y={116} className="wr-sub">not in this run</text>}
               {runsHere && notRunHere > 0 && <text x={s.x} y={232} className="wr-sub">+ {notRunHere} modules</text>}
-              {runsHere && notRunHere > 0 && <text x={s.x} y={243} className="wr-sub tiny">not run here</text>}
               {on && (otherModules[s.key]?.length ?? 0) > 5 && <text x={s.x} y={132 + 5 * 34 + 4} className="wr-sub">+ {otherModules[s.key].length - 5} modules</text>}</g>;
           })}
           <g className="wr-wires">
@@ -761,11 +763,14 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
             aria-label={`Packet, ${packet?.refs.length ?? 0} records`} onClick={() => tally.retrieval?.last && setFocus(tally.retrieval.last.n)}
             onKeyDown={e => { if (e.key === 'Enter' && tally.retrieval?.last) setFocus(tally.retrieval.last.n); }}>
             {(packet?.refs ?? []).slice(0, 3).map((r, i) => <g key={i} transform={`translate(0 ${i * 26})`}><rect x={-50} y={-11} width={100} height={22} rx={5}/>
-              <text x={-44} y={4} className="wr-sub left">{`${r.record_type}:${r.record_id.slice(0, 7)}`}</text></g>)}
+              {/* The record's kind shows; its ID is on hover. */}
+              <title>{`${r.record_type}:${r.record_id}`}</title><text x={-44} y={4} className="wr-sub left">{r.record_type}</text></g>)}
             {(packet?.refs.length ?? 0) > 3 && <text y={72} className="wr-sub">+ {(packet?.refs.length ?? 0) - 3} records</text>}
             {tally.retrieval?.last && <Mark status={tally.retrieval.last.status} x={46} y={-9} r={5}/>}</g>
           {node('router', 'Router', 'diamond', [routeSys === 'app' ? 'app module' : `${routed} of ${SYSTEM_COUNT} routed`])}
-          {node('model', 'Model call', 'circle', writing ? [`writing · ${writingFor}s`, 'nothing is shown while it writes'] : modelEnd ? [`${(modelEnd.detail as {seconds?: number} | null)?.seconds ?? ''} s · ${local ? 'on this computer' : 'sent out'}`] : [local ? 'on this computer' : 'not run yet', 'nothing is shown while it writes'])}
+          {/* Where the model ran stays; how long it took and that nothing shows while it writes are on hover. */}
+          {node('model', 'Model call', 'circle', writing ? [`writing · ${writingFor}s`] : modelEnd ? [local ? 'on this computer' : 'sent out'] : [local ? 'on this computer' : 'not run yet'],
+            {hint: modelEnd ? `${(modelEnd.detail as {seconds?: number} | null)?.seconds ?? ''} s` : 'nothing is shown while it writes'})}
           {node('gate:schema', 'Shape', 'double', [events.some(e => e.node === 'gate:schema' && e.status === 'good') ? 'pass' : ''], {icon: '{ }'})}
           {node('gate:citation', 'Citations', 'double', [`${events.filter(e => e.node === 'gate:citation' && e.status === 'good').length} of ${events.filter(e => e.node === 'gate:citation' && e.kind === 'CHECK').length}`], {icon: '99'})}
           {(['gate:quote', 'gate:chart', 'gate:writing'] as const).map(g => node(g, g.slice(5), 'mini', undefined, {dim: !gateUsed(g)}))}
@@ -806,12 +811,13 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
         </svg>
         {bloom && !calm && <RunBloom flights={flights} svgRef={svgRef} host={mapRef}/>}
         <div className="wr-under">
-          <p className="wr-focus" aria-live="polite"><span className="br-eyebrow">Thought in focus</span>
+          <p className="wr-focus" aria-live="polite"><Reveal detail={thought ? 'Everything else dims to about a third. Esc clears.' : 'Click a light, a chip or a tally to follow one thought from input to output.'}>
+            <span className="br-eyebrow">Thought in focus</span></Reveal>
             {compareId && other.data ? <><b>Compared with the run of {stamp(other.data.run.created_at)} · {changes.length ? `${changes.length} part${changes.length === 1 ? '' : 's'} changed` : 'nothing changed'}</b>
               <small>{changes.map(c => `${c.k.replace(/^gate:|^tas\//, '')}: ${c.before ? WORD[c.before] : 'not reached'} → ${c.after ? WORD[c.after] : 'not reached'}`).join(' · ') || 'Every part ended with the same verdict.'}</small></>
-              : thought ? <><b>{thoughtId} · {thought.text}</b><small>Everything else dims to about a third. Esc clears.</small></>
+              : thought ? <b>{thoughtId} · {thought.text}</b>
               : run?.status === 'failed' ? <><b className="wr-bad">Stopped</b><small>{(run.error ?? run.message ?? 'The run stopped').replace(/[.\s]*$/, '.')} Press N for the step that stopped it.</small></>
-              : <><b>None chosen</b><small>Click a light, a chip or a tally to follow one thought from input to output.</small></>}</p>
+              : <b>None chosen</b>}</p>
           <ul className="wr-legend" aria-label="Key">
             {(['good', 'partial', 'bad', 'neutral'] as Status[]).map(s => <li key={s}><svg width="14" height="14" aria-hidden="true"><Mark status={s} x={7} y={7} r={5}/></svg>{WORD[s]}</li>)}
             <li><svg width="14" height="14" aria-hidden="true"><Mark status="neutral" self x={7} y={7} r={5}/></svg>model says · not checked</li>
@@ -830,7 +836,7 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
           <section aria-label="Input"><h4><b>1</b> Input</h4><p className="wr-q">“{run?.question}”</p>
             <p className="wr-chips">{settingsIn.filter(e => ['source_tier_floor', 'severity_floor', 'devils_advocate', 'live_events'].includes(e.rule ?? '')).map(e => <span key={e.n} className="br-chip">{settingChip(e)}</span>)}</p>
             {refsOf.length > 0 && <ul className="wr-refs">{refsOf.slice(0, 4).map(r => <li key={`${r.record_type}:${r.record_id}`}><b>{r.record_type}:{r.record_id.slice(0, 8)}</b></li>)}</ul>}</section>
-          <section aria-label="Steps"><h4><b>2</b> Steps <small>{steps.length} events · parent chain</small></h4>
+          <section aria-label="Steps"><h4><b>2</b> <Reveal detail="The parent chain of this thought."><span>Steps</span></Reveal> <small>{steps.length} events</small></h4>
             <p className="wr-stepbar"><span className="br-seg" role="radiogroup" aria-label="Show the steps as">
               {(['tree', 'timeline'] as const).map(v => <button key={v} type="button" role="radio" aria-checked={stepsView === v} className={stepsView === v ? 'on' : ''} onClick={() => setStepsView(v)}>{v}</button>)}</span>
               <input type="search" aria-label="Search the steps by kind, number or rule" placeholder="kind, #n or rule" value={stepSearch} onChange={e => setStepSearch(e.target.value)}/></p>
@@ -838,21 +844,23 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
               <button type="button" className="wr-steprow" onClick={() => setFocus(e.n)} aria-current={e.n === focus ? 'step' : undefined}
                 aria-label={`Step ${e.n}, ${e.text}, ${verdictOf(e)}, by ${who(e)}${e.rule ? `, rule ${e.rule}` : ''}`}>
                 <span className="wr-ln">#{e.n}</span><svg width="14" height="14" aria-hidden="true"><Mark status={e.status} self={e.self_reported} x={7} y={7} r={5}/></svg>
-                {stepsView === 'tree' ? <span className="wr-step-text" title={`${e.text} · ${who(e)}${e.rule ? ` · ${e.rule}` : ''}`}>{e.text}<small> {who(e)}{e.rule ? ` · ${e.rule}` : ''}</small></span>
-                  : <span className="wr-steptime" title={`${e.text} · ${clock(utc(e.at))}`}><i className={e.status} style={{left: `${stepX(e).left}%`, width: `${stepX(e).width}%`}}/></span>}
+                {/* Who and which rule (tree), or the time (timeline), are revealed on the step; the button's name carries them. */}
+                {stepsView === 'tree' ? <Reveal tabbable={false} describe={false} detail={`${who(e)}${e.rule ? ` · ${e.rule}` : ''}`}><span className="wr-step-text">{e.text}</span></Reveal>
+                  : <Reveal tabbable={false} describe={false} className="wr-steptime-rv" detail={`${e.text} · ${clock(utc(e.at))}`}><span className="wr-steptime"><i className={e.status} style={{left: `${stepX(e).left}%`, width: `${stepX(e).width}%`}}/></span></Reveal>}
                 <b className={e.status}>{verdictOf(e)}</b></button></li>)}
               {!steps.length && <li className="wr-none">No step matches “{stepSearch}”.</li>}</ol>
-            {stepsView === 'timeline' && chain.length > 0 && <p className="wr-stepaxis"><span>{clock(chainT0)}</span><span>{Math.max(0, Math.round((chainT1 - chainT0) / 1000))} s</span><span>{clock(chainT1)}</span></p>}</section>
+            {stepsView === 'timeline' && chain.length > 0 && <p className="wr-stepaxis"><Reveal detail={`${clock(chainT0)} → ${clock(chainT1)}`}><span>{Math.max(0, Math.round((chainT1 - chainT0) / 1000))} s</span></Reveal></p>}</section>
           <section aria-label="Output"><h4><b>3</b> Output <small>{item ? (item.grounded.length ? 'from a passage · model’s words' : 'model’s words · no passage says it') : refsOf.length ? 'from a passage · model’s words' : 'model’s words'}</small></h4>
             <p className="wr-q">{item ? <ClaimText item={item} reviewStatus={candidate.data?.review_status}/> : (claim?.claim as string | undefined) ?? (thought ?? focused).text}</p>
             {item && <UnderlineKey/>}
             {item && candidate.data && run?.finished && <ClaimDecision candidate={candidate.data} item={item} onSaved={afterDecision} compact/>}
             {candidateId && candidate.isLoading ? <div className="wr-skeleton" aria-label="Loading the answer"><i/><i/><i/></div>
               : <dl className="br-facts">
-              {claim && <><dt>Class</dt><dd>{words(String(claim.classification ?? ''))} <span className="br-chip ai">model says</span></dd>
+              {claim && <><dt>Class</dt><dd>{words(String(claim.classification ?? ''))} <AiNotice>The model says this: no check confirms it.</AiNotice></dd>
                 <dt>Confidence</dt><dd>model: {claim.confidence_term ? words(String(claim.confidence_term)).toLowerCase() : 'not given (old format)'}{capOf ? <> → <b>capped: {capOf}</b></> : null}</dd></>}
               {!claim && capOf && <><dt>Confidence</dt><dd><b>capped: {capOf}</b></dd></>}
-              {links.length > 0 && <><dt>Weakest link</dt><dd><span className="wr-links" aria-hidden="true">{links.map(e => <i key={e.n} className={`${e.status}${e === weakest ? ' weak' : ''}`} title={`#${e.n} ${e.text}`}/>)}</span>
+              {links.length > 0 && <><dt>Weakest link</dt><dd><span className="wr-links" aria-hidden="true">{links.map(e => <Reveal key={e.n} tabbable={false} describe={false} detail={`#${e.n} ${e.text}`}>
+                <i className={`${e.status}${e === weakest ? ' weak' : ''}`}/></Reveal>)}</span>
                 {weakest ? <> {capOf ? 'capped by' : 'weakest:'} step #{weakest.n}: {weakest.text}</> : ' every step held'}</dd></>}
               <dt>Removed</dt><dd>{removed ? removed.text : 'nothing removed'}</dd></dl>}</section>
           <section aria-label="Ledger"><h4><b>4</b> Ledger</h4><p className="wr-chips">
@@ -863,7 +871,8 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
         </div>
         <footer>
           {candidateId && !reviewed && !rejecting && <>
-            <button type="button" className="br-primary" onClick={() => review.mutate({path: {candidate_id: candidateId}, body: {decision: 'accept', note: null}})}>✓ Accept</button>
+            <Reveal tabbable={false} detail={`Accept and reject apply to the whole answer; ${item ? 'Keep, Correct and Reject above decide this claim; ' : ''}To check marks this thought only.`}>
+              <button type="button" className="br-primary" onClick={() => review.mutate({path: {candidate_id: candidateId}, body: {decision: 'accept', note: null}})}>✓ Accept</button></Reveal>
             <button type="button" onClick={() => setRejecting(true)}>✕ Reject with reason</button></>}
           {rejecting && <Form {...rejectForm}><form className="br-add" noValidate onSubmit={submitWith(rejectForm, async ({reason}) => {
             if (!candidateId) return;
@@ -876,16 +885,15 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
             <FormRootError className="field-msg next-line"/>
             <button type="submit">Reject</button></form></Form>}
           {reviewed && <span className="br-ok">{words(candidate.data?.review_status)}</span>}
-          {thoughtId && run?.finished && !sample && <button type="button" aria-pressed={marked === 'to_check'} disabled={mark.isPending}
-            title={marked === 'to_check' ? 'On your list to check; press again to take it off' : 'Put this thought on your list to check; it is kept in the run record'}
+          {thoughtId && run?.finished && !sample && <Reveal tabbable={false} detail={marked === 'to_check' ? 'On your list to check; press again to take it off.' : 'Put this thought on your list to check; it is kept in the run record. To check marks this thought only.'}>
+            <button type="button" aria-pressed={marked === 'to_check'} disabled={mark.isPending}
             onClick={() => mark.mutate({path: {investigation_id: investigationId, run_id: realId ?? '', thought_id: thoughtId}, body: {mark: marked === 'to_check' ? 'keep' : 'to_check', reason: null}})}>
-            {marked === 'to_check' ? '◉ To check' : '○ To check'}</button>}
+            {marked === 'to_check' ? '◉ To check' : '○ To check'}</button></Reveal>}
           <button type="button" onClick={() => { void navigator.clipboard?.writeText(citation()); setCopied(true); }}>{copied ? 'Copied' : 'Copy cite'}</button>
-          {onRunAgain && run && !sample && run.finished && <button type="button" title="Back to the plan with this question and the same packet, to change the instructions; the new run is a new record and this one is kept"
-            onClick={() => onRunAgain({question: run.question, module: run.module, theory: run.working_theory ?? null, from: focused ? {run_id: run.run_id, step: focused.n} : undefined})}>Run again from this step…</button>}
+          {onRunAgain && run && !sample && run.finished && <Reveal tabbable={false} detail="Back to the plan with this question and the same packet, to change the instructions; the new run is a new record and this one is kept.">
+            <button type="button" onClick={() => onRunAgain({question: run.question, module: run.module, theory: run.working_theory ?? null, from: focused ? {run_id: run.run_id, step: focused.n} : undefined})}>Run again from this step…</button></Reveal>}
           {review.isError && <span role="alert" className="br-bad">{errorMessage(review.error, 'Not saved')}</span>}
           {mark.isError && <span role="alert" className="br-bad">{errorMessage(mark.error, 'Not saved')}</span>}
-          <small>Accept and reject apply to the whole answer; {item ? 'Keep, Correct and Reject above decide this claim; ' : ''}To check marks this thought only.</small>
         </footer>
       </aside>}
     </div>
@@ -898,8 +906,10 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
         <span><button type="button" onClick={nextProblem} disabled={!problems.length}>Next problem · N</button>
           <button type="button" className={liveRun && playing ? 'on' : ''} onClick={() => { setReplay(false); setPlaying(true); setShown(events.length); }}>Live</button>
           {run?.finished && <button type="button" onClick={() => { setReplay(true); setFocus(null); setShown(0); setPlaying(true); }}>Replay</button>}</span>
-        <small>Event {shown} of {events.length} · {lightsInFlight} light{lightsInFlight === 1 ? '' : 's'} in flight{!playing && liveRun && events.length > shown ? ` · ${events.length - shown} new` : ''}</small>
-        <small>Model: {(events.find(e => e.node === 'model' && e.verdict !== 'STARTED')?.detail as {model?: string} | null)?.model ?? '—'}{local ? ' · this computer' : ''}</small>
+        {/* Where the playback is shows; lights in flight, new events and the model are revealed on it. */}
+        <Reveal detail={<><span className="rv-row">{lightsInFlight} light{lightsInFlight === 1 ? '' : 's'} in flight{!playing && liveRun && events.length > shown ? ` · ${events.length - shown} new` : ''}</span>
+          <span className="rv-row">Model: {(events.find(e => e.node === 'model' && e.verdict !== 'STARTED')?.detail as {model?: string} | null)?.model ?? '—'}{local ? ' · this computer' : ''}</span></>}>
+          <small>Event {shown} of {events.length}</small></Reveal>
       </div>
       <div className="wr-lanes" aria-label="The run, one lane per part" ref={lanesRef}>
         <p className="br-eyebrow">The run, one lane per part{win.to - win.from < 1 && <button type="button" className="wr-lanefit" onClick={() => setWin({from: 0, to: 1})}>whole run</button>}</p>
@@ -916,9 +926,9 @@ export function WatchTheRun({investigationId, runId, onBack, onRunAgain, onRevie
       </div>
       <div className="wr-ledgers">
         <p className="br-eyebrow">Ledgers</p>
-        <div><b>Run record</b><small>append-only, hashed</small><em>{events.length}</em></div>
-        <div><b>Judgement ledger</b><small>outcomes come later</small><em>0</em></div>
-        <div><b>Final audit</b><small>{route?.final_audit ? `${route.final_audit.node} runs apart, never inside the run` : 'none for an app module'}</small><em>—</em></div>
+        <div><Reveal detail="Append-only, hashed."><b>Run record</b></Reveal><em>{events.length}</em></div>
+        <div><Reveal detail="Outcomes come later."><b>Judgement ledger</b></Reveal><em>0</em></div>
+        <div><Reveal detail={route?.final_audit ? `${route.final_audit.node} runs apart, never inside the run` : 'None for an app module.'}><b>Final audit</b></Reveal><em>—</em></div>
       </div>
     </footer>
   </section>;

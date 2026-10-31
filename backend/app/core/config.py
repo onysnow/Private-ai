@@ -75,12 +75,27 @@ class Settings(BaseSettings):
     capture_timeout_seconds: float = 45.0
     # What one capture may bring back, the page and everything it loads, before the rest is cut off.
     capture_max_megabytes: int = 100
+    # Following (ADR-0022): a monitor or capture set to the Tor route goes to the Tor the reporter runs on this computer.
+    tor_socks_url: str = "socks5h://127.0.0.1:9050"
+    # Following a newsletter mailbox (app/services/mailbox.py): the IMAP ports a mail server may be read on (993: TLS
+    # from the start; 143: STARTTLS). Only the server's administrator widens this.
+    mailbox_ports: list[int] = [993, 143]
+    # A capture's time proof (ADR-0025), off until a person asks: the time server that signs the capture's fingerprint
+    # (RFC 3161). Its root must be in app/trust/tsa/ for the token to be checked here.
+    capture_time_server: str = "https://freetsa.org/tsr"
+    # OCR quality gate: proposals read from a page less legible than this (mean Tesseract word confidence, 0-100;
+    # app/services/legibility.py) are held back from Decide, and wait in the reading room beside the page.
+    ocr_legibility_floor: float = 60.0
     # Audio and video (ADR-0020): the largest recording an upload takes, and the Whisper model that transcribes it on
     # this computer (fetched once at setup into the folder below; a read never downloads it). Language: empty detects it.
     max_media_bytes: int = 500 * 1024 * 1024
     transcription_model: str = "small"
     transcription_model_dir: str = "./data/models"
     transcription_language: str = ""
+    # Where the voice models are kept (ADR-0026; python -m app.services.voices fetch).
+    voices_model_dir: str = "./data/models/voices"
+    # Where the face detector's model is kept (fetched the first time faces are looked for; DECISIONS_LOG 7, call 4).
+    faces_model_dir: str = "./data/models/faces"
     enable_pdf_ocr: bool = True
     pdf_ocr_language: str = "eng"
     pdf_ocr_dpi: int = 200
@@ -118,9 +133,13 @@ class Settings(BaseSettings):
     # back to native charts and tables when it cannot be reached.
     render_service_url: str = "http://127.0.0.1:8070"
     # The self-hosted base map (ADR-0005, lines 4 and 18): world.pmtiles and
-    # Protomaps' basemaps-assets (fonts, sprites), put there by the compose
-    # profile `maps`. Maps say "no base map installed" when it is empty.
+    # Protomaps' basemaps-assets (fonts, sprites). The backend fetches them
+    # itself the first time it starts without them (app/services/basemap_install.py);
+    # the compose profile `maps` still works. basemap_auto=false turns the
+    # download off (a computer that must never go online).
     basemap_dir: str = "./data/basemap"
+    basemap_auto: bool = True
+    basemap_maxzoom: int = 6
     render_service_timeout_seconds: float = 15.0
     cors_allowed_origins: str = (
         "http://localhost:3000,http://127.0.0.1:3000,http://127.0.0.1:8000,http://localhost:8000"

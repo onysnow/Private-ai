@@ -46,7 +46,8 @@ describe('Settings: API access', () => {
   it('says the API is local-only and how the backend is configured', async () => {
     const api = await renderSettings({[STATUS]: validSettingsStatus, [LIST]: []}, 'access');
     await screen.findByText('Local-only API access. No bearer token is required on loopback.');
-    expect(screen.getByText(/Access mode: local only/)).toHaveTextContent('Access mode: local only · token configured on backend: no');
+    // The access mode is a mark; the details are revealed on it.
+    expect(screen.getByText('⌂ Local only').closest('.rv')).toHaveAccessibleDescription(/Access mode: local only · token configured on backend: no/);
     expect(screen.queryByPlaceholderText('Bearer token')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Clear session token'})).not.toBeInTheDocument();
     expect(api.unmatched()).toEqual([]);
@@ -61,7 +62,7 @@ describe('Settings: API access', () => {
     await user.click(screen.getByRole('button', {name: 'Save token'}));
 
     await screen.findByText('Authenticated for this browser session. The token is held only in memory and is not written to storage.');
-    expect(screen.getByText(/Access mode:/)).toHaveTextContent('Access mode: shared bearer for remote clients · token configured on backend: yes');
+    expect(screen.getByText('↗ Shared with remote clients').closest('.rv')).toHaveAccessibleDescription(/Access mode: shared bearer for remote clients · token configured on backend: yes/);
     expect(screen.getByPlaceholderText('Bearer token')).toHaveValue('');
 
     await user.click(screen.getByRole('button', {name: 'Clear session token'}));
@@ -107,7 +108,8 @@ describe('Settings: demo mode', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', {name: 'Hide demo investigation'}));
     expect(window.localStorage.getItem('pai:hide-demo-investigations')).toBe('1');
-    expect(screen.getByText(/Hidden from investigation pickers in this browser only/)).toBeInTheDocument();
+    // What hiding does is revealed on the button.
+    expect(screen.getByRole('button', {name: 'Show demo investigation'})).toHaveAccessibleDescription(/^Hidden from investigation pickers in this browser only/);
     await user.click(screen.getByRole('button', {name: 'Show demo investigation'}));
     expect(window.localStorage.getItem('pai:hide-demo-investigations')).toBeNull();
   });

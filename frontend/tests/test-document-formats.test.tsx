@@ -14,6 +14,7 @@ import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
 import {mockApi} from '../test-support/mock-api';
+import {dropBody} from '../test-support/library';
 import {corpusStatusBody, documentFormatsBody, emptyGraph} from '../test-support/page-routes';
 
 vi.mock('next/navigation', () => ({
@@ -35,6 +36,7 @@ function panelRoutes(formats: unknown) {
   return {
     [FORMATS]: formats, 'GET /api/investigations/inv-1/documents': [], 'GET /api/investigations/inv-1/entities': [],
     'GET /api/investigations/inv-1/graph': emptyGraph(), 'GET /api/investigations/inv-1/corpus/status': corpusStatusBody('inv-1'),
+    'GET /api/investigations/inv-1/drop': dropBody('inv-1'),
   };
 }
 

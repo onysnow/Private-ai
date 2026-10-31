@@ -41,13 +41,12 @@ describe('CorpusInsights', () => {
       'POST /api/leads': leadBody({title: 'Alaric Voss', provider: 'openaleph', provider_record_id: voss.lead_key, kind: 'connector'}),
     });
     wrap(<CorpusInsights investigationId="inv-1"/>);
-    expect(api.calls(INSIGHTS)).toHaveLength(0);   // asked for only when opened
+    // Asked for when the screen opens: no button stands between the reporter and the names (sweep, 30 Oct).
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', {name: 'Show what stands out'}));
 
     const people = within(await screen.findByRole('list', {name: 'People'}));
     expect(people.getByText('Alaric Voss')).toBeInTheDocument();
-    expect(people.getByText('Alongside: Meridian Holdings Ltd (3), Limassol (2)')).toBeInTheDocument();
+    expect(people.getByText('Alongside: Meridian Holdings Ltd (3), Limassol (2)').closest('[hidden]')).not.toBeNull();  // on hover (Ony, 29 Oct)
     await user.click(within(screen.getByRole('list', {name: 'Companies'})).getByRole('button', {name: 'Open dossier'}));
     expect(useWorkbenchStore.getState().entityId).toBe('ent-1');
 
@@ -62,8 +61,11 @@ describe('CorpusInsights', () => {
   it('says why there is nothing to show', async () => {
     mockApi({[INSIGHTS]: insights([], {state: 'no_collection', detail: 'No document of this investigation has been sent to OpenAleph yet.', collection_id: null})});
     wrap(<CorpusInsights investigationId="inv-1"/>);
-    await userEvent.setup().click(screen.getByRole('button', {name: 'Show what stands out'}));
-    expect(await screen.findByText('No document of this investigation has been sent to OpenAleph yet.')).toBeInTheDocument();
+    // The state is a short word; the sentence is on hover.
+    expect(await screen.findByText('Nothing sent yet')).toBeInTheDocument();
+    // With nothing to list, the box takes the rail's free height and says why in big words.
+    expect(screen.getByRole('region', {name: 'What stands out in the corpus'})).toHaveClass('quiet');
+    expect(screen.getByText('No document of this investigation has been sent to OpenAleph yet.').closest('[hidden]')).not.toBeNull();
   });
 
   it('writes the lead without an alongside list when there is none', () => {

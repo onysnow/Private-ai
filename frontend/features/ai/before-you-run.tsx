@@ -21,15 +21,17 @@ import {submitWith, useZodForm} from '../../lib/forms';
 import {onScreen, typingInto} from '../../lib/on-screen';
 import {api} from '../../lib/api-instance';
 import {describeJob, waitForJob} from '../../lib/jobs';
-import {apiTime} from '../../lib/timestamps';
+import {timeWords} from '../../lib/timestamps';
 import {
   getCaseResearchQueryKey, investigationRunPlanMutation, investigationRunProfileOptions, investigationRunProfileQueryKey, saveInvestigationRunProfileMutation,
   saveQuestionMutation,
 } from '../../lib/generated/@tanstack/react-query.gen';
 import {investigationCaseSynthesis, investigationHypothesisTest} from '../../lib/generated/sdk.gen';
-import type {RunOptionsIn, RunPlanOut, RunSettingOut} from '../../lib/generated/types.gen';
-import {listAiRunsOptions, listAiRunsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
+import type {AiRunOut, RunOptionsIn, RunPlanOut, RunSettingOut} from '../../lib/generated/types.gen';
+import {capabilitiesOptions, listAiRunsOptions, listAiRunsQueryKey} from '../../lib/generated/@tanstack/react-query.gen';
 import {ReviewSheet} from './claim-review-view';
+import {AiNotice} from '../../components/status';
+import {Reveal} from '../../components/ui/reveal';
 import {SavedQuestions} from './saved-questions';
 import {WatchTheRun} from './watch-the-run';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -145,6 +147,53 @@ function Switch({row, value, onChange}: {row: RunSettingOut; value: string; onCh
     onClick={() => onChange(on ? 'OFF' : 'ON')}><span/></button>;
 }
 
+/** A run's state as a colour (the word on reveal): still running, stopped with an error, finished with problems listed,
+ *  finished clean. */
+function runState(r: AiRunOut): {key: 'live' | 'failed' | 'problems' | 'clean'; word: string} {
+  if (!r.finished) return {key: 'live', word: 'Running'};
+  if (r.error || r.status === 'failed') return {key: 'failed', word: 'Stopped before an answer'};
+  if (r.problems) return {key: 'problems', word: `${r.problems} problem${r.problems === 1 ? '' : 's'} listed`};
+  return {key: 'clean', word: 'Finished, no problem listed'};
+}
+const SYSTEM_DOTS = ['RAS', 'TAS', 'QAS', 'LAS', 'DAS'] as const;
+const runWhen = timeWords;
+
+/** Step 1's right-hand column: this case's earlier runs, newest first, or, before the first run, what a run is and
+ *  (when AI is off) what turning it on would send. Nothing here is invented: an empty case says it is empty. */
+export function RunHistory({runs, loading, failed, aiOn, onWatch, onSample}: {runs: AiRunOut[] | undefined; loading: boolean; failed: string | null;
+  aiOn: boolean | null; onWatch: (runId: string) => void; onSample: () => void}): ReactElement {
+  const list = runs ?? [];
+  return <aside className="br-history" aria-label="Earlier runs">
+    <p className="br-title"><span>Earlier runs</span>{list.length > 0 && <b className="br-history-n">{list.length}</b>}</p>
+    {failed && <p role="alert" className="br-bad">{failed}</p>}
+    {loading && !runs && <p className="br-quietline" role="status">Loading the runs…</p>}
+    {list.length > 0 && <ul className="br-runs">
+      {/* The question and its problem count show; the state is a colour named on reveal, with when it ran and its steps. */}
+      {list.slice(0, 8).map(r => { const st = runState(r); return <li key={r.run_id} data-state={st.key}>
+        <Reveal tabbable={false} detail={<><span className="rv-row"><b>{st.word}</b>{r.review_status ? ` · ${r.review_status}` : ''}</span>
+          <span className="rv-row">{runWhen(r.created_at)} · {r.events} steps · {r.module === 'hypothesis_test' ? 'Theory test' : 'Case synthesis'}</span></>}>
+          <span className="br-run-dot" aria-hidden="true"/></Reveal>
+        <span className="br-run-q">{r.question}<span className="sr-only"> · {st.word}</span></span>
+        {r.problems > 0 && <b className="br-run-problems" aria-label={`${r.problems} problem${r.problems === 1 ? '' : 's'}`}>{r.problems}</b>}
+        <button type="button" className="br-quiet" onClick={() => onWatch(r.run_id)}>Watch it again</button>
+      </li>; })}
+    </ul>}
+    {runs && list.length === 0 && !failed && <div className="br-norun">
+      {/* The run's route, unlit: the five systems a run is routed through, as they light up in Watch the run. */}
+      <Reveal tabbable={false} detail="A run is routed through the suite's five systems and lights them as it goes. None has run in this case yet.">
+        <span className="br-norun-route" aria-hidden="true">{SYSTEM_DOTS.map(x => <i key={x}><span/>{x}</i>)}</span></Reveal>
+      <p className="br-norun-head">No runs yet in this case</p>
+      {aiOn === false && <div className="br-norun-off" role="note">
+        <p><span className="br-off-dot" aria-hidden="true"/><b>AI is off</b> · nothing leaves this computer</p>
+        <p className="br-norun-send"><Reveal detail="Only when you press Run, after the plan has shown it. With a model on this computer, nothing leaves it at all.">
+          <span>Turned on, a run sends your question and up to {PACKET_DEFAULT} records from this case to the model you choose.</span></Reveal></p>
+        <a href="/settings#ai" className="br-quiet">Settings › AI and research</a>
+      </div>}
+      <button type="button" className="br-quiet br-sample" onClick={onSample}>Watch a sample run</button>
+    </div>}
+  </aside>;
+}
+
 export function BeforeYouRun({investigationId, active = true}: {investigationId: string; active?: boolean}): ReactElement {
   const queryClient = useQueryClient();
   const profile = useQuery({...investigationRunProfileOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId)});
@@ -215,6 +264,9 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
     return () => { requestListeners.delete(take); };
   }, []);
   const earlier = useQuery({...listAiRunsOptions({path: {investigation_id: investigationId}}), enabled: Boolean(investigationId) && step === 1});
+  // Whether AI is on here (the same reading as the case home's AI strip); null until known.
+  const caps = useQuery({...capabilitiesOptions(), staleTime: 60_000});
+  const aiOn = caps.data ? Boolean(caps.data.ai_features_enabled) : null;
   const [outcome, setOutcome] = useState<{ok: boolean; text: string} | null>(null);
   const flagged = useRef(new Set<string>());
 
@@ -319,6 +371,9 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   });
 
   const changed = values && caseDefaults ? Object.keys(values).filter(k => values[k] !== caseDefaults[k]) : [];
+  // Until the first plan comes back (the server reads the case to build the packet, which can take a few seconds), each
+  // column shows that it is being worked out rather than empty headings.
+  const working = !p && !plan.isError ? <p className="br-working" role="status"><span aria-hidden="true"/>Working out the plan from this case…</p> : null;
   const rows = p?.settings ?? [];
   // Keep the question to ask again (by hand, or after each import in a case set to Without approval).
   const keep = useMutation({...saveQuestionMutation(), onSuccess: () => {
@@ -343,11 +398,14 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   useEffect(() => { setSizeDraft(String(maxResults)); }, [maxResults]);
 
   const leftCol = <div className="br-col br-left" aria-label="Operating instructions" role="region">
-    <p className="br-title">Operating instructions <small>Profile <b>{profile.data?.name ?? '…'}</b>{changed.length ? <> · <em>{changed.length} changed</em></> : null}</small></p>
-    {values && GROUPS.map(g => <fieldset key={g} className="br-group"><legend>{g}</legend>
+    <p className="br-title"><Reveal detail={<>Profile <b>{profile.data?.name ?? '…'}</b></>}><span>Operating instructions</span></Reveal>
+      {changed.length ? <small><em>{changed.length} changed</em></small> : null}</p>
+    {!rows.length && working}
+    {values && rows.length > 0 && GROUPS.map(g => <fieldset key={g} className="br-group"><legend>{g}</legend>
       {rows.filter(r => r.group === g).map(r => <div key={r.key} className={`br-row${values[r.key] !== caseDefaults?.[r.key] ? ' changed' : ''}`}
-        onMouseEnter={() => setHover(r.key)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(r.key)} onBlur={() => setHover(null)} title={`${r.key} · ${r.source}`}>
-        <span className="br-label">{r.label}<small>{r.help}</small></span>
+        onMouseEnter={() => setHover(r.key)} onMouseLeave={() => setHover(null)} onFocus={() => setHover(r.key)} onBlur={() => setHover(null)}>
+        {/* The setting's help and where it comes from are revealed on its label (pointing at it also lights its step in the plan). */}
+        <Reveal detail={<><span className="rv-row">{r.help}</span><span className="rv-row rv-mono">{r.key} · {r.source}</span></>}><span className="br-label">{r.label}</span></Reveal>
         {SWITCHES.has(r.key) ? <Switch row={r} value={values[r.key]} onChange={v => change(r.key, v)}/> : <Segments row={r} value={values[r.key]} onChange={v => change(r.key, v)}/>}
       </div>)}
     </fieldset>)}
@@ -362,15 +420,16 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
         <button type="submit">Add</button>
       </form></Form>
     </fieldset>
-    <fieldset className="br-group br-planned"><legend>Overlays</legend><span>Legal · Journalism · Values (labour)</span><span className="br-chip">Planned</span></fieldset>
+    <fieldset className="br-group br-planned"><legend>Overlays</legend><Reveal detail="Legal · Journalism · Values (labour): planned, not in the app yet."><span className="br-chip">Planned</span></Reveal></fieldset>
   </div>;
 
   // The plan, and in edit mode what it is made of. A step a setting adds can be removed or added here; it flips that
   // setting (echoed like any change). The other steps always run: the packet, the model, the checks, your review.
   const optional = OPTIONAL_STEPS.map(o => ({...o, row: rows.find(r => r.key === o.key)})).filter(o => o.row && values);
   const midCol = <div className={`br-col br-mid${editing ? ' editing' : ''}`} role="region" aria-label="The plan">
-    <p className="br-title">The plan <small>{editing ? 'What this run is made of; the steps follow from it' : 'Edit any step before it runs'}</small>
-      <button type="button" className="br-quiet" aria-pressed={editing} onClick={() => setEditing(v => !v)}>{editing ? 'Done' : 'Edit plan'}</button></p>
+    <p className="br-title">The plan
+      <Reveal tabbable={false} detail={editing ? 'What this run is made of; the steps follow from it.' : 'Edit any step before it runs.'}>
+        <button type="button" className="br-quiet" aria-pressed={editing} onClick={() => setEditing(v => !v)}>{editing ? 'Done' : 'Edit plan'}</button></Reveal></p>
     <div className="br-qcard">{editing ? <div className="br-edit">
       <span className="br-seg" role="radiogroup" aria-label="What runs">
         {([['case_synthesis', 'Case synthesis'], ['hypothesis_test', 'Test a theory']] as const).map(([m, l]) =>
@@ -390,33 +449,38 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       {packetFrom && <p className="br-tray br-reuse" role="status"><b>Same packet as run {packetFrom.run_id.slice(0, 8)}</b> (from its step {packetFrom.step}): the records it sent go in again, with the instructions set here.
         <button type="button" className="br-quiet" onClick={() => setPacketFrom(null)}>Build a new packet</button></p>}
       {p && !packetFrom && <div className="br-packet">{p.packet.first.length > 0 && <ul className="br-firsts" aria-label="The first records in the packet">
-        {p.packet.first.map(r => <li key={`${r.record_type}:${r.record_id}`} title={`${(TYPE_WORDS[r.record_type] ?? [r.record_type])[0]}: ${r.title || r.record_id.slice(0, 8)}`}>
-          <span aria-hidden="true">{(TYPE_WORDS[r.record_type]?.[0] ?? r.record_type).charAt(0).toUpperCase()}</span>
+        {p.packet.first.map(r => <li key={`${r.record_type}:${r.record_id}`}>
+          <Reveal tabbable={false} describe={false} detail={`${(TYPE_WORDS[r.record_type] ?? [r.record_type])[0]}: ${r.title || r.record_id.slice(0, 8)}`}>
+            <span aria-hidden="true">{(TYPE_WORDS[r.record_type]?.[0] ?? r.record_type).charAt(0).toUpperCase()}</span></Reveal>
           <span className="sr-only">{(TYPE_WORDS[r.record_type] ?? [r.record_type])[0]}: {r.title || r.record_id.slice(0, 8)}</span></li>)}</ul>}
-        <p className="br-tray"><b>{p.packet.records} records go in</b> · {p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
-        {maxResults !== PACKET_DEFAULT && <> · up to {maxResults}</>}
-        {p.packet.leads_only > 0 && <><br/>{p.packet.leads_only} outside lead{p.packet.leads_only === 1 ? '' : 's'} count as leads only</>}
-        {p.packet.below_tier_floor.map(t => <span key={t.tier} className="br-floor" title="They still go in the packet; the tier floor keeps them from counting toward a fact">
-          <br/>{t.count} Tier {t.tier} record{t.count === 1 ? '' : 's'} left out by the tier floor · leads only</span>)}
+        {/* The count shows; what the packet is made of is revealed on it. A tier-floor note stays as a count chip. */}
+        <p className="br-tray"><Reveal detail={<><span className="rv-row">{p.packet.by_type.map(t => typeWords(t.record_type, t.count)).join(', ') || 'none found'}
+          {maxResults !== PACKET_DEFAULT && <> · up to {maxResults}</>}</span>
+          {p.packet.leads_only > 0 && <span className="rv-row">{p.packet.leads_only} outside lead{p.packet.leads_only === 1 ? '' : 's'} count as leads only</span>}</>}>
+          <b>{p.packet.records} records go in</b></Reveal>
+        {p.packet.below_tier_floor.map(t => <Reveal key={t.tier} detail={`${t.count} Tier ${t.tier} record${t.count === 1 ? '' : 's'} left out by the tier floor · leads only. They still go in the packet; the tier floor keeps them from counting toward a fact.`}>
+          <span className="br-floor">{t.count} Tier {t.tier}</span></Reveal>)}
         {!includeLeads && <><br/>Outside leads stay out of this packet</>}</p></div>}
     </div>
     {plan.isError && <p role="alert" className="br-bad">{errorMessage(plan.error, 'Could not work out the plan')}</p>}
+    {working}
     <ol className="br-plan">{p?.steps.map(s => {
       const opt = optional.find(o => o.key === s.key);
       return <li key={s.key} className={`${s.changed ? 'changed' : ''}${hover === s.key ? ' lit' : ''}`}>
-        <span className="br-n">{s.n}</span><span><b>{s.title}</b>{s.system && s.system !== 'app' && <span className="br-sys">{s.system}</span>}<small>{s.detail}</small></span>
+        <span className="br-n">{s.n}</span><span>{s.detail ? <Reveal detail={s.detail}><b>{s.title}</b></Reveal> : <b>{s.title}</b>}{s.system && s.system !== 'app' && <span className="br-sys">{s.system}</span>}</span>
         {editing && opt ? <button type="button" className="br-quiet br-step-x" onClick={() => change(opt.key, opt.off)} aria-label={`Remove the step: ${s.title}`}>Remove</button>
-          : editing ? <span className="br-who" title="This step always runs">always</span> : <span className="br-who">{s.who}</span>}</li>;
+          : editing ? <Reveal detail="This step always runs."><span className="br-who">always</span></Reveal> : <span className="br-who">{s.who}</span>}</li>;
     })}</ol>
     {editing && values && optional.some(o => values[o.key] !== o.on) && <p className="br-addsteps"><span className="br-eyebrow">Add a step</span>
       {optional.filter(o => values[o.key] !== o.on).map(o => <button key={o.key} type="button" className="br-quiet" onClick={() => change(o.key, o.on)}>
         + {o.row!.label}{o.key === 'research_depth' ? ` · ${o.row!.allowed.find(a => a.value === o.on)?.label ?? o.on}` : ''}</button>)}</p>}
-    {p && <div className="br-systems"><p className="br-eyebrow">Likely to run · decided by what the answer will contain</p>
-      <p>{p.systems.filter(s => s.state !== 'not_expected').map(s => <span key={s.system} className={`br-sysrow ${s.state}`} title={STATE_WORDS[s.state]}><b>{s.system}</b> · {s.why}{s.state === 'not_in_app' ? ' · not in the app yet' : ''}{s.state === 'next_run' ? ' · next run, from this answer' : ''}</span>)}
-        {p.systems.some(s => s.state === 'not_expected') && <span className="br-sysrow not_expected"
-          title={p.systems.filter(s => s.state === 'not_expected').map(s => `${s.system} runs for ${s.why}`).join(' · ')}>
-          <b>{p.systems.filter(s => s.state === 'not_expected').map(s => s.system).join(' · ')}</b> · not expected</span>}</p>
-      <small>You cannot switch a system off: it runs when the answer would need it. A next run starts from this answer once you accept it.</small></div>}
+    {/* Each system is its tag, styled by its state; why it runs and its state are revealed on it. */}
+    {p && <div className="br-systems"><p className="br-eyebrow"><Reveal detail="Decided by what the answer will contain. You cannot switch a system off: it runs when the answer would need it. A next run starts from this answer once you accept it.">
+      <span>Likely to run</span></Reveal></p>
+      <p>{p.systems.filter(s => s.state !== 'not_expected').map(s => <Reveal key={s.system} detail={<><b>{s.system}</b> · {s.why}<span className="rv-row">{STATE_WORDS[s.state]}{s.state === 'not_in_app' ? ' · not in the app yet' : ''}{s.state === 'next_run' ? ' · next run, from this answer' : ''}</span></>}>
+        <span className={`br-sysrow ${s.state}`}><b>{s.system}</b></span></Reveal>)}
+        {p.systems.some(s => s.state === 'not_expected') && <Reveal detail={<>Not expected · {p.systems.filter(s => s.state === 'not_expected').map(s => `${s.system} runs for ${s.why}`).join(' · ')}</>}>
+          <span className="br-sysrow not_expected"><b>{p.systems.filter(s => s.state === 'not_expected').map(s => s.system).join(' · ')}</b></span></Reveal>}</p></div>}
     {p?.injections.map(i => <p key={i.record_id} className="br-inject" role="note"><b>Ignored an instruction inside the evidence.</b> {i.title || i.record_type} reads “{i.quote}”.
       Material can never change a setting; it is quoted as evidence and logged.</p>)}
   </div>;
@@ -428,39 +492,39 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
 
   if (step === 1) return <section className="br" aria-label="AI runs">
     <header className="br-head"><h2>Ask the case</h2>{stepper}</header>
-    <Form {...askForm}><form className="br-ask" noValidate onSubmit={submitWith(askForm, async () => { setStep(2); }, 'Could not go on')}>
-      <span className="br-seg" role="radiogroup" aria-label="What to run">
-        {([['case_synthesis', 'Case synthesis'], ['hypothesis_test', 'Test a theory']] as const).map(([m, l]) =>
-          <button key={m} type="button" role="radio" aria-checked={module === m} className={module === m ? 'on' : ''} onClick={() => setModule(m)}>{l}</button>)}
-      </span>
-      <FormField control={askForm.control} name="question" render={({field}) => <FormItemBare>
-        <label>Your question<FormControl><textarea {...field} ref={el => { field.ref(el); questionRef.current = el; }} rows={3} className="br-question"
-          placeholder="Who controlled Fernhill Ltd between 2016 and 2023, and how was the harbour land moved?"/></FormControl></label>
-        <FormMessage className="field-msg"/></FormItemBare>}/>
-      {module === 'hypothesis_test' && <FormField control={askForm.control} name="theory" render={({field}) => <FormItemBare>
-        <label>The theory to test<FormControl><textarea {...field} rows={2}/></FormControl></label>
-        <FormMessage className="field-msg"/></FormItemBare>}/>}
-      <FormRootError className="field-msg"/>
-      <button type="submit" className="br-primary">Next: instructions and plan</button>
-    </form></Form>
-    {(earlier.data?.runs.length ?? 0) > 0 && <div className="br-earlier"><p className="br-eyebrow">Earlier runs</p><ul>
-      {earlier.data!.runs.slice(0, 6).map(r => <li key={r.run_id}><span>{r.question}</span>
-        <small>{apiTime(r.created_at).toLocaleString(undefined, {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})} · {r.events} steps{r.problems ? ` · ${r.problems} problem${r.problems === 1 ? '' : 's'}` : ''}{r.review_status ? ` · ${r.review_status}` : ''}</small>
-        <button type="button" className="br-quiet" onClick={() => { setRunId(r.run_id); setStep(3); }}>Watch it again</button></li>)}
-    </ul></div>}
-    <SavedQuestions investigationId={investigationId} onAsk={q => {
-      setModule(q.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setQuestion(q.question); setTheory(q.working_theory ?? '');
-    }}/>
-    {earlier.isSuccess && earlier.data.runs.length === 0 && <p className="br-tray">No runs yet in this case. <button type="button" className="br-quiet"
-      onClick={() => { setRunId(null); setSampleOnly(true); setStep(3); }}>Watch a sample run</button></p>}
+    <div className="br-step1">
+      <div className="br-step1-main">
+        <Form {...askForm}><form className="br-ask" noValidate onSubmit={submitWith(askForm, async () => { setStep(2); }, 'Could not go on')}>
+          <span className="br-seg" role="radiogroup" aria-label="What to run">
+            {([['case_synthesis', 'Case synthesis'], ['hypothesis_test', 'Test a theory']] as const).map(([m, l]) =>
+              <button key={m} type="button" role="radio" aria-checked={module === m} className={module === m ? 'on' : ''} onClick={() => setModule(m)}>{l}</button>)}
+          </span>
+          <FormField control={askForm.control} name="question" render={({field}) => <FormItemBare>
+            <label>Your question<FormControl><textarea {...field} ref={el => { field.ref(el); questionRef.current = el; }} rows={3} className="br-question"
+              placeholder="Who controlled Fernhill Ltd between 2016 and 2023, and how was the harbour land moved?"/></FormControl></label>
+            <FormMessage className="field-msg"/></FormItemBare>}/>
+          {module === 'hypothesis_test' && <FormField control={askForm.control} name="theory" render={({field}) => <FormItemBare>
+            <label>The theory to test<FormControl><textarea {...field} rows={2}/></FormControl></label>
+            <FormMessage className="field-msg"/></FormItemBare>}/>}
+          <FormRootError className="field-msg"/>
+          <Reveal tabbable={false} detail="Next you see the instructions, the plan and what would leave this computer. Nothing is sent until you press Run.">
+            <button type="submit" className="br-primary">Next: instructions and plan</button></Reveal>
+        </form></Form>
+        <SavedQuestions investigationId={investigationId} onAsk={q => {
+          setModule(q.module === 'hypothesis_test' ? 'hypothesis_test' : 'case_synthesis'); setQuestion(q.question); setTheory(q.working_theory ?? '');
+        }}/>
+      </div>
+      <RunHistory runs={earlier.data?.runs} loading={earlier.isPending} failed={earlier.isError ? errorMessage(earlier.error, 'Could not load the earlier runs') : null}
+        aiOn={aiOn} onWatch={id => { setRunId(id); setStep(3); }} onSample={() => { setRunId(null); setSampleOnly(true); setStep(3); }}/>
+    </div>
   </section>;
 
   if (step === 4) return <ReviewSheet candidateId={reviewId} active={active} onBack={() => setStep(3)}
-    header={<header className="br-head"><h2>Review <small>claim by claim · grounded or guessed · nothing joins the case until you accept it</small></h2>{stepper}</header>}/>;
+    header={<header className="br-head"><h2><Reveal detail="Claim by claim · grounded or guessed · nothing joins the case until you accept it."><span>Review</span></Reveal></h2>{stepper}</header>}/>;
 
   // The instructions and plan as a drawer at the left edge of the live view, for a new run of the question watched.
   const planDrawer = drawer ? <div className="br br-drawer">
-    <p className="br-title">Instructions &amp; plan <small>for a new run of this question; the run on the map keeps the instructions it ran under</small>
+    <p className="br-title"><Reveal detail="For a new run of this question; the run on the map keeps the instructions it ran under."><span>Instructions &amp; plan</span></Reveal>
       <button type="button" className="br-quiet" onClick={() => setDrawer(false)} aria-label="Close the instructions and plan">×</button></p>
     {midCol}
     {leftCol}
@@ -487,40 +551,48 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
   </section>;
 
   return <section className="br" aria-label="AI runs" ref={planRef}>
-    <header className="br-head"><h2>Before you run <small>{p?.module_label ?? ''} · how strict, what it may use, what leaves this computer</small></h2>{stepper}</header>
+    <header className="br-head"><h2><Reveal detail={`${p?.module_label ? `${p.module_label} · ` : ''}how strict, what it may use, what leaves this computer`}><span>Before you run</span></Reveal></h2>{stepper}</header>
     <div className="br-cols">
       {leftCol}
       {midCol}
 
       <div className="br-col br-right" role="region" aria-label="Where it runs, what it costs">
         <p className="br-title">Where it runs, what it costs</p>
+        {working}
         {p && <>
-          <div className={`br-leaves${p.where.nothing_leaves ? ' none' : ''}`}><p className="br-eyebrow">What leaves this computer</p>
-            <p className="br-leaves-line">{p.where.nothing_leaves ? '✓ ' : ''}{p.where.leaves}</p>
+          <div className={`br-leaves${p.where.nothing_leaves || !p.where.enabled ? ' none' : ''}`}><p className="br-eyebrow">What leaves this computer</p>
+            {/* AI off is a state, not an error: nothing leaves, and what turning it on would send is said plainly. */}
+            <p className="br-leaves-line">{p.where.nothing_leaves || !p.where.enabled ? '✓ ' : ''}{p.where.enabled ? p.where.leaves : 'Nothing: AI is off'}</p>
             <div className="br-boxes" aria-hidden="true"><span>Your case<small>{p.packet.records} records</small></span><i>→</i>
               <span className={p.where.runs_on_this_computer ? '' : 'out'}>Model<small>{p.where.model ?? 'none chosen'}</small></span><i>→</i>
               <span className="never">Outside<small>never called</small></span></div>
-            <p className="br-lookups">Runs make no outside lookups yet: the model reads only the packet. The Outside lookups setting is kept with the run for when they do.</p>
-            {!p.where.enabled && <p className="br-bad">AI is off. Turn it on in <a href="/settings">Settings</a>.</p>}
-            {p.where.enabled && !p.where.provider && <p className="br-bad">No model chosen. Choose one in <a href="/settings">Settings</a>.</p>}
+            <p className="br-lookups"><Reveal label="About outside lookups" detail="Runs make no outside lookups yet: the model reads only the packet. The Outside lookups setting is kept with the run for when they do.">
+              <span aria-hidden="true">ⓘ</span></Reveal></p>
+            {!p.where.enabled && <p className="br-would">Turned on, this run would send your question and {p.packet.records} records (≈ {p.where.words_in.toLocaleString()} words) to the model you choose.
+              {' '}<a href="/settings#ai">Settings › AI and research</a></p>}
+            {p.where.enabled && !p.where.provider && <p className="br-would">No model chosen yet. <a href="/settings#ai">Choose one in Settings › AI and research</a></p>}
           </div>
+          {/* Model and money show; size, time and limits are revealed on the model. */}
           <dl className="br-facts">
-            <dt>Model</dt><dd>{p.where.model ?? 'none chosen'}{p.where.runs_on_this_computer ? ' · on this computer' : p.where.provider ? ` · ${p.where.provider}` : ''}</dd>
-            <dt>Size</dt><dd>≈ {p.where.words_in.toLocaleString()} words in · up to ≈ {p.where.words_out_max.toLocaleString()} out</dd>
-            <dt>Time</dt><dd>{runTime(p.where.minutes)}</dd>
+            <dt>Model</dt><dd><Reveal detail={<><span className="rv-row">Size ≈ {p.where.words_in.toLocaleString()} words in · up to ≈ {p.where.words_out_max.toLocaleString()} out</span>
+              <span className="rv-row">Time {runTime(p.where.minutes)}</span>
+              <span className="rv-row">Limit {p.where.limits.concurrent} runs at once · {p.where.limits.per_minute} a minute</span></>}>
+              <span>{p.where.model ?? 'none chosen'}{p.where.runs_on_this_computer ? ' · on this computer' : p.where.provider ? ` · ${p.where.provider}` : ''}</span></Reveal></dd>
             <dt>Money</dt><dd>{p.where.money}</dd>
-            <dt>Limit</dt><dd>{p.where.limits.concurrent} runs at once · {p.where.limits.per_minute} a minute</dd>
           </dl>
         </>}
-        <p className="br-eyebrow">Changes echoed to the run record</p>
-        <ol className="br-echo" aria-live="polite">{echo.length ? echo.map((e, i) => <li key={i}><time>{e.at}</time> <b>{e.kind}</b> {e.text}</li>) : <li className="br-quietline">No change yet</li>}</ol>
-        <p className="br-eyebrow">Cannot be turned off</p>
-        <ul className="br-locked">{p?.locked.map(l => <li key={l.text} title={l.by}><span aria-hidden="true">🔒</span> {l.text}</li>)}</ul>
+        {/* How many changes go to the run record shows; the log itself is revealed on the count. */}
+        {(p || echo.length > 0) && <p className="br-eyebrow br-echo-count" aria-live="polite">{echo.length ? <Reveal detail={<ol className="br-echo">{echo.map((e, i) => <li key={i}><time>{e.at}</time> <b>{e.kind}</b> {e.text}</li>)}</ol>}>
+          <span><b>{echo.length}</b> change{echo.length === 1 ? '' : 's'} echoed to the run record</span></Reveal> : 'No change echoed to the run record yet'}</p>}
+        {p && <><p className="br-eyebrow">Cannot be turned off</p>
+          <ul className="br-locked">{p.locked.map(l => <li key={l.text}><span aria-hidden="true">🔒</span> {l.by ? <Reveal detail={l.by}><span>{l.text}</span></Reveal> : l.text}</li>)}</ul></>}
       </div>
     </div>
     <footer className="br-foot">
       <button type="button" className="br-primary" onClick={() => void run(true)} disabled={!p?.where.callable || running}>Run and watch <kbd>⌘↵</kbd></button>
       <button type="button" onClick={() => void run(false)} disabled={!p?.where.callable || running}>Run in the background</button>
+      {p && !p.where.callable && <Reveal detail={!p.where.enabled ? 'Turn AI on in Settings › AI and research to run this plan.' : !p.where.provider ? 'Choose a model in Settings › AI and research.' : 'The model cannot be called right now.'}>
+        <span className="br-offnote"><span className="br-off-dot" aria-hidden="true"/>{!p.where.enabled ? 'AI is off' : !p.where.provider ? 'No model' : 'Model unreachable'}</span></Reveal>}
       {saving ? <Form {...reasonForm}><form className="br-add br-why" noValidate onSubmit={saveDefault}>
         <FormField control={reasonForm.control} name="reason" render={({field}) => <FormItemBare>
           <FormControl><input {...field} aria-label="Why this case runs with these settings" placeholder="Why, in one line (kept with the profile)" autoFocus/></FormControl>
@@ -534,7 +606,7 @@ export function BeforeYouRun({investigationId, active = true}: {investigationId:
       {keep.isError && <span role="alert" className="br-bad">{errorMessage(keep.error, 'Could not save the question.')}</span>}
       {!running && outcome && step === 2 && <span role="status" className={outcome.ok ? 'br-ok' : 'br-bad'}>{outcome.text}</span>}
       {running && step === 2 && <span role="status">Running in the background. The answer will wait for you in AI drafts.{runId && <> <button type="button" className="br-quiet" onClick={() => setStep(3)}>Watch it</button></>}</span>}
-      <span className="br-note">AI can be wrong. Every result waits for you.</span>
+      <AiNotice>AI can be wrong. Every result waits for you.</AiNotice>
       <button type="button" className="br-cancel" onClick={cancel}>Cancel</button>
     </footer>
   </section>;

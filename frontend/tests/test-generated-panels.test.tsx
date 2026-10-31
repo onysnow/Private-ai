@@ -2,7 +2,7 @@
 // The first panels moved out of app/page.tsx onto the generated API client
 // (Foundation Fixes fixes 2 and 3): local deletion and source & evidence
 // capture, plus the wiring that sends generated calls through ApiClient.
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import type {ReactElement} from 'react';
@@ -64,11 +64,20 @@ describe('DeletionPanel', () => {
       .mockResolvedValueOnce(json({investigation_id: 'inv-1', deleted: true, deleted_record_counts: {investigations: 1}, deleted_record_total: 3,
         document_files_deleted: 1, shared_document_files_preserved: 0, missing_document_files: 0, openaleph_collection: null}));
     vi.stubGlobal('fetch', fetchMock);
+    window.localStorage.setItem('workbench.your-safety.inv-1', '{"plan":{"who":"my editor"}}');
+    window.localStorage.setItem('sv-recent:inv-1', '[{"q":"Fernhill"}]');
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={onDeleted}/>);
 
-    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
-    await screen.findByText('Preview ready. Type the case’s name to enable deletion.');
-    expect(screen.getByText(/3 record\(s\) · 1 owned file\(s\) to delete/)).toBeInTheDocument();
+    // What goes is counted as the screen opens: no button to press first, and no sentence at rest (the steps say it).
+    await screen.findByText(/3 record\(s\) · 1 owned file\(s\) to delete/);
+    expect(screen.queryByText(/Preview ready/)).not.toBeInTheDocument();
+    // The tile says what it counts (every row the case owns), and the rows are listed by table, biggest first.
+    expect(screen.getByText('database rows removed')).toBeInTheDocument();
+    const tables = within(screen.getByRole('list', {name: 'Rows removed, by table'}));
+    expect(tables.getAllByRole('listitem').map(li => li.textContent)).toEqual(['2sources', '1the case itself']);
+    // The step to do now is to type the name.
+    expect(screen.getByRole('list', {name: 'Steps'}).querySelector('[aria-current="step"]')).toHaveTextContent('Type its name');
+    expect(screen.queryByRole('button', {name: 'Preview deletion'})).not.toBeInTheDocument();
     const remove = screen.getByRole('button', {name: 'Permanently delete investigation'});
     expect(remove).toBeDisabled();
     const name = screen.getByRole('textbox', {name: 'Type the case’s name to delete it'});
@@ -83,6 +92,9 @@ describe('DeletionPanel', () => {
     expect(onDeleted).toHaveBeenCalledWith(expect.objectContaining({deleted_record_total: 3}));
     expect(url(fetchMock.mock.calls[1])).toBe('http://api.test/api/investigations/inv-1?confirmation=Kestrelwood');
     expect(init(fetchMock.mock.calls[1]).method).toBe('DELETE');
+    // What this browser kept for the case goes with it: the safety plan and the names searched for.
+    expect(window.localStorage.getItem('workbench.your-safety.inv-1')).toBeNull();
+    expect(window.localStorage.getItem('sv-recent:inv-1')).toBeNull();
   });
 
   it('names the OpenAleph casefile that goes too, and says when one is left behind', async () => {
@@ -94,7 +106,6 @@ describe('DeletionPanel', () => {
         document_files_deleted: 1, shared_document_files_preserved: 0, missing_document_files: 0,
         openaleph_collection: {...casefile, deleted: false, detail: 'OpenAleph could not be reached to delete its casefile (ConnectError); delete it in OpenAleph.'}})));
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()}/>);
-    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
     expect(await screen.findByText('OpenAleph casefile “Kestrelwood” is deleted too.')).toBeInTheDocument();
     await user.type(screen.getByPlaceholderText('The case’s name'), 'Kestrelwood');
     await user.click(screen.getByRole('button', {name: 'Permanently delete investigation'}));
@@ -103,12 +114,21 @@ describe('DeletionPanel', () => {
     expect(casefileOutcome(null)).toBe('');
   });
 
-  it('says why a deletion is blocked and keeps the delete control away', async () => {
+  it('waits for Preview deletion on the all-stages page, which mounts every panel at once', async () => {
     const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValueOnce(json(preview));
+    vi.stubGlobal('fetch', fetchMock);
+    wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()} countOnOpen={false}/>);
+    expect(fetchMock).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
+    await screen.findByRole('textbox', {name: 'Type the case’s name to delete it'});
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('says why a deletion is blocked and keeps the delete control away', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(json({...preview, can_delete: false,
       unsafe_paths: [{document_id: 'd1', storage_path: '/etc/passwd', error: 'outside the storage root'}]})));
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={vi.fn()}/>);
-    await user.click(screen.getByRole('button', {name: 'Preview deletion'}));
     await screen.findByText('Deletion is blocked by an unsafe document path.');
     expect(screen.getByText('outside the storage root')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Permanently delete investigation'})).not.toBeInTheDocument();
@@ -132,7 +152,9 @@ describe('SourceCapturePanel', () => {
     await user.type(screen.getByPlaceholderText('Exact quote / excerpt'), '$2.4M wired');
     await user.click(save);
 
-    await screen.findByText('Saved evidence ev-1. It is now available for claim review.');
+    // "Saved" shows; the record's ID is on hover (Ony, 29 Oct: raw IDs are sub-text).
+    expect(await screen.findByText('Saved')).toBeVisible();
+    expect(screen.getByText('Saved evidence ev-1').closest('[hidden]')).not.toBeNull();
     expect(onSaved).toHaveBeenCalledTimes(1);
     expect(screen.getByPlaceholderText('Source title')).toHaveValue('');
     expect(await sentJson(fetchMock.mock.calls[0])).toEqual(
@@ -144,7 +166,7 @@ describe('SourceCapturePanel', () => {
     const user = userEvent.setup();
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(json({detail: 'Investigation not found'}, 404)));
     wrap(<SourceCapturePanel investigationId="inv-1" sourceCount={2} evidenceCount={5} onSaved={vi.fn()}/>);
-    expect(screen.getByText('2 source(s) · 5 evidence record(s) in this investigation.')).toBeInTheDocument();
+    expect(screen.getByText('2 source(s) · 5 evidence record(s) in this investigation.').closest('[hidden]')).not.toBeNull();
     await user.type(screen.getByPlaceholderText('Source title'), 'Wire log');
     await user.type(screen.getByPlaceholderText('Exact quote / excerpt'), 'quote');
     await user.click(screen.getByRole('button', {name: 'Save source + evidence'}));

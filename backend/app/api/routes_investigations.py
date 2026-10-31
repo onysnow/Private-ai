@@ -63,6 +63,7 @@ from app.schemas.responses import (
     DemoSeedOut,
     DocumentOut,
     ErrorOut,
+    EvidenceClaimLinkOut,
     EvidencePoolRow,
     FinancialLedgerOut,
     GraphOut,
@@ -99,6 +100,9 @@ from app.services.investigations import (
 )
 from app.services.investigations import (
     list_investigation_claims as _list_investigation_claims,
+)
+from app.services.investigations import (
+    list_investigation_evidence_claim_links as _list_investigation_evidence_claim_links,
 )
 from app.services.investigations import (
     list_investigation_connector_findings as _list_investigation_connector_findings,
@@ -471,15 +475,19 @@ def get_investigation_timeline(
     kind: list[str] | None = Query(default=None),
     verification_status: list[str] | None = Query(default=None),
     include_record_activity: bool = False,
+    include_source_dates: bool = False,
     limit: int | None = Query(default=None, ge=1, le=500),
     offset: int = Query(default=0, ge=0, le=MAX_OFFSET),
     db: Session = Depends(get_db),
 ) -> Any:
+    """The case's events in date order. A source's own date (when a document was published or filed) is an event
+    only with `include_source_dates`, or when `kind` names source_date: it says when a document was made, not what
+    happened."""
     try:
         return investigation_timeline(
             db, investigation_id, kinds=set(kind or []) or None,
             verification_statuses=set(verification_status or []) or None,
-            include_record_activity=include_record_activity, limit=limit, offset=offset,
+            include_record_activity=include_record_activity, include_source_dates=include_source_dates, limit=limit, offset=offset,
         )
     except ValueError as exc:
         raise HTTPException(404, str(exc))
@@ -628,6 +636,13 @@ def list_investigation_evidence(
     if db.get(Investigation, investigation_id) is None:
         raise HTTPException(404, "Investigation not found")
     return _list_investigation_evidence(db, investigation_id, limit=limit, offset=offset)
+
+
+@router.get("/investigations/{investigation_id}/evidence-claim-links", response_model=list[EvidenceClaimLinkOut])
+def list_investigation_evidence_claim_links(investigation_id: str, db: Session = Depends(get_db)) -> Any:
+    if db.get(Investigation, investigation_id) is None:
+        raise HTTPException(404, "Investigation not found")
+    return _list_investigation_evidence_claim_links(db, investigation_id)
 
 
 @router.get("/investigations/{investigation_id}/sources", response_model=list[SourceOut])

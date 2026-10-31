@@ -8,7 +8,6 @@ answering other requests while a slow document (OCR) is read.
 from __future__ import annotations
 
 import threading
-import time
 
 import pytest
 from fastapi.testclient import TestClient
@@ -146,9 +145,12 @@ def test_slow_read_does_not_freeze_other_requests(client, monkeypatch):
     import app.services.documents as documents
 
     real = documents.extract_chunks
+    reading, release = threading.Event(), threading.Event()
 
     def slow(path):
-        time.sleep(1.5)
+        # Hold the read until the health check has answered: the order is the check, not a clock (review B7).
+        reading.set()
+        release.wait(30)
         return real(path)
 
     monkeypatch.setattr(documents, "extract_chunks", slow)
@@ -156,13 +158,20 @@ def test_slow_read_does_not_freeze_other_requests(client, monkeypatch):
     result: dict = {}
     upload = threading.Thread(target=lambda: result.setdefault("r", _upload(client, inv)))
     upload.start()
-    time.sleep(0.3)  # let the upload reach the slow read
-    started = time.monotonic()
-    assert client.get("/api/health").json() == {"status": "ok"}
-    health_seconds = time.monotonic() - started
-    upload.join(10)
+    try:
+        assert reading.wait(30), "the upload never reached the read"
+        health: dict = {}
+        checker = threading.Thread(target=lambda: health.setdefault("r", client.get("/api/health")))
+        checker.start()
+        checker.join(20)
+        # The health check answered while the read was still held: it never waited behind the upload.
+        assert not checker.is_alive(), "health check waited behind the upload"
+        assert health["r"].json() == {"status": "ok"}
+        assert "r" not in result, "the upload finished before the read was let go"
+    finally:
+        release.set()
+        upload.join(30)
     assert result["r"].status_code == 200
-    assert health_seconds < 0.75, f"health check waited {health_seconds:.2f}s behind the upload"
 
 
 def test_startup_fails_inline_jobs_a_stopped_process_left_behind(tmp_path):
@@ -297,3 +306,47 @@ def test_stop_reading_stops_at_the_next_page_and_leaves_nothing_half_read(client
     assert client.post(f"/api/jobs/{job_id}/retry").json()["status"] == "succeeded"
     with SessionLocal() as db:
         assert db.query(DocumentChunk).filter(DocumentChunk.document_id == doc_id).count() == 3
+
+
+def test_a_read_says_what_it_has_found_so_far(client, tmp_path):
+    """Case home's Bring in (mockup HOME_1): "page 2 of 2 · 2 names and 1 claim found so far", counted from the
+    pages read with the proposals' own rules, before the proposals are made at the end of the read."""
+    import fitz
+
+    from app.core.config import settings
+    from app.jobs.handlers import HANDLERS
+    from app.models.domain import Document, ExtractionCandidate, Source
+
+    inv = _investigation(client)
+    path = tmp_path / "minutes.pdf"
+    pdf = fitz.open()
+    pdf.new_page().insert_text((72, 72), "Minutes of the board of Fernhill Holdings.")
+    pdf.new_page().insert_text((72, 72), "Marlow Shipping paid the harbour authority in March.")
+    pdf.save(path); pdf.close()
+    with SessionLocal() as db:
+        src = Source(investigation_id=inv, title="Minutes", source_type="document")
+        db.add(src); db.flush()
+        doc = Document(investigation_id=inv, source_id=src.id, filename="minutes.pdf", sha256="ef" * 32, storage_path=str(path), extraction_status="pending")
+        db.add(doc); db.commit()
+        job = create_job(db, kind="extract_document", investigation_id=inv, subject_type="document", subject_id=doc.id)
+        doc_id, job_id = doc.id, job.id
+    said: list[str] = []
+    real = HANDLERS["extract_document"]
+
+    def listening(db, job, report):
+        def tell(progress, message):
+            said.append(message)
+            return report(progress, message)
+        return real(db, job, tell)
+
+    old = settings.enable_local_entity_suggestions
+    settings.enable_local_entity_suggestions = True
+    try:
+        assert execute_job(SessionLocal, job_id, {**HANDLERS, "extract_document": listening}) == "succeeded"
+    finally:
+        settings.enable_local_entity_suggestions = old
+    assert "Reading · page 1 of 2 · 1 name found so far" in said, said
+    assert "Reading · page 2 of 2 · 2 names and 1 claim found so far" in said, said
+    with SessionLocal() as db:
+        made = {t: db.query(ExtractionCandidate).filter_by(document_id=doc_id, candidate_type=t).count() for t in ("entity", "claim")}
+    assert made == {"entity": 2, "claim": 1}  # what the read said it found is what it proposed

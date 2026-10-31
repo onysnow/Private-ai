@@ -4,6 +4,7 @@
 import {useState} from 'react';
 import type {FormEvent, ReactElement} from 'react';
 
+import {Reveal} from '../../components/ui/reveal';
 import {errorMessage} from '../../lib/api-client';
 import {useLockStore} from '../../lib/app-lock';
 import type {LockStateOut} from '../../lib/generated/types.gen';
@@ -21,6 +22,18 @@ export function initials(name: string): string {
 
 function Signed({name}: {name: string}): ReactElement {
   return name.trim() ? <span className="lk-signed">{name.trim()}</span> : <span className="lk-slot">your name</span>;
+}
+
+/** How a name will read on the work, filling in as it is typed (mockup ACCOUNT_1); where each line appears is revealed on it. */
+export function HowItReads({name}: {name: string}): ReactElement {
+  return <>
+    <p className="lk-eyebrow" style={{marginTop: 16}}><Reveal detail="It fills in as you type."><span>How it will read</span></Reveal></p>
+    <div className="lk-reads">
+      <Reveal detail="In the custody log"><div className="lk-read"><span className="lk-mono">today · <Signed name={name}/> · Accepted the proposal</span></div></Reveal>
+      <Reveal detail="On a decision card"><div className="lk-read"><span>✓ Accepted by <Signed name={name}/></span></div></Reveal>
+      <Reveal detail="For a lawyer"><div className="lk-read"><span className="lk-mono">decided_by: <Signed name={name}/> (owner) · human</span></div></Reveal>
+    </div>
+  </>;
 }
 
 type Step = 'name' | 'passphrase' | 'words';
@@ -76,7 +89,7 @@ export function FirstOpen({state}: {state: LockStateOut}): ReactElement {
   return <form className="lk-first" onSubmit={next} aria-label="First open">
     <div className="lk-first-in">
       <div className="lk-top">
-        <span><b>Journalism Workbench</b> · This computer · {step === 'name' ? 'first open after the update' : 'Protect with a passphrase'}</span>
+        <span>{step === 'name' ? <Reveal detail="First open after the update."><b>Journalism Workbench</b></Reveal> : <b>Journalism Workbench</b>} · This computer{step === 'name' ? '' : ' · Protect with a passphrase'}</span>
         <span className="lk-chip ok">⌂ Nothing leaves this computer</span>
       </div>
 
@@ -93,12 +106,7 @@ export function FirstOpen({state}: {state: LockStateOut}): ReactElement {
                 maxLength={120} autoFocus autoComplete="name"/>
               <span className={`lk-initials${name.trim() ? ' on' : ''}`} aria-hidden="true">{initials(name)}</span>
             </div>
-            <p className="lk-eyebrow" style={{marginTop: 16}}>How it will read · fills in as you type</p>
-            <div className="lk-reads">
-              <div className="lk-read"><span className="lk-where">Custody log</span><span className="lk-mono">today · <Signed name={name}/> · Accepted the proposal</span></div>
-              <div className="lk-read"><span className="lk-where">Decision card</span><span>✓ Accepted by <Signed name={name}/></span></div>
-              <div className="lk-read"><span className="lk-where">For a lawyer</span><span className="lk-mono">decided_by: <Signed name={name}/> (owner) · human</span></div>
-            </div>
+            <HowItReads name={name}/>
           </div>
           {before > 0 && <div className="lk-panel lk-before">
             <span className="lk-count">{before}</span>

@@ -23,6 +23,7 @@ import type {ReactElement} from 'react';
 import {ChartFrame, ContestedMark, FootStat, KeyRow, KeySection, LineSwatch, Segmented} from '../../components/charts/chart-frame';
 import {ConnectionGrid} from '../../components/connection-grid';
 import {KIND_ICON} from '../../components/network/party-icons';
+import {Reveal} from '../../components/ui/reveal';
 import type {NetLink, NetOverlays, NetParty} from '../../components/network/network-view';
 import {isDated, linkSpan, shownAsOf} from '../../lib/as-of';
 import {useWorkbenchStore} from '../../lib/workbench-store';
@@ -169,11 +170,13 @@ export function Graph({relationships: allRelationships, entities, onNode, onEdge
       <select className="cf-tool" value={centre ?? ''} onChange={e => setFocus(e.target.value)} aria-label="Party at the centre">
         {[...all.parties].sort((a, b) => a.label.localeCompare(b.label)).map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
       </select></label>}
+    {/* Each family is its line and its count; the family's name, and what a press does, on reveal (Ony, 29 Oct). */}
     {familiesPresent.length > 1 && <div role="group" aria-label="Show links" style={{display: 'flex', flexWrap: 'wrap', gap: 6}}>
-      {familiesPresent.map(f => <button key={f} type="button" className="cf-chip" aria-pressed={!hidden.has(f)}
+      {familiesPresent.map(f => <Reveal key={f} tabbable={false} detail={<><b>{LINK[f].name}</b><span className="rv-row">Press to {hidden.has(f) ? 'show' : 'hide'} these links.</span></>}>
+        <button type="button" className="cf-chip" aria-pressed={!hidden.has(f)}
         onClick={() => setHidden(cur => { const next = new Set(cur); if (next.has(f)) next.delete(f); else next.add(f); return next; })}>
-        <span className="cf-chip-line" style={{width: 14, height: 3, background: LINK[f].colour, display: 'inline-block', borderRadius: 2}}/>
-        {LINK[f].name} · {all.links.filter(l => l.family === f).length}</button>)}
+        <span className="cf-chip-line" aria-hidden="true" style={{width: 18, height: 3, background: LINK[f].colour, display: 'inline-block', borderRadius: 2}}/>
+        <span className="sr-only">{LINK[f].name}</span> {all.links.filter(l => l.family === f).length}</button></Reveal>)}
     </div>}
     <div role="group" aria-label="Layers" style={{display: 'flex', flexWrap: 'wrap', gap: 6}}>
       {([['tags', 'Your tags'], ['dates', 'Link dates']] as [Layer, string][]).map(([layer, name]) => <button key={layer} type="button" className="cf-chip"
@@ -213,10 +216,12 @@ export function Graph({relationships: allRelationships, entities, onNode, onEdge
     <FootStat value={links.length}>links</FootStat>
     {contested > 0 && <FootStat value={contested}>contested</FootStat>}
     {unsupported > 0 && <FootStat value={unsupported}>not yet supported</FootStat>}
-    {crossings !== null && <span data-testid="graph-crossings">{crossingsLine(crossings, parties.length)}</span>}
-    {asOf !== null && <span>As of {asOf}: {allRelationships.length - relationships.length} of {allRelationships.length} links had not started or had ended{undated ? `; ${undated} undated always shown` : ''}.</span>}
+    {/* The counts stay; the sentences behind them are on reveal. */}
+    {crossings !== null && <Reveal detail={<span data-testid="graph-crossings">{crossingsLine(crossings, parties.length)}</span>}><span><FootStat value={crossings}>crossing{crossings === 1 ? '' : 's'}</FootStat></span></Reveal>}
+    {asOf !== null && <Reveal detail={`As of ${asOf}: ${allRelationships.length - relationships.length} of ${allRelationships.length} links had not started or had ended${undated ? `; ${undated} undated always shown` : ''}.`}>
+      <span><FootStat value={`${relationships.length} of ${allRelationships.length}`}>as of {asOf}</FootStat></span></Reveal>}
     {footnote && <span>{footnote}</span>}
-    <span>Point at a party or link for its details; click to open it.</span>
+    <Reveal label="Using the network" detail="Point at a party or link for its details; click to open it."><span aria-hidden="true">ⓘ</span></Reveal>
   </>;
 
   return <ChartFrame kind="network" title="Who is linked to whom" testId="relationship-network"
