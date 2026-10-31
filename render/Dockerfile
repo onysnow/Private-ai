@@ -3,7 +3,7 @@
 # Build context: this directory (docker-compose.yml sets it).
 
 # --- Stage 1: the packages ----------------------------------------------------
-FROM node:22-bookworm-slim AS packages
+FROM node:22.22.2-bookworm-slim AS packages
 WORKDIR /srv/render
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev

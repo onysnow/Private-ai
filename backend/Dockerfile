@@ -2,7 +2,7 @@
 # image can carry both the API and the workbench screen it serves (ADR-0004).
 
 # --- Stage 1: the Next.js workbench as static files --------------------------
-FROM node:22-alpine AS workbench-screen
+FROM node:22.22.2-alpine AS workbench-screen
 WORKDIR /frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci

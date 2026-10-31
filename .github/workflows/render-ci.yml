@@ -10,10 +10,12 @@ on:
     paths:
       - 'render/**'
       - '.github/workflows/render-ci.yml'
+      - 'frontend/.nvmrc'
   pull_request:
     paths:
       - 'render/**'
       - '.github/workflows/render-ci.yml'
+      - 'frontend/.nvmrc'
 
 jobs:
   render:
@@ -30,7 +32,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '22.18.0'
+          # The one Node version: frontend/.nvmrc (also what backend/Dockerfile and render/Dockerfile build on).
+          node-version-file: frontend/.nvmrc
           cache: npm
           cache-dependency-path: render/package-lock.json
 
