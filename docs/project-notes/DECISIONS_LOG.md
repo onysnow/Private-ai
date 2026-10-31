@@ -1276,3 +1276,50 @@ A visual sweep of the 1MDB demo at 1440×900 found these, and each is changed so
   the progress files apart, where no document was written more than 3 times) the similar documents test passed every
   time and no shard failed the query. Running the live tests again on the same stack straight after a run can still meet the
   bug, through the collections the last run deleted; CI starts from a new stack each time.
+
+## 59. The checks themselves: what the review of tests and CI found, fixed (31 Oct 2026)
+
+- **Question:** the 31 Oct review of PR #117's tests and CI (`tests.md`) found gates that did not test what people
+  rely on (the migrated schema on PostgreSQL, the backup's columns, case isolation, the SQLite suite) and tests that
+  raced real timers.
+- **Calls, with the reason for each:**
+  - **PostgreSQL CI tests the migrations (A1, A2, A3).** `backend-postgres-ci.yml` runs `alembic check`, a downgrade
+    to base and up again, and `test_pr_migrations_downgrade_and_upgrade_with_rows` on PostgreSQL before the gate
+    resets the schema. That test fills every table at head (`tests/full_rows.py`: one row, every column) and steps
+    the PR's 17 migrations down one at a time and up again, checking every row and value that lives through it; it
+    runs on SQLite in the suite too. The schema check is equality, not a subset. The gate still resets the schema
+    and the suite still builds it with `create_all`: these steps are what test the migrations.
+  - **Backup round trip of every column (A4).** One row per `RESTORE_ORDER` table with every column filled, exported,
+    restored into a database the migrations built, and compared field by field straight from the tables. The
+    owned-table guard follows foreign keys at any depth.
+  - **Case isolation tried on every route (A5, C5).** Case B holds one record of every kind; every
+    investigation-scoped operation in the OpenAPI paths is called under a scope allowing only case A, with B's ids in
+    the path, the query and the body, and must refuse and show nothing of B (about 30 s). The path-tracing check asks
+    the scope check with B's real records instead of reading its source text.
+  - **The Wire's owed amounts (A6, backend part).** `wire.py` sends `payment_kind` and `owed` on each link. The drawing
+    (owed links out of the sums, sums kept by currency in `features/the-wire/wire-engine.ts`) is left to the frontend
+    fix that owns that file.
+  - **SQLite in CI (D2, D5).** A `backend-sqlite` job runs the suite with pytest-xdist, one temporary SQLite file per
+    worker. Measured here on 4 cores (SQLite, `--no-cov`): 1104 s serial, 379 s with `-n auto`, the same 19
+    failures both ways (this sandbox has no Tesseract, Chromium or compose files). Both jobs time out at 150 minutes;
+    pytest-timeout fails a test after 300 s (a setting, so a checkout without the plugin still runs).
+    `chart-kinds.json` triggers the backend run. `tools/check_all.py` checks one Alembic head, runs `alembic upgrade`
+    and `alembic check` on SQLite (D4), and runs the suite with `-n auto` when xdist is installed.
+  - **Order, not seconds (B7).** Slow reads and the model wait on an event; the loop search and the comment stripper
+    count their work; the reader-crash test waits for the pool to see the crash.
+  - **Frontend timers (B1-B4, B6).** The Wire's label tests fake timers and animation frames and run them out; the
+    captures poll and the calm-zone check are stepped with fake timers; job polls wait 10 ms in tests
+    (`setJobPollSleep`, `test-support/job-poll.ts`), and the two tests that read the state between polls step each
+    poll. The water simulations are their own vitest project (`effects`), one file at a time, after the app's tests
+    (`npm test` runs both; 537 tests in 67 s alone).
+  - **Page-test harness (C3).** An unconfigured GET to a route in `openapi.json` answers the emptiest reply of its
+    shape (`api.defaulted()`); a route the API does not have still fails (`api.unknown()`); `api.unmatched()` keeps
+    both unknown routes and unconfigured changes. The page fixtures are checked against the generated zod validators
+    (the red-flags fixture had drifted: fixed).
+  - **Node 22.22.2 (D1).** `frontend/.nvmrc`, both CI jobs read it, `engines`, and both Dockerfiles pin it.
+  - **Small ones (C1, C2).** Model and area counts are compared as sets, against the models and the catalogue's own data.
+- **Not done:** C4 (the long literals in the tests touched here are sentence-builder outputs, which the finding keeps);
+  D3 (no Windows job); D4's `--max-warnings 0` (the two warnings are in files other fixes own); D6 (widening ruff's
+  isort scope reorders side-effect imports in `app/db/` and rewraps `exports.py`'s import block, which other open
+  branches edit; mypy already checks the whole package); B5; shrinking the film and sim tests (that belongs upstream in
+  onysnow/onysnow-studios, ADR-0009).
