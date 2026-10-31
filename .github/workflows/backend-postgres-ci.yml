@@ -109,5 +109,21 @@ jobs:
       - name: Apply Alembic migrations on PostgreSQL
         run: python -m alembic upgrade head
 
+      # The gate below drops this schema and the suite builds its own with
+      # create_all, so these two steps are what tests the migrated schema on
+      # PostgreSQL: the migrations must match the models (alembic check fails on
+      # any drift: a type, a default, a constraint, a missing column) and every
+      # migration must come down and go back up again on this database.
+      - name: Check the migrated schema matches the models on PostgreSQL
+        run: python -m alembic check
+
+      - name: Downgrade every migration and upgrade again on PostgreSQL
+        run: python -m alembic downgrade base && python -m alembic upgrade head && python -m alembic check
+
+      - name: Downgrade and upgrade migrations with rows in their tables on PostgreSQL
+        # tests/test_migrations.py runs these on SQLite in the suite; here they run on
+        # the PostgreSQL database CI keeps (MIGRATION_TEST_URL), before the gate resets it.
+        run: MIGRATION_TEST_URL="$POSTGRES_TEST_URL" python -m pytest -p no:cacheprovider --no-cov -q tests/test_migrations.py -k "with_rows"
+
       - name: Run backend pytest suite on PostgreSQL
         run: python run_postgres_gate.py
