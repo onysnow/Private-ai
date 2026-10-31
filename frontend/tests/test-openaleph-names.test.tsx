@@ -203,7 +203,7 @@ describe('DocumentsPanel and OpenAleph\'s names', () => {
       [CANDIDATES]: [candidate('cand-new', 'entity', {caption: 'Angela Merkel', suggested_schema: 'Person'})],
     });
     await user.click(screen.getByRole('menuitem', {name: 'Find names again'}));
-    await screen.findByText('Angela Merkel', {}, {timeout: 4000});
+    await screen.findByText('Angela Merkel');
     expect(api.calls(analyze)).toHaveLength(1);
     expect(api.calls('GET /api/jobs/job-a')).toHaveLength(2);
     expect(api.calls(DOCUMENTS)).toHaveLength(2);

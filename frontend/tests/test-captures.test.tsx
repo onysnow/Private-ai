@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Links & captures (The Drop's tab; mockup INTAKE_3, ADR-0018): a pasted link is captured, the lane and receipt say
 // what was kept and how, a page that could not be kept says why, and the same page is not captured twice by accident.
-import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -46,7 +46,7 @@ const EMPTY_DROP = {investigation_id: 'inv-1', stages: [], lanes: [], totals: {f
 const BASE = {'GET /api/settings/status': validSettingsStatus, 'GET /api/investigations/inv-1/drop': EMPTY_DROP};
 
 beforeEach(() => { connectGeneratedClient(new ApiClient('http://api.test')); useWorkbenchStore.setState({investigationId: 'inv-1', document: null}); });
-afterEach(() => cleanup());
+afterEach(() => { cleanup(); vi.useRealTimers(); });
 
 describe('capture helpers', () => {
   it('knows a web address and compares links without their tracking parts', () => {
@@ -172,8 +172,15 @@ describe('Links & captures', () => {
         message: 'Reading the page', error: null, investigation_id: 'inv-1', subject_type: 'capture', subject_id: 'c1',
         created_at: '2026-10-19T10:14:01', started_at: '2026-10-19T10:14:02', finished_at: null, updated_at: '2026-10-19T10:14:09'}});
     const api = mockApi({...BASE, 'GET /api/investigations/inv-1/captures': () => { calls += 1; return calls === 1 ? [reading] : [capture()]; }});
+    // The list refetches every 1500 ms while a job runs: step the clock by that, rather than wait on it (review B2).
+    vi.useFakeTimers({shouldAdvanceTime: true});
     render(<QueryProvider><TheDrop investigationId="inv-1"/></QueryProvider>);
-    await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/captures').length).toBeGreaterThan(1), {timeout: 4000});
+    await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/captures')).toHaveLength(1));
+    await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
+    await waitFor(() => expect(api.calls('GET /api/investigations/inv-1/captures')).toHaveLength(2));
+    // Once both the capture and its job are done, it stops asking.
+    await act(async () => { await vi.advanceTimersByTimeAsync(4500); });
+    expect(api.calls('GET /api/investigations/inv-1/captures')).toHaveLength(2);
   });
 
   it('collects the audio on a captured page and opens it in Listen & read', async () => {

@@ -8,9 +8,16 @@ import {isBackgroundJob} from './api-validate';
 export type WaitOptions={intervalMs?:number,timeoutMs?:number,signal?:AbortSignal,sleep?:(ms:number)=>Promise<void>};
 
 const defaultSleep=(ms:number)=>new Promise<void>(resolve=>setTimeout(resolve,ms));
+// The wait between polls when a caller passes none. Tests set a short one so a page test does not
+// wait a real second per poll (review B3); called with nothing it goes back to the real wait. Kept on
+// globalThis under a registered symbol, so it holds for a copy of this module a test loads afresh.
+const POLL_SLEEP=Symbol.for('journalism-workbench.job-poll-sleep');
+type Sleep=(ms:number)=>Promise<void>;
+export function setJobPollSleep(sleep?:Sleep):void{(globalThis as Record<symbol,Sleep|undefined>)[POLL_SLEEP]=sleep;}
+const pollSleep:Sleep=ms=>((globalThis as Record<symbol,Sleep|undefined>)[POLL_SLEEP]??defaultSleep)(ms);
 
 export async function waitForJob(client:ApiClient,jobId:string,onUpdate?:(job:BackgroundJob)=>void,options:WaitOptions={}):Promise<BackgroundJob>{
-  const {intervalMs=1000,timeoutMs=30*60*1000,signal,sleep=defaultSleep}=options;
+  const {intervalMs=1000,timeoutMs=30*60*1000,signal,sleep=pollSleep}=options;
   const endpoint=`/api/jobs/${encodeURIComponent(jobId)}`;
   const started=Date.now();
   for(;;){

@@ -5300,6 +5300,10 @@ class WireLinkOut(ResponseModel):
     role: str
     pct: str
     ev: list[WireQuoteOut]
+    # A Payment's kind (app/services/payment_kinds.py); null when not said, or not a payment.
+    payment_kind: Literal["transfer", "loan", "fee", "settlement", "price", "fine", "ordered"] | None = None
+    # An amount owed (a price, a fine, an order): not money that moved, so never added to what was paid.
+    owed: bool = False
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, serialize_by_alias=True)
 
 

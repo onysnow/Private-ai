@@ -74,7 +74,7 @@ describe('MiniNetwork', () => {
     const end = (id: string) => ({id, ftm_id: `ftm-${id}`, caption: id, schema: 'Company'});
     const link = (id: string, s: string, t: string, properties: Record<string, string[]>) =>
       relationshipFixture({id, properties, source: end(s), target: end(t)});
-    mockApi({...(withStanding ? standing(11) : {}), 'GET /api/investigations/inv-1/graph': {...emptyGraph([
+    mockApi({...(withStanding ? standing(11) : {[STANDING]: {status: 503, body: {detail: 'Not arrived'}}}), 'GET /api/investigations/inv-1/graph': {...emptyGraph([
       link('l1', 'Meridian', 'Bellcastle', {startDate: ['2017']}),
       link('l2', 'Bellcastle', 'Orrin', {startDate: ['2020-05']}),
     ]), nodes: [node('Meridian'), node('Bellcastle'), node('Orrin')]}});

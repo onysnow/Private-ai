@@ -77,10 +77,17 @@ def test_restore_order_covers_every_investigation_owned_table():
     """Guard against the gap this file was written for: a table that hangs off
     investigations but is missing from the backup list silently drops data
     on every export. Walk the metadata instead of hand-listing tables."""
-    owned = {
-        table.name for table in Base.metadata.tables.values()
-        if any(fk.column.table.name == "investigations" for fk in table.foreign_keys)
-    }
+    # Owned at any depth: a child of a child of an investigation (a story's sections' claims)
+    # is the case's content as much as a direct child is (review A4).
+    owned: set[str] = {"investigations"}
+    grew = True
+    while grew:
+        grew = False
+        for table in Base.metadata.tables.values():
+            if table.name not in owned and any(fk.column.table.name in owned for fk in table.foreign_keys):
+                owned.add(table.name)
+                grew = True
+    owned.discard("investigations")
     # Tables that are deliberately not portable (per-deployment state, not investigation content).
     non_portable = {"investigation_memberships", "openaleph_operation_failures", "background_jobs",
                     # What this deployment's OpenAleph holds (ADR-0006, Wave B): a restore re-sends it all.

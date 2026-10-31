@@ -111,3 +111,72 @@ def test_legacy_relationship_evidence_backup_normalization():
     assert records["relationship_evidence_attachments"][0]["evidence_id"] == "ev-1"
     _normalize_legacy_relationship_evidence(records)
     assert len(records["relationship_evidence_attachments"]) == 1
+
+
+def _migrated_sqlite(path: Path):
+    """A database built the way a reporter's is: by the migrations, not create_all."""
+    from alembic import command
+    from app.db.migrations import _alembic_config
+
+    url = f"sqlite:///{path.as_posix()}"
+    command.upgrade(_alembic_config(url), "head")
+    return create_engine(url, connect_args={"check_same_thread": False})
+
+
+def test_every_column_of_every_restorable_table_round_trips(tmp_path):
+    """Review A4: one row in every table a backup carries, every column filled, through
+    export and restore into a migrated database, compared field by field. A column the
+    export leaves out, a datetime or JSON value that comes back changed, or a migration
+    that lacks a column the model has, fails here."""
+    from app.db.session import engine
+    from app.services.exports import RESTORE_ORDER
+    from tests.full_rows import full_rows
+
+    rows = full_rows(Base.metadata, RESTORE_ORDER, investigation_id="inv-every-column")
+    assert set(rows) == set(RESTORE_ORDER)
+    # Values the export checks against each other (its provenance lineage), set so they agree.
+    entity_id = rows["entities"][0]["id"]
+    for row in rows["extraction_candidates"]:
+        row.update(review_status="accepted", accepted_record_type="entity", accepted_record_id=entity_id)
+    with engine.begin() as conn:
+        for name, table_rows in rows.items():
+            conn.execute(Base.metadata.tables[name].insert(), table_rows)
+
+    def snapshot(bind) -> dict[str, dict[tuple, dict]]:
+        # Read straight from the tables, not through the export's own row reader, so a column
+        # the export leaves out is still compared.
+        out: dict[str, dict[tuple, dict]] = {}
+        with bind.connect() as conn:
+            for name in RESTORE_ORDER:
+                table = Base.metadata.tables[name]
+                pk = [c.name for c in table.primary_key]
+                out[name] = {tuple(r[c] for c in pk): dict(r) for r in conn.execute(select(table)).mappings()}
+        return out
+
+    original = snapshot(engine)
+    with SessionLocal() as src_db:
+        package, _manifest = build_investigation_export(src_db, "inv-every-column", include_documents=False)
+    for name in RESTORE_ORDER:
+        assert len(original[name]) == len(rows[name]), name
+        for row in original[name].values():
+            empty = sorted(key for key, value in row.items() if value is None)
+            # A self-referencing table's parent row is the only one allowed an empty column.
+            assert not empty or len(original[name]) == 2, f"{name}: {empty} left empty"
+
+    restored_engine = _migrated_sqlite(tmp_path / "migrated.db")
+    with sessionmaker(bind=restored_engine)() as db:
+        restore_investigation_export(db, package, tmp_path / "restored-documents")
+    restored = snapshot(restored_engine)
+    restored_engine.dispose()
+
+    # What a restore sets on purpose: a derived file the backup did not carry keeps no path here.
+    for row in original["derived_files"].values():
+        row["storage_path"] = ""
+    differences = []
+    for name in RESTORE_ORDER:
+        assert restored[name].keys() == original[name].keys(), f"{name}: rows missing after restore"
+        for key, row in original[name].items():
+            for column, value in row.items():
+                if restored[name][key].get(column) != value:
+                    differences.append(f"{name}.{column}: {value!r} became {restored[name][key].get(column)!r}")
+    assert not differences, "\n".join(differences)

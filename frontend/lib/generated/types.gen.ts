@@ -24999,6 +24999,22 @@ export type WireLinkOut = {
    */
   id: string;
   /**
+   * Owed
+   */
+  owed?: boolean;
+  /**
+   * Payment Kind
+   */
+  payment_kind?:
+    | 'transfer'
+    | 'loan'
+    | 'fee'
+    | 'settlement'
+    | 'price'
+    | 'fine'
+    | 'ordered'
+    | null;
+  /**
    * Pct
    */
   pct: string;

@@ -3,7 +3,7 @@
 // server, the account kept on its holder's card, a party's drawer with its flags and
 // the dossier link, names shown as text (never as markup), the empty case, and touch
 // (a finger's pan is not a tap, no hover tips for a finger, the phone bar's Back and Next).
-import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {InspectorSlot} from '../features/inspector/inspector-slot';
@@ -41,7 +41,14 @@ beforeEach(() => {
   connectGeneratedClient(new ApiClient('http://api.test'));
   useWorkbenchStore.setState({investigationId: 'inv-1'});
 });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); document.documentElement.removeAttribute('data-motion'); });
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); document.documentElement.removeAttribute('data-motion'); });
+
+// The engine places its labels in animation frames and boots on a timer (wire-engine.ts). A test that
+// reads a label fakes the clock and frames, then runs them out once the data is in, so the map has
+// settled before it is read (review B1). shouldAdvanceTime keeps Testing Library's waits moving.
+const fakeFrames = () => vi.useFakeTimers({shouldAdvanceTime: true,
+  toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance']});
+const settle = () => act(async () => { await vi.advanceTimersByTimeAsync(5000); });
 
 const reviewed = (stance: 'supports' | 'contradicts') => plainAdvisory({relationship_evidence_attachment_count: 1,
   relationship_evidence_review_counts: {supports: stance === 'supports' ? 1 : 0, contradicts: stance === 'contradicts' ? 1 : 0, context: 0, superseded: 0, unresolved: 0, unreviewed: 0}});
@@ -213,14 +220,14 @@ describe('The Wire', () => {
   it('steps through the labelled links with J / K and opens one with Enter', async () => {
     mockApi({'GET /api/investigations/inv-1/wire': SEE1, 'GET /api/investigations/inv-1/graph': SEE1_GRAPH});
     document.documentElement.dataset.motion = 'calm';
+    fakeFrames();
     render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
     await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
-    await waitFor(() => expect([...document.querySelectorAll<SVGGElement>('.elab')].some(g => g.style.display !== 'none')).toBe(true));
-    // The calm descent to the party can still be redrawing the links: press J until one stays lit.
-    await waitFor(() => {
-      if (!document.querySelector('.elab.lit')) fireEvent.keyDown(window, {key: 'j'});
-      expect(document.querySelector('.elab.lit')).not.toBeNull();
-    });
+    await settle();
+    expect([...document.querySelectorAll<SVGGElement>('.elab')].some(g => g.style.display !== 'none')).toBe(true);
+    fireEvent.keyDown(window, {key: 'j'});
+    await settle();
+    expect(document.querySelector('.elab.lit')).not.toBeNull();
     expect(document.querySelector('.tw-tip')?.textContent).toMatch(/Enter opens every record on this link/);
     fireEvent.keyDown(window, {key: 'Enter'});
     await waitFor(() => expect(document.querySelector('.tw-alttitle')?.textContent).toBe('one link, opened'));
@@ -287,14 +294,13 @@ describe('The Wire', () => {
       'GET /api/documents/d1/page-image': () => new Response(new Uint8Array([137, 80, 78, 71]), {headers: {'content-type': 'image/png'}}),
     });
     document.documentElement.dataset.motion = 'calm';
+    fakeFrames();
     render(<QueryProvider><TheWire investigationId="inv-1"/></QueryProvider>);
     await screen.findByRole('button', {name: 'Clear: Around Kestrel SA'});
-    const pill = await waitFor(() => {
-      const g = [...document.querySelectorAll<SVGGElement>('.elab')].find(x => x.style.display !== 'none' && x.textContent?.includes('owns 100%'));
-      expect(g).toBeTruthy();
-      return g!;
-    });
-    fireEvent.click(pill);
+    await settle();
+    const pill = [...document.querySelectorAll<SVGGElement>('.elab')].find(x => x.style.display !== 'none' && x.textContent?.includes('owns 100%'));
+    expect(pill).toBeTruthy();
+    fireEvent.click(pill!);
     const panel = await screen.findByRole('complementary', {name: 'The link'});
     expect(panel.querySelector('h2')?.textContent).toBe('Loop Two BV owns 100% since 2016 Kestrel SA');
     expect(panel.textContent).toContain('✓ Shown');

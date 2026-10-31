@@ -27,6 +27,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -88,6 +89,22 @@ def _install_render_packages() -> None:
     _render_installed = True
 
 
+def _alembic_checks(python: str, env: dict[str, str]) -> None:
+    """CI's migration checks: one head, and a migrated database that matches the models (alembic check)."""
+    print("\n=== backend: Alembic migration chain has a single head ===", flush=True)
+    heads = subprocess.run([python, "-m", "alembic", "heads"], cwd=BACKEND, env=env, capture_output=True, text=True)
+    lines = [line for line in heads.stdout.splitlines() if line.strip()]
+    if heads.returncode != 0 or len(lines) != 1:
+        print(heads.stdout + heads.stderr)
+        print(f"\nFAILED: the migration chain has {len(lines)} heads, expected exactly 1")
+        sys.exit(1)
+    print(f"--- passed: {lines[0]}")
+    with tempfile.TemporaryDirectory(prefix="check-all-alembic-") as folder:
+        migrated = dict(env, DATABASE_URL=f"sqlite:///{Path(folder, 'migrated.db').as_posix()}")
+        _run("backend: alembic upgrade head (SQLite)", [python, "-m", "alembic", "upgrade", "head"], BACKEND, migrated)
+        _run("backend: alembic check (SQLite)", [python, "-m", "alembic", "check"], BACKEND, migrated)
+
+
 def backend_checks(*, fast: bool = False) -> None:
     python = _venv_python()
     _warn_on_version_drift(python)
@@ -100,8 +117,11 @@ def backend_checks(*, fast: bool = False) -> None:
     if fast:
         return
     _run("backend: API schema up to date", [python, str(ROOT / "tools" / "export_openapi.py"), "--check"], ROOT, env)
+    _alembic_checks(python, env)
     _install_render_packages()
-    _run("backend: pytest (SQLite)", [python, "-m", "pytest", "-q", "-p", "no:warnings"], BACKEND, env)
+    # In parallel when pytest-xdist is installed (requirements-test.txt), one SQLite file per worker, as CI's SQLite job.
+    has_xdist = subprocess.run([python, "-c", "import xdist"], env=env, capture_output=True).returncode == 0
+    _run("backend: pytest (SQLite)", [python, "-m", "pytest", "-q", "-p", "no:warnings", *(["-n", "auto"] if has_xdist else [])], BACKEND, env)
     if env.get("POSTGRES_TEST_URL"):
         _run("backend: pytest (PostgreSQL gate)", [python, "run_postgres_gate.py"], BACKEND, env)
     else:

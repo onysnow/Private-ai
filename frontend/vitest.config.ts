@@ -12,7 +12,17 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['tests/**/*.{ts,tsx}', 'vendor/onysnow-effects/**/*.test.{ts,tsx}'],
+    // Two projects (review B6). The vendored water simulations (film, sim, lanes) each keep a CPU
+    // busy for 8-23 s; run beside the page tests they starved the page tests' real intervals and
+    // animation frames. They run as their own project, one file at a time, after the app's tests
+    // (package.json "test" runs the two in turn).
+    projects: [
+      {extends: true, test: {name: 'app', include: ['tests/**/*.{ts,tsx}']}},
+      {
+        extends: true,
+        test: {name: 'effects', include: ['vendor/onysnow-effects/**/*.test.{ts,tsx}'], pool: 'forks', maxWorkers: 1, fileParallelism: false},
+      },
+    ],
     // Per-file environment via a `// @vitest-environment jsdom` doc-comment
     // lets node-only tests (like tests/test-api-client-auth.ts) skip jsdom's
     // startup cost, while component tests opt into jsdom individually

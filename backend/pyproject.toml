@@ -63,3 +63,6 @@ disallow_untyped_defs = true
 # only --cov=app, so opsconsole tests had to pass in CI but nothing gated their
 # coverage. Combined coverage at the time this was added: 86.21%.
 addopts = "-q --cov=app --cov=opsconsole --cov-report=term-missing --cov-fail-under=80"
+# pytest-timeout (requirements-test.txt): one test may take five minutes at most. Kept as a setting,
+# not in addopts, so a checkout whose environment lacks the plugin still runs (with a warning).
+timeout = 300

@@ -11769,6 +11769,10 @@ export const zWireLinkOut = z.object({
   ev: z.array(zWireQuoteOut),
   fam: z.enum(['owns', 'runs', 'money', 'other']),
   id: z.string(),
+  owed: z.boolean().optional().default(false),
+  payment_kind: z
+    .enum(['transfer', 'loan', 'fee', 'settlement', 'price', 'fine', 'ordered'])
+    .nullish(),
   pct: z.string(),
   role: z.string(),
   s: z.string(),

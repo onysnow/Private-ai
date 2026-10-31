@@ -4,7 +4,7 @@
 // the read job, retry a failed read, import a batch, review proposals with
 // their reasoning, stage a relationship from a reviewed claim, and the
 // OpenAleph corpus actions.
-import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
+import {act, cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -14,6 +14,7 @@ import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
 import {useWorkbenchStore} from '../lib/workbench-store';
+import {fastJobPolls, steppedJobPolls} from '../test-support/job-poll';
 import {mockApi} from '../test-support/mock-api';
 import type {RouteCall} from '../test-support/mock-api';
 import {dropBody, dropLane} from '../test-support/library';
@@ -33,7 +34,7 @@ beforeEach(() => {
   connectGeneratedClient(new ApiClient('http://api.test'));
   useWorkbenchStore.setState({investigationId: 'inv-1', provenance: null, document: null});
 });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); mockPush.mockClear(); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); mockPush.mockClear(); fastJobPolls(); });
 
 const DOCUMENTS = 'GET /api/investigations/inv-1/documents';
 const ENTITIES = 'GET /api/investigations/inv-1/entities';
@@ -412,15 +413,17 @@ describe('DocumentsPanel reading as a background job (ADR-0004)', () => {
       'GET /api/documents/doc-2': {...read, chunks: []},
       'GET /api/documents/doc-2/candidates': [candidateFixture({id: 'cand-2', document_id: 'doc-2'})],
     });
+    const nextPoll = steppedJobPolls();
     const user = userEvent.setup();
     await user.upload(fileInput(), new File(['pdf-bytes'], 'scan.pdf', {type: 'application/pdf'}));
     await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
 
     await screen.findByText('Saved. Reading the document: Reading the document (5%)');
     expect(screen.getByRole('button', {name: 'Check reading progress'})).toBeInTheDocument();
+    act(() => nextPoll());
     // The "Extracted N chunk(s)" line is replaced at once by loading the
     // proposals, which clears the status on success (as the page always did).
-    await screen.findByText('Kestrelwood Holdings Ltd', {}, {timeout: 4000});
+    await screen.findByText('Kestrelwood Holdings Ltd');
     expect(api.calls('GET /api/jobs/job-1')).toHaveLength(2);
     expect(api.calls('GET /api/documents/doc-2')).toHaveLength(1);
     expect(api.calls(DOCUMENTS)).toHaveLength(3);

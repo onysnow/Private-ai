@@ -47441,6 +47441,31 @@
             "title": "Id",
             "type": "string"
           },
+          "owed": {
+            "default": false,
+            "title": "Owed",
+            "type": "boolean"
+          },
+          "payment_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "transfer",
+                  "loan",
+                  "fee",
+                  "settlement",
+                  "price",
+                  "fine",
+                  "ordered"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Kind"
+          },
           "pct": {
             "title": "Pct",
             "type": "string"

@@ -199,11 +199,21 @@ def test_the_loop_search_is_bounded_in_a_dense_case_and_says_so():
     """Ten parties paying each other make over a million loops from ninety links. The search stops, keeps the
     shortest, and marks each one so the summary can say the list is not complete."""
     from app.patterns.detectors import cycle
-    import time
 
-    started = time.monotonic()
-    got = cycle.measure(_payment_ring(10), cycle.Params(link="Payment"))
-    assert time.monotonic() - started < 10
+    # Count the loops the search draws, not seconds (review B7): it stops just past MAX_SEARCHED.
+    real, drawn = cycle.nx.simple_cycles, []
+
+    def counted(graph):
+        for loop in real(graph):
+            drawn.append(1)
+            yield loop
+
+    cycle.nx.simple_cycles = counted
+    try:
+        got = cycle.measure(_payment_ring(10), cycle.Params(link="Payment"))
+    finally:
+        cycle.nx.simple_cycles = real
+    assert len(drawn) == cycle.MAX_SEARCHED + 1
     assert 0 < len(got) <= cycle.MAX_KEPT
     assert all(m.facts.get("loops_cut_short") is True for m in got)
     sizes = [len(m.parties) for m in got]
