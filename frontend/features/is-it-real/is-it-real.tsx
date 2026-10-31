@@ -339,7 +339,11 @@ function Outside({documentId, data, onLogged}: {documentId: string; data: Authen
   const [choice, setPicked] = useState<string>(firstSend ?? 'local');
   // A source-protected item can only be compared here, whatever was picked before it was marked.
   const picked = data.source_protected ? 'local' : choice;
-  const [result, setResult] = useState('');
+  const [result, setResultText] = useState('');
+  // Where an outside check went: the tab opened after the request may be blocked, and noopener hides whether it was,
+  // so the address stays as a link to open by hand.
+  const [sentTo, setSentTo] = useState<{url: string; service: string} | null>(null);
+  const setResult = (text: string) => { setResultText(text); setSentTo(null); };
   const [busy, setBusy] = useState(false);
   const option = options.find(o => o.key === picked) ?? local;
   const run = async () => {
@@ -351,7 +355,8 @@ function Outside({documentId, data, onLogged}: {documentId: string; data: Authen
       } else {
         const out = (await outsideAuthenticity({path: {document_id: documentId}, body: {option: picked === 'reverse' ? service : picked as 'web'}, throwOnError: true})).data;
         window.open(out.url, '_blank', 'noopener,noreferrer');
-        setResult(`Sent to ${out.service} and logged. It opened in a new tab.`);
+        setResultText(`Sent to ${out.service} and logged.`);
+        setSentTo({url: out.url, service: out.service});
       }
       onLogged();
     } catch (e) { setResult(errorMessage(e, 'Nothing was sent')); }
@@ -380,7 +385,8 @@ function Outside({documentId, data, onLogged}: {documentId: string; data: Authen
         : <><button type="button" className="ir-primary" disabled={busy || !option.available} onClick={() => void run()}>Allow once &amp; send</button>
           <button type="button" className="ir-ghost" onClick={() => { setPicked('local'); setResult('Nothing was sent.'); }}>Don’t send</button></>}
     </div>
-    {result && <p className="ir-small" role="status">{result}</p>}
+    {result && <p className="ir-small" role="status">{result}{sentTo && <> <Reveal tabbable={false} detail="If your browser blocked the new tab, this opens it.">
+      <a href={sentTo.url} target="_blank" rel="noopener noreferrer">Open {sentTo.service}</a></Reveal></>}</p>}
   </section>;
 }
 
