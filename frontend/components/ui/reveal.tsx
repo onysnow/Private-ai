@@ -91,6 +91,8 @@ function Card({anchor, pinned, children}: {anchor: HTMLElement; pinned: boolean;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
+      // The card is the topmost layer: it takes this Esc, so the inspector or dialog below leaves it alone.
+      e.preventDefault();
       const inside = ref.current?.contains(document.activeElement);
       clearTimers();
       set(null);
