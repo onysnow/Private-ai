@@ -125,17 +125,38 @@ export const clipWords = (text: string, n: number): string => {
   return `${(at > n * 0.5 ? cut.slice(0, at) : cut).replace(/[\s,;:·–-]+$/, '')}…`;
 };
 
+/** The payments' sums, one per currency in the order they come, never added across currencies: "20,000 EUR + 9,400
+ *  USD"; empty when none has an amount. */
+export function fmtSums(links: Pick<WireLinkOut, 'amount' | 'cur'>[]): string {
+  const by = new Map<string, number>();
+  for (const l of links) if (l.amount) by.set(l.cur || '', (by.get(l.cur || '') ?? 0) + l.amount);
+  return [...by].map(([c, sum]) => fmtAmt(sum, c)).join(' + ');
+}
+
+/** The time strip's quarters: how many payments with an amount each holds, and their sums per currency. */
+export function moneyBins(links: Pick<WireLinkOut, 'fam' | 'date' | 'amount' | 'cur'>[]): Record<string, {n: number; say: string}> {
+  const groups: Record<string, Pick<WireLinkOut, 'amount' | 'cur'>[]> = {};
+  for (const l of links) {
+    if (l.fam !== 'money' || !l.date || !l.amount) continue;
+    const t = tval(l.date);
+    if (t == null) continue;
+    const b = Math.floor(t * 4) / 4;
+    (groups[b] || (groups[b] = [])).push(l);
+  }
+  return Object.fromEntries(Object.entries(groups).map(([b, ls]) => [b, {n: ls.length, say: fmtSums(ls)}]));
+}
+
 export function linkSentence(fam: string, links: WireLinkOut[], ended: string): string {
   const l0 = links[0];
   const n = links.length;
   if (fam === 'money') {
-    const sum = links.reduce((s, l) => s + (l.amount || 0), 0);
+    const sums = fmtSums(links);
     const ds = links.map(l => l.date).filter(Boolean).sort();
     const span = !ds.length ? '' : ds[0].slice(0, 7) === ds[ds.length - 1].slice(0, 7) ? monthYear(ds[0])
       : ds[0].slice(0, 4) === ds[ds.length - 1].slice(0, 4) ? `${MONTHS[+ds[0].slice(5, 7) - 1] ?? ''}–${monthYear(ds[ds.length - 1])}`
         : `${monthYear(ds[0])}–${monthYear(ds[ds.length - 1])}`;
     const why = n === 1 && l0.role ? ` “${clipWords(l0.role, 24)}”` : '';
-    return `paid ${sum ? fmtAmt(sum, l0.cur) : 'an amount not stated'}${why}${n > 1 ? ` · ${n}×` : ''}${span ? ` · ${span}` : ''}`;
+    return `paid ${sums || 'an amount not stated'}${why}${n > 1 ? ` · ${n}×` : ''}${span ? ` · ${span}` : ''}`;
   }
   const many = n > 1 ? ` · ×${n}` : '';
   const when = ended ? ` · ended ${monthYear(ended)}` : l0.date ? ` since ${l0.date.slice(0, 4)}` : '';
@@ -247,7 +268,8 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       // One curve per kind, direction and certainty: a shown payment and an unshown one between the same two
       // parties are two lines, each with its own style and sentence (SEE_1, Fernhill → Kestrel).
       const sure = sureOf(l);
-      const sk = `${l.fam}|${l.fam === 'other' ? '' : `${a}>${b}`}|${sure ?? ''}`;
+      // Payments in different currencies are different strands: their sums are never added together.
+      const sk = `${l.fam}|${l.fam === 'other' ? '' : `${a}>${b}`}|${sure ?? ''}${l.fam === 'money' ? `|${l.cur ?? ''}` : ''}`;
       const S = B.strands[sk] || (B.strands[sk] = {fam: l.fam, s: a, t: b, links: [], sum: 0, cur: l.cur, sure});
       S.links.push(l);
       if (l.amount) S.sum += l.amount;
@@ -1307,10 +1329,10 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
         const ki = Object.keys(edgeEls).find(k => k.startsWith(`${key}#`));
         if (!ki || !B) continue;
         const pay = B.links.filter(l => l.fam === 'money'), L = pay.length ? pay : B.links, l0 = L[0];
-        const fwd = L.some(l => rep(l.s) === a), sum = pay.reduce((s, l) => s + (l.amount || 0), 0);
+        const fwd = L.some(l => rep(l.s) === a), sums = fmtSums(pay);
         const years = [...new Set(pay.map(l => l.date.slice(0, 4)).filter(Boolean))].sort();
         const span = years.length ? ` · ${years[0]}${years.length > 1 ? `–${years[years.length - 1]}` : ''}` : '';
-        const txt = pay.length ? `${fwd ? 'PAID' : 'WAS PAID BY'} · ${pay.length > 1 ? `${pay.length} PAYMENTS · ` : ''}${fmtAmt(sum, l0.cur).toUpperCase()}${span}`
+        const txt = pay.length ? `${fwd ? 'PAID' : 'WAS PAID BY'} · ${pay.length > 1 ? `${pay.length} PAYMENTS · ` : ''}${(sums || 'amount not stated').toUpperCase()}${span}`
           : `${(FAM[l0.fam] || FAM.other).n.toUpperCase()}${fwd ? '' : ' (OTHER WAY)'}`;
         const g = el('g', {}, gLab);
         const r = el('rect', {y: -11, height: 22, rx: 11, class: 'hop-bg', stroke: '#FF8070'}, g);
@@ -1754,13 +1776,9 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
     tsvg.textContent = '';
     const r = tsvg.getBoundingClientRect(), w = r.width || 600, h = r.height || 74;
     const X = (t: number) => (Math.max(T0, Math.min(T1, t)) - T0) / (T1 - T0) * w;
-    const bins: Record<string, number> = {};
-    for (const l of D.links) {
-      if (l.fam !== 'money' || !l.date || !l.amount) continue;
-      const b = Math.floor(tval(l.date)! * 4) / 4;
-      bins[b] = (bins[b] || 0) + l.amount;
-    }
-    const max = Math.max(1, ...Object.values(bins)), base = h - 18;
+    // A quarter's bar is how many payments it holds: amounts in different currencies are never stacked into one.
+    const bins = moneyBins(D.links);
+    const max = Math.max(1, ...Object.values(bins).map(v => v.n)), base = h - 18;
     el('line', {x1: 0, x2: w, y1: base, y2: base, stroke: '#6F8AA3'}, tsvg);
     const step = Math.max(1, Math.ceil((T1 - T0) / Math.max(1, w / 60)));
     for (let y = Math.ceil(T0); y <= T1; y += step) {
@@ -1770,11 +1788,11 @@ export function mountWire(root: HTMLElement, data: WireOut, hooks: WireHooks, in
       t.textContent = String(y);
     }
     for (const b in bins) {
-      const x = X(+b), bh = Math.max(2, Math.log10(bins[b] / 1e6 + 1) / Math.log10(max / 1e6 + 1) * (base - 22));
+      const x = X(+b), bh = Math.max(2, bins[b].n / max * (base - 22));
       const live = +b >= range[0] - 0.25 && +b <= range[1];
       const rc = el('rect', {x: x + 1, y: base - bh, width: Math.max(3, w / (T1 - T0) / 4 - 2), height: bh, rx: 1.5, fill: live ? '#c98a5e' : '#3d5268'}, tsvg);
       const ti = el('title', {}, rc);
-      ti.textContent = `${Math.floor(+b)} Q${(+b % 1) * 4 + 1}: ${fmtAmt(bins[b], '')} paid`;
+      ti.textContent = `${Math.floor(+b)} Q${(+b % 1) * 4 + 1}: ${bins[b].n} ${bins[b].n === 1 ? 'payment' : 'payments'} · ${bins[b].say}`;
     }
     for (const e of D.events) {
       const t = tval(e.date);

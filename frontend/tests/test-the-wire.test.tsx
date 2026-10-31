@@ -8,7 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {InspectorSlot} from '../features/inspector/inspector-slot';
 import {TheWire, linkInfo} from '../features/the-wire/the-wire';
-import {brighten, clipWords, fmtAmt, fmtDate, linkSentence, pointsIn, separate} from '../features/the-wire/wire-engine';
+import {brighten, clipWords, fmtAmt, fmtDate, fmtSums, linkSentence, moneyBins, pointsIn, separate} from '../features/the-wire/wire-engine';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -137,6 +137,16 @@ describe('The Wire', () => {
     expect(clipWords('Owning entity in the Cook Islands trust structure', 32)).toBe('Owning entity in the Cook…');
     expect(clipWords('Founder and chairman of the board', 32)).toBe('Founder and chairman of the…');
     expect(clipWords('Director', 32)).toBe('Director');
+  });
+
+  it('never adds payments in different currencies: each currency has its own sum', () => {
+    const l = (amount: number, cur: string, date: string) => ({id: 'x', s: 'a', t: 'b', schema: 'Payment', fam: 'money' as const, amount, cur, date, role: '', pct: '', ev: []});
+    expect(linkSentence('money', [l(20000, 'EUR', '2018-02-01'), l(9400, 'USD', '2018-03-01')], '')).toBe('paid 20,000 EUR + 9,400 USD · 2× · Feb–Mar 2018');
+    expect(fmtSums([l(1000, 'EUR', ''), l(500, 'USD', ''), l(2000, 'EUR', '')])).toBe('3,000 EUR + 500 USD');
+    expect(fmtSums([])).toBe('');
+    // The time strip counts payments a quarter and names each currency's sum; it never stacks amounts across them.
+    const bins = moneyBins([l(20000, 'EUR', '2018-02-01'), l(9400, 'USD', '2018-03-01')]);
+    expect(Object.values(bins)).toEqual([{n: 2, say: '20,000 EUR + 9,400 USD'}]);
   });
 
   it('writes each link as a sentence from the fixed verbs', () => {
