@@ -19,9 +19,15 @@ export function typingInto(target: EventTarget | null): boolean {
 const LAYERS = '[role="dialog"]:not([hidden]), [role="alertdialog"]:not([hidden]), [data-layer]:not([hidden])';
 const DIALOG = '[role="dialog"], [role="alertdialog"]';
 
-/** Whether a layer is open above `self`: any open dialog, or a data-layer other than `self` and not inside it. */
+/** Whether a layer is open above `self`: any open dialog, or a data-layer other than `self` and not inside it. A
+ *  layer inside a hidden screen (a drawer left open on a stage that is still mounted) is not open. */
 export function layerAbove(self?: Element | null): boolean {
-  return [...document.querySelectorAll(LAYERS)].some(el => el !== self && (el.matches(DIALOG) || !self?.contains(el)));
+  return [...document.querySelectorAll(LAYERS)].some(el => el !== self && !el.closest('[hidden]') && (el.matches(DIALOG) || !self?.contains(el)));
+}
+
+/** Whether any dialog is showing (not one inside a hidden screen). */
+export function dialogOpen(): boolean {
+  return [...document.querySelectorAll(DIALOG)].some(el => !el.closest('[hidden]'));
 }
 
 /** Whether an Esc belongs to something above the element `self`: already taken, or a layer is open over it. */

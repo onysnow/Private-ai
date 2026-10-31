@@ -117,6 +117,13 @@ describe('Is it real?', () => {
     await user.click(within(card).getByRole('button', {name: 'Allow once & send'}));
     await waitFor(() => expect(open).toHaveBeenCalledWith('https://tineye.com/search?url=x', '_blank', 'noopener,noreferrer'));
     expect(api.calls('POST /api/documents/d1/authenticity/outside')[0].body).toEqual({option: 'tineye'});
+    // A tab opened after the request can be blocked, and noopener hides whether it was: it never claims one opened,
+    // and the address is a link to open by hand.
+    const said = await within(card).findByRole('status');
+    expect(said).not.toHaveTextContent(/opened/);
+    const link = within(said).getByRole('link', {name: /Open TinEye/});
+    expect(link).toHaveAttribute('href', 'https://tineye.com/search?url=x');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     expect(within(card).getByRole('button', {name: 'TinEye'})).toHaveAttribute('aria-pressed', 'true');
 
     await user.click(screen.getByRole('checkbox', {name: 'Source-protected item'}));

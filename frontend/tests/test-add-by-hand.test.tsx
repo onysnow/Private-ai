@@ -5,7 +5,7 @@ import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
-import {AddByHand, linkProperties, precisionOf} from '../features/by-hand/add-by-hand';
+import {AddByHand, linkProperties, precisionOf, readAmount} from '../features/by-hand/add-by-hand';
 import {ApiClient} from '../lib/api-client';
 import {connectGeneratedClient} from '../lib/api-generated';
 import {QueryProvider} from '../lib/query-client';
@@ -17,8 +17,54 @@ afterEach(() => cleanup());
 describe('Add by hand', () => {
   it('reads a date’s precision from its form and names the link’s properties as FollowTheMoney does', () => {
     expect([precisionOf('2019'), precisionOf('2019-03'), precisionOf('2019-03-03'), precisionOf('March')]).toEqual(['year', 'month', 'day', null]);
-    expect(linkProperties('Payment', '29,400', 'eur', '2019-03-03', '')).toEqual({amount: ['29400'], currency: ['EUR'], date: ['2019-03-03']});
+    expect(linkProperties('Payment', '29400', 'eur', '2019-03-03', '')).toEqual({amount: ['29400'], currency: ['EUR'], date: ['2019-03-03']});
     expect(linkProperties('Ownership', '60', 'EUR', '2018', '')).toEqual({percentage: ['60'], startDate: ['2018']});
+  });
+
+  it('reads an amount by its separators, and asks when one comma or dot before three digits could be either', () => {
+    expect(readAmount('')).toBeNull();
+    expect(readAmount('29400')).toEqual({value: '29400'});
+    expect(readAmount('29 400')).toEqual({value: '29400'});
+    expect(readAmount('29.400,50')).toEqual({value: '29400.5'});
+    expect(readAmount('1,234,567.89')).toEqual({value: '1234567.89'});
+    expect(readAmount('1.234.567')).toEqual({value: '1234567'});
+    expect(readAmount('1,5')).toEqual({value: '1.5'});
+    expect(readAmount('29.40')).toEqual({value: '29.4'});
+    expect(readAmount('0,500')).toEqual({value: '0.5'});
+    expect(readAmount('12345.678')).toEqual({value: '12345.678'});
+    expect(readAmount('29.400')).toEqual({ask: ['29400', '29.4']});
+    expect(readAmount('29,400')).toEqual({ask: ['29400', '29.4']});
+    expect(readAmount('1,23,4')).toHaveProperty('bad');
+    expect(readAmount('29.400.5')).toHaveProperty('bad');
+    expect(readAmount('about 300')).toHaveProperty('bad');
+  });
+
+  it('asks which reading a typed amount means and needs a currency before a payment can be added', async () => {
+    mockApi({
+      'GET /api/investigations/inv-1/by-hand/suggest': ({url}: {url: URL}) => (url.searchParams.get('q')?.toLowerCase().startsWith('fern')
+        ? [{id: 'e-fern', caption: 'Fernhill Ltd', schema: 'Company', matched: 'Fernhill Ltd', as: 'its name', country: 'gb'}]
+        : [{id: 'e-ms', caption: 'Marsh Holdings', schema: 'Company', matched: 'Marsh Holdings', as: 'its name'}]),
+      'POST /api/investigations/inv-1/by-hand/preview': {already: [], waiting: [], changes: []},
+      'GET /api/investigations/inv-1/documents': [],
+    });
+    render(<QueryProvider><AddByHand investigationId="inv-1"/></QueryProvider>);
+    const user = userEvent.setup();
+    const [first, second] = screen.getAllByLabelText('party');
+    await user.type(first, 'Fern');
+    await user.click(await screen.findByRole('option', {name: /Fernhill Ltd/}));
+    await user.type(second, 'Marsh');
+    await user.click(await screen.findByRole('option', {name: /Marsh Holdings/}));
+    await user.click(screen.getByRole('radio', {name: /I know it, no source yet/}));
+    expect(screen.getByLabelText('Currency')).toHaveValue('');
+    await user.type(screen.getByLabelText('Amount'), '29.400');
+    const which = screen.getByRole('group', {name: 'Which amount?'});
+    expect(screen.getByRole('button', {name: 'Add the link'})).toBeDisabled();
+    await user.click(within(which).getByRole('button', {name: /29\s400/}));
+    expect(screen.getByText(/which currency\?/)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Add the link'})).toBeDisabled();
+    await user.type(screen.getByLabelText('Currency'), 'eur');
+    expect(screen.getByText(/reads as 29\s400 EUR/)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Add the link'})).toBeEnabled();
   });
 
   it('writes a link to a new party with no source yet, after showing what it changes', async () => {
@@ -42,6 +88,8 @@ describe('Add by hand', () => {
     const add = within(screen.getByRole('group', {name: 'Add “Marsh Holdings” as a new party'})).getByRole('button', {name: 'a company'});
     await user.click(add);
     await user.type(screen.getByLabelText('Amount'), '29,400');
+    await user.click(within(screen.getByRole('group', {name: 'Which amount?'})).getByRole('button', {name: /29\s400/}));
+    await user.type(screen.getByLabelText('Currency'), 'EUR');
     await user.type(screen.getByLabelText('Date'), '2019-03-03');
     const changes = screen.getByRole('region', {name: 'What it changes'});
     expect(await within(changes).findByText('Raises the Red Flag “Circular payment” (Strong)')).toBeInTheDocument();

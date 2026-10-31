@@ -8,7 +8,7 @@
 // Style opens the deck's themes and fonts in the right panel; Export gives the .pptx, the slides as a PDF, or a handout
 // (a PDF page per slide with its notes), saving first so the file is what is on screen (DECISIONS_LOG 15).
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactElement} from 'react';
 
 import {SlideCanvas, SlideStyleProvider, buildCitationLookup, resolveTheme} from '../../components/presentation/slide-canvas';
@@ -22,6 +22,7 @@ import {deckChecksEndpointOptions, deckChecksEndpointQueryKey, getStoryOptions, 
   listDecksEndpointQueryKey, presentationStylesOptions} from '../../lib/generated/@tanstack/react-query.gen';
 import {createDeckEndpoint, updateDeckEndpoint} from '../../lib/generated/sdk.gen';
 import type {DeckChecksOut, DeckOut, SlideProblemOut, StoryOut} from '../../lib/generated/types.gen';
+import {onScreen, typingInto} from '../../lib/on-screen';
 
 type Slide = DeckSlide & {made_with?: Record<string, string>};
 type Kind = 'presenting' | 'slidedoc' | 'side';
@@ -210,9 +211,10 @@ function DeckEditor({deck, investigationId, story, more}: {deck: DeckOut; invest
   const [exporting, setExporting] = useState(false);
   const restyle = (next: DeckStyle) => { setStyle(next); setDirty(true); setMessage(''); };
 
+  const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
-      if (presenting || ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement || ev.target instanceof HTMLSelectElement) return;
+      if (presenting || ev.metaKey || ev.ctrlKey || ev.altKey || ev.defaultPrevented || typingInto(ev.target) || !onScreen(rootRef.current)) return;
       if (ev.key === 'j' || ev.key === 'ArrowRight') setAt(n => Math.min(slides.length - 1, n + 1));
       if (ev.key === 'k' || ev.key === 'ArrowLeft') setAt(n => Math.max(0, n - 1));
       if (ev.key === 'p') setPresenting(true);
@@ -236,7 +238,7 @@ function DeckEditor({deck, investigationId, story, more}: {deck: DeckOut; invest
     change(ordered.reduce((s, p) => applyFix(s, p, id => claimById.get(id)?.status), slide));
   };
 
-  return <SlideStyleProvider theme={theme}><div className="dk-body">
+  return <SlideStyleProvider theme={theme}><div className="dk-body" ref={rootRef}>
     <div className="dk-bar">
       <input className="dk-title" aria-label="Deck title" value={title} onChange={e => { setTitle(e.target.value); setDirty(true); }}/>
       <Reveal detail="Every slide re-checks against the case each time the deck is saved: a claim not yet shown, 7×7, a long run of text slides, a claim changed since the slide was made.">
@@ -324,10 +326,11 @@ function Present({slides, checks, title, canvas, claimText, onClose, start}: {sl
   const [asked, setAsked] = useState(false);
   useEffect(() => { if (ready && began === null) setBegan(Date.now()); }, [ready, began]);
   useEffect(() => { const t = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(t); }, []);
+  const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
-      if (ev.target instanceof HTMLInputElement) return;
-      if (ev.key === 'Escape') onClose();
+      if (ev.metaKey || ev.ctrlKey || ev.altKey || ev.defaultPrevented || typingInto(ev.target) || !onScreen(rootRef.current)) return;
+      if (ev.key === 'Escape') { ev.preventDefault(); onClose(); return; }
       if (!ready) return;
       if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown') setAt(n => Math.min(slides.length - 1, n + 1));
       if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') setAt(n => Math.max(0, n - 1));
@@ -339,7 +342,7 @@ function Present({slides, checks, title, canvas, claimText, onClose, start}: {sl
   const elapsed = began ? (now - began) / 1000 : 0;
   const slide = slides[at];
   const sources = slide.evidence.filter(r => r.record_type === 'claim').map(r => ({id: r.record_id, claim: claimText(r.record_id)}));
-  return <div className="dk-present" role="dialog" aria-modal="true" aria-label={`Presenting ${title}`}>
+  return <div className="dk-present" ref={rootRef} role="dialog" aria-modal="true" aria-label={`Presenting ${title}`}>
     {!ready ? <div className="dk-before" role="alert">
       <h3>Before you present</h3>
       <ul>{flagged.map(n => <li key={n}>Slide {n}: {(checks?.changed ?? []).includes(n) ? 'a claim on it changed since the deck was made' : 'cites a claim not yet shown (Draft)'} · {slides[n - 1]?.heading}</li>)}</ul>

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Decks (features/decks/deck-editor.tsx; mockups DECK_1 and DECK_2): a deck made from the story, each slide's check
 // badge, a one-click fix sent back with Save, and Present warning about a draft slide before it starts (never blocking).
-import {cleanup, render, screen, waitFor, within} from '@testing-library/react';
+import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -63,6 +63,39 @@ describe('decks', () => {
     expect(within(before).getByText(/Slide 2: cites a claim not yet shown \(Draft\)/)).toBeInTheDocument();
     await user.click(screen.getByRole('button', {name: 'Present anyway'}));
     expect(screen.getByText(/If they ask · 1 claim behind this slide/)).toBeInTheDocument();
+  });
+
+  it('takes its keys only on screen, never while typing or with Ctrl, Cmd or Alt, and Present likewise', async () => {
+    mockApi({'GET /api/investigations/inv-1/decks': {decks: [DECK]}, 'GET /api/decks/d1/checks': CHECKS, 'GET /api/investigations/inv-1/claims': CLAIMS});
+    render(<QueryProvider><section id="decks"><DecksScreen investigationId="inv-1"/></section><div contentEditable="true" data-testid="writeup"/></QueryProvider>);
+    const strip = await screen.findByRole('navigation', {name: 'Slides'});
+    await within(strip).findByRole('button', {name: /Slide 2: The sale/});
+    const current = () => within(strip).getAllByRole('button', {hidden: true}).findIndex(b => b.getAttribute('aria-current') === 'true');
+    expect(current()).toBe(0);
+    fireEvent.keyDown(screen.getByTestId('writeup'), {key: 'j'});
+    fireEvent.keyDown(window, {key: 'p', ctrlKey: true});
+    fireEvent.keyDown(window, {key: 'j', altKey: true});
+    expect(current()).toBe(0);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    (document.getElementById('decks') as HTMLElement).hidden = true;
+    fireEvent.keyDown(window, {key: 'j'});
+    fireEvent.keyDown(window, {key: 'p'});
+    expect(current()).toBe(0);
+    expect(screen.queryByRole('dialog', {hidden: true})).toBeNull();
+    (document.getElementById('decks') as HTMLElement).hidden = false;
+    fireEvent.keyDown(window, {key: 'j'});
+    expect(current()).toBe(1);
+    fireEvent.keyDown(window, {key: 'p'});
+    expect(screen.getByRole('dialog', {name: /^Presenting/})).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: 'Present anyway'}));
+    expect(screen.getByText(/Slide 2 of 2/)).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByTestId('writeup'), {key: 'ArrowLeft'});
+    fireEvent.keyDown(window, {key: 'ArrowLeft', metaKey: true});
+    expect(screen.getByText(/Slide 2 of 2/)).toBeInTheDocument();
+    const esc = new KeyboardEvent('keydown', {key: 'Escape', bubbles: true, cancelable: true});
+    window.dispatchEvent(esc);
+    expect(esc.defaultPrevented).toBe(true);
+    await waitFor(() => expect(screen.queryByRole('dialog', {name: /^Presenting/})).toBeNull());
   });
 
   it('shows what a deck from the story would hold when there is none, and makes it', async () => {

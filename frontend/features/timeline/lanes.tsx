@@ -17,7 +17,7 @@ import {Reveal} from '../../components/ui/reveal';
 import {PARTY, eventKind, partyKind} from '../../lib/viz-tokens';
 import {useWorkbenchStore} from '../../lib/workbench-store';
 import {LaneDetail} from './lane-detail';
-import {FACT, FACT_ORDER, bounds, denseStretch, filmCards, isFuzzy, justUnder, lanesOf, layoutLabels, parseWhen, quarters, span, windowFor, wrapName, yearStep} from './lanes-model';
+import {FACT, FACT_ORDER, bounds, denseStretch, filmCards, inEuros, isFuzzy, justUnder, lanesOf, layoutLabels, parseWhen, quarters, span, windowFor, wrapName, yearStep} from './lanes-model';
 import type {Fact, LanesBy, Zoom} from './lanes-model';
 import {Aside, FactMark, KeysMark, KindDot, factWord} from './marks';
 
@@ -201,8 +201,10 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
   const outOfOrder = new Map(sequence.map(s => [s.event_id, s]));
   const brackets = flags ? justUnder(events, LINE) : [];
   const amounts = events.filter(e => e.schema === 'Payment' && e.amount);
-  const lo10 = Math.log10(Math.max(1, Math.min(...amounts.map(e => e.amount as number), LINE / 10)));
-  const hi10 = Math.log10(Math.max(...amounts.map(e => e.amount as number), LINE * 2));
+  // The money row is a € scale: a payment stands at its euro value; one with none sits as a stub at the foot, unmeasured.
+  const euros = amounts.map(inEuros).filter((v): v is number => v != null && v > 0);
+  const lo10 = Math.log10(Math.max(1, Math.min(...euros, LINE / 10)));
+  const hi10 = Math.log10(Math.max(...euros, LINE * 2));
   const moneyY = (n: number) => axisY + AXIS + MONEY - 6 - ((Math.log10(n) - lo10) / (hi10 - lo10)) * (MONEY - 14);
   const quarterBars = quarters(events, caseFrom, caseTo);
   const maxQ = Math.max(1, ...quarterBars.map(q => q.count));
@@ -517,14 +519,15 @@ export function TimelineLanes({investigationId, picked}: {investigationId: strin
                 {moneyRow && <g className="tl2-money">
                   <text x={8} y={axisY + AXIS + 26} className="tl2-lanename big">Money{amounts.length ? <title>Log scale · each payment its own bar, never added up</title> : null}</text>
                   {!amounts.length && <text x={8} y={axisY + AXIS + 40} className="tl2-small">no payments with an amount</text>}
-                  {amounts.some(e => e.currency === 'EUR') && <>
+                  {euros.length > 0 && <>
                     <line x1={LABEL_W} x2={LABEL_W + chartW} y1={moneyY(LINE)} y2={moneyY(LINE)} className="tl2-line10k"/>
                     <text x={LABEL_W + chartW - 4} y={moneyY(LINE) - 3} className="tl2-small tl2-line10kword" textAnchor="end">€10,000 REPORTING LINE</text>
                   </>}
-                  {amounts.map(e => { const xx = x(span(e)[0]); return xx >= LABEL_W && xx <= LABEL_W + chartW ?
-                    <rect key={e.id} x={xx - 2} y={moneyY(e.amount as number)} width={4} height={axisY + AXIS + MONEY - 6 - moneyY(e.amount as number)}
-                      className={`tl2-paybar${brackets.some(b => b.ids.includes(e.id)) ? ' flagged' : ''}${isFuzzy(e) ? ' fuzzy' : ''}`} onClick={() => setSelected(e.id)}>
-                      <title>{money(e.amount as number, e.currency)} · {dateWords(e.date_start, e.precision)}</title></rect> : null; })}
+                  {amounts.map(e => { const xx = x(span(e)[0]); const eur = inEuros(e); const foot = axisY + AXIS + MONEY - 6;
+                    const y = eur != null && eur > 0 ? moneyY(eur) : foot - 6; return xx >= LABEL_W && xx <= LABEL_W + chartW ?
+                    <rect key={e.id} x={xx - 2} y={y} width={4} height={foot - y}
+                      className={`tl2-paybar${brackets.some(b => b.ids.includes(e.id)) ? ' flagged' : ''}${isFuzzy(e) ? ' fuzzy' : ''}${eur == null ? ' noeur' : ''}`} onClick={() => setSelected(e.id)}>
+                      <title>{money(e.amount as number, e.currency)}{eur == null ? ' · no euro value, not measured against the line' : e.currency !== 'EUR' ? ` · ${money(eur, 'EUR')}` : ''} · {dateWords(e.date_start, e.precision)}</title></rect> : null; })}
                 </g>}
               </svg>
             </div>}

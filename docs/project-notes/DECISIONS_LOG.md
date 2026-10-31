@@ -1303,3 +1303,37 @@ A visual sweep of the 1MDB demo at 1440×900 found these, and each is changed so
 - **Not done yet:** the first full run against the app. The servers were down when the check was written (the
   container had restarted; nothing listened on 3000 or 8000) and starting them was not permitted, so the thresholds
   are calibrated on the self-test page only, not on the app's screens.
+
+## 60. Frontend review fixes: money in its own currency, keys and Esc, amounts typed by hand, case data in the browser (31 Oct 2026)
+
+- **Question:** the frontend review of PR #117 (`/tmp/claude-0/review/frontend.md`) found nine faults, each confirmed in
+  the code with a failing test before it was fixed.
+- **Calls:**
+  1. **Timeline › Lanes:** the "just under the reporting line" bracket and the money row measure each payment in euros
+     (its EUR amount, or the `amount_eur` the record carries). A payment with no euro value is never flagged and sits
+     on the money row as an outlined stub, its title saying it is not measured against the €10,000 line.
+  2. **Esc layers:** a dialog inside a hidden screen (a stage still mounted) is not an open layer (`layerAbove`,
+     and Case home's check through the new `dialogOpen`).
+  3. **Decks:** the editor's J/K/P and arrows, and Present's keys, act only when their screen is showing, never while
+     typing (rich text included) and never with Ctrl, Cmd or Alt. Present's Esc is taken (preventDefault).
+  4. **Reveal:** the Esc that closes a card is taken, so the inspector or dialog under it stays.
+  5. **Add by hand:** an amount is read by its separators, the same in every locale: with a comma and a dot the last is
+     the decimal mark; one used more than once separates thousands; a single one before exactly three digits
+     ("29.400", "1,500") could be either, so both readings are offered and one must be picked; any other single one
+     is the decimal mark. The amount is shown back as read ("reads as 29 400 EUR"). The currency no longer defaults
+     to EUR: a payment with an amount needs its three-letter code typed.
+  6. **Case data in the browser:** deleting a case removes everything this browser kept for it
+     (`lib/case-browser-data.ts`: the Your safety answers and plan, recent searches, the last Is it real? check,
+     watchlist looks, visit times, where you last were). Locking the app removes the recent searches and last checks
+     of every case. **The safety plan is kept on lock, in this browser.** The app lock does not seal data at rest
+     (ADR-0016 §1 and §5: the databases are not encrypted by the app; the disk's encryption covers them), so the plan
+     in localStorage has the same protection at rest as the case's own records. Deleting it on every lock would lose
+     the reporter's plan at each idle timeout; moving it to the server would undo DECISIONS_LOG 9 (never sent, never
+     shared with a team). The pane's lock mark now says it is deleted with the case and that the lock does not cover
+     it, the disk's encryption does.
+  7. **Is it real?:** the outside check no longer says "It opened in a new tab": the tab opens after the request, so a
+     browser may block it, and `noopener` hides whether it did. The status gives the address as a link to open.
+  8. **The Wire:** payments in different currencies are never added: a strand is one currency, the sentence and the
+     path chip name a sum per currency ("20,000 EUR + 9,400 USD"), and the time strip's bars count payments per
+     quarter, naming each currency's sum on hover.
+  9. **Case home:** Z (undo the held answer) waits while typing, with Ctrl, Cmd or Alt, and when single keys are off.
