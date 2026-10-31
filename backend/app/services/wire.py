@@ -42,6 +42,7 @@ from app.models.sources import Evidence, Source
 from app.services.claim_done import _document_of
 from app.services.custody_chain import _anchor, _passage
 from app.services.relationships import investigation_relationships
+from app.services.payment_kinds import is_owed
 
 KIND = {"Person": "person", "Company": "company", "Organization": "org", "PublicBody": "org", "Vessel": "vehicle", "Vehicle": "vehicle",
         "Airplane": "vehicle", "RealEstate": "property", "Asset": "property", "BankAccount": "account", "LegalEntity": "other"}
@@ -129,6 +130,10 @@ def wire(db: Session, investigation_id: str) -> dict[str, Any]:
             "id": r["id"], "s": r["source"]["id"], "t": r["target"]["id"], "schema": r["schema"], "fam": FAMILY.get(r["schema"], "other"),
             "amount": _amount(props), "cur": _first(props, "currency").upper(), "date": _first(props, "date", "startDate")[:10],
             "role": _first(props, "role", "purpose", "summary")[:160], "pct": _first(props, "percentage"), "ev": quotes,
+            # A payment's kind (app/services/payment_kinds.py), and whether it is an amount owed: a price, a fine or
+            # an order records what was set, not money that moved, so the screen keeps it out of what it adds up.
+            "payment_kind": r.get("payment_kind") if r["schema"] == "Payment" else None,
+            "owed": r["schema"] == "Payment" and is_owed(r.get("payment_kind")),
         })
 
     graph = nx.Graph()

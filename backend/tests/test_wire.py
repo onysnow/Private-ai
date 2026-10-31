@@ -63,6 +63,32 @@ def test_the_wire_places_every_party_rolls_accounts_into_holders_and_keeps_link_
     assert again == {i: (e["x"], e["y"]) for i, e in ents.items()}
 
 
+def test_each_payment_link_says_its_kind_and_an_amount_owed_is_marked_apart():
+    """Review A6: The Wire adds up money links, so it must be able to tell an amount owed (a fine, an
+    agreed price, an order) from money that moved, as the ledger and the money checks do."""
+    inv = ok(client.post("/api/investigations", json={"name": "Owed on the wire"}))["id"]
+    payer, payee = _party(inv, "Harbour Nominees"), _party(inv, "Fernhill Ltd")
+    paid = _link(inv, "Payment", payer, payee, amount=["13000"], currency=["eur"], date=["2016-05-02"])
+    usd = _link(inv, "Payment", payer, payee, amount=["5000"], currency=["usd"], date=["2016-05-09"])
+    fine = ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": payer,
+                                                      "target_entity_id": payee, "payment_kind": "fine",
+                                                      "properties": {"amount": ["900"], "currency": ["eur"]}}))["id"]
+    loan = ok(client.post("/api/relationships", json={"investigation_id": inv, "schema": "Payment", "source_entity_id": payer,
+                                                      "target_entity_id": payee, "payment_kind": "loan",
+                                                      "properties": {"amount": ["100"], "currency": ["eur"]}}))["id"]
+    owns = _link(inv, "Ownership", payer, payee)
+
+    links = {link["id"]: link for link in ok(client.get(f"/api/investigations/{inv}/wire"))["links"]}
+    assert all("payment_kind" in link and "owed" in link for link in links.values())
+    assert (links[fine]["payment_kind"], links[fine]["owed"]) == ("fine", True)
+    assert (links[loan]["payment_kind"], links[loan]["owed"]) == ("loan", False)
+    # Not said: read as money that moved, as everywhere else.
+    assert (links[paid]["payment_kind"], links[paid]["owed"]) == (None, False)
+    assert (links[owns]["payment_kind"], links[owns]["owed"]) == (None, False)
+    # Each link keeps its own currency, so the screen can keep EUR and USD apart.
+    assert (links[paid]["cur"], links[usd]["cur"]) == ("EUR", "USD")
+
+
 def test_the_wire_of_an_empty_case_is_empty():
     inv = ok(client.post("/api/investigations", json={"name": "Nothing yet"}))["id"]
     assert ok(client.get(f"/api/investigations/{inv}/wire")) == {"investigation_id": inv, "entities": [], "links": [], "events": []}
