@@ -369,7 +369,7 @@ export function investigationRoutes(id: string, records: InvestigationRecords = 
     [`GET ${base}/places`]: placesBody(id),
     [`GET ${base}/tags`]: tagsBody(id),
     [`GET ${base}/collections`]: {investigation_id: id, collections: []},
-    [`GET ${base}/red-flags`]: {investigation_id: id, rules: [], flags: [], gone: []},
+    [`GET ${base}/red-flags`]: {investigation_id: id, rules: [], flags: [], gone: [], cannot_run: [], investigation_type: {set_by: 'app', areas: [], suggested: []}},
     [`GET ${base}/checks`]: {investigation_id: id, items: [], gone: []},
     // See › Money loads with the view (features/money): no payments yet.
     [`GET ${base}/financial-flows`]: {investigation_id: id, transactions: [], incomplete: [], currencies: [], flow_type_rule: '', duplicate_rule: ''},
