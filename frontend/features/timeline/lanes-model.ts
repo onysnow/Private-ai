@@ -197,10 +197,19 @@ export function quarters(events: TimelineLaneEventOut[], from: number, to: numbe
 
 export type FlagBracket = {lane: string; from: number; to: number; ids: string[]; say: string};
 
-/** Payments just under a reporting line from one payer, more than one within a year: a bracket over the time they
- *  cover (the Red Flag of splitting a sum to stay under the line). Amounts are compared, never added up. */
+/** A payment's value in euros: its amount when it is in EUR, else the euro value the record carries, else null (it
+ *  cannot be measured against a € line, and is never measured by its raw amount). */
+export function inEuros(e: TimelineLaneEventOut): number | null {
+  if (e.amount == null) return null;
+  if (e.currency === 'EUR') return e.amount;
+  return e.amount_eur ?? null;
+}
+
+/** Payments just under the € reporting line from one payer, more than one within a year: a bracket over the time they
+ *  cover (the Red Flag of splitting a sum to stay under the line). Each is measured in euros (inEuros), compared,
+ *  never added up. */
 export function justUnder(events: TimelineLaneEventOut[], line = 10_000, share = 0.9): FlagBracket[] {
-  const near = events.filter(e => e.schema === 'Payment' && e.amount != null && e.amount >= line * share && e.amount < line && e.parties.length);
+  const near = events.filter(e => { const v = inEuros(e); return e.schema === 'Payment' && v != null && v >= line * share && v < line && e.parties.length > 0; });
   const byPayer = new Map<string, TimelineLaneEventOut[]>();
   for (const e of near) byPayer.set(e.parties[0], [...(byPayer.get(e.parties[0]) ?? []), e]);
   const out: FlagBracket[] = [];
@@ -209,9 +218,8 @@ export function justUnder(events: TimelineLaneEventOut[], line = 10_000, share =
     let group: TimelineLaneEventOut[] = [];
     const close = () => {
       if (group.length > 1) {
-        const currency = group[0].currency ? ` ${group[0].currency}` : '';
         out.push({lane: payer, from: span(group[0])[0], to: span(group[group.length - 1])[1], ids: group.map(e => e.id),
-          say: `just under ${line.toLocaleString('en-GB')}${currency} ×${group.length}`});
+          say: `just under ${line.toLocaleString('en-GB')} EUR ×${group.length}`});
       }
     };
     for (const e of sorted) {

@@ -93,6 +93,14 @@ describe('lanes model', () => {
     expect(flag).toMatchObject({lane: 'fern', ids: ['1', '2', '3'], say: 'just under 10,000 EUR ×3'});
     expect(justUnder([pay('1', '2018-02-01', 9800), pay('2', '2020-03-01', 9800)])).toEqual([]);
   });
+
+  it('measures the € line in euros: other currencies count only by their euro value, never by their raw amount', () => {
+    const pay = (id: string, date: string, amount: number, currency: string, amount_eur: number | null = null) =>
+      ev(id, `Payment ${id}`, date, {schema: 'Payment', amount, currency, amount_eur, parties: ['fern', 'kestrel']});
+    expect(justUnder([pay('1', '2020-01-01', 9500, 'EUR'), pay('2', '2020-02-01', 9600, 'JPY')])).toEqual([]);
+    expect(justUnder([pay('1', '2020-01-01', 9500, 'GBP', 11100), pay('2', '2020-02-01', 9500, 'GBP', 11100)])).toEqual([]);
+    expect(justUnder([pay('1', '2020-01-01', 9500, 'EUR'), pay('2', '2020-02-01', 8400, 'GBP', 9800)])[0]).toMatchObject({ids: ['1', '2']});
+  });
 });
 
 describe('Lanes', () => {

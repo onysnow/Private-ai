@@ -105,6 +105,7 @@
 .tl2-line10kword { fill: var(--f-disputed); }
 .tl2-paybar { fill: var(--accent-1); cursor: pointer; }
 .tl2-paybar.flagged { fill: var(--f-disputed); } .tl2-paybar.fuzzy { opacity: .55; }
+.tl2-paybar.noeur { fill: none; stroke: var(--accent-1); stroke-width: 1; }
 .tl2-banner { display: flex; gap: 12px; align-items: center; padding: 11px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--f-disputed) 55%, transparent);
   background: color-mix(in srgb, var(--f-disputed) 9%, transparent); }
 .tl2-banner > i { font-style: normal; color: var(--f-disputed); width: 22px; height: 22px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; flex: none; }
