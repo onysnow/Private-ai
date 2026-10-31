@@ -19,9 +19,10 @@ WHEN = datetime(2026, 3, 4, 5, 6, 7, 891011)
 JSON_VALUE: dict[str, Any] = {"kept": ["exactly", 2, 3.5, True, None, {"nested": "ü"}]}
 
 
-def _text(table: str, column: str, limit: int | None, suffix: str) -> str:
-    # The suffix leads, so a short column (and a unique one) still tells the two rows apart.
-    value = f"{suffix[0]}:{table}.{column} ü"
+def _text(table: str, column: str, limit: int | None, suffix: str, prefix: str = "") -> str:
+    # The prefix and suffix lead, so a short column (and a unique one) still tells two cases'
+    # rows, and the two rows of one table, apart.
+    value = f"{prefix}{suffix[0]}:{table}.{column} ü"
     return value[:limit] if limit else value
 
 
@@ -38,7 +39,7 @@ def _default_is_list(column: Any) -> bool:
     return isinstance(arg, list)
 
 
-def _value(table: Table, column: Any, index: int, suffix: str) -> Any:
+def _value(table: Table, column: Any, index: int, suffix: str, prefix: str = "") -> Any:
     kind = column.type
     if suffix == "child":
         index += 100
@@ -57,18 +58,20 @@ def _value(table: Table, column: Any, index: int, suffix: str) -> Any:
         # walks it (a capture's files, a document's issues) can read; any other gets the object.
         return [dict(JSON_VALUE)] if _default_is_list(column) else dict(JSON_VALUE)
     if isinstance(kind, Text):
-        return _text(table.name, column.name, None, suffix) + "\nsecond line"
+        return _text(table.name, column.name, None, suffix, prefix) + "\nsecond line"
     if isinstance(kind, String):
-        return _text(table.name, column.name, kind.length, suffix)
+        return _text(table.name, column.name, kind.length, suffix, prefix)
     raise AssertionError(f"no value for {table.name}.{column.name} of type {kind!r}: add one to tests/full_rows.py")
 
 
-def _primary_value(table: Table, suffix: str) -> str:
-    return f"{table.name[:24]}-{suffix}"
+def _primary_value(table: Table, suffix: str, prefix: str = "") -> str:
+    return f"{prefix}{table.name[:24]}-{suffix}"
 
 
-def full_rows(metadata: MetaData, tables: list[str] | None = None, *, investigation_id: str = "inv-full") -> dict[str, list[dict[str, Any]]]:
-    """Rows keyed by table name, in an order that inserts parents first."""
+def full_rows(metadata: MetaData, tables: list[str] | None = None, *, investigation_id: str = "inv-full",
+              prefix: str = "", int_start: int = 0) -> dict[str, list[dict[str, Any]]]:
+    """Rows keyed by table name, in an order that inserts parents first. A prefix starts every
+    string, so two cases' rows can sit in one database and each can be told by its prefix."""
     wanted = set(tables) if tables is not None else set(metadata.tables)
     ids: dict[str, Any] = {}
     out: dict[str, list[dict[str, Any]]] = {}
@@ -92,11 +95,11 @@ def full_rows(metadata: MetaData, tables: list[str] | None = None, *, investigat
                         raise AssertionError(f"{table.name}.{column.name} points at {key}, which has no row yet")
                     row[column.name] = ids[key]
                 elif column.primary_key and isinstance(column.type, String):
-                    row[column.name] = _primary_value(table, suffix)
+                    row[column.name] = _primary_value(table, suffix, prefix)
                 elif column.primary_key:
-                    row[column.name] = index + (1 if suffix != "child" else 2)
+                    row[column.name] = int_start + index + (1 if suffix != "child" else 2)
                 else:
-                    row[column.name] = _value(table, column, index, suffix)
+                    row[column.name] = _value(table, column, index, suffix, prefix)
             if table.name == "investigations":
                 row["id"] = investigation_id
             rows.append(row)
