@@ -96,8 +96,9 @@ def create_mailbox_monitor(investigation_id: str, body: MailboxCreate, request: 
     return following.serialize_monitor(row)
 
 
-@router.patch("/monitors/{monitor_id}", response_model=MonitorOut, responses={404: {"model": ErrorOut},
-                                                                         409: {"model": ErrorOut}})
+@router.patch("/monitors/{monitor_id}", response_model=MonitorOut, responses={
+    404: {"model": ErrorOut}, 409: {"model": ErrorOut},
+    422: {"model": ValidationErrorOut | ErrorOut, "description": "A mailbox cannot be set to Tor (the message says why)"}})
 def update_monitor(monitor_id: str, body: MonitorUpdate, db: Session = Depends(get_db)) -> Any:
     """Change how often it is checked, its route (Direct or Tor), pause or resume it, or accept the address it moved
     to (a moved source is never followed by itself)."""
@@ -107,6 +108,11 @@ def update_monitor(monitor_id: str, body: MonitorUpdate, db: Session = Depends(g
     if body.every_minutes is not None:
         row.every_minutes = body.every_minutes
         row.next_check_at = utcnow_naive()
+    if body.route == "tor" and row.kind == "mailbox":
+        # A mailbox is read straight from this computer; set to Tor it would still be (ADR-0021: what is followed
+        # through Tor is never fetched directly).
+        raise HTTPException(422, "A mailbox is read over IMAP straight from this computer: reading it through Tor is not "
+                                 "built yet, so a mailbox cannot be set to Tor")
     if body.route is not None:
         row.route = body.route
         row.etag = row.last_modified = None

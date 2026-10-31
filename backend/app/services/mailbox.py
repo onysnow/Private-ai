@@ -6,15 +6,22 @@ a document of the case and goes through the ordinary email reader, which reads t
 so a tracking pixel learns nothing.
 
 The password is kept in its own file beside the connector keys (mode 600), never in the database or a backup, and is
-removed when the mailbox is no longer followed. Each check is a line in the outbound log.
+removed when the mailbox is no longer followed, or its case deleted. Each check is a line in the outbound log.
+
+The mail server must be a public address (as for web following: never this computer's own or one on its network), on
+IMAP's own ports (993, TLS from the start; 143, with STARTTLS) unless the server's administrator sets others
+(MAILBOX_PORTS). A mailbox is read straight from this computer: reading one through Tor is not built yet, so a mailbox
+set to Tor is not read at all.
 """
 
 from __future__ import annotations
 
 import email
 import email.policy
+import hashlib
 import imaplib
 import re
+import socket
 import ssl
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
@@ -69,16 +76,22 @@ def _password(monitor_id: str) -> str:
     return _read().get(monitor_id, "")
 
 
-def forget(db: Session, monitor: Monitor) -> None:
-    """Stop following: the password goes, and so do the kept messages nobody captured."""
+def forget_passwords(monitor_ids: list[str] | set[str]) -> None:
+    """The passwords of these mailboxes go (the mailbox is no longer followed, or its case was deleted)."""
     from app.services.credentials import _write
 
     values = _read()
-    if values.pop(monitor.id, None) is not None:
+    dropped = [values.pop(monitor_id, None) for monitor_id in monitor_ids]
+    if any(d is not None for d in dropped):
         if values:
             _write(_secrets(), values)
         else:
             _secrets().unlink(missing_ok=True)
+
+
+def forget(db: Session, monitor: Monitor) -> None:
+    """Stop following: the password goes, and so do the kept messages nobody captured."""
+    forget_passwords([monitor.id])
     folder = _folder(monitor)
     for item in db.scalars(select(MonitorItem).where(MonitorItem.monitor_id == monitor.id, MonitorItem.state != "captured")):
         kept = (item.extra or {}).get("eml")
@@ -108,6 +121,8 @@ def follow(db: Session, investigation_id: str, *, host: str, user: str, password
     host, user, sender = host.strip().lower(), user.strip(), sender.strip().lower()
     if not HOST.match(host):
         raise MailboxRefused("The mail server is a name such as imap.example.org")
+    if port not in settings.mailbox_ports:
+        raise MailboxRefused("The mail server is read on IMAP's own port: 993 (TLS) or 143 (STARTTLS)")
     if not user or not password:
         raise MailboxRefused("Give the mailbox's user name and password")
     if not SENDER.match(sender):
@@ -147,8 +162,54 @@ def _when(value: str | None) -> datetime | None:
     return when.astimezone(timezone.utc).replace(tzinfo=None) if when.tzinfo else when
 
 
-def _connect(host: str, port: int) -> imaplib.IMAP4_SSL:
-    return imaplib.IMAP4_SSL(host, port, ssl_context=ssl.create_default_context(), timeout=TIMEOUT_S)
+UNREAD = "the mail server could not be read over TLS"
+TOR_NOT_BUILT = ("set to Tor, and reading a mailbox through Tor is not built yet: nothing was read. Set it back to "
+                 "Direct to read it from this computer")
+
+
+class _Pinned:
+    """Connects to the address resolve_public checked, not to whatever the name resolves to the second time."""
+    _address: tuple[str, int]
+
+    def _create_socket(self, timeout: float | None) -> socket.socket:
+        sock = socket.create_connection(self._address, timeout)
+        tls = getattr(self, "ssl_context", None)
+        return tls.wrap_socket(sock, server_hostname=self.host) if tls is not None else sock  # type: ignore[attr-defined]
+
+
+class _PinnedSSL(_Pinned, imaplib.IMAP4_SSL):
+    def __init__(self, host: str, port: int, address: tuple[str, int]) -> None:
+        self._address = address
+        super().__init__(host, port, ssl_context=ssl.create_default_context(), timeout=TIMEOUT_S)
+
+
+class _PinnedStartTLS(_Pinned, imaplib.IMAP4):
+    def __init__(self, host: str, port: int, address: tuple[str, int]) -> None:
+        self._address = address
+        super().__init__(host, port, timeout=TIMEOUT_S)
+
+
+def _connect(host: str, port: int) -> imaplib.IMAP4:
+    """A TLS connection to the mail server at a public address only (web_capture.resolve_public, as web following's
+    guard): on 143 the plain greeting is upgraded with STARTTLS before anything is sent. Raises OSError otherwise."""
+    from app.services.web_capture import resolve_public
+
+    found = resolve_public(host, port)
+    if not found:
+        raise OSError(UNREAD)
+    address = (str(found[0][4][0]), port)
+    if port == 143:
+        client = _PinnedStartTLS(host, port, address)
+        try:
+            client.starttls(ssl_context=ssl.create_default_context())
+        except Exception:
+            try:
+                client.shutdown()
+            except OSError:
+                pass
+            raise
+        return client
+    return _PinnedSSL(host, port, address)
 
 
 def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Monitor:
@@ -160,6 +221,13 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
     now = now or utcnow_naive()
     user, host, port, sender = parts(monitor.url)
     monitor.last_checked_at = now
+    if monitor.route == "tor":
+        # Never a direct connection for a mailbox set to Tor (ADR-0021: what is followed through Tor is not fetched directly).
+        monitor.health, monitor.health_detail = "broken", TOR_NOT_BUILT
+        monitor.checks = [{"state": "bad", "text": "Not read: set to Tor, which a mailbox cannot use yet"}]
+        _schedule(monitor, now)
+        db.commit()
+        return monitor
     request_id = _log(db, monitor, f"IMAP (new mail from {sender}?)", f"imaps://{host}:{port}/INBOX")
     try:
         client = _connect(host, port)
@@ -177,7 +245,7 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
                 raw = next((part[1] for part in data if isinstance(part, tuple)), b"")
                 if not raw or len(raw) > MAX_MESSAGE_BYTES:
                     continue
-                fresh += _keep(db, monitor, uid, raw, now)
+                fresh += _keep(db, monitor, raw, now)
                 last = max(last, uid)
             monitor.etag, monitor.last_modified = str(last), validity
         finally:
@@ -185,21 +253,16 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
                 client.logout()
             except (imaplib.IMAP4.error, OSError):
                 pass
-    except imaplib.IMAP4.error as exc:
+    except (imaplib.IMAP4.error, OSError, ssl.SSLError, EOFError) as exc:
+        # One wording for every failure but a refused login over TLS, so the answer never says whether something at
+        # that address answered (a refused, timed-out, private or non-IMAP address all read the same).
         mark_outbound_failed(db, request_id)
-        refused = "authenticat" in str(exc).lower() or "login" in str(exc).lower() or "credential" in str(exc).lower()
+        text = str(exc).lower()
+        refused = isinstance(exc, imaplib.IMAP4.error) and not isinstance(exc, imaplib.IMAP4.abort) and (
+            "authenticat" in text or "login" in text or "credential" in text)
         monitor.health = "broken"
-        monitor.health_detail = "the mailbox refused the user name or password" if refused else "the mail server refused the request"
+        monitor.health_detail = "the mailbox refused the user name or password" if refused else UNREAD
         monitor.checks = [{"state": "bad", "text": f"Not read: {monitor.health_detail}"}]
-        _schedule(monitor, now)
-        db.commit()
-        return monitor
-    except (OSError, ssl.SSLError) as exc:
-        from app.services.following import reason_of
-
-        mark_outbound_failed(db, request_id)
-        monitor.health, monitor.health_detail = "broken", f"could not be read: {reason_of(exc)}"
-        monitor.checks = [{"state": "bad", "text": f"Not read: {reason_of(exc)}"}]
         _schedule(monitor, now)
         db.commit()
         return monitor
@@ -211,14 +274,17 @@ def check(db: Session, monitor: Monitor, *, now: datetime | None = None) -> Moni
     return monitor
 
 
-def _keep(db: Session, monitor: Monitor, uid: int, raw: bytes, now: datetime) -> int:
-    key = f"uid:{monitor.last_modified or ''}:{uid}"
+def _keep(db: Session, monitor: Monitor, raw: bytes, now: datetime) -> int:
+    """Queue one message, known by the message itself (its Message-ID and its bytes), not by the server's number for
+    it: a server that renumbers the mailbox (a new UIDVALIDITY) gives old numbers to new messages."""
+    message = email.message_from_bytes(raw, policy=email.policy.default)
+    digest = hashlib.sha256(str(message.get("message-id") or "").strip().encode("utf-8", "replace") + b"\n" + raw).hexdigest()
+    key = f"msg:{digest[:40]}"
     if db.scalar(select(MonitorItem.id).where(MonitorItem.monitor_id == monitor.id, MonitorItem.key == key)):
         return 0
-    message = email.message_from_bytes(raw, policy=email.policy.default)
     folder = _folder(monitor)
     folder.mkdir(parents=True, exist_ok=True)
-    path = folder / f"{uid}.eml"
+    path = folder / f"{digest[:40]}.eml"
     path.write_bytes(raw)
     text = _plain(message)
     db.add(MonitorItem(investigation_id=monitor.investigation_id, monitor_id=monitor.id, key=key, url=None,

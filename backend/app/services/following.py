@@ -184,7 +184,8 @@ def _log(db: Session, monitor: Monitor, what: str, url: str) -> str:
 
     host = urlsplit(url).hostname or url
     return record_outbound(db, monitor.investigation_id, service=f"following:{host}", kind=monitor.kind, value=f"{what} {url}",
-                           reason=f"Following: {monitor.name}" + (" (through Tor)" if monitor.route == "tor" else ""),
+                           # A mailbox is never read through Tor (app/services/mailbox.py): the log never says it was.
+                           reason=f"Following: {monitor.name}" + (" (through Tor)" if monitor.route == "tor" and monitor.kind != "mailbox" else ""),
                            actor="automatic", source={"monitor_id": monitor.id, "destination": host})
 
 
