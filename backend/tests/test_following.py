@@ -198,6 +198,37 @@ def test_a_page_that_names_its_feed_is_followed_through_the_feed_and_every_reque
     assert any(h.get("User-Agent", "").startswith("JournalismWorkbench") for _p, h in site.requests)
 
 
+def test_every_request_made_to_find_out_what_an_address_is_is_logged_before_it_goes(site, monkeypatch):
+    from app.services import outbound
+
+    inv = _case()
+    # A request whose address answers 404: refused, and still in the log.
+    site.status["/gone"] = 404
+    assert _follow(inv, site.base + "/gone")["status"] == 422
+    with SessionLocal() as db:
+        logged = [r.value for r in db.scalars(select(OutboundRequest).where(OutboundRequest.investigation_id == inv))]
+    assert logged == [f"GET {site.base}/gone"]
+
+    # A page that names its feed: both discovery requests, each written before it went.
+    order: list[str] = []
+    real_fetch, real_record = following.fetch, outbound.record_outbound
+    monkeypatch.setattr(following, "fetch", lambda url, **kw: (order.append(f"fetch {url}"), real_fetch(url, **kw))[1])
+    monkeypatch.setattr(outbound, "record_outbound", lambda *a, **kw: (order.append(f"log {kw['value']}"), real_record(*a, **kw))[1])
+    assert _follow(inv, site.base + "/home")["status"] == 200
+    home, feed = f"{site.base}/home", f"{site.base}/feed.xml"
+    assert order[:4] == [f"log GET {home}", f"fetch {home}", f"log GET {feed}", f"fetch {feed}"]
+    fetched = [o.split(" ", 1)[1] for o in order if o.startswith("fetch ")]
+    assert sum(o.startswith("log ") for o in order) == len(fetched), order
+
+    # One that cannot be reached at all says so in the log.
+    monkeypatch.setattr(following, "fetch", lambda url, **kw: (_ for _ in ()).throw(following.FetchFailed("timeout")))
+    assert _follow(inv, "https://slow.example.org/feed")["status"] == 422
+    with SessionLocal() as db:
+        row = db.scalars(select(OutboundRequest).where(OutboundRequest.investigation_id == inv,
+                                                       OutboundRequest.value == "GET https://slow.example.org/feed")).one()
+        assert row.outcome == "failed"
+
+
 def test_a_check_asks_only_for_what_is_new(site):
     inv = _case()
     m = _follow(inv, site.base + "/feed.xml")

@@ -70,3 +70,22 @@ def test_the_download_starts_once_and_not_when_turned_off(monkeypatch, tmp_path:
     assert started == ["basemap-install"]
     assert basemap_install.progress()["state"] == "fetching"
     monkeypatch.setitem(basemap_install._state, "state", "idle")
+
+
+def test_every_host_the_download_asks_is_logged_before_it_is_asked(monkeypatch, tmp_path: Path) -> None:
+    """ADR-0015: the list of builds is fetched from build-metadata.protomaps.dev, and that is in the log first."""
+    from app.services import outbound
+
+    order: list[str] = []
+    monkeypatch.setattr(outbound, "record_platform_request", lambda db, **kw: order.append(f"log {kw['destination']}"))
+
+    def stop(client):
+        order.append("ask build-metadata.protomaps.dev")
+        raise RuntimeError("offline")
+
+    monkeypatch.setattr(basemap_install, "newest_build", stop)
+    try:
+        basemap_install.install(folder=tmp_path)
+    except RuntimeError:
+        pass
+    assert order == ["log build-metadata.protomaps.dev", "ask build-metadata.protomaps.dev"]

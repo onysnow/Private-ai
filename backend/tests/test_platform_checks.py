@@ -130,3 +130,22 @@ def test_what_yt_dlp_answers_becomes_works_partly_or_broken(monkeypatch):
     walled = platform_checks._ytdlp("https://www.youtube.com/watch?v=y")
     assert walled.state == "broken" and "sign-in" in walled.detail
     assert platform_checks._ytdlp("https://www.tiktok.com/@a/video/1").state == "partly"
+
+
+def test_a_visit_is_in_the_outbound_log_before_it_goes(monkeypatch):
+    """ADR-0015: a visit that hangs or crashes midway is still in the log."""
+    seen: list[int] = []
+
+    def crash(url: str) -> Result:
+        with SessionLocal() as db:
+            seen.append(len(db.scalars(select(OutboundRequest).where(OutboundRequest.service == "Instagram (works today?)",
+                                                                       OutboundRequest.value == url)).all()))
+        raise RuntimeError("the browser crashed")
+
+    monkeypatch.setattr(platform_checks, "_page", crash)
+    with SessionLocal() as db:
+        before = len(db.scalars(select(OutboundRequest).where(OutboundRequest.service == "Instagram (works today?)")).all())
+        row = platform_checks.check(db, "instagram")
+        assert row.state == "broken"
+        lines = db.scalars(select(OutboundRequest).where(OutboundRequest.service == "Instagram (works today?)")).all()
+    assert seen == [before + 1] and len(lines) == before + 1 and lines[-1].outcome == "failed"

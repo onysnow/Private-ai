@@ -185,6 +185,8 @@ def install(maxzoom: int | None = None, folder: Path | None = None) -> Path:
     try:
         with httpx.Client(timeout=120, follow_redirects=True) as client:
             if not target.exists():
+                record_platform_request(None, kind="download", service="Protomaps", destination="build-metadata.protomaps.dev",
+                                        sent="The list of the public world map's builds. Nothing about a case.")
                 key = newest_build(client)
                 url = BUILD_URL.format(key=key)
                 record_platform_request(None, kind="download", service="Protomaps", destination="build.protomaps.com",

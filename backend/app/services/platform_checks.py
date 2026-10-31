@@ -200,19 +200,22 @@ def _open(platform: Platform, url: str) -> Result:
 
 
 def check(db: Session, key: str, *, actor: str = "automatic") -> PlatformCheck:
-    from app.services.outbound import record_platform_request
+    from app.services.outbound import mark_outbound_failed, record_platform_request
 
     platform = BY_KEY[key]
     url = test_url(db, platform)
+    # In the log before the visit (ADR-0015), so a visit that hangs or crashes is still there.
+    request_id = record_platform_request(
+        db, kind="web address", service=f"{platform.name} (works today?)", destination=urlsplit(url).hostname or url, sent=url,
+        detail=f"Does it work today? A public test item, logged out ({'you asked' if actor != 'automatic' else 'daily check'})")
     started = time.monotonic()
     try:
         result = _ytdlp(url) if platform.how == "yt-dlp" else _page(url) if platform.how == "page" else _open(platform, url)
     except Exception as exc:  # one platform's tool failing says so; it never stops the others
         result = Result("broken", f"The check failed ({type(exc).__name__})", ["everything"])
     seconds = round(time.monotonic() - started, 1)
-    record_platform_request(db, kind="web address", service=f"{platform.name} (works today?)", destination=urlsplit(url).hostname or url,
-                            sent=url, outcome="sent" if result.state != "broken" else "failed",
-                            detail=f"Does it work today? A public test item, logged out ({'you asked' if actor != 'automatic' else 'daily check'})")
+    if result.state == "broken":
+        mark_outbound_failed(db, request_id)
     row = PlatformCheck(platform=key, test_url=url, state=result.state, detail=result.detail[:500], missing=result.missing,
                         seconds=seconds, tool=platform.route, checked_at=utcnow_naive())
     db.add(row)
