@@ -264,3 +264,19 @@ def test_every_record_in_a_path_is_traced_to_its_investigation():
             assert "{investigation_id}" in path, f"{path}: {name} must stay nested under {{investigation_id}}"
     untraced -= nested
     assert not untraced, f"path parameters the investigation scope cannot trace: {sorted(untraced)}"
+
+
+def test_a_case_scoped_remote_user_cannot_change_or_run_the_server_wide_platform_checks(monkeypatch):
+    """Does it work today? is a setting of the whole server (routes_following.py), like the lookup defaults."""
+    factory = _db_factory()
+    _seed(factory)
+    monkeypatch.setattr(settings, "api_auth_investigation_ids", "inv-allowed")
+    app = _scoped_app(factory)
+    with TestClient(app, base_url="https://journalism.example.test") as client:
+        assert client.put("/api/settings/lookups", json={"defaults": {}}).status_code == 403
+        changed = client.patch("/api/platform-checks", json={"daily": True, "items": {"youtube": "https://attacker.example.org/x"}})
+        assert changed.status_code == 403
+        assert client.post("/api/platform-checks/run").status_code == 403
+        shown = client.get("/api/platform-checks").json()
+        assert shown["daily"] is False
+        assert "attacker" not in next(p["test_url"] for p in shown["platforms"] if p["key"] == "youtube")

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies import authorize_request_resource
 from app.api.routes_documents import _submit_or_record_failure
-from app.core.authorization import scope_for_request
+from app.core.authorization import require_scope_global_admin, scope_for_request
 from app.core.time import utcnow_naive
 from app.db.session import get_db
 from app.jobs.handlers import EXTRACT_DOCUMENT, FOLLOW_AUDIO, WEB_CAPTURE
@@ -276,10 +276,14 @@ def get_platform_checks(db: Session = Depends(get_db)) -> Any:
     return platform_checks.overview(db)
 
 
-@router.patch("/platform-checks", response_model=PlatformChecksOut, responses={422: {"model": ValidationErrorOut | ErrorOut}})
-def change_platform_checks(body: PlatformChecksUpdate, db: Session = Depends(get_db)) -> Any:
-    """Turn the daily check on or off, the warning before a capture, or change a test item."""
+@router.patch("/platform-checks", response_model=PlatformChecksOut, responses={
+    403: {"model": ErrorOut, "description": "Only the server's administrator changes it"}, 422: {"model": ValidationErrorOut | ErrorOut}})
+def change_platform_checks(body: PlatformChecksUpdate, request: Request, db: Session = Depends(get_db)) -> Any:
+    """Turn the daily check on or off, the warning before a capture, or change a test item. A setting of the whole
+    server: only its administrator changes it."""
     from app.services import platform_checks
+
+    require_scope_global_admin(scope_for_request(request))
 
     try:
         platform_checks.change(db, daily=body.daily, warn=body.warn, items=body.items)
@@ -289,13 +293,16 @@ def change_platform_checks(body: PlatformChecksUpdate, db: Session = Depends(get
 
 
 @router.post("/platform-checks/run", response_model=BackgroundJobOut, status_code=202,
-             responses={422: {"model": ValidationErrorOut | ErrorOut, "description": "No such platform"}})
+             responses={403: {"model": ErrorOut, "description": "Only the server's administrator runs it"},
+                        422: {"model": ValidationErrorOut | ErrorOut, "description": "No such platform"}})
 async def run_platform_checks(request: Request, platform: str | None = Query(None, max_length=32), db: Session = Depends(get_db)) -> Any:
     """Try every platform now (or one), as a background job; each request goes in the outbound log."""
     from app.jobs.handlers import CHECK_PLATFORMS
     from app.jobs.records import serialize_job
     from app.models.domain import BackgroundJob
     from app.services.platform_checks import BY_KEY
+
+    require_scope_global_admin(scope_for_request(request))
 
     if platform is not None and platform not in BY_KEY:
         raise HTTPException(422, f"No platform called {platform}")
