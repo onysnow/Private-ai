@@ -1276,3 +1276,30 @@ A visual sweep of the 1MDB demo at 1440×900 found these, and each is changed so
   the progress files apart, where no document was written more than 3 times) the similar documents test passed every
   time and no shard failed the query. Running the live tests again on the same stack straight after a run can still meet the
   bug, through the collections the last run deleted; CI starts from a new stack each time.
+
+## 59. A browser check for every screen: overlapping text, cut-off text, the page scrolling, console errors (31 Oct 2026)
+
+- **Question:** the same visual bugs kept coming back after each fix, found by eye in sweep screenshots: names and
+  labels on top of each other, words cut off with no "…" and no way to read the rest, the page scrolling, hydration and
+  key warnings (architecture review of 31 Oct, "highest payoff" item 1).
+- **Call:** `frontend/scripts/check-screens.mjs`, run as `npm run check:screens -- --base http://localhost:3000 --case <id|auto>`.
+  It opens every screen in Chromium (Playwright) and fails on: two seen text boxes crossing (HTML text measured by its
+  own words, SVG `<text>` too); text hidden by a clipping box with no ellipsis, or an ellipsis with no Reveal, title or
+  accessible name to show the rest; words running outside their own box; the page scrolling down or sideways; console
+  errors, `pageerror`, hydration and React key warnings. Panels whose content covers under 40% of their height are
+  reported, not failed ("Fill the space").
+- **Why this way:** the screens are read from `lib/stages.ts` and the settings list in `app/settings/page.tsx`, so a new
+  stage part or settings pane is checked without touching the check. The theme is set the way the app keeps it
+  (`localStorage` `pai:appearance`) before the page loads. Overlaps under something opaque that belongs to neither text
+  (a dialog over the page) and the same words drawn twice in one place (an SVG halo) are not counted; a chip that
+  half-covers a name is. Reduced motion is on so nothing is measured mid-animation. `--self-test` proves each check on
+  a built-in page with each bug once and its harmless look-alike beside it, with no app running (13 of 13 pass).
+- **Exceptions:** `frontend/scripts/check-screens.allow.json`; every entry names its class, screen (a glob), optionally
+  width, theme and a text or CSS-path match, and must give its reason. It starts empty: no exception is accepted yet.
+- **CI:** `.github/workflows/screens-ci.yml` builds the static export, lets the API serve it on one origin (ADR-0004),
+  builds the 1MDB demo case offline (records, no downloads) and runs the check; by hand (1440 px, default theme, or the
+  inputs given) and nightly (both widths, all five themes). It is not on pull requests: its run time on a runner is not
+  measured yet; the step summary and the uploaded artifact hold the report and the screenshots.
+- **Not done yet:** the first full run against the app. The servers were down when the check was written (the
+  container had restarted; nothing listened on 3000 or 8000) and starting them was not permitted, so the thresholds
+  are calibrated on the self-test page only, not on the app's screens.

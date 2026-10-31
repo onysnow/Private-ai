@@ -1,0 +1,136 @@
+name: Screen check
+
+# The browser check of every screen (frontend/scripts/check-screens.mjs, DECISIONS_LOG 59): overlapping text, text
+# cut off with nothing to reveal it, words outside their box, the page scrolling, console errors and hydration or key
+# warnings; large empty panels are reported, not failed. It needs the whole app running with a case in it, so it is
+# heavier than the other jobs: the backend's dependencies, the static export, and a real browser.
+#
+# When it runs (kept off pull requests until a run's time is known; see DECISIONS_LOG 59):
+# - by hand (Actions › Screen check › Run workflow): 1440 px on the default theme, or the widths and themes given;
+# - nightly: the full matrix, both widths on all five themes.
+#
+# How: the app as it ships (ADR-0004), the static export served by the API on one origin (port 8000), so no
+# `next dev` and no first-visit compiles. The 1MDB demo case is built offline, without its downloads, the way
+# backend/tests/test_demo_1mdb.py builds it: its records, no document files.
+# The report (report.md, report.json) and a screenshot of every failing screen are kept as the run's artifact.
+on:
+  workflow_dispatch:
+    inputs:
+      width:
+        description: Widths in px, comma-separated (1440, 390)
+        default: '1440'
+      theme:
+        description: default, all, or theme ids (case-night, rain-noir, archive, forest-ledger, indigo-clarity)
+        default: default
+      only:
+        description: Only screens starting with this (e.g. /see#places); empty for every screen
+        default: ''
+  schedule:
+    - cron: '17 3 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: screens-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screens:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      TZ: UTC
+      BASEMAP_AUTO: 'false'
+      DATABASE_URL: sqlite:////tmp/screens/screens.db
+      DOCUMENT_STORAGE_DIR: /tmp/screens/documents
+      # The nightly run is the full matrix; a run by hand takes its inputs (1440 on the default theme unless changed).
+      CHECK_WIDTH: ${{ github.event_name == 'schedule' && '1440,390' || inputs.width }}
+      CHECK_THEME: ${{ github.event_name == 'schedule' && 'all' || inputs.theme }}
+      CHECK_ONLY: ${{ github.event_name == 'schedule' && '' || inputs.only }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.18.0'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Let pip read the private authority-suite-sdk repository
+        uses: ./.github/actions/authority-sdk-access
+        with:
+          deploy-key: ${{ secrets.AUTHORITY_SDK_DEPLOY_KEY }}
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build the static export
+        # NEXT_PUBLIC_API_URL unset: the export talks to the API on its own origin (next.config.mjs).
+        working-directory: frontend
+        run: npm run build
+
+      - name: Install Playwright and its Chromium
+        # Not one of the app's dependencies (no lockfile change); the check finds it through NODE_PATH. 1.63.0 is the
+        # release the check was written and self-tested against.
+        run: |
+          npm install -g playwright@1.63.0
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"
+          "$(npm root -g)/playwright/cli.js" install --with-deps chromium
+
+      - name: Start the API (it serves the export)
+        working-directory: backend
+        run: |
+          mkdir -p /tmp/screens/documents
+          nohup python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/screens/api.log 2>&1 &
+          for i in $(seq 1 90); do curl -sf http://127.0.0.1:8000/api/investigations > /dev/null && exit 0; sleep 2; done
+          echo "::error::The API did not answer within 180 s"; cat /tmp/screens/api.log; exit 1
+
+      - name: Build the 1MDB demo case offline
+        # The API's start made the schema; this adds the case's records with no document files (nothing downloaded).
+        working-directory: backend
+        run: |
+          python - <<'EOF'
+          from pathlib import Path
+          import app.main  # noqa: F401  every model registered
+          from app.db.session import Base, SessionLocal, engine
+          from app.services import demo_1mdb
+          Base.metadata.create_all(bind=engine)
+          with SessionLocal() as db:
+              if demo_1mdb.existing(db) is None:
+                  inv, _ = demo_1mdb.build(db, [(d, None) for d in demo_1mdb.manifest()], storage_dir=Path("/tmp/screens/documents"))
+                  db.commit()
+                  print("1MDB demo case", inv.id)
+          EOF
+
+      - name: Check every screen
+        working-directory: frontend
+        run: |
+          set -o pipefail
+          args=(--base http://127.0.0.1:8000 --api http://127.0.0.1:8000 --case auto --width "$CHECK_WIDTH" --theme "$CHECK_THEME" --out screen-check)
+          if [ -n "$CHECK_ONLY" ]; then args+=(--only "$CHECK_ONLY"); fi
+          npm run -s check:screens -- "${args[@]}"
+
+      - name: Write the summary
+        if: always()
+        run: test -f frontend/screen-check/report.md && head -c 60000 frontend/screen-check/report.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Keep the report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screen-check
+          path: |
+            frontend/screen-check/
+            /tmp/screens/api.log
+          retention-days: 14
+          if-no-files-found: ignore

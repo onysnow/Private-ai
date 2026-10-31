@@ -27,6 +27,8 @@ backend/native/target/
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+# The screen check's report and screenshots (frontend/scripts/check-screens.mjs).
+frontend/screen-check/
 # The MapLibre worker, copied from node_modules before each build (frontend/scripts/copy-maplibre-worker.mjs).
 frontend/public/maplibre/
 node_modules/
