@@ -60,8 +60,13 @@ describe('The lock screen', () => {
     await screen.findByText('Kestrel harbour case');
     expect(screen.queryByRole('dialog', {name: 'The app is locked'})).not.toBeInTheDocument();
     const {LOCKED_EVENT} = await import('../lib/api-client');
+    window.localStorage.setItem('sv-recent:inv-1', '[{"q":"Fernhill"}]');
+    window.localStorage.setItem('workbench.your-safety.inv-1', '{"plan":{"who":"my editor"}}');
     act(() => { window.dispatchEvent(new Event(LOCKED_EVENT)); });
     expect(await screen.findByRole('dialog', {name: 'The app is locked'})).toBeInTheDocument();
+    // Locking forgets the names searched for; the safety plan stays (DECISIONS_LOG 59).
+    expect(window.localStorage.getItem('sv-recent:inv-1')).toBeNull();
+    expect(window.localStorage.getItem('workbench.your-safety.inv-1')).not.toBeNull();
   });
 
   it('works as before when the server has no app lock', async () => {

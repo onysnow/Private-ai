@@ -2,7 +2,8 @@
 // Your safety (research §13; mockup KEEP-safety-and-data, right top; DECISIONS_LOG 9): signs that the story itself
 // raises the danger to the reporter, their sources or witnesses, shown apart from Red Flags and never blocking work.
 // Signs from the case's records come from the server; the questions only the reporter can answer, and the safety plan,
-// stay in this browser (localStorage): never sent to the server, not in backups, never shared with a team.
+// stay in this browser (localStorage): never sent to the server, not in backups, never shared with a team. They go when
+// the case is deleted; the app lock does not cover them (lib/case-browser-data.ts, DECISIONS_LOG 59).
 import {useQuery} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
@@ -87,7 +88,7 @@ export function YourSafety({investigationId}: {investigationId: string}): ReactE
       </li>)}
     </ul>
     {data && <fieldset className="ys-ask">
-      <legend>Only you can say <Reveal label="Kept private" detail="Kept private: in this browser only, never sent, not in backups."><span aria-hidden="true">🔒</span></Reveal></legend>
+      <legend>Only you can say <Reveal label="Kept private" detail="Kept private: in this browser only, never sent, not in backups. Deleted with the case. The app lock does not cover it: your disk encryption does."><span aria-hidden="true">🔒</span></Reveal></legend>
       {data.questions.map(q => <div key={q.id} role="radiogroup" aria-label={q.question} className="ys-q">
         <p>{q.question}</p>
         <span>{(['yes', 'no', 'not_sure'] as Answer[]).map(a => <label key={a} className={kept.answers[q.id] === a ? 'on' : ''}>

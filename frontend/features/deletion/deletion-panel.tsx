@@ -18,6 +18,7 @@ import {Button} from '@/components/ui/button';
 import {Reveal} from '@/components/ui/reveal';
 import {Input} from '@/components/ui/input';
 import {errorMessage} from '../../lib/api-client';
+import {forgetCase} from '../../lib/case-browser-data';
 import {investigationDeletionPreview, removeInvestigation} from '../../lib/generated/sdk.gen';
 import type {InvestigationDeletionPreview, InvestigationDeletionResult} from '../../lib/generated/types.gen';
 
@@ -82,6 +83,7 @@ export function DeletionPanel({investigationId, onDeleted, caseName = '', countO
       const result = await deleteMutation.mutateAsync({id: preview.investigation_id, confirmation: confirmation.trim()});
       setPreview(null);
       setConfirmation('');
+      forgetCase(preview.investigation_id);
       setStatus(`Deleted ${result.deleted_record_total} record(s) and ${result.document_files_deleted} owned document file(s); preserved ${result.shared_document_files_preserved} shared file(s).${casefileOutcome(result.openaleph_collection)}`);
       await onDeleted(result);
     } catch (error) {

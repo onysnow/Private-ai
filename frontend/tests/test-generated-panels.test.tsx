@@ -64,6 +64,8 @@ describe('DeletionPanel', () => {
       .mockResolvedValueOnce(json({investigation_id: 'inv-1', deleted: true, deleted_record_counts: {investigations: 1}, deleted_record_total: 3,
         document_files_deleted: 1, shared_document_files_preserved: 0, missing_document_files: 0, openaleph_collection: null}));
     vi.stubGlobal('fetch', fetchMock);
+    window.localStorage.setItem('workbench.your-safety.inv-1', '{"plan":{"who":"my editor"}}');
+    window.localStorage.setItem('sv-recent:inv-1', '[{"q":"Fernhill"}]');
     wrap(<DeletionPanel investigationId="inv-1" onDeleted={onDeleted}/>);
 
     // What goes is counted as the screen opens: no button to press first, and no sentence at rest (the steps say it).
@@ -90,6 +92,9 @@ describe('DeletionPanel', () => {
     expect(onDeleted).toHaveBeenCalledWith(expect.objectContaining({deleted_record_total: 3}));
     expect(url(fetchMock.mock.calls[1])).toBe('http://api.test/api/investigations/inv-1?confirmation=Kestrelwood');
     expect(init(fetchMock.mock.calls[1]).method).toBe('DELETE');
+    // What this browser kept for the case goes with it: the safety plan and the names searched for.
+    expect(window.localStorage.getItem('workbench.your-safety.inv-1')).toBeNull();
+    expect(window.localStorage.getItem('sv-recent:inv-1')).toBeNull();
   });
 
   it('names the OpenAleph casefile that goes too, and says when one is left behind', async () => {
