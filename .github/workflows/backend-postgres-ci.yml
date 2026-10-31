@@ -5,14 +5,19 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/backend-postgres-ci.yml"
+      # Read by backend/tests/test_visuals_kinds.py: a change to it alone runs the backend suite.
+      - "frontend/test-support/chart-kinds.json"
   pull_request:
     paths:
       - "backend/**"
       - ".github/workflows/backend-postgres-ci.yml"
+      - "frontend/test-support/chart-kinds.json"
 
 jobs:
   backend-postgres:
     runs-on: ubuntu-latest
+    # A hung test (a thread, a browser, a subprocess) fails the job instead of holding the runner for six hours.
+    timeout-minutes: 150
     services:
       postgres:
         image: postgres:16
@@ -127,3 +132,72 @@ jobs:
 
       - name: Run backend pytest suite on PostgreSQL
         run: python run_postgres_gate.py
+
+  # The suite on SQLite, the database the app uses on a reporter's own computer (Start without
+  # Docker): foreign keys only with the pragma, LIKE without case, JSON kept as text, and the
+  # migrations' batch copies. DATABASE_URL is left unset, so tests/conftest.py gives each
+  # pytest-xdist worker its own temporary SQLite file.
+  backend-sqlite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # The Authority System Suite comes from the authority-suite-sdk package in
+      # backend/requirements.txt (private repository; the "Let pip read" step below
+      # gives git the read-only deploy key, secret AUTHORITY_SDK_DEPLOY_KEY).
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install OCR runtime
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
+
+      - name: Let pip read the private authority-suite-sdk repository
+        uses: ./.github/actions/authority-sdk-access
+        with:
+          deploy-key: ${{ secrets.AUTHORITY_SDK_DEPLOY_KEY }}
+
+      - name: Install backend dependencies
+        # STRUCT-0026: requirements.txt is now production-only (no pytest/
+        # pytest-cov, which the Dockerfile-built image never runs); this job
+        # actually runs the test suite, so it installs requirements-test.txt,
+        # which layers pytest/pytest-cov on top of requirements.txt.
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-test.txt
+
+      - name: Set up Rust for the native module
+        # ADR-0021: backend/native compiles code from the ArtCraft apps into the workbench_native module.
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache the native module's build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/native/target
+          key: native-${{ runner.os }}-${{ hashFiles('backend/native/Cargo.lock', 'backend/native/src/**') }}
+          restore-keys: native-${{ runner.os }}-
+
+      - name: Build and install the native module
+        run: CARGO_TARGET_DIR=native/target python -m pip install ./native
+
+      - name: Install the web-capture browser
+        # ADR-0018: the capture tests drive a real Chromium against a page served on this runner.
+        run: python -m playwright install --with-deps --only-shell chromium
+
+      - name: Fetch the transcription model the tests use
+        # ADR-0020: the recording tests transcribe a short file with Whisper's smallest English model.
+        run: TRANSCRIPTION_MODEL_DIR="$HOME/whisper-models" python -m app.services.transcription fetch tiny.en
+
+      - name: Fetch the voice models the tests use
+        # ADR-0026: the voices test tells the voices of a short file apart with the pinned models.
+        run: python -m app.services.voices fetch "$HOME/voice-models"
+
+      - name: Run backend pytest suite on SQLite
+        # Coverage is measured by the PostgreSQL job; this one runs the suite in parallel, one database per worker.
+        run: python -m pytest -n auto --no-cov -p no:cacheprovider
