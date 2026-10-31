@@ -55,5 +55,5 @@ def measure(graph: CaseGraph, p: Params) -> list[Measure]:
         out.append(Measure([key, *others], [l.id for l, _ in items], float(len(items)), {
             "party": graph.name(key), "currency": currency, "sign": SIGN.get(currency, f"{currency} "), "count": len(items), "payments": len(items), "total": total, "total_text": f"{total:,.0f}",
             "first_date": dates[0] if dates else None, "last_date": dates[-1] if dates else None,
-            "period": f" from {dates[0]} to {dates[-1]}" if len(dates) > 1 else ""}))
+            "period": f" from {dates[0]} to {dates[-1]}" if len(dates) > 1 else ""}, key=(p.by, key, currency)))
     return out

@@ -57,5 +57,5 @@ def measure(graph: CaseGraph, p: Params) -> list[Measure]:
         held = [l.id for h in shared for l in holders[a][h] + holders[b][h]]
         out.append(Measure([a, b, *shared], [l.id for l in found] + held, float(len(found)), {
             "payments": len(found), "shared": shared, "a": graph.name(a), "b": graph.name(b), "holders": ", ".join(roles),
-            "count_text": f"{len(found)} payment{'s' if len(found) != 1 else ''}"}))
+            "count_text": f"{len(found)} payment{'s' if len(found) != 1 else ''}"}, key=(a, b)))
     return out

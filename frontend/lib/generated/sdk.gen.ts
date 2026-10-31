@@ -12636,7 +12636,8 @@ export const getPlatformChecks = <ThrowOnError extends boolean = false>(
 /**
  * Change Platform Checks
  *
- * Turn the daily check on or off, the warning before a capture, or change a test item.
+ * Turn the daily check on or off, the warning before a capture, or change a test item. A setting of the whole
+ * server: only its administrator changes it.
  */
 export const changePlatformChecks = <ThrowOnError extends boolean = false>(
   options: Options<ChangePlatformChecksData, ThrowOnError>,

@@ -74,19 +74,23 @@ def host_of(url_or_host: str) -> str:
 
 
 def record_platform_request(db: Session | None, *, kind: str, service: str, destination: str, sent: str,
-                            outcome: str = "sent", detail: str | None = None, investigation_id: str | None = None) -> None:
-    """Write one line. Never raises: the log must not stop the work it records (a failure is logged instead)."""
+                            outcome: str = "sent", detail: str | None = None, investigation_id: str | None = None) -> str | None:
+    """Write one line, before the request goes; returns its id (None when it could not be written). Never raises: the
+    log must not stop the work it records (a failure is logged instead)."""
     from app.db.session import SessionLocal
 
     try:
         factory = sessionmaker(bind=db.get_bind(), expire_on_commit=False) if db is not None else SessionLocal
         with factory() as own:
-            own.add(OutboundRequest(investigation_id=investigation_id, service=service, kind=kind, value=sent[:4000],
-                                    reason=(detail or "")[:500], actor="automatic", leaves_computer=True, outcome=outcome[:16],
-                                    source={"destination": host_of(destination)[:255]}))
+            row = OutboundRequest(investigation_id=investigation_id, service=service, kind=kind, value=sent[:4000],
+                                  reason=(detail or "")[:500], actor="automatic", leaves_computer=True, outcome=outcome[:16],
+                                  source={"destination": host_of(destination)[:255]})
+            own.add(row)
             own.commit()
+            return row.id
     except Exception:
         logger.warning("could not record an outbound request (%s to %s)", kind, service, exc_info=True)
+        return None
 
 
 def recent(db: Session, *, days: int = 7, kinds: tuple[str, ...] | None = None,

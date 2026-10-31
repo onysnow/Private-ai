@@ -145,6 +145,8 @@ class InvestigationDeletionPreview(ResponseModel):
     capture_file_count: int = 0
     # Files made from the case's files (ADR-0021), deleted with the case.
     derived_file_count: int = 0
+    # Newsletters kept from a followed mailbox and not captured yet, deleted with the case.
+    following_file_count: int = 0
     can_delete: bool
     requires_confirmation: str
     openaleph_collection: DeletionCollectionOut | None

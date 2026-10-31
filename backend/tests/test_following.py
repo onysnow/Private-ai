@@ -198,6 +198,37 @@ def test_a_page_that_names_its_feed_is_followed_through_the_feed_and_every_reque
     assert any(h.get("User-Agent", "").startswith("JournalismWorkbench") for _p, h in site.requests)
 
 
+def test_every_request_made_to_find_out_what_an_address_is_is_logged_before_it_goes(site, monkeypatch):
+    from app.services import outbound
+
+    inv = _case()
+    # A request whose address answers 404: refused, and still in the log.
+    site.status["/gone"] = 404
+    assert _follow(inv, site.base + "/gone")["status"] == 422
+    with SessionLocal() as db:
+        logged = [r.value for r in db.scalars(select(OutboundRequest).where(OutboundRequest.investigation_id == inv))]
+    assert logged == [f"GET {site.base}/gone"]
+
+    # A page that names its feed: both discovery requests, each written before it went.
+    order: list[str] = []
+    real_fetch, real_record = following.fetch, outbound.record_outbound
+    monkeypatch.setattr(following, "fetch", lambda url, **kw: (order.append(f"fetch {url}"), real_fetch(url, **kw))[1])
+    monkeypatch.setattr(outbound, "record_outbound", lambda *a, **kw: (order.append(f"log {kw['value']}"), real_record(*a, **kw))[1])
+    assert _follow(inv, site.base + "/home")["status"] == 200
+    home, feed = f"{site.base}/home", f"{site.base}/feed.xml"
+    assert order[:4] == [f"log GET {home}", f"fetch {home}", f"log GET {feed}", f"fetch {feed}"]
+    fetched = [o.split(" ", 1)[1] for o in order if o.startswith("fetch ")]
+    assert sum(o.startswith("log ") for o in order) == len(fetched), order
+
+    # One that cannot be reached at all says so in the log.
+    monkeypatch.setattr(following, "fetch", lambda url, **kw: (_ for _ in ()).throw(following.FetchFailed("timeout")))
+    assert _follow(inv, "https://slow.example.org/feed")["status"] == 422
+    with SessionLocal() as db:
+        row = db.scalars(select(OutboundRequest).where(OutboundRequest.investigation_id == inv,
+                                                       OutboundRequest.value == "GET https://slow.example.org/feed")).one()
+        assert row.outcome == "failed"
+
+
 def test_a_check_asks_only_for_what_is_new(site):
     inv = _case()
     m = _follow(inv, site.base + "/feed.xml")
@@ -349,6 +380,20 @@ def test_a_podcast_episode_is_captured_as_its_audio_and_transcribed(site, monkey
     assert done["state"] == "saved" and done["document_id"]
     doc = client.get(f"/api/documents/{done['document_id']}").json()
     assert doc["extraction_status"] == "complete" and doc["sha256"]
+
+
+def test_a_podcast_episode_whose_audio_cannot_be_fetched_goes_back_in_the_queue(site):
+    inv = _case()
+    _follow(inv, site.base + "/podcast.xml")
+    episode = _screen(inv)["queue"][0]
+    site.status["/ep41.mp3"] = 500
+    after = client.post(f"/api/monitor-items/{episode['id']}/capture")
+    assert after.status_code == 200, after.text
+    back = next(q for q in _screen(inv)["queue"] if q["id"] == episode["id"])
+    assert back["state"] == "waiting" and not back["document_id"]
+    # And it can be captured again once the file answers.
+    del site.status["/ep41.mp3"]
+    assert client.post(f"/api/monitor-items/{episode['id']}/capture").status_code == 200
 
 
 def test_a_closed_platform_has_no_monitor_and_is_never_asked(site):

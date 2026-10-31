@@ -190,6 +190,20 @@ def _wanted(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...]) ->
     return out
 
 
+def carry_flag_items(db: Session, investigation_id: str, old: str, new: str) -> None:
+    """A flag kept under a new fingerprint (patterns/engine.py, a grouped flag taking over earlier ones) keeps its To
+    check items and the decisions on them."""
+    flag_items = db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id, CheckItem.kind == "checklist",
+                                                    CheckItem.flag_id.is_not(None)))
+    held = {c.fingerprint for c in db.scalars(select(CheckItem).where(CheckItem.investigation_id == investigation_id))}
+    for item in flag_items:
+        if item.fingerprint == _fp("flag", old, item.question or ""):
+            moved = _fp("flag", new, item.question or "")
+            if moved not in held:
+                item.fingerprint = moved
+                held.add(moved)
+
+
 def recompute(db: Session, investigation_id: str, specs: tuple[CheckSpec, ...] | None = None) -> None:
     """Brings the case's items up to date: new ones open, ones no longer called
     for are marked gone (decisions kept), ones that come back lose the mark."""

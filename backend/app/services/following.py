@@ -184,7 +184,8 @@ def _log(db: Session, monitor: Monitor, what: str, url: str) -> str:
 
     host = urlsplit(url).hostname or url
     return record_outbound(db, monitor.investigation_id, service=f"following:{host}", kind=monitor.kind, value=f"{what} {url}",
-                           reason=f"Following: {monitor.name}" + (" (through Tor)" if monitor.route == "tor" else ""),
+                           # A mailbox is never read through Tor (app/services/mailbox.py): the log never says it was.
+                           reason=f"Following: {monitor.name}" + (" (through Tor)" if monitor.route == "tor" and monitor.kind != "mailbox" else ""),
                            actor="automatic", source={"monitor_id": monitor.id, "destination": host})
 
 
@@ -478,9 +479,40 @@ def closed_platform(url: str) -> str | None:
     return next((h for h in CLOSED_HOSTS if host == h or host.endswith("." + h)), None)
 
 
-def discover(text: str, *, route: str = "direct") -> Found:
-    """What an address or handle the reporter typed can be followed as. Asks the source once (not logged here: the
-    caller logs it with the case). Raises FollowRefused."""
+class DiscoveryLog:
+    """Each request made to find out what an address is, written in the case's outbound log before it goes (ADR-0015),
+    whether or not the address can be followed; one that fails says so there."""
+
+    def __init__(self, db: Session, investigation_id: str, text: str, route: str) -> None:
+        self.db, self.investigation_id, self.text, self.route = db, investigation_id, text.strip()[:300], route
+
+    def before(self, url: str) -> str:
+        from app.services.outbound import record_outbound
+
+        host = urlsplit(url).hostname or url
+        return record_outbound(self.db, self.investigation_id, service=f"following:{host}", kind="web address", value=f"GET {url}",
+                               reason=f"Following: what is {self.text}?" + (" (through Tor)" if self.route == "tor" else ""),
+                               actor="automatic", source={"destination": host})
+
+    def failed(self, request_id: str) -> None:
+        from app.services.outbound import mark_outbound_failed
+
+        mark_outbound_failed(self.db, request_id)
+
+
+def _ask(url: str, *, route: str, log: DiscoveryLog | None, accept: str = "*/*") -> Fetched:
+    request_id = log.before(url) if log is not None else None
+    try:
+        return fetch(url, route=route, accept=accept)
+    except Exception:
+        if log is not None and request_id is not None:
+            log.failed(request_id)
+        raise
+
+
+def discover(text: str, *, route: str = "direct", log: DiscoveryLog | None = None) -> Found:
+    """What an address or handle the reporter typed can be followed as. Asks the source once, or twice for a page that
+    names its feed; `log` writes each request in the case's outbound log before it goes. Raises FollowRefused."""
     handle = _bluesky_handle(text)
     if handle:
         return Found("account", f"https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor={quote(handle)}&limit=20"
@@ -490,7 +522,7 @@ def discover(text: str, *, route: str = "direct") -> Found:
         return Found("account", mastodon[0], f"{mastodon[1]} · public account", "mastodon")
     channel = _telegram_channel(text)
     if channel:
-        return _telegram(channel, route)
+        return _telegram(channel, route, log)
     url = text.strip()
     if not re.match(r"^https?://", url, re.I):
         raise FollowRefused("Give a web address (https://…), a Bluesky handle (@name.bsky.social), a Mastodon "
@@ -499,7 +531,7 @@ def discover(text: str, *, route: str = "direct") -> Found:
     if closed:
         return Found("closed", url, f"{closed} · closed platform")
     try:
-        got = fetch(url, route=route)
+        got = _ask(url, route=route, log=log)
     except OSError as exc:
         raise FollowRefused(f"The address could not be read: {reason_of(exc)}") from exc
     if got.moved_to:
@@ -522,16 +554,16 @@ def discover(text: str, *, route: str = "direct") -> Found:
     title, _text_ = main_text(got.body)
     if feeds:
         # A page that names its feed: following the feed is lighter for the site and lists every new item.
-        return discover(feeds[0], route=route)
+        return discover(feeds[0], route=route, log=log)
     return Found("page", url, f"{title or host} · page")
 
 
-def _telegram(channel: str, route: str) -> Found:
+def _telegram(channel: str, route: str, log: DiscoveryLog | None = None) -> Found:
     """A public channel is followed through its web preview, which Telegram shows logged out; a channel without one
     (private, or a person or group) cannot be followed."""
     url = f"https://t.me/s/{channel}"
     try:
-        got = fetch(url, route=route, accept="text/html")
+        got = _ask(url, route=route, log=log, accept="text/html")
     except OSError as exc:
         raise FollowRefused(f"The channel could not be read: {reason_of(exc)}") from exc
     if got.status != 200 or urlsplit(got.url).path.rstrip("/") != f"/s/{channel}" or b"tgme_channel_info" not in got.body:
@@ -549,7 +581,7 @@ def follow(db: Session, investigation_id: str, text: str, *, every_minutes: int 
         raise LookupError("Investigation not found")
     if route not in ROUTES:
         raise FollowRefused(f"Route must be one of {', '.join(ROUTES)}")
-    found = discover(text, route=route)
+    found = discover(text, route=route, log=DiscoveryLog(db, investigation_id, text, route))
     if db.scalar(select(Monitor.id).where(Monitor.investigation_id == investigation_id, Monitor.url == found.url)):
         raise FollowRefused("This case already follows that address")
     if found.kind == "sitemap":
@@ -569,8 +601,6 @@ def follow(db: Session, investigation_id: str, text: str, *, every_minutes: int 
     db.add(monitor)
     db.commit()
     if found.kind != "closed":
-        # The address was asked once to see what it is: that request is the case's too.
-        _log(db, monitor, "GET", text.strip() if found.kind != "account" else found.url)
         check(db, monitor)
     return monitor
 

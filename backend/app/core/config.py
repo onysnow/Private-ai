@@ -77,6 +77,9 @@ class Settings(BaseSettings):
     capture_max_megabytes: int = 100
     # Following (ADR-0022): a monitor or capture set to the Tor route goes to the Tor the reporter runs on this computer.
     tor_socks_url: str = "socks5h://127.0.0.1:9050"
+    # Following a newsletter mailbox (app/services/mailbox.py): the IMAP ports a mail server may be read on (993: TLS
+    # from the start; 143: STARTTLS). Only the server's administrator widens this.
+    mailbox_ports: list[int] = [993, 143]
     # A capture's time proof (ADR-0025), off until a person asks: the time server that signs the capture's fingerprint
     # (RFC 3161). Its root must be in app/trust/tsa/ for the token to be checked here.
     capture_time_server: str = "https://freetsa.org/tsr"

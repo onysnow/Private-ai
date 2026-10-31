@@ -5375,6 +5375,7 @@ export const zInvestigationDeletionPreview = z.object({
   derived_file_count: z.int().optional().default(0),
   document_file_summary: zDeletionFileSummary,
   document_files: z.array(zDeletionDocumentFile),
+  following_file_count: z.int().optional().default(0),
   investigation_id: z.string(),
   investigation_name: z.string(),
   openaleph_collection: zDeletionCollectionOut.nullable(),

@@ -1337,3 +1337,29 @@ A visual sweep of the 1MDB demo at 1440×900 found these, and each is changed so
      path chip name a sum per currency ("20,000 EUR + 9,400 USD"), and the time strip's bars count payments per
      quarter, naming each currency's sum on hover.
   9. **Case home:** Z (undo the held answer) waits while typing, with Ctrl, Cmd or Alt, and when single keys are off.
+
+## 61. Backend review of PR #117: Following, mailboxes, case deletion and grouped flags (31 Oct 2026)
+
+- **Mailbox and Tor:** a mailbox cannot be set to Tor (`PATCH /api/monitors/{id}` answers 422 with the reason), as a
+  capture from a Tor-followed source is refused (ADR-0021): IMAP over Tor is not built, and the mailbox was read
+  directly while the log said "(through Tor)". A mailbox row already set to Tor is not read at all (no connection;
+  its health says why), and the log never adds "(through Tor)" to a mailbox.
+- **Mail server address:** connected only at an address `resolve_public` checked (no private, loopback or link-local
+  address, as web following's guard), on 993 (TLS) or 143 (STARTTLS) unless the server's administrator sets
+  `MAILBOX_PORTS`; every failure but a refused login reads "the mail server could not be read over TLS", so the
+  answer never says whether something at that address answered.
+- **Mailbox renumbered:** a message is known by its Message-ID and bytes, not the server's UID, and kept under that
+  name, so a new UIDVALIDITY no longer drops new messages or overwrites a kept one.
+- **Case deletion:** also removes the case's `following/` folder, the empty folders left in its folder, and its
+  mailboxes' passwords; the deletion preview counts the kept newsletters (`following_file_count`).
+- **Does it work today?:** changing or running it needs the server's administrator (as the lookup defaults).
+- **Outbound log before the request (ADR-0015):** each request Following makes to find out what an address is (a
+  refused or timed-out one, and the feed a page names) is written before it goes; Does it work today? writes its row
+  before the visit; the base map's list of builds (`build-metadata.protomaps.dev`) is logged.
+- **Podcast episode:** one whose audio cannot be fetched goes back in the queue, to be captured again.
+- **Grouped flags (BO-033, ML-021, BO-031):** a family that groups links gives the group's key (payer, payee and
+  stated / not recorded; party and currency; the two parties), and the flag is known by it, so a dismissed flag stays
+  dismissed with its notes when its group gains or loses a payment or the rule's version changes. A keyed flag seen
+  for the first time takes over the earlier flags of its rule on its links (the one-per-payment BO-033 flags): it is
+  dismissed when every one it takes over was, and keeps their To check items. The engine has no "changed since set
+  aside" state, so none is added.

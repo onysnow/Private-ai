@@ -13158,6 +13158,10 @@ export type InvestigationDeletionPreview = {
    */
   document_files: Array<DeletionDocumentFile>;
   /**
+   * Following File Count
+   */
+  following_file_count?: number;
+  /**
    * Investigation Id
    */
   investigation_id: string;
@@ -38446,9 +38450,11 @@ export type UpdateMonitorErrors = {
    */
   409: ErrorOut;
   /**
-   * The request's input does not match what the route declares
+   * Response 422 Update Monitor
+   *
+   * A mailbox cannot be set to Tor (the message says why)
    */
-  422: ValidationErrorOut;
+  422: ValidationErrorOut | ErrorOut;
   /**
    * Refused: why, in a sentence
    */
@@ -38691,6 +38697,10 @@ export type ChangePlatformChecksData = {
 
 export type ChangePlatformChecksErrors = {
   /**
+   * Only the server's administrator changes it
+   */
+  403: ErrorOut;
+  /**
    * Response 422 Change Platform Checks
    *
    * Unprocessable Content
@@ -38766,6 +38776,10 @@ export type RunPlatformChecksData = {
 };
 
 export type RunPlatformChecksErrors = {
+  /**
+   * Only the server's administrator runs it
+   */
+  403: ErrorOut;
   /**
    * Response 422 Run Platform Checks
    *
