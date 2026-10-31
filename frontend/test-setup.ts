@@ -1,6 +1,14 @@
 import '@testing-library/jest-dom/vitest';
 import {afterEach, vi} from 'vitest';
 
+import {fastJobPolls} from './test-support/job-poll';
+
+// A screen following a background job polls GET /api/jobs/{id} once a second (lib/jobs.ts). In a
+// test the mock answers at once, so wait 10 ms between polls instead of a real second: a page
+// test that needs two polls no longer races its own wait under load (review B3).
+// test-support/job-poll.ts has a stepped wait for a test that reads the state between polls.
+fastJobPolls();
+
 // app/page.tsx (bulk import) and app/review/page.tsx both use next/navigation
 // hooks, which throw "invariant expected app router to be mounted" outside a
 // real Next.js app-router tree -- every test in this suite renders its page

@@ -6,6 +6,9 @@ import userEvent from '@testing-library/user-event';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {FOLD_MS, InterruptNotice} from '../features/inbox/interrupt-notice';
+
+// How often the notice looks for a calm zone (features/inbox/interrupt-notice.tsx, its setInterval).
+const CALM_POLL = 2000;
 import {SavedQuestions} from '../features/ai/saved-questions';
 import {KeysPane} from '../features/settings/keys-pane';
 import {leavesShort, LookupsPane, shortSent, whatLeaves} from '../features/settings/lookups-pane';
@@ -291,15 +294,21 @@ describe('The top-band notice', () => {
   });
 
   it('waits while a calm zone is on screen', async () => {
-    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
     const zone = document.createElement('div');
     zone.setAttribute('data-calm-zone', '');
     document.body.appendChild(zone);
-    render(<QueryProvider><InterruptNotice/></QueryProvider>);
-    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
-    expect(screen.queryByRole('alert')).toBeNull();
-    zone.remove();
-    expect(await screen.findByRole('alert', {}, {timeout: 3000})).toHaveTextContent('round trip');
+    // The calm check runs every CALM_POLL (2 s): step the clock past it rather than wait on it (review B4).
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    try {
+      const api = mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+      render(<QueryProvider><InterruptNotice/></QueryProvider>);
+      await vi.waitFor(() => expect(api.calls('GET /api/investigations/inv-1/inbox')).toHaveLength(1));
+      await act(async () => {});
+      expect(screen.queryByRole('alert')).toBeNull();
+      zone.remove();
+      act(() => { vi.advanceTimersByTime(CALM_POLL + 10); });
+      expect(screen.getByRole('alert')).toHaveTextContent('round trip');
+    } finally { vi.useRealTimers(); }
   });
 
   it('is not held by a calm zone kept mounted behind a hidden wrapper', async () => {
@@ -328,27 +337,37 @@ describe('The top-band notice', () => {
     const {useSnoozed} = await import('../features/inbox/inbox');
     let snooze: (id: string, ms: number) => void = () => undefined;
     function Snoozer(): null { snooze = useSnoozed()[1]; return null; }
-    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
     const zone = document.createElement('div');
     zone.setAttribute('data-calm-zone', '');
     document.body.appendChild(zone);
-    render(<QueryProvider><Snoozer/><InterruptNotice/></QueryProvider>);
-    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
-    act(() => { snooze('f:f1', 60_000); });
-    zone.remove();
-    await act(async () => { await new Promise(r => setTimeout(r, 2500)); });
-    expect(screen.queryByRole('alert')).toBeNull();
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    try {
+      const api = mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+      render(<QueryProvider><Snoozer/><InterruptNotice/></QueryProvider>);
+      await vi.waitFor(() => expect(api.calls('GET /api/investigations/inv-1/inbox')).toHaveLength(1));
+      await act(async () => {});
+      act(() => { snooze('f:f1', 60_000); });
+      zone.remove();
+      // The clock moves past the calm check for certain (the control below shows the notice with the same
+      // steps), so no notice here is the snooze's doing, not a check that never came.
+      act(() => { vi.advanceTimersByTime(CALM_POLL + 10); });
+      expect(screen.queryByRole('alert')).toBeNull();
+    } finally { vi.useRealTimers(); }
   });
 
   it('(control) without the snooze the same notice does show', async () => {
-    mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
     const zone = document.createElement('div');
     zone.setAttribute('data-calm-zone', '');
     document.body.appendChild(zone);
-    render(<QueryProvider><InterruptNotice/></QueryProvider>);
-    await act(async () => { await new Promise(r => setTimeout(r, 50)); });
-    zone.remove();
-    await act(async () => { await new Promise(r => setTimeout(r, 2500)); });
-    expect(screen.queryByRole('alert')).not.toBeNull();
+    vi.useFakeTimers({shouldAdvanceTime: true});
+    try {
+      const api = mockApi({'GET /api/investigations/inv-1/inbox': inbox({interrupt: [textbook], needs: [textbook]})});
+      render(<QueryProvider><InterruptNotice/></QueryProvider>);
+      await vi.waitFor(() => expect(api.calls('GET /api/investigations/inv-1/inbox')).toHaveLength(1));
+      await act(async () => {});
+      zone.remove();
+      act(() => { vi.advanceTimersByTime(CALM_POLL + 10); });
+      expect(screen.queryByRole('alert')).not.toBeNull();
+    } finally { vi.useRealTimers(); }
   });
 });

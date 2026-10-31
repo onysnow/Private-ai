@@ -9,7 +9,7 @@
     "build": "next build",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "vitest run",
+    "test": "vitest run --project app && vitest run --project effects",
     "test:watch": "vitest",
     "generate:api": "openapi-ts"
   },

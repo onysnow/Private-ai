@@ -11,11 +11,12 @@
 // OpenAleph sync/refresh and staging a relationship from an accepted claim
 // candidate -- both layer on top of what's covered here rather than being
 // core to the upload/review loop.
-import {cleanup, render, screen, waitFor} from '@testing-library/react';
+import {act, cleanup, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type {ReactElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {fastJobPolls, steppedJobPolls} from '../test-support/job-poll';
 import {mockApi} from '../test-support/mock-api';
 import type {MockApi, RouteCall} from '../test-support/mock-api';
 import {pageRoutes} from '../test-support/page-routes';
@@ -51,6 +52,7 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
   mockPush.mockClear();
+  fastJobPolls();
 });
 
 async function importHome(): Promise<() => ReactElement> {
@@ -254,12 +256,14 @@ describe('Home document reading runs as a background job (ADR-0004)', () => {
       'GET /api/documents/doc-2/candidates': [candidateFixture({id: 'cand-2'})],
     });
 
+    const nextPoll = steppedJobPolls();
     const user = userEvent.setup();
     await user.upload(fileInput(), new File(['pdf-bytes'], 'scan.pdf', {type: 'application/pdf'}));
     await user.click(screen.getByRole('button', {name: 'Upload & extract'}));
 
     await screen.findByText('Saved. Reading the document: Reading the document (5%)');
-    await screen.findByText('Kestrelwood Holdings Ltd', {}, {timeout: 4000});
+    act(() => nextPoll());
+    await screen.findByText('Kestrelwood Holdings Ltd');
     // Two polls until the job finished, then the read document and its
     // proposals; the list was reloaded on save and again when the read ended.
     expect(api.calls('GET /api/jobs/job-1')).toHaveLength(2);
